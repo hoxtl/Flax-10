@@ -74,12 +74,14 @@ WSGI_APPLICATION = 'Flax10.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-#if you are running django on a docker container, change "HOST" into "host.docker.internal"
+#if you are running django on a docker container and PostgreSQL on your host machine, change "HOST" into "host.docker.internal" 
+#Above instruction is to be verified workable
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "study_flex_db",
-        "USER": "edustu",
+        "NAME": "postgres",
+        "USER": "user",
         "PASSWORD": "1234",
         "HOST": "127.0.0.1",
         "PORT": "5432",

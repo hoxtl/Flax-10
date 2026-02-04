@@ -17,9 +17,8 @@
 				pkgs.python314Packages.pip
 				pkgs.python314Packages.virtualenv
 
-				#Nodejs and vite
-				pkgs.nodejs_25
-				pkgs.vite
+				#Nodejs
+				pkgs.nodejs_20
 
 				pkgs.git
 			];
@@ -31,16 +30,25 @@
 				echo "Running for the first time, creating venv with necessary packages and deploying Node toolchain..."
 				python -m venv /flax-10-project-files/venv
 				source /flax-10-project-files/venv/bin/activate
-				pip install django djangorestframework psycopg[binary]
-				cd flax-10-project-files/frontend
-				npm install
 				
-			else
-				source /flax-10-project-files/venv/bin/activate
+				cd /work
+				pip install -r requirements.txt
+				
+				cd flax-10-project-files/frontend
+				if [ ! -d package.json ]; then
+					echo "Frontend dorectory empty. Rebuilding template..."
+					npm create vite@latest . -- --template react
+					npm install
+				fi
+				
+				npm ci
+				
 			fi
 			
 			echo "Python: $(python --version)"
 			echo "NodeJS: $(node --version)"
+			
+			cd /work/flax-10-project-files
 			echo "Venv: $VIRTUAL_ENV"
 			'';
 		};
