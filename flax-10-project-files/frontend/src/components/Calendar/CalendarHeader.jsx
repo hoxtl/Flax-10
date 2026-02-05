@@ -1,5 +1,5 @@
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
-import { addDays, formatDate } from "../../utils/dateUtils";
+import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
 import './CalendarHeader.css';
 
 /**
@@ -13,14 +13,27 @@ export function CalendarHeader() {
     // Moves forward or backward by the appropriate amount based on current view.
     // direction: 1 for forward, -1 for backward
     const navigate = (direction) => {
-        const newDate = addDays(selectedDate, getNavigationDays(viewMode, direction));
+        const multipliers = { day: 1, week: 7, month: 30 };
+        const newDate = addDays(selectedDate, multipliers[viewMode] * direction);
         dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
     };
+    const week = getWeekDays(selectedDate);
+    const title = {
+        day: formatDate(selectedDate),
+        week: `${week[0].toLocaleDateString([], { month: 'short', day: 'numeric' })} – ${week[6].toLocaleDateString([], { month: 'short', day: 'numeric' })}`,
+        month: formatMonthYear(selectedDate)
+    }[viewMode];
 
-    const nav = <NavigationButtons onNavigate={navigate} />;
-    const title = <h2 className="calendar-title">{formatDate(selectedDate)}</h2>;
-    const toggle = <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />;
-    return <div className="calendar-header">{nav}{title}{toggle}</div>;
+    return (
+        <div className="calendar-header">
+            <div className="nav-buttons">
+                <button onClick={() => navigate(-1)}>&lt;</button>
+                <button onClick={() => navigate(1)}>&gt;</button>
+            </div>
+            <h2 className="calendar-title">{title}</h2>
+            <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
+        </div>
+    );
 }
 
 

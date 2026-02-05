@@ -19,10 +19,12 @@ export function WeekView() {
         />
     ));
     return (
-        <div className="week-view week-grid">
+        <div className="week-view">
             <WeekHeader days={weekDays} />
-            <TimeLabels />
-            {dayColumns}
+            <div className="week-grid">
+                <TimeLabels />
+                {dayColumns}
+            </div>
         </div>
     );
 }
@@ -32,12 +34,16 @@ export function WeekView() {
  */
 function WeekHeader({ days }) {
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const headerCells = days.map((day, index) => (
-        <div key={day.toISOString()} className="day-header">
-            <span className="day-name">{dayNames[index]}</span>
-            <span className="day-number">{day.getDate()}</span>
-        </div>
-    ));
+    const today = new Date();
+    const headerCells = days.map((day, index) => {
+        const isToday = isSameDay(day, today);
+        return (
+            <div key={day.toISOString()} className={`day-header ${isToday ? 'is-today' : ''}`}>
+                <span className="day-name">{dayNames[index]}</span>
+                <span className="day-number">{day.getDate()}</span>
+            </div>
+        );
+    });
     return (
         <div className="week-header">
             <div className="time-gutter" />

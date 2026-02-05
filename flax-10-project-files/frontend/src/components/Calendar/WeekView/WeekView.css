@@ -6,7 +6,8 @@
 
 .week-header {
     display: flex;
-    border-bottom: 2px solid var(--border, #E8D4B8);
+    border-bottom: 2px solid var(--border, white);
+    background-color: #f6f4f1;
 }
 
 .time-gutter {
@@ -18,26 +19,46 @@
     flex: 1;
     text-align: center;
     padding: 0.75rem;
-    background: var(--panel, #f6f4f1);
+    background: transparent;
+}
+
+/* Bold the text and perhaps add a colored circle behind the number */
+.day-header.is-today .day-number {
+    background-color: #8D6E63;
+    /* Match your brown theme */
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.day-header.is-today .day-name {
+    color: #8D6E63;
+    font-weight: bold;
 }
 
 .day-name {
     display: block;
     font-size: 0.75rem;
-    color: var(--muted, #8B7355);
+    color: #9E7E5D;
 }
 
 .day-number {
     display: block;
     font-size: 1.25rem;
     font-weight: bold;
-    color: var(--text, #5C4A32);
+    color: #503f2e;
 }
 
 .week-grid {
     display: flex;
-    max-height: 70vh;
+    flex: 1;
     overflow-y: auto;
+    color: var(--text, #9E7E5D);
 }
 
 .time-labels {
@@ -49,21 +70,32 @@
     padding: 0.25rem;
     text-align: right;
     font-size: 0.75rem;
-    color: var(--muted, #8B7355);
+    color: var(--muted, #9E7E5D);
 }
 
 .day-column {
-    flex: 1;
-    border-left: 1px solid var(--border, #E8D4B8);
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border, #f6f4f1);
     position: relative;
+    flex: 1;
 }
 
 .hour-cell {
-    border-bottom: 1px solid var(--border, #E8D4B8);
+    border-bottom: 1px solid var(--border, #f6f4f1) !important;
+    box-sizing: border-box;
+}
+
+.hour-cell:last-child {
+    border-bottom: 1px solid var(--border, #f6f4f1) !important;
 }
 
 .hour-cell.drop-target {
     background: #E8F5E8;
+}
+
+.hour-cell:nth-last-child(1) {
+    border-bottom: 2px solid #f6f4f1 !important;
 }
 
 .column-events {
