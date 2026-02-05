@@ -1,0 +1,84 @@
+.container {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ─── BADGE ───────────────────────── */
+.badgeWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.badgeNormal {
+  background: var(--primary);
+  color: #fff;
+}
+
+.badgeReading {
+  background: #00e5ff;
+  color: #0a3d4f;
+}
+
+.badgeSub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ─── TRACK ───────────────────────── */
+.track {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  align-items: center;
+}
+
+/* ─── SEGMENTS ────────────────────── */
+.segment {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.segmentBar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: #eee;
+  transition: height 0.2s ease, background 0.2s ease;
+}
+
+.segmentCurrent {
+  height: 7px;
+  background: var(--primary);
+}
+
+.segmentPast {
+  background: rgba(158, 126, 93, 0.18);
+}
+
+.segmentLabel {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.segmentLabelActive {
+  font-weight: 700;
+  color: var(--text);
+}
