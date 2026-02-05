@@ -1,31 +1,31 @@
-import { fetch_api } from "./client";
+import { fetchApi } from "./client";
 
-export async function get_events(params = {}) {
-    const query = build_query_string(params);
-    return fetch_api(`/events${query}`);
+export async function getEvents(params = {}) {
+    const query = buildQueryString(params);
+    return fetchApi(`/events${query}`);
 }
 
-export async function create_event(event_data) {
-    return fetch_api(`/events`, {
+export async function createEvent(event_data) {
+    return fetchApi(`/events`, {
         method: "POST",
         body: JSON.stringify(event_data),
     });
 }
 
-export async function update_event(id, event_data) {
-    return fetch_api(`/events/${id}`, {
+export async function updateEvent(id, event_data) {
+    return fetchApi(`/events/${id}`, {
         method: "PUT",
         body: JSON.stringify(event_data),
     });
 }
 
-export async function delete_event(id) {
-    return fetch_api(`/events/${id}`, {
+export async function deleteEvent(id) {
+    return fetchApi(`/events/${id}`, {
         method: "DELETE",
     });
 }
 
-function build_query_string(params) {
+function buildQueryString(params) {
     const entries = Object.entries(params)
         .filter(([, v]) => v);
     if (entries.length === 0) return '';
