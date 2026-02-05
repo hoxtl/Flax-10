@@ -19,10 +19,10 @@ function useIsMobile(breakpoint = 900) {
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const isMobile = useIsMobile(900);
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // desktop
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // mobile
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); //   Desktop
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Mobile
 
-  //change this to real user data later
+  // Change this to real user data later
   const user = {
     name: "Jane Smith",
     year: "Year 2",

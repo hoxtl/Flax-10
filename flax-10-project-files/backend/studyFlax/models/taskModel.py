@@ -1,5 +1,4 @@
 from django.db import models
-
 from .todoListModel import TodoList
 
 PRIORITY_CHOICES = [
