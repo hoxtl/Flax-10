@@ -1,0 +1,39 @@
+/* Main header container - uses flexbox to spread out the three sections */
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #f6f4f1;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.calendar-title {
+    margin: 0;
+    color: black;
+    font-size: 1.25rem;
+}
+
+/* Styling for all the buttons in nav and view toggle */
+.nav-buttons button,
+.view-toggle button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #9E7E5D;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 0.25rem;
+}
+
+.nav-buttons button:hover,
+.view-toggle button:hover {
+    background: #7E5F40;
+}
+
+/* Highlight the currrently active view mode button */
+.view-toggle button.active {
+    background: #3a3a3a;
+    color: white;
+}
