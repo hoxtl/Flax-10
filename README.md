@@ -96,6 +96,13 @@ For docker users, you will need to run the ```docker run...``` command mentioned
 ## Sources
 - Mention any external sources / AI generated code
 
+**Package Management Software**
+
+| Package   | Version | Purpose            |
+| --------- | ------- | ------------------ |
+| Nix	    | 2.33.2  | Enviromental package management      |
+| npm	    | 19.2.0  | JavaScript package management |
+
 **Frontend Packages**
 
 - Runtime Dependencies
