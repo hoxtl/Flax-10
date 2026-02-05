@@ -2,6 +2,7 @@ import { CalendarProvider, useCalendar } from '../../context/CalendarContext';
 import { useCalendarEvents } from '../../hooks/useCalendarEvents';
 import { CalendarHeader } from './CalendarHeader';
 import { DayView } from './DayView/DayView';
+import { WeekView } from './WeekView/WeekView';
 import './Calendar.css';
 
 export function Calendar() {
@@ -30,11 +31,14 @@ function CalendarView({ viewMode }) {
   if (viewMode === 'day') {
     return <DayView />;
   }
-  // Placeholder for week and month views until they're implemented
+  if (viewMode === 'week') {
+    return <WeekView />;
+  }
+  // Placeholder for month view until it's implemented
   return (
     <div className="view-placeholder">
-      <p>{viewMode.charAt(0).toUpperCase() + viewMode.slice(1)} view coming soon</p>
-      <p>Use Day view for now</p>
+      <p>Month view coming soon</p>
+      <p>Use Day or Week view for now</p>
     </div>
   );
 }

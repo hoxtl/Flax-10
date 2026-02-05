@@ -1,0 +1,80 @@
+.week-view {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.week-header {
+    display: flex;
+    border-bottom: 2px solid var(--border, #E8D4B8);
+}
+
+.time-gutter {
+    width: 60px;
+    flex-shrink: 0;
+}
+
+.day-header {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem;
+    background: var(--panel, #f6f4f1);
+}
+
+.day-name {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted, #8B7355);
+}
+
+.day-number {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--text, #5C4A32);
+}
+
+.week-grid {
+    display: flex;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.time-labels {
+    width: 60px;
+    flex-shrink: 0;
+}
+
+.time-label-cell {
+    padding: 0.25rem;
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--muted, #8B7355);
+}
+
+.day-column {
+    flex: 1;
+    border-left: 1px solid var(--border, #E8D4B8);
+    position: relative;
+}
+
+.hour-cell {
+    border-bottom: 1px solid var(--border, #E8D4B8);
+}
+
+.hour-cell.drop-target {
+    background: #E8F5E8;
+}
+
+.column-events {
+    position: absolute;
+    top: 0;
+    left: 2px;
+    right: 2px;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.column-events>* {
+    pointer-events: auto;
+}
