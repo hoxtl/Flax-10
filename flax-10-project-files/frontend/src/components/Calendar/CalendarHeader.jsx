@@ -13,17 +13,14 @@ export function CalendarHeader() {
     // Moves forward or backward by the appropriate amount based on current view.
     // direction: 1 for forward, -1 for backward
     const navigate = (direction) => {
-        const days = getNavigationDays(viewMode, direction);
-        const newDate = addDays(selectedDate, days);
+        const newDate = addDays(selectedDate, getNavigationDays(viewMode, direction));
         dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
     };
-    return (
-        <div className="calendar-header">
-            <NavigationButtons onNavigate={navigate} />
-            <h2 className="calendar-title">{formatDate(selectedDate)}</h2>
-            <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
-        </div>
-    );
+
+    const nav = <NavigationButtons onNavigate={navigate} />;
+    const title = <h2 className="calendar-title">{formatDate(selectedDate)}</h2>;
+    const toggle = <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />;
+    return <div className="calendar-header">{nav}{title}{toggle}</div>;
 }
 
 
@@ -40,19 +37,16 @@ function NavigationButtons({ onNavigate }) {
 // Buttons to switch between day, week, and month views
 function ViewModeToggle({ viewMode, dispatch }) {
     const modes = ['day', 'week', 'month'];
-    return (
-        <div className="view-toggle">
-            {modes.map((mode) => (
-                <button
-                    key={mode}
-                    onClick={() => dispatch({ type: 'SET_VIEW_MODE', payload: mode })}
-                    className={viewMode === mode ? 'active' : ''}
-                >
-                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </button>
-            ))}
-        </div>
-    );
+    const buttons = modes.map((m) => (
+        <button
+            key={m}
+            onClick={() => dispatch({ type: 'SET_VIEW_MODE', payload: m })}
+            className={viewMode === m ? 'active' : ''}
+        >
+            {m.charAt(0).toUpperCase() + m.slice(1)}
+        </button>
+    ));
+    return <div className="view-toggle">{buttons}</div>;
 }
 
 // Figures out how many days to jump based on the view

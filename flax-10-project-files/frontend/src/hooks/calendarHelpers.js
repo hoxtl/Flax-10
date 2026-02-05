@@ -10,12 +10,8 @@ import { getStartOfWeek, getStartOfMonth, getEndOfMonth, addDays } from '../util
  * @returns ISO strings that we can send to the API
  */
 export function getDateRangeForView(date, viewMode) {
-    if (viewMode == 'day') {
-        return getDayRange(date);
-    }
-    if (viewMode == 'week') {
-        return getWeekRange(date);
-    }
+    if (viewMode == 'day') return getDayRange(date);
+    if (viewMode == 'week') return getWeekRange(date);
     return getMonthRange(date);
 }
 
