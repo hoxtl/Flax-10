@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./DashboardLayout.module.css";
 import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
+import WeekBar from "../components/WeekBar";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -50,6 +51,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
       <div className={styles.main}>
         <TopBar onToggle={handleToggleSidebar} onAddClick={() => {}} />
+        <WeekBar date={new Date()} />
         <div className={styles.content}>{children}</div>
       </div>
     </div>
