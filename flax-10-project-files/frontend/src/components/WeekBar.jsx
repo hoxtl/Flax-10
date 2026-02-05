@@ -52,7 +52,7 @@ export default function WeekBar({ date }) {
   );
 
   const currentIdx = getWeekIndexForDate(date, cfg);
-  const isReadingWeek = labels[currentIdx] === "RW";
+  const isReadingWeek = currentIdx >= 0 && labels[currentIdx] === "RW";
 
   const badgeLabel =
     currentIdx < 0

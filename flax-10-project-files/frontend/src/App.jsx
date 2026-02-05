@@ -36,9 +36,13 @@ import Home from "./pages/Home";
 */
 
 export default function App() {
+  const [activeNav, setActiveNav] = useState("home");
+
   return (
-    <DashboardLayout>
-      <Home />
-    </DashboardLayout>
+  <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+    {({ selectedDate, setSelectedDate }) => (
+      <Home selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+    )}
+  </DashboardLayout>
   );
 }
