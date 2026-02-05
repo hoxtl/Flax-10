@@ -12,7 +12,7 @@
 /* Each hour slot is a row with time label + content area */
 .time-slot {
     display: flex;
-    border-bottom: 1px solid #E8D4B8;
+    border-bottom: 1px solid var(--border, #f6f4f1);
     position: relative;
 }
 
