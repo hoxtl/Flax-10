@@ -1,0 +1,39 @@
+/* Stack all the hour slots vertically */
+.day-view.time-grid {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Each hour slot is a row with time label + content area */
+.time-slot {
+    display: flex;
+    min-height: 60px;
+    border-bottom: 1px solid #E8D4B8;
+}
+
+/* Visual feedback when dragging a tag over this slot */
+.time-slot.drop-target {
+    background: #E8F5E8;
+    /* Light green to show it's a valid drop zone */
+}
+
+/* The "9 AM", "10 AM" labels on the left */
+.time-label {
+    width: 80px;
+    padding: 0.5rem;
+    text-align: right;
+    color: #9E7E5D;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    /* Don't let this column shrink */
+}
+
+/* Where the event cards go */
+.slot-content {
+    flex: 1;
+    padding: 0.25rem;
+    position: relative;
+}
