@@ -1,37 +1,29 @@
-import { EventCard } from "../EventCard";
-import { formatHour } from "./dayViewHelpers.js";
+import { useCallback } from "react";
+import { formatHour } from "./dayViewHelpers";
 import { useDrop } from "react-dnd";
 import { useEventActions } from "../../../context/EventContext";
+import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 
 /**
- * A single hour slot in the day view (e.g. 9 AM, 10 AM)
- * Shows the time label on the left and events on the right
- * also handles drag-and-drop: you can drop a tag here to create an event
+ * A single hour slot that acts as a drop target.
+ * Handles drops from both tags (create new event) and existing events (move event).
+ * Also handles clicks to create events at a specific time.
  */
 export function TimeSlot({ hour, events, date }) {
-    const { addEvent } = useEventActions();
-    // When a tag is dropped on this slot, create an event at this hour
-    const handleDrop = (payload) => { createEventFromTag(payload.data, date, hour, addEvent); };
-    // useDrop gives us props to make this element a drop target
-    const { dropProps, isOver } = useDrop({ accept: ['TAG'], onDrop: handleDrop, });
-    const eventCards = events.map(event => (<EventCard key={event.id} event={event} />));
-    const label = <div className="time-label">{formatHour(hour)}</div>;
-    const content = <div className="slot-content">{eventCards}</div>;
-    return <div className={`time-slot ${isOver ? 'drop-target' : ''}`} {...dropProps}>{label}{content}</div>;
+    const { addEvent, editEvent } = useEventActions();
+    const getMins = (e) => hour * 60 + getMinuteOffset(e.clientY, e.currentTarget.getBoundingClientRect().top);
+    const onDrop = (p, e) => p.type === 'TAG'
+        ? createEventFromTag(p.data, date, getMins(e), addEvent)
+        : moveEventToTime(p.data, date, getMins(e), editEvent);
+    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop });
+    return <div className={`time-slot ${isOver ? 'drop-target' : ''}`} style={{ height: 60 }} {...dropProps}><span className="time-label">{formatHour(hour)}</span></div>;
 }
 
-/**
- * Create a new calendar event from a dragged tag.
- * Uses the tag's name as the event title 
- * and its default duration for length
- */
-function createEventFromTag(tag, date, hour, addEvent) {
-    // Set the start time to be the beginning of this hour
-    const startTime = new Date(date);
-    startTime.setHours(hour, 0, 0, 0);
-    // End time = start time + tag's default duration
+// Creates a new event when a tag is dropped
+function createEventFromTag(tag, date, startMinutes, addEvent) {
+    const startTime = dateWithMinutes(date, startMinutes);
     const endTime = new Date(startTime);
-    endTime.setMinutes(endTime.getMinutes() + tag.defaultDuration);
+    endTime.setMinutes(endTime.getMinutes() + tag.default_duration);
 
     addEvent({
         title: tag.name,
@@ -39,4 +31,23 @@ function createEventFromTag(tag, date, hour, addEvent) {
         end_time: endTime.toISOString(),
         tag: tag.id,
     });
+}
+
+// Moves an existing event to a new time (preserves duration)
+function moveEventToTime(event, date, startMinutes, editEvent) {
+    const duration = new Date(event.end_time) - new Date(event.start_time);
+    const newStart = dateWithMinutes(date, startMinutes);
+    const newEnd = new Date(newStart.getTime() + duration);
+
+    editEvent(event.id, {
+        start_time: newStart.toISOString(),
+        end_time: newEnd.toISOString(),
+    });
+}
+
+// Helper to create a Date at a specific minute of the day
+function dateWithMinutes(date, totalMinutes) {
+    const result = new Date(date);
+    result.setHours(Math.floor(totalMinutes / 60), totalMinutes % 60, 0, 0);
+    return result;
 }

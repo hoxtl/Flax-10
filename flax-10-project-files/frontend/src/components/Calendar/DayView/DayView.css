@@ -2,7 +2,9 @@
 .day-view.time-grid {
     background: white;
     border-radius: 8px;
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: 80vh;
+    position: relative;
     display: flex;
     flex-direction: column;
 }
@@ -10,8 +12,8 @@
 /* Each hour slot is a row with time label + content area */
 .time-slot {
     display: flex;
-    min-height: 60px;
     border-bottom: 1px solid #E8D4B8;
+    position: relative;
 }
 
 /* Visual feedback when dragging a tag over this slot */
@@ -31,9 +33,19 @@
     /* Don't let this column shrink */
 }
 
-/* Where the event cards go */
-.slot-content {
-    flex: 1;
-    padding: 0.25rem;
-    position: relative;
+/* Events float on top of the slot grid */
+.events-layer {
+    position: absolute;
+    top: 0;
+    left: 80px;
+    /* Start after time labels */
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    /* Let clicks pass through to slots */
+}
+
+/* But events themselves should be clickable */
+.events-layer>* {
+    pointer-events: auto;
 }

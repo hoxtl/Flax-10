@@ -1,12 +1,9 @@
-// Returns an array of hours from 0 to 23 for rendering the day grid
+// Returns an array of hours [0, 1, 2, ... 23]
 export function getHoursOfDay() {
     return Array.from({ length: 24 }, (_, i) => i);
 }
 
-/**
- * Converts hour number (0-23) to readable format like 9 AM or 2 PM
- * Handles the tricky cases: 0 = 12 AM, 12 = 12PM
- */
+// Converts 24-hour number to "9 AM" format
 export function formatHour(hour) {
     if (hour === 0) return '12 AM';
     if (hour === 12) return '12 PM';
@@ -15,23 +12,37 @@ export function formatHour(hour) {
 }
 
 /**
- * Calculates where to position an event within its hour slot.
- * If event starts at 9:30, it should be offset 50% into the 9AM slot.
- * Returns pixels from top of the slot
+ * Calculates the CSS style for positioning an event on the grid.
+ * Returns top (position from midnight) and height (based on duration).
  */
-export function calculateEventPosition(event, slotHeight) {
+export function calculateEventStyle(event, slotHeight) {
     const start = new Date(event.start_time);
-    const minutes = start.getMinutes();
-    return (minutes / 60) * slotHeight;
+    const end = new Date(event.end_time);
+
+    const startMinutes = start.getHours() * 60 + start.getMinutes();
+    const durationMinutes = (end - start) / (1000 * 60);
+
+    const top = (startMinutes / 60) * slotHeight;
+    const height = (durationMinutes / 60) * slotHeight;
+
+    return { top: `${top}px`, height: `${height}px` };
 }
 
 /**
- * Calculates how tall to make an event card based on its duration
- * A 90-min event should be 1.5x the height of a 1-hour slot
+ * Calculates new end time based on resize delta.
+ * Used when user drags the bottom edge of an event.
  */
-export function calculateEventHeight(event, slotHeight) {
+export function calculateNewEndTime(event, deltaY, slotHeight, snapInterval) {
+    const deltaMinutes = (deltaY / slotHeight) * 60;
+    const snappedDelta = Math.round(deltaMinutes / snapInterval) * snapInterval;
+
+    const currentEnd = new Date(event.end_time);
+    const newEnd = new Date(currentEnd);
+    newEnd.setMinutes(newEnd.getMinutes() + snappedDelta);
+
+    // Don't let event become shorter than minimum
     const start = new Date(event.start_time);
-    const end = new Date(event.end_time);
-    const durationMinutes = (end - start) / 60000; // convert ms to minutes
-    return (durationMinutes / 60) * slotHeight;
+    if (newEnd <= start) newEnd.setTime(start.getTime() + snapInterval * 60 * 1000);
+
+    return newEnd;
 }
