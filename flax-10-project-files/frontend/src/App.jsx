@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import DashboardLayout from "./layout/DashboardLayout";
 import Home from "./pages/Home";
+import { APP_ROUTES } from './lib/routes';
 
 /*function App() {
   const [count, setCount] = useState(0)
@@ -36,9 +37,14 @@ import Home from "./pages/Home";
 */
 
 export default function App() {
+  const [activeNav, setActiveNav] = useState("home");
+
+  // Find the current route's element based on activeNav
+  const currentRoute = APP_ROUTES.find(r => r.id === activeNav) || APP_ROUTES[0];
+
   return (
-    <DashboardLayout>
-      <Home />
+    <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+      {currentRoute.element}
     </DashboardLayout>
   );
 }

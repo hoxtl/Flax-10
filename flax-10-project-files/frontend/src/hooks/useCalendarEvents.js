@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useCalendar, useCalendarDispatch } from '../context/CalendarContext';
-import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/eventApi';
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/event_api';
 import { getDateRangeForView } from './calendarHelpers';
 
 /**

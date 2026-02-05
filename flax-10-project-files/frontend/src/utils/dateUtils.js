@@ -50,3 +50,24 @@ export function formatTime(date) {
 export function formatDate(date) {
     return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 }
+
+export function formatMonthYear(date) {
+    return date.toLocaleDateString([], { month: 'long', year: 'numeric' });
+}
+
+export function addWeeks(date, weeks) {
+    return addDays(date, weeks * 7);
+}
+
+export function addMonths(date, months) {
+    const result = new Date(date);
+    result.setMonth(result.getMonth() + months);
+    return result;
+}
+
+export function getGreeting() {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
+    return "Good evening";
+}
