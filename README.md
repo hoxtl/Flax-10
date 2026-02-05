@@ -116,7 +116,7 @@ at your repository directory.
 
 | Package             | Version | Purpose                                         |
 | ------------------- | ------- | ----------------------------------------------- |
-| Django              | 6.0.2   | Web framework                                   |
+| Django              | 5.2.0   | Web framework                                   |
 | djangorestframework | 3.16.1  | REST API framework for Django                   |
 | psycopg             | 3.3.2   | PostgreSQL driver (modern async-capable core)   |
 | psycopg-binary      | 3.3.2   | Precompiled psycopg binaries for local/dev use  |
