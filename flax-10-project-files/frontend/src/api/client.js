@@ -1,14 +1,14 @@
 const API_BASE_URL = "/api";
 
-export async function fetch_api(endpoint, options = {}) {
+export async function fetchApi(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;
-    const config = build_request_config(options);
+    const config = buildRequestConfig(options);
 
     const response = await fetch(url, config);
-    return handle_response(response);
+    return handleResponse(response);
 }
 
-function build_request_config(options) {
+function buildRequestConfig(options) {
     return {
         headers: {
             'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ function build_request_config(options) {
     };
 }
 
-async function handle_response(response) {
+async function handleResponse(response) {
     if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         throw new Error(error.detail || `Request failed`);
