@@ -1,0 +1,10 @@
+asgiref==3.11.1
+distlib==0.4.0
+Django==5.2.0
+djangorestframework==3.16.1
+filelock==3.20.1
+platformdirs==4.5.0
+psycopg==3.3.2
+psycopg-binary==3.3.2
+sqlparse==0.5.5
+virtualenv==20.36.1
