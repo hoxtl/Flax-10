@@ -1,2 +1,2 @@
-from .event import Event
+from .event import Event, RecurrenceRule
 from .tag import Tag, Category
