@@ -1,15 +1,17 @@
 import styles from "./TopBar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../lib/dateUtils";
+import { getInitials } from "../lib/userUtils";
 
-function TopBarGreeting() {
+
+function TopBarGreeting({ user }) {
   const now = new Date();
 
   return (
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
-        <h1 className={styles.name}>Jane</h1>
+         <h1 className={styles.name}>{user?.name?.split(" ")[0] || "Guest"}</h1>
         <span className={styles.date}>
           {DAYS[now.getDay()]}, {now.getDate()} {MONTHS[now.getMonth()]}
         </span>
@@ -30,31 +32,33 @@ function SearchInput() {
 function AddButton({ onClick }) {
   return (
     <button className={styles.addBtn} onClick={onClick}>
-      <span style={{ color: "#fff", fontSize: 20, lineHeight: 1 }}>+</span>
+      <span className={styles.addIcon}>+</span>
     </button>
   );
 }
 
-function TopBarActions({ onAddClick }) {
+function TopBarActions({ onAddClick, user }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
       <AddButton onClick={onAddClick} />
-      <div className={styles.avatar}>JS</div>
+      <div className={styles.avatar}>
+        {getInitials(user?.name) || "?"}
+      </div>
     </div>
   );
 }
 
-export default function TopBar({ onToggle, onAddClick }) {
+export default function TopBar({ onToggle, onAddClick, user }) {
   return (
     <header className={styles.container}>
       <div className={styles.left}>
         <button className={styles.toggle} onClick={onToggle}>
           ☰
         </button>
-        <TopBarGreeting />
+        <TopBarGreeting user={user} />
       </div>
-      <TopBarActions onAddClick={onAddClick} />
+      <TopBarActions onAddClick={onAddClick} user={user} />
     </header>
   );
 }

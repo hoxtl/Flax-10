@@ -53,6 +53,10 @@
   transition: background 0.15s, color 0.15s;
 }
 
+.navItem:hover {
+  background: var(--hover); /* or #faf9fc if you prefer */
+}
+
 .navItemExpanded {
   gap: 11px;
   justify-content: flex-start;
@@ -68,6 +72,10 @@
   background: #f3f0ff;
   color: #a78bfa;
   font-weight: 600;
+}
+
+.navItemActive:hover {
+  background: var(--active);
 }
 
 .icon {
