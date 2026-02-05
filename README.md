@@ -54,6 +54,11 @@ docker run --rm -it `
 	-w /work `
 	nixos/nix:latest
 ```
+(If this does not work, try this signle-line concatenated version of dock run command):
+
+```
+docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
+```
 
 and then,
 
