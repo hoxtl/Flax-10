@@ -93,6 +93,11 @@
   color: var(--text);
   width: 200px;
 }
+.addIcon {
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+}
 
 .addBtn {
   width: 36px;

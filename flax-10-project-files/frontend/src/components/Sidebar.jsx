@@ -1,5 +1,7 @@
 import { NAV } from "../lib/uiConstants";
 import styles from "./Sidebar.module.css";
+import { getInitials } from "../lib/userUtils";
+import { APP_ROUTES } from "../lib/routes";
 
 function SidebarHeader({ collapsed }) {
   return (
@@ -17,31 +19,26 @@ function NavItem({ item, isActive, collapsed, onClick }) {
   ].filter(Boolean).join(" ");
 
   return (
-    <button
-      onClick={onClick}
-      className={cls}
-      onMouseEnter={(e) => {
-        if (!isActive) e.currentTarget.style.background = "#faf9fc";
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) e.currentTarget.style.background = "transparent";
-      }}
-    >
+    <button onClick={onClick} className={cls}>
       <span className={styles.icon}>{item.icon}</span>
       {!collapsed && <span className={styles.label}>{item.label}</span>}
     </button>
   );
 }
 
-function SidebarUserProfile({ collapsed }) {
-  return (
+function SidebarUserProfile({ collapsed, user }) {
+    const initials = getInitials(user?.name) || "?";
+    const year = user?.year || "Year 2";
+    const major = user?.major || "CS";
+    
+    return (
     <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
-      <div className={styles.avatar}>JS</div>
+      <div className={styles.avatar}>{initials}</div>
 
       {!collapsed && (
         <div className={styles.userText}>
-          <div className={styles.userName}>Jane Smith</div>
-          <div className={styles.userMeta}>Year 2 · CS</div>
+          <div className={styles.userName}>{user?.name || "Guest"}</div>
+          <div className={styles.userMeta}>{year} · {major}</div>
         </div>
       )}
     </div>
@@ -54,20 +51,25 @@ export default function Sidebar({ active, onChange, collapsed }) {
   return (
     <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
       <SidebarHeader collapsed={collapsed} />
+       <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
+      <SidebarUserProfile collapsed={collapsed} />
+    </aside>
+  );
+}
 
-      <nav className={styles.nav}>
-        {NAV.map((n) => (
-          <NavItem
+function SidebarNav({ active, onChange, collapsed }) {
+  return (
+    <nav className={styles.nav}>
+      {APP_ROUTES.map((n) => (
+        <NavItem
             key={n.id}
             item={n}
             isActive={active === n.id}
             collapsed={collapsed}
             onClick={() => onChange?.(n.id)}
-          />
-        ))}
-      </nav>
+        />
+))}
 
-      <SidebarUserProfile collapsed={collapsed} />
-    </aside>
+    </nav>
   );
 }
