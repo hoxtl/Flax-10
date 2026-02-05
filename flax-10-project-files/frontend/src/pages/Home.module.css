@@ -1,7 +1,10 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 28px;              
-  padding-top: 10px; 
-  padding-left: 35px;    
+  gap: 28px;                 
+  padding: 20px 32px;
+}
+
+.filters {
+  margin-bottom: -20px; 
 }
