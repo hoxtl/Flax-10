@@ -7,7 +7,7 @@ const KEY = "studyflax_term_config";
 
 export const DEFAULT_TERM_CONFIG = {
   // each school has different dates, so startDate must be user-specific maybe ask when they create a profile.
-  startDate: "2026-01-13",     // YYYY-MM-DD
+  startDate: "2026-01-09",     // YYYY-MM-DD
   totalWeeks: 11,              // teaching weeks count (not including RW slot)
   hasReadingWeek: true,
   readingWeekAfterWeek: 5,     // RW appears after week 5 (between week 5 and 6)

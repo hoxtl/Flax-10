@@ -3,6 +3,7 @@ import styles from "./DashboardLayout.module.css";
 import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
 import WeekBar from "../components/WeekBar";
+import PillFilters from "../components/PillFilters";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
