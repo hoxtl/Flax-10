@@ -1,5 +1,5 @@
 from django.db import models
-
+from .recurrenceRuleModel import RecurrenceRule
 from .userModel import User
 from .tagModel import Tag
 
@@ -23,3 +23,6 @@ class CalendarEvent(models.Model):
         choices=PRIORITY_CHOICES,
         default='medium'
     )
+    recurrence_rule = models.ForeignKey('RecurrenceRule', on_delete=models.SET_NULL, null=True, blank=True)
+    reminder_minutes = models.PositiveIntegerField(null=True, blank=True)
+    
