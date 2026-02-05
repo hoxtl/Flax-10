@@ -34,4 +34,4 @@ function handleUpdateEvent(state, updatedEvent) {
         e.id === updatedEvent.id ? updatedEvent : e
     );
     return { ...state, events };
-}                           
+}

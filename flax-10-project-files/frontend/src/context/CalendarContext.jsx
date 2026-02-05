@@ -22,4 +22,4 @@ export function useCalendar() {
 
 export function useCalendarDispatch() {
     return useContext(CalendarDispatchContext);
-}                                       
+}
