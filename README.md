@@ -76,7 +76,18 @@ nix --extra-experimental-features 'nix-command flakes' develop -c bash
 - Django ```settings.py``` is configured to be compatible with these default parameters, however you will need your password offered to the psql terminal to replace the password specified in the ```settings.py```. By default it is 1234.
 - Now you should have a PostgreSQL server running in the background. Have fun ```python manage.py migrate``` your django project!
 
+**Nix Terminal Post Installation Access Notification**
+
+- Each time after installation would you want to access nix shell again, run
+
+```
+nix --extra-experimental-features 'nix-command flakes' develop -c bash
+```
+
+at your repository directory.
+
 ## Sources
+- Mention any external sources / AI generated code
 
 **Frontend Packages**
 
@@ -115,5 +126,3 @@ nix --extra-experimental-features 'nix-command flakes' develop -c bash
 | distlib             | 0.4.0   | Dependency utility library (virtualenv backend) |
 | filelock            | 3.20.1  | Cross-platform file locking                     |
 | platformdirs        | 4.5.0   | OS-specific directory resolution                |
-
-
