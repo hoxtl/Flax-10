@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { createResizeSession } from './resizeUtils';
+import { createResizeSession } from '../../utils/resizeUtils';
 import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes } from './calendarConstants';
 
 /**
