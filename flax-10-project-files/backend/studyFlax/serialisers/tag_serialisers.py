@@ -1,0 +1,13 @@
+from rest_framework import serializers
+from studyFlax.models import Tag, Category
+
+class CategorySerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'color', 'is_default']
+
+class TagSerialiser(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    class Meta:
+        model = Tag
+        fields = ['id', 'name', 'default_duration', 'is_default', 'color', 'category', 'category_name']
