@@ -91,6 +91,8 @@ nix --extra-experimental-features 'nix-command flakes' develop -c bash
 
 at your repository directory.
 
+For docker users, you will need to run the ```docker run...``` command mentioned above, as the container is set to self-destructive after exit by ```--rm```.
+
 ## Sources
 - Mention any external sources / AI generated code
 
