@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { parseDropPayload, setupDragStart, handleDragOverEffect } from './dragUtils';
+import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../utils/dragUtils';
 
 /**
 * Hook for making an element draggable.
@@ -36,22 +36,4 @@ export function useDrop({ accept, onDrop }) {
         onDrop: handleDrop,
     };
     return { dropProps, isOver };
-}
-
-/**
- * Parses the drop event data and validates the type.
- * Returns null if the type is not in the accept list.
- */
-function parseDropPayload(e, acceptTypes) {
-    try {
-        const raw = e.dataTransfer.getData('application/json');
-        const parsed = JSON.parse(raw);
-
-        if (acceptTypes.includes(parsed.type)) {
-            return parsed;
-        }
-        return null;
-    } catch {
-        return null;
-    }
 }

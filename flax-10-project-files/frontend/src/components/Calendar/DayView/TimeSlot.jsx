@@ -1,29 +1,51 @@
 import { useCallback } from "react";
 import { formatHour } from "./dayViewHelpers";
-import { useDrop } from "react-dnd";
-import { useEventActions } from "../../../context/EventContext";
+import { useDrop } from '../../../hooks/useDragDrop';
+import { useEventActions } from "../../../hooks/useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 
 /**
- * A single hour slot that acts as a drop target.
- * Handles drops from both tags (create new event) and existing events (move event).
- * Also handles clicks to create events at a specific time.
+ * A single hour slot in the day view.
+ * Acts as a drop target for events and tags.
  */
-export function TimeSlot({ hour, events, date }) {
+export function TimeSlot({ hour, date }) {
     const { addEvent, editEvent } = useEventActions();
-    const getMins = (e) => hour * 60 + getMinuteOffset(e.clientY, e.currentTarget.getBoundingClientRect().top);
-    const onDrop = (p, e) => p.type === 'TAG'
-        ? createEventFromTag(p.data, date, getMins(e), addEvent)
-        : moveEventToTime(p.data, date, getMins(e), editEvent);
-    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop });
-    return <div className={`time-slot ${isOver ? 'drop-target' : ''}`} style={{ height: 60 }} {...dropProps}><span className="time-label">{formatHour(hour)}</span></div>;
+    // Handle drops - either create new event from tag or move existing event
+    const handleDrop = useCallback((payload, e) => {
+        const minutes = calculateDropMinutes(hour, e);
+        if (payload.type === 'TAG') {
+            createEventFromTag(payload.data, date, minutes, addEvent);
+        } else if (payload.type === 'EVENT') {
+            moveEventToTime(payload.data, date, minutes, editEvent);
+        }
+    }, [hour, date, addEvent, editEvent]);
+    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
+    const className = `time-slot ${isOver ? 'drop-target' : ''}`;
+    return (
+        <div className={className} style={{ height: SLOT_HEIGHT }} {...dropProps}>
+            <span className="time-label">{formatHour(hour)}</span>
+        </div>
+    );
 }
 
-// Creates a new event when a tag is dropped
+/**
+ * Calculates the exact minute based on where in the slot the user dropped.
+ * Uses the hour base plus the offset within the slot.
+ */
+function calculateDropMinutes(hour, e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetMinutes = getMinuteOffset(e.clientY, rect.top);
+    return hour * 60 + offsetMinutes;
+}
+
+/**
+ * Creates a new event when a tag is dropped onto a time slot.
+ * Uses the tag's default duration.
+ */
 function createEventFromTag(tag, date, startMinutes, addEvent) {
-    const startTime = dateWithMinutes(date, startMinutes);
+    const startTime = createDateWithMinutes(date, startMinutes);
     const endTime = new Date(startTime);
-    endTime.setMinutes(endTime.getMinutes() + tag.default_duration);
+    endTime.setMinutes(endTime.getMinutes() + (tag.default_duration || 60));
 
     addEvent({
         title: tag.name,
@@ -33,10 +55,13 @@ function createEventFromTag(tag, date, startMinutes, addEvent) {
     });
 }
 
-// Moves an existing event to a new time (preserves duration)
+/**
+ * Moves an existing event to a new time slot.
+ * Preserves the event's original duration.
+ */
 function moveEventToTime(event, date, startMinutes, editEvent) {
     const duration = new Date(event.end_time) - new Date(event.start_time);
-    const newStart = dateWithMinutes(date, startMinutes);
+    const newStart = createDateWithMinutes(date, startMinutes);
     const newEnd = new Date(newStart.getTime() + duration);
 
     editEvent(event.id, {
@@ -45,9 +70,13 @@ function moveEventToTime(event, date, startMinutes, editEvent) {
     });
 }
 
-// Helper to create a Date at a specific minute of the day
-function dateWithMinutes(date, totalMinutes) {
+/**
+ * Creates a Date object set to a specific minute of the day.
+ */
+function createDateWithMinutes(date, totalMinutes) {
     const result = new Date(date);
-    result.setHours(Math.floor(totalMinutes / 60), totalMinutes % 60, 0, 0);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    result.setHours(hours, minutes, 0, 0);
     return result;
 }
