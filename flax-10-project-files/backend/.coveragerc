@@ -1,0 +1,5 @@
+[run]
+source = studyFlax
+omit =
+    */migrations/*
+    */__init__.py
