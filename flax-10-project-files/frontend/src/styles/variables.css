@@ -1,0 +1,24 @@
+:root {
+  /* Palette */
+  --c-white: #ffffff;
+  --c-greige: #B4A490;
+  --c-taupe: #AA9A94;
+  --c-caramel: #9E7E5D;
+  --c-olive: #81725B;
+  --c-cocoa: #4A3421;
+
+  --bg: #ffffff;              /* page background */
+  --panel: #a5a195;           /* surfaces (topbar, cards) */
+  --sidebar: #a5a195;         /* sidebar surface */
+  --border: rgba(74,52,33,0.18);
+
+  --text: #2B1E14;           
+  --muted: rgba(43,30,20,0.55);
+
+  --primary: #9E7E5D;         /* buttons / highlights */
+  --primary-strong: #4A3421;  
+  --accent: #AA9A94;         
+
+  --hover: rgba(74,52,33,0.06);
+  --active: rgba(74,52,33,0.10);
+}
