@@ -21,6 +21,9 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // desktop
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // mobile
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const d = new Date(); d.setHours(0, 0, 0, 0); return d;
+  });
 
   //change this to real user data later
   const user = {
@@ -51,8 +54,12 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
       <div className={styles.main}>
         <TopBar user={user} onToggle={handleToggleSidebar} onAddClick={() => {}} />
-        <WeekBar date={new Date()} />
-        <div className={styles.content}>{children}</div>
+        <WeekBar date={selectedDate} />
+       <div className={styles.content}>
+        {typeof children === "function"
+            ? children({ selectedDate, setSelectedDate })
+            : children}
+        </div>
       </div>
     </div>
   );

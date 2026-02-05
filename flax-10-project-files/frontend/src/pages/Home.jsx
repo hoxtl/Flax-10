@@ -4,9 +4,8 @@ import PillFilters from "../components/PillFilters";
 import DateNavigator from "../components/DateNavigator";
 import { isToday } from "../lib/dateUtils";
 
-export default function Home() {
+export default function Home({ selectedDate, setSelectedDate }) {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const items = []; // later replace with real dayItems/events
   const todayFlag = isToday(selectedDate);
 
