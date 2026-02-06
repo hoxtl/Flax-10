@@ -1,31 +1,60 @@
 import { useState, useCallback } from 'react';
+import { useCalendar } from '../../context/CalendarContext';
+import { useResizeHighlight } from '../../context/ResizeHighlightContext';
 import { createResizeSession } from '../../utils/resizeUtils';
-import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes } from './calendarConstants';
+import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from './calendarConstants';
+import { checkOverlapWithConfirm } from '../../utils/overlapUtils';
 
-/**
- * Hook for resizing calendar events by dragging the bottom edge.
- * Returns state and a handler to attach to the resize handle.
- *
- * @param {object} event - The event being resized
- * @param {ref} eventRef - Ref to the event DOM element
- * @param {function} editEvent - Function to save the new end time
- */
 export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
+    const { events } = useCalendar();
+    const { setResizeHighlight } = useResizeHighlight();
     const [isResizing, setIsResizing] = useState(false);
     const [resizePreview, setResizePreview] = useState(null);
     const handleResizeStart = useCallback((e) => {
         e.stopPropagation();
         setIsResizing(true);
-        const onMove = (height) => setResizePreview(height);
-        const onEnd = (diff) => {
-            commitResize(event, diff, editEvent);
-            setIsResizing(false);
-            setResizePreview(null);
-            if (resizeJustEnded) resizeJustEnded.current = true;
-        };
+        const onMove = createMoveHandler(event, setResizePreview, setResizeHighlight);
+        const onEnd = createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded);
         createResizeSession(e.clientY, eventRef.current.offsetHeight, { onMove, onEnd });
-    }, [event, eventRef, editEvent, resizeJustEnded]);
+    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight]);
     return { isResizing, resizePreview, handleResizeStart };
+}
+
+function createMoveHandler(event, setResizePreview, setResizeHighlight) {
+    return (height) => {
+        const snappedHeight = snapHeightToGrid(event, height);
+        setResizePreview(snappedHeight);
+        updateHighlight(event, height, setResizeHighlight);
+    };
+}
+
+function createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded) {
+    return (diff) => {
+        commitResize(event, diff, editEvent, events);
+        setIsResizing(false);
+        setResizePreview(null);
+        setResizeHighlight(null);
+        if (resizeJustEnded) resizeJustEnded.current = true;
+    };
+}
+
+function snapHeightToGrid(event, rawHeight) {
+    const start = new Date(event.start_time);
+    const startMins = start.getHours() * 60 + start.getMinutes();
+    const endMins = startMins + (rawHeight / SLOT_HEIGHT) * 60;
+    const snappedEndMins = Math.round(endMins / SNAP_INTERVAL) * SNAP_INTERVAL;
+    const duration = snappedEndMins - startMins;
+    return (duration / 60) * SLOT_HEIGHT;
+}
+
+function updateHighlight(event, newHeight, setResizeHighlight) {
+    const start = new Date(event.start_time);
+    const startMins = start.getHours() * 60 + start.getMinutes();
+    const endMins = startMins + (newHeight / SLOT_HEIGHT) * 60;
+    const snappedEndMins = Math.round(endMins / SNAP_INTERVAL) * SNAP_INTERVAL;
+    const hour = Math.floor(snappedEndMins / 60);
+    const quarter = Math.floor((snappedEndMins % 60) / SNAP_INTERVAL);
+    setResizeHighlight({ date: start, hour, quarter });
 }
 
 /**
@@ -38,19 +67,26 @@ function calculateNewHeight(originalHeight, currentY, startY) {
     return Math.max(minHeight, originalHeight + delta);
 }
 
-/**
- * Saves the new event duration after resize is complete.
- * Converts pixel delta to minutes and updates the event.
- */
-function commitResize(event, deltaY, editEvent) {
-    const deltaMinutes = pixelsToMinutes(deltaY);
-    const currentEnd = new Date(event.end_time);
-    const newEnd = new Date(currentEnd);
-    newEnd.setMinutes(newEnd.getMinutes() + deltaMinutes);
+function commitResize(event, deltaY, editEvent, allEvents) {
+    const newEnd = calculateNewEndTime(event, deltaY);
+    const others = allEvents.filter(e => e.id !== event.id);
+    if (!isValidResize(event, newEnd, others)) return;
+    editEvent(event.id, { end_time: newEnd.toISOString() });
+}
 
-    // Don't let event shrink past its start time
+function calculateNewEndTime(event, deltaY) {
     const start = new Date(event.start_time);
-    if (newEnd > start) {
-        editEvent(event.id, { end_time: newEnd.toISOString() });
-    }
+    const startMins = start.getHours() * 60 + start.getMinutes();
+    const currentDuration = (new Date(event.end_time) - start) / (1000 * 60);
+    const newDuration = currentDuration + pixelsToMinutes(deltaY);
+    const snappedEndMins = Math.round((startMins + newDuration) / SNAP_INTERVAL) * SNAP_INTERVAL;
+    const newEnd = new Date(start);
+    newEnd.setHours(Math.floor(snappedEndMins / 60), snappedEndMins % 60, 0, 0);
+    return newEnd;
+}
+
+function isValidResize(event, newEnd, otherEvents) {
+    const start = new Date(event.start_time);
+    if (newEnd <= start) return false;
+    return checkOverlapWithConfirm({ ...event, end_time: newEnd.toISOString() }, otherEvents);
 }
