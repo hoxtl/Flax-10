@@ -6,6 +6,7 @@ import { DEFAULT_TERM_CONFIG } from "./termDefaults";
 
 const KEY = "studyflax_term_config";
 
+// Loads term config from localStorage. If not found or on error, returns default config. change to API call later.
 export function loadTermConfig() {
   try {
     const raw = localStorage.getItem(KEY);
@@ -15,6 +16,7 @@ export function loadTermConfig() {
   }
 }
 
+// Saves term config to localStorage. change to API call later.
 export function saveTermConfig(cfg) {
   localStorage.setItem(KEY, JSON.stringify({ ...DEFAULT_TERM_CONFIG, ...cfg }));
 }

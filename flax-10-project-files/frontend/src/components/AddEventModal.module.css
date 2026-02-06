@@ -1,0 +1,29 @@
+.backdrop{
+  position:fixed; inset:0; background:rgba(20,18,30,.45);
+  display:flex; align-items:center; justify-content:center; z-index:60;
+}
+
+.modal{
+  width:min(720px, 92vw); background:#fff; border-radius:26px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25); padding:26px;
+}
+
+.header{ display:flex; align-items:center; justify-content:space-between; }
+.title{ margin:0; font-size:34px; font-weight:900; }
+.close{ border:none; background:transparent; font-size:30px; cursor:pointer; color:#8c8a98; }
+
+.form{ margin-top:18px; display:flex; flex-direction:column; gap:16px; }
+.field{ display:flex; flex-direction:column; gap:8px; }
+.label{ font-weight:700; color:#6d6a78; }
+.row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+.input{
+  height:46px; border:1px solid #e6e3ee; border-radius:12px;
+  padding:0 14px; font-size:16px; outline:none;
+}
+
+.submit{
+  margin-top:10px; height:58px; border:none; border-radius:14px;
+  background:linear-gradient(135deg, #a78bfa, #7c3aed);
+  color:#fff; font-weight:800; font-size:20px; cursor:pointer;
+}
