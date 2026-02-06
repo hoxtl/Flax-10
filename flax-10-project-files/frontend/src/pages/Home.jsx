@@ -28,14 +28,35 @@ function FiltersBar({ activeFilter, onChange, dayItems }) {
 // Main Home component. Manages the selected date and active filter state, computes the events to show, and renders the navigation, filters, and event cards.
 export default function Home({ selectedDate, setSelectedDate, events = [], onDelete }) {
   const [activeFilter, setActiveFilter] = useState("all");
-  const dayItems = useMemo(() => eventsForDate(events, selectedDate), [events, selectedDate]);
-  const filtered = useMemo(() => filterEvents(activeFilter, dayItems), [activeFilter, dayItems]);
-  const scheduleTitle = useMemo(() => getScheduleTitle(selectedDate), [selectedDate]);
+
+  const safeSelectedDate =
+    selectedDate instanceof Date && !Number.isNaN(selectedDate.getTime())
+      ? selectedDate
+      : new Date();
+
+  const dayItems = useMemo(
+    () => eventsForDate(events, safeSelectedDate),
+    [events, safeSelectedDate]
+  );
+
+  const filtered = useMemo(
+    () => filterEvents(activeFilter, dayItems),
+    [activeFilter, dayItems]
+  );
+
+  const scheduleTitle = useMemo(
+    () => getScheduleTitle(safeSelectedDate),
+    [safeSelectedDate]
+  );
 
   return (
     <div className={styles.page}>
       <FiltersBar activeFilter={activeFilter} onChange={setActiveFilter} dayItems={dayItems} />
-      <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
+      <DateNavigator
+        date={safeSelectedDate}
+        onChange={setSelectedDate}
+        scheduleTitle={scheduleTitle}
+      />
       <div className={styles.content}>
         <CardGrid items={filtered} onDelete={onDelete} />
       </div>
