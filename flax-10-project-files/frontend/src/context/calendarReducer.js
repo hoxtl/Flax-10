@@ -1,37 +1,44 @@
+/*
+    This function is used to handle the calendar reducer.
+    It includes the initial state, handlers, and update event function.
+*/
 export const initialState = {
     events: [],
     selectedDate: new Date(),
-    viewMode: 'week',  // 'day', 'week', 'month'                                  
+    viewMode: 'week',
     isLoading: false,
     error: null,
+    modalEvent: null,
+    isModalOpen: false,
 };
 
+/*
+    This function is used to handle the handlers.
+*/
+const handlers = {
+    SET_EVENTS: (state, payload) => ({ ...state, events: payload, isLoading: false }),
+    ADD_EVENT: (state, payload) => ({ ...state, events: [...state.events, payload] }),
+    UPDATE_EVENT: (state, payload) => ({ ...state, events: updateEvent(state.events, payload) }),
+    DELETE_EVENT: (state, payload) => ({ ...state, events: state.events.filter(e => e.id !== payload) }),
+    SET_VIEW_MODE: (state, payload) => ({ ...state, viewMode: payload }),
+    SET_SELECTED_DATE: (state, payload) => ({ ...state, selectedDate: payload }),
+    SET_LOADING: (state, payload) => ({ ...state, isLoading: payload }),
+    SET_ERROR: (state, payload) => ({ ...state, error: payload, isLoading: false }),
+    OPEN_MODAL: (state, payload) => ({ ...state, modalEvent: payload, isModalOpen: true }),
+    CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, isModalOpen: false }),
+};
+
+/*
+    This function is used to handle the calendar reducer.
+*/
 export function calendarReducer(state, action) {
-    switch (action.type) {
-        case 'SET_EVENTS':
-            return { ...state, events: action.payload, isLoading: false };
-        case 'ADD_EVENT':
-            return { ...state, events: [...state.events, action.payload] };
-        case 'UPDATE_EVENT':
-            return handleUpdateEvent(state, action.payload);
-        case 'DELETE_EVENT':
-            return { ...state, events: state.events.filter(e => e.id !== action.payload) };
-        case 'SET_VIEW_MODE':
-            return { ...state, viewMode: action.payload };
-        case 'SET_SELECTED_DATE':
-            return { ...state, selectedDate: action.payload };
-        case 'SET_LOADING':
-            return { ...state, isLoading: action.payload };
-        case 'SET_ERROR':
-            return { ...state, error: action.payload, isLoading: false };
-        default:
-            return state;
-    }
+    const handler = handlers[action.type];
+    return handler ? handler(state, action.payload) : state;
 }
 
-function handleUpdateEvent(state, updatedEvent) {
-    const events = state.events.map(e =>
-        e.id === updatedEvent.id ? updatedEvent : e
-    );
-    return { ...state, events };
+/*
+    This function is used to handle the update event.
+*/
+function updateEvent(events, updatedEvent) {
+    return events.map(e => e.id === updatedEvent.id ? updatedEvent : e);
 }
