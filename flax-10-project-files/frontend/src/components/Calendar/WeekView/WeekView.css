@@ -71,6 +71,10 @@
     text-align: right;
     font-size: 0.75rem;
     color: var(--muted, #9E7E5D);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    box-sizing: border-box;
 }
 
 .day-column {
@@ -84,10 +88,34 @@
 .hour-cell {
     border-bottom: 1px solid var(--border, #f6f4f1) !important;
     box-sizing: border-box;
+    position: relative;
+    /* Sub-grid lines at 15-minute intervals */
+    background-image: linear-gradient(to bottom,
+            transparent 24%,
+            rgba(0, 0, 0, 0.03) 25%,
+            rgba(0, 0, 0, 0.03) 26%,
+            transparent 27%,
+            transparent 49%,
+            rgba(0, 0, 0, 0.05) 50%,
+            rgba(0, 0, 0, 0.05) 51%,
+            transparent 52%,
+            transparent 74%,
+            rgba(0, 0, 0, 0.03) 75%,
+            rgba(0, 0, 0, 0.03) 76%,
+            transparent 77%);
 }
 
-.hour-cell:last-child {
-    border-bottom: 1px solid var(--border, #f6f4f1) !important;
+/* Highlight effect when dragging over a cell */
+.hour-cell.drop-target {
+    background-color: rgba(139, 115, 85, 0.15);
+    background-image: none;
+    /* Remove sub-grid when highlighting */
+    box-shadow: inset 0 0 0 2px rgba(139, 115, 85, 0.3);
+    transition: all 0.15s ease;
+}
+
+.hour-cell:hover {
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 .hour-cell.drop-target {

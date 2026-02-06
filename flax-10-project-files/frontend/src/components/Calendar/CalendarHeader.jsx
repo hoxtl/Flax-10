@@ -1,5 +1,7 @@
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
+import { useEventActions } from "../../hooks/useCalendarEvents";
+import { createQuickEvent } from "../../utils/eventUtils";
 import './CalendarHeader.css';
 
 /**
@@ -9,14 +11,8 @@ import './CalendarHeader.css';
 export function CalendarHeader() {
     const { selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
-
-    // Moves forward or backward by the appropriate amount based on current view.
-    // direction: 1 for forward, -1 for backward
-    const navigate = (direction) => {
-        const multipliers = { day: 1, week: 7, month: 30 };
-        const newDate = addDays(selectedDate, multipliers[viewMode] * direction);
-        dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
-    };
+    const { addEvent } = useEventActions();
+    const nav = (d) => dispatch({ type: 'SET_SELECTED_DATE', payload: addDays(selectedDate, { day: 1, week: 7, month: 30 }[viewMode] * d) });
     const week = getWeekDays(selectedDate);
     const title = {
         day: formatDate(selectedDate),
@@ -26,12 +22,9 @@ export function CalendarHeader() {
 
     return (
         <div className="calendar-header">
-            <div className="nav-buttons">
-                <button onClick={() => navigate(-1)}>&lt;</button>
-                <button onClick={() => navigate(1)}>&gt;</button>
-            </div>
+            <div className="nav-buttons"><button onClick={() => nav(-1)}>&lt;</button><button onClick={() => nav(1)}>&gt;</button></div>
             <h2 className="calendar-title">{title}</h2>
-            <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
+            <div className="actions"><button className="btn-add" onClick={() => createQuickEvent(selectedDate, addEvent)}>+</button><ViewModeToggle viewMode={viewMode} dispatch={dispatch} /></div>
         </div>
     );
 }

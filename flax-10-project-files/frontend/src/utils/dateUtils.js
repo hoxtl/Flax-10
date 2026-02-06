@@ -43,6 +43,11 @@ export function isSameDay(date1, date2) {
     return date1.toDateString() === date2.toDateString();
 }
 
+export function isSameMonth(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear()
+        && date1.getMonth() === date2.getMonth();
+}
+
 export function formatTime(date) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
