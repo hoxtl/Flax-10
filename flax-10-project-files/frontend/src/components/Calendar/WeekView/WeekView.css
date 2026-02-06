@@ -1,10 +1,14 @@
 .week-view {
     background: white;
     border-radius: 8px;
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: 80vh;
 }
 
 .week-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     display: flex;
     border-bottom: 2px solid var(--border, white);
     background-color: #f6f4f1;
@@ -57,7 +61,6 @@
 .week-grid {
     display: flex;
     flex: 1;
-    overflow-y: auto;
     color: var(--text, #9E7E5D);
 }
 
@@ -72,7 +75,7 @@
     font-size: 0.75rem;
     color: var(--muted, #9E7E5D);
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: flex-end;
     box-sizing: border-box;
 }

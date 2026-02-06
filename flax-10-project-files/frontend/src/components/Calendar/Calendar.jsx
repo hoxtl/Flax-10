@@ -3,6 +3,7 @@ import { useCalendarEvents } from '../../hooks/useCalendarEvents';
 import { CalendarHeader } from './CalendarHeader';
 import { DayView } from './DayView/DayView';
 import { WeekView } from './WeekView/WeekView';
+import { MonthView } from './MonthView/MonthView';
 import { EventModal } from './EventModal/EventModal';
 import './Calendar.css';
 
@@ -29,14 +30,8 @@ function CalendarContent() {
 }
 
 function CalendarView({ viewMode }) {
-    const views = { day: DayView, week: WeekView };
+    const views = { day: DayView, week: WeekView, month: MonthView };
     const View = views[viewMode];
 
-    if (View) return <View />;
-
-    return (
-        <div className="view-placeholder">
-            <p>Month view coming soon</p>
-        </div>
-    );
+    return View ? <View /> : null;
 }

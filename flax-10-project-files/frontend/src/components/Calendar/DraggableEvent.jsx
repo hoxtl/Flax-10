@@ -17,9 +17,18 @@ export function DraggableEvent({ event, style }) {
     const { editEvent } = useEventActions();
     const { openModal } = useEventModal();
     const eventRef = useRef(null);
+    const resizeJustEnded = useRef(false);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
-    const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent);
-    const handleClick = () => { if (!isDragging && !isResizing) openModal(event); };
+    const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
+
+    const handleClick = () => {
+        if (resizeJustEnded.current) {
+            resizeJustEnded.current = false;
+            return;
+        }
+        if (!isDragging && !isResizing) openModal(event);
+    };
+
     return (
         <EventCard
             eventRef={eventRef}
@@ -39,6 +48,11 @@ export function DraggableEvent({ event, style }) {
     This function is used to handle the event card component.
 */
 function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
+    const handleResizeMouseDown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onResizeStart(e);
+    };
     return (
         <div
             ref={eventRef}
@@ -48,7 +62,7 @@ function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizi
             {...dragProps}
         >
             <EventContent event={event} />
-            <div className="resize-handle" onMouseDown={onResizeStart} />
+            <div className="resize-handle" draggable={false} onMouseDown={handleResizeMouseDown} />
         </div>
     );
 }

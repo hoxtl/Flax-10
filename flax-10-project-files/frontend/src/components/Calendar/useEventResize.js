@@ -10,7 +10,7 @@ import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes } from './calendarCons
  * @param {ref} eventRef - Ref to the event DOM element
  * @param {function} editEvent - Function to save the new end time
  */
-export function useEventResize(event, eventRef, editEvent) {
+export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
     const [isResizing, setIsResizing] = useState(false);
     const [resizePreview, setResizePreview] = useState(null);
     const handleResizeStart = useCallback((e) => {
@@ -21,9 +21,10 @@ export function useEventResize(event, eventRef, editEvent) {
             commitResize(event, diff, editEvent);
             setIsResizing(false);
             setResizePreview(null);
+            if (resizeJustEnded) resizeJustEnded.current = true;
         };
         createResizeSession(e.clientY, eventRef.current.offsetHeight, { onMove, onEnd });
-    }, [event, eventRef, editEvent]);
+    }, [event, eventRef, editEvent, resizeJustEnded]);
     return { isResizing, resizePreview, handleResizeStart };
 }
 
