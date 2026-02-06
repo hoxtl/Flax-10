@@ -1,14 +1,19 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import DashboardLayout from "./layout/DashboardLayout";
-import Home from "./pages/Home";
-import Tasks from "./pages/Tasks";
+import { APP_ROUTES } from "./lib/routes";
 
 export default function App() {
+  const location = useLocation();
+
+  const activeNav =
+    APP_ROUTES.find((r) => r.path === location.pathname)?.id || "home";
+
   return (
-    <DashboardLayout>
+    <DashboardLayout activeNav={activeNav}>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/tasks" element={<Tasks />} />
+        {APP_ROUTES.map((r) => (
+          <Route key={r.id} path={r.path} element={r.element} />
+        ))}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </DashboardLayout>
