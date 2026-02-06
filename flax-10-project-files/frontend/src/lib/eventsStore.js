@@ -39,8 +39,16 @@ export function eventsForDate(events, date) {
   return events.filter(e => e.date === d);
 }
 
-// Helper to convert a date to "YYYY-MM-DD" format for consistent comparisons.
 export function toYmd(date) {
-  const x = new Date(date); x.setHours(0,0,0,0);
+  // Accept Date, timestamp, or date-string. Fallback to today if invalid.
+  const x = date instanceof Date ? new Date(date.getTime()) : new Date(date);
+
+  if (Number.isNaN(x.getTime())) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today.toISOString().slice(0, 10);
+  }
+
+  x.setHours(0, 0, 0, 0);
   return x.toISOString().slice(0, 10);
 }
