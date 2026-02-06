@@ -23,27 +23,66 @@ export function checkOverlapWithConfirm(event, allEvents) {
     return confirm(`This event overlaps with: ${names}\n\nDo you want to continue?`);
 }
 
+// function that processes a group of overlapping events to determine their columns
+function processGroup(groupEvents, columnsMap) {
+    const columnEnds = [];
+    // We use a temporary map so we can set the totalColumns after processing the whole group
+    const groupResults = new Map();
+
+    groupEvents.forEach(event => {
+        const start = new Date(event.start_time);
+        // Find the first column where the previous event has ended by this event's start time
+        let col = columnEnds.findIndex(end => end <= start);
+
+        // If no column is free, start a new one
+        if (col === -1) col = columnEnds.length;
+
+        groupResults.set(event.id, { column: col });
+        columnEnds[col] = new Date(event.end_time);
+    });
+
+    const maxCols = columnEnds.length;
+    groupResults.forEach((val, id) => {
+        columnsMap.set(id, { column: val.column, totalColumns: maxCols });
+    });
+}
+
 export function calculateEventColumns(events) {
     if (!events.length) return new Map();
 
+    // Sort events by start time
     const sorted = [...events].sort((a, b) =>
         new Date(a.start_time) - new Date(b.start_time)
     );
 
     const columns = new Map();
-    const columnEnds = [];
+    let currentGroup = [];
+    let groupEnd = null;
 
     sorted.forEach(event => {
         const start = new Date(event.start_time);
-        let col = columnEnds.findIndex(end => end <= start);
-        if (col === -1) col = columnEnds.length;
 
-        columns.set(event.id, { column: col, totalColumns: 0 });
-        columnEnds[col] = new Date(event.end_time);
+        // If we have a current group and this event starts after the entire group has finished,
+        // then this event belongs to a new, non-overlapping group.
+        if (groupEnd && start >= groupEnd) {
+            processGroup(currentGroup, columns);
+            currentGroup = [];
+            groupEnd = null;
+        }
+
+        currentGroup.push(event);
+
+        // Update the end time of the current group (it's the max end time of all events in the group)
+        const end = new Date(event.end_time);
+        if (!groupEnd || end > groupEnd) {
+            groupEnd = end;
+        }
     });
 
-    const maxCols = columnEnds.length;
-    columns.forEach(val => val.totalColumns = maxCols);
+    // Don't forget to process the last group
+    if (currentGroup.length > 0) {
+        processGroup(currentGroup, columns);
+    }
 
     return columns;
 }

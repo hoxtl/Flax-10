@@ -1,45 +1,59 @@
 from rest_framework import serializers
-from studyFlax.models import CalendarEvent, RecurrenceRule
+from studyFlax.models import CalendarEvent, RecurrenceRule, Tag
 from .tag_serialisers import TagSerialiser
 
 class RecurrenceSerialiser(serializers.ModelSerializer):
     class Meta:
         model = RecurrenceRule
-        fields = ['id', 'frequency', 'interval', 'end_date', 'count']
+        fields = ['id', 'frequency', 'interval', 'end_date', 'count', 'exception_dates']
 
 class CalendarEventSerialiser(serializers.ModelSerializer):
-    tag_details = TagSerialiser(source='tags', read_only=True)
+    tag_details = TagSerialiser(source='tag', read_only=True)
+    tag_name = serializers.CharField(source='tag.name', read_only=True, allow_null=True)
     recurrence_details = RecurrenceSerialiser(source='recurrence_rule', read_only=True)
 
     class Meta:
         model = CalendarEvent
-        fields = ['id', 'title', 'description', 
-        'start_time', 'end_time', 'location', 'tag', 
-        'tag_details', 'recurrence_details', 
+        fields = ['id', 'title', 'description',
+        'start_time', 'end_time', 'location', 'tag',
+        'tag_name', 'tag_details', 'recurrence_details',
         'recurrence_rule', 'reminder_minutes']
 
 class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     recurrence_rule = serializers.JSONField(required=False, allow_null=True)
-    
+    tag = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
     class Meta:
         model = CalendarEvent
-        fields = ['id', 'title', 'description', 
-        'start_time', 'end_time', 'location', 'tag', 
+        fields = ['id', 'title', 'description',
+        'start_time', 'end_time', 'location', 'tag',
         'recurrence_rule', 'reminder_minutes']
-    
+
     def create(self, validated_data):
         recurrence_data = validated_data.pop('recurrence_rule', None)
+        validated_data['tag'] = self._resolve_tag(validated_data.get('tag'))
         recurrence_rule = self._handle_recurrence(recurrence_data)
         event = CalendarEvent.objects.create(recurrence_rule=recurrence_rule, **validated_data)
         return event
-    
+
     def update(self, instance, validated_data):
-        recurrence_data = validated_data.pop('recurrence_rule', None)
-        instance.recurrence_rule = self._handle_recurrence(recurrence_data, instance.recurrence_rule)
+        if 'recurrence_rule' in validated_data:
+            recurrence_data = validated_data.pop('recurrence_rule')
+            instance.recurrence_rule = self._handle_recurrence(recurrence_data, instance.recurrence_rule)
+        if 'tag' in validated_data:
+            validated_data['tag'] = self._resolve_tag(validated_data.get('tag'))
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+    def _resolve_tag(self, tag_value):
+        if not tag_value:
+            return None
+        if isinstance(tag_value, int) or (isinstance(tag_value, str) and tag_value.isdigit()):
+            return Tag.objects.filter(id=int(tag_value)).first()
+        tag, _ = Tag.objects.get_or_create(name=tag_value, defaults={'is_default': True})
+        return tag
     
     def _handle_recurrence(self, recurrence_data, existing_rule=None):
         if not recurrence_data or not isinstance(recurrence_data, dict):

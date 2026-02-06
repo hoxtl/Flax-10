@@ -5,19 +5,18 @@ import { createResizeSession } from '../../utils/resizeUtils';
 import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from './calendarConstants';
 import { checkOverlapWithConfirm } from '../../utils/overlapUtils';
 
-export function useEventResize(event, eventRef, editEvent, resizeJustEnded, isRecurringInstance = false) {
+export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
     const { events } = useCalendar();
     const { setResizeHighlight } = useResizeHighlight();
     const [isResizing, setIsResizing] = useState(false);
     const [resizePreview, setResizePreview] = useState(null);
     const handleResizeStart = useCallback((e) => {
-        if (isRecurringInstance) return;
         e.stopPropagation();
         setIsResizing(true);
         const onMove = createMoveHandler(event, setResizePreview, setResizeHighlight);
         const onEnd = createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded);
         createResizeSession(e.clientY, eventRef.current.offsetHeight, { onMove, onEnd });
-    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight, isRecurringInstance]);
+    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight]);
     return { isResizing, resizePreview, handleResizeStart };
 }
 
@@ -68,6 +67,28 @@ function calculateNewHeight(originalHeight, currentY, startY) {
 }
 
 function saveResizedEvent(event, deltaY, editEvent, events, resizeJustEnded) {
+    const isRecurring = hasRecurrence(event);
+    if (isRecurring) {
+        handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded);
+    } else {
+        executeResize(event, deltaY, editEvent, events, resizeJustEnded);
+    }
+}
+
+function hasRecurrence(event) {
+    return event.recurrence_details || event.recurrence_rule;
+}
+
+function handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded) {
+    const choice = window.confirm(
+        'This is a recurring event.\n\nOK = Resize ALL occurrences\nCancel = Cancel resize'
+    );
+    if (choice) {
+        executeResize(event, deltaY, editEvent, events, resizeJustEnded);
+    }
+}
+
+function executeResize(event, deltaY, editEvent, events, resizeJustEnded) {
     const newEnd = calculateNewEndTime(event, deltaY);
     const baseEventId = extractBaseEventId(event.id);
     const updatedEvent = { ...event, end_time: newEnd.toISOString() };

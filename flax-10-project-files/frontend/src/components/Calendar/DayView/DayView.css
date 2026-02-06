@@ -101,6 +101,18 @@
     z-index: 10;
 }
 
+/* When dragging an event, fade out all other events so we can see the grid highlights */
+.day-view:has(.draggable-event.dragging) .draggable-event:not(.dragging) {
+    opacity: 0.2;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.day-view:has(.draggable-event.dragging) .draggable-event.dragging {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .events-layer>* {
     pointer-events: auto;
 }

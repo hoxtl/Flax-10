@@ -9,8 +9,25 @@ import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../utils
 */
 export function useDrag({ type, data }) {
     const [isDragging, setIsDragging] = useState(false);
-    const onDragStart = (e) => (setIsDragging(true), setupDragStart(e, type, data));
-    const onDragEnd = () => setIsDragging(false);
+
+    const onDragStart = (e) => {
+        // Disable transitions to ensure immediate opacity change for the ghost image
+        e.currentTarget.style.transition = 'none';
+        e.currentTarget.style.opacity = '0.3';
+        setupDragStart(e, type, data);
+
+        // Defer state update
+        requestAnimationFrame(() => {
+            setIsDragging(true);
+        });
+    };
+
+    const onDragEnd = (e) => {
+        e.currentTarget.style.transition = '';
+        e.currentTarget.style.opacity = '';
+        setIsDragging(false);
+    };
+
     return { dragProps: { draggable: true, onDragStart, onDragEnd }, isDragging };
 }
 /**
