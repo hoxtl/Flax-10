@@ -1,6 +1,6 @@
 import styles from "./PillFilters.module.css";
 import { PILLS } from "../lib/uiConstants";
-import { countByType } from "../lib/pillUtils";
+import { countByType } from "../utils/pillUtils";
 
 // Button component for each pill filter
 function cls(isActive) {

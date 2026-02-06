@@ -14,7 +14,9 @@ def tag_list(request):
     return create_tag(request)
 
 def get_tags(request):
-    tags = Tag.objects.filter(Q(user=user) | Q(is_default=True))
+    # TODO: uncomment user filter when auth is implemented
+    # tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True))
+    tags = Tag.objects.filter(is_default=True)
     serialiser = TagSerialiser(tags, many=True)
     return Response(serialiser.data)
 

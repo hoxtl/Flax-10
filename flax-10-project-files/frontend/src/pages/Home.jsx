@@ -2,21 +2,24 @@ import { useState, useMemo } from "react";
 import styles from "./Home.module.css";
 import PillFilters from "../components/PillFilters";
 import DateNavigator from "../components/DateNavigator";
-import { isToday } from "../lib/dateUtils";
-import { eventsForDate } from "../lib/eventsStore";
+import { isToday } from "../utils/dateUtils";
+import { useCalendar, useCalendarDispatch } from "../context/CalendarContext";
+import { useCalendarEvents, useEventActions } from "../hooks/useCalendarEvents";
 import CardGrid from "../components/CardGrid";
 
-// Home page showing the schedule for the selected date, with filters and navigation.
 function getScheduleTitle(selectedDate) {
   return isToday(selectedDate) ? "Today's schedule" : "Schedule";
 }
 
-// Filters events based on the active filter key. If "all", returns all items.
 function filterEvents(active, items) {
-  return active === "all" ? items : items.filter((e) => e.type === active);
+  return active === "all" ? items : items.filter((e) => e.tag === active);
 }
 
-// Renders the filter pills at the top of the page, showing counts for each type and allowing selection.
+function eventsForDate(events, date) {
+  const target = new Date(date).toDateString();
+  return events.filter(e => new Date(e.start_time).toDateString() === target);
+}
+
 function FiltersBar({ activeFilter, onChange, dayItems }) {
   return (
     <div className={styles.filters}>
@@ -25,9 +28,14 @@ function FiltersBar({ activeFilter, onChange, dayItems }) {
   );
 }
 
-// Main Home component. Manages the selected date and active filter state, computes the events to show, and renders the navigation, filters, and event cards.
-export default function Home({ selectedDate, setSelectedDate, events = [], onDelete }) {
+export default function Home() {
+  const { selectedDate, events } = useCalendar();
+  const dispatch = useCalendarDispatch();
+  const { removeEvent } = useEventActions();
   const [activeFilter, setActiveFilter] = useState("all");
+  useCalendarEvents();
+
+  const setSelectedDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
   const dayItems = useMemo(() => eventsForDate(events, selectedDate), [events, selectedDate]);
   const filtered = useMemo(() => filterEvents(activeFilter, dayItems), [activeFilter, dayItems]);
   const scheduleTitle = useMemo(() => getScheduleTitle(selectedDate), [selectedDate]);
@@ -37,7 +45,7 @@ export default function Home({ selectedDate, setSelectedDate, events = [], onDel
       <FiltersBar activeFilter={activeFilter} onChange={setActiveFilter} dayItems={dayItems} />
       <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
       <div className={styles.content}>
-        <CardGrid items={filtered} onDelete={onDelete} />
+        <CardGrid items={filtered} onDelete={removeEvent} />
       </div>
     </div>
   );
