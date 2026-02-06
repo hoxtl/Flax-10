@@ -5,6 +5,8 @@
 import { DraggableEvent } from '../DraggableEvent';
 import { getHoursOfDay, calculateEventStyle } from '../DayView/dayViewHelpers';
 import { useTimeSlotDrop } from '../useTimeSlotDrop';
+import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
+import { isSameDay } from '../../../utils/dateUtils';
 import { SLOT_HEIGHT } from '../calendarConstants';
 
 export function DayColumn({ date, events }) {
@@ -19,7 +21,7 @@ export function DayColumn({ date, events }) {
                     <DraggableEvent
                         key={event.id}
                         event={event}
-                        style={calculateEventStyle(event, SLOT_HEIGHT)}
+                        style={calculateEventStyle(event, SLOT_HEIGHT, events)}
                     />
                 ))}
             </div>
@@ -29,17 +31,21 @@ export function DayColumn({ date, events }) {
 
 function HourCell({ hour, date }) {
     const { mergedProps, isOver, highlightQuarter } = useTimeSlotDrop(hour, date);
+    const { resizeHighlight } = useResizeHighlight();
+    const isResizeTarget = resizeHighlight && resizeHighlight.hour === hour && isSameDay(resizeHighlight.date, date);
+    const showHighlight = isOver || isResizeTarget;
+    const quarter = isOver ? highlightQuarter : resizeHighlight?.quarter;
     return (
         <div
-            className={`hour-cell${isOver ? ' drop-target' : ''}`}
+            className={`hour-cell${showHighlight ? ' drop-target' : ''}`}
             style={{ height: SLOT_HEIGHT }}
             {...mergedProps}
         >
-            {isOver && highlightQuarter !== null && (
-                <div
-                    className="quarter-highlight"
-                    style={{ top: `${highlightQuarter * 25}%` }}
-                />
+            {isOver && quarter !== null && (
+                <div className="quarter-highlight" style={{ top: `${quarter * 25}%` }} />
+            )}
+            {isResizeTarget && quarter !== null && (
+                <div className="resize-line-highlight" style={{ top: `${quarter * 25}%` }} />
             )}
         </div>
     );

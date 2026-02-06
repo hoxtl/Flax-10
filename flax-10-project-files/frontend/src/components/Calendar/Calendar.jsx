@@ -1,4 +1,5 @@
 import { CalendarProvider, useCalendar, useEventModal } from '../../context/CalendarContext';
+import { ResizeHighlightProvider } from '../../context/ResizeHighlightContext';
 import { useCalendarEvents } from '../../hooks/useCalendarEvents';
 import { CalendarHeader } from './CalendarHeader';
 import { DayView } from './DayView/DayView';
@@ -10,7 +11,9 @@ import './Calendar.css';
 export function Calendar() {
     return (
         <CalendarProvider>
-            <CalendarContent />
+            <ResizeHighlightProvider>
+                <CalendarContent />
+            </ResizeHighlightProvider>
         </CalendarProvider>
     );
 }

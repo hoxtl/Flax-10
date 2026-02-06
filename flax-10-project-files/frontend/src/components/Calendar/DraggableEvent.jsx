@@ -20,7 +20,6 @@ export function DraggableEvent({ event, style }) {
     const resizeJustEnded = useRef(false);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
-
     const handleClick = () => {
         if (resizeJustEnded.current) {
             resizeJustEnded.current = false;
@@ -28,18 +27,11 @@ export function DraggableEvent({ event, style }) {
         }
         if (!isDragging && !isResizing) openModal(event);
     };
-
     return (
         <EventCard
-            eventRef={eventRef}
-            event={event}
-            style={style}
-            resizePreview={resizePreview}
-            isDragging={isDragging}
-            isResizing={isResizing}
-            dragProps={dragProps}
-            onClick={handleClick}
-            onResizeStart={handleResizeStart}
+            eventRef={eventRef} event={event} style={style}
+            resizePreview={resizePreview} isDragging={isDragging} isResizing={isResizing}
+            dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart}
         />
     );
 }
@@ -53,6 +45,7 @@ function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizi
         e.preventDefault();
         onResizeStart(e);
     };
+    const height = resizePreview || parseFloat(style?.height) || 0;
     return (
         <div
             ref={eventRef}
@@ -61,22 +54,22 @@ function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizi
             onClick={onClick}
             {...dragProps}
         >
-            <EventContent event={event} />
+            <EventContent event={event} height={height} />
             <div className="resize-handle" draggable={false} onMouseDown={handleResizeMouseDown} />
         </div>
     );
 }
 
-/*
-    This function is used to handle the event content component.
-*/
-function EventContent({ event }) {
+function EventContent({ event, height }) {
     const startTime = formatTime(new Date(event.start_time));
     const endTime = formatTime(new Date(event.end_time));
+    const showTime = height >= 30;
+    const showDescription = height >= 60 && event.description;
     return (
         <div className="event-content">
             <div className="event-title">{event.title}</div>
-            <div className="event-time">{startTime} - {endTime}</div>
+            {showTime && <div className="event-time">{startTime} - {endTime}</div>}
+            {showDescription && <div className="event-description">{event.description}</div>}
         </div>
     );
 }

@@ -5,6 +5,13 @@
     It is also used to confirm the deletion of an event.
 */
 
+import { checkOverlapWithConfirm } from '../../../utils/overlapUtils';
+
+function checkOverlap(event, allEvents) {
+    const others = allEvents.filter(e => e.id !== event.id);
+    return checkOverlapWithConfirm(event, others);
+}
+
 /*
     This function is used to get the initial form for the event modal.
 */
@@ -23,13 +30,17 @@ export function getInitialForm(event) {
 /*
     This function is used to validate and submit the form.
 */
-export async function validateAndSubmit(e, form, event, actions, onClose, setError) {
+export async function validateAndSubmit(e, form, event, actions, onClose, setError, allEvents) {
     e.preventDefault();
     if (new Date(form.start_time) >= new Date(form.end_time)) return setError('Start must be before end');
     if (!form.title.trim()) return setError('Title is required');
 
+    const data = buildEventData(form);
+    const testEvent = { ...data, id: event?.id };
+
+    if (!checkOverlap(testEvent, allEvents)) return;
+
     try {
-        const data = buildEventData(form);
         event?.id ? await actions.editEvent(event.id, data) : await actions.addEvent(data);
         onClose();
     } catch (err) {

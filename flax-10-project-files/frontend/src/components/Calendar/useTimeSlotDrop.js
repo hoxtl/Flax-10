@@ -1,17 +1,20 @@
 import { useState, useCallback } from "react";
 import { useDrop } from '../../hooks/useDragDrop';
+import { useCalendar } from "../../context/CalendarContext";
 import { useEventActions } from "../../hooks/useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "./calendarConstants";
+import { checkOverlapWithConfirm } from "../../utils/overlapUtils";
 
 export function useTimeSlotDrop(hour, date) {
+    const { events } = useCalendar();
     const { addEvent, editEvent } = useEventActions();
     const [highlightQuarter, setHighlightQuarter] = useState(null);
 
     const handleDrop = useCallback((payload, e) => {
         const minutes = getDropMinutes(hour, e);
         setHighlightQuarter(null);
-        dispatchDrop(payload, date, minutes, addEvent, editEvent);
-    }, [hour, date, addEvent, editEvent]);
+        dispatchDrop(payload, date, minutes, addEvent, editEvent, events);
+    }, [hour, date, addEvent, editEvent, events]);
 
     const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
     const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter);
@@ -24,11 +27,11 @@ function getDropMinutes(hour, e) {
     return hour * 60 + minuteOffset;
 }
 
-function dispatchDrop(payload, date, minutes, addEvent, editEvent) {
+function dispatchDrop(payload, date, minutes, addEvent, editEvent, allEvents) {
     if (payload.type === 'TAG') {
-        createEventFromTag(payload.data, date, minutes, addEvent);
+        createEventFromTag(payload.data, date, minutes, addEvent, allEvents);
     } else if (payload.type === 'EVENT') {
-        moveEventToTime(payload.data, date, minutes, editEvent);
+        moveEventToTime(payload.data, date, minutes, editEvent, allEvents);
     }
 }
 
@@ -48,28 +51,37 @@ function buildMergedProps(dropProps, isOver, setHighlightQuarter) {
     };
 }
 
-function createEventFromTag(tag, date, startMinutes, addEvent) {
+function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
     const start = createDateAtMinutes(date, startMinutes);
     const end = new Date(start);
     end.setMinutes(end.getMinutes() + (tag.default_duration || 60));
 
-    addEvent({
+    const newEvent = {
         title: tag.name,
         description: "",
         start_time: start.toISOString(),
         end_time: end.toISOString(),
-    });
+    };
+
+    if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
+
+    addEvent(newEvent);
 }
 
-function moveEventToTime(event, date, startMinutes, editEvent) {
+function moveEventToTime(event, date, startMinutes, editEvent, allEvents) {
     const duration = new Date(event.end_time) - new Date(event.start_time);
     const newStart = createDateAtMinutes(date, startMinutes);
     const newEnd = new Date(newStart.getTime() + duration);
-
-    editEvent(event.id, {
+    const updatedEvent = {
+        ...event,
         start_time: newStart.toISOString(),
         end_time: newEnd.toISOString(),
-    });
+    };
+
+    const others = allEvents.filter(e => e.id !== event.id);
+    if (!checkOverlapWithConfirm(updatedEvent, others)) return;
+
+    editEvent(event.id, { start_time: newStart.toISOString(), end_time: newEnd.toISOString(), });
 }
 
 function createDateAtMinutes(date, totalMinutes) {

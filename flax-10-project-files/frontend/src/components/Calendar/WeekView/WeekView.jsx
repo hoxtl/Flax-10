@@ -15,19 +15,12 @@ export function WeekView() {
     const scrollRef = useRef(null);
     const weekDays = getWeekDays(selectedDate);
     useAutoScroll(scrollRef, getEventsForWeek(events, weekDays));
-    const dayColumns = weekDays.map(day => (
-        <DayColumn
-            key={day.toISOString()}
-            date={day}
-            events={getEventsForDay(events, day)}
-        />
-    ));
     return (
         <div className="week-view" ref={scrollRef}>
             <WeekHeader days={weekDays} />
             <div className="week-grid">
                 <TimeLabels />
-                {dayColumns}
+                {weekDays.map(day => <DayColumn key={day.toISOString()} date={day} events={getEventsForDay(events, day)} />)}
             </div>
         </div>
     );
@@ -37,10 +30,7 @@ export function WeekView() {
  * Filter events for the entire week
  */
 function getEventsForWeek(events, weekDays) {
-    return events.filter(e => {
-        const d = new Date(e.start_time);
-        return weekDays.some(day => isSameDay(d, day));
-    });
+    return events.filter(e => weekDays.some(day => isSameDay(new Date(e.start_time), day)));
 }
 
 /**
@@ -49,19 +39,19 @@ function getEventsForWeek(events, weekDays) {
 function WeekHeader({ days }) {
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const today = new Date();
-    const headerCells = days.map((day, index) => {
-        const isToday = isSameDay(day, today);
-        return (
-            <div key={day.toISOString()} className={`day-header ${isToday ? 'is-today' : ''}`}>
-                <span className="day-name">{dayNames[index]}</span>
-                <span className="day-number">{day.getDate()}</span>
-            </div>
-        );
-    });
     return (
         <div className="week-header">
             <div className="time-gutter" />
-            {headerCells}
+            {days.map((day, i) => <DayHeaderCell key={day.toISOString()} day={day} name={dayNames[i]} isToday={isSameDay(day, today)} />)}
+        </div>
+    );
+}
+
+function DayHeaderCell({ day, name, isToday }) {
+    return (
+        <div className={`day-header ${isToday ? 'is-today' : ''}`}>
+            <span className="day-name">{name}</span>
+            <span className="day-number">{day.getDate()}</span>
         </div>
     );
 }
@@ -70,8 +60,5 @@ function WeekHeader({ days }) {
  * Filters events to only those starting on the given day.
  */
 function getEventsForDay(events, date) {
-    return events.filter(event => {
-        const eventDate = new Date(event.start_time);
-        return isSameDay(eventDate, date);
-    });
+    return events.filter(e => isSameDay(new Date(e.start_time), date));
 }

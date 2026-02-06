@@ -46,7 +46,7 @@ function DayGrid({ hours, date, events }) {
                     <DraggableEvent
                         key={e.id}
                         event={e}
-                        style={calculateEventStyle(e, SLOT_HEIGHT)}
+                        style={calculateEventStyle(e, SLOT_HEIGHT, events)}
                     />
                 ))}
             </div>
