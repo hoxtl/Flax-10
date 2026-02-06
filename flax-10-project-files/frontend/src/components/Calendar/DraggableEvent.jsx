@@ -20,13 +20,7 @@ export function DraggableEvent({ event, style }) {
     const resizeJustEnded = useRef(false);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
-    const handleClick = () => {
-        if (resizeJustEnded.current) {
-            resizeJustEnded.current = false;
-            return;
-        }
-        if (!isDragging && !isResizing) openModal(event);
-    };
+    const handleClick = createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event);
     return (
         <EventCard
             eventRef={eventRef} event={event} style={style}
@@ -34,6 +28,16 @@ export function DraggableEvent({ event, style }) {
             dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart}
         />
     );
+}
+
+function createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event) {
+    return () => {
+        if (resizeJustEnded.current) {
+            resizeJustEnded.current = false;
+            return;
+        }
+        if (!isDragging && !isResizing) openModal(event);
+    };
 }
 
 /*

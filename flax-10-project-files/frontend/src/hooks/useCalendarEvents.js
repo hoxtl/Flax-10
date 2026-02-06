@@ -12,7 +12,6 @@ import { getDateRangeForView } from './calendarHelpers';
 export function useCalendarEvents() {
     const { selectedDate, viewMode, events } = useCalendar();
     const dispatch = useCalendarDispatch();
-
     // Fetches events from the API based on the current date range being viewed
     // Uses useCallback so it doesn't get recreated on every render, preventing infinite loops
     const loadEvents = useCallback(async () => {
@@ -26,12 +25,10 @@ export function useCalendarEvents() {
             dispatch({ type: 'SET_ERROR', payload: error.message });
         }
     }, [selectedDate, viewMode, dispatch]);
-
     // Automatically fetch events whenever date or view mode changes
     useEffect(() => {
         loadEvents();
     }, [loadEvents]);
-
     return { events, loadEvents };
 }
 
@@ -42,27 +39,39 @@ export function useCalendarEvents() {
  * @returns 
  */
 export function useEventActions() {
+    const { selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
+    const loadEvents = useCallback(async () => {
+        const { start, end } = getDateRangeForView(selectedDate, viewMode);
+        const data = await getEvents({ start, end });
+        dispatch({ type: 'SET_EVENTS', payload: data });
+    }, [selectedDate, viewMode, dispatch]);
+    return {
+        addEvent: createAddEvent(loadEvents),
+        editEvent: createEditEvent(loadEvents),
+        removeEvent: createRemoveEvent(dispatch)
+    };
+}
 
-    // Creates a new event and adds it to the calendar
-    const addEvent = async (eventData) => {
+function createAddEvent(reload) {
+    return async (eventData) => {
         const newEvent = await createEvent(eventData);
-        dispatch({ type: 'ADD_EVENT', payload: newEvent });
+        await reload();
         return newEvent;
     };
+}
 
-    // Updates an existing event (by ID) and updates it in the calendar
-    const editEvent = async (id, eventData) => {
+function createEditEvent(reload) {
+    return async (id, eventData) => {
         const updated = await updateEvent(id, eventData);
-        dispatch({ type: 'UPDATE_EVENT', payload: updated });
+        await reload();
         return updated;
     };
+}
 
-    // Deletes an event (by ID) and removes it from the calendar
-    const removeEvent = async (id) => {
+function createRemoveEvent(dispatch) {
+    return async (id) => {
         await deleteEvent(id);
         dispatch({ type: 'DELETE_EVENT', payload: id });
     };
-
-    return { addEvent, editEvent, removeEvent };
 }
