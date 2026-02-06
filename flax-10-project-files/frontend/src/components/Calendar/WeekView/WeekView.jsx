@@ -1,7 +1,9 @@
+import { useRef } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
 import { getWeekDays, isSameDay } from '../../../utils/dateUtils';
 import { DayColumn } from './DayColumn';
 import { TimeLabels } from './TimeLabels';
+import { useAutoScroll } from '../useAutoScroll';
 import './WeekView.css';
 
 /**
@@ -10,7 +12,9 @@ import './WeekView.css';
  */
 export function WeekView() {
     const { selectedDate, events } = useCalendar();
+    const scrollRef = useRef(null);
     const weekDays = getWeekDays(selectedDate);
+    useAutoScroll(scrollRef, getEventsForWeek(events, weekDays));
     const dayColumns = weekDays.map(day => (
         <DayColumn
             key={day.toISOString()}
@@ -19,7 +23,7 @@ export function WeekView() {
         />
     ));
     return (
-        <div className="week-view">
+        <div className="week-view" ref={scrollRef}>
             <WeekHeader days={weekDays} />
             <div className="week-grid">
                 <TimeLabels />
@@ -27,6 +31,16 @@ export function WeekView() {
             </div>
         </div>
     );
+}
+
+/**
+ * Filter events for the entire week
+ */
+function getEventsForWeek(events, weekDays) {
+    return events.filter(e => {
+        const d = new Date(e.start_time);
+        return weekDays.some(day => isSameDay(d, day));
+    });
 }
 
 /**

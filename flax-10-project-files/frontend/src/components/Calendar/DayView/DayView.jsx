@@ -1,18 +1,22 @@
+import { useRef } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
 import { isSameDay } from '../../../utils/dateUtils';
 import { TimeSlot } from './TimeSlot';
 import { DraggableEvent } from '../DraggableEvent';
 import { getHoursOfDay, calculateEventStyle } from './dayViewHelpers';
 import { SLOT_HEIGHT } from '../calendarConstants';
+import { useAutoScroll } from '../useAutoScroll';
 import './DayView.css';
 
 export function DayView() {
     const { selectedDate, events } = useCalendar();
-    const hours = getHoursOfDay();
+    const scrollRef = useRef(null);
     const dayEvents = filterEventsForDay(events, selectedDate);
+    useAutoScroll(scrollRef, dayEvents);
+    const hours = getHoursOfDay();
 
     return (
-        <div className="day-view">
+        <div className="day-view" ref={scrollRef}>
             <TimeLabelsColumn hours={hours} />
             <DayGrid hours={hours} date={selectedDate} events={dayEvents} />
         </div>
