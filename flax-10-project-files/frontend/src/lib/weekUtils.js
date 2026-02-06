@@ -1,5 +1,6 @@
 // Pure helpers for WeekBar. No React, no storage.
 
+// Builds an array of week labels, inserting "RW" after the specified week if needed.
 export function buildWeekLabels(totalWeeks, hasReadingWeek, readingWeekAfterWeek) {
   const labels = [];
   for (let w = 1; w <= totalWeeks; w++) {
@@ -9,6 +10,7 @@ export function buildWeekLabels(totalWeeks, hasReadingWeek, readingWeekAfterWeek
   return labels;
 }
 
+// Given a date and term config, returns the corresponding week index (0-based) or -1 if before term start.
 export function getWeekIndexForDate(date, cfg) {
   const start = new Date(cfg.startDate);
   start.setHours(0, 0, 0, 0);

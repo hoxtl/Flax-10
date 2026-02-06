@@ -40,8 +40,8 @@ export default function App() {
 
   return (
   <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-    {({ selectedDate, setSelectedDate }) => (
-      <Home selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+    {({ selectedDate, setSelectedDate, events, onDelete }) => (
+      <Home selectedDate={selectedDate} setSelectedDate={setSelectedDate} events={events} onDelete={onDelete} />
     )}
   </DashboardLayout>
   );

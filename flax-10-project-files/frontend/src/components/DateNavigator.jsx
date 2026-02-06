@@ -2,6 +2,7 @@ import { useRef } from "react";
 import styles from "./DateNavigator.module.css";
 import { addDays, formatDayLabel, parseDateInput, isSameDay } from "../lib/dateUtils";
 
+//Component to navigate between dates
 function Arrow({ dir, onClick }) {
   return (
     <button className={styles.arrow} onClick={onClick}>
@@ -10,6 +11,7 @@ function Arrow({ dir, onClick }) {
   );
 }
 
+// Button to jump back to today's date
 function TodayBtn({ onClick }) {
   return (
     <button className={styles.today} onClick={onClick}>
@@ -18,6 +20,7 @@ function TodayBtn({ onClick }) {
   );
 }
 
+// Button that opens the native date picker when clicked, allowing the user to select a date directly
 function CalendarButton({ value, onPick }) {
   const ref = useRef(null);
   return (
@@ -39,7 +42,7 @@ function CalendarButton({ value, onPick }) {
   );
 }
 
-
+//Display current date and allow navigation to previous/next day, as well as quick jump to today or a specific date using the calendar picker
 export default function DateNavigator({ date, onChange, scheduleTitle }) {
   const today = new Date(); today.setHours(0,0,0,0);
   const showToday = !isSameDay(date, today);

@@ -1,0 +1,59 @@
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.06);
+  border: 1px solid rgba(30, 30, 30, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--accent);
+}
+
+.row {
+  display: flex;
+  gap: 14px;
+  padding: 16px 16px 16px 18px;
+  align-items: flex-start;
+}
+
+.iconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.03);
+  flex: 0 0 auto;
+  font-size: 22px;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.delete {
+  border: none;
+  background: transparent;
+  color: #9a948b;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 10px;
+}
+
+.delete:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #5c564e;
+}
+
+
