@@ -5,18 +5,19 @@ import { createResizeSession } from '../../utils/resizeUtils';
 import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from './calendarConstants';
 import { checkOverlapWithConfirm } from '../../utils/overlapUtils';
 
-export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
+export function useEventResize(event, eventRef, editEvent, resizeJustEnded, isRecurringInstance = false) {
     const { events } = useCalendar();
     const { setResizeHighlight } = useResizeHighlight();
     const [isResizing, setIsResizing] = useState(false);
     const [resizePreview, setResizePreview] = useState(null);
     const handleResizeStart = useCallback((e) => {
+        if (isRecurringInstance) return;
         e.stopPropagation();
         setIsResizing(true);
         const onMove = createMoveHandler(event, setResizePreview, setResizeHighlight);
         const onEnd = createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded);
         createResizeSession(e.clientY, eventRef.current.offsetHeight, { onMove, onEnd });
-    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight]);
+    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight, isRecurringInstance]);
     return { isResizing, resizePreview, handleResizeStart };
 }
 
@@ -30,11 +31,10 @@ function createMoveHandler(event, setResizePreview, setResizeHighlight) {
 
 function createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded) {
     return (diff) => {
-        commitResize(event, diff, editEvent, events);
+        saveResizedEvent(event, diff, editEvent, events, resizeJustEnded);
         setIsResizing(false);
         setResizePreview(null);
         setResizeHighlight(null);
-        if (resizeJustEnded) resizeJustEnded.current = true;
     };
 }
 
@@ -67,11 +67,19 @@ function calculateNewHeight(originalHeight, currentY, startY) {
     return Math.max(minHeight, originalHeight + delta);
 }
 
-function commitResize(event, deltaY, editEvent, allEvents) {
+function saveResizedEvent(event, deltaY, editEvent, events, resizeJustEnded) {
     const newEnd = calculateNewEndTime(event, deltaY);
-    const others = allEvents.filter(e => e.id !== event.id);
-    if (!isValidResize(event, newEnd, others)) return;
-    editEvent(event.id, { end_time: newEnd.toISOString() });
+    const baseEventId = extractBaseEventId(event.id);
+    const updatedEvent = { ...event, end_time: newEnd.toISOString() };
+    const others = events.filter(e => extractBaseEventId(e.id) !== baseEventId);
+    if (checkOverlapWithConfirm(updatedEvent, others)) {
+        editEvent(baseEventId, { end_time: newEnd.toISOString() });
+        if (resizeJustEnded) resizeJustEnded.current = true;
+    }
+}
+
+function extractBaseEventId(id) {
+    return id > 1000000 ? Math.floor(id / 1000000) : id;
 }
 
 function calculateNewEndTime(event, deltaY) {

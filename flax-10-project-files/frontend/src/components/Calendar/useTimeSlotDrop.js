@@ -15,7 +15,6 @@ export function useTimeSlotDrop(hour, date) {
         setHighlightQuarter(null);
         dispatchDrop(payload, date, minutes, addEvent, editEvent, events);
     }, [hour, date, addEvent, editEvent, events]);
-
     const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
     const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter);
     return { mergedProps, isOver, highlightQuarter };
@@ -55,16 +54,13 @@ function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
     const start = createDateAtMinutes(date, startMinutes);
     const end = new Date(start);
     end.setMinutes(end.getMinutes() + (tag.default_duration || 60));
-
     const newEvent = {
         title: tag.name,
         description: "",
         start_time: start.toISOString(),
         end_time: end.toISOString(),
     };
-
     if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
-
     addEvent(newEvent);
 }
 
@@ -72,16 +68,19 @@ function moveEventToTime(event, date, startMinutes, editEvent, allEvents) {
     const duration = new Date(event.end_time) - new Date(event.start_time);
     const newStart = createDateAtMinutes(date, startMinutes);
     const newEnd = new Date(newStart.getTime() + duration);
-    const updatedEvent = {
-        ...event,
+    const baseEventId = extractBaseEventId(event.id);
+    const updateData = {
         start_time: newStart.toISOString(),
         end_time: newEnd.toISOString(),
     };
-
-    const others = allEvents.filter(e => e.id !== event.id);
+    const updatedEvent = { ...event, ...updateData };
+    const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
     if (!checkOverlapWithConfirm(updatedEvent, others)) return;
+    editEvent(baseEventId, updateData);
+}
 
-    editEvent(event.id, { start_time: newStart.toISOString(), end_time: newEnd.toISOString(), });
+function extractBaseEventId(id) {
+    return id > 1000000 ? Math.floor(id / 1000000) : id;
 }
 
 function createDateAtMinutes(date, totalMinutes) {
