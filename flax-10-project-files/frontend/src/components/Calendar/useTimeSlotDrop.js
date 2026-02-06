@@ -7,14 +7,14 @@ import { checkOverlapWithConfirm } from "../../utils/overlapUtils";
 
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
-    const { addEvent, editEvent } = useEventActions();
+    const { addEvent, editEvent, addException } = useEventActions();
     const [highlightQuarter, setHighlightQuarter] = useState(null);
 
     const handleDrop = useCallback((payload, e) => {
         const minutes = getDropMinutes(hour, e);
         setHighlightQuarter(null);
-        dispatchDrop(payload, date, minutes, addEvent, editEvent, events);
-    }, [hour, date, addEvent, editEvent, events]);
+        dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, events);
+    }, [hour, date, addEvent, editEvent, addException, events]);
     const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
     const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter);
     return { mergedProps, isOver, highlightQuarter };
@@ -26,11 +26,11 @@ function getDropMinutes(hour, e) {
     return hour * 60 + minuteOffset;
 }
 
-function dispatchDrop(payload, date, minutes, addEvent, editEvent, allEvents) {
+function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, allEvents) {
     if (payload.type === 'TAG') {
         createEventFromTag(payload.data, date, minutes, addEvent, allEvents);
     } else if (payload.type === 'EVENT') {
-        moveEventToTime(payload.data, date, minutes, editEvent, allEvents);
+        moveEventToTime(payload.data, date, minutes, addEvent, editEvent, addException, allEvents);
     }
 }
 
@@ -64,19 +64,81 @@ function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
     addEvent(newEvent);
 }
 
-function moveEventToTime(event, date, startMinutes, editEvent, allEvents) {
+function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
+    if (hasRecurrence(event)) {
+        handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents);
+    } else {
+        executeMove(event, date, startMinutes, editEvent, allEvents);
+    }
+}
+
+function hasRecurrence(event) {
+    return event.recurrence_details || event.recurrence_rule;
+}
+
+function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
+    const choice = window.confirm(
+        'This is a recurring event.\n\nOK = Change time for ALL occurrences\nCancel = Move only this occurrence'
+    );
+    if (choice) {
+        updateAllOccurrences(event, startMinutes, editEvent, allEvents);
+    } else {
+        moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents);
+    }
+}
+
+function updateAllOccurrences(event, startMinutes, editEvent, allEvents) {
+    const originalStart = new Date(event.start_time);
+    const newStart = new Date(originalStart);
+    newStart.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+    const duration = new Date(event.end_time) - originalStart;
+    const newEnd = new Date(newStart.getTime() + duration);
+    const baseEventId = extractBaseEventId(event.id);
+    const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
+    const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
+    if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
+    editEvent(baseEventId, updateData);
+}
+
+async function moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents) {
+    const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
+    const newEvent = buildNewEvent(event, newStart, newEnd);
+    if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
+
+    const baseEventId = extractBaseEventId(event.id);
+    const originalDateStr = getDateString(event.start_time);
+    await addException(baseEventId, originalDateStr);
+    await addEvent(newEvent);
+}
+
+function buildNewEvent(event, newStart, newEnd) {
+    return {
+        title: event.title,
+        description: event.description || '',
+        start_time: newStart.toISOString(),
+        end_time: newEnd.toISOString(),
+        location: event.location || '',
+    };
+}
+
+function getDateString(dateTime) {
+    return new Date(dateTime).toISOString().slice(0, 10);
+}
+
+function executeMove(event, date, startMinutes, editEvent, allEvents) {
+    const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
+    const baseEventId = extractBaseEventId(event.id);
+    const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
+    const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
+    if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
+    editEvent(baseEventId, updateData);
+}
+
+function calculateNewTimes(event, date, startMinutes) {
     const duration = new Date(event.end_time) - new Date(event.start_time);
     const newStart = createDateAtMinutes(date, startMinutes);
     const newEnd = new Date(newStart.getTime() + duration);
-    const baseEventId = extractBaseEventId(event.id);
-    const updateData = {
-        start_time: newStart.toISOString(),
-        end_time: newEnd.toISOString(),
-    };
-    const updatedEvent = { ...event, ...updateData };
-    const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!checkOverlapWithConfirm(updatedEvent, others)) return;
-    editEvent(baseEventId, updateData);
+    return { newStart, newEnd };
 }
 
 function extractBaseEventId(id) {

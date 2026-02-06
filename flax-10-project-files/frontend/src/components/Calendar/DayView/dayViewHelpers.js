@@ -23,12 +23,17 @@ export function calculateEventStyle(event, slotHeight, allEvents) {
     const startMins = start.getHours() * 60 + start.getMinutes();
     const duration = (new Date(event.end_time) - start) / (1000 * 60);
 
-    const style = { top: `${(startMins / 60) * slotHeight}px`, height: `${(duration / 60) * slotHeight}px`, width: '100%', left: '0' };
+    const style = {
+        top: `${(startMins / 60) * slotHeight + 1}px`,
+        height: `${(duration / 60) * slotHeight - 2}px`,
+        width: '100%',
+        left: '0'
+    };
     const colInfo = allEvents?.length > 1 ? calculateEventColumns(allEvents).get(event.id) : null;
 
     if (colInfo?.totalColumns > 1) {
         const width = 100 / colInfo.totalColumns;
-        style.width = `${width}%`;
+        style.width = `calc(${width}% - 6px)`;
         style.left = `${width * colInfo.column}%`;
     }
 

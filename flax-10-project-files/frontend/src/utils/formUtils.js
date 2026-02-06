@@ -24,7 +24,7 @@ function getFormFromEvent(event) {
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
         recurrence: event.recurrence_details?.frequency || 'none',
-        tag: event.tag || null,
+        tag: event.tag_name || event.tag_details?.name || '',
         location: event.location || '',
     };
 }
@@ -43,32 +43,83 @@ function getDefaultForm(options) {
     };
 }
 
-/*
-    This function is used to validate and submit the form.
-*/
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, allEvents) {
     e.preventDefault();
     if (new Date(form.start_time) >= new Date(form.end_time)) return setError('Start must be before end');
     if (!form.title.trim()) return setError('Title is required');
+
     const data = buildEventData(form);
     const testEvent = { ...data, id: event?.id };
     if (!checkOverlap(testEvent, allEvents)) return;
+
     try {
-        event?.id ? await actions.editEvent(event.id, data) : await actions.addEvent(data);
+        if (!event?.id) {
+            await actions.addEvent(data);
+        } else if (hasRecurrence(event)) {
+            await handleRecurringEdit(event, data, actions);
+        } else {
+            await actions.editEvent(extractBaseEventId(event.id), data);
+        }
         onClose();
     } catch (err) {
         setError(err.message);
     }
 }
 
-/*
-    This function is used to confirm the deletion of an event.
-*/
-export function confirmDelete(event, actions, onClose) {
-    if (confirm('Delete this event?')) {
-        actions.removeEvent(event.id);
-        onClose();
+function hasRecurrence(event) {
+    return event?.recurrence_details || event?.recurrence_rule;
+}
+
+async function handleRecurringEdit(event, data, actions) {
+    const choice = window.confirm(
+        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
+    );
+    const baseId = extractBaseEventId(event.id);
+    if (choice) {
+        await actions.editEvent(baseId, data);
+    } else {
+        await editSingleOccurrence(event, data, actions, baseId);
     }
+}
+
+async function editSingleOccurrence(event, data, actions, baseId) {
+    const originalDateStr = new Date(event.start_time).toISOString().slice(0, 10);
+    const singleEventData = { ...data };
+    delete singleEventData.recurrence_rule;
+    await actions.addException(baseId, originalDateStr);
+    await actions.addEvent(singleEventData);
+}
+
+function extractBaseEventId(id) {
+    return id > 1000000 ? Math.floor(id / 1000000) : id;
+}
+
+export async function confirmDelete(event, actions, onClose) {
+    if (hasRecurrence(event)) {
+        await handleRecurringDelete(event, actions, onClose);
+    } else {
+        await handleSingleDelete(event, actions, onClose);
+    }
+}
+
+async function handleRecurringDelete(event, actions, onClose) {
+    const choice = window.confirm(
+        'This is a recurring event.\n\nOK = Delete ALL occurrences\nCancel = Delete only this occurrence'
+    );
+    const baseId = extractBaseEventId(event.id);
+    if (choice) {
+        await actions.removeEvent(baseId);
+    } else {
+        const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
+        await actions.addException(baseId, dateStr);
+    }
+    onClose();
+}
+
+async function handleSingleDelete(event, actions, onClose) {
+    if (!confirm('Delete this event?')) return;
+    await actions.removeEvent(extractBaseEventId(event.id));
+    onClose();
 }
 
 function buildEventData(form) {
@@ -78,22 +129,21 @@ function buildEventData(form) {
 }
 
 function buildBaseEventData(form) {
-    const data = {
+    return {
         title: form.title,
         description: form.description,
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
+        tag: form.tag || null,
     };
-    if (form.tag && typeof form.tag === 'number') {
-        data.tag = form.tag;
-    }
-    return data;
 }
 
 function addRecurrenceIfNeeded(data, form) {
     if (form.recurrence && form.recurrence !== 'none') {
         data.recurrence_rule = { frequency: form.recurrence, interval: 1 };
+    } else {
+        data.recurrence_rule = null;
     }
 }
 

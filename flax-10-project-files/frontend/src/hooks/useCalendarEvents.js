@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useCalendar, useCalendarDispatch } from '../context/CalendarContext';
-import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/event_api';
+import { getEvents, createEvent, updateEvent, deleteEvent, addExceptionDate } from '../api/event_api';
 import { getDateRangeForView } from './calendarHelpers';
 
 /**
@@ -49,7 +49,8 @@ export function useEventActions() {
     return {
         addEvent: createAddEvent(loadEvents),
         editEvent: createEditEvent(loadEvents),
-        removeEvent: createRemoveEvent(dispatch)
+        removeEvent: createRemoveEvent(dispatch, loadEvents),
+        addException: createAddException(loadEvents),
     };
 }
 
@@ -69,9 +70,16 @@ function createEditEvent(reload) {
     };
 }
 
-function createRemoveEvent(dispatch) {
+function createRemoveEvent(dispatch, reload) {
     return async (id) => {
         await deleteEvent(id);
-        dispatch({ type: 'DELETE_EVENT', payload: id });
+        await reload();
+    };
+}
+
+function createAddException(reload) {
+    return async (eventId, dateStr) => {
+        await addExceptionDate(eventId, dateStr);
+        await reload();
     };
 }

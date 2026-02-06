@@ -42,30 +42,60 @@ def process_event_recurrence(event, start_date, end_date):
     return generate_instances(event, start_date, end_date)
 
 def generate_instances(event, start_date, end_date):
-    instances = [event]
     if not event.recurrence_rule or not start_date or not end_date:
-        return instances
-    
+        return [event]
+
     rule = event.recurrence_rule
-    current = event.start_time
+    instances = get_base_instance(event, rule)
     duration = event.end_time - event.start_time
-    delta = get_timedelta(rule.frequency, rule.interval)
     max_occurrences = rule.count or 365
-    
-    for count in range(max_occurrences):
-        current = add_instance_if_valid(instances, event, current, delta, duration, start_date, end_date, rule)
-        if current is None:
+
+    for i in range(1, max_occurrences + 1):
+        next_start = get_next_occurrence(event.start_time, rule.frequency, rule.interval, i)
+        if next_start is None or should_stop_generating(next_start, end_date, rule):
             break
-    
+        if next_start >= start_date and not is_exception_date(next_start, rule):
+            instances.append(create_instance(event, next_start, duration))
+
     return instances
 
-def add_instance_if_valid(instances, event, current, delta, duration, start_date, end_date, rule):
-    current += delta
-    if should_stop_generating(current, end_date, rule):
-        return None
-    if current >= start_date:
-        instances.append(create_instance(event, current, duration))
-    return current
+def get_base_instance(event, rule):
+    if is_exception_date(event.start_time, rule):
+        return []
+    return [event]
+
+def get_next_occurrence(start, frequency, interval, occurrence_num):
+    if frequency == 'daily':
+        return start + timedelta(days=interval * occurrence_num)
+    if frequency == 'weekly':
+        return start + timedelta(weeks=interval * occurrence_num)
+    if frequency == 'monthly':
+        return add_months(start, interval * occurrence_num)
+    if frequency == 'yearly':
+        return add_years(start, interval * occurrence_num)
+    return None
+
+def add_months(dt, months):
+    new_month = dt.month + months
+    new_year = dt.year + (new_month - 1) // 12
+    new_month = ((new_month - 1) % 12) + 1
+    new_day = min(dt.day, get_days_in_month(new_year, new_month))
+    return dt.replace(year=new_year, month=new_month, day=new_day)
+
+def add_years(dt, years):
+    new_year = dt.year + years
+    new_day = min(dt.day, get_days_in_month(new_year, dt.month))
+    return dt.replace(year=new_year, day=new_day)
+
+def get_days_in_month(year, month):
+    import calendar
+    return calendar.monthrange(year, month)[1]
+
+def is_exception_date(date, rule):
+    if not rule.exception_dates:
+        return False
+    date_str = date.strftime('%Y-%m-%d')
+    return date_str in rule.exception_dates
 
 def should_stop_generating(current, end_date, rule):
     if current > end_date:
@@ -73,11 +103,6 @@ def should_stop_generating(current, end_date, rule):
     if rule.end_date and current.date() > rule.end_date:
         return True
     return False
-
-def get_timedelta(frequency, interval):
-    deltas = {'daily': timedelta(days=interval), 'weekly': timedelta(weeks=interval),
-              'monthly': timedelta(days=30 * interval), 'yearly': timedelta(days=365 * interval)}
-    return deltas.get(frequency, timedelta(days=1))
 
 def create_instance(event, start, duration):
     class EventInstance:

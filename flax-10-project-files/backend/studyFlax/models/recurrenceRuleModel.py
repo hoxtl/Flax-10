@@ -11,6 +11,7 @@ class RecurrenceRule(models.Model):
     interval = models.PositiveIntegerField(default=1)
     end_date = models.DateField(null=True, blank=True)
     count = models.PositiveIntegerField(null=True, blank=True)
-    
+    exception_dates = models.JSONField(default=list, blank=True)
+
     def __str__(self):
         return f"{self.frequency} every {self.interval}"

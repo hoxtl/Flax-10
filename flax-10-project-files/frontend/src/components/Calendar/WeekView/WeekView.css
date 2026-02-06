@@ -169,3 +169,15 @@
     pointer-events: none;
     z-index: 15;
 }
+
+/* When dragging an event, fade out all other events so we can see the grid highlights */
+.week-view:has(.draggable-event.dragging) .draggable-event:not(.dragging) {
+    opacity: 0.2;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.week-view:has(.draggable-event.dragging) .draggable-event.dragging {
+    opacity: 0;
+    pointer-events: none;
+}

@@ -1,12 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { SLOT_HEIGHT } from './calendarConstants';
 
 export function useAutoScroll(ref, events) {
+    const hasScrolled = useRef(false);
+
     useEffect(() => {
-        if (!ref.current) return;
+        if (!ref.current || hasScrolled.current) return;
+
         const minutes = getEarliestMinutes(events);
-        const scrollY = (minutes / 60) * SLOT_HEIGHT - 10; // so that the whole time is shown
+        const scrollY = (minutes / 60) * SLOT_HEIGHT - 10;
         ref.current.scrollTop = scrollY;
+        hasScrolled.current = true;
     }, [events, ref]);
 }
 

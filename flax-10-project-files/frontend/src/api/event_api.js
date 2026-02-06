@@ -25,6 +25,13 @@ export async function deleteEvent(id) {
     });
 }
 
+export async function addExceptionDate(eventId, date) {
+    return fetchApi(`/events/${eventId}/exception/`, {
+        method: "POST",
+        body: JSON.stringify({ date }),
+    });
+}
+
 function buildQueryString(params) {
     const entries = Object.entries(params)
         .filter(([, v]) => v);
