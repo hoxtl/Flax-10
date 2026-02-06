@@ -43,7 +43,11 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <FiltersBar activeFilter={activeFilter} onChange={setActiveFilter} dayItems={dayItems} />
-      <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
+      <DateNavigator
+        date={selectedDate}
+        onChange={setSelectedDate}
+        scheduleTitle={scheduleTitle}
+      />
       <div className={styles.content}>
         <CardGrid items={filtered} onDelete={removeEvent} />
       </div>
