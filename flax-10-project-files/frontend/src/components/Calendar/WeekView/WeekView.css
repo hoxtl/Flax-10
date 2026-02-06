@@ -22,7 +22,7 @@
 .day-header {
     flex: 1;
     text-align: center;
-    padding: 0.75rem;
+    padding: 0.4rem;
     background: transparent;
 }
 
@@ -47,15 +47,21 @@
 
 .day-name {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: #9E7E5D;
 }
 
 .day-number {
     display: block;
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #503f2e;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.day-number:hover {
+    color: #8D6E63;
 }
 
 .week-grid {
@@ -162,8 +168,4 @@
     border-bottom: 3px solid rgba(139, 115, 85, 0.9);
     pointer-events: none;
     z-index: 15;
-}
-
-pointer-events: none;
-border-radius: 4px;
 }

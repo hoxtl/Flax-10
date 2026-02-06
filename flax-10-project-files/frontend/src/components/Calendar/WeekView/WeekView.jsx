@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useCalendar } from '../../../context/CalendarContext';
+import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { getWeekDays, isSameDay } from '../../../utils/dateUtils';
 import { DayColumn } from './DayColumn';
 import { TimeLabels } from './TimeLabels';
@@ -37,21 +37,26 @@ function getEventsForWeek(events, weekDays) {
  * Header row showing day names and dates.
  */
 function WeekHeader({ days }) {
+    const dispatch = useCalendarDispatch();
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const today = new Date();
+    const handleDayClick = (day) => {
+        dispatch({ type: 'SET_SELECTED_DATE', payload: day });
+        dispatch({ type: 'SET_VIEW_MODE', payload: 'day' });
+    };
     return (
         <div className="week-header">
             <div className="time-gutter" />
-            {days.map((day, i) => <DayHeaderCell key={day.toISOString()} day={day} name={dayNames[i]} isToday={isSameDay(day, today)} />)}
+            {days.map((day, i) => <DayHeaderCell key={day.toISOString()} day={day} name={dayNames[i]} isToday={isSameDay(day, today)} onClick={() => handleDayClick(day)} />)}
         </div>
     );
 }
 
-function DayHeaderCell({ day, name, isToday }) {
+function DayHeaderCell({ day, name, isToday, onClick }) {
     return (
         <div className={`day-header ${isToday ? 'is-today' : ''}`}>
             <span className="day-name">{name}</span>
-            <span className="day-number">{day.getDate()}</span>
+            <span className="day-number" onClick={onClick}>{day.getDate()}</span>
         </div>
     );
 }
