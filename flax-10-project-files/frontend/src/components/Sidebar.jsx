@@ -1,6 +1,6 @@
 import { NAV } from "../lib/uiConstants";
 import styles from "./Sidebar.module.css";
-import { getInitials } from "../lib/userUtils";
+import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
 
 // Header component that displays the app name and adjusts styling based on collapsed state
@@ -30,11 +30,11 @@ function NavItem({ item, isActive, collapsed, onClick }) {
 
 // User profile component that displays the user's initials, name, year, and major, adjusting layout based on collapsed state
 function SidebarUserProfile({ collapsed, user }) {
-    const initials = getInitials(user?.name) || "?";
-    const year = user?.year || "Year 2";
-    const major = user?.major || "CS";
-    
-    return (
+  const initials = getInitials(user?.name) || "?";
+  const year = user?.year || "Year 2";
+  const major = user?.major || "CS";
+
+  return (
     <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
       <div className={styles.avatar}>{initials}</div>
 
@@ -55,7 +55,7 @@ export default function Sidebar({ active, onChange, collapsed }) {
   return (
     <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
       <SidebarHeader collapsed={collapsed} />
-       <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
+      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
       <SidebarUserProfile collapsed={collapsed} />
     </aside>
   );
@@ -67,13 +67,13 @@ function SidebarNav({ active, onChange, collapsed }) {
     <nav className={styles.nav}>
       {APP_ROUTES.map((n) => (
         <NavItem
-            key={n.id}
-            item={n}
-            isActive={active === n.id}
-            collapsed={collapsed}
-            onClick={() => onChange?.(n.id)}
+          key={n.id}
+          item={n}
+          isActive={active === n.id}
+          collapsed={collapsed}
+          onClick={() => onChange?.(n.id)}
         />
-))}
+      ))}
 
     </nav>
   );

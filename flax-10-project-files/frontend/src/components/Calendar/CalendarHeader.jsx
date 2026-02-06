@@ -1,41 +1,55 @@
-/*
-    This file is used to handle the calendar header component.
-*/
-
+import { useRef } from "react";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
-import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
+import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput } from "../../utils/dateUtils";
 import './CalendarHeader.css';
 
-/*
-    This function is used to handle the calendar header component.
-    It includes the navigation buttons, title, and view mode toggle.
-*/
 export function CalendarHeader() {
     const { selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
     const { openModal } = useEventModal();
     const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
+    const jumpToDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
 
     return (
         <div className="calendar-header">
-            <NavigationButtons onNavigate={navigate} />
+            <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
             <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
             <HeaderActions openModal={openModal} viewMode={viewMode} dispatch={dispatch} />
         </div>
     );
 }
 
-/*
-    This function is used to handle the navigation buttons.
-    It includes the previous and next buttons.
-*/
-function NavigationButtons({ onNavigate }) {
+function NavigationButtons({ onNavigate, selectedDate, onDatePick }) {
     return (
         <div className="nav-buttons">
             <button onClick={() => onNavigate(-1)}>&lt;</button>
             <button onClick={() => onNavigate(1)}>&gt;</button>
+            <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
+            <TodayButton onDatePick={onDatePick} />
         </div>
     );
+}
+
+function DatePickerButton({ selectedDate, onDatePick }) {
+    const ref = useRef(null);
+    const value = selectedDate.toISOString().slice(0, 10);
+    const handleChange = (e) => onDatePick(parseDateInput(e.target.value));
+
+    return (
+        <>
+            <button className="btn-calendar" onClick={() => ref.current?.showPicker?.()}>📅</button>
+            <input ref={ref} type="date" className="hidden-date-input" value={value} onChange={handleChange} />
+        </>
+    );
+}
+
+function TodayButton({ onDatePick }) {
+    const goToToday = () => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        onDatePick(today);
+    };
+    return <button className="btn-today" onClick={goToToday}>Today</button>;
 }
 
 /*

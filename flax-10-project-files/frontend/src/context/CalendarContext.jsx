@@ -17,7 +17,11 @@ export function CalendarProvider({ children }) {
 }
 
 export function useCalendar() {
-    return useContext(CalendarContext);
+    const context = useContext(CalendarContext);
+    if (!context) {
+        throw new Error('useCalendar must be used within CalendarProvider');
+    }
+    return context;
 }
 
 export function useCalendarDispatch() {
@@ -25,11 +29,13 @@ export function useCalendarDispatch() {
 }
 
 export function useEventModal() {
-    const { modalEvent, isModalOpen } = useCalendar();
+    const { modalEvent, modalType, isModalOpen } = useCalendar();
     const dispatch = useCalendarDispatch();
 
-    const openModal = (event = null) => dispatch({ type: 'OPEN_MODAL', payload: event });
+    const openModal = (event = null, type = null) => {
+        dispatch({ type: 'OPEN_MODAL', payload: { event, type } });
+    };
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
 
-    return { modalEvent, isModalOpen, openModal, closeModal };
+    return { modalEvent, modalType, isModalOpen, openModal, closeModal };
 }
