@@ -17,3 +17,8 @@ venv/
 # Coverage 
 .coverage 
 htmlcov/
+# Coverage output
+.coverage
+htmlcov/
+
+package-lock.json
