@@ -2,6 +2,7 @@ import { NAV } from "../lib/uiConstants";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../lib/userUtils";
 import { APP_ROUTES } from "../lib/routes";
+import { useNavigate } from "react-router-dom";
 
 // Header component that displays the app name and adjusts styling based on collapsed state
 function SidebarHeader({ collapsed }) {
@@ -63,18 +64,22 @@ export default function Sidebar({ active, onChange, collapsed }) {
 
 // Component that renders the navigation items in the sidebar, highlighting the active item and adjusting layout based on collapsed state
 function SidebarNav({ active, onChange, collapsed }) {
+  const navigate = useNavigate();
+
   return (
     <nav className={styles.nav}>
       {APP_ROUTES.map((n) => (
         <NavItem
-            key={n.id}
-            item={n}
-            isActive={active === n.id}
-            collapsed={collapsed}
-            onClick={() => onChange?.(n.id)}
+          key={n.id}
+          item={n}
+          isActive={active === n.id}
+          collapsed={collapsed}
+          onClick={() => {
+            onChange?.(n.id);
+            navigate(n.path);
+          }}
         />
-))}
-
+      ))}
     </nav>
   );
 }
