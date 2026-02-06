@@ -12,8 +12,8 @@ export const PIXELS_PER_SNAP = SLOT_HEIGHT * (SNAP_INTERVAL / 60);
  */
 export function pixelsToMinutes(pixels) {
     const rawMinutes = (pixels / SLOT_HEIGHT) * 60;
-    // Snap to nearest interval (e.g., 15 min)
-    return Math.round(rawMinutes / SNAP_INTERVAL) * SNAP_INTERVAL;
+    // Snap down to interval (e.g., 15 min)
+    return Math.floor(rawMinutes / SNAP_INTERVAL) * SNAP_INTERVAL;
 }
 
 /**
@@ -31,5 +31,5 @@ export function minutesToPixels(minutes) {
 export function getMinuteOffset(mouseY, slotTop) {
     const offsetInSlot = mouseY - slotTop;
     const minuteOffset = (offsetInSlot / SLOT_HEIGHT) * 60;
-    return Math.round(minuteOffset / SNAP_INTERVAL) * SNAP_INTERVAL;
+    return Math.floor(minuteOffset / SNAP_INTERVAL) * SNAP_INTERVAL;
 }
