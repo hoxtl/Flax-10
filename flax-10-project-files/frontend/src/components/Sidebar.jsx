@@ -4,6 +4,7 @@ import { getInitials } from "../lib/userUtils";
 import { APP_ROUTES } from "../lib/routes";
 import { useNavigate } from "react-router-dom";
 
+// Header component that displays the app name and adjusts styling based on collapsed state
 function SidebarHeader({ collapsed }) {
   return (
     <div className={`${styles.header} ${collapsed ? styles.headerCollapsed : ""}`}>
@@ -12,6 +13,7 @@ function SidebarHeader({ collapsed }) {
   );
 }
 
+// Component for each navigation item in the sidebar
 function NavItem({ item, isActive, collapsed, onClick }) {
   const cls = [
     styles.navItem,
@@ -27,6 +29,7 @@ function NavItem({ item, isActive, collapsed, onClick }) {
   );
 }
 
+// User profile component that displays the user's initials, name, year, and major, adjusting layout based on collapsed state
 function SidebarUserProfile({ collapsed, user }) {
     const initials = getInitials(user?.name) || "?";
     const year = user?.year || "Year 2";
@@ -46,6 +49,7 @@ function SidebarUserProfile({ collapsed, user }) {
   );
 }
 
+// Main Sidebar component that composes the header, navigation, and user profile components, adjusting width based on collapsed state
 export default function Sidebar({ active, onChange, collapsed }) {
   const W = collapsed ? 72 : 224;
 
@@ -58,6 +62,7 @@ export default function Sidebar({ active, onChange, collapsed }) {
   );
 }
 
+// Component that renders the navigation items in the sidebar, highlighting the active item and adjusting layout based on collapsed state
 function SidebarNav({ active, onChange, collapsed }) {
   const navigate = useNavigate();
 
