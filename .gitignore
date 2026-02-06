@@ -14,6 +14,9 @@ __pycache__/
 venv/
 .venv/
 
+# Coverage 
+.coverage 
+htmlcov/
 # Coverage output
 .coverage
 htmlcov/
