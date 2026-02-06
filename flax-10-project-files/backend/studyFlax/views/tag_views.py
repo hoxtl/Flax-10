@@ -7,7 +7,7 @@ from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def tag_list(request):
     if request.method == 'GET':
         return get_tags(request)
@@ -23,13 +23,15 @@ def create_tag(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    serialiser.save(user=request.user)
+    # serialiser.save(user=request.user) # Uncomment when we have user authentication
+    serialiser.save() # Remove when we have user authentication
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def category_list(request):
-    categories = Category.objects.filter(Q(user=request.user) | Q(is_default=True))
+    # categories = Category.objects.filter(Q(user=request.user) | Q(is_default=True)) # Uncomment when we have user authentication
+    categories = Category.objects.all() # Remove when we have user authentication
     serialiser = CategorySerialiser(categories, many=True)
     return Response(serialiser.data)
     
