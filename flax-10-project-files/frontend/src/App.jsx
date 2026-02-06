@@ -1,48 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import DashboardLayout from "./layout/DashboardLayout";
-import Home from "./pages/Home";
-
-/*function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
-*/
+import { APP_ROUTES } from "./lib/routes";
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState("home");
+  const location = useLocation();
+
+  const activeNav =
+    APP_ROUTES.find((r) => r.path === location.pathname)?.id || "home";
 
   return (
-  <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-    {({ selectedDate, setSelectedDate, events, onDelete }) => (
-      <Home selectedDate={selectedDate} setSelectedDate={setSelectedDate} events={events} onDelete={onDelete} />
-    )}
-  </DashboardLayout>
+    <DashboardLayout activeNav={activeNav}>
+      <Routes>
+        {APP_ROUTES.map((r) => (
+          <Route key={r.id} path={r.path} element={r.element} />
+        ))}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </DashboardLayout>
   );
 }
