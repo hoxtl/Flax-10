@@ -5,7 +5,7 @@ import { TimeSlot } from './TimeSlot';
 import { DraggableEvent } from '../DraggableEvent';
 import { getHoursOfDay, calculateEventStyle } from './dayViewHelpers';
 import { SLOT_HEIGHT } from '../calendarConstants';
-import { useAutoScroll } from '../useAutoScroll';
+import { useAutoScroll } from '../../../hooks/useAutoScroll';
 import './DayView.css';
 
 export function DayView() {

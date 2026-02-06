@@ -7,10 +7,12 @@ from studyFlax.models import CalendarEvent
 from studyFlax.serialisers import CalendarEventSerialiser, CalendarEventCreateSerialiser
 
 @api_view(['GET', 'PUT', 'DELETE'])
+# TODO: Enable authentication when ready
 # @permission_classes([IsAuthenticated])
 def event_detail(request, pk):
-    # event = get_object_or_404(CalendarEvent, pk=pk, user=request.user) # Uncomment when we have user authentication
-    event = get_object_or_404(CalendarEvent, pk=pk) # Remove when we have user authentication
+    # TODO: Filter by user when authentication is enabled
+    # event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
+    event = get_object_or_404(CalendarEvent, pk=pk)
 
     if request.method == 'GET': 
         return get_event(event)

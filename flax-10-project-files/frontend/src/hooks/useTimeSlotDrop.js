@@ -1,9 +1,10 @@
 import { useState, useCallback } from "react";
-import { useDrop } from '../../hooks/useDragDrop';
-import { useCalendar } from "../../context/CalendarContext";
-import { useEventActions } from "../../hooks/useCalendarEvents";
-import { getMinuteOffset, SLOT_HEIGHT } from "./calendarConstants";
-import { checkOverlapWithConfirm } from "../../utils/overlapUtils";
+import { useDrop } from './useDragDrop';
+import { useCalendar } from "../context/CalendarContext";
+import { useEventActions } from "./useCalendarEvents";
+import { getMinuteOffset, SLOT_HEIGHT } from "../components/Calendar/calendarConstants";
+import { checkOverlapWithConfirm } from "../utils/overlapUtils";
+import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
 
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
@@ -72,10 +73,6 @@ function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addExce
     }
 }
 
-function hasRecurrence(event) {
-    return event.recurrence_details || event.recurrence_rule;
-}
-
 function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
     const choice = window.confirm(
         'This is a recurring event.\n\nOK = Change time for ALL occurrences\nCancel = Move only this occurrence'
@@ -139,10 +136,6 @@ function calculateNewTimes(event, date, startMinutes) {
     const newStart = createDateAtMinutes(date, startMinutes);
     const newEnd = new Date(newStart.getTime() + duration);
     return { newStart, newEnd };
-}
-
-function extractBaseEventId(id) {
-    return id > 1000000 ? Math.floor(id / 1000000) : id;
 }
 
 function createDateAtMinutes(date, totalMinutes) {

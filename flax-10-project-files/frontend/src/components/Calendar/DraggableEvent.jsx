@@ -1,18 +1,11 @@
-/*
-    This file is used to handle the draggable event component.
-*/
-
 import { useRef } from 'react';
 import { useDrag } from '../../hooks/useDragDrop';
 import { useEventActions } from '../../hooks/useCalendarEvents';
 import { useEventModal } from '../../context/CalendarContext';
-import { useEventResize } from './useEventResize';
+import { useEventResize } from '../../hooks/useEventResize';
 import { formatTime } from '../../utils/dateUtils';
 import './DraggableEvent.css';
 
-/*
-    This function is used to handle the draggable event component.
-*/
 export function DraggableEvent({ event, style }) {
     const { editEvent } = useEventActions();
     const { openModal } = useEventModal();
@@ -40,9 +33,6 @@ function createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, 
     };
 }
 
-/*
-    This function is used to handle the event card component.
-*/
 function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
     const handleResizeMouseDown = (e) => {
         e.stopPropagation();
@@ -78,9 +68,6 @@ function EventContent({ event, height }) {
     );
 }
 
-/*
-    This function is used to build the style for the event card.
-*/
 function buildStyle(baseStyle, resizePreview, event) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
@@ -88,9 +75,6 @@ function buildStyle(baseStyle, resizePreview, event) {
     return style;
 }
 
-/*
-    This function is used to build the class name for the event card.
-*/
 function buildClassName(isDragging, isResizing) {
     let className = 'draggable-event';
     if (isDragging) className += ' dragging';

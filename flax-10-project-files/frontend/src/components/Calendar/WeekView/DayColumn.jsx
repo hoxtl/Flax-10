@@ -4,7 +4,7 @@
 */
 import { DraggableEvent } from '../DraggableEvent';
 import { getHoursOfDay, calculateEventStyle } from '../DayView/dayViewHelpers';
-import { useTimeSlotDrop } from '../useTimeSlotDrop';
+import { useTimeSlotDrop } from '../../../hooks/useTimeSlotDrop';
 import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
 import { isSameDay } from '../../../utils/dateUtils';
 import { SLOT_HEIGHT } from '../calendarConstants';

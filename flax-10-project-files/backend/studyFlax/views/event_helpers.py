@@ -47,6 +47,11 @@ def generate_instances(event, start_date, end_date):
 
     rule = event.recurrence_rule
     instances = get_base_instance(event, rule)
+    instances.extend(generate_occurrence_instances(event, rule, start_date, end_date))
+    return instances
+
+def generate_occurrence_instances(event, rule, start_date, end_date):
+    instances = []
     duration = event.end_time - event.start_time
     max_occurrences = rule.count or 365
 
