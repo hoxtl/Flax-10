@@ -1,5 +1,4 @@
 from django.db import models
-
 from .userModel import User
 
 class UserSettings(models.Model):

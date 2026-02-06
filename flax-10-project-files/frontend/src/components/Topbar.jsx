@@ -3,7 +3,7 @@ import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
 import { getInitials } from "../lib/userUtils";
 
-
+// Component that displays a greeting message based on the time of day, along with the user's first name and the current date
 function TopBarGreeting({ user }) {
   const now = new Date();
 
@@ -20,6 +20,7 @@ function TopBarGreeting({ user }) {
   );
 }
 
+// Search input component with a search icon and placeholder text, allowing users to search for events or tasks
 function SearchInput() {
   return (
     <div className={styles.search}>
@@ -29,6 +30,7 @@ function SearchInput() {
   );
 }
 
+// Button component that displays a plus icon and triggers the onClick callback when pressed, used for adding new events or tasks
 function AddButton({ onClick }) {
   return (
     <button className={styles.addBtn} onClick={onClick}>
@@ -37,6 +39,7 @@ function AddButton({ onClick }) {
   );
 }
 
+// Component that renders the search input, add button, user avatar,allowing users to search, add new items, and view their profile
 function TopBarActions({ onAddClick, user }) {
   return (
     <div className={styles.actions}>
@@ -49,6 +52,7 @@ function TopBarActions({ onAddClick, user }) {
   );
 }
 
+// Main TopBar component that composes the greeting and actions components
 export default function TopBar({ onToggle, onAddClick, user }) {
   return (
     <header className={styles.container}>

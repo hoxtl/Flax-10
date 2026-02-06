@@ -1,5 +1,6 @@
 // Pure helpers for WeekBar. No React, no storage.
 
+// Builds an array of week labels, inserting "RW" after the specified week if needed.
 export function buildWeekLabels(totalWeeks, hasReadingWeek, readingWeekAfterWeek) {
   const labels = [];
   for (let w = 1; w <= totalWeeks; w++) {
@@ -9,6 +10,7 @@ export function buildWeekLabels(totalWeeks, hasReadingWeek, readingWeekAfterWeek
   return labels;
 }
 
+// Given a date and term config, returns the corresponding week index (0-based) or -1 if before term start.
 export function getWeekIndexForDate(date, cfg) {
   const start = new Date(cfg.startDate);
   start.setHours(0, 0, 0, 0);
@@ -19,17 +21,12 @@ export function getWeekIndexForDate(date, cfg) {
   const diffMs = d - start;
   if (diffMs < 0) return -1;
 
-  // 1-based teaching week number
   const rawWeek = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
-
   const labels = buildWeekLabels(cfg.totalWeeks, cfg.hasReadingWeek, cfg.readingWeekAfterWeek);
 
-  // If beyond last teaching week, clamp to end of labels
-  if (rawWeek > cfg.totalWeeks) return labels.length - 1;
-
-  // Convert teaching week number -> label index (account for RW slot)
   let idx = rawWeek - 1;
   if (cfg.hasReadingWeek && rawWeek > cfg.readingWeekAfterWeek) idx += 1;
+  if (idx >= labels.length) idx = labels.length - 1;
 
   return idx;
 }
