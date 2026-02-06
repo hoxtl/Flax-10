@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DashboardLayout.module.css";
 import Sidebar from "../components/Sidebar";
-import TopBar from "../components/TopBar";
+import TopBar from "../components/Topbar";
 import WeekBar from "../components/WeekBar";
 import QuickAddModal from "../components/QuickAddModal";
 import AddEventModal from "../components/AddEventModal";
@@ -28,6 +28,7 @@ function midnightToday() {
   return d;
 }
 
+
 // Mock function to get user data, change to api call later
 function getUser() {
   return { name: "Jane Smith", year: "Year 2", major: "CS" };
@@ -38,6 +39,7 @@ function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
   if (isMobile) return setMobileOpen((v) => !v);
   setCollapsed((c) => !c);
 }
+
 
 // Utility function to render the children prop, which can be either a React node or a function 
 function renderChildren(children, selectedDate, setSelectedDate, events, onDelete) {
