@@ -1,44 +1,42 @@
-import { CalendarProvider, useCalendar } from '../../context/CalendarContext';
+import { CalendarProvider, useCalendar, useEventModal } from '../../context/CalendarContext';
 import { useCalendarEvents } from '../../hooks/useCalendarEvents';
 import { CalendarHeader } from './CalendarHeader';
 import { DayView } from './DayView/DayView';
 import { WeekView } from './WeekView/WeekView';
+import { EventModal } from './EventModal/EventModal';
 import './Calendar.css';
 
 export function Calendar() {
-  return (
-    <CalendarProvider>
-      <CalendarContent />
-    </CalendarProvider>
-  );
+    return (
+        <CalendarProvider>
+            <CalendarContent />
+        </CalendarProvider>
+    );
 }
 
 function CalendarContent() {
-  const { viewMode } = useCalendar();
+    const { viewMode } = useCalendar();
+    const { isModalOpen, modalEvent, closeModal } = useEventModal();
+    useCalendarEvents();
 
-  // This hook fetches events when date/view changes
-  useCalendarEvents();
-
-  return (
-    <div className="calendar-container">
-      <CalendarHeader />
-      <CalendarView viewMode={viewMode} />
-    </div>
-  );
+    return (
+        <div className="calendar-container">
+            <CalendarHeader />
+            <CalendarView viewMode={viewMode} />
+            {isModalOpen && <EventModal event={modalEvent} onClose={closeModal} />}
+        </div>
+    );
 }
 
 function CalendarView({ viewMode }) {
-  if (viewMode === 'day') {
-    return <DayView />;
-  }
-  if (viewMode === 'week') {
-    return <WeekView />;
-  }
-  // Placeholder for month view until it's implemented
-  return (
-    <div className="view-placeholder">
-      <p>Month view coming soon</p>
-      <p>Use Day or Week view for now</p>
-    </div>
-  );
+    const views = { day: DayView, week: WeekView };
+    const View = views[viewMode];
+
+    if (View) return <View />;
+
+    return (
+        <div className="view-placeholder">
+            <p>Month view coming soon</p>
+        </div>
+    );
 }

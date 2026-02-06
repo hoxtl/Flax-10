@@ -1,36 +1,34 @@
-import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
+/*
+    This file is used to handle the calendar header component.
+*/
+
+import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
-import { useEventActions } from "../../hooks/useCalendarEvents";
-import { createQuickEvent } from "../../utils/eventUtils";
 import './CalendarHeader.css';
 
-/**
- * The top bar of the calendar with navigation arrows and view mode buttons.
- * shows the current date and lets users switch between day/week/month views.
- */
+/*
+    This function is used to handle the calendar header component.
+    It includes the navigation buttons, title, and view mode toggle.
+*/
 export function CalendarHeader() {
     const { selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
-    const { addEvent } = useEventActions();
-    const nav = (d) => dispatch({ type: 'SET_SELECTED_DATE', payload: addDays(selectedDate, { day: 1, week: 7, month: 30 }[viewMode] * d) });
-    const week = getWeekDays(selectedDate);
-    const title = {
-        day: formatDate(selectedDate),
-        week: `${week[0].toLocaleDateString([], { month: 'short', day: 'numeric' })} – ${week[6].toLocaleDateString([], { month: 'short', day: 'numeric' })}`,
-        month: formatMonthYear(selectedDate)
-    }[viewMode];
+    const { openModal } = useEventModal();
+    const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
 
     return (
         <div className="calendar-header">
-            <div className="nav-buttons"><button onClick={() => nav(-1)}>&lt;</button><button onClick={() => nav(1)}>&gt;</button></div>
-            <h2 className="calendar-title">{title}</h2>
-            <div className="actions"><button className="btn-add" onClick={() => createQuickEvent(selectedDate, addEvent)}>+</button><ViewModeToggle viewMode={viewMode} dispatch={dispatch} /></div>
+            <NavigationButtons onNavigate={navigate} />
+            <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
+            <HeaderActions openModal={openModal} viewMode={viewMode} dispatch={dispatch} />
         </div>
     );
 }
 
-
-// Left/right arrow buttons for navigating dates
+/*
+    This function is used to handle the navigation buttons.
+    It includes the previous and next buttons.
+*/
 function NavigationButtons({ onNavigate }) {
     return (
         <div className="nav-buttons">
@@ -40,24 +38,67 @@ function NavigationButtons({ onNavigate }) {
     );
 }
 
-// Buttons to switch between day, week, and month views
-function ViewModeToggle({ viewMode, dispatch }) {
-    const modes = ['day', 'week', 'month'];
-    const buttons = modes.map((m) => (
-        <button
-            key={m}
-            onClick={() => dispatch({ type: 'SET_VIEW_MODE', payload: m })}
-            className={viewMode === m ? 'active' : ''}
-        >
-            {m.charAt(0).toUpperCase() + m.slice(1)}
-        </button>
-    ));
-    return <div className="view-toggle">{buttons}</div>;
+/*
+    This function is used to handle the header actions.
+    It includes the add event button and the view mode toggle.
+*/
+function HeaderActions({ openModal, viewMode, dispatch }) {
+    return (
+        <div className="actions">
+            <button className="btn-add" onClick={() => openModal()}>+</button>
+            <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
+        </div>
+    );
 }
 
-// Figures out how many days to jump based on the view
-// Day view jumps 1 day, week view jumps 7 days, month view jumps ~30 days
-function getNavigationDays(viewMode, direction) {
-    const multipliers = { day: 1, week: 7, month: 30 };
-    return multipliers[viewMode] * direction;
+/*
+    This function is used to handle the view mode toggle.
+    It includes the day, week, and month view modes.
+*/
+function ViewModeToggle({ viewMode, dispatch }) {
+    const modes = ['day', 'week', 'month'];
+    return (
+        <div className="view-toggle">
+            {modes.map(m => <ModeButton key={m} mode={m} active={viewMode === m} dispatch={dispatch} />)}
+        </div>
+    );
+}
+
+/*
+    This function is used to handle the mode button.
+    It includes the day, week, and month view modes.
+*/
+function ModeButton({ mode, active, dispatch }) {
+    const label = mode.charAt(0).toUpperCase() + mode.slice(1);
+    const onClick = () => dispatch({ type: 'SET_VIEW_MODE', payload: mode });
+    return <button onClick={onClick} className={active ? 'active' : ''}>{label}</button>;
+}
+
+/*
+    This function is used to handle the navigation.
+    It includes the previous and next buttons.
+*/
+function navigateDate(dispatch, selectedDate, viewMode, dir) {
+    const days = { day: 1, week: 7, month: 30 }[viewMode] * dir;
+    dispatch({ type: 'SET_SELECTED_DATE', payload: addDays(selectedDate, days) });
+}
+
+/*
+    This function is used to handle the title.
+    It includes the day, week, and month view modes.
+*/
+function getTitle(selectedDate, viewMode) {
+    if (viewMode === 'day') return formatDate(selectedDate);
+    if (viewMode === 'month') return formatMonthYear(selectedDate);
+    return getWeekTitle(selectedDate);
+}
+
+/*
+    This function is used to handle the week title.
+    It includes the day, week, and month view modes.
+*/
+function getWeekTitle(selectedDate) {
+    const week = getWeekDays(selectedDate);
+    const fmt = { month: 'short', day: 'numeric' };
+    return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }

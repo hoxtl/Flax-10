@@ -1,40 +1,64 @@
-import { useState, useCallback, useRef } from 'react';
+/*
+    This file is used to handle the draggable event component.
+*/
+
+import { useRef } from 'react';
 import { useDrag } from '../../hooks/useDragDrop';
 import { useEventActions } from '../../hooks/useCalendarEvents';
+import { useEventModal } from '../../context/CalendarContext';
 import { useEventResize } from './useEventResize';
 import { formatTime } from '../../utils/dateUtils';
 import './DraggableEvent.css';
 
-/**
- * A draggable, resizable event card.
- * Drag to move, drag bottom edge to resize.
- */
+/*
+    This function is used to handle the draggable event component.
+*/
 export function DraggableEvent({ event, style }) {
     const { editEvent } = useEventActions();
+    const { openModal } = useEventModal();
     const eventRef = useRef(null);
-    // Hook for drag-to-move functionality
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
-    // Hook for resize functionality
     const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent);
-    // Build the final style, including resize preview if active
-    const finalStyle = buildEventStyle(style, resizePreview, event);
-    const className = buildClassName(isDragging, isResizing);
+    const handleClick = () => { if (!isDragging && !isResizing) openModal(event); };
     return (
-        <div ref={eventRef} className={className} style={finalStyle} {...dragProps}>
+        <EventCard
+            eventRef={eventRef}
+            event={event}
+            style={style}
+            resizePreview={resizePreview}
+            isDragging={isDragging}
+            isResizing={isResizing}
+            dragProps={dragProps}
+            onClick={handleClick}
+            onResizeStart={handleResizeStart}
+        />
+    );
+}
+
+/*
+    This function is used to handle the event card component.
+*/
+function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
+    return (
+        <div
+            ref={eventRef}
+            className={buildClassName(isDragging, isResizing)}
+            style={buildStyle(style, resizePreview, event)}
+            onClick={onClick}
+            {...dragProps}
+        >
             <EventContent event={event} />
-            <div className="resize-handle" onMouseDown={handleResizeStart} />
+            <div className="resize-handle" onMouseDown={onResizeStart} />
         </div>
     );
 }
 
-/**
- * The inner content of an event card.
- * Shows title and time range.
- */
+/*
+    This function is used to handle the event content component.
+*/
 function EventContent({ event }) {
     const startTime = formatTime(new Date(event.start_time));
     const endTime = formatTime(new Date(event.end_time));
-
     return (
         <div className="event-content">
             <div className="event-title">{event.title}</div>
@@ -43,26 +67,19 @@ function EventContent({ event }) {
     );
 }
 
-/**
- * Builds the final style object for the event.
- * Includes resize preview height and tag color.
- */
-function buildEventStyle(baseStyle, resizePreview, event) {
+/*
+    This function is used to build the style for the event card.
+*/
+function buildStyle(baseStyle, resizePreview, event) {
     const style = { ...baseStyle };
-
-    if (resizePreview) {
-        style.height = `${resizePreview}px`;
-    }
-
-    // Color the left border based on the event's tag
+    if (resizePreview) style.height = `${resizePreview}px`;
     style.borderLeftColor = event.tag_details?.color || '#8B7355';
-
     return style;
 }
 
-/**
- * Builds the CSS class string based on drag/resize state.
- */
+/*
+    This function is used to build the class name for the event card.
+*/
 function buildClassName(isDragging, isResizing) {
     let className = 'draggable-event';
     if (isDragging) className += ' dragging';

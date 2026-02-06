@@ -23,3 +23,13 @@ export function useCalendar() {
 export function useCalendarDispatch() {
     return useContext(CalendarDispatchContext);
 }
+
+export function useEventModal() {
+    const { modalEvent, isModalOpen } = useCalendar();
+    const dispatch = useCalendarDispatch();
+
+    const openModal = (event = null) => dispatch({ type: 'OPEN_MODAL', payload: event });
+    const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
+
+    return { modalEvent, isModalOpen, openModal, closeModal };
+}
