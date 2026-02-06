@@ -1,11 +1,5 @@
-/*
-    This file is for the form utils.
-    It is used to get the initial form for the event modal.
-    It is also used to validate and submit the form.
-    It is also used to confirm the deletion of an event.
-*/
-
 import { checkOverlapWithConfirm } from './overlapUtils';
+import { extractBaseEventId, hasRecurrence } from './eventUtils';
 
 function checkOverlap(event, allEvents) {
     const others = allEvents.filter(e => e.id !== event.id);
@@ -45,29 +39,38 @@ function getDefaultForm(options) {
 
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, allEvents) {
     e.preventDefault();
-    if (new Date(form.start_time) >= new Date(form.end_time)) return setError('Start must be before end');
-    if (!form.title.trim()) return setError('Title is required');
+    const validationError = validateForm(form);
+    if (validationError) return setError(validationError);
 
     const data = buildEventData(form);
-    const testEvent = { ...data, id: event?.id };
-    if (!checkOverlap(testEvent, allEvents)) return;
+    if (!checkOverlap({ ...data, id: event?.id }, allEvents)) return;
 
+    await submitEvent(event, data, actions, onClose, setError);
+}
+
+function validateForm(form) {
+    if (new Date(form.start_time) >= new Date(form.end_time)) return 'Start must be before end';
+    if (!form.title.trim()) return 'Title is required';
+    return null;
+}
+
+async function submitEvent(event, data, actions, onClose, setError) {
     try {
-        if (!event?.id) {
-            await actions.addEvent(data);
-        } else if (hasRecurrence(event)) {
-            await handleRecurringEdit(event, data, actions);
-        } else {
-            await actions.editEvent(extractBaseEventId(event.id), data);
-        }
+        await saveEvent(event, data, actions);
         onClose();
     } catch (err) {
         setError(err.message);
     }
 }
 
-function hasRecurrence(event) {
-    return event?.recurrence_details || event?.recurrence_rule;
+async function saveEvent(event, data, actions) {
+    if (!event?.id) {
+        await actions.addEvent(data);
+    } else if (hasRecurrence(event)) {
+        await handleRecurringEdit(event, data, actions);
+    } else {
+        await actions.editEvent(extractBaseEventId(event.id), data);
+    }
 }
 
 async function handleRecurringEdit(event, data, actions) {
@@ -88,10 +91,6 @@ async function editSingleOccurrence(event, data, actions, baseId) {
     delete singleEventData.recurrence_rule;
     await actions.addException(baseId, originalDateStr);
     await actions.addEvent(singleEventData);
-}
-
-function extractBaseEventId(id) {
-    return id > 1000000 ? Math.floor(id / 1000000) : id;
 }
 
 export async function confirmDelete(event, actions, onClose) {
@@ -147,9 +146,6 @@ function addRecurrenceIfNeeded(data, form) {
     }
 }
 
-/*
-    This function is used to format the date for the input.
-*/
 function formatForInput(d) {
     return (d ? (typeof d === 'string' ? new Date(d) : d) : new Date()).toISOString().slice(0, 16);
 }

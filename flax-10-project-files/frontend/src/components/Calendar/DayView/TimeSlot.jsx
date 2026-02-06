@@ -1,4 +1,4 @@
-import { useTimeSlotDrop } from '../useTimeSlotDrop';
+import { useTimeSlotDrop } from '../../../hooks/useTimeSlotDrop';
 import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
 import { isSameDay } from '../../../utils/dateUtils';
 

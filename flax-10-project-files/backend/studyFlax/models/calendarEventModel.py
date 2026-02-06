@@ -11,7 +11,8 @@ PRIORITY_CHOICES = [
 ]
 
 class CalendarEvent(models.Model):
-    # user = models.ForeignKey(User, on_delete=models.CASCADE) # For when we have user authentication
+    # TODO: Make user field required when authentication is enabled
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")

@@ -7,7 +7,8 @@ from studyFlax.serialisers import CalendarEventSerialiser, CalendarEventCreateSe
 from .event_helpers import filter_events_by_date_range, check_event_overlap, expand_recurring_events, parse_date_param
 
 @api_view(['GET', 'POST'])
-# @permission_classes([IsAuthenticated]) # Uncomment when we have user authentication
+# TODO: Enable authentication when ready
+# @permission_classes([IsAuthenticated])
 def event_list(request):
     if request.method == 'GET':
         return get_events(request)
@@ -27,10 +28,11 @@ def create_event(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # overlap = check_event_overlap(request.user, serialiser.validated_data) # Uncomment when we have user authentication
-    # event = serialiser.save(user=request.user) # Uncomment when we have user authentication
-    event = serialiser.save() # Remove when we have user authentication
+    # TODO: Enable overlap check and user association when authentication is ready
+    # overlap = check_event_overlap(request.user, serialiser.validated_data)
+    # event = serialiser.save(user=request.user)
+    event = serialiser.save()
     response_data = CalendarEventSerialiser(event).data
-    # response_data['has_overlap'] = overlap # Uncomment when we have user authentication
+    # response_data['has_overlap'] = overlap
     return Response(response_data, status=status.HTTP_201_CREATED)
     

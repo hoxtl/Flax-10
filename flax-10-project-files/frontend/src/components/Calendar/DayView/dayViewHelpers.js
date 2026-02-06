@@ -1,11 +1,9 @@
 import { calculateEventColumns } from '../../../utils/overlapUtils';
 
-// Returns an array of hours [0, 1, 2, ... 23]
 export function getHoursOfDay() {
     return Array.from({ length: 24 }, (_, i) => i);
 }
 
-// Converts 24-hour number to "9 AM" format
 export function formatHour(hour) {
     if (hour === 0) return '12 AM';
     if (hour === 12) return '12 PM';
@@ -52,7 +50,6 @@ export function calculateNewEndTime(event, deltaY, slotHeight, snapInterval) {
     const newEnd = new Date(currentEnd);
     newEnd.setMinutes(newEnd.getMinutes() + snappedDelta);
 
-    // Don't let event become shorter than minimum
     const start = new Date(event.start_time);
     if (newEnd <= start) newEnd.setTime(start.getTime() + snapInterval * 60 * 1000);
 

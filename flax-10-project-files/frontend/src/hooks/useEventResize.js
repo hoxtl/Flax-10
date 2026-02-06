@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import { useCalendar } from '../../context/CalendarContext';
-import { useResizeHighlight } from '../../context/ResizeHighlightContext';
-import { createResizeSession } from '../../utils/resizeUtils';
-import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from './calendarConstants';
-import { checkOverlapWithConfirm } from '../../utils/overlapUtils';
+import { useCalendar } from '../context/CalendarContext';
+import { useResizeHighlight } from '../context/ResizeHighlightContext';
+import { createResizeSession } from '../utils/resizeUtils';
+import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from '../components/Calendar/calendarConstants';
+import { checkOverlapWithConfirm } from '../utils/overlapUtils';
+import { extractBaseEventId, hasRecurrence } from '../utils/eventUtils';
 
 export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
     const { events } = useCalendar();
@@ -75,10 +76,6 @@ function saveResizedEvent(event, deltaY, editEvent, events, resizeJustEnded) {
     }
 }
 
-function hasRecurrence(event) {
-    return event.recurrence_details || event.recurrence_rule;
-}
-
 function handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded) {
     const choice = window.confirm(
         'This is a recurring event.\n\nOK = Resize ALL occurrences\nCancel = Cancel resize'
@@ -97,10 +94,6 @@ function executeResize(event, deltaY, editEvent, events, resizeJustEnded) {
         editEvent(baseEventId, { end_time: newEnd.toISOString() });
         if (resizeJustEnded) resizeJustEnded.current = true;
     }
-}
-
-function extractBaseEventId(id) {
-    return id > 1000000 ? Math.floor(id / 1000000) : id;
 }
 
 function calculateNewEndTime(event, deltaY) {
