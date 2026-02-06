@@ -3,3 +3,19 @@
 /flax-10-project-files/backend/studyFlax/urls/__pycache__
 /flax-10-project-files/backend/studyFlax/migrations/__pycache__
 /flax-10-project-files/backend/studyFlax/__pycache__
+
+# Python caches (ignore everywhere)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+venv/
+.venv/
+
+# Coverage output
+.coverage
+htmlcov/
+
+package-lock.json

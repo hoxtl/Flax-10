@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, cloneElement } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -38,13 +38,13 @@ import { APP_ROUTES } from './lib/routes';
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("home");
-
-  // Find the current route's element based on activeNav
   const currentRoute = APP_ROUTES.find(r => r.id === activeNav) || APP_ROUTES[0];
 
   return (
     <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-      {currentRoute.element}
+      {({ selectedDate, setSelectedDate, events, onDelete }) => (
+        cloneElement(currentRoute.element, { selectedDate, setSelectedDate, events, onDelete })
+      )}
     </DashboardLayout>
   );
 }
