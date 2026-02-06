@@ -1,7 +1,29 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 28px;              
-  padding-top: 10px; 
-  padding-left: 35px;    
+  gap: 28px;                 
+  padding: 20px 32px;
+}
+
+.filters {
+  margin-bottom: -20px; 
+}
+
+.content{ display:flex; flex-direction:column; gap:12px; }
+.empty{ color:#7a7787; text-align:center; padding:60px 0; }
+
+.card{
+  background:#fff; border:1px solid #eceaf2; border-radius:16px;
+  padding:14px 16px;
+}
+
+.cardTop{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.cardTitle{ font-weight:800; color:#1e1b2e; }
+.cardMeta{ margin-top:6px; color:#7a7787; font-size:13px; }
+.cardDesc{ margin-top:8px; color:#4c4957; font-size:14px; }
+
+.badge{
+  font-size:12px; font-weight:800; text-transform:uppercase;
+  background:rgba(167,139,250,.16); color:#5b3db8;
+  padding:6px 10px; border-radius:999px;
 }
