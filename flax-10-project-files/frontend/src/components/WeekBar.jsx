@@ -3,6 +3,7 @@ import styles from "./WeekBar.module.css";
 import { loadTermConfig } from "../lib/termConfig";
 import { buildWeekLabels, getWeekIndexForDate } from "../lib/weekUtils";
 
+// Badge component that shows the current week or reading week status, and the total number of weeks in the term
 function WeekBadge({ label, totalWeeks, isReadingWeek }) {
   return (
     <div className={styles.badgeWrap}>
@@ -18,6 +19,7 @@ function WeekBadge({ label, totalWeeks, isReadingWeek }) {
   );
 }
 
+// Component for each segment in the week bar
 function WeekSegment({ label, isCurrent, isPast }) {
   const barClass = [
     styles.segmentBar,
@@ -41,44 +43,62 @@ function WeekSegment({ label, isCurrent, isPast }) {
   );
 }
 
+// Main component that renders the week bar, showing the current week, reading week status, and total weeks in the term
 export default function WeekBar({ date }) {
-  // Load user-specific term config (localStorage for now)
   const cfg = loadTermConfig();
+  const labels = buildLabels(cfg);
+  const currentIdx = getWeekIndexForDate(date, cfg);
+  const isReadingWeek = checkReadingWeek(labels, currentIdx);
+  const badgeLabel = getBadgeLabel(labels, currentIdx, isReadingWeek, cfg);
 
-  const labels = buildWeekLabels(
+  return (
+    <div className={styles.container}>
+      <WeekBadge label={badgeLabel} totalWeeks={cfg.totalWeeks} isReadingWeek={isReadingWeek} />
+      <WeekTrack labels={labels} currentIdx={currentIdx} />
+    </div>
+  );
+}
+
+// Builds the labels for the week bar based on the term configuration, including handling reading week if applicable
+function buildLabels(cfg) {
+  return buildWeekLabels(
     cfg.totalWeeks,
     cfg.hasReadingWeek,
     cfg.readingWeekAfterWeek
   );
+}
 
-  const currentIdx = getWeekIndexForDate(date, cfg);
-  const isReadingWeek = labels[currentIdx] === "RW";
+// Checks if the current index corresponds to a reading week based on the labels array
+function checkReadingWeek(labels, idx) {
+  return idx >= 0 && labels[idx] === "RW";
+}
 
-  const badgeLabel =
-    currentIdx < 0
-      ? "Semester hasn't started"
-      : isReadingWeek
-      ? "Reading Week"
-      : `Week ${labels[currentIdx]}`;
+// Determines the label to show in the badge based on the current index and whether it's a reading week
+function getBadgeLabel(labels, idx, isRW) {
+  if (idx < 0) return "Semester hasn't started";
+  if (isRW) return "Reading Week";
+  return `Week ${labels[idx]}`;
+}
 
+// Component that renders the track of week segments, highlighting the current week and past weeks based on the current index
+function WeekTrack({ labels, currentIdx }) {
   return (
-    <div className={styles.container}>
-      <WeekBadge
-        label={badgeLabel}
-        totalWeeks={cfg.totalWeeks}
-        isReadingWeek={isReadingWeek}
-      />
-
-      <div className={styles.track}>
-        {labels.map((label, i) => (
-          <WeekSegment
-            key={i}
-            label={label}
-            isCurrent={i === currentIdx}
-            isPast={i < currentIdx}
-          />
-        ))}
-      </div>
+    <div className={styles.track}>
+      {labels.map(renderWeekSegment(currentIdx))}
     </div>
   );
+}
+
+// Helper function that returns a function to render each week segment, determining if it's the current week or a past week based on the index
+function renderWeekSegment(currentIdx) {
+  return function (label, i) {
+    return (
+      <WeekSegment
+        key={i}
+        label={label}
+        isCurrent={i === currentIdx}
+        isPast={i < currentIdx}
+      />
+    );
+  };
 }

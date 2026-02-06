@@ -69,8 +69,8 @@
 }
 
 .navItemActive {
-  background: #f3f0ff;
-  color: #a78bfa;
+  background: #f0eff4;
+  color: var(--accent);
   font-weight: 600;
 }
 

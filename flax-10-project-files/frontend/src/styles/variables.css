@@ -21,4 +21,7 @@
 
   --hover: rgba(74,52,33,0.06);
   --active: rgba(74,52,33,0.10);
+
+  --pill-bg: #f0ede8;      /* soft background */
+  --pill-hover: #eadfd2;   /* hover background */
 }
