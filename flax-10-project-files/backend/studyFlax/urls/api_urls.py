@@ -1,9 +1,7 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+from studyFlax.views.taskViews import TaskViewSet
 
-#Import the test view. Discard if needed.
+router = DefaultRouter()
+router.register(r"tasks", TaskViewSet, basename="tasks")
 
-from studyFlax.views.views import hello
-
-urlpatterns = [
-    path("hello/", hello),
-]
+urlpatterns = router.urls
