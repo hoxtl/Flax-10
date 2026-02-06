@@ -2,6 +2,7 @@ import { NAV } from "../lib/uiConstants";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../lib/userUtils";
 import { APP_ROUTES } from "../lib/routes";
+import { useNavigate } from "react-router-dom";
 
 function SidebarHeader({ collapsed }) {
   return (
@@ -58,18 +59,22 @@ export default function Sidebar({ active, onChange, collapsed }) {
 }
 
 function SidebarNav({ active, onChange, collapsed }) {
+  const navigate = useNavigate();
+
   return (
     <nav className={styles.nav}>
       {APP_ROUTES.map((n) => (
         <NavItem
-            key={n.id}
-            item={n}
-            isActive={active === n.id}
-            collapsed={collapsed}
-            onClick={() => onChange?.(n.id)}
+          key={n.id}
+          item={n}
+          isActive={active === n.id}
+          collapsed={collapsed}
+          onClick={() => {
+            onChange?.(n.id);
+            navigate(n.path);
+          }}
         />
-))}
-
+      ))}
     </nav>
   );
 }
