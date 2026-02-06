@@ -21,10 +21,11 @@ export function getInitialForm(event) {
         description: event.description || '',
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
+        recurrence: event.recurrence_details?.frequency || 'none',
     };
     const now = new Date();
-    const later = new Date(now.getTime() + 3600000); // 1 hour
-    return { title: '', description: '', start_time: formatForInput(now), end_time: formatForInput(later) };
+    const later = new Date(now.getTime() + 3600000);
+    return { title: '', description: '', start_time: formatForInput(now), end_time: formatForInput(later), recurrence: 'none' };
 }
 
 /*
@@ -62,12 +63,16 @@ export function confirmDelete(event, actions, onClose) {
     This function is used to build the event data.
 */
 function buildEventData(form) {
-    return {
+    const data = {
         title: form.title,
         description: form.description,
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
     };
+    if (form.recurrence && form.recurrence !== 'none') {
+        data.recurrence_rule = { frequency: form.recurrence, interval: 1 };
+    }
+    return data;
 }
 
 /*

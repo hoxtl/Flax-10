@@ -35,6 +35,7 @@ function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete }) {
         <form onSubmit={onSubmit}>
             <FormField label="Title" value={form.title} onChange={update('title')} required />
             <FormField label="Description" type="textarea" value={form.description} onChange={update('description')} />
+            <RecurrenceField value={form.recurrence} onChange={update('recurrence')} />
             <TimeRow form={form} update={update} />
             <ActionButtons isEditing={isEditing} onDelete={onDelete} />
         </form>
@@ -55,6 +56,21 @@ function ActionButtons({ isEditing, onDelete }) {
         <div className="modal-actions">
             {isEditing && <button type="button" className="delete-btn" onClick={onDelete}>Delete</button>}
             <button type="submit" className="submit-btn">Save</button>
+        </div>
+    );
+}
+
+function RecurrenceField({ value, onChange }) {
+    return (
+        <div className="form-field">
+            <label htmlFor="field-recurrence">Recurrence</label>
+            <select id="field-recurrence" value={value || 'none'} onChange={onChange}>
+                <option value="none">None</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select>
         </div>
     );
 }
