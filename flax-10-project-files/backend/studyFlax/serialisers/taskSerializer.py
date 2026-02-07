@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from studyFlax.models.taskModel import Task
+from studyFlax.models import Task
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:

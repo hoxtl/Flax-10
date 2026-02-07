@@ -1,24 +1,39 @@
-/flax-10-project-files/backend/Flax10/__pycache__
-/flax-10-project-files/backend/studyFlax/views/__pycache__
-/flax-10-project-files/backend/studyFlax/urls/__pycache__
-/flax-10-project-files/backend/studyFlax/migrations/__pycache__
-/flax-10-project-files/backend/studyFlax/__pycache__
-
 # Python caches (ignore everywhere)
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 
 # Virtual env
 venv/
 .venv/
+env/
+frontend/venv/
+backend/venv/
 
-# Coverage 
-.coverage 
-htmlcov/
-# Coverage output
+*.log
+db.sqlite3
+*.sqlite3
+
+# Coverage
 .coverage
+.coverage.*
 htmlcov/
 
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# env Files
+.env
+.env.*
+!.env.example
+
+# Node 
+node_modules/
 package-lock.json
