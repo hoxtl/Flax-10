@@ -4,6 +4,7 @@ import { useEventActions } from '../../hooks/useCalendarEvents';
 import { useEventModal } from '../../context/CalendarContext';
 import { useEventResize } from '../../hooks/useEventResize';
 import { formatTime } from '../../utils/dateUtils';
+import { getCardTheme } from '../../utils/cardUtils';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style }) {
@@ -71,7 +72,11 @@ function EventContent({ event, height }) {
 function buildStyle(baseStyle, resizePreview, event) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
-    style.borderLeftColor = event.tag_details?.color || '#8B7355';
+
+    // Apply theme accent color to left border
+    const theme = getCardTheme(event.tag_name);
+    style.borderLeftColor = theme.accent;
+
     return style;
 }
 
