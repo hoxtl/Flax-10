@@ -1,6 +1,6 @@
-import { useTimeSlotDrop } from '../../../hooks/useTimeSlotDrop';
-import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
-import { isSameDay } from '../../../utils/dateUtils';
+import { useTimeSlotDrop } from '../../hooks/useTimeSlotDrop';
+import { useResizeHighlight } from '../../context/ResizeHighlightContext';
+import { isSameDay } from '../../utils/dateUtils';
 
 export function TimeSlot({ hour, date }) {
     const { mergedProps, isOver, highlightQuarter } = useTimeSlotDrop(hour, date);

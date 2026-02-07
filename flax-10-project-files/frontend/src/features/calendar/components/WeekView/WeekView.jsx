@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
-import { getWeekDays, isSameDay } from '../../../utils/dateUtils';
+import { useCalendar, useCalendarDispatch } from '../../context/CalendarContext';
+import { getWeekDays, isSameDay } from '../../utils/dateUtils';
 import { DayColumn } from './DayColumn';
 import { TimeLabels } from './TimeLabels';
-import { useAutoScroll } from '../../../hooks/useAutoScroll';
+import { useAutoScroll } from '../../hooks/useAutoScroll';
 import './WeekView.css';
 
 /**

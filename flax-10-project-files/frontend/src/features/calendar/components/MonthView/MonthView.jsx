@@ -1,7 +1,7 @@
-import { useCalendar, useCalendarDispatch, useEventModal } from '../../../context/CalendarContext';
-import { isSameDay, isSameMonth } from '../../../utils/dateUtils';
-import { useDrag } from '../../../hooks/useDragDrop';
-import { useMonthDayDrop } from '../../../hooks/useMonthDayDrop';
+import { useCalendar, useCalendarDispatch, useEventModal } from '../../context/CalendarContext';
+import { isSameDay, isSameMonth } from '../../utils/dateUtils';
+import { useDrag } from '../../hooks/useDragDrop';
+import { useMonthDayDrop } from '../../hooks/useMonthDayDrop';
 import './MonthView.css';
 
 /*

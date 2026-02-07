@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DashboardLayout.module.css";
-import Sidebar from "../components/Sidebar";
-import TopBar from "../components/Topbar";
-import WeekBar from "../components/WeekBar";
-import QuickAddModal from "../components/QuickAddModal";
-import { EventModal } from "../components/Calendar/EventModal/EventModal";
-import { useEventModal, useCalendar } from "../context/CalendarContext";
+import Sidebar from "../shared/components/Sidebar";
+import TopBar from "../shared/components/Topbar";
+import WeekBar from "../shared/components/WeekBar";
+import QuickAddModal from "../features/calendar/components/QuickAddModal";
+import { EventModal } from "../features/calendar/components/EventModal/EventModal";
+import { useEventModal, useCalendar } from "../features/calendar/context/CalendarContext";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);

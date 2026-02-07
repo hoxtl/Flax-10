@@ -1,7 +1,8 @@
-import { useCalendar } from '../../context/CalendarContext';
-import { ResizeHighlightProvider } from '../../context/ResizeHighlightContext';
-import { useCalendarEvents } from '../../hooks/useCalendarEvents';
+import { useCalendar } from "../context/CalendarContext";
+import { ResizeHighlightProvider } from "../context/ResizeHighlightContext";
+import { useCalendarEvents } from "../hooks/useCalendarEvents";
 import { CalendarHeader } from './CalendarHeader';
+
 import { DayView } from './DayView/DayView';
 import { WeekView } from './WeekView/WeekView';
 import { MonthView } from './MonthView/MonthView';

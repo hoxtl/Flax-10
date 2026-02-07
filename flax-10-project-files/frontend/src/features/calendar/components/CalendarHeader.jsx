@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
-import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput } from "../../utils/dateUtils";
+import { useCalendar, useCalendarDispatch, useEventModal } from "../context/CalendarContext";
+import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput } from "../utils/dateUtils";
 import './CalendarHeader.css';
 
 export function CalendarHeader() {

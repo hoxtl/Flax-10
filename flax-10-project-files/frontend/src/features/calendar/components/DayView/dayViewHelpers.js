@@ -1,4 +1,4 @@
-import { calculateEventColumns } from '../../../utils/overlapUtils';
+import { calculateEventColumns } from '../../utils/overlapUtils';
 
 export function getHoursOfDay() {
     return Array.from({ length: 24 }, (_, i) => i);

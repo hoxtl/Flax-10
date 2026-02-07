@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import { useDrag } from '../../hooks/useDragDrop';
-import { useEventActions } from '../../hooks/useCalendarEvents';
-import { useEventModal } from '../../context/CalendarContext';
-import { useEventResize } from '../../hooks/useEventResize';
-import { formatTime } from '../../utils/dateUtils';
+import { useDrag } from "../hooks/useDragDrop";
+import { useEventActions } from "../hooks/useCalendarEvents";
+import { useEventModal } from "../context/CalendarContext";
+import { useEventResize } from '../hooks/useEventResize';
+import { formatTime } from '../utils/dateUtils';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style }) {
