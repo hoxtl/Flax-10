@@ -1,21 +1,18 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useState, cloneElement } from 'react'
+import './App.css'
 import DashboardLayout from "./layout/DashboardLayout";
-import { APP_ROUTES } from "./lib/routes";
+import { APP_ROUTES } from './lib/routes';
+import { CalendarProvider } from './context/CalendarContext';
 
 export default function App() {
-  const location = useLocation();
-
-  const activeNav =
-    APP_ROUTES.find((r) => r.path === location.pathname)?.id || "home";
+  const [activeNav, setActiveNav] = useState("home");
+  const currentRoute = APP_ROUTES.find(r => r.id === activeNav) || APP_ROUTES[0];
 
   return (
-    <DashboardLayout activeNav={activeNav}>
-      <Routes>
-        {APP_ROUTES.map((r) => (
-          <Route key={r.id} path={r.path} element={r.element} />
-        ))}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </DashboardLayout>
+    <CalendarProvider>
+      <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+        {currentRoute.element}
+      </DashboardLayout>
+    </CalendarProvider>
   );
 }

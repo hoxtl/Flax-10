@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from studyFlax.models.taskModel import Task
-from studyFlax.serializers.taskSerializer import TaskSerializer
+from studyFlax.serialisers.taskSerializer import TaskSerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer

@@ -1,16 +1,15 @@
 // src/components/WeekBar.jsx
 import styles from "./WeekBar.module.css";
 import { loadTermConfig } from "../lib/termConfig";
-import { buildWeekLabels, getWeekIndexForDate } from "../lib/weekUtils";
+import { buildWeekLabels, getWeekIndexForDate } from "../utils/weekUtils";
 
 // Badge component that shows the current week or reading week status, and the total number of weeks in the term
 function WeekBadge({ label, totalWeeks, isReadingWeek }) {
   return (
     <div className={styles.badgeWrap}>
       <span
-        className={`${styles.badge} ${
-          isReadingWeek ? styles.badgeReading : styles.badgeNormal
-        }`}
+        className={`${styles.badge} ${isReadingWeek ? styles.badgeReading : styles.badgeNormal
+          }`}
       >
         {label}
       </span>
@@ -33,9 +32,8 @@ function WeekSegment({ label, isCurrent, isPast }) {
     <div className={styles.segment}>
       <div className={barClass} />
       <span
-        className={`${styles.segmentLabel} ${
-          isCurrent ? styles.segmentLabelActive : ""
-        }`}
+        className={`${styles.segmentLabel} ${isCurrent ? styles.segmentLabelActive : ""
+          }`}
       >
         {label}
       </span>
