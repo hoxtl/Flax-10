@@ -32,19 +32,15 @@ function createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, 
     return () => {
         if (resizeJustEnded.current) {
             resizeJustEnded.current = false;
-            return;
+        } else if (!isDragging && !isResizing) {
+            openModal(event);
         }
-        if (!isDragging && !isResizing) openModal(event);
     };
 }
 
 function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
-    const handleResizeMouseDown = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onResizeStart(e);
-    };
     const height = resizePreview || parseFloat(style?.height) || 0;
+
     return (
         <div
             ref={eventRef}
@@ -54,9 +50,15 @@ function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, i
             {...dragProps}
         >
             <EventContent event={event} height={height} />
-            <div className="resize-handle" draggable={false} onMouseDown={handleResizeMouseDown} />
+            <div className="resize-handle" draggable={false} onMouseDown={(e) => handleResizeMouseDown(e, onResizeStart)} />
         </div>
     );
+}
+
+function handleResizeMouseDown(e, onResizeStart) {
+    e.stopPropagation();
+    e.preventDefault();
+    onResizeStart(e);
 }
 
 function EventContent({ event, height }) {

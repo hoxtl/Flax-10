@@ -32,6 +32,9 @@ export default function TagManagerModal({ onClose }) {
     );
 }
 
+/**
+ * Renders the header section of the modal.
+ */
 function ModalHeader({ onClose }) {
     return (
         <div className={styles.header}>
@@ -41,6 +44,9 @@ function ModalHeader({ onClose }) {
     );
 }
 
+/**
+ * Decides whether to render the list of tags or the edit/add form.
+ */
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
     if (editingId || isAdding) {
         const initialData = editingId ? tags.find(t => t.id === editingId) : { label: '', color: '#000000', icon: '⭐' };
@@ -49,6 +55,9 @@ function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, on
     return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
 }
 
+/**
+ * Renders the list of existing tags.
+ */
 function TagList({ tags, onEdit, onDelete, onAdd }) {
     return (
         <div className={styles.content}>
@@ -62,6 +71,9 @@ function TagList({ tags, onEdit, onDelete, onAdd }) {
     );
 }
 
+/**
+ * Renders a single tag item with preview and actions.
+ */
 function TagItem({ tag, onEdit, onDelete }) {
     return (
         <div className={styles.item}>
@@ -71,6 +83,9 @@ function TagItem({ tag, onEdit, onDelete }) {
     );
 }
 
+/**
+ * Visual preview of the tag (icon handling color).
+ */
 function TagPreview({ tag }) {
     return (
         <div className={styles.preview} style={{ '--color': tag.color }}>
@@ -80,6 +95,9 @@ function TagPreview({ tag }) {
     );
 }
 
+/**
+ * Edit and Delete buttons for a tag.
+ */
 function TagActions({ id, onEdit, onDelete }) {
     return (
         <div className={styles.actions}>

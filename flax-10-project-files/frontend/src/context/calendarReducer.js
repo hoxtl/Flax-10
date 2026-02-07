@@ -28,30 +28,38 @@ const handlers = {
     SET_ERROR: (state, payload) => ({ ...state, error: payload, isLoading: false }),
     OPEN_MODAL: (state, payload) => openModalHandler(state, payload),
     CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, isModalOpen: false }),
-    SET_FILTER: (state, payload) => {
-        const current = Array.isArray(state.filter) ? state.filter : [state.filter];
-        let newFilter;
-
-        if (payload === 'all') {
-            newFilter = ['all'];
-        } else {
-            // If 'all' was selected, replace it with the new selection
-            if (current.includes('all')) {
-                newFilter = [payload];
-            } else {
-                // Toggle selection
-                if (current.includes(payload)) {
-                    newFilter = current.filter(t => t !== payload);
-                    // If nothing selected, revert to 'all'
-                    if (newFilter.length === 0) newFilter = ['all'];
-                } else {
-                    newFilter = [...current, payload];
-                }
-            }
-        }
-        return { ...state, filter: newFilter };
-    },
+    SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
 };
+
+/**
+ * Toggles the filter state based on the selected payload.
+ * Handles switching between 'all' and specific tags, and multi-select logic.
+ */
+function toggleFilter(currentFilter, payload) {
+    if (payload === 'all') return ['all'];
+
+    // Ensure currentFilter is always an array for consistent handling
+    const current = Array.isArray(currentFilter) ? currentFilter : [currentFilter];
+
+    // If resetting from 'all', just return the new payload
+    if (current.includes('all')) return [payload];
+
+    return updateFilterList(current, payload);
+}
+
+/**
+ * Updates the list of active filters.
+ * Adds the payload if not present, removes it if present.
+ * Reverts to 'all' if the result would be empty.
+ */
+function updateFilterList(current, payload) {
+    if (current.includes(payload)) {
+        const newFilter = current.filter(t => t !== payload);
+        // Default to 'all' if no filters remain
+        return newFilter.length === 0 ? ['all'] : newFilter;
+    }
+    return [...current, payload];
+}
 
 /*
     This function is used to handle the calendar reducer.
