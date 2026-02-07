@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1770503122167" clover="3.2.0">
+  <project timestamp="1770503122167" name="All files">
+    <metrics statements="199" coveredstatements="199" conditionals="63" coveredconditionals="60" methods="105" coveredmethods="105" elements="367" coveredelements="364" complexity="0" loc="199" ncloc="199" packages="7" files="23" classes="23"/>
+    <package name="components.Calendar">
+      <metrics statements="16" coveredstatements="16" conditionals="4" coveredconditionals="4" methods="8" coveredmethods="8"/>
+      <file name="CalendarHeader.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/CalendarHeader.jsx">
+        <metrics statements="16" coveredstatements="16" conditionals="4" coveredconditionals="4" methods="8" coveredmethods="8"/>
+        <line num="8" count="11" type="stmt"/>
+        <line num="9" count="11" type="stmt"/>
+        <line num="10" count="11" type="stmt"/>
+        <line num="11" count="11" type="stmt"/>
+        <line num="12" count="11" type="stmt"/>
+        <line num="14" count="11" type="stmt"/>
+        <line num="24" count="11" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="33" count="2" type="stmt"/>
+        <line num="34" count="2" type="stmt"/>
+        <line num="38" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="39" count="10" type="cond" truecount="2" falsecount="0"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="44" count="2" type="stmt"/>
+        <line num="45" count="2" type="stmt"/>
+        <line num="46" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.Calendar.EventModal">
+      <metrics statements="11" coveredstatements="11" conditionals="3" coveredconditionals="3" methods="6" coveredmethods="6"/>
+      <file name="EventModal.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/EventModal.jsx">
+        <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="6" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="7" count="9" type="stmt"/>
+        <line num="8" count="9" type="stmt"/>
+      </file>
+      <file name="useEventForm.js" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/useEventForm.js">
+        <metrics statements="8" coveredstatements="8" conditionals="1" coveredconditionals="1" methods="5" coveredmethods="5"/>
+        <line num="11" count="7" type="stmt"/>
+        <line num="12" count="7" type="stmt"/>
+        <line num="13" count="7" type="stmt"/>
+        <line num="14" count="7" type="stmt"/>
+        <line num="16" count="7" type="stmt"/>
+        <line num="18" count="7" type="stmt"/>
+        <line num="19" count="7" type="stmt"/>
+        <line num="21" count="7" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.Calendar.EventModal.components">
+      <metrics statements="14" coveredstatements="14" conditionals="13" coveredconditionals="13" methods="13" coveredmethods="13"/>
+      <file name="ActionButtons.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/ActionButtons.jsx">
+        <metrics statements="1" coveredstatements="1" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="2" count="9" type="stmt"/>
+      </file>
+      <file name="EventFormBody.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/EventFormBody.jsx">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
+        <line num="8" count="63" type="stmt"/>
+        <line num="9" count="9" type="stmt"/>
+      </file>
+      <file name="FormField.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/FormField.jsx">
+        <metrics statements="3" coveredstatements="3" conditionals="3" coveredconditionals="3" methods="1" coveredmethods="1"/>
+        <line num="2" count="45" type="stmt"/>
+        <line num="3" count="45" type="cond" truecount="2" falsecount="0"/>
+        <line num="4" count="45" type="stmt"/>
+      </file>
+      <file name="ModalContent.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/ModalContent.jsx">
+        <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="5" count="9" type="stmt"/>
+        <line num="6" count="3" type="stmt"/>
+      </file>
+      <file name="ModalHeader.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/ModalHeader.jsx">
+        <metrics statements="1" coveredstatements="1" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="2" count="9" type="stmt"/>
+      </file>
+      <file name="RecurrenceField.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/RecurrenceField.jsx">
+        <metrics statements="1" coveredstatements="1" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="2" count="9" type="stmt"/>
+      </file>
+      <file name="TagField.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/TagField.jsx">
+        <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="10" count="9" type="stmt"/>
+        <line num="14" count="45" type="stmt"/>
+      </file>
+      <file name="TimeRow.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/EventModal/components/TimeRow.jsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="4" count="9" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.Calendar.MonthView">
+      <metrics statements="62" coveredstatements="62" conditionals="16" coveredconditionals="15" methods="25" coveredmethods="25"/>
+      <file name="DayCell.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/MonthView/DayCell.jsx">
+        <metrics statements="24" coveredstatements="24" conditionals="6" coveredconditionals="6" methods="8" coveredmethods="8"/>
+        <line num="7" count="266" type="stmt"/>
+        <line num="8" count="266" type="stmt"/>
+        <line num="9" count="266" type="stmt"/>
+        <line num="10" count="266" type="stmt"/>
+        <line num="12" count="266" type="stmt"/>
+        <line num="22" count="266" type="stmt"/>
+        <line num="23" count="266" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="27" count="266" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="44" count="266" type="stmt"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="51" count="266" type="stmt"/>
+        <line num="52" count="266" type="cond" truecount="2" falsecount="0"/>
+        <line num="53" count="266" type="cond" truecount="2" falsecount="0"/>
+        <line num="54" count="266" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="266" type="stmt"/>
+      </file>
+      <file name="DayEvents.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/MonthView/DayEvents.jsx">
+        <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="4" count="266" type="stmt"/>
+        <line num="6" count="24" type="stmt"/>
+      </file>
+      <file name="EventDot.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/MonthView/EventDot.jsx">
+        <metrics statements="8" coveredstatements="8" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
+        <line num="5" count="24" type="stmt"/>
+        <line num="6" count="24" type="stmt"/>
+        <line num="7" count="24" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="11" count="24" type="cond" truecount="2" falsecount="0"/>
+        <line num="12" count="24" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+      </file>
+      <file name="MonthView.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/MonthView/MonthView.jsx">
+        <metrics statements="20" coveredstatements="20" conditionals="6" coveredconditionals="5" methods="5" coveredmethods="5"/>
+        <line num="10" count="9" type="stmt"/>
+        <line num="11" count="9" type="stmt"/>
+        <line num="12" count="9" type="stmt"/>
+        <line num="13" count="9" type="stmt"/>
+        <line num="18" count="38" type="stmt"/>
+        <line num="29" count="9" type="stmt"/>
+        <line num="30" count="9" type="stmt"/>
+        <line num="31" count="9" type="stmt"/>
+        <line num="33" count="9" type="cond" truecount="1" falsecount="1"/>
+        <line num="34" count="38" type="stmt"/>
+        <line num="35" count="38" type="cond" truecount="4" falsecount="0"/>
+        <line num="37" count="9" type="stmt"/>
+        <line num="41" count="9" type="stmt"/>
+        <line num="42" count="9" type="stmt"/>
+        <line num="43" count="9" type="stmt"/>
+        <line num="47" count="38" type="stmt"/>
+        <line num="48" count="38" type="stmt"/>
+        <line num="49" count="266" type="stmt"/>
+        <line num="50" count="266" type="stmt"/>
+        <line num="52" count="38" type="stmt"/>
+      </file>
+      <file name="WeekRow.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/MonthView/WeekRow.jsx">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="5"/>
+        <line num="5" count="38" type="stmt"/>
+        <line num="8" count="266" type="stmt"/>
+        <line num="15" count="266" type="stmt"/>
+        <line num="16" count="700" type="stmt"/>
+        <line num="17" count="10" type="stmt"/>
+      </file>
+      <file name="WeekdayHeader.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/MonthView/WeekdayHeader.jsx">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="2" count="9" type="stmt"/>
+        <line num="3" count="9" type="stmt"/>
+        <line num="5" count="63" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.Calendar.header">
+      <metrics statements="19" coveredstatements="19" conditionals="2" coveredconditionals="2" methods="12" coveredmethods="12"/>
+      <file name="NavigationButtons.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/header/NavigationButtons.jsx">
+        <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="8" coveredmethods="8"/>
+        <line num="5" count="11" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="16" count="11" type="stmt"/>
+        <line num="17" count="11" type="stmt"/>
+        <line num="18" count="11" type="stmt"/>
+        <line num="20" count="11" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="29" count="11" type="stmt"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="31" count="2" type="stmt"/>
+        <line num="32" count="2" type="stmt"/>
+        <line num="34" count="11" type="stmt"/>
+      </file>
+      <file name="ViewModeToggle.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/components/Calendar/header/ViewModeToggle.jsx">
+        <metrics statements="6" coveredstatements="6" conditionals="2" coveredconditionals="2" methods="4" coveredmethods="4"/>
+        <line num="4" count="11" type="stmt"/>
+        <line num="5" count="11" type="stmt"/>
+        <line num="7" count="33" type="stmt"/>
+        <line num="13" count="33" type="stmt"/>
+        <line num="14" count="33" type="stmt"/>
+        <line num="15" count="33" type="cond" truecount="2" falsecount="0"/>
+      </file>
+    </package>
+    <package name="context">
+      <metrics statements="33" coveredstatements="33" conditionals="12" coveredconditionals="10" methods="21" coveredmethods="21"/>
+      <file name="CalendarContext.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/context/CalendarContext.jsx">
+        <metrics statements="15" coveredstatements="15" conditionals="4" coveredconditionals="2" methods="6" coveredmethods="6"/>
+        <line num="4" count="5" type="stmt"/>
+        <line num="5" count="5" type="stmt"/>
+        <line num="8" count="35" type="stmt"/>
+        <line num="10" count="35" type="stmt"/>
+        <line num="20" count="9" type="stmt"/>
+        <line num="21" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="24" count="6" type="stmt"/>
+        <line num="28" count="6" type="stmt"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="33" count="3" type="stmt"/>
+        <line num="35" count="3" type="cond" truecount="0" falsecount="2"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="40" count="3" type="stmt"/>
+      </file>
+      <file name="calendarReducer.js" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/context/calendarReducer.js">
+        <metrics statements="18" coveredstatements="18" conditionals="8" coveredconditionals="8" methods="15" coveredmethods="15"/>
+        <line num="5" count="6" type="stmt"/>
+        <line num="19" count="6" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="28" count="5" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="36" count="18" type="stmt"/>
+        <line num="37" count="18" type="cond" truecount="2" falsecount="0"/>
+        <line num="41" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="46" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="48" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="utils">
+      <metrics statements="44" coveredstatements="44" conditionals="13" coveredconditionals="13" methods="20" coveredmethods="20"/>
+      <file name="dateUtils.js" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/utils/dateUtils.js">
+        <metrics statements="42" coveredstatements="42" conditionals="13" coveredconditionals="13" methods="19" coveredmethods="19"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="3" count="21" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="13" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="14" count="63" type="stmt"/>
+        <line num="15" count="63" type="stmt"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="21" count="6" type="stmt"/>
+        <line num="22" count="6" type="stmt"/>
+        <line num="23" count="6" type="stmt"/>
+        <line num="24" count="6" type="stmt"/>
+        <line num="25" count="6" type="stmt"/>
+        <line num="29" count="3" type="stmt"/>
+        <line num="33" count="3" type="stmt"/>
+        <line num="37" count="90" type="stmt"/>
+        <line num="38" count="90" type="stmt"/>
+        <line num="39" count="90" type="stmt"/>
+        <line num="43" count="972" type="stmt"/>
+        <line num="47" count="268" type="cond" truecount="2" falsecount="0"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="56" count="2" type="stmt"/>
+        <line num="60" count="9" type="stmt"/>
+        <line num="64" count="1" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
+        <line num="69" count="1" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
+        <line num="74" count="3" type="stmt"/>
+        <line num="75" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="76" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+        <line num="83" count="1" type="stmt"/>
+        <line num="87" count="2" type="stmt"/>
+        <line num="91" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="92" count="3" type="stmt"/>
+        <line num="93" count="3" type="stmt"/>
+        <line num="97" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="98" count="1" type="stmt"/>
+      </file>
+      <file name="test-utils.jsx" path="/Users/catechew/Downloads/For University/Kings/Year 2/Software Engineering Group Project/Large Group Project/Flax-10/flax-10-project-files/frontend/src/utils/test-utils.jsx">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="4" count="3" type="stmt"/>
+        <line num="5" count="29" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

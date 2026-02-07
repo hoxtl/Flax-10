@@ -10,8 +10,7 @@ export function TimeLabels() {
         <div
             key={hour}
             className="time-label-cell"
-            style={{ height: SLOT_HEIGHT }}
-        >
+            style={{ height: SLOT_HEIGHT }}>
             {formatHour(hour)}
         </div>
     ));
