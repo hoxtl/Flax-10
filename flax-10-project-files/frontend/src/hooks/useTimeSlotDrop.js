@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useDrop } from './useDragDrop';
-import { useCalendar } from "../context/CalendarContext";
+import { useCalendar, useEventModal } from "../context/CalendarContext";
 import { useEventActions } from "./useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "../components/Calendar/calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
@@ -8,17 +8,29 @@ import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
 
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
+    const { openModal } = useEventModal();
     const { addEvent, editEvent, addException } = useEventActions();
     const [highlightQuarter, setHighlightQuarter] = useState(null);
+    const handleDrop = createDropHandler(hour, date, addEvent, editEvent, addException, events, setHighlightQuarter);
+    const handleClick = createClickHandler(hour, date, openModal);
+    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
+    const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter, handleClick);
+    return { mergedProps, isOver, highlightQuarter };
+}
 
-    const handleDrop = useCallback((payload, e) => {
+function createDropHandler(hour, date, addEvent, editEvent, addException, events, setHighlightQuarter) {
+    return useCallback((payload, e) => {
         const minutes = getDropMinutes(hour, e);
         setHighlightQuarter(null);
         dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, events);
     }, [hour, date, addEvent, editEvent, addException, events]);
-    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
-    const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter);
-    return { mergedProps, isOver, highlightQuarter };
+}
+
+function createClickHandler(hour, date, openModal) {
+    return useCallback((e) => {
+        const minutes = getClickMinutes(hour, e);
+        openEventModalAtTime(date, minutes, openModal);
+    }, [hour, date, openModal]);
 }
 
 function getDropMinutes(hour, e) {
@@ -35,20 +47,43 @@ function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException,
     }
 }
 
-function buildMergedProps(dropProps, isOver, setHighlightQuarter) {
+function buildMergedProps(dropProps, isOver, setHighlightQuarter, handleClick) {
     return {
         ...dropProps,
-        onDragOver: (e) => {
-            if (dropProps.onDragOver) dropProps.onDragOver(e);
-            const rect = e.currentTarget.getBoundingClientRect();
-            const quarter = Math.floor((e.clientY - rect.top) / (SLOT_HEIGHT / 4));
-            setHighlightQuarter(Math.min(3, Math.max(0, quarter)));
-        },
-        onDragLeave: (e) => {
-            if (dropProps.onDragLeave) dropProps.onDragLeave(e);
-            setHighlightQuarter(null);
-        }
+        onClick: handleClick,
+        onDragOver: createDragOverHandler(dropProps, setHighlightQuarter),
+        onDragLeave: createDragLeaveHandler(dropProps, setHighlightQuarter)
     };
+}
+
+function createDragOverHandler(dropProps, setHighlightQuarter) {
+    return (e) => {
+        if (dropProps.onDragOver) dropProps.onDragOver(e);
+        const rect = e.currentTarget.getBoundingClientRect();
+        const quarter = Math.floor((e.clientY - rect.top) / (SLOT_HEIGHT / 4));
+        setHighlightQuarter(Math.min(3, Math.max(0, quarter)));
+    };
+}
+
+function createDragLeaveHandler(dropProps, setHighlightQuarter) {
+    return (e) => {
+        if (dropProps.onDragLeave) dropProps.onDragLeave(e);
+        setHighlightQuarter(null);
+    };
+}
+
+function getClickMinutes(hour, e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const minuteOffset = getMinuteOffset(e.clientY, rect.top);
+    return hour * 60 + minuteOffset;
+}
+
+function openEventModalAtTime(date, startMinutes, openModal) {
+    const hourStart = Math.floor(startMinutes / 60) * 60;
+    const start = createDateAtMinutes(date, hourStart);
+    const end = new Date(start);
+    end.setMinutes(end.getMinutes() + 60);
+    openModal({ start_time: start, end_time: end });
 }
 
 function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
