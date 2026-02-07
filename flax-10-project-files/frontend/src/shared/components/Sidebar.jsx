@@ -1,7 +1,7 @@
 import { NAV } from "../../constants/uiConstants";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../utils/userUtils";
-import { APP_ROUTES } from "../lib/routes";
+import { APP_ROUTES } from "../../lib/routes";
 
 // Header component that displays the app name and adjusts styling based on collapsed state
 function SidebarHeader({ collapsed }) {
