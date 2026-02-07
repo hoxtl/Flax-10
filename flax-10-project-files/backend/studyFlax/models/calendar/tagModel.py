@@ -1,5 +1,6 @@
 from django.db import models
-from .userModel import User
+
+from ..auth.userModel import User
 from .categoryModel import Category
 
 class Tag(models.Model):
