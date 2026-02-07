@@ -48,6 +48,16 @@
     font-size: 0.875rem;
 }
 
+.form-warning {
+    background: #fff4e5;
+    color: #d68910;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    border: 1px solid #f9c74f;
+}
+
 .close-btn {
     background: none;
     border: none;
@@ -98,6 +108,12 @@
     resize: vertical;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
 .submit-btn {
     width: 100%;
     padding: 0.75rem;
@@ -129,4 +145,10 @@
 .delete-btn:hover {
     background: #c0392b;
     color: white;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }

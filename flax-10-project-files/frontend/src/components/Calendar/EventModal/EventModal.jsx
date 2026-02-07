@@ -23,12 +23,27 @@ export function EventModal({ event, onClose, initialType }) {
     );
 }
 
-function ModalContent({ onClose, isEditing, form, setForm, error, handleSubmit, handleDelete }) {
+function ModalContent({ onClose, isEditing, form, setForm, error, overlapWarning, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete }) {
     return (
         <div className="modal-content" onClick={e => e.stopPropagation()}>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
+            {overlapWarning && <OverlapWarning events={overlapWarning} onConfirm={handleConfirmSave} onCancel={handleCancelSave} />}
             <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} />
+        </div>
+    );
+}
+
+function OverlapWarning({ events, onConfirm, onCancel }) {
+    const names = events.map(e => e.title).join(', ');
+    return (
+        <div className="form-warning">
+            <p><strong>⚠️ Overlap Warning</strong></p>
+            <p>This event overlaps with: {names}</p>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button type="button" onClick={onConfirm} className="submit-btn" style={{ flex: 1 }}>Continue Anyway</button>
+                <button type="button" onClick={onCancel} className="delete-btn" style={{ flex: 1 }}>Cancel</button>
+            </div>
         </div>
     );
 }

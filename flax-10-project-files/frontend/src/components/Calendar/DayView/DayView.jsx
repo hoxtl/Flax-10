@@ -46,7 +46,7 @@ function DayGrid({ hours, date, events }) {
                     <DraggableEvent
                         key={e.id}
                         event={e}
-                        style={calculateEventStyle(e, SLOT_HEIGHT, events)}
+                        style={calculateEventStyle(e, SLOT_HEIGHT, events, date)}
                     />
                 ))}
             </div>
@@ -55,7 +55,16 @@ function DayGrid({ hours, date, events }) {
 }
 
 function filterEventsForDay(events, date) {
-    return events.filter(event => isSameDay(new Date(event.start_time), date));
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return events.filter(event => {
+        const start = new Date(event.start_time);
+        const end = new Date(event.end_time);
+        return start < dayEnd && end > dayStart;
+    });
 }
 
 function formatHour(hour) {
