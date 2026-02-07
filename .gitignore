@@ -8,6 +8,8 @@ __pycache__/
 venv/
 .venv/
 env/
+frontend/venv/
+backend/venv/
 
 *.log
 db.sqlite3
