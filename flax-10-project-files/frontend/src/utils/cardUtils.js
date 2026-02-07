@@ -3,8 +3,11 @@ export function getCardTheme(type) {
 }
 
 export function formatTimeRange(e) {
-  if (!e.start || !e.end) return "—";
-  return `${e.start} – ${e.end}`;
+  if (!e.start_time || !e.end_time) return "—";
+  const start = new Date(e.start_time);
+  const end = new Date(e.end_time);
+  const formatTime = (d) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  return `${formatTime(start)} – ${formatTime(end)}`;
 }
 
 const THEMES = {

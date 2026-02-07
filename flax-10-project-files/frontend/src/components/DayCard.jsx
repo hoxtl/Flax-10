@@ -3,7 +3,7 @@ import { getCardTheme, formatTimeRange } from "../utils/cardUtils";
 
 // Card component that displays the details of an event and includes a delete button
 export default function DayCard({ e, onDelete }) {
-  const t = getCardTheme(e.type);
+  const t = getCardTheme(e.tag_name);
   return (
     <article className={styles.card} style={{ "--accent": t.accent }}>
       <div className={styles.row}>
