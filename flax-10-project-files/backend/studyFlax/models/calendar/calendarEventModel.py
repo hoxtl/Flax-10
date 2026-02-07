@@ -1,8 +1,8 @@
 from django.db import models
 
 from ..auth.userModel import User
-from ..calendar.recurrenceRuleModel import RecurrenceRule
-from ..calendar.tagModel import Tag
+from .recurrenceRuleModel import RecurrenceRule
+from .tagModel import Tag
 
 PRIORITY_CHOICES = [
     ('low', 'Low'),
@@ -26,6 +26,6 @@ class CalendarEvent(models.Model):
         choices=PRIORITY_CHOICES,
         default='medium'
     )
-    recurrence_rule = models.ForeignKey('RecurrenceRule', on_delete=models.SET_NULL, null=True, blank=True)
+    recurrence_rule = models.ForeignKey(RecurrenceRule, on_delete=models.SET_NULL, null=True, blank=True)
     reminder_minutes = models.PositiveIntegerField(null=True, blank=True)
     
