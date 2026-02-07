@@ -32,15 +32,18 @@ export default function PillFilters({ active, onChange, items }) {
   return (
     <>
       <div className={styles.row}>
-        {allPills.map((p) => (
-          <PillButton
-            key={p.key}
-            pill={p}
-            isActive={active === p.key}
-            count={counts[p.key] || 0}
-            onClick={() => onChange(p.key)}
-          />
-        ))}
+        {allPills.map((p) => {
+          const isActive = Array.isArray(active) ? active === p.key || active.includes(p.key) : active === p.key;
+          return (
+            <PillButton
+              key={p.key}
+              pill={p}
+              isActive={isActive}
+              count={counts[p.key] || 0}
+              onClick={() => onChange(p.key)}
+            />
+          );
+        })}
         <button
           className={`${styles.pill} ${styles.inactive}`}
           onClick={() => setShowManager(true)}
