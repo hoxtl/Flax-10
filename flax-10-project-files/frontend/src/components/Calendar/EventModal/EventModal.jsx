@@ -28,8 +28,11 @@ function ModalContent({ onClose, isEditing, form, setForm, error, overlapWarning
         <div className="modal-content" onClick={e => e.stopPropagation()}>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
-            {overlapWarning && <OverlapWarning events={overlapWarning} onConfirm={handleConfirmSave} onCancel={handleCancelSave} />}
-            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} />
+            {overlapWarning ? (
+                <OverlapWarning events={overlapWarning} onConfirm={handleConfirmSave} onCancel={handleCancelSave} />
+            ) : (
+                <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} />
+            )}
         </div>
     );
 }
