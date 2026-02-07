@@ -4,20 +4,24 @@ import { useEventActions } from '../../hooks/useCalendarEvents';
 import { useEventModal } from '../../context/CalendarContext';
 import { useEventResize } from '../../hooks/useEventResize';
 import { formatTime } from '../../utils/dateUtils';
-import { getCardTheme } from '../../utils/cardUtils';
+import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style }) {
     const { editEvent } = useEventActions();
     const { openModal } = useEventModal();
+    const { getTag } = useTags();
+    const theme = getTag(event.tag_name);
+
     const eventRef = useRef(null);
     const resizeJustEnded = useRef(false);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
     const handleClick = createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event);
+
     return (
         <EventCard
-            eventRef={eventRef} event={event} style={style}
+            eventRef={eventRef} event={event} style={style} theme={theme}
             resizePreview={resizePreview} isDragging={isDragging} isResizing={isResizing}
             dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart}
         />
@@ -34,7 +38,7 @@ function createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, 
     };
 }
 
-function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
+function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
     const handleResizeMouseDown = (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -45,7 +49,7 @@ function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizi
         <div
             ref={eventRef}
             className={buildClassName(isDragging, isResizing)}
-            style={buildStyle(style, resizePreview, event)}
+            style={buildStyle(style, resizePreview, theme)}
             onClick={onClick}
             {...dragProps}
         >
@@ -69,13 +73,12 @@ function EventContent({ event, height }) {
     );
 }
 
-function buildStyle(baseStyle, resizePreview, event) {
+function buildStyle(baseStyle, resizePreview, theme) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
 
     // Apply theme accent color to left border
-    const theme = getCardTheme(event.tag_name);
-    style.borderLeftColor = theme.accent;
+    style.borderLeftColor = theme ? theme.color : '#8B7355';
 
     return style;
 }
