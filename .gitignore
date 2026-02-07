@@ -1,18 +1,33 @@
 # Python caches (ignore everywhere)
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 
 # Virtual env
 venv/
 .venv/
+env/
 
-# Coverage 
-.coverage 
-htmlcov/
-# Coverage output
+*.log
+db.sqlite3
+*.sqlite3
+
+# Coverage
 .coverage
+.coverage.*
 htmlcov/
 
-package-lock.json
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# env Files
+.env
+.env.*
+!.env.example
