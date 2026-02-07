@@ -12,7 +12,8 @@ function getScheduleTitle(selectedDate) {
 }
 
 function filterEvents(active, items) {
-  return active === "all" ? items : items.filter((e) => e.tag === active);
+  if (active === "all") return items;
+  return items.filter((e) => e.tag_name?.toLowerCase() === active);
 }
 
 function eventsForDate(events, date) {
