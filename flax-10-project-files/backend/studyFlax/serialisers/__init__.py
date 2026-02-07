@@ -1,2 +1,4 @@
 from .event_serialisers import CalendarEventSerialiser, CalendarEventCreateSerialiser
 from .tag_serialisers import TagSerialiser, CategorySerialiser
+from .module_serialiser import ModuleSerialiser
+from .enrollment_serialisers import EnrollmentSerialiser
