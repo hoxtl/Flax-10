@@ -36,7 +36,6 @@ __pycache__/
 dist/
 build/
 
-
 # Env files
 .env
 .env.*
