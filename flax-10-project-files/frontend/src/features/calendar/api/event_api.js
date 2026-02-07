@@ -1,4 +1,4 @@
-import { fetchApi } from "./client";
+import { fetchApi } from "../../../shared/api/client";
 
 export async function getEvents(params = {}) {
     const query = buildQueryString(params);
