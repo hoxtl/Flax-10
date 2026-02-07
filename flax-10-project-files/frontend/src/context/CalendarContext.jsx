@@ -21,7 +21,14 @@ export function useCalendar() {
     if (!context) {
         throw new Error('useCalendar must be used within CalendarProvider');
     }
-    return context;
+
+    // Derived state: filter events based on the current filter
+    const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
+    const filteredEvents = currentFilter.includes('all')
+        ? context.events
+        : context.events.filter(e => currentFilter.includes(e.tag_name));
+
+    return { ...context, events: filteredEvents, allEvents: context.events };
 }
 
 export function useCalendarDispatch() {

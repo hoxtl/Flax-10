@@ -11,6 +11,7 @@ export const initialState = {
     modalEvent: null,
     modalType: null,
     isModalOpen: false,
+    filter: ['all'],
 };
 
 /*
@@ -27,6 +28,29 @@ const handlers = {
     SET_ERROR: (state, payload) => ({ ...state, error: payload, isLoading: false }),
     OPEN_MODAL: (state, payload) => openModalHandler(state, payload),
     CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, isModalOpen: false }),
+    SET_FILTER: (state, payload) => {
+        const current = Array.isArray(state.filter) ? state.filter : [state.filter];
+        let newFilter;
+
+        if (payload === 'all') {
+            newFilter = ['all'];
+        } else {
+            // If 'all' was selected, replace it with the new selection
+            if (current.includes('all')) {
+                newFilter = [payload];
+            } else {
+                // Toggle selection
+                if (current.includes(payload)) {
+                    newFilter = current.filter(t => t !== payload);
+                    // If nothing selected, revert to 'all'
+                    if (newFilter.length === 0) newFilter = ['all'];
+                } else {
+                    newFilter = [...current, payload];
+                }
+            }
+        }
+        return { ...state, filter: newFilter };
+    },
 };
 
 /*
