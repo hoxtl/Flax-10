@@ -1,5 +1,7 @@
 import { useCalendar, useCalendarDispatch, useEventModal } from '../../../context/CalendarContext';
 import { isSameDay, isSameMonth } from '../../../utils/dateUtils';
+import { useDrag } from '../../../hooks/useDragDrop';
+import { useMonthDayDrop } from '../../../hooks/useMonthDayDrop';
 import './MonthView.css';
 
 /*
@@ -51,10 +53,12 @@ function WeekRow({ days, events, cur, dispatch }) {
 */
 function DayCell({ day, events, isCur, dispatch }) {
     const isToday = isSameDay(day, new Date());
-    const onClick = () => handleDayClick(dispatch, day);
+    const { dropProps, isOver } = useMonthDayDrop(day);
+    const cellProps = mergeDayProps(dropProps, dispatch, day);
+    const className = buildCellClass(isCur, isToday, isOver);
 
     return (
-        <div className={buildCellClass(isCur, isToday)} onClick={onClick}>
+        <div className={className} {...cellProps}>
             <span className="day-number">{day.getDate()}</span>
             <AddEventBtn day={day} />
             <DayEvents events={events} />
@@ -101,11 +105,13 @@ function DayEvents({ events }) {
 */
 function EventDot({ e }) {
     const { openModal } = useEventModal();
+    const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: e });
     const onClick = (ev) => {
         ev.stopPropagation();
         openModal(e);
     };
-    return <div className="month-event-dot" title={e.title} onClick={onClick}>{e.title}</div>;
+    const className = isDragging ? 'month-event-dot dragging' : 'month-event-dot';
+    return <div className={className} title={e.title} onClick={onClick} {...dragProps}>{e.title}</div>;
 }
 
 /*
@@ -118,10 +124,18 @@ function MoreEvents({ count }) {
 /*
     Build cell class based on whether it is the current month or today.
 */
-function buildCellClass(isCurrentMonth, isToday) {
+function mergeDayProps(dropProps, dispatch, day) {
+    return {
+        ...dropProps,
+        onClick: () => handleDayClick(dispatch, day)
+    };
+}
+
+function buildCellClass(isCurrentMonth, isToday, isOver) {
     let cls = 'day-cell';
     if (!isCurrentMonth) cls += ' other-month';
     if (isToday) cls += ' is-today';
+    if (isOver) cls += ' drop-over';
     return cls;
 }
 
