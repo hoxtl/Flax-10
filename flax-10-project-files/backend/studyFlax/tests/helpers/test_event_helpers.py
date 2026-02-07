@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from ..base import BaseEventTestCase
 from ..fixtures import create_simple_event, create_recurring_event, get_datetime_str
-from studyFlax.views.event_helpers import (
+from studyFlax.views.calendar.event_helpers import (
     filter_events_by_date_range, parse_date_param,
     expand_recurring_events, generate_instances,
     get_next_occurrence, is_exception_date,
