@@ -1,7 +1,7 @@
 import styles from "./TopBar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
-import { getInitials } from "../utils/userUtils";
+import { getInitials } from "../shared/utils/userUtils";
 
 // Component that displays a greeting message based on the time of day, along with the user's first name and the current date
 function TopBarGreeting({ user }) {
