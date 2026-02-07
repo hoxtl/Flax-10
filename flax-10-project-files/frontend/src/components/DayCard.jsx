@@ -2,10 +2,10 @@ import styles from "./DayCard.module.css";
 import { getCardTheme, formatTimeRange } from "../utils/cardUtils";
 
 // Card component that displays the details of an event and includes a delete button
-export default function DayCard({ e, onDelete }) {
+export default function DayCard({ e, onDelete, onClick }) {
   const t = getCardTheme(e.tag_name);
   return (
-    <article className={styles.card} style={{ "--accent": t.accent }}>
+    <article className={styles.card} style={{ "--accent": t.accent }} onClick={onClick}>
       <div className={styles.row}>
         <div className={styles.iconWrap}>{t.icon}</div>
         <div className={styles.main}>
@@ -14,7 +14,16 @@ export default function DayCard({ e, onDelete }) {
           <Meta e={e} />
           <Footer e={e} />
         </div>
-        <button className={styles.delete} onClick={() => onDelete?.(e.id)} aria-label="Delete">×</button>
+        <button
+          className={styles.delete}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            onDelete?.(e.id);
+          }}
+          aria-label="Delete"
+        >
+          ×
+        </button>
       </div>
     </article>
   );
