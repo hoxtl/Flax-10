@@ -39,7 +39,6 @@ function createDropHandlers(accept, onDrop, setIsOver, dragCounter) {
         const payload = parseDropPayload(e, accept);
         if (payload) onDrop(payload, e);
     };
-
     return {
         onDragEnter: (e) => (e.preventDefault(), dragCounter.current++, setIsOver(true)),
         onDragOver: handleDragOverEffect,

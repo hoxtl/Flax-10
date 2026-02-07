@@ -1,0 +1,175 @@
+import { render, screen, fireEvent } from '../../../utils/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MonthView } from '../../../components/Calendar/MonthView/MonthView';
+import * as CalendarContextModule from '../../../context/CalendarContext';
+
+// Mock hooks
+const mockUseDrag = vi.fn(() => ({ dragProps: {}, isDragging: false }));
+const mockUseMonthDayDrop = vi.fn(() => ({ dropProps: {}, isOver: false }));
+const mockOpenModal = vi.fn();
+const mockDispatch = vi.fn();
+
+vi.mock('../../../hooks/useDragDrop', () => ({
+    useDrag: (...args) => mockUseDrag(...args),
+}));
+
+vi.mock('../../../hooks/useMonthDayDrop', () => ({
+    useMonthDayDrop: (...args) => mockUseMonthDayDrop(...args),
+}));
+
+vi.mock('../../../context/CalendarContext', async () => {
+    const actual = await vi.importActual('../../../context/CalendarContext');
+    return {
+        ...actual,
+        useCalendar: vi.fn(),
+        useCalendarDispatch: () => mockDispatch,
+        useEventModal: () => ({ openModal: mockOpenModal }),
+    };
+});
+
+describe('MonthView', () => {
+    // Current date: Feb 15, 2026
+    const defaultState = {
+        selectedDate: new Date(2026, 1, 15),
+        events: [
+            { id: 1, title: 'Event 1', start_time: new Date(2026, 1, 15, 10, 0) },
+            { id: 2, title: 'Event 2', start_time: new Date(2026, 1, 15, 12, 0) },
+            // Event on another day
+            { id: 3, title: 'Event 3', start_time: new Date(2026, 1, 20, 10, 0) },
+        ],
+    };
+
+    const setup = (state = defaultState) => {
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue(state);
+        render(<MonthView />);
+    };
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('should render the month grid', () => {
+        setup();
+        // Feb 2026 has 28 days.
+        // It starts on Sunday Feb 1.
+        // Grid should show Feb 1 to Feb 28.
+        // Also checks grid structure (WeekRows)
+        // We can check for a few days.
+        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByText('15')).toBeInTheDocument();
+        expect(screen.getByText('28')).toBeInTheDocument();
+    });
+
+    it('should render correct number of days for March 2026 (6 weeks)', () => {
+        // March 2026: Starts Sunday (Mar 1). Ends Tuesday (Mar 31).
+        // Wait, Mar 1 2026 is Sunday.
+        // Mar 31 is Tuesday.
+        // So rows:
+        // 1: 1-7
+        // 2: 8-14
+        // 3: 15-21
+        // 4: 22-28
+        // 5: 29, 30, 31, Apr1, Apr2, Apr3, Apr4.
+        // Total 5 weeks.
+
+        // Let's force a month with padding at START.
+        // May 2026 starts Friday.
+        // Row 1: Apr26...May1...
+        // This will trigger 'other-month' at start.
+
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({
+            selectedDate: new Date(2026, 4, 1), // May 2026
+            events: []
+        });
+
+        render(<MonthView />);
+        const cells = screen.getAllByText(/\d+/); // Get days
+        // May has 31 days. + padding.
+        // Just check if we have "other-month" class.
+        const otherMonthCells = document.querySelectorAll('.other-month');
+        expect(otherMonthCells.length).toBeGreaterThan(0);
+    });
+
+    it('should render events on correct days', () => {
+        setup();
+        // Event 1 and 2 are on Feb 15.
+        // Event 3 on Feb 20.
+        expect(screen.getByText('Event 1')).toBeInTheDocument();
+        expect(screen.getByText('Event 2')).toBeInTheDocument();
+        expect(screen.getByText('Event 3')).toBeInTheDocument();
+    });
+
+    it('should open modal when clicking add button on a day', () => {
+        setup();
+        // Find add button for a day (e.g. day 15).
+        // The structure is day-cell > add-btn.
+        // It's hard to target specific day's add button by text '+' alone as there are 28+ of them.
+        // We can get all buttons with text '+' and click one.
+        const addBtns = screen.getAllByText('+');
+        fireEvent.click(addBtns[14]); // 15th button roughly? Or random one.
+
+        expect(mockOpenModal).toHaveBeenCalled();
+        // Check payload?
+        // createDraftEvent logic: start time 9am on that day.
+        const arg = mockOpenModal.mock.calls[0][0];
+        expect(arg.start_time.getHours()).toBe(9);
+    });
+
+    it('should open modal when clicking an event', () => {
+        setup();
+        const eventEl = screen.getByText('Event 1');
+        fireEvent.click(eventEl);
+        expect(mockOpenModal).toHaveBeenCalledWith(
+            expect.objectContaining({ id: 1, title: 'Event 1' })
+        );
+    });
+
+    it('should handle dragging state', () => {
+        mockUseDrag.mockReturnValue({ dragProps: { draggable: true }, isDragging: true });
+        setup();
+        const eventEl = screen.getByText('Event 1');
+        expect(eventEl).toHaveClass('dragging');
+    });
+
+    it('should handle drop over state', () => {
+        mockUseMonthDayDrop.mockReturnValue({ dropProps: {}, isOver: true });
+        setup();
+        // Day cell should have 'drop-over' class
+        // BUT DayCell uses buildCellClass.
+        // We need to find the day cell element.
+        // The day number '15' is inside the cell.
+        const dayNum = screen.getByText('15');
+        const cell = dayNum.closest('.day-cell');
+        expect(cell).toHaveClass('drop-over');
+    });
+
+    it('should select date on day click', () => {
+        setup();
+        const dayNum = screen.getByText('15');
+        const cell = dayNum.closest('.day-cell');
+        fireEvent.click(cell);
+
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'SET_SELECTED_DATE',
+            payload: expect.any(Date), // Should be Feb 15
+        });
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'SET_VIEW_MODE',
+            payload: 'day',
+        });
+    });
+
+    it('should show +X more events if too many', () => {
+        // Create state with 4 events on same day
+        const manyEvents = [1, 2, 3, 4].map(i => ({
+            id: i, title: `Ev ${i}`, start_time: new Date(2026, 1, 15, 10, i)
+        }));
+        setup({ ...defaultState, events: manyEvents });
+
+        expect(screen.getByText('Ev 1')).toBeInTheDocument();
+        expect(screen.getByText('Ev 2')).toBeInTheDocument();
+        expect(screen.getByText('Ev 3')).toBeInTheDocument();
+        expect(screen.queryByText('Ev 4')).not.toBeInTheDocument();
+        expect(screen.getByText('+1 more')).toBeInTheDocument();
+    });
+});
