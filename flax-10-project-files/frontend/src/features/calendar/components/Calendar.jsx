@@ -34,3 +34,5 @@ function CalendarView({ viewMode }) {
 
     return View ? <View /> : null;
 }
+
+export default Calendar;

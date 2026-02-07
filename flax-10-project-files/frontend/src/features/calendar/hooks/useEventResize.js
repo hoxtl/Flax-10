@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useCalendar } from '../context/CalendarContext';
 import { useResizeHighlight } from '../context/ResizeHighlightContext';
 import { createResizeSession } from '../utils/resizeUtils';
-import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from '../components/Calendar/calendarConstants';
+import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from '../components/calendarConstants';
 import { checkOverlapWithConfirm } from '../utils/overlapUtils';
 import { extractBaseEventId, hasRecurrence } from '../utils/eventUtils';
 
