@@ -1,4 +1,5 @@
 from django.db import models
+
 from ..auth.userModel import User
 
 class TodoList(models.Model):
