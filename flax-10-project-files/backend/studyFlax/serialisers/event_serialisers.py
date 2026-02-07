@@ -79,5 +79,3 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
             setattr(rule, key, value)
         rule.save()
         return rule
-
-
