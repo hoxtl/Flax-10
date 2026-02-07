@@ -13,3 +13,12 @@ __pycache__/
 # Virtual env
 venv/
 .venv/
+
+# Coverage 
+.coverage 
+htmlcov/
+# Coverage output
+.coverage
+htmlcov/
+
+package-lock.json

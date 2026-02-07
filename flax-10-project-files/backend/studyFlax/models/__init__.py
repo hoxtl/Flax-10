@@ -4,3 +4,5 @@ from .tagModel import *
 from .taskModel import *
 from .todoListModel import *
 from .userSettingsModel import *
+from .recurrenceRuleModel import *
+from .categoryModel import *
