@@ -21,3 +21,6 @@ export { CalendarProvider, useCalendarContext } from './context/CalendarContext.
 // Hooks
 export { default as useCalendarEvents } from './hooks/useCalendarEvents.js';
 export { default as useDragDrop } from './hooks/useDragDrop.js';
+
+// Store
+export { default as eventsStore } from './store/eventsStore.js';
