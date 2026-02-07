@@ -1,7 +1,8 @@
 from django.db import models
-from .recurrenceRuleModel import RecurrenceRule
-from .userModel import User
-from .tagModel import Tag
+
+from ..auth.userModel import User
+from ..calendar.recurrenceRuleModel import RecurrenceRule
+from ..calendar.tagModel import Tag
 
 PRIORITY_CHOICES = [
     ('low', 'Low'),
