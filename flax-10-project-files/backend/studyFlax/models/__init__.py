@@ -6,3 +6,5 @@ from .todoListModel import *
 from .userSettingsModel import *
 from .recurrenceRuleModel import *
 from .categoryModel import *
+from .enrollmentModel import *
+from .moduleModel import *
