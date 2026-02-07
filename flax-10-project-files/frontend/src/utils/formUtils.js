@@ -147,5 +147,15 @@ function addRecurrenceIfNeeded(data, form) {
 }
 
 function formatForInput(d) {
-    return (d ? (typeof d === 'string' ? new Date(d) : d) : new Date()).toISOString().slice(0, 16);
+    const date = d ? (typeof d === 'string' ? new Date(d) : d) : new Date();
+    return toLocalISOString(date);
+}
+
+function toLocalISOString(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
