@@ -1,0 +1,139 @@
+.month-view {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.weekday-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f6f4f1;
+    border-bottom: 1px solid #e0dcd7;
+}
+
+.weekday-label {
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9E7E5D;
+    text-transform: uppercase;
+}
+
+.month-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.week-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    min-height: 100px;
+}
+
+.day-cell {
+    border: 1px solid #f6f4f1;
+    padding: 0.5rem;
+    min-height: 80px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    position: relative;
+}
+
+.day-cell:hover {
+    background-color: rgba(139, 115, 85, 0.05);
+}
+
+.day-cell:hover .month-add-btn {
+    opacity: 1;
+}
+
+.month-add-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #9E7E5D;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    border-radius: 4px;
+}
+
+.month-add-btn:hover {
+    color: #503f2e;
+    background-color: rgba(139, 115, 85, 0.1);
+}
+
+.day-cell.other-month {
+    background-color: #fafaf9;
+}
+
+.day-cell.other-month .day-number {
+    color: #c4b8a8;
+}
+
+.day-cell.is-today .day-number {
+    background-color: #8D6E63;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-number {
+    font-weight: 600;
+    color: #503f2e;
+    font-size: 0.875rem;
+}
+
+.day-events {
+    margin-top: 0.25rem;
+}
+
+.month-event-dot {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    background-color: rgba(139, 115, 85, 0.15);
+    border-left: 2px solid #9E7E5D;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #503f2e;
+}
+
+.more-events {
+    font-size: 0.65rem;
+    color: #9E7E5D;
+    cursor: pointer;
+}
+
+.more-events:hover {
+    text-decoration: underline;
+}
+
+.month-event-dot {
+    cursor: grab;
+}
+
+.month-event-dot:active {
+    cursor: grabbing;
+}
+
+.month-event-dot.dragging {
+    opacity: 0.3;
+}
+
+.day-cell.drop-over {
+    background-color: rgba(139, 115, 85, 0.15);
+    border: 2px dashed #9E7E5D;
+}

@@ -1,5 +1,5 @@
 import styles from "./DayCard.module.css";
-import { getCardTheme, formatTimeRange } from "../lib/cardUtils";
+import { getCardTheme, formatTimeRange } from "../utils/cardUtils";
 
 // Card component that displays the details of an event and includes a delete button
 export default function DayCard({ e, onDelete }) {

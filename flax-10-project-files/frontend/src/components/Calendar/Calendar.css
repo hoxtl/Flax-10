@@ -1,0 +1,12 @@
+.calendar-container {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+.view-placeholder {
+  padding: 2rem;
+  text-align: center;
+  background: var(--panel, #f6f4f1);
+  border-radius: 8px;
+  color: var(--muted, #8B7355);
+}

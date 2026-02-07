@@ -1,7 +1,7 @@
 import styles from "./TopBar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
-import { getGreeting } from "../lib/dateUtils";
-import { getInitials } from "../lib/userUtils";
+import { getGreeting } from "../utils/dateUtils";
+import { getInitials } from "../utils/userUtils";
 
 // Component that displays a greeting message based on the time of day, along with the user's first name and the current date
 function TopBarGreeting({ user }) {
@@ -11,7 +11,7 @@ function TopBarGreeting({ user }) {
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
-         <h1 className={styles.name}>{user?.name?.split(" ")[0] || "Guest"}</h1>
+        <h1 className={styles.name}>{user?.name?.split(" ")[0] || "Guest"}</h1>
         <span className={styles.date}>
           {DAYS[now.getDay()]}, {now.getDate()} {MONTHS[now.getMonth()]}
         </span>
