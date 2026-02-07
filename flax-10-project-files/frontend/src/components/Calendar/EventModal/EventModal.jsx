@@ -1,17 +1,21 @@
 import { useEventForm } from './useEventForm';
+import { useTags } from '../../../context/TagContext';
 import './EventModal.css';
 
-const TAG_OPTIONS = [
-    { value: '', label: 'None' },
-    { value: 'class', label: 'Class' },
-    { value: 'study', label: 'Study Block' },
-    { value: 'task', label: 'Task' },
-    { value: 'other', label: 'Other' },
-];
-
 export function EventModal({ event, onClose, initialType }) {
-    const options = { initialTag: initialType || null };
+    const { tags } = useTags();
+    const defaultTag = tags.length > 0 ? tags[0].id : '';
+    // If initialType is provided, use it. Otherwise use the first tag.
+    // If editing an event, the event's tag will take precedence in useEventForm logic.
+    const options = { initialTag: initialType || defaultTag };
     const logic = useEventForm(event, onClose, options);
+
+    // Ensure form has a tag if it came back empty (edge case)
+    if (!logic.form.tag && defaultTag) {
+        // This is a bit of a hack, ideally useEventForm handles this, but since we control options...
+        // Actually, let's rely on useEventForm initializing correctly with options.
+    }
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <ModalContent onClose={onClose} {...logic} />
@@ -72,11 +76,12 @@ function ActionButtons({ isEditing, onDelete }) {
 }
 
 function TagField({ value, onChange }) {
+    const { tags } = useTags();
     return (
         <div className="form-field">
             <label htmlFor="field-tag">Type</label>
             <select id="field-tag" value={value || ''} onChange={onChange}>
-                {TAG_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                {tags.map(opt => <option key={opt.id} value={opt.id}>{opt.label}</option>)}
             </select>
         </div>
     );

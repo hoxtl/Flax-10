@@ -1,6 +1,8 @@
+import { useState } from "react";
 import styles from "./PillFilters.module.css";
-import { PILLS } from "../lib/uiConstants";
 import { countByType } from "../utils/pillUtils";
+import { useTags } from "../context/TagContext";
+import TagManagerModal from "./TagManagerModal";
 
 // Button component for each pill filter
 function cls(isActive) {
@@ -16,20 +18,38 @@ function PillButton({ pill, isActive, count, onClick }) {
   );
 }
 
-// Main component that renders the row of pill filters, showing the count for each type and allowing selection
+// Main component that renders the row of pill filters
 export default function PillFilters({ active, onChange, items }) {
+  const { tags } = useTags();
+  const [showManager, setShowManager] = useState(false);
   const counts = countByType(items);
+
+  const allPills = [
+    { key: "all", label: "All" },
+    ...tags.map(t => ({ key: t.id, label: t.label }))
+  ];
+
   return (
-    <div className={styles.row}>
-      {PILLS.map((p) => (
-        <PillButton
-          key={p.key}
-          pill={p}
-          isActive={active === p.key}
-          count={counts[p.key] || 0}
-          onClick={() => onChange(p.key)}
-        />
-      ))}
-    </div>
+    <>
+      <div className={styles.row}>
+        {allPills.map((p) => (
+          <PillButton
+            key={p.key}
+            pill={p}
+            isActive={active === p.key}
+            count={counts[p.key] || 0}
+            onClick={() => onChange(p.key)}
+          />
+        ))}
+        <button
+          className={`${styles.pill} ${styles.inactive}`}
+          onClick={() => setShowManager(true)}
+          aria-label="Manage Tags"
+        >
+          ✎
+        </button>
+      </div>
+      {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
+    </>
   );
 }
