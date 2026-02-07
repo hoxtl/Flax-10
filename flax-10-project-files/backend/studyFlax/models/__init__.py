@@ -1,8 +1,15 @@
-from .userModel import *
-from .calendarEventModel import *
-from .tagModel import *
-from .taskModel import *
-from .todoListModel import *
-from .userSettingsModel import *
-from .recurrenceRuleModel import *
-from .categoryModel import *
+# Auth
+from .auth.userModel import *
+from .auth.userSettingsModel import *
+
+# Calendar
+from .calendar.calendarEventModel import *
+from .calendar.categoryModel import *
+from .calendar.recurrenceRuleModel import *
+from .calendar.tagModel import *
+
+# Tasks
+from .tasks.taskModel import *
+
+# Todos
+from .todos.todoListModel import *
