@@ -2,12 +2,13 @@ import { useEventForm } from './useEventForm';
 import { useTags } from '../../../context/TagContext';
 import './EventModal.css';
 
-export function EventModal({ event, onClose, initialType }) {
+export function EventModal({ event, onClose, initialType, initialDate }) {
     const { tags } = useTags();
-    const defaultTag = tags.length > 0 ? tags[0].id : '';
+    const otherTag = tags.find(t => t.id === 'other');
+    const defaultTag = otherTag ? otherTag.id : (tags.length > 0 ? tags[0].id : '');
     // If initialType is provided, use it. Otherwise use the first tag.
     // If editing an event, the event's tag will take precedence in useEventForm logic.
-    const options = { initialTag: initialType || defaultTag };
+    const options = { initialTag: initialType || defaultTag, initialDate };
     const logic = useEventForm(event, onClose, options);
 
     // Ensure form has a tag if it came back empty (edge case)

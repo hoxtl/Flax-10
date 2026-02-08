@@ -99,10 +99,13 @@ function TagPreview({ tag }) {
  * Edit and Delete buttons for a tag.
  */
 function TagActions({ id, onEdit, onDelete }) {
+    const isDeletable = id !== 'other';
     return (
         <div className={styles.actions}>
             <button onClick={() => onEdit(id)}>✎</button>
-            <button onClick={() => onDelete(id)} className={styles.delete}>🗑</button>
+            {isDeletable && (
+                <button onClick={() => onDelete(id)} className={styles.delete}>🗑</button>
+            )}
         </div>
     );
 }

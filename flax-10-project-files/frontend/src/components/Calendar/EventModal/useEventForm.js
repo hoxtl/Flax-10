@@ -14,7 +14,7 @@ export function useEventForm(event, onClose, options = {}) {
     const [error, setError] = useState('');
     const [overlapWarning, setOverlapWarning] = useState(null);
 
-    useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag]);
+    useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
 
     const handleSubmit = (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, events, false);
     const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, events, true);

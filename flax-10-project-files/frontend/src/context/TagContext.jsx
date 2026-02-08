@@ -30,6 +30,7 @@ export function TagProvider({ children }) {
     };
 
     const deleteTag = (id) => {
+        if (id === 'other') return;
         setTags((prev) => prev.filter((t) => t.id !== id));
     };
 

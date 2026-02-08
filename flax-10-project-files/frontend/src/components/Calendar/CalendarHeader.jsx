@@ -14,7 +14,7 @@ export function CalendarHeader() {
         <div className="calendar-header">
             <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
             <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
-            <HeaderActions openModal={openModal} viewMode={viewMode} dispatch={dispatch} />
+            <HeaderActions openModal={openModal} viewMode={viewMode} selectedDate={selectedDate} dispatch={dispatch} />
         </div>
     );
 }
@@ -52,10 +52,20 @@ function TodayButton({ onDatePick }) {
     return <button className="btn-today" onClick={goToToday}>Today</button>;
 }
 
-function HeaderActions({ openModal, viewMode, dispatch }) {
+function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
+    const handleAddClick = () => {
+        // For Day and Week views, use the selected date
+        // For Month view, use today's date (openModal will default to today)
+        if (viewMode === 'day' || viewMode === 'week') {
+            openModal(null, null, selectedDate);
+        } else {
+            openModal();
+        }
+    };
+
     return (
         <div className="actions">
-            <button className="btn-add" onClick={() => openModal()}>+</button>
+            <button className="btn-add" onClick={handleAddClick}>+</button>
             <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
         </div>
     );

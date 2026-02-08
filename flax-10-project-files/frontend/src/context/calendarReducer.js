@@ -10,6 +10,7 @@ export const initialState = {
     error: null,
     modalEvent: null,
     modalType: null,
+    modalInitialDate: null,
     isModalOpen: false,
     filter: ['all'],
 };
@@ -27,7 +28,7 @@ const handlers = {
     SET_LOADING: (state, payload) => ({ ...state, isLoading: payload }),
     SET_ERROR: (state, payload) => ({ ...state, error: payload, isLoading: false }),
     OPEN_MODAL: (state, payload) => openModalHandler(state, payload),
-    CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, isModalOpen: false }),
+    CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false }),
     SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
 };
 
@@ -75,7 +76,19 @@ function updateEvent(events, updatedEvent) {
 
 function openModalHandler(state, payload) {
     if (payload?.event !== undefined) {
-        return { ...state, modalEvent: payload.event, modalType: payload.type || null, isModalOpen: true };
+        return {
+            ...state,
+            modalEvent: payload.event,
+            modalType: payload.type || null,
+            modalInitialDate: payload.initialDate || null,
+            isModalOpen: true
+        };
     }
-    return { ...state, modalEvent: payload, modalType: null, isModalOpen: true };
+    return {
+        ...state,
+        modalEvent: payload,
+        modalType: null,
+        modalInitialDate: payload?.initialDate || null,
+        isModalOpen: true
+    };
 }
