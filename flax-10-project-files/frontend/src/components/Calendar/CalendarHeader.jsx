@@ -39,6 +39,12 @@ function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
 
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
+    if (viewMode === 'year') {
+        const newDate = new Date(selectedDate);
+        newDate.setFullYear(newDate.getFullYear() + dir);
+        dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
+        return;
+    }
     const days = { day: 1, week: 7, month: 30 }[viewMode] * dir;
     dispatch({ type: 'SET_SELECTED_DATE', payload: addDays(selectedDate, days) });
 }
@@ -46,6 +52,7 @@ function navigateDate(dispatch, selectedDate, viewMode, dir) {
 function getTitle(selectedDate, viewMode) {
     if (viewMode === 'day') return formatDate(selectedDate);
     if (viewMode === 'month') return formatMonthYear(selectedDate);
+    if (viewMode === 'year') return selectedDate.getFullYear().toString();
     return getWeekTitle(selectedDate);
 }
 
