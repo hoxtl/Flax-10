@@ -9,6 +9,7 @@ from studyFlax.views.calendar.tag_views import tag_list, category_list
 from studyFlax.views.hello import hello
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
+from studyFlax.views.authentication.logout_view import logout_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -20,4 +21,5 @@ urlpatterns = [
     path("categories/", category_list, name="category-list"),
     path("auth/register/", register_view, name='auth-register'),
     path("auth/login/", login_view, name='auth-login'),
+    path("auth/logout/", logout_view, name='auth-logout'),
 ]
