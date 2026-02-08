@@ -29,7 +29,7 @@ function printSection(number, title) {
 }
 
 function shortenPath(filepath) {
-  return filepath.replace('../../frontend/src/', '');
+  return filepath.replace('../frontend/src/', '');
 }
 
 function countFunctionLines(code, startIdx) {
