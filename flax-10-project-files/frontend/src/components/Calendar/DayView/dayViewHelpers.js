@@ -16,17 +16,32 @@ export function formatHour(hour) {
  * Returns top (position from midnight), height (based on duration),
  * and width/left for side-by-side positioning if overlapping.
  */
-export function calculateEventStyle(event, slotHeight, allEvents) {
-    const start = new Date(event.start_time);
-    const startMins = start.getHours() * 60 + start.getMinutes();
-    const duration = (new Date(event.end_time) - start) / (1000 * 60);
+export function calculateEventStyle(event, slotHeight, allEvents, date) {
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const eventStart = new Date(event.start_time);
+    const eventEnd = new Date(event.end_time);
+
+    const effectiveStart = eventStart < dayStart ? dayStart : eventStart;
+    const effectiveEnd = eventEnd > dayEnd ? dayEnd : eventEnd;
+
+    // If event is completely outside (shouldn't happen with proper filtering, but safe to check)
+    if (effectiveEnd <= effectiveStart) return { display: 'none' };
+
+    const startMins = effectiveStart.getHours() * 60 + effectiveStart.getMinutes();
+    const duration = (effectiveEnd - effectiveStart) / (1000 * 60);
 
     const style = {
         top: `${(startMins / 60) * slotHeight + 1}px`,
         height: `${(duration / 60) * slotHeight - 2}px`,
         width: '100%',
-        left: '0'
+        left: '0',
+        position: 'absolute'
     };
+
     const colInfo = allEvents?.length > 1 ? calculateEventColumns(allEvents).get(event.id) : null;
 
     if (colInfo?.totalColumns > 1) {

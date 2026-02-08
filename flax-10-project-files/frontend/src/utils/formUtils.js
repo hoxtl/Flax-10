@@ -1,10 +1,7 @@
-import { checkOverlapWithConfirm } from './overlapUtils';
+import { findOverlappingEvents } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 
-function checkOverlap(event, allEvents) {
-    const others = allEvents.filter(e => e.id !== event.id);
-    return checkOverlapWithConfirm(event, others);
-}
+
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event);
@@ -37,13 +34,22 @@ function getDefaultForm(options) {
     };
 }
 
-export async function validateAndSubmit(e, form, event, actions, onClose, setError, allEvents) {
-    e.preventDefault();
+export async function validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, allEvents, forceSave = false) {
+    if (e) e.preventDefault();
     const validationError = validateForm(form);
     if (validationError) return setError(validationError);
 
     const data = buildEventData(form);
-    if (!checkOverlap({ ...data, id: event?.id }, allEvents)) return;
+
+    // Check overlap if not forced
+    if (!forceSave) {
+        const others = allEvents.filter(e => e.id !== (event?.id));
+        const overlapping = findOverlappingEvents({ ...data, id: event?.id }, others);
+        if (overlapping.length > 0) {
+            setOverlapWarning(overlapping);
+            return;
+        }
+    }
 
     await submitEvent(event, data, actions, onClose, setError);
 }
@@ -147,5 +153,10 @@ function addRecurrenceIfNeeded(data, form) {
 }
 
 function formatForInput(d) {
-    return (d ? (typeof d === 'string' ? new Date(d) : d) : new Date()).toISOString().slice(0, 16);
+    if (!d) return new Date().toISOString().slice(0, 16); // Fallback
+    const date = typeof d === 'string' ? new Date(d) : d;
+    // Adjust for timezone to ensure the input shows local time
+    const offset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toISOString().slice(0, 16);
 }

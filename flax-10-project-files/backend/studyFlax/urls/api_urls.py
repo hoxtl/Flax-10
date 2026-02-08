@@ -1,14 +1,16 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from studyFlax.views.taskViews import TaskViewSet
+from studyFlax.views.tasks.taskViews import TaskViewSet
 router = DefaultRouter()
 router.register(r"tasks", TaskViewSet, basename="tasks")
-from studyFlax.views.event_views import event_list
-from studyFlax.views.event_detail_views import event_detail, add_exception_date
-from studyFlax.views.tag_views import tag_list, category_list
+from studyFlax.views.calendar.event_views import event_list
+from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
+from studyFlax.views.calendar.tag_views import tag_list, category_list
+from studyFlax.views.hello import hello
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("hello/", hello, name="hello"),
     path("events/", event_list, name="event-list"),
     path("events/<int:pk>/", event_detail, name="event-detail"),
     path("events/<int:pk>/exception/", add_exception_date, name="event-exception"),

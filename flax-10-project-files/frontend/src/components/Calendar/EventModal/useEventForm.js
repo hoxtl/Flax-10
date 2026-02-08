@@ -12,11 +12,15 @@ export function useEventForm(event, onClose, options = {}) {
     const actions = useEventActions();
     const [form, setForm] = useState(() => getInitialForm(event, options));
     const [error, setError] = useState('');
+    const [overlapWarning, setOverlapWarning] = useState(null);
 
-    useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag]);
+    useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
 
-    const handleSubmit = (e) => validateAndSubmit(e, form, event, actions, onClose, setError, events);
+    const handleSubmit = (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, events, false);
+    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, events, true);
+    const handleCancelSave = () => setOverlapWarning(null);
+
     const handleDelete = () => confirmDelete(event, actions, onClose);
 
-    return { form, setForm, error, isEditing: !!event?.id, handleSubmit, handleDelete };
+    return { form, setForm, error, overlapWarning, isEditing: !!event?.id, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete };
 }
