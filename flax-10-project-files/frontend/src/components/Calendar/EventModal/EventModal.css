@@ -24,6 +24,8 @@
     padding: 1.5rem;
     width: 100%;
     max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
@@ -46,6 +48,16 @@
     border-radius: 6px;
     margin-bottom: 1rem;
     font-size: 0.875rem;
+}
+
+.form-warning {
+    background: #fff4e5;
+    color: #d68910;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    border: 1px solid #f9c74f;
 }
 
 .close-btn {
@@ -78,11 +90,17 @@
 .form-field textarea,
 .form-field select {
     width: 100%;
+    max-width: 100%;
     padding: 0.5rem 0.75rem;
     border: 1px solid #e0dcd7;
     border-radius: 6px;
     font-size: 0.875rem;
     box-sizing: border-box;
+}
+
+.form-field input[type="datetime-local"] {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
 }
 
 .form-field input:focus,
@@ -96,6 +114,12 @@
 .form-field textarea {
     min-height: 80px;
     resize: vertical;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
 }
 
 .submit-btn {
@@ -129,4 +153,10 @@
 .delete-btn:hover {
     background: #c0392b;
     color: white;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }

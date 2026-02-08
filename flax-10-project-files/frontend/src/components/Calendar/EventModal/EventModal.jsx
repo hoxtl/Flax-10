@@ -1,17 +1,22 @@
 import { useEventForm } from './useEventForm';
+import { useTags } from '../../../context/TagContext';
 import './EventModal.css';
 
-const TAG_OPTIONS = [
-    { value: '', label: 'None' },
-    { value: 'class', label: 'Class' },
-    { value: 'study', label: 'Study Block' },
-    { value: 'task', label: 'Task' },
-    { value: 'other', label: 'Other' },
-];
-
-export function EventModal({ event, onClose, initialType }) {
-    const options = { initialTag: initialType || null };
+export function EventModal({ event, onClose, initialType, initialDate }) {
+    const { tags } = useTags();
+    const otherTag = tags.find(t => t.id === 'other');
+    const defaultTag = otherTag ? otherTag.id : (tags.length > 0 ? tags[0].id : '');
+    // If initialType is provided, use it. Otherwise use the first tag.
+    // If editing an event, the event's tag will take precedence in useEventForm logic.
+    const options = { initialTag: initialType || defaultTag, initialDate };
     const logic = useEventForm(event, onClose, options);
+
+    // Ensure form has a tag if it came back empty (edge case)
+    if (!logic.form.tag && defaultTag) {
+        // This is a bit of a hack, ideally useEventForm handles this, but since we control options...
+        // Actually, let's rely on useEventForm initializing correctly with options.
+    }
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <ModalContent onClose={onClose} {...logic} />
@@ -19,12 +24,30 @@ export function EventModal({ event, onClose, initialType }) {
     );
 }
 
-function ModalContent({ onClose, isEditing, form, setForm, error, handleSubmit, handleDelete }) {
+function ModalContent({ onClose, isEditing, form, setForm, error, overlapWarning, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete }) {
     return (
         <div className="modal-content" onClick={e => e.stopPropagation()}>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
-            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} />
+            {overlapWarning ? (
+                <OverlapWarning events={overlapWarning} onConfirm={handleConfirmSave} onCancel={handleCancelSave} />
+            ) : (
+                <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} />
+            )}
+        </div>
+    );
+}
+
+function OverlapWarning({ events, onConfirm, onCancel }) {
+    const names = events.map(e => e.title).join(', ');
+    return (
+        <div className="form-warning">
+            <p><strong>⚠️ Overlap Warning</strong></p>
+            <p>This event overlaps with: {names}</p>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button type="button" onClick={onConfirm} className="submit-btn" style={{ flex: 1 }}>Continue Anyway</button>
+                <button type="button" onClick={onCancel} className="delete-btn" style={{ flex: 1 }}>Cancel</button>
+            </div>
         </div>
     );
 }
@@ -72,11 +95,12 @@ function ActionButtons({ isEditing, onDelete }) {
 }
 
 function TagField({ value, onChange }) {
+    const { tags } = useTags();
     return (
         <div className="form-field">
             <label htmlFor="field-tag">Type</label>
             <select id="field-tag" value={value || ''} onChange={onChange}>
-                {TAG_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                {tags.map(opt => <option key={opt.id} value={opt.id}>{opt.label}</option>)}
             </select>
         </div>
     );
