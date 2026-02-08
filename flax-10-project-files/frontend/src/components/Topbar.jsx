@@ -2,6 +2,17 @@ import styles from "./TopBar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
 import { getInitials } from "../utils/userUtils";
+import ProfileDropdown from "./ProfileDropdown";
+
+// Get current date parts
+function getCurrentDateParts() {
+  const now = new Date();
+  return {
+    day: DAYS[now.getDay()],
+    date: now.getDate(),
+    month: MONTHS[now.getMonth()],
+  };
+}
 
 // Component that displays a greeting message based on the time of day, along with the user's first name and the current date
 function TopBarGreeting({ user }) {
@@ -40,20 +51,22 @@ function AddButton({ onClick }) {
 }
 
 // Component that renders the search input, add button, user avatar,allowing users to search, add new items, and view their profile
-function TopBarActions({ onAddClick, user }) {
+function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
       <AddButton onClick={onAddClick} />
-      <div className={styles.avatar}>
-        {getInitials(user?.name) || "?"}
-      </div>
+      <ProfileDropdown
+        user={user}
+        onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick}
+      />
     </div>
   );
 }
 
 // Main TopBar component that composes the greeting and actions components
-export default function TopBar({ onToggle, onAddClick, user }) {
+export default function TopBar({ onToggle, onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <header className={styles.container}>
       <div className={styles.left}>
@@ -62,7 +75,12 @@ export default function TopBar({ onToggle, onAddClick, user }) {
         </button>
         <TopBarGreeting user={user} />
       </div>
-      <TopBarActions onAddClick={onAddClick} user={user} />
+      <TopBarActions
+        onAddClick={onAddClick}
+        user={user}
+        onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick}
+      />
     </header>
   );
 }
