@@ -17,7 +17,8 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
         fields = ['id', 'title', 'description',
         'start_time', 'end_time', 'location', 'tag',
         'tag_name', 'tag_details', 'recurrence_details',
-        'recurrence_rule', 'reminder_minutes']
+        'recurrence_rule', 'reminder_minutes',
+        'source', 'external_id']
 
 class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     recurrence_rule = serializers.JSONField(required=False, allow_null=True)
@@ -27,7 +28,8 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
         model = CalendarEvent
         fields = ['id', 'title', 'description',
         'start_time', 'end_time', 'location', 'tag',
-        'recurrence_rule', 'reminder_minutes']
+        'recurrence_rule', 'reminder_minutes',
+        'source', 'external_id']
 
     def create(self, validated_data):
         recurrence_data = validated_data.pop('recurrence_rule', None)
