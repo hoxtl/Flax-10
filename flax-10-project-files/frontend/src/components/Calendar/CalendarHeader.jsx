@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
-import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput } from "../../utils/dateUtils";
+import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput, isSameDay, isSameMonth } from "../../utils/dateUtils";
 import './CalendarHeader.css';
 
 export function CalendarHeader() {
@@ -25,7 +25,7 @@ function NavigationButtons({ onNavigate, selectedDate, onDatePick }) {
             <button onClick={() => onNavigate(-1)}>&lt;</button>
             <button onClick={() => onNavigate(1)}>&gt;</button>
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
-            <TodayButton onDatePick={onDatePick} />
+            <TodayButton selectedDate={selectedDate} onDatePick={onDatePick} />
         </div>
     );
 }
@@ -43,7 +43,27 @@ function DatePickerButton({ selectedDate, onDatePick }) {
     );
 }
 
-function TodayButton({ onDatePick }) {
+function TodayButton({ selectedDate, onDatePick }) {
+    const { viewMode } = useCalendar();
+
+    // Check if today is currently visible
+    const isTodayVisible = () => {
+        const today = new Date();
+        if (viewMode === 'day') {
+            return isSameDay(selectedDate, today);
+        }
+        if (viewMode === 'week') {
+            const week = getWeekDays(selectedDate);
+            return week.some(d => isSameDay(d, today));
+        }
+        if (viewMode === 'month') {
+            return isSameMonth(selectedDate, today);
+        }
+        return false;
+    };
+
+    if (isTodayVisible()) return null;
+
     const goToToday = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -54,9 +74,9 @@ function TodayButton({ onDatePick }) {
 
 function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
     const handleAddClick = () => {
-        // For Day and Week views, use the selected date
-        // For Month view, use today's date (openModal will default to today)
-        if (viewMode === 'day' || viewMode === 'week') {
+        // For Day view, use the selected date
+        // For Month and Week views, use today's date (openModal will default to today)
+        if (viewMode === 'day') {
             openModal(null, null, selectedDate);
         } else {
             openModal();
@@ -102,3 +122,4 @@ function getWeekTitle(selectedDate) {
     const fmt = { month: 'short', day: 'numeric' };
     return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }
+
