@@ -13,7 +13,16 @@ const DEFAULT_TAGS = [
 export function TagProvider({ children }) {
     const [tags, setTags] = useState(() => {
         const saved = localStorage.getItem('calendar_tags');
-        return saved ? JSON.parse(saved) : DEFAULT_TAGS;
+        if (!saved) return DEFAULT_TAGS;
+
+        const parsed = JSON.parse(saved);
+        // Ensure 'other' tag always exists
+        const hasOther = parsed.some(t => t.id === 'other');
+        if (!hasOther) {
+            const otherTag = DEFAULT_TAGS.find(t => t.id === 'other');
+            return [...parsed, otherTag];
+        }
+        return parsed;
     });
 
     useEffect(() => {
