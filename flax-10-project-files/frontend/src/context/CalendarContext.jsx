@@ -21,7 +21,14 @@ export function useCalendar() {
     if (!context) {
         throw new Error('useCalendar must be used within CalendarProvider');
     }
-    return context;
+
+    // Derived state: filter events based on the current filter
+    const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
+    const filteredEvents = currentFilter.includes('all')
+        ? context.events
+        : context.events.filter(e => currentFilter.includes(e.tag_name));
+
+    return { ...context, events: filteredEvents, allEvents: context.events };
 }
 
 export function useCalendarDispatch() {
@@ -29,13 +36,13 @@ export function useCalendarDispatch() {
 }
 
 export function useEventModal() {
-    const { modalEvent, modalType, isModalOpen } = useCalendar();
+    const { modalEvent, modalType, modalInitialDate, isModalOpen } = useCalendar();
     const dispatch = useCalendarDispatch();
 
-    const openModal = (event = null, type = null) => {
-        dispatch({ type: 'OPEN_MODAL', payload: { event, type } });
+    const openModal = (event = null, type = null, initialDate = null) => {
+        dispatch({ type: 'OPEN_MODAL', payload: { event, type, initialDate } });
     };
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
 
-    return { modalEvent, modalType, isModalOpen, openModal, closeModal };
+    return { modalEvent, modalType, modalInitialDate, isModalOpen, openModal, closeModal };
 }

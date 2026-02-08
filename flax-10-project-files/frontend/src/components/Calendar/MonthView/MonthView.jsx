@@ -1,4 +1,5 @@
 import { useCalendar, useCalendarDispatch, useEventModal } from '../../../context/CalendarContext';
+import { useTags } from '../../../context/TagContext';
 import { isSameDay, isSameMonth } from '../../../utils/dateUtils';
 import { useDrag } from '../../../hooks/useDragDrop';
 import { useMonthDayDrop } from '../../../hooks/useMonthDayDrop';
@@ -105,13 +106,22 @@ function DayEvents({ events }) {
 */
 function EventDot({ e }) {
     const { openModal } = useEventModal();
+    const { getTag } = useTags();
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: e });
+
+    const tag = getTag(e.tag_name);
+    const style = tag ? {
+        backgroundColor: `${tag.color}26`, // 15% opacity (approx)
+        borderLeftColor: tag.color,
+        color: '#1e1b2e' // Keep text dark for readability
+    } : {};
+
     const onClick = (ev) => {
         ev.stopPropagation();
         openModal(e);
     };
     const className = isDragging ? 'month-event-dot dragging' : 'month-event-dot';
-    return <div className={className} title={e.title} onClick={onClick} {...dragProps}>{e.title}</div>;
+    return <div className={className} style={style} title={e.title} onClick={onClick} {...dragProps}>{e.title}</div>;
 }
 
 /*

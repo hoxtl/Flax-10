@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
-import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput } from "../../utils/dateUtils";
+import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput, isSameDay, isSameMonth } from "../../utils/dateUtils";
 import './CalendarHeader.css';
 
 export function CalendarHeader() {
@@ -14,7 +14,7 @@ export function CalendarHeader() {
         <div className="calendar-header">
             <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
             <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
-            <HeaderActions openModal={openModal} viewMode={viewMode} dispatch={dispatch} />
+            <HeaderActions openModal={openModal} viewMode={viewMode} selectedDate={selectedDate} dispatch={dispatch} />
         </div>
     );
 }
@@ -25,7 +25,7 @@ function NavigationButtons({ onNavigate, selectedDate, onDatePick }) {
             <button onClick={() => onNavigate(-1)}>&lt;</button>
             <button onClick={() => onNavigate(1)}>&gt;</button>
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
-            <TodayButton onDatePick={onDatePick} />
+            <TodayButton selectedDate={selectedDate} onDatePick={onDatePick} />
         </div>
     );
 }
@@ -37,13 +37,33 @@ function DatePickerButton({ selectedDate, onDatePick }) {
 
     return (
         <>
-            <button className="btn-calendar" onClick={() => ref.current?.showPicker?.()}>📅</button>
+            <button className="btn-calendar" onClick={() => ref.current?.showPicker?.()}>🗓️</button>
             <input ref={ref} type="date" className="hidden-date-input" value={value} onChange={handleChange} />
         </>
     );
 }
 
-function TodayButton({ onDatePick }) {
+function TodayButton({ selectedDate, onDatePick }) {
+    const { viewMode } = useCalendar();
+
+    // Check if today is currently visible
+    const isTodayVisible = () => {
+        const today = new Date();
+        if (viewMode === 'day') {
+            return isSameDay(selectedDate, today);
+        }
+        if (viewMode === 'week') {
+            const week = getWeekDays(selectedDate);
+            return week.some(d => isSameDay(d, today));
+        }
+        if (viewMode === 'month') {
+            return isSameMonth(selectedDate, today);
+        }
+        return false;
+    };
+
+    if (isTodayVisible()) return null;
+
     const goToToday = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -52,10 +72,20 @@ function TodayButton({ onDatePick }) {
     return <button className="btn-today" onClick={goToToday}>Today</button>;
 }
 
-function HeaderActions({ openModal, viewMode, dispatch }) {
+function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
+    const handleAddClick = () => {
+        // For Day view, use the selected date
+        // For Month and Week views, use today's date (openModal will default to today)
+        if (viewMode === 'day') {
+            openModal(null, null, selectedDate);
+        } else {
+            openModal();
+        }
+    };
+
     return (
         <div className="actions">
-            <button className="btn-add" onClick={() => openModal()}>+</button>
+            <button className="btn-add" onClick={handleAddClick}>+</button>
             <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
         </div>
     );
@@ -92,3 +122,4 @@ function getWeekTitle(selectedDate) {
     const fmt = { month: 'short', day: 'numeric' };
     return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }
+
