@@ -84,5 +84,5 @@ console.log('🔀 NESTING DEPTH CHECK - JavaScript/JSX');
 console.log('Band V: ≤1 level | Band IV: ≤2 levels\n');
 console.log('='.repeat(70));
 
-const targetDir = process.argv[2] || 'src';
+const targetDir = process.argv[2] || '../../frontend/src';  // Updated path
 walkDir(targetDir);
