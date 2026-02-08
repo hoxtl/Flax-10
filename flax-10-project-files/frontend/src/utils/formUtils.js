@@ -19,7 +19,11 @@ function getFormFromEvent(event) {
         end_time: formatForInput(event.end_time),
         recurrence: event.recurrence_details?.frequency || 'none',
         tag: event.tag_name || event.tag_details?.name || '',
-        location: event.location || '',
+        location: event.locution || event.location || '',
+        all_day: event.all_day || event.is_all_day || event.allDay || (
+            formatForInput(event.start_time).endsWith('T00:00') &&
+            formatForInput(event.end_time).endsWith('T00:00')
+        ),
     };
 }
 
@@ -34,6 +38,7 @@ function getDefaultForm(options) {
         recurrence: 'none',
         tag: options.initialTag || null,
         location: '',
+        all_day: false,
     };
 }
 
@@ -135,6 +140,7 @@ function buildBaseEventData(form) {
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
         tag: form.tag || null,
+        all_day: form.all_day,
     };
 }
 

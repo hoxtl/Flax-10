@@ -1,4 +1,4 @@
-import { isSameMonth, isSameDay } from '../../../utils/dateUtils';
+import { isSameMonth, isSameDay, overlapsDay } from '../../../utils/dateUtils';
 import { DayCell } from './DayCell';
 
 export function WeekRow({ days, events, cur, dispatch }) {
@@ -13,6 +13,6 @@ export function WeekRow({ days, events, cur, dispatch }) {
 
 function getEventsForDay(events, date) {
     return events
-        .filter(e => isSameDay(new Date(e.start_time), date))
+        .filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), date))
         .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }

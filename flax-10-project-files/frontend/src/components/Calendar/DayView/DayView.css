@@ -1,9 +1,22 @@
 .day-view {
     display: flex;
+    flex-direction: column;
     background: white;
     border-radius: 8px;
     overflow-y: auto;
     max-height: 80vh;
+}
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: white;
+}
+
+.day-grid-container {
+    display: flex;
+    flex: 1;
 }
 
 .time-labels-column {
@@ -40,7 +53,8 @@
 
 .time-slot {
     height: 60px;
-    border-bottom: 1px solid #f6f4f1;
+    border-bottom: 1px solid #e5e7eb;
+    /* Darker gray */
     box-sizing: border-box;
     position: relative;
     background-image: linear-gradient(to bottom,
