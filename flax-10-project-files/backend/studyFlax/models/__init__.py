@@ -7,6 +7,7 @@ from .calendar.calendarEventModel import *
 from .calendar.categoryModel import *
 from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
+from .calendar.timetableSourceModel import *
 
 # Tasks
 from .tasks.taskModel import *

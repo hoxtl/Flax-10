@@ -1,5 +1,8 @@
 import { useRef } from "react";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
+import { getEvents } from "../../api/event_api";
+import { importTimetable } from "../../api/timetable_api";
+import { getDateRangeForView } from "../../hooks/calendarHelpers";
 import { addDays, formatDate, getWeekDays, formatMonthYear, parseDateInput, isSameDay, isSameMonth } from "../../utils/dateUtils";
 import './CalendarHeader.css';
 
@@ -45,48 +48,32 @@ function DatePickerButton({ selectedDate, onDatePick }) {
 
 function TodayButton({ selectedDate, onDatePick }) {
     const { viewMode } = useCalendar();
-
-    // Check if today is currently visible
-    const isTodayVisible = () => {
-        const today = new Date();
-        if (viewMode === 'day') {
-            return isSameDay(selectedDate, today);
-        }
-        if (viewMode === 'week') {
-            const week = getWeekDays(selectedDate);
-            return week.some(d => isSameDay(d, today));
-        }
-        if (viewMode === 'month') {
-            return isSameMonth(selectedDate, today);
-        }
-        return false;
-    };
-
-    if (isTodayVisible()) return null;
-
-    const goToToday = () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        onDatePick(today);
-    };
+    if (isTodayVisible(viewMode, selectedDate)) return null;
+    const goToToday = () => onDatePick(getTodayDate());
     return <button className="btn-today" onClick={goToToday}>Today</button>;
 }
 
 function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
-    const handleAddClick = () => {
-        // For Day view, use the selected date
-        // For Month and Week views, use today's date (openModal will default to today)
-        if (viewMode === 'day') {
-            openModal(null, null, selectedDate);
-        } else {
-            openModal();
-        }
-    };
-
+    const handleAddClick = () => openForView(openModal, viewMode, selectedDate);
+    const handleImportClick = () => handleImport(dispatch, selectedDate, viewMode);
     return (
         <div className="actions">
+            <ImportButton onImport={handleImportClick} />
             <button className="btn-add" onClick={handleAddClick}>+</button>
             <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
+        </div>
+    );
+}
+
+function ImportButton({ onImport }) {
+    return (
+        <div className="btn-import-wrapper">
+            <button className="btn-import" onClick={onImport}>
+                Import timetable
+            </button>
+            <span className="btn-import-tooltip">
+                Import your timetable using the shareable link
+            </span>
         </div>
     );
 }
@@ -123,3 +110,41 @@ function getWeekTitle(selectedDate) {
     return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }
 
+function openForView(openModal, viewMode, selectedDate) {
+    if (viewMode === 'day') {
+        openModal(null, null, selectedDate);
+        return;
+    }
+    openModal();
+}
+
+function isTodayVisible(viewMode, selectedDate) {
+    const today = new Date();
+    if (viewMode === 'day') return isSameDay(selectedDate, today);
+    if (viewMode === 'week') return getWeekDays(selectedDate).some(d => isSameDay(d, today));
+    if (viewMode === 'month') return isSameMonth(selectedDate, today);
+    return false;
+}
+
+function getTodayDate() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+}
+
+async function handleImport(dispatch, selectedDate, viewMode) {
+    const sourceUrl = window.prompt("Paste timetable URL (.ics or timetable page)");
+    if (!sourceUrl) return;
+    try {
+        await importTimetable(sourceUrl.trim());
+        await reloadEvents(dispatch, selectedDate, viewMode);
+    } catch (error) {
+        window.alert(error?.message || "Failed to import timetable");
+    }
+}
+
+async function reloadEvents(dispatch, selectedDate, viewMode) {
+    const { start, end } = getDateRangeForView(selectedDate, viewMode);
+    const data = await getEvents({ start, end });
+    dispatch({ type: 'SET_EVENTS', payload: data });
+}
