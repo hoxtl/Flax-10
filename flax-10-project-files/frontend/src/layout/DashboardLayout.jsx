@@ -20,7 +20,7 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function getUser() {
-  return { name: "Jane Smith", year: "Year 2", major: "CS" };
+  return { name: "Jane Smith", year: "Year 2", major: "CS", email: "jane@kcl.ac.uk" };
 }
 
 function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
@@ -45,10 +45,16 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   );
 }
 
-function MainArea({ user, onToggle, onQuickAdd, selectedDate, children }) {
+function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, children }) {
   return (
     <div className={styles.main}>
-      <TopBar user={user} onToggle={onToggle} onAddClick={onQuickAdd} />
+      <TopBar 
+        user={user} 
+        onToggle={onToggle} 
+        onAddClick={onQuickAdd}
+        onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick}
+      />
       <WeekBar date={selectedDate} />
       <div className={styles.content}>{children}</div>
     </div>
@@ -84,14 +90,46 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
     openModal(null, type, selectedDate);
   }
 
+  function handleSettingsClick() {
+    onNavChange?.("settings");
+  }
+
+  function handleLogoutClick() {
+    console.log("Logout clicked");
+  }
+
   return (
     <div className={styles.root}>
-      <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} collapsed={sidebarCollapsed} />
-      <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user} activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-      <MainArea user={user} onToggle={onToggle} onQuickAdd={() => setShowQuickAdd(true)} selectedDate={selectedDate}>
+      <DesktopSidebar 
+        isMobile={isMobile} 
+        user={user} 
+        activeNav={activeNav} 
+        onNavChange={onNavChange} 
+        collapsed={sidebarCollapsed} 
+      />
+      <MobileSidebar 
+        isMobile={isMobile} 
+        open={mobileSidebarOpen} 
+        user={user} 
+        activeNav={activeNav} 
+        onPick={onPickNav} 
+        onClose={() => setMobileSidebarOpen(false)} 
+      />
+      <MainArea 
+        user={user} 
+        onToggle={onToggle} 
+        onQuickAdd={() => setShowQuickAdd(true)}
+        onSettingsClick={handleSettingsClick}
+        onLogoutClick={handleLogoutClick}
+        selectedDate={selectedDate}
+      >
         {children}
       </MainArea>
-      <QuickAddGate open={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSelectType={onSelectType} />
+      <QuickAddGate 
+        open={showQuickAdd} 
+        onClose={() => setShowQuickAdd(false)} 
+        onSelectType={onSelectType} 
+      />
       {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
     </div>
   );
