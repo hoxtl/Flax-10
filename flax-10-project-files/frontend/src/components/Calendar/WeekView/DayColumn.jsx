@@ -21,7 +21,7 @@ export function DayColumn({ date, events }) {
                     <DraggableEvent
                         key={event.id}
                         event={event}
-                        style={calculateEventStyle(event, SLOT_HEIGHT, events)}
+                        style={calculateEventStyle(event, SLOT_HEIGHT, events, date)}
                     />
                 ))}
             </div>

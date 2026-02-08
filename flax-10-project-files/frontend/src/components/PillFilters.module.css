@@ -1,19 +1,30 @@
 .row {
   display: flex;
-  gap: 8px; /* exactly like your old code */
+  gap: 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  padding: 10px 2px 4px 2px;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.row::-webkit-scrollbar {
+  display: none;
 }
 
 /* Base pill style */
 .pill {
   margin-bottom: 20px;
   border: none;
-  border-radius: 22px;         
-  padding: 7px 17px;           
-  font-size: 13px;            
-  font-weight: 600;            
+  border-radius: 22px;
+  padding: 7px 17px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s;      
+  transition: all 0.2s;
 }
 
 .pill:hover {
@@ -22,21 +33,20 @@
 
 /* Inactive */
 .inactive {
-  background: #f0eff4;         
-  color: #6b6880;              
+  background: #f0eff4;
+  color: #6b6880;
   box-shadow: none;
 }
 
 /* Active */
 .active {
   background: var(--primary);
-  box-shadow: 0 6px 18px rgba(158, 126, 93, 0.18);       
-  color: #fff;               
-  font-weight: 700;          
+  box-shadow: 0 6px 18px rgba(158, 126, 93, 0.18);
+  color: #fff;
+  font-weight: 700;
 }
 
 /* Count inside */
 .count {
-  font-weight: 800;          
+  font-weight: 800;
 }
-

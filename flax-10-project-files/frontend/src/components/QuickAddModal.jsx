@@ -1,17 +1,28 @@
 import styles from "./QuickAddModal.module.css";
+import { useTags } from "../context/TagContext";
 
 // Reusable Tile component for each option in the quick add modal, displaying an icon and label
-function Tile({ icon, label, onClick, className }) {
+function Tile({ icon, label, onClick, color }) {
   return (
-    <button className={`${styles.tile} ${className || ""}`} onClick={onClick} type="button">
+    <button
+      className={styles.tile}
+      onClick={onClick}
+      type="button"
+      style={{
+        backgroundColor: `${color}15`, // 15 = ~8% opacity
+        borderColor: `${color}30`     // 30 = ~19% opacity
+      }}
+    >
       <span className={styles.icon}>{icon}</span>
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label} style={{ color: color }}>{label}</span>
     </button>
   );
 }
 
-// Main component for the quick add modal, displaying options for adding different types of events (class, study block, task, other)
+// Main component for the quick add modal, displaying options for adding different types of events
 export default function QuickAddModal({ onClose, onSelectType }) {
+  const { tags } = useTags();
+
   return (
     <div className={styles.backdrop} onMouseDown={onClose}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
@@ -24,10 +35,15 @@ export default function QuickAddModal({ onClose, onSelectType }) {
         </div>
 
         <div className={styles.grid}>
-          <Tile icon="📚" label="Class" className={styles.class} onClick={() => onSelectType("class")} />
-          <Tile icon="🧠" label="Study Block" className={styles.study} onClick={() => onSelectType("study")} />
-          <Tile icon="✅" label="Task" className={styles.task} onClick={() => onSelectType("task")} />
-          <Tile icon="⭐" label="Other" className={styles.other} onClick={() => onSelectType("other")} />
+          {tags.map(tag => (
+            <Tile
+              key={tag.id}
+              icon={tag.icon}
+              label={tag.label}
+              color={tag.color}
+              onClick={() => onSelectType(tag.id)}
+            />
+          ))}
         </div>
       </div>
     </div>
