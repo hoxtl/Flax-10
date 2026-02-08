@@ -1,17 +1,39 @@
-import { useState, cloneElement } from 'react'
+import { useState } from 'react'
 import './App.css'
 import DashboardLayout from "./layout/DashboardLayout";
 import { APP_ROUTES } from './lib/routes';
 import { CalendarProvider } from './context/CalendarContext';
+import Settings from './pages/Settings';
+
+function getUser() {
+  return { 
+    name: "Jane Smith", 
+    email: "jane@kcl.ac.uk", 
+    year: "Year 2", 
+    major: "CS" 
+  };
+}
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("home");
-  const currentRoute = APP_ROUTES.find(r => r.id === activeNav) || APP_ROUTES[0];
+  const user = getUser();
+
+  function handleBackFromSettings() {
+    setActiveNav("home");
+  }
+
+  let pageContent;
+  if (activeNav === "settings") {
+    pageContent = <Settings user={user} onBack={handleBackFromSettings} />;
+  } else {
+    const route = APP_ROUTES.find(r => r.id === activeNav) || APP_ROUTES[0];
+    pageContent = route.element;
+  }
 
   return (
     <CalendarProvider>
       <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-        {currentRoute.element}
+        {pageContent}
       </DashboardLayout>
     </CalendarProvider>
   );
