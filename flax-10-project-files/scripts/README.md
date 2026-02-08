@@ -1,25 +1,33 @@
 # Code Quality Scripts
 
-Check Band V requirements: **≤15 lines per function**, **≤1 nesting level**, **≤400 lines per file**
+Check Band V requirements: 
+- **Functions**: ≤15 lines (tests: ≤25 lines)
+- **Nesting**: ≤1 level (tests: ≤2 levels)
+- **Files**: ≤400 lines total
 
-## Backend (Python)
+## 🚀 Run Checks
+
+From the `scripts/` directory:
 ```bash
-cd scripts/python
-python check_function_length.py
-python check_nesting.py
-python check_file_length.py
+# Check Python backend
+python check_all.py
+
+# Check JavaScript frontend
+node check_all.js
 ```
 
-## Frontend (JavaScript)
-```bash
-cd scripts/javascript
-node check_function_length.js
-node check_nesting.js
-node check_file_length.js
+## 💡 When to Run
 
-## What Each Script Checks
+- Before every commit
+- Before creating a PR
+- During code reviews
+- Before final submission
 
-- `check_function_length` - Functions must be ≤15 lines (Band V) or ≤25 lines for testing 
-- `check_nesting` - Nesting depth must be ≤1 level (Band V) 
-- `check_file_length` - Files must be ≤400 lines
+## 📁 What Gets Checked
 
+- **Backend**: `backend/studyFlax/*.py`
+- **Frontend**: `frontend/src/*.{js,jsx}`
+
+---
+
+**Fix all violations to achieve Band V (80-100%)!**
