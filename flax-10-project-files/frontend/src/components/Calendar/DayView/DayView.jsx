@@ -1,7 +1,9 @@
 import { useRef } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
-import { isSameDay } from '../../../utils/dateUtils';
+import { isSameDay, overlapsDay, isAllDayEvent } from '../../../utils/dateUtils';
+import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
 import { TimeSlot } from './TimeSlot';
+import { AllDayRow } from '../WeekView/components/AllDayRow';
 import { DraggableEvent } from '../DraggableEvent';
 import { getHoursOfDay, calculateEventStyle } from './dayViewHelpers';
 import { SLOT_HEIGHT } from '../calendarConstants';
@@ -11,14 +13,19 @@ import './DayView.css';
 export function DayView() {
     const { selectedDate, events } = useCalendar();
     const scrollRef = useRef(null);
-    const dayEvents = filterEventsForDay(events, selectedDate);
-    useAutoScroll(scrollRef, dayEvents);
+    const dayEventsCombined = filterEventsForDay(events, selectedDate);
+    const timedEvents = dayEventsCombined.filter(e => shouldShowInTimeGrid(e, selectedDate));
+    useAutoScroll(scrollRef, timedEvents);
     const hours = getHoursOfDay();
-
     return (
         <div className="day-view" ref={scrollRef}>
-            <TimeLabelsColumn hours={hours} />
-            <DayGrid hours={hours} date={selectedDate} events={dayEvents} />
+            <div className="sticky-header">
+                <AllDayRow days={[selectedDate]} events={dayEventsCombined} />
+            </div>
+            <div className="day-grid-container">
+                <TimeLabelsColumn hours={hours} />
+                <DayGrid hours={hours} date={selectedDate} events={timedEvents} />
+            </div>
         </div>
     );
 }
@@ -46,7 +53,7 @@ function DayGrid({ hours, date, events }) {
                     <DraggableEvent
                         key={e.id}
                         event={e}
-                        style={calculateEventStyle(e, SLOT_HEIGHT, events)}
+                        style={calculateEventStyle(e, SLOT_HEIGHT, events, date)}
                     />
                 ))}
             </div>
@@ -55,7 +62,7 @@ function DayGrid({ hours, date, events }) {
 }
 
 function filterEventsForDay(events, date) {
-    return events.filter(event => isSameDay(new Date(event.start_time), date));
+    return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), date));
 }
 
 function formatHour(hour) {

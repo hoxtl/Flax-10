@@ -11,42 +11,62 @@ export function formatHour(hour) {
     return `${hour - 12} PM`;
 }
 
-/**
- * Calculates the CSS style for positioning an event on the grid.
- * Returns top (position from midnight), height (based on duration),
- * and width/left for side-by-side positioning if overlapping.
- */
-export function calculateEventStyle(event, slotHeight, allEvents) {
-    const start = new Date(event.start_time);
-    const startMins = start.getHours() * 60 + start.getMinutes();
-    const duration = (new Date(event.end_time) - start) / (1000 * 60);
+export function calculateEventStyle(event, slotHeight, allEvents, currentDate = null) {
+    const { start, end } = getClippedEventRange(event, currentDate);
+    const style = getBaseStyle(start, end, slotHeight);
+    const layout = getLayout(event, allEvents);
 
-    const style = {
+    if (layout) return applyLayout(style, layout);
+    return style;
+}
+
+function getClippedEventRange(event, currentDate) {
+    let start = new Date(event.start_time);
+    let end = new Date(event.end_time);
+
+    if (currentDate) {
+        const dayStart = new Date(currentDate);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(dayStart);
+        dayEnd.setDate(dayEnd.getDate() + 1);
+
+        if (start < dayStart) start = dayStart;
+        if (end > dayEnd) end = dayEnd;
+    }
+    return { start, end };
+}
+
+function getBaseStyle(start, end, slotHeight) {
+    const startMins = start.getHours() * 60 + start.getMinutes();
+    const duration = (end - start) / (1000 * 60);
+    return {
         top: `${(startMins / 60) * slotHeight + 1}px`,
         height: `${(duration / 60) * slotHeight - 2}px`,
         width: '100%',
         left: '0'
     };
-    const colInfo = allEvents?.length > 1 ? calculateEventColumns(allEvents).get(event.id) : null;
-
-    if (colInfo?.totalColumns > 1) {
-        const width = 100 / colInfo.totalColumns;
-        style.width = `calc(${width}% - 6px)`;
-        style.left = `${width * colInfo.column}%`;
-    }
-
-    return style;
 }
 
-/**
- * Calculates new end time based on resize delta.
- * Used when user drags the bottom edge of an event.
- */
+function getLayout(event, allEvents) {
+    if (!allEvents || allEvents.length <= 1) return null;
+    return calculateEventColumns(allEvents).get(event.id);
+}
+
+function applyLayout(style, layout) {
+    if (layout.totalColumns <= 1) return style;
+    const width = 100 / layout.totalColumns;
+    return {
+        ...style,
+        width: `calc(${width}% - 6px)`,
+        left: `${width * layout.column}%`
+    };
+}
+
 export function calculateNewEndTime(event, deltaY, slotHeight, snapInterval) {
     const deltaMinutes = (deltaY / slotHeight) * 60;
     const snappedDelta = Math.round(deltaMinutes / snapInterval) * snapInterval;
-
     const currentEnd = new Date(event.end_time);
+
     const newEnd = new Date(currentEnd);
     newEnd.setMinutes(newEnd.getMinutes() + snappedDelta);
 
