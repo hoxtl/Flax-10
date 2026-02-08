@@ -1,8 +1,9 @@
-# Python caches (ignore everywhere)
+# Python cache
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
 # Virtual env
 venv/
@@ -36,4 +37,4 @@ Thumbs.db
 
 # Node 
 node_modules/
-package-lock.json
+package-lock.jsonpackage-lock.json
