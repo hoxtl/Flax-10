@@ -41,7 +41,7 @@ def check_file_length(filepath, limit=400):
 
 def main():
     # Configure these
-    TARGET_DIR = 'recipes'  # Change to your directory
+    TARGET_DIR = '../../backend/studyFlax'  # Updated path
     LINE_LIMIT = 400
     
     results = []
@@ -94,13 +94,13 @@ def main():
     print(f"⚠️  Files approaching limit (>{LINE_LIMIT * 0.9} lines): {len(warnings)}")
     
     if results:
-        print("\n⚠️  ACTION REQUIRED: Refactor files exceeding {LINE_LIMIT} lines!")
+        print(f"\n⚠️  ACTION REQUIRED: Refactor files exceeding {LINE_LIMIT} lines!")
         return 1
     elif warnings:
         print("\n⚠️  Warning: Some files are approaching the limit.")
         return 0
     else:
-        print("\n✅ All files are within the {LINE_LIMIT} line limit!")
+        print(f"\n✅ All files are within the {LINE_LIMIT} line limit!")
         return 0
 
 if __name__ == '__main__':
