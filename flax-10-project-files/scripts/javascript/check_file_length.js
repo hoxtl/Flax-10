@@ -50,7 +50,7 @@ function walkDir(dir, results = [], warnings = [], limit = 400) {
   return { results, warnings };
 }
 
-const targetDir = process.argv[2] || 'src';
+const targetDir = process.argv[2] || '../../frontend/src';  // Updated path
 const limit = 400;
 const { results, warnings } = walkDir(targetDir, [], [], limit);
 
