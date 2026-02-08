@@ -15,19 +15,28 @@ export function CalendarHeader() {
         <div className="calendar-header">
             <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
             <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
-            <HeaderActions openModal={openModal} viewMode={viewMode} dispatch={dispatch} />
+            <HeaderActions openModal={openModal} viewMode={viewMode} selectedDate={selectedDate} dispatch={dispatch} />
         </div>
     );
 }
 
-function HeaderActions({ openModal, viewMode, dispatch }) {
+function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
+    const handleAddClick = () => {
+        if (viewMode === 'day') {
+            openModal(null, null, selectedDate);
+        } else {
+            openModal();
+        }
+    };
+
     return (
         <div className="actions">
-            <button className="btn-add" onClick={() => openModal()}>+</button>
+            <button className="btn-add" onClick={handleAddClick}>+</button>
             <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
         </div>
     );
 }
+
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
     const days = { day: 1, week: 7, month: 30 }[viewMode] * dir;
@@ -45,3 +54,4 @@ function getWeekTitle(selectedDate) {
     const fmt = { month: 'short', day: 'numeric' };
     return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }
+

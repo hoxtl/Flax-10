@@ -2,8 +2,8 @@ import { useState, useMemo } from "react";
 import styles from "./Home.module.css";
 import PillFilters from "../components/PillFilters";
 import DateNavigator from "../components/DateNavigator";
-import { isToday } from "../utils/dateUtils";
-import { useCalendar, useCalendarDispatch } from "../context/CalendarContext";
+import { isToday, overlapsDay } from "../utils/dateUtils";
+import { useCalendar, useCalendarDispatch, useEventModal } from "../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../hooks/useCalendarEvents";
 import CardGrid from "../components/CardGrid";
 
@@ -17,8 +17,8 @@ function filterEvents(active, items) {
 }
 
 function eventsForDate(events, date) {
-  const target = new Date(date).toDateString();
-  return events.filter(e => new Date(e.start_time).toDateString() === target);
+  // Use overlapsDay to correctly handle all-day events and timezone differences
+  return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), date));
 }
 
 function FiltersBar({ activeFilter, onChange, dayItems }) {
@@ -33,6 +33,7 @@ export default function Home() {
   const { selectedDate, events } = useCalendar();
   const dispatch = useCalendarDispatch();
   const { removeEvent } = useEventActions();
+  const { openModal } = useEventModal();
   const [activeFilter, setActiveFilter] = useState("all");
   useCalendarEvents();
 
@@ -40,6 +41,10 @@ export default function Home() {
   const dayItems = useMemo(() => eventsForDate(events, selectedDate), [events, selectedDate]);
   const filtered = useMemo(() => filterEvents(activeFilter, dayItems), [activeFilter, dayItems]);
   const scheduleTitle = useMemo(() => getScheduleTitle(selectedDate), [selectedDate]);
+
+  const handleEdit = (event) => {
+    openModal(event, event.tag_name);
+  };
 
   return (
     <div className={styles.page}>
@@ -50,7 +55,7 @@ export default function Home() {
         scheduleTitle={scheduleTitle}
       />
       <div className={styles.content}>
-        <CardGrid items={filtered} onDelete={removeEvent} />
+        <CardGrid items={filtered} onDelete={removeEvent} onEdit={handleEdit} date={selectedDate} />
       </div>
     </div>
   );

@@ -4,35 +4,36 @@ import { useEventActions } from '../../hooks/useCalendarEvents';
 import { useEventModal } from '../../context/CalendarContext';
 import { useEventResize } from '../../hooks/useEventResize';
 import { formatTime } from '../../utils/dateUtils';
+import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style }) {
     const { editEvent } = useEventActions();
     const { openModal } = useEventModal();
+    const { getTag } = useTags();
+    const theme = getTag(event.tag_name);
+
     const eventRef = useRef(null);
     const resizeJustEnded = useRef(false);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
-    const handleClick = createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event);
+    const handleClick = () => {
+        if (resizeJustEnded.current) { resizeJustEnded.current = false; return; }
+        if (!isDragging && !isResizing) openModal(event);
+    };
+
     return (
         <EventCard
-            eventRef={eventRef} event={event} style={style}
+            eventRef={eventRef} event={event} style={style} theme={theme}
             resizePreview={resizePreview} isDragging={isDragging} isResizing={isResizing}
             dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart} />
     );
 }
 
-function createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event) {
-    return () => {
-        if (resizeJustEnded.current) { resizeJustEnded.current = false; return; }
-        if (!isDragging && !isResizing) openModal(event);
-    };
-}
-
-function EventCard({ eventRef, event, style, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
+function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
     const height = resizePreview || parseFloat(style?.height) || 0;
     const className = buildClassName(isDragging, isResizing);
-    const renderStyle = buildStyle(style, resizePreview, event);
+    const renderStyle = buildStyle(style, resizePreview, theme);
     return (
         <div ref={eventRef} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
             <EventContent event={event} height={height} />
@@ -58,10 +59,13 @@ function EventContent({ event, height }) {
     );
 }
 
-function buildStyle(baseStyle, resizePreview, event) {
+function buildStyle(baseStyle, resizePreview, theme) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
-    style.borderLeftColor = event.tag_details?.color || '#8B7355';
+
+    // Apply theme accent color to left border
+    style.borderLeftColor = theme ? theme.color : '#8B7355';
+
     return style;
 }
 

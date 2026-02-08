@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
-import { isSameDay, overlapsDay, isAllDayEvent } from '../../../utils/dateUtils';
+import { overlapsDay } from '../../../utils/dateUtils';
 import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
 import { TimeSlot } from './TimeSlot';
 import { AllDayRow } from '../WeekView/components/AllDayRow';
@@ -15,7 +15,7 @@ export function DayView() {
     const scrollRef = useRef(null);
     const dayEventsCombined = filterEventsForDay(events, selectedDate);
     const timedEvents = dayEventsCombined.filter(e => shouldShowInTimeGrid(e, selectedDate));
-    useAutoScroll(scrollRef, timedEvents);
+    useAutoScroll(scrollRef, timedEvents, selectedDate.toISOString());
     const hours = getHoursOfDay();
     return (
         <div className="day-view" ref={scrollRef}>

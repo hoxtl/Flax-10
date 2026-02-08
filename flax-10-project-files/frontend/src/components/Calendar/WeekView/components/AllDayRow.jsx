@@ -1,5 +1,6 @@
 import { getAllDayVisualRange } from '../../../../utils/eventDisplayUtils';
 import { useEventModal } from '../../../../context/CalendarContext';
+import { useTags } from '../../../../context/TagContext';
 import { calculateBarStyle } from './allDayRowHelpers';
 import './AllDayRow.css';
 
@@ -35,13 +36,17 @@ function AllDayEvents({ events, days }) {
 
 function AllDayEventBar({ event, days }) {
     const { openModal } = useEventModal();
+    const { getTag } = useTags();
+    const tag = getTag(event.tag_name || event.tag);
+    const color = tag?.color || '#3b82f6';
+
     const style = calculateBarStyle(event, days);
     if (!style) return null;
 
     return (
         <div
             className="all-day-event-bar"
-            style={style}
+            style={{ ...style, backgroundColor: color }}
             onClick={(ev) => { ev.stopPropagation(); openModal(event); }}
         >
             {event.title}

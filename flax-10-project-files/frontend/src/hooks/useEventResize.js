@@ -57,15 +57,7 @@ function updateHighlight(event, newHeight, setResizeHighlight) {
     setResizeHighlight({ date: start, hour, quarter });
 }
 
-/**
- * Calculates the preview height during resize.
- * Enforces minimum height based on MIN_EVENT_DURATION.
- */
-function calculateNewHeight(originalHeight, currentY, startY) {
-    const delta = currentY - startY;
-    const minHeight = (MIN_EVENT_DURATION / 60) * SLOT_HEIGHT;
-    return Math.max(minHeight, originalHeight + delta);
-}
+
 
 function saveResizedEvent(event, deltaY, editEvent, events, resizeJustEnded) {
     const isRecurring = hasRecurrence(event);
@@ -105,10 +97,4 @@ function calculateNewEndTime(event, deltaY) {
     const newEnd = new Date(start);
     newEnd.setHours(Math.floor(snappedEndMins / 60), snappedEndMins % 60, 0, 0);
     return newEnd;
-}
-
-function isValidResize(event, newEnd, otherEvents) {
-    const start = new Date(event.start_time);
-    if (newEnd <= start) return false;
-    return checkOverlapWithConfirm({ ...event, end_time: newEnd.toISOString() }, otherEvents);
 }
