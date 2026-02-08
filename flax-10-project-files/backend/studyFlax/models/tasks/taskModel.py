@@ -1,5 +1,5 @@
 from django.db import models
-from .todoListModel import TodoList
+from ..todos.todoListModel import TodoList
 
 PRIORITY_CHOICES = [
     ('low', 'Low'),
