@@ -1,16 +1,21 @@
-import { } from '../../../context/CalendarContext';
+
 
 export function ViewModeToggle({ viewMode, dispatch }) {
-    const modes = ['day', 'week', 'month'];
+    const modes = ['day', 'week', 'month', 'year'];
+
     return (
         <div className="view-toggle">
-            {modes.map(m => <ModeButton key={m} mode={m} active={viewMode === m} dispatch={dispatch} />)}
+            <select
+                value={viewMode}
+                onChange={(e) => dispatch({ type: 'SET_VIEW_MODE', payload: e.target.value })}
+                className="view-select"
+            >
+                {modes.map(m => <option key={m} value={m}>{capitalize(m)}</option>)}
+            </select>
         </div>
     );
 }
 
-function ModeButton({ mode, active, dispatch }) {
-    const label = mode.charAt(0).toUpperCase() + mode.slice(1);
-    const onClick = () => dispatch({ type: 'SET_VIEW_MODE', payload: mode });
-    return <button onClick={onClick} className={active ? 'active' : ''}>{label}</button>;
+function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
 }
