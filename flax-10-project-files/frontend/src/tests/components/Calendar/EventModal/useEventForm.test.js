@@ -77,7 +77,9 @@ describe('useEventForm', () => {
             mockActions,
             onClose,
             expect.any(Function), // setError
-            mockEvents
+            expect.any(Function), // setOverlapWarning
+            mockEvents,
+            false // forceSave
         );
     });
 

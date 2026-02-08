@@ -21,14 +21,13 @@ import {
 } from '../../utils/dateUtils';
 
 describe('dateUtils', () => {
-    // Feb 15 2026 is Sunday
     const date = new Date(2026, 1, 15);
 
     describe('getWeekDays', () => {
         it('should return 7 days starting from Sunday', () => {
             const week = getWeekDays(date);
             expect(week).toHaveLength(7);
-            expect(week[0].getDay()).toBe(0); // Sunday
+            expect(week[0].getDay()).toBe(0);
             expect(week[0].getDate()).toBe(15);
             expect(week[6].getDate()).toBe(21);
         });
@@ -36,27 +35,20 @@ describe('dateUtils', () => {
 
     describe('getMonthDays', () => {
         it('should return full calendar month days', () => {
-            // Feb 2026 (28 days, fits 4 weeks exact)
             const days = getMonthDays(date);
-            // 4 weeks * 7 = 28
             expect(days).toHaveLength(28);
             expect(days[0].getDate()).toBe(1);
             expect(days[27].getDate()).toBe(28);
         });
 
         it('should handle months with padding', () => {
-            // March 2026
             const mar = new Date(2026, 2, 15);
             const days = getMonthDays(mar);
-            // 5 rows = 35 days
             expect(days).toHaveLength(35);
-            expect(days[0].getDate()).toBe(1); // Mar 1 is Sunday, so starts cleanly?
-            // Mar 1 2026 is Sunday.
-            // Mar 31 is Tuesday.
-            // Padding: Apr 1 (Wed) ... Apr 4 (Sat)
+            expect(days[0].getDate()).toBe(1);
             const last = days[days.length - 1];
             expect(last.getDate()).toBe(4);
-            expect(last.getMonth()).toBe(3); // April
+            expect(last.getMonth()).toBe(3);
         });
     });
 
@@ -117,8 +109,6 @@ describe('dateUtils', () => {
 
     describe('Formatting', () => {
         it('formatTime', () => {
-            // Mock locale needed?
-            // Assuming en-US behavior or consistent
             const d = new Date(2026, 1, 15, 13, 5);
             expect(formatTime(d)).toMatch(/01:05 PM|13:05|1:05 PM/);
         });
@@ -160,11 +150,40 @@ describe('dateUtils', () => {
     describe('Inputs', () => {
         it('parseDateInput', () => {
             expect(parseDateInput(null)).toBeNull();
+            expect(parseDateInput('')).toBeNull();
             const d = parseDateInput('2026-02-15');
             expect(d.getFullYear()).toBe(2026);
             expect(d.getMonth()).toBe(1);
             expect(d.getDate()).toBe(15);
             expect(d.getHours()).toBe(0);
+        });
+
+        it('overlapsDay (true)', async () => {
+            const { overlapsDay } = await import('../../utils/dateUtils');
+            const day = new Date(2026, 1, 15);
+            expect(overlapsDay(new Date(2026, 1, 15, 10), new Date(2026, 1, 15, 11), day)).toBe(true);
+            expect(overlapsDay(new Date(2026, 1, 15, 0), new Date(2026, 1, 16, 0), day)).toBe(true);
+            expect(overlapsDay(new Date(2026, 1, 14, 20), new Date(2026, 1, 15, 5), day)).toBe(true);
+            expect(overlapsDay(new Date(2026, 1, 15, 20), new Date(2026, 1, 16, 5), day)).toBe(true);
+        });
+
+        it('overlapsDay (false)', async () => {
+            const { overlapsDay } = await import('../../utils/dateUtils');
+            const day = new Date(2026, 1, 15);
+            expect(overlapsDay(new Date(2026, 1, 14, 10), new Date(2026, 1, 14, 11), day)).toBe(false);
+            expect(overlapsDay(new Date(2026, 1, 16, 10), new Date(2026, 1, 16, 11), day)).toBe(false);
+            expect(overlapsDay(new Date(2026, 1, 14, 23), new Date(2026, 1, 15, 0), day)).toBe(false);
+            expect(overlapsDay(new Date(2026, 1, 16, 0), new Date(2026, 1, 16, 1), day)).toBe(false);
+        });
+
+        it('isAllDayEvent', async () => {
+            const { isAllDayEvent } = await import('../../utils/dateUtils');
+            // 24 hours
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(true);
+            // < 24 hours
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 9) })).toBe(false);
+            // > 24 hours
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 17, 10) })).toBe(true);
         });
     });
 });

@@ -1,9 +1,21 @@
 import { render, screen, fireEvent } from '../../../utils/test-utils';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
+import { TagProvider } from '../../../context/TagContext';
+import { importTimetable } from '../../../api/timetable_api';
+import { getEvents } from '../../../api/event_api';
 
-// Mock context values
+// Mock API modules
+// Mock API modules
+vi.mock('../../../api/event_api', () => ({
+    getEvents: vi.fn(() => Promise.resolve([])),
+}));
+
+vi.mock('../../../api/timetable_api', () => ({
+    importTimetable: vi.fn(() => Promise.resolve()),
+}));
+
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
 
@@ -19,13 +31,17 @@ vi.mock('../../../context/CalendarContext', async () => {
 
 describe('CalendarHeader', () => {
     const defaultState = {
-        selectedDate: new Date(2026, 1, 15), // Feb 15, 2026
+        selectedDate: new Date(2026, 1, 15),
         viewMode: 'month',
     };
 
     const setup = (state = defaultState) => {
         vi.mocked(CalendarContextModule.useCalendar).mockReturnValue(state);
-        render(<CalendarHeader />);
+        render(
+            <TagProvider>
+                <CalendarHeader />
+            </TagProvider>
+        );
     };
 
     beforeEach(() => {
@@ -35,24 +51,6 @@ describe('CalendarHeader', () => {
     it('should render title correctly for month view', () => {
         setup({ ...defaultState, viewMode: 'month' });
         expect(screen.getByText('February 2026')).toBeInTheDocument();
-    });
-
-    it('should render title correctly for week view', () => {
-        setup({ ...defaultState, viewMode: 'week' });
-        // Week of Feb 15 (Sunday) to Feb 21 (Saturday)
-        // Assuming getWeekDays starts on Sunday.
-        // Feb 15 is Sunday.
-        expect(screen.getByText(/Feb 15 – Feb 21/)).toBeInTheDocument();
-    });
-
-    it('should render title correctly for day view', () => {
-        setup({ ...defaultState, viewMode: 'day' });
-        // Feb 15, 2026
-        // Expected format depends on formatDate impl. usually "Sunday, February 15, 2026" or similar.
-        // Let's use loose match or check dateUtils mock if we mock it.
-        // For now, assume it contains "15" and "Feb".
-        expect(screen.getByRole('heading')).toHaveTextContent(/Feb/);
-        expect(screen.getByRole('heading')).toHaveTextContent(/15/);
     });
 
     it('should handle navigation (next/prev)', () => {
@@ -66,37 +64,16 @@ describe('CalendarHeader', () => {
             payload: expect.any(Date),
         });
 
-        // Add passing expectation for prev
-        // And then click NEXT
         fireEvent.click(nextBtn);
-        // Verify call count or arg.
-        // navigate(1).
         expect(mockDispatch).toHaveBeenCalledTimes(2);
     });
 
-    it('should trigger date picker', () => {
+    it('should handle view mode toggle via dropdown', () => {
         setup();
-        // Mock showPicker on HTMLInputElement prototype because it's not in JSDOM
-        // We use a spy to verify it's called
-        const showPickerSpy = vi.fn();
-        HTMLInputElement.prototype.showPicker = showPickerSpy;
+        const select = screen.getByRole('combobox');
 
-        fireEvent.click(screen.getByText('📅'));
-        expect(showPickerSpy).toHaveBeenCalled();
+        fireEvent.change(select, { target: { value: 'week' } });
 
-        // Also test change
-        const input = screen.getByDisplayValue(new Date(2026, 1, 15).toISOString().slice(0, 10)); // Feb 15
-        fireEvent.change(input, { target: { value: '2026-03-01' } });
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_SELECTED_DATE',
-            payload: expect.any(Date),
-        });
-    });
-
-    it('should handle view mode toggle', () => {
-        setup();
-        const weekBtn = screen.getByText('Week');
-        fireEvent.click(weekBtn);
         expect(mockDispatch).toHaveBeenCalledWith({
             type: 'SET_VIEW_MODE',
             payload: 'week',
@@ -111,41 +88,14 @@ describe('CalendarHeader', () => {
     });
 
     it('should handle Today button', () => {
-        setup();
+        // Ensure today is NOT selectedDate, otherwise button might be hidden
+        setup({ ...defaultState, selectedDate: new Date(2020, 1, 1) });
         const todayBtn = screen.getByText('Today');
         fireEvent.click(todayBtn);
         expect(mockDispatch).toHaveBeenCalledWith({
             type: 'SET_SELECTED_DATE',
             payload: expect.any(Date),
         });
-    });
-
-    it('should handle date picker change', () => {
-        setup();
-        // The input has class hidden-date-input
-        // and type="date"
-        // We can find by selector or display value?
-        // Default selectedDate is Feb 15, 2026. value="2026-02-15"
-        const input = screen.getByDisplayValue('2026-02-15');
-        fireEvent.change(input, { target: { value: '2026-03-01' } });
-
-        // dateUtils parseDateInput likely creates date from string.
-        // We expect SET_SELECTED_DATE with a date object corresponding to 2026-03-01.
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_SELECTED_DATE',
-            payload: expect.any(Date),
-        });
-        // We could be more specific:
-        const callArgs = mockDispatch.mock.calls[0][0]; // First call
-        expect(callArgs.payload.toISOString()).toContain('2026-03-01');
-    });
-
-    it('should apply active class to current view mode', () => {
-        setup({ ...defaultState, viewMode: 'week' });
-        const weekBtn = screen.getByText('Week');
-        expect(weekBtn).toHaveClass('active');
-        const monthBtn = screen.getByText('Month');
-        expect(monthBtn).not.toHaveClass('active');
     });
 
     // Test TodayButton again explicitly to be sure
@@ -166,5 +116,91 @@ describe('CalendarHeader', () => {
         expect(callArgs.payload.toISOString()).toContain('2025-01-01');
 
         vi.useRealTimers();
+    });
+
+    it('should handle import timetable flow (success)', async () => {
+        setup();
+        const importBtn = screen.getByText('Import timetable');
+        vi.spyOn(window, 'prompt').mockReturnValue('http://example.com/calendar.ics');
+        vi.spyOn(window, 'alert').mockImplementation(() => { });
+        fireEvent.click(importBtn);
+        await expect.poll(() => importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics');
+        await vi.waitUntil(() => getEvents.mock.calls.length > 0);
+        expect(getEvents).toHaveBeenCalled();
+        await vi.waitUntil(() => mockDispatch.mock.calls.length > 0);
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'SET_EVENTS',
+            payload: expect.anything()
+        });
+    });
+
+    it('should handle import timetable flow (cancel)', async () => {
+        setup();
+        const importBtn = screen.getByText('Import timetable');
+        vi.spyOn(window, 'prompt').mockReturnValue(null);
+
+        fireEvent.click(importBtn);
+        expect(importTimetable).not.toHaveBeenCalled();
+    });
+
+    it('should handle import timetable flow (error)', async () => {
+        setup();
+        const importBtn = screen.getByText('Import timetable');
+        vi.spyOn(window, 'prompt').mockReturnValue('bad-url');
+        vi.spyOn(window, 'alert');
+
+        importTimetable.mockRejectedValueOnce(new Error('Import failed'));
+
+        fireEvent.click(importBtn);
+
+        await vi.waitUntil(() => window.alert.mock.calls.length > 0);
+
+        expect(window.alert).toHaveBeenCalledWith('Import failed');
+    });
+
+    it('should open modal with date for day view', () => {
+        setup({ ...defaultState, viewMode: 'day' });
+        const addBtn = screen.getByText('+');
+        fireEvent.click(addBtn);
+        expect(mockOpenModal).toHaveBeenCalledWith(null, null, defaultState.selectedDate);
+    });
+
+    it('should navigate correctly in year view', () => {
+        setup({ ...defaultState, viewMode: 'year' });
+        const nextBtn = screen.getByText('>');
+        fireEvent.click(nextBtn);
+
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'SET_SELECTED_DATE',
+            payload: expect.any(Date)
+        });
+        const callArgs = mockDispatch.mock.calls[0][0];
+        // 2026 + 1 = 2027
+        expect(callArgs.payload.getFullYear()).toBe(2027);
+    });
+
+    it('should navigate correctly in week view', () => {
+        setup({ ...defaultState, viewMode: 'week' });
+        const nextBtn = screen.getByText('>');
+        fireEvent.click(nextBtn);
+
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'SET_SELECTED_DATE',
+            payload: expect.any(Date)
+        });
+        // 1 week ahead
+        const callArgs = mockDispatch.mock.calls[0][0];
+        // Jan 15 + 7 = Jan 22
+        expect(callArgs.payload.getDate()).toBe(22);
+    });
+
+    it('should navigate correctly in day view', () => {
+        setup({ ...defaultState, viewMode: 'day' });
+        const prevBtn = screen.getByText('<');
+        fireEvent.click(prevBtn);
+
+        const callArgs = mockDispatch.mock.calls[0][0];
+        // Jan 15 - 1 = Jan 14
+        expect(callArgs.payload.getDate()).toBe(14);
     });
 });

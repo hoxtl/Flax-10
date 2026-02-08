@@ -117,4 +117,40 @@ describe('calendarReducer', () => {
         expect(newState.modalEvent).toBeNull();
         expect(newState.modalType).toBeNull();
     });
+
+    // Test filtering logic
+    it('should handle SET_FILTER (toggle)', () => {
+        let state = calendarReducer(initialState, { type: 'SET_FILTER', payload: 'work' });
+        expect(state.filter).toEqual(['work']);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 'study' });
+        expect(state.filter).toEqual(['work', 'study']);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 'work' });
+        expect(state.filter).toEqual(['study']);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 'study' });
+        expect(state.filter).toEqual(['all']);
+    });
+
+    it('should handle SET_FILTER to all', () => {
+        const workState = { ...initialState, filter: ['work', 'study'] };
+        const state = calendarReducer(workState, { type: 'SET_FILTER', payload: 'all' });
+        expect(state.filter).toEqual(['all']);
+    });
+
+    // Test openModalHandler edge cases
+    it('should handle OPEN_MODAL with complex payload', () => {
+        const event = { id: 1 };
+        const date = new Date(2026, 1, 1);
+        const action = {
+            type: 'OPEN_MODAL',
+            payload: {
+                event,
+                type: 'edit',
+                initialDate: date
+            }
+        };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.modalEvent).toEqual(event);
+        expect(newState.modalType).toBe('edit');
+        expect(newState.modalInitialDate).toBe(date);
+    });
 });
