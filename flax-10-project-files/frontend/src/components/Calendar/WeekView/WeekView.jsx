@@ -65,5 +65,14 @@ function DayHeaderCell({ day, name, isToday, onClick }) {
  * Filters events to only those starting on the given day.
  */
 function getEventsForDay(events, date) {
-    return events.filter(e => isSameDay(new Date(e.start_time), date));
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return events.filter(e => {
+        const start = new Date(e.start_time);
+        const end = new Date(e.end_time);
+        return start < dayEnd && end > dayStart;
+    });
 }

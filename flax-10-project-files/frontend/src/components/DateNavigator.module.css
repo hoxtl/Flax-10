@@ -1,7 +1,7 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;       
+  gap: 8px;
   padding: 12px;
 }
 
@@ -9,7 +9,7 @@
 .right {
   display: flex;
   align-items: center;
-  gap: 6px;   
+  gap: 6px;
 }
 
 .center {
@@ -72,8 +72,10 @@
 .today {
   padding: 6px 12px;
   border-radius: 8px;
-  background: rgba(180, 140, 90, 0.15); /* soft brown */
-  color: #6b4e2e;                      /* muted brown text */
+  background: rgba(180, 140, 90, 0.15);
+  /* soft brown */
+  color: #6b4e2e;
+  /* muted brown text */
   border: none;
   font-size: 13px;
   font-weight: 600;
@@ -86,3 +88,26 @@
 
 
 
+
+@media (max-width: 600px) {
+  .row {
+    padding: 8px;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+  }
+
+  .arrow,
+  .calBtn {
+    width: 32px;
+    height: 32px;
+  }
+}

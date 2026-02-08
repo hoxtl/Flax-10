@@ -137,3 +137,35 @@
     background-color: rgba(139, 115, 85, 0.15);
     border: 2px dashed #9E7E5D;
 }
+
+@media (max-width: 768px) {
+    .weekday-label {
+        padding: 0.25rem;
+        font-size: 0.65rem;
+    }
+
+    .week-row {
+        min-height: 60px;
+    }
+
+    .day-cell {
+        min-height: 50px;
+        padding: 2px;
+    }
+
+    .day-number {
+        font-size: 0.75rem;
+    }
+
+    .day-cell.is-today .day-number {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .month-event-dot {
+        font-size: 0.6rem;
+        padding: 1px 2px;
+        border-left-width: 1.5px;
+    }
+}
