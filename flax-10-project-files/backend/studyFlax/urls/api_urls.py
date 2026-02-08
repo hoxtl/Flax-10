@@ -6,6 +6,7 @@ router.register(r"tasks", TaskViewSet, basename="tasks")
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, category_list
+from studyFlax.views.calendar.timetable_views import timetable_import
 from studyFlax.views.hello import hello
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
@@ -22,4 +23,5 @@ urlpatterns = [
     path("auth/register/", register_view, name='auth-register'),
     path("auth/login/", login_view, name='auth-login'),
     path("auth/logout/", logout_view, name='auth-logout'),
+    path("timetable/import/", timetable_import, name="timetable-import"),
 ]
