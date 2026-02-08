@@ -1,5 +1,5 @@
 from django.db import models
-from .userModel import User
+from ..auth.userModel import User
 
 class Module(models.Model):
     module_code = models.CharField(max_length=20, unique=True)

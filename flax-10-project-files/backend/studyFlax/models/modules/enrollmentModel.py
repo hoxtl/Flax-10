@@ -1,5 +1,5 @@
 from django.db import models
-from .userModel import User
+from ..auth.userModel import User
 from .moduleModel import Module
 
 class Enrollment(models.Model):
