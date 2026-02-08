@@ -162,6 +162,16 @@
 
 
 
+.error {
+    color: #dc2626;
+    font-size: 0.9rem;
+    padding: 8px;
+    background: #fee2e2;
+    border-radius: 6px;
+    margin-top: 8px;
+    text-align: center;
+}
+
 .formActions {
     display: flex;
     gap: 12px;
