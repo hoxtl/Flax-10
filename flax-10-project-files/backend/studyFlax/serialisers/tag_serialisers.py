@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from studyFlax.models.tagModel import Tag
-from studyFlax.models.categoryModel import Category
+from studyFlax.models import Tag
+from studyFlax.models import Category
 
 class CategorySerialiser(serializers.ModelSerializer):
     class Meta:
