@@ -36,13 +36,13 @@ export function useCalendarDispatch() {
 }
 
 export function useEventModal() {
-    const { modalEvent, modalType, isModalOpen } = useCalendar();
+    const { modalEvent, modalType, modalInitialDate, isModalOpen } = useCalendar();
     const dispatch = useCalendarDispatch();
 
-    const openModal = (event = null, type = null) => {
-        dispatch({ type: 'OPEN_MODAL', payload: { event, type } });
+    const openModal = (event = null, type = null, initialDate = null) => {
+        dispatch({ type: 'OPEN_MODAL', payload: { event, type, initialDate } });
     };
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
 
-    return { modalEvent, modalType, isModalOpen, openModal, closeModal };
+    return { modalEvent, modalType, modalInitialDate, isModalOpen, openModal, closeModal };
 }
