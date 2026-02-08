@@ -7,6 +7,7 @@ from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, category_list
 from studyFlax.views.hello import hello
+from studyFlax.views.authentication.register_view import register_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -16,4 +17,5 @@ urlpatterns = [
     path("events/<int:pk>/exception/", add_exception_date, name="event-exception"),
     path("tags/", tag_list, name="tag-list"),
     path("categories/", category_list, name="category-list"),
+    path("auth/register/", register_view, name='auth-register'),
 ]
