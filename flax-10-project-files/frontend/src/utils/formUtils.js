@@ -1,10 +1,7 @@
-import { checkOverlapWithConfirm } from './overlapUtils';
+import { findOverlappingEvents } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 
-function checkOverlap(event, allEvents) {
-    const others = allEvents.filter(e => e.id !== event.id);
-    return checkOverlapWithConfirm(event, others);
-}
+
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event);
@@ -36,21 +33,32 @@ function getDefaultForm(options) {
         start_time: formatForInput(now),
         end_time: formatForInput(later),
         recurrence: 'none',
-        tag: options.initialTag || null,
+        tag: options.initialTag || 'other',
         location: '',
         all_day: false,
     };
 }
 
-export async function validateAndSubmit(e, form, event, actions, onClose, setError, allEvents) {
-    e.preventDefault();
-    const validationError = validateForm(form);
-    if (validationError) return setError(validationError);
+export async function validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, allEvents, forceSave = false) {
+    if (e) e.preventDefault();
+    const error = validateForm(form);
+    if (error) return setError(error);
 
     const data = buildEventData(form);
-    if (!checkOverlap({ ...data, id: event?.id }, allEvents)) return;
+    if (!forceSave && hasOverlaps(data, event, allEvents, setOverlapWarning)) return;
 
     await submitEvent(event, data, actions, onClose, setError);
+}
+
+function hasOverlaps(data, event, allEvents, setOverlapWarning) {
+    const others = allEvents.filter(e => e.id !== (event?.id));
+    const overlapping = findOverlappingEvents({ ...data, id: event?.id }, others);
+
+    if (overlapping.length > 0) {
+        setOverlapWarning(overlapping);
+        return true;
+    }
+    return false;
 }
 
 function validateForm(form) {
@@ -79,15 +87,20 @@ async function saveEvent(event, data, actions) {
 }
 
 async function handleRecurringEdit(event, data, actions) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
-    );
+    const choice = confirmRecurringEdit();
     const baseId = extractBaseEventId(event.id);
+
     if (choice) {
         await actions.editEvent(baseId, data);
     } else {
         await editSingleOccurrence(event, data, actions, baseId);
     }
+}
+
+function confirmRecurringEdit() {
+    return window.confirm(
+        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
+    );
 }
 
 async function editSingleOccurrence(event, data, actions, baseId) {
@@ -139,7 +152,8 @@ function buildBaseEventData(form) {
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
-        tag: form.tag || null,
+        tag_name: form.tag || null, // Map form 'tag' (ID) to backend 'tag_name'
+        tag: form.tag || null,      // Keep 'tag' for backward compatibility if needed
         all_day: form.all_day,
     };
 }
@@ -153,15 +167,10 @@ function addRecurrenceIfNeeded(data, form) {
 }
 
 function formatForInput(d) {
-    const date = d ? (typeof d === 'string' ? new Date(d) : d) : new Date();
-    return toLocalISOString(date);
-}
-
-function toLocalISOString(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    if (!d) return new Date().toISOString().slice(0, 16); // Fallback
+    const date = typeof d === 'string' ? new Date(d) : d;
+    // Adjust for timezone to ensure the input shows local time
+    const offset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toISOString().slice(0, 16);
 }

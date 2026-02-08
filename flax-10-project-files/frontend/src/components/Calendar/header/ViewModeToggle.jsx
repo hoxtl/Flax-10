@@ -1,4 +1,4 @@
-import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
+import { } from '../../../context/CalendarContext';
 
 export function ViewModeToggle({ viewMode, dispatch }) {
     const modes = ['day', 'week', 'month'];

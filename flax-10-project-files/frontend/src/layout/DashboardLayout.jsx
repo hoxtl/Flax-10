@@ -62,13 +62,13 @@ function QuickAddGate({ open, onClose, onSelectType }) {
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const isMobile = useIsMobile(900);
-  const user = useMemo(getUser, []);
+  const user = useMemo(() => getUser(), []);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const { openModal, isModalOpen, modalEvent, modalType, closeModal } = useEventModal();
+  const { openModal, isModalOpen, modalEvent, modalType, modalInitialDate, closeModal } = useEventModal();
 
   function onToggle() {
     toggleByDevice(isMobile, setMobileSidebarOpen, setSidebarCollapsed);
@@ -81,7 +81,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
   function onSelectType(type) {
     setShowQuickAdd(false);
-    openModal(null, type);
+    openModal(null, type, selectedDate);
   }
 
   return (
@@ -92,7 +92,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         {children}
       </MainArea>
       <QuickAddGate open={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSelectType={onSelectType} />
-      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} onClose={closeModal} />}
+      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
     </div>
   );
 }

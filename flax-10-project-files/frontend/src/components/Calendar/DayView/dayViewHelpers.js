@@ -43,7 +43,8 @@ function getBaseStyle(start, end, slotHeight) {
         top: `${(startMins / 60) * slotHeight + 1}px`,
         height: `${(duration / 60) * slotHeight - 2}px`,
         width: '100%',
-        left: '0'
+        left: '0',
+        position: 'absolute'
     };
 }
 

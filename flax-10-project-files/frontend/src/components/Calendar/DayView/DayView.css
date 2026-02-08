@@ -4,7 +4,8 @@
     background: white;
     border-radius: 8px;
     overflow-y: auto;
-    max-height: 80vh;
+    flex: 1;
+    min-height: 0;
 }
 
 .sticky-header {

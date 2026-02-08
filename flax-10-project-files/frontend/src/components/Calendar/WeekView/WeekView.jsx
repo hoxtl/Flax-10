@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
-import { getWeekDays, isSameDay, overlapsDay, isAllDayEvent } from '../../../utils/dateUtils';
+import { getWeekDays, isSameDay, overlapsDay } from '../../../utils/dateUtils';
 import { DayColumn } from './DayColumn';
 import { AllDayRow } from './components/AllDayRow';
 import { TimeLabels } from './TimeLabels';
@@ -21,7 +21,7 @@ export function WeekView() {
 
     // Auto-scroll logic: filter out all-day events to find start time
     const timedEventsForAutoScroll = eventsForWeek.filter(e => shouldShowInTimeGrid(e, new Date(e.start_time)));
-    useAutoScroll(scrollRef, timedEventsForAutoScroll);
+    useAutoScroll(scrollRef, timedEventsForAutoScroll, weekDays[0].toISOString());
 
     return (
         <div className="week-view" ref={scrollRef}>

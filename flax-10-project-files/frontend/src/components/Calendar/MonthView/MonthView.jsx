@@ -22,9 +22,6 @@ export function MonthView() {
     );
 }
 
-/*
-    Get weeks for the given date.
-*/
 function getMonthWeeks(date) {
     const weeks = [];
     const current = getStartDate(date);

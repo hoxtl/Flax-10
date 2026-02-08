@@ -1,4 +1,4 @@
-import { overlapsDay, isSameDay, startOfDay } from './dateUtils';
+import { overlapsDay, startOfDay } from './dateUtils';
 
 export function isAllDayEvent(event) {
     if (event.all_day || event.is_all_day || event.allDay) return true;

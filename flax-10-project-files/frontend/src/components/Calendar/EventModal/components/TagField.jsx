@@ -1,17 +1,15 @@
-const TAG_OPTIONS = [
-    { value: '', label: 'None' },
-    { value: 'class', label: 'Class' },
-    { value: 'study', label: 'Study Block' },
-    { value: 'task', label: 'Task' },
-    { value: 'other', label: 'Other' },
-];
+import { useTags } from '../../../../context/TagContext';
 
 export function TagField({ value, onChange }) {
+    const { tags } = useTags();
+
     return (
         <div className="form-field">
             <label htmlFor="field-tag">Type</label>
             <select id="field-tag" value={value || ''} onChange={onChange}>
-                {TAG_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                {tags.map(tag => (
+                    <option key={tag.id} value={tag.id}>{tag.label}</option>
+                ))}
             </select>
         </div>
     );
