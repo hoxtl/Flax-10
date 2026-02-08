@@ -57,7 +57,7 @@ function walkDir(dir, results = []) {
   return results;
 }
 
-const targetDir = process.argv[2] || 'src';
+const targetDir = process.argv[2] || '../../frontend/src';  // Updated path
 const results = walkDir(targetDir);
 results.sort((a, b) => b.lines - a.lines);
 
