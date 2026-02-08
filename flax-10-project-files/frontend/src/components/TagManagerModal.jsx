@@ -47,12 +47,61 @@ function ModalHeader({ onClose }) {
 /**
  * Decides whether to render the list of tags or the edit/add form.
  */
+// ... (imports remain)
+
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
     if (editingId || isAdding) {
-        const initialData = editingId ? tags.find(t => t.id === editingId) : { label: '', color: '#000000', icon: '⭐' };
+        // Remove default icon
+        const initialData = editingId ? tags.find(t => t.id === editingId) : { label: '', color: '#000000', icon: '' };
         return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} />;
     }
     return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
+}
+
+// ... (TagList, TagItem, etc. remain)
+
+function TagForm({ initialData, onSave, onCancel }) {
+    const [form, setForm] = useState(initialData);
+    const [error, setError] = useState('');
+
+    const isIconValid = (icon) => {
+        if (!icon) return false;
+        const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
+        const isPlainAlphaNumeric = /^[a-zA-Z0-9]+$/.test(icon);
+        return hasEmoji && !isPlainAlphaNumeric;
+    };
+
+    const handleSaveClick = () => {
+        if (!form.label.trim()) {
+            setError("Name is required.");
+            return;
+        }
+        if (!form.icon) {
+            setError("Icon is required.");
+            return;
+        }
+        if (!isIconValid(form.icon)) {
+            setError("Only emojis allowed.");
+            return;
+        }
+        setError('');
+        onSave(form);
+    };
+
+    const handleChange = (field, value) => {
+        setForm({ ...form, [field]: value });
+        if (error) setError(''); // Clear error on change
+    };
+
+    return (
+        <div className={`${styles.content} ${styles.form}`}>
+            <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" />
+            <ColorInput value={form.color} onChange={v => handleChange('color', v)} />
+            <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => handleChange('icon', v)} placeholder="e.g. 🏋️" />
+            {error && <div className={styles.error}>{error}</div>}
+            <FormActions onSave={handleSaveClick} onCancel={onCancel} />
+        </div>
+    );
 }
 
 /**
@@ -110,19 +159,7 @@ function TagActions({ id, onEdit, onDelete }) {
     );
 }
 
-function TagForm({ initialData, onSave, onCancel }) {
-    const [form, setForm] = useState(initialData);
-    const isValid = form.label && form.icon;
 
-    return (
-        <div className={`${styles.content} ${styles.form}`}>
-            <TextInput label="Name" value={form.label} onChange={v => setForm({ ...form, label: v })} placeholder="e.g. Gym" />
-            <ColorInput value={form.color} onChange={v => setForm({ ...form, color: v })} />
-            <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => setForm({ ...form, icon: v })} placeholder="e.g. 🏋️" />
-            <FormActions onSave={() => onSave(form)} onCancel={onCancel} disabled={!isValid} />
-        </div>
-    );
-}
 
 function TextInput({ label, value, onChange, placeholder }) {
     return (
