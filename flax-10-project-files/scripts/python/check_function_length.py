@@ -55,7 +55,7 @@ def check_file(filepath):
 
 # Collect all results
 all_results = []
-for root, dirs, files in os.walk('recipes'):
+for root, dirs, files in os.walk('../../backend/studyFlax'):  # Updated path
     dirs[:] = [d for d in dirs if d not in ['__pycache__', 'migrations']]
     for file in files:
         if file.endswith('.py'):
