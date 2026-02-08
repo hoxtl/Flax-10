@@ -15,7 +15,7 @@ function getFormFromEvent(event) {
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
         recurrence: event.recurrence_details?.frequency || 'none',
-        tag: event.tag_name || event.tag_details?.name || '',
+        tag: event.tag_name || event.tag_details?.name || 'other', // Default to 'other'
         location: event.locution || event.location || '',
         all_day: event.all_day || event.is_all_day || event.allDay || (
             formatForInput(event.start_time).endsWith('T00:00') &&
