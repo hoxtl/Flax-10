@@ -27,11 +27,9 @@ def create_enrollments(request):
 def enrollment_detail(request, enrollment_id):
     enrollment = get_object_or_404(Enrollment, id=enrollment_id)
     user = request.user
-
     if request.method == 'GET':
         return Response(EnrollmentSerialiser(enrollment).data)
     return delete_enrollment(request, enrollment, user)
-
 def delete_enrollment(request, enrollment, user):
     if enrollment.student != user:
         return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
