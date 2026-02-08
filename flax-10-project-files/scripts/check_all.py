@@ -141,7 +141,7 @@ def check_nesting(target_dir):
     return violations
 
 def main():
-    target = '../../backend/studyFlax'
+    target = '../backend/studyFlax'
     
     print_header()
     
