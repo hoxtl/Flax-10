@@ -5,7 +5,7 @@ Check Band V requirements:
 - **Nesting**: ≤1 level (tests: ≤2 levels)
 - **Files**: ≤400 lines total
 
-## 🚀 Run Checks
+## Run Checks
 
 From the `scripts/` directory:
 ```bash
@@ -16,14 +16,13 @@ python check_all.py
 node check_all.js
 ```
 
-## 💡 When to Run
+## When to Run
 
 - Before every commit
-- Before creating a PR
 - During code reviews
 - Before final submission
 
-## 📁 What Gets Checked
+## What Gets Checked
 
 - **Backend**: `backend/studyFlax/*.py`
 - **Frontend**: `frontend/src/*.{js,jsx}`
