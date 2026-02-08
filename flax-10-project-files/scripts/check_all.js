@@ -200,7 +200,7 @@ function checkNesting(targetDir) {
 }
 
 function main() {
-  const target = '../../frontend/src';
+  const target = '../frontend/src'; 
   
   printHeader();
   
