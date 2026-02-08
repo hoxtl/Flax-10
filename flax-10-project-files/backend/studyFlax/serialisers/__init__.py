@@ -1,2 +1,3 @@
 from .event_serialisers import CalendarEventSerialiser, CalendarEventCreateSerialiser
 from .tag_serialisers import TagSerialiser, CategorySerialiser
+from .auth_serialisers import RegistrationUserSerialiser, UserSerialiser, LoggedUserSerialiser
