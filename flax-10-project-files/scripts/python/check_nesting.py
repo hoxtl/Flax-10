@@ -2,10 +2,6 @@ import ast
 import sys
 import os
 
-
-# TO RUN type in "python check_nesting.py"
-
-
 def get_nesting_level(node, level=0):
     """Get the maximum nesting level in a node."""
     max_level = level
@@ -48,7 +44,7 @@ def check_file(filepath):
 
 def main():
     # Find all Python files except migrations and __pycache__
-    for root, dirs, files in os.walk('recipes'):
+    for root, dirs, files in os.walk('../../backend/studyFlax'):  # Updated path
         # Skip these directories
         dirs[:] = [d for d in dirs if d not in ['__pycache__', 'migrations']]
         
