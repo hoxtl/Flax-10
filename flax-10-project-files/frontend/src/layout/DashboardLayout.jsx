@@ -74,7 +74,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const { openModal, isModalOpen, modalEvent, modalType, closeModal } = useEventModal();
+  const { openModal, isModalOpen, modalEvent, modalType, modalInitialDate, closeModal } = useEventModal();
 
   function onToggle() {
     toggleByDevice(isMobile, setMobileSidebarOpen, setSidebarCollapsed);
@@ -87,7 +87,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
   function onSelectType(type) {
     setShowQuickAdd(false);
-    openModal(null, type);
+    openModal(null, type, selectedDate);
   }
 
   function handleSettingsClick() {
@@ -130,7 +130,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         onClose={() => setShowQuickAdd(false)} 
         onSelectType={onSelectType} 
       />
-      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} onClose={closeModal} />}
+      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
     </div>
   );
 }
