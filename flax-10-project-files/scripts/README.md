@@ -2,7 +2,7 @@
 
 Check Band V requirements: 
 - **Functions**: ≤15 lines (tests: ≤25 lines)
-- **Nesting**: ≤1 level (tests: ≤2 levels)
+- **Nesting**: ≤1 level 
 - **Files**: ≤400 lines total
 
 ## Run Checks
