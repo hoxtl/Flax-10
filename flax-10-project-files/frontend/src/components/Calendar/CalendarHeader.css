@@ -39,6 +39,58 @@
     /* Push to left? No, flex space-between handles this but we need to prevent overlap */
 }
 
+.btn-import-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-import-tooltip {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2a2a2a;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease-in-out;
+    z-index: 10;
+}
+
+.btn-import-tooltip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -4px;
+    transform: translateX(-50%);
+    border-width: 4px 4px 0;
+    border-style: solid;
+    border-color: #2a2a2a transparent transparent;
+}
+
+.btn-import-wrapper:hover .btn-import-tooltip {
+    opacity: 1;
+}
+
+.btn-import {
+    background: #3a3a3a;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.btn-import:hover {
+    background: #2a2a2a;
+}
+
 .btn-add {
     background: transparent !important;
     border: none;

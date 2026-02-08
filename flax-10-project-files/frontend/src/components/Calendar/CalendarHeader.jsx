@@ -1,5 +1,8 @@
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
+import { getEvents } from "../../api/event_api";
+import { importTimetable } from "../../api/timetable_api";
+import { getDateRangeForView } from "../../hooks/calendarHelpers";
 import { NavigationButtons } from "./header/NavigationButtons";
 import { ViewModeToggle } from "./header/ViewModeToggle";
 import './CalendarHeader.css';
@@ -21,22 +24,25 @@ export function CalendarHeader() {
 }
 
 function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
-    const handleAddClick = () => {
-        if (viewMode === 'day') {
-            openModal(null, null, selectedDate);
-        } else {
-            openModal();
-        }
-    };
-
+    const handleAddClick = () => openForView(openModal, viewMode, selectedDate);
+    const handleImportClick = () => handleImport(dispatch, selectedDate, viewMode);
     return (
         <div className="actions">
+            <ImportButton onImport={handleImportClick} />
             <button className="btn-add" onClick={handleAddClick}>+</button>
             <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
         </div>
     );
 }
 
+function ImportButton({ onImport }) {
+    return (
+        <div className="btn-import-wrapper">
+            <button className="btn-import" onClick={onImport}>Import timetable</button>
+            <span className="btn-import-tooltip">Import your timetable using the shareable link</span>
+        </div>
+    );
+}
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
     if (viewMode === 'year') {
@@ -62,3 +68,27 @@ function getWeekTitle(selectedDate) {
     return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }
 
+function openForView(openModal, viewMode, selectedDate) {
+    if (viewMode === 'day') {
+        openModal(null, null, selectedDate);
+    } else {
+        openModal();
+    }
+}
+
+async function handleImport(dispatch, selectedDate, viewMode) {
+    const sourceUrl = window.prompt("Paste timetable URL (.ics or timetable page)");
+    if (!sourceUrl) return;
+    try {
+        await importTimetable(sourceUrl.trim());
+        await reloadEvents(dispatch, selectedDate, viewMode);
+    } catch (error) {
+        window.alert(error?.message || "Failed to import timetable");
+    }
+}
+
+async function reloadEvents(dispatch, selectedDate, viewMode) {
+    const { start, end } = getDateRangeForView(selectedDate, viewMode);
+    const data = await getEvents({ start, end });
+    dispatch({ type: 'SET_EVENTS', payload: data });
+}
