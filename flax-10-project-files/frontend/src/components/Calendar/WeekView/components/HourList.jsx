@@ -1,0 +1,13 @@
+import { HourCell } from './HourCell';
+import { getHoursOfDay } from '../../DayView/dayViewHelpers';
+
+export function HourList({ date }) {
+    const hours = getHoursOfDay();
+    return (
+        <>
+            {hours.map(hour => (
+                <HourCell key={hour} hour={hour} date={date} />
+            ))}
+        </>
+    );
+}

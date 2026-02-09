@@ -43,6 +43,13 @@ export function isSameDay(date1, date2) {
     return date1.toDateString() === date2.toDateString();
 }
 
+export function overlapsDay(eventStart, eventEnd, day) {
+    const dayStart = startOfDay(day);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    return eventStart < dayEnd && eventEnd > dayStart;
+}
+
 export function isSameMonth(date1, date2) {
     return date1.getFullYear() === date2.getFullYear()
         && date1.getMonth() === date2.getMonth();
@@ -101,4 +108,11 @@ export function formatDayLabel(date, today = new Date()) {
         day: "2-digit",
         year: "numeric",
     });
+}
+
+export function isAllDayEvent(event) {
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    const duration = (end - start) / (1000 * 60 * 60);
+    return duration >= 24;
 }

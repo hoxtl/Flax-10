@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from studyFlax.models import CalendarEvent
 from studyFlax.serialisers import CalendarEventSerialiser, CalendarEventCreateSerialiser
 from .event_helpers import filter_events_by_date_range, check_event_overlap, expand_recurring_events, parse_date_param
+from .timetable_service import sync_timetable_if_needed
 
 @api_view(['GET', 'POST'])
 # TODO: Enable authentication when ready
@@ -15,6 +16,7 @@ def event_list(request):
     return create_event(request)
 
 def get_events(request):
+    safe_sync_timetable()
     events = CalendarEvent.objects.all()
     events = filter_events_by_date_range(events, request.query_params)
     start_date = parse_date_param(request.query_params.get('start'))
@@ -22,6 +24,12 @@ def get_events(request):
     expanded_events = expand_recurring_events(list(events), start_date, end_date)
     serialiser = CalendarEventSerialiser(expanded_events, many=True)
     return Response(serialiser.data)
+
+def safe_sync_timetable():
+    try:
+        sync_timetable_if_needed()
+    except Exception:
+        pass
 
 def create_event(request):
     serialiser = CalendarEventCreateSerialiser(data=request.data)

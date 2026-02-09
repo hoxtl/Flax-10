@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
-import { getWeekDays, isSameDay } from '../../../utils/dateUtils';
+import { getWeekDays, isSameDay, overlapsDay } from '../../../utils/dateUtils';
 import { DayColumn } from './DayColumn';
+import { AllDayRow } from './components/AllDayRow';
 import { TimeLabels } from './TimeLabels';
 import { useAutoScroll } from '../../../hooks/useAutoScroll';
 import './WeekView.css';
@@ -10,27 +11,62 @@ import './WeekView.css';
  * Week view shows 7 day columns with hour rows.
  * Each column shows that day's events.
  */
+import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
+
 export function WeekView() {
     const { selectedDate, events } = useCalendar();
     const scrollRef = useRef(null);
     const weekDays = getWeekDays(selectedDate);
-    useAutoScroll(scrollRef, getEventsForWeek(events, weekDays));
+    const eventsForWeek = getEventsForWeek(events, weekDays);
+
+    // Auto-scroll logic: filter out all-day events to find start time
+    const timedEventsForAutoScroll = eventsForWeek.filter(e => shouldShowInTimeGrid(e, new Date(e.start_time)));
+    useAutoScroll(scrollRef, timedEventsForAutoScroll, weekDays[0].toISOString());
+
     return (
         <div className="week-view" ref={scrollRef}>
-            <WeekHeader days={weekDays} />
-            <div className="week-grid">
-                <TimeLabels />
-                {weekDays.map(day => <DayColumn key={day.toISOString()} date={day} events={getEventsForDay(events, day)} />)}
+            <div className="sticky-header">
+                <WeekHeader days={weekDays} />
+                <AllDayRow days={weekDays} events={eventsForWeek} />
             </div>
+            <WeekGrid days={weekDays} events={eventsForWeek} />
         </div>
     );
+}
+
+function WeekGrid({ days, events }) {
+    return (
+        <div className="week-grid">
+            <TimeLabels />
+            {days.map(day => (
+                <DayColumn
+                    key={day.toISOString()}
+                    date={day}
+                    events={getTimedEventsForDay(events, day)}
+                />
+            ))}
+        </div>
+    );
+}
+
+function getTimedEventsForDay(events, day) {
+    return getEventsForDay(events, day).filter(e => shouldShowInTimeGrid(e, day));
 }
 
 /**
  * Filter events for the entire week
  */
 function getEventsForWeek(events, weekDays) {
-    return events.filter(e => weekDays.some(day => isSameDay(new Date(e.start_time), day)));
+    const weekStart = new Date(weekDays[0]);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekDays[weekDays.length - 1]);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    return events.filter(e => {
+        const start = new Date(e.start_time);
+        const end = new Date(e.end_time);
+        return start < weekEnd && end > weekStart;
+    });
 }
 
 /**
@@ -65,14 +101,5 @@ function DayHeaderCell({ day, name, isToday, onClick }) {
  * Filters events to only those starting on the given day.
  */
 function getEventsForDay(events, date) {
-    const dayStart = new Date(date);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(date);
-    dayEnd.setHours(23, 59, 59, 999);
-
-    return events.filter(e => {
-        const start = new Date(e.start_time);
-        const end = new Date(e.end_time);
-        return start < dayEnd && end > dayStart;
-    });
+    return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), date));
 }

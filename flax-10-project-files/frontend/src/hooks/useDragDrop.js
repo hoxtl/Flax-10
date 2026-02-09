@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../utils/dragUtils';
 
 export function useDrag({ type, data }) {
@@ -27,11 +27,7 @@ function createDragHandlers(type, data, setIsDragging) {
 export function useDrop({ accept, onDrop }) {
     const [isOver, setIsOver] = useState(false);
     const dragCounter = useRef(0);
-    const dropProps = createDropHandlers(accept, onDrop, setIsOver, dragCounter);
-    return { dropProps, isOver };
-}
 
-function createDropHandlers(accept, onDrop, setIsOver, dragCounter) {
     const handleDrop = (e) => {
         e.preventDefault();
         setIsOver(false);
@@ -40,10 +36,23 @@ function createDropHandlers(accept, onDrop, setIsOver, dragCounter) {
         if (payload) onDrop(payload, e);
     };
 
-    return {
-        onDragEnter: (e) => (e.preventDefault(), dragCounter.current++, setIsOver(true)),
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        dragCounter.current++;
+        setIsOver(true);
+    };
+
+    const handleDragLeave = () => {
+        dragCounter.current--;
+        if (dragCounter.current === 0) setIsOver(false);
+    };
+
+    const dropProps = {
+        onDragEnter: handleDragEnter,
         onDragOver: handleDragOverEffect,
-        onDragLeave: () => (--dragCounter.current === 0 && setIsOver(false)),
+        onDragLeave: handleDragLeave,
         onDrop: handleDrop,
     };
+
+    return { dropProps, isOver };
 }

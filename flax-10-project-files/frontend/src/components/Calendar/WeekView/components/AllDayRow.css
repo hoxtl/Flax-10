@@ -1,0 +1,48 @@
+.all-day-row {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 2rem;
+    flex-shrink: 0;
+    background-color: #fbfaf9;
+}
+
+.all-day-label {
+    width: 53px;
+    font-size: 0.75rem;
+    color: #9E7E5D;
+    /* Matches time labels */
+    padding: 4px;
+    border-right: 1px solid #f6f4f1;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.all-day-grid {
+    flex: 1;
+    display: grid;
+    position: relative;
+}
+
+.all-day-cell {
+    border-right: 1px solid #f6f4f1;
+    height: 100%;
+    grid-row: 1 / -1;
+}
+
+.all-day-event-bar {
+    margin: 2px 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 10;
+    cursor: pointer;
+    align-self: start;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

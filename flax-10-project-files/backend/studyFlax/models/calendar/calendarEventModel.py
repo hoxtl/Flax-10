@@ -14,7 +14,7 @@ PRIORITY_CHOICES = [
 class CalendarEvent(models.Model):
     # TODO: Make user field required when authentication is enabled
     # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='events')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
     start_time = models.DateTimeField()
@@ -28,4 +28,6 @@ class CalendarEvent(models.Model):
     )
     recurrence_rule = models.ForeignKey(RecurrenceRule, on_delete=models.SET_NULL, null=True, blank=True)
     reminder_minutes = models.PositiveIntegerField(null=True, blank=True)
+    source = models.CharField(max_length=100, null=True, blank=True)
+    external_id = models.CharField(max_length=255, null=True, blank=True)
     

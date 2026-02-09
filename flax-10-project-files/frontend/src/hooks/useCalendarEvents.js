@@ -12,12 +12,9 @@ import { getDateRangeForView } from './calendarHelpers';
 export function useCalendarEvents() {
     const { selectedDate, viewMode, events } = useCalendar();
     const dispatch = useCalendarDispatch();
-    // Fetches events from the API based on the current date range being viewed
-    // Uses useCallback so it doesn't get recreated on every render, preventing infinite loops
     const loadEvents = useCallback(async () => {
         dispatch({ type: 'SET_LOADING', payload: true });
         try {
-            // Figure out what date range we need based on day/week/month view
             const { start, end } = getDateRangeForView(selectedDate, viewMode);
             const data = await getEvents({ start, end });
             dispatch({ type: 'SET_EVENTS', payload: data });
@@ -25,10 +22,7 @@ export function useCalendarEvents() {
             dispatch({ type: 'SET_ERROR', payload: error.message });
         }
     }, [selectedDate, viewMode, dispatch]);
-    // Automatically fetch events whenever date or view mode changes
-    useEffect(() => {
-        loadEvents();
-    }, [loadEvents]);
+    useEffect(() => { loadEvents(); }, [loadEvents]);
     return { events, loadEvents };
 }
 

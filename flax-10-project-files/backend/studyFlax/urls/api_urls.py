@@ -1,14 +1,16 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from studyFlax.views.tasks.taskViews import TaskViewSet
 router = DefaultRouter()
-router.register(r"tasks", TaskViewSet, basename="tasks")
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, category_list
+from studyFlax.views.calendar.timetable_views import timetable_import
 from studyFlax.views.hello import hello
 from studyFlax.views.modules.module_views import module_list, module_detail
 from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
+from studyFlax.views.authentication.register_view import register_view
+from studyFlax.views.authentication.login_view import login_view
+from studyFlax.views.authentication.logout_view import logout_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -21,5 +23,9 @@ urlpatterns = [
     path("modules/", module_list, name="module_list"),
     path("modules/<int:module_id>/", module_detail, name="module_detail"),
     path("enrollments/", enrollment_list, name="enrollment_list"),
-    path("enrollments/<int:enrollment_id>/", enrollment_detail, name="enrollment_detail")
+    path("enrollments/<int:enrollment_id>/", enrollment_detail, name="enrollment_detail"),
+    path("auth/register/", register_view, name='auth-register'),
+    path("auth/login/", login_view, name='auth-login'),
+    path("auth/logout/", logout_view, name='auth-logout'),
+    path("timetable/import/", timetable_import, name="timetable-import"),
 ]

@@ -7,12 +7,7 @@ from .calendar.calendarEventModel import *
 from .calendar.categoryModel import *
 from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
-
-# Tasks
-from .tasks.taskModel import *
-
-# Todos
-from .todos.todoListModel import *
+from .calendar.timetableSourceModel import *
 
 # Module
 from modules.moduleModel import *
