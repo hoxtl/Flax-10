@@ -2,15 +2,16 @@
 """
 Code Quality Checker - BAND V COMPLIANCE
 Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file
+Test files: ≤25 lines for test functions | ≤2 nesting | 
 """
 
 import os
 import ast
 
-# ANSI Colors - Adjusted for terminal compatibility
+# ANSI Colors
 class Colors:
     RED = '\033[91m'
-    YELLOW = '\033[33m'  # Standard yellow
+    YELLOW = '\033[33m'
     MAGENTA = '\033[95m'
     BOLD = '\033[1m'
     END = '\033[0m'
@@ -19,11 +20,16 @@ def print_header():
     print(f"\n{'='*75}")
     print(f"{Colors.BOLD}{Colors.MAGENTA}{'BAND V CODE QUALITY REPORT - PYTHON'.center(75)}{Colors.END}")
     print(f"{'='*75}")
-    print(f"Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file\n")
+    print(f"Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file")
+    print(f"Test files: ≤25 lines for test functions\n")
 
 def print_section(number, title):
     print(f"\n{Colors.BOLD}{Colors.YELLOW}{number}. {title}{Colors.END}")
     print(f"{'─'*75}")
+
+def print_subsection(title):
+    print(f"\n{Colors.BOLD}{title}{Colors.END}")
+    print(f"{'·'*75}")
 
 def shorten_path(path):
     return path.replace('../backend/studyFlax/', '')
@@ -149,13 +155,29 @@ def main():
     print_section("1", "FUNCTION LENGTH")
     func_violations = check_function_length(target)
     
-    if func_violations:
-        print(f"\n{Colors.RED}❌ {len(func_violations)} VIOLATION(S){Colors.END}\n")
-        for v in sorted(func_violations, key=lambda x: x['lines'], reverse=True):
+    # Separate regular and test violations
+    regular_func = [v for v in func_violations if not v['is_test']]
+    test_func = [v for v in func_violations if v['is_test']]
+    
+    # Regular files
+    print_subsection("Regular Files (≤15 lines)")
+    if regular_func:
+        print(f"\n{Colors.RED}❌ {len(regular_func)} VIOLATION(S){Colors.END}\n")
+        for v in sorted(regular_func, key=lambda x: x['lines'], reverse=True):
             print(f"{Colors.BOLD}{v['file']}{Colors.END}")
             print(f"  {v['name']}() → {Colors.RED}{v['lines']} lines{Colors.END} (limit: {v['limit']})\n")
     else:
-        print(f"\n✅ All functions meet Band V requirements\n")
+        print(f"\n✅ All regular functions meet Band V requirements\n")
+    
+    # Test files
+    print_subsection("Test Files (≤25 lines)")
+    if test_func:
+        print(f"\n{Colors.RED}❌ {len(test_func)} VIOLATION(S){Colors.END}\n")
+        for v in sorted(test_func, key=lambda x: x['lines'], reverse=True):
+            print(f"{Colors.BOLD}{v['file']}{Colors.END}")
+            print(f"  {v['name']}() → {Colors.RED}{v['lines']} lines{Colors.END} (limit: {v['limit']})\n")
+    else:
+        print(f"\n✅ All test functions meet Band V requirements\n")
     
     # 2. File Length
     print_section("2", "FILE LENGTH")
@@ -173,13 +195,29 @@ def main():
     print_section("3", "NESTING DEPTH")
     nest_violations = check_nesting(target)
     
-    if nest_violations:
-        print(f"\n{Colors.RED}❌ {len(nest_violations)} VIOLATION(S){Colors.END}\n")
-        for v in sorted(nest_violations, key=lambda x: x['nesting'], reverse=True):
+    # Separate regular and test violations
+    regular_nest = [v for v in nest_violations if not v['is_test']]
+    test_nest = [v for v in nest_violations if v['is_test']]
+    
+    # Regular files
+    print_subsection("Regular Files (≤1 level)")
+    if regular_nest:
+        print(f"\n{Colors.RED}❌ {len(regular_nest)} VIOLATION(S){Colors.END}\n")
+        for v in sorted(regular_nest, key=lambda x: x['nesting'], reverse=True):
             print(f"{Colors.BOLD}{v['file']}{Colors.END}")
             print(f"  {v['name']}() → {Colors.RED}{v['nesting']} levels{Colors.END} (limit: {v['limit']})\n")
     else:
-        print(f"\n✅ All functions meet Band V requirements\n")
+        print(f"\n✅ All regular functions meet Band V requirements\n")
+    
+    # Test files
+    print_subsection("Test Files (≤2 levels)")
+    if test_nest:
+        print(f"\n{Colors.RED}❌ {len(test_nest)} VIOLATION(S){Colors.END}\n")
+        for v in sorted(test_nest, key=lambda x: x['nesting'], reverse=True):
+            print(f"{Colors.BOLD}{v['file']}{Colors.END}")
+            print(f"  {v['name']}() → {Colors.RED}{v['nesting']} levels{Colors.END} (limit: {v['limit']})\n")
+    else:
+        print(f"\n✅ All test functions meet Band V requirements\n")
     
     # Summary
     print(f"{'─'*75}")
@@ -188,9 +226,9 @@ def main():
     
     total_violations = len(func_violations) + len(file_violations) + len(nest_violations)
     
-    print(f"Function Length:  {'❌' if func_violations else '✅'} {len(func_violations)} violation(s)")
+    print(f"Function Length:  {'❌' if func_violations else '✅'} {len(func_violations)} violation(s) ({len(regular_func)} regular, {len(test_func)} test)")
     print(f"File Length:      {'❌' if file_violations else '✅'} {len(file_violations)} violation(s)")
-    print(f"Nesting Depth:    {'❌' if nest_violations else '✅'} {len(nest_violations)} violation(s)")
+    print(f"Nesting Depth:    {'❌' if nest_violations else '✅'} {len(nest_violations)} violation(s) ({len(regular_nest)} regular, {len(test_nest)} test)")
     
     print(f"\n{'='*75}")
     
