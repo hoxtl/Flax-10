@@ -1,4 +1,4 @@
-import styles from "./TopBar.module.css";
+import styles from "./Topbar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
 import { getInitials } from "../utils/userUtils";
