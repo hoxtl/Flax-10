@@ -68,7 +68,6 @@ function QuickAddGate({ open, onClose, onSelectType }) {
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const isMobile = useIsMobile(900);
-  const user = useMemo(() => getUser(), []);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
