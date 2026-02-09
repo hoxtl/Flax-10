@@ -1,9 +1,9 @@
-# Node / Frontend
-node_modules/
+# Vite / React specific
 dist/
 dist-ssr/
 .vite/
 
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -14,8 +14,7 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 
-# Env Files
+# Env
 .env
 .env.*

@@ -1,0 +1,40 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual env
+venv/
+.venv/
+env/
+frontend/venv/
+backend/venv/
+
+*.log
+db.sqlite3
+*.sqlite3
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# env Files
+.env
+.env.*
+!.env.example
+
+# Node 
+node_modules/
+package-lock.jsonpackage-lock.json

@@ -17,60 +17,44 @@ export function DraggableEvent({ event, style }) {
     const resizeJustEnded = useRef(false);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
-    const handleClick = createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event);
+    const handleClick = () => {
+        if (resizeJustEnded.current) { resizeJustEnded.current = false; return; }
+        if (!isDragging && !isResizing) openModal(event);
+    };
 
     return (
         <EventCard
             eventRef={eventRef} event={event} style={style} theme={theme}
             resizePreview={resizePreview} isDragging={isDragging} isResizing={isResizing}
-            dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart}
-        />
+            dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart} />
     );
-}
-
-function createClickHandler(resizeJustEnded, isDragging, isResizing, openModal, event) {
-    return () => {
-        if (resizeJustEnded.current) {
-            resizeJustEnded.current = false;
-        } else if (!isDragging && !isResizing) {
-            openModal(event);
-        }
-    };
 }
 
 function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
     const height = resizePreview || parseFloat(style?.height) || 0;
-
+    const className = buildClassName(isDragging, isResizing);
+    const renderStyle = buildStyle(style, resizePreview, theme);
     return (
-        <div
-            ref={eventRef}
-            className={buildClassName(isDragging, isResizing)}
-            style={buildStyle(style, resizePreview, theme)}
-            onClick={onClick}
-            {...dragProps}
-        >
+        <div ref={eventRef} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
             <EventContent event={event} height={height} />
-            <div className="resize-handle" draggable={false} onMouseDown={(e) => handleResizeMouseDown(e, onResizeStart)} />
+            <ResizeHandle onStart={onResizeStart} />
         </div>
     );
 }
 
-function handleResizeMouseDown(e, onResizeStart) {
-    e.stopPropagation();
-    e.preventDefault();
-    onResizeStart(e);
+function ResizeHandle({ onStart }) {
+    const onMouseDown = (e) => { e.stopPropagation(); e.preventDefault(); onStart(e); };
+    return <div className="resize-handle" draggable={false} onMouseDown={onMouseDown} />;
 }
 
 function EventContent({ event, height }) {
     const startTime = formatTime(new Date(event.start_time));
     const endTime = formatTime(new Date(event.end_time));
-    const showTime = height >= 30;
-    const showDescription = height >= 60 && event.description;
     return (
         <div className="event-content">
             <div className="event-title">{event.title}</div>
-            {showTime && <div className="event-time">{startTime} - {endTime}</div>}
-            {showDescription && <div className="event-description">{event.description}</div>}
+            {height >= 30 && <div className="event-time">{startTime} - {endTime}</div>}
+            {height >= 60 && event.description && <div className="event-description">{event.description}</div>}
         </div>
     );
 }

@@ -2,7 +2,7 @@ import styles from "./CardGrid.module.css";
 import DayCard from "./DayCard";
 
 // Grid component that displays a list of event cards. If no items, shows an empty state message
-export default function CardGrid({ items, onDelete, onEdit }) {
+export default function CardGrid({ items, onDelete, onEdit, date }) {
   if (!items?.length) {
     return (
       <p className={styles.empty}>
@@ -14,7 +14,7 @@ export default function CardGrid({ items, onDelete, onEdit }) {
   return (
     <div className={styles.grid}>
       {items.map((e) => (
-        <DayCard key={e.id} e={e} onDelete={onDelete} onClick={() => onEdit?.(e)} />
+        <DayCard key={e.id} e={e} onDelete={onDelete} onClick={() => onEdit?.(e)} date={date} />
       ))}
     </div>
   );
