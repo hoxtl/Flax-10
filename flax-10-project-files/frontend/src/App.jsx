@@ -30,6 +30,10 @@ export default function App() {
   } else {
     const route = APP_ROUTES.find(r => r.id === activeNav) || APP_ROUTES[0];
     pageContent = route.element;
+
+    if (pageContent && typeof pageContent === "object") {
+      pageContent = { ...pageContent, props: { ...pageContent.props, user } };
+    }
   }
 
   return (
