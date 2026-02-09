@@ -6,6 +6,7 @@ from studyFlax.models import Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
 
 @api_view(['GET', 'POST'])
+#TODO - need to include authentication
 def enrollment_list(request):
     if request.method == 'GET':
         return get_enrollments(request)

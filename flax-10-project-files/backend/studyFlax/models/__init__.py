@@ -10,5 +10,5 @@ from .calendar.tagModel import *
 from .calendar.timetableSourceModel import *
 
 # Module
-from modules.moduleModel import *
-from modules.enrollmentModel import *
+from .modules.moduleModel import *
+from .modules.enrollmentModel import *

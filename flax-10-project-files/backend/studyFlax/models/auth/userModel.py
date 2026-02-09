@@ -1,29 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-<<<<<<< HEAD
-ROLE_CHOICES = [
+ROLE_CHOICES = [ 
     ('student', 'Student'),
     ('teacher', 'Teacher'),
 ]
 
-class User(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    role = models.CharField(
-        max_length=10,
-        choices=ROLE_CHOICES,
-        default='student'
-    )
-
-    def is_teacher(self):
-        return self.role == 'teacher'
-    def is_student(self):
-        return self.role == 'student'
-=======
 class User(AbstractUser):
     """
     Custom User model which extends Django's AbstractUser.
@@ -35,4 +17,15 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=False)
 
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
->>>>>>> 88ff21bd6cbeace8359ab58465de22ffc536003c
+
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        default='student'
+    )
+
+    def is_teacher(self):
+        return self.role == 'teacher'
+    
+    def is_student(self):
+        return self.role == 'student'
