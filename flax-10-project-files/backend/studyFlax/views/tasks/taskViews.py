@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from studyFlax.models import Task
+# from studyFlax.models import Task
 from studyFlax.serialisers.taskSerializer import TaskSerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    queryset = Task.objects.all()
+    # queryset = Task.objects.all()         #Task model doesn't exist replace it with whatever new task model has been created
