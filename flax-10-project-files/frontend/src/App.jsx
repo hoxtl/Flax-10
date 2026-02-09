@@ -35,7 +35,7 @@ export default function App() {
   return (
     <CalendarProvider>
       <TagProvider>
-        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
           {pageContent}
         </DashboardLayout>
       </TagProvider>
