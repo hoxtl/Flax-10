@@ -1,27 +1,102 @@
-.page {
+.momentumPage {
+  position: relative;
+  height: calc(100vh - 120px); 
   padding: 24px;
-  max-width: 720px;
 }
 
-.title {
-  margin: 0 0 16px;
+/* Center block */
+.center {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 10px;
 }
 
+.time {
+  font-size: 96px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.quote {
+  font-size: 28px;
+  opacity: 0.85;
+}
+
+.greeting {
+  margin-top: 18px;
+  font-size: 22px;
+  opacity: 0.75;
+}
+
+/* Bottom-right button */
+.tasksBtn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+/* Drawer + backdrop */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.drawer {
+  position: fixed;
+  right: 24px;
+  bottom: 72px;
+  width: 340px;
+  max-height: 60vh;
+  overflow: auto;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.drawerTitle {
+  font-weight: 600;
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Existing list UI */
 .addRow {
   display: flex;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .input {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
 
 .addBtn {
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid #ddd;
   cursor: pointer;
@@ -37,7 +112,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px;
+  padding: 10px;
   border: 1px solid #eee;
   border-radius: 12px;
 }
