@@ -62,50 +62,39 @@ describe('CalendarContext', () => {
         consoleSpy.mockRestore();
     });
 
+    const FilterConsumer = () => {
+        const { events } = useCalendar();
+        const dispatch = useCalendarDispatch();
+        useEffect(() => {
+            dispatch({
+                type: 'SET_EVENTS',
+                payload: [
+                    { id: 1, title: 'Work Event', tag_name: 'work' },
+                    { id: 2, title: 'Study Event', tag_name: 'study' }
+                ]
+            });
+        }, [dispatch]);
+
+        return (
+            <div>
+                <ul>{events.map(e => <li key={e.id}>{e.title}</li>)}</ul>
+                <button onClick={() => dispatch({ type: 'SET_FILTER', payload: 'work' })}>Filter Work</button>
+            </div>
+        );
+    };
+
     it('should filter events based on context filter', () => {
-        const FilterConsumer = () => {
-            const { events } = useCalendar(); // Use useCalendar to get filtered events
-            const dispatch = useCalendarDispatch();
-            // We need to inject events into state first or mock initialState.
-            // Since we use real provider, we must dispatch SET_EVENTS.
-            useEffect(() => {
-                dispatch({
-                    type: 'SET_EVENTS',
-                    payload: [
-                        { id: 1, title: 'Work Event', tag_name: 'work' },
-                        { id: 2, title: 'Study Event', tag_name: 'study' }
-                    ]
-                });
-            }, [dispatch]);
-
-            return (
-                <div>
-                    <ul>
-                        {events.map(e => <li key={e.id}>{e.title}</li>)}
-                    </ul>
-                    <button onClick={() => dispatch({ type: 'SET_FILTER', payload: 'work' })}>
-                        Filter Work
-                    </button>
-                </div>
-            );
-        };
-
         render(
             <CalendarProvider>
                 <FilterConsumer />
             </CalendarProvider>
         );
 
-        // Initially 'all' -> show both
         expect(screen.getByText('Work Event')).toBeInTheDocument();
         expect(screen.getByText('Study Event')).toBeInTheDocument();
 
-        // Click filter
-        act(() => {
-            screen.getByText('Filter Work').click();
-        });
+        act(() => { screen.getByText('Filter Work').click(); });
 
-        // Should only show Work Event
         expect(screen.getByText('Work Event')).toBeInTheDocument();
         expect(screen.queryByText('Study Event')).not.toBeInTheDocument();
     });
