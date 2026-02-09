@@ -9,9 +9,9 @@ function getGreeting(d = new Date()) {
   return "Night owl";
 }
 
-export default function Tasks() {
+export default function Tasks({ user }) {
   const greeting = useMemo(() => getGreeting(), []);
-  const name = "Sarah"; // MVP placeholder (wire to user later)
+  const name = user?.name?.split(" ")[0] || "Guest";
 
   const [text, setText] = useState("");
   const [items, setItems] = useState([
