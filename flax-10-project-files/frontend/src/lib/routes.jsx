@@ -1,5 +1,6 @@
 import Home from "../pages/Home";
 import CalendarPage from "../pages/CalendarPage";
+import Tasks from "../pages/Tasks";
 
 export const APP_ROUTES = [
     { id: "home", label: "Home", icon: "🏠", path: "/", element: <Home /> },
