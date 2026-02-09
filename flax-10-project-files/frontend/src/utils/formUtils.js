@@ -14,28 +14,36 @@ function getFormFromEvent(event) {
         description: event.description || '',
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
-        recurrence: event.recurrence_details?.frequency || 'none',
-        tag: event.tag_name || event.tag_details?.name || 'other', // Default to 'other'
+        recurrence: getRecurrenceFromEvent(event),
+        tag: event.tag_name || event.tag_details?.name || 'other',
         location: event.locution || event.location || '',
-        all_day: event.all_day || event.is_all_day || event.allDay || (
-            formatForInput(event.start_time).endsWith('T00:00') &&
-            formatForInput(event.end_time).endsWith('T00:00')
-        ),
+        all_day: isAllDay(event),
     };
+}
+
+function getRecurrenceFromEvent(event) {
+    return {
+        frequency: event.recurrence_details?.frequency || 'none',
+        interval: event.recurrence_details?.interval || 1
+    };
+}
+
+function isAllDay(event) {
+    if (event.all_day || event.is_all_day || event.allDay) return true;
+    const start = formatForInput(event.start_time);
+    const end = formatForInput(event.end_time);
+    return start.endsWith('T00:00') && end.endsWith('T00:00');
 }
 
 function getDefaultForm(options) {
     const now = options.initialDate ? new Date(options.initialDate) : new Date();
-    const later = new Date(now.getTime() + 3600000);
     return {
-        title: '',
-        description: '',
+        title: '', description: '',
         start_time: formatForInput(now),
-        end_time: formatForInput(later),
-        recurrence: 'none',
+        end_time: formatForInput(new Date(now.getTime() + 3600000)),
+        recurrence: { frequency: 'none', interval: 1 },
         tag: options.initialTag || 'other',
-        location: '',
-        all_day: false,
+        location: '', all_day: false,
     };
 }
 
@@ -159,8 +167,9 @@ function buildBaseEventData(form) {
 }
 
 function addRecurrenceIfNeeded(data, form) {
-    if (form.recurrence && form.recurrence !== 'none') {
-        data.recurrence_rule = { frequency: form.recurrence, interval: 1 };
+    const { frequency, interval } = form.recurrence || {};
+    if (frequency && frequency !== 'none') {
+        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1 };
     } else {
         data.recurrence_rule = null;
     }
