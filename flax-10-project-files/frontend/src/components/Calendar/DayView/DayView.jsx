@@ -11,23 +11,27 @@ import { useAutoScroll } from '../../../hooks/useAutoScroll';
 import './DayView.css';
 
 export function DayView() {
-    const { selectedDate, events } = useCalendar();
-    const scrollRef = useRef(null);
-    const dayEventsCombined = filterEventsForDay(events, selectedDate);
-    const timedEvents = dayEventsCombined.filter(e => shouldShowInTimeGrid(e, selectedDate));
-    useAutoScroll(scrollRef, timedEvents, selectedDate.toISOString());
-    const hours = getHoursOfDay();
+    const { events } = useCalendar();
+    const { selectedDate, timedEvents, allEvents, scrollRef } = useDayViewData(events);
+
     return (
         <div className="day-view" ref={scrollRef}>
-            <div className="sticky-header">
-                <AllDayRow days={[selectedDate]} events={dayEventsCombined} />
-            </div>
+            <div className="sticky-header"><AllDayRow days={[selectedDate]} events={allEvents} /></div>
             <div className="day-grid-container">
-                <TimeLabelsColumn hours={hours} />
-                <DayGrid hours={hours} date={selectedDate} events={timedEvents} />
+                <TimeLabelsColumn hours={getHoursOfDay()} />
+                <DayGrid hours={getHoursOfDay()} date={selectedDate} events={timedEvents} />
             </div>
         </div>
     );
+}
+
+function useDayViewData(events) {
+    const { selectedDate } = useCalendar();
+    const scrollRef = useRef(null);
+    const allEvents = filterEventsForDay(events, selectedDate);
+    const timedEvents = allEvents.filter(e => shouldShowInTimeGrid(e, selectedDate));
+    useAutoScroll(scrollRef, timedEvents, selectedDate.toISOString());
+    return { selectedDate, timedEvents, allEvents, scrollRef };
 }
 
 function TimeLabelsColumn({ hours }) {
@@ -66,7 +70,7 @@ function filterEventsForDay(events, date) {
 }
 
 function formatHour(hour) {
-    if (hour === 0) return '12 AM';
-    if (hour === 12) return '12 PM';
-    return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
+    const period = hour < 12 ? 'AM' : 'PM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour} ${period}`;
 }
