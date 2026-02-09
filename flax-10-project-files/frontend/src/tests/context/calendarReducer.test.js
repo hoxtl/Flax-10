@@ -1,0 +1,156 @@
+import { describe, it, expect } from 'vitest';
+import { calendarReducer, initialState } from '../../context/calendarReducer';
+
+describe('calendarReducer', () => {
+    it('should return initial state for unknown action', () => {
+        const action = { type: 'UNKNOWN' };
+        const newState = calendarReducer(initialState, action);
+        expect(newState).toBe(initialState);
+    });
+
+    it('should handle SET_EVENTS', () => {
+        const events = [{ id: 1, title: 'Test' }];
+        const action = { type: 'SET_EVENTS', payload: events };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.events).toEqual(events);
+        expect(newState.isLoading).toBe(false);
+    });
+
+    it('should handle ADD_EVENT', () => {
+        const event = { id: 1, title: 'New' };
+        const action = { type: 'ADD_EVENT', payload: event };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.events).toHaveLength(1);
+        expect(newState.events[0]).toEqual(event);
+    });
+
+    it('should handle UPDATE_EVENT', () => {
+        const initialWithEvent = { ...initialState, events: [{ id: 1, title: 'Old' }] };
+        const updated = { id: 1, title: 'New' };
+        const action = { type: 'UPDATE_EVENT', payload: updated };
+        const newState = calendarReducer(initialWithEvent, action);
+        expect(newState.events[0].title).toBe('New');
+    });
+
+    it('should handle DELETE_EVENT', () => {
+        const initialWithEvent = { ...initialState, events: [{ id: 1, title: 'Delete me' }] };
+        const action = { type: 'DELETE_EVENT', payload: 1 };
+        const newState = calendarReducer(initialWithEvent, action);
+        expect(newState.events).toHaveLength(0);
+    });
+
+    it('should handle SET_VIEW_MODE', () => {
+        const action = { type: 'SET_VIEW_MODE', payload: 'month' };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.viewMode).toBe('month');
+    });
+
+    it('should handle SET_SELECTED_DATE', () => {
+        const date = new Date(2026, 1, 1);
+        const action = { type: 'SET_SELECTED_DATE', payload: date };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.selectedDate).toBe(date);
+    });
+
+    it('should handle OPEN_MODAL with event', () => {
+        const event = { id: 1 };
+        const action = { type: 'OPEN_MODAL', payload: { event, type: 'edit' } };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.isModalOpen).toBe(true);
+        expect(newState.modalEvent).toEqual(event);
+        expect(newState.modalType).toBe('edit');
+    });
+
+    it('should handle OPEN_MODAL without event (create)', () => {
+        const action = { type: 'OPEN_MODAL', payload: { event: null, type: 'create' } };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.isModalOpen).toBe(true);
+        expect(newState.modalEvent).toBeNull();
+        expect(newState.modalType).toBe('create');
+    });
+    it('should handle SET_LOADING', () => {
+        const action = { type: 'SET_LOADING', payload: true };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.isLoading).toBe(true);
+    });
+
+    it('should handle SET_ERROR', () => {
+        const error = 'Something went wrong';
+        const action = { type: 'SET_ERROR', payload: error };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.error).toBe(error);
+        expect(newState.isLoading).toBe(false);
+    });
+
+    it('should handle OPEN_MODAL with direct payload (legacy/fallback)', () => {
+        // payload without event property
+        const payload = { id: 1, title: 'Event' };
+        const action = { type: 'OPEN_MODAL', payload };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.isModalOpen).toBe(true);
+        expect(newState.modalEvent).toEqual(payload);
+        expect(newState.modalType).toBeNull();
+    });
+
+    it('should handle UPDATE_EVENT with multiple events', () => {
+        const events = [{ id: 1, title: 'Keep' }, { id: 2, title: 'Old' }];
+        const initialWithEvents = { ...initialState, events };
+        const updated = { id: 2, title: 'New' };
+        const action = { type: 'UPDATE_EVENT', payload: updated };
+        const newState = calendarReducer(initialWithEvents, action);
+        expect(newState.events[0].title).toBe('Keep');
+        expect(newState.events[1].title).toBe('New');
+    });
+
+    it('should handle OPEN_MODAL with event but no type (defaults null)', () => {
+        const event = { id: 1 };
+        const action = { type: 'OPEN_MODAL', payload: { event } };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.modalType).toBeNull();
+    });
+
+    it('should handle CLOSE_MODAL', () => {
+        const openState = { ...initialState, isModalOpen: true, modalEvent: {}, modalType: 'edit' };
+        const action = { type: 'CLOSE_MODAL' };
+        const newState = calendarReducer(openState, action);
+        expect(newState.isModalOpen).toBe(false);
+        expect(newState.modalEvent).toBeNull();
+        expect(newState.modalType).toBeNull();
+    });
+
+    // Test filtering logic
+    it('should handle SET_FILTER (toggle)', () => {
+        let state = calendarReducer(initialState, { type: 'SET_FILTER', payload: 'work' });
+        expect(state.filter).toEqual(['work']);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 'study' });
+        expect(state.filter).toEqual(['work', 'study']);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 'work' });
+        expect(state.filter).toEqual(['study']);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 'study' });
+        expect(state.filter).toEqual(['all']);
+    });
+
+    it('should handle SET_FILTER to all', () => {
+        const workState = { ...initialState, filter: ['work', 'study'] };
+        const state = calendarReducer(workState, { type: 'SET_FILTER', payload: 'all' });
+        expect(state.filter).toEqual(['all']);
+    });
+
+    // Test openModalHandler edge cases
+    it('should handle OPEN_MODAL with complex payload', () => {
+        const event = { id: 1 };
+        const date = new Date(2026, 1, 1);
+        const action = {
+            type: 'OPEN_MODAL',
+            payload: {
+                event,
+                type: 'edit',
+                initialDate: date
+            }
+        };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.modalEvent).toEqual(event);
+        expect(newState.modalType).toBe('edit');
+        expect(newState.modalInitialDate).toBe(date);
+    });
+});

@@ -11,26 +11,22 @@ export function useTimeSlotDrop(hour, date) {
     const { openModal } = useEventModal();
     const { addEvent, editEvent, addException } = useEventActions();
     const [highlightQuarter, setHighlightQuarter] = useState(null);
-    const handleDrop = createDropHandler(hour, date, addEvent, editEvent, addException, events, setHighlightQuarter);
-    const handleClick = createClickHandler(hour, date, openModal);
-    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
-    const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter, handleClick);
-    return { mergedProps, isOver, highlightQuarter };
-}
 
-function createDropHandler(hour, date, addEvent, editEvent, addException, events, setHighlightQuarter) {
-    return useCallback((payload, e) => {
+    const handleDrop = useCallback((payload, e) => {
         const minutes = getDropMinutes(hour, e);
         setHighlightQuarter(null);
         dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, events);
     }, [hour, date, addEvent, editEvent, addException, events]);
-}
 
-function createClickHandler(hour, date, openModal) {
-    return useCallback((e) => {
+    const handleClick = useCallback((e) => {
         const minutes = getClickMinutes(hour, e);
         openEventModalAtTime(date, minutes, openModal);
     }, [hour, date, openModal]);
+
+    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
+    const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter, handleClick);
+
+    return { mergedProps, isOver, highlightQuarter };
 }
 
 function getDropMinutes(hour, e) {

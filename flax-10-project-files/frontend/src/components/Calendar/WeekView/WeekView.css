@@ -8,13 +8,28 @@
     flex-direction: column;
 }
 
-.week-header {
+.sticky-header {
     position: sticky;
     top: 0;
+    z-index: 20;
+    background: white;
+}
+
+.week-header {
+    /* position: sticky not needed if container doesn't scroll */
     z-index: 10;
     display: flex;
     border-bottom: 2px solid var(--border, white);
     background-color: #f6f4f1;
+    flex-shrink: 0;
+}
+
+/* ... existing styles ... */
+
+.week-grid {
+    display: flex;
+    flex: 1;
+    color: var(--text, #9E7E5D);
 }
 
 .time-gutter {
@@ -115,6 +130,7 @@
             rgba(0, 0, 0, 0.03) 75%,
             rgba(0, 0, 0, 0.03) 76%,
             transparent 77%);
+    flex-shrink: 0;
 }
 
 /* Highlight effect when dragging over a cell */

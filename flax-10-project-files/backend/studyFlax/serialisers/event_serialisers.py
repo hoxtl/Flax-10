@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from studyFlax.models import CalendarEvent, RecurrenceRule, Tag
 from .tag_serialisers import TagSerialiser
@@ -58,6 +59,12 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
         return tag
     
     def _handle_recurrence(self, recurrence_data, existing_rule=None):
+        if isinstance(recurrence_data, str):
+            try:
+                recurrence_data = json.loads(recurrence_data)
+            except json.JSONDecodeError:
+                pass
+        
         if not recurrence_data or not isinstance(recurrence_data, dict):
             return self._delete_existing_rule(existing_rule)
         if existing_rule:
