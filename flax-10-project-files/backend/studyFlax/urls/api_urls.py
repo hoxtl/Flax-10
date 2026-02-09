@@ -1,8 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from studyFlax.views.tasks.taskViews import TaskViewSet
 router = DefaultRouter()
-router.register(r"tasks", TaskViewSet, basename="tasks")
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, category_list
