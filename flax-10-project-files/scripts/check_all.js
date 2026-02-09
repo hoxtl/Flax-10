@@ -2,30 +2,37 @@
 /**
  * Code Quality Checker - BAND V COMPLIANCE
  * Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file
+ * Test files: ≤25 lines for test functions
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// ANSI Colors - Fixed for JavaScript
+// ANSI Colors
 const Colors = {
-  RED: '\x1b[91m',      // Changed from \033
-  YELLOW: '\x1b[33m',   // Changed from \033
-  MAGENTA: '\x1b[95m',  // Changed from \033
-  BOLD: '\x1b[1m',      // Changed from \033
-  END: '\x1b[0m'        // Changed from \033
+  RED: '\x1b[91m',
+  YELLOW: '\x1b[33m',
+  MAGENTA: '\x1b[95m',
+  BOLD: '\x1b[1m',
+  END: '\x1b[0m'
 };
 
 function printHeader() {
   console.log('\n' + '='.repeat(75));
   console.log(`${Colors.BOLD}${Colors.MAGENTA}${'BAND V CODE QUALITY REPORT - JAVASCRIPT'.padStart(62).padEnd(75)}${Colors.END}`);
   console.log('='.repeat(75));
-  console.log('Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file\n');
+  console.log('Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file');
+  console.log('Test files: ≤25 lines for test functions\n');
 }
 
 function printSection(number, title) {
   console.log(`\n${Colors.BOLD}${Colors.YELLOW}${number}. ${title}${Colors.END}`);
   console.log('─'.repeat(75));
+}
+
+function printSubsection(title) {
+  console.log(`\n${Colors.BOLD}${title}${Colors.END}`);
+  console.log('·'.repeat(75));
 }
 
 function shortenPath(filepath) {
@@ -71,11 +78,22 @@ function checkFunctionLength(targetDir) {
       const isTest = filepath.includes('/tests/') || filepath.includes('.test.') || filepath.includes('.spec.');
       const limit = isTest ? 25 : 15;
       
-      const regex = /(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|const\s+(\w+)\s*=\s*(?:async\s*)?function)/g;
+      let regex;
+      
+      if (isTest) {
+        // For test files: only match 'it' and 'test' blocks
+        regex = /\b(it|test)\s*\([^,]+,\s*(?:async\s*)?\([^)]*\)\s*=>/g;
+      } else {
+        // For regular files: match all function declarations
+        regex = /(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|const\s+(\w+)\s*=\s*(?:async\s*)?function)/g;
+      }
       
       let match;
       while ((match = regex.exec(code)) !== null) {
-        const name = match[1] || match[2] || match[3] || 'anonymous';
+        const name = isTest ? 
+          (match[1] || 'test') :  // 'it' or 'test'
+          (match[1] || match[2] || match[3] || 'anonymous');
+        
         const lines = countFunctionLines(code, match.index);
         
         if (lines > limit) {
@@ -154,11 +172,21 @@ function checkNesting(targetDir) {
       const isTest = filepath.includes('/tests/') || filepath.includes('.test.') || filepath.includes('.spec.');
       const limit = isTest ? 2 : 1;
       
-      const regex = /(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|const\s+(\w+)\s*=\s*(?:async\s*)?function)/g;
+      let regex;
+      
+      if (isTest) {
+        // For test files: only match 'it' and 'test' blocks
+        regex = /\b(it|test)\s*\([^,]+,\s*(?:async\s*)?\([^)]*\)\s*=>/g;
+      } else {
+        // For regular files: match all function declarations
+        regex = /(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|const\s+(\w+)\s*=\s*(?:async\s*)?function)/g;
+      }
       
       let match;
       while ((match = regex.exec(code)) !== null) {
-        const name = match[1] || match[2] || match[3] || 'anonymous';
+        const name = isTest ? 
+          (match[1] || 'test') :
+          (match[1] || match[2] || match[3] || 'anonymous');
         
         // Find function body
         let braceCount = 0;
@@ -208,14 +236,32 @@ function main() {
   printSection('1', 'FUNCTION LENGTH');
   const funcViolations = checkFunctionLength(target);
   
-  if (funcViolations.length > 0) {
-    console.log(`\n${Colors.RED}❌ ${funcViolations.length} VIOLATION(S)${Colors.END}\n`);
-    funcViolations.sort((a, b) => b.lines - a.lines).forEach(v => {
+  // Separate regular and test violations
+  const regularFunc = funcViolations.filter(v => !v.isTest);
+  const testFunc = funcViolations.filter(v => v.isTest);
+  
+  // Regular files
+  printSubsection('Regular Files (≤15 lines)');
+  if (regularFunc.length > 0) {
+    console.log(`\n${Colors.RED}❌ ${regularFunc.length} VIOLATION(S)${Colors.END}\n`);
+    regularFunc.sort((a, b) => b.lines - a.lines).forEach(v => {
       console.log(`${Colors.BOLD}${v.file}${Colors.END}`);
       console.log(`  ${v.name}() → ${Colors.RED}${v.lines} lines${Colors.END} (limit: ${v.limit})\n`);
     });
   } else {
-    console.log('\n✅ All functions meet Band V requirements\n');
+    console.log('\n✅ All regular functions meet Band V requirements\n');
+  }
+  
+  // Test files
+  printSubsection('Test Files (≤25 lines)');
+  if (testFunc.length > 0) {
+    console.log(`\n${Colors.RED}❌ ${testFunc.length} VIOLATION(S)${Colors.END}\n`);
+    testFunc.sort((a, b) => b.lines - a.lines).forEach(v => {
+      console.log(`${Colors.BOLD}${v.file}${Colors.END}`);
+      console.log(`  ${v.name}() → ${Colors.RED}${v.lines} lines${Colors.END} (limit: ${v.limit})\n`);
+    });
+  } else {
+    console.log('\n✅ All test functions meet Band V requirements\n');
   }
   
   // 2. File Length
@@ -236,14 +282,32 @@ function main() {
   printSection('3', 'NESTING DEPTH');
   const nestViolations = checkNesting(target);
   
-  if (nestViolations.length > 0) {
-    console.log(`\n${Colors.RED}❌ ${nestViolations.length} VIOLATION(S)${Colors.END}\n`);
-    nestViolations.sort((a, b) => b.nesting - a.nesting).forEach(v => {
+  // Separate regular and test violations
+  const regularNest = nestViolations.filter(v => !v.isTest);
+  const testNest = nestViolations.filter(v => v.isTest);
+  
+  // Regular files
+  printSubsection('Regular Files (≤1 level)');
+  if (regularNest.length > 0) {
+    console.log(`\n${Colors.RED}❌ ${regularNest.length} VIOLATION(S)${Colors.END}\n`);
+    regularNest.sort((a, b) => b.nesting - a.nesting).forEach(v => {
       console.log(`${Colors.BOLD}${v.file}${Colors.END}`);
       console.log(`  ${v.name}() → ${Colors.RED}${v.nesting} levels${Colors.END} (limit: ${v.limit})\n`);
     });
   } else {
-    console.log('\n✅ All functions meet Band V requirements\n');
+    console.log('\n✅ All regular functions meet Band V requirements\n');
+  }
+  
+  // Test files
+  printSubsection('Test Files (≤2 levels)');
+  if (testNest.length > 0) {
+    console.log(`\n${Colors.RED}❌ ${testNest.length} VIOLATION(S)${Colors.END}\n`);
+    testNest.sort((a, b) => b.nesting - a.nesting).forEach(v => {
+      console.log(`${Colors.BOLD}${v.file}${Colors.END}`);
+      console.log(`  ${v.name}() → ${Colors.RED}${v.nesting} levels${Colors.END} (limit: ${v.limit})\n`);
+    });
+  } else {
+    console.log('\n✅ All test functions meet Band V requirements\n');
   }
   
   // Summary
@@ -253,9 +317,9 @@ function main() {
   
   const totalViolations = funcViolations.length + fileViolations.length + nestViolations.length;
   
-  console.log(`Function Length:  ${funcViolations.length > 0 ? '❌' : '✅'} ${funcViolations.length} violation(s)`);
+  console.log(`Function Length:  ${funcViolations.length > 0 ? '❌' : '✅'} ${funcViolations.length} violation(s) (${regularFunc.length} regular, ${testFunc.length} test)`);
   console.log(`File Length:      ${fileViolations.length > 0 ? '❌' : '✅'} ${fileViolations.length} violation(s)`);
-  console.log(`Nesting Depth:    ${nestViolations.length > 0 ? '❌' : '✅'} ${nestViolations.length} violation(s)`);
+  console.log(`Nesting Depth:    ${nestViolations.length > 0 ? '❌' : '✅'} ${nestViolations.length} violation(s) (${regularNest.length} regular, ${testNest.length} test)`);
   
   console.log('\n' + '='.repeat(75));
   
