@@ -6,13 +6,15 @@ import { CalendarProvider } from './context/CalendarContext';
 import Settings from './pages/Settings';
 
 function getUser() {
-  return { 
-    name: "Jane Smith", 
-    email: "jane@kcl.ac.uk", 
-    year: "Year 2", 
-    major: "CS" 
+  return {
+    name: "Jane Smith",
+    email: "jane@kcl.ac.uk",
+    year: "Year 2",
+    major: "CS"
   };
 }
+
+import { TagProvider } from './context/TagContext';
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("home");
@@ -32,9 +34,11 @@ export default function App() {
 
   return (
     <CalendarProvider>
-      <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-        {pageContent}
-      </DashboardLayout>
+      <TagProvider>
+        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+          {pageContent}
+        </DashboardLayout>
+      </TagProvider>
     </CalendarProvider>
   );
 }

@@ -15,8 +15,12 @@ function getFormFromEvent(event) {
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
         recurrence: event.recurrence_details?.frequency || 'none',
-        tag: event.tag_name || event.tag_details?.name || '',
-        location: event.location || '',
+        tag: event.tag_name || event.tag_details?.name || 'other', // Default to 'other'
+        location: event.locution || event.location || '',
+        all_day: event.all_day || event.is_all_day || event.allDay || (
+            formatForInput(event.start_time).endsWith('T00:00') &&
+            formatForInput(event.end_time).endsWith('T00:00')
+        ),
     };
 }
 
@@ -29,29 +33,32 @@ function getDefaultForm(options) {
         start_time: formatForInput(now),
         end_time: formatForInput(later),
         recurrence: 'none',
-        tag: options.initialTag || null,
+        tag: options.initialTag || 'other',
         location: '',
+        all_day: false,
     };
 }
 
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, allEvents, forceSave = false) {
     if (e) e.preventDefault();
-    const validationError = validateForm(form);
-    if (validationError) return setError(validationError);
+    const error = validateForm(form);
+    if (error) return setError(error);
 
     const data = buildEventData(form);
-
-    // Check overlap if not forced
-    if (!forceSave) {
-        const others = allEvents.filter(e => e.id !== (event?.id));
-        const overlapping = findOverlappingEvents({ ...data, id: event?.id }, others);
-        if (overlapping.length > 0) {
-            setOverlapWarning(overlapping);
-            return;
-        }
-    }
+    if (!forceSave && hasOverlaps(data, event, allEvents, setOverlapWarning)) return;
 
     await submitEvent(event, data, actions, onClose, setError);
+}
+
+function hasOverlaps(data, event, allEvents, setOverlapWarning) {
+    const others = allEvents.filter(e => e.id !== (event?.id));
+    const overlapping = findOverlappingEvents({ ...data, id: event?.id }, others);
+
+    if (overlapping.length > 0) {
+        setOverlapWarning(overlapping);
+        return true;
+    }
+    return false;
 }
 
 function validateForm(form) {
@@ -80,15 +87,20 @@ async function saveEvent(event, data, actions) {
 }
 
 async function handleRecurringEdit(event, data, actions) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
-    );
+    const choice = confirmRecurringEdit();
     const baseId = extractBaseEventId(event.id);
+
     if (choice) {
         await actions.editEvent(baseId, data);
     } else {
         await editSingleOccurrence(event, data, actions, baseId);
     }
+}
+
+function confirmRecurringEdit() {
+    return window.confirm(
+        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
+    );
 }
 
 async function editSingleOccurrence(event, data, actions, baseId) {
@@ -140,7 +152,9 @@ function buildBaseEventData(form) {
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
-        tag: form.tag || null,
+        tag_name: form.tag || null, // Map form 'tag' (ID) to backend 'tag_name'
+        tag: form.tag || null,      // Keep 'tag' for backward compatibility if needed
+        all_day: form.all_day,
     };
 }
 

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import styles from "./Home.module.css";
 import PillFilters from "../components/PillFilters";
 import DateNavigator from "../components/DateNavigator";
-import { isToday } from "../utils/dateUtils";
+import { isToday, overlapsDay } from "../utils/dateUtils";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../hooks/useCalendarEvents";
 import CardGrid from "../components/CardGrid";
@@ -17,8 +17,8 @@ function filterEvents(active, items) {
 }
 
 function eventsForDate(events, date) {
-  const target = new Date(date).toDateString();
-  return events.filter(e => new Date(e.start_time).toDateString() === target);
+  // Use overlapsDay to correctly handle all-day events and timezone differences
+  return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), date));
 }
 
 function FiltersBar({ activeFilter, onChange, dayItems }) {
@@ -55,7 +55,7 @@ export default function Home() {
         scheduleTitle={scheduleTitle}
       />
       <div className={styles.content}>
-        <CardGrid items={filtered} onDelete={removeEvent} onEdit={handleEdit} />
+        <CardGrid items={filtered} onDelete={removeEvent} onEdit={handleEdit} date={selectedDate} />
       </div>
     </div>
   );

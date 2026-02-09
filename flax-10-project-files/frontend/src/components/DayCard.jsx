@@ -3,7 +3,7 @@ import { formatTimeRange } from "../utils/cardUtils";
 import { useTags } from "../context/TagContext";
 
 // Card component that displays the details of an event and includes a delete button
-export default function DayCard({ e, onDelete, onClick }) {
+export default function DayCard({ e, onDelete, onClick, date }) {
   const { getTag } = useTags();
   const theme = getTag(e.tag_name);
   const t = theme || { color: "#94A3B8", icon: "⭐" };
@@ -14,7 +14,7 @@ export default function DayCard({ e, onDelete, onClick }) {
         <div className={styles.main}>
           <Header e={e} />
           <Sub e={e} />
-          <Meta e={e} />
+          <Meta e={e} date={date} />
           <Footer e={e} />
         </div>
         <button
@@ -48,10 +48,10 @@ function Sub({ e }) {
 }
 
 // Meta component that displays the event time range and location (if provided)
-function Meta({ e }) {
+function Meta({ e, date }) {
   return (
     <div className={styles.meta}>
-      <span className={styles.metaItem}>🕒 {formatTimeRange(e)}</span>
+      <span className={styles.metaItem}>🕒 {formatTimeRange(e, date)}</span>
       {e.location ? <span className={styles.metaItem}>📍 {e.location}</span> : null}
     </div>
   );
