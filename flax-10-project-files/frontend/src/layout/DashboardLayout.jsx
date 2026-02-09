@@ -66,7 +66,7 @@ function QuickAddGate({ open, onClose, onSelectType }) {
   return <QuickAddModal onClose={onClose} onSelectType={onSelectType} />;
 }
 
-export default function DashboardLayout({ activeNav, onNavChange, children }) {
+export default function DashboardLayout({ activeNav, onNavChange, user, children }) {
   const isMobile = useIsMobile(900);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
