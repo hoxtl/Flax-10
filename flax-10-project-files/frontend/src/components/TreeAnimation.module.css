@@ -1,0 +1,29 @@
+.container {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 0.5rem;
+    position: relative;
+}
+
+.scene {
+    width: 100%;
+    height: 100%;
+    animation: sway 3s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+}
+
+.svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+@keyframes sway {
+    from {
+        transform: rotate(-1deg);
+    }
+
+    to {
+        transform: rotate(1deg);
+    }
+}
