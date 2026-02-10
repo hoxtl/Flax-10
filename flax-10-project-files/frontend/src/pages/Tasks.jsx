@@ -32,8 +32,7 @@ function dropConfetti() {
 function buildPersonalLine(quote, name) {
   if (!quote) return name ? `Hi, ${name}.` : "Hi.";
   const cleaned = quote.trim().replace(/[".]+$/g, "");
-  const lower = cleaned.charAt(0).toLowerCase() + cleaned.slice(1);
-  return `${lower}, ${name}.`;
+  return name ? `${cleaned}, ${name}.` : `${cleaned}.`;
 }
 
 export default function Tasks({ user }) {

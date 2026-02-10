@@ -9,6 +9,7 @@ export const LOCAL_QUOTES = [
     "Progress over perfection.",
     "Breathe. Then begin.",
     "Do the next thing.",
+    "Every day is precious."
   ];
   
   export function pickQuoteByKey(key) {
