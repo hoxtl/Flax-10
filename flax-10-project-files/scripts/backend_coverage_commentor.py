@@ -156,17 +156,15 @@ def main() -> int:
 
     files, totals = parse_coverage_xml(xml_path)
 
-    body = textwrap.dedent(
-        f"""
-        ✅ **Coverage Report**
-
-        **Total coverage:** {totals["rate_pct"]:.2f}%
-        • Statements: {totals["statements"]}
-        • Missing: {totals["missing"]}
-
-        {markdown_table(files)}
-        """
-    ).strip()
+    body = "\n".join([
+    "✅ **Coverage Report**",
+    "",
+    f"**Total coverage:** {totals['rate_pct']:.2f}%",
+    f"• Statements: {totals['statements']}",
+    f"• Missing: {totals['missing']}",
+    "",
+    markdown_table(files),
+    ]).strip()
 
     post_pr_comment(repo, pr_number, token, body)
     print(f"Posted coverage comment to PR #{pr_number}")
