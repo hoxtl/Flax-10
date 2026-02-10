@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./Tasks.module.css";
 import { pickQuoteByKey } from "../lib/quotes";
 import confetti from "canvas-confetti";
+import ToDoPanel from "../components/Tasks/ToDoPanel";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -45,7 +46,7 @@ export default function Tasks({ user }) {
     return () => clearInterval(id);
   }, []);
 
-  // Quote per hour
+  // Quote per minute
   const quoteKey = useMemo(() => {
     return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}`;
   }, [now]);
@@ -77,30 +78,6 @@ export default function Tasks({ user }) {
       if (next) dropConfetti();
       return next;
     });
-  };
-
-  // Tasks drawer
-  const [open, setOpen] = useState(false);
-
-  // Checklist state (drawer)
-  const [text, setText] = useState("");
-  const [items, setItems] = useState([
-    { id: 1, title: "Read lecture slides", done: false },
-    { id: 2, title: "Start SEG task", done: false },
-  ]);
-
-  const addItem = (e) => {
-    e.preventDefault();
-    const t = text.trim();
-    if (!t) return;
-    setItems((prev) => [{ id: Date.now(), title: t, done: false }, ...prev]);
-    setText("");
-  };
-
-  const toggleDone = (id) => {
-    setItems((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, done: !x.done } : x))
-    );
   };
 
   const resetGoal = () => {
@@ -166,54 +143,7 @@ export default function Tasks({ user }) {
       </div>
 
       <div className={styles.bottomQuote}>"{quote}"</div>
-
-      <button className={styles.tasksBtn} onClick={() => setOpen(true)}>
-        Tasks
-      </button>
-
-      {open && (
-        <>
-          <div className={styles.backdrop} onClick={() => setOpen(false)} />
-          <div className={styles.drawer}>
-            <div className={styles.drawerHeader}>
-              <div className={styles.drawerTitle}>Today</div>
-              <button
-                className={styles.closeBtn}
-                onClick={() => setOpen(false)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <form className={styles.addRow} onSubmit={addItem}>
-              <input
-                className={styles.input}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="New task..."
-              />
-              <button className={styles.addBtn} type="submit">
-                Add
-              </button>
-            </form>
-
-            <div className={styles.list}>
-              {items.map((item) => (
-                <label key={item.id} className={styles.row}>
-                  <input
-                    type="checkbox"
-                    checked={item.done}
-                    onChange={() => toggleDone(item.id)}
-                  />
-                  <span className={item.done ? styles.done : ""}>
-                    {item.title}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+      <ToDoPanel />
     </div>
   );
 }
