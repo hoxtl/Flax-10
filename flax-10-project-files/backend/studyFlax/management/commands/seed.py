@@ -17,7 +17,7 @@ class Command(BaseCommand):
         self.stdout.write("Seeding data...")
 
         users = []
-        for _ in range(5):
+        for _ in range(50):
             user = User.objects.create_user(
                 username=fake.user_name(),
                 email=fake.unique.email(),
