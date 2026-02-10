@@ -9,11 +9,5 @@ from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
 from .calendar.timetableSourceModel import *
 
-# Tasks
-from .tasks.taskModel import *
-
-# Todos
-from .todos.todoListModel import *
-
 # Notifications
 from .notifications.notificationModel import *
