@@ -70,7 +70,9 @@ jobs:
           path: flax-10-project-files/backend/htmlcov/
 
       - name: Post coverage report as comment
-        uses: MishaKav/pytest-coverage-comment@v1.1.47
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          pytest-xml-coverage-path: flax-10-project-files/backend/coverage.xml
+        working-directory: flax-10-project-files/scripts/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERAGE_XML_PATH: flax-10-project-files/backend/coverage.xml
+        run: |
+          python backend_coverage_commentor.py
