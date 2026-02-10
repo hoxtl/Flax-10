@@ -10,63 +10,119 @@ export default function TimerPage() {
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
     const [mode, setMode] = useState('work'); // 'work' | 'break'
+    const [modal, setModal] = useState(null); // { title, message, actionLabel, onAction }
     const timerRef = useRef(null);
 
     useEffect(() => {
-        if (isActive && timeLeft > 0) {
+        if (isActive) {
             timerRef.current = setInterval(() => {
-                setTimeLeft((prev) => prev - 1);
+                setTimeLeft((prev) => {
+                    // If in break mode, stop at 0
+                    if (mode === 'break' && prev <= 0) {
+                        return 0;
+                    }
+                    return prev - 1;
+                });
             }, 1000);
-        } else if (timeLeft === 0) {
-            handleTimerComplete();
         }
 
         return () => clearInterval(timerRef.current);
-    }, [isActive, timeLeft]);
+    }, [isActive, mode]);
+
+    // Handle break completion separately
+    useEffect(() => {
+        if (mode === 'break' && timeLeft === 0 && isActive) {
+            handleTimerComplete();
+        }
+    }, [mode, timeLeft, isActive]);
 
     const handleTimerComplete = () => {
         setIsActive(false);
-        // Play notification sound here if we had one
+
         if (mode === 'work') {
             if (breakTime === 0) {
-                // Skip break entirely if 0
-                // Increment session immediately
-                const newCompleted = completedSessions + 1;
-                setCompletedSessions(newCompleted);
-
-                if (newCompleted >= targetSessions) {
-                    alert("🎉 Goal reached! You've completed all your sessions.");
-                    setMode('work');
-                    setTimeLeft(workTime * 60);
-                    setCompletedSessions(0);
-                    return;
-                }
-
-                // Start next work session immediately
-                setMode('work');
-                setTimeLeft(workTime * 60);
-                setIsActive(true); // Continuous if no break? Or wait? Let's pause.
+                // Skip break if 0
+                completeSessionAndContinue();
             } else {
-                alert("Work session complete! Time for a break.");
-                setMode('break');
-                setTimeLeft(breakTime * 60);
+                setModal({
+                    title: "Focus Session Complete!",
+                    message: "Great job! Time to take a well-deserved break.",
+                    actionLabel: "Start Break",
+                    onAction: () => {
+                        setMode('break');
+                        setTimeLeft(breakTime * 60);
+                        setIsActive(true); // Start break timer automatically? User usually wants to start it themselves? 
+                        // Actually, let's start it.
+                        setModal(null);
+                    }
+                });
             }
         } else {
-            // Break is done, increment session and check goal
+            // Break done
             const newCompleted = completedSessions + 1;
             setCompletedSessions(newCompleted);
 
             if (newCompleted >= targetSessions) {
-                alert("🎉 Goal reached! You've completed all your sessions.");
-                setMode('work');
-                setTimeLeft(workTime * 60);
-                setCompletedSessions(0);
+                setModal({
+                    title: "🎉 Goal Reached!",
+                    message: "You've completed all your scheduled sessions. Amazing work!",
+                    actionLabel: "Start New Goal",
+                    onAction: () => {
+                        setMode('work');
+                        setTimeLeft(workTime * 60);
+                        setCompletedSessions(0);
+                        setModal(null);
+                    }
+                });
                 return;
             }
 
-            alert("Break over! Time to focus on the next session.");
-            setMode('work');
-            setTimeLeft(workTime * 60);
+            setModal({
+                title: "Break Over",
+                message: "Ready to get back to focus?",
+                actionLabel: "Start Work",
+                onAction: () => {
+                    setMode('work');
+                    setTimeLeft(workTime * 60);
+                    setModal(null);
+                    // Let user start manually
+                }
+            });
+        }
+    };
+
+    const completeSessionAndContinue = () => {
+        const newCompleted = completedSessions + 1;
+        setCompletedSessions(newCompleted);
+
+        if (newCompleted >= targetSessions) {
+            setModal({
+                title: "🎉 Goal Reached!",
+                message: "You've completed all your scheduled sessions. Amazing work!",
+                actionLabel: "Start New Goal",
+                onAction: () => {
+                    setMode('work');
+                    setTimeLeft(workTime * 60);
+                    setCompletedSessions(0);
+                    setModal(null);
+                }
+            });
+            return;
+        }
+
+        setMode('work');
+        setTimeLeft(workTime * 60);
+        setIsActive(false); // Pause so they can start when ready
+    };
+
+    const handleStartBreak = () => {
+        setIsActive(false);
+        if (breakTime === 0) {
+            completeSessionAndContinue();
+        } else {
+            setMode('break');
+            setTimeLeft(breakTime * 60);
+            setIsActive(true);
         }
     };
 
@@ -77,6 +133,7 @@ export default function TimerPage() {
         setMode('work');
         setTimeLeft(workTime * 60);
         setCompletedSessions(0);
+        setModal(null);
     };
 
     const handleTimeChange = (type, value) => {
@@ -86,7 +143,7 @@ export default function TimerPage() {
             setWorkTime(newVal);
             if (mode === 'work' && !isActive) setTimeLeft(newVal * 60);
         } else if (type === 'break') {
-            const newVal = Math.max(0, Math.min(60, val)); // Allow 0
+            const newVal = Math.max(0, Math.min(60, val));
             setBreakTime(newVal);
             if (mode === 'break' && !isActive) setTimeLeft(newVal * 60);
         } else if (type === 'sessions') {
@@ -95,31 +152,41 @@ export default function TimerPage() {
     };
 
     const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        const absSeconds = Math.abs(seconds);
+        const mins = Math.floor(absSeconds / 60);
+        const secs = absSeconds % 60;
+        const sign = seconds < 0 ? '+' : '';
+        return `${sign}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
     // Calculate progress for the current session
+    let currentSessionFraction = 0;
+    if (mode === 'work') {
+        const totalSeconds = workTime * 60;
+        // Cap progress at 100% even if overtime
+        currentSessionFraction = Math.min(1, Math.max(0, (totalSeconds - timeLeft) / totalSeconds));
+    }
 
-    const currentTotal = mode === 'work' ? workTime * 60 : breakTime * 60;
-    const sessionProgress = ((currentTotal - timeLeft) / currentTotal) * 100;
+    // Progress = (Completed Sessions + Current Session Progress) / Total Goal
+    const overallProgress = Math.min(100, ((completedSessions + (mode === 'work' ? currentSessionFraction : 0)) / targetSessions) * 100);
+
+    const isOvertime = mode === 'work' && timeLeft < 0;
 
     return (
         <div className={styles.container}>
             <div className={styles.title}>Study Timer</div>
 
-            <TreeAnimation progress={sessionProgress} mode={mode} />
+            <TreeAnimation progress={overallProgress} mode={mode} />
 
             <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
-                {mode === 'work' ? '🔥 Focus Time' : '☕ Break Time'}
+                {mode === 'work' ? (isOvertime ? '🚀 Overtime' : '🔥 Focus Time') : '☕ Break Time'}
             </div>
 
             <div className={styles.sessionStatus}>
                 Session {completedSessions + 1} of {targetSessions}
             </div>
 
-            <div className={`${styles.timerDisplay} ${mode === 'break' ? styles.break : ''}`}>
+            <div className={`${styles.timerDisplay} ${mode === 'break' ? styles.break : ''} ${isOvertime ? styles.overtime : ''}`}>
                 {formatTime(timeLeft)}
             </div>
 
@@ -170,6 +237,34 @@ export default function TimerPage() {
                     />
                 </div>
             </div>
+
+            {isOvertime && (
+                <div className={styles.overtimePopup}>
+                    <div className={styles.overtimeContent}>
+                        <h3>Time's Up!</h3>
+                        <p>You're in overtime mode.</p>
+                        <div className={styles.overtimeTime}>{formatTime(timeLeft)}</div>
+                        <button className={`${styles.button} ${styles.primary}`} onClick={handleStartBreak}>
+                            Start Break
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {modal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.modalTitle}>{modal.title}</div>
+                        <div className={styles.modalMessage}>{modal.message}</div>
+                        <button
+                            className={`${styles.button} ${styles.primary}`}
+                            onClick={modal.onAction}
+                        >
+                            {modal.actionLabel}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
