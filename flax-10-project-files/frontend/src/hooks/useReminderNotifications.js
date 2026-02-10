@@ -27,18 +27,31 @@ function requestNotificationPermission() {
 function checkAndNotify(events, now, lastCheck, addNotification) {
     const sent = getSentReminders();
     events.forEach(event => {
-        if (shouldNotify(event, now, lastCheck, sent)) {
-            triggerNotification(event, addNotification, sent);
+        checkEventReminders(event, now, lastCheck, sent, addNotification);
+    });
+}
+
+function checkEventReminders(event, now, lastCheck, sent, addNotification) {
+    const reminders = getReminders(event);
+    reminders.forEach(minutes => {
+        if (shouldNotify(event, minutes, now, lastCheck, sent)) {
+            triggerNotification(event, minutes, addNotification, sent);
         }
     });
 }
 
-function shouldNotify(event, now, lastCheck, sentSet) {
-    if (!hasValidReminder(event)) return false;
-    const key = getEventKey(event);
+function getReminders(event) {
+    if (Array.isArray(event.reminder_minutes)) return event.reminder_minutes;
+    if (event.reminder_minutes != null && event.reminder_minutes >= 0) return [event.reminder_minutes];
+    return [];
+}
+
+function shouldNotify(event, minutes, now, lastCheck, sentSet) {
+    if (!event.start_time) return false;
+    const key = getReminderKey(event, minutes);
     if (sentSet.has(key)) return false;
 
-    const reminderTime = getReminderTime(event);
+    const reminderTime = getReminderTime(event, minutes);
     if (reminderTime > now) return false;
 
     const isDue = reminderTime > lastCheck && reminderTime <= now;
@@ -47,14 +60,14 @@ function shouldNotify(event, now, lastCheck, sentSet) {
     return isDue || wasMissed;
 }
 
-function triggerNotification(event, addNotification, sentSet) {
-    sendBrowserNotification(event);
-    addInAppNotification(event, addNotification);
-    markAsSent(event, sentSet);
+function triggerNotification(event, minutes, addNotification, sentSet) {
+    sendBrowserNotification(event, minutes);
+    addInAppNotification(event, minutes, addNotification);
+    markAsSent(event, minutes, sentSet);
 }
 
-function markAsSent(event, sentSet) {
-    const key = getEventKey(event);
+function markAsSent(event, minutes, sentSet) {
+    const key = getReminderKey(event, minutes);
     sentSet.add(key);
     saveSentReminders(sentSet);
 }
@@ -76,39 +89,33 @@ function saveSentReminders(set) {
     }
 }
 
-function hasValidReminder(event) {
-    return event.start_time && event.reminder_minutes != null && event.reminder_minutes >= 0;
+function getReminderTime(event, minutes) {
+    return new Date(new Date(event.start_time).getTime() - minutes * 60000);
 }
 
-function getReminderTime(event) {
-    return new Date(new Date(event.start_time).getTime() - event.reminder_minutes * 60000);
+function getReminderKey(event, minutes) {
+    const dateStr = new Date(event.start_time).toISOString();
+    return `${event.id}_${dateStr}_${minutes}`;
 }
 
-function sendBrowserNotification(event) {
+function sendBrowserNotification(event, minutes) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     new Notification(`Reminder: ${event.title}`, {
-        body: getNotificationBody(event),
-        tag: getEventKey(event),
+        body: getNotificationBody(event, minutes),
+        tag: getReminderKey(event, minutes),
         requireInteraction: true
     });
 }
 
-function addInAppNotification(event, addNotification) {
+function addInAppNotification(event, minutes, addNotification) {
     addNotification({
         title: `Reminder: ${event.title}`,
-        message: getNotificationBody(event),
+        message: getNotificationBody(event, minutes),
     });
 }
 
-function getNotificationBody(event) {
+function getNotificationBody(event, minutes) {
     const time = new Date(event.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const prefix = event.reminder_minutes === 0 ? 'Starting now!' : `Starts at ${time}`;
+    const prefix = minutes === 0 ? 'Starting now!' : `Starts at ${time}`;
     return event.description ? `${prefix}\n${event.description}` : prefix;
-}
-
-function getEventKey(event) {
-    const dateStr = event.start_time instanceof Date
-        ? event.start_time.toISOString()
-        : new Date(event.start_time).toISOString();
-    return `${event.id}_${dateStr}`;
 }

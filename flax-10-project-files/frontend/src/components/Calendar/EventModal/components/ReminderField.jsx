@@ -1,71 +1,153 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import './ReminderField.css';
+
+const PRESET_OPTIONS = [
+    { value: 0, label: 'At time of event' },
+    { value: 5, label: '5 minutes before' },
+    { value: 10, label: '10 minutes before' },
+    { value: 15, label: '15 minutes before' },
+    { value: 30, label: '30 minutes before' },
+    { value: 60, label: '1 hour before' },
+    { value: 1440, label: '1 day before' },
+];
 
 export function ReminderField({ value, onChange }) {
-    const isCustom = isCustomValue(value);
-    const handleChange = (newVal) => {
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-        onChange(newVal);
-    };
-    const onSelect = (e) => handleChange(e.target.value === 'custom' ? 1 : parseInt(e.target.value));
-    const selectedValue = isCustom ? 'custom' : (value ?? -1);
+    const [isOpen, setIsOpen] = useState(false);
+    const selected = Array.isArray(value) ? value : [];
+    const dropdownRef = useRef(null);
+
+    useClickOutside(dropdownRef, () => setIsOpen(false));
 
     return (
-        <div className="form-field">
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <label>Reminder</label>
-                <PermissionButton />
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <ReminderSelect value={selectedValue} onChange={onSelect} />
-                {isCustom && <CustomReminderInput value={value} onChange={handleChange} />}
-            </div>
+        <div className="form-field reminder-field" ref={dropdownRef}>
+            <label>Reminders</label>
+            <DropdownButton selected={selected} onClick={() => setIsOpen(!isOpen)} />
+            {isOpen && <DropdownPanel selected={selected} onChange={onChange} />}
         </div>
     );
 }
 
-function PermissionButton() {
-    const [p, setP] = useState(() => ('Notification' in window) ? Notification.permission : 'denied');
+function useClickOutside(ref, onClickOutside) {
+    useEffect(() => {
+        const handler = (e) => ref.current && !ref.current.contains(e.target) && onClickOutside();
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [ref, onClickOutside]);
+}
+
+function DropdownButton({ selected, onClick }) {
+    const label = getButtonLabel(selected);
+    return (
+        <button type="button" className="reminder-dropdown-btn" onClick={onClick}>
+            <span>{label}</span>
+            <span className="dropdown-arrow">&#9662;</span>
+        </button>
+    );
+}
+
+function getButtonLabel(selected) {
+    if (selected.length === 0) return 'No reminders';
+    if (selected.length === 1) return formatMinutes(selected[0]);
+    return `${selected.length} reminders`;
+}
+
+function DropdownPanel({ selected, onChange }) {
+    const options = getAllOptions(selected);
+    return (
+        <div className="reminder-dropdown-panel">
+            <PermissionStatus />
+            <ReminderOptions options={options} selected={selected} onChange={onChange} />
+            <CustomReminderInput selected={selected} onChange={onChange} />
+        </div>
+    );
+}
+
+function getAllOptions(selected) {
+    const presetValues = PRESET_OPTIONS.map(o => o.value);
+    const customValues = selected.filter(v => !presetValues.includes(v));
+    const customOptions = customValues.map(v => ({ value: v, label: formatMinutes(v) }));
+    return [...PRESET_OPTIONS, ...customOptions].sort((a, b) => a.value - b.value);
+}
+
+function PermissionStatus() {
+    const [p, setP] = useState(getPermission);
     const request = () => Notification.requestPermission().then(setP);
 
-    if (!('Notification' in window)) return <span style={{ fontSize: '12px' }}>Not supported</span>;
-    if (p === 'granted') return <span style={{ color: 'green', fontSize: '12px' }}>✓ Enabled</span>;
-    if (p === 'denied') return <span style={{ color: 'red', fontSize: '12px' }}>Blocked</span>;
-    return <button type="button" onClick={request} style={{ fontSize: '12px' }}>Enable Alerts</button>;
+    if (!('Notification' in window)) return <div className="reminder-status">Not supported</div>;
+    if (p === 'granted') return <div className="reminder-status granted">Notifications enabled</div>;
+    if (p === 'denied') return <div className="reminder-status denied">Notifications blocked</div>;
+    return <button type="button" onClick={request} className="reminder-enable-btn">Enable notifications</button>;
 }
 
-function ReminderSelect({ value, onChange }) {
+function ReminderOptions({ options, selected, onChange }) {
     return (
-        <select value={value} onChange={onChange} style={{ flex: 1 }}>
-            <option value={-1}>None</option>
-            <option value={0}>At time of event</option>
-            <option value={5}>5 minutes before</option>
-            <option value={10}>10 minutes before</option>
-            <option value={15}>15 minutes before</option>
-            <option value={30}>30 minutes before</option>
-            <option value={60}>1 hour before</option>
-            <option value={120}>2 hours before</option>
-            <option value={1440}>1 day before</option>
-            <option value="custom">Custom...</option>
-        </select>
-    );
-}
-
-function CustomReminderInput({ value, onChange }) {
-    return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <input
-                type="number" min="0" value={value}
-                onChange={(e) => onChange(parseInt(e.target.value))}
-                style={{ width: '60px' }}
-            />
-            <span>minutes</span>
+        <div className="reminder-options-list">
+            {options.map(opt => (
+                <ReminderCheckbox
+                    key={opt.value}
+                    label={opt.label}
+                    checked={selected.includes(opt.value)}
+                    onToggle={() => toggleReminder(selected, opt.value, onChange)}
+                />
+            ))}
         </div>
     );
 }
 
-function isCustomValue(v) {
-    const standards = [-1, 0, 5, 10, 15, 30, 60, 120, 1440];
-    return v !== null && v !== undefined && !standards.includes(v);
+function ReminderCheckbox({ label, checked, onToggle }) {
+    return (
+        <label className="reminder-option">
+            <input type="checkbox" checked={checked} onChange={onToggle} />
+            <span>{label}</span>
+        </label>
+    );
+}
+
+function CustomReminderInput({ selected, onChange }) {
+    const [customValue, setCustomValue] = useState('');
+
+    const handleAdd = () => {
+        const minutes = parseInt(customValue, 10);
+        if (isNaN(minutes) || minutes < 0) return;
+        if (!selected.includes(minutes)) onChange([...selected, minutes].sort((a, b) => a - b));
+        setCustomValue('');
+    };
+
+    return (
+        <div className="custom-reminder">
+            <input
+                type="number"
+                min="0"
+                placeholder="Custom (minutes)"
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+            />
+            <button type="button" onClick={handleAdd}>Add</button>
+        </div>
+    );
+}
+
+function toggleReminder(selected, minutes, onChange) {
+    requestPermissionIfNeeded();
+    const newValue = selected.includes(minutes)
+        ? selected.filter(v => v !== minutes)
+        : [...selected, minutes].sort((a, b) => a - b);
+    onChange(newValue);
+}
+
+function formatMinutes(minutes) {
+    if (minutes === 0) return 'At time of event';
+    if (minutes < 60) return `${minutes} min before`;
+    if (minutes < 1440) return `${minutes / 60} hr before`;
+    return `${minutes / 1440} day before`;
+}
+
+function getPermission() {
+    return ('Notification' in window) ? Notification.permission : 'denied';
+}
+
+function requestPermissionIfNeeded() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
 }
