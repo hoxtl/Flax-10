@@ -15,6 +15,7 @@ function getFormFromEvent(event) {
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
         recurrence: getRecurrenceFromEvent(event),
+        reminder: event.reminder_minutes !== null ? event.reminder_minutes : -1,
         tag: event.tag_name || event.tag_details?.name || 'other',
         location: event.locution || event.location || '',
         all_day: isAllDay(event),
@@ -42,6 +43,7 @@ function getDefaultForm(options) {
         start_time: formatForInput(now),
         end_time: formatForInput(new Date(now.getTime() + 3600000)),
         recurrence: { frequency: 'none', interval: 1 },
+        reminder: -1,
         tag: options.initialTag || 'other',
         location: '', all_day: false,
     };
@@ -160,8 +162,9 @@ function buildBaseEventData(form) {
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
-        tag_name: form.tag || null, // Map form 'tag' (ID) to backend 'tag_name'
-        tag: form.tag || null,      // Keep 'tag' for backward compatibility if needed
+        tag_name: form.tag || null,
+        tag: form.tag || null,
+        reminder_minutes: form.reminder === -1 ? null : form.reminder,
         all_day: form.all_day,
     };
 }
