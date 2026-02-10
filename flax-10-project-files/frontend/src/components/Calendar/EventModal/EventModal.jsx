@@ -4,10 +4,12 @@ import { ModalContent } from './components/ModalContent';
 import './EventModal.css';
 
 export function EventModal({ event, onClose, initialType, initialDate }) {
-    const { tags } = useTags();
-    const otherTag = tags.find(t => t.id === 'other');
-    const defaultTag = otherTag ? otherTag.id : (tags.length > 0 ? tags[0].id : '');
+    const { tags, loading } = useTags();
 
+    if (loading || tags.length === 0) return null;
+
+    const otherTag = tags.find(t => t.label?.toLowerCase() === 'other');
+    const defaultTag = otherTag?.id || tags[0]?.id;
     const options = { initialTag: initialType || defaultTag, initialDate };
     const logic = useEventForm(event, onClose, options);
 

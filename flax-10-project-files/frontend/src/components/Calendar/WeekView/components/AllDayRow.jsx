@@ -37,7 +37,7 @@ function AllDayEvents({ events, days }) {
 function AllDayEventBar({ event, days }) {
     const { openModal } = useEventModal();
     const { getTag } = useTags();
-    const tag = getTag(event.tag_name || event.tag);
+    const tag = getTag(event.tag);
     const color = tag?.color || '#3b82f6';
 
     const style = calculateBarStyle(event, days);

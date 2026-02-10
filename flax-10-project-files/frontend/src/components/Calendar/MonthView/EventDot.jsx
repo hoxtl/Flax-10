@@ -7,7 +7,7 @@ export function EventDot({ e }) {
     const { getTag } = useTags();
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: e });
 
-    const tag = getTag(e.tag_name || e.tag);
+    const tag = getTag(e.tag);
     const color = tag?.color || '#3b82f6';
 
     const onClick = (ev) => {

@@ -1,17 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNotifications } from '../../context/NotificationContext';
+import { playNotificationSound } from '../../utils/notificationSound';
 import './NotificationToast.css';
 
 export function NotificationToast() {
     const { notifications } = useNotifications();
     const [visibleToast, setVisibleToast] = useState(null);
-    const [lastCount, setLastCount] = useState(0);
+    const lastCountRef = useRef(notifications.length);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
-        if (notifications.length > lastCount && notifications.length > 0) {
-            showToast(notifications[0]);
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
         }
-        setLastCount(notifications.length);
+        if (notifications.length > lastCountRef.current) {
+            showToast(notifications[0]);
+            playNotificationSound();
+        }
+        lastCountRef.current = notifications.length;
     }, [notifications.length]);
 
     function showToast(notification) {

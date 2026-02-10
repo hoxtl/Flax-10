@@ -58,6 +58,7 @@ function DayGrid({ hours, date, events }) {
                         key={e.id}
                         event={e}
                         style={calculateEventStyle(e, SLOT_HEIGHT, events, date)}
+                        minWidthForDetails={25}
                     />
                 ))}
             </div>

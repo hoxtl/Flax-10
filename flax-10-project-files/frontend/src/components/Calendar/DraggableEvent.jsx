@@ -7,11 +7,11 @@ import { formatTime } from '../../utils/dateUtils';
 import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
-export function DraggableEvent({ event, style }) {
+export function DraggableEvent({ event, style, minWidthForDetails = 80 }) {
     const { editEvent } = useEventActions();
     const { openModal } = useEventModal();
     const { getTag } = useTags();
-    const theme = getTag(event.tag_name);
+    const theme = getTag(event.tag);
 
     const eventRef = useRef(null);
     const resizeJustEnded = useRef(false);
@@ -26,20 +26,28 @@ export function DraggableEvent({ event, style }) {
         <EventCard
             eventRef={eventRef} event={event} style={style} theme={theme}
             resizePreview={resizePreview} isDragging={isDragging} isResizing={isResizing}
-            dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart} />
+            dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart}
+            minWidth={minWidthForDetails} />
     );
 }
 
-function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
+function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart, minWidth }) {
     const height = resizePreview || parseFloat(style?.height) || 0;
+    const width = parseWidthPercent(style?.width);
     const className = buildClassName(isDragging, isResizing);
     const renderStyle = buildStyle(style, resizePreview, theme);
     return (
         <div ref={eventRef} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
-            <EventContent event={event} height={height} />
+            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={onResizeStart} />
         </div>
     );
+}
+
+function parseWidthPercent(width) {
+    if (!width) return 100;
+    const match = width.match(/(\d+(?:\.\d+)?)/);
+    return match ? parseFloat(match[1]) : 100;
 }
 
 function ResizeHandle({ onStart }) {
@@ -47,14 +55,16 @@ function ResizeHandle({ onStart }) {
     return <div className="resize-handle" draggable={false} onMouseDown={onMouseDown} />;
 }
 
-function EventContent({ event, height }) {
+function EventContent({ event, height, width, minWidth }) {
     const startTime = formatTime(new Date(event.start_time));
     const endTime = formatTime(new Date(event.end_time));
+    const showTime = height >= 30 && width >= minWidth;
+    const showDesc = height >= 60 && width >= minWidth;
     return (
         <div className="event-content">
             <div className="event-title">{event.title}</div>
-            {height >= 30 && <div className="event-time">{startTime} - {endTime}</div>}
-            {height >= 60 && event.description && <div className="event-description">{event.description}</div>}
+            {showTime && <div className="event-time">{startTime} - {endTime}</div>}
+            {showDesc && event.description && <div className="event-description">{event.description}</div>}
         </div>
     );
 }

@@ -2,9 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useNotifications } from '../context/NotificationContext';
 
 export function useReminderNotifications(events) {
-    const lastCheckRef = useRef(new Date());
-    const notifiedRef = useRef(new Set());
     const { addNotification } = useNotifications();
+    const lastCheckRef = useRef(new Date());
 
     useEffect(() => {
         requestNotificationPermission();
@@ -13,7 +12,7 @@ export function useReminderNotifications(events) {
     useEffect(() => {
         const interval = setInterval(() => {
             const now = new Date();
-            checkReminders(events, now, lastCheckRef.current, notifiedRef.current, addNotification);
+            checkAndNotify(events, now, lastCheckRef.current, addNotification);
             lastCheckRef.current = now;
         }, 10000);
         return () => clearInterval(interval);
@@ -22,37 +21,59 @@ export function useReminderNotifications(events) {
 
 function requestNotificationPermission() {
     if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-        Notification.requestPermission();
-    }
+    if (Notification.permission === 'default') Notification.requestPermission();
 }
 
-function checkReminders(events, now, lastCheck, notifiedSet, addNotification) {
-    events.forEach(event => processEventReminder(event, now, lastCheck, notifiedSet, addNotification));
-}
-
-function processEventReminder(event, now, lastCheck, notifiedSet, addNotification) {
-    if (!shouldNotify(event, now, lastCheck, notifiedSet)) return;
-    sendBrowserNotification(event);
-    addInAppNotification(event, addNotification);
-    notifiedSet.add(getEventKey(event));
-}
-
-function addInAppNotification(event, addNotification) {
-    addNotification({
-        title: `Reminder: ${event.title}`,
-        message: getNotificationBody(event),
-        time: new Date(),
+function checkAndNotify(events, now, lastCheck, addNotification) {
+    const sent = getSentReminders();
+    events.forEach(event => {
+        if (shouldNotify(event, now, lastCheck, sent)) {
+            triggerNotification(event, addNotification, sent);
+        }
     });
 }
 
-function shouldNotify(event, now, lastCheck, notifiedSet) {
+function shouldNotify(event, now, lastCheck, sentSet) {
     if (!hasValidReminder(event)) return false;
+    const key = getEventKey(event);
+    if (sentSet.has(key)) return false;
+
     const reminderTime = getReminderTime(event);
     if (reminderTime > now) return false;
+
     const isDue = reminderTime > lastCheck && reminderTime <= now;
-    const wasRecentlyMissed = (now - reminderTime) < 60000;
-    return (isDue || wasRecentlyMissed) && !notifiedSet.has(getEventKey(event));
+    const wasMissed = (now - reminderTime) < 60000;
+
+    return isDue || wasMissed;
+}
+
+function triggerNotification(event, addNotification, sentSet) {
+    sendBrowserNotification(event);
+    addInAppNotification(event, addNotification);
+    markAsSent(event, sentSet);
+}
+
+function markAsSent(event, sentSet) {
+    const key = getEventKey(event);
+    sentSet.add(key);
+    saveSentReminders(sentSet);
+}
+
+function getSentReminders() {
+    try {
+        const saved = localStorage.getItem('sent_reminders');
+        return new Set(saved ? JSON.parse(saved) : []);
+    } catch {
+        return new Set();
+    }
+}
+
+function saveSentReminders(set) {
+    try {
+        localStorage.setItem('sent_reminders', JSON.stringify([...set]));
+    } catch (e) {
+        console.error('Failed to save sent reminders', e);
+    }
 }
 
 function hasValidReminder(event) {
@@ -65,16 +86,20 @@ function getReminderTime(event) {
 
 function sendBrowserNotification(event) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    try {
-        const notification = new Notification(`Reminder: ${event.title}`, {
-            body: getNotificationBody(event),
-            tag: getEventKey(event),
-            requireInteraction: true
-        });
-        notification.onclick = () => window.focus();
-    } catch (err) {
-        console.error('[Reminder] Failed to create notification:', err);
-    }
+    new Notification(`Reminder: ${event.title}`, {
+        body: getNotificationBody(event),
+        tag: getEventKey(event),
+        requireInteraction: true
+    });
+}
+
+function addInAppNotification(event, addNotification) {
+    addNotification({
+        title: `Reminder: ${event.title}`,
+        message: getNotificationBody(event),
+        time: new Date(),
+        tag: getEventKey(event)
+    });
 }
 
 function getNotificationBody(event) {
@@ -84,5 +109,8 @@ function getNotificationBody(event) {
 }
 
 function getEventKey(event) {
-    return `${event.id}_${event.start_time}`;
+    const dateStr = event.start_time instanceof Date
+        ? event.start_time.toISOString()
+        : new Date(event.start_time).toISOString();
+    return `${event.id}_${dateStr}`;
 }

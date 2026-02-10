@@ -48,7 +48,7 @@ export default function PillFilters({ active, onChange, items }) {
 function getAllPills(tags) {
   return [
     { key: "all", label: "All" },
-    ...tags.map(t => ({ key: t.id, label: t.label }))
+    ...tags.map(t => ({ key: t.label.toLowerCase(), label: t.label }))
   ];
 }
 
