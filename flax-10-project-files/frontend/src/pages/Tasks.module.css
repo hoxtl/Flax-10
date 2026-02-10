@@ -1,7 +1,12 @@
 .momentumPage {
-  position: relative;
-  height: calc(100vh - 120px); 
-  padding: 24px;
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)),
+    url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  overflow: hidden;
 }
 
 /* Center block */
