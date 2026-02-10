@@ -1,63 +1,147 @@
 import styles from './TreeAnimation.module.css';
 
 export default function TreeAnimation({ progress, mode }) {
-    // progress is 0 to 100
-    // We want the tree to grow from bottom up.
-    // We'll use a clip-path or mask. simpler is to have a div with overflow hidden and height %?
-    // Actually, SVG masking is smoother.
+    // Progress is now overall goal progress (0-100)
 
-    // In break mode, show full tree or maybe a coffee cup?
-    // For now, let's just keep the tree fully grown during break as a reward.
+    // Define 6 stages of growth for a taller tree
+    let stage = 0;
+    if (progress < 10) stage = 0;      // Seed
+    else if (progress < 25) stage = 1; // Sprout
+    else if (progress < 45) stage = 2; // Sapling
+    else if (progress < 65) stage = 3; // Small Tree
+    else if (progress < 90) stage = 4; // Tall Tree
+    else stage = 5;                    // Full Grown (with fruit)
 
-    const showPercent = mode === 'break' ? 100 : Math.max(5, progress);
+    // Pixel art colors
+    const C = {
+        brown: '#78350f',
+        green: '#22c55e',
+        lightGreen: '#4ade80',
+        darkGreen: '#15803d',
+        red: '#ef4444',
+        pot: '#d97706',
+        soil: '#573010'
+    };
+
+    const P = ({ x, y, c }) => (
+        <rect x={x} y={y} width="1" height="1" fill={c} />
+    );
+
+    // ViewBox changed to 20x24 to allow for a taller tree
+    const renderStage = (s) => {
+        switch (s) {
+            case 0: // Seed
+                return (
+                    <>
+                        {/* Pot at bottom (y=20-23) */}
+                        <P x={8} y={23} c={C.pot} /><P x={9} y={23} c={C.pot} /><P x={10} y={23} c={C.pot} /><P x={11} y={23} c={C.pot} />
+                        <P x={7} y={22} c={C.pot} /><P x={12} y={22} c={C.pot} />
+                        <P x={8} y={22} c={C.soil} /><P x={9} y={22} c={C.soil} /><P x={10} y={22} c={C.soil} /><P x={11} y={22} c={C.soil} />
+                        {/* Sprout tip */}
+                        <P x={9} y={21} c={C.green} /><P x={10} y={21} c={C.green} />
+                    </>
+                );
+            case 1: // Sprout
+                return (
+                    <>
+                        <P x={8} y={23} c={C.pot} /><P x={9} y={23} c={C.pot} /><P x={10} y={23} c={C.pot} /><P x={11} y={23} c={C.pot} />
+                        <P x={7} y={22} c={C.pot} /><P x={12} y={22} c={C.pot} />
+                        <P x={8} y={22} c={C.soil} /><P x={9} y={22} c={C.soil} /><P x={10} y={22} c={C.soil} /><P x={11} y={22} c={C.soil} />
+                        {/* Stem */}
+                        <P x={9} y={21} c={C.green} /><P x={9} y={20} c={C.green} />
+                        {/* Leaves */}
+                        <P x={8} y={19} c={C.green} /><P x={10} y={19} c={C.green} />
+                    </>
+                );
+            case 2: // Sapling
+                return (
+                    <>
+                        <P x={8} y={23} c={C.pot} /><P x={9} y={23} c={C.pot} /><P x={10} y={23} c={C.pot} /><P x={11} y={23} c={C.pot} />
+                        <P x={7} y={22} c={C.pot} /><P x={12} y={22} c={C.pot} />
+                        <P x={8} y={22} c={C.soil} /><P x={9} y={22} c={C.soil} /><P x={10} y={22} c={C.soil} /><P x={11} y={22} c={C.soil} />
+                        {/* Trunk */}
+                        <P x={9} y={21} c={C.brown} /><P x={10} y={21} c={C.brown} />
+                        <P x={9} y={20} c={C.brown} /><P x={10} y={20} c={C.brown} />
+                        <P x={9} y={19} c={C.brown} />
+                        {/* Foliage */}
+                        <P x={8} y={18} c={C.green} /><P x={9} y={18} c={C.green} /><P x={10} y={18} c={C.green} /><P x={11} y={18} c={C.green} />
+                        <P x={7} y={17} c={C.green} /><P x={8} y={17} c={C.green} /><P x={9} y={17} c={C.green} /><P x={10} y={17} c={C.green} /><P x={11} y={17} c={C.green} />
+                        <P x={9} y={16} c={C.green} />
+                    </>
+                );
+            case 3: // Small Tree
+                return (
+                    <>
+                        <P x={8} y={23} c={C.pot} /><P x={9} y={23} c={C.pot} /><P x={10} y={23} c={C.pot} /><P x={11} y={23} c={C.pot} />
+                        <P x={7} y={22} c={C.pot} /><P x={12} y={22} c={C.pot} />
+                        <P x={8} y={22} c={C.soil} /><P x={9} y={22} c={C.soil} /><P x={10} y={22} c={C.soil} /><P x={11} y={22} c={C.soil} />
+                        {/* Trunk */}
+                        <P x={9} y={21} c={C.brown} /><P x={10} y={21} c={C.brown} />
+                        <P x={9} y={20} c={C.brown} /><P x={10} y={20} c={C.brown} />
+                        <P x={9} y={19} c={C.brown} /><P x={10} y={19} c={C.brown} />
+                        <P x={9} y={18} c={C.brown} /><P x={10} y={18} c={C.brown} />
+                        {/* Foliage - wider and taller */}
+                        <P x={7} y={17} c={C.green} /><P x={8} y={17} c={C.green} /><P x={9} y={17} c={C.green} /><P x={10} y={17} c={C.green} /><P x={11} y={17} c={C.green} /><P x={12} y={17} c={C.green} />
+                        <P x={6} y={16} c={C.green} /><P x={7} y={16} c={C.green} /><P x={8} y={16} c={C.green} /><P x={9} y={16} c={C.green} /><P x={10} y={16} c={C.green} /><P x={11} y={16} c={C.green} /><P x={12} y={16} c={C.green} /><P x={13} y={16} c={C.green} />
+                        <P x={7} y={15} c={C.green} /><P x={8} y={15} c={C.green} /><P x={9} y={15} c={C.green} /><P x={10} y={15} c={C.green} /><P x={11} y={15} c={C.green} /><P x={12} y={15} c={C.green} />
+                        <P x={8} y={14} c={C.green} /><P x={9} y={14} c={C.green} /><P x={10} y={14} c={C.green} /><P x={11} y={14} c={C.green} />
+                        <P x={9} y={13} c={C.green} /><P x={10} y={13} c={C.green} />
+                    </>
+                );
+            case 4: // Tall Tree
+                return (
+                    <>
+                        <P x={8} y={23} c={C.pot} /><P x={9} y={23} c={C.pot} /><P x={10} y={23} c={C.pot} /><P x={11} y={23} c={C.pot} />
+                        <P x={7} y={22} c={C.pot} /><P x={12} y={22} c={C.pot} />
+                        <P x={8} y={22} c={C.soil} /><P x={9} y={22} c={C.soil} /><P x={10} y={22} c={C.soil} /><P x={11} y={22} c={C.soil} />
+                        {/* Trunk - Taller */}
+                        <P x={9} y={21} c={C.brown} /><P x={10} y={21} c={C.brown} />
+                        <P x={9} y={20} c={C.brown} /><P x={10} y={20} c={C.brown} />
+                        <P x={9} y={19} c={C.brown} /><P x={10} y={19} c={C.brown} />
+                        <P x={9} y={18} c={C.brown} /><P x={10} y={18} c={C.brown} />
+                        <P x={9} y={17} c={C.brown} /><P x={10} y={17} c={C.brown} />
+                        {/* Foliage - moving up */}
+                        <P x={6} y={16} c={C.green} /><P x={7} y={16} c={C.green} /><P x={8} y={16} c={C.green} /><P x={9} y={16} c={C.green} /><P x={10} y={16} c={C.green} /><P x={11} y={16} c={C.green} /><P x={12} y={16} c={C.green} /><P x={13} y={16} c={C.green} />
+                        <P x={5} y={15} c={C.green} /><P x={6} y={15} c={C.green} /><P x={7} y={15} c={C.green} /><P x={8} y={15} c={C.green} /><P x={9} y={15} c={C.green} /><P x={10} y={15} c={C.green} /><P x={11} y={15} c={C.green} /><P x={12} y={15} c={C.green} /><P x={13} y={15} c={C.green} /><P x={14} y={15} c={C.green} />
+                        <P x={6} y={14} c={C.green} /><P x={7} y={14} c={C.green} /><P x={8} y={14} c={C.green} /><P x={9} y={14} c={C.green} /><P x={10} y={14} c={C.green} /><P x={11} y={14} c={C.green} /><P x={12} y={14} c={C.green} /><P x={13} y={14} c={C.green} />
+                        <P x={7} y={13} c={C.green} /><P x={8} y={13} c={C.green} /><P x={9} y={13} c={C.green} /><P x={10} y={13} c={C.green} /><P x={11} y={13} c={C.green} /><P x={12} y={13} c={C.green} />
+                        <P x={8} y={12} c={C.green} /><P x={9} y={12} c={C.green} /><P x={10} y={12} c={C.green} /><P x={11} y={12} c={C.green} />
+                        <P x={9} y={11} c={C.green} /><P x={10} y={11} c={C.green} />
+                    </>
+                );
+            case 5: // Full Grown
+                return (
+                    <>
+                        <P x={8} y={23} c={C.pot} /><P x={9} y={23} c={C.pot} /><P x={10} y={23} c={C.pot} /><P x={11} y={23} c={C.pot} />
+                        <P x={7} y={22} c={C.pot} /><P x={12} y={22} c={C.pot} />
+                        <P x={8} y={22} c={C.soil} /><P x={9} y={22} c={C.soil} /><P x={10} y={22} c={C.soil} /><P x={11} y={22} c={C.soil} />
+                        {/* Trunk - Tall */}
+                        <P x={9} y={21} c={C.brown} /><P x={10} y={21} c={C.brown} />
+                        <P x={9} y={20} c={C.brown} /><P x={10} y={20} c={C.brown} />
+                        <P x={9} y={19} c={C.brown} /><P x={10} y={19} c={C.brown} />
+                        <P x={9} y={18} c={C.brown} /><P x={10} y={18} c={C.brown} />
+                        <P x={9} y={17} c={C.brown} /><P x={10} y={17} c={C.brown} />
+                        {/* Foliage - BIG */}
+                        <P x={6} y={16} c={C.green} /><P x={7} y={16} c={C.green} /><P x={8} y={16} c={C.green} /><P x={9} y={16} c={C.green} /><P x={10} y={16} c={C.green} /><P x={11} y={16} c={C.green} /><P x={12} y={16} c={C.green} /><P x={13} y={16} c={C.green} />
+                        <P x={5} y={15} c={C.green} /><P x={6} y={15} c={C.green} /><P x={7} y={15} c={C.green} /><P x={8} y={15} c={C.green} /><P x={9} y={15} c={C.green} /><P x={10} y={15} c={C.green} /><P x={11} y={15} c={C.green} /><P x={12} y={15} c={C.green} /><P x={13} y={15} c={C.green} /><P x={14} y={15} c={C.green} />
+                        <P x={4} y={14} c={C.green} /><P x={5} y={14} c={C.green} /><P x={6} y={14} c={C.green} /><P x={7} y={14} c={C.green} /><P x={8} y={14} c={C.green} /><P x={9} y={14} c={C.green} /><P x={10} y={14} c={C.green} /><P x={11} y={14} c={C.green} /><P x={12} y={14} c={C.green} /><P x={13} y={14} c={C.green} /><P x={14} y={14} c={C.green} /><P x={15} y={14} c={C.green} />
+                        <P x={5} y={13} c={C.green} /><P x={6} y={13} c={C.green} /><P x={7} y={13} c={C.green} /><P x={8} y={13} c={C.green} /><P x={9} y={13} c={C.green} /><P x={10} y={13} c={C.green} /><P x={11} y={13} c={C.green} /><P x={12} y={13} c={C.green} /><P x={13} y={13} c={C.green} /><P x={14} y={13} c={C.green} />
+                        <P x={6} y={12} c={C.green} /><P x={7} y={12} c={C.green} /><P x={8} y={12} c={C.green} /><P x={9} y={12} c={C.green} /><P x={10} y={12} c={C.green} /><P x={11} y={12} c={C.green} /><P x={12} y={12} c={C.green} /><P x={13} y={12} c={C.green} />
+                        <P x={7} y={11} c={C.green} /><P x={8} y={11} c={C.green} /><P x={9} y={11} c={C.green} /><P x={10} y={11} c={C.green} /><P x={11} y={11} c={C.green} /><P x={12} y={11} c={C.green} />
+                        <P x={8} y={10} c={C.green} /><P x={9} y={10} c={C.green} /><P x={10} y={10} c={C.green} /><P x={11} y={10} c={C.green} />
+                        {/* Fruits/Decor */}
+                        <P x={6} y={15} c={C.red} /><P x={13} y={14} c={C.red} /><P x={9} y={12} c={C.red} /><P x={11} y={11} c={C.red} />
+                    </>
+                );
+            default: return null;
+        }
+    };
 
     return (
         <div className={styles.container}>
             <div className={styles.scene}>
-                {/* Background brightness/sky could change too */}
-                <svg viewBox="0 0 200 200" className={styles.svg}>
-                    <defs>
-                        <clipPath id="grow-clip">
-                            {/* 
-                                The rect height should grow from bottom (y=200) to top (y=0).
-                                y = 200 - (200 * percent / 100)
-                                height = 200 * percent / 100
-                            */}
-                            <rect
-                                x="0"
-                                y={200 - (2 * showPercent)}
-                                width="200"
-                                height={2 * showPercent}
-                            />
-                        </clipPath>
-                    </defs>
-
-                    {/* Ground */}
-                    <path d="M0 180 Q100 170 200 180 L200 200 L0 200 Z" fill="#86efac" />
-
-                    {/* Tree Group with Clip Path */}
-                    <g clipPath="url(#grow-clip)">
-                        {/* Trunk */}
-                        <path d="M90 180 L90 120 Q90 100 80 80 L90 120 L110 120 L110 180 Z" fill="#78350f" stroke="#78350f" strokeWidth="10" />
-
-                        {/* Leaves / Crown */}
-                        {/* A simple fluffy tree shape */}
-                        <circle cx="100" cy="80" r="40" fill="#22c55e" />
-                        <circle cx="70" cy="90" r="30" fill="#22c55e" />
-                        <circle cx="130" cy="90" r="30" fill="#22c55e" />
-                        <circle cx="100" cy="50" r="30" fill="#4ade80" />
-
-                        {/* Some fruits/decorations */}
-                        <circle cx="110" cy="70" r="5" fill="#ef4444" />
-                        <circle cx="90" cy="90" r="5" fill="#ef4444" />
-                        <circle cx="80" cy="60" r="5" fill="#ef4444" />
-                    </g>
-
-                    {/* Seed/Sprout for low progress? */}
-                    {showPercent < 15 && (
-                        <path d="M100 180 L100 170 Q100 160 110 160" fill="none" stroke="#22c55e" strokeWidth="3" />
-                    )}
-
+                <svg viewBox="0 0 20 24" className={styles.svg} shapeRendering="crispEdges">
+                    {renderStage(stage)}
                 </svg>
             </div>
         </div>
