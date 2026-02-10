@@ -14,8 +14,15 @@
     font-weight: 700;
     color: #2563eb;
     margin-bottom: 2rem;
-    margin-top: -7rem;
+    margin-top: -2rem;
 
+}
+
+.sessionStatus {
+    font-size: 1.25rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
 .timerDisplay {
