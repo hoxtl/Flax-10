@@ -15,9 +15,6 @@ jobs:
   coverage:
     name: Backend Coverage Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: flax-10-project-files/backend
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -36,23 +33,27 @@ jobs:
           pip install coverage
 
       - name: Run Coverage Test
+        working-directory: flax-10-project-files/backend
         run: |
           python -m coverage erase
           python -m coverage run manage.py test
           python -m coverage report -m
 
       - name: Generate XML and HTML coverage
+        working-directory: flax-10-project-files/backend
         run: |
           python -m coverage html
           python -m coverage xml
 
       - name: Upload coverage report artifact
+        working-directory: flax-10-project-files/backend
         uses: actions/upload-artifact@v4
         with:
           name: htmlcov
           path: htmlcov/
 
       - name: Post coverage report as comment
+        working-directory: flax-10-project-files/backend
         uses: MishaKav/pytest-coverage-comment@v1.1.47
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
