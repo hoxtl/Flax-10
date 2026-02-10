@@ -21,7 +21,7 @@ function getGreeting(d = new Date()) {
 
 function dropConfetti() {
     const duration = 1200;
-    const end = Date.now() + dutation; 
+    const end = Date.now() + duration; 
 
     (function frame() {
         confetti({
