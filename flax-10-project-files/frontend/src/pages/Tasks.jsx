@@ -52,6 +52,11 @@ export default function Tasks({ user }) {
   }, [now]);
   const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
 
+  const personalLine = useMemo(
+    () => buildPersonalLine(quote, name),
+    [quote, name]
+  );
+
   // Main goal 
   const [goalText, setGoalText] = useState("");
   const [todayGoal, setTodayGoal] = useState("");
@@ -110,9 +115,7 @@ export default function Tasks({ user }) {
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
 
-        <div className={styles.greeting}>
-          {greeting}, {name}.
-        </div>
+        <div className={styles.personalLine}>{personalLine}</div>
 
         {/* If no goal yet, show prompt and input. Once submitted, show TODAY */}
         {!todayGoal ? (
