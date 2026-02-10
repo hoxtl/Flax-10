@@ -45,6 +45,5 @@ export function useEventModal() {
         dispatch({ type: 'OPEN_MODAL', payload: { event, type, initialDate } });
     };
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
-
     return { modalEvent, modalType, modalInitialDate, isModalOpen, openModal, closeModal };
 }
