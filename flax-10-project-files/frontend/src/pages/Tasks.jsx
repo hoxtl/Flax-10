@@ -55,6 +55,28 @@ export default function Tasks({ user }) {
   }, [now]);
 
   const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
+  
+  // Main goal 
+  const [goalDraft, setGoalDraft] = useState("");
+  const [todayGoal, setTodayGoal] = useState("");
+  const [todayDone, setTodayDone] = useState(false);
+  
+  const submitGoal = (e) => {
+    e.preventDefault();
+    const t = goalDraft.trim();
+    if (!t) return;
+        setTodayGoal(t);
+        setGoalDraft("");
+        setTodayDone(false);
+    };
+
+    const toggleTodayDone = () => {
+    setTodayDone((prev) => {
+        const next = !prev;
+        if (next) burstConfetti();
+        return next;
+    });
+    };
 
   // Tasks drawer
   const [open, setOpen] = useState(false);
