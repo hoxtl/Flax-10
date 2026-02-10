@@ -35,8 +35,8 @@
 }
 
 .goalUnderline {
-  height: 2px;
-  background: rgba(0, 0, 0, 0.25);
+  height: 1.5px;
+  background: rgba(0,0,0,0.2);
   width: 100%;
   margin: 0 auto;
 }
