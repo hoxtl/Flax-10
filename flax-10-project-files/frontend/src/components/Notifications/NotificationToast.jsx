@@ -4,27 +4,20 @@ import { playNotificationSound } from '../../utils/notificationSound';
 import './NotificationToast.css';
 
 export function NotificationToast() {
-    const { notifications } = useNotifications();
+    const { notifications, loading } = useNotifications();
     const [visibleToast, setVisibleToast] = useState(null);
-    const lastCountRef = useRef(notifications.length);
-    const isInitialMount = useRef(true);
+    const seenIdsRef = useRef(new Set());
+    const initializedRef = useRef(false);
 
     useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
+        if (loading) return;
+        if (!initializedRef.current) {
+            markAllAsSeen(notifications, seenIdsRef.current);
+            initializedRef.current = true;
             return;
         }
-        if (notifications.length > lastCountRef.current) {
-            showToast(notifications[0]);
-            playNotificationSound();
-        }
-        lastCountRef.current = notifications.length;
-    }, [notifications.length]);
-
-    function showToast(notification) {
-        setVisibleToast(notification);
-        setTimeout(() => setVisibleToast(null), 3000);
-    }
+        checkForNewNotification(notifications, seenIdsRef.current, setVisibleToast);
+    }, [notifications, loading]);
 
     if (!visibleToast) return null;
 
@@ -34,4 +27,20 @@ export function NotificationToast() {
             <span className="toast-message">{visibleToast.message}</span>
         </div>
     );
+}
+
+function markAllAsSeen(notifications, seenIds) {
+    notifications.forEach(n => seenIds.add(n.id));
+}
+
+function checkForNewNotification(notifications, seenIds, setVisibleToast) {
+    const newNotification = notifications.find(n => !seenIds.has(n.id));
+    if (newNotification) showToast(newNotification, seenIds, setVisibleToast);
+}
+
+function showToast(notification, seenIds, setVisibleToast) {
+    seenIds.add(notification.id);
+    setVisibleToast(notification);
+    playNotificationSound();
+    setTimeout(() => setVisibleToast(null), 3000);
 }

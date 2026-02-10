@@ -14,3 +14,6 @@ from .tasks.taskModel import *
 
 # Todos
 from .todos.todoListModel import *
+
+# Notifications
+from .notifications.notificationModel import *

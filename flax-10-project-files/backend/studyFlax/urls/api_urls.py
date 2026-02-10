@@ -11,6 +11,7 @@ from studyFlax.views.hello import hello
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
+from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -25,4 +26,7 @@ urlpatterns = [
     path("auth/login/", login_view, name='auth-login'),
     path("auth/logout/", logout_view, name='auth-logout'),
     path("timetable/import/", timetable_import, name="timetable-import"),
+    path("notifications/", notification_list, name="notification-list"),
+    path("notifications/<int:pk>/", notification_detail, name="notification-detail"),
+    path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
 ]
