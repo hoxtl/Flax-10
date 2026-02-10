@@ -46,15 +46,13 @@ jobs:
           python -m coverage xml
 
       - name: Upload coverage report artifact
-        working-directory: flax-10-project-files/backend
         uses: actions/upload-artifact@v4
         with:
           name: htmlcov
-          path: htmlcov/
+          path: flax-10-project-files/backend/htmlcov/
 
       - name: Post coverage report as comment
-        working-directory: flax-10-project-files/backend
         uses: MishaKav/pytest-coverage-comment@v1.1.47
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pytest-xml-coverage-path: coverage.xml
+          pytest-xml-coverage-path: flax-10-project-files/backend/coverage.xml
