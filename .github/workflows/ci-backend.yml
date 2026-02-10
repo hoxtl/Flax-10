@@ -75,4 +75,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERAGE_XML_PATH: ../backend/coverage.xml
         run: |
-        python backend_coverage_commentor.py
+          python backend_coverage_commentor.py
