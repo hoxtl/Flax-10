@@ -66,10 +66,18 @@ export default function Tasks({ user }) {
       {/* Center content */}
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
-        <div className={styles.quote}>{quote}</div>
+
         <div className={styles.greeting}>
           {greeting}, {name}.
         </div>
+
+        <div className={styles.goalBlock}>
+          <div className={styles.goalPrompt}>What is your main goal for today?</div>
+          <input className={styles.goalInput} placeholder="" />
+          <div className={styles.goalUnderline} />
+        </div>
+
+        <div className={styles.bottomQuote}>"{quote}"</div>
       </div>
 
       {/* Bottom-right Tasks button */}
