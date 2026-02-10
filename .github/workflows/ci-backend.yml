@@ -72,7 +72,7 @@ jobs:
       - name: Post coverage report as comment
         working-directory: flax-10-project-files/scripts
         env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERAGE_XML_PATH: ../backend/coverage.xml
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERAGE_XML_PATH: ../backend/coverage.xml
         run: |
           python backend_coverage_commentor.py
