@@ -34,7 +34,7 @@ jobs:
       - name: Run frontend tests with coverage
         run: |
           npm run test -- --run
-          npm run coverage
+          npm run coverage-report-clover
 
       - name: Post frontend coverage report as PR comment
         working-directory: flax-10-project-files/scripts
