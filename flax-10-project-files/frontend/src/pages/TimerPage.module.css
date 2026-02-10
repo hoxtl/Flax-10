@@ -2,30 +2,29 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify_content: center;
+    justify-content: center;
     height: 100%;
+    width: 100%;
     padding: 2rem;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    max-width: 600px;
-    margin: 2rem auto;
     text-align: center;
 }
 
 .title {
     font-size: 2rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #2563eb;
     margin-bottom: 2rem;
+    margin-top: -7rem;
+
 }
 
 .timerDisplay {
-    font-size: 6rem;
+    font-size: 6vw;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     color: #2563eb;
-    margin: 1rem 0;
+    margin: 2rem 0;
+    line-height: 1;
     transition: color 0.3s ease;
 }
 
@@ -35,13 +34,13 @@
 
 .controls {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 2rem;
+    margin-bottom: 3rem;
 }
 
 .button {
-    padding: 0.75rem 2rem;
-    font-size: 1.1rem;
+    padding: 1rem 3rem;
+    font-size: 1.5rem;
     font-weight: 600;
     border: none;
     border-radius: 99px;
