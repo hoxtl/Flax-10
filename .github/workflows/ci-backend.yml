@@ -1,4 +1,4 @@
-name: CI
+name: CI Backend
 
 on:
   push:
@@ -15,6 +15,22 @@ jobs:
   coverage:
     name: Backend Coverage Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+        ports:
+          - 5432:5432
+        # Healthcheck so tests don't race Postgres startup
+        options: >-
+          --health-cmd="pg_isready -U user -d postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -28,6 +44,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install coverage
