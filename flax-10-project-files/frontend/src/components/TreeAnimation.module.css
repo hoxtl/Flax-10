@@ -16,14 +16,17 @@
     width: 100%;
     height: 100%;
     overflow: visible;
+    image-rendering: pixelated;
+    /* for firefox */
+    image-rendering: crisp-edges;
 }
 
 @keyframes sway {
-    from {
-        transform: rotate(-1deg);
+    0% {
+        transform: rotate(-2deg);
     }
 
-    to {
-        transform: rotate(1deg);
+    100% {
+        transform: rotate(2deg);
     }
 }

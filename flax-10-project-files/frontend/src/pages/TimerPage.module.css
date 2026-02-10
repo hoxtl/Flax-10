@@ -11,11 +11,11 @@
 }
 
 .title {
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: #2563eb;
     margin-bottom: 1rem;
-    margin-top: 0;
+    margin-top: -3;
 }
 
 .sessionStatus {
@@ -26,7 +26,7 @@
 }
 
 .timerDisplay {
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     color: #2563eb;
