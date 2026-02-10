@@ -20,6 +20,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reporter: ["text", "text-summary", "html", "lcov"],
+      reportOnFailure: true,
     },
   },
 })
