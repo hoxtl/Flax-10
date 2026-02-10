@@ -10,7 +10,35 @@
   display: grid;
   place-items: center;
   text-align: center;
-  gap: 10px;
+  gap: 14px;
+}
+
+.goalBlock {
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+  width: min(720px, 80%);
+}
+
+.goalPrompt {
+  font-size: 28px;
+  opacity: 0.8;
+}
+
+.goalInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 28px;
+  text-align: center;
+  padding: 10px 6px;
+}
+
+.goalUnderline {
+  height: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  width: 100%;
+  margin: 0 auto;
 }
 
 .time {
@@ -19,9 +47,14 @@
   font-weight: 700;
 }
 
-.quote {
-  font-size: 28px;
-  opacity: 0.85;
+.bottomQuote {
+  position: relative;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  font-size: 16px;
+  opacity: 0.6;
+  width: min(900px, 90%);
 }
 
 .greeting {
