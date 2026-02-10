@@ -20,7 +20,6 @@ function getGreeting(d = new Date()) {
 
 export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
-  const greeting = useMemo(() => getGreeting(), []);
 
   // Live clock
   const [now, setNow] = useState(() => new Date());
@@ -29,10 +28,11 @@ export default function Tasks({ user }) {
     return () => clearInterval(id);
   }, []);
 
+  const greeting = useMemo(() => getGreeting(now), [now]);
+
   // Generate quote per hour
   const quoteKey = useMemo(() => {
-    const d = now; 
-    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}-${d.getHours()}`;
+    return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}`;
   }, [now]);
 
   const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
@@ -63,7 +63,6 @@ export default function Tasks({ user }) {
 
   return (
     <div className={styles.momentumPage}>
-      {/* Center content */}
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
 
@@ -76,16 +75,14 @@ export default function Tasks({ user }) {
           <input className={styles.goalInput} placeholder="" />
           <div className={styles.goalUnderline} />
         </div>
-
-        <div className={styles.bottomQuote}>"{quote}"</div>
       </div>
 
-      {/* Bottom-right Tasks button */}
+      <div className={styles.bottomQuote}>"{quote}"</div>
+
       <button className={styles.tasksBtn} onClick={() => setOpen(true)}>
         Tasks
       </button>
 
-      {/* Drawer */}
       {open && (
         <>
           <div className={styles.backdrop} onClick={() => setOpen(false)} />
