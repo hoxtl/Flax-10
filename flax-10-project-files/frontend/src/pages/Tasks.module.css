@@ -163,3 +163,29 @@
   text-decoration: line-through;
   opacity: 0.6;
 }
+
+.todayBlock {
+  margin-top: 26px;
+  text-align: center;
+}
+
+.todayLabel {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.todayRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+}
+
+.todayDone {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
