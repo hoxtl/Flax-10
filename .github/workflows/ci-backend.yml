@@ -73,6 +73,9 @@ jobs:
         working-directory: flax-10-project-files/scripts/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERAGE_XML_PATH: flax-10-project-files/backend/coverage.xml
+          COVERAGE_XML_PATH: flax-10-project-files/backend/
         run: |
           python backend_coverage_commentor.py
+          
+      - name: Post code quality check as comment
+        working-directory: flax-10-project-files/scripts/
