@@ -1,15 +1,23 @@
-import { createContext, useContext, useReducer, useCallback } from 'react';
+import { createContext, useContext, useReducer, useEffect } from 'react';
 
 const NotificationContext = createContext(null);
 
-const initialState = {
-    notifications: [],
-    isOpen: false,
-    hasUnread: false,
+const getInitialState = () => {
+    try {
+        const saved = localStorage.getItem('notifications');
+        return saved ? JSON.parse(saved) : { notifications: [], isOpen: false, hasUnread: false };
+    } catch (e) {
+        return { notifications: [], isOpen: false, hasUnread: false };
+    }
 };
 
 export function NotificationProvider({ children }) {
-    const [state, dispatch] = useReducer(notificationReducer, initialState);
+    const [state, dispatch] = useReducer(notificationReducer, null, getInitialState);
+
+    useEffect(() => {
+        localStorage.setItem('notifications', JSON.stringify(state));
+    }, [state]);
+
     const actions = buildActions(dispatch);
 
     return (
@@ -66,8 +74,11 @@ function addNotification(state, notification) {
 }
 
 function dismissNotification(state, id) {
+    const notifications = state.notifications.filter(n => n.id !== id);
+    const hasUnread = notifications.some(n => !n.read);
     return {
         ...state,
-        notifications: state.notifications.filter(n => n.id !== id),
+        notifications,
+        hasUnread
     };
 }

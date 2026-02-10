@@ -5,7 +5,7 @@ import { useTags } from "../context/TagContext";
 // Card component that displays the details of an event and includes a delete button
 export default function DayCard({ e, onDelete, onClick, date }) {
   const { getTag } = useTags();
-  const theme = getTag(e.tag_name);
+  const theme = getTag(e.tag);
   const t = theme || { color: "#94A3B8", icon: "⭐" };
   return (
     <article className={styles.card} style={{ "--accent": t.color }} onClick={onClick}>

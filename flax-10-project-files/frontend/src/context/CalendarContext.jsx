@@ -28,7 +28,7 @@ export function useCalendar() {
     const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
     const filteredEvents = currentFilter.includes('all')
         ? context.events
-        : context.events.filter(e => currentFilter.includes(e.tag_name));
+        : context.events.filter(e => currentFilter.includes(e.tag_name?.toLowerCase()));
 
     return { ...context, events: filteredEvents, allEvents: context.events };
 }
