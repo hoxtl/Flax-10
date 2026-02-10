@@ -29,6 +29,13 @@ function dropConfetti() {
   })();
 }
 
+function buildPersonalLine(quote, name) {
+  if (!quote) return name ? `Hi, ${name}.` : "Hi.";
+  const cleaned = quote.trim().replace(/[".]+$/g, "");
+  const lower = cleaned.charAt(0).toLowerCase() + cleaned.slice(1);
+  return `${lower}, ${name}.`;
+}
+
 export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
 
