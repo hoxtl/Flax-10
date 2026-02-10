@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './TimerPage.module.css';
+import TreeAnimation from '../components/TreeAnimation';
 
 export default function TimerPage() {
     const [workTime, setWorkTime] = useState(25);
@@ -78,12 +79,15 @@ export default function TimerPage() {
     };
 
     // Calculate progress for the current session
+
     const currentTotal = mode === 'work' ? workTime * 60 : breakTime * 60;
     const sessionProgress = ((currentTotal - timeLeft) / currentTotal) * 100;
 
     return (
         <div className={styles.container}>
             <div className={styles.title}>Study Timer</div>
+
+            <TreeAnimation progress={sessionProgress} mode={mode} />
 
             <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
                 {mode === 'work' ? '🔥 Focus Time' : '☕ Break Time'}
