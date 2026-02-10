@@ -58,14 +58,14 @@ function NotificationList({ notifications, onDismiss }) {
 }
 
 function NotificationItem({ notification, onDismiss }) {
-    const { id, title, message, read, time } = notification;
+    const { id, title, message, read, created_at } = notification;
 
     return (
         <li className={`notification-item ${read ? '' : 'unread'}`}>
             <div className="notification-content">
                 <span className="notification-title">{title}</span>
                 <span className="notification-message">{message}</span>
-                <span className="notification-time">{formatTime(time)}</span>
+                <span className="notification-time">{formatTime(created_at)}</span>
             </div>
             <button className="dismiss-btn" onClick={() => onDismiss(id)}>×</button>
         </li>

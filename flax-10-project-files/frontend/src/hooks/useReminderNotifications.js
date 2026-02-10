@@ -97,8 +97,6 @@ function addInAppNotification(event, addNotification) {
     addNotification({
         title: `Reminder: ${event.title}`,
         message: getNotificationBody(event),
-        time: new Date(),
-        tag: getEventKey(event)
     });
 }
 

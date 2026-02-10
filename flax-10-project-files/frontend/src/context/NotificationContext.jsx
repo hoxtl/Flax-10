@@ -1,84 +1,75 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import * as api from '../api/notificationApi';
 
 const NotificationContext = createContext(null);
 
-const getInitialState = () => {
-    try {
-        const saved = localStorage.getItem('notifications');
-        return saved ? JSON.parse(saved) : { notifications: [], isOpen: false, hasUnread: false };
-    } catch (e) {
-        return { notifications: [], isOpen: false, hasUnread: false };
-    }
-};
-
 export function NotificationProvider({ children }) {
-    const [state, dispatch] = useReducer(notificationReducer, null, getInitialState);
+    const [notifications, setNotifications] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        localStorage.setItem('notifications', JSON.stringify(state));
-    }, [state]);
+        loadNotifications();
+    }, []);
 
-    const actions = buildActions(dispatch);
+    async function loadNotifications() {
+        try {
+            const data = await api.fetchNotifications();
+            setNotifications(data);
+        } catch (err) {
+            console.error('Failed to fetch notifications:', err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const actions = useNotificationActions(setNotifications);
+    const hasUnread = notifications.some(n => !n.read);
+    const value = { notifications, isOpen, hasUnread, loading, ...actions, togglePanel, closePanel };
+
+    function togglePanel() { setIsOpen(prev => !prev); }
+    function closePanel() { setIsOpen(false); }
 
     return (
-        <NotificationContext.Provider value={{ ...state, ...actions }}>
+        <NotificationContext.Provider value={value}>
             {children}
         </NotificationContext.Provider>
     );
+}
+
+function useNotificationActions(setNotifications) {
+    const addNotification = useCallback(async (notification) => {
+        try {
+            const created = await api.createNotification(notification);
+            setNotifications(prev => [created, ...prev]);
+        } catch (err) {
+            console.error('Failed to create notification:', err);
+        }
+    }, [setNotifications]);
+
+    const dismissNotification = useCallback(async (id) => {
+        try {
+            await api.deleteNotification(id);
+            setNotifications(prev => prev.filter(n => n.id !== id));
+        } catch (err) {
+            console.error('Failed to delete notification:', err);
+        }
+    }, [setNotifications]);
+
+    const markAllRead = useCallback(async () => {
+        try {
+            await api.markAllNotificationsRead();
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        } catch (err) {
+            console.error('Failed to mark all read:', err);
+        }
+    }, [setNotifications]);
+
+    return { addNotification, dismissNotification, markAllRead };
 }
 
 export function useNotifications() {
     const context = useContext(NotificationContext);
     if (!context) throw new Error('useNotifications must be used within NotificationProvider');
     return context;
-}
-
-function buildActions(dispatch) {
-    return {
-        addNotification: (n) => dispatch({ type: 'ADD_NOTIFICATION', payload: n }),
-        dismissNotification: (id) => dispatch({ type: 'DISMISS_NOTIFICATION', payload: id }),
-        markAllRead: () => dispatch({ type: 'MARK_ALL_READ' }),
-        togglePanel: () => dispatch({ type: 'TOGGLE_PANEL' }),
-        closePanel: () => dispatch({ type: 'CLOSE_PANEL' }),
-    };
-}
-
-function notificationReducer(state, action) {
-    switch (action.type) {
-        case 'ADD_NOTIFICATION': return addNotification(state, action.payload);
-        case 'DISMISS_NOTIFICATION': return dismissNotification(state, action.payload);
-        case 'MARK_ALL_READ': return markAllRead(state);
-        case 'TOGGLE_PANEL': return { ...state, isOpen: !state.isOpen };
-        case 'CLOSE_PANEL': return { ...state, isOpen: false };
-        default: return state;
-    }
-}
-
-function markAllRead(state) {
-    const notifications = state.notifications.map(n => ({ ...n, read: true }));
-    return { ...state, notifications, hasUnread: false };
-}
-
-function addNotification(state, notification) {
-    const newNotification = {
-        id: Date.now(),
-        timestamp: new Date(),
-        read: false,
-        ...notification,
-    };
-    return {
-        ...state,
-        notifications: [newNotification, ...state.notifications],
-        hasUnread: true,
-    };
-}
-
-function dismissNotification(state, id) {
-    const notifications = state.notifications.filter(n => n.id !== id);
-    const hasUnread = notifications.some(n => !n.read);
-    return {
-        ...state,
-        notifications,
-        hasUnread
-    };
 }
