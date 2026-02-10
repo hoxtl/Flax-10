@@ -20,21 +20,21 @@ function getGreeting(d = new Date()) {
 }
 
 function dropConfetti() {
-    const duration = 1200;
-    const end = Date.now() + duration; 
+  const duration = 1200;
+  const end = Date.now() + duration;
 
-    (function frame() {
-        confetti({
-            particleCount: 10, 
-            spread: 70,
-            startVelocity: 19,
-            gravity: 0.9,
-            ticks: 200,
-            origin: { x: Math.random(), y: 0.05},
-        });
+  (function frame() {
+    confetti({
+      particleCount: 12,
+      spread: 70,
+      startVelocity: 18,
+      gravity: 0.9,
+      ticks: 200,
+      origin: { x: Math.random(), y: 0.05 },
+    });
 
-        if (Date.now() < end) requestAnimationFrame(frame);
-    })();
+    if (Date.now() < end) requestAnimationFrame(frame);
+  })();
 }
 
 export default function Tasks({ user }) {
@@ -49,17 +49,39 @@ export default function Tasks({ user }) {
 
   const greeting = useMemo(() => getGreeting(now), [now]);
 
-  // Generate quote per hour
+  // Quote per hour
   const quoteKey = useMemo(() => {
     return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}`;
   }, [now]);
-
   const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
+
+  // Main goal (Momentum-like)
+  const [goalText, setGoalText] = useState("");
+  const [todayGoal, setTodayGoal] = useState("");
+  const [todayDone, setTodayDone] = useState(false);
+
+  const submitGoal = (e) => {
+    e.preventDefault();
+    const t = goalText.trim();
+    if (!t) return;
+
+    setTodayGoal(t);
+    setTodayDone(false);
+    setGoalText("");
+  };
+
+  const toggleTodayDone = () => {
+    setTodayDone((prev) => {
+      const next = !prev;
+      if (next) dropConfetti();
+      return next;
+    });
+  };
 
   // Tasks drawer
   const [open, setOpen] = useState(false);
 
-  // Checklist state
+  // Checklist state (drawer)
   const [text, setText] = useState("");
   const [items, setItems] = useState([
     { id: 1, title: "Read lecture slides", done: false },
@@ -80,6 +102,12 @@ export default function Tasks({ user }) {
     );
   };
 
+  const resetGoal = () => {
+    setTodayGoal("");
+    setTodayDone(false);
+    setGoalText("");
+  };
+
   return (
     <div className={styles.momentumPage}>
       <div className={styles.center}>
@@ -89,11 +117,54 @@ export default function Tasks({ user }) {
           {greeting}, {name}.
         </div>
 
-        <div className={styles.goalBlock}>
-          <div className={styles.goalPrompt}>What is your main goal for today?</div>
-          <input className={styles.goalInput} placeholder="" />
-          <div className={styles.goalUnderline} />
-        </div>
+        {/* If no goal yet, show prompt+input. Once submitted, show TODAY */}
+        {!todayGoal ? (
+          <form className={styles.goalBlock} onSubmit={submitGoal}>
+            <div className={styles.goalPrompt}>
+              What is your main goal for today?
+            </div>
+
+            <input
+              className={styles.goalInput}
+              value={goalText}
+              onChange={(e) => setGoalText(e.target.value)}
+              placeholder=""
+              autoFocus
+            />
+
+            <div className={styles.goalUnderline} />
+          </form>
+        ) : (
+          <div className={styles.todayBlock}>
+            <div className={styles.todayLabel}>TODAY</div>
+
+            <label className={styles.todayRow}>
+              <input
+                type="checkbox"
+                checked={todayDone}
+                onChange={toggleTodayDone}
+              />
+              <span className={todayDone ? styles.todayDone : ""}>
+                {todayGoal}
+              </span>
+            </label>
+
+            {/* optional: allow changing the goal */}
+            <button
+              type="button"
+              onClick={resetGoal}
+              style={{
+                marginTop: 14,
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                opacity: 0.7,
+              }}
+            >
+              Change goal
+            </button>
+          </div>
+        )}
       </div>
 
       <div className={styles.bottomQuote}>"{quote}"</div>
@@ -108,7 +179,10 @@ export default function Tasks({ user }) {
           <div className={styles.drawer}>
             <div className={styles.drawerHeader}>
               <div className={styles.drawerTitle}>Today</div>
-              <button className={styles.closeBtn} onClick={() => setOpen(false)}>
+              <button
+                className={styles.closeBtn}
+                onClick={() => setOpen(false)}
+              >
                 ✕
               </button>
             </div>
