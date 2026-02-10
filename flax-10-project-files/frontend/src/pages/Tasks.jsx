@@ -39,6 +39,9 @@ function buildPersonalLine(quote, name) {
 export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
 
+  // To-do list panel
+  const [tasksOpen, setTasksOpen] = useState(true);
+
   // Live clock
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -57,7 +60,7 @@ export default function Tasks({ user }) {
     [quote, name]
   );
 
-  // Main goal 
+  // Main goal
   const [goalText, setGoalText] = useState("");
   const [todayGoal, setTodayGoal] = useState("");
   const [todayDone, setTodayDone] = useState(false);
@@ -93,7 +96,6 @@ export default function Tasks({ user }) {
 
         <div className={styles.personalLine}>{personalLine}</div>
 
-        {/* If no goal yet, show prompt and input. Once submitted, show TODAY */}
         {!todayGoal ? (
           <form className={styles.goalBlock} onSubmit={submitGoal}>
             <div className={styles.goalPrompt}>
@@ -143,7 +145,15 @@ export default function Tasks({ user }) {
       </div>
 
       <div className={styles.bottomQuote}>"{quote}"</div>
-      <ToDoPanel />
+
+      <button
+        className={styles.tasksBtn}
+        onClick={() => setTasksOpen((v) => !v)}
+      >
+        Tasks
+      </button>
+
+      <ToDoPanel open={tasksOpen} />
     </div>
   );
 }
