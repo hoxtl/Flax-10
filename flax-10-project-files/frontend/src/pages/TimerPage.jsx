@@ -4,6 +4,8 @@ import styles from './TimerPage.module.css';
 export default function TimerPage() {
     const [workTime, setWorkTime] = useState(25);
     const [breakTime, setBreakTime] = useState(5);
+    const [targetSessions, setTargetSessions] = useState(4);
+    const [completedSessions, setCompletedSessions] = useState(0);
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
     const [mode, setMode] = useState('work'); // 'work' | 'break'
@@ -29,7 +31,19 @@ export default function TimerPage() {
             setMode('break');
             setTimeLeft(breakTime * 60);
         } else {
-            alert("Break over! Time to focus.");
+            // Break is done, increment session and check goal
+            const newCompleted = completedSessions + 1;
+            setCompletedSessions(newCompleted);
+
+            if (newCompleted >= targetSessions) {
+                alert("🎉 Goal reached! You've completed all your sessions.");
+                setMode('work');
+                setTimeLeft(workTime * 60);
+                setCompletedSessions(0);
+                return;
+            }
+
+            alert("Break over! Time to focus on the next session.");
             setMode('work');
             setTimeLeft(workTime * 60);
         }
@@ -41,6 +55,7 @@ export default function TimerPage() {
         setIsActive(false);
         setMode('work');
         setTimeLeft(workTime * 60);
+        setCompletedSessions(0);
     };
 
     const handleTimeChange = (type, value) => {
@@ -48,9 +63,11 @@ export default function TimerPage() {
         if (type === 'work') {
             setWorkTime(newVal);
             if (mode === 'work' && !isActive) setTimeLeft(newVal * 60);
-        } else {
+        } else if (type === 'break') {
             setBreakTime(newVal);
             if (mode === 'break' && !isActive) setTimeLeft(newVal * 60);
+        } else if (type === 'sessions') {
+            setTargetSessions(Math.max(1, parseInt(value) || 1));
         }
     };
 
@@ -60,9 +77,9 @@ export default function TimerPage() {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const progress = mode === 'work'
-        ? ((workTime * 60 - timeLeft) / (workTime * 60)) * 100
-        : ((breakTime * 60 - timeLeft) / (breakTime * 60)) * 100;
+    // Calculate progress for the current session
+    const currentTotal = mode === 'work' ? workTime * 60 : breakTime * 60;
+    const sessionProgress = ((currentTotal - timeLeft) / currentTotal) * 100;
 
     return (
         <div className={styles.container}>
@@ -70,6 +87,10 @@ export default function TimerPage() {
 
             <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
                 {mode === 'work' ? '🔥 Focus Time' : '☕ Break Time'}
+            </div>
+
+            <div className={styles.sessionStatus}>
+                Session {completedSessions + 1} of {targetSessions}
             </div>
 
             <div className={`${styles.timerDisplay} ${mode === 'break' ? styles.break : ''}`}>
@@ -109,6 +130,16 @@ export default function TimerPage() {
                         className={styles.input}
                         value={breakTime}
                         onChange={(e) => handleTimeChange('break', e.target.value)}
+                        disabled={isActive}
+                    />
+                </div>
+                <div className={styles.settingItem}>
+                    <label className={styles.label}>Sessions</label>
+                    <input
+                        type="number"
+                        className={styles.input}
+                        value={targetSessions}
+                        onChange={(e) => handleTimeChange('sessions', e.target.value)}
                         disabled={isActive}
                     />
                 </div>
