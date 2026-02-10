@@ -45,9 +45,18 @@
 }
 
 .time {
-  font-size: clamp(72px, 10vw, 140px);
-  font-weight: 700;
+  font-size: clamp(72px, 100vw, 140px);
+  font-weight: 600;
   line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.greeting {
+  font-size: clamp(34px, 4.4vw, 56px);
+  font-weight: 600;
+  opacity: 0.9;
+  margin-top: 6px;
+  letter-spacing: -0.1px;
 }
 
 .bottomQuote {
@@ -61,11 +70,6 @@
   width: 100%;
   padding: 0 16px;
   letter-spacing: 0.3px;
-}
-
-.greeting {
-  font-size: 22px;
-  opacity: 0.9;
 }
 
 /* Bottom-right button */
