@@ -28,9 +28,29 @@ export default function TimerPage() {
         setIsActive(false);
         // Play notification sound here if we had one
         if (mode === 'work') {
-            alert("Work session complete! Time for a break.");
-            setMode('break');
-            setTimeLeft(breakTime * 60);
+            if (breakTime === 0) {
+                // Skip break entirely if 0
+                // Increment session immediately
+                const newCompleted = completedSessions + 1;
+                setCompletedSessions(newCompleted);
+
+                if (newCompleted >= targetSessions) {
+                    alert("🎉 Goal reached! You've completed all your sessions.");
+                    setMode('work');
+                    setTimeLeft(workTime * 60);
+                    setCompletedSessions(0);
+                    return;
+                }
+
+                // Start next work session immediately
+                setMode('work');
+                setTimeLeft(workTime * 60);
+                setIsActive(true); // Continuous if no break? Or wait? Let's pause.
+            } else {
+                alert("Work session complete! Time for a break.");
+                setMode('break');
+                setTimeLeft(breakTime * 60);
+            }
         } else {
             // Break is done, increment session and check goal
             const newCompleted = completedSessions + 1;
@@ -60,11 +80,13 @@ export default function TimerPage() {
     };
 
     const handleTimeChange = (type, value) => {
-        const newVal = Math.max(1, Math.min(180, parseInt(value) || 1));
+        const val = parseInt(value) || 0;
         if (type === 'work') {
+            const newVal = Math.max(1, Math.min(180, val));
             setWorkTime(newVal);
             if (mode === 'work' && !isActive) setTimeLeft(newVal * 60);
         } else if (type === 'break') {
+            const newVal = Math.max(0, Math.min(60, val)); // Allow 0
             setBreakTime(newVal);
             if (mode === 'break' && !isActive) setTimeLeft(newVal * 60);
         } else if (type === 'sessions') {
