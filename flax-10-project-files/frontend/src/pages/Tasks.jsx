@@ -55,7 +55,7 @@ export default function Tasks({ user }) {
   }, [now]);
   const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
 
-  // Main goal (Momentum-like)
+  // Main goal 
   const [goalText, setGoalText] = useState("");
   const [todayGoal, setTodayGoal] = useState("");
   const [todayDone, setTodayDone] = useState(false);
@@ -117,7 +117,7 @@ export default function Tasks({ user }) {
           {greeting}, {name}.
         </div>
 
-        {/* If no goal yet, show prompt+input. Once submitted, show TODAY */}
+        {/* If no goal yet, show prompt and input. Once submitted, show TODAY */}
         {!todayGoal ? (
           <form className={styles.goalBlock} onSubmit={submitGoal}>
             <div className={styles.goalPrompt}>
@@ -149,7 +149,6 @@ export default function Tasks({ user }) {
               </span>
             </label>
 
-            {/* optional: allow changing the goal */}
             <button
               type="button"
               onClick={resetGoal}
