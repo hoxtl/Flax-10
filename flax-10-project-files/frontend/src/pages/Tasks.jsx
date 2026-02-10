@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./Tasks.module.css";
+import { pickQuoteByKey } from "../lib/quotes";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -17,28 +18,9 @@ function getGreeting(d = new Date()) {
   return "Night owl";
 }
 
-const QUOTES = [
-  "Never stop exploring.",
-  "Make it count.",
-  "Stay curious.",
-  "One task at a time.",
-  "Small steps daily.",
-  "Keep going.",
-  "Start, then improve.",
-  "Progress over perfection.",
-];
-
-function getDailyQuote(d = new Date()) {
-  const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-  return QUOTES[hash % QUOTES.length];
-}
-
 export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
   const greeting = useMemo(() => getGreeting(), []);
-  const quote = useMemo(() => getDailyQuote(), []);
 
   // Live clock
   const [now, setNow] = useState(() => new Date());
@@ -46,6 +28,14 @@ export default function Tasks({ user }) {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Generate quote per hour
+  const quoteKey = useMemo(() => {
+    const d = now; 
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}-${d.getHours()}`;
+  }, [now]);
+
+  const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
 
   // Tasks drawer
   const [open, setOpen] = useState(false);
