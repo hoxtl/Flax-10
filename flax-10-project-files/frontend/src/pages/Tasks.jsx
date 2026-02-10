@@ -47,7 +47,7 @@ export default function Tasks({ user }) {
 
   // Quote per hour
   const quoteKey = useMemo(() => {
-    return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}`;
+    return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}`;
   }, [now]);
   const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
 
