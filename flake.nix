@@ -34,7 +34,12 @@
 				];
 
 				shellHook = ''
-				  echo "Entering Flax-10 wonderland..."
+				  echo "\n"
+				  echo "Entering Flax-10 wonderland...\n"
+				  echo "...\n"
+				  echo "..\n"
+				  echo ".\n"
+				  echo "\n"
 				
 				WORK_DIR="$PWD"
 				VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
@@ -42,31 +47,42 @@
 				BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
 				
 				if [ ! -d "$VENV_DIR" ]; then 
-					echo "Running for the first time, creating venv with necessary packages and deploying Node toolchain..."
+					echo "\n"
+					echo "Running for the first time, creating venv with necessary packages and deploying Node toolchain...\n"
+					echo "\n"
 					python -m venv "$VENV_DIR"
 					source "$VENV_DIR/bin/activate"
 					
 					cd "$WORK_DIR"
 					pip install -r requirements.txt
 				else
-					echo "Venv detected..."
+					echo "\n"
+					echo "Venv detected...\n"
+					echo "\n"
 					source "$VENV_DIR/bin/activate"
+					pip install -r requirements.txt
 				fi
 				
 				cd "$FRONTEND_DIR"
 				if [ ! -f package.json ]; then
+					echo "\n"
 					echo "Frontend dorectory empty. Rebuilding template..."
+					echo "\n"
 					npm create vite@latest . -- --template react
 					npm install
 				else
-					echo "Frontend template detected..."
+					echo "\n"
+					echo "Frontend template detected...\n"
+					echo "\n"
 					npm ci
 				fi
 				
+				echo "\n"
 				echo "Python: $(python --version)"
 				echo "NodeJS: $(node --version)"
 				echo "Venv: $VIRTUAL_ENV"
 				cd "$WORK_DIR"
+				echo "\n"
 				'';
 			};
 		in {
