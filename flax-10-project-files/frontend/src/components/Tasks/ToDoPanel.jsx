@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./ToDoPanel.module.css";
 
-export default function ToDoPanel() {
+export default function ToDoPanel({ open = true }) {
   const [text, setText] = useState("");
   const [items, setItems] = useState([]);
 
@@ -20,7 +20,7 @@ export default function ToDoPanel() {
   };
 
   return (
-    <div className={styles.panel}>
+    <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
       <div className={styles.list}>
         {items.map((item) => (
           <label key={item.id} className={styles.row}>
@@ -29,9 +29,7 @@ export default function ToDoPanel() {
               checked={item.done}
               onChange={() => toggleDone(item.id)}
             />
-            <span className={item.done ? styles.done : ""}>
-              {item.title}
-            </span>
+            <span className={item.done ? styles.done : ""}>{item.title}</span>
           </label>
         ))}
       </div>
@@ -40,7 +38,7 @@ export default function ToDoPanel() {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="New task"
+          placeholder="New Task"
         />
       </form>
     </div>
