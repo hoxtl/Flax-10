@@ -11,7 +11,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
-    "coverage-report-clover": "vitest run --coverage --coverage.reporter=clover --coverage"
+    "coverage-report-clover": "vitest run --coverage --coverage.reporter=clover --coverage.reportOnFailure=true"
   },
   "dependencies": {
     "react": "^19.2.0",
