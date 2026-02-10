@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./Tasks.module.css";
 import { pickQuoteByKey } from "../lib/quotes";
+import confetti from "canvas-confetti";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -16,6 +17,24 @@ function getGreeting(d = new Date()) {
   if (h >= 12 && h < 17) return "Good afternoon";
   if (h >= 17 && h < 22) return "Good evening";
   return "Night owl";
+}
+
+function dropConfetti() {
+    const duration = 1200;
+    const end = Date.now() + dutation; 
+
+    (function frame() {
+        confetti({
+            particleCount: 10, 
+            spread: 70,
+            startVelocity: 19,
+            gravity: 0.9,
+            ticks: 200,
+            origin: { x: Math.random(), y: 0.05},
+        });
+
+        if (Date.now() < end) requestAnimationFrame(frame);
+    })();
 }
 
 export default function Tasks({ user }) {
