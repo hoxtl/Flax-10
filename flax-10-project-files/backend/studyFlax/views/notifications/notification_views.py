@@ -40,3 +40,9 @@ def notification_detail(request, pk):
 def mark_all_read(request):
     Notification.objects.update(read=True)
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['DELETE'])
+def clear_all(request):
+    Notification.objects.all().delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

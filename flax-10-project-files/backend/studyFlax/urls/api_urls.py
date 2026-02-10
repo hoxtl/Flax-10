@@ -9,7 +9,7 @@ from studyFlax.views.hello import hello
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
-from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read
+from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -27,4 +27,5 @@ urlpatterns = [
     path("notifications/", notification_list, name="notification-list"),
     path("notifications/<int:pk>/", notification_detail, name="notification-detail"),
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
+    path("notifications/clear-all/", clear_all, name="notification-clear-all"),
 ]

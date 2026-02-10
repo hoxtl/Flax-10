@@ -15,7 +15,7 @@ function getFormFromEvent(event, options = {}) {
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
         recurrence: getRecurrenceFromEvent(event),
-        reminder: event.reminder_minutes !== null ? event.reminder_minutes : -1,
+        reminder: Array.isArray(event.reminder_minutes) ? event.reminder_minutes : [],
         tag: event.tag || event.tag_details?.id || options.initialTag || null,
         location: event.locution || event.location || '',
         all_day: isAllDay(event),
@@ -43,7 +43,7 @@ function getDefaultForm(options) {
         start_time: formatForInput(now),
         end_time: formatForInput(new Date(now.getTime() + 3600000)),
         recurrence: { frequency: 'none', interval: 1 },
-        reminder: -1,
+        reminder: [],
         tag: options.initialTag || null,
         location: '', all_day: false,
     };
@@ -163,7 +163,7 @@ function buildBaseEventData(form) {
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
         tag: form.tag || null,
-        reminder_minutes: form.reminder === -1 ? null : form.reminder,
+        reminder_minutes: form.reminder,
         all_day: form.all_day,
     };
 }

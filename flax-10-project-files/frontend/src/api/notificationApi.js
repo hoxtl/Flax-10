@@ -18,3 +18,7 @@ export async function deleteNotification(id) {
 export async function markAllNotificationsRead() {
     return fetchApi('/notifications/mark-all-read/', { method: 'POST' });
 }
+
+export async function clearAllNotifications() {
+    return fetchApi('/notifications/clear-all/', { method: 'DELETE' });
+}

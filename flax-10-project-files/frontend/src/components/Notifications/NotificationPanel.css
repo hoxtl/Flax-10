@@ -27,18 +27,35 @@
     color: #333;
 }
 
-.mark-read-btn {
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.mark-read-btn,
+.clear-all-btn {
     background: none;
     border: none;
-    color: #9E7E5D;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
 }
 
+.mark-read-btn {
+    color: #9E7E5D;
+}
+
 .mark-read-btn:hover {
     background: #f5f0eb;
+}
+
+.clear-all-btn {
+    color: #ef4444;
+}
+
+.clear-all-btn:hover {
+    background: #fef2f2;
 }
 
 .notification-list {

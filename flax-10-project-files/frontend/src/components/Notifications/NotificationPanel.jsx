@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import './NotificationPanel.css';
 
 export function NotificationPanel() {
-    const { isOpen, notifications, closePanel, markAllRead, dismissNotification } = useNotifications();
+    const { isOpen, notifications, closePanel, markAllRead, dismissNotification, clearAll } = useNotifications();
     const panelRef = useRef(null);
 
     useClickOutside(panelRef, closePanel, isOpen);
@@ -12,7 +12,7 @@ export function NotificationPanel() {
 
     return (
         <div className="notification-panel" ref={panelRef}>
-            <PanelHeader onMarkAllRead={markAllRead} count={notifications.length} />
+            <PanelHeader onMarkAllRead={markAllRead} onClearAll={clearAll} count={notifications.length} />
             <NotificationList notifications={notifications} onDismiss={dismissNotification} />
         </div>
     );
@@ -30,15 +30,21 @@ function useClickOutside(ref, handler, isActive) {
     }, [ref, handler, isActive]);
 }
 
-function PanelHeader({ onMarkAllRead, count }) {
+function PanelHeader({ onMarkAllRead, onClearAll, count }) {
     return (
         <div className="notification-panel-header">
             <h3>Notifications</h3>
-            {count > 0 && (
-                <button className="mark-read-btn" onClick={onMarkAllRead}>
-                    Mark all read
-                </button>
-            )}
+            <HeaderActions count={count} onMarkAllRead={onMarkAllRead} onClearAll={onClearAll} />
+        </div>
+    );
+}
+
+function HeaderActions({ count, onMarkAllRead, onClearAll }) {
+    if (count === 0) return null;
+    return (
+        <div className="header-actions">
+            <button className="mark-read-btn" onClick={onMarkAllRead}>Mark all read</button>
+            <button className="clear-all-btn" onClick={onClearAll}>Clear all</button>
         </div>
     );
 }

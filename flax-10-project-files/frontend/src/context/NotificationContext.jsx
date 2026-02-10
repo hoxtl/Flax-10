@@ -65,7 +65,16 @@ function useNotificationActions(setNotifications) {
         }
     }, [setNotifications]);
 
-    return { addNotification, dismissNotification, markAllRead };
+    const clearAll = useCallback(async () => {
+        try {
+            await api.clearAllNotifications();
+            setNotifications([]);
+        } catch (err) {
+            console.error('Failed to clear notifications:', err);
+        }
+    }, [setNotifications]);
+
+    return { addNotification, dismissNotification, markAllRead, clearAll };
 }
 
 export function useNotifications() {
