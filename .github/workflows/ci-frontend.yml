@@ -40,7 +40,7 @@ jobs:
         working-directory: flax-10-project-files/scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERAGE_XML_PATH: flax-10-project-files/frontend/coverage/clover.xml
+          COVERAGE_XML_PATH: ../frontend/coverage/clover.xml
           PATH_TRIM_ANCHOR: frontend/src
         run: |
           python frontend_coverage_commentor.py
