@@ -1,11 +1,13 @@
 import { createContext, useContext, useReducer } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
+import { useReminderNotifications } from "../hooks/useReminderNotifications";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);
+    useReminderNotifications(state.events);
 
     return (
         <CalendarContext.Provider value={state}>
