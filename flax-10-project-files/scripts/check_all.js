@@ -47,22 +47,39 @@ function isTestFile(filePath) {
            /\.(test|spec)\.(js|jsx)$/.test(filePath);
 }
 
-function isTestFrameworkCallback(path) {
-    // Check if this function is a callback to describe/it/test/etc.
-    const parent = path.parent;
-    if (parent.type !== 'CallExpression') return false;
+function isOrganizationalCallback(path) {
+    // Check if this is a callback to describe/beforeEach/etc (not it/test)
+    if (path.parent.type !== 'CallExpression') return false;
     
-    const callee = parent.callee;
-    const testFunctions = [
-        'describe', 'it', 'test', 'beforeEach', 'afterEach', 
-        'beforeAll', 'afterAll', 'expect', 'context'
-    ];
+    const callee = path.parent.callee;
+    const organizationalFunctions = ['describe', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll', 'context'];
+    
+    if (callee.type === 'Identifier' && organizationalFunctions.includes(callee.name)) {
+        return true;
+    }
+    
+    // Handle describe.skip, beforeEach.only, etc.
+    if (callee.type === 'MemberExpression' && 
+        callee.object.type === 'Identifier' && 
+        organizationalFunctions.includes(callee.object.name)) {
+        return true;
+    }
+    
+    return false;
+}
+
+function shouldCheckTestCallback(path) {
+    // Only check actual test functions (it, test), not organizational wrappers
+    if (path.parent.type !== 'CallExpression') return false;
+    
+    const callee = path.parent.callee;
+    const testFunctions = ['it', 'test'];
     
     if (callee.type === 'Identifier' && testFunctions.includes(callee.name)) {
         return true;
     }
     
-    // Handle it.skip, describe.only, etc.
+    // Handle it.skip, test.only, etc.
     if (callee.type === 'MemberExpression' && 
         callee.object.type === 'Identifier' && 
         testFunctions.includes(callee.object.name)) {
@@ -104,6 +121,48 @@ function isElseIf(path) {
     const parent = path.parent;
     if (!parent || parent.type !== 'IfStatement') return false;
     return parent.alternate === path.node;
+}
+
+function getFunctionName(path, node) {
+    // Check if this is an it/test callback
+    if (path.parent.type === 'CallExpression') {
+        const callee = path.parent.callee;
+        const testFunctions = ['it', 'test'];
+        
+        let isTestCallback = false;
+        if (callee.type === 'Identifier' && testFunctions.includes(callee.name)) {
+            isTestCallback = true;
+        } else if (callee.type === 'MemberExpression' && 
+                   callee.object.type === 'Identifier' && 
+                   testFunctions.includes(callee.object.name)) {
+            isTestCallback = true;
+        }
+        
+        if (isTestCallback && path.parent.arguments[0]) {
+            const firstArg = path.parent.arguments[0];
+            if (firstArg.type === 'StringLiteral' || firstArg.type === 'Literal') {
+                const description = firstArg.value;
+                const calleeName = callee.name || (callee.object && callee.object.name);
+                return `${calleeName}("${description}")`;
+            }
+        }
+    }
+    
+    // Standard function name detection
+    if (node.id && node.id.name) {
+        return node.id.name;
+    }
+    if (path.parent.type === 'VariableDeclarator' && path.parent.id.name) {
+        return path.parent.id.name;
+    }
+    if (path.parent.type === 'Property' && path.parent.key.name) {
+        return path.parent.key.name;
+    }
+    if (path.parent.type === 'MethodDefinition' && path.parent.key.name) {
+        return path.parent.key.name;
+    }
+    
+    return 'anonymous';
 }
 
 function getNestingLevel(path, level = 0) {
@@ -175,25 +234,15 @@ function checkFunctionLength(targetDir) {
                     'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression'(path) {
                         const node = path.node;
                         
-                        // Skip test framework callbacks in test files
-                        if (isTest && isTestFrameworkCallback(path)) {
+                        // In test files, skip organizational callbacks (describe/beforeEach/etc)
+                        if (isTest && isOrganizationalCallback(path)) {
                             return;
                         }
                         
                         const lines = countFunctionLines(node, sourceLines);
                         
                         if (lines > limit) {
-                            let functionName = 'anonymous';
-                            
-                            if (node.id && node.id.name) {
-                                functionName = node.id.name;
-                            } else if (path.parent.type === 'VariableDeclarator' && path.parent.id.name) {
-                                functionName = path.parent.id.name;
-                            } else if (path.parent.type === 'Property' && path.parent.key.name) {
-                                functionName = path.parent.key.name;
-                            } else if (path.parent.type === 'MethodDefinition' && path.parent.key.name) {
-                                functionName = path.parent.key.name;
-                            }
+                            let functionName = getFunctionName(path, node);
                             
                             violations.push({
                                 file: shortenPath(filePath),
@@ -290,25 +339,15 @@ function checkNesting(targetDir) {
                     'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression'(path) {
                         const node = path.node;
                         
-                        // Skip test framework callbacks in test files
-                        if (isTest && isTestFrameworkCallback(path)) {
+                        // In test files, skip organizational callbacks (describe/beforeEach/etc)
+                        if (isTest && isOrganizationalCallback(path)) {
                             return;
                         }
                         
                         const nesting = getNestingLevel(path);
                         
                         if (nesting > limit) {
-                            let functionName = 'anonymous';
-                            
-                            if (node.id && node.id.name) {
-                                functionName = node.id.name;
-                            } else if (path.parent.type === 'VariableDeclarator' && path.parent.id.name) {
-                                functionName = path.parent.id.name;
-                            } else if (path.parent.type === 'Property' && path.parent.key.name) {
-                                functionName = path.parent.key.name;
-                            } else if (path.parent.type === 'MethodDefinition' && path.parent.key.name) {
-                                functionName = path.parent.key.name;
-                            }
+                            let functionName = getFunctionName(path, node);
                             
                             violations.push({
                                 file: shortenPath(filePath),
