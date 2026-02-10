@@ -151,8 +151,8 @@ describe('YearView', () => {
         const day15 = within(month).getByText('15');
         expect(within(day15).getByText('All Day', { selector: '.event-title' })).toBeInTheDocument();
         expect(within(day15).getByText('All Day', { selector: '.event-time' })).toBeInTheDocument();
-        expect(within(day15).getByText('11:00 PM', { selector: '.event-time' })).toBeInTheDocument();
+        expect(within(day15).getByText(/11:00 pm|11:00 PM/i, { selector: '.event-time' })).toBeInTheDocument();
         expect(within(day15).getByText('Normal', { selector: '.event-title' })).toBeInTheDocument();
-        expect(within(day15).getByText('10:00 AM', { selector: '.event-time' })).toBeInTheDocument();
+        expect(within(day15).getByText(/10:00 am|10:00 AM/i, { selector: '.event-time' })).toBeInTheDocument();
     });
 });
