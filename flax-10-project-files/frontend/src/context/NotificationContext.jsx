@@ -39,11 +39,16 @@ function notificationReducer(state, action) {
     switch (action.type) {
         case 'ADD_NOTIFICATION': return addNotification(state, action.payload);
         case 'DISMISS_NOTIFICATION': return dismissNotification(state, action.payload);
-        case 'MARK_ALL_READ': return { ...state, hasUnread: false };
+        case 'MARK_ALL_READ': return markAllRead(state);
         case 'TOGGLE_PANEL': return { ...state, isOpen: !state.isOpen };
         case 'CLOSE_PANEL': return { ...state, isOpen: false };
         default: return state;
     }
+}
+
+function markAllRead(state) {
+    const notifications = state.notifications.map(n => ({ ...n, read: true }));
+    return { ...state, notifications, hasUnread: false };
 }
 
 function addNotification(state, notification) {

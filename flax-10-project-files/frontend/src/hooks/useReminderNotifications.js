@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { useNotifications } from '../context/NotificationContext';
 
 export function useReminderNotifications(events) {
     const lastCheckRef = useRef(new Date());
     const notifiedRef = useRef(new Set());
+    const { addNotification } = useNotifications();
 
     useEffect(() => {
         requestNotificationPermission();
@@ -11,11 +13,11 @@ export function useReminderNotifications(events) {
     useEffect(() => {
         const interval = setInterval(() => {
             const now = new Date();
-            checkReminders(events, now, lastCheckRef.current, notifiedRef.current);
+            checkReminders(events, now, lastCheckRef.current, notifiedRef.current, addNotification);
             lastCheckRef.current = now;
         }, 10000);
         return () => clearInterval(interval);
-    }, [events]);
+    }, [events, addNotification]);
 }
 
 function requestNotificationPermission() {
@@ -25,15 +27,23 @@ function requestNotificationPermission() {
     }
 }
 
-function checkReminders(events, now, lastCheck, notifiedSet) {
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    events.forEach(event => processEventReminder(event, now, lastCheck, notifiedSet));
+function checkReminders(events, now, lastCheck, notifiedSet, addNotification) {
+    events.forEach(event => processEventReminder(event, now, lastCheck, notifiedSet, addNotification));
 }
 
-function processEventReminder(event, now, lastCheck, notifiedSet) {
+function processEventReminder(event, now, lastCheck, notifiedSet, addNotification) {
     if (!shouldNotify(event, now, lastCheck, notifiedSet)) return;
-    sendNotification(event);
+    sendBrowserNotification(event);
+    addInAppNotification(event, addNotification);
     notifiedSet.add(getEventKey(event));
+}
+
+function addInAppNotification(event, addNotification) {
+    addNotification({
+        title: `Reminder: ${event.title}`,
+        message: getNotificationBody(event),
+        time: new Date(),
+    });
 }
 
 function shouldNotify(event, now, lastCheck, notifiedSet) {
@@ -53,7 +63,8 @@ function getReminderTime(event) {
     return new Date(new Date(event.start_time).getTime() - event.reminder_minutes * 60000);
 }
 
-function sendNotification(event) {
+function sendBrowserNotification(event) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
     try {
         const notification = new Notification(`Reminder: ${event.title}`, {
             body: getNotificationBody(event),
