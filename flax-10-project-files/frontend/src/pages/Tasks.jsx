@@ -11,14 +11,6 @@ function formatTime(d = new Date()) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
-function getGreeting(d = new Date()) {
-  const h = d.getHours();
-  if (h >= 5 && h < 12) return "Good morning";
-  if (h >= 12 && h < 17) return "Good afternoon";
-  if (h >= 17 && h < 22) return "Good evening";
-  return "Night owl";
-}
-
 function dropConfetti() {
   const duration = 1200;
   const end = Date.now() + duration;
@@ -46,8 +38,6 @@ export default function Tasks({ user }) {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
-
-  const greeting = useMemo(() => getGreeting(now), [now]);
 
   // Quote per hour
   const quoteKey = useMemo(() => {
