@@ -90,3 +90,9 @@
   padding: 2px 0;
 }
 
+.reorderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
