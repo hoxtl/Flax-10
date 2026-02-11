@@ -233,3 +233,47 @@
         transform: scale(1);
     }
 }
+
+.summaryText {
+    margin-bottom: 1.5rem;
+}
+
+.summaryContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summaryLabel {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.summaryPill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+}
+
+.pillSessions {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+.pillFocus {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.pillBreak {
+    background-color: #dcfce7;
+    color: #166534;
+}
