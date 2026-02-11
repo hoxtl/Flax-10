@@ -27,7 +27,7 @@ class CalendarEvent(models.Model):
         default='medium'
     )
     recurrence_rule = models.ForeignKey(RecurrenceRule, on_delete=models.SET_NULL, null=True, blank=True)
-    reminder_minutes = models.PositiveIntegerField(null=True, blank=True)
+    reminder_minutes = models.JSONField(default=list, blank=True)
     source = models.CharField(max_length=100, null=True, blank=True)
     external_id = models.CharField(max_length=255, null=True, blank=True)
     

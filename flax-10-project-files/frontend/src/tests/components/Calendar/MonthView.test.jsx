@@ -28,6 +28,10 @@ vi.mock('../../../context/CalendarContext', async () => {
     };
 });
 
+vi.mock('../../../hooks/useReminderNotifications', () => ({
+    useReminderNotifications: vi.fn(),
+}));
+
 describe('MonthView', () => {
     // Current date: Feb 15, 2026
     const defaultState = {

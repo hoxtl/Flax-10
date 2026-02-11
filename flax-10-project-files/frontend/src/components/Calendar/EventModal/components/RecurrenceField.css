@@ -1,0 +1,50 @@
+.recurrence-field {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recurrence-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.frequency-select {
+    flex: 1;
+}
+
+.interval-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.interval-input input {
+    width: 60px;
+}
+
+.end-repeat-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.end-repeat-section label {
+    font-size: 13px;
+    color: #666;
+}
+
+.end-repeat-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.end-type-select {
+    flex: 1;
+}
+
+.end-date-input {
+    flex: 1;
+}

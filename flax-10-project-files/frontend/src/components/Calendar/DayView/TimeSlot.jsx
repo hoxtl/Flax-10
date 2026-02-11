@@ -5,22 +5,30 @@ import { isSameDay } from '../../../utils/dateUtils';
 export function TimeSlot({ hour, date }) {
     const { mergedProps, isOver, highlightQuarter } = useTimeSlotDrop(hour, date);
     const { resizeHighlight } = useResizeHighlight();
-
-    const isResizeTarget = resizeHighlight &&
-        resizeHighlight.hour === hour &&
-        isSameDay(resizeHighlight.date, date);
-
-    const showHighlight = isOver || isResizeTarget;
-    const quarter = isOver ? highlightQuarter : resizeHighlight?.quarter;
+    const isResizeTarget = checkResizeTarget(resizeHighlight, hour, date);
+    const highlight = getHighlightState(isOver, isResizeTarget, highlightQuarter, resizeHighlight);
 
     return (
-        <div className={`time-slot${showHighlight ? ' drop-target' : ''}`} {...mergedProps}>
-            {isOver && quarter !== null && (
-                <div className="quarter-highlight" style={{ top: `${quarter * 25}%` }} />
-            )}
-            {isResizeTarget && quarter !== null && (
-                <div className="resize-line-highlight" style={{ top: `${quarter * 25}%` }} />
-            )}
+        <div className={`time-slot${highlight.show ? ' drop-target' : ''}`} {...mergedProps}>
+            <HighlightIndicator type="quarter" show={isOver} quarter={highlight.quarter} />
+            <HighlightIndicator type="resize" show={isResizeTarget} quarter={highlight.quarter} />
         </div>
     );
+}
+
+function checkResizeTarget(resizeHighlight, hour, date) {
+    return resizeHighlight && resizeHighlight.hour === hour && isSameDay(resizeHighlight.date, date);
+}
+
+function getHighlightState(isOver, isResizeTarget, highlightQuarter, resizeHighlight) {
+    return {
+        show: isOver || isResizeTarget,
+        quarter: isOver ? highlightQuarter : resizeHighlight?.quarter
+    };
+}
+
+function HighlightIndicator({ type, show, quarter }) {
+    if (!show || quarter === null) return null;
+    const className = type === 'quarter' ? 'quarter-highlight' : 'resize-line-highlight';
+    return <div className={className} style={{ top: `${quarter * 25}%` }} />;
 }

@@ -21,19 +21,26 @@ export function calculateEventStyle(event, slotHeight, allEvents, currentDate = 
 }
 
 function getClippedEventRange(event, currentDate) {
-    let start = new Date(event.start_time);
-    let end = new Date(event.end_time);
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    if (!currentDate) return { start, end };
+    return clipToDay(start, end, currentDate);
+}
 
-    if (currentDate) {
-        const dayStart = new Date(currentDate);
-        dayStart.setHours(0, 0, 0, 0);
-        const dayEnd = new Date(dayStart);
-        dayEnd.setDate(dayEnd.getDate() + 1);
+function clipToDay(start, end, currentDate) {
+    const { dayStart, dayEnd } = getDayBounds(currentDate);
+    return {
+        start: start < dayStart ? dayStart : start,
+        end: end > dayEnd ? dayEnd : end
+    };
+}
 
-        if (start < dayStart) start = dayStart;
-        if (end > dayEnd) end = dayEnd;
-    }
-    return { start, end };
+function getDayBounds(date) {
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    return { dayStart, dayEnd };
 }
 
 function getBaseStyle(start, end, slotHeight) {

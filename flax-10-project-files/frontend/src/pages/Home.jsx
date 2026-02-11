@@ -43,7 +43,7 @@ export default function Home() {
   const scheduleTitle = useMemo(() => getScheduleTitle(selectedDate), [selectedDate]);
 
   const handleEdit = (event) => {
-    openModal(event, event.tag_name);
+    openModal(event, event.tag);
   };
 
   return (
