@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./ToDoPanel.module.css";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ToDoPanel({ open = true }) {
   const [text, setText] = useState("");
@@ -30,18 +31,29 @@ export default function ToDoPanel({ open = true }) {
 
   return (
     <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
+      
       <div className={styles.list}>
-        {items.map((item) => (
-          <label key={item.id} className={styles.row}>
-            <input
-              type="checkbox"
-              checked={item.done}
-              onChange={() => toggleDone(item.id)}
-            />
-            <span className={item.done ? styles.done : ""}>{item.title}</span>
-          </label>
-        ))}
-      </div>
+        <AnimatePresence>
+            {items.map((item) => (
+            <motion.label
+                key={item.id}
+                layout
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                className={styles.row}
+            >
+                <input
+                type="checkbox"
+                checked={item.done}
+                onChange={() => toggleDone(item.id)}
+                />
+                <span className={item.done ? styles.done : ""}>{item.title}</span>
+            </motion.label>
+            ))}
+        </AnimatePresence>
+        </div>
 
       <form onSubmit={addItem} className={styles.inputRow}>
         <input
