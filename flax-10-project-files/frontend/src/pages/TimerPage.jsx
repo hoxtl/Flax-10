@@ -17,10 +17,6 @@ export default function TimerPage() {
         if (isActive) {
             timerRef.current = setInterval(() => {
                 setTimeLeft((prev) => {
-                    // If in break mode, stop at 0
-                    if (mode === 'break' && prev <= 0) {
-                        return 0;
-                    }
                     return prev - 1;
                 });
             }, 1000);
@@ -29,12 +25,12 @@ export default function TimerPage() {
         return () => clearInterval(timerRef.current);
     }, [isActive, mode]);
 
-    // Handle break completion separately
-    useEffect(() => {
-        if (mode === 'break' && timeLeft === 0 && isActive) {
-            handleTimerComplete();
-        }
-    }, [mode, timeLeft, isActive]);
+    // Handle break completion separately - DISABLED to allow overtime
+    // useEffect(() => {
+    //     if (mode === 'break' && timeLeft === 0 && isActive) {
+    //         handleTimerComplete();
+    //     }
+    // }, [mode, timeLeft, isActive]);
 
     const handleTimerComplete = () => {
         setIsActive(false);
@@ -56,37 +52,31 @@ export default function TimerPage() {
                     }
                 });
             }
-        } else {
-            // Break done
-            const newCompleted = completedSessions + 1;
-            setCompletedSessions(newCompleted);
+        }
+    };
 
-            if (newCompleted >= targetSessions) {
-                setModal({
-                    title: "🎉 Goal Reached!",
-                    message: "You've completed all your scheduled sessions. Amazing work!",
-                    actionLabel: "Start New Goal",
-                    onAction: () => {
-                        setMode('work');
-                        setTimeLeft(workTime * 60);
-                        setCompletedSessions(0);
-                        setModal(null);
-                    }
-                });
-                return;
-            }
+    const startWork = () => {
+        const newCompleted = completedSessions + 1;
+        setCompletedSessions(newCompleted);
 
+        if (newCompleted >= targetSessions) {
             setModal({
-                title: "Break Over",
-                message: "Ready to get back to focus?",
-                actionLabel: "Start Work",
+                title: "🎉 Goal Reached!",
+                message: "You've completed all your scheduled sessions. Amazing work!",
+                actionLabel: "Start New Goal",
                 onAction: () => {
                     setMode('work');
                     setTimeLeft(workTime * 60);
+                    setCompletedSessions(0);
                     setModal(null);
                 }
             });
+            return;
         }
+
+        setMode('work');
+        setTimeLeft(workTime * 60);
+        setIsActive(true);
     };
 
     const completeSessionAndContinue = () => {
@@ -200,6 +190,7 @@ export default function TimerPage() {
     }
 
     const isOvertime = mode === 'work' && timeLeft < 0;
+    const isBreakOvertime = mode === 'break' && timeLeft < 0;
 
     return (
         <div className={styles.container}>
@@ -208,14 +199,14 @@ export default function TimerPage() {
             <TreeAnimation progress={sessionProgress} mode={mode} />
 
             <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
-                {mode === 'work' ? (isOvertime ? '🚀 Overtime' : '🔥 Focus Time') : '☕ Break Time'}
+                {mode === 'work' ? (isOvertime ? '🚀 Overtime' : '🔥 Focus Time') : (isBreakOvertime ? '⏳ Break Overtime' : '☕ Break Time')}
             </div>
 
             <div className={styles.sessionStatus}>
                 Session {completedSessions + 1} of {targetSessions}
             </div>
 
-            <div className={`${styles.timerDisplay} ${mode === 'break' ? styles.break : ''} ${isOvertime ? styles.overtime : ''}`}>
+            <div className={`${styles.timerDisplay} ${mode === 'break' ? styles.break : ''} ${isOvertime || isBreakOvertime ? styles.overtime : ''}`}>
                 {formatTime(timeLeft)}
             </div>
 
@@ -281,6 +272,19 @@ export default function TimerPage() {
                         <div className={styles.overtimeTime}>{formatTime(timeLeft)}</div>
                         <button className={`${styles.button} ${styles.primary}`} onClick={handleStartBreak}>
                             Start Break
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {isBreakOvertime && (
+                <div className={styles.overtimePopup}>
+                    <div className={styles.overtimeContent}>
+                        <h3>Break Over!</h3>
+                        <p>Time to get back to work.</p>
+                        <div className={styles.overtimeTime}>{formatTime(timeLeft)}</div>
+                        <button className={`${styles.button} ${styles.primary}`} onClick={startWork}>
+                            Start Work
                         </button>
                     </div>
                 </div>
