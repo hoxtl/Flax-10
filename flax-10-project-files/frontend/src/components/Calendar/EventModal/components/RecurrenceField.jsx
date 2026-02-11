@@ -77,7 +77,7 @@ function DateInput({ endDate, onChange }) {
     return (
         <input
             type="date"
-            value={endDate || ''}
+            value={endDate}
             onChange={(e) => onChange('end_date', e.target.value || null)}
             className="end-date-input"
         />
