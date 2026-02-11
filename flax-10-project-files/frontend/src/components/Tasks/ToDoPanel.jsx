@@ -14,10 +14,19 @@ export default function ToDoPanel({ open = true }) {
   };
 
   const toggleDone = (id) => {
-    setItems((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, done: !x.done } : x))
-    );
-  };
+    setItems((prev) => {
+        const updated = prev.map((x) =>
+        x.id === id ? { ...x, done: !x.done } : x
+        );
+
+        updated.sort((a, b) => {
+        if (a.done === b.done) return a.id - b.id;
+        return a.done - b.done; 
+        });
+
+        return updated;
+    });
+};
 
   return (
     <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
