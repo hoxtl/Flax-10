@@ -30,3 +30,31 @@
         transform: rotate(2deg);
     }
 }
+
+.brown {
+    fill: #78350f;
+}
+
+.green {
+    fill: #22c55e;
+}
+
+.lightGreen {
+    fill: #4ade80;
+}
+
+.darkGreen {
+    fill: #15803d;
+}
+
+.red {
+    fill: #ef4444;
+}
+
+.pot {
+    fill: #d97706;
+}
+
+.soil {
+    fill: #573010;
+}
