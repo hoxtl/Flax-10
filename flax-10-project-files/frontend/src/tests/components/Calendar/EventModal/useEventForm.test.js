@@ -8,7 +8,10 @@ import * as FormUtilsModule from '../../../../utils/formUtils';
 // Mock dependencies
 const mockEvents = [];
 const mockActions = { addEvent: vi.fn(), updateEvent: vi.fn(), deleteEvent: vi.fn() };
-const mockInitialForm = { title: 'Form', description: '', tag: '', start_time: '', end_time: '' };
+const mockInitialForm = {
+    title: 'Form', description: '', tag: '', start_time: '', end_time: '',
+    reminder: [], recurrence: { frequency: 'none' }, location: '', all_day: false
+};
 
 vi.mock('../../../../context/CalendarContext', async () => {
     const actual = await vi.importActual('../../../../context/CalendarContext');
