@@ -108,7 +108,7 @@ export default function Tasks({ user }) {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
                 >
                 <div className={styles.goalPrompt}>
                     What is your main goal for today?
@@ -131,7 +131,7 @@ export default function Tasks({ user }) {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
                 >
                 <div className={styles.todayLabel}>TODAY</div>
 
