@@ -25,7 +25,8 @@ function getFormFromEvent(event, options = {}) {
 function getRecurrenceFromEvent(event) {
     return {
         frequency: event.recurrence_details?.frequency || 'none',
-        interval: event.recurrence_details?.interval || 1
+        interval: event.recurrence_details?.interval || 1,
+        end_date: event.recurrence_details?.end_date || null
     };
 }
 
@@ -42,7 +43,7 @@ function getDefaultForm(options) {
         title: '', description: '',
         start_time: formatForInput(now),
         end_time: formatForInput(new Date(now.getTime() + 3600000)),
-        recurrence: { frequency: 'none', interval: 1 },
+        recurrence: { frequency: 'none', interval: 1, end_date: null },
         reminder: [],
         tag: options.initialTag || null,
         location: '', all_day: false,
@@ -169,9 +170,9 @@ function buildBaseEventData(form) {
 }
 
 function addRecurrenceIfNeeded(data, form) {
-    const { frequency, interval } = form.recurrence || {};
+    const { frequency, interval, end_date } = form.recurrence || {};
     if (frequency && frequency !== 'none') {
-        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1 };
+        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
     } else {
         data.recurrence_rule = null;
     }
