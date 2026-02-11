@@ -1,22 +1,32 @@
+import './RecurrenceField.css';
+
 export function RecurrenceField({ value, onChange }) {
-    const { frequency = 'none', interval = 1 } = value || {};
-    const onFreqChange = (e) => onChange({ ...value, frequency: e.target.value, interval });
-    const onIntChange = (e) => onChange({ ...value, frequency, interval: e.target.value });
+    const { frequency = 'none', interval = 1, end_date = null } = value || {};
+    const hasRecurrence = frequency !== 'none';
+
+    const updateField = (field, val) => onChange({ ...value, frequency, interval, end_date, [field]: val });
 
     return (
-        <div className="form-field">
+        <div className="form-field recurrence-field">
             <label>Recurrence</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <RecurrenceSelect frequency={frequency} onChange={onFreqChange} />
-                {frequency !== 'none' && <IntervalInput interval={interval} onChange={onIntChange} />}
-            </div>
+            <RecurrenceOptions frequency={frequency} interval={interval} onChange={updateField} />
+            {hasRecurrence && <EndRepeatField endDate={end_date} onChange={updateField} />}
         </div>
     );
 }
 
-function RecurrenceSelect({ frequency, onChange }) {
+function RecurrenceOptions({ frequency, interval, onChange }) {
     return (
-        <select value={frequency} onChange={onChange} style={{ flex: 1 }}>
+        <div className="recurrence-row">
+            <FrequencySelect frequency={frequency} onChange={(e) => onChange('frequency', e.target.value)} />
+            {frequency !== 'none' && <IntervalInput interval={interval} onChange={onChange} />}
+        </div>
+    );
+}
+
+function FrequencySelect({ frequency, onChange }) {
+    return (
+        <select value={frequency} onChange={onChange} className="frequency-select">
             <option value="none">None</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -28,9 +38,54 @@ function RecurrenceSelect({ frequency, onChange }) {
 
 function IntervalInput({ interval, onChange }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <div className="interval-input">
             <span>Every</span>
-            <input type="number" min="1" value={interval} onChange={onChange} style={{ width: '60px' }} />
+            <input type="number" min="1" value={interval} onChange={(e) => onChange('interval', e.target.value)} />
         </div>
     );
+}
+
+function EndRepeatField({ endDate, onChange }) {
+    const endType = endDate ? 'on_date' : 'never';
+
+    const handleTypeChange = (e) => {
+        const newType = e.target.value;
+        onChange('end_date', newType === 'never' ? null : getDefaultEndDate());
+    };
+
+    return (
+        <div className="end-repeat-section">
+            <label>End repeat</label>
+            <EndRepeatOptions endType={endType} endDate={endDate} onTypeChange={handleTypeChange} onChange={onChange} />
+        </div>
+    );
+}
+
+function EndRepeatOptions({ endType, endDate, onTypeChange, onChange }) {
+    return (
+        <div className="end-repeat-row">
+            <select value={endType} onChange={onTypeChange} className="end-type-select">
+                <option value="never">Never</option>
+                <option value="on_date">On date</option>
+            </select>
+            {endType === 'on_date' && <DateInput endDate={endDate} onChange={onChange} />}
+        </div>
+    );
+}
+
+function DateInput({ endDate, onChange }) {
+    return (
+        <input
+            type="date"
+            value={endDate || ''}
+            onChange={(e) => onChange('end_date', e.target.value || null)}
+            className="end-date-input"
+        />
+    );
+}
+
+function getDefaultEndDate() {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 1);
+    return date.toISOString().slice(0, 10);
 }
