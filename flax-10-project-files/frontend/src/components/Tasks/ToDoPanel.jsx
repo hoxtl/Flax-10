@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./ToDoPanel.module.css";
-import { motion, AnimatePresence } from "framer-motion";
+import { Reorder, AnimatePresence } from "framer-motion";
 
 export default function ToDoPanel({ open = true }) {
   const [text, setText] = useState("");
