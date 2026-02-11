@@ -51,8 +51,7 @@ export default function TimerPage() {
                     onAction: () => {
                         setMode('break');
                         setTimeLeft(breakTime * 60);
-                        setIsActive(true); // Start break timer automatically? User usually wants to start it themselves? 
-                        // Actually, let's start it.
+                        setIsActive(true);
                         setModal(null);
                     }
                 });
@@ -85,7 +84,6 @@ export default function TimerPage() {
                     setMode('work');
                     setTimeLeft(workTime * 60);
                     setModal(null);
-                    // Let user start manually
                 }
             });
         }
@@ -112,7 +110,7 @@ export default function TimerPage() {
 
         setMode('work');
         setTimeLeft(workTime * 60);
-        setIsActive(false); // Pause so they can start when ready
+        setIsActive(false);
     };
 
     const handleStartBreak = () => {
@@ -159,16 +157,19 @@ export default function TimerPage() {
         return `${sign}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    // Calculate progress for the current session
-    let currentSessionFraction = 0;
+    // Calculate progress for the current session (grow tree per session)
+    let sessionProgress = 0;
     if (mode === 'work') {
         const totalSeconds = workTime * 60;
-        // Cap progress at 100% even if overtime
-        currentSessionFraction = Math.min(1, Math.max(0, (totalSeconds - timeLeft) / totalSeconds));
-    }
+        const fraction = Math.min(1, Math.max(0, (totalSeconds - timeLeft) / totalSeconds));
+        sessionProgress = fraction * 100;
 
-    // Progress = (Completed Sessions + Current Session Progress) / Total Goal
-    const overallProgress = Math.min(100, ((completedSessions + (mode === 'work' ? currentSessionFraction : 0)) / targetSessions) * 100);
+        // Ensure it hits 100% exactly when finished (or in overtime)
+        if (timeLeft <= 0) sessionProgress = 100;
+    } else {
+        // During break, show full tree
+        sessionProgress = 100;
+    }
 
     const isOvertime = mode === 'work' && timeLeft < 0;
 
@@ -176,7 +177,7 @@ export default function TimerPage() {
         <div className={styles.container}>
             <div className={styles.title}>Study Timer</div>
 
-            <TreeAnimation progress={overallProgress} mode={mode} />
+            <TreeAnimation progress={sessionProgress} mode={mode} />
 
             <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
                 {mode === 'work' ? (isOvertime ? '🚀 Overtime' : '🔥 Focus Time') : '☕ Break Time'}
