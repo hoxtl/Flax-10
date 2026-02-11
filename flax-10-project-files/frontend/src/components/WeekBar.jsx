@@ -18,27 +18,24 @@ function WeekBadge({ label, totalWeeks, isReadingWeek }) {
   );
 }
 
-// Component for each segment in the week bar
 function WeekSegment({ label, isCurrent, isPast }) {
-  const barClass = [
-    styles.segmentBar,
-    isCurrent && styles.segmentCurrent,
-    isPast && styles.segmentPast,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+  const barClass = buildBarClass(isCurrent, isPast);
+  const labelClass = buildLabelClass(isCurrent);
   return (
     <div className={styles.segment}>
       <div className={barClass} />
-      <span
-        className={`${styles.segmentLabel} ${isCurrent ? styles.segmentLabelActive : ""
-          }`}
-      >
-        {label}
-      </span>
+      <span className={labelClass}>{label}</span>
     </div>
   );
+}
+
+function buildBarClass(isCurrent, isPast) {
+  return [styles.segmentBar, isCurrent && styles.segmentCurrent, isPast && styles.segmentPast]
+    .filter(Boolean).join(" ");
+}
+
+function buildLabelClass(isCurrent) {
+  return `${styles.segmentLabel} ${isCurrent ? styles.segmentLabelActive : ""}`;
 }
 
 // Main component that renders the week bar, showing the current week, reading week status, and total weeks in the term

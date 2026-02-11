@@ -1,11 +1,13 @@
 import { createContext, useContext, useReducer } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
+import { useReminderNotifications } from "../hooks/useReminderNotifications";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);
+    useReminderNotifications(state.events);
 
     return (
         <CalendarContext.Provider value={state}>
@@ -26,7 +28,7 @@ export function useCalendar() {
     const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
     const filteredEvents = currentFilter.includes('all')
         ? context.events
-        : context.events.filter(e => currentFilter.includes(e.tag_name));
+        : context.events.filter(e => currentFilter.includes(e.tag_name?.toLowerCase()));
 
     return { ...context, events: filteredEvents, allEvents: context.events };
 }
@@ -43,6 +45,5 @@ export function useEventModal() {
         dispatch({ type: 'OPEN_MODAL', payload: { event, type, initialDate } });
     };
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
-
     return { modalEvent, modalType, modalInitialDate, isModalOpen, openModal, closeModal };
 }
