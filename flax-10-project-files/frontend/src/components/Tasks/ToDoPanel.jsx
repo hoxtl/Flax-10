@@ -16,21 +16,42 @@ export default function ToDoPanel({ open = true }) {
     setItems((prev) => [...prev, { id: Date.now(), title: t, done: false }]);
     setText("");
   };
-
+  
   const toggleDone = (id) => {
     setItems((prev) => {
         const updated = prev.map((x) =>
-        x.id === id ? { ...x, done: !x.done } : x
-        );
-
-        updated.sort((a, b) => {
+            x.id === id ? { ...x, done: !x.done } : x
+    );
+    updated.sort((a, b) => {
         if (a.done === b.done) return a.id - b.id;
         return a.done - b.done; 
-        });
-
-        return updated;
     });
-};
+    return updated;
+    });
+    };
+
+    const startEdit = (item) => {
+        setEditingId(item.id);
+        setEditText(item.title);
+    };
+
+    const saveEdit = (id) => {
+        const t = editText.trim();
+        if (!t) {
+            setEditingId(null);
+            setEditText("");
+            return;
+        }
+        
+        setItems((prev) => prev.map((x) => (x.id === id ? { ...x, title: t } : x)));
+        setEditingId(null);
+        setEditText("");
+    };
+    
+    const cancelEdit = () => {
+        setEditingId(null);
+        setEditText("");
+    };
 
   return (
     <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
