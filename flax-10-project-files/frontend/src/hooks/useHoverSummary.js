@@ -1,26 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useHoverSummary(delay = 2000) {
     const [isHovered, setIsHovered] = useState(false);
     const [showSummary, setShowSummary] = useState(false);
-    const timeoutRef = useRef(null);
-
-    const onMouseEnter = () => {
-        setIsHovered(true);
-        timeoutRef.current = setTimeout(() => setShowSummary(true), delay);
-    };
-
-    const onMouseLeave = () => {
-        setIsHovered(false);
-        setShowSummary(false);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-
     useEffect(() => {
-        return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        };
-    }, []);
-
-    return { isHovered, showSummary, binder: { onMouseEnter, onMouseLeave } };
+        if (!isHovered) { setShowSummary(false); return; }
+        const timer = setTimeout(() => setShowSummary(true), delay);
+        return () => clearTimeout(timer);
+    }, [isHovered, delay]);
+    return {
+        isHovered,
+        showSummary,
+        binder: { onMouseEnter: () => setIsHovered(true), onMouseLeave: () => setIsHovered(false) }
+    };
 }
