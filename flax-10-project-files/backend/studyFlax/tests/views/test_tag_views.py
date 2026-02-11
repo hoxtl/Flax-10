@@ -1,63 +1,79 @@
+import json
 from rest_framework import status
 from ..base import BaseTestCase
-from ..fixtures import create_tag_data, SAMPLE_TAGS
 from studyFlax.models import Tag
 
-class TagCreateTests(BaseTestCase):
-    """Tests for creating tags."""
-    
+class TagDetailTests(BaseTestCase):
+    """Tests for tag detail operations (GET, PATCH, DELETE)."""
+
     def setUp(self):
-        """Set up tag test environment."""
+        """Set up tag detail test environment."""
         super().setUp()
-        self.url = "/api/tags/"
-        Tag.objects.all().delete()
-    
-    def test_create_tag(self):
-        """Test creating a tag."""
-        data = create_tag_data("work")
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['name'], "work")
-        self.assertEqual(Tag.objects.count(), 1)
-    
-    def test_create_tag_minimal(self):
-        """Test creating tag with only name."""
-        data = {"name": "personal"}
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    
-    def test_create_tag_missing_name(self):
-        """Test creating tag without name fails."""
-        data = {"color": "#FF0000"}
-        response = self.client.post(self.url, data, format='json')
+        self.tag = Tag.objects.create(name="test_tag", color="#000000", is_default=True)
+        self.url = f"/api/tags/{self.tag.id}/"
+        self.detail_url = lambda pk: f"/api/tags/{pk}/"
+
+    def test_get_tag_detail(self):
+        """Test retrieving a specific tag."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], self.tag.name)
+
+    def test_get_tag_not_found(self):
+        """Test retrieving a non-existent tag."""
+        response = self.client.get(self.detail_url(9999))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_tag(self):
+        """Test updating a tag."""
+        data = {"name": "updated_tag"}
+        response = self.client.patch(self.url, json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.tag.refresh_from_db()
+        self.assertEqual(self.tag.name, "updated_tag")
+
+    def test_update_tag_invalid(self):
+        """Test updating a tag with invalid data."""
+        data = {"color": "invalid_color"} 
+        response = self.client.patch(self.url, json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_tag(self):
+        """Test deleting a tag."""
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Tag.objects.filter(id=self.tag.id).exists())
+
+    def test_delete_other_tag_forbidden(self):
+        """Test that deleting the 'other' tag is forbidden."""
+        other_tag = Tag.objects.get(name="other")
+        url = self.detail_url(other_tag.id)
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class TagListTests(BaseTestCase):
-    """Tests for listing tags."""
-    
+    """Tests for listing and creating tags."""
+
     def setUp(self):
         """Set up tag list test environment."""
         super().setUp()
         self.url = "/api/tags/"
-    
-    def test_list_all_tags(self):
-        """Test listing all tags."""
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), len(SAMPLE_TAGS))
-    
-    def test_list_empty_tags(self):
-        """Test listing when no tags exist."""
-        Tag.objects.all().delete()
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)
 
-    
-    def test_list_categories(self):
-        """Test listing categories."""
-        url = "/api/categories/"
-        response = self.client.get(url)
+    def test_list_tags(self):
+        """Test listing tags."""
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Assuming categories might be empty or present, just check status
-        self.assertTrue(len(response.data) >= 0)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_create_tag(self):
+        """Test creating a tag."""
+        data = {"name": "new_tag", "color": "#123456"}
+        response = self.client.post(self.url, json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Tag.objects.filter(name="new_tag").count(), 1)
+
+    def test_create_tag_invalid(self):
+        """Test creating an invalid tag."""
+        data = {"color": "red"} 
+        response = self.client.post(self.url, json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

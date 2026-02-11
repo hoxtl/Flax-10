@@ -27,11 +27,15 @@ function getMonthWeeks(date) {
     const current = getStartDate(date);
     const last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-    while (current <= last || current.getDay() !== 0) {
+    while (shouldContinue(current, last)) {
         weeks.push(generateWeek(current));
-        if (current > last && current.getDay() === 0) break;
     }
     return weeks;
+}
+
+function shouldContinue(current, last) {
+    if (current <= last) return true;
+    return current.getDay() !== 0;
 }
 
 function getStartDate(date) {

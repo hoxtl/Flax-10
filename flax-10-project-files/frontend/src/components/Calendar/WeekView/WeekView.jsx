@@ -15,14 +15,9 @@ import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
 
 export function WeekView() {
     const { selectedDate, events } = useCalendar();
-    const scrollRef = useRef(null);
     const weekDays = getWeekDays(selectedDate);
     const eventsForWeek = getEventsForWeek(events, weekDays);
-
-    // Auto-scroll logic: filter out all-day events to find start time
-    const timedEventsForAutoScroll = eventsForWeek.filter(e => shouldShowInTimeGrid(e, new Date(e.start_time)));
-    useAutoScroll(scrollRef, timedEventsForAutoScroll, weekDays[0].toISOString());
-
+    const scrollRef = useWeekScroll(eventsForWeek, weekDays);
     return (
         <div className="week-view" ref={scrollRef}>
             <div className="sticky-header">
@@ -32,6 +27,13 @@ export function WeekView() {
             <WeekGrid days={weekDays} events={eventsForWeek} />
         </div>
     );
+}
+
+function useWeekScroll(events, weekDays) {
+    const scrollRef = useRef(null);
+    const timed = events.filter(e => shouldShowInTimeGrid(e, new Date(e.start_time)));
+    useAutoScroll(scrollRef, timed, weekDays[0].toISOString());
+    return scrollRef;
 }
 
 function WeekGrid({ days, events }) {
