@@ -131,6 +131,7 @@ For docker users, you will need to run the ```docker run...``` command mentioned
 | Package             | Version | Purpose                                         |
 | ------------------- | ------- | ----------------------------------------------- |
 | Django              | 5.2.0   | Web framework                                   |
+| faker		          | 40.4.0  | Fake data generator			                  |
 | djangorestframework | 3.16.1  | REST API framework for Django                   |
 | psycopg             | 3.3.2   | PostgreSQL driver (modern async-capable core)   |
 | psycopg-binary      | 3.3.2   | Precompiled psycopg binaries for local/dev use  |
