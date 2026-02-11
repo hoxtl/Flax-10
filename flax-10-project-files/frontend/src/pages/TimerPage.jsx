@@ -8,6 +8,8 @@ export default function TimerPage() {
     const [targetSessions, setTargetSessions] = useState(4);
     const [completedSessions, setCompletedSessions] = useState(0);
     const [timeLeft, setTimeLeft] = useState(25 * 60);
+    const [totalWorkSeconds, setTotalWorkSeconds] = useState(0);
+    const [totalBreakSeconds, setTotalBreakSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
     const [mode, setMode] = useState('work'); // 'work' | 'break'
     const [modal, setModal] = useState(null); // { title, message, actionLabel, onAction }
@@ -19,6 +21,11 @@ export default function TimerPage() {
                 setTimeLeft((prev) => {
                     return prev - 1;
                 });
+                if (mode === 'work') {
+                    setTotalWorkSeconds((prev) => prev + 1);
+                } else if (mode === 'break') {
+                    setTotalBreakSeconds((prev) => prev + 1);
+                }
             }, 1000);
         }
 
@@ -62,12 +69,39 @@ export default function TimerPage() {
         if (newCompleted >= targetSessions) {
             setModal({
                 title: "🎉 Goal Reached!",
-                message: "You've completed all your scheduled sessions. Amazing work!",
+                message: (
+                    <div className={styles.summaryContainerWrapper}>
+                        <p className={styles.summaryText}>You've completed all your scheduled sessions. Amazing work!</p>
+                        <div className={styles.summaryContainer}>
+                            <div className={styles.summaryItem}>
+                                <span className={styles.summaryLabel}>✅ Sessions</span>
+                                <span className={`${styles.summaryPill} ${styles.pillSessions}`}>
+                                    {newCompleted}
+                                </span>
+                            </div>
+                            <div className={styles.summaryItem}>
+                                <span className={styles.summaryLabel}>🔥 Focus</span>
+                                <span className={`${styles.summaryPill} ${styles.pillFocus}`}>
+                                    {formatTime(totalWorkSeconds)}
+                                </span>
+                            </div>
+                            <div className={styles.summaryItem}>
+                                <span className={styles.summaryLabel}>☕ Break</span>
+                                <span className={`${styles.summaryPill} ${styles.pillBreak}`}>
+                                    {formatTime(totalBreakSeconds)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                ),
                 actionLabel: "Start New Goal",
                 onAction: () => {
                     setMode('work');
                     setTimeLeft(workTime * 60);
                     setCompletedSessions(0);
+                    setTotalWorkSeconds(0);
+                    setTotalBreakSeconds(0);
+                    setIsActive(false);
                     setModal(null);
                 }
             });
@@ -86,12 +120,39 @@ export default function TimerPage() {
         if (newCompleted >= targetSessions) {
             setModal({
                 title: "🎉 Goal Reached!",
-                message: "You've completed all your scheduled sessions. Amazing work!",
+                message: (
+                    <div className={styles.summaryContainerWrapper}>
+                        <p className={styles.summaryText}>You've completed all your scheduled sessions. Amazing work!</p>
+                        <div className={styles.summaryContainer}>
+                            <div className={styles.summaryItem}>
+                                <span className={styles.summaryLabel}>✅ Sessions</span>
+                                <span className={`${styles.summaryPill} ${styles.pillSessions}`}>
+                                    {newCompleted}
+                                </span>
+                            </div>
+                            <div className={styles.summaryItem}>
+                                <span className={styles.summaryLabel}>🔥 Focus</span>
+                                <span className={`${styles.summaryPill} ${styles.pillFocus}`}>
+                                    {formatTime(totalWorkSeconds)}
+                                </span>
+                            </div>
+                            <div className={styles.summaryItem}>
+                                <span className={styles.summaryLabel}>☕ Break</span>
+                                <span className={`${styles.summaryPill} ${styles.pillBreak}`}>
+                                    {formatTime(totalBreakSeconds)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                ),
                 actionLabel: "Start New Goal",
                 onAction: () => {
                     setMode('work');
                     setTimeLeft(workTime * 60);
                     setCompletedSessions(0);
+                    setTotalWorkSeconds(0);
+                    setTotalBreakSeconds(0);
+                    setIsActive(false);
                     setModal(null);
                 }
             });
@@ -121,6 +182,8 @@ export default function TimerPage() {
         setMode('work');
         setTimeLeft(workTime * 60);
         setCompletedSessions(0);
+        setTotalWorkSeconds(0);
+        setTotalBreakSeconds(0);
         setModal(null);
     };
 
