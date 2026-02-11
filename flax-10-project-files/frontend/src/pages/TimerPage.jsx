@@ -135,17 +135,45 @@ export default function TimerPage() {
     };
 
     const handleTimeChange = (type, value) => {
-        const val = parseInt(value) || 0;
+        // Allow empty string to clear input
+        if (value === '') {
+            if (type === 'work') setWorkTime('');
+            else if (type === 'break') setBreakTime('');
+            else if (type === 'sessions') setTargetSessions('');
+            return;
+        }
+
+        const val = parseInt(value);
+        if (isNaN(val)) return;
+
         if (type === 'work') {
-            const newVal = Math.max(1, Math.min(180, val));
+            const newVal = Math.max(0, val);
             setWorkTime(newVal);
             if (mode === 'work' && !isActive) setTimeLeft(newVal * 60);
         } else if (type === 'break') {
-            const newVal = Math.max(0, Math.min(60, val));
+            const newVal = Math.max(0, val);
             setBreakTime(newVal);
             if (mode === 'break' && !isActive) setTimeLeft(newVal * 60);
         } else if (type === 'sessions') {
-            setTargetSessions(Math.max(1, parseInt(value) || 1));
+            setTargetSessions(Math.max(1, val));
+        }
+    };
+
+    const handleBlur = (type) => {
+        if (type === 'work') {
+            if (workTime === '' || isNaN(workTime)) {
+                setWorkTime(0); // Default to 0
+                if (mode === 'work' && !isActive) setTimeLeft(0);
+            }
+        } else if (type === 'break') {
+            if (breakTime === '' || isNaN(breakTime)) {
+                setBreakTime(0); // Default to 0
+                if (mode === 'break' && !isActive) setTimeLeft(0);
+            }
+        } else if (type === 'sessions') {
+            if (targetSessions === '' || isNaN(targetSessions) || targetSessions < 1) {
+                setTargetSessions(1); // Default to 1
+            }
         }
     };
 
@@ -215,6 +243,8 @@ export default function TimerPage() {
                         value={workTime}
                         onChange={(e) => handleTimeChange('work', e.target.value)}
                         disabled={isActive}
+                        onFocus={(e) => e.target.select()}
+                        onBlur={() => handleBlur('work')}
                     />
                 </div>
                 <div className={styles.settingItem}>
@@ -225,6 +255,8 @@ export default function TimerPage() {
                         value={breakTime}
                         onChange={(e) => handleTimeChange('break', e.target.value)}
                         disabled={isActive}
+                        onFocus={(e) => e.target.select()}
+                        onBlur={() => handleBlur('break')}
                     />
                 </div>
                 <div className={styles.settingItem}>
@@ -235,6 +267,8 @@ export default function TimerPage() {
                         value={targetSessions}
                         onChange={(e) => handleTimeChange('sessions', e.target.value)}
                         disabled={isActive}
+                        onFocus={(e) => e.target.select()}
+                        onBlur={() => handleBlur('sessions')}
                     />
                 </div>
             </div>
