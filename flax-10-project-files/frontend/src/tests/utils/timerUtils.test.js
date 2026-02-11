@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { getProgress, useCompletionCheck } from '../hooks/timerUtils';
+import { getProgress, useCompletionCheck } from '../../hooks/timerUtils';
 
 describe('timerUtils', () => {
     describe('getProgress', () => {
