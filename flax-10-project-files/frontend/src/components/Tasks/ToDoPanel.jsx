@@ -6,6 +6,9 @@ export default function ToDoPanel({ open = true }) {
   const [text, setText] = useState("");
   const [items, setItems] = useState([]);
 
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
+
   const addItem = (e) => {
     e.preventDefault();
     const t = text.trim();
