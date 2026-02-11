@@ -7,17 +7,13 @@ export function NotificationProvider({ children }) {
     const { notifications, setNotifications, loading } = useNotificationLoader();
     const [isOpen, setIsOpen] = useState(false);
     const actions = useNotificationActions(setNotifications);
-    const hasUnread = notifications.some(n => !n.read);
+
     const value = {
-        notifications, isOpen, hasUnread, loading, ...actions,
-        togglePanel: () => setIsOpen(p => !p),
-        closePanel: () => setIsOpen(false)
+        notifications, isOpen, hasUnread: notifications.some(n => !n.read), loading, ...actions,
+        togglePanel: () => setIsOpen(p => !p), closePanel: () => setIsOpen(false)
     };
-    return (
-        <NotificationContext.Provider value={value}>
-            {children}
-        </NotificationContext.Provider>
-    );
+
+    return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }
 
 function useNotificationLoader() {

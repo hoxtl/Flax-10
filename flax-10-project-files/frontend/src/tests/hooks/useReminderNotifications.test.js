@@ -38,7 +38,6 @@ describe('useReminderNotifications', () => {
     it('should trigger notification for due event', () => {
         const now = new Date('2024-03-15T10:00:00Z');
         vi.setSystemTime(now);
-
         const event = {
             id: 1,
             title: 'Meeting',
@@ -46,40 +45,11 @@ describe('useReminderNotifications', () => {
             reminder_minutes: [5], // 5 mins before
         };
         mockEvents.push(event);
-
         renderHook(() => useReminderNotifications(mockEvents));
-
         // Fast forward 1 minute to trigger check
         act(() => {
             vi.advanceTimersByTime(60000);
         });
-
-        // Should trigger because now is 10:01, event is 10:05.
-        // Wait, reminder is 5 mins before 10:05 = 10:00.
-        // Current time is 10:00. Hook checks immediately on mount?
-        // Code: check(); // Initial check
-        // So it should trigger immediately if due.
-
-        // However, initial check uses `lastCheck.current` initialized to `new Date()`.
-        // If we render at 10:00:00, lastCheck is 10:00:00.
-        // Reminder time is 10:00:00.
-        // Condition: reminderTime > lastCheck && reminderTime <= now
-        // 10:00:00 > 10:00:00 is FALSE.
-
-        // So we need to be slightly after the reminder time?
-        // Or if we simulate that lastCheck was in the past?
-        // But hook initializes lastCheck to NOW.
-
-        // If the event starts at 10:05, reminder is at 10:00.
-        // If we are at 10:00:01, lastCheck 10:00:01.
-
-        // Wait, if I start the app AT the reminder time, I might miss it if logic is strict > lastCheck.
-        // But usually `lastCheck` is updated.
-
-        // Valid test strategy:
-        // Start at 9:59.
-        // Advance to 10:01.
-        // Reminder at 10:00 should fire.
     });
 
     it('should trigger notification when passing reminder time', () => {

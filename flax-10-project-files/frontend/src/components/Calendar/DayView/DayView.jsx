@@ -49,19 +49,19 @@ function TimeLabelsColumn({ hours }) {
 function DayGrid({ hours, date, events }) {
     return (
         <div className="day-grid">
-            {hours.map(hour => (
-                <TimeSlot key={hour} hour={hour} date={date} />
+            {hours.map(hour => <TimeSlot key={hour} hour={hour} date={date} />)}
+            <EventsLayer events={events} date={date} />
+        </div>
+    );
+}
+
+function EventsLayer({ events, date }) {
+    return (
+        <div className="events-layer">
+            {events.map(e => (
+                <DraggableEvent key={e.id} event={e}
+                    style={calculateEventStyle(e, SLOT_HEIGHT, events, date)} minWidthForDetails={25} />
             ))}
-            <div className="events-layer">
-                {events.map(e => (
-                    <DraggableEvent
-                        key={e.id}
-                        event={e}
-                        style={calculateEventStyle(e, SLOT_HEIGHT, events, date)}
-                        minWidthForDetails={25}
-                    />
-                ))}
-            </div>
         </div>
     );
 }
