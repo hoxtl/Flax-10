@@ -106,7 +106,6 @@ describe('TagContext', () => {
 
     it('should handle API errors gracefully', async () => {
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-
         // Fetch error
         TagApi.fetchTags.mockRejectedValue(new Error('Fetch failed'));
         render(
@@ -115,24 +114,18 @@ describe('TagContext', () => {
             </TagProvider>
         );
         await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch tags:', expect.any(Error)));
-
         // Create error
         TagApi.createTag.mockRejectedValue(new Error('Create failed'));
-        // Need to wait for initial fetch (even if failed) or render new provider?
-        // Let's assume we can trigger add.
         await act(async () => { screen.getByText('Add').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to create tag:', expect.any(Error));
-
         // Update error
         TagApi.updateTag.mockRejectedValue(new Error('Update failed'));
         await act(async () => { screen.getByText('Update').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to update tag:', expect.any(Error));
-
         // Delete error
         TagApi.deleteTag.mockRejectedValue(new Error('Delete failed'));
         await act(async () => { screen.getByText('Delete').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to delete tag:', expect.any(Error));
-
         consoleSpy.mockRestore();
     });
 

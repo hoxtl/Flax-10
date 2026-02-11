@@ -39,10 +39,8 @@ function AllDayEventBar({ event, days }) {
     const { getTag } = useTags();
     const tag = getTag(event.tag);
     const color = tag?.color || '#3b82f6';
-
     const style = calculateBarStyle(event, days);
     if (!style) return null;
-
     return (
         <div
             className="all-day-event-bar"

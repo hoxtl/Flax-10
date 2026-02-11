@@ -105,26 +105,27 @@ function ReminderCheckbox({ label, checked, onToggle }) {
 
 function CustomReminderInput({ selected, onChange }) {
     const [customValue, setCustomValue] = useState('');
-
-    const handleAdd = () => {
-        const minutes = parseInt(customValue, 10);
-        if (isNaN(minutes) || minutes < 0) return;
-        if (!selected.includes(minutes)) onChange([...selected, minutes].sort((a, b) => a - b));
-        setCustomValue('');
-    };
+    const onAdd = () => addCustom(customValue, selected, onChange, setCustomValue);
 
     return (
         <div className="custom-reminder">
-            <input
-                type="number"
-                min="0"
-                placeholder="Custom (minutes)"
-                value={customValue}
-                onChange={(e) => setCustomValue(e.target.value)}
-            />
-            <button type="button" onClick={handleAdd}>Add</button>
+            <input type="number" min="0" placeholder="Custom (minutes)"
+                value={customValue} onChange={(e) => setCustomValue(e.target.value)} />
+            <button type="button" onClick={onAdd}>Add</button>
         </div>
     );
+}
+
+function addCustom(val, selected, onChange, setVal) {
+    const minutes = parseInt(val, 10);
+    if (isValidCustom(minutes, selected)) {
+        onChange([...selected, minutes].sort((a, b) => a - b));
+    }
+    setVal('');
+}
+
+function isValidCustom(minutes, selected) {
+    return !isNaN(minutes) && minutes >= 0 && !selected.includes(minutes);
 }
 
 function toggleReminder(selected, minutes, onChange) {

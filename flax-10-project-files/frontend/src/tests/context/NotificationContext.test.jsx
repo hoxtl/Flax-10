@@ -148,43 +148,25 @@ describe('NotificationContext', () => {
     it('should handle API errors gracefully', async () => {
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
         api.fetchNotifications.mockRejectedValue(new Error('Fetch failed'));
-
         render(
             <NotificationProvider>
                 <TestComponent />
             </NotificationProvider>
         );
-
         await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch notifications:', expect.any(Error)));
-
         api.createNotification.mockRejectedValue(new Error('Create failed'));
         await act(async () => { screen.getByText('Add').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to create notification:', expect.any(Error));
-
         api.deleteNotification.mockRejectedValue(new Error('Delete failed'));
         api.fetchNotifications.mockResolvedValue([{ id: 1 }]);
-        // Need to render with notification first to dismiss it
-        // But the previous test block already rendered? No, separate render usually.
-        // Wait, render is inside "it". This is "should handle API errors gracefully".
-        // It rendered once. State has notifications from fetch?
-        // fetch rejected at start of this test. So notifications = [].
-        // We need to set notifications manually or mock fetch success on next call?
-        // But loadNotifications only runs on mount.
-        // We can use createNotification (which fails in this test) or...
-        // Actually we can just call the action if we exposed it via TestComponent?
-        // TestComponent has Dismiss button which calls dismissNotification(1).
-
         await act(async () => { screen.getByText('Dismiss').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to delete notification:', expect.any(Error));
-
         api.markAllNotificationsRead.mockRejectedValue(new Error('Mark read failed'));
         await act(async () => { screen.getByText('Read All').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to mark all read:', expect.any(Error));
-
         api.clearAllNotifications.mockRejectedValue(new Error('Clear failed'));
         await act(async () => { screen.getByText('Clear').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to clear notifications:', expect.any(Error));
-
         consoleSpy.mockRestore();
     });
 
