@@ -1,13 +1,13 @@
 .panel {
   position: fixed;
   right: 24px;
-  bottom: 72px; 
-  width: 280px;
+  bottom: 72px;
+  width: 230px;
   max-height: 60vh;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(16px);
-  border-radius: 18px;
-  padding: 18px;
+  border-radius: 20px;
+  padding: 14px 16px 12px;
   display: flex;
   flex-direction: column;
   color: white;
@@ -15,6 +15,7 @@
   transition: transform 160ms ease, opacity 160ms ease;
   transform-origin: bottom right;
 }
+
 
 @media (max-width: 520px) {
   .panel {
@@ -41,17 +42,26 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 2px;          
 }
 
 .row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.25;
+  padding: 2px 0;     
 }
 
 .row input {
+  accent-color: #ff4d8d;
+}
+
+.row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin-top: 4px; 
   accent-color: #ff4d8d;
 }
 
@@ -66,7 +76,7 @@
 }
 
 .inputRow {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .inputRow input {
@@ -75,9 +85,10 @@
   outline: none;
   background: transparent;
   color: white;
-  font-size: 14px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255,255,255,0.2);
+  font-size: 15px;
+  opacity: 0.85;
+  padding: 10px 0 2px;
+  border-top: 1px solid rgba(255,255,255,0.18);
 }
 
 .editInput {
@@ -91,8 +102,9 @@
 }
 
 .reorderGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
+
 
