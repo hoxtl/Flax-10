@@ -55,6 +55,11 @@
   accent-color: #ff4d8d;
 }
 
+.row span {
+  flex: 1;
+  cursor: default;
+}
+
 .done {
   text-decoration: line-through;
   opacity: 0.5;
@@ -74,3 +79,14 @@
   padding-top: 10px;
   border-top: 1px solid rgba(255,255,255,0.2);
 }
+
+.editInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 15px;
+  padding: 2px 0;
+}
+
