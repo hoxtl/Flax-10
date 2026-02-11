@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import TimerPage from '../../pages/TimerPage';
 
 // Mock TreeAnimation to simplify DOM
-vi.mock('../components/Timer/TreeAnimation', () => ({
+vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
 
