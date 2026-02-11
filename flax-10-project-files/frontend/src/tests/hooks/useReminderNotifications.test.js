@@ -6,6 +6,20 @@ import { useReminderNotifications } from '../../hooks/useReminderNotifications';
 const mockAddNotification = vi.fn();
 const mockEvents = [];
 
+// localStorage mock
+const localStorageMock = createLocalStorageMock();
+Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+
+function createLocalStorageMock() {
+    let store = {};
+    return {
+        getItem: vi.fn((key) => store[key] || null),
+        setItem: vi.fn((key, value) => { store[key] = value; }),
+        clear: vi.fn(() => { store = {}; }),
+        removeItem: vi.fn((key) => { delete store[key]; }),
+    };
+}
+
 vi.mock('../../context/CalendarContext', () => ({
     useCalendar: () => ({ events: mockEvents }),
 }));
@@ -19,7 +33,7 @@ describe('useReminderNotifications', () => {
         vi.clearAllMocks();
         vi.useFakeTimers();
         mockEvents.length = 0;
-        localStorage.clear();
+        localStorageMock.clear();
         global.Notification = vi.fn();
         global.Notification.requestPermission = vi.fn().mockResolvedValue('granted');
         global.Notification.permission = 'granted';
@@ -135,7 +149,7 @@ describe('useReminderNotifications', () => {
     });
 
     it('should handle localStorage errors gracefully', () => {
-        const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('QuotaExceeded'); });
+        localStorageMock.setItem.mockImplementation(() => { throw new Error('QuotaExceeded'); });
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
         vi.setSystemTime(new Date('2024-03-15T09:59:00Z'));
@@ -149,12 +163,12 @@ describe('useReminderNotifications', () => {
 
         expect(consoleSpy).toHaveBeenCalledWith('Failed to save sent reminders', expect.any(Error));
 
-        spy.mockRestore();
+        localStorageMock.setItem.mockReset();
         consoleSpy.mockRestore();
     });
 
     it('should handle corrupted localStorage gracefully', () => {
-        vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('invalid-json');
+        localStorageMock.getItem.mockReturnValue('invalid-json');
 
         vi.setSystemTime(new Date('2024-03-15T09:59:00Z'));
         const event = {
@@ -162,10 +176,12 @@ describe('useReminderNotifications', () => {
         };
         mockEvents.push(event);
 
-        // Should default to empty set and notify at least once (multiple times possible if persistence fails)
+        // Should default to empty set and notify at least once
         renderHook(() => useReminderNotifications(mockEvents));
         act(() => vi.advanceTimersByTime(120000));
         expect(mockAddNotification).toHaveBeenCalled();
+
+        localStorageMock.getItem.mockReset();
     });
 
     it('should ignore events with invalid reminder_minutes', () => {
