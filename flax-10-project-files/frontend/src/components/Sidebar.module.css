@@ -54,7 +54,7 @@
 }
 
 .navItem:hover {
-  background: var(--hover); /* or #faf9fc if you prefer */
+  background: var(--hover);
 }
 
 .navItemExpanded {
@@ -88,6 +88,15 @@
   text-overflow: ellipsis;
 }
 
+/* Sidebar footer */
+.sidebarFooter {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px 0 10px;
+  gap: 2px;
+}
+
 /* User profile */
 .user {
   padding: 14px 12px;
@@ -110,7 +119,7 @@
   height: 36px;
   border-radius: 50%;
   flex-shrink: 0;
- background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: linear-gradient(135deg, var(--primary), var(--accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,5 +144,3 @@
   color: #1e1b2e;
   white-space: nowrap;
 }
-
-
