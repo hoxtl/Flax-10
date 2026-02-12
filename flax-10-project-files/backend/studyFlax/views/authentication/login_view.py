@@ -24,8 +24,7 @@ def login_view(request):
     if logged_user is not None:
         token, new_token = Token.objects.get_or_create(user=logged_user)
     
-        return Response({'message': "Successfully logged in!", 
-                        'user': UserSerialiser(logged_user).data, 
+        return Response({'user': UserSerialiser(logged_user).data, 
                         'token': token.key}, status=status.HTTP_200_OK)
 
     return Response({'error': 'Credentials are not valid!'}, status=status.HTTP_401_UNAUTHORIZED)                

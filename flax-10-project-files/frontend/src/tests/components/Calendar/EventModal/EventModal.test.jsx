@@ -6,7 +6,7 @@ import { TagProvider } from '../../../../context/TagContext';
 const { mockFormLogic } = vi.hoisted(() => ({
     mockFormLogic: {
         isEditing: false,
-        form: { title: '', description: '', tag: '', start_time: '', end_time: '' },
+        form: { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] },
         setForm: vi.fn(cb => {
             // If callback, execute it to cover the arrow function in component
             if (typeof cb === 'function') cb(mockFormLogic.form);
@@ -41,6 +41,14 @@ vi.mock('../../../../context/CalendarContext', async (importOriginal) => {
     };
 });
 
+vi.mock('../../../../context/TagContext', () => ({
+    TagProvider: ({ children }) => children,
+    useTags: () => ({
+        tags: [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }],
+        loading: false,
+    }),
+}));
+
 describe('EventModal', () => {
     const mockOnClose = vi.fn();
 
@@ -57,7 +65,7 @@ describe('EventModal', () => {
         // Reset mock state default
         mockFormLogic.isEditing = false;
         mockFormLogic.error = null;
-        mockFormLogic.form = { title: '', description: '', tag: '', start_time: '', end_time: '' };
+        mockFormLogic.form = { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] };
     });
 
     it('should render new event title', () => {
