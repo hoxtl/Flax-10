@@ -2,11 +2,11 @@ import React from 'react';
 import * as Components from '../Authentication/AuthComponents';
 
 /**
- * Sign In form component
+ * Authentication component for user sign in
  */
 export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading }) => {
   return (
-    <Components.SignInContainer signinIn={signIn}>
+    <Components.SignInContainer signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Sign in</Components.Title>
         
@@ -28,10 +28,10 @@ export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading })
           disabled={loading}
         />
         
-        <Components.Anchor href='#'>Forgot your password?</Components.Anchor>
+        <Components.Anchor href='#'>Reset your password here</Components.Anchor>
         
         <Components.Button type="submit" disabled={loading}>
-          {loading ? 'Signing In...' : 'Sign In'}
+          {loading ? 'Logging in...' : 'Sign In'}
         </Components.Button>
       </Components.Form>
     </Components.SignInContainer>

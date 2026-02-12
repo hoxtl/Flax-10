@@ -10,16 +10,16 @@ import { authService } from '../api/authService';
 import { validatePasswords, getErrorMessage, saveUserData } from '../utils/authHelpers';
 
 /**
- * Main authentication page component
- * Handles sign up and sign in functionality
+ * Main page for user authentication
+ * Responsible for both sign up and log in user functionality
  */
+
 export default function AuthPage() {
   const navigate = useNavigate();
   const [signIn, toggle] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // Form state management
   const { formData: signUpData, updateField: updateSignUpField } = useAuthForm({
     first_name: '',
     last_name: '',
@@ -34,7 +34,6 @@ export default function AuthPage() {
     password: ''
   });
 
-  // Handle sign up submission
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError('');
@@ -56,13 +55,12 @@ export default function AuthPage() {
         setError(getErrorMessage(data));
       }
     } catch (err) {
-      setError('Network error. Please check your connection and try again.');
+      setError('There has been an error, please try again...');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle sign in submission
   const handleSignIn = async (e) => {
     e.preventDefault();
     setError('');
@@ -77,13 +75,12 @@ export default function AuthPage() {
         setError(data.error || 'Invalid username or password');
       }
     } catch (err) {
-      setError('Network error. Please check your connection and try again.');
+      setError('There has been an error, please try again...');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle panel toggle between sign in/up
   const handlePanelToggle = (isSignIn) => {
     toggle(isSignIn);
     setError('');
