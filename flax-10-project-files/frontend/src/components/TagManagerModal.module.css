@@ -10,7 +10,7 @@
 }
 
 .modal {
-    background: white;
+    background: var(--panel);
     width: 90%;
     max-width: 400px;
     border-radius: 12px;
@@ -87,7 +87,7 @@
 }
 
 .actions button {
-    background: white;
+    background: var(--panel);
     border: 1px solid #ddd;
     padding: 6px 10px;
     border-radius: 6px;
