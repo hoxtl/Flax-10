@@ -41,30 +41,26 @@ const Input = ({ value, onChange, onBlur }) => (
         onChange={onChange} onFocus={(e) => e.target.select()} onBlur={onBlur} />
 );
 
-export const TimerSettings = ({ work, breakTime, sessions, onUpdate, isActive }) => {
-    const handleChange = (type) => (e) => {
-        const val = e.target.value;
-        onUpdate(type, val === '' ? '' : parseInt(val));
-    };
-    const handleBlur = (type, val, def) => () => {
-        if (val === '' || isNaN(val) || (type === 'sessions' && val < 1))
-            onUpdate(type, def);
-    };
+const SettingItem = ({ label, value, onChange, onBlur }) => (
+    <div className={styles.settingItem}>
+        <label className={styles.label}>{label}</label>
+        <Input value={value} onChange={onChange} onBlur={onBlur} />
+    </div>
+);
+
+export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
+    const handleChange = (type) => (e) => onUpdate(type, e.target.value === '' ? '' : parseInt(e.target.value));
+
+    // Simplified onLimit to just call onUpdate with default if needed
+    // Actually, we can just inline the blurring logic in SettingItem or keep helper here. 
+    // To keep it short:
+    const handleBlur = (type, val, def) => () => (val === '' || isNaN(val) || val < (type === 'sessions' ? 1 : 0)) && onUpdate(type, def);
 
     return (
         <div className={styles.settings}>
-            <div className={styles.settingItem}>
-                <label className={styles.label}>Work (min)</label>
-                <Input value={work} onChange={handleChange('work')} onBlur={handleBlur('work', work, 0)} />
-            </div>
-            <div className={styles.settingItem}>
-                <label className={styles.label}>Break (min)</label>
-                <Input value={breakTime} onChange={handleChange('break')} onBlur={handleBlur('break', breakTime, 0)} />
-            </div>
-            <div className={styles.settingItem}>
-                <label className={styles.label}>Sessions</label>
-                <Input value={sessions} onChange={handleChange('sessions')} onBlur={handleBlur('sessions', sessions, 1)} />
-            </div>
+            <SettingItem label="Work (min)" value={work} onChange={handleChange('work')} onBlur={handleBlur('work', work, 0)} />
+            <SettingItem label="Break (min)" value={breakTime} onChange={handleChange('break')} onBlur={handleBlur('break', breakTime, 0)} />
+            <SettingItem label="Sessions" value={sessions} onChange={handleChange('sessions')} onBlur={handleBlur('sessions', sessions, 1)} />
         </div>
     );
 };

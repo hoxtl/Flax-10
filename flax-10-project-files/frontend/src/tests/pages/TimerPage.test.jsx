@@ -10,11 +10,16 @@ vi.mock('../../components/Timer/TreeAnimation', () => ({
 describe('TimerPage Integration', () => {
     beforeEach(() => {
         vi.useFakeTimers();
+        global.Notification = {
+            permission: 'granted',
+            requestPermission: vi.fn(),
+        };
     });
 
     afterEach(() => {
         vi.useRealTimers();
         vi.clearAllMocks();
+        delete global.Notification;
     });
 
     it('renders initial state correctly', () => {
