@@ -23,18 +23,22 @@ const SummaryPill = ({ label, value, type }) => (
     </div>
 );
 
+const GoalSummary = ({ sessions, workTime, breakTime }) => (
+    <div className={styles.summaryContainerWrapper}>
+        <p className={styles.summaryText}>You've completed all your scheduled sessions. Amazing work!</p>
+        <div className={styles.summaryContainer}>
+            <SummaryPill label="✅ Sessions" value={sessions} type="Sessions" />
+            <SummaryPill label="🔥 Focus" value={formatTime(workTime)} type="Focus" />
+            <SummaryPill label="☕ Break" value={formatTime(breakTime)} type="Break" />
+        </div>
+    </div>
+);
+
 export const GoalModal = ({ sessions, workTime, breakTime, onAction }) => (
     <div className={styles.modalOverlay}>
         <div className={styles.modalContent}>
             <div className={styles.modalTitle}>🎉 Goal Reached!</div>
-            <div className={styles.summaryContainerWrapper}>
-                <p className={styles.summaryText}>You've completed all your scheduled sessions. Amazing work!</p>
-                <div className={styles.summaryContainer}>
-                    <SummaryPill label="✅ Sessions" value={sessions} type="Sessions" />
-                    <SummaryPill label="🔥 Focus" value={formatTime(workTime)} type="Focus" />
-                    <SummaryPill label="☕ Break" value={formatTime(breakTime)} type="Break" />
-                </div>
-            </div>
+            <GoalSummary sessions={sessions} workTime={workTime} breakTime={breakTime} />
             <button className={`${styles.button} ${styles.primary} ${styles.goalButton}`} onClick={onAction}>
                 Start New Goal
             </button>

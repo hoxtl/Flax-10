@@ -1,8 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTimerLogic } from '../../hooks/useTimerLogic';
 
 describe('useTimerLogic Hook', () => {
+    beforeEach(() => {
+        global.Notification = {
+            permission: 'granted',
+            requestPermission: vi.fn(),
+        };
+    });
+
+    afterEach(() => {
+        delete global.Notification;
+    });
+
     it('initializes correctly', () => {
         const { result } = renderHook(() => useTimerLogic());
         expect(result.current.timeLeft).toBe(1500);
