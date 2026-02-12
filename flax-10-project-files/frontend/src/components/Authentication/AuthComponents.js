@@ -182,15 +182,15 @@ ${props => (props.signIn !== true ? `transform: translateX(50%);` : null)}
  `;
 
  export const LeftOverlayPanel = styled(OverlayPanel)`
-   transform: translateX(-20%);
-   ${props => props.signIn !== true ? `transform: translateX(0);` : null}
- `;
+  transform: translateX(-8%);
+`;
+
 
  export const RightOverlayPanel = styled(OverlayPanel)`
-     right: 0;
-     transform: translateX(0);
-     ${props => props.signIn !== true ? `transform: translateX(20%);` : null}
- `;
+  right: 0;
+  transform: translateX(8%);
+  ${props => props.signIn !== true ? `transform: translateX(28%);` : null}
+`;
 
 export const Paragraph = styled.p`
  font-size: 14px;
