@@ -74,7 +74,31 @@
 
 .pillContainer {
     display: flex;
-    gap: 12px;
+    flex-direction: row;
     flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
     margin-bottom: 24px;
+    width: 100%;
+}
+
+.clearPill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 16px;
+    border: 1px solid #ff4d4f;
+    color: #ff4d4f;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: white;
+    white-space: nowrap;
+    margin-bottom: 20px;
+}
+
+.clearPill:hover {
+    background-color: #fff1f0;
 }
