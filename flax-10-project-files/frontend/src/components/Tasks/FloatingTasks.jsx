@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import ToDoPanel from "./ToDoPanel";
 import styles from "./FloatingTasks.module.css";
 
@@ -14,7 +15,7 @@ export default function FloatingTasks() {
     localStorage.setItem(OPEN_KEY, JSON.stringify(open));
   }, [open]);
 
-  return (
+  return createPortal(
     <>
       <button
         className={styles.fab}
@@ -26,6 +27,7 @@ export default function FloatingTasks() {
       </button>
 
       <ToDoPanel open={open} />
-    </>
+    </>,
+    document.body
   );
 }
