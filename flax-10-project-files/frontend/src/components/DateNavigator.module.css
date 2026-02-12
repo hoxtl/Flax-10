@@ -49,11 +49,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.2s;
 }
 
 .arrow:hover {
-  background: var(--accent);
-  border-radius: 10px;
+  background: var(--hover);
 }
 
 .calBtn {
@@ -63,31 +69,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.2s;
 }
 
 .calBtn:hover {
-  background: var(--accent);
+  background: var(--hover);
 }
 
 .today {
   padding: 6px 12px;
   border-radius: 8px;
-  background: rgba(180, 140, 90, 0.15);
-  /* soft brown */
-  color: #6b4e2e;
-  /* muted brown text */
+  background: var(--pill-bg);
+  color: var(--primary);
   border: none;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .today:hover {
-  background: rgba(180, 140, 90, 0.25);
+  background: var(--pill-hover);
 }
-
-
-
 
 @media (max-width: 600px) {
   .row {
