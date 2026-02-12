@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
+import { useTheme } from "../context/ThemeContext";
 
 // Single tab button
 function TabButton({ id, label, isActive, onClick }) {
@@ -87,6 +88,30 @@ function FormSelect({ id, label, value, onChange, options, name }) {
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+// Theme selector component
+function ThemeSelector({ value, onChange }) {
+  return (
+    <div className={styles.themeSelector}>
+      <button
+        type="button"
+        className={`${styles.themeOption} ${value === 'light' ? styles.active : ''}`}
+        onClick={() => onChange('light')}
+      >
+        <span className={styles.themeIcon}>☀️</span>
+        <span className={styles.themeLabel}>Light</span>
+      </button>
+      <button
+        type="button"
+        className={`${styles.themeOption} ${value === 'dark' ? styles.active : ''}`}
+        onClick={() => onChange('dark')}
+      >
+        <span className={styles.themeIcon}>🌙</span>
+        <span className={styles.themeLabel}>Dark</span>
+      </button>
     </div>
   );
 }
@@ -262,15 +287,43 @@ function SecurityForm({ onSave, isSaving, error }) {
 }
 
 // Preferences panel
-function PreferencesPanel() {
+function PreferencesPanel({ onSave, isSaving }) {
+  const { theme, setTheme } = useTheme();
+  const [formData, setFormData] = useState({
+    theme: theme,
+  });
+
+  function handleThemeChange(newTheme) {
+    setFormData(prev => ({ ...prev, theme: newTheme }));
+    setTheme(newTheme); // Update theme immediately
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    onSave(formData);
+  }
+
   return (
-    <div className={styles.formSection}>
-      <h2 className={styles.sectionTitle}>Preferences</h2>
-      <p className={styles.formDescription}>Customize your StudyFlax experience</p>
-      <p style={{ color: "var(--muted)", marginTop: "40px" }}>
-        Preferences coming soon...
-      </p>
-    </div>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <SectionHeader
+        title="Appearance"
+        description="Customize how StudyFlax looks"
+      />
+
+      <div className={styles.formGroup}>
+        <label>Theme</label>
+        <p className={styles.formDescription}>
+          Choose your preferred color scheme. This will be saved and applied every time you log in.
+        </p>
+        <ThemeSelector value={formData.theme} onChange={handleThemeChange} />
+      </div>
+
+      <SubmitButton
+        isSaving={isSaving}
+        label="Save Preferences"
+        savingLabel="Saving..."
+      />
+    </form>
   );
 }
 
@@ -313,6 +366,7 @@ export default function Settings({ user, onBack }) {
     setIsSaving(true);
     try {
       console.log("Saving account:", data);
+      // TODO: Call API to save account settings
       await new Promise((resolve) => setTimeout(resolve, 1000));
       showTemporaryMessage(setSuccessMessage, "Account updated successfully!");
     } catch (error) {
@@ -338,10 +392,25 @@ export default function Settings({ user, onBack }) {
     setIsSaving(true);
     try {
       console.log("Changing password");
+      // TODO: Call API to change password
       await new Promise((resolve) => setTimeout(resolve, 1000));
       showTemporaryMessage(setSuccessMessage, "Password changed successfully!");
     } catch (error) {
       setPasswordError("Failed to change password. Check your current password.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePreferencesSave = async (data) => {
+    setIsSaving(true);
+    try {
+      console.log("Saving preferences:", data);
+      // TODO: Call API to save preferences (theme)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
+    } catch (error) {
+      console.error("Failed to save preferences:", error);
     } finally {
       setIsSaving(false);
     }
@@ -368,7 +437,9 @@ export default function Settings({ user, onBack }) {
             />
           )}
 
-          {activeTab === "preferences" && <PreferencesPanel />}
+          {activeTab === "preferences" && (
+            <PreferencesPanel onSave={handlePreferencesSave} isSaving={isSaving} />
+          )}
         </div>
       </div>
     </div>
