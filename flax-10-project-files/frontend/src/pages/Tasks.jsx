@@ -43,7 +43,14 @@ export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
 
   // To-do list panel
-  const [tasksOpen, setTasksOpen] = useState(true);
+  const [tasksOpen, setTasksOpen] = useState(() => {
+    const saved = localStorage.getItem("flax_tasks_open");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("flax_tasks_open", JSON.stringify(tasksOpen));
+  }, [tasksOpen]);
 
   // Live clock
   const [now, setNow] = useState(() => new Date());
