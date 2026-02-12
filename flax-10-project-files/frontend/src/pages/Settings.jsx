@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
 import { useTheme } from "../context/ThemeContext";
+import { updateUserSettings } from '../api/userService';
 
 // Single tab button
 function TabButton({ id, label, isActive, onClick }) {
@@ -405,12 +406,11 @@ export default function Settings({ user, onBack }) {
   const handlePreferencesSave = async (data) => {
     setIsSaving(true);
     try {
-      console.log("Saving preferences:", data);
-      // TODO: Call API to save preferences (theme)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await updateUserSettings({ theme: data.theme });
       showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
     } catch (error) {
       console.error("Failed to save preferences:", error);
+      showTemporaryMessage(setSuccessMessage, "Failed to save preferences");
     } finally {
       setIsSaving(false);
     }
