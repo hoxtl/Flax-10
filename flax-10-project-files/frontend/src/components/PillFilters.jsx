@@ -3,6 +3,7 @@ import styles from "./PillFilters.module.css";
 import { countByType } from "../utils/pillUtils";
 import { useTags } from "../context/TagContext";
 import TagManagerModal from "./TagManagerModal";
+import BasePill from "./BasePill";
 
 // Button component for each pill filter
 function cls(isActive) {
@@ -58,10 +59,10 @@ function getAllPills(tags) {
 function PillItem({ pill, active, counts, onChange }) {
   const isActive = checkActive(active, pill.key);
   return (
-    <PillButton
-      pill={pill}
-      isActive={isActive}
+    <BasePill
+      label={pill.label}
       count={counts[pill.key] || 0}
+      isActive={checkActive(active, pill.key)}
       onClick={() => onChange(pill.key)}
     />
   );
