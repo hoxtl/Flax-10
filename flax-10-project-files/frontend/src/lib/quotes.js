@@ -1,4 +1,4 @@
-// Morning (5am – 11:59am)
+// Morning (4am – 11:59am)
 const MORNING_QUOTES = [
   "Good morning. Begin well.",
   "Take your time. Do it right.",
@@ -49,7 +49,7 @@ const EVENING_QUOTES = [
   "Breathe."
 ];
 
-// Night (10pm – 4:59am)
+// Night (10pm – 3:59am)
 const NIGHT_QUOTES = [
   "Quiet effort, loud results.",
   "Calm mind, sharp focus.",
@@ -85,4 +85,3 @@ export function pickQuoteByKey(key, hour = new Date().getHours()) {
   const hash = hashKey(key);
   return pool[hash % pool.length];
 }
-
