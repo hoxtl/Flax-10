@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getType, handleDateChange, getDisplayValue, handleToggle } from '../../../../../components/Calendar/EventModal/components/TimeRowHelpers';
+import { getType, handleDateChange, getDisplayValue, handleToggle } from '../../../../../components/Calendar/EventModal/components/timeRowHelpers';
 
 describe('TimeRowHelpers', () => {
     describe('getType', () => {
