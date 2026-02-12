@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { ThemeProvider } from './context/ThemeContext'; 
 import DashboardLayout from "./layout/DashboardLayout";
 import { APP_ROUTES } from './lib/routes';
 import { CalendarProvider } from './context/CalendarContext';
@@ -11,7 +12,8 @@ function getUser() {
     name: "Jane Smith",
     email: "jane@kcl.ac.uk",
     year: "Year 2",
-    major: "CS"
+    major: "CS",
+    theme: "light"
   };
 }
 
@@ -35,15 +37,17 @@ export default function App() {
   }
 
   return (
-    <NotificationProvider>
-      <CalendarProvider>
-        <TagProvider>
-          <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-            {pageContent}
-          </DashboardLayout>
-          <NotificationToast />
-        </TagProvider>
-      </CalendarProvider>
-    </NotificationProvider>
+    <ThemeProvider>
+      <NotificationProvider>
+        <CalendarProvider>
+          <TagProvider>
+            <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+              {pageContent}
+            </DashboardLayout>
+            <NotificationToast />
+          </TagProvider>
+        </CalendarProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 }
