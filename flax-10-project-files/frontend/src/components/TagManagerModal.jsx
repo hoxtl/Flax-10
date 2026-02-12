@@ -124,10 +124,11 @@ function TagList({ tags, onEdit, onDelete, onAdd }) {
  * Renders a single tag item with preview and actions.
  */
 function TagItem({ tag, onEdit, onDelete }) {
+    const isOther = tag.label?.toLowerCase() === 'other';
     return (
         <div className={styles.item}>
             <TagPreview tag={tag} />
-            <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} />
+            <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isOther} />
         </div>
     );
 }
@@ -147,8 +148,7 @@ function TagPreview({ tag }) {
 /**
  * Edit and Delete buttons for a tag.
  */
-function TagActions({ id, onEdit, onDelete }) {
-    const isDeletable = id !== 'other';
+function TagActions({ id, onEdit, onDelete, isDeletable }) {
     return (
         <div className={styles.actions}>
             <button onClick={() => onEdit(id)}>✎</button>

@@ -1,0 +1,181 @@
+import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NotificationProvider, useNotifications } from '../../context/NotificationContext';
+import * as api from '../../api/notificationApi';
+
+vi.mock('../../api/notificationApi', () => ({
+    fetchNotifications: vi.fn(),
+    createNotification: vi.fn(),
+    deleteNotification: vi.fn(),
+    markAllNotificationsRead: vi.fn(),
+    clearAllNotifications: vi.fn(),
+}));
+
+const TestComponent = () => {
+    const {
+        notifications,
+        addNotification,
+        dismissNotification,
+        markAllRead,
+        clearAll,
+        hasUnread,
+        isOpen,
+        togglePanel,
+        closePanel
+    } = useNotifications();
+
+    return (
+        <div>
+            <div data-testid="count">{notifications.length}</div>
+            <div data-testid="unread">{hasUnread ? 'yes' : 'no'}</div>
+            <div data-testid="isOpen">{isOpen ? 'open' : 'closed'}</div>
+            <button onClick={() => addNotification({ title: 'New' })}>Add</button>
+            <button onClick={() => dismissNotification(1)}>Dismiss</button>
+            <button onClick={markAllRead}>Read All</button>
+            <button onClick={clearAll}>Clear</button>
+            <button onClick={togglePanel}>Toggle</button>
+            <button onClick={closePanel}>Close</button>
+        </div>
+    );
+};
+
+describe('NotificationContext', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        api.fetchNotifications.mockResolvedValue([]);
+    });
+
+    it('should load notifications on mount', async () => {
+        api.fetchNotifications.mockResolvedValue([{ id: 1, title: 'Test', read: false }]);
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'));
+        expect(screen.getByTestId('unread')).toHaveTextContent('yes');
+    });
+
+    it('should add notification', async () => {
+        api.createNotification.mockResolvedValue({ id: 2, title: 'New', read: false });
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+
+        await act(async () => {
+            screen.getByText('Add').click();
+        });
+
+        expect(api.createNotification).toHaveBeenCalled();
+        await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'));
+    });
+
+    it('should dismiss notification', async () => {
+        api.fetchNotifications.mockResolvedValue([{ id: 1, title: 'Test', read: false }]);
+        api.deleteNotification.mockResolvedValue({});
+
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'));
+
+        await act(async () => {
+            screen.getByText('Dismiss').click();
+        });
+
+        expect(api.deleteNotification).toHaveBeenCalledWith(1);
+        await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('0'));
+    });
+
+    it('should handle toggle and close panel', async () => {
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+
+        expect(screen.getByTestId('isOpen')).toHaveTextContent('closed');
+
+        act(() => { screen.getByText('Toggle').click(); });
+        expect(screen.getByTestId('isOpen')).toHaveTextContent('open');
+
+        act(() => { screen.getByText('Close').click(); });
+        expect(screen.getByTestId('isOpen')).toHaveTextContent('closed');
+    });
+
+    it('should mark all read', async () => {
+        api.fetchNotifications.mockResolvedValue([{ id: 1, read: false }]);
+        api.markAllNotificationsRead.mockResolvedValue({});
+
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await waitFor(() => expect(screen.getByTestId('unread')).toHaveTextContent('yes'));
+
+        await act(async () => {
+            screen.getByText('Read All').click();
+        });
+
+        expect(api.markAllNotificationsRead).toHaveBeenCalled();
+        await waitFor(() => expect(screen.getByTestId('unread')).toHaveTextContent('no'));
+    });
+
+    it('should clear all', async () => {
+        api.fetchNotifications.mockResolvedValue([{ id: 1 }, { id: 2 }]);
+        api.clearAllNotifications.mockResolvedValue({});
+
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('2'));
+
+        await act(async () => {
+            screen.getByText('Clear').click();
+        });
+
+        expect(api.clearAllNotifications).toHaveBeenCalled();
+        await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('0'));
+    });
+
+    it('should handle API errors gracefully', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        api.fetchNotifications.mockRejectedValue(new Error('Fetch failed'));
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch notifications:', expect.any(Error)));
+        api.createNotification.mockRejectedValue(new Error('Create failed'));
+        await act(async () => { screen.getByText('Add').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to create notification:', expect.any(Error));
+        api.deleteNotification.mockRejectedValue(new Error('Delete failed'));
+        api.fetchNotifications.mockResolvedValue([{ id: 1 }]);
+        await act(async () => { screen.getByText('Dismiss').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to delete notification:', expect.any(Error));
+        api.markAllNotificationsRead.mockRejectedValue(new Error('Mark read failed'));
+        await act(async () => { screen.getByText('Read All').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to mark all read:', expect.any(Error));
+        api.clearAllNotifications.mockRejectedValue(new Error('Clear failed'));
+        await act(async () => { screen.getByText('Clear').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to clear notifications:', expect.any(Error));
+        consoleSpy.mockRestore();
+    });
+
+    it('should throw error when used outside provider', () => {
+        // Prevent console.error from React
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+
+        expect(() => renderHook(() => useNotifications())).toThrow('useNotifications must be used within NotificationProvider');
+
+        consoleSpy.mockRestore();
+    });
+});

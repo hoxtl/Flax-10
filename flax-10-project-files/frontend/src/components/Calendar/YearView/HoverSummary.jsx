@@ -26,7 +26,7 @@ function EventList({ events, date }) {
 
 function SummaryItem({ event, date }) {
     const { getTag } = useTags();
-    const tag = getTag(event.tag_name || event.tag);
+    const tag = getTag(event.tag);
     const color = tag?.color || '#3b82f6';
     return (
         <div className="summary-event">

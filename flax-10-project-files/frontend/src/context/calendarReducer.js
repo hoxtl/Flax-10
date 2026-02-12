@@ -36,30 +36,17 @@ const handlers = {
  * Toggles the filter state based on the selected payload.
  * Handles switching between 'all' and specific tags, and multi-select logic.
  */
-function toggleFilter(currentFilter, payload) {
+function toggleFilter(filter, payload) {
     if (payload === 'all') return ['all'];
-
-    // Ensure currentFilter is always an array for consistent handling
-    const current = Array.isArray(currentFilter) ? currentFilter : [currentFilter];
-
-    // If resetting from 'all', just return the new payload
-    if (current.includes('all')) return [payload];
-
-    return updateFilterList(current, payload);
-}
-
-/**
- * Updates the list of active filters.
- * Adds the payload if not present, removes it if present.
- * Reverts to 'all' if the result would be empty.
- */
-function updateFilterList(current, payload) {
-    if (current.includes(payload)) {
-        const newFilter = current.filter(t => t !== payload);
-        // Default to 'all' if no filters remain
-        return newFilter.length === 0 ? ['all'] : newFilter;
+    const items = new Set(filter);
+    items.delete('all');
+    if (items.has(payload)) {
+        items.delete(payload);
+    } else {
+        items.add(payload);
     }
-    return [...current, payload];
+    const result = Array.from(items);
+    return result.length > 0 ? result : ['all'];
 }
 
 /*
@@ -75,20 +62,12 @@ function updateEvent(events, updatedEvent) {
 }
 
 function openModalHandler(state, payload) {
-    if (payload?.event !== undefined) {
-        return {
-            ...state,
-            modalEvent: payload.event,
-            modalType: payload.type || null,
-            modalInitialDate: payload.initialDate || null,
-            isModalOpen: true
-        };
-    }
+    const isEventPayload = payload?.event !== undefined;
     return {
         ...state,
-        modalEvent: payload,
-        modalType: null,
-        modalInitialDate: payload?.initialDate || null,
+        modalEvent: isEventPayload ? payload.event : payload,
+        modalType: isEventPayload ? (payload.type || null) : null,
+        modalInitialDate: (isEventPayload ? payload.initialDate : payload?.initialDate) || null,
         isModalOpen: true
     };
 }

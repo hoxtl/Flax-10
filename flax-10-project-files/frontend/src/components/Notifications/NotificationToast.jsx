@@ -1,0 +1,62 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNotifications } from '../../context/NotificationContext';
+import { playNotificationSound } from '../../utils/notificationSound';
+import './NotificationToast.css';
+
+export function NotificationToast() {
+    const { notifications, loading } = useNotifications();
+    const [currentToast, setCurrentToast] = useState(null);
+    const refs = useToastRefs();
+    const showNext = useShowNext(refs.queue, setCurrentToast);
+
+    useToastEffect(notifications, loading, refs, currentToast, showNext);
+
+    if (!currentToast) return null;
+    return <Toast notification={currentToast} />;
+}
+
+function useToastRefs() {
+    return {
+        queue: useRef([]),
+        seenIds: useRef(new Set()),
+        initialized: useRef(false)
+    };
+}
+
+function useShowNext(queueRef, setCurrentToast) {
+    return useCallback(() => {
+        if (queueRef.current.length === 0) return setCurrentToast(null);
+        setCurrentToast(queueRef.current.shift());
+        playNotificationSound();
+        setTimeout(() => setCurrentToast(prev => prev ? null : prev), 3000);
+    }, [queueRef, setCurrentToast]);
+}
+
+function useToastEffect(notifications, loading, refs, currentToast, showNext) {
+    useEffect(() => {
+        if (loading) return;
+        if (!refs.initialized.current) return initialize(notifications, refs);
+        queueNew(notifications, refs, currentToast, showNext);
+    }, [notifications, loading, currentToast, showNext, refs]);
+}
+
+function initialize(notifications, refs) {
+    notifications.forEach(n => refs.seenIds.current.add(n.id));
+    refs.initialized.current = true;
+}
+
+function queueNew(notifications, refs, currentToast, showNext) {
+    const newOnes = notifications.filter(n => !refs.seenIds.current.has(n.id));
+    newOnes.forEach(n => refs.seenIds.current.add(n.id));
+    refs.queue.current.push(...newOnes);
+    if (!currentToast && refs.queue.current.length > 0) showNext();
+}
+
+function Toast({ notification }) {
+    return (
+        <div className="notification-toast">
+            <span className="toast-title">{notification.title}</span>
+            <span className="toast-message">{notification.message}</span>
+        </div>
+    );
+}

@@ -4,38 +4,49 @@ import { extractBaseEventId, hasRecurrence } from './eventUtils';
 
 
 export function getInitialForm(event, options = {}) {
-    if (event) return getFormFromEvent(event);
+    if (event) return getFormFromEvent(event, options);
     return getDefaultForm(options);
 }
 
-function getFormFromEvent(event) {
+function getFormFromEvent(event, options = {}) {
     return {
         title: event.title || '',
         description: event.description || '',
         start_time: formatForInput(event.start_time),
         end_time: formatForInput(event.end_time),
-        recurrence: event.recurrence_details?.frequency || 'none',
-        tag: event.tag_name || event.tag_details?.name || 'other', // Default to 'other'
+        recurrence: getRecurrenceFromEvent(event),
+        reminder: Array.isArray(event.reminder_minutes) ? event.reminder_minutes : [],
+        tag: event.tag || event.tag_details?.id || options.initialTag || null,
         location: event.locution || event.location || '',
-        all_day: event.all_day || event.is_all_day || event.allDay || (
-            formatForInput(event.start_time).endsWith('T00:00') &&
-            formatForInput(event.end_time).endsWith('T00:00')
-        ),
+        all_day: isAllDay(event),
     };
+}
+
+function getRecurrenceFromEvent(event) {
+    return {
+        frequency: event.recurrence_details?.frequency || 'none',
+        interval: event.recurrence_details?.interval || 1,
+        end_date: event.recurrence_details?.end_date || null
+    };
+}
+
+function isAllDay(event) {
+    if (event.all_day || event.is_all_day || event.allDay) return true;
+    const start = formatForInput(event.start_time);
+    const end = formatForInput(event.end_time);
+    return start.endsWith('T00:00') && end.endsWith('T00:00');
 }
 
 function getDefaultForm(options) {
     const now = options.initialDate ? new Date(options.initialDate) : new Date();
-    const later = new Date(now.getTime() + 3600000);
     return {
-        title: '',
-        description: '',
+        title: '', description: '',
         start_time: formatForInput(now),
-        end_time: formatForInput(later),
-        recurrence: 'none',
-        tag: options.initialTag || 'other',
-        location: '',
-        all_day: false,
+        end_time: formatForInput(new Date(now.getTime() + 3600000)),
+        recurrence: { frequency: 'none', interval: 1, end_date: null },
+        reminder: [],
+        tag: options.initialTag || null,
+        location: '', all_day: false,
     };
 }
 
@@ -152,15 +163,16 @@ function buildBaseEventData(form) {
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         location: form.location || '',
-        tag_name: form.tag || null, // Map form 'tag' (ID) to backend 'tag_name'
-        tag: form.tag || null,      // Keep 'tag' for backward compatibility if needed
+        tag: form.tag || null,
+        reminder_minutes: form.reminder,
         all_day: form.all_day,
     };
 }
 
 function addRecurrenceIfNeeded(data, form) {
-    if (form.recurrence && form.recurrence !== 'none') {
-        data.recurrence_rule = { frequency: form.recurrence, interval: 1 };
+    const { frequency, interval, end_date } = form.recurrence || {};
+    if (frequency && frequency !== 'none') {
+        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
     } else {
         data.recurrence_rule = null;
     }
