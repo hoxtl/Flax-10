@@ -44,6 +44,10 @@ vi.mock('../../../hooks/useHoverSummary', () => ({
     })
 }));
 
+vi.mock('../../../hooks/useReminderNotifications', () => ({
+    useReminderNotifications: vi.fn(),
+}));
+
 describe('YearView', () => {
     const defaultState = {
         selectedDate: new Date(2026, 0, 15), // Jan 15, 2026

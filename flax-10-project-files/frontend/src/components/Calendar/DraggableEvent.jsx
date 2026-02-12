@@ -7,39 +7,50 @@ import { formatTime } from '../../utils/dateUtils';
 import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
-export function DraggableEvent({ event, style }) {
-    const { editEvent } = useEventActions();
+export function DraggableEvent({ event, style, minWidthForDetails = 80 }) {
     const { openModal } = useEventModal();
-    const { getTag } = useTags();
-    const theme = getTag(event.tag_name);
-
-    const eventRef = useRef(null);
-    const resizeJustEnded = useRef(false);
+    const theme = useTags().getTag(event.tag);
+    const refs = useEventRefs();
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
-    const { isResizing, resizePreview, handleResizeStart } = useEventResize(event, eventRef, editEvent, resizeJustEnded);
-    const handleClick = () => {
-        if (resizeJustEnded.current) { resizeJustEnded.current = false; return; }
-        if (!isDragging && !isResizing) openModal(event);
-    };
+    const resize = useEventResize(event, refs.event, useEventActions().editEvent, refs.resizeEnded);
+    const onClick = createClickHandler(refs.resizeEnded, isDragging, resize.isResizing, openModal, event);
 
     return (
-        <EventCard
-            eventRef={eventRef} event={event} style={style} theme={theme}
-            resizePreview={resizePreview} isDragging={isDragging} isResizing={isResizing}
-            dragProps={dragProps} onClick={handleClick} onResizeStart={handleResizeStart} />
+        <EventCard event={event} style={style} theme={theme} refs={refs}
+            resize={resize} isDragging={isDragging} dragProps={dragProps}
+            onClick={onClick} minWidth={minWidthForDetails} />
     );
 }
 
-function EventCard({ eventRef, event, style, theme, resizePreview, isDragging, isResizing, dragProps, onClick, onResizeStart }) {
-    const height = resizePreview || parseFloat(style?.height) || 0;
-    const className = buildClassName(isDragging, isResizing);
-    const renderStyle = buildStyle(style, resizePreview, theme);
+function useEventRefs() {
+    return { event: useRef(null), resizeEnded: useRef(false) };
+}
+
+function createClickHandler(resizeEndedRef, isDragging, isResizing, openModal, event) {
+    return () => {
+        if (resizeEndedRef.current) { resizeEndedRef.current = false; return; }
+        if (!isDragging && !isResizing) openModal(event);
+    };
+}
+
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth }) {
+    const height = resize.resizePreview || parseFloat(style?.height) || 0;
+    const width = parseWidthPercent(style?.width);
+    const className = buildClassName(isDragging, resize.isResizing);
+    const renderStyle = buildStyle(style, resize.resizePreview, theme);
+
     return (
-        <div ref={eventRef} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
-            <EventContent event={event} height={height} />
-            <ResizeHandle onStart={onResizeStart} />
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
+            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+            <ResizeHandle onStart={resize.handleResizeStart} />
         </div>
     );
+}
+
+function parseWidthPercent(width) {
+    if (!width) return 100;
+    const match = width.match(/(\d+(?:\.\d+)?)/);
+    return match ? parseFloat(match[1]) : 100;
 }
 
 function ResizeHandle({ onStart }) {
@@ -47,25 +58,28 @@ function ResizeHandle({ onStart }) {
     return <div className="resize-handle" draggable={false} onMouseDown={onMouseDown} />;
 }
 
-function EventContent({ event, height }) {
-    const startTime = formatTime(new Date(event.start_time));
-    const endTime = formatTime(new Date(event.end_time));
+function EventContent({ event, height, width, minWidth }) {
+    const showTime = height >= 30 && width >= minWidth;
+    const showDesc = height >= 60 && width >= minWidth;
     return (
         <div className="event-content">
             <div className="event-title">{event.title}</div>
-            {height >= 30 && <div className="event-time">{startTime} - {endTime}</div>}
-            {height >= 60 && event.description && <div className="event-description">{event.description}</div>}
+            {showTime && <TimeDisplay event={event} />}
+            {showDesc && event.description && <div className="event-description">{event.description}</div>}
         </div>
     );
+}
+
+function TimeDisplay({ event }) {
+    const startTime = formatTime(new Date(event.start_time));
+    const endTime = formatTime(new Date(event.end_time));
+    return <div className="event-time">{startTime} - {endTime}</div>;
 }
 
 function buildStyle(baseStyle, resizePreview, theme) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
-
-    // Apply theme accent color to left border
     style.borderLeftColor = theme ? theme.color : '#8B7355';
-
     return style;
 }
 
