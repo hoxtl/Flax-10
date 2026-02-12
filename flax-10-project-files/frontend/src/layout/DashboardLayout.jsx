@@ -20,7 +20,33 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function getUser() {
-  return { name: "Jane Smith", year: "Year 2", major: "CS", email: "jane@kcl.ac.uk" };
+  // Get user from localStorage
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      const user = JSON.parse(userString);
+      // Format the user data to match what the layout expects
+      return {
+        name: user.first_name && user.last_name 
+          ? `${user.first_name} ${user.last_name}` 
+          : user.username,
+        year: user.year || "Year 2", // Keep default if not provided by backend
+        major: user.major || "CS",   // Keep default if not provided by backend
+        email: user.email,
+        username: user.username
+      };
+    } catch (err) {
+      console.error('Error parsing user data:', err);
+    }
+  }
+  
+  // Fallback to default if no user in localStorage
+  return { 
+    name: "Guest", 
+    year: "Year 2", 
+    major: "CS", 
+    email: "guest@example.com" 
+  };
 }
 
 function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
