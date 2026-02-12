@@ -6,7 +6,7 @@ from faker import Faker
 
 from studyFlax.models import (
     User, UserSettings, Category, Tag, 
-    RecurrenceRule, CalendarEvent, TimetableSource
+    RecurrenceRule, CalendarEvent, Notification
 )
 
 class Command(BaseCommand):
@@ -16,10 +16,11 @@ class Command(BaseCommand):
         fake = Faker('en_GB')
         self.stdout.write("Seeding data...")
 
+        # 1. Create 20 Users
         users = []
-        for _ in range(50):
+        for _ in range(20):
             user = User.objects.create_user(
-                username=fake.user_name(),
+                username=fake.unique.user_name(),
                 email=fake.unique.email(),
                 password='password123',
                 first_name=fake.first_name(),
@@ -27,40 +28,37 @@ class Command(BaseCommand):
             )
             users.append(user)
             
-            # Create UserSettings for each user
+            # Create 20 UserSettings for each user
             UserSettings.objects.create(
                 user=user,
                 theme=random.choice(['light', 'dark', 'system']),
                 timezone='Europe/London'
             )
 
-        # Create Categories
+        # 2. Create exactly 5 Categories
         categories = []
-        for user in users:
-            for _ in range(3):
-                cat = Category.objects.create(
-                    name=fake.word().capitalize(),
-                    color=fake.hex_color(),
-                    is_default=False,
-                    user=user
-                )
-                categories.append(cat)
+        for _ in range(5):
+            cat = Category.objects.create(
+                name=fake.word().capitalize(),
+                color=fake.hex_color(),
+                is_default=random.choice([True, False]),
+                user=None
+            )
+            categories.append(cat)
 
-        # Create Tags
+        # 3. Create exactly 5 Tags (Linked to the Categories)
         tags = []
-        for user in users:
-            user_cats = [c for c in categories if c.user == user]
-            for _ in range(5):
-                tag = Tag.objects.create(
-                    name=fake.job(),
-                    category=random.choice(user_cats),
-                    user=user,
-                    color=fake.hex_color(),
-                    default_duration=random.choice([30, 60, 90])
-                )
-                tags.append(tag)
+        for _ in range(5):
+            tag = Tag.objects.create(
+                name=fake.job()[:50],
+                category=random.choice(categories),
+                user=None,
+                color=fake.hex_color(),
+                default_duration=random.choice([30, 60, 90])
+            )
+            tags.append(tag)
 
-        # Create Recurrence Rules
+        # 4. Create exactly 5 Recurrence Rules
         recurrences = []
         for _ in range(5):
             rule = RecurrenceRule.objects.create(
@@ -69,49 +67,50 @@ class Command(BaseCommand):
             )
             recurrences.append(rule)
 
-        # Create Calendar Events
+        # 5. Create exactly 5 Notifications
+        for _ in range(5):
+            Notification.objects.create(
+                title=fake.sentence(nb_words=4),
+                message=fake.paragraph(),
+                read=random.choice([True, False])
+            )
+
+        # 6. Create Calendar Events (Max 5 per day per user)
+        # Seeds events for a 2-week window (7 days ago to 7 days ahead)
+        today = timezone.now().date()
         for user in users:
-            user_tags = Tag.objects.filter(user=user)
-            if not user_tags.exists(): continue
+            for day_offset in range(-7, 7):
+                event_date = today + timedelta(days=day_offset)
+                
+                # Limit to 5 events per day per user
+                num_events = random.randint(1, 5)
+                
+                for _ in range(num_events):
+                    duration = random.choice([30, 60, 90, 120])
+                    # Generate a random start time on that specific day
+                    start_time = timezone.make_aware(fake.date_time_ad(
+                        start_datetime=event_date,
+                        end_datetime=event_date,
+                    ))
+                    end_time = start_time + timedelta(minutes=duration)
 
-            events_created = 0
-            attempts = 0
-
-            while events_created < 10 and attempts < 50:
-                attempts += 1
-
-                duration = random.choice([30, 60, 90, 120]) # minutes
-                start_time = fake.date_time_this_month(
-                    before_now=False,
-                    after_now=True,
-                    tzinfo=timezone.get_current_timezone()
-                )
-                end_time = start_time + timedelta(minutes=duration)
-
-                # Following code makes sure events don't overlap
-
-                overlap = CalendarEvent.objects.filter(
-                    user=user,
-                    start_time__lt=end_time,
-                    end_time__gt=start_time
-                ).exists()
-
-                if not overlap:
-                    CalendarEvent.objects.create(
+                    # Overlap check
+                    overlap = CalendarEvent.objects.filter(
                         user=user,
-                        title=fake.catch_phrase(),
-                        start_time=start_time,
-                        end_time=end_time,
-                        tag=random.choice(user_tags),
-                        priority=random.choice(['low', 'medium', 'high'])
-                    )
-                    events_created += 1
+                        start_time__lt=end_time,
+                        end_time__gt=start_time
+                    ).exists()
 
-        # Timetable Sources
-        # for _ in range(3):
-        #     TimetableSource.objects.create(
-        #         source_url=fake.unique.url(),
-        #         last_synced=timezone.now()
-        #     )
+                    if not overlap:
+                        CalendarEvent.objects.create(
+                            user=user,
+                            title=fake.catch_phrase(),
+                            start_time=start_time,
+                            end_time=end_time,
+                            tag=random.choice(tags),
+                            priority=random.choice(['low', 'medium', 'high', 'urgent']),
+                            recurrence_rule=random.choice([None, random.choice(recurrences)]),
+                            reminder_minutes=[15, 30]
+                        )
 
-        self.stdout.write(self.style.SUCCESS('Database seeded successfully!'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully seeded {User.objects.count()} users and related data!'))
