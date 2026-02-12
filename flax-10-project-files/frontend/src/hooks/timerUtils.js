@@ -7,9 +7,17 @@ export const getProgress = (t) => {
 
 export const useCompletionCheck = (timer, startNext, setModal) => {
     useEffect(() => {
+        if (Notification.permission === 'default') Notification.requestPermission();
+    }, []);
+
+    useEffect(() => {
         if (timer.mode === 'work' && timer.timeLeft === 0 && timer.isActive) {
-            timer.setIsActive(false);
-            timer.breakTime === 0 ? startNext() : setModal('break');
+            new Notification("Time's Up!", { body: "Overtime started. Keep focusing or take a break!" });
+            if (timer.breakTime === 0) {
+                timer.setIsActive(false);
+                startNext();
+            }
+            // Else: Let it tick into negative (Overtime)
         }
-    }, [timer.timeLeft, timer.isActive, timer.mode, timer.breakTime]);
+    }, [timer.timeLeft, timer.isActive, timer.mode, timer.breakTime, startNext]);
 };

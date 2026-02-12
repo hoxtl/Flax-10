@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { getProgress, useCompletionCheck } from '../../hooks/timerUtils';
 
@@ -14,43 +14,68 @@ describe('timerUtils', () => {
         });
 
         it('calculates correct percentage for work mode', () => {
-            // 25 mins = 1500s. 750s left = 50%
             expect(getProgress({ mode: 'work', workTime: 25, timeLeft: 750 })).toBe(50);
-            // 150s elapsed of 1500s = 10% progress (90% left) => wait check logic
-            // formula: ((total - left) / total) * 100
-            // ((1500 - 1350) / 1500) * 100 = (150/1500)*100 = 10%
             expect(getProgress({ mode: 'work', workTime: 25, timeLeft: 1350 })).toBe(10);
         });
     });
 
     describe('useCompletionCheck', () => {
-        it('triggers startNext or setModal when work completes', () => {
+        let NotificationMock;
+
+        beforeEach(() => {
+            NotificationMock = vi.fn();
+            global.Notification = NotificationMock;
+            global.Notification.permission = 'granted';
+            global.Notification.requestPermission = vi.fn();
+        });
+
+        afterEach(() => {
+            vi.clearAllMocks();
+        });
+
+        it('triggers startNext when breakTime is 0 (Auto-Advance)', () => {
             const startNext = vi.fn();
             const setModal = vi.fn();
+            const setIsActive = vi.fn();
 
             // Case 1: Work complete, no break => startNext
             renderHook(() => useCompletionCheck(
-                { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive: vi.fn() },
+                { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive },
                 startNext, setModal
             ));
-            expect(startNext).toHaveBeenCalled();
 
-            // Case 2: Work complete, with break => setModal
-            vi.clearAllMocks();
+            expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
+            expect(setIsActive).toHaveBeenCalledWith(false);
+            expect(startNext).toHaveBeenCalled();
+            expect(setModal).not.toHaveBeenCalled();
+        });
+
+        it('triggers Notification BUT continues timer (Overtime) when breakTime > 0', () => {
+            const startNext = vi.fn();
+            const setModal = vi.fn();
+            const setIsActive = vi.fn();
+
+            // Case 2: Work complete, has break => Overtime (No stop, No modal)
             renderHook(() => useCompletionCheck(
-                { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive: vi.fn() },
+                { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive },
                 startNext, setModal
             ));
-            expect(setModal).toHaveBeenCalledWith('break');
+
+            expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
+
+            // Crucial changes:
+            expect(setIsActive).not.toHaveBeenCalled(); // Should NOT stop timer
+            expect(setModal).not.toHaveBeenCalled();    // Should NOT show break modal (let OvertimePopup handle it)
+            expect(startNext).not.toHaveBeenCalled();
         });
 
         it('does nothing if conditions not met', () => {
             const startNext = vi.fn();
             const setModal = vi.fn();
-
             renderHook(() => useCompletionCheck(
                 { mode: 'work', timeLeft: 10, isActive: true, breakTime: 0 }, startNext, setModal
             ));
+            expect(NotificationMock).not.toHaveBeenCalled();
             expect(startNext).not.toHaveBeenCalled();
             expect(setModal).not.toHaveBeenCalled();
         });

@@ -35,7 +35,7 @@ export const GoalModal = ({ sessions, workTime, breakTime, onAction }) => (
                     <SummaryPill label="☕ Break" value={formatTime(breakTime)} type="Break" />
                 </div>
             </div>
-            <button className={`${styles.button} ${styles.primary}`} onClick={onAction}>
+            <button className={`${styles.button} ${styles.primary} ${styles.goalButton}`} onClick={onAction}>
                 Start New Goal
             </button>
         </div>
