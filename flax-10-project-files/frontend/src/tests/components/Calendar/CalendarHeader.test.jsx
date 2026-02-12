@@ -16,6 +16,17 @@ vi.mock('../../../api/timetable_api', () => ({
     importTimetable: vi.fn(() => Promise.resolve()),
 }));
 
+vi.mock('../../../api/tagApi', () => ({
+    fetchTags: vi.fn(() => Promise.resolve([])),
+    createTag: vi.fn(),
+    deleteTag: vi.fn(),
+    updateTag: vi.fn(),
+}));
+
+vi.mock('../../../hooks/useReminderNotifications', () => ({
+    useReminderNotifications: vi.fn(),
+}));
+
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
 
@@ -156,6 +167,21 @@ describe('CalendarHeader', () => {
         await vi.waitUntil(() => window.alert.mock.calls.length > 0);
 
         expect(window.alert).toHaveBeenCalledWith('Import failed');
+    });
+
+    it('should handle import timetable flow (unknown error)', async () => {
+        setup();
+        const importBtn = screen.getByText('Import timetable');
+        vi.spyOn(window, 'prompt').mockReturnValue('bad-url');
+        vi.spyOn(window, 'alert');
+
+        importTimetable.mockRejectedValueOnce({}); // No message
+
+        fireEvent.click(importBtn);
+
+        await vi.waitUntil(() => window.alert.mock.calls.length > 0);
+
+        expect(window.alert).toHaveBeenCalledWith('Failed to import timetable');
     });
 
     it('should open modal with date for day view', () => {

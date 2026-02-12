@@ -9,24 +9,21 @@ import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
     const { openModal } = useEventModal();
-    const { addEvent, editEvent, addException } = useEventActions();
-    const [highlightQuarter, setHighlightQuarter] = useState(null);
+    const actions = useEventActions();
+    const [highlightQuarter, setHi] = useState(null);
+    const onDrop = useCallback((p, e) => onDropAction(p, e, hour, date, actions, events, setHi), [hour, date, actions, events]);
+    const onClick = useCallback((e) => onClickAction(e, hour, date, openModal), [hour, date, openModal]);
+    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: onDrop });
+    return { mergedProps: buildMergedProps(dropProps, isOver, setHi, onClick), isOver, highlightQuarter: highlightQuarter };
+}
 
-    const handleDrop = useCallback((payload, e) => {
-        const minutes = getDropMinutes(hour, e);
-        setHighlightQuarter(null);
-        dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, events);
-    }, [hour, date, addEvent, editEvent, addException, events]);
+function onDropAction(payload, e, hour, date, actions, events, setHighlight) {
+    setHighlight(null);
+    dispatchDrop(payload, date, getDropMinutes(hour, e), actions.addEvent, actions.editEvent, actions.addException, events);
+}
 
-    const handleClick = useCallback((e) => {
-        const minutes = getClickMinutes(hour, e);
-        openEventModalAtTime(date, minutes, openModal);
-    }, [hour, date, openModal]);
-
-    const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: handleDrop });
-    const mergedProps = buildMergedProps(dropProps, isOver, setHighlightQuarter, handleClick);
-
-    return { mergedProps, isOver, highlightQuarter };
+function onClickAction(e, hour, date, openModal) {
+    openEventModalAtTime(date, getClickMinutes(hour, e), openModal);
 }
 
 function getDropMinutes(hour, e) {
