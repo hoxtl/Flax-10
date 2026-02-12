@@ -1,5 +1,5 @@
 :root {
-  /* Palette */
+  /* Palette - Light */
   --c-white: #ffffff;
   --c-greige: #B4A490;
   --c-taupe: #AA9A94;
@@ -7,12 +7,14 @@
   --c-olive: #81725B;
   --c-cocoa: #4A3421;
 
+  /* Light Theme */
+
   --bg: #ffffff;              /* page background */
-  --panel: #a5a195;           /* surfaces (topbar, cards) */
-  --sidebar: #a5a195;         /* sidebar surface */
+  --panel: #f6f4f1;           /* surfaces (topbar, cards) */
+  --sidebar: #f6f4f1;         /* sidebar surface */
   --border: rgba(74,52,33,0.18);
 
-  --text: #2B1E14;           
+  --text: #2B1E14;
   --muted: rgba(43,30,20,0.55);
 
   --primary: #9E7E5D;         /* buttons / highlights */
@@ -24,4 +26,34 @@
 
   --pill-bg: #f0ede8;      /* soft background */
   --pill-hover: #eadfd2;   /* hover background */
+}
+
+/* Dark Theme - Lighter & Warmer */
+[data-theme="dark"] {
+  /* Palette - Dark */
+  --c-white: #ffffff;
+  --c-greige: #8d7d6e;
+  --c-taupe: #8a7a74;
+  --c-caramel: #b8936d;
+  --c-olive: #6d6050;
+  --c-cocoa: #2a1e15;
+
+  /* Dark Theme - LIGHTER */
+  --bg: #1C1612;           /* Lighter background */
+  --panel: #252018;        /* Lighter panels */
+  --sidebar: #1F1A15;      /* Lighter sidebar */
+  --border: rgba(180,164,144,0.20);  /* More visible borders */
+
+  --text: rgba(255,255,255,0.95);    /* Brighter text */
+  --muted: rgba(200,184,164,0.75);   /* Brighter muted text */
+
+  --primary: #C4A57B;      /* Lighter primary */
+  --primary-strong: #E8D5C0;
+  --accent: #A89A94;
+
+  --hover: rgba(180,164,144,0.12);
+  --active: rgba(180,164,144,0.18);
+
+  --pill-bg: rgba(180,164,144,0.15);
+  --pill-hover: rgba(180,164,144,0.22);
 }
