@@ -1,7 +1,6 @@
 import styles from "./Tasks.module.css";
 import { pickQuoteByKey } from "../lib/quotes";
 import confetti from "canvas-confetti";
-
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -40,17 +39,6 @@ function buildPersonalLine(quote, name) {
 export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
 
-  // To-do-list Panel Open State
-  const [tasksOpen, setTasksOpen] = useState(() => {
-    const saved = localStorage.getItem("flax_tasks_open");
-    return saved !== null ? JSON.parse(saved) : true;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("flax_tasks_open", JSON.stringify(tasksOpen));
-  }, [tasksOpen]);
-
-  // Live Clock
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -58,10 +46,9 @@ export default function Tasks({ user }) {
     return () => clearInterval(id);
   }, []);
 
- // Quotes - changes every minute
   const quoteKey = useMemo(
     () => `${now.toDateString()}-${now.getHours()}-${now.getMinutes()}`,
-    [now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()]
+    [now]
   );
 
   const quote = useMemo(
@@ -74,7 +61,6 @@ export default function Tasks({ user }) {
     [quote, name]
   );
 
-  // Main Goal
   const [goalText, setGoalText] = useState("");
   const [todayGoal, setTodayGoal] = useState("");
   const [todayDone, setTodayDone] = useState(false);
@@ -103,12 +89,10 @@ export default function Tasks({ user }) {
     setGoalText("");
   };
 
-  // Rendering
   return (
     <div className={styles.momentumPage}>
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
-
         <div className={styles.personalLine}>{personalLine}</div>
 
         <AnimatePresence mode="wait">
@@ -176,15 +160,6 @@ export default function Tasks({ user }) {
       </div>
 
       <div className={styles.bottomQuote}>"{quote}"</div>
-
-      <button
-        className={styles.tasksBtn}
-        onClick={() => setTasksOpen((v) => !v)}
-      >
-        Tasks
-      </button>
-
-      <ToDoPanel open={tasksOpen} />
     </div>
   );
 }
