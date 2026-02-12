@@ -5,17 +5,19 @@
   width: 46px;
   height: 46px;
   border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   cursor: pointer;
-  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
   font-size: 18px;
   display: grid;
   place-items: center;
   z-index: 9999;
+  transition: transform 120ms ease, background 120ms ease;
 }
 
 .fab:hover {
   transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.98);
 }
