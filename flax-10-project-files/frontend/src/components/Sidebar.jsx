@@ -28,6 +28,22 @@ function NavItem({ item, isActive, collapsed, onClick }) {
   );
 }
 
+// Profile button that redirects user to their profile
+function ProfileButton({ onClick, collapsed, isActive }) {
+  const cls = [
+    styles.navItem,
+    collapsed ? styles.navItemCollapsed : styles.navItemExpanded,
+    isActive ? styles.navItemActive : "",
+  ].filter(Boolean).join(" ");
+
+  return (
+    <button onClick={onClick} className={cls}>
+      <span className={styles.icon}>👤</span>
+      {!collapsed && <span className={styles.label}>Profile</span>}
+    </button>
+  );
+}
+
 // User profile component that displays the user's initials, name, year, and major, adjusting layout based on collapsed state
 function SidebarUserProfile({ collapsed, user }) {
   const initials = getInitials(user?.name) || "?";
@@ -48,20 +64,7 @@ function SidebarUserProfile({ collapsed, user }) {
   );
 }
 
-// Main Sidebar component that composes the header, navigation, and user profile components, adjusting width based on collapsed state
-export default function Sidebar({ active, onChange, collapsed }) {
-  const W = collapsed ? 72 : 224;
-
-  return (
-    <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
-      <SidebarHeader collapsed={collapsed} />
-      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
-      <SidebarUserProfile collapsed={collapsed} />
-    </aside>
-  );
-}
-
-// Component that renders the navigation items in the sidebar, highlighting the active item and adjusting layout based on collapsed state
+// Component that renders the navigation items in the sidebar
 function SidebarNav({ active, onChange, collapsed }) {
   return (
     <nav className={styles.nav}>
@@ -74,7 +77,24 @@ function SidebarNav({ active, onChange, collapsed }) {
           onClick={() => onChange?.(n.id)}
         />
       ))}
-
     </nav>
+  );
+}
+
+// Main Sidebar component
+export default function Sidebar({ user, active, onChange, collapsed }) {
+  const handleProfileClick = () => {
+    onChange?.("profile");
+  };
+
+  return (
+    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
+      <SidebarHeader collapsed={collapsed} />
+      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
+      <div className={styles.sidebarFooter}>
+      <ProfileButton onClick={handleProfileClick} collapsed={collapsed} />
+        <SidebarUserProfile user={user} collapsed={collapsed} />
+      </div>
+    </aside>
   );
 }
