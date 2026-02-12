@@ -2,7 +2,8 @@
   position: fixed;
   right: 24px;
   bottom: 72px;
-  width: 230px;
+  width: 330px;
+  max-width: 92vw;
   max-height: 60vh;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(16px);
