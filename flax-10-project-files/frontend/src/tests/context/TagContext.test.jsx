@@ -1,7 +1,15 @@
 
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TagProvider, useTags } from '../../context/TagContext';
+import * as TagApi from '../../api/tagApi';
+
+vi.mock('../../api/tagApi', () => ({
+    fetchTags: vi.fn(),
+    createTag: vi.fn(),
+    deleteTag: vi.fn(),
+    updateTag: vi.fn(),
+}));
 
 const TestComponent = () => {
     const { tags, addTag, updateTag, deleteTag, getTag } = useTags();
@@ -10,116 +18,135 @@ const TestComponent = () => {
             <ul>
                 {tags.map(t => <li key={t.id} data-testid={`tag-${t.id}`}>{t.label}</li>)}
             </ul>
-            <button onClick={() => addTag({ id: 'new', label: 'New Tag', color: '#000' })}>Add</button>
-            <button onClick={() => updateTag('class', { label: 'Updated Class' })}>Update</button>
-            <button onClick={() => deleteTag('task')}>Delete</button>
-            <span data-testid="get-tag">{getTag('study')?.label}</span>
+            <button onClick={() => addTag({ label: 'New Tag', color: '#000' })}>Add</button>
+            <button onClick={() => updateTag(1, { label: 'Updated Class', color: '#000' })}>Update</button>
+            <button onClick={() => deleteTag(1)}>Delete</button>
+            <span data-testid="get-tag">{getTag(1)?.label}</span>
         </div>
     );
 };
 
 describe('TagContext', () => {
     beforeEach(() => {
-        localStorage.clear();
+        vi.clearAllMocks();
+        TagApi.fetchTags.mockResolvedValue([
+            { id: 1, name: 'Class', color: '#000' },
+            { id: 2, name: 'Other', color: '#fff' }
+        ]);
     });
 
-    it('should provide default tags', () => {
+    it('should load tags from API', async () => {
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
-        expect(screen.getByTestId('tag-class')).toHaveTextContent('Class');
-        expect(screen.getByTestId('tag-other')).toHaveTextContent('Other');
-    });
-
-    it('should load tags from localStorage', () => {
-        const savedTags = [{ id: 'saved', label: 'Saved Tag', color: '#fff' }];
-        localStorage.setItem('calendar_tags', JSON.stringify(savedTags));
-
-        render(
-            <TagProvider>
-                <TestComponent />
-            </TagProvider>
-        );
-        expect(screen.getByTestId('tag-saved')).toHaveTextContent('Saved Tag');
-        // 'other' tag is automatically added if missing
-        expect(screen.getByTestId('tag-other')).toHaveTextContent('Other');
+        await waitFor(() => {
+            expect(screen.getByTestId('tag-1')).toHaveTextContent('Class');
+            expect(screen.getByTestId('tag-2')).toHaveTextContent('Other');
+        });
     });
 
     it('should add a tag', async () => {
+        TagApi.createTag.mockResolvedValue({ id: 3, name: 'New Tag', color: '#000' });
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
+        await waitFor(() => expect(screen.getByTestId('tag-1')).toBeInTheDocument());
 
         await act(async () => {
             screen.getByText('Add').click();
         });
 
-        expect(screen.getByTestId('tag-new')).toHaveTextContent('New Tag');
+        await waitFor(() => expect(screen.getByTestId('tag-3')).toHaveTextContent('New Tag'));
     });
 
     it('should update a tag', async () => {
+        TagApi.updateTag.mockResolvedValue({ id: 1, name: 'Updated Class', color: '#000' });
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
-
-        expect(screen.getByTestId('tag-class')).toHaveTextContent('Class');
+        await waitFor(() => expect(screen.getByTestId('tag-1')).toBeInTheDocument());
 
         await act(async () => {
             screen.getByText('Update').click();
         });
 
-        expect(screen.getByTestId('tag-class')).toHaveTextContent('Updated Class');
+        await waitFor(() => expect(screen.getByTestId('tag-1')).toHaveTextContent('Updated Class'));
     });
 
     it('should delete a tag', async () => {
+        TagApi.deleteTag.mockResolvedValue({});
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
-
-        expect(screen.getByTestId('tag-task')).toBeInTheDocument();
+        await waitFor(() => expect(screen.getByTestId('tag-1')).toBeInTheDocument());
 
         await act(async () => {
             screen.getByText('Delete').click();
         });
 
-        expect(screen.queryByTestId('tag-task')).not.toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByTestId('tag-1')).not.toBeInTheDocument());
     });
 
-    it('should not delete "other" tag', async () => {
-        const CannotDeleteOther = () => {
-            const { deleteTag, tags } = useTags();
-            return (
-                <div>
-                    {tags.map(t => <span key={t.id}>{t.label}</span>)}
-                    <button onClick={() => deleteTag('other')}>Delete Other</button>
-                </div>
-            );
-        };
-        render(
-            <TagProvider>
-                <CannotDeleteOther />
-            </TagProvider>
-        );
-        await act(async () => {
-            screen.getByText('Delete Other').click();
-        });
-        expect(screen.getByText('Other')).toBeInTheDocument();
-    });
-
-    it('should get tag by id or fallback to other', () => {
+    it('should get tag by id', async () => {
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
-        expect(screen.getByTestId('get-tag')).toHaveTextContent('Study');
+        await waitFor(() => expect(screen.getByTestId('get-tag')).toHaveTextContent('Class'));
+    });
+
+    it('should handle API errors gracefully', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        // Fetch error
+        TagApi.fetchTags.mockRejectedValue(new Error('Fetch failed'));
+        render(
+            <TagProvider>
+                <TestComponent />
+            </TagProvider>
+        );
+        await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch tags:', expect.any(Error)));
+        // Create error
+        TagApi.createTag.mockRejectedValue(new Error('Create failed'));
+        await act(async () => { screen.getByText('Add').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to create tag:', expect.any(Error));
+        // Update error
+        TagApi.updateTag.mockRejectedValue(new Error('Update failed'));
+        await act(async () => { screen.getByText('Update').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to update tag:', expect.any(Error));
+        // Delete error
+        TagApi.deleteTag.mockRejectedValue(new Error('Delete failed'));
+        await act(async () => { screen.getByText('Delete').click(); });
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to delete tag:', expect.any(Error));
+        consoleSpy.mockRestore();
+    });
+
+    it('should get tag by string id', async () => {
+        // We need a wrapper to provide context
+        const wrapper = ({ children }) => <TagProvider>{children}</TagProvider>;
+
+        const { result } = renderHook(() => useTags(), { wrapper });
+
+        // Wait for loading to finish
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        // Test numerical ID retrieval
+        expect(result.current.getTag(1)).toEqual(expect.objectContaining({ label: 'Class' }));
+        // Test string ID retrieval
+        expect(result.current.getTag('1')).toEqual(expect.objectContaining({ label: 'Class' }));
+    });
+
+    it('should throw error when used outside provider', () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        expect(() => renderHook(() => useTags())).toThrow('useTags must be used within a TagProvider');
+        consoleSpy.mockRestore();
     });
 });

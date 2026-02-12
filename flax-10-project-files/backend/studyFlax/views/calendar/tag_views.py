@@ -29,6 +29,33 @@ def create_tag(request):
     serialiser.save() # Remove when we have user authentication
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
+@api_view(['GET', 'PATCH', 'DELETE'])
+def tag_detail(request, pk):
+    try:
+        tag = Tag.objects.get(pk=pk)
+    except Tag.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        return Response(TagSerialiser(tag).data)
+    if request.method == 'PATCH':
+        return update_tag(tag, request.data)
+    if request.method == 'DELETE':
+        return delete_tag(tag)
+
+def update_tag(tag, data):
+    serialiser = TagSerialiser(tag, data=data, partial=True)
+    if not serialiser.is_valid():
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+    serialiser.save()
+    return Response(serialiser.data)
+
+def delete_tag(tag):
+    if tag.name.lower() == 'other':
+        return Response({'error': 'Cannot delete Other tag'}, status=status.HTTP_400_BAD_REQUEST)
+    tag.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def category_list(request):

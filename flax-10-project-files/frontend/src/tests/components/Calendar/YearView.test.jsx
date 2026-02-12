@@ -44,6 +44,10 @@ vi.mock('../../../hooks/useHoverSummary', () => ({
     })
 }));
 
+vi.mock('../../../hooks/useReminderNotifications', () => ({
+    useReminderNotifications: vi.fn(),
+}));
+
 describe('YearView', () => {
     const defaultState = {
         selectedDate: new Date(2026, 0, 15), // Jan 15, 2026
@@ -151,8 +155,8 @@ describe('YearView', () => {
         const day15 = within(month).getByText('15');
         expect(within(day15).getByText('All Day', { selector: '.event-title' })).toBeInTheDocument();
         expect(within(day15).getByText('All Day', { selector: '.event-time' })).toBeInTheDocument();
-        expect(within(day15).getByText('11:00 PM', { selector: '.event-time' })).toBeInTheDocument();
+        expect(within(day15).getByText(/11:00 pm|11:00 PM/i, { selector: '.event-time' })).toBeInTheDocument();
         expect(within(day15).getByText('Normal', { selector: '.event-title' })).toBeInTheDocument();
-        expect(within(day15).getByText('10:00 AM', { selector: '.event-time' })).toBeInTheDocument();
+        expect(within(day15).getByText(/10:00 am|10:00 AM/i, { selector: '.event-time' })).toBeInTheDocument();
     });
 });

@@ -8,3 +8,6 @@ from .calendar.categoryModel import *
 from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
 from .calendar.timetableSourceModel import *
+
+# Notifications
+from .notifications.notificationModel import *
