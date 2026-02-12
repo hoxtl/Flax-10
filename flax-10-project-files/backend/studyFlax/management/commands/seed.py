@@ -50,7 +50,7 @@ class Command(BaseCommand):
         tags = []
         for _ in range(5):
             tag = Tag.objects.create(
-                name=fake.job()[:50],
+                name=fake.unique.word().capitalize(),
                 category=random.choice(categories),
                 user=None,
                 color=fake.hex_color(),
