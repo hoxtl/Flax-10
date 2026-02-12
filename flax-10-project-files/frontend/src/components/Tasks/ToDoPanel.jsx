@@ -1,10 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./ToDoPanel.module.css";
 import { Reorder, AnimatePresence } from "framer-motion";
 
+const STORAGE_KEY = "flax_todo_items_v1";
+
 export default function ToDoPanel({ open = true }) {
   const [text, setText] = useState("");
-  const [items, setItems] = useState([]);
+
+  // Load tasks once 
+  const [items, setItems] = useState(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+    }
+  }, [items]);
 
   // Inline edit state
   const [editingId, setEditingId] = useState(null);
