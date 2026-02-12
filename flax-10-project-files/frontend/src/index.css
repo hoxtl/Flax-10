@@ -65,6 +65,11 @@ button:focus-visible {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* Dark theme transitions */
+[data-theme="light"] * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
 /* Input fields in dark mode */
 [data-theme="dark"] input,
 [data-theme="dark"] select,
