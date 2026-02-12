@@ -8,12 +8,15 @@ function RatifiedBadge({ isRatified }) {
 }
 
 export default function SocietyCard({ society, onClick }) {
-    const cardStyle = { backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${society.image})' };
+    const bg = { backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)), url(${society.image})` };
     return (
-        <div className={styles.card} style={cardStyle} onClick={() => onClick(society.id)}>
-            <div className={styles.content}>
-                <h3 className={styles.name}>{society.name}<RatifiedBadge isRatified={society.is_ratified} /></h3>
-                <p className={styles.stats}>{society.member_count} members</p>
+        <div className={styles.card} style={bg} onClick={() => onClick?.(society.id)}>
+            <div className={styles.info}>
+                <h3 className={styles.name}>{
+                    society.name}
+                    <RatifiedBadge isRatified={society.isRatified} />
+                </h3>
+                <p className={styles.count}>{society.memberCount} members</p>
             </div>
         </div>
     );
