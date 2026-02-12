@@ -42,7 +42,7 @@ function buildPersonalLine(quote, name) {
 export default function Tasks({ user }) {
   const name = user?.name?.split(" ")[0] || "Guest";
 
-  // To-do list panel
+  // To-do-list Panel Open State
   const [tasksOpen, setTasksOpen] = useState(() => {
     const saved = localStorage.getItem("flax_tasks_open");
     return saved !== null ? JSON.parse(saved) : true;
@@ -52,25 +52,31 @@ export default function Tasks({ user }) {
     localStorage.setItem("flax_tasks_open", JSON.stringify(tasksOpen));
   }, [tasksOpen]);
 
-  // Live clock
+  // Live Clock
   const [now, setNow] = useState(() => new Date());
+
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  // Quote per minute
-  const quoteKey = useMemo(() => {
-    return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}`;
-  }, [now]);
-  const quote = useMemo(() => pickQuoteByKey(quoteKey), [quoteKey]);
+ // Quotes - changes every minute
+  const quoteKey = useMemo(
+    () => `${now.toDateString()}-${now.getHours()}-${now.getMinutes()}`,
+    [now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()]
+  );
+
+  const quote = useMemo(
+    () => pickQuoteByKey(quoteKey, now.getHours()),
+    [quoteKey, now.getHours()]
+  );
 
   const personalLine = useMemo(
     () => buildPersonalLine(quote, name),
     [quote, name]
   );
 
-  // Main goal
+  // Main Goal
   const [goalText, setGoalText] = useState("");
   const [todayGoal, setTodayGoal] = useState("");
   const [todayDone, setTodayDone] = useState(false);
@@ -99,6 +105,7 @@ export default function Tasks({ user }) {
     setGoalText("");
   };
 
+  // Rendering
   return (
     <div className={styles.momentumPage}>
       <div className={styles.center}>
@@ -107,62 +114,67 @@ export default function Tasks({ user }) {
         <div className={styles.personalLine}>{personalLine}</div>
 
         <AnimatePresence mode="wait">
-            {!todayGoal ? (
-                <motion.form
-                    key="goalForm"
-                    className={styles.goalBlock}
-                    onSubmit={submitGoal}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                >
-                <div className={styles.goalPrompt}>
-                    What is your main goal for today?
-                </div>
+          {!todayGoal ? (
+            <motion.form
+              key="goalForm"
+              className={styles.goalBlock}
+              onSubmit={submitGoal}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 24 }}
+            >
+              <div className={styles.goalPrompt}>
+                What is your main goal for today?
+              </div>
 
+              <input
+                className={styles.goalInput}
+                value={goalText}
+                onChange={(e) => setGoalText(e.target.value)}
+                autoFocus
+              />
+
+              <div className={styles.goalUnderline} />
+            </motion.form>
+          ) : (
+            <motion.div
+              key="todayBlock"
+              className={styles.todayBlock}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 24 }}
+            >
+              <div className={styles.todayLabel}>TODAY</div>
+
+              <label className={styles.todayRow}>
                 <input
-                    className={styles.goalInput}
-                    value={goalText}
-                    onChange={(e) => setGoalText(e.target.value)}
-                    placeholder=""
-                    autoFocus
+                  type="checkbox"
+                  checked={todayDone}
+                  onChange={toggleTodayDone}
                 />
+                <span className={todayDone ? styles.todayDone : ""}>
+                  {todayGoal}
+                </span>
+              </label>
 
-                <div className={styles.goalUnderline} />
-                </motion.form>
-            ) : (
-                <motion.div
-                    key="todayBlock"
-                    className={styles.todayBlock}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                >
-                <div className={styles.todayLabel}>TODAY</div>
-
-                <label className={styles.todayRow}>
-                    <input type="checkbox" checked={todayDone} onChange={toggleTodayDone} />
-                    <span className={todayDone ? styles.todayDone : ""}>{todayGoal}</span>
-                </label>
-
-                <button
-                    type="button"
-                    onClick={resetGoal}
-                    style={{
-                    marginTop: 14,
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    opacity: 0.7,
-                    }}
-                >
-                    Change goal
-                </button>
-                </motion.div>
-            )}
-            </AnimatePresence>
+              <button
+                type="button"
+                onClick={resetGoal}
+                style={{
+                  marginTop: 14,
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  opacity: 0.7,
+                }}
+              >
+                Change goal
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className={styles.bottomQuote}>"{quote}"</div>
