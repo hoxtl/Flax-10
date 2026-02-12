@@ -1,11 +1,9 @@
 import styles from "./Tasks.module.css";
-import ToDoPanel from "../components/Tasks/ToDoPanel";
+import { pickQuoteByKey } from "../lib/quotes";
+import confetti from "canvas-confetti";
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
-import { pickQuoteByKey } from "../lib/quotes";
-import confetti from "canvas-confetti";
 
 function pad2(n) {
   return String(n).padStart(2, "0");

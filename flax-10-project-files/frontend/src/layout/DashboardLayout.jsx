@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./DashboardLayout.module.css";
 import Sidebar from "../components/Sidebar";
 import TopBar from "../components/Topbar";
@@ -8,6 +8,7 @@ import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../utils/authHelpers";
+import FloatingTasks from "../components/Tasks/FloatingTasks";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -21,26 +22,6 @@ function useIsMobile(breakpoint = 900) {
   return isMobile;
 }
 
-function getUser() {
-  const userString = localStorage.getItem('user');
-  if (userString) {
-    try {
-      const user = JSON.parse(userString);
-      return {
-        name: user.first_name && user.last_name 
-          ? `${user.first_name} ${user.last_name}` 
-          : user.username,
-        year: user.year || "Year: Unknown",
-        major: user.major || "Major: Unknown",
-        email: user.email,
-        username: user.username
-      };
-    } catch (err) {
-      console.error('Error parsing user data:', err);
-    }
-  }
-}
-
 function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
   if (isMobile) return setMobileOpen((v) => !v);
   setCollapsed((c) => !c);
@@ -48,27 +29,48 @@ function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
 
 function DesktopSidebar({ isMobile, user, activeNav, onNavChange, collapsed }) {
   if (isMobile) return null;
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} collapsed={collapsed} />;
+  return (
+    <Sidebar
+      user={user}
+      active={activeNav}
+      onChange={onNavChange}
+      collapsed={collapsed}
+    />
+  );
 }
 
 function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   if (!isMobile || !open) return null;
+
   return (
     <>
       <div className={styles.backdrop} onClick={onClose} />
       <div className={styles.drawer}>
-        <Sidebar user={user} active={activeNav} onChange={onPick} collapsed={false} />
+        <Sidebar
+          user={user}
+          active={activeNav}
+          onChange={onPick}
+          collapsed={false}
+        />
       </div>
     </>
   );
 }
 
-function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, children }) {
+function MainArea({
+  user,
+  onToggle,
+  onQuickAdd,
+  onSettingsClick,
+  onLogoutClick,
+  selectedDate,
+  children,
+}) {
   return (
     <div className={styles.main}>
-      <TopBar 
-        user={user} 
-        onToggle={onToggle} 
+      <TopBar
+        user={user}
+        onToggle={onToggle}
         onAddClick={onQuickAdd}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
@@ -84,14 +86,28 @@ function QuickAddGate({ open, onClose, onSelectType }) {
   return <QuickAddModal onClose={onClose} onSelectType={onSelectType} />;
 }
 
-export default function DashboardLayout({ activeNav, onNavChange, user, children }) {
+export default function DashboardLayout({
+  activeNav,
+  onNavChange,
+  user,
+  children,
+}) {
   const isMobile = useIsMobile(900);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const { openModal, isModalOpen, modalEvent, modalType, modalInitialDate, closeModal } = useEventModal();
+
+  const {
+    openModal,
+    isModalOpen,
+    modalEvent,
+    modalType,
+    modalInitialDate,
+    closeModal,
+  } = useEventModal();
 
   function onToggle() {
     toggleByDevice(isMobile, setMobileSidebarOpen, setSidebarCollapsed);
@@ -118,35 +134,35 @@ export default function DashboardLayout({ activeNav, onNavChange, user, children
       if (response.ok) {
         clearUserData();
       } else {
-        console.error('Logout on backend has failed, local user data is being clearedd...')
         clearUserData();
       }
     } catch (err) {
-      console.error('Error when logging out: ', err);
       clearUserData();
     }
   }
 
   return (
     <div className={styles.root}>
-      <DesktopSidebar 
-        isMobile={isMobile} 
-        user={user} 
-        activeNav={activeNav} 
-        onNavChange={onNavChange} 
-        collapsed={sidebarCollapsed} 
+      <DesktopSidebar
+        isMobile={isMobile}
+        user={user}
+        activeNav={activeNav}
+        onNavChange={onNavChange}
+        collapsed={sidebarCollapsed}
       />
-      <MobileSidebar 
-        isMobile={isMobile} 
-        open={mobileSidebarOpen} 
-        user={user} 
-        activeNav={activeNav} 
-        onPick={onPickNav} 
-        onClose={() => setMobileSidebarOpen(false)} 
+
+      <MobileSidebar
+        isMobile={isMobile}
+        open={mobileSidebarOpen}
+        user={user}
+        activeNav={activeNav}
+        onPick={onPickNav}
+        onClose={() => setMobileSidebarOpen(false)}
       />
-      <MainArea 
-        user={user} 
-        onToggle={onToggle} 
+
+      <MainArea
+        user={user}
+        onToggle={onToggle}
         onQuickAdd={() => setShowQuickAdd(true)}
         onSettingsClick={handleSettingsClick}
         onLogoutClick={handleLogoutClick}
@@ -154,12 +170,23 @@ export default function DashboardLayout({ activeNav, onNavChange, user, children
       >
         {children}
       </MainArea>
-      <QuickAddGate 
-        open={showQuickAdd} 
-        onClose={() => setShowQuickAdd(false)} 
-        onSelectType={onSelectType} 
+
+      <QuickAddGate
+        open={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSelectType={onSelectType}
       />
-      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
+
+      {isModalOpen && (
+        <EventModal
+          event={modalEvent}
+          initialType={modalType}
+          initialDate={modalInitialDate}
+          onClose={closeModal}
+        />
+      )}
+
+      <FloatingTasks />
     </div>
   );
 }
