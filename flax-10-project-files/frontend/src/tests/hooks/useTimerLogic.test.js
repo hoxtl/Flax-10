@@ -68,6 +68,23 @@ describe('useTimerLogic Hook', () => {
         expect(result.current.timeLeft).toBe(300); // 5 min
     });
 
+    it('handlers.break triggers goal if last session (Skips break)', () => {
+        const { result } = renderHook(() => useTimerLogic());
+        act(() => {
+            result.current.updateTime('sessions', 2);
+            result.current.setCompletedSessions(1);
+        });
+
+        // Finishing session 2 (last one). Should skip break and go to goal.
+        act(() => {
+            result.current.handlers.break();
+        });
+
+        expect(result.current.modal).toBe('goal');
+        expect(result.current.mode).toBe('work'); // Mode shouldn't change to break
+        expect(result.current.completedSessions).toBe(2); // Should increment
+    });
+
     it('handlers.goal resets timer', () => {
         const { result } = renderHook(() => useTimerLogic());
         act(() => {

@@ -277,3 +277,8 @@
     background-color: #dcfce7;
     color: #166534;
 }
+
+.goalButton {
+    margin-top: 2rem;
+    width: 100%;
+}
