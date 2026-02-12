@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { MOCK_SOCIETIES } from "./SocietyData";
 import SocietyCard from "../components/Society/SocietyCard";
-import PillFilters from "../components/PillFilters";
 import styles from "./SocietiesPage.module.css";
 import BasePill from "../components/BasePill";
 import { countByType } from "../utils/pillUtils";
@@ -32,10 +31,17 @@ export default function AllSocieties({ onBack }) {
         setActiveFilters(prev => {
             const withoutAll = prev.filter(item => item !== "all");
             const exists = withoutAll.includes(id);
-            const next = exists ? withoutAll.filter(i => i !== id) : [...withoutAll, id];
+
+            const next = exists
+                ? withoutAll.filter(i => i !== id)
+                : [...withoutAll, id];
 
             return next.length === 0 ? ["all"] : next;
         });
+    }
+    const isFiltering = activeFilters.length > 1 || !activeFilters.includes("all");
+    function handleClear() {
+        setActiveFilters(["all"]);
     }
     return (
         <div className={styles.container}>
@@ -54,6 +60,14 @@ export default function AllSocieties({ onBack }) {
                         onClick={() => handleToggle(opt.id)}
                     />
                 ))}
+                {isFiltering && (
+                    <button
+                        className={styles.clearPill}
+                        onClick={handleClear}
+                    >
+                        Clear All x
+                    </button>
+                )}
             </div>
             <div className={styles.grid}>
                 {filtered.map(s => (
