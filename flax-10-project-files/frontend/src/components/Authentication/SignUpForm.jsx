@@ -2,7 +2,7 @@ import React from 'react';
 import * as Components from '../Authentication/AuthComponents';
 
 /**
- * Sign Up form component
+ * Authentication component for user sign up
  */
 export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading }) => {
   const fields = [
@@ -15,7 +15,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
   ];
 
   return (
-    <Components.SignUpContainer signinIn={signIn}>
+    <Components.SignUpContainer signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Create Account</Components.Title>
         
@@ -33,7 +33,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
         ))}
         
         <Components.Button type="submit" disabled={loading}>
-          {loading ? 'Creating Account...' : 'Sign Up'}
+          {loading ? 'Registering Account...' : 'Sign Up'}
         </Components.Button>
       </Components.Form>
     </Components.SignUpContainer>

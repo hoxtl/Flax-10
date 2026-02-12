@@ -26,3 +26,10 @@ export const saveUserData = (token, user) => {
     localStorage.setItem('user', JSON.stringify(user));
     window.location.reload();
 };
+
+export const clearUserData = () => {
+    localStorage.removeItem('user_token');
+    localStorage.removeItem('user');
+
+    window.location.reload();
+};

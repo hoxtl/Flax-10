@@ -25,5 +25,19 @@ export const authService = {
 
         const data = await response.json();
         return {response, data};
+    },
+
+    async logout() {
+        const token = localStorage.getItem('user_token');
+
+        const response = await fetch(`${API_BASE_URL}/logout/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`}
+        });
+
+        const data = await response.json();
+        return {response, data};
     }
 };
