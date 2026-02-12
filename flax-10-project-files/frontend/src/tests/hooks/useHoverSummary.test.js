@@ -40,6 +40,9 @@ describe('useHoverSummary', () => {
 
         act(() => {
             result.current.binder.onMouseEnter();
+        });
+
+        act(() => {
             vi.advanceTimersByTime(1000);
         });
 
@@ -58,6 +61,9 @@ describe('useHoverSummary', () => {
 
         act(() => {
             result.current.binder.onMouseEnter();
+        });
+
+        act(() => {
             vi.advanceTimersByTime(500); // Halfway
         });
 

@@ -82,10 +82,13 @@ function executeResize(event, deltaY, editEvent, events, resizeJustEnded) {
     const baseEventId = extractBaseEventId(event.id);
     const updatedEvent = { ...event, end_time: newEnd.toISOString() };
     const others = events.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (checkOverlapWithConfirm(updatedEvent, others)) {
-        editEvent(baseEventId, { end_time: newEnd.toISOString() });
-        if (resizeJustEnded) resizeJustEnded.current = true;
-    }
+    if (!checkOverlapWithConfirm(updatedEvent, others)) return;
+    editEvent(baseEventId, { end_time: newEnd.toISOString() });
+    markResizeEnded(resizeJustEnded);
+}
+
+function markResizeEnded(resizeJustEnded) {
+    if (resizeJustEnded) resizeJustEnded.current = true;
 }
 
 function calculateNewEndTime(event, deltaY) {

@@ -6,10 +6,8 @@ def filter_events_by_date_range(queryset, params):
     end = params.get('end')
     if not start and not end:
         return queryset
-
     recurring = Q(recurrence_rule__isnull=False)
     non_recurring = Q(recurrence_rule__isnull=True)
-
     if start and end:
         non_recurring_in_range = non_recurring & Q(start_time__lte=end) & Q(end_time__gte=start)
         recurring_could_expand = recurring & Q(start_time__lte=end)
@@ -51,18 +49,13 @@ def generate_instances(event, start_date, end_date):
     return instances
 
 def generate_occurrence_instances(event, rule, start_date, end_date):
-    instances = []
+    from itertools import takewhile
     duration = event.end_time - event.start_time
-    max_occurrences = rule.count or 365
-
-    for i in range(1, max_occurrences + 1):
-        next_start = get_next_occurrence(event.start_time, rule.frequency, rule.interval, i)
-        if next_start is None or should_stop_generating(next_start, end_date, rule):
-            break
-        if next_start >= start_date and not is_exception_date(next_start, rule):
-            instances.append(create_instance(event, next_start, duration))
-
-    return instances
+    candidates = (get_next_occurrence(event.start_time, rule.frequency, rule.interval, i) 
+                  for i in range(1, (rule.count or 365) + 1))
+    active = takewhile(lambda d: d and not should_stop_generating(d, end_date, rule), candidates)
+    return [create_instance(event, d, duration) for d in active 
+            if d >= start_date and not is_exception_date(d, rule)]
 
 def get_base_instance(event, rule):
     if is_exception_date(event.start_time, rule):

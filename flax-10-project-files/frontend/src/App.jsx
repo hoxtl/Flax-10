@@ -4,6 +4,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from './pages/AuthPage';
 import { APP_ROUTES } from './lib/routes';
 import { CalendarProvider } from './context/CalendarContext';
+import { NotificationProvider } from './context/NotificationContext';
 import Settings from './pages/Settings';
 
 function getUser() {
@@ -27,6 +28,7 @@ function isAuthenticated() {
 }
 
 import { TagProvider } from './context/TagContext';
+import { NotificationToast } from './components/Notifications';
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("home");
@@ -51,12 +53,15 @@ export default function App() {
   }
 
   return (
-    <CalendarProvider>
-      <TagProvider>
-        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-          {pageContent}
-        </DashboardLayout>
-      </TagProvider>
-    </CalendarProvider>
+    <NotificationProvider>
+      <CalendarProvider>
+        <TagProvider>
+          <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+            {pageContent}
+          </DashboardLayout>
+          <NotificationToast />
+        </TagProvider>
+      </CalendarProvider>
+    </NotificationProvider>
   );
 }
