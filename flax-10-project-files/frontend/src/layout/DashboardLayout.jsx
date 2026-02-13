@@ -30,8 +30,8 @@ function getUser() {
         name: user.first_name && user.last_name 
           ? `${user.first_name} ${user.last_name}` 
           : user.username,
-        year: user.year || "Year: Unknown",
-        major: user.major || "Major: Unknown",
+        year: user.year ? `Year ${user.year}` : 'Year: ',
+        major: user.major || "Major: ",
         email: user.email,
         username: user.username
       };
