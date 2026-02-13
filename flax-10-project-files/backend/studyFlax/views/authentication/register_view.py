@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from studyFlax.models import User
 from rest_framework.authtoken.models import Token
 from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser, UserSerialiser
+from studyFlax.models.auth.userSettingsModel import UserSettings
 
 
 @api_view(['POST'])
@@ -23,6 +24,8 @@ def register_view(request):
         first_name=user_serialiser.validated_data['first_name'],
         last_name=user_serialiser.validated_data['last_name']
     )
+
+    UserSettings.objects.create(user=new_user)
 
     token, new_token = Token.objects.get_or_create(user=new_user)
 
