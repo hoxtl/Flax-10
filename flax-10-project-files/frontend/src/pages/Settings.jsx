@@ -471,7 +471,12 @@ export default function Settings({ user, onBack }) {
   const handlePreferencesSave = async (data) => {
     setIsSaving(true);
     try {
-      await updateUserSettings({ theme: data.theme });
+      const response = await updateUserSettings({ theme: data.theme });
+      
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+      }
+      
       showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
     } catch (error) {
       console.error("Failed to save preferences:", error);
