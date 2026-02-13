@@ -80,20 +80,6 @@
   letter-spacing: -0.1px;
 }
 
-
-.bottomQuote {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 28px;
-  text-align: center;
-  font-size: 15px;
-  opacity: 0.75;
-  width: 100%;
-  padding: 0 16px;
-  letter-spacing: 0.3px;
-}
-
 /* Bottom-right button */
 .tasksBtn {
   position: fixed;
