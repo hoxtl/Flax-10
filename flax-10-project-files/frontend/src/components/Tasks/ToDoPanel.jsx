@@ -1,4 +1,3 @@
-// ToDoPanel.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./ToDoPanel.module.css";
 import { Reorder, AnimatePresence } from "framer-motion";
@@ -36,7 +35,6 @@ export default function ToDoPanel({ open = true }) {
     }
   });
 
-  // Persist
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -100,13 +98,12 @@ export default function ToDoPanel({ open = true }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Per-task menu (PORTAL)
+  // Per-task menu 
   const [taskMenuId, setTaskMenuId] = useState(null);
   const taskMenuRef = useRef(null);
   const [taskMenuPos, setTaskMenuPos] = useState({ top: 0, left: 0 });
   const [taskMenuAnchor, setTaskMenuAnchor] = useState(null); // {x,y,w,h}
 
-  // Close menus on outside click / esc
   useEffect(() => {
     const onDown = (e) => {
       // Close top menu
@@ -114,7 +111,6 @@ export default function ToDoPanel({ open = true }) {
         setMenuOpen(false);
       }
 
-      // Close task menu unless click is inside menu OR on a task dots button
       const clickedDotsBtn = e.target.closest?.("[data-task-menu-btn='true']");
       if (clickedDotsBtn) return;
 
@@ -148,19 +144,15 @@ export default function ToDoPanel({ open = true }) {
     const menuW = el.offsetWidth;
     const menuH = el.offsetHeight;
 
-    // Prefer: open BELOW and align the menu's right edge with the dots button
     let left = taskMenuAnchor.x + taskMenuAnchor.w - menuW;
     let top = taskMenuAnchor.y + taskMenuAnchor.h + 8;
 
-    // Clamp horizontally
     left = Math.max(pad, Math.min(left, window.innerWidth - menuW - pad));
 
-    // Flip above if bottom overflow
     if (top + menuH + pad > window.innerHeight) {
       top = taskMenuAnchor.y - menuH - 8;
     }
 
-    // Clamp vertically
     top = Math.max(pad, Math.min(top, window.innerHeight - menuH - pad));
 
     setTaskMenuPos({ top, left });
@@ -262,7 +254,6 @@ export default function ToDoPanel({ open = true }) {
     });
   };
 
-  // Single portal menu renderer (so you don't duplicate markup 3x)
   const renderTaskMenu = (item) => {
     if (taskMenuId !== item.id) return null;
 
@@ -308,7 +299,6 @@ export default function ToDoPanel({ open = true }) {
     );
   };
 
-  // helper: open/close menu and capture anchor rect
   const onTaskDotsClick = (e, item) => {
     const r = e.currentTarget.getBoundingClientRect();
     setTaskMenuAnchor({ x: r.left, y: r.top, w: r.width, h: r.height });
@@ -365,7 +355,7 @@ export default function ToDoPanel({ open = true }) {
           className={styles.reorderGroup}
         >
           <AnimatePresence>
-            {/* URGENT */}
+            {/* Urgent Section */}
             {urgentActive.length > 0 && (
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>URGENT</div>
@@ -493,7 +483,6 @@ export default function ToDoPanel({ open = true }) {
           </AnimatePresence>
         </Reorder.Group>
 
-        {/* DONE (not reorderable) */}
         {doneItems.length > 0 && (
           <div className={styles.section}>
             <div className={styles.doneTitle}>DONE</div>
