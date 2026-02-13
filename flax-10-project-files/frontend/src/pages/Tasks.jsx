@@ -93,7 +93,18 @@ export default function Tasks({ user }) {
     <div className={styles.tasksPage}>
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
-        <div className={styles.personalLine}>{personalLine}</div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={personalLine}
+            className={styles.personalLine}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22 }}
+          >
+            {personalLine}
+          </motion.div>
+        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {!todayGoal ? (
