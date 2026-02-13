@@ -1,8 +1,29 @@
-.momentumPage {
+.tasksPage {
+  min-height: 100vh;
   position: relative;
-  height: calc(100vh - 120px);
-  padding: 24px;
-  overflow: hidden;
+
+  background-image: url("../assets/tasks-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tasksPage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.center {
+  position: relative;
+  z-index: 1;
 }
 
 /* Center block */
@@ -10,8 +31,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;      /* horizontal center */
-  justify-content: center;  /* vertical center */
+  align-items: center;     
+  justify-content: center;  
   text-align: center;
   gap: 18px;
 }

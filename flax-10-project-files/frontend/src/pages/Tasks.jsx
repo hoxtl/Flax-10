@@ -90,7 +90,7 @@ export default function Tasks({ user }) {
   };
 
   return (
-    <div className={styles.momentumPage}>
+    <div className={styles.tasksPage}>
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
         <div className={styles.personalLine}>{personalLine}</div>
