@@ -358,7 +358,9 @@ export default function ToDoPanel({ open = true }) {
             {/* Urgent Section */}
             {urgentActive.length > 0 && (
               <div className={styles.section}>
-                <div className={styles.sectionTitle}>URGENT</div>
+                <div className={styles.sectionTitle}>
+                  URGENT <span className={styles.urgentBang} aria-hidden="true">!</span>
+                </div>
 
                 {urgentActive.map((item) => (
                   <Reorder.Item
