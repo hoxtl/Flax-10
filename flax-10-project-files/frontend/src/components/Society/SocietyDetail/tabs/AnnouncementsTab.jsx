@@ -20,8 +20,13 @@ function AnnouncementCard({ announcement }) {
         <div className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
             <CardHeader announcement={announcement} />
             <p className={styles.announcementContent}>{announcement.content}</p>
+            {announcement.image && <AnnouncementImage src={announcement.image} />}
         </div>
     );
+}
+
+function AnnouncementImage({ src }) {
+    return <img className={styles.announcementImage} src={src} alt="Announcement" />;
 }
 
 function CardHeader({ announcement }) {

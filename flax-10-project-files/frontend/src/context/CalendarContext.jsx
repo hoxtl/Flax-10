@@ -23,14 +23,28 @@ export function useCalendar() {
     if (!context) {
         throw new Error('useCalendar must be used within CalendarProvider');
     }
+    return getFilteredContext(context);
+}
 
-    // Derived state: filter events based on the current filter
+function getFilteredContext(context) {
     const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
-    const filteredEvents = currentFilter.includes('all')
-        ? context.events
-        : context.events.filter(e => currentFilter.includes(e.tag_name?.toLowerCase()));
-
+    const filteredEvents = filterEventsByTag(context.events, currentFilter);
     return { ...context, events: filteredEvents, allEvents: context.events };
+}
+
+function filterEventsByTag(events, filter) {
+    if (filter.includes('all')) return events;
+    return events.filter(e => filter.includes(e.tag_name?.toLowerCase()));
+}
+
+export function useCalendarData(props = {}) {
+    const context = useContext(CalendarContext);
+    const filtered = context ? getFilteredContext(context) : null;
+    return {
+        selectedDate: props.selectedDate ?? filtered?.selectedDate ?? new Date(),
+        events: props.events ?? filtered?.events ?? [],
+        viewMode: props.viewMode ?? filtered?.viewMode ?? 'month',
+    };
 }
 
 export function useCalendarDispatch() {
@@ -38,9 +52,14 @@ export function useCalendarDispatch() {
 }
 
 export function useEventModal() {
-    const { modalEvent, modalType, modalInitialDate, isModalOpen } = useCalendar();
-    const dispatch = useCalendarDispatch();
+    const context = useContext(CalendarContext);
+    const dispatch = useContext(CalendarDispatchContext);
 
+    if (!context || !dispatch) {
+        return { modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false, openModal: () => {}, closeModal: () => {} };
+    }
+
+    const { modalEvent, modalType, modalInitialDate, isModalOpen } = context;
     const openModal = (event = null, type = null, initialDate = null) => {
         dispatch({ type: 'OPEN_MODAL', payload: { event, type, initialDate } });
     };

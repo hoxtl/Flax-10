@@ -4,7 +4,8 @@ import { isSameDay } from '../../../../utils/dateUtils';
 import { SLOT_HEIGHT } from '../../calendarConstants';
 import { HighlightOverlay } from './HighlightOverlay';
 
-export function HourCell({ hour, date }) {
+export function HourCell({ hour, date, readOnly }) {
+    if (readOnly) return <div className="hour-cell" style={{ height: SLOT_HEIGHT }} />;
     const { props, hl, target, quarter } = useHourCellLogic(hour, date);
     return (
         <div className={`hour-cell${hl ? ' drop-target' : ''}`} style={{ height: SLOT_HEIGHT }} {...props}>

@@ -2,7 +2,12 @@ import { useTimeSlotDrop } from '../../../hooks/useTimeSlotDrop';
 import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
 import { isSameDay } from '../../../utils/dateUtils';
 
-export function TimeSlot({ hour, date }) {
+export function TimeSlot({ hour, date, readOnly }) {
+    if (readOnly) return <div className="time-slot" />;
+    return <InteractiveTimeSlot hour={hour} date={date} />;
+}
+
+function InteractiveTimeSlot({ hour, date }) {
     const { mergedProps, isOver, highlightQuarter } = useTimeSlotDrop(hour, date);
     const { resizeHighlight } = useResizeHighlight();
     const isResizeTarget = checkResizeTarget(resizeHighlight, hour, date);

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useCalendar } from '../../../context/CalendarContext';
+import { useCalendarData } from '../../../context/CalendarContext';
 import { overlapsDay } from '../../../utils/dateUtils';
 import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
 import { TimeSlot } from './TimeSlot';
@@ -10,23 +10,22 @@ import { SLOT_HEIGHT } from '../calendarConstants';
 import { useAutoScroll } from '../../../hooks/useAutoScroll';
 import './DayView.css';
 
-export function DayView() {
-    const { events } = useCalendar();
-    const { selectedDate, timedEvents, allEvents, scrollRef } = useDayViewData(events);
+export function DayView({ selectedDate: propDate, events: propEvents, readOnly }) {
+    const data = useCalendarData({ selectedDate: propDate, events: propEvents });
+    const { selectedDate, timedEvents, allEvents, scrollRef } = useDayViewData(data.selectedDate, data.events);
 
     return (
         <div className="day-view" ref={scrollRef}>
-            <div className="sticky-header"><AllDayRow days={[selectedDate]} events={allEvents} /></div>
+            <div className="sticky-header"><AllDayRow days={[selectedDate]} events={allEvents} readOnly={readOnly} /></div>
             <div className="day-grid-container">
                 <TimeLabelsColumn hours={getHoursOfDay()} />
-                <DayGrid hours={getHoursOfDay()} date={selectedDate} events={timedEvents} />
+                <DayGrid hours={getHoursOfDay()} date={selectedDate} events={timedEvents} readOnly={readOnly} />
             </div>
         </div>
     );
 }
 
-function useDayViewData(events) {
-    const { selectedDate } = useCalendar();
+function useDayViewData(selectedDate, events) {
     const scrollRef = useRef(null);
     const allEvents = filterEventsForDay(events, selectedDate);
     const timedEvents = allEvents.filter(e => shouldShowInTimeGrid(e, selectedDate));
@@ -46,20 +45,20 @@ function TimeLabelsColumn({ hours }) {
     );
 }
 
-function DayGrid({ hours, date, events }) {
+function DayGrid({ hours, date, events, readOnly }) {
     return (
         <div className="day-grid">
-            {hours.map(hour => <TimeSlot key={hour} hour={hour} date={date} />)}
-            <EventsLayer events={events} date={date} />
+            {hours.map(hour => <TimeSlot key={hour} hour={hour} date={date} readOnly={readOnly} />)}
+            <EventsLayer events={events} date={date} readOnly={readOnly} />
         </div>
     );
 }
 
-function EventsLayer({ events, date }) {
+function EventsLayer({ events, date, readOnly }) {
     return (
         <div className="events-layer">
             {events.map(e => (
-                <DraggableEvent key={e.id} event={e}
+                <DraggableEvent key={e.id} event={e} readOnly={readOnly}
                     style={calculateEventStyle(e, SLOT_HEIGHT, events, date)} minWidthForDetails={25} />
             ))}
         </div>
