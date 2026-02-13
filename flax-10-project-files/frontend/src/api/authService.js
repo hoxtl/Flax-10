@@ -2,12 +2,12 @@
  * API service for user authentication endpoints
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/auth';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 
 export const authService = {
     async register(userData) {
-        const response = await fetch(`${API_BASE_URL}/register/`, {
+        const response = await fetch(`${API_BASE_URL}/auth/register/`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(userData)
@@ -17,7 +17,7 @@ export const authService = {
     },
 
     async login(userCredentials) {
-        const response = await fetch(`${API_BASE_URL}/login/`, {
+        const response = await fetch(`${API_BASE_URL}/auth/login/`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(userCredentials)
@@ -28,9 +28,9 @@ export const authService = {
     },
 
     async logout() {
-        const token = localStorage.getItem('user_token');
+        const token = localStorage.getItem('token');
 
-        const response = await fetch(`${API_BASE_URL}/logout/`, {
+        const response = await fetch(`${API_BASE_URL}/auth/logout/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

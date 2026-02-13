@@ -22,6 +22,26 @@ function useIsMobile(breakpoint = 900) {
   return isMobile;
 }
 
+function getUser() {
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      const user = JSON.parse(userString);
+      return {
+        name: user.first_name && user.last_name 
+          ? `${user.first_name} ${user.last_name}` 
+          : user.username,
+        year: user.year ? `Year ${user.year}` : 'Year: ',
+        major: user.major || "Major: ",
+        email: user.email,
+        username: user.username
+      };
+    } catch (err) {
+      console.error('Error parsing user data:', err);
+    }
+  }
+}
+
 function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
   if (isMobile) return setMobileOpen((v) => !v);
   setCollapsed((c) => !c);
