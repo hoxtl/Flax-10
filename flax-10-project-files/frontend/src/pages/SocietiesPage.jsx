@@ -1,34 +1,24 @@
 import { useState } from "react";
-import SocietyCard from "../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import { MOCK_SOCIETIES } from "./SocietyData";
 import AllSocieties from "./AllSocieties";
+import SocietySection from "./SocietySection";
 
 export default function SocietiesPage() {
     const [view, setView] = useState("my");
-    const [mySocieties] = useState([]);
 
-    if (view === "all") {
-        return <AllSocieties onBack={() => setView("my")} />
-    }
+    if (view === "all") return <AllSocieties onBack={() => setView("my")} />;
+
+    const adminOf = MOCK_SOCIETIES.filter(s => s.isAdmin);
+    const memberOf = MOCK_SOCIETIES.filter(s => !s.isAdmin);
 
     return (
         <div className={styles.container}>
-            <h2>My Societies</h2>
-            {mySocieties.length > 0 ? (
-                <SocietyGrid societies={mySocieties} onBrowse={() => setView("all")} />
-            ) : (
-                <EmptyState onBrowse={() => setView("all")} />
-            )}
-        </div>
-    )
-}
+            <SocietySection title="Managed Societies" items={adminOf}
+                type="admin" onAction={() => console.log("Open Create Form")} />
 
-function EmptyState({ onBrowse }) {
-    return (
-        <div className={styles.emptyContainer}>
-            <p className={styles.emptyText}>You haven't joined any societies yet. 😊</p>
-            <button className={styles.emptyBrowseBtn} onClick={onBrowse}>Browse All Societies</button>
+            <SocietySection title="My Memberships" items={memberOf}
+                type="member" onAction={() => setView("all")} allSocieties={MOCK_SOCIETIES} />
         </div>
-    )
+    );
 }
