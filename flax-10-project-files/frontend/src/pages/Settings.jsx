@@ -1,6 +1,9 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
 
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 // Single tab button
 function TabButton({ id, label, isActive, onClick }) {
   const className = `${styles.tab} ${isActive ? styles.tabActive : ""}`;
@@ -117,18 +120,18 @@ function getInitialAccountData(user) {
   return {
     name: user?.name || "",
     email: user?.email || "",
-    year: user?.year || "Year 2",
-    major: user?.major || "Computer Science",
+    year: user?.year?.replace('Year', '') || "2",
+    major: user?.major?.replace('Major', '') || "Computer Science",
   };
 }
 
 // Get year options
 function getYearOptions() {
   return [
-    { value: "Year 1", label: "Year 1" },
-    { value: "Year 2", label: "Year 2" },
-    { value: "Year 3", label: "Year 3" },
-    { value: "Year 4", label: "Year 4" },
+    { value: "1", label: "Year 1" },
+    { value: "2", label: "Year 2" },
+    { value: "3", label: "Year 3" },
+    { value: "4", label: "Year 4" },
   ];
 }
 
@@ -311,12 +314,43 @@ export default function Settings({ user, onBack }) {
 
   const handleAccountSave = async (data) => {
     setIsSaving(true);
+    setPasswordError("");
+
     try {
-      console.log("Saving account:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      showTemporaryMessage(setSuccessMessage, "Account updated successfully!");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setPasswordError("You are not logged in, please try again...");
+        setIsSaving(false);
+        return;
+      }
+
+      const user_year = data.year.replace('Year', '');
+
+      const response = await fetch(`${API_BASE_URL}/settings/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({
+          year: user_year,
+          major: data.major
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        if (responseData.user) {
+          localStorage.setItem('user', JSON.stringify(responseData.user));
+          showTemporaryMessage(setSuccessMessage, "The account has been updated!");
+        } else {
+          setPasswordError(responseData.error || "The account update has failed...");
+        }
+      }
     } catch (error) {
-      console.error("Failed to update account:", error);
+      console.error("Update account error: ", error)
+      setPasswordError("Action failed, please try again...")
     } finally {
       setIsSaving(false);
     }

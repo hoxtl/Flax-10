@@ -21,7 +21,7 @@ function getUser() {
 }
 
 function isAuthenticated() {
-  return !!localStorage.getItem('user_token');
+  return !!localStorage.getItem('token');
 }
 
 import { TagProvider } from './context/TagContext';
