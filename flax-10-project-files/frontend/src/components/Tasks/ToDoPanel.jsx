@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 const STORAGE_KEY = "flax_todo_items_v1";
 const AUTO_CLEAR_MS = 2 * 60 * 60 * 1000;
 
-function normalizeItem(x) {
+function normaliseItem(x) {
   return {
     id: x?.id ?? crypto.randomUUID(),
     title: typeof x?.title === "string" ? x.title : "",
@@ -28,7 +28,7 @@ export default function ToDoPanel({ open = true }) {
   const [items, setItems] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw).map(normalizeItem) : [];
+      const parsed = raw ? JSON.parse(raw).map(normaliseItem) : [];
       return parsed;
     } catch {
       return [];
