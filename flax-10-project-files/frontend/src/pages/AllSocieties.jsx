@@ -5,78 +5,55 @@ import styles from "./SocietiesPage.module.css";
 import BasePill from "../components/BasePill";
 import { countByType } from "../utils/pillUtils";
 
+const filterOptions = [
+    { id: "all", label: "All" },
+    { id: "ratified", label: "Ratified ✅" },
+    { id: "unratified", label: "Unratified" }
+];
+
 export default function AllSocieties({ onBack }) {
     const [search, setSearch] = useState("");
     const [activeFilters, setActiveFilters] = useState(["all"]);
-
-    const filterOptions = [
-        { id: "all", label: "All" },
-        { id: "ratified", label: "Ratified ✅" },
-        { id: "unratified", label: "Unratified" }
-    ];
     const counts = countByType(MOCK_SOCIETIES);
-    const filtered = useMemo(() => MOCK_SOCIETIES.filter(s => {
-        const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
-        if (activeFilters.includes("all")) return matchesSearch;
-
-        const matchesRatified = activeFilters.includes("ratified") ? s.isRatified : false;
-        const matchesUnratified = activeFilters.includes("unratified") ? !s.isRatified : false;
-
-        return matchesSearch && (matchesRatified || matchesUnratified);
-    }), [search, activeFilters]);
-
-    function handleToggle(id) {
-        if (id === "all") return setActiveFilters(["all"]);
-
-        setActiveFilters(prev => {
-            const withoutAll = prev.filter(item => item !== "all");
-            const exists = withoutAll.includes(id);
-
-            const next = exists
-                ? withoutAll.filter(i => i !== id)
-                : [...withoutAll, id];
-
-            return next.length === 0 ? ["all"] : next;
-        });
-    }
-    const isFiltering = activeFilters.length > 1 || !activeFilters.includes("all");
-    function handleClear() {
-        setActiveFilters(["all"]);
-    }
+    const filtered = useMemo(() => filterSocieties(MOCK_SOCIETIES, search, activeFilters), [search, activeFilters]);
     return (
         <div className={styles.container}>
-            <h2>All Societies</h2>
             <header className={styles.header}>
                 <button onClick={onBack} className={styles.backBtn}>← Back</button>
-                <input className={styles.searchBar} placeholder="Search all societies..." onChange={e => setSearch(e.target.value)} />
+                <input className={styles.searchBar} placeholder="Search..." onChange={e => setSearch(e.target.value)} />
             </header>
             <div className={styles.pillContainer}>
                 {filterOptions.map(opt => (
-                    <BasePill
-                        key={opt.id}
-                        label={opt.label}
-                        count={counts[opt.id] || 0}
-                        isActive={activeFilters.includes(opt.id)}
-                        onClick={() => handleToggle(opt.id)}
-                    />
+                    <BasePill key={opt.id} label={opt.label} count={counts[opt.id] || 0}
+                        isActive={activeFilters.includes(opt.id)} onClick={() => setActiveFilters(prev => getNextFilters(prev, opt.id))} />
                 ))}
-                {isFiltering && (
-                    <button
-                        className={styles.clearPill}
-                        onClick={handleClear}
-                    >
-                        Clear All x
-                    </button>
-                )}
+                {activeFilters[0] !== "all" && <button className={styles.clearPill} onClick={() => setActiveFilters(["all"])}>Clear All x</button>}
             </div>
-            <div className={styles.grid}>
-                {filtered.map(s => (
-                    <SocietyCard key={s.id} society={s} />
-                ))}
-            </div>
+            {filtered.length > 0 ? (
+                <div className={styles.grid}>
+                    {filtered.map(s => <SocietyCard key={s.id} society={s} />)}
+                </div>
+            ) : emptyState()}
         </div>
     );
 }
+
+const filterSocieties = (list, search, filters) => list.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
+    if (filters.includes("all")) return matchesSearch;
+    const matchesPill = (filters.includes("ratified") && s.isRatified) ||
+        (filters.includes("unratified") && !s.isRatified);
+    return matchesSearch && matchesPill;
+});
+
+const getNextFilters = (prev, id) => {
+    if (id === "all") return ["all"];
+    const withoutAll = prev.filter(item => item !== "all");
+    const next = withoutAll.includes(id)
+        ? withoutAll.filter(i => i !== id)
+        : [...withoutAll, id];
+    return next.length === 0 ? ["all"] : next;
+};
 
 function emptyState() {
     return (
