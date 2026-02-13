@@ -8,7 +8,7 @@ export const MainSection = ({ t, onOpenHistory }) => (
     <>
         <div className={styles.header}>
             <div className={styles.title}>Study Timer</div>
-            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">📜</button>
+            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">History 📜</button>
         </div>
         <TreeAnimation progress={t.progress} mode={t.mode} />
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
