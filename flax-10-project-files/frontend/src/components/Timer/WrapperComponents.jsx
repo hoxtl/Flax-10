@@ -4,12 +4,18 @@ import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSetting
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
+const TimerHeader = ({ onOpenHistory }) => (
+    <div className={styles.header}>
+        <div className={styles.title}>Study Timer</div>
+        <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
+            History 📜
+        </button>
+    </div>
+);
+
 export const MainSection = ({ t, onOpenHistory }) => (
     <>
-        <div className={styles.header}>
-            <div className={styles.title}>Study Timer</div>
-            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">History 📜</button>
-        </div>
+        <TimerHeader onOpenHistory={onOpenHistory} />
         <TreeAnimation progress={t.progress} mode={t.mode} />
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
         <SessionStatus current={t.completedSessions} total={t.targetSessions} />
