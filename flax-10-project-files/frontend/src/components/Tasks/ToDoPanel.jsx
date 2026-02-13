@@ -230,9 +230,9 @@ export default function ToDoPanel({ open = true }) {
     setEditText("");
   };
 
-  // Derived lists
   const activeRaw = useMemo(() => items.filter((x) => !x.done), [items]);
   const doneItems = useMemo(() => items.filter((x) => x.done), [items]);
+  const isEmpty = activeRaw.length === 0 && doneItems.length === 0;
 
   const activePinned = useMemo(() => pinUrgentFirst(activeRaw), [activeRaw]);
   const urgentActive = useMemo(
@@ -348,6 +348,11 @@ export default function ToDoPanel({ open = true }) {
 
       {/* List */}
       <div className={styles.list}>
+        {isEmpty && (
+          <div className={styles.emptyState}>
+            No tasks yet. Add one below!
+          </div>
+        )}
         <Reorder.Group
           axis="y"
           values={activePinned}
