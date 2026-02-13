@@ -1,0 +1,57 @@
+.page {
+    min-height: 100vh;
+    background: #fafafa;
+    position: relative;
+}
+
+.backBtn {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mainContent {
+    display: flex;
+    gap: 24px;
+    padding: 0 24px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.tabSection {
+    flex: 1;
+    min-width: 0;
+}
+
+.notFound {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 16px;
+}
+
+.notFound button {
+    padding: 10px 20px;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .mainContent {
+        flex-direction: column;
+    }
+}

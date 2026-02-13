@@ -1,0 +1,45 @@
+import styles from "./SocietyTabs.module.css";
+import CalendarTab from "./tabs/CalendarTab";
+import AboutTab from "./tabs/AboutTab";
+import PhotosTab from "./tabs/PhotosTab";
+import AnnouncementsTab from "./tabs/AnnouncementsTab";
+
+const TABS = [
+    { id: "calendar", label: "Calendar" },
+    { id: "about", label: "About" },
+    { id: "photos", label: "Photos" },
+    { id: "announcements", label: "Announcements" }
+];
+
+export default function SocietyTabs({ activeTab, onTabChange, details }) {
+    return (
+        <div className={styles.container}>
+            <TabBar activeTab={activeTab} onTabChange={onTabChange} />
+            <TabContent activeTab={activeTab} details={details} />
+        </div>
+    );
+}
+
+function TabBar({ activeTab, onTabChange }) {
+    return (
+        <div className={styles.tabBar}>
+            {TABS.map(tab => <TabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onClick={() => onTabChange(tab.id)} />)}
+        </div>
+    );
+}
+
+function TabButton({ tab, isActive, onClick }) {
+    const className = isActive ? `${styles.tab} ${styles.active}` : styles.tab;
+    return <button className={className} onClick={onClick}>{tab.label}</button>;
+}
+
+function TabContent({ activeTab, details }) {
+    const components = {
+        calendar: CalendarTab,
+        about: AboutTab,
+        photos: PhotosTab,
+        announcements: AnnouncementsTab
+    };
+    const Component = components[activeTab];
+    return <div className={styles.content}><Component details={details} /></div>;
+}

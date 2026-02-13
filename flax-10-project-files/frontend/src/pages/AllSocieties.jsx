@@ -11,7 +11,7 @@ const filterOptions = [
     { id: "unratified", label: "Unratified" }
 ];
 
-export default function AllSocieties({ onBack }) {
+export default function AllSocieties({ onBack, onSelect }) {
     const [search, setSearch] = useState("");
     const [activeFilters, setActiveFilters] = useState(["all"]);
     const counts = countByType(MOCK_SOCIETIES);
@@ -31,7 +31,7 @@ export default function AllSocieties({ onBack }) {
             </div>
             {filtered.length > 0 ? (
                 <div className={styles.grid}>
-                    {filtered.map(s => <SocietyCard key={s.id} society={s} />)}
+                    {filtered.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
                 </div>
             ) : emptyState()}
         </div>

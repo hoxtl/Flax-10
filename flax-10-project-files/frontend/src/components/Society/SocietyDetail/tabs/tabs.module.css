@@ -1,0 +1,135 @@
+.empty {
+    color: #999;
+    text-align: center;
+    padding: 40px;
+}
+
+/* About Tab */
+.aboutTab {
+    line-height: 1.7;
+}
+
+.aboutText {
+    color: #444;
+    font-size: 1rem;
+}
+
+/* Photos Tab */
+.photoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.photoCard {
+    aspect-ratio: 1;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.photoCard:hover {
+    transform: scale(1.02);
+}
+
+/* Announcements Tab */
+.announcementList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.announcementCard {
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    border-left: 3px solid #ddd;
+}
+
+.announcementCard.pinned {
+    border-left-color: var(--primary-color, #9E7E5D);
+    background: #fdf8f4;
+}
+
+.announcementHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.announcementTitle {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.pinnedBadge {
+    font-size: 0.75rem;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.announcementDate {
+    color: #999;
+    font-size: 0.85rem;
+    margin-left: auto;
+}
+
+.announcementContent {
+    margin: 0;
+    color: #555;
+}
+
+/* Calendar Tab */
+.calendarTab {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.viewSwitcher {
+    display: flex;
+    gap: 8px;
+}
+
+.viewBtn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.viewBtn:hover {
+    background: #f5f5f5;
+    border-color: #ddd;
+}
+
+.viewBtn.activeView {
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border-color: var(--primary-color, #9E7E5D);
+}
+
+.calendarPlaceholder {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 300px;
+}
+
+.eventsList {
+    margin-top: 16px;
+    padding-left: 20px;
+}
+
+.eventsList li {
+    margin-bottom: 8px;
+    color: #555;
+}

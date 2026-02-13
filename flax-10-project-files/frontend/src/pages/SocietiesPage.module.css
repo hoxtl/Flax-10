@@ -137,4 +137,6 @@
 
 .clearPill:hover {
     background-color: #fff1f0;
+    outline: none;
+    border-color: #ff4d4f;
 }
