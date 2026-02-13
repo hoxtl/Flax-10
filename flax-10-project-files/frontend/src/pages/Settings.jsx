@@ -62,10 +62,18 @@ function ErrorMessage({ message }) {
 }
 
 // Form input field
-function FormInput({ id, label, type = "text", value, onChange, required, name }) {
+function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength }) {
+  const remaining_chars = maxLength ? maxLength - value.length : null;
+
   return (
     <div className={styles.formGroup}>
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>{label}
+        {maxLength && (
+          <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>
+            ({remaining_chars} characters remaining)
+          </span>
+        )}
+      </label>
       <input
         type={type}
         id={id}
@@ -73,6 +81,7 @@ function FormInput({ id, label, type = "text", value, onChange, required, name }
         value={value}
         onChange={onChange}
         required={required}
+        maxLength={maxLength}
       />
     </div>
   );
@@ -200,6 +209,7 @@ function AccountForm({ user, onSave, isSaving }) {
           label="Major"
           value={formData.major}
           onChange={handleChange}
+          maxLength={100}
         />
       </div>
 
