@@ -20,6 +20,15 @@ def user_settings_view(request):
         return Response(settings_serialiser.data)
 
     elif request.method == 'PATCH':
+        user = request.user
+
+        if 'first_name' in request.data:
+            user.first_name = request.data['first_name']
+    
+        if 'last_name' in request.data:
+            user.last_name = request.data['last_name']
+        user.save()
+
         settings_serialiser = UserSettingsSerialiser(settings, data=request.data, partial=True)
 
         if settings_serialiser.is_valid():

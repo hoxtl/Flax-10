@@ -118,20 +118,26 @@ function SubmitButton({ isSaving, label, savingLabel }) {
 // Get initial account data
 function getInitialAccountData(user) {
   return {
-    name: user?.name || "",
+    firstName: user?.first_name || "",
+    lastName: user?.last_name || "",
     email: user?.email || "",
-    year: user?.year?.replace('Year', '') || "2",
-    major: user?.major?.replace('Major', '') || "Computer Science",
+    year: user?.year || "2",
+    major: user?.major || "Computer Science",
   };
 }
 
 // Get year options
 function getYearOptions() {
   return [
+    { value: "Found.", label: "Foundation Year" },
     { value: "1", label: "Year 1" },
     { value: "2", label: "Year 2" },
     { value: "3", label: "Year 3" },
     { value: "4", label: "Year 4" },
+    { value: "5", label: "Year 5" },
+    { value: "6", label: "Year 6" },
+    { value: "7", label: "Year 7" },
+    { value: "8", label: "Year 8" }
   ];
 }
 
@@ -154,9 +160,19 @@ function AccountForm({ user, onSave, isSaving }) {
       <SectionHeader title="Personal Information" />
       
       <FormInput
-        id="name"
-        label="Full Name"
-        value={formData.name}
+        id="firstName"
+        name="firstName"
+        label="First Name"
+        value={formData.firstName}
+        onChange={handleChange}
+        required
+      />
+
+      <FormInput
+        id="lastName"
+        name="lastName"
+        label="Last Name"
+        value={formData.lastName}
         onChange={handleChange}
         required
       />
@@ -324,8 +340,6 @@ export default function Settings({ user, onBack }) {
         return;
       }
 
-      const user_year = data.year.replace('Year', '');
-
       const response = await fetch(`${API_BASE_URL}/settings/`, {
         method: 'PATCH',
         headers: {
@@ -333,7 +347,9 @@ export default function Settings({ user, onBack }) {
           'Authorization': `Token ${token}`
         },
         body: JSON.stringify({
-          year: user_year,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          year: data.year,
           major: data.major
         })
       });
@@ -344,7 +360,13 @@ export default function Settings({ user, onBack }) {
         if (responseData.user) {
           localStorage.setItem('user', JSON.stringify(responseData.user));
           showTemporaryMessage(setSuccessMessage, "The account has been updated!");
-        } else {
+
+          setTimeout(() => {
+            onBack();
+            window.location.reload();
+          }, 1000);
+        }
+        else {
           setPasswordError(responseData.error || "The account update has failed...");
         }
       }
