@@ -158,8 +158,6 @@ export default function Tasks({ user }) {
           )}
         </AnimatePresence>
       </div>
-
-      <div className={styles.bottomQuote}>"{quote}"</div>
     </div>
   );
 }
