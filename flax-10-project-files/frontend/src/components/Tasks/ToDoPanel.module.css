@@ -217,6 +217,14 @@
   text-transform: uppercase;
 }
 
+.urgentBang {
+  margin-left: 6px;
+  font-weight: 900;
+  opacity: 0.95;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
+}
+
+
 .doneTitle {
   font-size: 9.5px;
   font-weight: 700;
