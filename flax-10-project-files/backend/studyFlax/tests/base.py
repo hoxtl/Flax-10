@@ -45,31 +45,28 @@ class BaseEventTestCase(BaseTestCase):
     
     def create_event_in_db(self, event_data, user=None):
         """Create event directly in database."""
-        if user is None:
-            user = self.user
+        user = user or self.user
         tag_id = event_data.pop("tag", None)
-        recurrence_data = event_data.pop("recurrence_rule", None)
-        recurrence_rule = None
-        if recurrence_data:
-            import json
-            if isinstance(recurrence_data, str):
-                try:
-                    recurrence_data = json.loads(recurrence_data)
-                except json.JSONDecodeError:
-                    pass
-            recurrence_rule = RecurrenceRule.objects.create(**recurrence_data)
-        
-        # Parse datetime strings to objects if needed
-        from datetime import datetime
-        if isinstance(event_data.get('start_time'), str):
-            event_data['start_time'] = datetime.fromisoformat(event_data['start_time'].replace('Z', '+00:00'))
-        if isinstance(event_data.get('end_time'), str):
-             event_data['end_time'] = datetime.fromisoformat(event_data['end_time'].replace('Z', '+00:00'))
-
-        event = CalendarEvent.objects.create(recurrence_rule=recurrence_rule, user=user, **event_data)
+        rule = self._create_recurrence(event_data.pop("recurrence_rule", None))
+        self._parse_event_dates(event_data)
+        event = CalendarEvent.objects.create(recurrence_rule=rule, user=user, **event_data)
         if tag_id:
             event.tag_id = tag_id
             event.save()
         return event
+
+    def _create_recurrence(self, data):
+        if not data: return None
+        if isinstance(data, str):
+            import json
+            try: data = json.loads(data)
+            except json.JSONDecodeError: pass
+        return RecurrenceRule.objects.create(**data)
+
+    def _parse_event_dates(self, data):
+        from datetime import datetime
+        for f in ['start_time', 'end_time']:
+            if isinstance(data.get(f), str):
+                data[f] = datetime.fromisoformat(data[f].replace('Z', '+00:00'))
 
 

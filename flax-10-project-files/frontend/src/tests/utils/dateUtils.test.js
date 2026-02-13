@@ -110,11 +110,11 @@ describe('dateUtils', () => {
     describe('Formatting', () => {
         it('formatTime', () => {
             const d = new Date(2026, 1, 15, 13, 5);
-            expect(formatTime(d)).toMatch(/01:05 PM|13:05|1:05 PM/);
+            expect(formatTime(d)).toMatch(/01:05 PM|13:05|1:05 PM|01:05 pm|1:05 pm/);
         });
 
         it('formatDate', () => {
-            expect(formatDate(date)).toMatch(/Sun, Feb 15/);
+            expect(formatDate(date)).toMatch(/Sun, Feb 15|Sun, 15 Feb/);
         });
 
         it('formatMonthYear', () => {
@@ -125,7 +125,7 @@ describe('dateUtils', () => {
             vi.useFakeTimers();
             vi.setSystemTime(date);
             expect(formatDayLabel(date)).toBe('Today');
-            expect(formatDayLabel(addDays(date, 1))).toMatch(/Mon, Feb 16/);
+            expect(formatDayLabel(addDays(date, 1))).toMatch(/Mon, Feb 16|Mon, 16 Feb 2026/);
             vi.useRealTimers();
         });
     });

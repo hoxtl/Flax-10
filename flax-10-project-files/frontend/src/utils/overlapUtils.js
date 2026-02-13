@@ -50,25 +50,20 @@ export function calculateEventColumns(events) {
 }
 
 function processEventGroups(sortedEvents) {
-    const columns = new Map();
-    let currentGroup = [];
-    let groupEnd = null;
+    const ctx = { columns: new Map(), group: [], end: null };
+    sortedEvents.forEach(event => processEventInContext(event, ctx));
+    if (ctx.group.length) processGroup(ctx.group, ctx.columns);
+    return ctx.columns;
+}
 
-    sortedEvents.forEach(event => {
-        if (shouldStartNewGroup(event, groupEnd)) {
-            processGroup(currentGroup, columns);
-            currentGroup = [];
-            groupEnd = null;
-        }
-        currentGroup.push(event);
-        groupEnd = updateGroupEnd(event, groupEnd);
-    });
-
-    if (currentGroup.length > 0) {
-        processGroup(currentGroup, columns);
+function processEventInContext(event, ctx) {
+    if (shouldStartNewGroup(event, ctx.end)) {
+        processGroup(ctx.group, ctx.columns);
+        ctx.group = [];
+        ctx.end = null;
     }
-
-    return columns;
+    ctx.group.push(event);
+    ctx.end = updateGroupEnd(event, ctx.end);
 }
 
 function shouldStartNewGroup(event, groupEnd) {
