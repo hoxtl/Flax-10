@@ -8,7 +8,6 @@ import { NotificationProvider } from './context/NotificationContext';
 import Settings from './pages/Settings';
 
 function getUser() {
-  // First check if user is in localStorage (from auth)
   const userString = localStorage.getItem('user');
   if (userString) {
     try {
@@ -18,11 +17,9 @@ function getUser() {
     }
   }
   
-  // Return null if no user (removed dummy data fallback)
   return null;
 }
 
-// Check if user is authenticated
 function isAuthenticated() {
   return !!localStorage.getItem('user_token');
 }
@@ -38,12 +35,10 @@ export default function App() {
     setActiveNav("home");
   }
 
-  // Authentication check - if not authenticated OR no user, show auth page
   if (!isAuthenticated() || !user) {
     return <AuthPage />;
   }
 
-  // If authenticated, show dashboard
   let pageContent;
   if (activeNav === "settings") {
     pageContent = <Settings user={user} onBack={handleBackFromSettings} />;
