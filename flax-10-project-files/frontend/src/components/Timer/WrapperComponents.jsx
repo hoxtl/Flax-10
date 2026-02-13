@@ -2,10 +2,14 @@ import styles from '../../pages/TimerPage.module.css';
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings } from './TimerComponents';
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
+import HistoryModal from './HistoryModal';
 
-export const MainSection = ({ t }) => (
+export const MainSection = ({ t, onOpenHistory }) => (
     <>
-        <div className={styles.title}>Study Timer</div>
+        <div className={styles.header}>
+            <div className={styles.title}>Study Timer</div>
+            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">📜</button>
+        </div>
         <TreeAnimation progress={t.progress} mode={t.mode} />
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
         <SessionStatus current={t.completedSessions} total={t.targetSessions} />
@@ -15,8 +19,9 @@ export const MainSection = ({ t }) => (
     </>
 );
 
-export const PopupSection = ({ t }) => (
+export const PopupSection = ({ t, showHistory, onCloseHistory }) => (
     <>
+        {showHistory && <HistoryModal onClose={onCloseHistory} />}
         {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} />}
         {t.isBreakOvertime && <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} />}
         {t.modal === 'break' && <BreakModal onAction={t.handlers.break} />}

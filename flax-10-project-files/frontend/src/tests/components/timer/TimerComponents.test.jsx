@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TimerDisplay, ModeIndicator, TimerControls, TimerSettings } from '../../components/Timer/TimerComponents';
+import { TimerDisplay, ModeIndicator, TimerControls, TimerSettings } from '../../../components/Timer/TimerComponents';
 
 describe('TimerComponents', () => {
     describe('TimerDisplay', () => {
