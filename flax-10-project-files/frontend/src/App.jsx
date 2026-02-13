@@ -1,18 +1,27 @@
 import { useState } from 'react'
 import './App.css'
 import DashboardLayout from "./layout/DashboardLayout";
+import AuthPage from './pages/AuthPage';
 import { APP_ROUTES } from './lib/routes';
 import { CalendarProvider } from './context/CalendarContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Settings from './pages/Settings';
 
 function getUser() {
-  return {
-    name: "Jane Smith",
-    email: "jane@kcl.ac.uk",
-    year: "Year 2",
-    major: "CS"
-  };
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      return JSON.parse(userString);
+    } catch (err) {
+      console.error('Error parsing user data:', err);
+    }
+  }
+  
+  return null;
+}
+
+function isAuthenticated() {
+  return !!localStorage.getItem('token');
 }
 
 import { TagProvider } from './context/TagContext';
@@ -24,6 +33,10 @@ export default function App() {
 
   function handleBackFromSettings() {
     setActiveNav("home");
+  }
+
+  if (!isAuthenticated() || !user) {
+    return <AuthPage />;
   }
 
   let pageContent;
