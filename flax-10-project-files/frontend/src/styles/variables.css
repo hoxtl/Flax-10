@@ -8,7 +8,6 @@
   --c-cocoa: #4A3421;
 
   /* Light Theme */
-
   --bg: #ffffff;              /* page background */
   --panel: #f6f4f1;           /* surfaces (topbar, cards) */
   --sidebar: #f6f4f1;         /* sidebar surface */
@@ -28,7 +27,7 @@
   --pill-hover: #eadfd2;   /* hover background */
 }
 
-/* Dark Theme - Lighter & Warmer */
+/* Dark Theme - Darker & Warmer */
 [data-theme="dark"] {
   /* Palette - Dark */
   --c-white: #ffffff;
@@ -38,22 +37,22 @@
   --c-olive: #6d6050;
   --c-cocoa: #2a1e15;
 
-  /* Dark Theme - LIGHTER */
-  --bg: #1C1612;           /* Lighter background */
-  --panel: #252018;        /* Lighter panels */
-  --sidebar: #1F1A15;      /* Lighter sidebar */
-  --border: rgba(180,164,144,0.20);  /* More visible borders */
+  /* Dark Theme */
+  --bg: #120D0A;           /* Dark background */
+  --panel: #1A1310;        /* Dark panels */
+  --sidebar: #151008;      /* Dark sidebar  */
+  --border: rgba(180,164,144,0.15);  /* Subtle borders */
 
-  --text: rgba(255,255,255,0.95);    /* Brighter text */
-  --muted: rgba(200,184,164,0.75);   /* Brighter muted text */
+  --text: rgba(255,255,255,0.92);    /* Bright text */
+  --muted: rgba(200,184,164,0.65);   /* Muted text */
 
-  --primary: #C4A57B;      /* Lighter primary */
-  --primary-strong: #E8D5C0;
-  --accent: #A89A94;
+  --primary: #B8936D;      /* Warm primary */
+  --primary-strong: #D4B896;
+  --accent: #9A8A84;
 
-  --hover: rgba(180,164,144,0.12);
-  --active: rgba(180,164,144,0.18);
+  --hover: rgba(180,164,144,0.10);
+  --active: rgba(180,164,144,0.16);
 
-  --pill-bg: rgba(180,164,144,0.15);
-  --pill-hover: rgba(180,164,144,0.22);
+  --pill-bg: rgba(180,164,144,0.12);
+  --pill-hover: rgba(180,164,144,0.20);
 }
