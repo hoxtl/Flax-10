@@ -1,0 +1,89 @@
+.info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: white;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.bio {
+    flex: 1;
+    margin: 0;
+    color: #444;
+    min-width: 200px;
+}
+
+.stats {
+    display: flex;
+    gap: 16px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.joinBtn {
+    padding: 10px 24px;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.joinBtn:hover {
+    background: var(--primary-dark, #8a6d4f);
+}
+
+.joinedBtn {
+    padding: 10px 24px;
+    background: #e0e0e0;
+    color: #666;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.joinedBtn:hover {
+    background: #9E7E5D;
+    color: white;
+}
+
+.joinedBtn:hover::after {
+    content: " (Leave)";
+    font-size: 0.8em;
+}
+
+.requestedBtn {
+    padding: 10px 24px;
+    background: #fff3e0;
+    color: #666;
+    border: 1px solid #ffe0b2;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.requestedBtn:hover {
+    background: #ffe0b2;
+    outline: none;
+    border-color: #ffe0b2;
+}
+
+.requestedBtn:hover::after {
+    content: " (Cancel)";
+    font-size: 0.8em;
+}

@@ -1,0 +1,44 @@
+.container {
+    background: transparent;
+}
+
+.tabBar {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tab {
+    padding: 14px 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #888;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.tab:hover {
+    color: #555;
+}
+
+.tab.active {
+    color: var(--primary-color, #9E7E5D);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-color, #9E7E5D);
+    border-radius: 3px 3px 0 0;
+}
+
+.content {
+    padding: 20px 0;
+    min-height: 400px;
+}
