@@ -4,7 +4,7 @@ import { useTags } from '../../../../context/TagContext';
 import { calculateBarStyle } from './allDayRowHelpers';
 import './AllDayRow.css';
 
-export function AllDayRow({ days, events }) {
+export function AllDayRow({ days, events, readOnly }) {
     const rowEvents = useRowEvents(days, events);
 
     return (
@@ -12,7 +12,7 @@ export function AllDayRow({ days, events }) {
             <div className="all-day-label">All-day</div>
             <div className="all-day-grid" style={{ gridTemplateColumns: `repeat(${days.length}, 1fr)` }}>
                 {days.map(d => <div key={d.toISOString()} className="all-day-cell" />)}
-                <AllDayEvents events={rowEvents} days={days} />
+                <AllDayEvents events={rowEvents} days={days} readOnly={readOnly} />
             </div>
         </div>
     );
@@ -30,23 +30,20 @@ function useRowEvents(days, events) {
     });
 }
 
-function AllDayEvents({ events, days }) {
-    return events.map(e => <AllDayEventBar key={e.id} event={e} days={days} />);
+function AllDayEvents({ events, days, readOnly }) {
+    return events.map(e => <AllDayEventBar key={e.id} event={e} days={days} readOnly={readOnly} />);
 }
 
-function AllDayEventBar({ event, days }) {
+function AllDayEventBar({ event, days, readOnly }) {
     const { openModal } = useEventModal();
     const { getTag } = useTags();
-    const tag = getTag(event.tag);
+    const tag = getTag ? getTag(event.tag) : null;
     const color = tag?.color || '#3b82f6';
     const style = calculateBarStyle(event, days);
     if (!style) return null;
+    const handleClick = readOnly ? undefined : (ev) => { ev.stopPropagation(); openModal(event); };
     return (
-        <div
-            className="all-day-event-bar"
-            style={{ ...style, backgroundColor: color }}
-            onClick={(ev) => { ev.stopPropagation(); openModal(event); }}
-        >
+        <div className="all-day-event-bar" style={{ ...style, backgroundColor: color }} onClick={handleClick}>
             {event.title}
         </div>
     );

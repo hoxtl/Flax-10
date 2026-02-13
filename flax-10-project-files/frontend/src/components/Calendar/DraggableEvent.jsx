@@ -7,7 +7,22 @@ import { formatTime } from '../../utils/dateUtils';
 import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
-export function DraggableEvent({ event, style, minWidthForDetails = 80 }) {
+export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
+    if (readOnly) return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
+}
+
+function ReadOnlyEvent({ event, style, minWidth }) {
+    const height = parseFloat(style?.height) || 0;
+    const width = parseWidthPercent(style?.width);
+    return (
+        <div className="draggable-event" style={style}>
+            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+        </div>
+    );
+}
+
+function EditableEvent({ event, style, minWidthForDetails }) {
     const { openModal } = useEventModal();
     const theme = useTags().getTag(event.tag);
     const refs = useEventRefs();

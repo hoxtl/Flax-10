@@ -84,6 +84,14 @@
     color: #555;
 }
 
+.announcementImage {
+    margin-top: 12px;
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 /* Calendar Tab */
 .calendarTab {
     display: flex;
@@ -91,45 +99,59 @@
     gap: 16px;
 }
 
+.calendarHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.navButtons {
+    display: flex;
+    gap: 4px;
+}
+
+.navButtons button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.navButtons button:hover {
+    background: #f5f5f5;
+}
+
+.calendarTitle {
+    font-weight: 600;
+    font-size: 1.1rem;
+    flex: 1;
+}
+
 .viewSwitcher {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 }
 
 .viewBtn {
-    padding: 8px 16px;
+    padding: 6px 14px;
     border: 1px solid #ddd;
     background: white;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.2s;
 }
 
 .viewBtn:hover {
     background: #f5f5f5;
-    border-color: #ddd;
 }
 
 .viewBtn.activeView {
     background: var(--primary-color, #9E7E5D);
     color: white;
     border-color: var(--primary-color, #9E7E5D);
-}
-
-.calendarPlaceholder {
-    background: #f5f5f5;
-    border-radius: 8px;
-    padding: 20px;
-    min-height: 300px;
-}
-
-.eventsList {
-    margin-top: 16px;
-    padding-left: 20px;
-}
-
-.eventsList li {
-    margin-bottom: 8px;
-    color: #555;
 }

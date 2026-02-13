@@ -1,11 +1,11 @@
 import { isSameMonth, overlapsDay } from '../../../utils/dateUtils';
 import { DayCell } from './DayCell';
 
-export function WeekRow({ days, events, cur, dispatch }) {
+export function WeekRow({ days, events, cur, onDateSelect, readOnly }) {
     return (
         <div className="week-row">
             {days.map(d => (
-                <DayCell key={d.toISOString()} day={d} events={getEventsForDay(events, d)} isCur={isSameMonth(d, cur)} dispatch={dispatch} />
+                <DayCell key={d.toISOString()} day={d} events={getEventsForDay(events, d)} isCur={isSameMonth(d, cur)} onDateSelect={onDateSelect} readOnly={readOnly} />
             ))}
         </div>
     );

@@ -1,50 +1,81 @@
 import { useState } from "react";
 import styles from "./tabs.module.css";
+import { MonthView } from "../../../Calendar/MonthView/MonthView";
+import { WeekView } from "../../../Calendar/WeekView/WeekView";
+import { DayView } from "../../../Calendar/DayView/DayView";
 
 export default function CalendarTab({ details }) {
     const [view, setView] = useState("month");
-    const events = details.upcomingEvents || [];
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const events = convertEvents(details.upcomingEvents || []);
 
     return (
         <div className={styles.calendarTab}>
-            <ViewSwitcher view={view} onViewChange={setView} />
-            <CalendarPlaceholder view={view} events={events} />
+            <CalendarHeader view={view} setView={setView} date={selectedDate} setDate={setSelectedDate} />
+            <CalendarView view={view} date={selectedDate} events={events} onDateSelect={setSelectedDate} />
         </div>
     );
 }
 
-function ViewSwitcher({ view, onViewChange }) {
+function CalendarHeader({ view, setView, date, setDate }) {
+    return (
+        <div className={styles.calendarHeader}>
+            <NavButtons date={date} setDate={setDate} view={view} />
+            <span className={styles.calendarTitle}>{formatTitle(date, view)}</span>
+            <ViewSwitcher view={view} setView={setView} />
+        </div>
+    );
+}
+
+function NavButtons({ date, setDate, view }) {
+    const nav = (dir) => setDate(getNewDate(date, view, dir));
+    return (
+        <div className={styles.navButtons}>
+            <button onClick={() => nav(-1)}>&larr;</button>
+            <button onClick={() => setDate(new Date())}>Today</button>
+            <button onClick={() => nav(1)}>&rarr;</button>
+        </div>
+    );
+}
+
+function ViewSwitcher({ view, setView }) {
     const views = ["month", "week", "day"];
     return (
         <div className={styles.viewSwitcher}>
-            {views.map(v => <ViewButton key={v} view={v} isActive={view === v} onClick={() => onViewChange(v)} />)}
+            {views.map(v => <ViewBtn key={v} v={v} active={view === v} onClick={() => setView(v)} />)}
         </div>
     );
 }
 
-function ViewButton({ view, isActive, onClick }) {
-    const className = isActive ? `${styles.viewBtn} ${styles.activeView}` : styles.viewBtn;
-    return <button className={className} onClick={onClick}>{capitalize(view)}</button>;
+function ViewBtn({ v, active, onClick }) {
+    const cls = active ? `${styles.viewBtn} ${styles.activeView}` : styles.viewBtn;
+    return <button className={cls} onClick={onClick}>{v.charAt(0).toUpperCase() + v.slice(1)}</button>;
 }
 
-function CalendarPlaceholder({ view, events }) {
-    return (
-        <div className={styles.calendarPlaceholder}>
-            <p>Society calendar ({view} view)</p>
-            <EventsList events={events} />
-        </div>
-    );
+function CalendarView({ view, date, events, onDateSelect }) {
+    if (view === "week") return <WeekView selectedDate={date} events={events} onDateSelect={onDateSelect} readOnly />;
+    if (view === "day") return <DayView selectedDate={date} events={events} readOnly />;
+    return <MonthView selectedDate={date} events={events} onDateSelect={onDateSelect} readOnly />;
 }
 
-function EventsList({ events }) {
-    if (events.length === 0) return <p className={styles.empty}>No upcoming events.</p>;
-    return (
-        <ul className={styles.eventsList}>
-            {events.map(e => <li key={e.id}>{e.title} - {e.date} at {e.time}</li>)}
-        </ul>
-    );
+function convertEvents(events) {
+    return events.map(e => ({ ...e, start_time: `${e.date}T${e.time}`, end_time: `${e.date}T${addHour(e.time)}` }));
 }
 
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+function addHour(time) {
+    const [h, m] = time.split(":").map(Number);
+    return `${String((h + 1) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function getNewDate(date, view, dir) {
+    const d = new Date(date);
+    if (view === "month") d.setMonth(d.getMonth() + dir);
+    else if (view === "week") d.setDate(d.getDate() + 7 * dir);
+    else d.setDate(d.getDate() + dir);
+    return d;
+}
+
+function formatTitle(date, view) {
+    if (view === "day") return date.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+    return date.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
 }

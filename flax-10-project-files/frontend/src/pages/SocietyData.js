@@ -17,8 +17,12 @@ export const MOCK_SOCIETY_DETAILS = {
             "https://images.unsplash.com/photo-1531746790731-6c087fecd65a",
             "https://images.unsplash.com/photo-1561557944-6e7860d1a7eb"
         ],
+        photos: [
+            "https://images.unsplash.com/photo-1518770660439-4636190af475",
+            "https://images.unsplash.com/photo-1535378917042-10a22c95931a"
+        ],
         announcements: [
-            { id: 1, title: "Competition Results", content: "We placed 2nd at the National Robotics Challenge!", date: "2026-02-10", pinned: true },
+            { id: 1, title: "Competition Results", content: "We placed 2nd at the National Robotics Challenge!", date: "2026-02-10", pinned: true, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64" },
             { id: 2, title: "Workshop Tomorrow", content: "Join us for an intro to Arduino session.", date: "2026-02-12", pinned: false }
         ],
         upcomingEvents: [
@@ -36,8 +40,9 @@ export const MOCK_SOCIETY_DETAILS = {
             "https://images.unsplash.com/photo-1504639725590-34d0984388bd",
             "https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
         ],
+        photos: [],
         announcements: [
-            { id: 3, title: "Hackathon Sign-ups Open", content: "Register for our annual 24-hour hackathon!", date: "2026-02-08", pinned: true }
+            { id: 3, title: "Hackathon Sign-ups Open", content: "Register for our annual 24-hour hackathon!", date: "2026-02-08", pinned: true, image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d" }
         ],
         upcomingEvents: [
             { id: 201, title: "Python Basics", date: "2026-02-15", time: "16:00" }

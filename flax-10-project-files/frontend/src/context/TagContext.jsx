@@ -100,6 +100,8 @@ function getIconForTag(name) {
 
 export function useTags() {
     const context = useContext(TagContext);
-    if (!context) throw new Error('useTags must be used within a TagProvider');
+    if (!context) {
+        return { tags: [], loading: false, getTag: () => null, addTag: () => {}, deleteTag: () => {}, updateTag: () => {} };
+    }
     return context;
 }
