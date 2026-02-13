@@ -134,7 +134,6 @@ export default function ToDoPanel({ open = true }) {
     };
   }, []);
 
-  // Position the portal menu after render (prevents off-screen / clipping)
   useEffect(() => {
     if (!taskMenuId || !taskMenuAnchor) return;
     const el = taskMenuRef.current;
