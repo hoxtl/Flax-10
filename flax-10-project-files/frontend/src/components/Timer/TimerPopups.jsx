@@ -1,16 +1,20 @@
 import styles from '../../pages/TimerPage.module.css';
 import { formatTime } from './TimerComponents';
 
+const OvertimeContent = ({ mode, time, onAction }) => (
+    <div className={styles.overtimeContent}>
+        <h3>{mode === 'work' ? "Time's Up!" : "Break Over!"}</h3>
+        <p>{mode === 'work' ? "You're in overtime mode." : "Time to get back to work."}</p>
+        <div className={styles.overtimeTime}>{formatTime(time)}</div>
+        <button className={`${styles.button} ${styles.primary}`} onClick={onAction}>
+            {mode === 'work' ? "Start Break" : "Start Work"}
+        </button>
+    </div>
+);
+
 export const OvertimePopup = ({ mode, time, onAction }) => (
     <div className={styles.overtimePopup}>
-        <div className={styles.overtimeContent}>
-            <h3>{mode === 'work' ? "Time's Up!" : "Break Over!"}</h3>
-            <p>{mode === 'work' ? "You're in overtime mode." : "Time to get back to work."}</p>
-            <div className={styles.overtimeTime}>{formatTime(time)}</div>
-            <button className={`${styles.button} ${styles.primary}`} onClick={onAction}>
-                {mode === 'work' ? "Start Break" : "Start Work"}
-            </button>
-        </div>
+        <OvertimeContent mode={mode} time={time} onAction={onAction} />
     </div>
 );
 

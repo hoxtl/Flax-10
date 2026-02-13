@@ -48,19 +48,16 @@ const SettingItem = ({ label, value, onChange, onBlur }) => (
     </div>
 );
 
-export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
-    const handleChange = (type) => (e) => onUpdate(type, e.target.value === '' ? '' : parseInt(e.target.value));
+const getChangeHandler = (onUpdate, type) => (e) =>
+    onUpdate(type, e.target.value === '' ? '' : parseInt(e.target.value));
 
-    // Simplified onLimit to just call onUpdate with default if needed
-    // Actually, we can just inline the blurring logic in SettingItem or keep helper here. 
-    // To keep it short:
-    const handleBlur = (type, val, def) => () => (val === '' || isNaN(val) || val < (type === 'sessions' ? 1 : 0)) && onUpdate(type, def);
+const getBlurHandler = (onUpdate, type, val, def) => () =>
+    (val === '' || isNaN(val) || val < (type === 'sessions' ? 1 : 0)) && onUpdate(type, def);
 
-    return (
-        <div className={styles.settings}>
-            <SettingItem label="Work (min)" value={work} onChange={handleChange('work')} onBlur={handleBlur('work', work, 0)} />
-            <SettingItem label="Break (min)" value={breakTime} onChange={handleChange('break')} onBlur={handleBlur('break', breakTime, 0)} />
-            <SettingItem label="Sessions" value={sessions} onChange={handleChange('sessions')} onBlur={handleBlur('sessions', sessions, 1)} />
-        </div>
-    );
-};
+export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => (
+    <div className={styles.settings}>
+        <SettingItem label="Work (min)" value={work} onChange={getChangeHandler(onUpdate, 'work')} onBlur={getBlurHandler(onUpdate, 'work', work, 0)} />
+        <SettingItem label="Break (min)" value={breakTime} onChange={getChangeHandler(onUpdate, 'break')} onBlur={getBlurHandler(onUpdate, 'break', breakTime, 0)} />
+        <SettingItem label="Sessions" value={sessions} onChange={getChangeHandler(onUpdate, 'sessions')} onBlur={getBlurHandler(onUpdate, 'sessions', sessions, 1)} />
+    </div>
+);
