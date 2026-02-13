@@ -18,7 +18,6 @@ const MORNING_QUOTES = [
 
 // Afternoon (12pm – 5:59pm)
 const DAY_QUOTES = [
-  "This is where most people slow down.",
   "Make this hour count.",
   "You’re closer than you think.",
   "Don’t quit at 70%.",
