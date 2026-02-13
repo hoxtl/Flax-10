@@ -16,13 +16,30 @@ class Command(BaseCommand):
         fake = Faker('en_GB')
         self.stdout.write("Seeding data...")
 
-        # 1. Create 20 Users
-        users = []
+        # Create the Superuser John Doe
+        john = User.objects.create_superuser(
+            username='johndoe',
+            email='john.doe@example.com',
+            password='1234',
+            first_name='John',
+            last_name='Doe'
+        )
+        
+        # Create UserSettings for John Doe
+        UserSettings.objects.create(
+            user=john,
+            theme='dark',
+            timezone='Europe/London'
+        )
+
+        users = [john]
+
+        # Create 20 Users
         for _ in range(20):
             user = User.objects.create_user(
                 username=fake.unique.user_name(),
                 email=fake.unique.email(),
-                password='password123',
+                password='1234',
                 first_name=fake.first_name(),
                 last_name=fake.last_name()
             )
@@ -35,7 +52,7 @@ class Command(BaseCommand):
                 timezone='Europe/London'
             )
 
-        # 2. Create exactly 5 Categories
+        # Create exactly 5 Categories
         categories = []
         for _ in range(5):
             cat = Category.objects.create(
@@ -46,7 +63,7 @@ class Command(BaseCommand):
             )
             categories.append(cat)
 
-        # 3. Create exactly 5 Tags (Linked to the Categories)
+        # Create exactly 5 Tags (Linked to the Categories)
         tags = []
         for _ in range(5):
             tag = Tag.objects.create(
@@ -58,7 +75,7 @@ class Command(BaseCommand):
             )
             tags.append(tag)
 
-        # 4. Create exactly 5 Recurrence Rules
+        # Create exactly 5 Recurrence Rules
         recurrences = []
         for _ in range(5):
             rule = RecurrenceRule.objects.create(
@@ -67,7 +84,7 @@ class Command(BaseCommand):
             )
             recurrences.append(rule)
 
-        # 5. Create exactly 5 Notifications
+        # Create exactly 5 Notifications
         for _ in range(5):
             Notification.objects.create(
                 title=fake.sentence(nb_words=4),
@@ -75,7 +92,7 @@ class Command(BaseCommand):
                 read=random.choice([True, False])
             )
 
-        # 6. Create Calendar Events (Max 5 per day per user)
+        # Create Calendar Events (Max 5 per day per user)
         # Seeds events for a 2-week window (7 days ago to 7 days ahead)
         today = timezone.now().date()
         for user in users:
