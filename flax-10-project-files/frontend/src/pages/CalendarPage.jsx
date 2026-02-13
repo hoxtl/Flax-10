@@ -1,7 +1,8 @@
 import { Calendar } from '../components/Calendar/Calendar';
 import PillFilters from '../components/PillFilters';
-import { useCalendar, useCalendarDispatch } from '../context/CalendarContext';
+import { useCalendar, useCalendarDispatch, useEventModal } from '../context/CalendarContext';
 import styles from './CalendarPage.module.css';
+import { EventModal } from '../components/Calendar/EventModal/EventModal';
 
 export default function CalendarPage() {
     const { filter, allEvents } = useCalendar();
@@ -15,6 +16,20 @@ export default function CalendarPage() {
                 <PillFilters active={filter} onChange={handleFilterChange} items={allEvents} />
             </div>
             <Calendar />
+            <EventModalContainer />
         </div>
+    );
+}
+
+function EventModalContainer() {
+    const { isModalOpen, closeModal, modalEvent, modalType, modalInitialDate } = useEventModal();
+    if (!isModalOpen) return null;
+    return (
+        <EventModal
+            event={modalEvent}
+            onClose={closeModal}
+            initialType={modalType}
+            initialDate={modalInitialDate}
+        />
     );
 }
