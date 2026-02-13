@@ -1,0 +1,134 @@
+.reminder-field {
+    position: relative;
+}
+
+.reminder-dropdown-btn {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.reminder-dropdown-btn:hover {
+    border-color: #9E7E5D;
+}
+
+.dropdown-arrow {
+    color: #666;
+    font-size: 14px;
+}
+
+.reminder-dropdown-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    margin-top: 4px;
+    padding: 8px 0;
+}
+
+.reminder-status {
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #666;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 4px;
+}
+
+.reminder-status.granted {
+    color: #22c55e;
+}
+
+.reminder-status.denied {
+    color: #ef4444;
+}
+
+.reminder-enable-btn {
+    display: block;
+    width: calc(100% - 16px);
+    margin: 4px 8px 8px;
+    padding: 6px 12px;
+    border: 1px solid #9E7E5D;
+    background: white;
+    color: #9E7E5D;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.reminder-enable-btn:hover {
+    background: #f5f0eb;
+}
+
+.reminder-options-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.reminder-option {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.reminder-option:hover {
+    background: #f5f5f5;
+}
+
+.reminder-option input[type="checkbox"] {
+    accent-color: #9E7E5D;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    order: -1;
+}
+
+.reminder-option span {
+    flex: 1;
+}
+
+.custom-reminder {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid #eee;
+    margin-top: 4px;
+}
+
+.custom-reminder input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.custom-reminder button {
+    padding: 6px 12px;
+    background: #9E7E5D;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.custom-reminder button:hover {
+    background: #8a6d4f;
+}

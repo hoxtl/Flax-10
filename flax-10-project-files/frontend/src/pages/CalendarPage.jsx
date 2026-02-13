@@ -6,11 +6,9 @@ import styles from './CalendarPage.module.css';
 export default function CalendarPage() {
     const { filter, allEvents } = useCalendar();
     const dispatch = useCalendarDispatch();
-
     const handleFilterChange = (key) => {
         dispatch({ type: 'SET_FILTER', payload: key });
     };
-
     return (
         <div className={styles.page}>
             <div className={styles.filters}>

@@ -6,6 +6,8 @@ import WeekBar from "../components/WeekBar";
 import QuickAddModal from "../components/QuickAddModal";
 import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
+import { authService } from "../api/authService";
+import { clearUserData } from "../utils/authHelpers";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -20,7 +22,23 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function getUser() {
-  return { name: "Jane Smith", year: "Year 2", major: "CS", email: "jane@kcl.ac.uk" };
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      const user = JSON.parse(userString);
+      return {
+        name: user.first_name && user.last_name 
+          ? `${user.first_name} ${user.last_name}` 
+          : user.username,
+        year: user.year || "Year: Unknown",
+        major: user.major || "Major: Unknown",
+        email: user.email,
+        username: user.username
+      };
+    } catch (err) {
+      console.error('Error parsing user data:', err);
+    }
+  }
 }
 
 function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
@@ -94,8 +112,20 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
     onNavChange?.("settings");
   }
 
-  function handleLogoutClick() {
-    console.log("Logout clicked");
+  async function handleLogoutClick() {
+    try {
+      const { response } = await authService.logout();
+
+      if (response.ok) {
+        clearUserData();
+      } else {
+        console.error('Logout on backend has failed, local user data is being clearedd...')
+        clearUserData();
+      }
+    } catch (err) {
+      console.error('Error when logging out: ', err);
+      clearUserData();
+    }
   }
 
   return (

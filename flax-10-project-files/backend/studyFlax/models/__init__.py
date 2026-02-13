@@ -12,3 +12,6 @@ from .calendar.timetableSourceModel import *
 # Module
 from .modules.moduleModel import *
 from .modules.enrollmentModel import *
+
+# Notifications
+from .notifications.notificationModel import *
