@@ -3,6 +3,7 @@ import { pickQuoteByKey } from "../lib/quotes";
 import confetti from "canvas-confetti";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { getDisplayName } from "../utils/userDisplay";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -31,14 +32,13 @@ function dropConfetti() {
 }
 
 function buildPersonalLine(quote, name) {
-  if (!quote) return name ? `Hi, ${name}.` : "Hi.";
   const cleaned = quote.trim().replace(/[".]+$/g, "");
-  return name ? `${cleaned}, ${name}.` : `${cleaned}.`;
+  if (!name) return `${cleaned}.`;         
+  return `${cleaned}, ${name}.`;
 }
 
 export default function Tasks({ user }) {
-  const name = user?.name?.split(" ")[0] || "Guest";
-
+  const name = (getDisplayName(user) || "").trim();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
