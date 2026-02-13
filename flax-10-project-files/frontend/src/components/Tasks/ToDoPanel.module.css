@@ -63,7 +63,7 @@
 
   padding: 4px 6px;
   border-radius: 10px;
-  cursor: pointer;
+  cursor: default;
 
   display: inline-flex;
   align-items: center;
@@ -72,24 +72,14 @@
   max-width: 140px;
 }
 
-.titleBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
 .titleText {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.2px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.titleChevron {
-  font-size: 11px;
-  opacity: 0.7;
-  transform: translateY(-1px);
 }
 
 .menuWrap {

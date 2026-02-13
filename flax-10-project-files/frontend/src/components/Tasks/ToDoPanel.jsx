@@ -319,12 +319,10 @@ export default function ToDoPanel({ open = true }) {
     <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
       {/* Header */}
       <div className={styles.header}>
-        <button type="button" className={styles.titleBtn} title="List">
-          <span className={styles.titleText}>Today</span>
-          <span className={styles.titleChevron} aria-hidden="true">
-            ▼
-          </span>
-        </button>
+
+       <div className={styles.titleBtn} title="To-do">
+          <span className={styles.titleText}>To-do</span> 
+        </div>
 
         <div className={styles.menuWrap} ref={menuRef}>
           <button
