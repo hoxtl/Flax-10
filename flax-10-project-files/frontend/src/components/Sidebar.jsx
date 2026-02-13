@@ -1,9 +1,8 @@
-import { NAV } from "../lib/uiConstants";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
+import { getDisplayName } from "../utils/userDisplay"; 
 
-// Header component that displays the app name and adjusts styling based on collapsed state
 function SidebarHeader({ collapsed }) {
   return (
     <div className={`${styles.header} ${collapsed ? styles.headerCollapsed : ""}`}>
@@ -12,13 +11,14 @@ function SidebarHeader({ collapsed }) {
   );
 }
 
-// Component for each navigation item in the sidebar
 function NavItem({ item, isActive, collapsed, onClick }) {
   const cls = [
     styles.navItem,
     collapsed ? styles.navItemCollapsed : styles.navItemExpanded,
     isActive ? styles.navItemActive : "",
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button onClick={onClick} className={cls}>
@@ -28,10 +28,10 @@ function NavItem({ item, isActive, collapsed, onClick }) {
   );
 }
 
-// User profile component that displays the user's initials, name, year, and major, adjusting layout based on collapsed state
 function SidebarUserProfile({ collapsed, user }) {
-  const initials = getInitials(user?.name) || "?";
-  const year = user?.year || "Year 2";
+  const displayName = getDisplayName(user); 
+  const initials = getInitials(displayName) || "?";
+  const year = user?.year ? `Year ${user.year}` : "Year 2";
   const major = user?.major || "CS";
 
   return (
@@ -40,7 +40,7 @@ function SidebarUserProfile({ collapsed, user }) {
 
       {!collapsed && (
         <div className={styles.userText}>
-          <div className={styles.userName}>{user?.name || "Guest"}</div>
+          <div className={styles.userName}>{displayName}</div> 
           <div className={styles.userMeta}>{year} · {major}</div>
         </div>
       )}
@@ -48,7 +48,6 @@ function SidebarUserProfile({ collapsed, user }) {
   );
 }
 
-// Main Sidebar component that composes the header, navigation, and user profile components, adjusting width based on collapsed state
 export default function Sidebar({ active, onChange, collapsed, user }) {
   const W = collapsed ? 72 : 224;
 
@@ -61,7 +60,6 @@ export default function Sidebar({ active, onChange, collapsed, user }) {
   );
 }
 
-// Component that renders the navigation items in the sidebar, highlighting the active item and adjusting layout based on collapsed state
 function SidebarNav({ active, onChange, collapsed }) {
   return (
     <nav className={styles.nav}>
@@ -74,7 +72,6 @@ function SidebarNav({ active, onChange, collapsed }) {
           onClick={() => onChange?.(n.id)}
         />
       ))}
-
     </nav>
   );
 }

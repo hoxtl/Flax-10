@@ -4,8 +4,8 @@ import { getGreeting } from "../utils/dateUtils";
 import { getInitials } from "../utils/userUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { NotificationCenter } from "./Notifications";
+import { getDisplayName } from "../utils/userDisplay";
 
-// Get current date parts
 function getCurrentDateParts() {
   const now = new Date();
   return {
@@ -15,15 +15,16 @@ function getCurrentDateParts() {
   };
 }
 
-// Component that displays a greeting message based on the time of day, along with the user's first name and the current date
 function TopBarGreeting({ user }) {
   const now = new Date();
+  const displayName = getDisplayName(user);          
+  const firstName = displayName.split(" ")[0];       
 
   return (
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
-        <h1 className={styles.name}>{user?.name?.split(" ")[0] || "Guest"}</h1>
+        <h1 className={styles.name}>{firstName}</h1>
         <span className={styles.date}>
           {DAYS[now.getDay()]}, {now.getDate()} {MONTHS[now.getMonth()]}
         </span>
@@ -32,7 +33,6 @@ function TopBarGreeting({ user }) {
   );
 }
 
-// Search input component with a search icon and placeholder text, allowing users to search for events or tasks
 function SearchInput() {
   return (
     <div className={styles.search}>
@@ -42,7 +42,6 @@ function SearchInput() {
   );
 }
 
-// Button component that displays a plus icon and triggers the onClick callback when pressed, used for adding new events or tasks
 function AddButton({ onClick }) {
   return (
     <button className={styles.addBtn} onClick={onClick}>
@@ -51,7 +50,6 @@ function AddButton({ onClick }) {
   );
 }
 
-// Component that renders the search input, add button, notifications, and user avatar
 function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <div className={styles.actions}>
@@ -67,7 +65,6 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
   );
 }
 
-// Main TopBar component that composes the greeting and actions components
 export default function TopBar({ onToggle, onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <header className={styles.container}>
