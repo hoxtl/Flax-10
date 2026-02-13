@@ -2,7 +2,7 @@
   position: fixed;
   right: 24px;
   bottom: 72px;
-  width: 200px;
+  width: 250px;
   max-width: 92vw;
   max-height: 45vh;
   background: rgba(0, 0, 0, 0.85);
@@ -75,7 +75,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-size: 15px;
+  font-size: 23px;
   line-height: 1.25;
   padding: 2px 0;     
 }
@@ -132,5 +132,3 @@
   padding: 0;
   list-style: none;
 }
-
-
