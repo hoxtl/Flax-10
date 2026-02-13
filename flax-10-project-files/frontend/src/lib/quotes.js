@@ -12,6 +12,7 @@ const MORNING_QUOTES = [
   "This hour matters.",
   "Begin before the noise begins.",
   "The sun rose. So can you.",
+  "You are capable of wonderful things.",
   "Breathe."
 ];
 
@@ -30,6 +31,7 @@ const DAY_QUOTES = [
   "Even slow progress is progress.",
   "The afternoon is for quiet progress.",
   "The afternoon holds quiet power.",
+  "You are capable of wonderful things.",
   "Continue",
   "Breathe.",
 ];
@@ -45,6 +47,7 @@ const EVENING_QUOTES = [
   "You’re almost there.",
   "Last push.",
   "Close the day with intent.",
+  "You are capable of wonderful things.",
   "Last rep energy.",
   "Breathe."
 ];
@@ -63,6 +66,7 @@ const NIGHT_QUOTES = [
   "The world is asleep. You are not.",
   "Midnight sharpens focus.",
   "The unseen hours matter.",
+  "You are capable of wonderful things.",
   "Breathe."
 ];
 
