@@ -27,8 +27,8 @@ function getUser() {
     try {
       const user = JSON.parse(userString);
       return {
-        name: user.first_name && user.last_name 
-          ? `${user.first_name} ${user.last_name}` 
+        name: user.first_name && user.last_name
+          ? `${user.first_name} ${user.last_name}`
           : user.username,
         year: user.year ? `Year ${user.year}` : 'Year: ',
         major: user.major || "Major: ",
@@ -66,9 +66,9 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
 function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, children }) {
   return (
     <div className={styles.main}>
-      <TopBar 
-        user={user} 
-        onToggle={onToggle} 
+      <TopBar
+        user={user}
+        onToggle={onToggle}
         onAddClick={onQuickAdd}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
@@ -130,24 +130,24 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
   return (
     <div className={styles.root}>
-      <DesktopSidebar 
-        isMobile={isMobile} 
-        user={user} 
-        activeNav={activeNav} 
-        onNavChange={onNavChange} 
-        collapsed={sidebarCollapsed} 
+      <DesktopSidebar
+        isMobile={isMobile}
+        user={user}
+        activeNav={activeNav}
+        onNavChange={onNavChange}
+        collapsed={sidebarCollapsed}
       />
-      <MobileSidebar 
-        isMobile={isMobile} 
-        open={mobileSidebarOpen} 
-        user={user} 
-        activeNav={activeNav} 
-        onPick={onPickNav} 
-        onClose={() => setMobileSidebarOpen(false)} 
+      <MobileSidebar
+        isMobile={isMobile}
+        open={mobileSidebarOpen}
+        user={user}
+        activeNav={activeNav}
+        onPick={onPickNav}
+        onClose={() => setMobileSidebarOpen(false)}
       />
-      <MainArea 
-        user={user} 
-        onToggle={onToggle} 
+      <MainArea
+        user={user}
+        onToggle={onToggle}
         onQuickAdd={() => setShowQuickAdd(true)}
         onSettingsClick={handleSettingsClick}
         onLogoutClick={handleLogoutClick}
@@ -155,10 +155,10 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       >
         {children}
       </MainArea>
-      <QuickAddGate 
-        open={showQuickAdd} 
-        onClose={() => setShowQuickAdd(false)} 
-        onSelectType={onSelectType} 
+      <QuickAddGate
+        open={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSelectType={onSelectType}
       />
       {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
     </div>

@@ -7,16 +7,14 @@ from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
 @api_view(['GET', 'POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def tag_list(request):
     if request.method == 'GET':
         return get_tags(request)
     return create_tag(request)
 
 def get_tags(request):
-    # TODO: uncomment user filter when auth is implemented
-    # tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True))
-    tags = Tag.objects.filter(is_default=True)
+    tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True))
     serialiser = TagSerialiser(tags, many=True)
     return Response(serialiser.data)
 
@@ -25,8 +23,7 @@ def create_tag(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # serialiser.save(user=request.user) # Uncomment when we have user authentication
-    serialiser.save() # Remove when we have user authentication
+    serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PATCH', 'DELETE'])
@@ -57,10 +54,9 @@ def delete_tag(tag):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def category_list(request):
-    # categories = Category.objects.filter(Q(user=request.user) | Q(is_default=True)) # Uncomment when we have user authentication
-    categories = Category.objects.all() # Remove when we have user authentication
+    categories = Category.objects.all()
     serialiser = CategorySerialiser(categories, many=True)
     return Response(serialiser.data)
     

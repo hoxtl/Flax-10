@@ -6,22 +6,24 @@ from urllib.request import Request, urlopen
 from django.utils import timezone as django_timezone
 from studyFlax.models import CalendarEvent, TimetableSource
 
-def sync_timetable(source_url):
+def sync_timetable(source_url, user=None):
     source_key = get_source_key(source_url)
     try:
         events = load_events(source_url, source_key)
-        created, updated = upsert_events(events)
-        update_source_status(source_url, True, "")
+        created, updated = upsert_events(events, user)
+        update_source_status(source_url, user, True, "")
         return {"created": created, "updated": updated, "source_url": source_url}
     except Exception as exc:
-        update_source_status(source_url, False, str(exc))
+        update_source_status(source_url, user, False, str(exc))
         raise
 
-def sync_timetable_if_needed(min_interval=timedelta(hours=6)):
-    source = TimetableSource.objects.first()
+def sync_timetable_if_needed(user, min_interval=timedelta(hours=6)):
+    if not user.is_authenticated:
+        return None
+    source = TimetableSource.objects.filter(user=user).first()
     if not source or not should_sync(source, min_interval):
         return None
-    return sync_timetable(source.source_url)
+    return sync_timetable(source.source_url, user)
 
 def load_events(source_url, source_key):
     ics_url = resolve_ics_url(source_url)
@@ -139,32 +141,36 @@ def get_source_key(url):
     host = urlparse(url).netloc or "timetable"
     return host.replace("www.", "")
 
-def upsert_events(events):
+def upsert_events(events, user=None):
     created = updated = 0
     for data in events:
         if not data.get("start_time") or not data.get("end_time"):
             continue
-        existing = find_existing_event(data["source"], data.get("external_id"))
+        existing = find_existing_event(data["source"], data.get("external_id"), user)
         if existing:
             apply_event_updates(existing, data)
             updated += 1
         else:
-            create_event(data)
+            create_event(data, user)
             created += 1
     return created, updated
 
-def find_existing_event(source, external_id):
+def find_existing_event(source, external_id, user=None):
     if not source or not external_id:
         return None
-    return CalendarEvent.objects.filter(source=source, external_id=external_id).first()
+    qs = CalendarEvent.objects.filter(source=source, external_id=external_id)
+    if user:
+        qs = qs.filter(user=user)
+    return qs.first()
 
 def apply_event_updates(event, data):
     for field in ("title", "description", "start_time", "end_time", "location"):
         setattr(event, field, data.get(field))
     event.save()
 
-def create_event(data):
+def create_event(data, user=None):
     CalendarEvent.objects.create(
+        user=user,
         title=data.get("title", "Untitled"),
         description=data.get("description", ""),
         start_time=data.get("start_time"),
@@ -174,8 +180,14 @@ def create_event(data):
         external_id=data.get("external_id"),
     )
 
-def update_source_status(source_url, synced, error):
+def update_source_status(source_url, user, synced, error):
     values = {"last_error": error}
     if synced:
         values["last_synced"] = django_timezone.now()
-    TimetableSource.objects.update_or_create(source_url=source_url, defaults=values)
+    
+    defaults = values
+    TimetableSource.objects.update_or_create(
+        source_url=source_url, 
+        user=user,
+        defaults=defaults
+    )

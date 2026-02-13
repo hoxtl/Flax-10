@@ -8,16 +8,15 @@ from .event_helpers import filter_events_by_date_range, check_event_overlap, exp
 from .timetable_service import sync_timetable_if_needed
 
 @api_view(['GET', 'POST'])
-# TODO: Enable authentication when ready
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def event_list(request):
     if request.method == 'GET':
         return get_events(request)
     return create_event(request)
 
 def get_events(request):
-    safe_sync_timetable()
-    events = CalendarEvent.objects.all()
+    safe_sync_timetable(request.user)
+    events = CalendarEvent.objects.filter(user=request.user)
     events = filter_events_by_date_range(events, request.query_params)
     start_date = parse_date_param(request.query_params.get('start'))
     end_date = parse_date_param(request.query_params.get('end'))
@@ -25,9 +24,9 @@ def get_events(request):
     serialiser = CalendarEventSerialiser(expanded_events, many=True)
     return Response(serialiser.data)
 
-def safe_sync_timetable():
+def safe_sync_timetable(user):
     try:
-        sync_timetable_if_needed()
+        sync_timetable_if_needed(user)
     except Exception:
         pass
 
@@ -36,11 +35,9 @@ def create_event(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # TODO: Enable overlap check and user association when authentication is ready
-    # overlap = check_event_overlap(request.user, serialiser.validated_data)
-    # event = serialiser.save(user=request.user)
-    event = serialiser.save()
+    overlap = check_event_overlap(request.user, serialiser.validated_data)
+    event = serialiser.save(user=request.user)
     response_data = CalendarEventSerialiser(event).data
-    # response_data['has_overlap'] = overlap
+    response_data['has_overlap'] = overlap
     return Response(response_data, status=status.HTTP_201_CREATED)
     

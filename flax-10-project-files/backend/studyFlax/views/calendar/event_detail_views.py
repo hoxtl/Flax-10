@@ -7,12 +7,9 @@ from studyFlax.models import CalendarEvent
 from studyFlax.serialisers import CalendarEventSerialiser, CalendarEventCreateSerialiser
 
 @api_view(['GET', 'PUT', 'DELETE'])
-# TODO: Enable authentication when ready
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def event_detail(request, pk):
-    # TODO: Filter by user when authentication is enabled
-    # event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
-    event = get_object_or_404(CalendarEvent, pk=pk)
+    event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
 
     if request.method == 'GET': 
         return get_event(event)
@@ -37,8 +34,9 @@ def delete_event(event):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_exception_date(request, pk):
-    event = get_object_or_404(CalendarEvent, pk=pk)
+    event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
     if not event.recurrence_rule:
         return Response({'error': 'Event is not recurring'}, status=status.HTTP_400_BAD_REQUEST)
     date_str = request.data.get('date')

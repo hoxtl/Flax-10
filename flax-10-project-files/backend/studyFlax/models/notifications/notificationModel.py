@@ -1,7 +1,8 @@
 from django.db import models
-
+from ..auth.userModel import User
 
 class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     message = models.TextField(blank=True)
     read = models.BooleanField(default=False)
