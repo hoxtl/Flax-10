@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import TimerPage from '../../pages/TimerPage';
+import * as historyUtils from '../../utils/historyUtils';
 
 // Mock TreeAnimation to simplify DOM
 vi.mock('../../components/Timer/TreeAnimation', () => ({
@@ -10,16 +11,18 @@ vi.mock('../../components/Timer/TreeAnimation', () => ({
 describe('TimerPage Integration', () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        global.Notification = {
-            permission: 'granted',
-            requestPermission: vi.fn(),
-        };
+        const NotificationMock = vi.fn();
+        NotificationMock.permission = 'granted';
+        NotificationMock.requestPermission = vi.fn();
+        vi.stubGlobal('Notification', NotificationMock);
+
+        vi.spyOn(historyUtils, 'saveSession').mockImplementation(() => { });
     });
 
     afterEach(() => {
         vi.useRealTimers();
         vi.clearAllMocks();
-        delete global.Notification;
+        vi.unstubAllGlobals();
     });
 
     it('renders initial state correctly', () => {
@@ -72,15 +75,14 @@ describe('TimerPage Integration', () => {
         fireEvent.change(inputs[0], { target: { value: '0' } }); // 0 mins
 
         fireEvent.click(screen.getByText('Start'));
-        // 0 mins sets timeLeft to 0, which triggers effect? 
-        // Logic says Math.max(0, val). If 0,timeLeft=0. Effect triggers immediately if active.
+        // 0 mins sets timeLeft to 0, which triggers effect immediately if active.
 
         act(() => {
             vi.advanceTimersByTime(100);
         });
 
-        // Should check for modal
-        expect(screen.getByText('Focus Session Complete!')).toBeInTheDocument();
+        // Should check for modal (OvertimePopup)
+        expect(screen.getByText("Time's Up!")).toBeInTheDocument();
     });
 
     it('enters break mode from modal', () => {
@@ -94,5 +96,13 @@ describe('TimerPage Integration', () => {
         fireEvent.click(screen.getByText('Start Break'));
         expect(screen.getByText('☕ Break Time')).toBeInTheDocument();
         expect(screen.getByText('05:00')).toBeInTheDocument();
+    });
+
+    it('opens history modal when history button is clicked', () => {
+        render(<TimerPage />);
+        const historyBtn = screen.getByLabelText('History');
+        fireEvent.click(historyBtn);
+        expect(screen.getByText('History')).toBeInTheDocument();
+        expect(screen.getByText('No recent sessions.')).toBeInTheDocument();
     });
 });

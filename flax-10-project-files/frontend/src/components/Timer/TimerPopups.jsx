@@ -14,7 +14,7 @@ export const OvertimePopup = ({ mode, time, onAction }) => (
     </div>
 );
 
-const SummaryPill = ({ label, value, type }) => (
+export const SummaryPill = ({ label, value, type }) => (
     <div className={styles.summaryItem}>
         <span className={styles.summaryLabel}>{label}</span>
         <span className={`${styles.summaryPill} ${styles[`pill${type}`]}`}>

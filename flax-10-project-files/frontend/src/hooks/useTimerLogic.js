@@ -5,9 +5,9 @@ import { getProgress } from './timerUtils';
 
 export function useTimerLogic() {
     const t = useTimer();
-    const { modal, setModal, startNext } = useTimerFlow(t);
-    const handlers = useTimerHandlers(t, modal, setModal, startNext);
-    const ot = t.timeLeft < 0;
+    const { modal, setModal, startNext, resetBlockId } = useTimerFlow(t);
+    const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId);
+    const ot = t.timeLeft <= 0;
 
     return {
         ...t, modal, handlers, progress: getProgress(t),

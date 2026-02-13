@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTimerLogic } from '../../hooks/useTimerLogic';
+import * as historyUtils from '../../utils/historyUtils';
 
 describe('useTimerLogic Hook', () => {
     beforeEach(() => {
@@ -8,6 +9,7 @@ describe('useTimerLogic Hook', () => {
             permission: 'granted',
             requestPermission: vi.fn(),
         };
+        vi.spyOn(historyUtils, 'saveSession').mockImplementation(() => { });
     });
 
     afterEach(() => {
