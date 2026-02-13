@@ -6,7 +6,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
     created_by_name = serializers.CharField(source='created_by.first_name', read_only=True)
     class Meta:
         model = Module
-        fields = ['id', 'module_code', 'module_name', 'description', 'created_by']
+        fields = ['id', 'module_code', 'module_name', 'description', 'created_by', 'created_by_name', 'start_time', 'end_time', 'location', 'recurrence_rule']
     
     def validate(self, validated_data):
         user = self.context['request'].user

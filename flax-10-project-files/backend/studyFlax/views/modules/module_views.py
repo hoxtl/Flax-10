@@ -1,11 +1,13 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from studyFlax.models import Module
 from studyFlax.serialisers import ModuleSerialiser
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def module_list(request):
     if request.method == 'GET':
         return get_modules(request)
@@ -28,6 +30,7 @@ def create_module(request):
     return Response(ModuleSerialiser(module).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def module_detail(request, module_id):
     module = get_object_or_404(Module, id=module_id)
     user = request.user
