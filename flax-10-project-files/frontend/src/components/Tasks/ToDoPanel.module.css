@@ -1,22 +1,29 @@
+/* Panel */
+
 .panel {
   position: fixed;
   right: 24px;
   bottom: 72px;
+
   width: 250px;
   max-width: 92vw;
   max-height: 45vh;
+
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(16px);
+
   border-radius: 20px;
   padding: 14px 16px 12px;
+
   display: flex;
   flex-direction: column;
+
   color: white;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+
   transition: transform 160ms ease, opacity 160ms ease;
   transform-origin: bottom right;
 }
-
 
 @media (max-width: 520px) {
   .panel {
@@ -38,46 +45,155 @@
   pointer-events: none;
 }
 
+/* Header (3 dots) */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.menuBtn {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 12px;
+}
+
+.menuBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dots {
+  font-size: 18px;
+  line-height: 1;
+  display: inline-block;
+  transform: translateY(-1px);
+}
+
+/* Menu */
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: 36px;
+
+  min-width: 240px;
+  padding: 8px;
+
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  z-index: 10;
+}
+
+.menuItem {
+  width: 100%;
+  text-align: left;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  outline: none;
+
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.92);
+
+  padding: 12px;
+  border-radius: 16px;
+
+  cursor: pointer;
+  font-size: 13px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menuItem:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.menuItem:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.menuIcon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.95;
+}
+
+.menuLabel {
+  flex: 1;
+  white-space: nowrap;
+}
+
+/* List + Scrollbar */
+
 .list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+
   display: flex;
   flex-direction: column;
-  gap: 2px;          
+  gap: 2px;
+
   scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(255,255,255,0.22) transparent; /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent; /* Firefox */
 }
 
 /* Chrome / Safari / Edge */
 .list::-webkit-scrollbar {
   width: 8px;
 }
-
 .list::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .list::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  border: 2px solid transparent; 
-  background-clip: content-box;
-}
-
-.list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.30);
   border: 2px solid transparent;
   background-clip: content-box;
+}
+.list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.30);
+}
+
+/* Rows (tasks) */
+
+.reorderGroup {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .row {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+
   font-size: 23px;
   line-height: 1.25;
-  padding: 2px 0;     
+  padding: 2px 0;
 }
 
 .row input {
@@ -87,8 +203,7 @@
 .row input[type="checkbox"] {
   width: 14px;
   height: 14px;
-  margin-top: 4px; 
-  accent-color: #ff4d8d;
+  margin-top: 4px;
 }
 
 .row span {
@@ -101,6 +216,8 @@
   opacity: 0.5;
 }
 
+/* Inputs */
+
 .inputRow {
   margin-top: 10px;
 }
@@ -109,12 +226,15 @@
   width: 100%;
   border: none;
   outline: none;
+
   background: transparent;
   color: white;
+
   font-size: 15px;
   opacity: 0.85;
+
   padding: 10px 0 2px;
-  border-top: 1px solid rgba(255,255,255,0.18);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .editInput {
@@ -123,12 +243,7 @@
   outline: none;
   background: transparent;
   color: white;
+
   font-size: 10px;
   padding: 2px 0;
-}
-
-.reorderGroup {
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
