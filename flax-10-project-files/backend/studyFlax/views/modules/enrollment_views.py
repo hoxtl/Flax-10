@@ -1,18 +1,19 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from studyFlax.models import Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
+from studyFlax.models import CalendarEvent
 
 @api_view(['GET', 'POST'])
-#TODO - need to include authentication
+@permission_classes([IsAuthenticated])
 def enrollment_list(request):
     if request.method == 'GET':
         return get_enrollments(request)
     return create_enrollments(request)
 
-#TODO - check the user is authenticated first
 def get_enrollments(request):
     user = request.user
     enrollments = Enrollment.objects.filter(student=user)
@@ -24,9 +25,20 @@ def create_enrollments(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     enrollment = serialiser.save()
+    module = enrollment.module
+    CalendarEvent.objects.create(
+            user=request.user,
+            title=f"Lecture: {module.module_name}",
+            start_time=module.start_time,
+            end_time=module.end_time,
+            recurrence_rule = module.recurrence_rule,
+            location=module.location,
+            source="module_enrollment" 
+        )
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def enrollment_detail(request, enrollment_id):
     enrollment = get_object_or_404(Enrollment, id=enrollment_id)
     user = request.user

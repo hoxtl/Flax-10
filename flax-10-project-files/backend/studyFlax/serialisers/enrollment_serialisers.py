@@ -12,7 +12,7 @@ class EnrollmentSerialiser(serializers.ModelSerializer):
     
     def validate(self, validated_data):
         user = self.context['request'].user
-        if user.is_teacher:
+        if user.is_teacher():
             raise serializers.ValidationError("Teachers cannot enroll in modules")
         
         if user.id != validated_data.get('student', user).id:
