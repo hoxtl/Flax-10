@@ -1,53 +1,149 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./ToDoPanel.module.css";
 import { Reorder, AnimatePresence } from "framer-motion";
 
 const STORAGE_KEY = "flax_todo_items_v1";
+const AUTO_CLEAR_MS = 2 * 60 * 60 * 1000;
+
+function normalizeItem(x) {
+  return {
+    id: x?.id ?? crypto.randomUUID(),
+    title: typeof x?.title === "string" ? x.title : "",
+    done: !!x?.done,
+    completedAt: typeof x?.completedAt === "number" ? x.completedAt : null,
+  };
+}
+
+function sortTasks(list) {
+  const active = list.filter((t) => !t.done);
+  const done = list.filter((t) => t.done);
+  return [...active, ...done];
+}
 
 export default function ToDoPanel({ open = true }) {
   const [text, setText] = useState("");
 
-  // Load tasks once 
+  // Load tasks once
   const [items, setItems] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw).map(normalizeItem) : [];
+      return sortTasks(parsed);
     } catch {
       return [];
     }
   });
 
+  // Persist tasks
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
+    } catch {}
+  }, [items]);
+
+  // Auto clear completed tasks after 2 hours
+  useEffect(() => {
+    const now = Date.now();
+    const nextExpiry = items
+      .filter((t) => t.done && typeof t.completedAt === "number")
+      .map((t) => t.completedAt + AUTO_CLEAR_MS)
+      .filter((ts) => ts > now)
+      .sort((a, b) => a - b)[0];
+
+    const hasExpired = items.some(
+      (t) => t.done && typeof t.completedAt === "number" && now - t.completedAt >= AUTO_CLEAR_MS
+    );
+
+    if (hasExpired) {
+      setItems((prev) =>
+        sortTasks(
+          prev.filter(
+            (t) => !(t.done && typeof t.completedAt === "number" && now - t.completedAt >= AUTO_CLEAR_MS)
+          )
+        )
+      );
     }
+
+    if (!nextExpiry) return;
+    const timeoutMs = Math.max(0, nextExpiry - now + 50);
+
+    const id = window.setTimeout(() => {
+      const n = Date.now();
+      setItems((prev) =>
+        sortTasks(
+          prev.filter(
+            (t) => !(t.done && typeof t.completedAt === "number" && n - t.completedAt >= AUTO_CLEAR_MS)
+          )
+        )
+      );
+    }, timeoutMs);
+
+    return () => window.clearTimeout(id);
   }, [items]);
 
   // Inline edit state
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
+  // 3 dots menu state
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onDown = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
   const addItem = (e) => {
     e.preventDefault();
     const t = text.trim();
     if (!t) return;
 
-    setItems((prev) => [...prev, { id: Date.now(), title: t, done: false }]);
+    const newItem = {
+      id: crypto.randomUUID(),
+      title: t,
+      done: false,
+      completedAt: null,
+    };
+
+    setItems((prev) => sortTasks([...prev, newItem]));
     setText("");
   };
 
   const toggleDone = (id) => {
     setItems((prev) => {
-      const updated = prev.map((x) =>
-        x.id === id ? { ...x, done: !x.done } : x
-      );
+      const now = Date.now();
+      const updated = prev.map((x) => {
+        if (x.id !== id) return x;
 
-      // Move checked items to bottom of list
-      const active = updated.filter((x) => !x.done);
-      const done = updated.filter((x) => x.done);
-      return [...active, ...done];
+        const nextDone = !x.done;
+        return {
+          ...x,
+          done: nextDone,
+          completedAt: nextDone ? now : null,
+        };
+      });
+
+      return sortTasks(updated);
     });
+  };
+
+  const clearCompleted = () => {
+    setItems((prev) => sortTasks(prev.filter((x) => !x.done)));
+    setMenuOpen(false);
   };
 
   const startEdit = (item) => {
@@ -57,16 +153,13 @@ export default function ToDoPanel({ open = true }) {
 
   const saveEdit = (id) => {
     const t = editText.trim();
-
     if (!t) {
       setEditingId(null);
       setEditText("");
       return;
     }
 
-    setItems((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, title: t } : x))
-    );
+    setItems((prev) => prev.map((x) => (x.id === id ? { ...x, title: t } : x)));
     setEditingId(null);
     setEditText("");
   };
@@ -76,13 +169,47 @@ export default function ToDoPanel({ open = true }) {
     setEditText("");
   };
 
+  const values = useMemo(() => items, [items]);
+
+  const anyCompleted = items.some((x) => x.done);
+
   return (
     <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
+      <div className={styles.header}>
+        <div className={styles.menuWrap} ref={menuRef}>
+          <button
+            type="button"
+            className={styles.menuBtn}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Task menu"
+            aria-expanded={menuOpen}
+          >
+            <span className={styles.dots} aria-hidden="true">•••</span>
+          </button>
+
+          {menuOpen && (
+            <div className={styles.menu}>
+              <button
+                type="button"
+                className={styles.menuItem}
+                onClick={clearCompleted}
+                disabled={!anyCompleted}
+                title={!anyCompleted ? "No completed tasks" : "Remove completed tasks"}
+              >
+
+                <span className={styles.menuIcon} aria-hidden="true">🪄</span>
+                <span className={styles.menuLabel}>Clear completed tasks</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className={styles.list}>
         <Reorder.Group
           axis="y"
-          values={items}
-          onReorder={setItems}
+          values={values}
+          onReorder={(newOrder) => setItems(sortTasks(newOrder))}
           className={styles.reorderGroup}
         >
           <AnimatePresence>
