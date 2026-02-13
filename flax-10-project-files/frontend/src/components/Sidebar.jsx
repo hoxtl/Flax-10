@@ -49,14 +49,14 @@ function SidebarUserProfile({ collapsed, user }) {
 }
 
 // Main Sidebar component that composes the header, navigation, and user profile components, adjusting width based on collapsed state
-export default function Sidebar({ active, onChange, collapsed }) {
+export default function Sidebar({ active, onChange, collapsed, user }) {
   const W = collapsed ? 72 : 224;
 
   return (
     <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
       <SidebarHeader collapsed={collapsed} />
       <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
-      <SidebarUserProfile collapsed={collapsed} />
+      <SidebarUserProfile collapsed={collapsed} user={user} />
     </aside>
   );
 }

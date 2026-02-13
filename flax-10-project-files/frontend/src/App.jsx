@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { ThemeProvider } from './context/ThemeContext'; 
 import DashboardLayout from "./layout/DashboardLayout";
+import AuthPage from './pages/AuthPage';
 import { APP_ROUTES } from './lib/routes';
 import { CalendarProvider } from './context/CalendarContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -11,12 +12,20 @@ import Settings from './pages/Settings';
 import { getUserSettings } from './api/userService';
 
 function getUser() {
-  return {
-    name: "Jane Smith",
-    email: "jane@kcl.ac.uk",
-    year: "Year 2",
-    major: "CS",
-  };
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      return JSON.parse(userString);
+    } catch (err) {
+      console.error('Error parsing user data:', err);
+    }
+  }
+  
+  return null;
+}
+
+function isAuthenticated() {
+  return !!localStorage.getItem('token');
 }
 
 export default function App() {
@@ -25,9 +34,13 @@ export default function App() {
   const [isLoadingTheme, setIsLoadingTheme] = useState(true);
   const user = getUser();
 
-  // Load user's theme preference on mount
   useEffect(() => {
     async function loadUserTheme() {
+      if (!isAuthenticated()) {
+        setIsLoadingTheme(false);
+        return;
+      }
+
       try {
         const settings = await getUserSettings();
         setInitialTheme(settings.theme || "light");
@@ -46,9 +59,12 @@ export default function App() {
     setActiveNav("home");
   }
 
-  // Wait for theme to load before rendering
+  if (!isAuthenticated() || !user) {
+    return <AuthPage />;
+  }
+
   if (isLoadingTheme) {
-    return null; // or a loading spinner
+    return null; 
   }
 
   let pageContent;
