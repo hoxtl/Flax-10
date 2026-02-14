@@ -3,6 +3,8 @@ import styles from './EditProfileModal.module.css';
 import { updateUserProfile } from '../api/userService';
 import { getInitials } from '../utils/userUtils';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   const [username, setUsername] = useState(user?.username || '');
   const [bio, setBio] = useState(user?.bio || '');
@@ -10,6 +12,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   const [previewUrl, setPreviewUrl] = useState(user?.profile_photo_url || null);
   const [removePhoto, setRemovePhoto] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
@@ -28,9 +31,50 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
     setRemovePhoto(true);
   };
 
+  const checkUsernameAvailable = async (newUsername) => {
+    // If username hasn't changed, it's valid
+    if (newUsername === user?.username) {
+      return true;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/check-username/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({ username: newUsername })
+      });
+
+      const data = await response.json();
+      return data.available;
+    } catch (error) {
+      console.error('Error checking username:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+
+    // Validate username
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      setLoading(false);
+      return;
+    }
+
+    // Check if username is available
+    const isAvailable = await checkUsernameAvailable(username);
+    if (!isAvailable) {
+      setError('Username is already taken');
+      setLoading(false);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -48,7 +92,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
       window.location.reload();
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to update profile');
+      setError(error.response?.data?.error || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -65,6 +109,10 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          {error && (
+            <div className={styles.error}>{error}</div>
+          )}
+
           <div className={styles.photoSection}>
             <div className={styles.photoPreview}>
               {previewUrl ? (
