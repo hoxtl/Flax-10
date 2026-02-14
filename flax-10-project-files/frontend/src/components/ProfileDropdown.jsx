@@ -97,6 +97,7 @@ function AvatarButton({ initials, profilePhotoUrl, onClick }) {
 }
 
 // Main profile dropdown
+// Main profile dropdown
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -108,6 +109,13 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }
       try {
         const data = await getUserProfile();
         setProfileData(data);
+        
+        // Update localStorage with fresh profile photo URL
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        if (data.profile_photo_url) {
+          currentUser.profile_photo_url = data.profile_photo_url;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+        }
       } catch (error) {
         console.error('Failed to load profile:', error);
       } finally {
@@ -134,6 +142,8 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }
   };
 
   const profilePhotoUrl = profileData?.profile_photo_url;
+  
+  console.log('ProfileDropdown render:', { profilePhotoUrl, initials });
 
   return (
     <div className={styles.container}>
