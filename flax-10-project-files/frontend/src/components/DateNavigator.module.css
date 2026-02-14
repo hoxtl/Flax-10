@@ -65,21 +65,20 @@
 }
 
 .calBtn {
-  background: var(--nav-btn-bg);
-  color: white;
-  background: var(--nav-btn-bg);
-  color: white;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
   border: none;
+  background: var(--nav-btn-bg);
+  color: white;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 18px;
-  transition: background 0.2s;
+}
+
+.calBtn:hover {
+  background: var(--nav-btn-hover);
 }
 
 .calBtn:hover {
