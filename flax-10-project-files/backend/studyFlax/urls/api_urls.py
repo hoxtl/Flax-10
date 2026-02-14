@@ -11,6 +11,7 @@ from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
 from studyFlax.views.settings.user_settings_view import user_settings_view
+from studyFlax.views.user.profile_view import profile_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -30,4 +31,5 @@ urlpatterns = [
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
     path("notifications/clear-all/", clear_all, name="notification-clear-all"),
     path("settings/", user_settings_view, name='user-settings'),
+    path("profile/", profile_view, name='user-profile'),
 ]
