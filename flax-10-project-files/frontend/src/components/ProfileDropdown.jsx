@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../utils/userUtils";
+import { getUserProfile } from "../api/userService";
 
 // Check if click is outside element
 function isClickOutside(element, event) {
@@ -23,14 +24,20 @@ function useClickOutside(ref, onClose, isActive) {
 }
 
 // Dropdown header with user info
-function DropdownHeader({ user }) {
+function DropdownHeader({ user, profilePhotoUrl }) {
   const initials = getInitials(user?.name) || "?";
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
 
   return (
     <div className={styles.dropdownHeader}>
-      <div className={styles.avatarLarge}>{initials}</div>
+      <div className={styles.avatarLarge}>
+        {profilePhotoUrl ? (
+          <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
+        ) : (
+          initials
+        )}
+      </div>
       <div className={styles.userInfo}>
         <div className={styles.userName}>{user?.name || "Guest"}</div>
         <div className={styles.userMeta}>{year} · {major}</div>
@@ -59,7 +66,7 @@ function Divider() {
 }
 
 // Dropdown menu content
-function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user }) {
+function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user, profilePhotoUrl }) {
   const dropdownRef = useRef(null);
   useClickOutside(dropdownRef, onClose, isOpen);
 
@@ -67,7 +74,7 @@ function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user })
 
   return (
     <div className={styles.dropdown} ref={dropdownRef}>
-      <DropdownHeader user={user} />
+      <DropdownHeader user={user} profilePhotoUrl={profilePhotoUrl} />
       <Divider />
       <MenuItem icon="⚙️" label="Settings" onClick={onSettingsClick} />
       <Divider />
@@ -77,39 +84,72 @@ function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user })
 }
 
 // Avatar button
-function AvatarButton({ initials, onClick }) {
+function AvatarButton({ initials, profilePhotoUrl, onClick }) {
   return (
     <button className={styles.avatar} onClick={onClick} aria-label="User menu">
-      {initials}
+      {profilePhotoUrl ? (
+        <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
+      ) : (
+        initials
+      )}
     </button>
   );
 }
 
 // Main profile dropdown
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const initials = getInitials(user?.name) || "?";
-  
-    const handleSettingsClick = () => {
-      setIsOpen(false);
-      onSettingsClick?.();
+  const [isOpen, setIsOpen] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const initials = getInitials(user?.name) || "?";
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await getUserProfile();
+        setProfileData(data);
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-  
-    const handleLogoutClick = () => {
-      setIsOpen(false);
-      onLogoutClick?.();
-    };
-  
-    return (
-      <div className={styles.container}>
-        <AvatarButton initials={initials} onClick={() => setIsOpen(!isOpen)} />
-        <DropdownMenu
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          onSettingsClick={handleSettingsClick}
-          onLogoutClick={handleLogoutClick}
-          user={user}
-        />
-      </div>
-    );
-  }
+    loadProfile();
+  }, []);
+
+  const handleSettingsClick = () => {
+    setIsOpen(false);
+    onSettingsClick?.();
+  };
+
+  const handleLogoutClick = () => {
+    setIsOpen(false);
+    onLogoutClick?.();
+  };
+
+  const displayUser = {
+    ...user,
+    year: profileData?.year || user?.year,
+    major: profileData?.major || user?.major,
+  };
+
+  const profilePhotoUrl = profileData?.profile_photo_url;
+
+  return (
+    <div className={styles.container}>
+      <AvatarButton 
+        initials={initials} 
+        profilePhotoUrl={profilePhotoUrl}
+        onClick={() => setIsOpen(!isOpen)} 
+      />
+      <DropdownMenu
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onSettingsClick={handleSettingsClick}
+        onLogoutClick={handleLogoutClick}
+        user={displayUser}
+        profilePhotoUrl={profilePhotoUrl}
+      />
+    </div>
+  );
+}
