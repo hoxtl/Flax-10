@@ -5,9 +5,7 @@
   flex-wrap: nowrap;
   padding: 10px 2px 4px 2px;
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
 }
 
 .row::-webkit-scrollbar {
@@ -28,13 +26,13 @@
 }
 
 .pill:hover {
-  background: var(--accent);
+  background: var(--pill-hover);
 }
 
 /* Inactive */
 .inactive {
-  background: #f0eff4;
-  color: #6b6880;
+  background: var(--pill-bg);
+  color: var(--muted);
   box-shadow: none;
 }
 

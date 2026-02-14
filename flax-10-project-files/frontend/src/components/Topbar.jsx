@@ -1,10 +1,10 @@
 import styles from "./Topbar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
-import { getInitials } from "../utils/userUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { NotificationCenter } from "./Notifications";
 import { getDisplayName } from "../utils/userDisplay";
+import ThemeToggle from "./ThemeToggle";
 
 function getCurrentDateParts() {
   const now = new Date();
@@ -17,14 +17,15 @@ function getCurrentDateParts() {
 
 function TopBarGreeting({ user }) {
   const now = new Date();
-  const displayName = getDisplayName(user);          
-  const firstName = displayName.split(" ")[0];       
+
+  const displayName = (getDisplayName(user) || "").trim();
+  const firstName = displayName ? displayName.split(" ")[0] : "";
 
   return (
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
-        <h1 className={styles.name}>{firstName}</h1>
+        {!!firstName && <h1 className={styles.name}>{firstName}</h1>}
         <span className={styles.date}>
           {DAYS[now.getDay()]}, {now.getDate()} {MONTHS[now.getMonth()]}
         </span>
@@ -54,6 +55,7 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
+      <ThemeToggle />
       <AddButton onClick={onAddClick} />
       <NotificationCenter />
       <ProfileDropdown

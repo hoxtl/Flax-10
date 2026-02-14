@@ -49,45 +49,57 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  background: var(--nav-btn-bg);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .arrow:hover {
-  background: var(--accent);
-  border-radius: 10px;
+  background: var(--nav-btn-hover);
+}
+
+.arrow:hover {
+  background: var(--nav-btn-hover);
 }
 
 .calBtn {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  background: var(--nav-btn-bg);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .calBtn:hover {
-  background: var(--accent);
+  background: var(--nav-btn-hover);
+}
+
+.calBtn:hover {
+  background: var(--nav-btn-hover);
 }
 
 .today {
   padding: 6px 12px;
   border-radius: 8px;
-  background: rgba(180, 140, 90, 0.15);
-  /* soft brown */
-  color: #6b4e2e;
-  /* muted brown text */
+  background: var(--pill-bg);
+  color: var(--primary);
   border: none;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .today:hover {
-  background: rgba(180, 140, 90, 0.25);
+  background: var(--pill-hover);
 }
-
-
-
 
 @media (max-width: 600px) {
   .row {
@@ -107,6 +119,10 @@
 
   .arrow,
   .calBtn {
+  background: var(--nav-btn-bg);
+  color: white;
+  background: var(--nav-btn-bg);
+  color: white;
     width: 32px;
     height: 32px;
   }
