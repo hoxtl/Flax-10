@@ -7,7 +7,8 @@
 
   width: 220px;
   max-width: 90vw;
-  max-height: 45vh;
+  min-height: 100px;
+  max-height: 60vh;
 
   background: var(--todo-bg);
   backdrop-filter: blur(16px);
