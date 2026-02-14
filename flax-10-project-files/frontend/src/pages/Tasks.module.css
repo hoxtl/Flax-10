@@ -16,7 +16,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--tasks-overlay);
   backdrop-filter: blur(2px);
   z-index: 0;
 }
@@ -42,25 +42,45 @@
   display: grid;
   gap: 14px;
   width: min(720px, 80%);
+  font-size: 28px;
+  color: var(--tasks-muted);
 }
 
 .goalPrompt {
   font-size: 28px;
   opacity: 0.8;
+  color: var(--tasks-muted);
+  opacity: 1;
 }
 
 .goalInput {
-  border: none;
-  outline: none;
-  background: transparent;
+  width: 100%;
   font-size: 28px;
   text-align: center;
   padding: 10px 6px;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--tasks-text);
+  caret-color: var(--tasks-text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.goalInput:global(:-webkit-autofill),
+.goalInput:global(:-webkit-autofill:hover),
+.goalInput:global(:-webkit-autofill:focus),
+.goalInput:global(:-webkit-autofill:active) {
+  -webkit-text-fill-color: var(--tasks-text);
+  transition: background-color 9999s ease-out 0s;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
 }
 
 .goalUnderline {
   height: 1.5px;
-  background: rgba(0,0,0,0.2);
+  background: var(--tasks-underline);
   width: 100%;
   margin: 0 auto;
 }
@@ -70,6 +90,7 @@
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.5px;
+  color: var(--tasks-text);
 }
 
 .personalLine {
@@ -79,6 +100,7 @@
   margin-top: 6px;
   letter-spacing: -0.1px;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.2);
+  color: var(--tasks-text);
 }
 
 /* Bottom-right button */
