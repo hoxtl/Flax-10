@@ -79,12 +79,20 @@ function openForView(openModal, viewMode, selectedDate) {
 async function handleImport(dispatch, selectedDate, viewMode) {
     const sourceUrl = window.prompt("Paste timetable URL (.ics or timetable page)");
     if (!sourceUrl) return;
+    
+    const trimmedUrl = sourceUrl.trim();
+    if (!trimmedUrl) return;
+    
     try {
-        await importTimetable(sourceUrl.trim());
+        const result = await importTimetable(trimmedUrl);
+        console.log('Import result:', result);
         await reloadEvents(dispatch, selectedDate, viewMode);
+        window.alert(`Successfully imported ${result.created || 0} new events and updated ${result.updated || 0} events!`);
     } catch (error) {
+        console.error('Import error:', error);
         window.alert(error?.message || "Failed to import timetable");
     }
+}
 }
 
 async function reloadEvents(dispatch, selectedDate, viewMode) {
