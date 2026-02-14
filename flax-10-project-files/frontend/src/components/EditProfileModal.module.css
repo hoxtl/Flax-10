@@ -204,3 +204,13 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.error {
+  background: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
