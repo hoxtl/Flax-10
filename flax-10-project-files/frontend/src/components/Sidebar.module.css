@@ -127,13 +127,13 @@
 .userName {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--user-details-text);
   white-space: nowrap;
 }
 
 .userMeta {
   font-size: 11px;
-  color: var(--muted);
+  color: var(--user-details-text);
   white-space: nowrap;
 }
 
