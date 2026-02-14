@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
 import { getEvents } from "../../api/event_api";
@@ -5,32 +6,54 @@ import { importTimetable } from "../../api/timetable_api";
 import { getDateRangeForView } from "../../hooks/calendarHelpers";
 import { NavigationButtons } from "./header/NavigationButtons";
 import { ViewModeToggle } from "./header/ViewModeToggle";
+import TimetableImportModal from '../TimetableImportModal';
 import './CalendarHeader.css';
 
 export function CalendarHeader() {
     const { selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
     const { openModal } = useEventModal();
+    const [showImportModal, setShowImportModal] = useState(false);
+    
     const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
     const jumpToDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+    
+    const handleImport = async (url) => {
+        await importTimetable(url);
+        await reloadEvents(dispatch, selectedDate, viewMode);
+        alert('Timetable imported successfully!');
+    };
 
     return (
-        <div className="calendar-header">
-            <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
-            <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
-            <HeaderActions openModal={openModal} viewMode={viewMode} selectedDate={selectedDate} dispatch={dispatch} />
-        </div>
+        <>
+            <div className="calendar-header">
+                <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
+                <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
+                <HeaderActions 
+                    openModal={openModal} 
+                    viewMode={viewMode} 
+                    selectedDate={selectedDate}
+                    onImportClick={() => setShowImportModal(true)}
+                />
+            </div>
+            
+            <TimetableImportModal
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                onImport={handleImport}
+            />
+        </>
     );
 }
 
-function HeaderActions({ openModal, viewMode, selectedDate, dispatch }) {
+function HeaderActions({ openModal, viewMode, selectedDate, onImportClick }) {
     const handleAddClick = () => openForView(openModal, viewMode, selectedDate);
-    const handleImportClick = () => handleImport(dispatch, selectedDate, viewMode);
+    
     return (
         <div className="actions">
-            <ImportButton onImport={handleImportClick} />
+            <ImportButton onImport={onImportClick} />
             <button className="btn-add" onClick={handleAddClick}>+</button>
-            <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
+            <ViewModeToggle viewMode={viewMode} dispatch={useCalendarDispatch()} />
         </div>
     );
 }
@@ -74,25 +97,6 @@ function openForView(openModal, viewMode, selectedDate) {
     } else {
         openModal();
     }
-}
-
-async function handleImport(dispatch, selectedDate, viewMode) {
-    const sourceUrl = window.prompt("Paste timetable URL (.ics or timetable page)");
-    if (!sourceUrl) return;
-    
-    const trimmedUrl = sourceUrl.trim();
-    if (!trimmedUrl) return;
-    
-    try {
-        const result = await importTimetable(trimmedUrl);
-        console.log('Import result:', result);
-        await reloadEvents(dispatch, selectedDate, viewMode);
-        window.alert(`Successfully imported ${result.created || 0} new events and updated ${result.updated || 0} events!`);
-    } catch (error) {
-        console.error('Import error:', error);
-        window.alert(error?.message || "Failed to import timetable");
-    }
-}
 }
 
 async function reloadEvents(dispatch, selectedDate, viewMode) {
