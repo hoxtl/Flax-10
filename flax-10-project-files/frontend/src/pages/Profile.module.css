@@ -321,3 +321,114 @@
   color: var(--text);
   font-style: italic;
 }
+
+.rangeSelector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rangeSelector button {
+  flex: 1;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rangeSelector button:hover {
+  background: var(--hover);
+}
+
+.rangeActive {
+  background: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px;
+  font-size: 14px;
+}
+
+.eventCounts {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--panel);
+  border-radius: 8px;
+}
+
+.eventCount {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.eventCount strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Better spacing for modal content */
+.modalContent {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.listItem {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.listItem:hover {
+  background: var(--hover);
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.listAvatar {
+  font-size: 24px;
+  margin-right: 16px;
+}
+
+.listInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.listName {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.listMeta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Range selector padding */
+.rangeSelector {
+  padding: 16px 20px;
+  margin: 0;
+}
+
+.rangeSelector button {
+  padding: 10px 20px;
+}
