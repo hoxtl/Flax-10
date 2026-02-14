@@ -1,5 +1,9 @@
 .tasksPage {
-  min-height: 100vh;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
   position: relative;
 
   background-image: url("../assets/tasks-bg.jpg");
@@ -11,6 +15,7 @@
   align-items: center;
   justify-content: center;
 }
+
 
 .tasksPage::before {
   content: "";
