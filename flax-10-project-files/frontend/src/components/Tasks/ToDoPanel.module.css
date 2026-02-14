@@ -9,7 +9,7 @@
   max-width: 90vw;
   max-height: 45vh;
 
-  background: rgba(0, 0, 0, 0.84);
+  background: var(--todo-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 
@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column;
 
-  color: white;
+  color: var(--todo-text);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
 
   transition: transform 160ms ease, opacity 160ms ease;
@@ -60,7 +60,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--todo-text);
 
   padding: 4px 6px;
   border-radius: 10px;
@@ -91,7 +91,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--todo-muted);
 
   cursor: pointer;
   padding: 6px 8px;
@@ -119,7 +119,7 @@
   padding: 7px;
 
   background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--todo-border);
   border-radius: 14px;
 
   box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
@@ -182,7 +182,7 @@
   gap: 2px;
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  scrollbar-color: var(--todo-scrollbar) transparent;
 }
 
 .list::-webkit-scrollbar {
@@ -265,7 +265,7 @@
 }
 
 .row input {
-  accent-color: #ff4d8d;
+  accent-color: var(--todo-accent);
 }
 
 .row input[type="checkbox"] {
@@ -318,8 +318,8 @@
 }
 
 .taskMenuBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.85);
+  background: var(--todo-hover);
+  color: var(--todo-muted);
 }
 
 .taskDots {
@@ -404,7 +404,7 @@
   opacity: 0.85;
 
   padding: 9px 0 2px;
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-top: 1px solid var(--todo-divider);
 }
 
 .editInput {
