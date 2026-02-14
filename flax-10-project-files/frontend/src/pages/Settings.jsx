@@ -444,7 +444,7 @@ export default function Settings({ user, onBack }) {
 
   const handlePasswordSave = async (data) => {
     setPasswordError("");
-
+    
     if (isPasswordTooShort(data.newPassword)) {
       setPasswordError("Password must be at least 8 characters long");
       return;
@@ -457,11 +457,41 @@ export default function Settings({ user, onBack }) {
 
     setIsSaving(true);
     try {
-      console.log("Changing password");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      showTemporaryMessage(setSuccessMessage, "Password changed successfully!");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setPasswordError("You are not logged in");
+        setIsSaving(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/settings/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({
+          password: data.newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to change password');
+      }
+
+      showTemporaryMessage(setSuccessMessage, "Password changed successfully! Please log in again with your new password.");
+      
+      // Log out user after password change
+      setTimeout(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }, 2000);
+      
     } catch (error) {
-      setPasswordError("Failed to change password. Check your current password.");
+      console.error('Password change error:', error);
+      setPasswordError(error.message || "Failed to change password");
     } finally {
       setIsSaving(false);
     }
