@@ -4,8 +4,7 @@ import { updateUserProfile } from '../api/userService';
 import { getInitials } from '../utils/userUtils';
 
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
-  const [firstName, setFirstName] = useState(user?.first_name || '');
-  const [lastName, setLastName] = useState(user?.last_name || '');
+  const [username, setUsername] = useState(user?.username || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(user?.profile_photo_url || null);
@@ -35,8 +34,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
 
     try {
       const formData = new FormData();
-      formData.append('first_name', firstName);
-      formData.append('last_name', lastName);
+      formData.append('username', username);
       formData.append('bio', bio);
       
       if (profilePhoto) {
@@ -56,7 +54,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
     }
   };
 
-  const initials = getInitials(`${firstName} ${lastName}`);
+  const initials = user?.name ? getInitials(user.name) : username.substring(0, 2).toUpperCase();
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -100,22 +98,14 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
           </div>
 
           <div className={styles.field}>
-            <label>First Name</label>
+            <label>Username</label>
             <input
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>Last Name</label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
+              minLength={3}
+              placeholder="Choose a username"
             />
           </div>
 
