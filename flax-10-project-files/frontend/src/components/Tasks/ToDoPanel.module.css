@@ -20,7 +20,7 @@
   flex-direction: column;
 
   color: var(--todo-text);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--todo-shadow);
 
   transition: transform 160ms ease, opacity 160ms ease;
   transform-origin: bottom right;
@@ -118,7 +118,7 @@
   min-width: 175px;
   padding: 7px;
 
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--todo-menu-bg);
   border: 1px solid var(--todo-border);
   border-radius: 14px;
 
@@ -134,8 +134,8 @@
   text-align: left;
 
   border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(0, 0, 0, 0.24);
-  color: rgba(255, 255, 255, 0.92);
+  background: var(--todo-item-bg);
+  color: var(--todo-text);
 
   padding: 9px 10px;
   border-radius: 12px;
