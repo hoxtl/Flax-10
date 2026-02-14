@@ -52,18 +52,27 @@ const calculateClip = (progress) => {
     return `inset(${percentHidden}% 0 0 0)`;
 };
 
-export default function TreeAnimation({ progress }) {
-    const clipStyle = { clipPath: calculateClip(progress), transition: 'clip-path 1s linear' };
+const TreeSvg = ({ style }) => (
+    <svg viewBox="0 0 20 24" className={styles.svg} shapeRendering="crispEdges">
+        <Pot />
+        <Soil />
+        <g style={style}><FullTree /></g>
+    </svg>
+);
 
+const TreeScene = ({ progress }) => {
+    const clipStyle = { clipPath: calculateClip(progress), transition: 'clip-path 1s linear' };
+    return (
+        <div className={styles.scene}>
+            <TreeSvg style={clipStyle} />
+        </div>
+    );
+};
+
+export default function TreeAnimation({ progress }) {
     return (
         <div className={styles.container}>
-            <div className={styles.scene}>
-                <svg viewBox="0 0 20 24" className={styles.svg} shapeRendering="crispEdges">
-                    <Pot />
-                    <Soil />
-                    <g style={clipStyle}><FullTree /></g>
-                </svg>
-            </div>
+            <TreeScene progress={progress} />
         </div>
     );
 }

@@ -11,6 +11,7 @@ export const formatDate = (dateString) => {
     });
 };
 
+/** Use current time if date/start/end are missing (legacy data support) */
 const normalizeSession = (s) => {
     let { startTime, endTime, date, duration } = s;
     const now = new Date().toISOString();
@@ -23,12 +24,14 @@ const normalizeSession = (s) => {
     return { ...s, startTime, endTime, date };
 };
 
+/** Initialize a new study block from a session */
 const createBlock = (id, s) => ({
     id, sessions: [s], totalDuration: s.duration,
     totalBreak: s.breakDuration || 0,
     startTime: s.startTime, endTime: s.endTime, date: s.date
 });
 
+/** Aggregate session data into an existing block */
 const updateBlock = (b, s) => {
     b.sessions.push(s);
     b.totalDuration += s.duration;
@@ -39,6 +42,7 @@ const updateBlock = (b, s) => {
     if (!isNaN(endTs) && endTs > new Date(b.endTime).getTime()) b.endTime = s.endTime;
 };
 
+/** Group sessions by ID and sort by date (newest first) */
 export const groupHistoryByBlock = (history) => {
     const blocks = {};
     history.forEach(rawSession => {

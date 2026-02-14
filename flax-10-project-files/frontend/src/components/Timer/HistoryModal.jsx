@@ -40,6 +40,7 @@ const ClearButton = ({ onClear }) => (
     </div>
 );
 
+/** Custom hook to manage history state and deletion logic */
 const useHistoryData = () => {
     const [history, setHistory] = useState([]);
     useEffect(() => setHistory(getHistory()), []);

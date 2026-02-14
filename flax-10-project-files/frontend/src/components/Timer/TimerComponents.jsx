@@ -1,5 +1,6 @@
 import styles from '../../pages/TimerPage.module.css';
 
+/** Formats seconds to MM:SS. Handles negative values with '+' for overtime */
 export const formatTime = (seconds) => {
     const abs = Math.abs(seconds);
     const m = Math.floor(abs / 60).toString().padStart(2, '0');
@@ -48,9 +49,11 @@ const SettingItem = ({ label, value, onChange, onBlur }) => (
     </div>
 );
 
+/** Higher-order function to curate change event before calling update */
 const getChangeHandler = (onUpdate, type) => (e) =>
     onUpdate(type, e.target.value === '' ? '' : parseInt(e.target.value));
 
+/** Validates input on blur: resets to default if empty or invalid */
 const getBlurHandler = (onUpdate, type, val, def) => () =>
     (val === '' || isNaN(val) || val < (type === 'sessions' ? 1 : 0)) && onUpdate(type, def);
 

@@ -1,6 +1,7 @@
 import styles from '../../pages/TimerPage.module.css';
 import { formatTime } from './TimerComponents';
 
+/** Reusable content for overtime state (used in OvertimePopup) */
 const OvertimeContent = ({ mode, time, onAction }) => (
     <div className={styles.overtimeContent}>
         <h3>{mode === 'work' ? "Time's Up!" : "Break Over!"}</h3>
