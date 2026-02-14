@@ -1,18 +1,17 @@
 .all-day-row {
     display: flex;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border);
     min-height: 2rem;
     flex-shrink: 0;
-    background-color: #fbfaf9;
+    background-color: var(--panel);
 }
 
 .all-day-label {
     width: 53px;
     font-size: 0.75rem;
-    color: #9E7E5D;
-    /* Matches time labels */
+    color: var(--muted);
     padding: 4px;
-    border-right: 1px solid #f6f4f1;
+    border-right: 1px solid var(--border);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -27,7 +26,7 @@
 }
 
 .all-day-cell {
-    border-right: 1px solid #f6f4f1;
+    border-right: 1px solid var(--border);
     height: 100%;
     grid-row: 1 / -1;
 }

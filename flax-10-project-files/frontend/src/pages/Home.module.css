@@ -17,14 +17,14 @@
 }
 
 .empty {
-  color: #7a7787;
+  color: var(--muted);
   text-align: center;
   padding: 60px 0;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #eceaf2;
+  background: white;
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 14px 16px;
 }
@@ -38,18 +38,18 @@
 
 .cardTitle {
   font-weight: 800;
-  color: #1e1b2e;
+  color: var(--text);
 }
 
 .cardMeta {
   margin-top: 6px;
-  color: #7a7787;
+  color: var(--muted);
   font-size: 13px;
 }
 
 .cardDesc {
   margin-top: 8px;
-  color: #4c4957;
+  color: var(--text);
   font-size: 14px;
 }
 
