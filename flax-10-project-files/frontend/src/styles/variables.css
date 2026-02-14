@@ -26,6 +26,7 @@
   --pill-bg: #f0ede8;
   --pill-hover: #eadfd2;
 
+  /* Calendar */
   --calendar-bg: white;
   --weekbar-bg: white;
   --search-bg: #fafaf9;
@@ -38,6 +39,17 @@
   --user-details-text: #1e1b2e;
 
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
+
+  /* To-do panel */
+  --todo-bg: rgba(0, 0, 0, 0.84);
+  --todo-text: rgba(255, 255, 255, 0.92);
+  --todo-muted: rgba(255, 255, 255, 0.70);
+  --todo-border: rgba(255, 255, 255, 0.16);
+  --todo-hover: rgba(255, 255, 255, 0.08);
+  --todo-scrollbar: rgba(255, 255, 255, 0.22);
+  --todo-accent: #ff4d8d;
+  --todo-divider: rgba(255, 255, 255, 0.18);
+
 }
 
 :root[data-theme="dark"] {
@@ -68,6 +80,7 @@
   --pill-bg: rgba(180,164,144,0.12);
   --pill-hover: rgba(180,164,144,0.20);
 
+  /* Calendar */
   --calendar-bg: #120D0A;
   --weekbar-bg: #1A1310;
   --search-bg: #151008;
@@ -78,5 +91,15 @@
   --nav-btn-hover: #1a1a1a;
   --sidebar-active: rgba(180,164,144,0.16);
   --user-details-text: rgba(255,255,255,0.92);
+
+  /* To-do panel */
+  --todo-bg: rgba(0, 0, 0, 0.84);
+  --todo-text: rgba(255, 255, 255, 0.92);
+  --todo-muted: rgba(255, 255, 255, 0.70);
+  --todo-border: rgba(255, 255, 255, 0.16);
+  --todo-hover: rgba(255, 255, 255, 0.10);
+  --todo-scrollbar: rgba(255, 255, 255, 0.22);
+  --todo-accent: #ff4d8d;
+  --todo-divider: rgba(255, 255, 255, 0.18);
 
 }
