@@ -1,5 +1,4 @@
 :root {
-  /* Palette - Light */
   --c-white: #ffffff;
   --c-greige: #B4A490;
   --c-taupe: #AA9A94;
@@ -7,29 +6,41 @@
   --c-olive: #81725B;
   --c-cocoa: #4A3421;
 
-  /* Light Theme */
-  --bg: #ffffff;              /* page background */
-  --panel: #f6f4f1;           /* surfaces (topbar, cards) */
-  --sidebar: #f6f4f1;         /* sidebar surface */
+  --bg: #ffffff;
+  --panel: #f6f4f1;
+  --sidebar: #f6f4f1;
   --border: rgba(74,52,33,0.18);
 
   --text: #2B1E14;
+  --text-dark: #1e1b2e;
   --muted: rgba(43,30,20,0.55);
 
-  --primary: #9E7E5D;         /* buttons / highlights */
+  --primary: #9E7E5D;
   --primary-strong: #4A3421;  
   --accent: #AA9A94;         
 
   --hover: rgba(74,52,33,0.06);
-  --active: rgba(74,52,33,0.10);
+  --hover-light: rgba(139, 115, 85, 0.05);
+  --active: rgba(100, 116, 139, 0.12);
 
-  --pill-bg: #f0ede8;      /* soft background */
-  --pill-hover: #eadfd2;   /* hover background */
+  --pill-bg: #f0ede8;
+  --pill-hover: #eadfd2;
+
+  --calendar-bg: white;
+  --weekbar-bg: white;
+  --search-bg: #fafaf9;
+  --btn-black: #3a3a3a;
+  --btn-black-hover: #2a2a2a;
+  --event-card-bg: white;
+  --nav-btn-bg: #000000;
+  --nav-btn-hover: #333333;
+  --sidebar-active: rgba(100, 116, 139, 0.12);
+  --user-details-text: #1e1b2e;
+
+  --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
 }
 
-/* Dark Theme - Darker & Warmer */
-[data-theme="dark"] {
-  /* Palette - Dark */
+:root[data-theme="dark"] {
   --c-white: #ffffff;
   --c-greige: #8d7d6e;
   --c-taupe: #8a7a74;
@@ -37,22 +48,35 @@
   --c-olive: #6d6050;
   --c-cocoa: #2a1e15;
 
-  /* Dark Theme */
-  --bg: #120D0A;           /* Dark background */
-  --panel: #1A1310;        /* Dark panels */
-  --sidebar: #151008;      /* Dark sidebar  */
-  --border: rgba(180,164,144,0.15);  /* Subtle borders */
+  --bg: #120D0A;
+  --panel: #1A1310;
+  --sidebar: #151008;
+  --border: rgba(180,164,144,0.15);
 
-  --text: rgba(255,255,255,0.92);    /* Bright text */
-  --muted: rgba(200,184,164,0.65);   /* Muted text */
+  --text: rgba(255,255,255,0.92);
+  --text-dark: rgba(255,255,255,0.92);
+  --muted: rgba(200,184,164,0.65);
 
-  --primary: #B8936D;      /* Warm primary */
+  --primary: #B8936D;
   --primary-strong: #D4B896;
   --accent: #9A8A84;
 
   --hover: rgba(180,164,144,0.10);
+  --hover-light: rgba(180,164,144,0.12);
   --active: rgba(180,164,144,0.16);
 
   --pill-bg: rgba(180,164,144,0.12);
   --pill-hover: rgba(180,164,144,0.20);
+
+  --calendar-bg: #120D0A;
+  --weekbar-bg: #1A1310;
+  --search-bg: #151008;
+  --btn-black: #2a2a2a;
+  --btn-black-hover: #1a1a1a;
+  --event-card-bg: #1A1310;
+  --nav-btn-bg: #2a2a2a;
+  --nav-btn-hover: #1a1a1a;
+  --sidebar-active: rgba(180,164,144,0.16);
+  --user-details-text: rgba(255,255,255,0.92);
+
 }
