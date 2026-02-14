@@ -19,14 +19,15 @@
 }
 
 .modal-content {
-    background: white;
+    background: var(--panel);
     border-radius: 12px;
     padding: 1.5rem;
     width: 100%;
-    max-width: 400px;
+    max-width: 550px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
 }
 
 .modal-header {
@@ -38,7 +39,7 @@
 
 .modal-header h3 {
     margin: 0;
-    color: #503f2e;
+    color: var(--text);
 }
 
 .form-error {
@@ -65,13 +66,13 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #9E7E5D;
+    color: var(--muted);
     padding: 0;
     line-height: 1;
 }
 
 .close-btn:hover {
-    color: #503f2e;
+    color: var(--text);
 }
 
 .form-field {
@@ -82,7 +83,7 @@
     display: block;
     margin-bottom: 0.25rem;
     font-weight: 500;
-    color: #503f2e;
+    color: var(--text);
     font-size: 0.875rem;
 }
 
@@ -92,10 +93,12 @@
     width: 100%;
     max-width: 100%;
     padding: 0.5rem 0.75rem;
-    border: 1px solid #e0dcd7;
+    border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 0.875rem;
     box-sizing: border-box;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .form-field input[type="datetime-local"] {
@@ -107,8 +110,8 @@
 .form-field textarea:focus,
 .form-field select:focus {
     outline: none;
-    border-color: #9E7E5D;
-    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.15);
 }
 
 .form-field textarea {
@@ -119,13 +122,13 @@
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: 1rem;
 }
 
 .submit-btn {
     width: 100%;
     padding: 0.75rem;
-    background: #8D6E63;
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 6px;
@@ -135,13 +138,13 @@
 }
 
 .submit-btn:hover {
-    background: #7d6259;
+    opacity: 0.9;
 }
 
 .delete-btn {
     width: 100%;
     padding: 0.75rem;
-    background: white;
+    background: var(--bg);
     color: #c0392b;
     border: 1px solid #c0392b;
     border-radius: 6px;
