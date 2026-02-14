@@ -9,6 +9,7 @@ import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../utils/authHelpers";
 import FloatingTasks from "../components/Tasks/FloatingTasks";
+import { useLocation } from "react-router-dom";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -77,15 +78,7 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   );
 }
 
-function MainArea({
-  user,
-  onToggle,
-  onQuickAdd,
-  onSettingsClick,
-  onLogoutClick,
-  selectedDate,
-  children,
-}) {
+function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, children }) {
   return (
     <div className={styles.main}>
       <TopBar
@@ -95,7 +88,7 @@ function MainArea({
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
       />
-      <WeekBar date={selectedDate} />
+      {showWeekBar && <WeekBar date={selectedDate} />}
       <div className={styles.content}>{children}</div>
     </div>
   );
@@ -106,28 +99,21 @@ function QuickAddGate({ open, onClose, onSelectType }) {
   return <QuickAddModal onClose={onClose} onSelectType={onSelectType} />;
 }
 
-export default function DashboardLayout({
-  activeNav,
-  onNavChange,
-  user,
-  children,
-}) {
+export default function DashboardLayout({ activeNav, onNavChange, children }) {
+  const location = useLocation();
   const isMobile = useIsMobile(900);
+  const user = useMemo(() => getUser(), []);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  
   const [showQuickAdd, setShowQuickAdd] = useState(false);
 
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-
-  const {
-    openModal,
-    isModalOpen,
-    modalEvent,
-    modalType,
-    modalInitialDate,
-    closeModal,
-  } = useEventModal();
+  
+  const showWeekBar = activeNav == "calendar" || location.pathname.startsWith("/calendar");
+  const { openModal, isModalOpen, modalEvent, modalType, modalInitialDate, closeModal } = useEventModal();
 
   function onToggle() {
     toggleByDevice(isMobile, setMobileSidebarOpen, setSidebarCollapsed);
@@ -187,14 +173,15 @@ export default function DashboardLayout({
         onSettingsClick={handleSettingsClick}
         onLogoutClick={handleLogoutClick}
         selectedDate={selectedDate}
+        showWeekBar={showWeekBar}
       >
         {children}
       </MainArea>
-
-      <QuickAddGate
-        open={showQuickAdd}
-        onClose={() => setShowQuickAdd(false)}
-        onSelectType={onSelectType}
+      
+      <QuickAddGate 
+        open={showQuickAdd} 
+        onClose={() => setShowQuickAdd(false)} 
+        onSelectType={onSelectType} 
       />
 
       {isModalOpen && (
