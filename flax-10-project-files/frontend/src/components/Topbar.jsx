@@ -3,6 +3,8 @@ import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
 import { getInitials } from "../utils/userUtils";
 import ProfileDropdown from "./ProfileDropdown";
+import { NotificationCenter } from "./Notifications";
+import ThemeToggle from "./ThemeToggle";
 
 // Get current date parts
 function getCurrentDateParts() {
@@ -50,12 +52,14 @@ function AddButton({ onClick }) {
   );
 }
 
-// Component that renders the search input, add button, user avatar,allowing users to search, add new items, and view their profile
+// Component that renders the search input, add button, notifications, and user avatar
 function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
+      <ThemeToggle />
       <AddButton onClick={onAddClick} />
+      <NotificationCenter />
       <ProfileDropdown
         user={user}
         onSettingsClick={onSettingsClick}

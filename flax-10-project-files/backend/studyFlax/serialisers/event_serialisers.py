@@ -59,17 +59,17 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
         return tag
     
     def _handle_recurrence(self, recurrence_data, existing_rule=None):
-        if isinstance(recurrence_data, str):
-            try:
-                recurrence_data = json.loads(recurrence_data)
-            except json.JSONDecodeError:
-                pass
-        
-        if not recurrence_data or not isinstance(recurrence_data, dict):
+        data = self._parse_recurrence_input(recurrence_data)
+        if not data or not isinstance(data, dict):
             return self._delete_existing_rule(existing_rule)
         if existing_rule:
-            return self._update_existing_rule(existing_rule, recurrence_data)
-        return RecurrenceRule.objects.create(**recurrence_data)
+            return self._update_existing_rule(existing_rule, data)
+        return RecurrenceRule.objects.create(**data)
+
+    def _parse_recurrence_input(self, data):
+        if not isinstance(data, str): return data
+        try: return json.loads(data)
+        except json.JSONDecodeError: return None
     
     def _delete_existing_rule(self, rule):
         if rule:

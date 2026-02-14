@@ -1,7 +1,7 @@
-# Team *Flax-10* Major Group project (StudyFlax)
+# Team *Flax-10* Major Group Project (StudyFlax)
 
 ## Project topic
-Academic Proposal - Time management system for students in higher education
+Academic - Time management system for students in higher education
 
 ## Team members
 The members of the team are:

@@ -71,6 +71,18 @@ describe('NavigationButtons', () => {
         expect(screen.queryByText('Today')).not.toBeInTheDocument();
 
         isSameDay.mockReturnValue(false);
+        isSameDay.mockReturnValue(false);
         useCalendar.mockReturnValue({ viewMode: 'week' }); // Reset
+    });
+
+    it('should open date picker on calendar click', () => {
+        const showPickerSpy = vi.fn();
+        HTMLInputElement.prototype.showPicker = showPickerSpy;
+
+        render(<NavigationButtons {...defaultProps} />);
+        const calendarBtn = screen.getByText('🗓️');
+        fireEvent.click(calendarBtn);
+
+        expect(showPickerSpy).toHaveBeenCalled();
     });
 });

@@ -3,56 +3,61 @@ import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../utils
 
 export function useDrag({ type, data }) {
     const [isDragging, setIsDragging] = useState(false);
-    const { onDragStart, onDragEnd } = createDragHandlers(type, data, setIsDragging);
-    return { dragProps: { draggable: true, onDragStart, onDragEnd }, isDragging };
+    const handlers = createDragHandlers(type, data, setIsDragging);
+    return { dragProps: { draggable: true, ...handlers }, isDragging };
 }
 
 function createDragHandlers(type, data, setIsDragging) {
-    const onDragStart = (e) => {
-        e.currentTarget.style.transition = 'none';
-        e.currentTarget.style.opacity = '0.3';
-        setupDragStart(e, type, data);
-        requestAnimationFrame(() => setIsDragging(true));
+    return {
+        onDragStart: (e) => handleDragStart(e, type, data, setIsDragging),
+        onDragEnd: (e) => handleDragEnd(e, setIsDragging)
     };
+}
 
-    const onDragEnd = (e) => {
-        e.currentTarget.style.transition = '';
-        e.currentTarget.style.opacity = '';
-        setIsDragging(false);
-    };
+function handleDragStart(e, type, data, setIsDragging) {
+    e.currentTarget.style.transition = 'none';
+    e.currentTarget.style.opacity = '0.3';
+    setupDragStart(e, type, data);
+    requestAnimationFrame(() => setIsDragging(true));
+}
 
-    return { onDragStart, onDragEnd };
+function handleDragEnd(e, setIsDragging) {
+    e.currentTarget.style.transition = '';
+    e.currentTarget.style.opacity = '';
+    setIsDragging(false);
 }
 
 export function useDrop({ accept, onDrop }) {
     const [isOver, setIsOver] = useState(false);
-    const dragCounter = useRef(0);
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setIsOver(false);
-        dragCounter.current = 0;
-        const payload = parseDropPayload(e, accept);
-        if (payload) onDrop(payload, e);
-    };
-
-    const handleDragEnter = (e) => {
-        e.preventDefault();
-        dragCounter.current++;
-        setIsOver(true);
-    };
-
-    const handleDragLeave = () => {
-        dragCounter.current--;
-        if (dragCounter.current === 0) setIsOver(false);
-    };
-
-    const dropProps = {
-        onDragEnter: handleDragEnter,
-        onDragOver: handleDragOverEffect,
-        onDragLeave: handleDragLeave,
-        onDrop: handleDrop,
-    };
-
+    const counter = useRef(0);
+    const dropProps = createDropProps(setIsOver, counter, accept, onDrop);
     return { dropProps, isOver };
+}
+
+function createDropProps(setIsOver, counter, accept, onDrop) {
+    return {
+        onDragEnter: (e) => handleDragEnter(e, counter, setIsOver),
+        onDragOver: handleDragOverEffect,
+        onDragLeave: () => handleDragLeave(counter, setIsOver),
+        onDrop: (e) => handleDrop(e, counter, setIsOver, accept, onDrop)
+    };
+}
+
+function handleDragEnter(e, counter, setIsOver) {
+    e.preventDefault();
+    counter.current++;
+    setIsOver(true);
+}
+
+function handleDragLeave(counter, setIsOver) {
+    counter.current--;
+    if (counter.current === 0) setIsOver(false);
+}
+
+function handleDrop(e, counter, setIsOver, accept, onDrop) {
+    e.preventDefault();
+    setIsOver(false);
+    counter.current = 0;
+    const payload = parseDropPayload(e, accept);
+    if (payload) onDrop(payload, e);
 }
