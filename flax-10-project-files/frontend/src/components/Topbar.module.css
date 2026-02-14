@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 15px 32px;
-  background: #f6f4f1;
+  background: var(--panel);
   ;
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -22,14 +22,14 @@
   border: none;
   cursor: pointer;
   font-size: 20px;
-  color: #6b6880;
+  color: var(--muted);
   padding: 2px 4px;
   border-radius: 6px;
   line-height: 1;
 }
 
 .toggle:hover {
-  background: #f0eff4;
+  background: var(--hover);
 }
 
 .greeting {
@@ -86,11 +86,11 @@
   padding-left: 32px;
   padding-right: 14px;
   height: 36px;
-  border: 1px solid #e8e6ed;
+  border: 1px solid var(--border);
   border-radius: 9px;
   font-size: 13px;
   outline: none;
-  background: #fafaf9;
+  background: var(--search-bg);
   color: var(--text);
   width: 200px;
 }

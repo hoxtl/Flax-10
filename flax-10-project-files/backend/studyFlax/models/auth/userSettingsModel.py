@@ -3,6 +3,8 @@ from django.db import models
 from .userModel import User
 
 class UserSettings(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings')
     theme = models.CharField(max_length=50)
     timezone = models.CharField(max_length=100)
+    year = models.CharField(max_length=50, blank=True, default='')
+    major = models.CharField(max_length=100, blank=True, default='')
