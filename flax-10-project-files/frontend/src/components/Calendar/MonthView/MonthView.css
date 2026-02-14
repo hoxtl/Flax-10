@@ -1,5 +1,5 @@
 .month-view {
-    background: var(--panel);
+    background: var(--calendar-bg);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -7,7 +7,7 @@
 .weekday-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    background: var(--panel);
+    background: var(--calendar-bg);
     border-bottom: 1px solid var(--border);
 }
 

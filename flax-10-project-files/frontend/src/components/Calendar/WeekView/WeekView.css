@@ -1,5 +1,5 @@
 .week-view {
-    background: var(--panel);
+    background: var(--calendar-bg);
     border-radius: 8px;
     overflow-y: auto;
     flex: 1;
@@ -12,7 +12,7 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--panel);
+    background: var(--calendar-bg);
 }
 
 .week-header {

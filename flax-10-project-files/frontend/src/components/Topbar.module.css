@@ -90,7 +90,7 @@
   border-radius: 9px;
   font-size: 13px;
   outline: none;
-  background: var(--panel);
+  background: var(--search-bg);
   color: var(--text);
   width: 200px;
 }
