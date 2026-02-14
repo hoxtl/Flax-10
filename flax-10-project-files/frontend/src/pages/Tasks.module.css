@@ -3,19 +3,15 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-
   position: relative;
-
   background-image: url("../assets/tasks-bg.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 
 .tasksPage::before {
   content: "";
@@ -24,11 +20,6 @@
   background: var(--tasks-overlay);
   backdrop-filter: blur(2px);
   z-index: 0;
-}
-
-.center {
-  position: relative;
-  z-index: 1;
 }
 
 /* Center block */
@@ -40,6 +31,7 @@
   justify-content: center;  
   text-align: center;
   gap: 18px;
+  transform: translateY(55px);
 }
 
 .goalBlock {
