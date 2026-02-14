@@ -4,6 +4,7 @@ import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSetting
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
+/** Header component with title and history toggle */
 const TimerHeader = ({ onOpenHistory }) => (
     <div className={styles.header}>
         <div className={styles.title}>Study Timer</div>
@@ -13,6 +14,7 @@ const TimerHeader = ({ onOpenHistory }) => (
     </div>
 );
 
+/** Main timer UI layout including visuals, controls, and settings */
 export const MainSection = ({ t, onOpenHistory }) => (
     <>
         <TimerHeader onOpenHistory={onOpenHistory} />
@@ -25,6 +27,7 @@ export const MainSection = ({ t, onOpenHistory }) => (
     </>
 );
 
+/** Container for all timerrelated modals and popups */
 export const PopupSection = ({ t, showHistory, onCloseHistory }) => (
     <>
         {showHistory && <HistoryModal onClose={onCloseHistory} />}

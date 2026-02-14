@@ -1,3 +1,4 @@
+/** LocalStorage key for persisting study sessions */
 export const HISTORY_KEY = 'study_history';
 
 export const getHistory = () => {
@@ -8,6 +9,7 @@ export const getHistory = () => {
     }
 };
 
+/** Creates a completed session entry with calculated timestamps */
 export const saveSession = (workDuration, breakDuration, sessionCount, studyBlockId) => {
     const history = getHistory();
     const endTime = new Date();

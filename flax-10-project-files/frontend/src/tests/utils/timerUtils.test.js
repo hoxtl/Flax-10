@@ -2,82 +2,82 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { getProgress, useCompletionCheck } from '../../hooks/timerUtils';
 
-describe('timerUtils', () => {
-    describe('getProgress', () => {
-        it('returns 100 for break mode', () => {
-            expect(getProgress({ mode: 'break' })).toBe(100);
-        });
+const testProgressBreak = () => {
+    expect(getProgress({ mode: 'break' })).toBe(100);
+};
 
-        it('returns 100 when timeLeft is <= 0', () => {
-            expect(getProgress({ mode: 'work', timeLeft: 0 })).toBe(100);
-            expect(getProgress({ mode: 'work', timeLeft: -10 })).toBe(100);
-        });
+const testProgressZero = () => {
+    expect(getProgress({ mode: 'work', timeLeft: 0 })).toBe(100);
+    expect(getProgress({ mode: 'work', timeLeft: -10 })).toBe(100);
+};
 
-        it('calculates correct percentage for work mode', () => {
-            expect(getProgress({ mode: 'work', workTime: 25, timeLeft: 750 })).toBe(50);
-            expect(getProgress({ mode: 'work', workTime: 25, timeLeft: 1350 })).toBe(10);
-        });
-    });
+const testProgressWork = () => {
+    expect(getProgress({ mode: 'work', workTime: 25, timeLeft: 750 })).toBe(50);
+    expect(getProgress({ mode: 'work', workTime: 25, timeLeft: 1350 })).toBe(10);
+};
 
-    describe('useCompletionCheck', () => {
-        let NotificationMock;
+describe('timerUtils: getProgress', () => {
+    it('returns 100 for break mode', testProgressBreak);
+    it('returns 100 when timeLeft is <= 0', testProgressZero);
+    it('calculates correct percentage for work mode', testProgressWork);
+});
 
-        beforeEach(() => {
-            NotificationMock = vi.fn();
-            global.Notification = NotificationMock;
-            global.Notification.permission = 'granted';
-            global.Notification.requestPermission = vi.fn();
-        });
+let NotificationMock;
 
-        afterEach(() => {
-            vi.clearAllMocks();
-        });
+const setupMocks = () => {
+    NotificationMock = vi.fn();
+    global.Notification = NotificationMock;
+    global.Notification.permission = 'granted';
+    global.Notification.requestPermission = vi.fn();
+};
 
-        it('triggers startNext when breakTime is 0 (Auto-Advance)', () => {
-            const startNext = vi.fn();
-            const setModal = vi.fn();
-            const setIsActive = vi.fn();
+const testAutoAdvance = () => {
+    const startNext = vi.fn();
+    const setModal = vi.fn();
+    const setIsActive = vi.fn();
 
-            // Case 1: Work complete, no break => startNext
-            renderHook(() => useCompletionCheck(
-                { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive },
-                startNext, setModal
-            ));
+    renderHook(() => useCompletionCheck(
+        { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive },
+        startNext, setModal
+    ));
 
-            expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
-            expect(setIsActive).toHaveBeenCalledWith(false);
-            expect(startNext).toHaveBeenCalled();
-            expect(setModal).not.toHaveBeenCalled();
-        });
+    expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
+    expect(setIsActive).toHaveBeenCalledWith(false);
+    expect(startNext).toHaveBeenCalled();
+    expect(setModal).not.toHaveBeenCalled();
+};
 
-        it('triggers Notification BUT continues timer (Overtime) when breakTime > 0', () => {
-            const startNext = vi.fn();
-            const setModal = vi.fn();
-            const setIsActive = vi.fn();
+const testOvertime = () => {
+    const startNext = vi.fn();
+    const setModal = vi.fn();
+    const setIsActive = vi.fn();
 
-            // Case 2: Work complete, has break => Overtime (No stop, No modal)
-            renderHook(() => useCompletionCheck(
-                { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive },
-                startNext, setModal
-            ));
+    renderHook(() => useCompletionCheck(
+        { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive },
+        startNext, setModal
+    ));
 
-            expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
+    expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
+    expect(setIsActive).not.toHaveBeenCalled(); // Should NOT stop timer
+    expect(setModal).not.toHaveBeenCalled();    // Should NOT show break modal
+    expect(startNext).not.toHaveBeenCalled();
+};
 
-            // Crucial changes:
-            expect(setIsActive).not.toHaveBeenCalled(); // Should NOT stop timer
-            expect(setModal).not.toHaveBeenCalled();    // Should NOT show break modal (let OvertimePopup handle it)
-            expect(startNext).not.toHaveBeenCalled();
-        });
+const testNoAction = () => {
+    const startNext = vi.fn();
+    const setModal = vi.fn();
+    renderHook(() => useCompletionCheck(
+        { mode: 'work', timeLeft: 10, isActive: true, breakTime: 0 }, startNext, setModal
+    ));
+    expect(NotificationMock).not.toHaveBeenCalled();
+    expect(startNext).not.toHaveBeenCalled();
+    expect(setModal).not.toHaveBeenCalled();
+};
 
-        it('does nothing if conditions not met', () => {
-            const startNext = vi.fn();
-            const setModal = vi.fn();
-            renderHook(() => useCompletionCheck(
-                { mode: 'work', timeLeft: 10, isActive: true, breakTime: 0 }, startNext, setModal
-            ));
-            expect(NotificationMock).not.toHaveBeenCalled();
-            expect(startNext).not.toHaveBeenCalled();
-            expect(setModal).not.toHaveBeenCalled();
-        });
-    });
+describe('timerUtils: useCompletionCheck', () => {
+    beforeEach(setupMocks);
+    afterEach(() => vi.clearAllMocks());
+    it('triggers startNext when breakTime is 0 (Auto-Advance)', testAutoAdvance);
+    it('triggers Notification BUT continues timer (Overtime) when breakTime > 0', testOvertime);
+    it('does nothing if conditions not met', testNoAction);
 });

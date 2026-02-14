@@ -9,6 +9,7 @@ export function useTimerLogic() {
     const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId);
     const ot = t.timeLeft <= 0;
 
+    /** Returns composite timer state, derived boolean flags, and event handlers */
     return {
         ...t, modal, handlers, progress: getProgress(t),
         isOvertime: t.mode === 'work' && ot, isBreakOvertime: t.mode === 'break' && ot
