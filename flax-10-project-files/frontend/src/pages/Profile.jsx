@@ -174,7 +174,7 @@ export default function Profile({ user }) {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [allEvents, setAllEvents] = useState([]);
-  const [eventRange, setEventRange] = useState('today');
+  const [eventRange, setEventRange] = useState('month');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
