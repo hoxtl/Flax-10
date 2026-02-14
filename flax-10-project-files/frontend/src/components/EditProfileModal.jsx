@@ -1,136 +1,143 @@
-import { useState } from "react";
-import styles from "./EditProfileModal.module.css";
-import { getInitials } from "../utils/userUtils";
-
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h2 className={styles.title}>Edit Profile</h2>
-      <button className={styles.closeBtn} onClick={onClose}>✕</button>
-    </div>
-  );
-}
-
-function ProfilePictureSection({ user }) {
-  const initials = getInitials(user?.name) || "?";
-
-  const handleChangePhoto = () => {
-    console.log("Change photo clicked");
-    // TODO: Implement photo upload
-  };
-
-  return (
-    <div className={styles.section}>
-      <div className={styles.photoSection}>
-        <div className={styles.currentPhoto}>{initials}</div>
-        <div>
-          <div className={styles.userName}>{user?.name || "Guest"}</div>
-          <button className={styles.linkBtn} onClick={handleChangePhoto}>
-            Change profile photo
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FormField({ label, name, value, onChange, type = "text" }) {
-  return (
-    <div className={styles.formField}>
-      <label className={styles.label}>{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        className={styles.input}
-      />
-    </div>
-  );
-}
-
-function BioField({ value, onChange }) {
-  return (
-    <div className={styles.formField}>
-      <label className={styles.label}>Bio</label>
-      <textarea
-        name="bio"
-        value={value}
-        onChange={onChange}
-        className={styles.textarea}
-        rows={3}
-        placeholder="Year 2 · CS"
-      />
-    </div>
-  );
-}
-
-function SaveButton({ onClick, isSaving }) {
-  return (
-    <div className={styles.footer}>
-      <button className={styles.saveBtn} onClick={onClick} disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save"}
-      </button>
-    </div>
-  );
-}
+import { useState } from 'react';
+import styles from './EditProfileModal.module.css';
+import { updateUserProfile } from '../api/userService';
+import { getInitials } from '../utils/userUtils';
 
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    username: user?.username || "",
-    bio: `${user?.year || "Year 2"} · ${user?.major || "CS"}`,
-  });
-  const [isSaving, setIsSaving] = useState(false);
+  const [firstName, setFirstName] = useState(user?.first_name || '');
+  const [lastName, setLastName] = useState(user?.last_name || '');
+  const [bio, setBio] = useState(user?.bio || '');
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(user?.profile_photo_url || null);
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await onSave(formData);
-      onClose();
-    } catch (error) {
-      console.error("Failed to save:", error);
-    } finally {
-      setIsSaving(false);
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePhoto(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setRemovePhoto(false);
     }
   };
+
+  const handleRemovePhoto = () => {
+    setProfilePhoto(null);
+    setPreviewUrl(null);
+    setRemovePhoto(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('first_name', firstName);
+      formData.append('last_name', lastName);
+      formData.append('bio', bio);
+      
+      if (profilePhoto) {
+        formData.append('profile_photo', profilePhoto);
+      } else if (removePhoto) {
+        formData.append('remove_photo', 'true');
+      }
+
+      await updateUserProfile(formData);
+      await onSave();
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initials = getInitials(`${firstName} ${lastName}`);
 
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader onClose={onClose} />
-        
-        <div className={styles.content}>
-          <ProfilePictureSection user={user} />
-          
-          <FormField
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-
-          <FormField
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-
-          <BioField
-            value={formData.bio}
-            onChange={handleChange}
-          />
+        <div className={styles.header}>
+          <h2>Edit Profile</h2>
+          <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
-        <SaveButton onClick={handleSave} isSaving={isSaving} />
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.photoSection}>
+            <div className={styles.photoPreview}>
+              {previewUrl ? (
+                <img src={previewUrl} alt="Preview" />
+              ) : (
+                <div className={styles.photoPlaceholder}>
+                  {initials}
+                </div>
+              )}
+            </div>
+            <div className={styles.photoActions}>
+              <label className={styles.photoUpload}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  style={{ display: 'none' }}
+                />
+                Change Photo
+              </label>
+              {(previewUrl || user?.profile_photo_url) && (
+                <button 
+                  type="button" 
+                  className={styles.photoRemove}
+                  onClick={handleRemovePhoto}
+                >
+                  Remove Photo
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.field}>
+            <label>First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label>Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label>Reminder Note</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              placeholder="Add a personal reminder note..."
+            />
+          </div>
+
+          <div className={styles.actions}>
+            <button type="button" onClick={onClose} className={styles.cancelBtn}>
+              Cancel
+            </button>
+            <button type="submit" disabled={loading} className={styles.saveBtn}>
+              {loading ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
