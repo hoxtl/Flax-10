@@ -37,6 +37,7 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
     return () => clearInterval(id);
   }, []);
 
+  // Stable per-minute key 
   const quoteKey = useMemo(
     () => `${now.toDateString()}-${now.getHours()}-${now.getMinutes()}`,
     [now]
@@ -54,22 +55,30 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
 
   return (
     <div className={`${styles.page} ${styles[getTimeTone(now.getHours())]}`}>
-      <div className={styles.brand}>StudyFlax</div>
-      <div className={styles.footerNote}>Built for calm study.</div>
-
       <WelcomeBackgroundPaths />
+
+      {/* Brand mark */}
+      <motion.div
+        className={styles.brand}
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: "easeOut" }}
+      >
+        <div className={styles.brandName}>STUDYFLAX</div>
+        <div className={styles.brandTagline}>Built for calm study.</div>
+      </motion.div>
 
       <motion.div
         className={styles.center}
         initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: 0.55, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <motion.div
           className={styles.time}
           initial={{ scale: 0.99, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.08, duration: 0.45 }}
+          transition={{ delay: 0.06, duration: 0.38 }}
         >
           {formatTime(now)}
         </motion.div>
@@ -81,13 +90,12 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
+            transition={{ duration: 0.26, ease: "easeOut" }}
           >
             {greetingLine}
           </motion.div>
         </AnimatePresence>
 
-        {/* Quotes */}
         <AnimatePresence mode="wait">
           <motion.div
             key={quoteLine}
@@ -95,7 +103,7 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.28, delay: 0.12, ease: "easeOut" }}
+            transition={{ duration: 0.26, delay: 0.09, ease: "easeOut" }}
           >
             {quoteLine}
           </motion.div>
@@ -105,7 +113,7 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
           className={styles.actions}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.45 }}
+          transition={{ delay: 0.18, duration: 0.4 }}
         >
           <button className={styles.primaryBtn} onClick={onExplore}>
             Explore StudyFlax
@@ -120,6 +128,8 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
           </button>
         </motion.div>
       </motion.div>
+
+      <div className={styles.footerNote}>v1</div>
     </div>
   );
 }
