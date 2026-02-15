@@ -9,3 +9,13 @@ export function getDisplayName(user) {
 
   return "";
 }
+
+// Use only the user's first_name if present, otherwise fallback
+export function getPreferredFirstName(user) {
+  const first = (user?.first_name || "").trim();
+  if (first) return first;
+
+  // fallback to username if no first_name
+  const username = (user?.username || "").trim();
+  return username;
+}

@@ -1,7 +1,7 @@
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
-import { getDisplayName } from "../utils/userDisplay"; 
+import { getPreferredFirstName } from "../utils/userDisplay";
 
 function SidebarHeader({ collapsed }) {
   return (
@@ -29,8 +29,8 @@ function NavItem({ item, isActive, collapsed, onClick }) {
 }
 
 function SidebarUserProfile({ collapsed, user }) {
-  const displayName = getDisplayName(user); 
-  const initials = getInitials(displayName) || "?";
+  const firstName = getPreferredFirstName(user); 
+  const initials = getInitials(firstName) || "?";
   const year = user?.year ? `Year ${user.year}` : "Year 2";
   const major = user?.major || "CS";
 
@@ -40,7 +40,7 @@ function SidebarUserProfile({ collapsed, user }) {
 
       {!collapsed && (
         <div className={styles.userText}>
-          <div className={styles.userName}>{displayName}</div> 
+          <div className={styles.userName}>{firstName}</div> 
           <div className={styles.userMeta}>{year} · {major}</div>
         </div>
       )}
