@@ -1,0 +1,163 @@
+.card {
+    background: var(--bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(20, 20, 20, 0.06);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 160ms ease;
+    display: flex;
+}
+.card:hover,
+.card:focus-within {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
+}
+.card:active {
+    transform: translateY(-1px) scale(1.005);
+}
+.card.enrolled {
+    background: linear-gradient(to bottom, var(--bg) 0%, var(--panel) 100%);
+}
+.content {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+.iconWrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: var(--hover);
+    flex: 0 0 auto;
+    font-size: 16px;
+}
+.moduleCode {
+    background: var(--pill-bg);
+    color: var(--primary);
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.enrolledBadge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+.moduleTitle {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+}
+.descriptionSection {
+    margin: 0;
+}
+.description {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0 0 0.5rem 0;
+}
+.expandButton {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s;
+}
+.expandButton:hover {
+    opacity: 0.7;
+}
+.meta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+.metaItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+.actions {
+    display: flex;
+    gap: 0.625rem;
+    margin-top: 0.25rem;
+}
+.editButton,
+.deleteButton,
+.enrollButton,
+.unenrollButton {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(.2, .9, .2, 1);
+    border: none;
+}
+.editButton {
+    background: var(--hover);
+    color: var(--text);
+    flex: 1;
+}
+.editButton:hover {
+    background: var(--hover-light);
+}
+.deleteButton {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--error-text);
+    flex: 1;
+}
+.deleteButton:hover {
+    background: rgba(220, 38, 38, 0.15);
+}
+.enrollButton {
+    background: var(--primary);
+    color: var(--c-white);
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.15);
+}
+.enrollButton:hover {
+    background: var(--c-olive);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(158, 126, 93, 0.2);
+}
+.enrollButton:active {
+    transform: translateY(0);
+}
+.unenrollButton {
+    background: rgba(225, 29, 72, 0.1);
+    color: var(--error-text);
+    width: 100%;
+}
+.unenrollButton:hover {
+    background: rgba(225, 29, 72, 0.15);
+}
