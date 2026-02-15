@@ -16,7 +16,7 @@ export async function createModule(module_data) {
 }
 
 export async function updateModule(module_id, module_data) {
-    return fetchApi(`/modules/${module_id}`, {
+    return fetchApi(`/modules/${module_id}/`, {
         method: "PUT",
         body: JSON.stringify(module_data)
     });
@@ -43,14 +43,5 @@ export async function disenrolFromModule(enrollment_id) {
     return fetchApi(`/enrollments/${enrollment_id}/`, {
         method: "DELETE"
     });
-}
-
-export function isEnrolledIn(module_id, enrollments) {
-    return enrollments.some(e => e.module === module_id);
-}
-
-export function getEnrollmentId(module_id, enrollments) {
-    const enrollment = enrollments.find(e => e.module === module.id);
-    return enrollment ? enrollment.id : null;
 }
 
