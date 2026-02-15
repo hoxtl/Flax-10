@@ -9,11 +9,16 @@ export async function fetchApi(endpoint, options = {}) {
 }
 
 function buildRequestConfig(options) {
+    const token = localStorage.getItem('user_token');
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+    };
+    if (token) {
+        headers['Authorization'] = `Token ${token}`;
+    }
     return {
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
+        headers: headers,
         ...options,
     };
 }
