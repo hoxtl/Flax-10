@@ -227,6 +227,14 @@
     border-radius: 10px;
 }
 
+.tagBadge {
+    font-size: 0.7rem;
+    color: var(--c-white);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
 .announcementDate {
     color: var(--muted);
     font-size: 0.85rem;

@@ -13,7 +13,8 @@
 }
 
 .sectionTitle {
-    font-size: 0.85rem;
+    margin: 0 0 8px;
+    font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--muted);
     letter-spacing: 0.5px;

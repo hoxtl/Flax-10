@@ -10,7 +10,7 @@ export default function AnnouncementsTab({ details, editMode, onUpdate, tags }) 
 
     return (
         <>
-            <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={setEditingAnnouncement} />
+            <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={setEditingAnnouncement} tags={tags} />
             {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={tags}
                 onClose={() => setEditingAnnouncement(null)} onSubmit={handleSave} />}
         </>
@@ -28,11 +28,11 @@ function formatAnnouncement(data) {
         image: data.images?.[0] || null, tagId: data.tagId, date: new Date().toISOString().split('T')[0], pinned: data.pinned };
 }
 
-function AnnouncementsList({ announcements, editMode, onEdit }) {
+function AnnouncementsList({ announcements, editMode, onEdit, tags }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
     return (
         <div className={styles.announcementList}>
-            {announcements.map(a => <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)} />)}
+            {announcements.map(a => <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)} tag={tags?.find(t => t.id === a.tagId)} />)}
         </div>
     );
 }
@@ -42,11 +42,11 @@ function EmptyAnnouncements({ editMode }) {
     return <p className={styles.empty}>No announcements yet.</p>;
 }
 
-function AnnouncementCard({ announcement, editMode, onEdit }) {
+function AnnouncementCard({ announcement, editMode, onEdit, tag }) {
     return (
         <div className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
             {editMode && <EditButton onClick={onEdit} />}
-            <CardHeader announcement={announcement} />
+            <CardHeader announcement={announcement} tag={tag} />
             <p className={styles.announcementContent}>{announcement.content}</p>
             <AnnouncementImages announcement={announcement} />
         </div>
@@ -57,10 +57,11 @@ function EditButton({ onClick }) {
     return <button className={styles.editAnnouncementBtn} onClick={onClick} title="Edit">✎</button>;
 }
 
-function CardHeader({ announcement }) {
+function CardHeader({ announcement, tag }) {
     return (
         <div className={styles.announcementHeader}>
             <h4 className={styles.announcementTitle}>{announcement.title}</h4>
+            {tag && <span className={styles.tagBadge} style={{ backgroundColor: tag.color }}>{tag.label}</span>}
             {announcement.pinned && <span className={styles.pinnedBadge}>Pinned</span>}
             <span className={styles.announcementDate}>{formatDate(announcement.date)}</span>
         </div>

@@ -11,6 +11,12 @@ export const MOCK_SOCIETY_DETAILS = {
         bio: "Building the future, one robot at a time. Weekly workshops, competitions, and hackathons.",
         about: "The Robotics Society brings together students passionate about robotics, AI, and engineering. We host weekly workshops, participate in national competitions, and collaborate on exciting projects.",
         dateCreated: "2019-09-15",
+        tags: [
+            { id: "workshop", label: "Workshop", color: "#3b82f6" },
+            { id: "competition", label: "Competition", color: "#ef4444" },
+            { id: "meeting", label: "Meeting", color: "#8b5cf6" },
+            { id: "social", label: "Social", color: "#22c55e" }
+        ],
         images: [
             "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
             "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
@@ -35,6 +41,12 @@ export const MOCK_SOCIETY_DETAILS = {
         bio: "Code, connect, create. The largest tech community on campus.",
         about: "Computing Society is the go-to community for all things tech. From coding workshops to hackathons, career talks to game nights, we've got something for everyone.",
         dateCreated: "2015-01-20",
+        tags: [
+            { id: "hackathon", label: "Hackathon", color: "#f97316" },
+            { id: "workshop", label: "Workshop", color: "#3b82f6" },
+            { id: "career", label: "Career Talk", color: "#6366f1" },
+            { id: "social", label: "Social", color: "#22c55e" }
+        ],
         images: [
             "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
             "https://images.unsplash.com/photo-1504639725590-34d0984388bd",
@@ -53,6 +65,11 @@ export const MOCK_SOCIETY_DETAILS = {
         bio: "Checkmate your stress. Casual and competitive chess for all levels.",
         about: "Whether you're a grandmaster or just learning the moves, Chess Club welcomes you. Weekly meetups, tournaments, and puzzle sessions.",
         dateCreated: "2020-10-01",
+        tags: [
+            { id: "tournament", label: "Tournament", color: "#ef4444" },
+            { id: "meetup", label: "Meetup", color: "#22c55e" },
+            { id: "lesson", label: "Lesson", color: "#3b82f6" }
+        ],
         images: [
             "https://images.unsplash.com/photo-1529699211952-734e80c4d42b",
             "https://images.unsplash.com/photo-1560174038-da43ac74f01b"

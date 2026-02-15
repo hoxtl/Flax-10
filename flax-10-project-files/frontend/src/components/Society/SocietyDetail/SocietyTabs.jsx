@@ -15,7 +15,7 @@ export default function SocietyTabs({ activeTab, onTabChange, details, editMode,
     return (
         <div className={styles.container}>
             <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-            <TabContent activeTab={activeTab} details={details} editMode={editMode} onUpdate={onUpdateDetails} tags={tags} />
+            <TabContent activeTab={activeTab} details={details} editMode={editMode} onUpdate={onUpdateDetails} tags={tags} onTabChange={onTabChange} />
         </div>
     );
 }
@@ -33,11 +33,11 @@ function TabButton({ tab, isActive, onClick }) {
     return <button className={className} onClick={onClick}>{tab.label}</button>;
 }
 
-function TabContent({ activeTab, details, editMode, onUpdate, tags }) {
+function TabContent({ activeTab, details, editMode, onUpdate, tags, onTabChange }) {
     if (activeTab === 'about') return <TabWrapper><AboutTab details={details} editMode={editMode} onUpdate={(text) => onUpdate?.({ about: text })} /></TabWrapper>;
     if (activeTab === 'photos') return <TabWrapper><PhotosTab details={details} editMode={editMode} onUpdate={onUpdate} /></TabWrapper>;
     if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab details={details} editMode={editMode} onUpdate={onUpdate} tags={tags} /></TabWrapper>;
-    return <TabWrapper><CalendarTab details={details} editMode={editMode} /></TabWrapper>;
+    return <TabWrapper><CalendarTab details={details} editMode={editMode} onUpdate={onUpdate} tags={tags} onViewAnnouncement={() => onTabChange('announcements')} /></TabWrapper>;
 }
 
 function TabWrapper({ children }) {

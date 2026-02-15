@@ -2,8 +2,8 @@ import { useDrag } from '../../../hooks/useDragDrop';
 import { useEventModal } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 
-export function EventDot({ e }) {
-    const { color, className, onClick, dragProps } = useEventDotLogic(e);
+export function EventDot({ e, onEventClick, customTags }) {
+    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags);
 
     return (
         <div className={className} title={e.title} onClick={onClick}
@@ -14,21 +14,31 @@ export function EventDot({ e }) {
     );
 }
 
-function useEventDotLogic(event) {
+function useEventDotLogic(event, onEventClick, customTags) {
     const { openModal } = useEventModal();
-    const { getTag } = useTags();
+    const globalTags = useTags();
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
 
+    const handleClick = (ev) => {
+        ev.stopPropagation();
+        if (onEventClick) {
+            const rect = ev.currentTarget.getBoundingClientRect();
+            onEventClick(event, rect);
+        } else openModal(event);
+    };
+
     return {
-        color: getEventColor(event, getTag),
+        color: getEventColor(event, customTags, globalTags),
         className: getEventClassName(isDragging),
-        onClick: (ev) => { ev.stopPropagation(); openModal(event); },
+        onClick: handleClick,
         dragProps
     };
 }
 
-function getEventColor(event, getTag) {
-    const tag = getTag(event.tag);
+function getEventColor(event, customTags, globalTags) {
+    if (event.tag_color) return event.tag_color;
+    if (customTags) return customTags.find(t => t.id === event.tagId)?.color || '#3b82f6';
+    const tag = globalTags.getTag(event.tag);
     return tag?.color || '#3b82f6';
 }
 

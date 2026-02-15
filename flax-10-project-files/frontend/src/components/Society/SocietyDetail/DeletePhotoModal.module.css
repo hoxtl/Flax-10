@@ -52,7 +52,7 @@
 }
 
 .dangerBtn:hover {
-    background: #ffccc7;
+    background: var(--danger-border);
 }
 
 .primaryBtn {
