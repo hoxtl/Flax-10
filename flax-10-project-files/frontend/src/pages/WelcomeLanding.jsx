@@ -35,10 +35,7 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
     [now]
   );
 
-  const quote = useMemo(
-    () => pickQuoteByKey(quoteKey, now.getHours()),
-    [quoteKey, now]
-  );
+  const quote = useMemo(() => pickQuoteByKey(quoteKey, now.getHours()), [quoteKey, now]);
 
   const greetingLine = useMemo(() => {
     const g = getGreeting();

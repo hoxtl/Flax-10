@@ -61,7 +61,6 @@ export default function App() {
     return () => window.removeEventListener("auth-changed", sync);
   }, []);
 
-  // Load theme once logged in
   useEffect(() => {
     async function loadUserTheme() {
       if (!authed) {
