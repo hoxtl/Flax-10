@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
 
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 
 export default function PasswordResetConfirm() {
   const { token } = useParams();
@@ -13,6 +15,7 @@ export default function PasswordResetConfirm() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +28,7 @@ export default function PasswordResetConfirm() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       const response = await fetch(`${API_BASE_URL}/auth/password-reset/confirm/`, {
@@ -40,28 +44,39 @@ export default function PasswordResetConfirm() {
       const data = await response.json();
 
       if (response.ok) {
-        // Show success message
-        alert('✅ ' + data.message);
-        // Redirect to login page
-        navigate('/login');
+        setSuccess(data.message);
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       } else {
         setError(data.error || data.confirm_password || 'Failed to reset password');
+        setLoading(false);
       }
     } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
+      setError('There has been an error, please try again...');
       setLoading(false);
-    }
+    } 
   };
 
   return (
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.formCard}>
-          <h1 className={styles.title}>Set New Password</h1>
+          <h1 className={styles.title}>Reset Your Password</h1>
           <p className={styles.subtitle}>
-            Enter your new password below. Make sure it's at least 8 characters long.
+            Enter a new password below. Ensure the password is secure and at least 8 characters long.
           </p>
+
+          {success && (
+            <div className={styles.success}>
+              <strong>Password reset successfully!</strong>
+              <p>{success}</p>
+              <p style={{ marginTop: '10px', fontSize: '0.9em' }}>
+                Redirecting to login...
+              </p>
+            </div>
+          )}
 
           {error && <div className={styles.error}>{error}</div>}
 

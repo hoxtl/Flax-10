@@ -29,18 +29,9 @@ export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading })
           disabled={loading}
         />
         
-        <Link 
-          to="/reset-password" 
-          style={{ 
-            color: 'var(--primary)', 
-            textDecoration: 'none',
-            fontSize: '0.875rem',
-            alignSelf: 'center',
-            marginTop: '0.5rem'
-          }}
-        >
+        <Components.PasswordResetLink to='/reset-password'>
           Reset your password here
-        </Link>
+        </Components.PasswordResetLink>
         
         <Components.Button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Sign In'}
