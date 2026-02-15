@@ -19,5 +19,5 @@ pnpm-debug.log*
 .env
 .env.*
 
-# Test coverage 
-coverage/
+# Coverage Report 
+coverage

@@ -1,29 +1,70 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+import { ThemeProvider } from './context/ThemeContext'; 
 import DashboardLayout from "./layout/DashboardLayout";
+import AuthPage from './pages/AuthPage';
 import { APP_ROUTES } from './lib/routes';
 import { CalendarProvider } from './context/CalendarContext';
 import { NotificationProvider } from './context/NotificationContext';
-import Settings from './pages/Settings';
-
-function getUser() {
-  return {
-    name: "Jane Smith",
-    email: "jane@kcl.ac.uk",
-    year: "Year 2",
-    major: "CS"
-  };
-}
-
 import { TagProvider } from './context/TagContext';
 import { NotificationToast } from './components/Notifications';
+import Settings from './pages/Settings';
+import { getUserSettings } from './api/userService';
+
+function getUser() {
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      return JSON.parse(userString);
+    } catch (err) {
+      console.error('Error parsing user data:', err);
+    }
+  }
+  
+  return null;
+}
+
+function isAuthenticated() {
+  return !!localStorage.getItem('token');
+}
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("home");
+  const [initialTheme, setInitialTheme] = useState("light");
+  const [isLoadingTheme, setIsLoadingTheme] = useState(true);
   const user = getUser();
+
+  useEffect(() => {
+    async function loadUserTheme() {
+      if (!isAuthenticated()) {
+        setIsLoadingTheme(false);
+        return;
+      }
+
+      try {
+        const settings = await getUserSettings();
+        setInitialTheme(settings.theme || "light");
+      } catch (error) {
+        console.log("Using default theme (not logged in or error)");
+        setInitialTheme("light");
+      } finally {
+        setIsLoadingTheme(false);
+      }
+    }
+    
+    loadUserTheme();
+  }, []);
 
   function handleBackFromSettings() {
     setActiveNav("home");
+  }
+
+  if (!isAuthenticated() || !user) {
+    return <AuthPage />;
+  }
+
+  if (isLoadingTheme) {
+    return null; 
   }
 
   let pageContent;
@@ -35,15 +76,17 @@ export default function App() {
   }
 
   return (
-    <NotificationProvider>
-      <CalendarProvider>
-        <TagProvider>
-          <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
-            {pageContent}
-          </DashboardLayout>
-          <NotificationToast />
-        </TagProvider>
-      </CalendarProvider>
-    </NotificationProvider>
+    <ThemeProvider initialTheme={initialTheme}>
+      <NotificationProvider>
+        <CalendarProvider>
+          <TagProvider>
+            <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav}>
+              {pageContent}
+            </DashboardLayout>
+            <NotificationToast />
+          </TagProvider>
+        </CalendarProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 }
