@@ -1,7 +1,7 @@
 .sidebar {
   height: 100vh;
-  background: #f6f4f1;; 
-  border-right: 1px solid #ededf2;
+  background: var(--sidebar); 
+  border-right: 1px solid var(--border); 
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -12,11 +12,12 @@
 /* Top header area (blank-ish for now, just "StudyFlax") */
 .header {
   padding: 18px 16px;
-  border-bottom: 1px solid #f0eff4;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
+
 
 .headerCollapsed {
   justify-content: center;
@@ -26,7 +27,7 @@
 .brand {
   font-weight: 800;
   font-size: 18px;
-  color: #1e1b2e;
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -46,7 +47,7 @@
   cursor: pointer;
   border-radius: 9px;
   background: transparent;
-  color: #1e1b2e;
+  color: var(--text);
   font-weight: 500;
   font-size: 14px;
   white-space: nowrap;
@@ -69,7 +70,7 @@
 }
 
 .navItemActive {
-  background: #f0eff4;
+  background: var(--active);
   color: var(--accent);
   font-weight: 600;
 }
@@ -91,7 +92,7 @@
 /* User profile */
 .user {
   padding: 14px 12px;
-  border-top: 1px solid #f0eff4;
+  border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
 }
@@ -126,13 +127,13 @@
 .userName {
   font-size: 13px;
   font-weight: 600;
-  color: #1e1b2e;
+  color: var(--user-details-text);
   white-space: nowrap;
 }
 
 .userMeta {
   font-size: 11px;
-  color: #1e1b2e;
+  color: var(--user-details-text);
   white-space: nowrap;
 }
 
