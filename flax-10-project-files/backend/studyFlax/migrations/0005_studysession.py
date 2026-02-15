@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0003_alter_calendarevent_reminder_minutes'),
+        ('studyFlax', '0004_usersettings_major_usersettings_year_and_more'),
     ]
 
     operations = [
