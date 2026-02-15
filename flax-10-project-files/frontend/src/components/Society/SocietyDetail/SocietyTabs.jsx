@@ -11,11 +11,11 @@ const TABS = [
     { id: "announcements", label: "Announcements" }
 ];
 
-export default function SocietyTabs({ activeTab, onTabChange, details, editMode, onUpdateDetails }) {
+export default function SocietyTabs({ activeTab, onTabChange, details, editMode, onUpdateDetails, tags }) {
     return (
         <div className={styles.container}>
             <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-            <TabContent activeTab={activeTab} details={details} editMode={editMode} onUpdate={onUpdateDetails} />
+            <TabContent activeTab={activeTab} details={details} editMode={editMode} onUpdate={onUpdateDetails} tags={tags} />
         </div>
     );
 }
@@ -33,27 +33,13 @@ function TabButton({ tab, isActive, onClick }) {
     return <button className={className} onClick={onClick}>{tab.label}</button>;
 }
 
-function TabContent({ activeTab, details, editMode, onUpdate }) {
-    const components = {
-        calendar: CalendarTab,
-        about: AboutTab,
-        photos: PhotosTab,
-        announcements: AnnouncementsTab
-    };
+function TabContent({ activeTab, details, editMode, onUpdate, tags }) {
+    if (activeTab === 'about') return <TabWrapper><AboutTab details={details} editMode={editMode} onUpdate={(text) => onUpdate?.({ about: text })} /></TabWrapper>;
+    if (activeTab === 'photos') return <TabWrapper><PhotosTab details={details} editMode={editMode} onUpdate={onUpdate} /></TabWrapper>;
+    if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab details={details} editMode={editMode} onUpdate={onUpdate} tags={tags} /></TabWrapper>;
+    return <TabWrapper><CalendarTab details={details} editMode={editMode} /></TabWrapper>;
+}
 
-    const Component = components[activeTab];
-
-    if (activeTab === 'about') {
-        return <div className={styles.content}>
-            <AboutTab details={details} editMode={editMode} onUpdate={(text) => onUpdate?.({ about: text })} />
-        </div>;
-    }
-
-    if (activeTab === 'photos') {
-        return <div className={styles.content}>
-            <PhotosTab details={details} editMode={editMode} onUpdate={onUpdate} />
-        </div>;
-    }
-
-    return <div className={styles.content}><Component details={details} editMode={editMode} /></div>;
+function TabWrapper({ children }) {
+    return <div className={styles.content}>{children}</div>;
 }
