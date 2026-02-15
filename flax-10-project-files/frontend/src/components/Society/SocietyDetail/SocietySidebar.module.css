@@ -5,7 +5,7 @@
 }
 
 .section {
-    background: white;
+    background: var(--panel);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
@@ -13,22 +13,21 @@
 }
 
 .sectionTitle {
-    margin: 0 0 12px;
     font-size: 0.85rem;
     text-transform: uppercase;
-    color: #999;
+    color: var(--muted);
     letter-spacing: 0.5px;
 }
 
 .pinnedTitle {
     margin: 0 0 8px;
     font-weight: 600;
-    color: #333;
+    color: var(--text);
 }
 
 .pinnedContent {
     margin: 0;
-    color: #666;
+    color: var(--text);
     font-size: 0.9rem;
     line-height: 1.5;
 }
@@ -36,17 +35,17 @@
 .eventTitle {
     margin: 0 0 4px;
     font-weight: 600;
-    color: #333;
+    color: var(--text);
 }
 
 .eventDate {
     margin: 0;
-    color: var(--primary-color, #9E7E5D);
+    color: var(--primary);
     font-size: 0.9rem;
 }
 
 .empty {
-    color: #999;
+    color: var(--muted);
     font-size: 0.9rem;
     text-align: center;
     padding: 20px;
@@ -61,17 +60,17 @@
 .addBtn {
     width: 100%;
     padding: 12px 16px;
-    border: 2px dashed var(--primary-color, #9E7E5D);
+    border: 2px dashed var(--primary);
     background: transparent;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 500;
-    color: var(--primary-color, #9E7E5D);
+    color: var(--primary);
     transition: all 0.2s;
 }
 
 .addBtn:hover {
-    background: rgba(158, 126, 93, 0.08);
+    background: var(--hover-light);
 }
 
 @media (max-width: 900px) {

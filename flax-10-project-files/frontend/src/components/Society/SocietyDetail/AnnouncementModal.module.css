@@ -12,7 +12,8 @@
     width: min(500px, 90vw);
     max-height: 90vh;
     overflow-y: auto;
-    background: white;
+    overflow-y: auto;
+    background: var(--bg);
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -36,7 +37,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #999;
+    color: var(--muted);
     padding: 0;
     line-height: 1;
 }
@@ -56,49 +57,53 @@
 .label {
     font-weight: 500;
     font-size: 0.9rem;
-    color: #333;
+    color: var(--text);
 }
 
 .input {
     padding: 10px 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.95rem;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .input:focus {
     outline: none;
-    border-color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
 }
 
 .textarea {
     padding: 10px 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.95rem;
     font-family: inherit;
     resize: vertical;
     min-height: 80px;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .textarea:focus {
     outline: none;
-    border-color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
 }
 
 .imageUpload {
     padding: 24px;
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border);
     border-radius: 8px;
     text-align: center;
     cursor: pointer;
-    color: #666;
+    color: var(--muted);
     transition: all 0.2s;
 }
 
 .imageUpload:hover {
-    border-color: var(--primary-color, #9E7E5D);
-    color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 .imagesGrid {
@@ -124,20 +129,20 @@
 .addImageBtn {
     width: 80px;
     height: 80px;
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 1.5rem;
-    color: #999;
+    color: var(--muted);
     transition: all 0.2s;
 }
 
 .addImageBtn:hover {
-    border-color: var(--primary-color, #9E7E5D);
-    color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 .imagePreview {
@@ -170,21 +175,22 @@
 }
 
 .removeBtn:hover {
-    background: #ff4d4f;
+    background: var(--danger);
 }
 
 .select {
     padding: 10px 14px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.95rem;
-    background: white;
+    background: var(--bg);
+    color: var(--text);
     cursor: pointer;
 }
 
 .select:focus {
     outline: none;
-    border-color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
 }
 
 .eventSection {
@@ -192,7 +198,7 @@
     flex-direction: column;
     gap: 12px;
     padding: 16px;
-    background: #f9f9f9;
+    background: var(--panel);
     border-radius: 12px;
 }
 
@@ -206,7 +212,7 @@
 .toggle input {
     width: 18px;
     height: 18px;
-    accent-color: var(--primary-color, #9E7E5D);
+    accent-color: var(--primary);
 }
 
 .eventFields {
@@ -214,7 +220,7 @@
     flex-direction: column;
     gap: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e5e5e5;
+    border-top: 1px solid var(--border);
 }
 
 .timeRow {
@@ -229,13 +235,14 @@
     gap: 12px;
     margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
 }
 
 .cancelBtn {
     padding: 10px 20px;
-    border: 1px solid #ddd;
-    background: white;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
@@ -243,8 +250,8 @@
 
 .submitBtn {
     padding: 10px 20px;
-    background: var(--primary-color, #9E7E5D);
-    color: white;
+    background: var(--primary);
+    color: var(--c-white);
     border: none;
     border-radius: 8px;
     cursor: pointer;

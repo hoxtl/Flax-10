@@ -4,7 +4,7 @@
 
 .tabBar {
     display: flex;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border);
 }
 
 .tab {
@@ -14,17 +14,17 @@
     cursor: pointer;
     font-size: 0.95rem;
     font-weight: 500;
-    color: #888;
+    color: var(--muted);
     position: relative;
     transition: color 0.2s;
 }
 
 .tab:hover {
-    color: #555;
+    color: var(--text);
 }
 
 .tab.active {
-    color: var(--primary-color, #9E7E5D);
+    color: var(--primary);
 }
 
 .tab.active::after {
@@ -34,7 +34,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: var(--primary-color, #9E7E5D);
+    background: var(--primary);
     border-radius: 3px 3px 0 0;
 }
 

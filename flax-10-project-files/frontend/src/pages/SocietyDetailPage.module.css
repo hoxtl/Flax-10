@@ -1,7 +1,8 @@
 .page {
     min-height: 100vh;
-    background: #fafafa;
+    background: var(--bg);
     position: relative;
+    color: var(--text);
 }
 
 .topBar {
@@ -16,39 +17,39 @@
 }
 
 .backBtn {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
-    color: #333;
+    color: var(--text);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .editToggle {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
-    color: #333;
+    color: var(--text);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: all 0.2s;
 }
 
 .editToggle:hover {
-    background: rgba(255, 255, 255, 1);
+    background: var(--hover);
 }
 
 .editActive {
-    background: var(--primary-color, #9E7E5D);
-    color: white;
+    background: var(--primary);
+    color: var(--c-white);
 }
 
 .editActive:hover {
-    background: var(--primary-dark, #8a6d4f);
+    filter: brightness(0.9);
 }
 
 .mainContent {
@@ -75,8 +76,8 @@
 
 .notFound button {
     padding: 10px 20px;
-    background: var(--primary-color, #9E7E5D);
-    color: white;
+    background: var(--primary);
+    color: var(--c-white);
     border: none;
     border-radius: 8px;
     cursor: pointer;
