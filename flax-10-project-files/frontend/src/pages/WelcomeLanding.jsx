@@ -21,6 +21,13 @@ function cleanQuote(q) {
   return (q || "").trim().replace(/[".]+$/g, "");
 }
 
+function getMicroline(hour = new Date().getHours()) {
+  if (hour >= 5 && hour < 12) return "Your workspace is ready.";
+  if (hour >= 12 && hour < 18) return "Your dashboard awaits.";
+  if (hour >= 18 && hour < 22) return "Wrap up gently. Keep it light.";
+  return "Quiet hours. Clear mind.";
+}
+
 export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
   const firstName = firstNameFromUser(user);
   const [now, setNow] = useState(() => new Date());
@@ -35,7 +42,15 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
     [now]
   );
 
-  const quote = useMemo(() => pickQuoteByKey(quoteKey, now.getHours()), [quoteKey, now]);
+  const quote = useMemo(
+    () => pickQuoteByKey(quoteKey, now.getHours()),
+    [quoteKey, now]
+  );
+
+  const microline = useMemo(
+    () => getMicroline(now.getHours()),
+    [now]
+  );
 
   const greetingLine = useMemo(() => {
     const g = getGreeting();
@@ -68,15 +83,16 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
           <motion.div
             key={greetingLine}
             className={styles.bigLine}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.28 }}
+            transition={{ duration: 0.26, ease: "easeOut" }}
           >
             {greetingLine}
           </motion.div>
         </AnimatePresence>
 
+        {/* Animated underline */}
         <motion.div
           className={styles.underline}
           initial={{ scaleX: 0, opacity: 0 }}
@@ -85,6 +101,16 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
           style={{ transformOrigin: "center" }}
         />
 
+        {/* Microline */}
+        <motion.div
+          className={styles.microline}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18, duration: 0.4 }}
+        >
+          {microline}
+        </motion.div>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={quoteLine}
@@ -92,7 +118,7 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.28 }}
+            transition={{ duration: 0.26, delay: 0.1, ease: "easeOut" }}
           >
             {quoteLine}
           </motion.div>
