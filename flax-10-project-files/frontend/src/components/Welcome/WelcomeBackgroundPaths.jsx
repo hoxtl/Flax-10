@@ -28,6 +28,7 @@ function FloatingPaths({ flip = 1 }) {
         aria-hidden="true"
       >
         {paths.map((p) => (
+
           <motion.path
             key={`${flip}-${p.id}`}
             d={p.d}
@@ -36,16 +37,15 @@ function FloatingPaths({ flip = 1 }) {
             strokeOpacity={p.opacity}
             initial={{ pathLength: 0.2, opacity: 0.45 }}
             animate={{
-              pathLength: 1,
-              opacity: [0.25, 0.55, 0.12],
+              opacity: [0.18, 0.32, 0.18],
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 50 + Math.random() * 8,
-              repeat: Infinity,
-              ease: "linear",
+              opacity: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+              pathOffset: { duration: 28 + Math.random() * 10, repeat: Infinity, ease: "linear" },
             }}
           />
+          
         ))}
       </svg>
     </div>
