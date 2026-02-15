@@ -63,6 +63,17 @@ const testOvertime = () => {
     expect(startNext).not.toHaveBeenCalled();
 };
 
+const testBreakCompletion = () => {
+    const startNext = vi.fn();
+    const setModal = vi.fn();
+
+    renderHook(() => useCompletionCheck(
+        { mode: 'break', timeLeft: 0, isActive: true }, startNext, setModal
+    ));
+
+    expect(NotificationMock).toHaveBeenCalledWith("Break Over!", expect.any(Object));
+};
+
 const testNoAction = () => {
     const startNext = vi.fn();
     const setModal = vi.fn();
@@ -79,5 +90,6 @@ describe('timerUtils: useCompletionCheck', () => {
     afterEach(() => vi.clearAllMocks());
     it('triggers startNext when breakTime is 0 (Auto-Advance)', testAutoAdvance);
     it('triggers Notification BUT continues timer (Overtime) when breakTime > 0', testOvertime);
+    it('triggers Notification when break ends', testBreakCompletion);
     it('does nothing if conditions not met', testNoAction);
 });
