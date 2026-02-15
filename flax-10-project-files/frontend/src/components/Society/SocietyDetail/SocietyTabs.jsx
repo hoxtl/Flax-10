@@ -11,11 +11,11 @@ const TABS = [
     { id: "announcements", label: "Announcements" }
 ];
 
-export default function SocietyTabs({ activeTab, onTabChange, details }) {
+export default function SocietyTabs({ activeTab, onTabChange, details, editMode }) {
     return (
         <div className={styles.container}>
             <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-            <TabContent activeTab={activeTab} details={details} />
+            <TabContent activeTab={activeTab} details={details} editMode={editMode} />
         </div>
     );
 }
@@ -33,7 +33,7 @@ function TabButton({ tab, isActive, onClick }) {
     return <button className={className} onClick={onClick}>{tab.label}</button>;
 }
 
-function TabContent({ activeTab, details }) {
+function TabContent({ activeTab, details, editMode }) {
     const components = {
         calendar: CalendarTab,
         about: AboutTab,
@@ -41,5 +41,5 @@ function TabContent({ activeTab, details }) {
         announcements: AnnouncementsTab
     };
     const Component = components[activeTab];
-    return <div className={styles.content}><Component details={details} /></div>;
+    return <div className={styles.content}><Component details={details} editMode={editMode} /></div>;
 }

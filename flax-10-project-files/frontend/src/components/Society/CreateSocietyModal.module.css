@@ -1,0 +1,223 @@
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 18, 30, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal {
+    width: min(520px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--panel, #fff);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    padding: 24px;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text, #1f2937);
+}
+
+.sub {
+    margin: 4px 0 0;
+    color: var(--muted, #6b7280);
+    font-size: 0.9rem;
+}
+
+.close {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--muted, #6b7280);
+    padding: 0;
+}
+
+.close:hover {
+    color: var(--text, #1f2937);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text, #374151);
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: var(--muted, #9ca3af);
+    margin: 0;
+}
+
+.input {
+    padding: 12px 14px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: var(--bg, #fff);
+    color: var(--text, #1f2937);
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary-color, #9E7E5D);
+}
+
+.textarea {
+    padding: 12px 14px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: var(--bg, #fff);
+    color: var(--text, #1f2937);
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #9E7E5D);
+}
+
+.toggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: #d1d5db;
+    border-radius: 13px;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.toggleOn {
+    background: var(--primary-color, #9E7E5D);
+}
+
+.toggleKnob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.toggleOn .toggleKnob {
+    transform: translateX(22px);
+}
+
+.notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-top: 8px;
+}
+
+.noticeIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border, #e5e7eb);
+}
+
+.cancelBtn {
+    padding: 10px 20px;
+    border: 1px solid var(--border, #e5e7eb);
+    background: var(--bg, #fff);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text, #374151);
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    background: var(--hover, #f9fafb);
+}
+
+.createBtn {
+    padding: 10px 24px;
+    border: none;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.createBtn:hover:not(:disabled) {
+    background: var(--primary-dark, #8a6d4f);
+}
+
+.createBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -87,3 +87,26 @@
     content: " (Cancel)";
     font-size: 0.8em;
 }
+
+.bioPlaceholder {
+    flex: 1;
+    margin: 0;
+    color: #999;
+    min-width: 200px;
+    font-style: italic;
+}
+
+.editBtn {
+    padding: 10px 24px;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.editBtn:hover {
+    background: var(--primary-dark, #8a6d4f);
+}
