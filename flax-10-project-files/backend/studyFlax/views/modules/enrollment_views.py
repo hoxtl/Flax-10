@@ -28,6 +28,7 @@ def create_enrollments(request):
     module = enrollment.module
     CalendarEvent.objects.create(
             user=request.user,
+            module=module,
             title=f"Lecture: {module.module_name}",
             start_time=module.start_time,
             end_time=module.end_time,
@@ -48,7 +49,13 @@ def enrollment_detail(request, enrollment_id):
 def delete_enrollment(request, enrollment, user):
     if enrollment.student != user:
         return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
+    
+    CalendarEvent.objects.filter( 
+        user=user,
+        module=enrollment.module,
+        source="module_enrollment"
+    ).delete()
     enrollment.delete()
-    return Response ( {"message": "Successfully disenrolled from the module."}, status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
     
