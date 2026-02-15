@@ -1,17 +1,13 @@
-§import styles from "./Welcome.module.css";
+import styles from "./WelcomeLanding.module.css";
 import { pickQuoteByKey } from "../lib/quotes";
 import confetti from "canvas-confetti";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { getDisplayName } from "../utils/userDisplay";
-import { useNavigate } from "react-router-dom";
-
-const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
 }
-
 function formatTime(d = new Date()) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
@@ -19,46 +15,32 @@ function formatTime(d = new Date()) {
 function dropConfetti() {
   const duration = 900;
   const end = Date.now() + duration;
-
   (function frame() {
     confetti({
       particleCount: 10,
       spread: 65,
-      startVelocity: 16,
+      startVelocity: 18,
       gravity: 0.9,
-      ticks: 180,
-      origin: { x: Math.random(), y: 0.08 },
+      ticks: 200,
+      origin: { x: Math.random(), y: 0.05 },
     });
-
     if (Date.now() < end) requestAnimationFrame(frame);
   })();
 }
 
-function buildPersonalLine(quote, name) {
-  const cleaned = quote.trim().replace(/[".]+$/g, "");
-  if (!name) return `${cleaned}.`;
-  return `${cleaned}, ${name}.`;
+function firstNameFromUser(user) {
+  const display = (getDisplayName(user) || "").trim();
+  if (!display) return "";
+  return display.split(" ")[0];
 }
 
-export default function Welcome({ user }) {
-  const navigate = useNavigate();
-  const name = (getDisplayName(user) || "").trim();
+function cleanQuote(q) {
+  return q.trim().replace(/[".]+$/g, "");
+}
 
+export default function WelcomeLanding({ user, onExplore }) {
+  const firstName = firstNameFromUser(user);
   const [now, setNow] = useState(() => new Date());
-
-  // lock scroll like before
-  useEffect(() => {
-    const prevHtmlOverflow = document.documentElement.style.overflow;
-    const prevBodyOverflow = document.body.style.overflow;
-
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.documentElement.style.overflow = prevHtmlOverflow;
-      document.body.style.overflow = prevBodyOverflow;
-    };
-  }, []);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -72,29 +54,16 @@ export default function Welcome({ user }) {
 
   const quote = useMemo(
     () => pickQuoteByKey(quoteKey, now.getHours()),
-    [quoteKey, now.getHours()]
+    [quoteKey, now]
   );
 
-  const quoteLine = useMemo(() => buildPersonalLine(quote, name), [quote, name]);
+  const greetingLine = useMemo(() => {
+    if (!firstName) return "Welcome back.";
+    return `Welcome back, ${firstName}.`;
+  }, [firstName]);
 
-  // new user / first visit message
-  const [showIntro, setShowIntro] = useState(() => {
-    return localStorage.getItem(WELCOME_SEEN_KEY) !== "true";
-  });
+  const quoteLine = useMemo(() => `${cleanQuote(quote)}.`, [quote]);
 
-  useEffect(() => {
-    if (!showIntro) return;
-    localStorage.setItem(WELCOME_SEEN_KEY, "true");
-    const id = setTimeout(() => setShowIntro(false), 1800);
-    return () => clearTimeout(id);
-  }, [showIntro]);
-
-  const introLine = useMemo(() => {
-    const n = name || "there";
-    return `Welcome to StudyFlax, ${n}. This is where the magic begins ✨`;
-  }, [name]);
-
-  // optional daily goal (you can keep/remove)
   const [goalText, setGoalText] = useState("");
   const [todayGoal, setTodayGoal] = useState("");
   const [todayDone, setTodayDone] = useState(false);
@@ -116,34 +85,41 @@ export default function Welcome({ user }) {
     });
   };
 
-  const resetGoal = () => {
-    setTodayGoal("");
-    setTodayDone(false);
-    setGoalText("");
-  };
-
   return (
-    <div className={styles.welcomePage}>
+    <div className={styles.page}>
       <div className={styles.center}>
         <div className={styles.time}>{formatTime(now)}</div>
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={showIntro ? "intro" : quoteLine}
-            className={styles.personalLine}
+            key={greetingLine}
+            className={styles.bigLine}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.22 }}
           >
-            {showIntro ? introLine : quoteLine}
+            {greetingLine}
+          </motion.div>
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={quoteLine}
+            className={styles.smallLine}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22 }}
+          >
+            {quoteLine}
           </motion.div>
         </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {!todayGoal ? (
             <motion.form
-              key="goalForm"
+              key knowing="goalForm"
               className={styles.goalBlock}
               onSubmit={submitGoal}
               initial={{ opacity: 0, y: 12 }}
@@ -159,27 +135,10 @@ export default function Welcome({ user }) {
                 className={styles.goalInput}
                 value={goalText}
                 onChange={(e) => setGoalText(e.target.value)}
-                placeholder=""
                 autoFocus
               />
 
               <div className={styles.goalUnderline} />
-
-              <button
-                type="button"
-                onClick={() => navigate("/calendar")}
-                style={{
-                  marginTop: 18,
-                  padding: "10px 16px",
-                  borderRadius: 999,
-                  border: "1px solid rgba(255,255,255,0.22)",
-                  background: "rgba(0,0,0,0.22)",
-                  color: "inherit",
-                  cursor: "pointer",
-                }}
-              >
-                Explore StudyFlax →
-              </button>
             </motion.form>
           ) : (
             <motion.div
@@ -202,40 +161,19 @@ export default function Welcome({ user }) {
                   {todayGoal}
                 </span>
               </label>
-
-              <div style={{ marginTop: 16, display: "flex", gap: 12, justifyContent: "center" }}>
-                <button
-                  type="button"
-                  onClick={resetGoal}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    opacity: 0.7,
-                    color: "inherit",
-                  }}
-                >
-                  Change goal
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => navigate("/calendar")}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    opacity: 0.9,
-                    color: "inherit",
-                    fontWeight: 600,
-                  }}
-                >
-                  Explore StudyFlax →
-                </button>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        <div className={styles.actions}>
+          <button className={styles.primaryBtn} onClick={onExplore}>
+            Explore StudyFlax
+          </button>
+
+          <button className={styles.secondaryBtn} disabled title="Coming soon">
+            Watch tutorial (coming soon)
+          </button>
+        </div>
       </div>
     </div>
   );
