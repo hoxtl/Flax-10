@@ -1,5 +1,4 @@
 import styles from "./WelcomeLanding.module.css";
-import { pickWelcomeQuoteByKey } from "../lib/quotes";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { getGreeting } from "../utils/dateUtils";
@@ -13,12 +12,15 @@ function formatTime(d = new Date()) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
-function firstNameFromUser(user) {
-  return (user?.first_name || "").trim();
+function getTimeTone(hour) {
+  if (hour >= 5 && hour < 12) return "morning";
+  if (hour >= 12 && hour < 18) return "day";
+  if (hour >= 18 && hour < 22) return "evening";
+  return "night";
 }
 
-function cleanQuote(q) {
-  return (q || "").trim().replace(/[".]+$/g, "");
+function firstNameFromUser(user) {
+  return (user?.first_name || "").trim();
 }
 
 export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
@@ -30,25 +32,14 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
     return () => clearInterval(id);
   }, []);
 
-  // Stable per-minute key (keeps quote steady for that minute)
-  const quoteKey = useMemo(
-    () => `${now.toDateString()}-${now.getHours()}-${now.getMinutes()}`,
-    [now]
-  );
-
-  // Welcome gateway quote 
-  const quote = useMemo(() => pickWelcomeQuoteByKey(quoteKey), [quoteKey]);
-
   const greetingLine = useMemo(() => {
     const g = getGreeting();
     if (!firstName) return `${g}.`;
     return `${g}, ${firstName}.`;
   }, [firstName]);
 
-  const quoteLine = useMemo(() => `${cleanQuote(quote)}.`, [quote]);
-
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles[getTimeTone(now.getHours())]}`}>
       <WelcomeBackgroundPaths />
 
       <motion.div
@@ -76,19 +67,6 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
             transition={{ duration: 0.26, ease: "easeOut" }}
           >
             {greetingLine}
-          </motion.div>
-        </AnimatePresence>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={quoteLine}
-            className={styles.smallLine}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.26, delay: 0.1, ease: "easeOut" }}
-          >
-            {quoteLine}
           </motion.div>
         </AnimatePresence>
 
