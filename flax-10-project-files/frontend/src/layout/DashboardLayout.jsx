@@ -8,6 +8,7 @@ import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../utils/authHelpers";
+import FloatingTasks from "../components/Tasks/FloatingTasks";
 import { useLocation } from "react-router-dom";
 
 function useIsMobile(breakpoint = 900) {
@@ -49,16 +50,29 @@ function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
 
 function DesktopSidebar({ isMobile, user, activeNav, onNavChange, collapsed }) {
   if (isMobile) return null;
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} collapsed={collapsed} />;
+  return (
+    <Sidebar
+      user={user}
+      active={activeNav}
+      onChange={onNavChange}
+      collapsed={collapsed}
+    />
+  );
 }
 
 function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   if (!isMobile || !open) return null;
+
   return (
     <>
       <div className={styles.backdrop} onClick={onClose} />
       <div className={styles.drawer}>
-        <Sidebar user={user} active={activeNav} onChange={onPick} collapsed={false} />
+        <Sidebar
+          user={user}
+          active={activeNav}
+          onChange={onPick}
+          collapsed={false}
+        />
       </div>
     </>
   );
@@ -92,11 +106,10 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-
   const showWeekBar = activeNav == "calendar" || location.pathname.startsWith("/calendar");
   const { openModal, isModalOpen, modalEvent, modalType, modalInitialDate, closeModal } = useEventModal();
 
@@ -125,11 +138,9 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       if (response.ok) {
         clearUserData();
       } else {
-        console.error('Logout on backend has failed, local user data is being clearedd...')
         clearUserData();
       }
     } catch (err) {
-      console.error('Error when logging out: ', err);
       clearUserData();
     }
   }
@@ -168,7 +179,17 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         onClose={() => setShowQuickAdd(false)}
         onSelectType={onSelectType}
       />
-      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
+
+      {isModalOpen && (
+        <EventModal
+          event={modalEvent}
+          initialType={modalType}
+          initialDate={modalInitialDate}
+          onClose={closeModal}
+        />
+      )}
+
+      <FloatingTasks />
     </div>
   );
 }
