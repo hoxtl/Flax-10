@@ -23,7 +23,7 @@ export default function FloatingTasks() {
         aria-label="Open tasks"
         title="Tasks"
       >
-        Tasks
+        To-do
       </button>
 
       <ToDoPanel open={open} />
