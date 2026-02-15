@@ -322,3 +322,20 @@
     margin-top: 2rem;
     width: 100%;
 }
+
+.notificationBtn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.notificationBtn:hover {
+    background: #0056b3;
+}
