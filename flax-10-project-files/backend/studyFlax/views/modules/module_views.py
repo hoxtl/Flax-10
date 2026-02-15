@@ -61,6 +61,6 @@ def delete_module(request, module, user):
         return Response( {"error": "You can only delete your own modules."}, status = status.HTTP_403_FORBIDDEN)
     
     module.delete()
-    return Response ( {"message": "Successfully deleted the module."}, status=status.HTTP_204_NO_CONTENT)
+    return Response (status=status.HTTP_204_NO_CONTENT)
 
     
