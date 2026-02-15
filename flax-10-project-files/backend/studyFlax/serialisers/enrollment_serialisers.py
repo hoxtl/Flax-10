@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from studyFlax.models import Enrollment
-from studyFlax.models import User
 
 class EnrollmentSerialiser(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.first_name', read_only=True)
@@ -9,12 +8,16 @@ class EnrollmentSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
         fields = ['id', 'student', 'student_name', 'module', 'module_name', 'enrolled_at']
-    
+        read_only_fields = ['student']
+
     def validate(self, validated_data):
         user = self.context['request'].user
+        module = validated_data.get('module')
         if user.is_teacher():
             raise serializers.ValidationError("Teachers cannot enroll in modules")
         
+        if Enrollment.objects.filter(student=user, module=module).exists():
+            raise serializers.ValidationError("You are already enrolled in this module.")
         if user.id != validated_data.get('student', user).id:
             raise serializers.ValidationError("Students can only enroll themselves.")
         
