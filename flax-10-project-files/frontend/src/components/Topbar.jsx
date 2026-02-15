@@ -4,6 +4,7 @@ import { getGreeting } from "../utils/dateUtils";
 import { getInitials } from "../utils/userUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { NotificationCenter } from "./Notifications";
+import ThemeToggle from "./ThemeToggle";
 
 // Get current date parts
 function getCurrentDateParts() {
@@ -56,6 +57,7 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
+      <ThemeToggle />
       <AddButton onClick={onAddClick} />
       <NotificationCenter />
       <ProfileDropdown
