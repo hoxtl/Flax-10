@@ -80,9 +80,75 @@ export default function AuthPage() {
     }
   };
 
+  function AuthBrand() {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          top: 18,
+          left: 20,
+          zIndex: 3,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 12,
+            letterSpacing: "0.34em",
+            fontWeight: 800,
+            color: "rgba(43,30,20,0.62)",
+          }}
+        >
+          STUDYFLAX
+        </div>
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: "0.02em",
+            color: "rgba(43,30,20,0.42)",
+          }}
+        >
+          Built for calm study.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
       <AuthHeroGeometric />
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))",
+          zIndex: 0,
+        }}
+      />
+
+      <AuthBrand />
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: 18,
+          left: 0,
+          right: 0,
+          zIndex: 3,
+          textAlign: "center",
+          fontSize: 12,
+          color: "rgba(10,7,5,0.45)",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        Always secure. No ads. Free forever.
+      </div>
 
       <div
         style={{

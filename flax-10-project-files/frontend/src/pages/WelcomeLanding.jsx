@@ -74,14 +74,19 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <motion.div
-          className={styles.time}
-          initial={{ scale: 0.99, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.06, duration: 0.38 }}
-        >
-          {formatTime(now)}
-        </motion.div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={formatTime(now)}
+            className={styles.time}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+          >
+            {formatTime(now)}
+          </motion.div>
+        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           <motion.div
