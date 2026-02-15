@@ -67,7 +67,6 @@ export default function App() {
     loadUserTheme();
   }, []);
 
-  // Re-sync welcome visibility after login
   useEffect(() => {
     if (!isAuthenticated() || !user) return;
     setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
