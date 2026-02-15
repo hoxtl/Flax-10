@@ -1,18 +1,29 @@
-import { useState, useEffect } from "react";
 import "./App.css";
-import { ThemeProvider } from "./context/ThemeContext";
-import DashboardLayout from "./layout/DashboardLayout";
-import AuthPage from "./pages/AuthPage";
 import { APP_ROUTES } from "./lib/routes";
-import { CalendarProvider } from "./context/CalendarContext";
-import { NotificationProvider } from "./context/NotificationContext";
-import { TagProvider } from "./context/TagContext";
-import { NotificationToast } from "./components/Notifications";
+import { useState, useEffect } from "react";
+
+import WelcomeLanding from "./pages/WelcomeLanding";
+import DashboardLayout from "./layout/DashboardLayout";
+
+import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
 import { getUserSettings } from "./api/userService";
-import WelcomeLanding from "./pages/WelcomeLanding";
+
+import { CalendarProvider } from "./context/CalendarContext";
+import { TagProvider } from "./context/TagContext";
+import { ThemeProvider } from "./context/ThemeContext";
+
+import { NotificationProvider } from "./context/NotificationContext";
+import { NotificationToast } from "./components/Notifications";
+
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
+
+export function clearUserData() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem(WELCOME_SEEN_KEY); 
+}
 
 function getUser() {
   const userString = localStorage.getItem("user");
