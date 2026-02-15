@@ -1,16 +1,30 @@
+import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
+import AnnouncementModal from "./AnnouncementModal";
 
-export default function SocietySidebar({ details, editMode }) {
+export default function SocietySidebar({ details, editMode, onAddAnnouncement, onAddEvent, tags }) {
+    const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
     const pinnedAnnouncement = details.announcements?.find(a => a.pinned);
     const nextEvent = details.upcomingEvents?.[0];
 
+    const handleAdd = (data) => { onAddAnnouncement?.(data); setShowAnnouncementModal(false); };
+
     return (
         <aside className={styles.sidebar}>
-            {pinnedAnnouncement && <PinnedSection announcement={pinnedAnnouncement} editMode={editMode} />}
-            {nextEvent && <UpcomingSection event={nextEvent} editMode={editMode} />}
-            {!pinnedAnnouncement && !nextEvent && <EmptySidebar editMode={editMode} />}
-            {editMode && <AddButtons />}
+            <SidebarContent pinned={pinnedAnnouncement} next={nextEvent} editMode={editMode} />
+            {editMode && <AddButtons onAnnouncement={() => setShowAnnouncementModal(true)} onEvent={onAddEvent} />}
+            {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)} onSubmit={handleAdd} tags={tags} />}
         </aside>
+    );
+}
+
+function SidebarContent({ pinned, next, editMode }) {
+    if (!pinned && !next && !editMode) return <EmptyMessage />;
+    return (
+        <>
+            {pinned && <PinnedSection announcement={pinned} />}
+            {next && <UpcomingSection event={next} />}
+        </>
     );
 }
 
@@ -34,16 +48,15 @@ function UpcomingSection({ event }) {
     );
 }
 
-function EmptySidebar({ editMode }) {
-    if (editMode) return null;
+function EmptyMessage() {
     return <p className={styles.empty}>No pinned items or upcoming events.</p>;
 }
 
-function AddButtons() {
+function AddButtons({ onAnnouncement, onEvent }) {
     return (
         <div className={styles.addButtons}>
-            <button className={styles.addBtn} onClick={() => console.log("Add announcement")}>+ Add Announcement</button>
-            <button className={styles.addBtn} onClick={() => console.log("Add event")}>+ Add Event</button>
+            <button className={styles.addBtn} onClick={onAnnouncement}>+ Add Announcement</button>
+            <button className={styles.addBtn} onClick={onEvent}>+ Add Event</button>
         </div>
     );
 }
