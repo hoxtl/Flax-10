@@ -2,7 +2,20 @@ import {useState, useEffect} from 'react';
 import {useNotifications} from '../context/NotificationContext';
 import {getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule, isEnrolledIn, getEnrollmentId} from '../api/module_api.js';
 
-async function LoadData(setLoading, setModules, setEnrollments, notify) {
+function useModuleActions(modules, enrollments,loading, setModules, setEnrollments, notify ) {
+    return {
+        modules, enrollments, loading,
+        handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
+        handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify),
+        toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments) 
+        ? handleDisenrol(m, enrollments, setEnrollments, notify) : handleEnrollment(m, setEnrollments, notify),
+        handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, cb),
+        handleModuleCreated: (m) => {setModules(prev => [...prev, m]); notify('Module created successfully', 'success'); },
+        handleModuleUpdated: (m) => {setModules(prev => prev.map(x => x.id === m.id ? m : x)); notify('Module updated successfully', 'success'); },      
+    }
+}
+
+async function loadData(setLoading, setModules, setEnrollments, notify) {
     try {
         setLoading(true)
         const [modules_data, enrollments_data] = await Promise.all([getModules(), getEnrollments()]);
@@ -15,7 +28,7 @@ async function LoadData(setLoading, setModules, setEnrollments, notify) {
     }
 }
 
-async function HandleEnrollment(module, setEnrollments, notify) {
+async function handleEnrollment(module, setEnrollments, notify) {
     try {
         const new_enrollment = await enrollInModule(module.id);
         setEnrollments(prev => [...prev, new_enrollment]);
@@ -25,7 +38,7 @@ async function HandleEnrollment(module, setEnrollments, notify) {
     }
 }
 
-async function HandleDisenrol(module, enrollments, setEnrollments, notify) {
+async function handleDisenrol(module, enrollments, setEnrollments, notify) {
     try {
         const enrollment_id = getEnrollmentId(module.id, enrollments);
         await disenrolFromModule(enrollment_id)
@@ -36,7 +49,7 @@ async function HandleDisenrol(module, enrollments, setEnrollments, notify) {
     }
 }
 
-async function HandleDeleteModule(module, setModules, notify, onSuccess) {
+async function handleDeleteModule(module, setModules, notify, onSuccess) {
     const confirmed = confirm(`Delete ${module.module_name}? This will delete enrollments too.`);
     if (!confirmed) return;
     try {
@@ -55,7 +68,8 @@ export default function useModules() {
     const [enrollments, setEnrollments] = useState([]);
     const { addNotification} = useNotifications();
     function notify (message, type) {
-        addNotification({title: type === 'error' ? 'Error' : ' Success', message});
+        addNotification({title: type === 'error' ? 'Error' : 'Success', message});
     }
-    useEffect(() => {LoadData(setLoading, setModules, setEnrollments, notify);}, []);
+    useEffect(() => {loadData(setLoading, setModules, setEnrollments, notify);}, []);
+    return useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify)
 }
