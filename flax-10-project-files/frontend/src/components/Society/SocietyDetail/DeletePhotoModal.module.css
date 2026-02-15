@@ -9,7 +9,7 @@
 }
 
 .modal {
-    background: white;
+    background: var(--bg);
     padding: 24px;
     border-radius: 12px;
     width: min(400px, 90vw);
@@ -20,11 +20,11 @@
     margin: 0 0 12px;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text);
 }
 
 .message {
-    color: #666;
+    color: var(--muted);
     margin-bottom: 24px;
     line-height: 1.5;
 }
@@ -46,9 +46,9 @@
 }
 
 .dangerBtn {
-    background: #fff1f0;
-    color: #cf1322;
-    border: 1px solid #ffa39e;
+    background: var(--danger-bg);
+    color: var(--danger);
+    border: 1px solid var(--danger-border);
 }
 
 .dangerBtn:hover {
@@ -56,8 +56,8 @@
 }
 
 .primaryBtn {
-    background: var(--primary-color, #9E7E5D);
-    color: white;
+    background: var(--primary);
+    color: var(--c-white);
 }
 
 .primaryBtn:hover {
@@ -65,13 +65,13 @@
 }
 
 .cancelBtn {
-    background: white;
-    border: 1px solid #ddd;
-    color: #666;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
     margin-top: 4px;
 }
 
 .cancelBtn:hover {
-    background: #f5f5f5;
-    color: #333;
+    background: var(--hover);
+    color: var(--text);
 }
