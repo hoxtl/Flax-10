@@ -1,50 +1,49 @@
 // Morning (4am – 11:59am)
 const MORNING_QUOTES = [
-  "Good morning. Begin well.",
-  "Take your time. Do it right.",
-  "Start with intention.",
-  "You have enough time.",
-  "Decide who you are today.",
-  "One good decision at a time.",
+  "A fresh start begins here.",
+  "Your workspace is ready.",
+  "Begin gently.",
+  "Start with clarity.",
   "Today is yours to shape.",
-  "Begin, even if it’s small.",
-  "M1ve gently, but move.",
-  "This hour matters.",
-  "Begin before the noise begins.",
-  "The sun rose. So can you.",
-  "You are capable of wonderful things.",
+  "One steady step forward.",
+  "Move gently, but move.",
+  "This morning belongs to you.",
+  "Let the day unfold with intention.",
+  "Small beginnings matter.",
 ];
 
 // Afternoon (12pm – 5:59pm)
 const DAY_QUOTES = [
-  "Make this hour count.",
-  "Small wins still count.",
+  "Progress is happening.",
   "Even slow progress is progress.",
-  "The afternoon is for quiet progress.",
-  "The afternoon holds quiet power.",
-  "You are capable of wonderful things.",
+  "Stay steady.",
+  "Quiet effort compounds.",
+  "This hour matters.",
+  "The afternoon is for focus.",
+  "Build something meaningful.",
+  "Keep it simple. Keep going.",
 ];
 
 // Evening (6pm – 9:59pm)
 const EVENING_QUOTES = [
-  "Make yourself proud.",
-  "You are capable of wonderful things.",
+  "Close the day well.",
+  "Finish with intention.",
+  "Reflect, then reset.",
+  "Let the work settle.",
+  "A calm finish goes far.",
+  "Wrap up with clarity.",
 ];
 
 // Night (10pm – 3:59am)
 const NIGHT_QUOTES = [
-  "Quiet effort, loud results.",
-  "Calm mind, sharp focus.",
-  "Build while others rest.",
-  "Discipline doesn't sleep.",
-  "Breathe. Then begin.",
-  "Silence builds strength.",
-  "Earn tomorrow.",
+  "The quiet hours build strength.",
+  "Calm mind. Clear direction.",
+  "Stillness sharpens focus.",
+  "Build quietly.",
   "Refine. Improve. Repeat.",
-  "The world is asleep. You are not.",
-  "Midnight sharpens focus.",
+  "What you build now lasts.",
   "The unseen hours matter.",
-  "You are capable of wonderful things.",
+  "Slow down. Stay sharp.",
 ];
 
 function hashKey(key) {

@@ -53,6 +53,14 @@
   justify-content: center;
 }
 
+.underline {
+  width: min(420px, 70vw);
+  height: 1px;
+  background: rgba(43, 30, 20, 0.22);
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
 /* Base glass button */
 .primaryBtn,
 .secondaryBtn,
