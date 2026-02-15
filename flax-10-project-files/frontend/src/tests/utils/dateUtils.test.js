@@ -72,6 +72,8 @@ const testGreeting = () => {
     expect(dateUtils.getGreeting()).toBe('Good morning');
     vi.setSystemTime(new Date(2026, 1, 15, 14, 0));
     expect(dateUtils.getGreeting()).toBe('Good afternoon');
+    vi.setSystemTime(new Date(2026, 1, 15, 20, 0));
+    expect(dateUtils.getGreeting()).toBe('Good evening');
     vi.useRealTimers();
 };
 

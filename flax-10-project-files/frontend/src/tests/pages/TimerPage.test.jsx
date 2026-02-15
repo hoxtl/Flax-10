@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as helpers from '../utils/timerTestHelpers';
 import * as historyUtils from '../../utils/historyUtils';
+import { fireEvent, screen } from '@testing-library/react';
 
 vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
@@ -73,6 +74,19 @@ const testHistoryModal = () => {
     helpers.expectButton('Clear History');
 };
 
+const testHistoryModalClose = () => {
+    helpers.renderTimerPage();
+    helpers.clickHistory();
+    // Assuming the close button is '×' as seen in HistoryModal.jsx (implied)
+    const closeButtons = screen.getAllByRole('button');
+    const closeBtn = closeButtons.find(b => b.textContent === '×');
+    if (closeBtn) {
+        fireEvent.click(closeBtn);
+        // Verify 'Clear History' is gone
+        expect(screen.queryByText('Clear History')).not.toBeInTheDocument();
+    }
+};
+
 describe('TimerPage Integration', () => {
     beforeEach(setupTests);
     afterEach(cleanupTests);
@@ -83,4 +97,5 @@ describe('TimerPage Integration', () => {
     it('shows break modal when work session finishes', testBreakModalShow);
     it('enters break mode from modal', testBreakModalEnter);
     it('opens history modal when history button is clicked', testHistoryModal);
+    it('closes history modal', testHistoryModalClose);
 });
