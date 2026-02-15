@@ -11,11 +11,8 @@ import {
   getErrorMessage,
   saveUserData,
 } from "../utils/authHelpers";
+import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
 
-/**
- * Main page for user authentication
- * Responsible for both sign up and log in user functionality
- */
 export default function AuthPage() {
   const [signIn, toggle] = useState(true);
   const [error, setError] = useState("");
@@ -39,24 +36,23 @@ export default function AuthPage() {
     e.preventDefault();
     setError("");
 
-    const passwordError = validatePasswords(signUpData.password, signUpData.password2);
-    if (passwordError) {
-      setError(passwordError);
-      return;
-    }
+    const passwordError = validatePasswords(
+      signUpData.password,
+      signUpData.password2
+    );
+    if (passwordError) return setError(passwordError);
 
     setLoading(true);
-
     try {
       const { response, data } = await authService.register(signUpData);
 
       if (response.ok) {
-        // saveUserData also resets welcome flag + reloads
-        saveUserData(data.token, data.user);
+        await new Promise((r) => setTimeout(r, 180));
+        saveUserData(data.token, data.user); 
       } else {
         setError(getErrorMessage(data));
       }
-    } catch (err) {
+    } catch {
       setError("There has been an error, please try again...");
     } finally {
       setLoading(false);
@@ -72,54 +68,60 @@ export default function AuthPage() {
       const { response, data } = await authService.login(signInData);
 
       if (response.ok) {
-        // saveUserData also resets welcome flag + reloads
+        await new Promise((r) => setTimeout(r, 180));
         saveUserData(data.token, data.user);
       } else {
         setError(data.error || "Invalid username or password");
       }
-    } catch (err) {
+    } catch {
       setError("There has been an error, please try again...");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePanelToggle = (isSignIn) => {
-    toggle(isSignIn);
-    setError("");
-  };
-
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #f0ede8 0%, #eadfd2 100%)",
-      }}
-    >
-      <Components.Container>
-        <ErrorMessage error={error} />
+    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
+      <AuthHeroGeometric />
 
-        <SignUpForm
-          signIn={signIn}
-          formData={signUpData}
-          updateField={updateSignUpField}
-          onSubmit={handleSignUp}
-          loading={loading}
-        />
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Components.Container>
+          <ErrorMessage error={error} />
 
-        <SignInForm
-          signIn={signIn}
-          formData={signInData}
-          updateField={updateSignInField}
-          onSubmit={handleSignIn}
-          loading={loading}
-        />
+          <SignUpForm
+            signIn={signIn}
+            formData={signUpData}
+            updateField={updateSignUpField}
+            onSubmit={handleSignUp}
+            loading={loading}
+          />
 
-        <AuthOverlay signIn={signIn} onToggle={handlePanelToggle} />
-      </Components.Container>
+          <SignInForm
+            signIn={signIn}
+            formData={signInData}
+            updateField={updateSignInField}
+            onSubmit={handleSignIn}
+            loading={loading}
+          />
+
+          <AuthOverlay
+            signIn={signIn}
+            onToggle={(isSignIn) => {
+              toggle(isSignIn);
+              setError("");
+            }}
+          />
+        </Components.Container>
+      </div>
     </div>
   );
 }

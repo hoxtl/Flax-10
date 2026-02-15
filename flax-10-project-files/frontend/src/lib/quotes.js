@@ -8,47 +8,27 @@ const MORNING_QUOTES = [
   "One good decision at a time.",
   "Today is yours to shape.",
   "Begin, even if it’s small.",
-  "Move gently, but move.",
+  "M1ve gently, but move.",
   "This hour matters.",
   "Begin before the noise begins.",
   "The sun rose. So can you.",
   "You are capable of wonderful things.",
-  "Breathe."
 ];
 
 // Afternoon (12pm – 5:59pm)
 const DAY_QUOTES = [
   "Make this hour count.",
-  "You’re closer than you think.",
-  "Don’t quit at 70%.",
-  "Keep building.",
-  "Keep going.",
-  "Halfway is not the finish line.",
-  "Progress is happening.",
   "Small wins still count.",
-  "Keep the rhythm.",
   "Even slow progress is progress.",
   "The afternoon is for quiet progress.",
   "The afternoon holds quiet power.",
   "You are capable of wonderful things.",
-  "Continue",
-  "Breathe.",
 ];
 
 // Evening (6pm – 9:59pm)
 const EVENING_QUOTES = [
-  "Finish strong.",
-  "One task at a time.",
   "Make yourself proud.",
-  "Stay consistent.",
-  "Small steps daily.",
-  "Wrap up with purpose.",
-  "You’re almost there.",
-  "Last push.",
-  "Close the day with intent.",
   "You are capable of wonderful things.",
-  "Last rep energy.",
-  "Breathe."
 ];
 
 // Night (10pm – 3:59am)
@@ -58,7 +38,6 @@ const NIGHT_QUOTES = [
   "Build while others rest.",
   "Discipline doesn't sleep.",
   "Breathe. Then begin.",
-  "One quiet step forward.",
   "Silence builds strength.",
   "Earn tomorrow.",
   "Refine. Improve. Repeat.",
@@ -66,7 +45,6 @@ const NIGHT_QUOTES = [
   "Midnight sharpens focus.",
   "The unseen hours matter.",
   "You are capable of wonderful things.",
-  "Breathe."
 ];
 
 function hashKey(key) {
