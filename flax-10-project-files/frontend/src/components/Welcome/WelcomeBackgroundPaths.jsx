@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import styles from "./WelcomeBackgroundPaths.module.css";
 
 function FloatingPaths({ flip = 1 }) {
-  const paths = Array.from({ length: 50 }, (_, i) => {
+  const paths = Array.from({ length: 30 }, (_, i) => {
     const opacity = 0.05 + i * 0.012;
     const width = 0.7 + i * 0.03;
 
@@ -23,6 +23,7 @@ function FloatingPaths({ flip = 1 }) {
       <svg
         className={styles.svg}
         viewBox="0 0 696 316"
+        preserveAspectRatio="none"
         fill="none"
         aria-hidden="true"
       >
@@ -36,11 +37,11 @@ function FloatingPaths({ flip = 1 }) {
             initial={{ pathLength: 0.2, opacity: 0.45 }}
             animate={{
               pathLength: 1,
-              opacity: [0.25, 0.55, 0.25],
+              opacity: [0.25, 0.55, 0.12],
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 20 + Math.random() * 10,
+              duration: 50 + Math.random() * 8,
               repeat: Infinity,
               ease: "linear",
             }}
@@ -55,8 +56,9 @@ export default function WelcomeBackgroundPaths() {
   const reduceMotion = useReducedMotion();
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 80, damping: 18, mass: 0.6 });
-  const y = useSpring(my, { stiffness: 80, damping: 18, mass: 0.6 });
+
+  const x = useSpring(mx, { stiffness: 70, damping: 18 });
+  const y = useSpring(my, { stiffness: 70, damping: 18 });
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -64,6 +66,7 @@ export default function WelcomeBackgroundPaths() {
     const onMove = (e) => {
       const w = window.innerWidth || 1;
       const h = window.innerHeight || 1;
+
       const px = (e.clientX / w - 0.5) * 2;
       const py = (e.clientY / h - 0.5) * 2;
 
@@ -79,7 +82,6 @@ export default function WelcomeBackgroundPaths() {
     <div className={styles.bg} aria-hidden="true">
       <div className={styles.glow} />
 
-      {/* Parallax wrapper */}
       <motion.div className={styles.parallax} style={{ x, y }}>
         <FloatingPaths flip={1} />
         <FloatingPaths flip={-1} />
