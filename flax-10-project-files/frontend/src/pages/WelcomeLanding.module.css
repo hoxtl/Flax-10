@@ -11,7 +11,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg, #f0e9df);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(74,52,33,0.04), transparent 60%),
+    var(--bg, #f0e9df);
 }
 
 .center {
@@ -36,15 +38,16 @@
 }
 
 .bigLine {
-  font-size: clamp(32px, 4.2vw, 54px);
-  font-weight: 750;
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: rgba(43, 30, 20, 0.92);
 }
 
 .smallLine {
   font-size: clamp(18px, 2.3vw, 26px);
   font-weight: 650;
-  opacity: 0.82;
+  opacity: 0.75;
   color: rgba(43, 30, 20, 0.85);
 }
 
