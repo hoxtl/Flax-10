@@ -4,16 +4,15 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 1rem;
-    background: #f6f4f1;
+    background: var(--panel);
     border-radius: 8px;
     margin-bottom: 0.5rem;
     position: relative;
-    /* Context for absolute positioning */
 }
 
 .calendar-title {
     margin: 0;
-    color: black;
+    color: var(--text);
     font-size: 1.25rem;
     position: absolute;
     left: 50%;
@@ -21,22 +20,18 @@
     white-space: nowrap;
 }
 
-/* Styling for all the buttons in nav and view toggle */
 .actions {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-left: auto;
-    /* Push to right */
 }
 
-/* Ensure nav buttons stay left */
 .nav-buttons {
     display: flex;
     align-items: center;
     gap: 0.25rem;
     margin-right: auto;
-    /* Push to left? No, flex space-between handles this but we need to prevent overlap */
 }
 
 .btn-import-wrapper {
@@ -50,8 +45,8 @@
     top: -32px;
     left: 50%;
     transform: translateX(-50%);
-    background: #2a2a2a;
-    color: white;
+    background: var(--panel);
+    color: var(--text);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -70,7 +65,7 @@
     transform: translateX(-50%);
     border-width: 4px 4px 0;
     border-style: solid;
-    border-color: #2a2a2a transparent transparent;
+    border-color: var(--panel) transparent transparent;
 }
 
 .btn-import-wrapper:hover .btn-import-tooltip {
@@ -78,9 +73,9 @@
 }
 
 .btn-import {
-    background: #3a3a3a;
+    background: var(--btn-black);
     border: none;
-    color: white;
+    color: var(--bg);
     cursor: pointer;
     padding: 0.35rem 0.75rem;
     border-radius: 4px;
@@ -88,13 +83,13 @@
 }
 
 .btn-import:hover {
-    background: #2a2a2a;
+    filter: brightness(0.9);
 }
 
 .btn-add {
     background: transparent !important;
     border: none;
-    color: #503f2e;
+    color: var(--primary);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
@@ -107,24 +102,21 @@
     opacity: 0.7;
 }
 
-/* Navigation buttons (arrows + Today) */
 .nav-buttons button {
     padding: 0.4rem 0.8rem;
-    /* Smaller padding for arrows */
     border: none;
-    background: #9E7E5D;
+    background: var(--btn-black);
     color: white;
     cursor: pointer;
     border-radius: 4px;
     margin: 0 0.25rem;
     font-size: 0.9rem;
-    /* Slightly smaller text */
 }
 
 .view-toggle button {
     padding: 0.5rem 1rem;
     border: none;
-    background: #9E7E5D;
+    background: var(--btn-black);
     color: white;
     cursor: pointer;
     border-radius: 4px;
@@ -133,16 +125,14 @@
 
 .nav-buttons button:hover,
 .view-toggle button:hover {
-    background: #7E5F40;
+    filter: brightness(0.9);
 }
 
-/* Highlight the currrently active view mode button */
 .view-toggle button.active {
-    background: #3a3a3a;
+    background: var(--primary-strong);
     color: white;
 }
 
-/* Hidden date input for the date picker */
 .hidden-date-input {
     position: absolute;
     opacity: 0;
@@ -151,7 +141,6 @@
     height: 0;
 }
 
-/* Calendar button styling */
 .btn-calendar {
     background: transparent !important;
     border: none !important;
@@ -164,18 +153,15 @@
     opacity: 0.7;
 }
 
-/* Today button */
 .btn-today {
-    background: #503f2e !important;
+    background: var(--primary-strong) !important;
     font-size: 0.85rem;
     padding: 0.4rem 0.75rem !important;
 }
 
 .btn-today:hover {
-    background: #3a2a1a !important;
+    filter: brightness(0.9) !important;
 }
-
-
 
 @media (max-width: 768px) {
     .calendar-header {
@@ -186,7 +172,6 @@
 
     .calendar-title {
         order: -1;
-        /* Keep title on top or structure differently */
         width: 100%;
         text-align: center;
         margin-bottom: 0.5rem;
@@ -204,27 +189,31 @@
     }
 }
 
-/* View Select Styling */
 .view-select {
     padding: 0.5rem 2rem 0.5rem 1rem;
     border: none;
-    background-color: #9E7E5D;
-    color: white;
+  
+    background-color: var(--primary) !important;
+    color: var(--calendar-bg);
+  
     cursor: pointer;
     border-radius: 4px;
     font-size: 1rem;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.7rem top 50%;
-    background-size: 0.65rem auto;
-}
+  
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  
+    background-image: var(--select-chevron) !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 0.65rem auto !important;
+  }
 
 .view-select:hover {
-    background-color: #7E5F40;
+    filter: brightness(0.9);
 }
 
 .view-select:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(158, 126, 93, 0.4);
+    box-shadow: 0 0 0 2px rgba(183, 146, 107, 0.4);
 }

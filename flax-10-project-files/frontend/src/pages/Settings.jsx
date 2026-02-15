@@ -1,5 +1,10 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
+import { useTheme } from "../context/ThemeContext";
+import { updateUserSettings } from '../api/userService';
+
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 // Single tab button
 function TabButton({ id, label, isActive, onClick }) {
@@ -59,10 +64,18 @@ function ErrorMessage({ message }) {
 }
 
 // Form input field
-function FormInput({ id, label, type = "text", value, onChange, required, name }) {
+function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength }) {
+  const remaining_chars = maxLength ? maxLength - value.length : null;
+
   return (
     <div className={styles.formGroup}>
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>{label}
+        {maxLength && (
+          <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>
+            ({remaining_chars} characters remaining)
+          </span>
+        )}
+      </label>
       <input
         type={type}
         id={id}
@@ -70,6 +83,7 @@ function FormInput({ id, label, type = "text", value, onChange, required, name }
         value={value}
         onChange={onChange}
         required={required}
+        maxLength={maxLength}
       />
     </div>
   );
@@ -87,6 +101,30 @@ function FormSelect({ id, label, value, onChange, options, name }) {
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+// Theme selector component
+function ThemeSelector({ value, onChange }) {
+  return (
+    <div className={styles.themeSelector}>
+      <button
+        type="button"
+        className={`${styles.themeOption} ${value === 'light' ? styles.active : ''}`}
+        onClick={() => onChange('light')}
+      >
+        <span className={styles.themeIcon}>☀️</span>
+        <span className={styles.themeLabel}>Light</span>
+      </button>
+      <button
+        type="button"
+        className={`${styles.themeOption} ${value === 'dark' ? styles.active : ''}`}
+        onClick={() => onChange('dark')}
+      >
+        <span className={styles.themeIcon}>🌙</span>
+        <span className={styles.themeLabel}>Dark</span>
+      </button>
     </div>
   );
 }
@@ -115,9 +153,10 @@ function SubmitButton({ isSaving, label, savingLabel }) {
 // Get initial account data
 function getInitialAccountData(user) {
   return {
-    name: user?.name || "",
+    firstName: user?.first_name || "",
+    lastName: user?.last_name || "",
     email: user?.email || "",
-    year: user?.year || "Year 2",
+    year: user?.year || "2",
     major: user?.major || "Computer Science",
   };
 }
@@ -125,10 +164,15 @@ function getInitialAccountData(user) {
 // Get year options
 function getYearOptions() {
   return [
-    { value: "Year 1", label: "Year 1" },
-    { value: "Year 2", label: "Year 2" },
-    { value: "Year 3", label: "Year 3" },
-    { value: "Year 4", label: "Year 4" },
+    { value: "Found.", label: "Foundation Year" },
+    { value: "1", label: "Year 1" },
+    { value: "2", label: "Year 2" },
+    { value: "3", label: "Year 3" },
+    { value: "4", label: "Year 4" },
+    { value: "5", label: "Year 5" },
+    { value: "6", label: "Year 6" },
+    { value: "7", label: "Year 7" },
+    { value: "8", label: "Year 8" }
   ];
 }
 
@@ -151,9 +195,19 @@ function AccountForm({ user, onSave, isSaving }) {
       <SectionHeader title="Personal Information" />
       
       <FormInput
-        id="name"
-        label="Full Name"
-        value={formData.name}
+        id="firstName"
+        name="firstName"
+        label="First Name"
+        value={formData.firstName}
+        onChange={handleChange}
+        required
+      />
+
+      <FormInput
+        id="lastName"
+        name="lastName"
+        label="Last Name"
+        value={formData.lastName}
         onChange={handleChange}
         required
       />
@@ -181,6 +235,7 @@ function AccountForm({ user, onSave, isSaving }) {
           label="Major"
           value={formData.major}
           onChange={handleChange}
+          maxLength={100}
         />
       </div>
 
@@ -262,15 +317,43 @@ function SecurityForm({ onSave, isSaving, error }) {
 }
 
 // Preferences panel
-function PreferencesPanel() {
+function PreferencesPanel({ onSave, isSaving }) {
+  const { theme, setTheme } = useTheme();
+  const [formData, setFormData] = useState({
+    theme: theme,
+  });
+
+  function handleThemeChange(newTheme) {
+    setFormData(prev => ({ ...prev, theme: newTheme }));
+    setTheme(newTheme); // Update theme immediately
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    onSave(formData);
+  }
+
   return (
-    <div className={styles.formSection}>
-      <h2 className={styles.sectionTitle}>Preferences</h2>
-      <p className={styles.formDescription}>Customize your StudyFlax experience</p>
-      <p style={{ color: "var(--muted)", marginTop: "40px" }}>
-        Preferences coming soon...
-      </p>
-    </div>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <SectionHeader
+        title="Appearance"
+        description="Customize how StudyFlax looks"
+      />
+
+      <div className={styles.formGroup}>
+        <label>Theme</label>
+        <p className={styles.formDescription}>
+          Choose your preferred color scheme. This will be saved and applied every time you log in.
+        </p>
+        <ThemeSelector value={formData.theme} onChange={handleThemeChange} />
+      </div>
+
+      <SubmitButton
+        isSaving={isSaving}
+        label="Save Preferences"
+        savingLabel="Saving..."
+      />
+    </form>
   );
 }
 
@@ -311,12 +394,49 @@ export default function Settings({ user, onBack }) {
 
   const handleAccountSave = async (data) => {
     setIsSaving(true);
+    setPasswordError("");
+
     try {
-      console.log("Saving account:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      showTemporaryMessage(setSuccessMessage, "Account updated successfully!");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setPasswordError("You are not logged in, please try again...");
+        setIsSaving(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/settings/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          year: data.year,
+          major: data.major
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        if (responseData.user) {
+          localStorage.setItem('user', JSON.stringify(responseData.user));
+          showTemporaryMessage(setSuccessMessage, "The account has been updated!");
+
+          setTimeout(() => {
+            onBack();
+            window.location.reload();
+          }, 1000);
+        }
+        else {
+          setPasswordError(responseData.error || "The account update has failed...");
+        }
+      }
     } catch (error) {
-      console.error("Failed to update account:", error);
+      console.error("Update account error: ", error)
+      setPasswordError("Action failed, please try again...")
     } finally {
       setIsSaving(false);
     }
@@ -338,10 +458,29 @@ export default function Settings({ user, onBack }) {
     setIsSaving(true);
     try {
       console.log("Changing password");
+      // TODO: Call API to change password
       await new Promise((resolve) => setTimeout(resolve, 1000));
       showTemporaryMessage(setSuccessMessage, "Password changed successfully!");
     } catch (error) {
       setPasswordError("Failed to change password. Check your current password.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePreferencesSave = async (data) => {
+    setIsSaving(true);
+    try {
+      const response = await updateUserSettings({ theme: data.theme });
+      
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+      }
+      
+      showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
+    } catch (error) {
+      console.error("Failed to save preferences:", error);
+      showTemporaryMessage(setSuccessMessage, "Failed to save preferences");
     } finally {
       setIsSaving(false);
     }
@@ -368,7 +507,9 @@ export default function Settings({ user, onBack }) {
             />
           )}
 
-          {activeTab === "preferences" && <PreferencesPanel />}
+          {activeTab === "preferences" && (
+            <PreferencesPanel onSave={handlePreferencesSave} isSaving={isSaving} />
+          )}
         </div>
       </div>
     </div>

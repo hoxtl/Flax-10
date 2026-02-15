@@ -195,3 +195,49 @@
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  /* Theme Selector */
+.themeSelector {
+  display: flex;
+  gap: 12px;
+  background: var(--panel);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-top: 12px;
+}
+
+.themeOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--muted);
+}
+
+.themeOption:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.themeOption.active {
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.themeIcon {
+  font-size: 32px;
+}
+
+.themeLabel {
+  font-size: 14px;
+  font-weight: 600;
+}
