@@ -19,12 +19,6 @@ import { NotificationToast } from "./components/Notifications";
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 
-export function clearUserData() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  localStorage.removeItem(WELCOME_SEEN_KEY); 
-}
-
 function getUser() {
   const userString = localStorage.getItem("user");
   if (userString) {
@@ -46,11 +40,11 @@ export default function App() {
   const [initialTheme, setInitialTheme] = useState("light");
   const [isLoadingTheme, setIsLoadingTheme] = useState(true);
 
+  const user = getUser();
+
   const [showWelcome, setShowWelcome] = useState(() => {
     return localStorage.getItem(WELCOME_SEEN_KEY) !== "1";
   });
-
-  const user = getUser();
 
   useEffect(() => {
     async function loadUserTheme() {
@@ -73,6 +67,12 @@ export default function App() {
     loadUserTheme();
   }, []);
 
+  // Re-sync welcome visibility after login
+  useEffect(() => {
+    if (!isAuthenticated() || !user) return;
+    setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
+  }, [user]);
+
   function handleBackFromSettings() {
     setActiveNav("home");
   }
@@ -93,6 +93,7 @@ export default function App() {
           onExplore={() => {
             localStorage.setItem(WELCOME_SEEN_KEY, "1");
             setShowWelcome(false);
+            setActiveNav("home");
           }}
         />
       </ThemeProvider>
@@ -116,7 +117,11 @@ export default function App() {
       <NotificationProvider>
         <CalendarProvider>
           <TagProvider>
-            <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
+            <DashboardLayout
+              activeNav={activeNav}
+              onNavChange={setActiveNav}
+              user={user}
+            >
               {pageContent}
             </DashboardLayout>
 
