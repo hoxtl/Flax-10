@@ -1,0 +1,124 @@
+.page {
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  background-image: url("../assets/tasks-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tasks-overlay);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.center {
+  position: relative;
+  z-index: 1;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  gap: 14px;
+  transform: translateY(30px);
+}
+
+.time {
+  font-size: clamp(72px, 10vw, 140px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  color: var(--tasks-text);
+}
+
+.bigLine {
+  font-size: clamp(32px, 4.2vw, 54px);
+  font-weight: 650;
+  color: var(--tasks-text);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.2);
+}
+
+.smallLine {
+  font-size: clamp(18px, 2.3vw, 26px);
+  font-weight: 600;
+  opacity: 0.85;
+  color: var(--tasks-text);
+}
+
+.goalBlock {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+  width: min(720px, 80%);
+}
+
+.goalPrompt {
+  font-size: 22px;
+  color: var(--tasks-muted);
+}
+
+.goalInput {
+  width: 100%;
+  font-size: 26px;
+  text-align: center;
+  padding: 10px 6px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--tasks-text);
+  caret-color: var(--tasks-text);
+}
+
+.goalUnderline {
+  height: 1.5px;
+  background: var(--tasks-underline);
+  width: 100%;
+}
+
+.actions {
+  margin-top: 22px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primaryBtn {
+  background: var(--primary-strong);
+  color: white;
+}
+
+.secondaryBtn {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--tasks-text);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
