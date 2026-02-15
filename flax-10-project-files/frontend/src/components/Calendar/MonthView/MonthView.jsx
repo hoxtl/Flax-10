@@ -7,7 +7,7 @@ import './MonthView.css';
     Shows full month view of the calendar.
     Props are optional - falls back to CalendarContext if not provided.
 */
-export function MonthView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly }) {
+export function MonthView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly, onEventClick, customTags }) {
     const data = useCalendarData({ selectedDate: propDate, events: propEvents });
     const contextDispatch = useCalendarDispatch();
     const weeks = getMonthWeeks(data.selectedDate);
@@ -17,7 +17,8 @@ export function MonthView({ selectedDate: propDate, events: propEvents, onDateSe
     return (
         <div className="month-view">
             <WeekdayHeader />
-            <MonthGrid weeks={weeks} events={data.events} cur={data.selectedDate} onDateSelect={handleDateSelect} readOnly={readOnly} />
+            <MonthGrid weeks={weeks} events={data.events} cur={data.selectedDate} onDateSelect={handleDateSelect}
+                readOnly={readOnly} onEventClick={onEventClick} customTags={customTags} />
         </div>
     );
 }
@@ -27,11 +28,12 @@ function createDispatchHandler(dispatch) {
     return (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
 }
 
-function MonthGrid({ weeks, events, cur, onDateSelect, readOnly }) {
+function MonthGrid({ weeks, events, cur, onDateSelect, readOnly, onEventClick, customTags }) {
     return (
         <div className="month-grid">
             {weeks.map((week, i) => (
-                <WeekRow key={i} days={week} events={events} cur={cur} onDateSelect={onDateSelect} readOnly={readOnly} />
+                <WeekRow key={i} days={week} events={events} cur={cur} onDateSelect={onDateSelect}
+                    readOnly={readOnly} onEventClick={onEventClick} customTags={customTags} />
             ))}
         </div>
     );

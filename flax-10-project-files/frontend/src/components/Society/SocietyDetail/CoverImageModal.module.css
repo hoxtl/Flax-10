@@ -66,14 +66,14 @@
     right: -8px;
     width: 24px;
     height: 24px;
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #ff4d4f;
+    color: var(--danger);
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

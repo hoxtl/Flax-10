@@ -42,6 +42,16 @@
     line-height: 1;
 }
 
+.error {
+    background: var(--danger-bg);
+    color: var(--danger);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    border: 1px solid var(--danger-border);
+}
+
 .form {
     display: flex;
     flex-direction: column;
@@ -178,6 +188,26 @@
     background: var(--danger);
 }
 
+.selectWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.colorDot {
+    position: absolute;
+    left: 12px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.selectWrapper .select {
+    padding-left: 30px;
+}
+
 .select {
     padding: 10px 14px;
     border: 1px solid var(--border);
@@ -186,6 +216,7 @@
     background: var(--bg);
     color: var(--text);
     cursor: pointer;
+    width: 100%;
 }
 
 .select:focus {
@@ -224,6 +255,12 @@
 }
 
 .timeRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.dateRow {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;

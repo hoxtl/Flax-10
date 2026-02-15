@@ -10,7 +10,7 @@
 
 .modal {
     width: min(440px, 90vw);
-    background: white;
+    background: var(--bg);
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -27,6 +27,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
+    color: var(--text);
 }
 
 .close {
@@ -34,13 +35,13 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #999;
+    color: var(--muted);
     padding: 0;
     line-height: 1;
 }
 
 .dropZone {
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border);
     border-radius: 12px;
     padding: 48px 24px;
     text-align: center;
@@ -49,23 +50,23 @@
 }
 
 .dropZone:hover {
-    border-color: var(--primary-color, #9E7E5D);
-    background: #faf8f6;
+    border-color: var(--primary);
+    background: var(--hover);
 }
 
 .dropIcon {
     display: block;
     font-size: 2.5rem;
-    color: #ccc;
+    color: var(--muted);
     margin-bottom: 8px;
 }
 
 .dropZone:hover .dropIcon {
-    color: var(--primary-color, #9E7E5D);
+    color: var(--primary);
 }
 
 .dropText {
-    color: #666;
+    color: var(--muted);
     font-size: 0.95rem;
 }
 
@@ -74,7 +75,7 @@
     max-height: 300px;
     object-fit: contain;
     border-radius: 12px;
-    background: #f5f5f5;
+    background: var(--panel);
 }
 
 .coverOption {
@@ -84,13 +85,13 @@
     margin-top: 16px;
     cursor: pointer;
     font-size: 0.95rem;
-    color: #444;
+    color: var(--text);
 }
 
 .coverOption input {
     width: 18px;
     height: 18px;
-    accent-color: var(--primary-color, #9E7E5D);
+    accent-color: var(--primary);
 }
 
 .footer {
@@ -99,22 +100,23 @@
     gap: 12px;
     margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
 }
 
 .cancelBtn {
     padding: 10px 20px;
-    border: 1px solid #ddd;
-    background: white;
+    border: 1px solid var(--border);
+    background: var(--bg);
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
+    color: var(--text);
 }
 
 .submitBtn {
     padding: 10px 20px;
-    background: var(--primary-color, #9E7E5D);
-    color: white;
+    background: var(--primary);
+    color: var(--c-white);
     border: none;
     border-radius: 8px;
     cursor: pointer;

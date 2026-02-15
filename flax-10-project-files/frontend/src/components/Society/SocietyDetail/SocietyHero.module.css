@@ -1,5 +1,5 @@
 .hero {
-    height: 280px;
+    height: 310px;
     background-size: cover;
     background-position: center;
     position: relative;
@@ -24,7 +24,6 @@
     justify-content: center;
     cursor: pointer;
     z-index: 5;
-    /* Lowered from 10 to clear TopBar (z-index 10) */
 }
 
 .content {
@@ -34,12 +33,9 @@
     width: 100%;
     position: relative;
     z-index: 6;
-    /* Just above editLayer */
     pointer-events: none;
-    /* Let clicks pass through empty areas */
 }
 
-/* Re-enable pointer events for interactive children */
 .nameWrapper,
 .imageCount,
 .nameInput {

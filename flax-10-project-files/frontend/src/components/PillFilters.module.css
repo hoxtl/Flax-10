@@ -14,7 +14,7 @@
 
 /* Base pill style */
 .pill {
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   border: none;
   border-radius: 22px;
   padding: 7px 17px;
@@ -23,6 +23,9 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .pill:hover {
@@ -47,4 +50,12 @@
 /* Count inside */
 .count {
   font-weight: 800;
+}
+
+/* Color dot for custom tags */
+.colorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
 }

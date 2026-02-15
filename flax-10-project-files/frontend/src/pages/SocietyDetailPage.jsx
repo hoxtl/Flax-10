@@ -7,7 +7,6 @@ import SocietyTabs from "../components/Society/SocietyDetail/SocietyTabs";
 import SocietySidebar from "../components/Society/SocietyDetail/SocietySidebar";
 import CoverImageModal from "../components/Society/SocietyDetail/CoverImageModal";
 import ImageGalleryModal from "../components/Society/SocietyDetail/ImageGalleryModal";
-import { useTags } from "../context/TagContext";
 
 export default function SocietyDetailPage({ society: initialSociety, onBack }) {
     const [society, setSociety] = useState(initialSociety);
@@ -16,7 +15,6 @@ export default function SocietyDetailPage({ society: initialSociety, onBack }) {
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
-    const { tags } = useTags();
 
     if (!society) return <NotFound onBack={onBack} />;
     const canEdit = society.isAdmin;
@@ -32,7 +30,7 @@ export default function SocietyDetailPage({ society: initialSociety, onBack }) {
                 onEditImages={() => setShowCoverModal(true)} />
             <SocietyInfo society={society} details={details} editMode={editMode} onUpdateSociety={handlers.updateDetails} />
             <MainContent activeTab={activeTab} setActiveTab={setActiveTab} details={details}
-                editMode={editMode} onUpdateDetails={handlers.updateDetails} tags={tags} onAddAnnouncement={handlers.addAnnouncement} />
+                editMode={editMode} handlers={handlers} />
             {galleryOpen && <ImageGalleryModal images={details.images || []} onClose={() => setGalleryOpen(false)} />}
             {showCoverModal && <CoverImageModal images={details.images || []} availablePhotos={availablePhotos}
                 onClose={() => setShowCoverModal(false)} onUpdate={(imgs) => handlers.updateDetails({ images: imgs })}
@@ -46,18 +44,26 @@ function useDetailHandlers(setSociety, setDetails) {
     const updateDetails = (updates) => setDetails(prev => ({ ...prev, ...updates }));
     const addCoverImage = (img) => setDetails(prev => ({ ...prev, images: [...(prev.images || []), img] }));
     const addAnnouncement = (data) => handleAddAnnouncement(data, setDetails);
-    return { updateSociety, updateDetails, addCoverImage, addAnnouncement };
+    const addEvent = (data) => handleAddEvent(data, setDetails);
+    return { updateSociety, updateDetails, addCoverImage, addAnnouncement, addEvent };
 }
 
 function handleAddAnnouncement(data, setDetails) {
-    const announcement = { id: Date.now(), title: data.title, content: data.content, images: data.images || [],
+    const announcementId = Date.now();
+    const announcement = { id: announcementId, title: data.title, content: data.content, images: data.images || [],
         image: data.images?.[0] || null, tagId: data.tagId, date: new Date().toISOString().split('T')[0], pinned: data.pinned || false };
     setDetails(prev => ({ ...prev, announcements: [...(prev.announcements || []), announcement] }));
-    if (data.addAsEvent) addEventFromAnnouncement(data, setDetails);
+    if (data.addAsEvent) addEventFromAnnouncement(data, announcementId, setDetails);
 }
 
-function addEventFromAnnouncement(data, setDetails) {
-    const event = { id: Date.now() + 1, title: data.title, date: data.date, time: data.allDay ? "00:00" : data.startTime };
+function addEventFromAnnouncement(data, announcementId, setDetails) {
+    const event = { id: Date.now() + 1, title: data.title, date: data.date, time: data.allDay ? "00:00" : data.startTime,
+        endDate: data.endDate, endTime: data.endTime, tagId: data.tagId, recurrence: data.recurrence, announcementId };
+    setDetails(prev => ({ ...prev, upcomingEvents: [...(prev.upcomingEvents || []), event] }));
+}
+
+function handleAddEvent(data, setDetails) {
+    const event = { id: Date.now(), title: data.title, date: data.date, time: data.time || "12:00", tagId: data.tag };
     setDetails(prev => ({ ...prev, upcomingEvents: [...(prev.upcomingEvents || []), event] }));
 }
 
@@ -95,15 +101,16 @@ function NotFound({ onBack }) {
     );
 }
 
-function MainContent({ activeTab, setActiveTab, details, editMode, onUpdateDetails, tags, onAddAnnouncement }) {
+function MainContent({ activeTab, setActiveTab, details, editMode, handlers }) {
+    const tags = details.tags || [];
     return (
         <div className={styles.mainContent}>
             <div className={styles.tabSection}>
                 <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} details={details}
-                    editMode={editMode} onUpdateDetails={onUpdateDetails} tags={tags} />
+                    editMode={editMode} onUpdateDetails={handlers.updateDetails} tags={tags} />
             </div>
             <SocietySidebar details={details} editMode={editMode} tags={tags}
-                onAddAnnouncement={onAddAnnouncement} onAddEvent={() => console.log("Open event modal")} />
+                onAddAnnouncement={handlers.addAnnouncement} onAddEvent={handlers.addEvent} />
         </div>
     );
 }

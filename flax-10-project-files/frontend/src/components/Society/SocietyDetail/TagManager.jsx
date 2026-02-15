@@ -1,0 +1,93 @@
+import { useState } from "react";
+import styles from "./TagManager.module.css";
+
+const DEFAULT_COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"];
+const MAX_TAGS = 7;
+
+export default function TagManager({ tags = [], onUpdate }) {
+    const [newTag, setNewTag] = useState({ label: "", color: getNextColor(tags) });
+    const canAddMore = tags.length < MAX_TAGS;
+
+    const handleAdd = () => {
+        if (!newTag.label.trim() || !canAddMore) return;
+        const tag = { id: newTag.label.toLowerCase().replace(/\s+/g, "-"), label: newTag.label.trim(), color: newTag.color };
+        onUpdate([...tags, tag]);
+        setNewTag({ label: "", color: getNextColor([...tags, tag]) });
+    };
+
+    const handleRemove = (id) => onUpdate(tags.filter(t => t.id !== id));
+
+    return (
+        <div className={styles.manager}>
+            <ManagerHeader count={tags.length} max={MAX_TAGS} />
+            <TagList tags={tags} onRemove={handleRemove} />
+            {canAddMore && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} />}
+        </div>
+    );
+}
+
+function ManagerHeader({ count, max }) {
+    return (
+        <div className={styles.headerRow}>
+            <h4 className={styles.title}>Manage Tags</h4>
+            <span className={styles.counter}>{count}/{max}</span>
+        </div>
+    );
+}
+
+function TagList({ tags, onRemove }) {
+    if (tags.length === 0) return <p className={styles.empty}>No tags yet. Add one below.</p>;
+    return (
+        <div className={styles.tagList}>
+            {tags.map(tag => <TagItem key={tag.id} tag={tag} onRemove={() => onRemove(tag.id)} />)}
+        </div>
+    );
+}
+
+function TagItem({ tag, onRemove }) {
+    return (
+        <div className={styles.tagItem}>
+            <span className={styles.colorDot} style={{ backgroundColor: tag.color }} />
+            <span className={styles.tagLabel}>{tag.label}</span>
+            <button className={styles.removeBtn} onClick={onRemove}>&times;</button>
+        </div>
+    );
+}
+
+function AddTagForm({ newTag, setNewTag, onAdd }) {
+    return (
+        <div className={styles.addForm}>
+            <input className={styles.input} placeholder="Tag name" value={newTag.label}
+                onChange={(e) => setNewTag(prev => ({ ...prev, label: e.target.value }))}
+                onKeyDown={(e) => e.key === "Enter" && onAdd()} />
+            <ColorPicker color={newTag.color} onChange={(c) => setNewTag(prev => ({ ...prev, color: c }))} />
+            <button className={styles.addBtn} onClick={onAdd} disabled={!newTag.label.trim()}>Add</button>
+        </div>
+    );
+}
+
+function ColorPicker({ color, onChange }) {
+    return (
+        <div className={styles.colorPicker}>
+            {DEFAULT_COLORS.map(c => (
+                <button key={c} className={`${styles.colorOption} ${c === color ? styles.selected : ""}`}
+                    style={{ backgroundColor: c }} onClick={() => onChange(c)} />
+            ))}
+            <CustomColorInput color={color} onChange={onChange} />
+        </div>
+    );
+}
+
+function CustomColorInput({ color, onChange }) {
+    const isCustom = !DEFAULT_COLORS.includes(color);
+    return (
+        <label className={`${styles.customColor} ${isCustom ? styles.selected : ""}`}>
+            <input type="color" value={color} onChange={(e) => onChange(e.target.value)} />
+        </label>
+    );
+}
+
+function getNextColor(tags) {
+    const usedColors = new Set(tags.map(t => t.color));
+    return DEFAULT_COLORS.find(c => !usedColors.has(c)) || DEFAULT_COLORS[0];
+}
