@@ -1,14 +1,15 @@
 import styles from "./SocietySidebar.module.css";
 
-export default function SocietySidebar({ details }) {
+export default function SocietySidebar({ details, editMode }) {
     const pinnedAnnouncement = details.announcements?.find(a => a.pinned);
     const nextEvent = details.upcomingEvents?.[0];
 
     return (
         <aside className={styles.sidebar}>
-            {pinnedAnnouncement && <PinnedSection announcement={pinnedAnnouncement} />}
-            {nextEvent && <UpcomingSection event={nextEvent} />}
-            {!pinnedAnnouncement && !nextEvent && <EmptySidebar />}
+            {pinnedAnnouncement && <PinnedSection announcement={pinnedAnnouncement} editMode={editMode} />}
+            {nextEvent && <UpcomingSection event={nextEvent} editMode={editMode} />}
+            {!pinnedAnnouncement && !nextEvent && <EmptySidebar editMode={editMode} />}
+            {editMode && <AddButtons />}
         </aside>
     );
 }
@@ -33,8 +34,18 @@ function UpcomingSection({ event }) {
     );
 }
 
-function EmptySidebar() {
+function EmptySidebar({ editMode }) {
+    if (editMode) return null;
     return <p className={styles.empty}>No pinned items or upcoming events.</p>;
+}
+
+function AddButtons() {
+    return (
+        <div className={styles.addButtons}>
+            <button className={styles.addBtn} onClick={() => console.log("Add announcement")}>+ Add Announcement</button>
+            <button className={styles.addBtn} onClick={() => console.log("Add event")}>+ Add Event</button>
+        </div>
+    );
 }
 
 function formatEventDate(event) {

@@ -1,18 +1,23 @@
 import { useState } from "react";
 import styles from "./SocietyInfo.module.css";
 
-export default function SocietyInfo({ society, details }) {
+export default function SocietyInfo({ society, details, editMode }) {
     return (
         <div className={styles.info}>
-            <Bio text={details.bio} />
+            <Bio text={details.bio} editMode={editMode} />
             <Stats society={society} details={details} />
-            <JoinButton isMember={details.isMember} isPrivate={society.isPrivate} />
+            {editMode ? <EditDetailsButton /> : <JoinButton isMember={details.isMember} isPrivate={society.isPrivate} />}
         </div>
     );
 }
 
-function Bio({ text }) {
-    if (!text) return null;
+function EditDetailsButton() {
+    return <button className={styles.editBtn} onClick={() => console.log("Edit details")}>Edit Details</button>;
+}
+
+function Bio({ text, editMode }) {
+    if (!text && !editMode) return null;
+    if (!text && editMode) return <p className={styles.bioPlaceholder}>Add a bio description...</p>;
     return <p className={styles.bio}>{text}</p>;
 }
 

@@ -4,7 +4,7 @@ import { MonthView } from "../../../Calendar/MonthView/MonthView";
 import { WeekView } from "../../../Calendar/WeekView/WeekView";
 import { DayView } from "../../../Calendar/DayView/DayView";
 
-export default function CalendarTab({ details }) {
+export default function CalendarTab({ details, editMode }) {
     const [view, setView] = useState("month");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const events = convertEvents(details.upcomingEvents || []);
@@ -12,7 +12,7 @@ export default function CalendarTab({ details }) {
     return (
         <div className={styles.calendarTab}>
             <CalendarHeader view={view} setView={setView} date={selectedDate} setDate={setSelectedDate} />
-            <CalendarView view={view} date={selectedDate} events={events} onDateSelect={setSelectedDate} />
+            <CalendarView view={view} date={selectedDate} events={events} onDateSelect={setSelectedDate} readOnly={!editMode} />
         </div>
     );
 }
@@ -52,10 +52,10 @@ function ViewBtn({ v, active, onClick }) {
     return <button className={cls} onClick={onClick}>{v.charAt(0).toUpperCase() + v.slice(1)}</button>;
 }
 
-function CalendarView({ view, date, events, onDateSelect }) {
-    if (view === "week") return <WeekView selectedDate={date} events={events} onDateSelect={onDateSelect} readOnly />;
-    if (view === "day") return <DayView selectedDate={date} events={events} readOnly />;
-    return <MonthView selectedDate={date} events={events} onDateSelect={onDateSelect} readOnly />;
+function CalendarView({ view, date, events, onDateSelect, readOnly }) {
+    if (view === "week") return <WeekView selectedDate={date} events={events} onDateSelect={onDateSelect} readOnly={readOnly} />;
+    if (view === "day") return <DayView selectedDate={date} events={events} readOnly={readOnly} />;
+    return <MonthView selectedDate={date} events={events} onDateSelect={onDateSelect} readOnly={readOnly} />;
 }
 
 function convertEvents(events) {

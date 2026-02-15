@@ -10,25 +10,38 @@ import ImageGalleryModal from "../components/Society/SocietyDetail/ImageGalleryM
 export default function SocietyDetailPage({ society, onBack }) {
     const [activeTab, setActiveTab] = useState("calendar");
     const [galleryOpen, setGalleryOpen] = useState(false);
+    const [editMode, setEditMode] = useState(false);
 
     if (!society) return <NotFound onBack={onBack} />;
 
     const details = MOCK_SOCIETY_DETAILS[society.id] || {};
+    const canEdit = society.isAdmin;
 
     return (
         <div className={styles.page}>
-            <BackButton onBack={onBack} />
-            <SocietyHero society={society} details={details} onImageClick={() => setGalleryOpen(true)} />
-            <SocietyInfo society={society} details={details} />
-            <MainContent activeTab={activeTab} setActiveTab={setActiveTab} details={details} />
+            <TopBar onBack={onBack} canEdit={canEdit} editMode={editMode} setEditMode={setEditMode} />
+            <SocietyHero society={society} details={details} onImageClick={() => setGalleryOpen(true)} editMode={editMode} />
+            <SocietyInfo society={society} details={details} editMode={editMode} />
+            <MainContent activeTab={activeTab} setActiveTab={setActiveTab} details={details} editMode={editMode} />
             {galleryOpen && <ImageGalleryModal images={details.images || []} onClose={() => setGalleryOpen(false)} />}
         </div>
     );
 }
 
-function BackButton({ onBack }) {
+function TopBar({ onBack, canEdit, editMode, setEditMode }) {
     return (
-        <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
+        <div className={styles.topBar}>
+            <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
+            {canEdit && <EditToggle editMode={editMode} setEditMode={setEditMode} />}
+        </div>
+    );
+}
+
+function EditToggle({ editMode, setEditMode }) {
+    return (
+        <button className={`${styles.editToggle} ${editMode ? styles.editActive : ""}`} onClick={() => setEditMode(!editMode)}>
+            {editMode ? "Exit Editor" : "Edit Society"}
+        </button>
     );
 }
 
@@ -41,13 +54,13 @@ function NotFound({ onBack }) {
     );
 }
 
-function MainContent({ activeTab, setActiveTab, details }) {
+function MainContent({ activeTab, setActiveTab, details, editMode }) {
     return (
         <div className={styles.mainContent}>
             <div className={styles.tabSection}>
-                <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} details={details} />
+                <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} details={details} editMode={editMode} />
             </div>
-            <SocietySidebar details={details} />
+            <SocietySidebar details={details} editMode={editMode} />
         </div>
     );
 }
