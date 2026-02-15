@@ -1,47 +1,43 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import * as Components from '../components/Authentication/AuthComponents';
-import { SignUpForm } from '../components/Authentication/SignUpForm';
-import { SignInForm } from '../components/Authentication/SignInForm';
-import { AuthOverlay } from '../components/Authentication/Overlay';
-import { ErrorMessage } from '../components/Authentication/ErrorMessage';
-import { useAuthForm } from '../hooks/useAuthForm';
-import { authService } from '../api/authService';
+import React, { useState } from "react";
+import * as Components from "../components/Authentication/AuthComponents";
+import { SignUpForm } from "../components/Authentication/SignUpForm";
+import { SignInForm } from "../components/Authentication/SignInForm";
+import { AuthOverlay } from "../components/Authentication/Overlay";
+import { ErrorMessage } from "../components/Authentication/ErrorMessage";
+import { useAuthForm } from "../hooks/useAuthForm";
+import { authService } from "../api/authService";
 import {
   validatePasswords,
   getErrorMessage,
-  saveUserData
-} from '../utils/authHelpers';
-
-const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
+  saveUserData,
+} from "../utils/authHelpers";
 
 /**
  * Main page for user authentication
  * Responsible for both sign up and log in user functionality
  */
 export default function AuthPage() {
-  const navigate = useNavigate();
   const [signIn, toggle] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { formData: signUpData, updateField: updateSignUpField } = useAuthForm({
-    first_name: '',
-    last_name: '',
-    username: '',
-    email: '',
-    password: '',
-    password2: ''
+    first_name: "",
+    last_name: "",
+    username: "",
+    email: "",
+    password: "",
+    password2: "",
   });
 
   const { formData: signInData, updateField: updateSignInField } = useAuthForm({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     const passwordError = validatePasswords(signUpData.password, signUpData.password2);
     if (passwordError) {
@@ -55,15 +51,13 @@ export default function AuthPage() {
       const { response, data } = await authService.register(signUpData);
 
       if (response.ok) {
+        // saveUserData also resets welcome flag + reloads
         saveUserData(data.token, data.user);
-
-        // show WelcomeLanding page immediately after signup
-        localStorage.removeItem(WELCOME_SEEN_KEY);
       } else {
         setError(getErrorMessage(data));
       }
     } catch (err) {
-      setError('There has been an error, please try again...');
+      setError("There has been an error, please try again...");
     } finally {
       setLoading(false);
     }
@@ -71,22 +65,20 @@ export default function AuthPage() {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       const { response, data } = await authService.login(signInData);
 
       if (response.ok) {
+        // saveUserData also resets welcome flag + reloads
         saveUserData(data.token, data.user);
-
-        // show WelcomeLanding page immediately after login
-        localStorage.removeItem(WELCOME_SEEN_KEY);
       } else {
-        setError(data.error || 'Invalid username or password');
+        setError(data.error || "Invalid username or password");
       }
     } catch (err) {
-      setError('There has been an error, please try again...');
+      setError("There has been an error, please try again...");
     } finally {
       setLoading(false);
     }
@@ -94,17 +86,17 @@ export default function AuthPage() {
 
   const handlePanelToggle = (isSignIn) => {
     toggle(isSignIn);
-    setError('');
+    setError("");
   };
 
   return (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f0ede8 0%, #eadfd2 100%)'
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #f0ede8 0%, #eadfd2 100%)",
       }}
     >
       <Components.Container>
