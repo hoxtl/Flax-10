@@ -15,7 +15,6 @@ import { validatePasswords, getErrorMessage, saveUserData } from '../utils/authH
  */
 
 export default function AuthPage() {
-  const navigate = useNavigate();
   const [signIn, toggle] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

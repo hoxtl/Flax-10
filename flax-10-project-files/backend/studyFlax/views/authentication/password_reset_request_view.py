@@ -30,7 +30,7 @@ def reset_password_view(request):
         #Change previously created tokens to used
         ResetPasswordToken.objects.filter(user=user, token_used=False).update(token_used=True)
 
-        new_token = ResetPasswordToken.objects.create(user=user)
+        new_token = ResetPasswordToken.create_user_token(user)
 
         reset_link = f"{settings.FRONTEND_URL}/reset-password/{new_token.token}"
 
