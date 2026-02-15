@@ -22,7 +22,7 @@ function useClickOutside(ref, onClose, isActive) {
 }
 
 function DropdownHeader({ user }) {
-  const displayName = getDisplayName(user);
+  const displayName = getPreferredFirstName(user);
   const initials = getInitials(displayName) || "?";
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
@@ -84,7 +84,7 @@ function AvatarButton({ initials, onClick }) {
 // Main profile dropdown
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }) {
     const [isOpen, setIsOpen] = useState(false);
-    const initials = getInitials(getDisplayName(user)) || "?";
+    const initials = getInitials(getPreferredFirstName(user)) || "?";
     const handleSettingsClick = () => {
       setIsOpen(false);
       onSettingsClick?.();
