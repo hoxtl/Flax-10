@@ -61,6 +61,12 @@
   margin-top: 4px;
 }
 
+.microline {
+  font-size: clamp(14px, 1.6vw, 18px);
+  font-weight: 650;
+  color: rgba(43, 30, 20, 0.65);
+}
+
 /* Base glass button */
 .primaryBtn,
 .secondaryBtn,
