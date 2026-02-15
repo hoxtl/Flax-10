@@ -2,7 +2,6 @@ import styles from "./WelcomeLanding.module.css";
 import { pickQuoteByKey } from "../lib/quotes";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { getDisplayName } from "../utils/userDisplay";
 import { getGreeting } from "../utils/dateUtils";
 
 function pad2(n) {
@@ -14,9 +13,7 @@ function formatTime(d = new Date()) {
 }
 
 function firstNameFromUser(user) {
-  const display = (getDisplayName(user) || "").trim();
-  if (!display) return "";
-  return display.split(" ")[0];
+  return (user?.first_name || "").trim();
 }
 
 function cleanQuote(q) {
