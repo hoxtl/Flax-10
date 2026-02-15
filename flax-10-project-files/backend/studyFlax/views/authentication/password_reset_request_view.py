@@ -25,7 +25,7 @@ def reset_password_view(request):
     user_email = serialiser.validated_data['email']
 
     try:
-        user = User.objects.get(email=user_email)
+        user = User.objects.get(email__iexact=user_email)
 
         #Change previously created tokens to used
         ResetPasswordToken.objects.filter(user=user, token_used=False).update(token_used=True)
