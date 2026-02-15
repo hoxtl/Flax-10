@@ -10,6 +10,11 @@ import { TagProvider } from './context/TagContext';
 import { NotificationToast } from './components/Notifications';
 import Settings from './pages/Settings';
 import { getUserSettings } from './api/userService';
+import PasswordResetRequest from './pages/PasswordResetRequest';
+import PasswordResetConfirm from './pages/PasswordResetConfirm';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+
 
 function getUser() {
   const userString = localStorage.getItem('user');
@@ -60,8 +65,15 @@ export default function App() {
   }
 
   if (!isAuthenticated() || !user) {
-    return <AuthPage />;
-  }
+  return (
+    <Routes>
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/reset-password" element={<PasswordResetRequest />} />
+      <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+}
 
   if (isLoadingTheme) {
     return null; 

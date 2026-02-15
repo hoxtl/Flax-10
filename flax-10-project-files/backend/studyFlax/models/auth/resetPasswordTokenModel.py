@@ -13,16 +13,14 @@ class ResetPasswordToken(models.Model):
     token_used = models.BooleanField(default=False)
 
 
-    def save_token(self, *args, **kwargs):
-        if not self.token:
-            self.token = secrets.token_urlsafe(32)
-        if not self.expires_at:
-            # Set token expiration time in 1 hour from current time
-            self.expires_at = timezone.now() + timedelta(hours=1)
-        super().save(*args, **kwargs)
+    @classmethod
+    def create_user_token(cls, user):
+        return cls.objects.create(user=user, token=secrets.token_urlsafe(32), expires_at=timezone.now() + timedelta(hours=1))
     
 
     def is_token_valid(self):
+        if not self.expires_at:
+            return False
         return (not self.token_used and timezone.now() < self.expires_at)
     
 
