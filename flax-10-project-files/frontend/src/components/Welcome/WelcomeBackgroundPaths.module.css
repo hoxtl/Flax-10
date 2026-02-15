@@ -37,3 +37,8 @@
     rgba(240,237,232,0.86)
   );
 }
+
+.parallax {
+  will-change: transform;
+}
+

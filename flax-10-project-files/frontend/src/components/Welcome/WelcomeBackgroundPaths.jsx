@@ -1,9 +1,10 @@
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import { useEffect } from "react";
 import styles from "./WelcomeBackgroundPaths.module.css";
 
 function FloatingPaths({ flip = 1 }) {
   const paths = Array.from({ length: 50 }, (_, i) => {
-    const opacity = 0.05 + i * 0.012; 
+    const opacity = 0.05 + i * 0.012;
     const width = 0.7 + i * 0.03;
 
     const d = `M-${380 - i * 5 * flip} -${189 + i * 6}
@@ -19,7 +20,12 @@ function FloatingPaths({ flip = 1 }) {
 
   return (
     <div className={styles.paths}>
-      <svg className={styles.svg} viewBox="0 0 696 316" fill="none" aria-hidden="true">
+      <svg
+        className={styles.svg}
+        viewBox="0 0 696 316"
+        fill="none"
+        aria-hidden="true"
+      >
         {paths.map((p) => (
           <motion.path
             key={`${flip}-${p.id}`}
@@ -46,11 +52,39 @@ function FloatingPaths({ flip = 1 }) {
 }
 
 export default function WelcomeBackgroundPaths() {
+  const reduceMotion = useReducedMotion();
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const x = useSpring(mx, { stiffness: 80, damping: 18, mass: 0.6 });
+  const y = useSpring(my, { stiffness: 80, damping: 18, mass: 0.6 });
+
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    const onMove = (e) => {
+      const w = window.innerWidth || 1;
+      const h = window.innerHeight || 1;
+      const px = (e.clientX / w - 0.5) * 2;
+      const py = (e.clientY / h - 0.5) * 2;
+
+      mx.set(px * 5);
+      my.set(py * 5);
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [mx, my, reduceMotion]);
+
   return (
     <div className={styles.bg} aria-hidden="true">
       <div className={styles.glow} />
-      <FloatingPaths flip={1} />
-      <FloatingPaths flip={-1} />
+
+      {/* Parallax wrapper */}
+      <motion.div className={styles.parallax} style={{ x, y }}>
+        <FloatingPaths flip={1} />
+        <FloatingPaths flip={-1} />
+      </motion.div>
+
       <div className={styles.fade} />
     </div>
   );
