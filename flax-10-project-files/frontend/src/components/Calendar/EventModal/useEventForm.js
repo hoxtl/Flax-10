@@ -8,7 +8,7 @@ import { useEventActions } from "../../../hooks/useCalendarEvents";
 import { getInitialForm, validateAndSubmit, confirmDelete } from "../../../utils/formUtils";
 
 export function useEventForm(event, onClose, options = {}) {
-    const { events } = useCalendar();
+    const calendarContext = useCalendar();
     const actions = useEventActions();
     const [form, setForm] = useState(() => getInitialForm(event, options));
     const [error, setError] = useState('');
@@ -16,11 +16,19 @@ export function useEventForm(event, onClose, options = {}) {
 
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
 
-    const handleSubmit = (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, events, false);
-    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, events, true);
+    const handleSubmit = options.customSubmit ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError) : (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], false);
+    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], true);
     const handleCancelSave = () => setOverlapWarning(null);
-
-    const handleDelete = () => confirmDelete(event, actions, onClose);
+    const handleDelete = options.customSubmit ? () => { options.customSubmit({ ...form, _delete: true }); onClose(); } : () => confirmDelete(event, actions, onClose);
 
     return { form, setForm, error, overlapWarning, isEditing: !!event?.id, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete };
+}
+
+function createCustomSubmitHandler(form, customSubmit, onClose, setError) {
+    return (e) => {
+        e?.preventDefault();
+        if (!form.title?.trim()) { setError('Title is required'); return; }
+        customSubmit(form);
+        onClose();
+    };
 }
