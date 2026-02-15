@@ -5,6 +5,35 @@ export const getProgress = (t) => {
     return ((t.workTime * 60 - t.timeLeft) / (t.workTime * 60)) * 100;
 };
 
+const createAudioNodes = () => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    return { ctx, osc, gain };
+};
+
+const playNotificationSound = () => {
+    try {
+        const nodes = createAudioNodes();
+        if (!nodes) return;
+        const { ctx, osc, gain } = nodes;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {
+        console.error("Audio play failed:", e);
+    }
+};
+
 const sendNotification = (title, body) => {
     if (Notification.permission === 'granted') {
         new Notification(title, { body, icon: '/favicon.ico' });
@@ -13,12 +42,14 @@ const sendNotification = (title, body) => {
 
 const handleCompletion = (timer, startNext) => {
     if (timer.mode === 'work') {
+        playNotificationSound();
         sendNotification("Time's Up!", "Work session complete. Take a break!");
         if (timer.breakTime === 0) {
             timer.setIsActive(false);
             startNext();
         }
     } else if (timer.mode === 'break') {
+        playNotificationSound();
         sendNotification("Break Over!", "Time to get back to work!");
     }
 };

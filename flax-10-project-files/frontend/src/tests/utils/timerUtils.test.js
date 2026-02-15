@@ -29,6 +29,30 @@ const setupMocks = () => {
     global.Notification = NotificationMock;
     global.Notification.permission = 'granted';
     global.Notification.requestPermission = vi.fn();
+
+    // Mock AudioContext
+    global.window.AudioContext = vi.fn().mockImplementation(() => ({
+        createOscillator: () => ({
+            connect: vi.fn(),
+            start: vi.fn(),
+            stop: vi.fn(),
+            type: '',
+            frequency: {
+                setValueAtTime: vi.fn(),
+                exponentialRampToValueAtTime: vi.fn()
+            }
+        }),
+        createGain: () => ({
+            connect: vi.fn(),
+            gain: {
+                setValueAtTime: vi.fn(),
+                linearRampToValueAtTime: vi.fn(),
+                exponentialRampToValueAtTime: vi.fn()
+            }
+        }),
+        currentTime: 0,
+        destination: {}
+    }));
 };
 
 const testAutoAdvance = () => {
