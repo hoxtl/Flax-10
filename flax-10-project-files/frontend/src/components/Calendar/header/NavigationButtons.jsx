@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
-import { parseDateInput, isSameDay, getWeekDays, isSameMonth } from '../../../utils/dateUtils';
+import { isSameDay, getWeekDays, isSameMonth } from '../../../utils/dateUtils';
+import { DatePickerButton } from './DatePickerButton';
 
 export function NavigationButtons({ onNavigate, selectedDate, onDatePick }) {
     return (
@@ -10,18 +11,6 @@ export function NavigationButtons({ onNavigate, selectedDate, onDatePick }) {
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
             <TodayButton selectedDate={selectedDate} onDatePick={onDatePick} />
         </div>
-    );
-}
-
-function DatePickerButton({ selectedDate, onDatePick }) {
-    const ref = useRef(null);
-    const value = selectedDate.toISOString().slice(0, 10);
-    const handleChange = (e) => onDatePick(parseDateInput(e.target.value));
-    return (
-        <>
-            <button className="btn-calendar" onClick={() => ref.current?.showPicker?.()}>🗓️</button>
-            <input ref={ref} type="date" className="hidden-date-input" value={value} onChange={handleChange} />
-        </>
     );
 }
 

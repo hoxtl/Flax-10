@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "./tabs.module.css";
 import { MonthView } from "../../../Calendar/MonthView/MonthView";
+import { DatePickerButton } from "../../../Calendar/header/DatePickerButton";
+import { addMonths } from "../../../../utils/dateUtils";
 
 export default function CalendarTab({ details, editMode }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -24,12 +26,13 @@ function CalendarHeader({ date, setDate }) {
 }
 
 function NavButtons({ date, setDate }) {
-    const nav = (dir) => setDate(getNewDate(date, dir));
+    const nav = (dir) => setDate(addMonths(date, dir));
     return (
         <div className={styles.navButtons}>
             <button onClick={() => nav(-1)}>&larr;</button>
             <button onClick={() => setDate(new Date())}>Today</button>
             <button onClick={() => nav(1)}>&rarr;</button>
+            <DatePickerButton selectedDate={date} onDatePick={setDate} />
         </div>
     );
 }
@@ -41,12 +44,6 @@ function convertEvents(events) {
 function addHour(time) {
     const [h, m] = time.split(":").map(Number);
     return `${String((h + 1) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
-function getNewDate(date, dir) {
-    const d = new Date(date);
-    d.setMonth(d.getMonth() + dir);
-    return d;
 }
 
 function formatTitle(date) {
