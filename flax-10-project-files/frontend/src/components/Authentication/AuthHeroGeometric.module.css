@@ -1,0 +1,64 @@
+.hero {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f0ede8 0%, #eadfd2 100%);
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(158,126,93,0.18), transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(74,52,33,0.12), transparent 60%);
+  filter: blur(32px);
+  opacity: 0.9;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+.shapeWrap {
+  position: absolute;
+}
+
+.shape {
+  position: relative;
+}
+
+.shapeInner {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 10px 36px rgba(74, 52, 33, 0.16);
+}
+
+.shapeInner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.20), transparent 70%);
+}
+
+.leftTop { left: -12%; top: 16%; }
+.rightMid { right: -8%; top: 68%; }
+.leftBottom { left: 6%; bottom: 6%; }
+.rightTop { right: 16%; top: 10%; }
+.leftSmall { left: 20%; top: 6%; }
+
+.fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(240,237,232,0.90),
+    rgba(240,237,232,0.22),
+    rgba(240,237,232,0.80)
+  );
+  pointer-events: none;
+}
