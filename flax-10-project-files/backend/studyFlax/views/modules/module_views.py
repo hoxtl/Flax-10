@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from studyFlax.models import Module
+from studyFlax.models import Module, CalendarEvent
 from studyFlax.serialisers import ModuleSerialiser
 
 @api_view(['GET', 'POST'])
@@ -47,8 +47,13 @@ def update_module(request, module, user):
     serialiser = ModuleSerialiser(module, data=request.data, partial=True, context={'request':request})
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    serialiser.save()
+    updated_module = serialiser.save()
+    CalendarEvent.objects.filter(module=updated_module).update(
+        title=f"Lecture: {updated_module.module_name}",
+        start_time=updated_module.start_time,
+        end_time=updated_module.end_time,
+        location=updated_module.location
+    )
     return Response(serialiser.data)
 
 def delete_module(request, module, user):
