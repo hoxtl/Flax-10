@@ -1,19 +1,18 @@
 import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
 import AnnouncementModal from "./AnnouncementModal";
+import { EventModal } from "../../Calendar/EventModal/EventModal";
 
 export default function SocietySidebar({ details, editMode, onAddAnnouncement, onAddEvent, tags }) {
     const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
-    const pinnedAnnouncement = details.announcements?.find(a => a.pinned);
-    const nextEvent = details.upcomingEvents?.[0];
-
-    const handleAdd = (data) => { onAddAnnouncement?.(data); setShowAnnouncementModal(false); };
+    const [showEventModal, setShowEventModal] = useState(false);
 
     return (
         <aside className={styles.sidebar}>
-            <SidebarContent pinned={pinnedAnnouncement} next={nextEvent} editMode={editMode} />
-            {editMode && <AddButtons onAnnouncement={() => setShowAnnouncementModal(true)} onEvent={onAddEvent} />}
-            {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)} onSubmit={handleAdd} tags={tags} />}
+            <SidebarContent pinned={details.announcements?.find(a => a.pinned)} next={details.upcomingEvents?.[0]} editMode={editMode} />
+            {editMode && <AddButtons onAnnouncement={() => setShowAnnouncementModal(true)} onEvent={() => setShowEventModal(true)} />}
+            {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)} onSubmit={(d) => { onAddAnnouncement?.(d); setShowAnnouncementModal(false); }} tags={tags} />}
+            {showEventModal && <EventModal onClose={() => setShowEventModal(false)} showReminder={false} customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEventModal(false); }} />}
         </aside>
     );
 }
