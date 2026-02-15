@@ -107,3 +107,39 @@
     border: 2px dashed rgba(255, 255, 255, 0.5);
     border-radius: 12px;
 }
+
+.arrowBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.2s;
+    z-index: 20;
+    padding: 0;
+}
+
+.hero:hover .arrowBtn {
+    opacity: 1;
+}
+
+.arrowBtn:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.leftArrow {
+    left: 20px;
+}
+
+.rightArrow {
+    right: 20px;
+}
