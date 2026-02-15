@@ -1,3 +1,17 @@
+// Welcome 
+const WELCOME_QUOTES = [
+  "Welcome back — your space is here.",
+  "Take a breath. Start where you are.",
+  "A calm start goes a long way.",
+  "Everything you need is within reach.",
+  "Open the day gently.",
+  "One clear step at a time.",
+  "Let’s keep things simple today.",
+  "Small progress counts.",
+  "Settle in — you’ve got this.",
+  "Your next step is waiting.",
+];
+
 // Morning (4am – 11:59am)
 const MORNING_QUOTES = [
   "A fresh start begins here.",
@@ -52,6 +66,11 @@ function hashKey(key) {
     hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
   }
   return hash;
+}
+
+export function pickWelcomeQuoteByKey(key) {
+  const hash = hashKey(key);
+  return WELCOME_QUOTES[hash % WELCOME_QUOTES.length];
 }
 
 export function pickQuoteByKey(key, hour = new Date().getHours()) {
