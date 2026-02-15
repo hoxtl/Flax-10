@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
 
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 
 export default function PasswordResetRequest() {
   const [email, setEmail] = useState('');
@@ -29,10 +31,10 @@ export default function PasswordResetRequest() {
         setMessage(data.message);
         setEmail(''); // Clear form
       } else {
-        setError(data.error || 'Something went wrong. Please try again.');
+        setError(data.error || 'There was an error, please try again...');
       }
     } catch (err) {
-      setError('Network error. Please check your connection and try again.');
+      setError('There was an error, please try again...');
     } finally {
       setLoading(false);
     }
@@ -42,17 +44,17 @@ export default function PasswordResetRequest() {
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.formCard}>
-          <h1 className={styles.title}>Reset Password</h1>
+          <h1 className={styles.title}>Request Password Reset</h1>
           <p className={styles.subtitle}>
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email address to receive a link to reset your password.
           </p>
 
           {message && (
             <div className={styles.success}>
-              <strong>✅ Email Sent!</strong>
+              <strong>Email Sent!</strong>
               <p>{message}</p>
               <p style={{ marginTop: '10px', fontSize: '0.9em' }}>
-                Please check your inbox (and spam folder) for the reset link.
+                Please check your inbox for the link.
               </p>
             </div>
           )}
@@ -62,7 +64,7 @@ export default function PasswordResetRequest() {
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.field}>
               <label htmlFor="email" className={styles.label}>
-                Email Address
+                Email address
               </label>
               <input
                 id="email"

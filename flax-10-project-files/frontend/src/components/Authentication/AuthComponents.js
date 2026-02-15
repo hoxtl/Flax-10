@@ -1,4 +1,5 @@
  import styled from 'styled-components';
+ import { Link } from 'react-router-dom';
 
  
 export const Container = styled.div`
@@ -182,22 +183,36 @@ ${props => (props.$signIn !== true ? `transform: translateX(50%);` : null)}
  `;
 
  export const LeftOverlayPanel = styled(OverlayPanel)`
-  transform: translateX(-8%);
+  transform: translateX(-1%);
 `;
 
 
  export const RightOverlayPanel = styled(OverlayPanel)`
   right: 0;
-  transform: translateX(8%);
-  ${props => props.$signIn !== true ? `transform: translateX(28%);` : null}
+  transform: translateX(1%);
+  ${props => props.$signIn !== true ? `transform: translateX(20%);` : null}
 `;
 
 export const Paragraph = styled.p`
  font-size: 14px;
- font-weight: 100;
+ font-weight: 400;
  line-height: 20px;
  letter-spacing: 0.5px;
  margin: 20px 0 30px;
  color: #ffffff;
  max-width: 280px;
  `;
+
+ export const PasswordResetLink = styled(Link)`
+  color: #9E7E5D;
+  text-decoration: none;
+  font-size: 0.9rem;
+  align-self: center;
+  margin-top: 0.5rem;
+  transition: all 0.1s ease-in-out;
+
+  &:hover {
+    color: #4A3421;
+    text-decoration: underline;
+  }
+`;
