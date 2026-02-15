@@ -55,6 +55,8 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
   return (
     <div className={`${styles.page} ${styles[getTimeTone(now.getHours())]}`}>
       <div className={styles.brand}>StudyFlax</div>
+      <div className={styles.footerNote}>Built for calm study.</div>
+
       <WelcomeBackgroundPaths />
 
       <motion.div
