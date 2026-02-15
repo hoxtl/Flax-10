@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../utils/userUtils";
+import { getPreferredFirstName, getDisplayName } from "../utils/userDisplay";
 
-// Check if click is outside element
 function isClickOutside(element, event) {
   if (!element) return false;
   return !element.contains(event.target);
 }
 
-// Custom hook for click outside detection
 function useClickOutside(ref, onClose, isActive) {
   useEffect(() => {
     if (!isActive) return;
@@ -22,9 +21,9 @@ function useClickOutside(ref, onClose, isActive) {
   }, [ref, onClose, isActive]);
 }
 
-// Dropdown header with user info
 function DropdownHeader({ user }) {
-  const initials = getInitials(user?.name) || "?";
+  const displayName = getPreferredFirstName(user);
+  const initials = getInitials(displayName) || "?";
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
 
@@ -32,7 +31,7 @@ function DropdownHeader({ user }) {
     <div className={styles.dropdownHeader}>
       <div className={styles.avatarLarge}>{initials}</div>
       <div className={styles.userInfo}>
-        <div className={styles.userName}>{user?.name || "Guest"}</div>
+        <div className={styles.userName}>{displayName}</div>
         <div className={styles.userMeta}>{year} · {major}</div>
       </div>
     </div>
@@ -53,12 +52,10 @@ function MenuItem({ icon, label, onClick, isDanger }) {
   );
 }
 
-// Divider line
 function Divider() {
   return <div className={styles.divider} />;
 }
 
-// Dropdown menu content
 function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user }) {
   const dropdownRef = useRef(null);
   useClickOutside(dropdownRef, onClose, isOpen);
@@ -76,7 +73,6 @@ function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user })
   );
 }
 
-// Avatar button
 function AvatarButton({ initials, onClick }) {
   return (
     <button className={styles.avatar} onClick={onClick} aria-label="User menu">
@@ -88,8 +84,7 @@ function AvatarButton({ initials, onClick }) {
 // Main profile dropdown
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }) {
     const [isOpen, setIsOpen] = useState(false);
-    const initials = getInitials(user?.name) || "?";
-  
+    const initials = getInitials(getPreferredFirstName(user)) || "?";
     const handleSettingsClick = () => {
       setIsOpen(false);
       onSettingsClick?.();
