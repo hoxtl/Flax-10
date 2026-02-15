@@ -1,51 +1,48 @@
 import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import styles from "./WelcomeBackgroundPaths.module.css";
 
-function FloatingPaths({ flip = 1 }) {
-  const paths = Array.from({ length: 30 }, (_, i) => {
-    const opacity = 0.05 + i * 0.012;
-    const width = 0.7 + i * 0.03;
+function buildPaths(flip = 1, count = 28) {
+  return Array.from({ length: count }, (_, i) => {
+    const strokeOpacity = 0.18 + i * 0.001; 
+    const width = 0.9 + i * 0.03;
 
     const d = `M-${380 - i * 5 * flip} -${189 + i * 6}
-      C-${380 - i * 5 * flip} -${189 + i * 6} -${312 - i * 5 * flip} ${
-      216 - i * 6
-    } ${152 - i * 5 * flip} ${343 - i * 6}
-      C${616 - i * 5 * flip} ${470 - i * 6} ${684 - i * 5 * flip} ${
-      875 - i * 6
-    } ${684 - i * 5 * flip} ${875 - i * 6}`;
+      C-${380 - i * 5 * flip} -${189 + i * 6} -${312 - i * 5 * flip} ${216 - i * 6}
+      ${152 - i * 5 * flip} ${343 - i * 6}
+      C${616 - i * 5 * flip} ${470 - i * 6} ${684 - i * 5 * flip} ${875 - i * 6}
+      ${684 - i * 5 * flip} ${875 - i * 6}`;
 
-    return { id: i, d, opacity, width };
+    const start = Math.random();
+
+    return { id: i, d, strokeOpacity, width, start };
   });
+}
+
+function FloatingPaths({ flip = 1 }) {
+  const paths = useMemo(() => buildPaths(flip, 28), [flip]);
 
   return (
     <div className={styles.paths}>
-      <svg
-        className={styles.svg}
-        viewBox="0 0 696 316"
-        preserveAspectRatio="none"
-        fill="none"
-        aria-hidden="true"
-      >
+      <svg className={styles.svg} viewBox="0 0 696 316" fill="none" aria-hidden="true">
         {paths.map((p) => (
-
           <motion.path
             key={`${flip}-${p.id}`}
             d={p.d}
             stroke="currentColor"
             strokeWidth={p.width}
-            strokeOpacity={p.opacity}
-            initial={{ pathLength: 0.2, opacity: 0.45 }}
+            strokeOpacity={p.strokeOpacity}
+            initial={{ pathLength: 1, pathOffset: p.start, opacity: 0.65 }}
             animate={{
-              opacity: [0.18, 0.32, 0.18],
-              pathOffset: [0, 1, 0],
+              pathOffset: [p.start, p.start + 1], // continuous
+              opacity: [0.35, 0.7, 0.35],
             }}
             transition={{
-              opacity: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-              pathOffset: { duration: 28 + Math.random() * 10, repeat: Infinity, ease: "linear" },
+              duration: (flip === 1 ? 7 : 10) + Math.random() * 3,
+              repeat: Infinity,
+              ease: "linear",
             }}
           />
-          
         ))}
       </svg>
     </div>
@@ -54,11 +51,12 @@ function FloatingPaths({ flip = 1 }) {
 
 export default function WelcomeBackgroundPaths() {
   const reduceMotion = useReducedMotion();
+
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
 
-  const x = useSpring(mx, { stiffness: 70, damping: 18 });
-  const y = useSpring(my, { stiffness: 70, damping: 18 });
+  const x = useSpring(mx, { stiffness: 70, damping: 18, mass: 0.6 });
+  const y = useSpring(my, { stiffness: 70, damping: 18, mass: 0.6 });
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -81,12 +79,10 @@ export default function WelcomeBackgroundPaths() {
   return (
     <div className={styles.bg} aria-hidden="true">
       <div className={styles.glow} />
-
       <motion.div className={styles.parallax} style={{ x, y }}>
         <FloatingPaths flip={1} />
         <FloatingPaths flip={-1} />
       </motion.div>
-
       <div className={styles.fade} />
     </div>
   );
