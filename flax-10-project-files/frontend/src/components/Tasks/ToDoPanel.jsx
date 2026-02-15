@@ -22,7 +22,7 @@ function pinUrgentFirst(activeList) {
   return [...urgent, ...others];
 }
 
-export default function ToDoPanel({ open = true }) {
+export default function ToDoPanel({ open = true, onClose }) {
   const [text, setText] = useState("");
 
   const [items, setItems] = useState(() => {
@@ -90,32 +90,41 @@ export default function ToDoPanel({ open = true }) {
     return () => window.clearTimeout(id);
   }, [items]);
 
-  // Inline edit
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
-  // Top menu (panel)
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const panelRef = useRef(null);
 
-  // Per-task menu 
   const [taskMenuId, setTaskMenuId] = useState(null);
   const taskMenuRef = useRef(null);
   const [taskMenuPos, setTaskMenuPos] = useState({ top: 0, left: 0 });
-  const [taskMenuAnchor, setTaskMenuAnchor] = useState(null); // {x,y,w,h}
+  const [taskMenuAnchor, setTaskMenuAnchor] = useState(null); 
 
   useEffect(() => {
+    if (!open) return;
+
     const onDown = (e) => {
-      // Close top menu
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
 
       const clickedDotsBtn = e.target.closest?.("[data-task-menu-btn='true']");
-      if (clickedDotsBtn) return;
+      if (!clickedDotsBtn) {
+        if (taskMenuRef.current && !taskMenuRef.current.contains(e.target)) {
+          setTaskMenuId(null);
+        }
+      }
 
-      if (taskMenuRef.current && !taskMenuRef.current.contains(e.target)) {
-        setTaskMenuId(null);
+      // Close panel if clicking outside
+      const panelEl = panelRef.current;
+      const clickedInsidePanel = panelEl?.contains(e.target);
+      const clickedInsideTopMenu = menuRef.current && menuRef.current.contains(e.target);
+      const clickedInsideTaskMenu = taskMenuRef.current && taskMenuRef.current.contains(e.target);
+
+      if (!clickedInsidePanel && !clickedInsideTopMenu && !clickedInsideTaskMenu) {
+        onClose?.();
       }
     };
 
@@ -123,6 +132,7 @@ export default function ToDoPanel({ open = true }) {
       if (e.key === "Escape") {
         setMenuOpen(false);
         setTaskMenuId(null);
+        onClose?.();
       }
     };
 
@@ -132,7 +142,7 @@ export default function ToDoPanel({ open = true }) {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, []);
+  }, [open, onClose]);
 
   useEffect(() => {
     if (!taskMenuId || !taskMenuAnchor) return;
@@ -305,7 +315,9 @@ export default function ToDoPanel({ open = true }) {
   };
 
   return (
-    <div className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
+    <div 
+      ref={panelRef}
+      className={`${styles.panel} ${open ? styles.open : styles.closed}`}>
       {/* Header */}
       <div className={styles.header}>
 
@@ -425,7 +437,6 @@ export default function ToDoPanel({ open = true }) {
               </div>
             )}
 
-            {/* OTHERS */}
             {otherActive.length > 0 && (
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>OTHERS</div>
@@ -528,7 +539,6 @@ export default function ToDoPanel({ open = true }) {
         )}
       </div>
 
-      {/* Input */}
       <form onSubmit={addItem} className={styles.inputRow}>
         <input
           value={text}
