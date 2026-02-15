@@ -60,36 +60,6 @@
   color: var(--tasks-text);
 }
 
-.goalBlock {
-  margin-top: 18px;
-  display: grid;
-  gap: 12px;
-  width: min(720px, 80%);
-}
-
-.goalPrompt {
-  font-size: 22px;
-  color: var(--tasks-muted);
-}
-
-.goalInput {
-  width: 100%;
-  font-size: 26px;
-  text-align: center;
-  padding: 10px 6px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--tasks-text);
-  caret-color: var(--tasks-text);
-}
-
-.goalUnderline {
-  height: 1.5px;
-  background: var(--tasks-underline);
-  width: 100%;
-}
-
 .actions {
   margin-top: 22px;
   display: flex;

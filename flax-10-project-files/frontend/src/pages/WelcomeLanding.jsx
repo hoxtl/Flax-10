@@ -43,7 +43,7 @@ export default function WelcomeLanding({ user, onExplore }) {
   );
 
   const greetingLine = useMemo(() => {
-    const g = getGreeting(); // e.g. "Good afternoon"
+    const g = getGreeting(); // "Good afternoon"
     if (!firstName) return `${g}.`;
     return `${g}, ${firstName}.`;
   }, [firstName]);
