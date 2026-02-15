@@ -22,7 +22,6 @@ const MORNING_QUOTES = [
   "You’re allowed to take it slow.",
   "Start with what matters most.",
   "A steady start is enough.",
-  "Today has room for you.",
   "Begin with ease.",
 ];
 
@@ -43,8 +42,6 @@ const DAY_QUOTES = [
 // Evening (6pm – 9:59pm)
 const EVENING_QUOTES = [
   "Close the day with care.",
-  "You’ve done enough for today.",
-  "Wrap up what you can — release the rest.",
   "Let the day settle.",
   "Soft finish. Clear mind.",
   "Reflect, then reset.",
