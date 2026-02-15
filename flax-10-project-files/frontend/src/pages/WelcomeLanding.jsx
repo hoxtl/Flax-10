@@ -77,6 +77,14 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
           </motion.div>
         </AnimatePresence>
 
+        <motion.div
+          className={styles.underline}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.45, ease: "easeOut" }}
+          style={{ transformOrigin: "center" }}
+        />
+
         <AnimatePresence mode="wait">
           <motion.div
             key={quoteLine}
