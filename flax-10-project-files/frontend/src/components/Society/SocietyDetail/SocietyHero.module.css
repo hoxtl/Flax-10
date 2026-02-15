@@ -15,11 +15,35 @@
     padding: 24px;
 }
 
+.editLayer {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    /* Lowered from 10 to clear TopBar (z-index 10) */
+}
+
 .content {
     display: flex;
     align-items: flex-end;
     gap: 16px;
     width: 100%;
+    position: relative;
+    z-index: 6;
+    /* Just above editLayer */
+    pointer-events: none;
+    /* Let clicks pass through empty areas */
+}
+
+/* Re-enable pointer events for interactive children */
+.nameWrapper,
+.imageCount,
+.nameInput {
+    pointer-events: auto;
 }
 
 .name {
@@ -29,31 +53,57 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.imageCount {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 4px 12px;
-    border-radius: 16px;
-    margin-left: auto;
-}
-
-.editImageBtn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
+.nameWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
-    font-weight: 500;
-    color: #333;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s;
+    transition: opacity 0.2s;
 }
 
-.editImageBtn:hover {
-    background: white;
-    transform: translateY(-1px);
+.nameWrapper:hover {
+    opacity: 0.9;
+}
+
+.nameInput {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    width: 100%;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.editIcon {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.nameWrapper:hover .editIcon {
+    opacity: 1;
+}
+
+.imageCount {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+}
+
+.editLabel {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 16px 32px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
 }

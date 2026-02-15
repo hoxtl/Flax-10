@@ -11,11 +11,11 @@ const filterOptions = [
     { id: "unratified", label: "Unratified" }
 ];
 
-export default function AllSocieties({ onBack, onSelect }) {
+export default function AllSocieties({ onBack, onSelect, societies = MOCK_SOCIETIES }) {
     const [search, setSearch] = useState("");
     const [activeFilters, setActiveFilters] = useState(["all"]);
-    const counts = countByType(MOCK_SOCIETIES);
-    const filtered = useMemo(() => filterSocieties(MOCK_SOCIETIES, search, activeFilters), [search, activeFilters]);
+    const counts = countByType(societies);
+    const filtered = useMemo(() => filterSocieties(societies, search, activeFilters), [societies, search, activeFilters]);
     return (
         <div className={styles.container}>
             <header className={styles.header}>
