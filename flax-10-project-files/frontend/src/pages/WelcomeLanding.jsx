@@ -119,7 +119,7 @@ export default function WelcomeLanding({ user, onExplore }) {
         <AnimatePresence mode="wait">
           {!todayGoal ? (
             <motion.form
-              key knowing="goalForm"
+              key ="goalForm"
               className={styles.goalBlock}
               onSubmit={submitGoal}
               initial={{ opacity: 0, y: 12 }}
