@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import styles from "./AddAnnouncementModal.module.css";
+import styles from "./AnnouncementModal.module.css";
 
 const MAX_IMAGES = 5;
 
