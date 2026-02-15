@@ -1,36 +1,82 @@
-.backdrop{
-  position:fixed; inset:0; background:rgba(20,18,30,.45);
-  display:flex; align-items:center; justify-content:center; z-index:50;
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 30, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
 }
 
-.modal{
-  width:min(560px, 92vw); background:#fff; border-radius:22px;
-  box-shadow:0 20px 60px rgba(0,0,0,.25); padding:22px;
+.modal {
+  width: min(560px, 92vw);
+  background: var(--panel);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  padding: 22px;
 }
 
-.header{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
-.title{ margin:0; font-size:22px; font-weight:800; }
-.sub{ margin:4px 0 0; color:#7a7787; }
-
-.close{
-  border:none; background:transparent; font-size:28px; line-height:1;
-  cursor:pointer; color:#8c8a98;
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-.grid{
-  margin-top:16px;
-  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
 }
 
-.tile{
-  border:1px solid #eceaf2; border-radius:16px; padding:16px;
-  display:flex; align-items:center; gap:12px; cursor:pointer; background:#faf9fc;
+.sub {
+  margin: 4px 0 0;
+  color: var(--muted);
 }
 
-.icon{ font-size:26px; }
-.label{ font-weight:700; }
+.close {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted);
+}
 
-.class{ background:rgba(124,58,237,.06); }
-.study{ background:rgba(46,204,113,.06); }
-.task{ background:rgba(52,152,219,.06); }
-.other{ background:rgba(241,196,15,.08); }
+.close:hover {
+  color: var(--text);
+}
+
+.grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.tile {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  background: var(--bg);
+  transition: all 0.2s;
+}
+
+.tile:hover {
+  background: var(--hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  font-size: 26px;
+}
+
+.label {
+  font-weight: 700;
+}

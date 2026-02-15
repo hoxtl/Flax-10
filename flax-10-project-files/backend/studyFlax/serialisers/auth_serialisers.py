@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from studyFlax.models import User
+from studyFlax.models.auth.userSettingsModel import UserSettings
 
 
 class RegistrationUserSerialiser(serializers.Serializer):
@@ -42,10 +43,28 @@ class RegistrationUserSerialiser(serializers.Serializer):
 
 
 class UserSerialiser(serializers.ModelSerializer):
+    year = serializers.SerializerMethodField()
+    major = serializers.SerializerMethodField()
+
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'year', 'major', 'role']
         read_only_fields = ['id']
+    
+
+    def get_year(self, user_obj):
+        try:
+            return user_obj.settings.year if hasattr(user_obj, 'settings') else ''
+        except UserSettings.DoesNotExist:
+            return ''
+    
+
+    def get_major(self, user_obj):
+        try:
+            return user_obj.settings.major if hasattr(user_obj, 'settings') else ''
+        except UserSettings.DoesNotExist:
+            return ''
 
 
 class LoggedUserSerialiser(serializers.Serializer):
