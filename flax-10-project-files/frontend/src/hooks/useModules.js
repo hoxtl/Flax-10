@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import {useNotifications} from '../context/NotificationContext';
-import {getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule, isEnrolledIn, getEnrollmentId} from '../api/module_api.js';
+import {getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule} from '../api/module_api.js';
+import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
 
 function useModuleActions(modules, enrollments,loading, setModules, setEnrollments, notify ) {
     return {
