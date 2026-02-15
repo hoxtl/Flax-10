@@ -122,17 +122,17 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    padding: 0 16px;
+    padding: 7px 16px;
     border: 1px solid #ff4d4f;
     color: #ff4d4f;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    border-radius: 22px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     background: white;
     white-space: nowrap;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
 }
 
 .clearPill:hover {
