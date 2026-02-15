@@ -11,3 +11,6 @@ from .calendar.timetableSourceModel import *
 
 # Notifications
 from .notifications.notificationModel import *
+
+# Society
+from .society import *
