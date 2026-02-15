@@ -1,4 +1,5 @@
 import styles from "./WelcomeLanding.module.css";
+import { pickWelcomeQuoteByKey } from "../lib/quotes";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { getGreeting } from "../utils/dateUtils";
@@ -23,6 +24,10 @@ function firstNameFromUser(user) {
   return (user?.first_name || "").trim();
 }
 
+function cleanQuote(q) {
+  return (q || "").trim().replace(/[".]+$/g, "");
+}
+
 export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
   const firstName = firstNameFromUser(user);
   const [now, setNow] = useState(() => new Date());
@@ -32,11 +37,20 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
     return () => clearInterval(id);
   }, []);
 
+  const quoteKey = useMemo(
+    () => `${now.toDateString()}-${now.getHours()}-${now.getMinutes()}`,
+    [now]
+  );
+
+  const quote = useMemo(() => pickWelcomeQuoteByKey(quoteKey), [quoteKey]);
+
   const greetingLine = useMemo(() => {
     const g = getGreeting();
     if (!firstName) return `${g}.`;
     return `${g}, ${firstName}.`;
   }, [firstName]);
+
+  const quoteLine = useMemo(() => `${cleanQuote(quote)}.`, [quote]);
 
   return (
     <div className={`${styles.page} ${styles[getTimeTone(now.getHours())]}`}>
@@ -44,15 +58,15 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
 
       <motion.div
         className={styles.center}
-        initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+        initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.55, ease: "easeOut" }}
       >
         <motion.div
           className={styles.time}
-          initial={{ scale: 0.98, opacity: 0 }}
+          initial={{ scale: 0.99, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.45 }}
+          transition={{ delay: 0.08, duration: 0.45 }}
         >
           {formatTime(now)}
         </motion.div>
@@ -61,18 +75,32 @@ export default function WelcomeLanding({ user, onExplore, onBackToAuth }) {
           <motion.div
             key={greetingLine}
             className={styles.bigLine}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.26, ease: "easeOut" }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
           >
             {greetingLine}
           </motion.div>
         </AnimatePresence>
 
+        {/* Quotes */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={quoteLine}
+            className={styles.smallLine}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.28, delay: 0.12, ease: "easeOut" }}
+          >
+            {quoteLine}
+          </motion.div>
+        </AnimatePresence>
+
         <motion.div
           className={styles.actions}
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.45 }}
         >
