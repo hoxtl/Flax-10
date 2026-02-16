@@ -11,6 +11,11 @@ import { useTaskOperations } from "../../hooks/useTaskOperations";
 import { useTaskReorder } from "../../hooks/useTaskReorder";
 import { partitionTasks } from "../../utils/taskListUtils";
 
+/**
+ * Main to-do list panel component that contains the header, list, and input components. 
+ * Handles all state management and logic for the to-do list, utilising custom hooks for storage, operations, and UI state.
+ */
+
 export default function ToDoPanel({ open = true, onClose, fabRef }) {
   const [items, setItems] = useTodoStorage();
   const panelRef = useRef(null);
