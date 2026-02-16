@@ -15,7 +15,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
   ];
 
   return (
-    <Components.SignUpContainer signIn={signIn}>
+    <Components.SignUpContainer $signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Create Account</Components.Title>
         
