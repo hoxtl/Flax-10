@@ -10,7 +10,7 @@ export function EventModal({ event, onClose, initialType, initialDate, showRemin
 
     if (loading) return null;
 
-    const defaultTag = getDefaultTag(tags, initialType);
+    const defaultTag = getDefaultTag(tags, initialType, !!customTags);
     const options = { initialTag: defaultTag, initialDate, customSubmit: onSubmit };
     const logic = useEventForm(event, onClose, options);
 
@@ -21,8 +21,9 @@ export function EventModal({ event, onClose, initialType, initialDate, showRemin
     );
 }
 
-function getDefaultTag(tags, initialType) {
+function getDefaultTag(tags, initialType, isCustom) {
     if (initialType) return initialType;
+    if (isCustom) return null;
     const otherTag = tags.find(t => t.label?.toLowerCase() === 'other');
     return otherTag?.id || tags[0]?.id;
 }
