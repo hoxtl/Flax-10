@@ -105,19 +105,20 @@
 .nav-buttons button {
     padding: 0.4rem 0.8rem;
     border: none;
-    background: var(--btn-black);
-    color: white;
+    background: var(--pill-bg);
+    color: var(--text);
     cursor: pointer;
     border-radius: 4px;
     margin: 0 0.25rem;
     font-size: 0.9rem;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .view-toggle button {
     padding: 0.5rem 1rem;
     border: none;
-    background: var(--btn-black);
-    color: white;
+    background: var(--pill-bg);
+    color: var(--text);
     cursor: pointer;
     border-radius: 4px;
     margin: 0 0.25rem;
@@ -125,11 +126,12 @@
 
 .nav-buttons button:hover,
 .view-toggle button:hover {
-    filter: brightness(0.9);
+    background: var(--pill-hover);
+    filter: none;
 }
 
 .view-toggle button.active {
-    background: var(--primary-strong);
+    background: var(--primary);
     color: white;
 }
 
@@ -147,14 +149,17 @@
     font-size: 1.2rem;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
+    color: var(--text);
 }
 
 .btn-calendar:hover {
-    opacity: 0.7;
+    background: var(--hover) !important;
+    border-radius: 4px;
 }
 
 .btn-today {
-    background: var(--primary-strong) !important;
+    background: var(--primary) !important;
+    color: var(--c-white) !important;
     font-size: 0.85rem;
     padding: 0.4rem 0.75rem !important;
 }
@@ -192,22 +197,22 @@
 .view-select {
     padding: 0.5rem 2rem 0.5rem 1rem;
     border: none;
-  
+
     background-color: var(--primary) !important;
     color: var(--calendar-bg);
-  
+
     cursor: pointer;
     border-radius: 4px;
     font-size: 1rem;
-  
+
     -webkit-appearance: none !important;
     appearance: none !important;
-  
+
     background-image: var(--select-chevron) !important;
     background-repeat: no-repeat !important;
     background-position: right 0.7rem center !important;
     background-size: 0.65rem auto !important;
-  }
+}
 
 .view-select:hover {
     filter: brightness(0.9);
