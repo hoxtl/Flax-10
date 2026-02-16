@@ -31,3 +31,4 @@ class CalendarEvent(models.Model):
     source = models.CharField(max_length=100, null=True, blank=True)
     external_id = models.CharField(max_length=255, null=True, blank=True)
     
+    module = models.ForeignKey('studyFlax.Module', on_delete=models.CASCADE, null=True, blank=True, related_name='calendar_events')
