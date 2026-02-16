@@ -1,66 +1,83 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { mockFramerMotion, mockInlinePortal } from "./testSetup";
-
-mockFramerMotion();
-mockInlinePortal();
-
 import { UrgentSection, OthersSection, DoneSection } from "../../../components/Tasks/TaskSection";
 
+vi.mock("framer-motion", () => ({
+  Reorder: {
+    Item: ({ children }) => <div data-testid="reorder-item">{children}</div>,
+  },
+}));
+
+vi.mock("../../../components/Tasks/TaskMenu", () => ({
+  default: () => <div data-testid="task-menu" />,
+}));
+
 describe("TaskSection", () => {
-  const baseHandlers = {
-    onToggleDone: vi.fn(),
-    onSaveEdit: vi.fn(),
-    onCancelEdit: vi.fn(),
-    onStartEdit: vi.fn(),
-    onDotsClick: vi.fn(),
-    onToggleUrgent: vi.fn(),
-    onDelete: vi.fn(),
+  const baseProps = {
+    editingId: null,
+    editText: "",
+    setEditText: () => {},
+    taskMenuId: null,
+    onToggleDone: () => {},
+    onSaveEdit: () => {},
+    onCancelEdit: () => {},
+    onStartEdit: () => {},
+    onDotsClick: () => {},
+    onToggleUrgent: () => {},
+    onDelete: () => {},
+    taskMenuRef: { current: null },
+    taskMenuPos: { top: 0, left: 0 },
   };
 
   it("UrgentSection returns null when empty", () => {
-    const { container } = render(<UrgentSection items={[]} {...baseHandlers} />);
+    const { container } = render(<UrgentSection {...baseProps} items={[]} />);
     expect(container.firstChild).toBeNull();
   });
 
   it("OthersSection returns null when empty", () => {
-    const { container } = render(<OthersSection items={[]} {...baseHandlers} />);
+    const { container } = render(<OthersSection {...baseProps} items={[]} />);
     expect(container.firstChild).toBeNull();
   });
 
   it("DoneSection returns null when empty", () => {
-    const { container } = render(<DoneSection items={[]} {...baseHandlers} />);
+    const { container } = render(
+      <DoneSection
+        items={[]}
+        taskMenuId={null}
+        onToggleDone={() => {}}
+        onDotsClick={() => {}}
+        onToggleUrgent={() => {}}
+        onDelete={() => {}}
+        taskMenuRef={{ current: null }}
+        taskMenuPos={{ top: 0, left: 0 }}
+      />
+    );
     expect(container.firstChild).toBeNull();
   });
 
-  it("renders section titles when items exist", () => {
-    render(
-      <UrgentSection
-        items={[{ id: "1", title: "A", done: false, urgent: true }]}
-        editingId={null}
-        editText=""
-        setEditText={vi.fn()}
-        taskMenuId={null}
-        taskMenuRef={{ current: null }}
-        taskMenuPos={{ top: 0, left: 0 }}
-        {...baseHandlers}
-      />
-    );
-
+  it("renders section titles (bang + no bang)", () => {
+    const items = [{ id: 1, title: "A", done: false, urgent: true }];
+    render(<UrgentSection {...baseProps} items={items} />);
     expect(screen.getByText("URGENT")).toBeInTheDocument();
+    expect(screen.getByText("!")).toBeInTheDocument();
+
+    render(<OthersSection {...baseProps} items={items} />);
+    expect(screen.getByText("OTHERS")).toBeInTheDocument();
   });
 
-  it("renders DONE section when done items exist", () => {
+  it("DoneSection renders DONE title", () => {
+    const items = [{ id: 2, title: "D", done: true, urgent: false }];
     render(
       <DoneSection
-        items={[{ id: "2", title: "B", done: true, urgent: false }]}
+        items={items}
         taskMenuId={null}
+        onToggleDone={() => {}}
+        onDotsClick={() => {}}
+        onToggleUrgent={() => {}}
+        onDelete={() => {}}
         taskMenuRef={{ current: null }}
         taskMenuPos={{ top: 0, left: 0 }}
-        {...baseHandlers}
       />
     );
-
     expect(screen.getByText("DONE")).toBeInTheDocument();
   });
 });
