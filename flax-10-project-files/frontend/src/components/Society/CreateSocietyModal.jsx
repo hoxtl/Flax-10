@@ -17,7 +17,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 function getInitialForm() {
-    return { name: "", bio: "", isRatified: false, isPrivate: false, collaborators: "" };
+    return { name: "", bio: "", isRatified: false, collaborators: "" };
 }
 
 function ModalHeader({ onClose }) {
@@ -39,7 +39,6 @@ function FormFields({ form, update }) {
             <BioField value={form.bio} onChange={v => update("bio", v)} />
             <CollaboratorsField value={form.collaborators} onChange={v => update("collaborators", v)} />
             <RatifiedToggle value={form.isRatified} onChange={v => update("isRatified", v)} />
-            <PrivacyToggle value={form.isPrivate} onChange={v => update("isPrivate", v)} />
         </div>
     );
 }
@@ -95,20 +94,6 @@ function RatifiedNotice() {
         <div className={styles.notice}>
             <span className={styles.noticeIcon}>i</span>
             <span>Ratification requires verification. Your society will show as pending until approved.</span>
-        </div>
-    );
-}
-
-function PrivacyToggle({ value, onChange }) {
-    return (
-        <div className={styles.field}>
-            <div className={styles.toggleRow}>
-                <div>
-                    <label className={styles.label}>Private Society</label>
-                    <p className={styles.hint}>{value ? "Only members can see events and content" : "Anyone can view events and content"}</p>
-                </div>
-                <Toggle checked={value} onChange={onChange} />
-            </div>
         </div>
     );
 }
