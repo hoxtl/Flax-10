@@ -16,7 +16,16 @@ vi.mock("../../../components/Tasks/TaskList", () => ({
       <button
         onClick={() =>
           onDotsClick(
-            { currentTarget: { getBoundingClientRect: () => ({ left: 1, top: 2, width: 3, height: 4 }) } },
+            {
+              currentTarget: {
+                getBoundingClientRect: () => ({
+                  left: 1,
+                  top: 2,
+                  width: 3,
+                  height: 4,
+                }),
+              },
+            },
             { id: 123 }
           )
         }
@@ -26,7 +35,9 @@ vi.mock("../../../components/Tasks/TaskList", () => ({
 
       <button onClick={onCancelEdit}>cancel-edit</button>
       <button onClick={() => onSaveEdit(777)}>save-edit</button>
-      <button onClick={() => onStartEdit({ id: 888, title: "Hello" })}>start-edit</button>
+      <button onClick={() => onStartEdit({ id: 888, title: "Hello" })}>
+        start-edit
+      </button>
     </div>
   ),
 }));
@@ -111,9 +122,15 @@ describe("ToDoPanel", () => {
     vi.clearAllMocks();
   });
 
+  it("defaults to open when open prop is omitted", () => {
+    render(<ToDoPanel onClose={() => {}} fabRef={{ current: null }} />);
+    const panel = screen.getByText("clear-completed").closest("div").parentElement;
+    expect(panel.className).toMatch(/open/);
+  });
+
   it("renders closed class when open=false", () => {
     render(<ToDoPanel open={false} onClose={() => {}} fabRef={{ current: null }} />);
-    const panel = screen.getByText("clear-completed").closest("div").parentElement; 
+    const panel = screen.getByText("clear-completed").closest("div").parentElement;
     expect(panel.className).toMatch(/closed/);
   });
 
@@ -127,10 +144,9 @@ describe("ToDoPanel", () => {
     const updater = setTaskMenuId.mock.calls[0][0];
     expect(typeof updater).toBe("function");
 
-    expect(updater(null)).toBe(123);  
-    expect(updater(123)).toBe(null);   
+    expect(updater(null)).toBe(123);
+    expect(updater(123)).toBe(null);
   });
-
 
   it("cancel edit clears editingId and editText", () => {
     render(<ToDoPanel open={true} onClose={() => {}} fabRef={{ current: null }} />);
