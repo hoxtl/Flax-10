@@ -18,7 +18,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
     <Components.SignUpContainer $signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Create Account</Components.Title>
-        
+
         {fields.map(field => (
           <Components.Input
             key={field.name}
@@ -31,7 +31,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
             disabled={loading}
           />
         ))}
-        
+
         <Components.Button type="submit" disabled={loading}>
           {loading ? 'Registering Account...' : 'Sign Up'}
         </Components.Button>
