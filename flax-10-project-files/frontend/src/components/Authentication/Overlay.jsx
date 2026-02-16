@@ -1,4 +1,3 @@
-import React from 'react';
 import * as Components from '../Authentication/AuthComponents';
 
 /**
@@ -6,10 +5,10 @@ import * as Components from '../Authentication/AuthComponents';
  */
 export const AuthOverlay = ({ signIn, onToggle }) => {
   return (
-    <Components.OverlayContainer signIn={signIn}>
-      <Components.Overlay signIn={signIn}>
+    <Components.OverlayContainer $signIn={signIn}>
+      <Components.Overlay $signIn={signIn}>
         
-        <Components.LeftOverlayPanel signIn={signIn}>
+        <Components.LeftOverlayPanel $signIn={signIn}>
           <Components.Title>Log In</Components.Title>
           <Components.Paragraph>
             Log back in to use StudyFlax!
@@ -19,7 +18,7 @@ export const AuthOverlay = ({ signIn, onToggle }) => {
           </Components.GhostButton>
         </Components.LeftOverlayPanel>
 
-        <Components.RightOverlayPanel signIn={signIn}>
+        <Components.RightOverlayPanel $signIn={signIn}>
           <Components.Title>Welcome to StudyFlax!</Components.Title>
           <Components.Paragraph>
             Sign up to use StudyFlax!

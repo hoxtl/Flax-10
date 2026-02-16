@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import styles from '../../pages/TimerPage.module.css';
 
 /** Formats seconds to MM:SS. Handles negative values with '+' for overtime */
@@ -37,30 +38,61 @@ export const TimerControls = ({ isActive, onToggle, onReset }) => (
     </div>
 );
 
-const Input = ({ value, onChange, onBlur }) => (
-    <input type="number" className={styles.input} value={value}
-        onChange={onChange} onFocus={(e) => e.target.select()} onBlur={onBlur} />
-);
+const useBufferedInput = (value, onUpdate, min, onError) => {
+    const [local, setLocal] = useState(value);
+    useEffect(() => setLocal(value), [value]);
 
-const SettingItem = ({ label, value, onChange, onBlur }) => (
-    <div className={styles.settingItem}>
-        <label className={styles.label}>{label}</label>
-        <Input value={value} onChange={onChange} onBlur={onBlur} />
+    const handleChange = (e) => {
+        const num = parseInt(e.target.value);
+        const isMin = !isNaN(num) && num < min;
+        setLocal(isMin ? min : e.target.value);
+        onError && onError(isMin);
+    };
+
+    const commit = () => {
+        const final = Math.max(parseInt(local) || min, min);
+        setLocal(final);
+        if (final !== value) onUpdate(final);
+        onError && onError(false);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') e.target.blur();
+        if (e.key === 'ArrowDown' && (local === '' || parseInt(local) <= min)) {
+            e.preventDefault();
+            onError && onError(true);
+        }
+    };
+    return { local, handleChange, commit, handleKeyDown };
+};
+
+const BufferedInput = ({ label, value, ...props }) => {
+    const { local, handleChange, commit, handleKeyDown } = useBufferedInput(value, props.onUpdate, props.min, props.onError);
+    return (
+        <div className={styles.settingItem}>
+            <label className={styles.label}>{label}</label>
+            <input type="number" className={styles.input} value={local}
+                onChange={handleChange} onBlur={commit} onKeyDown={handleKeyDown} onFocus={(e) => e.target.select()} />
+        </div>
+    );
+};
+
+const Disclaimer = ({ show }) => show ? (
+    <div className={styles.disclaimer} style={{ marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.7, textAlign: 'center', color: '#ef4444' }}>
+        * Minimum study time is 1 minute
     </div>
-);
+) : null;
 
-/** Higher-order function to curate change event before calling update */
-const getChangeHandler = (onUpdate, type) => (e) =>
-    onUpdate(type, e.target.value === '' ? '' : parseInt(e.target.value));
-
-/** Validates input on blur: resets to default if empty or invalid */
-const getBlurHandler = (onUpdate, type, val, def) => () =>
-    (val === '' || isNaN(val) || val < (type === 'sessions' ? 1 : 0)) && onUpdate(type, def);
-
-export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => (
-    <div className={styles.settings}>
-        <SettingItem label="Work (min)" value={work} onChange={getChangeHandler(onUpdate, 'work')} onBlur={getBlurHandler(onUpdate, 'work', work, 0)} />
-        <SettingItem label="Break (min)" value={breakTime} onChange={getChangeHandler(onUpdate, 'break')} onBlur={getBlurHandler(onUpdate, 'break', breakTime, 0)} />
-        <SettingItem label="Sessions" value={sessions} onChange={getChangeHandler(onUpdate, 'sessions')} onBlur={getBlurHandler(onUpdate, 'sessions', sessions, 1)} />
-    </div>
-);
+export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
+    const [showError, setShowError] = useState(false);
+    return (
+        <div className={styles.settingsContainer}>
+            <div className={styles.settings}>
+                <BufferedInput label="Work (min)" value={work} min={1} onUpdate={(v) => onUpdate('work', v)} onError={setShowError} />
+                <BufferedInput label="Break (min)" value={breakTime} min={0} onUpdate={(v) => onUpdate('break', v)} />
+                <BufferedInput label="Sessions" value={sessions} min={1} onUpdate={(v) => onUpdate('sessions', v)} />
+            </div>
+            <Disclaimer show={showError} />
+        </div>
+    );
+};

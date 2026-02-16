@@ -8,6 +8,7 @@ import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../utils/authHelpers";
+import FloatingTasks from "../components/Tasks/FloatingTasks";
 import { useLocation } from "react-router-dom";
 
 function useIsMobile(breakpoint = 900) {
@@ -49,16 +50,29 @@ function toggleByDevice(isMobile, setMobileOpen, setCollapsed) {
 
 function DesktopSidebar({ isMobile, user, activeNav, onNavChange, collapsed }) {
   if (isMobile) return null;
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} collapsed={collapsed} />;
+  return (
+    <Sidebar
+      user={user}
+      active={activeNav}
+      onChange={onNavChange}
+      collapsed={collapsed}
+    />
+  );
 }
 
 function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   if (!isMobile || !open) return null;
+
   return (
     <>
       <div className={styles.backdrop} onClick={onClose} />
       <div className={styles.drawer}>
-        <Sidebar user={user} active={activeNav} onChange={onPick} collapsed={false} />
+        <Sidebar
+          user={user}
+          active={activeNav}
+          onChange={onPick}
+          collapsed={false}
+        />
       </div>
     </>
   );
@@ -67,9 +81,9 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
 function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, children }) {
   return (
     <div className={styles.main}>
-      <TopBar 
-        user={user} 
-        onToggle={onToggle} 
+      <TopBar
+        user={user}
+        onToggle={onToggle}
         onAddClick={onQuickAdd}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
@@ -94,6 +108,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
   
@@ -125,35 +140,35 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       if (response.ok) {
         clearUserData();
       } else {
-        console.error('Logout on backend has failed, local user data is being clearedd...')
         clearUserData();
       }
     } catch (err) {
-      console.error('Error when logging out: ', err);
       clearUserData();
     }
   }
 
   return (
     <div className={styles.root}>
-      <DesktopSidebar 
-        isMobile={isMobile} 
-        user={user} 
-        activeNav={activeNav} 
-        onNavChange={onNavChange} 
-        collapsed={sidebarCollapsed} 
+      <DesktopSidebar
+        isMobile={isMobile}
+        user={user}
+        activeNav={activeNav}
+        onNavChange={onNavChange}
+        collapsed={sidebarCollapsed}
       />
-      <MobileSidebar 
-        isMobile={isMobile} 
-        open={mobileSidebarOpen} 
-        user={user} 
-        activeNav={activeNav} 
-        onPick={onPickNav} 
-        onClose={() => setMobileSidebarOpen(false)} 
+
+      <MobileSidebar
+        isMobile={isMobile}
+        open={mobileSidebarOpen}
+        user={user}
+        activeNav={activeNav}
+        onPick={onPickNav}
+        onClose={() => setMobileSidebarOpen(false)}
       />
-      <MainArea 
-        user={user} 
-        onToggle={onToggle} 
+
+      <MainArea
+        user={user}
+        onToggle={onToggle}
         onQuickAdd={() => setShowQuickAdd(true)}
         onSettingsClick={handleSettingsClick}
         onLogoutClick={handleLogoutClick}
@@ -168,7 +183,17 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         onClose={() => setShowQuickAdd(false)} 
         onSelectType={onSelectType} 
       />
-      {isModalOpen && <EventModal event={modalEvent} initialType={modalType} initialDate={modalInitialDate} onClose={closeModal} />}
+
+      {isModalOpen && (
+        <EventModal
+          event={modalEvent}
+          initialType={modalType}
+          initialDate={modalInitialDate}
+          onClose={closeModal}
+        />
+      )}
+
+      <FloatingTasks />
     </div>
   );
 }
