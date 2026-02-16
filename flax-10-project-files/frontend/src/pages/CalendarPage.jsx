@@ -1,5 +1,5 @@
 import { Calendar } from '../components/Calendar/Calendar';
-import PillFilters from '../components/PillFilters';
+import PillFilters from '../components/Tags/PillFilters';
 import { useCalendar, useCalendarDispatch, useEventModal } from '../context/CalendarContext';
 import styles from './CalendarPage.module.css';
 import { EventModal } from '../components/Calendar/EventModal/EventModal';

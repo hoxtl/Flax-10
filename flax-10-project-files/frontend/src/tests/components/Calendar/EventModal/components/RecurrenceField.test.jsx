@@ -7,7 +7,7 @@ describe('RecurrenceField', () => {
 
     it('should render default state', () => {
         render(<RecurrenceField value={{}} onChange={mockOnChange} />);
-        expect(screen.getByText('Recurrence')).toBeInTheDocument();
+        expect(screen.getByText('Repeat')).toBeInTheDocument();
         expect(screen.getByDisplayValue('None')).toBeInTheDocument();
         expect(screen.queryByText('Every')).not.toBeInTheDocument();
     });
@@ -71,6 +71,6 @@ describe('RecurrenceField', () => {
 
     it('should handle null value prop gracefully', () => {
         render(<RecurrenceField value={null} onChange={mockOnChange} />);
-        expect(screen.getByText('Recurrence')).toBeInTheDocument();
+        expect(screen.getByText('Repeat')).toBeInTheDocument();
     });
 });

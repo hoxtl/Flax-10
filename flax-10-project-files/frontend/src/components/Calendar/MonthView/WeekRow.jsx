@@ -1,4 +1,4 @@
-import { isSameMonth, overlapsDay } from '../../../utils/dateUtils';
+import { isSameMonth, overlapsDay } from '../utils/dateUtils';
 import { DayCell } from './DayCell';
 
 export function WeekRow({ days, events, cur, onDateSelect, readOnly, onEventClick, customTags }) {

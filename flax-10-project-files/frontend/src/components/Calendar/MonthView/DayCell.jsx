@@ -1,6 +1,6 @@
-import { useMonthDayDrop } from '../../../hooks/useMonthDayDrop';
+import { useMonthDayDrop } from '../hooks/useMonthDayDrop';
 import { useEventModal } from '../../../context/CalendarContext';
-import { isSameDay } from '../../../utils/dateUtils';
+import { isSameDay } from '../utils/dateUtils';
 import { DayEvents } from './DayEvents';
 
 export function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, customTags }) {

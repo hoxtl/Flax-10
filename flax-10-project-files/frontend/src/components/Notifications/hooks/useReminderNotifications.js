@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useNotifications } from '../context/NotificationContext';
+import { useNotifications } from '../../../context/NotificationContext';
 
 export function useReminderNotifications(events) {
     const { addNotification } = useNotifications();

@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
-import { useReminderNotifications } from "../hooks/useReminderNotifications";
+import { useReminderNotifications } from "../components/Notifications/hooks/useReminderNotifications";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
@@ -56,7 +56,7 @@ export function useEventModal() {
     const dispatch = useContext(CalendarDispatchContext);
 
     if (!context || !dispatch) {
-        return { modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false, openModal: () => {}, closeModal: () => {} };
+        return { modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false, openModal: () => { }, closeModal: () => { } };
     }
 
     const { modalEvent, modalType, modalInitialDate, isModalOpen } = context;

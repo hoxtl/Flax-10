@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import * as api from "../api/societyApi";
-import { addHourToTime } from "../utils/dateUtils";
+import * as api from "../../../api/societyApi";
+import { addHourToTime } from "../../Calendar/utils/dateUtils";
 
 function transformAnnouncementData(data) {
     return {

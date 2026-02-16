@@ -1,6 +1,6 @@
 import styles from "./Topbar.module.css";
 import { DAYS, MONTHS } from "../../lib/uiConstants";
-import { getGreeting } from "../utils/dateUtils";
+import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { NotificationCenter } from "../Notifications";
 import { getDisplayName } from "../Authentication/utils/userDisplay";

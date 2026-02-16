@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./tabs.module.css";
-import AnnouncementModal from "../AnnouncementModal";
-import { formatShortDate } from "../../../../utils/dateUtils";
+import AnnouncementModal from "./AnnouncementModal";
+import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
 
 export default function AnnouncementsTab({ announcements = [], editMode, onUpdate, tags }) {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
@@ -23,8 +23,10 @@ function saveAnnouncement(data, existing, onUpdate) {
 }
 
 function formatAnnouncement(data) {
-    return { id: data.id || Date.now(), title: data.title, content: data.content,
-        image_urls: data.images || [], tag: data.tag, pinned: data.pinned };
+    return {
+        id: data.id || Date.now(), title: data.title, content: data.content,
+        image_urls: data.images || [], tag: data.tag, pinned: data.pinned
+    };
 }
 
 function AnnouncementsList({ announcements, editMode, onEdit, tags }) {

@@ -2,8 +2,8 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useEventForm } from '../../../../components/Calendar/EventModal/useEventForm';
 import * as CalendarContextModule from '../../../../context/CalendarContext';
-import * as EventActionsModule from '../../../../hooks/useCalendarEvents';
-import * as FormUtilsModule from '../../../../utils/formUtils';
+import * as EventActionsModule from '../../../../components/Calendar/hooks/useCalendarEvents';
+import * as FormUtilsModule from '../../../../components/Calendar/utils/formUtils';
 
 // Mock dependencies
 const mockEvents = [];
@@ -21,11 +21,11 @@ vi.mock('../../../../context/CalendarContext', async () => {
     };
 });
 
-vi.mock('../../../../hooks/useCalendarEvents', () => ({
+vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useEventActions: () => mockActions,
 }));
 
-vi.mock('../../../../utils/formUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/formUtils', () => ({
     getInitialForm: vi.fn(() => mockInitialForm),
     validateAndSubmit: vi.fn(),
     confirmDelete: vi.fn(),

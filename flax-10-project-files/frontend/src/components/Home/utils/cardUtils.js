@@ -1,4 +1,4 @@
-import { isSameDay } from "./dateUtils";
+import { isSameDay } from "../../Calendar/utils/dateUtils";
 
 export function getCardTheme(type) {
   return THEMES[type] || THEMES.other;

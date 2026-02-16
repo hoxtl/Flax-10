@@ -1,6 +1,6 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { useTags } from '../../../context/TagContext';
-import { isSameDay } from '../../../utils/dateUtils';
+import { isSameDay } from '../utils/dateUtils';
 
 export function HoverSummary({ events, date }) {
     if (!events || events.length === 0) return <EmptySummary />;

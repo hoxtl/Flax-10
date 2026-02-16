@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "./tabs.module.css";
-import ImageGalleryModal from "../ImageGalleryModal";
-import AddPhotoModal from "../AddPhotoModal";
-import DeletePhotoModal from "../DeletePhotoModal";
+import ImageGalleryModal from "../imageHandlers/ImageGalleryModal";
+import AddPhotoModal from "../imageHandlers/AddPhotoModal";
+import DeletePhotoModal from "../imageHandlers/DeletePhotoModal";
 
 export default function PhotosTab({ society, editMode, onUpdate }) {
     const allPhotos = collectAllPhotos(society);

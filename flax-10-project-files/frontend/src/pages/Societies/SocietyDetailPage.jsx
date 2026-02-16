@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from "./SocietyDetailPage.module.css";
-import { useSocietyDetail } from "../hooks/useSocietyDetail";
-import SocietyHero from "../components/Society/SocietyDetail/SocietyHero";
-import SocietyInfo from "../components/Society/SocietyDetail/SocietyInfo";
-import SocietyTabs from "../components/Society/SocietyDetail/SocietyTabs";
-import SocietySidebar from "../components/Society/SocietyDetail/SocietySidebar";
-import CoverImageModal from "../components/Society/SocietyDetail/CoverImageModal";
-import ImageGalleryModal from "../components/Society/SocietyDetail/ImageGalleryModal";
+import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
+import SocietyHero from "../../components/Society/SocietyDetail/SocietyHero";
+import SocietyInfo from "../../components/Society/SocietyDetail/SocietyInfo";
+import SocietyTabs from "../../components/Society/SocietyDetail/SocietyTabs";
+import SocietySidebar from "../../components/Society/SocietyDetail/SocietySidebar";
+import CoverImageModal from "../../components/Society/SocietyDetail/CoverImageModal";
+import ImageGalleryModal from "../../components/Society/SocietyDetail/ImageGalleryModal";
 
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
@@ -43,8 +43,10 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 function buildHandlers(hookData) {
     const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent, addTag, deleteTag } = hookData;
-    return { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag };
+    return {
+        updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
+        addEvent, updateEvent, deleteEvent, addTag, deleteTag
+    };
 }
 
 function getImageUrls(images) {

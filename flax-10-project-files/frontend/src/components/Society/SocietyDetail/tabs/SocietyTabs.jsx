@@ -1,8 +1,8 @@
 import styles from "./SocietyTabs.module.css";
-import CalendarTab from "./tabs/CalendarTab";
-import AboutTab from "./tabs/AboutTab";
-import PhotosTab from "./tabs/PhotosTab";
-import AnnouncementsTab from "./tabs/AnnouncementsTab";
+import CalendarTab from "./calendarTab/CalendarTab";
+import AboutTab from "./AboutTab";
+import PhotosTab from "./PhotosTab";
+import AnnouncementsTab from "./announcementTab/AnnouncementsTab";
 
 const TABS = [
     { id: "calendar", label: "Calendar" },

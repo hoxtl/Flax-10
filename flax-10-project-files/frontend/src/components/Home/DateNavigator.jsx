@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import styles from "./DateNavigator.module.css";
-import { addDays, formatDayLabel, parseDateInput, isSameDay } from "../utils/dateUtils";
+import { addDays, formatDayLabel, parseDateInput, isSameDay } from "../Calendar/utils/dateUtils";
 
 //Component to navigate between dates
 function Arrow({ dir, onClick }) {

@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
-import { useEventActions } from "../../../hooks/useCalendarEvents";
-import { getInitialForm, validateAndSubmit, confirmDelete } from "../../../utils/formUtils";
+import { useEventActions } from '../hooks/useCalendarEvents';
+import { getInitialForm, validateAndSubmit, confirmDelete } from '../utils/formUtils';
 
 export function useEventForm(event, onClose, options = {}) {
     const calendarContext = useCalendar();
