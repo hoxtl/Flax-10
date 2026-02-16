@@ -37,14 +37,15 @@ def join_society(user, society):
 
 @api_view(['DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
-def membership_detail(request, society_id, user_id):
+def membership_detail(request, society_id, user_id=None):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
 
+    actual_user_id = request.user.id if user_id is None else int(user_id)
     if request.method == 'DELETE':
-        return leave_or_remove(request, society, user_id)
-    return update_role(request, society, user_id)
+        return leave_or_remove(request, society, actual_user_id)
+    return update_role(request, society, actual_user_id)
 
 
 def leave_or_remove(request, society, user_id):

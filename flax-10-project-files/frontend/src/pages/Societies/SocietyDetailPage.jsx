@@ -7,14 +7,16 @@ import SocietyTabs from "../../components/Society/SocietyDetail/tabs/SocietyTabs
 import SocietySidebar from "../../components/Society/SocietyDetail/SocietySidebar";
 import CoverImageModal from "../../components/Society/SocietyDetail/imageHandlers/CoverImageModal";
 import ImageGalleryModal from "../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal";
+import SettingsModal from "../../components/Society/SocietyDetail/SettingsModal";
 
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
-    const { society, loading, error, updateSociety } = hookData;
+    const { society, loading, error, updateSociety, members } = hookData;
     const [activeTab, setActiveTab] = useState("calendar");
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
 
     if (loading) return <div className={styles.page}>Loading...</div>;
     if (error || !society) return <NotFound onBack={onBack} />;
@@ -23,29 +25,37 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     const availablePhotos = getAvailablePhotos(society);
     const handlers = buildHandlers(hookData);
     const updateImages = (imgs) => updateSociety({ images: imgs, image: imgs[0] || null });
+    const handleDelete = async () => { await handlers.deleteSociety(); onBack(); };
 
     return (
         <div className={styles.page}>
-            <TopBar onBack={onBack} canEdit={canEdit} editMode={editMode} setEditMode={setEditMode} />
+            <TopBar onBack={onBack} canEdit={canEdit} editMode={editMode} setEditMode={setEditMode}
+                onSettings={() => setShowSettings(true)} />
             <SocietyHero society={society} onImageClick={() => setGalleryOpen(true)}
                 editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
                 onEditImages={() => setShowCoverModal(true)} />
-            <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety} />
+            <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
+                onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety} />
             <MainContent activeTab={activeTab} setActiveTab={setActiveTab} society={society}
                 editMode={editMode} handlers={handlers} />
             {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}
             {showCoverModal && <CoverImageModal images={getImageUrls(society.images)} availablePhotos={availablePhotos}
                 onClose={() => setShowCoverModal(false)} onUpdate={updateImages} />}
+            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onDelete={handleDelete}
+                members={members} onFetchMembers={handlers.fetchMembers} onUpdateRole={handlers.updateMemberRole}
+                onRemoveMember={handlers.removeMember} />}
         </div>
     );
 }
 
 function buildHandlers(hookData) {
     const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag } = hookData;
+        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
+        deleteSociety, fetchMembers, updateMemberRole, removeMember } = hookData;
     return {
         updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag
+        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
+        deleteSociety, fetchMembers, updateMemberRole, removeMember
     };
 }
 
@@ -59,11 +69,14 @@ function getAvailablePhotos(society) {
     return announcementImages.filter(img => !currentCovers.has(img));
 }
 
-function TopBar({ onBack, canEdit, editMode, setEditMode }) {
+function TopBar({ onBack, canEdit, editMode, setEditMode, onSettings }) {
     return (
         <div className={styles.topBar}>
             <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
-            {canEdit && <EditToggle editMode={editMode} setEditMode={setEditMode} />}
+            <div className={styles.topBarActions}>
+                {editMode && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
+                {canEdit && <EditToggle editMode={editMode} setEditMode={setEditMode} />}
+            </div>
         </div>
     );
 }

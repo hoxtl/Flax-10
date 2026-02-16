@@ -39,6 +39,7 @@ urlpatterns = [
     path("societies/", society_list, name="society-list"),
     path("societies/<int:society_id>/", society_detail, name="society-detail"),
     path("societies/<int:society_id>/members/", membership_list, name="society-members"),
+    path("societies/<int:society_id>/members/me/", membership_detail, name="society-member-self"),
     path("societies/<int:society_id>/members/<int:user_id>/", membership_detail, name="society-member-detail"),
     path("societies/<int:society_id>/tags/", society_tag_list, name="society-tags"),
     path("societies/<int:society_id>/tags/<int:tag_id>/", society_tag_detail, name="society-tag-detail"),

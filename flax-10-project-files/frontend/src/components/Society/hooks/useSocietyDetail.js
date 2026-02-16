@@ -151,9 +151,31 @@ export function useSocietyDetail(societyId) {
         setSociety(prev => ({ ...prev, is_member: true, member_count: prev.member_count + 1 }));
     };
 
-    const leaveSociety = async (userId) => {
-        await api.leaveSociety(societyId, userId);
+    const leaveSociety = async () => {
+        await api.leaveSociety(societyId, 'me');
         setSociety(prev => ({ ...prev, is_member: false, member_count: Math.max(0, prev.member_count - 1) }));
+    };
+
+    const deleteSociety = async () => {
+        await api.deleteSociety(societyId);
+    };
+
+    const [members, setMembers] = useState([]);
+
+    const fetchMembers = useCallback(async () => {
+        const data = await api.fetchMembers(societyId);
+        setMembers(data);
+    }, [societyId]);
+
+    const updateMemberRole = async (userId, role) => {
+        await api.updateMemberRole(societyId, userId, role);
+        setMembers(prev => prev.map(m => m.user === userId ? { ...m, role } : m));
+    };
+
+    const removeMember = async (userId) => {
+        await api.leaveSociety(societyId, userId);
+        setMembers(prev => prev.filter(m => m.user !== userId));
+        setSociety(prev => ({ ...prev, member_count: Math.max(0, prev.member_count - 1) }));
     };
 
     return {
@@ -161,6 +183,7 @@ export function useSocietyDetail(societyId) {
         addTag, updateTag, deleteTag,
         addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent,
-        joinSociety, leaveSociety
+        joinSociety, leaveSociety, deleteSociety,
+        members, fetchMembers, updateMemberRole, removeMember
     };
 }

@@ -78,6 +78,7 @@ def update_announcement(announcement, data):
     serialiser.save()
     if 'image_urls' in data:
         update_announcement_images(announcement, data['image_urls'])
+    announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data)
 
 

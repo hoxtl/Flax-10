@@ -1,0 +1,165 @@
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: var(--bg-secondary, #1e1e1e);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+.title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary, #fff);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #aaa);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: var(--text-primary, #fff);
+}
+
+.section {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+.sectionTitle {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary, #aaa);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.memberList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.memberRow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: var(--bg-tertiary, #2a2a2a);
+    border-radius: 6px;
+}
+
+.memberName {
+    flex: 1;
+    color: var(--text-primary, #fff);
+    font-size: 0.9rem;
+}
+
+.roleSelect {
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color, #444);
+    background: var(--bg-primary, #121212);
+    color: var(--text-primary, #fff);
+    font-size: 0.85rem;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #888);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+}
+
+.removeBtn:hover {
+    color: #ff6b6b;
+}
+
+.empty {
+    color: var(--text-secondary, #888);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.dangerSection {
+    padding: 1rem 1.5rem;
+}
+
+.deleteBtn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: 1px solid #ff6b6b;
+    color: #ff6b6b;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #ff6b6b;
+    color: #fff;
+}
+
+.confirmBox {
+    text-align: center;
+}
+
+.confirmBox p {
+    color: var(--text-secondary, #aaa);
+    margin-bottom: 1rem;
+}
+
+.confirmBtns {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.cancelBtn {
+    padding: 0.5rem 1rem;
+    background: var(--bg-tertiary, #2a2a2a);
+    border: none;
+    color: var(--text-primary, #fff);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.confirmDeleteBtn {
+    padding: 0.5rem 1rem;
+    background: #ff6b6b;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}

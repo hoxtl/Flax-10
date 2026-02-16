@@ -37,7 +37,7 @@ class SocietyListSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = Society
-        fields = ['id', 'name', 'image', 'cover_image', 'is_ratified', 'is_private', 'member_count']
+        fields = ['id', 'name', 'image', 'cover_image', 'is_ratified', 'member_count']
 
     def get_cover_image(self, obj):
         if obj.image:
@@ -79,6 +79,6 @@ class SocietyDetailSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Society
         fields = [
-            'id', 'name', 'bio', 'about', 'image', 'is_ratified', 'is_private',
+            'id', 'name', 'bio', 'about', 'image', 'is_ratified',
             'date_created', 'member_count', 'tags', 'images', 'announcements', 'events'
         ]
