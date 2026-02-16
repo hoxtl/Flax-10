@@ -7,7 +7,12 @@ from studyFlax.serialisers.event_serialisers import (
     CalendarEventCreateSerialiser
 )
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from .event_helpers import check_event_overlap, filter_events_by_date_range, parse_date_param
+from .event_helpers import (
+    check_event_overlap,
+    filter_events_by_date_range,
+    parse_date_param,
+    expand_recurring_events
+)
 from .timetable_service import sync_timetable_if_needed
 
 
@@ -28,40 +33,29 @@ def event_list(request):
 
 
 def get_events(request):
-<<<<<<< HEAD
     safe_sync_timetable(request.user)
-=======
-    safe_sync_timetable()
+    base_events = CalendarEvent.objects.filter(user=request.user)
+    filtered = filter_events_by_date_range(base_events, request.query_params)
     
-    # ALWAYS filter by current user
->>>>>>> main
-    events = CalendarEvent.objects.filter(user=request.user)
-    events = filter_events_by_date_range(events, request.query_params)
-    serialiser = CalendarEventSerialiser(events, many=True)
-    return Response(serialiser.data)
+    start = parse_date_param(request.query_params.get('start'))
+    end = parse_date_param(request.query_params.get('end'))
+    expanded = expand_recurring_events(filtered, start, end)
+    
+    return Response(CalendarEventSerialiser(expanded, many=True).data)
 
-<<<<<<< HEAD
 def safe_sync_timetable(user):
     try:
         sync_timetable_if_needed(user)
     except Exception:
         pass
-=======
->>>>>>> main
 
 def create_event(request):
     serialiser = CalendarEventCreateSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-<<<<<<< HEAD
     overlap = check_event_overlap(request.user, serialiser.validated_data)
     event = serialiser.save(user=request.user)
     response_data = CalendarEventSerialiser(event).data
     response_data['has_overlap'] = overlap
-=======
-    # ALWAYS assign to current user
-    event = serialiser.save(user=request.user)
-    response_data = CalendarEventSerialiser(event).data
->>>>>>> main
     return Response(response_data, status=status.HTTP_201_CREATED)

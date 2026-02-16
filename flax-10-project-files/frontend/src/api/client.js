@@ -18,7 +18,6 @@ function buildRequestConfig(options) {
     }
     return {
         headers,
-        headers,
         ...options,
     };
 }

@@ -1,4 +1,4 @@
-import { pinUrgentFirst } from "../../utils/tasks/taskUtils";
+import { pinUrgentFirst } from "../utils/taskUtils";
 
 export function useTaskReorder(setItems) {
   const onReorderActive = (newOrder) => {

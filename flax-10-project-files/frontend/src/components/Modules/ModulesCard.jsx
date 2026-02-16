@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { isEnrolledIn } from '../../utils/moduleUtils';
-import { formatWeekdayTime, formatDuration } from '../../utils/moduleUtils.js';
+import { isEnrolledIn } from './utils/moduleUtils.js';
+import { formatWeekdayTime, formatDuration } from './utils/moduleUtils.js';
 import styles from './ModulesCard.module.css';
 
 export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete }) {

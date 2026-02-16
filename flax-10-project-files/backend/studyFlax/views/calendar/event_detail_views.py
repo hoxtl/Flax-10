@@ -13,14 +13,8 @@ from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def event_detail(request, pk):
-<<<<<<< HEAD
     event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
 
-=======
-    # Filter by user - users can only access their own events
-    event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
-    
->>>>>>> main
     if request.method == 'GET': 
         return get_event(event)
     if request.method == 'PUT': 
@@ -49,9 +43,6 @@ def delete_event(event):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_exception_date(request, pk):
-<<<<<<< HEAD
-    event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
-=======
     # Filter by user
     event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
     
@@ -59,7 +50,6 @@ def add_exception_date(request, pk):
     if not date:
         return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
     
->>>>>>> main
     if not event.recurrence_rule:
         return Response({'error': 'Event has no recurrence rule'}, status=status.HTTP_400_BAD_REQUEST)
     

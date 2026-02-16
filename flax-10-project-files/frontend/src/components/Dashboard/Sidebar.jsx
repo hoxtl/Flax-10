@@ -1,15 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import styles from "./Sidebar.module.css";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Dashboard/Sidebar.jsx
 import { getInitials } from "../Authentication/utils/userUtils";
 import { APP_ROUTES } from "../../lib/routes";
 import { getPreferredFirstName } from "../Authentication/utils/userDisplay";
-=======
-import { getInitials } from "../utils/userUtils";
-import { APP_ROUTES } from "../lib/routes";
-import { getPreferredFirstName } from "../utils/userDisplay";
-import { getUserProfile } from "../api/userService";
->>>>>>> main:flax-10-project-files/frontend/src/components/Sidebar.jsx
+import { getUserProfile } from "../../api/userService";
 
 function SidebarHeader({ collapsed }) {
   return (

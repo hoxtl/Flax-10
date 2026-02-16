@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './EditProfileModal.module.css';
-import { updateUserProfile } from '../api/userService';
-import { getInitials } from '../utils/userUtils';
+import { updateUserProfile } from '../../api/userService';
+import { getInitials } from '../Authentication/utils/userUtils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -80,7 +80,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
       const formData = new FormData();
       formData.append('username', username);
       formData.append('bio', bio);
-      
+
       if (profilePhoto) {
         formData.append('profile_photo', profilePhoto);
       } else if (removePhoto) {
@@ -134,8 +134,8 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
                 Change Photo
               </label>
               {(previewUrl || user?.profile_photo_url) && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className={styles.photoRemove}
                   onClick={handleRemovePhoto}
                 >

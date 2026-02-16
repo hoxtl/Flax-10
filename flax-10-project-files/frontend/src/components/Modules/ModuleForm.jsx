@@ -1,7 +1,7 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { createModule, updateModule } from '../../api/module_api';
-import { serialiseModule} from '../../utils/moduleUtils';
-import { validateForm, getFormData, updateForm} from '../../utils/moduleHelpers';
+import { serialiseModule } from './utils/moduleUtils';
+import { validateForm, getFormData, updateForm } from './utils/moduleHelpers';
 import styles from './ModuleForm.module.css'
 
 
@@ -11,8 +11,8 @@ async function saveModule(is_editing, module, form_data) {
 }
 
 function handleNewForm(field, value, setFormData, setErrors, errors) {
-    setFormData(prev => ({ ...prev, [field]: value}));
-    if (errors[field]) setErrors(prev => ({ ... prev, [field]: null}))
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }))
 }
 
 function getInput(error, s) {
@@ -20,18 +20,20 @@ function getInput(error, s) {
 }
 // Validates and submits the form
 async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubmitting, onSuccess) {
-    e.preventDefault(); 
+    e.preventDefault();
     const new_errors = validateForm(form_data);
-    if (Object.keys(new_errors).length > 0) { setErrors(new_errors); 
-        return;}
-        setSubmitting(true);
-        try {
-            onSuccess(await saveModule(is_editing, module, form_data), !is_editing);
-        } catch (err) {
-            setErrors({ submit: err.message});
-        } finally {
-            setSubmitting(false);
-        }
+    if (Object.keys(new_errors).length > 0) {
+        setErrors(new_errors);
+        return;
+    }
+    setSubmitting(true);
+    try {
+        onSuccess(await saveModule(is_editing, module, form_data), !is_editing);
+    } catch (err) {
+        setErrors({ submit: err.message });
+    } finally {
+        setSubmitting(false);
+    }
 }
 
 //Form container with all field sections and submit / cancel actions

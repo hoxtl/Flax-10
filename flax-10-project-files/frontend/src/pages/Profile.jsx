@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
-import { getInitials } from "../utils/userUtils";
-import EditProfileModal from "../components/EditProfileModal";
+import { getInitials } from "../components/Authentication/utils/userUtils";
+import EditProfileModal from "../components/Dashboard/EditProfileModal";
 import { getUserProfile } from "../api/userService";
 import { getEvents } from "../api/event_api";
 
@@ -24,7 +24,7 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
   const username = user?.username || "guest";
   const year = profileData?.year || user?.year || "Year 2";
   const major = profileData?.major || user?.major || "Computer Science";
-  
+
   const moduleCount = profileData?.module_count || 0;
   const taskCount = profileData?.task_count || 0;
   const eventCount = profileData?.event_count || 0;
@@ -123,28 +123,28 @@ function Modal({ isOpen, onClose, title, children }) {
 function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
   const rangeLabels = {
     'today': 'Today',
-    'week': 'This Week', 
+    'week': 'This Week',
     'month': 'This Month'
   };
-  
+
   const title = `Events - ${rangeLabels[range]} (${events.length})`;
-  
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className={styles.rangeSelector}>
-        <button 
+        <button
           className={range === 'today' ? styles.rangeActive : ''}
           onClick={() => onRangeChange('today')}
         >
           Today
         </button>
-        <button 
+        <button
           className={range === 'week' ? styles.rangeActive : ''}
           onClick={() => onRangeChange('week')}
         >
           This Week
         </button>
-        <button 
+        <button
           className={range === 'month' ? styles.rangeActive : ''}
           onClick={() => onRangeChange('month')}
         >
@@ -153,9 +153,9 @@ function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
       </div>
       {events.length > 0 ? (
         events.map((event, i) => (
-          <EventItem 
-            key={i} 
-            title={event.title} 
+          <EventItem
+            key={i}
+            title={event.title}
             startTime={event.start_time}
             location={event.location}
           />
@@ -214,10 +214,10 @@ export default function Profile({ user }) {
   const getFilteredEvents = () => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
+
     return allEvents.filter(event => {
       const eventStart = new Date(event.start_time);
-      
+
       if (eventRange === 'today') {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -240,7 +240,7 @@ export default function Profile({ user }) {
 
   const modules = profileData?.modules || [];
   const filteredEvents = getFilteredEvents();
-  
+
   // Count all upcoming events (from today onwards, next 30 days)
   const upcomingEventCount = allEvents.filter(event => {
     const eventStart = new Date(event.start_time);
@@ -254,7 +254,7 @@ export default function Profile({ user }) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <ProfileHeader 
+        <ProfileHeader
           user={profileData || user}
           profileData={profileData}
           onModulesClick={() => setShowModules(true)}

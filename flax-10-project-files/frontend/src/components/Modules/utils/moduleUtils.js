@@ -21,29 +21,31 @@ export function serialiseModule(form_data) {
 
 export function formatWeekdayTime(date_time_str) {
     if (!date_time_str) return "Not announced yet...";
-    const date =new Date(date_time_str);
-    const weekday = date.toLocaleDateString('en-GB', {weekday: 'long'} );
-    const time = date.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', hour12: false});
+    const date = new Date(date_time_str);
+    const weekday = date.toLocaleDateString('en-GB', { weekday: 'long' });
+    const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
     return `${weekday}s at ${time}`;
 }
 
 export function formatFullDateTime(date_time_str) {
     if (!date_time_str) return "Not announced yet...";
-    const date =new Date(date_time_str);
-    return date.toLocaleString('en-GB', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-         hour: '2-digit', minute: '2-digit', hour12: false});
+    const date = new Date(date_time_str);
+    return date.toLocaleString('en-GB', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: false
+    });
 }
 
 export function formatTime(date_time_str) {
     if (!date_time_str) return "Not announced yet...";
-    const date =new Date(date_time_str);
-    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false});
+    const date = new Date(date_time_str);
+    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 export function formatDuration(start, end) {
     if (!start || !end) return '';
     const duration = (new Date(end) - new Date(start)) / (1000 * 60);
-        return createDurationString(duration);
+    return createDurationString(duration);
 }
 
 function createDurationString(duration) {
@@ -56,7 +58,7 @@ function createDurationString(duration) {
 
 //from formUtils.js - move to dateUtils to allow export
 export function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16); 
+    if (!d) return new Date().toISOString().slice(0, 16);
     const date = typeof d === 'string' ? new Date(d) : d;
     const offset = date.getTimezoneOffset() * 60000;
     const localDate = new Date(date.getTime() - offset);
@@ -74,7 +76,7 @@ export function filterModules(modules, enrollments, search_query, filter_mode) {
 function checkSearch(module, search_query) {
     const query_lower = search_query.toLowerCase();
     return module.module_name.toLowerCase().includes(query_lower)
-    || module.module_code.toLowerCase().includes(query_lower);
+        || module.module_code.toLowerCase().includes(query_lower);
 }
 
 function checkFilter(module, enrollments, filter_mode) {

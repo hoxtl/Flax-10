@@ -1,14 +1,14 @@
-import {formatForInput} from './moduleUtils.js';
+import { formatForInput } from './moduleUtils.js';
 
 export function getFormData() {
-    return {module_code: '', module_name: '', description: '', start_time: '', end_time: '', location: '', is_recurring: true};
+    return { module_code: '', module_name: '', description: '', start_time: '', end_time: '', location: '', is_recurring: true };
 }
 
 export function updateForm(module) {
     return {
         module_code: module.module_code || '',
         module_name: module.module_name || '',
-        description: module.description || '', 
+        description: module.description || '',
         start_time: formatForInput(module.start_time),
         end_time: formatForInput(module.end_time),
         location: module.location || '',
