@@ -1,84 +1,76 @@
 import { describe, it, expect } from 'vitest';
-import { partitionTasks, generateId } from '../../utils/tasks/taskListUtils';
+import { partitionTasks } from '../../utils/tasks/taskListUtils';
 
 describe('taskListUtils', () => {
   describe('partitionTasks', () => {
-    it('should separate active and completed tasks', () => {
+    it('should separate active and done tasks', () => {
       const tasks = [
-        { id: 1, done: false, title: 'Active 1' },
-        { id: 2, done: true, title: 'Done 1' },
-        { id: 3, done: false, title: 'Active 2' },
-        { id: 4, done: true, title: 'Done 2' },
+        { id: '1', done: false, urgent: false, title: 'Active 1' },
+        { id: '2', done: true, urgent: false, title: 'Done 1' },
+        { id: '3', done: false, urgent: false, title: 'Active 2' },
+        { id: '4', done: true, urgent: false, title: 'Done 2' },
       ];
-      
-      const { active, completed } = partitionTasks(tasks);
-      
-      expect(active).toHaveLength(2);
-      expect(completed).toHaveLength(2);
-      expect(active[0].title).toBe('Active 1');
-      expect(completed[0].title).toBe('Done 1');
+      const result = partitionTasks(tasks);
+      expect(result.activeRaw).toHaveLength(2);
+      expect(result.doneItems).toHaveLength(2);
+      expect(result.anyCompleted).toBe(true);
     });
 
-    it('should return empty arrays for empty input', () => {
-      const { active, completed } = partitionTasks([]);
-      
-      expect(active).toEqual([]);
-      expect(completed).toEqual([]);
+    it('should return isEmpty true for empty input', () => {
+      const result = partitionTasks([]);
+      expect(result.isEmpty).toBe(true);
+      expect(result.activeRaw).toEqual([]);
+      expect(result.doneItems).toEqual([]);
     });
 
-    it('should handle all active tasks', () => {
+    it('should return isEmpty false when tasks exist', () => {
+      const tasks = [{ id: '1', done: false, urgent: false }];
+      const result = partitionTasks(tasks);
+      expect(result.isEmpty).toBe(false);
+    });
+
+    it('should pin urgent tasks first in activePinned', () => {
       const tasks = [
-        { id: 1, done: false },
-        { id: 2, done: false },
+        { id: '1', done: false, urgent: false },
+        { id: '2', done: false, urgent: true },
+        { id: '3', done: false, urgent: false },
       ];
-      
-      const { active, completed } = partitionTasks(tasks);
-      
-      expect(active).toHaveLength(2);
-      expect(completed).toHaveLength(0);
+      const result = partitionTasks(tasks);
+      expect(result.activePinned[0].id).toBe('2');
+      expect(result.urgentActive).toHaveLength(1);
+      expect(result.otherActive).toHaveLength(2);
     });
 
-    it('should handle all completed tasks', () => {
+    it('should set anyCompleted to false when no done tasks', () => {
       const tasks = [
-        { id: 1, done: true },
-        { id: 2, done: true },
+        { id: '1', done: false, urgent: false },
+        { id: '2', done: false, urgent: false },
       ];
-      
-      const { active, completed } = partitionTasks(tasks);
-      
-      expect(active).toHaveLength(0);
-      expect(completed).toHaveLength(2);
-    });
-  });
-
-  describe('generateId', () => {
-    it('should return 1 for empty array', () => {
-      expect(generateId([])).toBe(1);
+      const result = partitionTasks(tasks);
+      expect(result.anyCompleted).toBe(false);
+      expect(result.doneItems).toHaveLength(0);
     });
 
-    it('should return max id + 1', () => {
+    it('should handle all done tasks', () => {
       const tasks = [
-        { id: 1 },
-        { id: 5 },
-        { id: 3 },
+        { id: '1', done: true, urgent: false },
+        { id: '2', done: true, urgent: false },
       ];
-      
-      expect(generateId(tasks)).toBe(6);
+      const result = partitionTasks(tasks);
+      expect(result.activeRaw).toHaveLength(0);
+      expect(result.doneItems).toHaveLength(2);
+      expect(result.isEmpty).toBe(false);
     });
 
-    it('should handle single task', () => {
-      const tasks = [{ id: 10 }];
-      
-      expect(generateId(tasks)).toBe(11);
-    });
-
-    it('should handle string ids by converting to numbers', () => {
+    it('should separate urgent and non-urgent active tasks', () => {
       const tasks = [
-        { id: '1' },
-        { id: '5' },
+        { id: '1', done: false, urgent: true },
+        { id: '2', done: false, urgent: true },
+        { id: '3', done: false, urgent: false },
       ];
-      
-      expect(generateId(tasks)).toBe(6);
+      const result = partitionTasks(tasks);
+      expect(result.urgentActive).toHaveLength(2);
+      expect(result.otherActive).toHaveLength(1);
     });
   });
 });
