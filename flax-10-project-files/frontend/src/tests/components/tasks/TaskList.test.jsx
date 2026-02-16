@@ -1,16 +1,27 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { mockFramerMotion } from "./testSetup";
+import TaskList from "../../../components/Tasks/TaskList";
 
-mockFramerMotion();
-
-vi.mock("../../../components/Tasks/TaskSection", () => ({
-  UrgentSection: ({ items }) => (items?.length ? <div>URGENT_SECTION</div> : null),
-  OthersSection: ({ items }) => (items?.length ? <div>OTHERS_SECTION</div> : null),
-  DoneSection: ({ items }) => (items?.length ? <div>DONE_SECTION</div> : null),
+vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => children,
+  Reorder: {
+    Group: ({ children }) => <div data-testid="reorder-group">{children}</div>,
+  },
 }));
 
-import TaskList from "../../../components/Tasks/TaskList";
+vi.mock("../../../components/Tasks/TaskPanel.module.css", () => ({
+  default: { list: "list", emptyState: "emptyState" },
+}));
+
+vi.mock("../../../components/Tasks/TaskSection.module.css", () => ({
+  default: { reorderGroup: "reorderGroup" },
+}));
+
+vi.mock("../../../components/Tasks/TaskSection", () => ({
+  UrgentSection: ({ items }) => <div>urgent:{items.length}</div>,
+  OthersSection: ({ items }) => <div>others:{items.length}</div>,
+  DoneSection: ({ items }) => <div>done:{items.length}</div>,
+}));
 
 describe("TaskList", () => {
   const baseProps = {
@@ -35,25 +46,24 @@ describe("TaskList", () => {
   };
 
   it("shows empty state when isEmpty", () => {
-    render(<TaskList {...baseProps} isEmpty={true} />);
+    render(<TaskList {...baseProps} isEmpty />);
     expect(screen.getByText(/no tasks yet/i)).toBeInTheDocument();
   });
 
-  it("renders sections when provided items", () => {
+  it("renders all sections and the reorder group", () => {
     render(
       <TaskList
         {...baseProps}
         isEmpty={false}
-        activePinned={[{ id: "1" }]}
-        urgentActive={[{ id: "1" }]}
-        otherActive={[{ id: "2" }]}
-        doneItems={[{ id: "3" }]}
+        urgentActive={[{ id: 1 }]}
+        otherActive={[{ id: 2 }, { id: 3 }]}
+        doneItems={[{ id: 4 }]}
       />
     );
 
     expect(screen.getByTestId("reorder-group")).toBeInTheDocument();
-    expect(screen.getByText("URGENT_SECTION")).toBeInTheDocument();
-    expect(screen.getByText("OTHERS_SECTION")).toBeInTheDocument();
-    expect(screen.getByText("DONE_SECTION")).toBeInTheDocument();
+    expect(screen.getByText("urgent:1")).toBeInTheDocument();
+    expect(screen.getByText("others:2")).toBeInTheDocument();
+    expect(screen.getByText("done:1")).toBeInTheDocument();
   });
 });

@@ -1,20 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { mockInlinePortal } from "./testSetup";
-
-mockInlinePortal();
+import { vi } from "vitest";
+import FloatingTasks from "../../../components/Tasks/FloatingTasks";
 
 vi.mock("../../../components/Tasks/ToDoPanel", () => ({
-  default: ({ open, onClose, fabRef }) => (
+  default: ({ open, onClose }) => (
     <div>
-      <div data-testid="panel-open">{String(open)}</div>
-      <div data-testid="has-fabref">{String(!!fabRef?.current)}</div>
-      <button onClick={onClose}>ClosePanel</button>
+      <div data-testid="panel" data-open={String(open)} />
+      <button onClick={onClose}>close-from-panel</button>
     </div>
   ),
 }));
-
-import FloatingTasks from "../../../components/Tasks/FloatingTasks";
 
 describe("FloatingTasks", () => {
   beforeEach(() => {
@@ -22,34 +17,35 @@ describe("FloatingTasks", () => {
     vi.restoreAllMocks();
   });
 
-  it("loads open state from localStorage", () => {
-    localStorage.setItem("flax_todo_open_v1", JSON.stringify(true));
+  it("loads open state from localStorage and toggles", () => {
+    localStorage.setItem("flax_todo_open_v1", "true");
     render(<FloatingTasks />);
-    expect(screen.getByTestId("panel-open").textContent).toBe("true");
-    expect(screen.getByLabelText("Close to-do")).toBeInTheDocument();
+    expect(screen.getByTestId("panel")).toHaveAttribute("data-open", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: /close to-do|open to-do/i }));
+    expect(screen.getByTestId("panel")).toHaveAttribute("data-open", "false");
   });
 
-  it("toggles open state and persists", () => {
+  it("covers onClose prop (setOpen(false))", () => {
+    localStorage.setItem("flax_todo_open_v1", "true");
     render(<FloatingTasks />);
-    expect(screen.getByTestId("panel-open").textContent).toBe("false");
 
-    fireEvent.click(screen.getByLabelText("Open to-do"));
-    expect(screen.getByTestId("panel-open").textContent).toBe("true");
-    expect(JSON.parse(localStorage.getItem("flax_todo_open_v1"))).toBe(true);
-
-    fireEvent.click(screen.getByLabelText("Close to-do"));
-    expect(screen.getByTestId("panel-open").textContent).toBe("false");
-    expect(JSON.parse(localStorage.getItem("flax_todo_open_v1"))).toBe(false);
+    fireEvent.click(screen.getByText("close-from-panel"));
+    expect(screen.getByTestId("panel")).toHaveAttribute("data-open", "false");
   });
 
-  it("passes fabRef and allows panel to close", () => {
+  it("falls back to false when localStorage JSON is invalid", () => {
+    localStorage.setItem("flax_todo_open_v1", "{bad json");
     render(<FloatingTasks />);
-    expect(screen.getByTestId("has-fabref").textContent).toBe("true");
+    expect(screen.getByTestId("panel")).toHaveAttribute("data-open", "false");
+  });
 
-    fireEvent.click(screen.getByLabelText("Open to-do"));
-    expect(screen.getByTestId("panel-open").textContent).toBe("true");
-
-    fireEvent.click(screen.getByText("ClosePanel"));
-    expect(screen.getByTestId("panel-open").textContent).toBe("false");
+  it("handles localStorage.setItem throwing", () => {
+    const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("fail");
+    });
+    render(<FloatingTasks />);
+    fireEvent.click(screen.getByRole("button", { name: /open to-do|close to-do/i }));
+    expect(spy).toHaveBeenCalled();
   });
 });

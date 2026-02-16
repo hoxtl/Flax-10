@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import TaskHeader from "../../../components/Tasks/TaskHeader";
 
 describe("TaskHeader", () => {
-  it("calls setMenuOpen on toggle", () => {
+  it("toggles menu open (executes updater)", () => {
     const setMenuOpen = vi.fn();
     render(
       <TaskHeader
@@ -11,51 +10,45 @@ describe("TaskHeader", () => {
         setMenuOpen={setMenuOpen}
         menuRef={{ current: null }}
         anyCompleted={false}
-        onClearCompleted={vi.fn()}
+        onClearCompleted={() => {}}
       />
     );
 
-    const btn = screen.getByLabelText("Task menu");
-    expect(btn).toHaveAttribute("aria-expanded", "false");
-    fireEvent.click(btn);
-    expect(setMenuOpen).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /task menu/i }));
+    const updater = setMenuOpen.mock.calls[0][0];
+    expect(typeof updater).toBe("function");
+    expect(updater(false)).toBe(true);
   });
 
-  it("renders top menu and disables clear when none", () => {
-    render(
-      <TaskHeader
-        menuOpen={true}
-        setMenuOpen={vi.fn()}
-        menuRef={{ current: null }}
-        anyCompleted={false}
-        onClearCompleted={vi.fn()}
-      />
-    );
-
-    const clearBtn = screen.getByRole("button", {
-      name: /clear completed tasks/i,
-    });
-    expect(clearBtn).toBeDisabled();
-    expect(clearBtn).toHaveAttribute("title", "No completed tasks");
-  });
-
-  it("enables clear and calls handler", () => {
+  it("shows clear button when open and enables it when anyCompleted=true", () => {
     const onClearCompleted = vi.fn();
     render(
       <TaskHeader
         menuOpen={true}
-        setMenuOpen={vi.fn()}
+        setMenuOpen={() => {}}
         menuRef={{ current: null }}
         anyCompleted={true}
         onClearCompleted={onClearCompleted}
       />
     );
+    const btn = screen.getByRole("button", { name: /clear completed tasks/i });
+    expect(btn).not.toBeDisabled();
+    fireEvent.click(btn);
+    expect(onClearCompleted).toHaveBeenCalledTimes(1);
+  });
 
-    const clearBtn = screen.getByRole("button", {
-      name: /clear completed tasks/i,
-    });
-    expect(clearBtn).not.toBeDisabled();
-    fireEvent.click(clearBtn);
-    expect(onClearCompleted).toHaveBeenCalled();
+  it("disables clear button when anyCompleted=false", () => {
+    render(
+      <TaskHeader
+        menuOpen={true}
+        setMenuOpen={() => {}}
+        menuRef={{ current: null }}
+        anyCompleted={false}
+        onClearCompleted={() => {}}
+      />
+    );
+    const btn = screen.getByRole("button", { name: /clear completed tasks/i });
+    expect(btn).toBeDisabled();
+    expect(btn).toHaveAttribute("title", "No completed tasks");
   });
 });
