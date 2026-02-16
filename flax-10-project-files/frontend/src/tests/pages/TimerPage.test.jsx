@@ -52,17 +52,17 @@ const testSettings = () => {
 
 const testBreakModalShow = () => {
     helpers.renderTimerPage();
-    helpers.updateSettings(0, '0');
+    helpers.updateSettings(0, '1');
     helpers.clickStart();
-    helpers.advanceTimer(100);
+    helpers.advanceTimer(61000);
     helpers.expectButton("Start Break");
 };
 
 const testBreakModalEnter = () => {
     helpers.renderTimerPage();
-    helpers.updateSettings(0, '0');
+    helpers.updateSettings(0, '1');
     helpers.clickStart();
-    helpers.advanceTimer(100);
+    helpers.advanceTimer(61000);
     helpers.clickButton("Start Break");
     helpers.expectTimer('05:00');
 };

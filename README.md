@@ -125,6 +125,8 @@ For docker users, you will need to run the ```docker run...``` command mentioned
 | globals                     | 16.5.0  | Shared global variable definitions |
 | @types/react                | 19.2.5  | TypeScript typings for React       |
 | @types/react-dom            | 19.2.3  | TypeScript typings for React DOM   |
+| canvas-confetti             | 1.9.4   | Confetti visual fx support in html5  |
+| framer-motion               | 12.34.0 | Web animation library  |
 
 **Backend Packages**
 

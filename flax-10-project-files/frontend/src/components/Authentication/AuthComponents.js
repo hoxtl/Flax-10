@@ -1,4 +1,5 @@
  import styled from 'styled-components';
+ import { Link } from 'react-router-dom';
 
  
 export const Container = styled.div`
@@ -21,7 +22,7 @@ export const Container = styled.div`
   width: 50%;
   opacity: 0;
   z-index: 1;
-  ${props => props.signIn !== true ? `
+  ${props => props.$signIn !== true ? `
     transform: translateX(100%);
     opacity: 1;
     z-index: 5;
@@ -38,7 +39,7 @@ export const Container = styled.div`
  left: 0;
  width: 50%;
  z-index: 2;
- ${props => (props.signIn !== true ? `transform: translateX(100%);` : null)}
+ ${props => (props.$signIn !== true ? `transform: translateX(100%);` : null)}
  `;
  
  export const Form = styled.form`
@@ -82,48 +83,106 @@ export const Input = styled.input`
  
 
 export const Button = styled.button`
-    border-radius: 20px;
-    border: 1px solid #9E7E5D;
-    background-color: #9E7E5D;
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: all 200ms ease-in;
-    cursor: pointer;
-    
-    &:hover:not(:disabled) {
-        background-color: transparent;
-        border-color: #9E7E5D;
-        color: #9E7E5D;
+  position: relative;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 52, 33, 0.38);
+  background: linear-gradient(
+    180deg,
+    rgba(84, 60, 39, 0.98),
+    rgba(60, 41, 26, 0.98)
+  );
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 12px;
+  font-weight: 650;
+  padding: 12px 45px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  overflow: hidden;
+  will-change: transform;
+  box-shadow:
+    0 10px 28px rgba(74, 52, 33, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  
+  /* Sheen effect */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -45% -70%;
+    background: linear-gradient(
+      120deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 65%
+    );
+    transform: translateX(-60%) rotate(8deg);
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 20px 50px rgba(74, 52, 33, 0.28);
+  }
+  
+  &:hover:not(:disabled)::before {
+    opacity: 1;
+    animation: btnSheen 1.15s ease forwards;
+  }
+  
+  @keyframes btnSheen {
+    to {
+      transform: translateX(60%) rotate(8deg);
     }
-    
-    &:active{
-        transform: scale(0.95);
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px) scale(1.01);
+    background: transparent;
+    color: rgba(74, 52, 33, 0.92);
+    border-color: rgba(74, 52, 33, 0.92);
+    box-shadow:
+      0 18px 42px rgba(74, 52, 33, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0px) scale(0.99);
+  }
+  
+  &:focus {
+    outline: 2px solid rgba(74, 52, 33, 0.28);
+    outline-offset: 3px;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &:disabled::before {
+    display: none;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      animation: none !important;
+      transition: none !important;
     }
-    &:focus {
-        outline: none;
-    }
-    
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
- `;
+    transition: none !important;
+  }
+`;
 
 
 export const GhostButton = styled(Button)`
- background-color: transparent;
- border-color: #ffffff;
- color: #ffffff;
- 
- &:hover:not(:disabled) {
-   background-color: rgba(255, 255, 255, 0.1);
-   border-color: #ffffff;
- }
- `;
+  background: rgba(255, 255, 255, 0.66);
+  border-color: rgba(74, 52, 33, 0.14);
+  color: rgba(43, 30, 20, 0.92);
+  
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(74, 52, 33, 0.18);
+  }
+`;
  
 export const Anchor = styled.a`
  color: #9E7E5D;
@@ -148,7 +207,7 @@ overflow: hidden;
 transition: transform 0.6s ease-in-out;
 z-index: 100;
 ${props =>
-  props.signIn !== true ? `transform: translateX(-100%);` : null}
+  props.$signIn !== true ? `transform: translateX(-100%);` : null}
 `;
 
 export const Overlay = styled.div`
@@ -163,7 +222,7 @@ height: 100%;
 width: 200%;
 transform: translateX(0);
 transition: transform 0.6s ease-in-out;
-${props => (props.signIn !== true ? `transform: translateX(50%);` : null)}
+${props => (props.$signIn !== true ? `transform: translateX(50%);` : null)}
 `;
  
  export const OverlayPanel = styled.div`
@@ -182,22 +241,36 @@ ${props => (props.signIn !== true ? `transform: translateX(50%);` : null)}
  `;
 
  export const LeftOverlayPanel = styled(OverlayPanel)`
-  transform: translateX(-8%);
+  transform: translateX(-1%);
 `;
 
 
  export const RightOverlayPanel = styled(OverlayPanel)`
   right: 0;
-  transform: translateX(8%);
-  ${props => props.signIn !== true ? `transform: translateX(28%);` : null}
+  transform: translateX(1%);
+  ${props => props.$signIn !== true ? `transform: translateX(20%);` : null}
 `;
 
 export const Paragraph = styled.p`
  font-size: 14px;
- font-weight: 100;
+ font-weight: 400;
  line-height: 20px;
  letter-spacing: 0.5px;
  margin: 20px 0 30px;
  color: #ffffff;
  max-width: 280px;
  `;
+
+ export const PasswordResetLink = styled(Link)`
+  color: #9E7E5D;
+  text-decoration: none;
+  font-size: 0.9rem;
+  align-self: center;
+  margin-top: 0.5rem;
+  transition: all 0.1s ease-in-out;
+
+  &:hover {
+    color: #4A3421;
+    text-decoration: underline;
+  }
+`;

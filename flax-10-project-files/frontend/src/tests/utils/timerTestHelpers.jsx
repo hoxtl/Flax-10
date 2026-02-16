@@ -26,6 +26,7 @@ export const expectButton = (text) => expect(screen.getByText(text)).toBeInTheDo
 export const updateSettings = (workIndex, value) => {
     const inputs = screen.getAllByRole('spinbutton');
     fireEvent.change(inputs[workIndex], { target: { value } });
+    fireEvent.blur(inputs[workIndex]); // Commit change for BufferedInput
 };
 
 /** Simulate blur event, optionally changing value first to test validation */

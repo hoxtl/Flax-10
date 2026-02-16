@@ -1,9 +1,10 @@
-import { NAV } from "../lib/uiConstants";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
+import { getPreferredFirstName } from "../utils/userDisplay";
+import { getUserProfile } from "../api/userService";
 
-// Header component that displays the app name and adjusts styling based on collapsed state
 function SidebarHeader({ collapsed }) {
   return (
     <div className={`${styles.header} ${collapsed ? styles.headerCollapsed : ""}`}>
@@ -12,13 +13,14 @@ function SidebarHeader({ collapsed }) {
   );
 }
 
-// Component for each navigation item in the sidebar
 function NavItem({ item, isActive, collapsed, onClick }) {
   const cls = [
     styles.navItem,
     collapsed ? styles.navItemCollapsed : styles.navItemExpanded,
     isActive ? styles.navItemActive : "",
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button onClick={onClick} className={cls}>
@@ -28,40 +30,6 @@ function NavItem({ item, isActive, collapsed, onClick }) {
   );
 }
 
-// User profile component that displays the user's initials, name, year, and major, adjusting layout based on collapsed state
-function SidebarUserProfile({ collapsed, user }) {
-  const initials = getInitials(user?.name) || "?";
-  const year = user?.year || "Year 2";
-  const major = user?.major || "CS";
-
-  return (
-    <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
-      <div className={styles.avatar}>{initials}</div>
-
-      {!collapsed && (
-        <div className={styles.userText}>
-          <div className={styles.userName}>{user?.name || "Guest"}</div>
-          <div className={styles.userMeta}>{year} · {major}</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Main Sidebar component that composes the header, navigation, and user profile components, adjusting width based on collapsed state
-export default function Sidebar({ active, onChange, collapsed, user }) {
-  const W = collapsed ? 72 : 224;
-
-  return (
-    <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
-      <SidebarHeader collapsed={collapsed} />
-      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
-      <SidebarUserProfile collapsed={collapsed} user={user} />
-    </aside>
-  );
-}
-
-// Component that renders the navigation items in the sidebar, highlighting the active item and adjusting layout based on collapsed state
 function SidebarNav({ active, onChange, collapsed }) {
   return (
     <nav className={styles.nav}>
@@ -74,7 +42,95 @@ function SidebarNav({ active, onChange, collapsed }) {
           onClick={() => onChange?.(n.id)}
         />
       ))}
-
     </nav>
+  );
+}
+
+function SidebarFooter({ active, onChange, collapsed, user }) {
+  const [profileData, setProfileData] = useState(null);
+
+  const loadProfile = useCallback(async () => {
+    try {
+      const data = await getUserProfile();
+      setProfileData(data);
+    } catch (e) {
+      console.error("Failed to load profile:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+
+    const onAuthChanged = () => loadProfile();
+    window.addEventListener("auth-changed", onAuthChanged);
+
+    const onProfileUpdated = () => loadProfile();
+    window.addEventListener("profile-updated", onProfileUpdated);
+
+    return () => {
+      window.removeEventListener("auth-changed", onAuthChanged);
+      window.removeEventListener("profile-updated", onProfileUpdated);
+    };
+  }, [loadProfile]);
+
+  const displayName =
+    profileData?.username ||
+    user?.username ||
+    getPreferredFirstName(user) ||
+    "User";
+
+  const initials = getInitials(displayName) || "?";
+
+  const yearRaw = profileData?.year ?? user?.year;
+  const year = yearRaw
+    ? String(yearRaw).startsWith("Year")
+      ? String(yearRaw)
+      : `Year ${yearRaw}`
+    : "Year 2";
+
+  const major = profileData?.major || user?.major || "CS";
+
+  const profilePhotoUrl = profileData?.profile_photo_url || user?.profile_photo_url;
+
+  return (
+    <div className={styles.sidebarFooter}>
+      <NavItem
+        item={{ id: "profile", icon: "👤", label: "Profile" }}
+        isActive={active === "profile"}
+        collapsed={collapsed}
+        onClick={() => onChange?.("profile")}
+      />
+
+      <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
+        <div className={styles.avatar}>
+          {profilePhotoUrl ? (
+            <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
+          ) : (
+            initials
+          )}
+        </div>
+
+        {!collapsed && (
+          <div className={styles.userText}>
+            <div className={styles.userName}>{displayName}</div>
+            <div className={styles.userMeta}>
+              {year} · {major}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function Sidebar({ active, onChange, collapsed, user }) {
+  const W = collapsed ? 72 : 224;
+
+  return (
+    <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
+      <SidebarHeader collapsed={collapsed} />
+      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
+      <SidebarFooter active={active} onChange={onChange} collapsed={collapsed} user={user} />
+    </aside>
   );
 }
