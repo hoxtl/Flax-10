@@ -6,7 +6,9 @@ import { getGreeting } from "../utils/dateUtils";
 import WelcomeBackgroundPaths from "../components/Welcome/WelcomeBackgroundPaths";
 
 function pad2(n) { return String(n).padStart(2, "0"); }
-function formatTime(d = new Date()) { return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+
+function formatTime(d) { return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+
 function getTimeTone(hour) {
   if (hour >= 5 && hour < 12) return "morning";
   if (hour >= 12 && hour < 18) return "day";
@@ -14,7 +16,12 @@ function getTimeTone(hour) {
   return "night";
 }
 function firstNameFromUser(user) { return (user?.first_name || "").trim(); }
-function cleanQuote(q) { return (q || "").trim().replace(/[".]+$/g, ""); }
+
+function cleanQuote(q) { 
+  if (!q) return "";
+  return String(q).trim().replace(/[".]+$/g, "");
+}
+
 function buildGreetingLine(firstName) {
   const g = getGreeting();
   return firstName ? `${g}, ${firstName}.` : `${g}.`;
