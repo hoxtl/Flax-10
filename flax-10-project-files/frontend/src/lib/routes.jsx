@@ -1,6 +1,6 @@
 import Home from "../pages/Home";
 import CalendarPage from "../pages/CalendarPage";
-import SocietiesPage from "../pages/SocietiesPage";
+import SocietiesPage from "../pages/Societies/SocietiesPage";
 
 export const APP_ROUTES = [
     { id: "home", label: "Home", icon: "🏠", path: "/", element: <Home /> },

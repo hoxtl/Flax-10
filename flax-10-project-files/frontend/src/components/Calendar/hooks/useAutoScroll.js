@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { SLOT_HEIGHT } from '../components/Calendar/calendarConstants';
+import { SLOT_HEIGHT } from '../calendarConstants';
 
 export function useAutoScroll(ref, events, dependency) {
     const hasScrolled = useRef(false);

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "./PillFilters.module.css";
-import { countByType } from "../utils/pillUtils";
-import { useTags } from "../context/TagContext";
-import TagManagerModal from "./TagManagerModal";
+import { countByType } from "./utils/pillUtils";
+import { useTags } from "../../context/TagContext";
+import TagManagerModal from "../TagManagerModal";
 import BasePill from "./BasePill";
 
 export default function PillFilters({ active, onChange, items }) {
