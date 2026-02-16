@@ -46,7 +46,6 @@ describe('ModalContent', () => {
         expect(screen.getByText('Overlap 1')).toBeInTheDocument();
         expect(screen.getByText('Overlap 2')).toBeInTheDocument();
 
-        // Check actions
         expect(screen.getByText('Save Anyway')).toBeInTheDocument();
         expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
