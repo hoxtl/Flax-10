@@ -8,7 +8,8 @@ export default function TaskMenu({
   taskMenuPos,
   onToggleUrgent,
   onDelete,
-}) {
+}) 
+{
   if (taskMenuId !== item.id) return null;
 
   const isUrgent = !!item.urgent;
