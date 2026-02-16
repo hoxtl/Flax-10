@@ -33,3 +33,36 @@ export async function updateUserSettings(settings) {
   
   return response.json();
 }
+
+export async function getUserProfile() {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${API_BASE}/profile/`, {
+    headers: {
+      'Authorization': `Token ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch profile');
+  }
+  
+  return response.json();
+}
+
+export async function updateUserProfile(formData) {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${API_BASE}/profile/`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Token ${token}`,
+    },
+    body: formData,
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to update profile');
+  }
+  
+  return response.json();
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
@@ -8,6 +9,8 @@ import WelcomeLanding from "./pages/WelcomeLanding";
 import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+
 import { getUserSettings } from "./api/userService";
 
 import { CalendarProvider } from "./context/CalendarContext";
@@ -16,10 +19,8 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationToast } from "./components/Notifications";
 
-import { Routes, Route, Navigate } from 'react-router-dom';
-import PasswordResetRequest from './pages/PasswordResetRequest';
-import PasswordResetConfirm from './pages/PasswordResetConfirm';
-
+import PasswordResetRequest from "./pages/PasswordResetRequest";
+import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 
@@ -61,7 +62,6 @@ export default function App() {
       setUser(readUser());
       setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
     };
-
     window.addEventListener("auth-changed", sync);
     return () => window.removeEventListener("auth-changed", sync);
   }, []);
@@ -85,6 +85,10 @@ export default function App() {
   }, [authed]);
 
   function handleBackFromSettings() {
+    setActiveNav("home");
+  }
+
+  function handleBackFromProfile() {
     setActiveNav("home");
   }
 
@@ -163,12 +167,15 @@ export default function App() {
                   >
                     {activeNav === "settings" ? (
                       <Settings user={user} onBack={handleBackFromSettings} />
+                    ) : activeNav === "profile" ? (
+                      <Profile user={user} onBack={handleBackFromProfile} />
                     ) : (
                       (() => {
                         const route =
                           APP_ROUTES.find((r) => r.id === activeNav) || APP_ROUTES[0];
                         let pageContent = route.element;
 
+                        // inject user into route element props
                         if (pageContent && typeof pageContent === "object") {
                           pageContent = {
                             ...pageContent,

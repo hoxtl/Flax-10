@@ -156,7 +156,7 @@ function getInitialAccountData(user) {
     firstName: user?.first_name || "",
     lastName: user?.last_name || "",
     email: user?.email || "",
-    year: user?.year || "2",
+    year: user?.year || "Year 2",
     major: user?.major || "Computer Science",
   };
 }
@@ -164,15 +164,15 @@ function getInitialAccountData(user) {
 // Get year options
 function getYearOptions() {
   return [
-    { value: "Found.", label: "Foundation Year" },
-    { value: "1", label: "Year 1" },
-    { value: "2", label: "Year 2" },
-    { value: "3", label: "Year 3" },
-    { value: "4", label: "Year 4" },
-    { value: "5", label: "Year 5" },
-    { value: "6", label: "Year 6" },
-    { value: "7", label: "Year 7" },
-    { value: "8", label: "Year 8" }
+    { value: "Foundation Year", label: "Foundation Year" },
+    { value: "Year 1", label: "Year 1" },
+    { value: "Year 2", label: "Year 2" },
+    { value: "Year 3", label: "Year 3" },
+    { value: "Year 4", label: "Year 4" },
+    { value: "Year 5", label: "Year 5" },
+    { value: "Year 6", label: "Year 6" },
+    { value: "Year 7", label: "Year 7" },
+    { value: "Year 8", label: "Year 8" }
   ];
 }
 
@@ -325,7 +325,7 @@ function PreferencesPanel({ onSave, isSaving }) {
 
   function handleThemeChange(newTheme) {
     setFormData(prev => ({ ...prev, theme: newTheme }));
-    setTheme(newTheme); // Update theme immediately
+    setTheme(newTheme);
   }
 
   function handleSubmit(e) {
@@ -444,7 +444,7 @@ export default function Settings({ user, onBack }) {
 
   const handlePasswordSave = async (data) => {
     setPasswordError("");
-
+    
     if (isPasswordTooShort(data.newPassword)) {
       setPasswordError("Password must be at least 8 characters long");
       return;
@@ -457,12 +457,41 @@ export default function Settings({ user, onBack }) {
 
     setIsSaving(true);
     try {
-      console.log("Changing password");
-      // TODO: Call API to change password
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      showTemporaryMessage(setSuccessMessage, "Password changed successfully!");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setPasswordError("You are not logged in");
+        setIsSaving(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/settings/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({
+          password: data.newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to change password');
+      }
+
+      showTemporaryMessage(setSuccessMessage, "Password changed successfully! Please log in again with your new password.");
+      
+      // Log out user after password change
+      setTimeout(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }, 2000);
+      
     } catch (error) {
-      setPasswordError("Failed to change password. Check your current password.");
+      console.error('Password change error:', error);
+      setPasswordError(error.message || "Failed to change password");
     } finally {
       setIsSaving(false);
     }

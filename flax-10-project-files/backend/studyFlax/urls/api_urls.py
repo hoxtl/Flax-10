@@ -1,6 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 router = DefaultRouter()
+
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
@@ -13,6 +15,8 @@ from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
 from studyFlax.views.settings.user_settings_view import user_settings_view
+from studyFlax.views.user.profile_view import profile_view
+from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
 
@@ -39,6 +43,8 @@ urlpatterns = [
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
     path("notifications/clear-all/", clear_all, name="notification-clear-all"),
     path("settings/", user_settings_view, name='user-settings'),
+    path("profile/", profile_view, name='user-profile'),
+    path("check-username/", check_username, name='check-username'),
     path("auth/password-reset/request/", reset_password_view, name='password-reset-request'),
     path("auth/password-reset/confirm/", confirm_password_reset_view, name='password-reset-confirm'),
 ]

@@ -1,125 +1,139 @@
 .container {
-    position: relative;
+  position: relative;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--c-white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  transition: opacity 0.2s;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
+
+.avatar:hover {
+  opacity: 0.9;
+}
+
+.avatarImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(43, 30, 20, 0.15);
+  min-width: 240px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdown-appear 0.2s ease-out;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: var(--c-white);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-    transition: opacity 0.2s;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .avatar:hover {
-    opacity: 0.9;
-  }
-  
-  .dropdown {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(43, 30, 20, 0.15);
-    min-width: 240px;
-    z-index: 1000;
-    overflow: hidden;
-    animation: dropdown-appear 0.2s ease-out;
-  }
-  
-  @keyframes dropdown-appear {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .dropdownHeader {
-    padding: 16px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
-  
-  .avatarLarge {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: var(--c-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-  
-  .userInfo {
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .userName {
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-  
-  .userMeta {
-    font-size: 13px;
-    color: var(--muted);
-  }
-  
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 4px 0;
-  }
-  
-  .menuItem {
-    width: 100%;
-    padding: 12px 16px;
-    border: none;
-    background: none;
-    text-align: left;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    color: var(--text);
-    transition: background 0.15s;
-  }
-  
-  .menuItem:hover {
-    background: var(--hover);
-  }
-  
-  .menuIcon {
-    font-size: 16px;
-    flex-shrink: 0;
-    opacity: 0.7;
-  }
-  
-  .menuItemDanger {
-    color: #dc2626;
-  }
-  
-  .menuItemDanger:hover {
-    background: #fef2f2;
-  }
+}
+
+.dropdownHeader {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatarLarge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--c-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.userMeta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.menuItem {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text);
+  transition: background 0.15s;
+}
+
+.menuItem:hover {
+  background: var(--hover);
+}
+
+.menuIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.menuItemDanger {
+  color: #dc2626;
+}
+
+.menuItemDanger:hover {
+  background: #fef2f2;
+}

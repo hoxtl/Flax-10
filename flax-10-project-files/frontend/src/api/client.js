@@ -3,7 +3,6 @@ const API_BASE_URL = "/api";
 export async function fetchApi(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = buildRequestConfig(options);
-
     const response = await fetch(url, config);
     return handleResponse(response);
 }
@@ -14,11 +13,14 @@ function buildRequestConfig(options) {
         'Content-Type': 'application/json',
         ...options.headers,
     };
+    
+    // Add Authorization header if token exists
     if (token) {
         headers['Authorization'] = `Token ${token}`;
     }
+    
     return {
-        headers: headers,
+        headers,
         ...options,
     };
 }
