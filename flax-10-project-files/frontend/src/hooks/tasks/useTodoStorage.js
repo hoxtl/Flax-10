@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { normalizeItem } from "../../utils/tasks/taskUtils";
+import { normaliseItem } from "../../utils/tasks/taskUtils";
 
 const STORAGE_KEY = "flax_todo_items_v1";
 const AUTO_CLEAR_MS = 2 * 60 * 60 * 1000;
@@ -21,7 +21,7 @@ export function useTodoStorage() {
 function loadItems() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw).map(normalizeItem) : [];
+    return raw ? JSON.parse(raw).map(normaliseItem) : [];
   } catch {
     return [];
   }

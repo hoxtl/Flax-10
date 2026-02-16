@@ -44,7 +44,7 @@ def _trim_path(path_str: str, anchor: str | None) -> str:
     if not path_str:
         return ""
 
-    # Normalize Windows separators if any appear.
+    # Normalise Windows separators if any appear.
     p = path_str.replace("\\", "/")
 
     if anchor:

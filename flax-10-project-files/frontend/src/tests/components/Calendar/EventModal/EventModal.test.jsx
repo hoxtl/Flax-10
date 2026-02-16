@@ -17,7 +17,6 @@ const { mockFormLogic } = vi.hoisted(() => ({
     },
 }));
 
-// We mock the hook to isolate the View functionality from Logic
 vi.mock('../../../../components/Calendar/EventModal/useEventForm', () => ({
     useEventForm: () => mockFormLogic,
 }));
