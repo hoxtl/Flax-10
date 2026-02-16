@@ -1,5 +1,5 @@
 import { useRef, useMemo } from "react";
-import styles from "./ToDoPanel.module.css";
+import styles from "./TaskPanel.module.css";
 import TaskHeader from "./TaskHeader";
 import TaskList from "./TaskList";
 import TaskInput from "./TaskInput";
