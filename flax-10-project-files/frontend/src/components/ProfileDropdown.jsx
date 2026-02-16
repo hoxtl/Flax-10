@@ -3,21 +3,19 @@ import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../utils/userUtils";
 import { getUserProfile } from "../api/userService";
 
-// Check if click is outside element
 function isClickOutside(element, event) {
   if (!element) return false;
   return !element.contains(event.target);
 }
 
-// Custom hook for click outside detection
 function useClickOutside(ref, onClose, isActive) {
   useEffect(() => {
     if (!isActive) return;
-    
+
     const handler = (e) => {
       if (isClickOutside(ref.current, e)) onClose();
     };
-    
+
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [ref, onClose, isActive]);
@@ -29,6 +27,12 @@ function DropdownHeader({ user, profilePhotoUrl }) {
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
 
+  // ✅ FIX: define displayName (was undefined)
+  const displayName =
+    user?.name ||
+    `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
+    "User";
+
   return (
     <div className={styles.dropdownHeader}>
       <div className={styles.avatarLarge}>
@@ -39,8 +43,10 @@ function DropdownHeader({ user, profilePhotoUrl }) {
         )}
       </div>
       <div className={styles.userInfo}>
-        <div className={styles.userName}>{user?.name || "Guest"}</div>
-        <div className={styles.userMeta}>{year} · {major}</div>
+        <div className={styles.userName}>{displayName}</div>
+        <div className={styles.userMeta}>
+          {year} · {major}
+        </div>
       </div>
     </div>
   );
@@ -48,7 +54,7 @@ function DropdownHeader({ user, profilePhotoUrl }) {
 
 // Single menu item
 function MenuItem({ icon, label, onClick, isDanger }) {
-  const className = isDanger 
+  const className = isDanger
     ? `${styles.menuItem} ${styles.menuItemDanger}`
     : styles.menuItem;
 
@@ -60,7 +66,6 @@ function MenuItem({ icon, label, onClick, isDanger }) {
   );
 }
 
-// Divider line
 function Divider() {
   return <div className={styles.divider} />;
 }
@@ -97,11 +102,9 @@ function AvatarButton({ initials, profilePhotoUrl, onClick }) {
 }
 
 // Main profile dropdown
-// Main profile dropdown
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const initials = getInitials(user?.name) || "?";
 
   useEffect(() => {
@@ -109,17 +112,15 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }
       try {
         const data = await getUserProfile();
         setProfileData(data);
-        
+
         // Update localStorage with fresh profile photo URL
-        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
         if (data.profile_photo_url) {
           currentUser.profile_photo_url = data.profile_photo_url;
-          localStorage.setItem('user', JSON.stringify(currentUser));
+          localStorage.setItem("user", JSON.stringify(currentUser));
         }
       } catch (error) {
-        console.error('Failed to load profile:', error);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load profile:", error);
       }
     };
     loadProfile();
@@ -142,15 +143,13 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }
   };
 
   const profilePhotoUrl = profileData?.profile_photo_url;
-  
-  console.log('ProfileDropdown render:', { profilePhotoUrl, initials });
 
   return (
     <div className={styles.container}>
-      <AvatarButton 
-        initials={initials} 
+      <AvatarButton
+        initials={initials}
         profilePhotoUrl={profilePhotoUrl}
-        onClick={() => setIsOpen(!isOpen)} 
+        onClick={() => setIsOpen(!isOpen)}
       />
       <DropdownMenu
         isOpen={isOpen}
