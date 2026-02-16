@@ -1,50 +1,139 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTodoStorage } from '../../hooks/tasks/useTodoStorage';
+
+const TWO_HOURS = 2 * 60 * 60 * 1000;
 
 describe('useTodoStorage', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should initialise with empty array if no stored data', () => {
     const { result } = renderHook(() => useTodoStorage());
-    
-    expect(result.current.items).toEqual([]);
+    expect(result.current[0]).toEqual([]);
   });
 
   it('should load tasks from localStorage on mount', () => {
-    const mockTasks = [
-      { id: 1, text: 'Test task', completed: false, urgent: false, timestamp: Date.now() },
-    ];
-    localStorage.setItem('todoItems', JSON.stringify(mockTasks));
-    
+    const mockTasks = [{ id: '1', title: 'Test', done: false, urgent: false, completedAt: null }];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
     const { result } = renderHook(() => useTodoStorage());
-    
-    expect(result.current.items).toHaveLength(1);
-    expect(result.current.items[0].text).toBe('Test task');
+    expect(result.current[0]).toHaveLength(1);
+    expect(result.current[0][0].title).toBe('Test');
   });
 
   it('should save tasks to localStorage when updated', () => {
     const { result } = renderHook(() => useTodoStorage());
-    
-    const newTask = { id: 1, text: 'New task', completed: false, urgent: false, timestamp: Date.now() };
-    
+    const newTask = { id: '1', title: 'New', done: false, urgent: false, completedAt: null };
     act(() => {
-      result.current.setItems([newTask]);
+      result.current[1]([newTask]);
     });
-    
-    const stored = JSON.parse(localStorage.getItem('todoItems'));
-    expect(stored).toHaveLength(1);
-    expect(stored[0].text).toBe('New task');
+    const stored = JSON.parse(localStorage.getItem('flax_todo_items_v1'));
+    expect(stored[0].title).toBe('New');
   });
 
   it('should handle invalid localStorage data gracefully', () => {
-    localStorage.setItem('todoItems', 'invalid json');
-    
+    localStorage.setItem('flax_todo_items_v1', 'invalid json');
     const { result } = renderHook(() => useTodoStorage());
-    
-    expect(result.current.items).toEqual([]);
+    expect(result.current[0]).toEqual([]);
+  });
+
+  it('should normalise items loaded from localStorage', () => {
+    const mockTasks = [{ id: '1', title: 'Task without done field' }];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
+    const { result } = renderHook(() => useTodoStorage());
+    expect(result.current[0][0].done).toBe(false);
+    expect(result.current[0][0].urgent).toBe(false);
+    expect(result.current[0][0].completedAt).toBeNull();
+  });
+
+  it('should immediately clear expired tasks on mount', async () => {
+    const now = Date.now();
+    const mockTasks = [
+      { id: '1', done: false, completedAt: null },
+      { id: '2', done: true, completedAt: now - TWO_HOURS - 1000 },
+    ];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
+    const { result } = renderHook(() => useTodoStorage());
+    await waitFor(() => {
+      expect(result.current[0]).toHaveLength(1);
+    });
+    expect(result.current[0][0].id).toBe('1');
+  });
+
+  it('should not clear tasks that have not expired', () => {
+    const now = Date.now();
+    const mockTasks = [
+      { id: '1', done: false, completedAt: null },
+      { id: '2', done: true, completedAt: now },
+    ];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
+    const { result } = renderHook(() => useTodoStorage());
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(result.current[0]).toHaveLength(2);
+  });
+
+  it('should schedule future clear and execute it', async () => {
+    const now = Date.now();
+    const mockTasks = [
+      { id: '1', done: false, completedAt: null },
+      { id: '2', done: true, completedAt: now - TWO_HOURS + (60 * 60 * 1000) },
+    ];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
+    const { result } = renderHook(() => useTodoStorage());
+    expect(result.current[0]).toHaveLength(2);
+    act(() => {
+      vi.advanceTimersByTime(60 * 60 * 1000 + 100);
+    });
+    await waitFor(() => {
+      expect(result.current[0]).toHaveLength(1);
+    });
+  });
+
+  it('should sort expiry times and schedule the earliest', async () => {
+    const now = Date.now();
+    const mockTasks = [
+      { id: '1', done: true, completedAt: now - TWO_HOURS + (2 * 60 * 60 * 1000) },
+      { id: '2', done: true, completedAt: now - TWO_HOURS + (1 * 60 * 60 * 1000) },
+    ];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
+    const { result } = renderHook(() => useTodoStorage());
+    act(() => {
+      vi.advanceTimersByTime(1 * 60 * 60 * 1000 + 100);
+    });
+    await waitFor(() => {
+      expect(result.current[0]).toHaveLength(1);
+    });
+    expect(result.current[0][0].id).toBe('1');
+  });
+
+  it('should handle localStorage.setItem errors gracefully', () => {
+    const { result } = renderHook(() => useTodoStorage());
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = vi.fn(() => { throw new Error('Storage full'); });
+    expect(() => {
+      act(() => {
+        result.current[1]([{ id: '1', title: 'New', done: false, urgent: false, completedAt: null }]);
+      });
+    }).not.toThrow();
+    Storage.prototype.setItem = originalSetItem;
+  });
+
+  it('should clear timeout on unmount', () => {
+    const now = Date.now();
+    const mockTasks = [{ id: '1', done: true, completedAt: now - TWO_HOURS + (60 * 60 * 1000) }];
+    localStorage.setItem('flax_todo_items_v1', JSON.stringify(mockTasks));
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+    const { unmount } = renderHook(() => useTodoStorage());
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
   });
 });
