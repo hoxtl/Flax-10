@@ -1,10 +1,10 @@
 import { useState } from "react";
 import styles from "./SocietiesPage.module.css";
-import { useSocieties } from "../hooks/useSocieties";
+import { useSocieties } from "../../hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
-import SocietySection from "./SocietySection";
-import SocietyDetailPage from "./SocietyDetailPage";
-import CreateSocietyModal from "../components/Society/CreateSocietyModal";
+import SocietySection from "../SocietySection";
+import SocietyDetailPage from "../SocietyDetailPage";
+import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
 
 export default function SocietiesPage() {
     const state = useSocietiesPage();

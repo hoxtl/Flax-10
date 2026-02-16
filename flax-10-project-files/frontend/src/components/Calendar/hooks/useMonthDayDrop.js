@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDrop } from './useDragDrop';
-import { useCalendar } from "../context/CalendarContext";
+import { useCalendar } from "../../../context/CalendarContext";
 import { useEventActions } from "./useCalendarEvents";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
 import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";

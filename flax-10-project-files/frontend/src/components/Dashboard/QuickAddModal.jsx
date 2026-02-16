@@ -1,5 +1,5 @@
 import styles from "./QuickAddModal.module.css";
-import { useTags } from "../context/TagContext";
+import { useTags } from "../../context/TagContext";
 
 // Reusable Tile component for each option in the quick add modal, displaying an icon and label
 function Tile({ icon, label, onClick, color }) {

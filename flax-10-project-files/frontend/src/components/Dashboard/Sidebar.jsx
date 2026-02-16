@@ -1,7 +1,7 @@
 import styles from "./Sidebar.module.css";
-import { getInitials } from "../utils/userUtils";
-import { APP_ROUTES } from "../lib/routes";
-import { getPreferredFirstName } from "../utils/userDisplay";
+import { getInitials } from "../Authentication/utils/userUtils";
+import { APP_ROUTES } from "../../lib/routes";
+import { getPreferredFirstName } from "../Authentication/utils/userDisplay";
 
 function SidebarHeader({ collapsed }) {
   return (

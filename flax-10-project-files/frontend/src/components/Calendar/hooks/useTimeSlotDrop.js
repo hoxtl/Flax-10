@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { useDrop } from './useDragDrop';
-import { useCalendar, useEventModal } from "../context/CalendarContext";
+import { useCalendar, useEventModal } from "../../../context/CalendarContext";
 import { useEventActions } from "./useCalendarEvents";
-import { getMinuteOffset, SLOT_HEIGHT } from "../components/Calendar/calendarConstants";
+import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
 import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
 
