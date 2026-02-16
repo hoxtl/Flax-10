@@ -21,7 +21,6 @@ export function CalendarHeader() {
     const handleImport = async (url) => {
         await importTimetable(url);
         await reloadEvents(dispatch, selectedDate, viewMode);
-        alert('Timetable imported successfully!');
     };
 
     return (
