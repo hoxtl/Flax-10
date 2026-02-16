@@ -37,9 +37,9 @@ function useEventDotLogic(event, onEventClick, customTags) {
 
 function getEventColor(event, customTags, globalTags) {
     if (event.tag_color) return event.tag_color;
-    if (customTags) return customTags.find(t => t.id === event.tagId)?.color || '#3b82f6';
+    if (customTags) return customTags.find(t => t.id === event.tagId)?.color || '#9E7E5D';
     const tag = globalTags.getTag(event.tag);
-    return tag?.color || '#3b82f6';
+    return tag?.color || '#9E7E5D';
 }
 
 function getEventClassName(isDragging) {
