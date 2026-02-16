@@ -6,7 +6,7 @@ from .societyModel import Society
 
 ROLE_CHOICES = [
     ('member', 'Member'),
-    ('committee', 'Committee'),
+    ('editor', 'Editor'),
     ('admin', 'Admin'),
 ]
 
@@ -25,4 +25,4 @@ class SocietyMembership(models.Model):
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role in ('admin', 'editor')

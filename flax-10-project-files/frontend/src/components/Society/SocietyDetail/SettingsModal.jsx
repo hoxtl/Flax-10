@@ -2,18 +2,18 @@ import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
 
 const ROLES = [
-    { value: "member", label: "Member" },
-    { value: "committee", label: "Committee" },
+    { value: "editor", label: "Editor" },
     { value: "admin", label: "Admin" }
 ];
 
-export default function SettingsModal({ onClose, onDelete, members, onFetchMembers, onUpdateRole, onRemoveMember }) {
+export default function SettingsModal({ onClose, onDelete, members, onFetchMembers, onUpdateRole, onRemoveMember, onAddCollaborator }) {
     useEffect(() => { onFetchMembers?.(); }, [onFetchMembers]);
 
     return (
         <div className={styles.backdrop} onMouseDown={onClose}>
             <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
                 <ModalHeader onClose={onClose} />
+                <AddCollaboratorSection onAdd={onAddCollaborator} />
                 <CollaboratorsSection members={members} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
                 <DangerSection onDelete={onDelete} onClose={onClose} />
             </div>
@@ -30,17 +30,46 @@ function ModalHeader({ onClose }) {
     );
 }
 
+function AddCollaboratorSection({ onAdd }) {
+    const [username, setUsername] = useState("");
+    const [role, setRole] = useState("editor");
+    const [error, setError] = useState("");
+
+    const handleAdd = async () => {
+        if (!username.trim()) return setError("Enter a username");
+        try {
+            await onAdd?.(username.trim(), role);
+            setUsername("");
+            setError("");
+        } catch { setError("User not found"); }
+    };
+
+    return (
+        <div className={styles.section}>
+            <h4 className={styles.sectionTitle}>Add Collaborator</h4>
+            <div className={styles.addRow}>
+                <input className={styles.input} value={username} onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username" onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
+                <RoleSelect value={role} onChange={setRole} />
+                <button className={styles.addBtn} onClick={handleAdd}>Add</button>
+            </div>
+            {error && <p className={styles.error}>{error}</p>}
+        </div>
+    );
+}
+
 function CollaboratorsSection({ members, onUpdateRole, onRemove }) {
+    const collaborators = (members || []).filter(m => m.role !== 'member');
     return (
         <div className={styles.section}>
             <h4 className={styles.sectionTitle}>Collaborators</h4>
-            <MemberList members={members} onUpdateRole={onUpdateRole} onRemove={onRemove} />
+            <MemberList members={collaborators} onUpdateRole={onUpdateRole} onRemove={onRemove} />
         </div>
     );
 }
 
 function MemberList({ members, onUpdateRole, onRemove }) {
-    if (!members || members.length === 0) return <p className={styles.empty}>No members yet.</p>;
+    if (!members || members.length === 0) return <p className={styles.empty}>No collaborators yet.</p>;
     return (
         <div className={styles.memberList}>
             {members.map(m => <MemberRow key={m.id} member={m} onUpdateRole={onUpdateRole} onRemove={onRemove} />)}
@@ -68,11 +97,11 @@ function RoleSelect({ value, onChange }) {
 
 function DangerSection({ onDelete, onClose }) {
     const [confirming, setConfirming] = useState(false);
+    if (confirming) return <DeleteConfirm onConfirm={onDelete} onCancel={() => setConfirming(false)} onClose={onClose} />;
     return (
         <div className={styles.dangerSection}>
             <h4 className={styles.sectionTitle}>Danger Zone</h4>
-            {confirming ? <DeleteConfirm onConfirm={onDelete} onCancel={() => setConfirming(false)} onClose={onClose} />
-                : <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete Society</button>}
+            <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete Society</button>
         </div>
     );
 }
@@ -80,8 +109,9 @@ function DangerSection({ onDelete, onClose }) {
 function DeleteConfirm({ onConfirm, onCancel, onClose }) {
     const handleDelete = () => { onConfirm?.(); onClose?.(); };
     return (
-        <div className={styles.confirmBox}>
-            <p>Are you sure? This cannot be undone.</p>
+        <div className={styles.dangerSection}>
+            <h4 className={styles.sectionTitle}>Danger Zone</h4>
+            <p className={styles.confirmText}>Are you sure? This cannot be undone.</p>
             <div className={styles.confirmBtns}>
                 <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
                 <button className={styles.confirmDeleteBtn} onClick={handleDelete}>Delete</button>

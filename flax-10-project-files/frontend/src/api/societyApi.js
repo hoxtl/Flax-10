@@ -23,6 +23,9 @@ export const leaveSociety = (societyId, userId) => deleteRequest(`${BASE}/${soci
 export const updateMemberRole = (societyId, userId, role) =>
     patchJson(`${BASE}/${societyId}/members/${userId}/`, { role });
 
+export const addCollaborator = (societyId, identifier, role) =>
+    postJson(`${BASE}/${societyId}/members/`, { username: identifier, role });
+
 // Tags
 export const fetchSocietyTags = (societyId) => fetchApi(`${BASE}/${societyId}/tags/`);
 
