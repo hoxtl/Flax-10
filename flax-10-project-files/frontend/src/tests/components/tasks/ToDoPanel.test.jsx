@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
 import ToDoPanel from "../../../components/Tasks/ToDoPanel";
@@ -119,19 +118,19 @@ describe("ToDoPanel", () => {
   });
 
   it("dots click sets anchor and toggles id (open then close)", () => {
-    // First click should set anchor + setTaskMenuId called with updater
     render(<ToDoPanel open={true} onClose={() => {}} fabRef={{ current: null }} />);
     fireEvent.click(screen.getByText("dots"));
 
     expect(setTaskMenuAnchor).toHaveBeenCalledWith({ x: 1, y: 2, w: 3, h: 4 });
     expect(setTaskMenuId).toHaveBeenCalledTimes(1);
-   
+
     const updater = setTaskMenuId.mock.calls[0][0];
     expect(typeof updater).toBe("function");
 
-    expect(updater(null)).toBe(123); 
-    expect(updater(123)).toBe(null); 
+    expect(updater(null)).toBe(123);  
+    expect(updater(123)).toBe(null);   
   });
+
 
   it("cancel edit clears editingId and editText", () => {
     render(<ToDoPanel open={true} onClose={() => {}} fabRef={{ current: null }} />);
