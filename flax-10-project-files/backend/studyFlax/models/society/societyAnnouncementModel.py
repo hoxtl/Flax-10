@@ -24,7 +24,7 @@ class SocietyAnnouncementImage(models.Model):
     announcement = models.ForeignKey(
         SocietyAnnouncement, on_delete=models.CASCADE, related_name='images'
     )
-    url = models.URLField(max_length=500)
+    url = models.TextField()
     order = models.PositiveIntegerField(default=0)
 
     class Meta:

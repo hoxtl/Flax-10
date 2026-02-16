@@ -33,23 +33,17 @@ class SocietyMembershipSerialiser(serializers.ModelSerializer):
 
 class SocietyListSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
+    cover_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Society
-        fields = ['id', 'name', 'image', 'is_ratified', 'is_private', 'member_count']
+        fields = ['id', 'name', 'image', 'cover_image', 'is_ratified', 'is_private', 'member_count']
 
-
-class SocietyDetailSerialiser(serializers.ModelSerializer):
-    member_count = serializers.IntegerField(read_only=True)
-    tags = SocietyTagSerialiser(many=True, read_only=True)
-    images = SocietyImageSerialiser(many=True, read_only=True)
-
-    class Meta:
-        model = Society
-        fields = [
-            'id', 'name', 'bio', 'about', 'image', 'is_ratified',
-            'is_private', 'date_created', 'member_count', 'tags', 'images'
-        ]
+    def get_cover_image(self, obj):
+        if obj.image:
+            return obj.image
+        first_img = obj.images.first()
+        return first_img.url if first_img else None
 
 
 class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
@@ -72,4 +66,19 @@ class SocietyEventSerialiser(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
             'all_day', 'tag', 'tag_data', 'recurrence', 'announcement', 'created_at'
+        ]
+
+
+class SocietyDetailSerialiser(serializers.ModelSerializer):
+    member_count = serializers.IntegerField(read_only=True)
+    tags = SocietyTagSerialiser(many=True, read_only=True)
+    images = SocietyImageSerialiser(many=True, read_only=True)
+    announcements = SocietyAnnouncementSerialiser(many=True, read_only=True)
+    events = SocietyEventSerialiser(many=True, read_only=True)
+
+    class Meta:
+        model = Society
+        fields = [
+            'id', 'name', 'bio', 'about', 'image', 'is_ratified', 'is_private',
+            'date_created', 'member_count', 'tags', 'images', 'announcements', 'events'
         ]
