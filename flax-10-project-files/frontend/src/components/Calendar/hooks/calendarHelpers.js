@@ -6,9 +6,6 @@ import { getStartOfWeek, getStartOfMonth, getEndOfMonth, getStartOfYear, getEndO
  * Week view = that week (Sun-Sat) (7 days)
  * Month view = that month (28-31 days)
  * Year view = that year (Jan 1 - Dec 31)
- * @param {Date} date - The date we're currently looking at
- * @param {string} viewMode - day, week, month, or year
- * @returns ISO strings that we can send to the API
  */
 export function getDateRangeForView(date, viewMode) {
     if (viewMode === 'day') return getDayRange(date);

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
 import WelcomeLanding from "./pages/WelcomeLanding";
@@ -7,11 +9,16 @@ import { ThemeProvider } from './context/ThemeContext';
 import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+
 import { getUserSettings } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationToast } from './components/Notifications';
+
+import PasswordResetRequest from "./pages/PasswordResetRequest";
+import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 
@@ -53,7 +60,6 @@ export default function App() {
       setUser(readUser());
       setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
     };
-
     window.addEventListener("auth-changed", sync);
     return () => window.removeEventListener("auth-changed", sync);
   }, []);
@@ -83,9 +89,11 @@ export default function App() {
     setActiveNav("home");
   }
 
-  if (isLoadingTheme) {
-    return null;
+  function handleBackFromProfile() {
+    setActiveNav("home");
   }
+
+  if (isLoadingTheme) return null;
 
   let screen = "app";
   if (!authed || !user) screen = "auth";
@@ -104,7 +112,12 @@ export default function App() {
             transition={{ duration: 0.28 }}
             style={{ height: "100vh" }}
           >
-            <AuthPage />
+            <Routes>
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="/reset-password" element={<PasswordResetRequest />} />
+              <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
           </motion.div>
         )}
 
@@ -155,12 +168,15 @@ export default function App() {
                   >
                     {activeNav === "settings" ? (
                       <Settings user={user} onBack={handleBackFromSettings} />
+                    ) : activeNav === "profile" ? (
+                      <Profile user={user} onBack={handleBackFromProfile} />
                     ) : (
                       (() => {
                         const route =
                           APP_ROUTES.find((r) => r.id === activeNav) || APP_ROUTES[0];
                         let pageContent = route.element;
 
+                        // inject user into route element props
                         if (pageContent && typeof pageContent === "object") {
                           pageContent = {
                             ...pageContent,

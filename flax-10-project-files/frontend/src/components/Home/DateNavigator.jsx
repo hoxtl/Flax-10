@@ -29,7 +29,7 @@ function CalendarButton({ value, onPick }) {
         className={styles.calBtn}
         onClick={() => ref.current?.showPicker?.()}
       >
-        🗓️
+        📅
       </button>
       <input
         ref={ref}

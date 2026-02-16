@@ -1,4 +1,5 @@
 from django.contrib import admin
+<<<<<<< HEAD
 from studyFlax.models.society import (
     Society, SocietyMembership, SocietyTag, SocietyImage,
     SocietyAnnouncement, SocietyAnnouncementImage, SocietyEvent
@@ -11,3 +12,10 @@ admin.site.register(SocietyImage)
 admin.site.register(SocietyAnnouncement)
 admin.site.register(SocietyAnnouncementImage)
 admin.site.register(SocietyEvent)
+=======
+from django.contrib.auth import get_user_model
+
+# Register your models here.
+User = get_user_model()
+admin.site.register(User)
+>>>>>>> main

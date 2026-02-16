@@ -1,29 +1,45 @@
 import re
-from datetime import datetime, timedelta, timezone as dt_timezone
-from urllib.parse import urljoin, urlparse
+from datetime import timedelta
 from urllib.request import Request, urlopen
-
 from django.utils import timezone as django_timezone
-from studyFlax.models import CalendarEvent, TimetableSource
+from icalendar import Calendar
+from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.calendar.timetableSourceModel import TimetableSource
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 def sync_timetable(source_url, user=None):
     source_key = get_source_key(source_url)
     try:
         events = load_events(source_url, source_key)
+<<<<<<< HEAD
         created, updated = upsert_events(events, user)
         update_source_status(source_url, user, True, "")
+=======
+        created, updated = upsert_events(events, user=user)
+        update_source_status(source_url, True, "")
+>>>>>>> main
         return {"created": created, "updated": updated, "source_url": source_url}
     except Exception as exc:
         update_source_status(source_url, user, False, str(exc))
         raise
 
+<<<<<<< HEAD
 def sync_timetable_if_needed(user, min_interval=timedelta(hours=6)):
     if not user.is_authenticated:
         return None
     source = TimetableSource.objects.filter(user=user).first()
+=======
+
+def sync_timetable_if_needed(min_interval=timedelta(hours=6)):
+    source = TimetableSource.objects.first()
+>>>>>>> main
     if not source or not should_sync(source, min_interval):
         return None
     return sync_timetable(source.source_url, user)
+
 
 def load_events(source_url, source_key):
     ics_url = resolve_ics_url(source_url)
@@ -31,10 +47,12 @@ def load_events(source_url, source_key):
         raise ValueError("No .ics link found")
     return parse_ics_events(fetch_url_text(ics_url), source_key)
 
+
 def should_sync(source, min_interval):
     if not source.last_synced:
         return True
     return django_timezone.now() - source.last_synced >= min_interval
+
 
 def resolve_ics_url(source_url):
     if source_url.lower().endswith(".ics"):
@@ -42,80 +60,56 @@ def resolve_ics_url(source_url):
     html = fetch_url_text(source_url)
     return extract_ics_url(html, source_url)
 
+
 def fetch_url_text(url):
     req = Request(url, headers={"User-Agent": "Flax10TimetableSync/1.0"})
     with urlopen(req, timeout=20) as response:
         return response.read().decode("utf-8", errors="ignore")
 
+
 def extract_ics_url(html, base_url):
     match = re.search(r'href="([^"]+\.ics[^"]*)"', html, re.IGNORECASE)
     if not match:
-        match = re.search(r'(https?://[^\s"\']+\.ics[^\s"\']*)', html, re.IGNORECASE)
-    return urljoin(base_url, match.group(1)) if match else None
+        return None
+    path = match.group(1)
+    if path.startswith("http"):
+        return path
+    from urllib.parse import urljoin
+    return urljoin(base_url, path)
+
+
+def get_source_key(source_url):
+    return source_url[:100]
+
 
 def parse_ics_events(ics_text, source_key):
-    lines = unfold_ics_lines(ics_text)
-    blocks = split_event_blocks(lines)
-    return [build_event_data(parse_event_block(b), source_key) for b in blocks]
+    cal = Calendar.from_ical(ics_text)
+    events = []
+    for component in cal.walk("VEVENT"):
+        event = parse_vevent(component, source_key)
+        if event:
+            events.append(event)
+    return events
 
-def unfold_ics_lines(ics_text):
-    lines = []
-    for line in ics_text.splitlines():
-        if line.startswith((" ", "\t")) and lines:
-            lines[-1] += line[1:]
-        else:
-            lines.append(line.strip())
-    return [line for line in lines if line]
 
-def split_event_blocks(lines):
-    blocks = []
-    current = None
-    for line in lines:
-        if line == "BEGIN:VEVENT":
-            current = []
-        elif line == "END:VEVENT" and current is not None:
-            blocks.append(current)
-            current = None
-        elif current is not None:
-            current.append(line)
-    return blocks
-
-def parse_event_block(lines):
-    data = {}
-    for line in lines:
-        key, value = parse_ics_line(line)
-        if key:
-            data[key] = value
-    return data
-
-def parse_ics_line(line):
-    if ":" not in line:
-        return None, None
-    key_part, value = line.split(":", 1)
-    key = key_part.split(";", 1)[0].upper()
-    return key, value.strip()
-
-def build_event_data(data, source_key):
-    start = parse_ics_datetime(data.get("DTSTART"))
-    end = parse_ics_datetime(data.get("DTEND"))
-    uid = data.get("UID") or f"{source_key}-{data.get('DTSTART','')}-{data.get('SUMMARY','')}"
+def parse_vevent(vevent, source_key):
+    uid = str(vevent.get("UID", ""))
+    start = vevent.get("DTSTART")
+    end = vevent.get("DTEND")
+    if not start or not end:
+        return None
     return {
-        "title": normalize_text(data.get("SUMMARY", "Untitled")),
-        "description": normalize_text(data.get("DESCRIPTION", "")),
-        "start_time": start,
-        "end_time": end,
-        "location": normalize_text(data.get("LOCATION", "")),
+        "title": str(vevent.get("SUMMARY", "Untitled")),
+        "description": str(vevent.get("DESCRIPTION", "")),
+        "start_time": start.dt,
+        "end_time": end.dt,
+        "location": str(vevent.get("LOCATION", "")),
         "source": source_key,
         "external_id": uid,
     }
 
-def normalize_text(value):
-    if not value:
-        return ""
-    text = value.replace("\\n", " ").replace("\\,", ",")
-    text = text.replace("\n", " ").replace("\r", " ")
-    return re.sub(r"\s+", " ", text).strip()
 
+<<<<<<< HEAD
 def parse_ics_datetime(value):
     if not value:
         return None
@@ -141,6 +135,8 @@ def get_source_key(url):
     host = urlparse(url).netloc or "timetable"
     return host.replace("www.", "")
 
+=======
+>>>>>>> main
 def upsert_events(events, user=None):
     created = updated = 0
     for data in events:
@@ -151,6 +147,7 @@ def upsert_events(events, user=None):
             apply_event_updates(existing, data)
             updated += 1
         else:
+<<<<<<< HEAD
             create_event(data, user)
             created += 1
     return created, updated
@@ -162,12 +159,32 @@ def find_existing_event(source, external_id, user=None):
     if user:
         qs = qs.filter(user=user)
     return qs.first()
+=======
+            create_event(data, user=user)
+            created += 1
+    return created, updated
+
+
+def find_existing_event(source, external_id, user=None):
+    if not source or not external_id:
+        return None
+    query = CalendarEvent.objects.filter(source=source, external_id=external_id)
+    if user:
+        query = query.filter(user=user)
+    return query.first()
+
+>>>>>>> main
 
 def apply_event_updates(event, data):
     for field in ("title", "description", "start_time", "end_time", "location"):
-        setattr(event, field, data.get(field))
+        if field in data:
+            setattr(event, field, data[field])
     event.save()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 def create_event(data, user=None):
     CalendarEvent.objects.create(
         user=user,
@@ -180,7 +197,12 @@ def create_event(data, user=None):
         external_id=data.get("external_id"),
     )
 
+<<<<<<< HEAD
 def update_source_status(source_url, user, synced, error):
+=======
+
+def update_source_status(source_url, synced, error):
+>>>>>>> main
     values = {"last_error": error}
     if synced:
         values["last_synced"] = django_timezone.now()
