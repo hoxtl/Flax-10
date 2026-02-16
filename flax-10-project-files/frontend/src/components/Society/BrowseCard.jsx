@@ -1,7 +1,7 @@
 import styles from './BrowseCard.module.css';
 
 export default function BrowseCard({ onClick, societies = [] }) {
-    const images = societies.slice(0, 4).map(s => s.image);
+    const images = societies.slice(0, 4).map(s => s.cover_image || s.image);
     return (
         <div className={styles.card} onClick={onClick}>
             <ImageGrid images={images} />

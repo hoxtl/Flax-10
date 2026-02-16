@@ -35,6 +35,7 @@ def create_announcement(request, society):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     announcement = serialiser.save(society=society)
     save_announcement_images(announcement, request.data.get('image_urls', []))
+    announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data, status=status.HTTP_201_CREATED)
 
 

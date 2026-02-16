@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.models.society import Society
+from studyFlax.models.society import Society, SocietyImage
 from studyFlax.serialisers import SocietyDetailSerialiser
 from .helpers import (
     get_society_or_404, get_membership, is_society_admin,
@@ -39,7 +39,18 @@ def update_society(request, society):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
-    return Response(serialiser.data)
+    handle_image_urls(society, request.data)
+    society.refresh_from_db()
+    return Response(SocietyDetailSerialiser(society).data)
+
+
+def handle_image_urls(society, data):
+    image_urls = data.get('image_urls') or data.get('images')
+    if image_urls is None:
+        return
+    society.images.all().delete()
+    for url in image_urls:
+        SocietyImage.objects.create(society=society, url=url, is_cover=True)
 
 
 def delete_society(request, society):
