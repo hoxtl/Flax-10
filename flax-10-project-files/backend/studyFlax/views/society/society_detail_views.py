@@ -29,6 +29,7 @@ def get_society_detail(user, society):
     membership = get_membership(user, society)
     data['is_member'] = membership is not None
     data['is_admin'] = membership.is_admin if membership else False
+    data['role'] = membership.role if membership else None
     return Response(data)
 
 

@@ -30,7 +30,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     return (
         <div className={styles.page}>
             <TopBar onBack={onBack} canEdit={canEdit} editMode={editMode} setEditMode={setEditMode}
-                onSettings={() => setShowSettings(true)} />
+                isAdmin={society.role === 'admin'} onSettings={() => setShowSettings(true)} />
             <SocietyHero society={society} onImageClick={() => setGalleryOpen(true)}
                 editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
                 onEditImages={() => setShowCoverModal(true)} />
@@ -69,12 +69,13 @@ function getAvailablePhotos(society) {
     return announcementImages.filter(img => !currentCovers.has(img));
 }
 
-function TopBar({ onBack, canEdit, editMode, setEditMode, onSettings }) {
+function TopBar({ onBack, canEdit, editMode, setEditMode, isAdmin, onSettings }) {
+    const showSettings = editMode && isAdmin;
     return (
         <div className={styles.topBar}>
             <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
             <div className={styles.topBarActions}>
-                {editMode && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
+                {showSettings && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
                 {canEdit && <EditToggle editMode={editMode} setEditMode={setEditMode} />}
             </div>
         </div>
