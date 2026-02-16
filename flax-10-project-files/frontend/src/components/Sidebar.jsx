@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
@@ -49,20 +49,37 @@ function SidebarNav({ active, onChange, collapsed }) {
 function SidebarFooter({ active, onChange, collapsed, user }) {
   const [profileData, setProfileData] = useState(null);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await getUserProfile();
-        setProfileData(data);
-      } catch (e) {
-        console.error("Failed to load profile:", e);
-      }
-    };
-    loadProfile();
+  const loadProfile = useCallback(async () => {
+    try {
+      const data = await getUserProfile();
+      setProfileData(data);
+    } catch (e) {
+      console.error("Failed to load profile:", e);
+    }
   }, []);
 
-  const firstName = getPreferredFirstName(user);
-  const initials = getInitials(firstName) || "?";
+  useEffect(() => {
+    loadProfile();
+
+    const onAuthChanged = () => loadProfile();
+    window.addEventListener("auth-changed", onAuthChanged);
+
+    const onProfileUpdated = () => loadProfile();
+    window.addEventListener("profile-updated", onProfileUpdated);
+
+    return () => {
+      window.removeEventListener("auth-changed", onAuthChanged);
+      window.removeEventListener("profile-updated", onProfileUpdated);
+    };
+  }, [loadProfile]);
+
+  const displayName =
+    profileData?.username ||
+    user?.username ||
+    getPreferredFirstName(user) ||
+    "User";
+
+  const initials = getInitials(displayName) || "?";
 
   const yearRaw = profileData?.year ?? user?.year;
   const year = yearRaw
@@ -72,11 +89,11 @@ function SidebarFooter({ active, onChange, collapsed, user }) {
     : "Year 2";
 
   const major = profileData?.major || user?.major || "CS";
+
   const profilePhotoUrl = profileData?.profile_photo_url || user?.profile_photo_url;
 
   return (
     <div className={styles.sidebarFooter}>
-      {/* ✅ Profile button at bottom (same big button styling) */}
       <NavItem
         item={{ id: "profile", icon: "👤", label: "Profile" }}
         isActive={active === "profile"}
@@ -84,7 +101,6 @@ function SidebarFooter({ active, onChange, collapsed, user }) {
         onClick={() => onChange?.("profile")}
       />
 
-      {/* ✅ User block (with profile photo) */}
       <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
         <div className={styles.avatar}>
           {profilePhotoUrl ? (
@@ -96,7 +112,7 @@ function SidebarFooter({ active, onChange, collapsed, user }) {
 
         {!collapsed && (
           <div className={styles.userText}>
-            <div className={styles.userName}>{firstName}</div>
+            <div className={styles.userName}>{displayName}</div>
             <div className={styles.userMeta}>
               {year} · {major}
             </div>
