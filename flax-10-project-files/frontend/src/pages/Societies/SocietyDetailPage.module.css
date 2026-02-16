@@ -52,6 +52,29 @@
     filter: brightness(0.9);
 }
 
+.topBarActions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.settingsBtn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s;
+}
+
+.settingsBtn:hover {
+    background: var(--hover);
+}
+
 .mainContent {
     display: flex;
     gap: 24px;

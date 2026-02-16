@@ -7,7 +7,6 @@ class Society(models.Model):
     about = models.TextField(blank=True, default="")
     image = models.TextField(blank=True, null=True)
     is_ratified = models.BooleanField(default=False)
-    is_private = models.BooleanField(default=False)
     date_created = models.DateField(auto_now_add=True)
 
     class Meta:

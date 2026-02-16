@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from "./SocietyInfo.module.css";
 
-export default function SocietyInfo({ society, editMode, onUpdateSociety }) {
+export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave }) {
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <Stats society={society} />
-            <JoinButton isMember={society.is_member} editMode={editMode} />
+            <JoinButton isMember={society.is_member} editMode={editMode} onJoin={onJoin} onLeave={onLeave} />
         </div>
     );
 }
@@ -58,13 +58,13 @@ function Stats({ society }) {
     );
 }
 
-function JoinButton({ isMember, editMode }) {
-    const [joined, setJoined] = useState(isMember);
+function JoinButton({ isMember, editMode, onJoin, onLeave }) {
     if (editMode) return null;
 
-    const className = joined ? styles.joinedBtn : styles.joinBtn;
-    const label = joined ? "Joined" : "Join Society";
-    return <button className={className} onClick={() => setJoined(!joined)}>{label}</button>;
+    const handleClick = () => isMember ? onLeave?.() : onJoin?.();
+    const className = isMember ? styles.joinedBtn : styles.joinBtn;
+    const label = isMember ? "Joined" : "Join Society";
+    return <button className={className} onClick={handleClick}>{label}</button>;
 }
 
 function formatYear(dateStr) {

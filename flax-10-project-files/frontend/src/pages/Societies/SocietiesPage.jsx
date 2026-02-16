@@ -42,7 +42,7 @@ function useSocietiesPage() {
 
 function MySocietiesView({ setView, onSelect, onCreateClick, societies }) {
     const adminOf = societies.filter(s => s.is_admin);
-    const memberOf = societies.filter(s => !s.is_admin);
+    const memberOf = societies.filter(s => s.is_member && !s.is_admin);
 
     return (
         <div className={styles.container}>
