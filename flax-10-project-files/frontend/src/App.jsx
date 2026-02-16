@@ -16,6 +16,11 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationToast } from "./components/Notifications";
 
+import { Routes, Route, Navigate } from 'react-router-dom';
+import PasswordResetRequest from './pages/PasswordResetRequest';
+import PasswordResetConfirm from './pages/PasswordResetConfirm';
+
+
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 
 function readUser() {
@@ -102,7 +107,12 @@ export default function App() {
             transition={{ duration: 0.28 }}
             style={{ height: "100vh" }}
           >
-            <AuthPage />
+            <Routes>
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="/reset-password" element={<PasswordResetRequest />} />
+              <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
           </motion.div>
         )}
 
