@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./SocietyDetailPage.module.css";
-import { MOCK_SOCIETY_DETAILS } from "./SocietyData";
+import { useSocietyDetail } from "../hooks/useSocietyDetail";
 import SocietyHero from "../components/Society/SocietyDetail/SocietyHero";
 import SocietyInfo from "../components/Society/SocietyDetail/SocietyInfo";
 import SocietyTabs from "../components/Society/SocietyDetail/SocietyTabs";
@@ -8,71 +8,53 @@ import SocietySidebar from "../components/Society/SocietyDetail/SocietySidebar";
 import CoverImageModal from "../components/Society/SocietyDetail/CoverImageModal";
 import ImageGalleryModal from "../components/Society/SocietyDetail/ImageGalleryModal";
 
-export default function SocietyDetailPage({ society: initialSociety, onBack }) {
-    const [society, setSociety] = useState(initialSociety);
-    const [details, setDetails] = useState(MOCK_SOCIETY_DETAILS[initialSociety.id] || {});
+export default function SocietyDetailPage({ societyId, onBack }) {
+    const hookData = useSocietyDetail(societyId);
+    const { society, loading, error, updateSociety } = hookData;
     const [activeTab, setActiveTab] = useState("calendar");
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
 
-    if (!society) return <NotFound onBack={onBack} />;
-    const canEdit = society.isAdmin;
-    const availablePhotos = useAvailablePhotos(details);
+    if (loading) return <div className={styles.page}>Loading...</div>;
+    if (error || !society) return <NotFound onBack={onBack} />;
 
-    const handlers = useDetailHandlers(setSociety, setDetails);
+    const canEdit = society.is_admin;
+    const availablePhotos = getAvailablePhotos(society);
+    const handlers = buildHandlers(hookData);
+    const updateImages = (imgs) => updateSociety({ images: imgs, image: imgs[0] || null });
 
     return (
         <div className={styles.page}>
             <TopBar onBack={onBack} canEdit={canEdit} editMode={editMode} setEditMode={setEditMode} />
-            <SocietyHero society={society} details={details} onImageClick={() => setGalleryOpen(true)}
-                editMode={editMode} onUpdateName={(name) => handlers.updateSociety({ name })}
+            <SocietyHero society={society} onImageClick={() => setGalleryOpen(true)}
+                editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
                 onEditImages={() => setShowCoverModal(true)} />
-            <SocietyInfo society={society} details={details} editMode={editMode} onUpdateSociety={handlers.updateDetails} />
-            <MainContent activeTab={activeTab} setActiveTab={setActiveTab} details={details}
+            <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety} />
+            <MainContent activeTab={activeTab} setActiveTab={setActiveTab} society={society}
                 editMode={editMode} handlers={handlers} />
-            {galleryOpen && <ImageGalleryModal images={details.images || []} onClose={() => setGalleryOpen(false)} />}
-            {showCoverModal && <CoverImageModal images={details.images || []} availablePhotos={availablePhotos}
-                onClose={() => setShowCoverModal(false)} onUpdate={(imgs) => handlers.updateDetails({ images: imgs })}
-                onAdd={handlers.addCoverImage} />}
+            {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}
+            {showCoverModal && <CoverImageModal images={getImageUrls(society.images)} availablePhotos={availablePhotos}
+                onClose={() => setShowCoverModal(false)} onUpdate={updateImages} />}
         </div>
     );
 }
 
-function useDetailHandlers(setSociety, setDetails) {
-    const updateSociety = (updates) => setSociety(prev => ({ ...prev, ...updates }));
-    const updateDetails = (updates) => setDetails(prev => ({ ...prev, ...updates }));
-    const addCoverImage = (img) => setDetails(prev => ({ ...prev, images: [...(prev.images || []), img] }));
-    const addAnnouncement = (data) => handleAddAnnouncement(data, setDetails);
-    const addEvent = (data) => handleAddEvent(data, setDetails);
-    return { updateSociety, updateDetails, addCoverImage, addAnnouncement, addEvent };
+function buildHandlers(hookData) {
+    const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
+        addEvent, updateEvent, deleteEvent, addTag, deleteTag } = hookData;
+    return { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
+        addEvent, updateEvent, deleteEvent, addTag, deleteTag };
 }
 
-function handleAddAnnouncement(data, setDetails) {
-    const announcementId = Date.now();
-    const announcement = { id: announcementId, title: data.title, content: data.content, images: data.images || [],
-        image: data.images?.[0] || null, tagId: data.tagId, date: new Date().toISOString().split('T')[0], pinned: data.pinned || false };
-    setDetails(prev => ({ ...prev, announcements: [...(prev.announcements || []), announcement] }));
-    if (data.addAsEvent) addEventFromAnnouncement(data, announcementId, setDetails);
+function getImageUrls(images) {
+    return (images || []).map(i => i.url || i);
 }
 
-function addEventFromAnnouncement(data, announcementId, setDetails) {
-    const event = { id: Date.now() + 1, title: data.title, date: data.date, time: data.allDay ? "00:00" : data.startTime,
-        endDate: data.endDate, endTime: data.endTime, tagId: data.tagId, recurrence: data.recurrence, announcementId };
-    setDetails(prev => ({ ...prev, upcomingEvents: [...(prev.upcomingEvents || []), event] }));
-}
-
-function handleAddEvent(data, setDetails) {
-    const event = { id: Date.now(), title: data.title, date: data.date, time: data.time || "12:00", tagId: data.tag };
-    setDetails(prev => ({ ...prev, upcomingEvents: [...(prev.upcomingEvents || []), event] }));
-}
-
-function useAvailablePhotos(details) {
-    const generalPhotos = details.photos || [];
-    const announcementPhotos = (details.announcements || []).filter(a => a.image).map(a => a.image);
-    const currentCovers = new Set(details.images || []);
-
-    return [...generalPhotos, ...announcementPhotos].filter(img => !currentCovers.has(img));
+function getAvailablePhotos(society) {
+    const announcementImages = (society.announcements || []).flatMap(a => a.images?.map(i => i.url) || []);
+    const currentCovers = new Set(getImageUrls(society.images));
+    return announcementImages.filter(img => !currentCovers.has(img));
 }
 
 function TopBar({ onBack, canEdit, editMode, setEditMode }) {
@@ -101,15 +83,18 @@ function NotFound({ onBack }) {
     );
 }
 
-function MainContent({ activeTab, setActiveTab, details, editMode, handlers }) {
-    const tags = details.tags || [];
+function MainContent({ activeTab, setActiveTab, society, editMode, handlers }) {
+    const tags = society.tags || [];
+    const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
+    const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
     return (
         <div className={styles.mainContent}>
             <div className={styles.tabSection}>
-                <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} details={details}
-                    editMode={editMode} onUpdateDetails={handlers.updateDetails} tags={tags} />
+                <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} society={society}
+                    editMode={editMode} onUpdate={handlers.updateSociety} eventHandlers={eventHandlers}
+                    tags={tags} tagHandlers={tagHandlers} />
             </div>
-            <SocietySidebar details={details} editMode={editMode} tags={tags}
+            <SocietySidebar society={society} editMode={editMode} tags={tags}
                 onAddAnnouncement={handlers.addAnnouncement} onAddEvent={handlers.addEvent} />
         </div>
     );

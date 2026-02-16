@@ -4,14 +4,14 @@ import ImageGalleryModal from "../ImageGalleryModal";
 import AddPhotoModal from "../AddPhotoModal";
 import DeletePhotoModal from "../DeletePhotoModal";
 
-export default function PhotosTab({ details, editMode, onUpdate }) {
-    const allPhotos = collectAllPhotos(details);
+export default function PhotosTab({ society, editMode, onUpdate }) {
+    const allPhotos = collectAllPhotos(society);
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [addModal, setAddModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     const handleConfirmDelete = (action) => {
-        const updates = performDelete(deleteTarget, action, details);
+        const updates = performDelete(deleteTarget, action, society);
         onUpdate?.(updates);
         setDeleteTarget(null);
     };
@@ -21,27 +21,21 @@ export default function PhotosTab({ details, editMode, onUpdate }) {
             <PhotoContent photos={allPhotos} editMode={editMode} onPhotoClick={setSelectedIndex}
                 onAddClick={() => setAddModal(true)} onDelete={setDeleteTarget} />
             {selectedIndex !== null && <ImageGalleryModal images={allPhotos.map(p => p.src)} initialIndex={selectedIndex} onClose={() => setSelectedIndex(null)} />}
-            {addModal && <AddPhotoModal onClose={() => setAddModal(false)} onAdd={(d) => { handleAdd(d, details, onUpdate); setAddModal(false); }} />}
+            {addModal && <AddPhotoModal onClose={() => setAddModal(false)} onAdd={(d) => { handleAdd(d, society, onUpdate); setAddModal(false); }} />}
             {deleteTarget && <DeletePhotoModal photo={deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleConfirmDelete} />}
         </>
     );
 }
 
-function handleAdd({ url, addToCover }, details, onUpdate) {
-    const updates = { photos: [...(details.photos || []), url] };
-    if (addToCover) updates.images = [...(details.images || []), url];
-    onUpdate?.(updates);
+function handleAdd({ url, addToCover }, society, onUpdate) {
+    const currentImages = (society.images || []).map(i => i.url || i);
+    onUpdate?.({ images: [...currentImages, url] });
 }
 
-function performDelete(photo, action, details) {
+function performDelete(photo, action, society) {
     const { src } = photo;
-    if (action === 'hide') return { hiddenPhotos: [...(details.hiddenPhotos || []), src] };
-    if (action === 'delete') return { photos: (details.photos || []).filter(p => p !== src) };
-    if (action === 'photos_only') return { photos: (details.photos || []).filter(p => p !== src) };
-    if (action === 'both') return {
-        photos: (details.photos || []).filter(p => p !== src),
-        images: (details.images || []).filter(img => img !== src)
-    };
+    const currentImages = (society.images || []).map(i => i.url || i);
+    if (action === 'delete' || action === 'both') return { images: currentImages.filter(img => img !== src) };
     return {};
 }
 
@@ -72,25 +66,20 @@ function AddPhotoCard({ onClick }) {
     );
 }
 
-function collectAllPhotos(details) {
-    const hidden = new Set(details.hiddenPhotos || []);
+function collectAllPhotos(society) {
     const photos = [];
+    const seen = new Set();
 
-    (details.images || []).forEach(img => {
-        if (!hidden.has(img)) photos.push({ src: img, source: 'cover' });
+    (society.images || []).forEach(img => {
+        const url = img.url || img;
+        if (!seen.has(url)) { seen.add(url); photos.push({ src: url, source: 'cover' }); }
     });
 
-    (details.photos || []).forEach(img => {
-        // Avoid duplicates if same image is in cover and photos
-        if (!photos.some(p => p.src === img) && !hidden.has(img)) {
-            photos.push({ src: img, source: 'general' });
-        }
-    });
-
-    (details.announcements || []).forEach(a => {
-        if (a.image && !hidden.has(a.image) && !photos.some(p => p.src === a.image)) {
-            photos.push({ src: a.image, source: 'announcement' });
-        }
+    (society.announcements || []).forEach(a => {
+        (a.images || []).forEach(img => {
+            const url = img.url || img;
+            if (!seen.has(url)) { seen.add(url); photos.push({ src: url, source: 'announcement' }); }
+        });
     });
 
     return photos;

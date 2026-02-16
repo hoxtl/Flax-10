@@ -1,28 +1,41 @@
 import { useState, useRef } from "react";
 import styles from "./CoverImageModal.module.css";
 
-export default function CoverImageModal({ images, availablePhotos, onClose, onUpdate, onAdd }) {
-    const [view, setView] = useState("list"); // list, add
+export default function CoverImageModal({ images, availablePhotos, onClose, onUpdate }) {
+    const [view, setView] = useState("list");
 
-    if (view === "add") {
-        return <AddCoverView onClose={() => setView("list")} onAdd={(img) => { onAdd(img); setView("list"); }} availablePhotos={availablePhotos} />;
-    }
+    const handleAdd = (img) => { onUpdate([...images, img]); setView("list"); };
+    const handleDelete = (index) => onUpdate(images.filter((_, i) => i !== index));
+    const handlePin = (index) => onUpdate([images[index], ...images.filter((_, i) => i !== index)]);
+
+    if (view === "add") return <AddCoverView onClose={() => setView("list")} onAdd={handleAdd} availablePhotos={availablePhotos} />;
 
     return (
         <div className={styles.backdrop} onMouseDown={onClose}>
             <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
                 <Header title="Manage Cover Images" onClose={onClose} />
-                <div className={styles.grid}>
-                    {images.map((img, i) => (
-                        <div key={i} className={styles.imageCard} style={{ backgroundImage: `url(${img})` }}>
-                            <button className={styles.deleteBtn} onClick={() => onUpdate(images.filter((_, idx) => idx !== i))}>&times;</button>
-                        </div>
-                    ))}
-                    <button className={styles.addCard} onClick={() => setView("add")}>
-                        <span className={styles.addIcon}>+</span>
-                    </button>
-                </div>
+                <p className={styles.hint}>First image is shown on society card. Click ★ to pin.</p>
+                <ImageGrid images={images} onDelete={handleDelete} onPin={handlePin} onAddClick={() => setView("add")} />
             </div>
+        </div>
+    );
+}
+
+function ImageGrid({ images, onDelete, onPin, onAddClick }) {
+    return (
+        <div className={styles.grid}>
+            {images.map((img, i) => <ImageCard key={i} src={img} index={i} onDelete={() => onDelete(i)} onPin={() => onPin(i)} />)}
+            <button className={styles.addCard} onClick={onAddClick}><span className={styles.addIcon}>+</span></button>
+        </div>
+    );
+}
+
+function ImageCard({ src, index, onDelete, onPin }) {
+    return (
+        <div className={`${styles.imageCard} ${index === 0 ? styles.pinned : ""}`} style={{ backgroundImage: `url(${src})` }}>
+            {index === 0 && <span className={styles.pinnedBadge}>★ Main</span>}
+            {index !== 0 && <button className={styles.pinBtn} onClick={onPin} title="Set as main">★</button>}
+            <button className={styles.deleteBtn} onClick={onDelete}>&times;</button>
         </div>
     );
 }

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import styles from "./SocietyHero.module.css";
 
-export default function SocietyHero({ society, details, onImageClick, editMode, onEditImages, onUpdateName }) {
+export default function SocietyHero({ society, onImageClick, editMode, onEditImages, onUpdateName }) {
     const [hovered, setHovered] = useState(false);
     const [idx, setIdx] = useState(0);
-    const images = details.images?.length > 0 ? details.images : [society.image];
+    const images = getImages(society);
     const currentImage = images[idx] || images[0];
 
     return (
@@ -18,6 +18,11 @@ export default function SocietyHero({ society, details, onImageClick, editMode, 
             </div>
         </div>
     );
+}
+
+function getImages(society) {
+    if (society.images?.length > 0) return society.images.map(i => i.url || i);
+    return society.image ? [society.image] : [];
 }
 
 function HeroArrows({ idx, total, setIdx }) {

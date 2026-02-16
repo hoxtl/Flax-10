@@ -8,7 +8,7 @@ export function EventModal({ event, onClose, initialType, initialDate, showRemin
     const tags = customTags || globalTags.tags;
     const loading = customTags ? false : globalTags.loading;
 
-    if (loading || tags.length === 0) return null;
+    if (loading) return null;
 
     const defaultTag = getDefaultTag(tags, initialType);
     const options = { initialTag: defaultTag, initialDate, customSubmit: onSubmit };

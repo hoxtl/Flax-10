@@ -71,6 +71,28 @@ export function formatDate(date) {
     return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
+export function formatDateTime(date) {
+    return `${formatDate(date)} at ${formatTime(date)}`;
+}
+
+export function formatShortDate(date) {
+    return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+export function formatDateWithYear(date) {
+    return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+}
+
+export function formatTimeRange(startTime, endTime, allDay) {
+    if (allDay) return "All day";
+    return `${formatTime(new Date(startTime))} to ${formatTime(new Date(endTime))}`;
+}
+
+export function addHourToTime(time) {
+    const [h, m] = time.split(":").map(Number);
+    return `${String((h + 1) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 export function formatMonthYear(date) {
     return date.toLocaleDateString([], { month: 'long', year: 'numeric' });
 }
