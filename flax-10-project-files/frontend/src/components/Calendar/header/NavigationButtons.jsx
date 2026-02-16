@@ -19,7 +19,7 @@ function DatePickerButton({ selectedDate, onDatePick }) {
     const handleChange = (e) => onDatePick(parseDateInput(e.target.value));
     return (
         <>
-            <button className="btn-calendar" onClick={() => ref.current?.showPicker?.()}>🗓️</button>
+            <button className="btn-calendar" onClick={() => ref.current?.showPicker?.()}>📅</button>
             <input ref={ref} type="date" className="hidden-date-input" value={value} onChange={handleChange} />
         </>
     );
