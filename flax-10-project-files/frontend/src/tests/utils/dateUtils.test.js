@@ -18,7 +18,7 @@ import {
     isToday,
     formatDayLabel,
     parseDateInput
-} from '../../utils/dateUtils';
+} from '../../components/Calendar/utils/dateUtils';
 
 describe('dateUtils', () => {
     const date = new Date(2026, 1, 15);
@@ -159,7 +159,7 @@ describe('dateUtils', () => {
         });
 
         it('overlapsDay (true)', async () => {
-            const { overlapsDay } = await import('../../utils/dateUtils');
+            const { overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
             const day = new Date(2026, 1, 15);
             expect(overlapsDay(new Date(2026, 1, 15, 10), new Date(2026, 1, 15, 11), day)).toBe(true);
             expect(overlapsDay(new Date(2026, 1, 15, 0), new Date(2026, 1, 16, 0), day)).toBe(true);
@@ -168,7 +168,7 @@ describe('dateUtils', () => {
         });
 
         it('overlapsDay (false)', async () => {
-            const { overlapsDay } = await import('../../utils/dateUtils');
+            const { overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
             const day = new Date(2026, 1, 15);
             expect(overlapsDay(new Date(2026, 1, 14, 10), new Date(2026, 1, 14, 11), day)).toBe(false);
             expect(overlapsDay(new Date(2026, 1, 16, 10), new Date(2026, 1, 16, 11), day)).toBe(false);
@@ -177,7 +177,7 @@ describe('dateUtils', () => {
         });
 
         it('isAllDayEvent', async () => {
-            const { isAllDayEvent } = await import('../../utils/dateUtils');
+            const { isAllDayEvent } = await import('../../components/Calendar/utils/dateUtils');
             // 24 hours
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(true);
             // < 24 hours

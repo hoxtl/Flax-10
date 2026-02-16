@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 // setup tests?
 // Since we test context, we need a consumer component.
 
-vi.mock('../../hooks/useReminderNotifications', () => ({
+vi.mock('../../components/Notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 

@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DashboardLayout.module.css";
-import Sidebar from "../components/Sidebar";
-import TopBar from "../components/Topbar";
-import WeekBar from "../components/WeekBar";
-import QuickAddModal from "../components/QuickAddModal";
+import Sidebar from "../components/Dashboard/Sidebar";
+import TopBar from "../components/Dashboard/Topbar";
+import WeekBar from "../components/Dashboard/WeekBar";
+import QuickAddModal from "../components/Dashboard/QuickAddModal";
 import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
-import { clearUserData } from "../utils/authHelpers";
+import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingTasks from "../components/Tasks/FloatingTasks";
 import { useLocation } from "react-router-dom";
 

@@ -4,13 +4,13 @@ import { SignUpForm } from "../components/Authentication/SignUpForm";
 import { SignInForm } from "../components/Authentication/SignInForm";
 import { AuthOverlay } from "../components/Authentication/Overlay";
 import { ErrorMessage } from "../components/Authentication/ErrorMessage";
-import { useAuthForm } from "../hooks/useAuthForm";
+import { useAuthForm } from "../components/Authentication/hooks/useAuthForm";
 import { authService } from "../api/authService";
 import {
   validatePasswords,
   getErrorMessage,
   saveUserData,
-} from "../utils/authHelpers";
+} from "../components/Authentication/utils/authHelpers";
 import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
 
 export default function AuthPage() {
@@ -48,7 +48,7 @@ export default function AuthPage() {
 
       if (response.ok) {
         await new Promise((r) => setTimeout(r, 180));
-        saveUserData(data.token, data.user); 
+        saveUserData(data.token, data.user);
       } else {
         setError(getErrorMessage(data));
       }

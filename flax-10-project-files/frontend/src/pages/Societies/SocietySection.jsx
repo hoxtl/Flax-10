@@ -1,6 +1,6 @@
 import styles from "./SocietiesPage.module.css";
-import SocietyCard from "../components/Society/SocietyCard";
-import BrowseCard from "../components/Society/BrowseCard";
+import SocietyCard from "../../components/Society/SocietyCard";
+import BrowseCard from "../../components/Society/BrowseCard";
 
 export default function SocietySection({ title, items, type, onAction, allSocieties = [], onSelect }) {
     const isMember = type === "member";

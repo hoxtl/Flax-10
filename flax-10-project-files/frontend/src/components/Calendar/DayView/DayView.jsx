@@ -1,13 +1,13 @@
 import { useRef } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
-import { overlapsDay } from '../../../utils/dateUtils';
-import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
+import { overlapsDay } from '../utils/dateUtils';
+import { shouldShowInTimeGrid } from '../utils/eventDisplayUtils';
 import { TimeSlot } from './TimeSlot';
 import { AllDayRow } from '../WeekView/components/AllDayRow';
 import { DraggableEvent } from '../DraggableEvent';
 import { getHoursOfDay, calculateEventStyle } from './dayViewHelpers';
 import { SLOT_HEIGHT } from '../calendarConstants';
-import { useAutoScroll } from '../../../hooks/useAutoScroll';
+import { useAutoScroll } from '../hooks/useAutoScroll';
 import './DayView.css';
 
 export function DayView({ selectedDate: propDate, events: propEvents, readOnly }) {

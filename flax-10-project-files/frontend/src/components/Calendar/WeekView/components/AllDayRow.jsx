@@ -1,4 +1,4 @@
-import { getAllDayVisualRange } from '../../../../utils/eventDisplayUtils';
+import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 import { useEventModal } from '../../../../context/CalendarContext';
 import { useTags } from '../../../../context/TagContext';
 import { calculateBarStyle } from './allDayRowHelpers';

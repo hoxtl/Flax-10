@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNotifications } from '../../context/NotificationContext';
-import { playNotificationSound } from '../../utils/notificationSound';
+import { playNotificationSound } from './utils/notificationSound';
 import './NotificationToast.css';
 
 export function NotificationToast() {

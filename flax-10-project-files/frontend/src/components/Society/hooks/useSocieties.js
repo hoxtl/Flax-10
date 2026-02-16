@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchSocieties, createSociety } from "../api/societyApi";
+import { fetchSocieties, createSociety } from "../../../api/societyApi";
 
 function toSnakeCase(obj) {
     const result = {};

@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import styles from "./AnnouncementModal.module.css";
 import { getInitialForm, validateForm, handleFileSelect, MAX_IMAGES } from "./AnnouncementModalHelpers";
-import { TimeRow } from "../../Calendar/EventModal/components/TimeRow";
-import { RecurrenceField } from "../../Calendar/EventModal/components/RecurrenceField";
-import { FormField } from "../../Calendar/EventModal/components/FormField";
-import { TagField } from "../../Calendar/EventModal/components/TagField";
-import "../../Calendar/EventModal/EventModal.css";
+import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
+import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
+import { FormField } from "../../../../Calendar/EventModal/components/FormField";
+import { TagField } from "../../../../Calendar/EventModal/components/TagField";
+import "../../../../Calendar/EventModal/EventModal.css";
 
 export default function AnnouncementModal({ onClose, onSubmit, tags = [], announcement = null }) {
     const [form, setForm] = useState(getInitialForm(announcement));

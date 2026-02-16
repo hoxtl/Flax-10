@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
-import AnnouncementModal from "./AnnouncementModal";
+import AnnouncementModal from "./tabs/announcementTab/AnnouncementModal";
 import { EventModal } from "../../Calendar/EventModal/EventModal";
-import { formatDateTime } from "../../../utils/dateUtils";
+import { formatDateTime } from "../../Calendar/utils/dateUtils";
 
 export default function SocietySidebar({ society, editMode, onAddAnnouncement, onAddEvent, tags }) {
     const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);

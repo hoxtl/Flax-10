@@ -1,4 +1,4 @@
-import { useDrag } from '../../../hooks/useDragDrop';
+import { useDrag } from '../hooks/useDragDrop';
 import { useEventModal } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 

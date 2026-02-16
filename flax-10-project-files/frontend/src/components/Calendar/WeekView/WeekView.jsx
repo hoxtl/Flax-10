@@ -1,17 +1,17 @@
 import { useRef } from 'react';
 import { useCalendarData, useCalendarDispatch } from '../../../context/CalendarContext';
-import { getWeekDays, isSameDay, overlapsDay } from '../../../utils/dateUtils';
+import { getWeekDays, isSameDay, overlapsDay } from '../utils/dateUtils';
 import { DayColumn } from './DayColumn';
 import { AllDayRow } from './components/AllDayRow';
 import { TimeLabels } from './TimeLabels';
-import { useAutoScroll } from '../../../hooks/useAutoScroll';
+import { useAutoScroll } from '../hooks/useAutoScroll';
 import './WeekView.css';
 
 /**
  * Week view shows 7 day columns with hour rows.
  * Props are optional - falls back to CalendarContext if not provided.
  */
-import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
+import { shouldShowInTimeGrid } from '../utils/eventDisplayUtils';
 
 export function WeekView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly }) {
     const data = useCalendarData({ selectedDate: propDate, events: propEvents });

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTags } from '../context/TagContext';
+import { useTags } from '../../context/TagContext';
 import styles from './TagManagerModal.module.css';
 
 export default function TagManagerModal({ onClose }) {

@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import SocietyCard from "../components/Society/SocietyCard";
+import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
-import BasePill from "../components/BasePill";
-import { countByType } from "../components/Tags/utils/pillUtils";
+import BasePill from "../../components/Tags/BasePill";
+import { countByType } from "../../components/Tags/utils/pillUtils";
 
 const filterOptions = [
     { id: "all", label: "All" },

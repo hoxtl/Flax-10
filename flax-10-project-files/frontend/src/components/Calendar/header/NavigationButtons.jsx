@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
-import { isSameDay, getWeekDays, isSameMonth } from '../../../utils/dateUtils';
+import { isSameDay, getWeekDays, isSameMonth } from '../utils/dateUtils';
 import { DatePickerButton } from './DatePickerButton';
 
 export function NavigationButtons({ onNavigate, selectedDate, onDatePick }) {
