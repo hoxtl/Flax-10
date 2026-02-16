@@ -36,7 +36,7 @@ describe('useEventForm', () => {
         vi.clearAllMocks();
     });
 
-    it('should initialize form with values', () => {
+    it('should initialise form with values', () => {
         const { result } = renderHook(() => useEventForm({ id: 1 }, vi.fn()));
         expect(result.current.form).toEqual(mockInitialForm);
         expect(result.current.isEditing).toBe(true);
