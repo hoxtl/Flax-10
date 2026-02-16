@@ -22,13 +22,27 @@ def user_settings_view(request):
     elif request.method == 'PATCH':
         user = request.user
 
+        # Update first and last name
         if 'first_name' in request.data:
             user.first_name = request.data['first_name']
     
         if 'last_name' in request.data:
             user.last_name = request.data['last_name']
+        
+        # Change password if provided
+        if 'password' in request.data:
+            new_password = request.data['password']
+            if new_password and len(new_password) >= 8:
+                user.set_password(new_password)  # This hashes the password properly
+            else:
+                return Response(
+                    {'error': 'Password must be at least 8 characters'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
         user.save()
 
+        # Update settings
         settings_serialiser = UserSettingsSerialiser(settings, data=request.data, partial=True)
 
         if settings_serialiser.is_valid():

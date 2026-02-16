@@ -1,6 +1,6 @@
 export const NAV = [
   { id: "home", icon: "🏠", label: "Home" },
-  { id: "calendar", icon: "🗓️", label: "Calendar" },
+  { id: "calendar", icon: "📆", label: "Calendar" },
   { id: "todo", icon: "✅", label: "To-do" },
   { id: "courses", icon: "📘", label: "Courses" },
   { id: "activities", icon: "⚡️", label: "Activities" },

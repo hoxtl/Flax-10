@@ -1,7 +1,9 @@
 from django.db import models
+from studyFlax.models.auth.userModel import User
 
 
 class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
     title = models.CharField(max_length=200)
     message = models.TextField(blank=True)
     read = models.BooleanField(default=False)
