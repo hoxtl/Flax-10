@@ -51,8 +51,8 @@
   align-items: center;
   justify-content: center;
   border: none;
-  background: #1a1a1a;
-  color: white;
+  background: var(--pill-bg);
+  color: var(--text);
   border-radius: 10px;
   cursor: pointer;
   font-size: 18px;
@@ -60,7 +60,7 @@
 }
 
 .arrow:hover {
-  background: #2a2a2a;
+  background: var(--pill-hover);
 }
 
 .calBtn {
@@ -71,14 +71,14 @@
   align-items: center;
   justify-content: center;
   border: none;
-  background: #1a1a1a;
-  color: white;
+  background: var(--pill-bg);
+  color: var(--text);
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .calBtn:hover {
-  background: #2a2a2a;
+  background: var(--pill-hover);
 }
 
 .today {
