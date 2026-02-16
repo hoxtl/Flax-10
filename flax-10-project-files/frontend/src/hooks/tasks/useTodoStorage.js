@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { normalizeItem } from "../utils/taskUtils";
+import { normalizeItem } from "../../utils/tasks/taskUtils";
 
 const STORAGE_KEY = "flax_todo_items_v1";
 const AUTO_CLEAR_MS = 2 * 60 * 60 * 1000;
