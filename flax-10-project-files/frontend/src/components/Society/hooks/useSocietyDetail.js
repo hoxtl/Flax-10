@@ -146,10 +146,21 @@ export function useSocietyDetail(societyId) {
         setSociety(prev => ({ ...prev, announcements: prev.announcements.filter(a => a.id !== announcementId) }));
     };
 
+    const joinSociety = async () => {
+        await api.joinSociety(societyId);
+        setSociety(prev => ({ ...prev, is_member: true, member_count: prev.member_count + 1 }));
+    };
+
+    const leaveSociety = async (userId) => {
+        await api.leaveSociety(societyId, userId);
+        setSociety(prev => ({ ...prev, is_member: false, member_count: Math.max(0, prev.member_count - 1) }));
+    };
+
     return {
         society, loading, error, refresh: loadSociety, updateSociety,
         addTag, updateTag, deleteTag,
         addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent
+        addEvent, updateEvent, deleteEvent,
+        joinSociety, leaveSociety
     };
 }
