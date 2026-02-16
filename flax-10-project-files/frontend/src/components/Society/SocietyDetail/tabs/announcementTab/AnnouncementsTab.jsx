@@ -3,10 +3,10 @@ import styles from "../tabs.module.css";
 import AnnouncementModal from "./AnnouncementModal";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
 
-export default function AnnouncementsTab({ announcements = [], editMode, onUpdate, tags }) {
+export default function AnnouncementsTab({ announcements = [], editMode, handlers, tags }) {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
 
-    const handleSave = (data) => { saveAnnouncement(data, announcements, onUpdate); setEditingAnnouncement(null); };
+    const handleSave = (data) => { saveAnnouncement(data, handlers); setEditingAnnouncement(null); };
 
     return (
         <>
@@ -17,16 +17,9 @@ export default function AnnouncementsTab({ announcements = [], editMode, onUpdat
     );
 }
 
-function saveAnnouncement(data, existing, onUpdate) {
-    const updated = data.id ? existing.map(a => a.id === data.id ? formatAnnouncement(data) : a) : [...existing, formatAnnouncement(data)];
-    onUpdate?.({ announcements: updated });
-}
-
-function formatAnnouncement(data) {
-    return {
-        id: data.id || Date.now(), title: data.title, content: data.content,
-        image_urls: data.images || [], tag: data.tag, pinned: data.pinned
-    };
+function saveAnnouncement(data, handlers) {
+    if (data.id) return handlers?.onUpdate?.(data.id, data);
+    return handlers?.onAdd?.(data);
 }
 
 function AnnouncementsList({ announcements, editMode, onEdit, tags }) {

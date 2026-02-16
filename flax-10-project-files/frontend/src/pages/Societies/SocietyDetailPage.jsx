@@ -89,12 +89,13 @@ function MainContent({ activeTab, setActiveTab, society, editMode, handlers }) {
     const tags = society.tags || [];
     const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
     const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
+    const announcementHandlers = { onAdd: handlers.addAnnouncement, onUpdate: handlers.updateAnnouncement, onDelete: handlers.deleteAnnouncement };
     return (
         <div className={styles.mainContent}>
             <div className={styles.tabSection}>
                 <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} society={society}
                     editMode={editMode} onUpdate={handlers.updateSociety} eventHandlers={eventHandlers}
-                    tags={tags} tagHandlers={tagHandlers} />
+                    announcementHandlers={announcementHandlers} tags={tags} tagHandlers={tagHandlers} />
             </div>
             <SocietySidebar society={society} editMode={editMode} tags={tags}
                 onAddAnnouncement={handlers.addAnnouncement} onAddEvent={handlers.addEvent} />
