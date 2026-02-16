@@ -54,8 +54,8 @@ describe('dateUtils', () => {
 
     describe('Helpers', () => {
         it('getStartOfWeek', () => {
-            const d = getStartOfWeek(new Date(2026, 1, 18)); // Wed Feb 18
-            expect(d.getDate()).toBe(15); // Sun Feb 15
+            const d = getStartOfWeek(new Date(2026, 1, 18)); 
+            expect(d.getDate()).toBe(15); 
         });
 
         it('getStartOfMonth', () => {

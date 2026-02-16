@@ -1,4 +1,4 @@
-export function normalizeItem(x) {
+export function normaliseItem(x) {
   return {
     id: x?.id ?? crypto.randomUUID(),
     title: typeof x?.title === "string" ? x.title : "",
