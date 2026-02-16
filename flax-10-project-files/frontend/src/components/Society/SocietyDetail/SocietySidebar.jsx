@@ -2,14 +2,17 @@ import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
 import AnnouncementModal from "./AnnouncementModal";
 import { EventModal } from "../../Calendar/EventModal/EventModal";
+import { formatDateTime } from "../../../utils/dateUtils";
 
-export default function SocietySidebar({ details, editMode, onAddAnnouncement, onAddEvent, tags }) {
+export default function SocietySidebar({ society, editMode, onAddAnnouncement, onAddEvent, tags }) {
     const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
     const [showEventModal, setShowEventModal] = useState(false);
+    const pinned = society.announcements?.find(a => a.pinned);
+    const nextEvent = society.events?.[0];
 
     return (
         <aside className={styles.sidebar}>
-            <SidebarContent pinned={details.announcements?.find(a => a.pinned)} next={details.upcomingEvents?.[0]} editMode={editMode} />
+            <SidebarContent pinned={pinned} next={nextEvent} editMode={editMode} />
             {editMode && <AddButtons onAnnouncement={() => setShowAnnouncementModal(true)} onEvent={() => setShowEventModal(true)} />}
             {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)} onSubmit={(d) => { onAddAnnouncement?.(d); setShowAnnouncementModal(false); }} tags={tags} />}
             {showEventModal && <EventModal onClose={() => setShowEventModal(false)} showReminder={false} customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEventModal(false); }} />}
@@ -42,7 +45,7 @@ function UpcomingSection({ event }) {
         <div className={styles.section}>
             <h4 className={styles.sectionTitle}>Up Next</h4>
             <p className={styles.eventTitle}>{event.title}</p>
-            <p className={styles.eventDate}>{formatEventDate(event)}</p>
+            <p className={styles.eventDate}>{formatDateTime(new Date(event.start_time))}</p>
         </div>
     );
 }
@@ -60,8 +63,3 @@ function AddButtons({ onAnnouncement, onEvent }) {
     );
 }
 
-function formatEventDate(event) {
-    const date = new Date(event.date);
-    const options = { weekday: "short", day: "numeric", month: "short" };
-    return `${date.toLocaleDateString("en-GB", options)} at ${event.time}`;
-}

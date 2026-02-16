@@ -51,6 +51,12 @@
     padding: 4px;
 }
 
+.hint {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+}
+
 .imageCard {
     aspect-ratio: 16/9;
     background-size: cover;
@@ -58,6 +64,51 @@
     border-radius: 8px;
     position: relative;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.imageCard.pinned {
+    border: 2px solid var(--primary);
+}
+
+.pinnedBadge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--primary);
+    color: var(--c-white);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pinBtn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 28px;
+    height: 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.imageCard:hover .pinBtn {
+    opacity: 1;
+}
+
+.pinBtn:hover {
+    background: var(--primary);
+    color: var(--c-white);
+    border-color: var(--primary);
 }
 
 .deleteBtn {
@@ -130,7 +181,6 @@
 
 .activeTab {
     color: var(--primary);
-    border-bottom-color: var(--primary);
 }
 
 .dropZone {

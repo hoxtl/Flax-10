@@ -10,13 +10,10 @@ function RatifiedBadge({ isRatified }) {
 export default function SocietyCard({ society, onClick }) {
     const bg = { backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)), url(${society.image})` };
     return (
-        <div className={styles.card} style={bg} onClick={() => onClick?.(society.id)}>
+        <div className={styles.card} style={bg} onClick={() => onClick?.(society)}>
             <div className={styles.info}>
-                <h3 className={styles.name}>{
-                    society.name}
-                    <RatifiedBadge isRatified={society.isRatified} />
-                </h3>
-                <p className={styles.count}>{society.memberCount} members</p>
+                <h3 className={styles.name}>{society.name}<RatifiedBadge isRatified={society.is_ratified} /></h3>
+                <p className={styles.count}>{society.member_count} members</p>
             </div>
         </div>
     );

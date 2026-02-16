@@ -1,9 +1,9 @@
 import { useState } from "react";
 import styles from "./tabs.module.css";
 
-export default function AboutTab({ details, editMode, onUpdate }) {
-    if (editMode) return <AboutEditor text={details.about} onUpdate={onUpdate} />;
-    return <AboutDisplay text={details.about} />;
+export default function AboutTab({ about, editMode, onUpdate }) {
+    if (editMode) return <AboutEditor text={about} onUpdate={onUpdate} />;
+    return <AboutDisplay text={about} />;
 }
 
 function AboutDisplay({ text }) {

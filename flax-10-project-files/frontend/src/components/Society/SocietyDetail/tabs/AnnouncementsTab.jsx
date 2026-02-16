@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from "./tabs.module.css";
 import AnnouncementModal from "../AnnouncementModal";
+import { formatShortDate } from "../../../../utils/dateUtils";
 
-export default function AnnouncementsTab({ details, editMode, onUpdate, tags }) {
+export default function AnnouncementsTab({ announcements = [], editMode, onUpdate, tags }) {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
-    const announcements = details.announcements || [];
 
-    const handleSave = (data) => { saveAnnouncement(data, details, onUpdate); setEditingAnnouncement(null); };
+    const handleSave = (data) => { saveAnnouncement(data, announcements, onUpdate); setEditingAnnouncement(null); };
 
     return (
         <>
@@ -17,22 +17,21 @@ export default function AnnouncementsTab({ details, editMode, onUpdate, tags }) 
     );
 }
 
-function saveAnnouncement(data, details, onUpdate) {
-    const existing = details.announcements || [];
+function saveAnnouncement(data, existing, onUpdate) {
     const updated = data.id ? existing.map(a => a.id === data.id ? formatAnnouncement(data) : a) : [...existing, formatAnnouncement(data)];
     onUpdate?.({ announcements: updated });
 }
 
 function formatAnnouncement(data) {
-    return { id: data.id || Date.now(), title: data.title, content: data.content, images: data.images,
-        image: data.images?.[0] || null, tagId: data.tagId, date: new Date().toISOString().split('T')[0], pinned: data.pinned };
+    return { id: data.id || Date.now(), title: data.title, content: data.content,
+        image_urls: data.images || [], tag: data.tag, pinned: data.pinned };
 }
 
 function AnnouncementsList({ announcements, editMode, onEdit, tags }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
     return (
         <div className={styles.announcementList}>
-            {announcements.map(a => <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)} tag={tags?.find(t => t.id === a.tagId)} />)}
+            {announcements.map(a => <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)} tag={tags?.find(t => t.id === a.tag)} />)}
         </div>
     );
 }
@@ -63,13 +62,13 @@ function CardHeader({ announcement, tag }) {
             <h4 className={styles.announcementTitle}>{announcement.title}</h4>
             {tag && <span className={styles.tagBadge} style={{ backgroundColor: tag.color }}>{tag.label}</span>}
             {announcement.pinned && <span className={styles.pinnedBadge}>Pinned</span>}
-            <span className={styles.announcementDate}>{formatDate(announcement.date)}</span>
+            <span className={styles.announcementDate}>{formatShortDate(new Date(announcement.created_at))}</span>
         </div>
     );
 }
 
 function AnnouncementImages({ announcement }) {
-    const images = announcement.images || (announcement.image ? [announcement.image] : []);
+    const images = (announcement.images || []).map(i => i.url || i);
     if (images.length === 0) return null;
     if (images.length === 1) return <img className={styles.announcementImage} src={images[0]} alt="Announcement" />;
     return <ImageGallery images={images} />;
@@ -83,6 +82,3 @@ function ImageGallery({ images }) {
     );
 }
 
-function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-}

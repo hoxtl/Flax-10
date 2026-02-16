@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "./tabs.module.css";
 import { MonthView } from "../../../Calendar/MonthView/MonthView";
 import { DatePickerButton } from "../../../Calendar/header/DatePickerButton";
-import { addMonths } from "../../../../utils/dateUtils";
+import { addMonths, formatMonthYear } from "../../../../utils/dateUtils";
 import { CalendarProvider, useEventModal } from "../../../../context/CalendarContext";
 import { EventModal } from "../../../Calendar/EventModal/EventModal";
 import TagFilterBar from "../TagFilterBar";
@@ -17,23 +17,23 @@ export default function CalendarTab(props) {
     );
 }
 
-function CalendarTabContent({ details, editMode, onUpdate, tags, onViewAnnouncement }) {
+function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
-    const events = filterEvents(convertEvents(details.upcomingEvents || [], tags), tagFilters);
+    const events = filterEvents(convertEvents(rawEvents, tags), tagFilters);
 
     const handleEventClick = (event, rect) => setPopupState({ event, rect });
     const closePopup = () => setPopupState({ event: null, rect: null });
 
     return (
         <div className={styles.calendarTab}>
-            {editMode && <TagManager tags={tags} onUpdate={(t) => onUpdate?.({ tags: t })} />}
+            {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
             <CalendarHeader date={selectedDate} setDate={setSelectedDate} />
             <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
             <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
                 readOnly={!editMode} onEventClick={editMode ? null : handleEventClick} customTags={tags} />
-            <SocietyEventModal onUpdate={onUpdate} events={details.upcomingEvents || []} tags={tags} editMode={editMode} />
+            <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
             {popupState.event && <EventDetailPopup event={popupState.event} tags={tags} anchorRect={popupState.rect}
                 onClose={closePopup} onViewAnnouncement={onViewAnnouncement} />}
         </div>
@@ -44,7 +44,7 @@ function CalendarHeader({ date, setDate }) {
     return (
         <div className={styles.calendarHeader}>
             <NavButtons date={date} setDate={setDate} />
-            <span className={styles.calendarTitle}>{formatTitle(date)}</span>
+            <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
         </div>
     );
 }
@@ -61,14 +61,18 @@ function NavButtons({ date, setDate }) {
     );
 }
 
-function SocietyEventModal({ onUpdate, events, tags, editMode }) {
+function SocietyEventModal({ eventHandlers, tags, editMode }) {
     const { isModalOpen, closeModal, modalEvent, modalInitialDate } = useEventModal();
     if (!isModalOpen || !editMode) return null;
 
     const handleSubmit = (data) => {
-        const newEvent = createEventFromForm(data, modalEvent);
-        const updated = modalEvent?.id ? events.map(e => e.id === modalEvent.id ? newEvent : e) : [...events, newEvent];
-        onUpdate?.({ upcomingEvents: updated });
+        if (data._delete && modalEvent?.id) {
+            eventHandlers?.onDelete?.(modalEvent.id);
+        } else if (modalEvent?.id) {
+            eventHandlers?.onUpdate?.(modalEvent.id, data);
+        } else {
+            eventHandlers?.onAdd?.(data);
+        }
         closeModal();
     };
 
@@ -78,26 +82,13 @@ function SocietyEventModal({ onUpdate, events, tags, editMode }) {
     );
 }
 
-function createEventFromForm(data, existingEvent) {
-    return { id: existingEvent?.id || Date.now(), title: data.title, date: data.date, time: data.time || "12:00",
-        endTime: data.endTime, tagId: data.tag, location: data.location, description: data.description };
-}
-
 function convertEvents(events, tags) {
-    return events.map(e => ({ ...e, start_time: `${e.date}T${e.time}`, end_time: `${e.date}T${addHour(e.time)}`,
-        tag_color: tags?.find(t => t.id === e.tagId)?.color }));
+    return events.map(e => ({ ...e, tag_color: tags?.find(t => t.id === e.tag)?.color }));
 }
 
 function filterEvents(events, tagFilters) {
     if (!tagFilters || tagFilters.length === 0) return events;
-    return events.filter(e => tagFilters.includes(e.tagId));
+    return events.filter(e => tagFilters.includes(e.tag));
 }
 
-function addHour(time) {
-    const [h, m] = time.split(":").map(Number);
-    return `${String((h + 1) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
 
-function formatTitle(date) {
-    return date.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
-}

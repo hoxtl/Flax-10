@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from "./SocietyInfo.module.css";
 
-export default function SocietyInfo({ society, details, editMode, onUpdateSociety }) {
+export default function SocietyInfo({ society, editMode, onUpdateSociety }) {
     return (
         <div className={styles.info}>
-            <BioSection text={details.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
-            <Stats society={society} details={details} />
-            <JoinButton isMember={details.isMember} isPrivate={society.isPrivate} editMode={editMode} />
+            <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
+            <Stats society={society} />
+            <JoinButton isMember={society.is_member} isPrivate={society.is_private} editMode={editMode} />
         </div>
     );
 }
@@ -48,12 +48,12 @@ function EditIcon({ onClick }) {
     return <button className={styles.editIcon} onClick={onClick} title="Edit">✎</button>;
 }
 
-function Stats({ society, details }) {
+function Stats({ society }) {
     return (
         <div className={styles.stats}>
-            <span>{society.memberCount} members</span>
-            {society.isRatified && <span className={styles.badge}>Ratified</span>}
-            {details.dateCreated && <span>Est. {formatYear(details.dateCreated)}</span>}
+            <span>{society.member_count} members</span>
+            {society.is_ratified && <span className={styles.badge}>Ratified</span>}
+            {society.date_created && <span>Est. {formatYear(society.date_created)}</span>}
         </div>
     );
 }

@@ -4,18 +4,18 @@ import styles from "./TagManager.module.css";
 const DEFAULT_COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"];
 const MAX_TAGS = 7;
 
-export default function TagManager({ tags = [], onUpdate }) {
+export default function TagManager({ tags = [], onAddTag, onDeleteTag }) {
     const [newTag, setNewTag] = useState({ label: "", color: getNextColor(tags) });
     const canAddMore = tags.length < MAX_TAGS;
 
-    const handleAdd = () => {
+    const handleAdd = async () => {
         if (!newTag.label.trim() || !canAddMore) return;
-        const tag = { id: newTag.label.toLowerCase().replace(/\s+/g, "-"), label: newTag.label.trim(), color: newTag.color };
-        onUpdate([...tags, tag]);
-        setNewTag({ label: "", color: getNextColor([...tags, tag]) });
+        const tagData = { label: newTag.label.trim(), color: newTag.color };
+        await onAddTag?.(tagData);
+        setNewTag({ label: "", color: getNextColor([...tags, tagData]) });
     };
 
-    const handleRemove = (id) => onUpdate(tags.filter(t => t.id !== id));
+    const handleRemove = (id) => onDeleteTag?.(id);
 
     return (
         <div className={styles.manager}>

@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { MOCK_SOCIETIES } from "./SocietyData";
 import SocietyCard from "../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import BasePill from "../components/BasePill";
@@ -11,7 +10,7 @@ const filterOptions = [
     { id: "unratified", label: "Unratified" }
 ];
 
-export default function AllSocieties({ onBack, onSelect, societies = MOCK_SOCIETIES }) {
+export default function AllSocieties({ onBack, onSelect, societies = [] }) {
     const [search, setSearch] = useState("");
     const [activeFilters, setActiveFilters] = useState(["all"]);
     const counts = countByType(societies);
@@ -41,8 +40,8 @@ export default function AllSocieties({ onBack, onSelect, societies = MOCK_SOCIET
 const filterSocieties = (list, search, filters) => list.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
     if (filters.includes("all")) return matchesSearch;
-    const matchesPill = (filters.includes("ratified") && s.isRatified) ||
-        (filters.includes("unratified") && !s.isRatified);
+    const matchesPill = (filters.includes("ratified") && s.is_ratified) ||
+        (filters.includes("unratified") && !s.is_ratified);
     return matchesSearch && matchesPill;
 });
 

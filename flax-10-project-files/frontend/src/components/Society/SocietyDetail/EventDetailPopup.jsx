@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import styles from "./EventDetailPopup.module.css";
+import { formatDateWithYear, formatTimeRange } from "../../../utils/dateUtils";
 
 export default function EventDetailPopup({ event, tags, anchorRect, onClose, onViewAnnouncement }) {
     const popupRef = useRef(null);
-    const tag = tags?.find(t => t.id === event?.tagId);
+    const tag = tags?.find(t => t.id === event?.tag);
     const position = usePopupPosition(popupRef, anchorRect);
 
     useEffect(() => {
@@ -50,8 +51,8 @@ function PopupBody({ event, tag }) {
     return (
         <div className={styles.body}>
             {event.location && <InfoLine icon="📍" value={event.location} />}
-            <InfoLine icon="📅" value={formatDate(event)} />
-            <InfoLine icon="🕐" value={formatTime(event)} />
+            <InfoLine icon="📅" value={formatDateWithYear(new Date(event.start_time))} />
+            <InfoLine icon="🕐" value={formatTimeRange(event.start_time, event.end_time, event.all_day)} />
             {tag && <InfoLine icon="🏷️" value={`Type: ${tag.label}`} />}
             {event.description && <Description text={event.description} />}
         </div>
@@ -74,14 +75,3 @@ function PopupFooter({ onViewAnnouncement }) {
     );
 }
 
-function formatDate(event) {
-    const date = new Date(event.date || event.start_time);
-    return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
-}
-
-function formatTime(event) {
-    if (event.allDay) return "All day";
-    const start = event.time || new Date(event.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-    const end = event.endTime || new Date(event.end_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-    return `${start} to ${end}`;
-}
