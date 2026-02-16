@@ -6,7 +6,7 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety }) {
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <Stats society={society} />
-            <JoinButton isMember={society.is_member} isPrivate={society.is_private} editMode={editMode} />
+            <JoinButton isMember={society.is_member} editMode={editMode} />
         </div>
     );
 }
@@ -58,31 +58,13 @@ function Stats({ society }) {
     );
 }
 
-function JoinButton({ isMember, isPrivate, editMode }) {
-    const [status, setStatus] = useState(isMember ? "joined" : "not_joined");
-    const handleClick = () => handleJoinClick(status, isPrivate, setStatus);
-
+function JoinButton({ isMember, editMode }) {
+    const [joined, setJoined] = useState(isMember);
     if (editMode) return null;
 
-    return <button className={getButtonClass(status)} onClick={handleClick}>{getButtonLabel(status)}</button>;
-}
-
-function handleJoinClick(status, isPrivate, setStatus) {
-    if (status === "joined") return setStatus("not_joined");
-    if (status === "requested") return setStatus("not_joined");
-    return setStatus(isPrivate ? "requested" : "joined");
-}
-
-function getButtonLabel(status) {
-    if (status === "joined") return "Joined";
-    if (status === "requested") return "Requested";
-    return "Join Society";
-}
-
-function getButtonClass(status) {
-    if (status === "joined") return styles.joinedBtn;
-    if (status === "requested") return styles.requestedBtn;
-    return styles.joinBtn;
+    const className = joined ? styles.joinedBtn : styles.joinBtn;
+    const label = joined ? "Joined" : "Join Society";
+    return <button className={className} onClick={() => setJoined(!joined)}>{label}</button>;
 }
 
 function formatYear(dateStr) {
