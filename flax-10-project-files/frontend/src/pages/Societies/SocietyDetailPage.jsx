@@ -3,10 +3,10 @@ import styles from "./SocietyDetailPage.module.css";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
 import SocietyHero from "../../components/Society/SocietyDetail/SocietyHero";
 import SocietyInfo from "../../components/Society/SocietyDetail/SocietyInfo";
-import SocietyTabs from "../../components/Society/SocietyDetail/SocietyTabs";
+import SocietyTabs from "../../components/Society/SocietyDetail/tabs/SocietyTabs";
 import SocietySidebar from "../../components/Society/SocietyDetail/SocietySidebar";
-import CoverImageModal from "../../components/Society/SocietyDetail/CoverImageModal";
-import ImageGalleryModal from "../../components/Society/SocietyDetail/ImageGalleryModal";
+import CoverImageModal from "../../components/Society/SocietyDetail/imageHandlers/CoverImageModal";
+import ImageGalleryModal from "../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal";
 
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);

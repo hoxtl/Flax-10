@@ -1,5 +1,5 @@
-import { isSameDay } from '../../../../utils/dateUtils';
-import { getAllDayVisualRange } from '../../../../utils/eventDisplayUtils';
+import { isSameDay } from '../../utils/dateUtils';
+import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 
 export function calculateBarStyle(event, days) {
     const range = getAllDayVisualRange(event);
