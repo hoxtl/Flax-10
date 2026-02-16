@@ -1,12 +1,13 @@
 import React from 'react';
 import * as Components from '../Authentication/AuthComponents';
+import { Link } from 'react-router-dom';
 
 /**
  * Authentication component for user sign in
  */
 export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading }) => {
   return (
-    <Components.SignInContainer signIn={signIn}>
+    <Components.SignInContainer $signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Sign in</Components.Title>
         
@@ -28,7 +29,9 @@ export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading })
           disabled={loading}
         />
         
-        <Components.Anchor href='#'>Reset your password here</Components.Anchor>
+        <Components.PasswordResetLink to='/reset-password'>
+          Reset your password here
+        </Components.PasswordResetLink>
         
         <Components.Button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Sign In'}
