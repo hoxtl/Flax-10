@@ -1,4 +1,4 @@
-import {formatTime, formatDuration } from '../../utils/moduleUtils.js';
+import { formatTime, formatDuration } from './utils/moduleUtils.js';
 import styles from './ModuleDetails.module.css';
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {

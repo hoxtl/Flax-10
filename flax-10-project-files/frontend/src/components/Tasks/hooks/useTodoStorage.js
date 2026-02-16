@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { normalizeItem } from "../../utils/tasks/taskUtils";
+import { normalizeItem } from "../utils/taskUtils";
 
 const STORAGE_KEY = "flax_todo_items_v1";
 const AUTO_CLEAR_MS = 2 * 60 * 60 * 1000;
@@ -30,13 +30,13 @@ function loadItems() {
 function saveItems(items) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {}
+  } catch { }
 }
 
 function setupAutoClear(items, setItems) {
   clearExpiredTasks(items, setItems);
   const nextExpiry = getNextExpiry(items);
-  
+
   if (!nextExpiry) return;
 
   const id = scheduleNextClear(nextExpiry, setItems);

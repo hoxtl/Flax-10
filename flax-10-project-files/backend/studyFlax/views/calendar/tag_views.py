@@ -16,10 +16,6 @@ def tag_list(request):
 
 
 def get_tags(request):
-<<<<<<< HEAD
-=======
-    # Get default tags OR user's custom tags
->>>>>>> main
     tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True))
     serialiser = TagSerialiser(tags, many=True)
     return Response(serialiser.data)
@@ -30,10 +26,6 @@ def create_tag(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-<<<<<<< HEAD
-=======
-    # Save with user assignment
->>>>>>> main
     serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
@@ -57,7 +49,6 @@ def tag_detail(request, pk):
     if request.method == 'DELETE':
         return delete_tag(tag)
 
-
 def update_tag(tag, data):
     serialiser = TagSerialiser(tag, data=data, partial=True)
     if not serialiser.is_valid():
@@ -78,11 +69,6 @@ def delete_tag(tag):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def category_list(request):
-<<<<<<< HEAD
-    categories = Category.objects.all()
-=======
-    # Get default categories OR user's custom categories
     categories = Category.objects.filter(Q(user=request.user) | Q(is_default=True))
->>>>>>> main
     serialiser = CategorySerialiser(categories, many=True)
     return Response(serialiser.data)

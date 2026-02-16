@@ -14,17 +14,11 @@ def timetable_import(request):
     if not source_url:
         return Response({"detail": "source_url is required"}, status=status.HTTP_400_BAD_REQUEST)
     
-<<<<<<< HEAD
     if not source_url.startswith(('http://', 'https://')):
         return Response({"detail": "Invalid URL protocol. Must start with http:// or https://"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         result = sync_timetable(source_url, request.user)
-=======
-    try:
-        # Pass user to sync_timetable
-        result = sync_timetable(source_url, user=request.user)
->>>>>>> main
     except ValueError as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
     

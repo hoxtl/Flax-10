@@ -1,12 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./ProfileDropdown.module.css";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Dashboard/ProfileDropdown.jsx
 import { getInitials } from "../Authentication/utils/userUtils";
 import { getPreferredFirstName, getDisplayName } from "../Authentication/utils/userDisplay";
-=======
-import { getInitials } from "../utils/userUtils";
-import { getUserProfile } from "../api/userService";
->>>>>>> main:flax-10-project-files/frontend/src/components/ProfileDropdown.jsx
+import { getUserProfile } from "../../api/userService";
 
 function isClickOutside(element, event) {
   if (!element) return false;

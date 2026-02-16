@@ -6,36 +6,22 @@ from icalendar import Calendar
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.calendar.timetableSourceModel import TimetableSource
 
-<<<<<<< HEAD
-=======
 
->>>>>>> main
 def sync_timetable(source_url, user=None):
     source_key = get_source_key(source_url)
     try:
         events = load_events(source_url, source_key)
-<<<<<<< HEAD
         created, updated = upsert_events(events, user)
         update_source_status(source_url, user, True, "")
-=======
-        created, updated = upsert_events(events, user=user)
-        update_source_status(source_url, True, "")
->>>>>>> main
         return {"created": created, "updated": updated, "source_url": source_url}
     except Exception as exc:
         update_source_status(source_url, user, False, str(exc))
         raise
 
-<<<<<<< HEAD
 def sync_timetable_if_needed(user, min_interval=timedelta(hours=6)):
     if not user.is_authenticated:
         return None
     source = TimetableSource.objects.filter(user=user).first()
-=======
-
-def sync_timetable_if_needed(min_interval=timedelta(hours=6)):
-    source = TimetableSource.objects.first()
->>>>>>> main
     if not source or not should_sync(source, min_interval):
         return None
     return sync_timetable(source.source_url, user)
@@ -109,7 +95,6 @@ def parse_vevent(vevent, source_key):
     }
 
 
-<<<<<<< HEAD
 def parse_ics_datetime(value):
     if not value:
         return None
@@ -135,8 +120,6 @@ def get_source_key(url):
     host = urlparse(url).netloc or "timetable"
     return host.replace("www.", "")
 
-=======
->>>>>>> main
 def upsert_events(events, user=None):
     created = updated = 0
     for data in events:
@@ -147,7 +130,6 @@ def upsert_events(events, user=None):
             apply_event_updates(existing, data)
             updated += 1
         else:
-<<<<<<< HEAD
             create_event(data, user)
             created += 1
     return created, updated
@@ -159,21 +141,6 @@ def find_existing_event(source, external_id, user=None):
     if user:
         qs = qs.filter(user=user)
     return qs.first()
-=======
-            create_event(data, user=user)
-            created += 1
-    return created, updated
-
-
-def find_existing_event(source, external_id, user=None):
-    if not source or not external_id:
-        return None
-    query = CalendarEvent.objects.filter(source=source, external_id=external_id)
-    if user:
-        query = query.filter(user=user)
-    return query.first()
-
->>>>>>> main
 
 def apply_event_updates(event, data):
     for field in ("title", "description", "start_time", "end_time", "location"):
@@ -181,10 +148,6 @@ def apply_event_updates(event, data):
             setattr(event, field, data[field])
     event.save()
 
-<<<<<<< HEAD
-=======
-
->>>>>>> main
 def create_event(data, user=None):
     CalendarEvent.objects.create(
         user=user,
@@ -197,12 +160,7 @@ def create_event(data, user=None):
         external_id=data.get("external_id"),
     )
 
-<<<<<<< HEAD
 def update_source_status(source_url, user, synced, error):
-=======
-
-def update_source_status(source_url, synced, error):
->>>>>>> main
     values = {"last_error": error}
     if synced:
         values["last_synced"] = django_timezone.now()

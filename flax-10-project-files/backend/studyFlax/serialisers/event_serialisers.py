@@ -19,7 +19,7 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
         'start_time', 'end_time', 'location', 'tag',
         'tag_name', 'tag_details', 'recurrence_details',
         'recurrence_rule', 'reminder_minutes',
-        'source', 'external_id']
+        'source', 'external_id', 'module']
 
 class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     recurrence_rule = serializers.JSONField(required=False, allow_null=True)
