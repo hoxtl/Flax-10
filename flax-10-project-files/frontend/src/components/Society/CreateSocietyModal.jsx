@@ -68,7 +68,7 @@ function CollaboratorsField({ value, onChange }) {
         <div className={styles.field}>
             <label className={styles.label}>Collaborators</label>
             <input className={styles.input} value={value} onChange={e => onChange(e.target.value)}
-                placeholder="Add emails separated by commas" />
+                placeholder="Add usernames separated by commas" />
             <p className={styles.hint}>Collaborators can edit society details and manage events</p>
         </div>
     );
