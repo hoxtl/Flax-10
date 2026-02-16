@@ -3,13 +3,13 @@ import styles from "./TaskPanel.module.css";
 import TaskHeader from "./TaskHeader";
 import TaskList from "./TaskList";
 import TaskInput from "./TaskInput";
-import { useTodoStorage } from "../../hooks/useTodoStorage";
-import { useTodoPanelState } from "../../hooks/useTodoPanelState";
-import { useTaskMenu } from "../../hooks/useTaskMenu";
+import { useTodoStorage } from "../../hooks/tasks/useTodoStorage";
+import { useTodoPanelState } from "../../hooks/tasks/useTodoPanelState";
+import { useTaskMenu } from "../../hooks/tasks/useTaskMenu";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
-import { useTaskOperations } from "../../hooks/useTaskOperations";
-import { useTaskReorder } from "../../hooks/useTaskReorder";
-import { partitionTasks } from "../../utils/taskListUtils";
+import { useTaskOperations } from "../../hooks/tasks/useTaskOperations";
+import { useTaskReorder } from "../../hooks/tasks/useTaskReorder";
+import { partitionTasks } from "../../utils/tasks/taskListUtils";
 
 /**
  * Main to-do list panel component that contains the header, list, and input components. 
