@@ -178,12 +178,19 @@ export function useSocietyDetail(societyId) {
         setSociety(prev => ({ ...prev, member_count: Math.max(0, prev.member_count - 1) }));
     };
 
+    const addCollaborator = async (identifier, role) => {
+        const member = await api.addCollaborator(societyId, identifier, role);
+        setMembers(prev => [...prev, member]);
+        setSociety(prev => ({ ...prev, member_count: prev.member_count + 1 }));
+        return member;
+    };
+
     return {
         society, loading, error, refresh: loadSociety, updateSociety,
         addTag, updateTag, deleteTag,
         addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent,
         joinSociety, leaveSociety, deleteSociety,
-        members, fetchMembers, updateMemberRole, removeMember
+        members, fetchMembers, updateMemberRole, removeMember, addCollaborator
     };
 }

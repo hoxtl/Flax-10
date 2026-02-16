@@ -41,7 +41,7 @@ def update_society(request, society):
     serialiser.save()
     handle_image_urls(society, request.data)
     society.refresh_from_db()
-    return Response(SocietyDetailSerialiser(society).data)
+    return get_society_detail(request.user, society)
 
 
 def handle_image_urls(society, data):

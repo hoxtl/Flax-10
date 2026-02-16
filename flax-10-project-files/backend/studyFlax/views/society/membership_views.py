@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.society import SocietyMembership
+from studyFlax.models.auth.userModel import User
 from studyFlax.serialisers import SocietyMembershipSerialiser
 from .helpers import (
     get_society_or_404, get_membership, is_society_admin,
@@ -19,13 +20,14 @@ def membership_list(request, society_id):
 
     if request.method == 'GET':
         return get_members(society)
+    if 'username' in request.data or 'email' in request.data:
+        return add_collaborator(request, society)
     return join_society(request.user, society)
 
 
 def get_members(society):
     members = SocietyMembership.objects.filter(society=society)
-    serialiser = SocietyMembershipSerialiser(members, many=True)
-    return Response(serialiser.data)
+    return Response(SocietyMembershipSerialiser(members, many=True).data)
 
 
 def join_society(user, society):
@@ -33,6 +35,29 @@ def join_society(user, society):
         return Response({'error': 'Already a member'}, status=status.HTTP_400_BAD_REQUEST)
     membership = SocietyMembership.objects.create(user=user, society=society)
     return Response(SocietyMembershipSerialiser(membership).data, status=status.HTTP_201_CREATED)
+
+
+def add_collaborator(request, society):
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
+    user = find_user_by_identifier(request.data)
+    if not user:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    if get_membership(user, society):
+        return Response({'error': 'Already a member'}, status=status.HTTP_400_BAD_REQUEST)
+    role = request.data.get('role', 'editor')
+    membership = SocietyMembership.objects.create(user=user, society=society, role=role)
+    return Response(SocietyMembershipSerialiser(membership).data, status=status.HTTP_201_CREATED)
+
+
+def find_user_by_identifier(data):
+    username = data.get('username')
+    email = data.get('email')
+    if username:
+        return User.objects.filter(username=username).first()
+    if email:
+        return User.objects.filter(email=email).first()
+    return None
 
 
 @api_view(['DELETE', 'PATCH'])
