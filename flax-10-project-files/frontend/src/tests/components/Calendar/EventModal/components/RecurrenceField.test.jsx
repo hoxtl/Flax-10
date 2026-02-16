@@ -56,9 +56,7 @@ describe('RecurrenceField', () => {
 
     it('should call onChange when end date changes', () => {
         render(<RecurrenceField value={{ frequency: 'daily', end_date: '2025-01-01' }} onChange={mockOnChange} />);
-        // Find date input
         const dateInput = document.querySelector('.end-date-input'); // class check or type check
-        // Or getByDisplayValue
         expect(dateInput).toBeInTheDocument();
 
         fireEvent.change(dateInput, { target: { value: '2025-02-01' } });
