@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./tabs.module.css";
+import styles from "../tabs.module.css";
 import AnnouncementModal from "./AnnouncementModal";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
 

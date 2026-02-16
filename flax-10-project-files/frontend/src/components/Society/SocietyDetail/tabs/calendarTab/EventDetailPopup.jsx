@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import styles from "./EventDetailPopup.module.css";
-import { formatDateWithYear, formatTimeRange } from "../../../../../utils/dateUtils";
+import { formatDateWithYear, formatTimeRange } from "../../../../Calendar/utils/dateUtils";
 
 export default function EventDetailPopup({ event, tags, anchorRect, onClose, onViewAnnouncement }) {
     const popupRef = useRef(null);

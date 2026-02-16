@@ -1,6 +1,6 @@
-import { useTimeSlotDrop } from '../../../hooks/useTimeSlotDrop';
+import { useTimeSlotDrop } from '../../hooks/useTimeSlotDrop';
 import { useResizeHighlight } from '../../../../context/ResizeHighlightContext';
-import { isSameDay } from '../../../../utils/dateUtils';
+import { isSameDay } from '../../utils/dateUtils';
 import { SLOT_HEIGHT } from '../../calendarConstants';
 import { HighlightOverlay } from './HighlightOverlay';
 

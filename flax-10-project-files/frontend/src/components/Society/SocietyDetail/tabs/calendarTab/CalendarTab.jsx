@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./tabs.module.css";
+import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";
 import { DatePickerButton } from "../../../../Calendar/header/DatePickerButton";
 import { addMonths, formatMonthYear } from "../../../../Calendar/utils/dateUtils";

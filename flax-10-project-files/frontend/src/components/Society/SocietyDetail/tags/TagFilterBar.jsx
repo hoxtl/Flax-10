@@ -1,4 +1,4 @@
-import BasePill from "../../BasePill";
+import BasePill from "../../../Tags/BasePill";
 import styles from "./TagFilterBar.module.css";
 
 export default function TagFilterBar({ tags, activeFilters = [], onFilterChange }) {

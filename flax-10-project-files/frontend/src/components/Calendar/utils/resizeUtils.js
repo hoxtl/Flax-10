@@ -2,7 +2,7 @@
  * Utility functions for handling event resizing in the calendar.
  */
 
-import { SLOT_HEIGHT, SNAP_INTERVAL, pixelsToMinutes } from "../components/Calendar/calendarConstants";
+import { SLOT_HEIGHT, SNAP_INTERVAL, pixelsToMinutes } from "../calendarConstants";
 
 /**
  * Calculates the new height of the event based on the mouse position.
