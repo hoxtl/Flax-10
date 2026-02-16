@@ -1,12 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import TaskRow from "../../../components/Tasks/TaskRow";
 
 describe("TaskRow", () => {
-  it("toggles done checkbox", () => {
+  it("calls onToggleDone when checkbox changes", () => {
     const onToggleDone = vi.fn();
     render(
       <TaskRow
-        item={{ id: 1, title: "A", done: false, urgent: false }}
+        item={{ id: 99, title: "Toggle", done: false, urgent: false }}
         isEditing={false}
         editText=""
         setEditText={() => {}}
@@ -18,8 +19,29 @@ describe("TaskRow", () => {
         isMenuActive={false}
       />
     );
+
     fireEvent.click(screen.getByRole("checkbox"));
-    expect(onToggleDone).toHaveBeenCalledWith(1);
+    expect(onToggleDone).toHaveBeenCalledWith(99);
+  });
+
+  it("TaskLabel applies done class when not urgent but done=true", () => {
+    render(
+      <TaskRow
+        item={{ id: 1, title: "Done task", done: true, urgent: false }}
+        isEditing={false}
+        editText=""
+        setEditText={() => {}}
+        onToggleDone={() => {}}
+        onSaveEdit={() => {}}
+        onCancelEdit={() => {}}
+        onStartEdit={() => {}}
+        onDotsClick={() => {}}
+        isMenuActive={false}
+      />
+    );
+
+    const label = screen.getByText("Done task");
+    expect(label.className).not.toBe("");
   });
 
   it("non-urgent label branch renders", () => {
