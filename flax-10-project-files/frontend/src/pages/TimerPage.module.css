@@ -338,4 +338,59 @@
 
 .notificationBtn:hover {
     background: #0056b3;
+}.soundSelectorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.soundControls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.soundSelect {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.volumeSlider {
+    width: 100px;
+    accent-color: var(--primary);
+}
+
+.taskInputContainer {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.taskInput {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 1.2rem;
+    text-align: center;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.taskInput:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+}
+
+.taskInput::placeholder {
+    color: #9ca3af;
+    font-style: italic;
 }

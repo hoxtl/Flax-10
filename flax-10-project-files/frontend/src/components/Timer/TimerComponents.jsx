@@ -96,3 +96,54 @@ export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
         </div>
     );
 };
+
+import { noiseGenerator } from '../../utils/noiseUtils';
+
+export const SoundSelector = () => {
+    const [noiseType, setNoiseType] = useState('none');
+
+    useEffect(() => {
+        if (noiseType === 'none') {
+            noiseGenerator.stop();
+        } else {
+            noiseGenerator.play(noiseType);
+            noiseGenerator.setVolume(0.5); // Default comfortable volume
+        }
+        return () => noiseGenerator.stop();
+    }, [noiseType]);
+
+    return (
+        <div className={styles.soundSelectorContainer}>
+            <div className={styles.soundControls}>
+                <span className={styles.label}>Calming Sound:</span>
+                <select
+                    className={styles.soundSelect}
+                    value={noiseType}
+                    onChange={(e) => setNoiseType(e.target.value)}
+                >
+                    <option value="none">None 🔇</option>
+                    <option value="white">White Noise 🌊</option>
+                    <option value="pink">Pink Noise 🌧️</option>
+                    <option value="brown">Brown Noise 🏔️</option>
+                </select>
+            </div>
+        </div>
+    );
+};
+
+export const TaskInput = () => {
+    const [task, setTask] = useState('');
+
+    return (
+        <div className={styles.taskInputContainer}>
+            {/* <label className={styles.label}>Current Focus:</label> */}
+            <input
+                type="text"
+                className={styles.taskInput}
+                placeholder="What are you working on? 🎯"
+                value={task}
+                onChange={(e) => setTask(e.target.value)}
+            />
+        </div>
+    );
+};

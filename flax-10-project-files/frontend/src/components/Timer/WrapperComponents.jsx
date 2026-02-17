@@ -1,6 +1,6 @@
 import styles from '../../pages/TimerPage.module.css';
 import TreeAnimation from './TreeAnimation';
-import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings } from './TimerComponents';
+import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
@@ -18,12 +18,14 @@ const TimerHeader = ({ onOpenHistory }) => (
 export const MainSection = ({ t, onOpenHistory }) => (
     <>
         <TimerHeader onOpenHistory={onOpenHistory} />
+        <TaskInput />
         <TreeAnimation progress={t.progress} mode={t.mode} />
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
         <SessionStatus current={t.completedSessions} total={t.targetSessions} />
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
         <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} />
         <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
+        <SoundSelector />
     </>
 );
 
