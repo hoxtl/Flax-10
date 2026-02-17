@@ -10,7 +10,7 @@ export const getHistory = () => {
 };
 
 /** Creates a completed session entry with calculated timestamps */
-export const saveSession = (workDuration, breakDuration, sessionCount, studyBlockId) => {
+export const saveSession = (workDuration, breakDuration, sessionCount, studyBlockId, task = '') => {
     const history = getHistory();
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - workDuration * 60000);
@@ -24,6 +24,7 @@ export const saveSession = (workDuration, breakDuration, sessionCount, studyBloc
         breakDuration: breakDuration,
         sessionCount: sessionCount,
         studyBlockId: studyBlockId || Date.now(), // Fallback
+        task: task,
         status: 'Completed'
     };
     localStorage.setItem(HISTORY_KEY, JSON.stringify([session, ...history]));

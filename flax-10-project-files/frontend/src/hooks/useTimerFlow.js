@@ -8,7 +8,7 @@ import { saveSession } from '../utils/historyUtils';
  */
 /** Logic to advance to next session or goal state */
 const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
-    saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current);
+    saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current, t.task);
     const next = t.completedSessions + 1;
     t.setCompletedSessions(next);
 

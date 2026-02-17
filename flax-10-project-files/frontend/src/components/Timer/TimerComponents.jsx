@@ -131,18 +131,22 @@ export const SoundSelector = () => {
     );
 };
 
-export const TaskInput = () => {
-    const [task, setTask] = useState('');
+export const TaskInput = ({ value, onChange }) => {
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.target.blur();
+        }
+    };
 
     return (
         <div className={styles.taskInputContainer}>
-            {/* <label className={styles.label}>Current Focus:</label> */}
             <input
                 type="text"
                 className={styles.taskInput}
                 placeholder="What are you working on? 🎯"
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                onKeyDown={handleKeyDown}
             />
         </div>
     );

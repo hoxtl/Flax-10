@@ -28,7 +28,8 @@ const normalizeSession = (s) => {
 const createBlock = (id, s) => ({
     id, sessions: [s], totalDuration: s.duration,
     totalBreak: s.breakDuration || 0,
-    startTime: s.startTime, endTime: s.endTime, date: s.date
+    startTime: s.startTime, endTime: s.endTime, date: s.date,
+    task: s.task // Capture the task from the session
 });
 
 /** Aggregate session data into an existing block */

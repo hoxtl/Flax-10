@@ -24,6 +24,7 @@ const StudyBlock = ({ block }) => (
             <span className={styles.blockDate}>{formatDate(block.startTime)}</span>
             <span className={styles.blockTime}>{formatTimeRange(block.startTime, block.endTime)}</span>
         </div>
+        {block.task && <div style={{ marginBottom: '0.5rem', fontWeight: 600, color: '#4b5563' }}>🎯 {block.task}</div>}
         <StatsRow block={block} />
     </div>
 );
