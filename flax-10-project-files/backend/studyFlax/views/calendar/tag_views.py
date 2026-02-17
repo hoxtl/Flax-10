@@ -33,7 +33,6 @@ def create_tag(request):
 @api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def tag_detail(request, pk):
-    # Filter by user or default tags
     try:
         tag = Tag.objects.get(Q(pk=pk) & (Q(user=request.user) | Q(is_default=True)))
     except Tag.DoesNotExist:
@@ -55,6 +54,7 @@ def update_tag(tag, data):
     serialiser.save()
     return Response(serialiser.data)
 
+<<<<<<< HEAD
 
 def update_default_tag_icon(tag, data):
     icon = data.get('icon')
@@ -65,6 +65,8 @@ def update_default_tag_icon(tag, data):
     return Response(TagSerialiser(tag).data)
 
 
+=======
+>>>>>>> main
 def delete_tag(tag):
     if tag.is_default:
         return Response({'error': 'Cannot delete default tags'}, status=status.HTTP_400_BAD_REQUEST)
@@ -72,7 +74,6 @@ def delete_tag(tag):
         return Response({'error': 'Cannot delete Other tag'}, status=status.HTTP_400_BAD_REQUEST)
     tag.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

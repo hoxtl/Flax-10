@@ -19,7 +19,7 @@ function useToastRefs() {
     return {
         queue: useRef([]),
         seenIds: useRef(new Set()),
-        initialized: useRef(false)
+        initialised: useRef(false)
     };
 }
 
@@ -35,14 +35,14 @@ function useShowNext(queueRef, setCurrentToast) {
 function useToastEffect(notifications, loading, refs, currentToast, showNext) {
     useEffect(() => {
         if (loading) return;
-        if (!refs.initialized.current) return initialize(notifications, refs);
+        if (!refs.initialised.current) return initialise(notifications, refs);
         queueNew(notifications, refs, currentToast, showNext);
     }, [notifications, loading, currentToast, showNext, refs]);
 }
 
-function initialize(notifications, refs) {
+function initialise(notifications, refs) {
     notifications.forEach(n => refs.seenIds.current.add(n.id));
-    refs.initialized.current = true;
+    refs.initialised.current = true;
 }
 
 function queueNew(notifications, refs, currentToast, showNext) {

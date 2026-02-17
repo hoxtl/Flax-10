@@ -28,7 +28,6 @@ function DropdownHeader({ user, profilePhotoUrl }) {
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
 
-  // ✅ FIX: define displayName (was undefined)
   const displayName =
     user?.name ||
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||

@@ -2,6 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
+from studyFlax.views.timerViews import StudySessionViewSet
+router.register(r'timer/history', StudySessionViewSet, basename='study-session')
 
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date

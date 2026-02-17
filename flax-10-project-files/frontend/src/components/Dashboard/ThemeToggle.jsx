@@ -4,7 +4,6 @@ import styles from './ThemeToggle.module.css';
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
-
   return (
     <button 
       className={styles.themeToggle} 
@@ -16,5 +15,4 @@ export default function ThemeToggle() {
         {isDark ? '🌙' : '☀️'}
       </div>
     </button>
-  );
-}
+  );}

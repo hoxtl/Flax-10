@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * Component to display field error messages
  */
@@ -24,6 +22,4 @@ export const ErrorMessage = ({ error }) => {
             border: "1px solid var(--border)",
         }}>
             {error}
-        </div>
-    );
-};
+        </div>);};

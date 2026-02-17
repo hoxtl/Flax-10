@@ -3,6 +3,7 @@ import { WeekdayHeader } from './WeekdayHeader';
 import { WeekRow } from './WeekRow';
 import './MonthView.css';
 
+<<<<<<< HEAD
 /*
     Shows full month view of the calendar.
     Props are optional - falls back to CalendarContext if not provided.
@@ -14,6 +15,12 @@ export function MonthView({ selectedDate: propDate, events: propEvents, onDateSe
 
     const handleDateSelect = onDateSelect || createDispatchHandler(contextDispatch);
 
+=======
+export function MonthView() {
+    const { selectedDate, events } = useCalendar();
+    const dispatch = useCalendarDispatch();
+    const weeks = getMonthWeeks(selectedDate);
+>>>>>>> main
     return (
         <div className="month-view">
             <WeekdayHeader />

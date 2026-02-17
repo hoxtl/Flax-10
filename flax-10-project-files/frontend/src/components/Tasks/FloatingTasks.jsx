@@ -5,25 +5,23 @@ import styles from "./FloatingTasks.module.css";
 
 const OPEN_KEY = "flax_todo_open_v1";
 
-export default function FloatingTasks() {
-  const fabRef = useRef(null);
+function loadOpenState() {
+  try {
+    const raw = localStorage.getItem(OPEN_KEY);
+    return raw ? JSON.parse(raw) : false;
+  } catch {
+    return false;
+  }
+}
 
-  const [open, setOpen] = useState(() => {
-    try {
-      const raw = localStorage.getItem(OPEN_KEY);
-      return raw ? JSON.parse(raw) : false;
-    } catch {
-      return false;
-    }
-  });
+function saveOpenState(open) {
+  try {
+    localStorage.setItem(OPEN_KEY, JSON.stringify(open));
+  } catch {}
+}
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(OPEN_KEY, JSON.stringify(open));
-    } catch {}
-  }, [open]);
-
-  return createPortal(
+function FloatingTasksPortal({ open, setOpen, fabRef }) {
+  return (
     <>
       <button
         ref={fabRef}
@@ -34,13 +32,15 @@ export default function FloatingTasks() {
       >
         To-do
       </button>
+      <ToDoPanel open={open} onClose={() => setOpen(false)} fabRef={fabRef} />
+    </>);}
 
-      <ToDoPanel 
-        open={open} 
-        onClose={() => setOpen(false)}
-        fabRef={fabRef}
-      />
-    </>,
+export default function FloatingTasks() {
+  const fabRef = useRef(null);
+  const [open, setOpen] = useState(loadOpenState);
+  useEffect(() => saveOpenState(open), [open]);
+  return createPortal(
+    <FloatingTasksPortal open={open} setOpen={setOpen} fabRef={fabRef} />,
     document.body
   );
 }
