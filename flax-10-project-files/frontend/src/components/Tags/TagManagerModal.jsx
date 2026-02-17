@@ -51,57 +51,49 @@ function ModalHeader({ onClose }) {
 
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
     if (editingId || isAdding) {
-        // Remove default icon
-        const initialData = editingId ? tags.find(t => t.id === editingId) : { label: '', color: '#000000', icon: '' };
-        return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} />;
+        const tag = editingId ? tags.find(t => t.id === editingId) : null;
+        const initialData = tag || { label: '', color: '#000000', icon: '' };
+        const isDefault = tag?.label?.toLowerCase() === 'other';
+        return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isDefault={isDefault} />;
     }
     return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
 }
 
 // ... (TagList, TagItem, etc. remain)
 
-function TagForm({ initialData, onSave, onCancel }) {
+function TagForm({ initialData, onSave, onCancel, isDefault = false }) {
     const [form, setForm] = useState(initialData);
     const [error, setError] = useState('');
 
-    const isIconValid = (icon) => {
-        if (!icon) return false;
-        const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
-        const isPlainAlphaNumeric = /^[a-zA-Z0-9]+$/.test(icon);
-        return hasEmoji && !isPlainAlphaNumeric;
-    };
-
     const handleSaveClick = () => {
-        if (!form.label.trim()) {
-            setError("Name is required.");
-            return;
-        }
-        if (!form.icon) {
-            setError("Icon is required.");
-            return;
-        }
-        if (!isIconValid(form.icon)) {
-            setError("Only emojis allowed.");
-            return;
-        }
+        if (!isDefault && !form.label.trim()) return setError("Name is required.");
+        if (!form.icon) return setError("Icon is required.");
+        if (!isIconValid(form.icon)) return setError("Only emojis allowed.");
         setError('');
         onSave(form);
     };
 
     const handleChange = (field, value) => {
         setForm({ ...form, [field]: value });
-        if (error) setError(''); // Clear error on change
+        if (error) setError('');
     };
 
     return (
         <div className={`${styles.content} ${styles.form}`}>
-            <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" />
-            <ColorInput value={form.color} onChange={v => handleChange('color', v)} />
+            <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isDefault} />
+            {!isDefault && <ColorInput value={form.color} onChange={v => handleChange('color', v)} />}
             <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => handleChange('icon', v)} placeholder="e.g. 🏋️" />
             {error && <div className={styles.error}>{error}</div>}
             <FormActions onSave={handleSaveClick} onCancel={onCancel} />
         </div>
     );
+}
+
+function isIconValid(icon) {
+    if (!icon) return false;
+    const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
+    const isPlainAlphaNumeric = /^[a-zA-Z0-9]+$/.test(icon);
+    return hasEmoji && !isPlainAlphaNumeric;
 }
 
 /**
@@ -161,11 +153,11 @@ function TagActions({ id, onEdit, onDelete, isDeletable }) {
 
 
 
-function TextInput({ label, value, onChange, placeholder }) {
+function TextInput({ label, value, onChange, placeholder, disabled = false }) {
     return (
         <label>
             {label}
-            <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
+            <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} />
         </label>
     );
 }

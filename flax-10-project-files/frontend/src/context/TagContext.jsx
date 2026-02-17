@@ -2,16 +2,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { fetchTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
 
 const TagContext = createContext(null);
-
-const ICON_MAP = {
-    'class': '📚', 'classes': '📚',
-    'study': '🧠',
-    'task': '✅',
-    'travel': '🚌',
-    'food': '🍔',
-    'other': '⭐',
-};
-
 const DEFAULT_ICON = '🏷️';
 
 export function TagProvider({ children }) {
@@ -57,7 +47,8 @@ function useTagGetters(tags) {
 
 async function createTagAction(tag, setTags) {
     try {
-        const created = await apiCreateTag({ name: tag.label, color: tag.color });
+        const data = { name: tag.label, color: tag.color, icon: tag.icon || DEFAULT_ICON };
+        const created = await apiCreateTag(data);
         setTags((prev) => [...prev, mapBackendTag(created)]);
     } catch (err) {
         console.error('Failed to create tag:', err);
@@ -75,7 +66,7 @@ async function deleteTagAction(id, setTags) {
 
 async function updateTagAction(id, updates, setTags) {
     try {
-        const backendData = { name: updates.label, color: updates.color };
+        const backendData = { name: updates.label, color: updates.color, icon: updates.icon };
         const updated = await apiUpdateTag(id, backendData);
         setTags((prev) => prev.map((t) => (t.id === id ? mapBackendTag(updated) : t)));
     } catch (err) {
@@ -89,13 +80,7 @@ function findTag(id, tags) {
 }
 
 function mapBackendTag(tag) {
-    const icon = getIconForTag(tag.name);
-    return { id: tag.id, label: tag.name, icon, color: tag.color };
-}
-
-function getIconForTag(name) {
-    const key = name.toLowerCase();
-    return ICON_MAP[key] || DEFAULT_ICON;
+    return { id: tag.id, label: tag.name, icon: tag.icon || DEFAULT_ICON, color: tag.color };
 }
 
 export function useTags() {

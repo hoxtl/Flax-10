@@ -42,9 +42,8 @@ def tag_detail(request, pk):
     if request.method == 'GET':
         return Response(TagSerialiser(tag).data)
     if request.method == 'PATCH':
-        # Don't allow editing default tags
         if tag.is_default:
-            return Response({'error': 'Cannot edit default tags'}, status=status.HTTP_400_BAD_REQUEST)
+            return update_default_tag_icon(tag, request.data)
         return update_tag(tag, request.data)
     if request.method == 'DELETE':
         return delete_tag(tag)
@@ -55,6 +54,15 @@ def update_tag(tag, data):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
     return Response(serialiser.data)
+
+
+def update_default_tag_icon(tag, data):
+    icon = data.get('icon')
+    if not icon:
+        return Response({'error': 'Only icon can be edited for default tags'}, status=status.HTTP_400_BAD_REQUEST)
+    tag.icon = icon
+    tag.save()
+    return Response(TagSerialiser(tag).data)
 
 
 def delete_tag(tag):
