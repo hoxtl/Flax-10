@@ -36,7 +36,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onEditImages={() => setShowCoverModal(true)} />
             <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
                 onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
-                canEdit={canEdit} onEnterEditMode={() => setEditMode(true)} />
+                canEdit={canEdit} onToggleEditMode={() => setEditMode(!editMode)} />
             <MainContent activeTab={activeTab} setActiveTab={setActiveTab} society={society}
                 editMode={editMode} handlers={handlers} />
             {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}
@@ -70,24 +70,13 @@ function getAvailablePhotos(society) {
     return announcementImages.filter(img => !currentCovers.has(img));
 }
 
-function TopBar({ onBack, canEdit, editMode, setEditMode, isAdmin, onSettings }) {
+function TopBar({ onBack, editMode, isAdmin, onSettings }) {
     const showSettings = editMode && isAdmin;
     return (
         <div className={styles.topBar}>
             <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
-            <div className={styles.topBarActions}>
-                {showSettings && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
-                {canEdit && <EditToggle editMode={editMode} setEditMode={setEditMode} />}
-            </div>
+            {showSettings && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
         </div>
-    );
-}
-
-function EditToggle({ editMode, setEditMode }) {
-    return (
-        <button className={`${styles.editToggle} ${editMode ? styles.editActive : ""}`} onClick={() => setEditMode(!editMode)}>
-            {editMode ? "Exit Editor" : "Edit Society"}
-        </button>
     );
 }
 

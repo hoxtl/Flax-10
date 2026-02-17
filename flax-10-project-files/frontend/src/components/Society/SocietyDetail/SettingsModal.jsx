@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
+import AddCollaboratorModal from "../AddCollaboratorModal";
 
 const ROLES = [
     { value: "editor", label: "Editor" },
@@ -7,16 +8,25 @@ const ROLES = [
 ];
 
 export default function SettingsModal({ onClose, onDelete, members, onFetchMembers, onUpdateRole, onRemoveMember, onAddCollaborator }) {
+    const [showAddModal, setShowAddModal] = useState(false);
     useEffect(() => { onFetchMembers?.(); }, [onFetchMembers]);
+
+    const handleAddCollaborators = async (users, role) => {
+        for (const user of users) await onAddCollaborator?.(user.username, role);
+    };
+
+    const existingUsernames = (members || []).map(m => m.username);
 
     return (
         <div className={styles.backdrop} onMouseDown={onClose}>
             <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
                 <ModalHeader onClose={onClose} />
-                <AddCollaboratorSection onAdd={onAddCollaborator} />
+                <AddCollaboratorSection onOpenModal={() => setShowAddModal(true)} />
                 <CollaboratorsSection members={members} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
                 <DangerSection onDelete={onDelete} onClose={onClose} />
             </div>
+            {showAddModal && <AddCollaboratorModal onClose={() => setShowAddModal(false)}
+                onAdd={handleAddCollaborators} existingUsernames={existingUsernames} />}
         </div>
     );
 }
@@ -30,30 +40,11 @@ function ModalHeader({ onClose }) {
     );
 }
 
-function AddCollaboratorSection({ onAdd }) {
-    const [username, setUsername] = useState("");
-    const [role, setRole] = useState("editor");
-    const [error, setError] = useState("");
-
-    const handleAdd = async () => {
-        if (!username.trim()) return setError("Enter a username");
-        try {
-            await onAdd?.(username.trim(), role);
-            setUsername("");
-            setError("");
-        } catch { setError("User not found"); }
-    };
-
+function AddCollaboratorSection({ onOpenModal }) {
     return (
         <div className={styles.section}>
             <h4 className={styles.sectionTitle}>Add Collaborator</h4>
-            <div className={styles.addRow}>
-                <input className={styles.input} value={username} onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username" onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
-                <RoleSelect value={role} onChange={setRole} />
-                <button className={styles.addBtn} onClick={handleAdd}>Add</button>
-            </div>
-            {error && <p className={styles.error}>{error}</p>}
+            <button className={styles.addBtn} onClick={onOpenModal}>+ Add Collaborators</button>
         </div>
     );
 }

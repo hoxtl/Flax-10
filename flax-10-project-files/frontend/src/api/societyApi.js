@@ -26,6 +26,8 @@ export const updateMemberRole = (societyId, userId, role) =>
 export const addCollaborator = (societyId, identifier, role) =>
     postJson(`${BASE}/${societyId}/members/`, { username: identifier, role });
 
+export const searchUsers = (query) => fetchApi(`/users/search/?q=${encodeURIComponent(query)}`);
+
 // Tags
 export const fetchSocietyTags = (societyId) => fetchApi(`${BASE}/${societyId}/tags/`);
 
