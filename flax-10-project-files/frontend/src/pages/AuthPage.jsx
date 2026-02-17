@@ -36,26 +36,34 @@ function AuthBackground() {
   );
 }
 
+async function tryRegister(signUpData) {
+  try { return await authService.register(signUpData); }
+  catch { return null; }
+}
+
+async function tryLogin(signInData) {
+  try { return await authService.login(signInData); }
+  catch { return null; }
+}
+
 async function submitSignUp(signUpData, setError, setLoading) {
   const passwordError = validatePasswords(signUpData.password, signUpData.password2);
   if (passwordError) return setError(passwordError);
   setLoading(true);
-  try {
-    const { response, data } = await authService.register(signUpData);
-    if (response.ok) { await new Promise((r) => setTimeout(r, 180)); saveUserData(data.token, data.user); }
-    else setError(getErrorMessage(data));
-  } catch { setError("There has been an error, please try again..."); }
-  finally { setLoading(false); }
+  const result = await tryRegister(signUpData);
+  if (!result) { setError("There has been an error, please try again..."); setLoading(false); return; }
+  if (result.response.ok) { await new Promise((r) => setTimeout(r, 180)); saveUserData(result.data.token, result.data.user); }
+  else setError(getErrorMessage(result.data));
+  setLoading(false);
 }
 
 async function submitSignIn(signInData, setError, setLoading) {
   setLoading(true);
-  try {
-    const { response, data } = await authService.login(signInData);
-    if (response.ok) { await new Promise((r) => setTimeout(r, 180)); saveUserData(data.token, data.user); }
-    else setError(data.error || "Invalid username or password");
-  } catch { setError("There has been an error, please try again..."); }
-  finally { setLoading(false); }
+  const result = await tryLogin(signInData);
+  if (!result) { setError("There has been an error, please try again..."); setLoading(false); return; }
+  if (result.response.ok) { await new Promise((r) => setTimeout(r, 180)); saveUserData(result.data.token, result.data.user); }
+  else setError(result.data.error || "Invalid username or password");
+  setLoading(false);
 }
 
 function useAuthPage() {
