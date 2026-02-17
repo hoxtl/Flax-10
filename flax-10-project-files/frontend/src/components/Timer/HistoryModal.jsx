@@ -44,9 +44,14 @@ const ClearButton = ({ onClear }) => (
 /** Custom hook to manage history state and deletion logic */
 const useHistoryData = () => {
     const [history, setHistory] = useState([]);
-    useEffect(() => setHistory(getHistory()), []);
+    useEffect(() => { getHistory().then(setHistory); }, []);
     const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
-    const clear = () => confirm('Clear all study history?') && (clearHistory() || setHistory([]));
+    const clear = async () => {
+        if (confirm('Clear all study history?')) {
+            await clearHistory();
+            setHistory([]);
+        }
+    };
     return { history, blocks, clear };
 };
 
