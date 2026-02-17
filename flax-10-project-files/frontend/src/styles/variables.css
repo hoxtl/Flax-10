@@ -11,6 +11,11 @@
   --sidebar: #f6f4f1;
   --border: rgba(74,52,33,0.18);
 
+  /* Topbar */
+  --topbar-bg: rgba(246, 244, 241, 0.75);
+  --topbar-border: rgba(255, 255, 255, 0.18);
+  --search-glass: rgba(255, 255, 255, 0.55);
+
   --text: #2B1E14;
   --text-dark: #1e1b2e;
   --muted: rgba(43,30,20,0.55);
@@ -78,6 +83,11 @@
   --panel: #1A1310;
   --sidebar: #151008;
   --border: rgba(180,164,144,0.15);
+
+  /* Topbar */
+  --topbar-bg: rgba(26, 19, 16, 0.80);
+  --topbar-border: rgba(180, 164, 144, 0.10);
+  --search-glass: rgba(255, 255, 255, 0.05);
 
   --text: rgba(255,255,255,0.92);
   --text-dark: rgba(255,255,255,0.92);
