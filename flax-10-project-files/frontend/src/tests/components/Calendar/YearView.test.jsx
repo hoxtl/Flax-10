@@ -5,7 +5,6 @@ import { YearView } from '../../../components/Calendar/YearView/YearView';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
 
-// Mock context values
 const mockDispatch = vi.fn();
 
 vi.mock('../../../context/CalendarContext', async () => {
@@ -17,7 +16,6 @@ vi.mock('../../../context/CalendarContext', async () => {
     };
 });
 
-// Mock TagContext to ensure useTags works without real provider issues
 vi.mock('../../../context/TagContext', async () => {
     return {
         TagProvider: ({ children }) => <div>{children}</div>,
@@ -30,7 +28,6 @@ vi.mock('../../../context/TagContext', async () => {
     };
 });
 
-// Mock hook
 const mockBinder = {
     onMouseEnter: vi.fn(),
     onMouseLeave: vi.fn(),
