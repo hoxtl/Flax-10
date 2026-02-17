@@ -516,7 +516,7 @@
 .quickNavBtn:hover {
   background: rgba(var(--brown-col), 0.08);
   border-color: rgba(var(--brown-col), 0.14);
-  color: rgba(var(--brown-text), 0.95);
+  color: rgba(var(--muted), 0.95);
 }
 
 .quickNavDot {
