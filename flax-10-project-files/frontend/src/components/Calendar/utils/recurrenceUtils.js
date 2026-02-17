@@ -22,11 +22,13 @@ function generateOccurrences(event, recurrence, viewStart, viewEnd) {
     const baseStart = new Date(event.start_time);
     const baseEnd = new Date(event.end_time);
     const duration = baseEnd - baseStart;
+    const endDate = getEndDate(event);
     const occurrences = [];
 
     for (let i = 0; i < 100; i++) {
         const start = calcNextOccurrence(baseStart, recurrence, i);
         if (start > viewEnd) break;
+        if (endDate && start > endDate) break;
 
         const end = new Date(start.getTime() + duration);
         if (overlapsRange(start, end, viewStart, viewEnd)) {
@@ -34,6 +36,13 @@ function generateOccurrences(event, recurrence, viewStart, viewEnd) {
         }
     }
     return occurrences;
+}
+
+function getEndDate(event) {
+    if (!event.recurrence_end_date) return null;
+    const d = new Date(event.recurrence_end_date);
+    d.setHours(23, 59, 59, 999);
+    return d;
 }
 
 function calcNextOccurrence(baseDate, recurrence, index) {

@@ -36,7 +36,8 @@ function transformIsoEventData(data) {
         end_time: normalizeIsoTime(data.end_time),
         all_day: data.all_day || false,
         tag: parseTagId(data.tag),
-        recurrence: getRecurrence(data)
+        recurrence: getRecurrence(data),
+        recurrence_end_date: getRecurrenceEndDate(data)
     };
 }
 
@@ -64,6 +65,12 @@ function getRecurrence(data) {
     const rec = data.recurrence;
     if (!rec || rec === 'none' || rec.frequency === 'none') return 'none';
     return typeof rec === 'string' ? rec : rec.frequency;
+}
+
+function getRecurrenceEndDate(data) {
+    const rec = data.recurrence;
+    if (typeof rec === 'object' && rec?.end_date) return rec.end_date;
+    return data.recurrence_end_date || null;
 }
 
 export function useSocietyDetail(societyId) {

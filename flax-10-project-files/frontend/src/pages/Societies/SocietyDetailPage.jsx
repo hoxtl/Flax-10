@@ -35,7 +35,8 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
                 onEditImages={() => setShowCoverModal(true)} />
             <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
-                onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety} />
+                onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
+                canEdit={canEdit} onEnterEditMode={() => setEditMode(true)} />
             <MainContent activeTab={activeTab} setActiveTab={setActiveTab} society={society}
                 editMode={editMode} handlers={handlers} />
             {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}

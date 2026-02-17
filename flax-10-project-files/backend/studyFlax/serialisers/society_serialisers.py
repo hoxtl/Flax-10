@@ -65,7 +65,7 @@ class SocietyEventSerialiser(serializers.ModelSerializer):
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
-            'all_day', 'tag', 'tag_data', 'recurrence', 'announcement', 'created_at'
+            'all_day', 'tag', 'tag_data', 'recurrence', 'recurrence_end_date', 'announcement', 'created_at'
         ]
 
 
