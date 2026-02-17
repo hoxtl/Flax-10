@@ -66,12 +66,14 @@
 
 .navItem:hover {
   background: var(--hover);
+  box-shadow: 0 0 12px rgba(158, 126, 93, 0.15);
 }
 
 .navItemActive {
   background: var(--active);
   color: var(--accent);
   font-weight: 600;
+  box-shadow: 0 0 16px rgba(158, 126, 93, 0.18);
 }
 
 .navItemActive:hover {
