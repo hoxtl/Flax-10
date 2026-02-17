@@ -29,7 +29,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 
     return (
         <div className={styles.page}>
-            <TopBar onBack={onBack} editMode={editMode} isAdmin={society.role === 'admin'}
+            <TopBar onBack={onBack} isAdmin={society.role === 'admin'}
                 onSettings={() => setShowSettings(true)} />
             <SocietyHero society={society} onImageClick={() => setGalleryOpen(true)}
                 editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
@@ -70,12 +70,11 @@ function getAvailablePhotos(society) {
     return announcementImages.filter(img => !currentCovers.has(img));
 }
 
-function TopBar({ onBack, editMode, isAdmin, onSettings }) {
-    const showSettings = editMode && isAdmin;
+function TopBar({ onBack, isAdmin, onSettings }) {
     return (
         <div className={styles.topBar}>
             <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
-            {showSettings && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
+            {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
         </div>
     );
 }
