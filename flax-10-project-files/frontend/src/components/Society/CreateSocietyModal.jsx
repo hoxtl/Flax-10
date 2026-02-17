@@ -20,16 +20,18 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
     const handleRemove = (id) => update("collaborators", form.collaborators.filter(c => c.id !== id));
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ModalHeader onClose={onClose} />
-                <FormFields form={form} update={update} onOpenCollabModal={() => setShowCollabModal(true)}
-                    onRoleChange={handleRoleChange} onRemove={handleRemove} />
-                <ModalFooter onClose={onClose} onCreate={() => onCreate(form)} disabled={!form.name.trim()} />
+        <>
+            <div className={styles.backdrop} onMouseDown={onClose}>
+                <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
+                    <ModalHeader onClose={onClose} />
+                    <FormFields form={form} update={update} onOpenCollabModal={() => setShowCollabModal(true)}
+                        onRoleChange={handleRoleChange} onRemove={handleRemove} />
+                    <ModalFooter onClose={onClose} onCreate={() => onCreate(form)} disabled={!form.name.trim()} />
+                </div>
             </div>
             {showCollabModal && <AddCollaboratorModal onClose={() => setShowCollabModal(false)}
                 onAdd={handleAddCollaborators} existingUsernames={form.collaborators.map(c => c.username)} />}
-        </div>
+        </>
     );
 }
 
