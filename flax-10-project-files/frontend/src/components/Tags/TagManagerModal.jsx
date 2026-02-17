@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTags } from '../../context/TagContext';
+import EmojiPicker from './EmojiPicker';
 import styles from './TagManagerModal.module.css';
 
 function isIconValid(icon) {
@@ -55,7 +56,7 @@ function TagForm({ initialData, onSave, onCancel, isDefault = false }) {
     <div className={`${styles.content} ${styles.form}`}>
       <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isDefault} />
       {!isDefault && <ColorInput value={form.color} onChange={v => handleChange('color', v)} />}
-      <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => handleChange('icon', v)} placeholder="e.g. 🏋️" />
+      <EmojiInput value={form.icon} onChange={v => handleChange('icon', v)} />
       {error && <div className={styles.error}>{error}</div>}
       <FormActions onSave={handleSaveClick} onCancel={onCancel} />
     </div>
@@ -124,6 +125,22 @@ function ColorInput({ value, onChange }) {
         <input type="color" value={value} onChange={e => onChange(e.target.value)} />
         <span style={{ color: value }}>{value}</span>
       </div>
+    </label>
+  );
+}
+
+function EmojiInput({ value, onChange }) {
+  const [showPicker, setShowPicker] = useState(false);
+  return (
+    <label className={styles.emojiInputWrapper}>
+      Icon (Emoji)
+      <div className={styles.emojiInputRow}>
+        <button type="button" className={styles.emojiPreviewBtn} onClick={() => setShowPicker(!showPicker)}>
+          {value || '😀'}
+        </button>
+        <span className={styles.emojiHint}>{value ? 'Click to change' : 'Click to select'}</span>
+      </div>
+      {showPicker && <EmojiPicker onSelect={onChange} onClose={() => setShowPicker(false)} />}
     </label>
   );
 }
