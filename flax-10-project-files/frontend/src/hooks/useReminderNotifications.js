@@ -4,20 +4,16 @@ import { useNotifications } from '../context/NotificationContext';
 export function useReminderNotifications(events) {
     const { addNotification } = useNotifications();
     const lastCheckRef = useRef(new Date());
-
+    useEffect(() => { requestNotificationPermission(); }, []);
     useEffect(() => {
-        requestNotificationPermission();
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const now = new Date();
-            checkAndNotify(events, now, lastCheckRef.current, addNotification);
-            lastCheckRef.current = now;
-        }, 10000);
-        return () => clearInterval(interval);
+      const interval = setInterval(() => {
+        const now = new Date();
+        checkAndNotify(events, now, lastCheckRef.current, addNotification);
+        lastCheckRef.current = now;
+      }, 10000);
+      return () => clearInterval(interval);
     }, [events, addNotification]);
-}
+  }
 
 function requestNotificationPermission() {
     if (!('Notification' in window)) return;
@@ -50,13 +46,10 @@ function shouldNotify(event, minutes, now, lastCheck, sentSet) {
     if (!event.start_time) return false;
     const key = getReminderKey(event, minutes);
     if (sentSet.has(key)) return false;
-
     const reminderTime = getReminderTime(event, minutes);
     if (reminderTime > now) return false;
-
     const isDue = reminderTime > lastCheck && reminderTime <= now;
     const wasMissed = (now - reminderTime) < 60000;
-
     return isDue || wasMissed;
 }
 
