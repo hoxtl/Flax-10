@@ -6,29 +6,24 @@ import { NotificationCenter } from "./Notifications";
 import { getDisplayName } from "../utils/userDisplay";
 import ThemeToggle from "./ThemeToggle";
 
-function getCurrentDateParts() {
+function getFirstName(user) {
+  const displayName = (getDisplayName(user) || "").trim();
+  return displayName ? displayName.split(" ")[0] : "";
+}
+
+function getCurrentDateString() {
   const now = new Date();
-  return {
-    day: DAYS[now.getDay()],
-    date: now.getDate(),
-    month: MONTHS[now.getMonth()],
-  };
+  return `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
 }
 
 function TopBarGreeting({ user }) {
-  const now = new Date();
-
-  const displayName = (getDisplayName(user) || "").trim();
-  const firstName = displayName ? displayName.split(" ")[0] : "";
-
+  const firstName = getFirstName(user);
   return (
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
         {!!firstName && <h1 className={styles.name}>{firstName}</h1>}
-        <span className={styles.date}>
-          {DAYS[now.getDay()]}, {now.getDate()} {MONTHS[now.getMonth()]}
-        </span>
+        <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
     </div>
   );
@@ -58,11 +53,16 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
       <ThemeToggle />
       <AddButton onClick={onAddClick} />
       <NotificationCenter />
-      <ProfileDropdown
-        user={user}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-      />
+      <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} />
+    </div>
+  );
+}
+
+function TopBarLeft({ onToggle, user }) {
+  return (
+    <div className={styles.left}>
+      <button className={styles.toggle} onClick={onToggle}>☰</button>
+      <TopBarGreeting user={user} />
     </div>
   );
 }
@@ -70,18 +70,8 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
 export default function TopBar({ onToggle, onAddClick, user, onSettingsClick, onLogoutClick }) {
   return (
     <header className={styles.container}>
-      <div className={styles.left}>
-        <button className={styles.toggle} onClick={onToggle}>
-          ☰
-        </button>
-        <TopBarGreeting user={user} />
-      </div>
-      <TopBarActions
-        onAddClick={onAddClick}
-        user={user}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-      />
+      <TopBarLeft onToggle={onToggle} user={user} />
+      <TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} />
     </header>
   );
 }
