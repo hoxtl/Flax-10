@@ -10,12 +10,16 @@ export function getInitialForm(announcement) {
 }
 
 function mapAnnouncementToForm(base, announcement) {
+    const images = (announcement.images || [])
+        .map(img => (typeof img === 'object' && img.url) ? img.url : img)
+        .filter(Boolean);
+
     return {
         ...base,
         title: announcement.title,
         content: announcement.content,
         tag: announcement.tagId || null,
-        images: announcement.images || (announcement.image ? [announcement.image] : []),
+        images: images,
         pinned: announcement.pinned || false,
         id: announcement.id
     };

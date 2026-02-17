@@ -21,8 +21,11 @@ export default function SocietyHero({ society, onImageClick, editMode, onEditIma
 }
 
 function getImages(society) {
-    if (society.images?.length > 0) return society.images.map(i => i.url || i);
-    return society.image ? [society.image] : [];
+    const urls = (society.images || []).map(i => i.url || i);
+    if (society.image && !urls.includes(society.image)) {
+        urls.unshift(society.image);
+    }
+    return urls.length > 0 ? urls : [];
 }
 
 function HeroArrows({ idx, total, setIdx }) {
