@@ -1,5 +1,5 @@
 import { useReducer, useEffect, useRef } from 'react';
-import { timerReducer, initialState } from './timerReducer';
+import { timerReducer, initialState } from '../utils/timerReducer';
 
 const useInterval = (isActive, dispatch) => {
     const ref = useRef();

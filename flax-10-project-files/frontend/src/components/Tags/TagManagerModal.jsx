@@ -8,26 +8,6 @@ function isIconValid(icon) {
   return hasEmoji && !/^[a-zA-Z0-9]+$/.test(icon);
 }
 
-function validateForm(form) {
-  if (!form.label.trim()) return "Name is required.";
-  if (!form.icon) return "Icon is required.";
-  if (!isIconValid(form.icon)) return "Only emojis allowed.";
-  return '';
-}
-
-function useTagForm(initialData, onSave) {
-  const [form, setForm] = useState(initialData);
-  const [error, setError] = useState('');
-  const handleChange = (field, value) => { setForm({ ...form, [field]: value }); if (error) setError(''); };
-  const handleSaveClick = () => {
-    const err = validateForm(form);
-    if (err) return setError(err);
-    setError('');
-    onSave(form);
-  };
-  return { form, error, handleChange, handleSaveClick };
-}
-
 function useTagModal() {
   const { tags, addTag, updateTag, deleteTag } = useTags();
   const [editingId, setEditingId] = useState(null);
@@ -46,93 +26,70 @@ function ModalHeader({ onClose }) {
   );
 }
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Tags/TagManagerModal.jsx
-/**
- * Decides whether to render the list of tags or the edit/add form.
- */
-// ... (imports remain)
-
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
-    if (editingId || isAdding) {
-        const tag = editingId ? tags.find(t => t.id === editingId) : null;
-        const initialData = tag || { label: '', color: '#000000', icon: '' };
-        const isDefault = tag?.label?.toLowerCase() === 'other';
-        return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isDefault={isDefault} />;
-    }
-    return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
+  if (editingId || isAdding) {
+    const tag = editingId ? tags.find(t => t.id === editingId) : null;
+    const initialData = tag || { label: '', color: '#000000', icon: '' };
+    const isDefault = tag?.label?.toLowerCase() === 'other';
+    return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isDefault={isDefault} />;
+  }
+  return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
 }
-
-// ... (TagList, TagItem, etc. remain)
 
 function TagForm({ initialData, onSave, onCancel, isDefault = false }) {
-    const [form, setForm] = useState(initialData);
-    const [error, setError] = useState('');
+  const [form, setForm] = useState(initialData);
+  const [error, setError] = useState('');
 
-    const handleSaveClick = () => {
-        if (!isDefault && !form.label.trim()) return setError("Name is required.");
-        if (!form.icon) return setError("Icon is required.");
-        if (!isIconValid(form.icon)) return setError("Only emojis allowed.");
-        setError('');
-        onSave(form);
-    };
+  const handleChange = (field, value) => {
+    setForm({ ...form, [field]: value });
+    if (error) setError('');
+  };
 
-    const handleChange = (field, value) => {
-        setForm({ ...form, [field]: value });
-        if (error) setError('');
-    };
+  const handleSaveClick = () => {
+    const err = validateTagForm(form, isDefault);
+    if (err) return setError(err);
+    onSave(form);
+  };
 
-    return (
-        <div className={`${styles.content} ${styles.form}`}>
-            <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isDefault} />
-            {!isDefault && <ColorInput value={form.color} onChange={v => handleChange('color', v)} />}
-            <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => handleChange('icon', v)} placeholder="e.g. 🏋️" />
-            {error && <div className={styles.error}>{error}</div>}
-            <FormActions onSave={handleSaveClick} onCancel={onCancel} />
-        </div>
-    );
+  return (
+    <div className={`${styles.content} ${styles.form}`}>
+      <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isDefault} />
+      {!isDefault && <ColorInput value={form.color} onChange={v => handleChange('color', v)} />}
+      <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => handleChange('icon', v)} placeholder="e.g. 🏋️" />
+      {error && <div className={styles.error}>{error}</div>}
+      <FormActions onSave={handleSaveClick} onCancel={onCancel} />
+    </div>
+  );
 }
 
-function isIconValid(icon) {
-    if (!icon) return false;
-    const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
-    const isPlainAlphaNumeric = /^[a-zA-Z0-9]+$/.test(icon);
-    return hasEmoji && !isPlainAlphaNumeric;
+function validateTagForm(form, isDefault) {
+  if (!isDefault && !form.label.trim()) return "Name is required.";
+  if (!form.icon) return "Icon is required.";
+  if (!isIconValid(form.icon)) return "Only emojis allowed.";
+  return '';
 }
 
-/**
- * Renders the list of existing tags.
- */
 function TagList({ tags, onEdit, onDelete, onAdd }) {
-    return (
-        <div className={styles.content}>
-            <div className={styles.list}>
-                {tags.map(tag => (
-                    <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />
-                ))}
-            </div>
-            <button className={styles.addBtn} onClick={onAdd}>+ Add New Tag</button>
-        </div>
-    );
+  return (
+    <div className={styles.content}>
+      <div className={styles.list}>
+        {tags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
+      </div>
+      <button className={styles.addBtn} onClick={onAdd}>+ Add New Tag</button>
+    </div>
+  );
 }
 
-/**
- * Renders a single tag item with preview and actions.
- */
 function TagItem({ tag, onEdit, onDelete }) {
-    const isOther = tag.label?.toLowerCase() === 'other';
-    return (
-        <div className={styles.item}>
-            <TagPreview tag={tag} />
-            <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isOther} />
-        </div>
-    );
+  const isOther = tag.label?.toLowerCase() === 'other';
+  return (
+    <div className={styles.item}>
+      <TagPreview tag={tag} />
+      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isOther} />
+    </div>
+  );
 }
 
-/**
- * Visual preview of the tag (icon handling color).
- */
-=======
->>>>>>> main:flax-10-project-files/frontend/src/components/TagManagerModal.jsx
 function TagPreview({ tag }) {
   return (
     <div className={styles.preview} style={{ '--color': tag.color }}>
@@ -151,40 +108,13 @@ function TagActions({ id, onEdit, onDelete, isDeletable }) {
   );
 }
 
-function TagItem({ tag, onEdit, onDelete }) {
-  return (
-    <div className={styles.item}>
-      <TagPreview tag={tag} />
-      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={tag.label?.toLowerCase() !== 'other'} />
-    </div>
-  );
-}
-
-function TagList({ tags, onEdit, onDelete, onAdd }) {
-  return (
-    <div className={styles.content}>
-      <div className={styles.list}>
-        {tags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
-      </div>
-      <button className={styles.addBtn} onClick={onAdd}>+ Add New Tag</button>
-    </div>
-  );
-}
-
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Tags/TagManagerModal.jsx
 function TextInput({ label, value, onChange, placeholder, disabled = false }) {
-    return (
-        <label>
-            {label}
-            <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} />
-        </label>
-    );
-=======
-function TextInput({ label, value, onChange, placeholder }) {
   return (
-    <label>{label}<input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} /></label>
+    <label>
+      {label}
+      <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} disabled={disabled} />
+    </label>
   );
->>>>>>> main:flax-10-project-files/frontend/src/components/TagManagerModal.jsx
 }
 
 function ColorInput({ value, onChange }) {
@@ -205,27 +135,6 @@ function FormActions({ onSave, onCancel }) {
       <button className={styles.saveBtn} onClick={onSave}>Save</button>
     </div>
   );
-}
-
-function TagForm({ initialData, onSave, onCancel }) {
-  const { form, error, handleChange, handleSaveClick } = useTagForm(initialData, onSave);
-  return (
-    <div className={`${styles.content} ${styles.form}`}>
-      <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" />
-      <ColorInput value={form.color} onChange={v => handleChange('color', v)} />
-      <TextInput label="Icon (Emoji)" value={form.icon} onChange={v => handleChange('icon', v)} placeholder="e.g. 🏋️" />
-      {error && <div className={styles.error}>{error}</div>}
-      <FormActions onSave={handleSaveClick} onCancel={onCancel} />
-    </div>
-  );
-}
-
-function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
-  if (editingId || isAdding) {
-    const initialData = editingId ? tags.find(t => t.id === editingId) : { label: '', color: '#000000', icon: '' };
-    return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} />;
-  }
-  return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
 }
 
 export default function TagManagerModal({ onClose }) {

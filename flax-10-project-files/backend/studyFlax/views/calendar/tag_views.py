@@ -54,7 +54,6 @@ def update_tag(tag, data):
     serialiser.save()
     return Response(serialiser.data)
 
-<<<<<<< HEAD
 
 def update_default_tag_icon(tag, data):
     icon = data.get('icon')
@@ -65,8 +64,6 @@ def update_default_tag_icon(tag, data):
     return Response(TagSerialiser(tag).data)
 
 
-=======
->>>>>>> main
 def delete_tag(tag):
     if tag.is_default:
         return Response({'error': 'Cannot delete default tags'}, status=status.HTTP_400_BAD_REQUEST)

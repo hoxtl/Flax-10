@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './TimerPage.module.css';
-import { useTimerLogic } from '../hooks/useTimerLogic';
-import { useNotificationPermission } from '../hooks/timerUtils';
+import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
+import { useNotificationPermission } from '../components/Timer/utils/timerUtils';
 import { MainSection, PopupSection } from '../components/Timer/WrapperComponents';
 
 export default function TimerPage() {

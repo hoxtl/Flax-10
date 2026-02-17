@@ -2,7 +2,7 @@ import { useTimer } from './useTimer';
 import { useState } from 'react';
 import { useTimerFlow } from './useTimerFlow';
 import { useTimerHandlers } from './useTimerHandlers';
-import { getProgress } from './timerUtils';
+import { getProgress } from '../utils/timerUtils';
 
 export function useTimerLogic() {
     const t = useTimer();

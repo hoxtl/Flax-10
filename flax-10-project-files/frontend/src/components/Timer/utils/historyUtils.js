@@ -1,4 +1,4 @@
-import { fetchApi } from '../api/client';
+import { fetchApi } from '../../../api/client';
 
 export const getHistory = async () => {
     try {
