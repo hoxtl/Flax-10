@@ -62,7 +62,6 @@ function PanelContent({ open, panelRef, menuRef, state, menu, operations, onReor
   );
 }
 
-/** Main to-do panel — wires storage, state and UI together. */
 export default function ToDoPanel({ open = true, onClose, fabRef }) {
   const [items, setItems] = useTodoStorage();
   const panelRef = useRef(null);
