@@ -8,6 +8,7 @@ import { useAuthForm } from "../hooks/useAuthForm";
 import { authService } from "../api/authService";
 import { validatePasswords, getErrorMessage, saveUserData } from "../utils/authHelpers";
 import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
+import { TestimonialsMarquee } from "../components/Authentication/TestimonialsMarquee";
 
 function AuthBrand() {
   return (
@@ -15,7 +16,7 @@ function AuthBrand() {
       <div style={{ fontSize: 12, letterSpacing: "0.34em", fontWeight: 800, color: "rgba(43,30,20,0.62)" }}>
         STUDYFLAX
       </div>
-      <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, letterSpacing: "0.02em", color: "rgba(43,30,20,0.42)" }}>
+      <div style={{ marginTop: 3, fontSize: 11, fontWeight: 500, letterSpacing: "0.02em", color: "rgba(43,30,20,0.38)" }}>
         Built for calm study.
       </div>
     </div>
@@ -24,15 +25,15 @@ function AuthBrand() {
 
 function AuthFooter() {
   return (
-    <div style={{ position: "absolute", bottom: 18, left: 0, right: 0, zIndex: 3, textAlign: "center", fontSize: 12, color: "rgba(10,7,5,0.45)", userSelect: "none", pointerEvents: "none" }}>
-      Always secure. No ads. Free forever.
+    <div style={{ width: "100%", textAlign: "center", padding: "4px 0 8px", fontSize: 11, color: "rgba(10,7,5,0.35)", userSelect: "none", letterSpacing: "0.02em" }}>
+      Always secure · No ads · Free forever
     </div>
   );
 }
 
 function AuthBackground() {
   return (
-    <div aria-hidden="true" style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))", zIndex: 0 }} />
+    <div aria-hidden="true" style={{ position: "fixed", inset: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))", zIndex: 0 }} />
   );
 }
 
@@ -92,13 +93,44 @@ function AuthForms({ signIn, error, loading, signUpData, updateSignUpField, sign
 export default function AuthPage() {
   const state = useAuthPage();
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
+    <div style={{
+      height: "100vh",
+      width: "100vw",
+      background: "#f0ede8",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      position: "relative"
+    }}>
       <AuthHeroGeometric />
       <AuthBackground />
       <AuthBrand />
-      <AuthFooter />
-      <div style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-        <AuthForms {...state} />
+
+      {/* Form: takes 62% of screen height, centred */}
+      <div style={{
+        height: "62vh",
+        flexShrink: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 2,
+      }}>
+        <div style={{ transform: "scale(0.7)", transformOrigin: "center center" }}>
+          <AuthForms {...state} />
+        </div>
+      </div>
+
+      {/* Testimonials: remaining 38% */}
+      <div style={{
+        flex: "1 1 0",
+        minHeight: 0,
+        zIndex: 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}>
+        <TestimonialsMarquee />
+        <AuthFooter />
       </div>
     </div>
   );

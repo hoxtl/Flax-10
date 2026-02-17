@@ -27,15 +27,7 @@ function AuthBrand() {
       >
         STUDYFLAX
       </div>
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "0.02em",
-          color: "rgba(43,30,20,0.42)",
-        }}
-      >
+      <div style={{ marginTop: 3, fontSize: 11, fontWeight: 500, letterSpacing: "0.02em", color: "rgba(43,30,20,0.38)" }}>
         Built for calm study.
       </div>
     </div>
