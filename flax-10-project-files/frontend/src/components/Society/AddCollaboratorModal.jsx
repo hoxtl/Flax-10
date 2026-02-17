@@ -2,16 +2,10 @@ import { useState, useEffect } from "react";
 import { searchUsers } from "../../api/societyApi";
 import styles from "./AddCollaboratorModal.module.css";
 
-const ROLES = [
-    { value: "editor", label: "Editor" },
-    { value: "admin", label: "Admin" }
-];
-
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [selected, setSelected] = useState([]);
-    const [role, setRole] = useState("editor");
 
     useEffect(() => { fetchResults(query, setResults); }, [query]);
 
@@ -22,8 +16,8 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
     };
 
     const handleRemove = (userId) => setSelected(selected.filter(u => u.id !== userId));
-    const handleAdd = () => { onAdd(selected, role); onClose(); };
-    const filteredResults = results.filter(u => !existingUsernames.includes(u.username));
+    const handleAdd = () => { onAdd(selected); onClose(); };
+    const filteredResults = filterResults(results, selected, existingUsernames);
 
     return (
         <div className={styles.backdrop} onMouseDown={onClose}>
@@ -32,11 +26,15 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
                 <SearchInput query={query} setQuery={setQuery} />
                 {filteredResults.length > 0 && <SearchResults results={filteredResults} onSelect={handleSelect} />}
                 <SelectedUsers users={selected} onRemove={handleRemove} />
-                <RoleSelect role={role} setRole={setRole} />
                 <ModalFooter onClose={onClose} onAdd={handleAdd} disabled={selected.length === 0} />
             </div>
         </div>
     );
+}
+
+function filterResults(results, selected, existingUsernames) {
+    const selectedIds = new Set(selected.map(u => u.id));
+    return results.filter(u => !existingUsernames.includes(u.username) && !selectedIds.has(u.id));
 }
 
 async function fetchResults(query, setResults) {
@@ -85,17 +83,6 @@ function SelectedUsers({ users, onRemove }) {
                     <button className={styles.chipRemove} onClick={() => onRemove(user.id)}>&times;</button>
                 </span>
             ))}
-        </div>
-    );
-}
-
-function RoleSelect({ role, setRole }) {
-    return (
-        <div className={styles.roleRow}>
-            <label className={styles.roleLabel}>Role:</label>
-            <select className={styles.roleSelect} value={role} onChange={e => setRole(e.target.value)}>
-                {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-            </select>
         </div>
     );
 }

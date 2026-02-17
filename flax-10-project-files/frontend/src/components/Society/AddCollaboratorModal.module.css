@@ -5,16 +5,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 1100;
 }
 
 .modal {
-    background: var(--bg);
+    background: var(--panel, #fff);
     border-radius: 12px;
     width: 90%;
     max-width: 400px;
     padding: 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 .header {
@@ -27,36 +27,45 @@
 .title {
     margin: 0;
     font-size: 1.25rem;
-    color: var(--text);
+    color: var(--text, #1f2937);
 }
 
 .closeBtn {
     background: none;
     border: none;
-    color: var(--muted);
+    color: var(--muted, #6b7280);
     font-size: 1.5rem;
     cursor: pointer;
     line-height: 1;
 }
 
+.closeBtn:hover {
+    color: var(--text, #1f2937);
+}
+
 .input {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border, #e5e7eb);
     border-radius: 8px;
     font-size: 1rem;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg, #fff);
+    color: var(--text, #1f2937);
     box-sizing: border-box;
 }
 
+.input:focus {
+    outline: none;
+    border-color: var(--primary-color, #9E7E5D);
+}
+
 .results {
-    border: 1px solid var(--border);
+    border: 1px solid var(--border, #e5e7eb);
     border-radius: 8px;
     margin-top: 0.5rem;
     max-height: 150px;
     overflow-y: auto;
-    background: var(--bg);
+    background: var(--bg, #fff);
 }
 
 .resultItem {
@@ -67,12 +76,12 @@
     background: none;
     text-align: left;
     cursor: pointer;
-    color: var(--text);
+    color: var(--text, #1f2937);
     font-size: 0.95rem;
 }
 
 .resultItem:hover {
-    background: var(--hover);
+    background: var(--hover, #f9fafb);
 }
 
 .selected {
@@ -87,7 +96,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 0.75rem;
-    background: var(--primary);
+    background: var(--primary-color, #9E7E5D);
     color: white;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -103,28 +112,6 @@
     padding: 0;
 }
 
-.roleRow {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 1rem;
-}
-
-.roleLabel {
-    color: var(--text);
-    font-size: 0.95rem;
-}
-
-.roleSelect {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.95rem;
-}
-
 .footer {
     display: flex;
     justify-content: flex-end;
@@ -134,22 +121,30 @@
 
 .cancelBtn {
     padding: 0.6rem 1.25rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border, #e5e7eb);
     border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg, #fff);
+    color: var(--text, #1f2937);
     cursor: pointer;
     font-size: 0.95rem;
+}
+
+.cancelBtn:hover {
+    background: var(--hover, #f9fafb);
 }
 
 .addBtn {
     padding: 0.6rem 1.25rem;
     border: none;
     border-radius: 8px;
-    background: var(--primary);
+    background: var(--primary-color, #9E7E5D);
     color: white;
     cursor: pointer;
     font-size: 0.95rem;
+}
+
+.addBtn:hover:not(:disabled) {
+    filter: brightness(1.1);
 }
 
 .addBtn:disabled {
