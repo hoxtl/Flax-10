@@ -2,11 +2,10 @@ import styles from "./Topbar.module.css";
 import { DAYS, MONTHS } from "../lib/uiConstants";
 import { getGreeting } from "../utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
-import { NotificationCenter } from "./Notifications";
 import { getDisplayName } from "../utils/userDisplay";
 import ThemeToggle from "./ThemeToggle";
 import { ExpandableTabs } from "./ExpandableTabs";
-import { Sun, Bell, Plus, Settings } from "lucide-react";
+import { Bell, Plus, Settings } from "lucide-react";
 
 function getFirstName(user) {
   const displayName = (getDisplayName(user) || "").trim();
