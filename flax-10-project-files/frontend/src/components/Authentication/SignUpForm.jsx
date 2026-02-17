@@ -1,9 +1,6 @@
 import React from 'react';
 import * as Components from '../Authentication/AuthComponents';
 
-/**
- * Authentication component for user sign up
- */
 export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading }) => {
   const fields = [
     { name: 'first_name', type: 'text', placeholder: 'First Name' },
@@ -32,8 +29,10 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
           />
         ))}
 
+        <div style={{ height: "8px" }} />
+
         <Components.Button type="submit" disabled={loading}>
-          {loading ? 'Registering Account...' : 'Sign Up'}
+          {loading ? 'Creating account...' : 'Sign Up'}
         </Components.Button>
       </Components.Form>
     </Components.SignUpContainer>
