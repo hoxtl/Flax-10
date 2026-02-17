@@ -74,17 +74,6 @@ function ModuleItem({ code }) {
   );
 }
 
-function TaskItem({ title, dueDate }) {
-  return (
-    <div className={styles.listItem}>
-      <div className={styles.listAvatar}>✓</div>
-      <div className={styles.listInfo}>
-        <div className={styles.listName}>{title}</div>
-        <div className={styles.listMeta}>Due {dueDate}</div>
-      </div>
-    </div>
-  );
-}
 
 function EventItem({ title, startTime, location }) {
   const date = new Date(startTime);
