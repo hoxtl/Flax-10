@@ -14,7 +14,8 @@ def create_default_tags(apps, schema_editor):
         name='Other',
         defaults={
             'is_default': True,
-            'color': '#808080', # Grey
+            'color': '#808080',
+            'icon': '⭐',
             'category': default_category
         }
     )
