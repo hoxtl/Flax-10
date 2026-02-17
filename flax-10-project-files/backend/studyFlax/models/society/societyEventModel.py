@@ -25,6 +25,7 @@ class SocietyEvent(models.Model):
     all_day = models.BooleanField(default=False)
     tag = models.ForeignKey(SocietyTag, on_delete=models.SET_NULL, null=True, blank=True)
     recurrence = models.CharField(max_length=20, choices=RECURRENCE_CHOICES, default='none')
+    recurrence_end_date = models.DateField(null=True, blank=True)
     announcement = models.ForeignKey(
         SocietyAnnouncement, on_delete=models.SET_NULL, null=True, blank=True, related_name='events'
     )
