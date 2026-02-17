@@ -19,3 +19,5 @@ from .notifications.notificationModel import *
 
 # Society
 from .society import *
+# Timer
+from .timer import *

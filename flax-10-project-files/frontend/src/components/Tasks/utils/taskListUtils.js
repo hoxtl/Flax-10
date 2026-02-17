@@ -1,22 +1,22 @@
 import { pinUrgentFirst } from "./taskUtils";
 
+function getActivePartitions(activeRaw) {
+  const activePinned = pinUrgentFirst(activeRaw);
+  return {
+    activePinned,
+    urgentActive: activePinned.filter((x) => x.urgent),
+    otherActive: activePinned.filter((x) => !x.urgent),
+  };
+}
+
 export function partitionTasks(items) {
   const activeRaw = items.filter((x) => !x.done);
   const doneItems = items.filter((x) => x.done);
-  const isEmpty = activeRaw.length === 0 && doneItems.length === 0;
-
-  const activePinned = pinUrgentFirst(activeRaw);
-  const urgentActive = activePinned.filter((x) => x.urgent);
-  const otherActive = activePinned.filter((x) => !x.urgent);
-  const anyCompleted = doneItems.length > 0;
-
+  const { activePinned, urgentActive, otherActive } = getActivePartitions(activeRaw);
   return {
-    activeRaw,
-    doneItems,
-    isEmpty,
-    activePinned,
-    urgentActive,
-    otherActive,
-    anyCompleted,
+    activeRaw, doneItems,
+    isEmpty: activeRaw.length === 0 && doneItems.length === 0,
+    activePinned, urgentActive, otherActive,
+    anyCompleted: doneItems.length > 0,
   };
 }

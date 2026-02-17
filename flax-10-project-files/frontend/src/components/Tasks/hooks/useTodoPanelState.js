@@ -5,7 +5,6 @@ export function useTodoPanelState() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-
   return {
     text,
     setText,
@@ -14,6 +13,4 @@ export function useTodoPanelState() {
     editText,
     setEditText,
     menuOpen,
-    setMenuOpen,
-  };
-}
+    setMenuOpen,};}

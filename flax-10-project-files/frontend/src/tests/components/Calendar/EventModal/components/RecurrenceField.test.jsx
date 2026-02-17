@@ -19,8 +19,6 @@ describe('RecurrenceField', () => {
 
     it('should call onChange when frequency changes', () => {
         render(<RecurrenceField value={{}} onChange={mockOnChange} />);
-
-        // The frequency select has value 'none' by default
         const frequencySelect = screen.getByDisplayValue('None');
         fireEvent.change(frequencySelect, { target: { value: 'daily' } });
 
@@ -41,14 +39,9 @@ describe('RecurrenceField', () => {
 
     it('should toggle end repeat type', () => {
         render(<RecurrenceField value={{ frequency: 'daily', end_date: null }} onChange={mockOnChange} />);
-
         const selects = screen.getAllByRole('combobox');
-        // Index 0: Frequency. Index 1: EndType.
         const endTypeSelect = selects[1];
-
         fireEvent.change(endTypeSelect, { target: { value: 'on_date' } });
-        // getDefaultEndDate returns yyyy-mm-dd (next month)
-        // We check if it matches the pattern
         expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
             end_date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)
         }));
@@ -56,15 +49,10 @@ describe('RecurrenceField', () => {
 
     it('should call onChange when end date changes', () => {
         render(<RecurrenceField value={{ frequency: 'daily', end_date: '2025-01-01' }} onChange={mockOnChange} />);
-        // Find date input
         const dateInput = document.querySelector('.end-date-input'); // class check or type check
-        // Or getByDisplayValue
         expect(dateInput).toBeInTheDocument();
-
         fireEvent.change(dateInput, { target: { value: '2025-02-01' } });
         expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ end_date: '2025-02-01' }));
-
-        // Test clearing date
         fireEvent.change(dateInput, { target: { value: '' } });
         expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ end_date: null }));
     });
