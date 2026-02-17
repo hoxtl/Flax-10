@@ -1,10 +1,15 @@
 asgiref==3.11.1
 distlib==0.4.0
-Django==5.2.0
+dj-database-url==3.1.1
+Django==5.2
 django-cors-headers==4.9.0
 djangorestframework==3.16.1
 dotenv==0.9.9
 filelock==3.20.1
+gunicorn==25.1.0
+icalendar==7.0.0
+packaging==26.0
+pillow==12.1.1
 platformdirs==4.5.0
 psycopg==3.3.2
 psycopg-binary==3.3.2
@@ -19,4 +24,7 @@ requests==2.32.5
 dj-database-url==3.1.1
 python-dateutil==2.9.0.post0
 six==1.17.0
+sqlparse==0.5.5
 tzdata==2025.3
+virtualenv==20.36.1
+whitenoise==6.11.0
