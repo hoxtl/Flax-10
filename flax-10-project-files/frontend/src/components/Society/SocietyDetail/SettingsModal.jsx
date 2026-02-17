@@ -12,19 +12,21 @@ export default function SettingsModal({ onClose, onDelete, members, onFetchMembe
     };
 
     const collaborators = (members || []).filter(m => m.role !== 'member');
-    const existingUsernames = (members || []).map(m => m.username);
+    const collaboratorUsernames = collaborators.map(c => c.username);
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-                <ModalHeader onClose={onClose} />
-                <AddCollaboratorSection onOpenModal={() => setShowAddModal(true)} />
-                <CollaboratorsSection collaborators={collaborators} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
-                <DangerSection onDelete={onDelete} onClose={onClose} />
+        <>
+            <div className={styles.backdrop} onMouseDown={onClose}>
+                <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
+                    <ModalHeader onClose={onClose} />
+                    <AddCollaboratorSection onOpenModal={() => setShowAddModal(true)} />
+                    <CollaboratorsSection collaborators={collaborators} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
+                    <DangerSection onDelete={onDelete} onClose={onClose} />
+                </div>
             </div>
             {showAddModal && <AddCollaboratorModal onClose={() => setShowAddModal(false)}
-                onAdd={handleAddCollaborators} existingUsernames={existingUsernames} />}
-        </div>
+                onAdd={handleAddCollaborators} existingUsernames={collaboratorUsernames} />}
+        </>
     );
 }
 
