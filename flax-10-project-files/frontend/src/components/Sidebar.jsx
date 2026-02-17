@@ -20,31 +20,34 @@ const getMajor = (profileData, user) => profileData?.major || user?.major || "CS
 const getProfilePhotoUrl = (profileData, user) =>
   profileData?.profile_photo_url || user?.profile_photo_url || null;
 
-function useProfileData() {
-  const [profileData, setProfileData] = useState(null);
+function useProfileListeners(refresh) {
+  useEffect(() => {
+    const onAuth = () => refresh();
+    const onProfile = () => refresh();
+    refresh();
+    window.addEventListener("auth-changed", onAuth);
+    window.addEventListener("profile-updated", onProfile);
+    return () => {
+      window.removeEventListener("auth-changed", onAuth);
+      window.removeEventListener("profile-updated", onProfile);
+    };
+  }, [refresh]);
+}
 
-  const loadProfile = useCallback(async () => {
+function useLoadProfile(setProfileData) {
+  return useCallback(async () => {
     try {
       setProfileData(await getUserProfile());
     } catch (e) {
       console.error("Failed to load profile:", e);
     }
-  }, []);
+  }, [setProfileData]);
+}
 
-  useEffect(() => {
-    const onAuth = () => loadProfile();
-    const onProfile = () => loadProfile();
-
-    loadProfile();
-    window.addEventListener("auth-changed", onAuth);
-    window.addEventListener("profile-updated", onProfile);
-
-    return () => {
-      window.removeEventListener("auth-changed", onAuth);
-      window.removeEventListener("profile-updated", onProfile);
-    };
-  }, [loadProfile]);
-
+function useProfileData() {
+  const [profileData, setProfileData] = useState(null);
+  const loadProfile = useLoadProfile(setProfileData);
+  useProfileListeners(loadProfile);
   return profileData;
 }
 
@@ -64,7 +67,6 @@ function NavItem({ item, isActive, collapsed, onClick }) {
   ]
     .filter(Boolean)
     .join(" ");
-
   return (
     <button onClick={onClick} className={cls}>
       <span className={styles.icon}>{item.icon}</span>
@@ -114,7 +116,6 @@ function Avatar({ photoUrl, initials }) {
 
 function UserText({ collapsed, displayName, year, major }) {
   if (collapsed) return null;
-
   return (
     <div className={styles.userText}>
       <div className={styles.userName}>{displayName}</div>
@@ -127,7 +128,6 @@ function UserText({ collapsed, displayName, year, major }) {
 
 function UserRow({ collapsed, displayName, year, major, photoUrl }) {
   const initials = getInitials(displayName) || "?";
-
   return (
     <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
       <Avatar photoUrl={photoUrl} initials={initials} />
@@ -136,27 +136,30 @@ function UserRow({ collapsed, displayName, year, major, photoUrl }) {
   );
 }
 
-/* Footer */
-
-function SidebarFooter({ active, onChange, collapsed, user }) {
+function useSidebarProfile(user) {
   const profileData = useProfileData();
 
-  const displayName = getDisplayName(profileData, user);
-  const year = getYearLabel(profileData, user);
-  const major = getMajor(profileData, user);
-  const photoUrl = getProfilePhotoUrl(profileData, user);
+  return {
+    displayName: getDisplayName(profileData, user),
+    year: getYearLabel(profileData, user),
+    major: getMajor(profileData, user),
+    photoUrl: getProfilePhotoUrl(profileData, user),
+  };
+}
+
+function SidebarFooter({ active, onChange, collapsed, user }) {
+  const profile = useSidebarProfile(user);
 
   return (
     <div className={styles.sidebarFooter}>
       <ProfileNavButton active={active} onChange={onChange} collapsed={collapsed} />
-      <UserRow collapsed={collapsed} displayName={displayName} year={year} major={major} photoUrl={photoUrl} />
+      <UserRow collapsed={collapsed} {...profile} />
     </div>
   );
 }
 
 export default function Sidebar({ active, onChange, collapsed, user }) {
   const W = collapsed ? 72 : 224;
-
   return (
     <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
       <SidebarHeader collapsed={collapsed} />
