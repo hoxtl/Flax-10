@@ -44,21 +44,15 @@ def delete_event(event):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_exception_date(request, pk):
-    # Filter by user
     event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
-    
     date = request.data.get('date')
     if not date:
         return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
-    
     if not event.recurrence_rule:
         return Response({'error': 'Event has no recurrence rule'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Add exception date
     exception_dates = event.recurrence_rule.exception_dates or []
     if date not in exception_dates:
         exception_dates.append(date)
         event.recurrence_rule.exception_dates = exception_dates
         event.recurrence_rule.save()
-    
     return Response(CalendarEventSerialiser(event).data)

@@ -35,7 +35,6 @@ def create_tag(request):
 @api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def tag_detail(request, pk):
-    # Filter by user or default tags
     try:
         tag = Tag.objects.get(Q(pk=pk) & (Q(user=request.user) | Q(is_default=True)))
     except Tag.DoesNotExist:
@@ -44,13 +43,11 @@ def tag_detail(request, pk):
     if request.method == 'GET':
         return Response(TagSerialiser(tag).data)
     if request.method == 'PATCH':
-        # Don't allow editing default tags
         if tag.is_default:
             return Response({'error': 'Cannot edit default tags'}, status=status.HTTP_400_BAD_REQUEST)
         return update_tag(tag, request.data)
     if request.method == 'DELETE':
         return delete_tag(tag)
-
 
 def update_tag(tag, data):
     serialiser = TagSerialiser(tag, data=data, partial=True)
@@ -58,7 +55,6 @@ def update_tag(tag, data):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
     return Response(serialiser.data)
-
 
 def delete_tag(tag):
     if tag.is_default:
@@ -68,11 +64,9 @@ def delete_tag(tag):
     tag.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def category_list(request):
-    # Get default categories OR user's custom categories
     categories = Category.objects.filter(Q(user=request.user) | Q(is_default=True))
     serialiser = CategorySerialiser(categories, many=True)
     return Response(serialiser.data)
