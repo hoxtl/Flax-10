@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchSocieties, createSociety } from "../../../api/societyApi";
+import { fetchSocieties, createSociety, addCollaborator } from "../../../api/societyApi";
 
 function toSnakeCase(obj) {
     const result = {};
@@ -8,6 +8,11 @@ function toSnakeCase(obj) {
         result[snakeKey] = value;
     }
     return result;
+}
+
+async function addCollaboratorsToSociety(societyId, collaborators) {
+    if (!collaborators?.length) return;
+    for (const c of collaborators) await addCollaborator(societyId, c.username, c.role);
 }
 
 export function useSocieties() {
@@ -30,8 +35,10 @@ export function useSocieties() {
     useEffect(() => { loadSocieties(); }, [loadSocieties]);
 
     const handleCreate = async (formData) => {
-        const apiData = toSnakeCase(formData);
+        const { collaborators, ...rest } = formData;
+        const apiData = toSnakeCase(rest);
         const newSociety = await createSociety(apiData);
+        await addCollaboratorsToSociety(newSociety.id, collaborators);
         setSocieties(prev => [...prev, newSociety]);
         return newSociety;
     };
