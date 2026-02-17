@@ -5,7 +5,6 @@ import * as CalendarContextModule from '../../../../context/CalendarContext';
 import * as EventActionsModule from '../../../../hooks/useCalendarEvents';
 import * as FormUtilsModule from '../../../../utils/formUtils';
 
-// Mock dependencies
 const mockEvents = [];
 const mockActions = { addEvent: vi.fn(), updateEvent: vi.fn(), deleteEvent: vi.fn() };
 const mockInitialForm = {
@@ -46,10 +45,7 @@ describe('useEventForm', () => {
         const { result, rerender } = renderHook(({ event }) => useEventForm(event, vi.fn()), {
             initialProps: { event: null },
         });
-
         expect(result.current.isEditing).toBe(false);
-
-        // Update prop
         rerender({ event: { id: 1 } });
         expect(result.current.isEditing).toBe(true);
         expect(FormUtilsModule.getInitialForm).toHaveBeenCalledTimes(3); // Initial (state) + Initial (effect) + update
@@ -90,11 +86,9 @@ describe('useEventForm', () => {
         const onClose = vi.fn();
         const event = { id: 1 };
         const { result } = renderHook(() => useEventForm(event, onClose));
-
         act(() => {
             result.current.handleDelete();
         });
-
         expect(FormUtilsModule.confirmDelete).toHaveBeenCalledWith(
             event,
             mockActions,

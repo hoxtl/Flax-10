@@ -3,9 +3,6 @@ import { WeekdayHeader } from './WeekdayHeader';
 import { WeekRow } from './WeekRow';
 import './MonthView.css';
 
-/*
-    Shows full month view of the calendar.
-*/
 export function MonthView() {
     const { selectedDate, events } = useCalendar();
     const dispatch = useCalendarDispatch();

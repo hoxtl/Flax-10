@@ -2,10 +2,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ModalContent } from '../../../../../components/Calendar/EventModal/components/ModalContent';
 
-// Mock child components to isolate ModalContent logic
 vi.mock('../../../../../components/Calendar/EventModal/components/ModalHeader', () => ({
     ModalHeader: ({ onClose }) => <div data-testid="modal-header"><button onClick={onClose}>Close</button></div>
 }));
+
 vi.mock('../../../../../components/Calendar/EventModal/components/EventFormBody', () => ({
     EventFormBody: ({ onSubmit }) => <form data-testid="event-form" onSubmit={onSubmit}><button>Submit</button></form>
 }));
