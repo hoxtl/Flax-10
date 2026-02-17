@@ -4,7 +4,7 @@
     "builder": "RAILPACK",
   },
   "deploy": {
-    "preDeployCommand": ["python flax-10-project-files/backend/manage.py migrate"],["python flax-10-project-files/backend/manage.py collectstatic --noinput"]
+    "preDeployCommand": ["python flax-10-project-files/backend/manage.py migrate"],["python flax-10-project-files/backend/manage.py collectstatic --noinput"],
     "startCommand": "gunicorn Flax10.wsgi:application --bind 0.0.0.0:$PORT",
     "healthcheckPath": "/",
     "healthcheckTimeout": 100,
