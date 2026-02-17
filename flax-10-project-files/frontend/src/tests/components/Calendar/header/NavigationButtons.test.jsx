@@ -74,11 +74,11 @@ describe('NavigationButtons', () => {
         useCalendar.mockReturnValue({ viewMode: 'week' }); // Reset
     });
 
-    it('should open date picker on calendar click', () => {
+    it('should open date picker on calendar click', async () => {
         const showPickerSpy = vi.fn();
         HTMLInputElement.prototype.showPicker = showPickerSpy;
         render(<NavigationButtons {...defaultProps} />);
-        const calendarBtn = screen.getByText('🗓️');
+        const calendarBtn = screen.getByText('📅');
         fireEvent.click(calendarBtn);
         expect(showPickerSpy).toHaveBeenCalled();
     });
