@@ -55,12 +55,14 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   );
 }
 
-function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, children }) {
+function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, children, activeNav }) {
+  const isMapPage = activeNav === "map";
+
   return (
     <div className={styles.main}>
       <TopBar user={user} onToggle={onToggle} onAddClick={onQuickAdd} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} />
       {showWeekBar && <WeekBar date={selectedDate} />}
-      <div className={styles.content}>{children}</div>
+      <div className={styles.content} style={isMapPage ? { padding: 0, overflow: "hidden", height: "100%" } : undefined}>{children}</div>
     </div>
   );
 }
@@ -99,7 +101,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
     <div className={styles.root}>
       <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} collapsed={sidebarCollapsed} />
       <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user} activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-      <MainArea user={user} onToggle={onToggle} onQuickAdd={() => setShowQuickAdd(true)} onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick} selectedDate={selectedDate} showWeekBar={showWeekBar}>
+      <MainArea user={user} onToggle={onToggle} onQuickAdd={() => setShowQuickAdd(true)} onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick} selectedDate={selectedDate} showWeekBar={showWeekBar} activeNav={activeNav}>
         {children}
       </MainArea>
       <QuickAddGate open={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSelectType={onSelectType} />
