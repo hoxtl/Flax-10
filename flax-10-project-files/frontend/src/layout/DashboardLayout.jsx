@@ -78,7 +78,9 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   );
 }
 
-function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, children }) {
+function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, children, activeNav }) {
+  const isMapPage = activeNav === "map";
+
   return (
     <div className={styles.main}>
       <TopBar
@@ -89,7 +91,8 @@ function MainArea({ user, onToggle, onQuickAdd, onSettingsClick, onLogoutClick, 
         onLogoutClick={onLogoutClick}
       />
       {showWeekBar && <WeekBar date={selectedDate} />}
-      <div className={styles.content}>{children}</div>
+      <div 
+      className={styles.content} style={isMapPage ? { padding: 0, overflow: "hidden", height: "100%" } : undefined}>{children}</div>
     </div>
   );
 }
@@ -174,6 +177,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         onLogoutClick={handleLogoutClick}
         selectedDate={selectedDate}
         showWeekBar={showWeekBar}
+        activeNav={activeNav}
       >
         {children}
       </MainArea>
