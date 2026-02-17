@@ -6,7 +6,7 @@ import { AuthOverlay } from "../components/Authentication/Overlay";
 import { ErrorMessage } from "../components/Authentication/ErrorMessage";
 import { useAuthForm } from "../components/Authentication/hooks/useAuthForm";
 import { authService } from "../api/authService";
-import { validatePasswords, getErrorMessage, saveUserData } from "../utils/authHelpers";
+import { validatePasswords, getErrorMessage, saveUserData } from "../components/Authentication/utils/authHelpers";
 import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
 
 function AuthBrand() {

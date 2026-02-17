@@ -78,26 +78,6 @@ function useAppState() {
   return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
 }
 
-useEffect(() => {
-  async function loadUserTheme() {
-    if (!isAuthenticated()) {
-      setIsLoadingTheme(false);
-      return;
-    }
-
-    try {
-      const settings = await getUserSettings();
-      setInitialTheme(settings.theme || "light");
-    } catch (error) {
-      console.log("Using default theme (not logged in or error)");
-      setInitialTheme("light");
-    } finally {
-      setIsLoadingTheme(false);
-    }
-  }
-
-  loadUserTheme();
-}, []);
 function ScreenWrap({ animKey, children }) {
   return (
     <motion.div key={animKey} variants={screenAnim} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.28 }} style={{ height: "100vh" }}>

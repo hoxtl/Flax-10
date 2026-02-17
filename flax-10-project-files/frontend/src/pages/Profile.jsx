@@ -184,7 +184,6 @@ function RangeButtons({ range, onRangeChange }) {
 }
 
 function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
-<<<<<<< HEAD
   const rangeLabels = {
     'today': 'Today',
     'week': 'This Week',
@@ -227,167 +226,52 @@ function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
       ) : (
         <p className={styles.emptyMessage}>No events found for this period</p>
       )}
-=======
-  const rangeLabels = {today: 'Today', week: 'This Week', month: 'This Month' };
-      return (
-      <Modal isOpen={isOpen} onClose={onClose} title={`Events - ${rangeLabels[range]} (${events.length})`}>
-        <RangeButtons range={range} onRangeChange={onRangeChange} />
-        {events.length > 0
-          ? events.map((e, i) => <EventItem key={i} title={e.title} startTime={e.start_time} location={e.location} />)
-          : <p className={styles.emptyMessage}>No events found for this period</p>}
->>>>>>> main
-      </Modal>
+    </Modal>
   );
 }
 
-<<<<<<< HEAD
-  export default function Profile({ user }) {
-    const [showModules, setShowModules] = useState(false);
-    const [showTasks, setShowTasks] = useState(false);
-    const [showEvents, setShowEvents] = useState(false);
-    const [showEditProfile, setShowEditProfile] = useState(false);
-    const [profileData, setProfileData] = useState(null);
-    const [allEvents, setAllEvents] = useState([]);
-    const [eventRange, setEventRange] = useState('month');
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      loadProfileData();
-      loadEvents();
-    }, []);
-
-    const loadProfileData = async () => {
-      try {
-        const data = await getUserProfile();
-        setProfileData(data);
-      } catch (error) {
-        console.error('Failed to load profile:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const loadEvents = async () => {
-      try {
-        const eventsData = await getEvents();
-        setAllEvents(eventsData || []);
-      } catch (error) {
-        console.error('Failed to load events:', error);
-      }
-    };
-
-    const handleEditProfile = () => {
-      setShowEditProfile(true);
-    };
-
-    const handleSaveProfile = async () => {
-      await loadProfileData();
-      setShowEditProfile(false);
-    };
-
-    const getFilteredEvents = () => {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      return allEvents.filter(event => {
-        const eventStart = new Date(event.start_time);
-
-        if (eventRange === 'today') {
-          const tomorrow = new Date(today);
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          return eventStart >= today && eventStart < tomorrow;
-        } else if (eventRange === 'week') {
-          const weekEnd = new Date(today);
-          weekEnd.setDate(weekEnd.getDate() + 7);
-          return eventStart >= today && eventStart < weekEnd;
-        } else { // month
-          const monthEnd = new Date(today);
-          monthEnd.setDate(monthEnd.getDate() + 30);
-          return eventStart >= today && eventStart < monthEnd;
-        }
-      }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    };
-
-    if (loading) {
-      return <div className={styles.container}>Loading...</div>;
-    }
-
-    const modules = profileData?.modules || [];
-    const filteredEvents = getFilteredEvents();
-
-    // Count all upcoming events (from today onwards, next 30 days)
-    const upcomingEventCount = allEvents.filter(event => {
-      const eventStart = new Date(event.start_time);
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const monthEnd = new Date(today);
-      monthEnd.setDate(monthEnd.getDate() + 30);
-      return eventStart >= today && eventStart < monthEnd;
-    }).length;
-
-    return (
-      <div className={styles.container}>
-        <div className={styles.content}>
-          <ProfileHeader
-            user={profileData || user}
-            profileData={profileData}
-            onModulesClick={() => setShowModules(true)}
-            onTasksClick={() => setShowTasks(true)}
-            onEventsClick={() => setShowEvents(true)}
-            onEditProfile={handleEditProfile}
-            upcomingEventCount={upcomingEventCount}
-          />
-
-          <div className={styles.modulesGrid}>
-            {modules.slice(0, 6).map((code, i) => (
-              <div key={i} className={styles.moduleCard}>
-                <div className={styles.moduleIcon}>📚</div>
-                <div className={styles.moduleCode}>{code}</div>
-              </div>
-            ))}
-=======
-function ModulesGrid({modules}) {
+function ModulesGrid({ modules }) {
   return (
-            <div className={styles.modulesGrid}>
-              {modules.slice(0, 6).map((code, i) => (
-                <div key={i} className={styles.moduleCard}>
-                  <div className={styles.moduleIcon}>📚</div>
-                  <div className={styles.moduleCode}>{code}</div>
->>>>>>> main
-                </div>
-              ))}
-            </div>
-            );
+    <div className={styles.modulesGrid}>
+      {modules.slice(0, 6).map((code, i) => (
+        <div key={i} className={styles.moduleCard}>
+          <div className={styles.moduleIcon}>📚</div>
+          <div className={styles.moduleCode}>{code}</div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-            function ProfileModals({state, user, profileData, modules, filteredEvents}) {
-  const {showModules, setShowModules, showTasks, setShowTasks, showEvents, setShowEvents, showEditProfile, setShowEditProfile, eventRange, setEventRange, handleSaveProfile} = state;
-            return (
-            <>
-              <EditProfileModal user={profileData || user} isOpen={showEditProfile} onClose={() => setShowEditProfile(false)} onSave={handleSaveProfile} />
-              <Modal isOpen={showModules} onClose={() => setShowModules(false)} title="Modules">
-                {modules.length > 0 ? modules.map((code, i) => <ModuleItem key={i} code={code} />) : <p className={styles.emptyMessage}>No modules found</p>}
-              </Modal>
-              <Modal isOpen={showTasks} onClose={() => setShowTasks(false)} title="Tasks">
-                <p className={styles.emptyMessage}>Tasks feature coming soon...</p>
-              </Modal>
-              <EventsModal isOpen={showEvents} onClose={() => setShowEvents(false)} events={filteredEvents} range={eventRange} onRangeChange={setEventRange} />
-            </>
-            );
+function ProfileModals({ state, user, profileData, modules, filteredEvents }) {
+  const { showModules, setShowModules, showTasks, setShowTasks, showEvents, setShowEvents, showEditProfile, setShowEditProfile, eventRange, setEventRange, handleSaveProfile } = state;
+  return (
+    <>
+      <EditProfileModal user={profileData || user} isOpen={showEditProfile} onClose={() => setShowEditProfile(false)} onSave={handleSaveProfile} />
+      <Modal isOpen={showModules} onClose={() => setShowModules(false)} title="Modules">
+        {modules.length > 0 ? modules.map((code, i) => <ModuleItem key={i} code={code} />) : <p className={styles.emptyMessage}>No modules found</p>}
+      </Modal>
+      <Modal isOpen={showTasks} onClose={() => setShowTasks(false)} title="Tasks">
+        <p className={styles.emptyMessage}>Tasks feature coming soon...</p>
+      </Modal>
+      <EventsModal isOpen={showEvents} onClose={() => setShowEvents(false)} events={filteredEvents} range={eventRange} onRangeChange={setEventRange} />
+    </>
+  );
 }
 
-            export default function Profile({user}) {
+export default function Profile({ user }) {
   const state = useProfileState();
-            const {showModules: _sm, profileData, allEvents, eventRange, loading, setShowModules, setShowTasks, setShowEvents, setShowEditProfile } = state;
-            if (loading) return <div className={styles.container}>Loading...</div>;
-            const modules = profileData?.modules || [];
-            const filteredEvents = getFilteredEvents(allEvents, eventRange);
-            const upcomingEventCount = getUpcomingCount(allEvents);
-            return (
-            <div className={styles.container}>
-              <div className={styles.content}>
-                <ProfileHeader user={profileData || user} profileData={profileData} onModulesClick={() => setShowModules(true)} onTasksClick={() => setShowTasks(true)} onEventsClick={() => setShowEvents(true)} onEditProfile={() => setShowEditProfile(true)} upcomingEventCount={upcomingEventCount} />
-                <ModulesGrid modules={modules} />
-              </div>
-              <ProfileModals state={state} user={user} profileData={profileData} modules={modules} filteredEvents={filteredEvents} />
-            </div>);}
+  const { showModules: _sm, profileData, allEvents, eventRange, loading, setShowModules, setShowTasks, setShowEvents, setShowEditProfile } = state;
+  if (loading) return <div className={styles.container}>Loading...</div>;
+  const modules = profileData?.modules || [];
+  const filteredEvents = getFilteredEvents(allEvents, eventRange);
+  const upcomingEventCount = getUpcomingCount(allEvents);
+  return (
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <ProfileHeader user={profileData || user} profileData={profileData} onModulesClick={() => setShowModules(true)} onTasksClick={() => setShowTasks(true)} onEventsClick={() => setShowEvents(true)} onEditProfile={() => setShowEditProfile(true)} upcomingEventCount={upcomingEventCount} />
+        <ModulesGrid modules={modules} />
+      </div>
+      <ProfileModals state={state} user={user} profileData={profileData} modules={modules} filteredEvents={filteredEvents} />
+    </div>);
+}

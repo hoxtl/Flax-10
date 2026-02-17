@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useCompletionCheck } from './timerUtils';
+import { useCompletionCheck } from '../utils/timerUtils';
 import { saveSession } from '../utils/historyUtils';
 
 /**
