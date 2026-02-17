@@ -1,12 +1,13 @@
 import { useState } from "react";
 import styles from "./SocietyInfo.module.css";
 
-export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave }) {
+export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onEnterEditMode }) {
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <Stats society={society} />
-            <JoinButton isMember={society.is_member} editMode={editMode} onJoin={onJoin} onLeave={onLeave} />
+            <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
+                onJoin={onJoin} onLeave={onLeave} onEnterEditMode={onEnterEditMode} />
         </div>
     );
 }
@@ -58,9 +59,13 @@ function Stats({ society }) {
     );
 }
 
-function JoinButton({ isMember, editMode, onJoin, onLeave }) {
+function ActionButton({ isMember, editMode, canEdit, onJoin, onLeave, onEnterEditMode }) {
     if (editMode) return null;
+    if (canEdit) return <button className={styles.joinBtn} onClick={onEnterEditMode}>Edit Society</button>;
+    return <MemberButton isMember={isMember} onJoin={onJoin} onLeave={onLeave} />;
+}
 
+function MemberButton({ isMember, onJoin, onLeave }) {
     const handleClick = () => isMember ? onLeave?.() : onJoin?.();
     const className = isMember ? styles.joinedBtn : styles.joinBtn;
     const label = isMember ? "Joined" : "Join Society";
