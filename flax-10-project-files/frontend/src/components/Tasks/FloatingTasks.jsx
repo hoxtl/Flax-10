@@ -33,9 +33,7 @@ function FloatingTasksPortal({ open, setOpen, fabRef }) {
         To-do
       </button>
       <ToDoPanel open={open} onClose={() => setOpen(false)} fabRef={fabRef} />
-    </>
-  );
-}
+    </>);}
 
 export default function FloatingTasks() {
   const fabRef = useRef(null);
