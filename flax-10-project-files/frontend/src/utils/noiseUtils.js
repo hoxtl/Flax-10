@@ -4,127 +4,109 @@ export class NoiseGenerator {
         this.ctx = null;
         this.node = null;
         this.gain = null;
-        this.type = 'white';
+        this.filter = null;
         this.volume = 0.5;
     }
 
     init() {
-        if (!this.ctx) {
-            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            this.gain = this.ctx.createGain();
-            this.gain.connect(this.ctx.destination);
+        if (this.ctx) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.gain = this.ctx.createGain();
+        this.filter = this.ctx.createBiquadFilter();
+        this.filter.connect(this.gain);
+        this.gain.connect(this.ctx.destination);
+    }
+
+    // --- Noise Processors ---
+
+    processWhite(output, size) {
+        for (let i = 0; i < size; i++) {
+            const r1 = Math.random();
+            const r2 = Math.random();
+            const gaussian = Math.sqrt(-2.0 * Math.log(r1)) * Math.cos(2.0 * Math.PI * r2);
+            output[i] = gaussian * 0.15; // Gaussian White Noise
         }
     }
 
-    makeNoise(type) {
-        const bufferSize = 4096;
-        const node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
-        node.onaudioprocess = (e) => {
-            const output = e.outputBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                if (type === 'white') {
-                    output[i] = Math.random() * 2 - 1;
-                } else if (type === 'pink') {
-                    // Pink noise approximation
-                    let b0, b1, b2, b3, b4, b5, b6;
-                    b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
-                    const white = Math.random() * 2 - 1;
-                    b0 = 0.99886 * b0 + white * 0.0555179;
-                    b1 = 0.99332 * b1 + white * 0.0750759;
-                    b2 = 0.96900 * b2 + white * 0.1538520;
-                    b3 = 0.86650 * b3 + white * 0.3104856;
-                    b4 = 0.55000 * b4 + white * 0.5329522;
-                    b5 = -0.7616 * b5 - white * 0.0168980;
-                    output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-                    output[i] *= 0.11; // (roughly) compensate for gain
-                    b6 = white * 0.115926;
-                } else if (type === 'brown') {
-                    // Brown noise
-                    let lastOut = 0;
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 3.5; // (roughly) compensate for gain
-                }
-            }
-        };
+    processPink(output, size, state) {
+        let { b0, b1, b2, b3, b4, b5, b6 } = state;
+        for (let i = 0; i < size; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+            b6 = white * 0.115926;
+        }
+        Object.assign(state, { b0, b1, b2, b3, b4, b5, b6 });
+    }
+
+    processBrown(output, size, state) {
+        let { lastOut } = state;
+        for (let i = 0; i < size; i++) {
+            const white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= 3.5;
+        }
+        state.lastOut = lastOut;
+    }
+
+    // --- Creators ---
+
+    createWhiteNoise() {
+        const node = this.ctx.createScriptProcessor(4096, 1, 1);
+        node.onaudioprocess = (e) => this.processWhite(e.outputBuffer.getChannelData(0), 4096);
         return node;
     }
 
-    // Better Brown Noise Implementation
-    createBrownNoise() {
-        const bufferSize = 4096;
-        let lastOut = 0;
-        const node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
-        node.onaudioprocess = (e) => {
-            const output = e.outputBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                output[i] = (lastOut + (0.02 * white)) / 1.02;
-                lastOut = output[i];
-                output[i] *= 3.5;
-            }
-        };
-        return node;
-
-    }
-
-    // Better Pink Noise Implementation
     createPinkNoise() {
-        const bufferSize = 4096;
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        const node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
-        node.onaudioprocess = (e) => {
-            const output = e.outputBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                b0 = 0.99886 * b0 + white * 0.0555179;
-                b1 = 0.99332 * b1 + white * 0.0750759;
-                b2 = 0.96900 * b2 + white * 0.1538520;
-                b3 = 0.86650 * b3 + white * 0.3104856;
-                b4 = 0.55000 * b4 + white * 0.5329522;
-                b5 = -0.7616 * b5 - white * 0.0168980;
-                output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-                output[i] *= 0.11;
-                b6 = white * 0.115926;
-            }
-        };
+        const node = this.ctx.createScriptProcessor(4096, 1, 1);
+        const state = { b0: 0, b1: 0, b2: 0, b3: 0, b4: 0, b5: 0, b6: 0 };
+        node.onaudioprocess = (e) => this.processPink(e.outputBuffer.getChannelData(0), 4096, state);
         return node;
     }
 
+    createBrownNoise() {
+        const node = this.ctx.createScriptProcessor(4096, 1, 1);
+        const state = { lastOut: 0 };
+        node.onaudioprocess = (e) => this.processBrown(e.outputBuffer.getChannelData(0), 4096, state);
+        return node;
+    }
+
+    // --- Control ---
+
+    getNoiseNode(type) {
+        if (type === 'white') return this.createWhiteNoise();
+        if (type === 'pink') return this.createPinkNoise();
+        if (type === 'brown') return this.createBrownNoise();
+        return null;
+    }
+
+    configureFilter(type) {
+        if (!this.filter) return;
+        this.filter.type = 'lowpass';
+        if (type === 'white') this.filter.frequency.value = 1500;
+        else if (type === 'pink') this.filter.frequency.value = 2500;
+        else this.filter.frequency.value = 400;
+    }
+
+    setupNode(type) {
+        this.node = this.getNoiseNode(type);
+        if (this.node) this.node.connect(this.filter);
+        if (this.gain) this.gain.gain.value = this.volume;
+    }
 
     play(type) {
         this.init();
-        if (this.node) {
-            this.node.disconnect();
-        }
+        this.stop();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
 
-        // Resume context if suspended (browser policy)
-        if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
-        }
-
-        this.type = type;
-
-        // Simple white noise
-        if (type === 'white') {
-            const bufferSize = 4096;
-            const node = this.ctx.createScriptProcessor(bufferSize, 1, 1);
-            node.onaudioprocess = (e) => {
-                const output = e.outputBuffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    output[i] = Math.random() * 2 - 1;
-                }
-            };
-            this.node = node;
-        } else if (type === 'pink') {
-            this.node = this.createPinkNoise();
-        } else if (type === 'brown') {
-            this.node = this.createBrownNoise();
-        }
-
-        this.node.connect(this.gain);
-        this.gain.gain.value = this.volume;
+        this.configureFilter(type);
+        this.setupNode(type);
     }
 
     stop() {
@@ -132,16 +114,11 @@ export class NoiseGenerator {
             this.node.disconnect();
             this.node = null;
         }
-        if (this.ctx && this.ctx.state === 'running') {
-            //  this.ctx.suspend(); 
-        }
     }
 
     setVolume(value) {
         this.volume = value;
-        if (this.gain) {
-            this.gain.gain.value = value;
-        }
+        if (this.gain) this.gain.gain.value = value;
     }
 }
 

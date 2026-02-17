@@ -9,24 +9,22 @@ export const getHistory = () => {
     }
 };
 
-/** Creates a completed session entry with calculated timestamps */
-export const saveSession = (workDuration, breakDuration, sessionCount, studyBlockId, task = '') => {
-    const history = getHistory();
+const createSessionObject = (workDuration, breakDuration, sessionCount, studyBlockId, task) => {
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - workDuration * 60000);
-
-    const session = {
-        id: Date.now(),
-        date: endTime.toISOString(),
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-        duration: workDuration,
-        breakDuration: breakDuration,
-        sessionCount: sessionCount,
-        studyBlockId: studyBlockId || Date.now(), // Fallback
-        task: task,
-        status: 'Completed'
+    return {
+        id: Date.now(), date: endTime.toISOString(),
+        startTime: startTime.toISOString(), endTime: endTime.toISOString(),
+        duration: workDuration, breakDuration: breakDuration,
+        sessionCount: sessionCount, studyBlockId: studyBlockId || Date.now(),
+        task: task, status: 'Completed'
     };
+};
+
+/** Creates a completed session entry */
+export const saveSession = (workDuration, breakDuration, sessionCount, studyBlockId, task = '') => {
+    const history = getHistory();
+    const session = createSessionObject(workDuration, breakDuration, sessionCount, studyBlockId, task);
     localStorage.setItem(HISTORY_KEY, JSON.stringify([session, ...history]));
 };
 
