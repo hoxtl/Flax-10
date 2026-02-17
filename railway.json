@@ -5,7 +5,7 @@
   },
   "deploy": {
     "preDeployCommand": "cd flax-10-project-files/backend && mkdir static && python manage.py migrate && python manage.py collectstatic --noinput",
-    "startCommand": "gunicorn Flax10.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120",
+    "startCommand": "gunicorn studyFlax.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,
     "healthcheckPath": "/",
