@@ -90,8 +90,7 @@ function useDashboardState(activeNav, onNavChange) {
   const onToggle = () => toggleByDevice(isMobile, setMobileSidebarOpen, setSidebarCollapsed);
   const onPickNav = (id) => { onNavChange?.(id); setMobileSidebarOpen(false); };
   const onSelectType = (type) => { setShowQuickAdd(false); modal.openModal(null, type, selectedDate); };
-  return { isMobile, user, sidebarCollapsed, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onToggle, onPickNav, onSelectType };
-}
+  return { isMobile, user, sidebarCollapsed, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onToggle, onPickNav, onSelectType };}
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const s = useDashboardState(activeNav, onNavChange);
@@ -106,6 +105,4 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       <QuickAddGate open={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSelectType={onSelectType} />
       {modal.isModalOpen && <EventModal event={modal.modalEvent} initialType={modal.modalType} initialDate={modal.modalInitialDate} onClose={modal.closeModal} />}
       <FloatingTasks />
-    </div>
-  );
-}
+    </div>);}
