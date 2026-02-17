@@ -3,12 +3,19 @@ import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
 
+async function addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator) {
+    const existingMember = (members || []).find(m => m.username === user.username);
+    if (existingMember) return onUpdateRole?.(existingMember.user, "editor");
+    return onAddCollaborator?.(user.username, "editor");
+}
+
 export default function SettingsModal({ onClose, onDelete, members, onFetchMembers, onUpdateRole, onRemoveMember, onAddCollaborator }) {
     const [showAddModal, setShowAddModal] = useState(false);
     useEffect(() => { onFetchMembers?.(); }, [onFetchMembers]);
 
     const handleAddCollaborators = async (users) => {
-        for (const user of users) await onAddCollaborator?.(user.username, "editor");
+        for (const user of users) await addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator);
+        onFetchMembers?.();
     };
 
     const collaborators = (members || []).filter(m => m.role !== 'member');
