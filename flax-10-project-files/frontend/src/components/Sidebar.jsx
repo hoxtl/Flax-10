@@ -1,9 +1,52 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import styles from "./Sidebar.module.css";
 import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
 import { getPreferredFirstName } from "../utils/userDisplay";
 import { getUserProfile } from "../api/userService";
+
+const getDisplayName = (profileData, user) =>
+  profileData?.username || user?.username || getPreferredFirstName(user) || "User";
+
+const getYearLabel = (profileData, user) => {
+  const yearRaw = profileData?.year ?? user?.year;
+  if (!yearRaw) return "Year 2";
+  const s = String(yearRaw);
+  return s.startsWith("Year") ? s : `Year ${s}`;
+};
+
+const getMajor = (profileData, user) => profileData?.major || user?.major || "CS";
+
+const getProfilePhotoUrl = (profileData, user) =>
+  profileData?.profile_photo_url || user?.profile_photo_url || null;
+
+function useProfileData() {
+  const [profileData, setProfileData] = useState(null);
+
+  const loadProfile = useCallback(async () => {
+    try {
+      setProfileData(await getUserProfile());
+    } catch (e) {
+      console.error("Failed to load profile:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onAuth = () => loadProfile();
+    const onProfile = () => loadProfile();
+
+    loadProfile();
+    window.addEventListener("auth-changed", onAuth);
+    window.addEventListener("profile-updated", onProfile);
+
+    return () => {
+      window.removeEventListener("auth-changed", onAuth);
+      window.removeEventListener("profile-updated", onProfile);
+    };
+  }, [loadProfile]);
+
+  return profileData;
+}
 
 function SidebarHeader({ collapsed }) {
   return (
@@ -46,79 +89,67 @@ function SidebarNav({ active, onChange, collapsed }) {
   );
 }
 
-function SidebarFooter({ active, onChange, collapsed, user }) {
-  const [profileData, setProfileData] = useState(null);
+const ProfileNavButton = memo(function ProfileNavButton({ active, onChange, collapsed }) {
+  return (
+    <NavItem
+      item={{ id: "profile", icon: "👤", label: "Profile" }}
+      isActive={active === "profile"}
+      collapsed={collapsed}
+      onClick={() => onChange?.("profile")}
+    />
+  );
+});
 
-  const loadProfile = useCallback(async () => {
-    try {
-      const data = await getUserProfile();
-      setProfileData(data);
-    } catch (e) {
-      console.error("Failed to load profile:", e);
-    }
-  }, []);
+function Avatar({ photoUrl, initials }) {
+  return (
+    <div className={styles.avatar}>
+      {photoUrl ? (
+        <img src={photoUrl} alt="Profile" className={styles.avatarImage} />
+      ) : (
+        initials
+      )}
+    </div>
+  );
+}
 
-  useEffect(() => {
-    loadProfile();
+function UserText({ collapsed, displayName, year, major }) {
+  if (collapsed) return null;
 
-    const onAuthChanged = () => loadProfile();
-    window.addEventListener("auth-changed", onAuthChanged);
+  return (
+    <div className={styles.userText}>
+      <div className={styles.userName}>{displayName}</div>
+      <div className={styles.userMeta}>
+        {year} · {major}
+      </div>
+    </div>
+  );
+}
 
-    const onProfileUpdated = () => loadProfile();
-    window.addEventListener("profile-updated", onProfileUpdated);
-
-    return () => {
-      window.removeEventListener("auth-changed", onAuthChanged);
-      window.removeEventListener("profile-updated", onProfileUpdated);
-    };
-  }, [loadProfile]);
-
-  const displayName =
-    profileData?.username ||
-    user?.username ||
-    getPreferredFirstName(user) ||
-    "User";
-
+function UserRow({ collapsed, displayName, year, major, photoUrl }) {
   const initials = getInitials(displayName) || "?";
 
-  const yearRaw = profileData?.year ?? user?.year;
-  const year = yearRaw
-    ? String(yearRaw).startsWith("Year")
-      ? String(yearRaw)
-      : `Year ${yearRaw}`
-    : "Year 2";
+  return (
+    <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
+      <Avatar photoUrl={photoUrl} initials={initials} />
+      <UserText collapsed={collapsed} displayName={displayName} year={year} major={major} />
+    </div>
+  );
+}
 
-  const major = profileData?.major || user?.major || "CS";
+/* Footer */
 
-  const profilePhotoUrl = profileData?.profile_photo_url || user?.profile_photo_url;
+function SidebarFooter({ active, onChange, collapsed, user }) {
+  const profileData = useProfileData();
+
+  const displayName = getDisplayName(profileData, user);
+  const year = getYearLabel(profileData, user);
+  const major = getMajor(profileData, user);
+  const photoUrl = getProfilePhotoUrl(profileData, user);
 
   return (
     <div className={styles.sidebarFooter}>
-      <NavItem
-        item={{ id: "profile", icon: "👤", label: "Profile" }}
-        isActive={active === "profile"}
-        collapsed={collapsed}
-        onClick={() => onChange?.("profile")}
-      />
-
-      <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
-        <div className={styles.avatar}>
-          {profilePhotoUrl ? (
-            <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
-          ) : (
-            initials
-          )}
-        </div>
-
-        {!collapsed && (
-          <div className={styles.userText}>
-            <div className={styles.userName}>{displayName}</div>
-            <div className={styles.userMeta}>
-              {year} · {major}
-            </div>
-          </div>
-        )}
-      </div>
+      <ProfileNavButton active={active} onChange={onChange} collapsed={collapsed} />
+      <UserRow collapsed={collapsed} displayName={displayName} year={year} major={major} photoUrl={photoUrl} />
     </div>
   );
 }
