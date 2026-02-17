@@ -34,8 +34,7 @@ def create_enrollments(request):
             end_time=module.end_time,
             recurrence_rule = module.recurrence_rule,
             location=module.location,
-            source="module_enrollment" 
-        )
+            source="module_enrollment" )
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'DELETE'])
@@ -48,13 +47,12 @@ def enrollment_detail(request, enrollment_id):
     return delete_enrollment(request, enrollment, user)
 def delete_enrollment(request, enrollment, user):
     if enrollment.student != user:
-        return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
+        return Response( {"error": "You can only un-enroll yourself."}, status = status.HTTP_403_FORBIDDEN)
     
     CalendarEvent.objects.filter( 
         user=user,
         module=enrollment.module,
-        source="module_enrollment"
-    ).delete()
+        source="module_enrollment").delete()
     enrollment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
