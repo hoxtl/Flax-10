@@ -1,8 +1,7 @@
 export function countByType(items) {
-  const counts = { all: items.length };
-  for (const it of items) {
-    const tagName = it.tag_name?.toLowerCase();
-    if (tagName) counts[tagName] = (counts[tagName] || 0) + 1;
-  }
-  return counts;
+  return items.reduce((counts, it) => {
+    const tag = it.tag_name?.toLowerCase();
+    if (tag) counts[tag] = (counts[tag] || 0) + 1;
+    return counts;
+  }, { all: items.length });
 }
