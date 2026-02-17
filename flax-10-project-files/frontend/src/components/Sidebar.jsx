@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Sidebar.module.css";
 import { APP_ROUTES } from "../lib/routes";
@@ -100,25 +100,6 @@ function SidebarNav({ active, onChange, open }) {
   );
 }
 
-const ProfileNavButton = memo(function ProfileNavButton({ active, onChange, open }) {
-  return (
-    <NavItem
-      item={{ id: "profile", icon: "👤", label: "Profile" }}
-      isActive={active === "profile"}
-      open={open}
-      onClick={() => onChange?.("profile")}
-    />
-  );
-});
-
-function SidebarFooter({ active, onChange, open }) {
-  return (
-    <div className={styles.sidebarFooter}>
-      <ProfileNavButton active={active} onChange={onChange} open={open} />
-    </div>
-  );
-}
-
 export default function Sidebar({ active, onChange }) {
   const [open, setOpen] = useState(false);
   const w = open ? EXPANDED_W : COLLAPSED_W;
@@ -132,7 +113,6 @@ export default function Sidebar({ active, onChange }) {
     >
       <SidebarHeader open={open} />
       <SidebarNav active={active} onChange={onChange} open={open} />
-      <SidebarFooter active={active} onChange={onChange} open={open} />
     </motion.aside>
   );
 }
