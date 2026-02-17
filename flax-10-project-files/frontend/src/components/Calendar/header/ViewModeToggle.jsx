@@ -1,5 +1,3 @@
-
-
 export function ViewModeToggle({ viewMode, dispatch }) {
     const modes = ['day', 'week', 'month', 'year'];
 
