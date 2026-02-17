@@ -6,8 +6,6 @@ import { TagProvider } from '../../../context/TagContext';
 import { importTimetable } from '../../../api/timetable_api';
 import { getEvents } from '../../../api/event_api';
 
-// Mock API modules
-// Mock API modules
 vi.mock('../../../api/event_api', () => ({
     getEvents: vi.fn(() => Promise.resolve([])),
 }));
@@ -99,7 +97,6 @@ describe('CalendarHeader', () => {
     });
 
     it('should handle Today button', () => {
-        // Ensure today is NOT selectedDate, otherwise button might be hidden
         setup({ ...defaultState, selectedDate: new Date(2020, 1, 1) });
         const todayBtn = screen.getByText('Today');
         fireEvent.click(todayBtn);
@@ -109,7 +106,6 @@ describe('CalendarHeader', () => {
         });
     });
 
-    // Test TodayButton again explicitly to be sure
     it('should set date to today when Today clicked', () => {
         vi.useFakeTimers();
         const today = new Date(2025, 0, 1); // Jan 1 2025

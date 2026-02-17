@@ -4,7 +4,6 @@ import { MonthView } from '../../../components/Calendar/MonthView/MonthView';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
 
-// Mock hooks
 const mockUseDrag = vi.fn(() => ({ dragProps: {}, isDragging: false }));
 const mockUseMonthDayDrop = vi.fn(() => ({ dropProps: {}, isOver: false }));
 const mockOpenModal = vi.fn();
@@ -59,11 +58,6 @@ describe('MonthView', () => {
 
     it('should render the month grid', () => {
         setup();
-        // Feb 2026 has 28 days.
-        // It starts on Sunday Feb 1.
-        // Grid should show Feb 1 to Feb 28.
-        // Also checks grid structure (WeekRows)
-        // We can check for a few days.
         expect(screen.getByText('1')).toBeInTheDocument();
         expect(screen.getByText('15')).toBeInTheDocument();
         expect(screen.getByText('28')).toBeInTheDocument();
@@ -142,7 +136,6 @@ describe('MonthView', () => {
     });
 
     it('should show +X more events if too many', () => {
-        // Create state with 4 events on same day
         const manyEvents = [1, 2, 3, 4].map(i => ({
             id: i, title: `Ev ${i}`, start_time: new Date(2026, 1, 15, 10, i), end_time: new Date(2026, 1, 15, 11, i)
         }));
