@@ -12,23 +12,21 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     padding: 0 24px;
   }
   
   .title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2B1E14;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(43, 30, 20, 0.45);
     margin: 0;
-    letter-spacing: -0.3px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
   
   .subtitle {
-    font-size: 13px;
-    color: rgba(43, 30, 20, 0.48);
-    margin: 0;
-    max-width: 480px;
+    display: none;
   }
   
   .marqueeWrapper {

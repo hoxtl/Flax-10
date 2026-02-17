@@ -9,27 +9,7 @@ import { authService } from "../api/authService";
 import { validatePasswords, getErrorMessage, saveUserData } from "../utils/authHelpers";
 import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
 import { TestimonialsMarquee } from "../components/Authentication/TestimonialsMarquee";
-
-function AuthBrand() {
-  return (
-    <div style={{ position: "absolute", top: 18, left: 20, zIndex: 3, userSelect: "none", pointerEvents: "none" }}>
-      <div style={{ fontSize: 12, letterSpacing: "0.34em", fontWeight: 800, color: "rgba(43,30,20,0.62)" }}>
-        STUDYFLAX
-      </div>
-      <div style={{ marginTop: 3, fontSize: 11, fontWeight: 500, letterSpacing: "0.02em", color: "rgba(43,30,20,0.38)" }}>
-        Built for calm study.
-      </div>
-    </div>
-  );
-}
-
-function AuthFooter() {
-  return (
-    <div style={{ width: "100%", textAlign: "center", padding: "4px 0 8px", fontSize: 11, color: "rgba(10,7,5,0.35)", userSelect: "none", letterSpacing: "0.02em" }}>
-      Always secure · No ads · Free forever
-    </div>
-  );
-}
+import { AuthBrand, AuthFooter } from "../components/Authentication/AuthBranding";
 
 function AuthBackground() {
   return (
@@ -106,29 +86,19 @@ export default function AuthPage() {
       <AuthBackground />
       <AuthBrand />
 
-      {/* Form: takes 62% of screen height, centred */}
       <div style={{
-        height: "62vh",
-        flexShrink: 0,
+        flex: "1 1 0",
+        minHeight: 0,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         zIndex: 2,
+        padding: "40px 24px 8px",
       }}>
-        <div style={{ transform: "scale(0.7)", transformOrigin: "center center" }}>
-          <AuthForms {...state} />
-        </div>
+        <AuthForms {...state} />
       </div>
 
-      {/* Testimonials: remaining 38% */}
-      <div style={{
-        flex: "1 1 0",
-        minHeight: 0,
-        zIndex: 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}>
+      <div style={{ flexShrink: 0, zIndex: 1 }}>
         <TestimonialsMarquee />
         <AuthFooter />
       </div>

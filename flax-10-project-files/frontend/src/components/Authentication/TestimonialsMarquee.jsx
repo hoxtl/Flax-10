@@ -39,7 +39,6 @@ export function TestimonialsMarquee() {
   return (
     <section className={styles.section}>
       <div className={styles.heading}>
-        <h2 className={styles.title}>Loved by students</h2>
       </div>
       <div className={styles.marqueeWrapper}>
         <MarqueeTrack />

@@ -27,15 +27,14 @@ export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading })
 
         <div style={{ height: "12px" }} />
 
+        <Components.Button type="submit" disabled={loading}>
+          {loading ? 'Signing in...' : 'Sign In'}
+        </Components.Button>
+
         <Components.PasswordResetLink to='/reset-password'>
           Forgot password?
         </Components.PasswordResetLink>
 
-        <div style={{ height: "8px" }} />
-
-        <Components.Button type="submit" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
-        </Components.Button>
       </Components.Form>
     </Components.SignInContainer>
   );
