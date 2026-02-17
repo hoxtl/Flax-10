@@ -18,8 +18,8 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&'
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS")]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -92,13 +92,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Flax10.wsgi.application'
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "postgres"),
-        "USER": os.environ.get("POSTGRES_USER", "postgres"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "1234"),
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+    "default": dj_database_url.parse{
+        os.environ.get("DATABASE_URL"),
+	conn_max_age=600,
+	ssl_require=True,
     }
 }
 
