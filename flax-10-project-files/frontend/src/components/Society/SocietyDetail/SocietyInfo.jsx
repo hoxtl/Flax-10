@@ -21,7 +21,8 @@ function BioSection({ text, editMode, onSave }) {
 }
 
 function BioDisplay({ text, editMode, onEdit }) {
-    if (!text && !editMode) return null;
+    if (!text && !editMode) return <div className={styles.bioWrapper} />;
+
     const displayText = text || "Add a bio description...";
     const className = text ? styles.bio : styles.bioPlaceholder;
 
@@ -54,7 +55,6 @@ function Stats({ society }) {
         <div className={styles.stats}>
             <span>{society.member_count} members</span>
             {society.is_ratified && <span className={styles.badge}>Ratified</span>}
-            {society.date_created && <span>Est. {formatYear(society.date_created)}</span>}
         </div>
     );
 }
@@ -75,8 +75,4 @@ function MemberButton({ isMember, onJoin, onLeave }) {
     const className = isMember ? styles.joinedBtn : styles.joinBtn;
     const label = isMember ? "Joined" : "Join Society";
     return <button className={className} onClick={handleClick}>{label}</button>;
-}
-
-function formatYear(dateStr) {
-    return new Date(dateStr).getFullYear();
 }
