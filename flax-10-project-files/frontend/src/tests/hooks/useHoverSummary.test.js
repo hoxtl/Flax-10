@@ -12,7 +12,7 @@ describe('useHoverSummary', () => {
         vi.useRealTimers();
     });
 
-    it('should initialize with summary hidden', () => {
+    it('should initialise with summary hidden', () => {
         const { result } = renderHook(() => useHoverSummary());
         expect(result.current.showSummary).toBe(false);
         expect(result.current.isHovered).toBe(false);
@@ -26,7 +26,7 @@ describe('useHoverSummary', () => {
         });
 
         expect(result.current.isHovered).toBe(true);
-        expect(result.current.showSummary).toBe(false); // Not yet
+        expect(result.current.showSummary).toBe(false); 
 
         act(() => {
             vi.advanceTimersByTime(1000);
