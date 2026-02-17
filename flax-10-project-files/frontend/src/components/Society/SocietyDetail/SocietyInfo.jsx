@@ -1,13 +1,13 @@
 import { useState } from "react";
 import styles from "./SocietyInfo.module.css";
 
-export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onEnterEditMode }) {
+export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode }) {
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <Stats society={society} />
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
-                onJoin={onJoin} onLeave={onLeave} onEnterEditMode={onEnterEditMode} />
+                onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
         </div>
     );
 }
@@ -59,10 +59,15 @@ function Stats({ society }) {
     );
 }
 
-function ActionButton({ isMember, editMode, canEdit, onJoin, onLeave, onEnterEditMode }) {
-    if (editMode) return null;
-    if (canEdit) return <button className={styles.joinBtn} onClick={onEnterEditMode}>Edit Society</button>;
+function ActionButton({ isMember, editMode, canEdit, onJoin, onLeave, onToggleEditMode }) {
+    if (canEdit) return <EditButton editMode={editMode} onToggle={onToggleEditMode} />;
     return <MemberButton isMember={isMember} onJoin={onJoin} onLeave={onLeave} />;
+}
+
+function EditButton({ editMode, onToggle }) {
+    const className = editMode ? styles.joinedBtn : styles.joinBtn;
+    const label = editMode ? "Exit Editor" : "Edit Society";
+    return <button className={className} onClick={onToggle}>{label}</button>;
 }
 
 function MemberButton({ isMember, onJoin, onLeave }) {

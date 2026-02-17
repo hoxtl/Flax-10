@@ -221,3 +221,52 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.addCollabBtn {
+    padding: 10px 16px;
+    border: 1px dashed var(--border, #d1d5db);
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--muted, #6b7280);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.addCollabBtn:hover {
+    border-color: var(--primary-color, #9E7E5D);
+    color: var(--primary-color, #9E7E5D);
+}
+
+.collabList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.collabChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.collabRemove {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.8;
+}
+
+.collabRemove:hover {
+    opacity: 1;
+}
