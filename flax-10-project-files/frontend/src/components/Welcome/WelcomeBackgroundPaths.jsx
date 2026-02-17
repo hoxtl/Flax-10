@@ -55,7 +55,7 @@ function PathItem({ p, flip }) {
 
 function FloatingPaths({ flip }) {
   const flipUsed = flip ?? 1;
-  const paths = useMemo(() => buildPaths(flipUsed, PATH_COUNT), [flipUsed]);
+  const paths = useMemo(() => buildPaths(flip), [flip]);
 
   return (
     <div className={styles.paths}>
