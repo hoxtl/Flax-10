@@ -11,6 +11,7 @@ RECURRENCE_CHOICES = [
     ('weekly', 'Weekly'),
     ('biweekly', 'Biweekly'),
     ('monthly', 'Monthly'),
+    ('yearly', 'Yearly'),
 ]
 
 

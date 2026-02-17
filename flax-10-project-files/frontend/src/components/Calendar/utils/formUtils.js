@@ -23,11 +23,13 @@ function getFormFromEvent(event, options = {}) {
 }
 
 function getRecurrenceFromEvent(event) {
-    return {
-        frequency: event.recurrence_details?.frequency || 'none',
-        interval: event.recurrence_details?.interval || 1,
-        end_date: event.recurrence_details?.end_date || null
-    };
+    if (event.recurrence_details) return parseRecurrenceDetails(event.recurrence_details);
+    if (typeof event.recurrence === 'string') return { frequency: event.recurrence || 'none', interval: 1, end_date: null };
+    return { frequency: 'none', interval: 1, end_date: null };
+}
+
+function parseRecurrenceDetails(details) {
+    return { frequency: details.frequency || 'none', interval: details.interval || 1, end_date: details.end_date || null };
 }
 
 function isAllDay(event) {

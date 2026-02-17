@@ -1,5 +1,5 @@
 export function extractBaseEventId(id) {
-    return id > 1000000 ? Math.floor(id / 1000000) : id;
+    return id >= 10000 ? Math.floor(id / 10000) : id;
 }
 
 export function hasRecurrence(event) {
