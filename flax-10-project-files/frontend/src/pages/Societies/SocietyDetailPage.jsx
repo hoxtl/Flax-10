@@ -29,8 +29,8 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 
     return (
         <div className={styles.page}>
-            <TopBar onBack={onBack} canEdit={canEdit} editMode={editMode} setEditMode={setEditMode}
-                isAdmin={society.role === 'admin'} onSettings={() => setShowSettings(true)} />
+            <TopBar onBack={onBack} editMode={editMode} isAdmin={society.role === 'admin'}
+                onSettings={() => setShowSettings(true)} />
             <SocietyHero society={society} onImageClick={() => setGalleryOpen(true)}
                 editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
                 onEditImages={() => setShowCoverModal(true)} />
