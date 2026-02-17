@@ -4,8 +4,7 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "preDeployCommand": "cd flax-10-project-files/backend && mkdir static && python manage.py migrate && python manage.py collectstatic --noinput",
-    "startCommand": "cd flax-10-project-files/backend && gunicorn Flax10.wsgi:application --bind 0.0.0.0:$PORT -k gthread --workers 4 --threads 2 --timeout 120",
+    "startCommand": "cd flax-10-project-files/backend && mkdir static && mkdir staticfiles && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn Flax10.wsgi:application --bind 0.0.0.0:$PORT -k gthread --workers 4 --threads 2 --timeout 120",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,
     "healthcheckPath": "/",
