@@ -27,37 +27,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.editToggle {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--text);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s;
-}
-
-.editToggle:hover {
-    background: var(--hover);
-}
-
-.editActive {
-    background: var(--primary);
-    color: var(--c-white);
-}
-
-.editActive:hover {
-    filter: brightness(0.9);
-}
-
-.topBarActions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
 .settingsBtn {
     background: var(--bg);
     border: 1px solid var(--border);

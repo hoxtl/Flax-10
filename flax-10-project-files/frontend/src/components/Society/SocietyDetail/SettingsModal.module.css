@@ -110,22 +110,6 @@
     padding: 1rem 0;
 }
 
-.addRow {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.input {
-    flex: 1;
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid var(--border-color, #444);
-    background: var(--bg-primary, #121212);
-    color: var(--text-primary, #fff);
-    font-size: 0.9rem;
-}
-
 .addBtn {
     padding: 0.5rem 1rem;
     background: var(--primary, #6366f1);
