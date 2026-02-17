@@ -18,7 +18,7 @@ const TimerHeader = ({ onOpenHistory }) => (
 export const MainSection = ({ t, onOpenHistory }) => (
     <>
         <TimerHeader onOpenHistory={onOpenHistory} />
-        <TaskInput />
+        <TaskInput value={t.task} onChange={t.setTask} />
         <TreeAnimation progress={t.progress} mode={t.mode} />
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
         <SessionStatus current={t.completedSessions} total={t.targetSessions} />
