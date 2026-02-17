@@ -2,9 +2,10 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
-import { hr } from 'framer-motion/client';
 
-mapboxgl.accessToken = (import.meta.env.VITE_MAPBOX_TOKEN || pk.eyJ1IjoiZGlhbm1haG1vb2QiLCJhIjoiY21scWRpZWltMWliMjNncXhsdmRvNXliZyJ9.n2D1WHK0ecTOOGbwtysyQw);
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
 
 const KCL_CAMPUSES = [
   {
@@ -62,9 +63,9 @@ function travelTime(seconds) {
   }
 
   const hrs = Math.floor(mins / 60);
-  const rem_mins = mins % 60;
+  const minsLeft = mins % 60;
 
-  return `${hrs}h ${rem_mins}m`;
+  return `${hrs}h ${minsLeft}m`;
 }
 
 function travelDistance(metres) {
@@ -203,7 +204,7 @@ export default function CampusMap() {
           offset: 28,
           closeButton: false,
           closeOnClick: false,
-        }).setHTML(`<div style="font-size:0.8rem;font-weight:800;color:rgba(43, 30, 20, 0.88);">🏛️ ${campus.name}</div>`)
+        }).setHTML(`<div class="locPopup">🏛️ ${campus.name}</div>`)
 
         const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
           .setLngLat(campus.coords)
@@ -225,11 +226,14 @@ export default function CampusMap() {
 
     // Click to allow user to set a starting location
     map.current.on('click', (e) => { 
+      if (e.originalEvent.defaultPrevented) return;
       const { lng, lat } = e.lngLat;
       setStartLocation({ lng, lat });
     });
 
     return () => {
+      campusMarkers.current.forEach(marker => marker.remove());
+      campusMarkers.current = [];
       map.current?.remove();
       map.current = null;
     };
@@ -261,7 +265,7 @@ export default function CampusMap() {
         closeOnClick: false,
     })
     .setLngLat([startLocation.lng, startLocation.lat])
-    .setHTML('<div style="font-size:0.8rem;font-weight:800;color:rgba(43, 30, 20, 0.88);">📍Me</div>')
+    .setHTML('<div class="locPopup">📍Me</div>')
     .addTo(map.current);
 
     startMarker.current = new mapboxgl.Marker({element: el, anchor: 'center'})
@@ -298,6 +302,11 @@ export default function CampusMap() {
     try {
       const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${lng},${lat};${dstLng},${dstLat}?steps=true&geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
       const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error('API map failed...');
+      }
+
       const data = await res.json();
 
       if (!data.routes || data.routes.length === 0) {
@@ -339,11 +348,18 @@ export default function CampusMap() {
     }
   }, [startLocation, selectedCampus]);
 
+  const resetRoute = () => {
+    map.current?.getSource('route').setData({
+      type: 'FeatureCollection',
+      features: [],
+    });
+  };
+
   useEffect(() => {
     if (startLocation && selectedCampus) {
       calculateRoute();
     } else if (routeLayerAdded.current) {
-      map.current?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] });
+      resetRoute();
       setRouteInfo(null);
     }
   }, [startLocation, selectedCampus, calculateRoute]);
@@ -369,13 +385,13 @@ export default function CampusMap() {
     setRouteInfo(null);
     if (startMarker.current) { startMarker.current.remove(); startMarker.current = null; }
     if (startPopup.current) { startPopup.current.remove(); startPopup.current = null; }
-    map.current?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] });
+    resetRoute();
   };
 
   const handleClearCampus = () => {
     setSelectedCampus(null);
     setRouteInfo(null);
-    map.current?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] });
+    resetRoute();
   };
 
   const flyToCampus = (campus) => {
