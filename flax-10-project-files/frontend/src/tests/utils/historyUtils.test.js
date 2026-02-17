@@ -1,83 +1,57 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getHistory, saveSession, clearHistory, HISTORY_KEY } from '../../utils/historyUtils';
+import { getHistory, saveSession, clearHistory } from '../../utils/historyUtils';
+import { fetchApi } from '../../api/client';
 
-const localStorageMock = (() => {
-    let store = {};
-    return {
-        getItem: (key) => store[key] || null,
-        setItem: (key, value) => { store[key] = value.toString(); },
-        removeItem: (key) => { delete store[key]; },
-        clear: () => { store = {}; }
-    };
-})();
-
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-
-const testGetHistory = () => {
-    // Case 1: Empty
-    expect(getHistory()).toEqual([]);
-
-    // Case 2: Data exists
-    const mockData = [{ id: 1, duration: 25 }];
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(mockData));
-    expect(getHistory()).toEqual(mockData);
-
-    // Case 3: Error handling (Invalid JSON)
-    localStorage.setItem(HISTORY_KEY, 'invalid-json');
-    expect(getHistory()).toEqual([]);
-};
-
-const testSaveNewSession = () => {
-    const mockNow = new Date('2026-02-15T12:00:00Z');
-    vi.setSystemTime(mockNow);
-    saveSession(25, 5, 1, 12345, 'My Task');
-
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY));
-    expect(history).toHaveLength(1);
-    expect(history[0]).toMatchObject({
-        duration: 25, breakDuration: 5, sessionCount: 1,
-        studyBlockId: 12345, status: 'Completed', endTime: mockNow.toISOString(),
-        task: 'My Task'
-    });
-    vi.useRealTimers();
-};
-
-const testSaveSessionDefaultTask = () => {
-    saveSession(25, 5, 1, 12345);
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY));
-    expect(history[0].task).toBe('');
-};
-
-const testAppendSession = () => {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify([{ id: 1, duration: 25 }]));
-    saveSession(50, 10, 2, 12345);
-
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY));
-    expect(history).toHaveLength(2);
-    expect(history[0].duration).toBe(50);
-    expect(history[1].duration).toBe(25);
-};
-
-const testClearHistory = () => {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify([{ id: 1 }]));
-    clearHistory();
-    expect(localStorage.getItem(HISTORY_KEY)).toBeNull();
-};
+vi.mock('../../api/client', () => ({
+    fetchApi: vi.fn(),
+}));
 
 describe('historyUtils', () => {
     beforeEach(() => {
-        localStorage.clear();
+        vi.clearAllMocks();
         vi.useFakeTimers();
     });
 
     afterEach(() => {
-        localStorage.clear();
         vi.useRealTimers();
     });
 
-    it('getHistory handles various states', testGetHistory);
-    it('saveSession creates new entry with task', testSaveNewSession);
-    it('saveSession defaults task to empty string', testSaveSessionDefaultTask);
-    it('saveSession appends to history', testAppendSession);
-    it('clearHistory removes data', testClearHistory);
+    it('getHistory calls API', async () => {
+        fetchApi.mockResolvedValueOnce([{ id: 1 }]);
+        const history = await getHistory();
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/');
+        expect(history).toEqual([{ id: 1 }]);
+    });
+
+    it('getHistory returns empty array on error', async () => {
+        fetchApi.mockRejectedValueOnce(new Error('Network error'));
+        const history = await getHistory();
+        expect(history).toEqual([]);
+    });
+
+    it('saveSession calls API with correct payload', async () => {
+        const mockNow = new Date('2026-02-15T12:00:00Z');
+        vi.setSystemTime(mockNow);
+
+        await saveSession(25, 5, 1, 12345, 'Task');
+
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/', {
+            method: 'POST',
+            body: expect.stringMatching(/"duration":25/)
+        });
+
+        const callArgs = fetchApi.mock.calls[0];
+        const body = JSON.parse(callArgs[1].body);
+
+        expect(body).toMatchObject({
+            duration: 25, break_duration: 5, session_count: 1,
+            study_block_id: 12345, task: 'Task', status: 'Completed',
+            end_time: mockNow.toISOString()
+        });
+    });
+
+    it('clearHistory calls API', async () => {
+        await clearHistory();
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/', { method: 'DELETE' });
+    });
 });

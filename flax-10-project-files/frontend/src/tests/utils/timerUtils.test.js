@@ -24,35 +24,27 @@ describe('timerUtils: getProgress', () => {
 
 let NotificationMock;
 
+const mockOscillator = () => ({
+    connect: vi.fn(), start: vi.fn(), stop: vi.fn(),
+    type: '', frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() }
+});
+
+const mockGain = () => ({
+    connect: vi.fn(),
+    gain: { setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() }
+});
+
+const mockAudioContext = () => ({
+    createOscillator: mockOscillator, createGain: mockGain,
+    currentTime: 0, destination: {}
+});
+
 const setupMocks = () => {
     NotificationMock = vi.fn();
-    global.Notification = NotificationMock;
-    global.Notification.permission = 'granted';
-    global.Notification.requestPermission = vi.fn();
-
-    // Mock AudioContext
-    global.window.AudioContext = vi.fn().mockImplementation(() => ({
-        createOscillator: () => ({
-            connect: vi.fn(),
-            start: vi.fn(),
-            stop: vi.fn(),
-            type: '',
-            frequency: {
-                setValueAtTime: vi.fn(),
-                exponentialRampToValueAtTime: vi.fn()
-            }
-        }),
-        createGain: () => ({
-            connect: vi.fn(),
-            gain: {
-                setValueAtTime: vi.fn(),
-                linearRampToValueAtTime: vi.fn(),
-                exponentialRampToValueAtTime: vi.fn()
-            }
-        }),
-        currentTime: 0,
-        destination: {}
-    }));
+    global.Notification = Object.assign(NotificationMock, {
+        permission: 'granted', requestPermission: vi.fn()
+    });
+    global.window.AudioContext = vi.fn().mockImplementation(mockAudioContext);
 };
 
 const testAutoAdvance = () => {

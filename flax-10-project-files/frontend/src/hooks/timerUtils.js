@@ -16,19 +16,24 @@ const createAudioNodes = () => {
     return { ctx, osc, gain };
 };
 
+const configureOscillator = (osc, ctx) => {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+};
+
+const configureGain = (gain, ctx) => {
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+};
+
 const playNotificationSound = () => {
     try {
         const nodes = createAudioNodes();
         if (!nodes) return;
-        const { ctx, osc, gain } = nodes;
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.5);
+        configureOscillator(nodes.osc, nodes.ctx);
+        configureGain(nodes.gain, nodes.ctx);
+        nodes.osc.start(nodes.ctx.currentTime);
+        nodes.osc.stop(nodes.ctx.currentTime + 0.5);
     } catch (e) {
         console.error("Audio play failed:", e);
     }
@@ -40,18 +45,20 @@ const sendNotification = (title, body) => {
     }
 };
 
-const handleCompletion = (timer, startNext) => {
-    if (timer.mode === 'work') {
-        playNotificationSound();
-        sendNotification("Time's Up!", "Work session complete. Take a break!");
-        if (timer.breakTime === 0) {
-            timer.setIsActive(false);
-            startNext();
-        }
-    } else if (timer.mode === 'break') {
-        playNotificationSound();
-        sendNotification("Break Over!", "Time to get back to work!");
+const handleWorkCompletion = (timer, startNext) => {
+    playNotificationSound();
+    sendNotification("Time's Up!", "Work session complete. Take a break!");
+    if (timer.breakTime === 0) {
+        timer.setIsActive(false);
+        startNext();
     }
+};
+
+const handleCompletion = (timer, startNext) => {
+    if (timer.mode === 'work') return handleWorkCompletion(timer, startNext);
+
+    playNotificationSound();
+    sendNotification("Break Over!", "Time to get back to work!");
 };
 
 export const useCompletionCheck = (timer, startNext, setModal) => {

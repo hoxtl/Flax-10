@@ -16,3 +16,6 @@ from .modules.enrollmentModel import *
 
 # Notifications
 from .notifications.notificationModel import *
+
+# Timer
+from .timer import *

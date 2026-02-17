@@ -1,33 +1,29 @@
-/** LocalStorage key for persisting study sessions */
-export const HISTORY_KEY = 'study_history';
+import { fetchApi } from '../api/client';
 
-export const getHistory = () => {
+export const getHistory = async () => {
     try {
-        return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        return await fetchApi('/timer/history/');
     } catch {
         return [];
     }
 };
 
-const createSessionObject = (workDuration, breakDuration, sessionCount, studyBlockId, task) => {
-    const endTime = new Date();
-    const startTime = new Date(endTime.getTime() - workDuration * 60000);
-    return {
-        id: Date.now(), date: endTime.toISOString(),
-        startTime: startTime.toISOString(), endTime: endTime.toISOString(),
-        duration: workDuration, breakDuration: breakDuration,
-        sessionCount: sessionCount, studyBlockId: studyBlockId || Date.now(),
-        task: task, status: 'Completed'
-    };
+const createSessionPayload = (work, brk, count, blockId, task) => ({
+    start_time: new Date(Date.now() - work * 60000).toISOString(),
+    end_time: new Date().toISOString(),
+    duration: work, break_duration: brk,
+    session_count: count, study_block_id: blockId,
+    task: task, status: 'Completed'
+});
+
+export const saveSession = async (work, brk, count, blockId, task = '') => {
+    const payload = createSessionPayload(work, brk, count, blockId, task);
+    await fetchApi('/timer/history/', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
 };
 
-/** Creates a completed session entry */
-export const saveSession = (workDuration, breakDuration, sessionCount, studyBlockId, task = '') => {
-    const history = getHistory();
-    const session = createSessionObject(workDuration, breakDuration, sessionCount, studyBlockId, task);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify([session, ...history]));
-};
-
-export const clearHistory = () => {
-    localStorage.removeItem(HISTORY_KEY);
+export const clearHistory = async () => {
+    await fetchApi('/timer/history/', { method: 'DELETE' });
 };
