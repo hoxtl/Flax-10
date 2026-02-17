@@ -22,6 +22,4 @@ export const ErrorMessage = ({ error }) => {
             border: "1px solid var(--border)",
         }}>
             {error}
-        </div>
-    );
-};
+        </div>);};

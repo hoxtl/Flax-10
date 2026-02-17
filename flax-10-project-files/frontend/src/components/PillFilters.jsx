@@ -4,12 +4,10 @@ import { countByType } from "../utils/pillUtils";
 import { useTags } from "../context/TagContext";
 import TagManagerModal from "./TagManagerModal";
 
-// Button component for each pill filter
 function cls(isActive) {
   return isActive ? `${styles.pill} ${styles.active}` : `${styles.pill} ${styles.inactive}`;
 }
 
-// Renders a single pill button with the label, count, and active state
 function PillButton({ pill, isActive, count, onClick }) {
   return (
     <button type="button" className={cls(isActive)} onClick={onClick}>
@@ -18,74 +16,40 @@ function PillButton({ pill, isActive, count, onClick }) {
   );
 }
 
-// Main component that renders the row of pill filters
-// Main component that renders the row of pill filters
-export default function PillFilters({ active, onChange, items }) {
-  const { tags } = useTags();
-  const [showManager, setShowManager] = useState(false);
-  const counts = countByType(items);
-  const pills = getAllPills(tags);
-
-  return (
-    <>
-      <div className={styles.row}>
-        {pills.map((p) => (
-          <PillItem
-            key={p.key} pill={p} active={active}
-            counts={counts} onChange={onChange}
-          />
-        ))}
-        <ManagerButton onClick={() => setShowManager(true)} />
-      </div>
-      {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
-    </>
-  );
-}
-
-/**
- * Combines the static 'All' option with dynamic tags from context.
- */
 function getAllPills(tags) {
-  return [
-    { key: "all", label: "All" },
-    ...tags.map(t => ({ key: t.label.toLowerCase(), label: t.label }))
-  ];
+  return [{ key: "all", label: "All" }, ...tags.map(t => ({ key: t.label.toLowerCase(), label: t.label }))];
 }
 
-/**
- * Renders an individual pill button.
- */
-function PillItem({ pill, active, counts, onChange }) {
-  const isActive = checkActive(active, pill.key);
-  return (
-    <PillButton
-      pill={pill}
-      isActive={isActive}
-      count={counts[pill.key] || 0}
-      onClick={() => onChange(pill.key)}
-    />
-  );
-}
-
-/**
- * Checks if a specific key is currently active in the filter state.
- * Handles both string (single) and array (multi) active states.
- */
 function checkActive(active, key) {
-  if (Array.isArray(active)) {
-    return active === key || active.includes(key);
-  }
+  if (Array.isArray(active)) return active === key || active.includes(key);
   return active === key;
 }
 
+function PillItem({ pill, active, counts, onChange }) {
+  const isActive = checkActive(active, pill.key);
+  return <PillButton pill={pill} isActive={isActive} count={counts[pill.key] || 0} onClick={() => onChange(pill.key)} />;
+}
+
 function ManagerButton({ onClick }) {
+  return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage Tags">✎</button>;
+}
+
+function PillRow({ pills, active, counts, onChange, onManage }) {
   return (
-    <button
-      className={`${styles.pill} ${styles.inactive}`}
-      onClick={onClick}
-      aria-label="Manage Tags"
-    >
-      ✎
-    </button>
+    <div className={styles.row}>
+      {pills.map((p) => <PillItem key={p.key} pill={p} active={active} counts={counts} onChange={onChange} />)}
+      <ManagerButton onClick={onManage} />
+    </div>
+  );
+}
+
+export default function PillFilters({ active, onChange, items }) {
+  const { tags } = useTags();
+  const [showManager, setShowManager] = useState(false);
+  return (
+    <>
+      <PillRow pills={getAllPills(tags)} active={active} counts={countByType(items)} onChange={onChange} onManage={() => setShowManager(true)} />
+      {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
+    </>
   );
 }
