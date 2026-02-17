@@ -1,0 +1,396 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    max-width: 100vw;
+    padding: 1rem;
+    text-align: center;
+    overflow-x: hidden;
+    position: relative;
+    box-sizing: border-box;
+    /* Essential for absolute positioning children */
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+    line-height: 1;
+}
+
+.historyButton {
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f3f4f6;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.historyButton:hover {
+    background: #e5e7eb;
+    transform: translateY(-50%) scale(1.02);
+}
+
+
+
+.sessionStatus {
+    font-size: 1rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.timerDisplay {
+    font-size: 3.5rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary);
+    margin: 0.5rem 0;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.timerDisplay.break {
+    color: #059669;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.button {
+    padding: 0.6rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.button:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+.button.primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.button.primary:hover {
+    background: #D3B599;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.button.danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.button.danger:hover {
+    background: #fecaca;
+}
+
+.settings {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.settingItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.input {
+    width: 60px;
+    padding: 0.4rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.modeIndicator {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.4rem 1.2rem;
+    border-radius: 99px;
+    background: #f6f4f1;
+    color: #2a2a2a;
+    margin-bottom: 0.5rem;
+}
+
+.modeIndicator.break {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.overtime {
+    color: #f59e0b;
+    /* Amber */
+}
+
+.overtimePopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    animation: slideUp 0.3s ease-out;
+    width: 90%;
+    max-width: 300px;
+}
+
+.overtimeContent h3 {
+    margin: 0 0 0.5rem 0;
+    color: #f59e0b;
+    font-size: 1.2rem;
+}
+
+.overtimeTime {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #f59e0b;
+    margin: 0.5rem 0 1rem;
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+}
+
+.modalContent {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.modalMessage {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.summaryText {
+    margin-bottom: 1.5rem;
+}
+
+.summaryContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summaryLabel {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.summaryPill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+}
+
+.pillSessions {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+.pillFocus {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.pillBreak {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.goalButton {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.notificationBtn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.notificationBtn:hover {
+    background: #0056b3;
+}.soundSelectorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.soundControls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.soundSelect {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.volumeSlider {
+    width: 100px;
+    accent-color: var(--primary);
+}
+
+.taskInputContainer {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.taskInput {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 1.2rem;
+    text-align: center;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.taskInput:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+}
+
+.taskInput::placeholder {
+    color: #9ca3af;
+    font-style: italic;
+}
