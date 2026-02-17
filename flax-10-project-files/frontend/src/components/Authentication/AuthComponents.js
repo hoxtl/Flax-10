@@ -8,9 +8,9 @@ export const Container = styled.div`
   box-shadow: 0 20px 60px rgba(74, 52, 33, 0.18), 0 8px 24px rgba(74, 52, 33, 0.10);
   position: relative;
   overflow: hidden;
-  width: 960px;
+  width: 860px;
   max-width: 100%;
-  min-height: 620px;
+  min-height: 420px;
 `;
 
 export const SignUpContainer = styled.div`
@@ -51,17 +51,17 @@ export const Form = styled.form`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 44px 56px;
+  padding: 36px 52px;
   height: 100%;
   text-align: center;
-  gap: 4px;
+  gap: 10px;
   box-sizing: border-box;
 `;
 
 export const Title = styled.h1`
   font-weight: 700;
-  margin: 0 0 24px 0;
-  font-size: 30px;
+  margin: 0 0 8px 0;
+  font-size: 28px;
   text-align: center;
   color: #2b1e14;
   letter-spacing: -0.3px;
@@ -70,8 +70,7 @@ export const Title = styled.h1`
 export const Input = styled.input`
   background-color: #f7f5f2;
   border: 1.5px solid rgba(74, 52, 33, 0.12);
-  padding: 14px 18px;
-  margin: 6px 0;
+  padding: 13px 18px;
   width: 100%;
   border-radius: 8px;
   color: #2b1e14;
@@ -99,26 +98,21 @@ export const Button = styled.button`
   color: rgba(255, 255, 255, 0.96);
   font-size: 11px;
   font-weight: 700;
-  padding: 14px 48px;
+  padding: 13px 44px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  transition: transform 180ms ease, box-shadow 180ms ease;
   overflow: hidden;
   will-change: transform;
   box-shadow: 0 8px 24px rgba(74, 52, 33, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  margin-top: 10px;
+  margin-top: 4px;
 
   &::before {
     content: "";
     position: absolute;
     inset: -45% -70%;
-    background: linear-gradient(
-      120deg,
-      transparent 35%,
-      rgba(255, 255, 255, 0.28) 50%,
-      transparent 65%
-    );
+    background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
     transform: translateX(-60%) rotate(8deg);
     opacity: 0;
     pointer-events: none;
@@ -138,19 +132,9 @@ export const Button = styled.button`
     box-shadow: 0 14px 36px rgba(74, 52, 33, 0.28);
   }
 
-  &:active:not(:disabled) {
-    transform: translateY(0px) scale(0.99);
-  }
-
-  &:focus {
-    outline: 2px solid rgba(74, 52, 33, 0.28);
-    outline-offset: 3px;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  &:active:not(:disabled) { transform: translateY(0px) scale(0.99); }
+  &:focus { outline: 2px solid rgba(74, 52, 33, 0.28); outline-offset: 3px; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
 
   @media (prefers-reduced-motion: reduce) {
     &::before { animation: none !important; }
@@ -176,12 +160,8 @@ export const Anchor = styled.a`
   color: #9e7e5d;
   font-size: 13px;
   text-decoration: none;
-  margin: 12px 0;
 
-  &:hover {
-    color: #4a3421;
-    text-decoration: underline;
-  }
+  &:hover { color: #4a3421; text-decoration: underline; }
 `;
 
 export const OverlayContainer = styled.div`
@@ -201,7 +181,6 @@ export const Overlay = styled.div`
   background: linear-gradient(150deg, #7a6148 0%, #5c4530 40%, #3c2a1a 100%);
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: 0 0;
   color: #ffffff;
   position: relative;
   left: -100%;
@@ -244,7 +223,6 @@ export const LeftOverlayPanel = styled(OverlayPanel)`
 export const RightOverlayPanel = styled(OverlayPanel)`
   right: 0;
   transform: translateX(1%);
-
   ${(props) => (props.$signIn !== true ? `transform: translateX(20%);` : "")}
 `;
 
@@ -263,11 +241,7 @@ export const PasswordResetLink = styled(Link)`
   text-decoration: none;
   font-size: 13px;
   align-self: center;
-  margin: 6px 0 2px;
   transition: color 0.15s ease;
 
-  &:hover {
-    color: #4a3421;
-    text-decoration: underline;
-  }
+  &:hover { color: #4a3421; text-decoration: underline; }
 `;
