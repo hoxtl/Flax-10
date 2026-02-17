@@ -18,10 +18,8 @@ function useImportForm(onImport, onClose) {
     if (err) { setError(err); setLoading(false); return; }
     setUrl('');
     onClose();
-    setLoading(false);
-  };
-  return { url, setUrl, loading, error, handleSubmit };
-}
+    setLoading(false);};
+  return { url, setUrl, loading, error, handleSubmit };}
 
 function ModalHeader({ onClose }) {
   return (
