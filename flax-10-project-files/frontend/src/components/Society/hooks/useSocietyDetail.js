@@ -3,12 +3,16 @@ import * as api from "../../../api/societyApi";
 import { addHourToTime } from "../../Calendar/utils/dateUtils";
 
 function transformAnnouncementData(data) {
+    const images = (data.images || [])
+        .map(img => (typeof img === 'object' && img.url) ? img.url : img)
+        .filter(Boolean);
+
     return {
         title: data.title,
         content: data.content,
         tag: parseTagId(data.tag),
         pinned: data.pinned,
-        image_urls: data.images || []
+        image_urls: images
     };
 }
 
@@ -85,6 +89,7 @@ export function useSocietyDetail(societyId) {
     const updateSociety = async (updates) => {
         const updated = await api.updateSociety(societyId, updates);
         setSociety(prev => ({ ...prev, ...updated }));
+        await loadSociety();
     };
 
     const addTag = async (tagData) => {

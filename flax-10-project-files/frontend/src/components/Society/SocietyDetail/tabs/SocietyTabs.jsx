@@ -1,13 +1,11 @@
 import styles from "./SocietyTabs.module.css";
 import CalendarTab from "./calendarTab/CalendarTab";
 import AboutTab from "./AboutTab";
-import PhotosTab from "./PhotosTab";
 import AnnouncementsTab from "./announcementTab/AnnouncementsTab";
 
 const TABS = [
     { id: "calendar", label: "Calendar" },
     { id: "about", label: "About" },
-    { id: "photos", label: "Photos" },
     { id: "announcements", label: "Announcements" }
 ];
 
@@ -37,7 +35,6 @@ function TabButton({ tab, isActive, onClick }) {
 
 function TabContent({ activeTab, society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, onTabChange }) {
     if (activeTab === 'about') return <TabWrapper><AboutTab about={society.about} editMode={editMode} onUpdate={(text) => onUpdate?.({ about: text })} /></TabWrapper>;
-    if (activeTab === 'photos') return <TabWrapper><PhotosTab society={society} editMode={editMode} onUpdate={onUpdate} /></TabWrapper>;
     if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab announcements={society.announcements} editMode={editMode} handlers={announcementHandlers} tags={tags} /></TabWrapper>;
     return <TabWrapper><CalendarTab events={society.events} editMode={editMode} eventHandlers={eventHandlers}
         tags={tags} tagHandlers={tagHandlers} onViewAnnouncement={() => onTabChange('announcements')} /></TabWrapper>;
