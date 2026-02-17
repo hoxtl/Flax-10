@@ -8,7 +8,6 @@ const { mockFormLogic } = vi.hoisted(() => ({
         isEditing: false,
         form: { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] },
         setForm: vi.fn(cb => {
-            // If callback, execute it to cover the arrow function in component
             if (typeof cb === 'function') cb(mockFormLogic.form);
         }),
         error: null,
@@ -17,7 +16,6 @@ const { mockFormLogic } = vi.hoisted(() => ({
     },
 }));
 
-// We mock the hook to isolate the View functionality from Logic
 vi.mock('../../../../components/Calendar/EventModal/useEventForm', () => ({
     useEventForm: () => mockFormLogic,
 }));
@@ -94,7 +92,6 @@ describe('EventModal', () => {
 
     it('should NOT call onClose when clicking content', () => {
         renderModal();
-        // Click on title or form
         fireEvent.click(screen.getByText('New Event'));
         expect(mockOnClose).not.toHaveBeenCalled();
     });
@@ -123,8 +120,6 @@ describe('EventModal', () => {
         mockFormLogic.isEditing = true;
         renderModal();
         expect(screen.getByText('Delete')).toBeInTheDocument();
-
-        // click delete
         fireEvent.click(screen.getByText('Delete'));
         expect(mockFormLogic.handleDelete).toHaveBeenCalled();
     });
