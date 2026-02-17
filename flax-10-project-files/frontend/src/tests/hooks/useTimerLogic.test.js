@@ -10,6 +10,7 @@ describe('useTimerLogic Hook', () => {
             requestPermission: vi.fn(),
         };
         vi.spyOn(historyUtils, 'saveSession').mockImplementation(() => { });
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
@@ -106,5 +107,35 @@ describe('useTimerLogic Hook', () => {
         });
         expect(result.current.completedSessions).toBe(0);
         expect(result.current.timeLeft).toBe(1500);
+    });
+
+    it('manages task state correctly', () => {
+        const { result } = renderHook(() => useTimerLogic());
+        expect(result.current.task).toBe('');
+        act(() => {
+            result.current.setTask('New Task');
+        });
+        expect(result.current.task).toBe('New Task');
+    });
+
+    it('passes task to saveSession on completion', () => {
+        const { result } = renderHook(() => useTimerLogic());
+
+        act(() => {
+            result.current.setTask('My Important Task');
+        });
+
+        act(() => {
+            // Trigger completion logic via overtimeBreak (standard flow)
+            result.current.handlers.overtimeBreak();
+        });
+
+        expect(historyUtils.saveSession).toHaveBeenCalledWith(
+            expect.any(Number), // workTime
+            expect.any(Number), // breakTime
+            expect.any(Number), // sessionCount 
+            expect.any(Number), // blockId
+            'My Important Task' // Task
+        );
     });
 });

@@ -30,15 +30,22 @@ const testGetHistory = () => {
 const testSaveNewSession = () => {
     const mockNow = new Date('2026-02-15T12:00:00Z');
     vi.setSystemTime(mockNow);
-    saveSession(25, 5, 1, 12345);
+    saveSession(25, 5, 1, 12345, 'My Task');
 
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY));
     expect(history).toHaveLength(1);
     expect(history[0]).toMatchObject({
         duration: 25, breakDuration: 5, sessionCount: 1,
-        studyBlockId: 12345, status: 'Completed', endTime: mockNow.toISOString()
+        studyBlockId: 12345, status: 'Completed', endTime: mockNow.toISOString(),
+        task: 'My Task'
     });
     vi.useRealTimers();
+};
+
+const testSaveSessionDefaultTask = () => {
+    saveSession(25, 5, 1, 12345);
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY));
+    expect(history[0].task).toBe('');
 };
 
 const testAppendSession = () => {
@@ -69,7 +76,8 @@ describe('historyUtils', () => {
     });
 
     it('getHistory handles various states', testGetHistory);
-    it('saveSession creates new entry', testSaveNewSession);
+    it('saveSession creates new entry with task', testSaveNewSession);
+    it('saveSession defaults task to empty string', testSaveSessionDefaultTask);
     it('saveSession appends to history', testAppendSession);
     it('clearHistory removes data', testClearHistory);
 });
