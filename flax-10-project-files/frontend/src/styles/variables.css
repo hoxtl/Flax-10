@@ -143,3 +143,15 @@
 
 
 }
+
+.MuiChartsAxis-tickLabel text,
+.MuiChartsLegend-label text {
+  fill: var(--muted) !important;
+}
+.MuiChartsAxis-line,
+.MuiChartsAxis-tick {
+  stroke: var(--border) !important;
+}
+.MuiChartsGrid-line {
+  stroke: var(--border) !important;
+}
