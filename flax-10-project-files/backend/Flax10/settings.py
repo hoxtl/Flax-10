@@ -105,11 +105,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ✅ Media files (profile photos)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# ✅ Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -118,6 +116,5 @@ EMAIL_HOST_USER = 'StudyFlax@gmail.com'
 EMAIL_HOST_PASSWORD = 'xmgwyxrbevcqlevu'
 DEFAULT_FROM_EMAIL = 'StudyFlax <StudyFlax@gmail.com>'
 
-# ✅ Frontend URL
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
