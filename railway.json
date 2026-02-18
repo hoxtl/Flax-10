@@ -4,6 +4,6 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && python manage.py collectstatic && gunicorn Flax10.wsgi:application --bind 0.0.0.0:$PORT -k gthread --workers 4 --threads 2 --timeout 120"
+    "startCommand": "python manage.py migrate && python manage.py makemigrations --merge && python manage.py collectstatic && gunicorn Flax10.wsgi:application --bind 0.0.0.0:$PORT -k gthread --workers 4 --threads 2 --timeout 120"
   }
 }
