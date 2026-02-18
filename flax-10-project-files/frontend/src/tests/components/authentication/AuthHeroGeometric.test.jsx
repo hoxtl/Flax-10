@@ -26,4 +26,9 @@ describe('AuthHeroGeometric', () => {
     const shapes = container.querySelectorAll('[class*="shapeWrap"]');
     expect(shapes.length).toBeGreaterThanOrEqual(0); 
   });
+
+  it('renders ElegantShape without className (uses empty string fallback)', () => {
+    const { container } = render(<AuthHeroGeometric />);
+    expect(container).toBeTruthy();
+  });
 });

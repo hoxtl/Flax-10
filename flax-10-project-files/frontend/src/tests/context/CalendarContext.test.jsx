@@ -3,8 +3,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { CalendarProvider, useCalendar, useCalendarDispatch, useEventModal } from '../../context/CalendarContext';
 import { useEffect } from 'react';
 
-// setup tests?
-// Since we test context, we need a consumer component.
 
 vi.mock('../../hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
@@ -58,7 +56,6 @@ describe('CalendarContext', () => {
     });
 
     it('should throw error if used outside provider', () => {
-        // Suppress console.error for this test as React logs the error
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
         expect(() => render(<TestConsumer />)).toThrow('useCalendar must be used within CalendarProvider');
