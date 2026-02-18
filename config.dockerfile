@@ -23,3 +23,6 @@ COPY flax-10-project-files/backend/ /app/
 COPY --from=frontend-builder /app/frontend/dist /app/studyFlax/static/
 
 EXPOSE 8080
+
+CMD ["sh", "-c", "python manage.py migrate --noinput"]
+CMD ["sh", "-c", "python manage.py collectstatic --noinput"]
