@@ -8,7 +8,7 @@ import { CalendarProvider, useEventModal } from "../../../../../context/Calendar
 import { EventModal } from "../../../../Calendar/EventModal/EventModal";
 import TagFilterBar from "../../tags/TagFilterBar";
 import TagManager from "../../tags/TagManager";
-import EventDetailPopup from "./EventDetailPopup";
+import { EventDetailPopup } from "../../../../Calendar/EventDetailPopup";
 import SyncButton from "./SyncButton";
 
 export default function CalendarTab(props) {
@@ -25,6 +25,7 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     const [popupState, setPopupState] = useState({ event: null, rect: null });
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
+    const closePopup = () => setPopupState({ event: null, rect: null });
 
     return (
         <div className={styles.calendarTab}>
@@ -34,8 +35,9 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
             <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
                 readOnly={!editMode} onEventClick={editMode ? null : (e, r) => setPopupState({ event: e, rect: r })} customTags={tags} />
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
-            {popupState.event && <EventDetailPopup event={popupState.event} tags={tags} anchorRect={popupState.rect}
-                onClose={() => setPopupState({ event: null, rect: null })} onViewAnnouncement={onViewAnnouncement} />}
+            {popupState.event && <EventDetailPopup event={popupState.event} anchorRect={popupState.rect}
+                tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
+                actions={getPopupActions(popupState.event, onViewAnnouncement)} />}
         </div>
     );
 }
@@ -86,4 +88,9 @@ function convertEvents(events, tags) {
 function filterEvents(events, tagFilters) {
     if (!tagFilters || tagFilters.length === 0) return events;
     return events.filter(e => tagFilters.includes(e.tag));
+}
+
+function getPopupActions(event, onViewAnnouncement) {
+    if (!event?.announcementId || !onViewAnnouncement) return null;
+    return [{ label: 'View Announcement', onClick: onViewAnnouncement }];
 }
