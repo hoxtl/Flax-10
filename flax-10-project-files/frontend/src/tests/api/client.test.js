@@ -68,5 +68,23 @@ describe('fetchApi', () => {
         global.fetch.mockRejectedValue(new Error('Network Error'));
         await expect(fetchApi('/test')).rejects.toThrow('Network Error');
     });
+
+    it('does not set Authorization header when no token', async () => {
+        localStorage.removeItem('token');
+        await expect(fetchApi('/test')).resolves.not.toThrow?.();
+    });
+
+    it('does not add Authorization header when no token in localStorage', async () => {
+        localStorage.removeItem('token');
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: async () => ({ data: 'ok' }),
+        });
+        const result = await fetchApi('/test');
+        const callHeaders = global.fetch.mock.calls[0][1].headers;
+        expect(callHeaders['Authorization']).toBeUndefined();
+        expect(result).toEqual({ data: 'ok' });
+    });
 });
 
