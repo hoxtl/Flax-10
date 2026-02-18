@@ -1,61 +1,99 @@
-import styles from './SummaryCards.module.css';
+import { motion } from 'framer-motion';
+import styles from './InsightCards.module.css';
 
-function computeConsistencyScore(summary, progressSummary, periodDays) {
-  const streakScore = Math.min((summary.current_streak_days / periodDays) * 100, 100);
-  const frequencyScore = Math.min((summary.total_sessions / periodDays) * 100, 100);
-  const adherenceScore = progressSummary?.adherence_percentage ?? 50;
-  return Math.round(streakScore * 0.3 + frequencyScore * 0.4 + adherenceScore * 0.3);
-}
-
-function scoreLabel(score) {
-  if (score >= 80) return { label: 'Excellent', color: '#4CAF50' };
-  if (score >= 60) return { label: 'Good', color: '#8BC34A' };
-  if (score >= 40) return { label: 'Building', color: '#FF9800' };
-  return { label: 'Getting Started', color: '#F44336' };
-}
-
-export const ConsistencyScore = ({ summary, progressSummary, periodDays }) => {
-  const score = computeConsistencyScore(summary, progressSummary, periodDays);
-  const { label, color } = scoreLabel(score);
+export function ConsistencyScore({ data }) {
+  if (!data?.summary) return null;
+  const { summary } = data;
+  const streak = summary.current_streak_days || 0;
+  const totalDays = summary.unique_study_days || 0;
+  const maxDays = Math.max(summary.period_days || 30, 1);
+  const adherence = summary.schedule_adherence ?? (totalDays / maxDays * 100);
+  const score = Math.min(100, Math.round(
+    streak * 0.3 * 10 +
+    (totalDays / maxDays) * 100 * 0.4 +
+    Math.min(adherence, 100) * 0.3
+  ));
+  const getColor = (s) => s >= 80 ? '#4CAF50' : s >= 60 ? '#8BC34A' : s >= 40 ? '#FF9800' : '#F44336';
+  const getLabel = (s) => s >= 80 ? 'Excellent' : s >= 60 ? 'Good' : s >= 40 ? 'Building' : 'Getting Started';
+  const color = getColor(score);
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (score / 100) * circumference;
   return (
-    <div className={styles.card} style={{ borderLeftColor: color }}>
-      <div className={styles.icon}>🎯</div>
-      <div className={styles.content}>
-        <div className={styles.label}>Consistency Score</div>
-        <div className={styles.value} style={{ color }}>{score}<span className={styles.unit}>/100</span></div>
-        <div className={styles.subtitle}>{label} — based on streak, frequency &amp; adherence</div>
+    <div className={styles.scoreCard}>
+      <p className={styles.cardLabel}>Consistency</p>
+      <div className={styles.scoreRing}>
+        <svg width="96" height="96" viewBox="0 0 96 96">
+          <circle cx="48" cy="48" r={radius} fill="none" stroke="var(--border)" strokeWidth="6" />
+          <motion.circle
+            cx="48" cy="48" r={radius} fill="none" stroke={color}
+            strokeWidth="6" strokeLinecap="round"
+            strokeDasharray={circumference}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: dashOffset }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+            transform="rotate(-90 48 48)"
+          />
+        </svg>
+        <div className={styles.scoreCenter}>
+          <motion.span className={styles.scoreNum} style={{ color }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            {score}
+          </motion.span>
+        </div>
       </div>
+      <span className={styles.scoreLabel} style={{ color }}>{getLabel(score)}</span>
     </div>
   );
-};
+}
 
-function getPeakHours(heatmapData) {
-  const hourTotals = Array(24).fill(0);
-  for (const dayRow of heatmapData) {
-    dayRow.forEach((val, h) => { hourTotals[h] += val; });
-  }
-  return hourTotals
-    .map((total, h) => ({ hour: h, total }))
-    .sort((a, b) => b.total - a.total)
+export function PeakHoursCard({ data }) {
+  if (!data?.heatmap) return null;
+  const { data: grid, hours } = data.heatmap;
+  if (!Array.isArray(grid) || !Array.isArray(hours)) return null;
+
+  const hourTotals = hours.map((_, hi) =>
+    grid.reduce((sum, row) => sum + (row[hi] || 0), 0)
+  );
+
+  const max = Math.max(...hourTotals, 1);
+  const topHours = hourTotals
+    .map((v, i) => ({ h: hours[i], v }))
+    .sort((a, b) => b.v - a.v)
     .slice(0, 3)
-    .filter(x => x.total > 0)
-    .map(x => {
-      const suffix = x.hour < 12 ? 'am' : 'pm';
-      const display = x.hour === 0 ? 12 : x.hour > 12 ? x.hour - 12 : x.hour;
-      return `${display}${suffix}`;
-    });
-}
+    .filter(x => x.v > 0);
 
-export const PeakHoursCard = ({ heatmapData }) => {
-  const peaks = getPeakHours(heatmapData);
+  const fmt = (h) => {
+    const num = parseInt(h);
+    return `${num % 12 || 12}${num >= 12 ? 'pm' : 'am'}`;
+  };
+
   return (
-    <div className={styles.card} style={{ borderLeftColor: '#FF9800' }}>
-      <div className={styles.icon}>⚡</div>
-      <div className={styles.content}>
-        <div className={styles.label}>Peak Study Hours</div>
-        <div className={styles.value} style={{ fontSize: '1.25rem' }}>{peaks.length > 0 ? peaks.join(', ') : '—'}</div>
-        <div className={styles.subtitle}>When you get the most work done</div>
-      </div>
+    <div className={styles.peakCard}>
+      <p className={styles.cardLabel}>Peak Hours</p>
+      {topHours.length === 0 ? (
+        <p className={styles.noData}>No data yet</p>
+      ) : (
+        <div className={styles.peakList}>
+          {topHours.map(({ h, v }, i) => (
+            <div key={`peak-${i}`} className={styles.peakItem}>
+              <div className={styles.peakRank}>#{i + 1}</div>
+              <div className={styles.peakInfo}>
+                <span className={styles.peakTime}>{fmt(h)}</span>
+                <div className={styles.peakBar}>
+                  <motion.div
+                    className={styles.peakFill}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(v / max) * 100}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ opacity: 1 - i * 0.2 }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
+}
