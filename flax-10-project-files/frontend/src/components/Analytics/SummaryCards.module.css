@@ -1,60 +1,77 @@
-.summaryGrid {
+.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
 }
 
 .card {
-  background: var(--surface-primary);
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid;
+  background: var(--panel);
+  border: none;
+  border-radius: 14px;
+  padding: 1.125rem 1.25rem;
   display: flex;
-  gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  align-items: center;
+  gap: 0.875rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+[data-theme="dark"] .card {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
 }
 
-.icon {
-  font-size: 2rem;
+[data-theme="dark"] .card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.iconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.content {
-  flex: 1;
-}
+.icon { font-size: 1.1rem; }
+
+.content { min-width: 0; }
 
 .label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: 0.7rem;
   font-weight: 500;
-  margin-bottom: 0.25rem;
+  color: var(--muted);
+  margin: 0 0 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
 }
 
 .value {
-  font-size: 1.75rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text);
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .unit {
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--text-secondary);
-  margin-left: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
 }
 
-.subtitle {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: 0.2rem;
-}
-
-.subtitle { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem; }
+@media (max-width: 1200px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } }
