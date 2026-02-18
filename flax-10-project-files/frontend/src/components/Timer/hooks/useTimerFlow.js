@@ -2,11 +2,6 @@ import { useState, useRef } from 'react';
 import { useCompletionCheck } from '../utils/timerUtils';
 import { saveSession } from '../utils/historyUtils';
 
-/**
- * Manages timer state transitions and session logging.
- * Handles auto-reset of study blocks when goal is reached.
- */
-/** Logic to advance to next session or goal state */
 const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
     saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current, t.task);
     const next = t.completedSessions + 1;
@@ -19,15 +14,11 @@ const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
     t.setMode('work'); t.setTimeLeft(t.workTime * 60); t.setIsActive(modal !== 'break');
 };
 
-/**
- * Manages timer state transitions and session logging.
- * Handles auto-reset of study blocks when goal is reached.
- */
-export function useTimerFlow(t) {
+export function useTimerFlow(t, notify) {
     const [modal, setModal] = useState(null);
     const studyBlockId = useRef(Date.now());
     const startNext = getStartNextHandler(t, studyBlockId, modal, setModal);
 
-    useCompletionCheck(t, startNext, setModal);
+    useCompletionCheck(t, startNext, notify);
     return { modal, setModal, startNext, resetBlockId: () => studyBlockId.current = Date.now() };
 }
