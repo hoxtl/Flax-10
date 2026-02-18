@@ -1,16 +1,53 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
-import PasswordResetPageLayout from './PasswordResetPageLayout';
+import AuthHeroGeometric from '../components/Authentication/AuthHeroGeometric';
+import { AuthBrand, AuthFooter } from '../components/Authentication/AuthBranding';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const bgStyle = { position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" };
+const centerStyle = { position: "relative", zIndex: 1, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "2rem" };
 
-function AuthBrand() {
+function useResetForm() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  return { email, setEmail, loading, setLoading, message, setMessage, error, setError };
+}
+
+async function postResetRequest(email) {
+  const res = await fetch(`${API_BASE_URL}/auth/password-reset/request/`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }),
+  });
+  return { ok: res.ok, data: await res.json() };
+}
+
+async function trySubmitReset(email, setEmail, setMessage, setError) {
+  const { ok, data } = await postResetRequest(email);
+  if (ok) { setMessage(data.message); setEmail(''); }
+  else setError(data.error || 'There was an error, please try again...');
+}
+
+function buildSubmitHandler({ email, setEmail, setLoading, setMessage, setError }) {
+  return async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setMessage('');
+    try { await trySubmitReset(email, setEmail, setMessage, setError); }
+    catch { setError('There was an error, please try again...'); }
+    finally { setLoading(false); }
+  };
+}
+
+function SuccessMessage({ message }) {
+  if (!message) return null;
   return (
     <div className={styles.success}>
       <strong>✅ Email Sent!</strong>
       <p>{message}</p>
-      <p className={styles.infoText}>Check your inbox for the reset link.</p>
+      <p style={{ marginTop: '10px', fontSize: '0.9em' }}>Check your inbox for the reset link.</p>
     </div>
   );
 }
@@ -54,43 +91,24 @@ function ResetCard({ email, setEmail, loading, message, error, onSubmit }) {
   );
 }
 
-export default function PasswordResetRequest() {
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setMessage('');
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/password-reset/request/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message);
-        setEmail('');
-      } else {
-        setError(data.error || 'There was an error, please try again...');
-      }
-    } catch (err) {
-      setError('There was an error, please try again...');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+function ResetPageLayout({ children }) {
   return (
-    <PasswordResetPageLayout>
+    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
+      <AuthHeroGeometric />
+      <div aria-hidden="true" style={bgStyle} />
+      <AuthBrand />
+      <AuthFooter absolute />
+      <div style={centerStyle}>{children}</div>
+    </div>
+  );
+}
+
+export default function PasswordResetRequest() {
+  const form = useResetForm();
+  const handleSubmit = buildSubmitHandler(form);
+  return (
+    <ResetPageLayout>
       <div className={styles.container}><ResetCard {...form} onSubmit={handleSubmit} /></div>
-    </PasswordResetPageLayout>
+    </ResetPageLayout>
   );
 }
