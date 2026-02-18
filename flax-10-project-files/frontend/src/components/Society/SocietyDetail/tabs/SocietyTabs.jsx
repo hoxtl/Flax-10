@@ -37,7 +37,8 @@ function TabContent({ activeTab, society, editMode, onUpdate, eventHandlers, ann
     if (activeTab === 'about') return <TabWrapper><AboutTab about={society.about} editMode={editMode} onUpdate={(text) => onUpdate?.({ about: text })} /></TabWrapper>;
     if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab announcements={society.announcements} editMode={editMode} handlers={announcementHandlers} tags={tags} /></TabWrapper>;
     return <TabWrapper><CalendarTab events={society.events} editMode={editMode} eventHandlers={eventHandlers}
-        tags={tags} tagHandlers={tagHandlers} onViewAnnouncement={() => onTabChange('announcements')} /></TabWrapper>;
+        tags={tags} tagHandlers={tagHandlers} onViewAnnouncement={() => onTabChange('announcements')}
+        societyId={society.id} isMember={!!society.role} /></TabWrapper>;
 }
 
 function TabWrapper({ children }) {
