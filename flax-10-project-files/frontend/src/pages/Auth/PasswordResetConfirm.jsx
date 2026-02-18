@@ -5,55 +5,9 @@ import PasswordResetPageLayout from './PasswordResetPageLayout';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
-function useConfirmForm() {
-  const [formData, setFormData] = useState({ new_password: '', confirm_password: '' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    if (passwordError) setPasswordError('');
-  };
-  return { formData, loading, setLoading, error, setError, success, setSuccess, passwordError, setPasswordError, handleChange };
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-async function postConfirmReset(token, formData) {
-  const res = await fetch(`${API_BASE_URL}/auth/password-reset/confirm/`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, new_password: formData.new_password, confirm_password: formData.confirm_password }),
-  });
-  return { ok: res.ok, data: await res.json() };
-}
-
-function validatePasswords(formData, setPasswordError) {
-  if (formData.new_password !== formData.confirm_password) {
-    setPasswordError('The two passwords do not match!');
-    return false;
-  }
-  return true;
-}
-
-async function tryConfirmReset(token, formData, navigate, setSuccess, setError, setLoading) {
-  const { ok, data } = await postConfirmReset(token, formData);
-  if (ok) { setSuccess(data.message); setTimeout(() => navigate('/login'), 2000); }
-  else { setError(data.error || data.confirm_password || 'Failed to reset password'); setLoading(false); }
-}
-
-function buildSubmitHandler({ formData, token, navigate, setLoading, setError, setSuccess, setPasswordError }) {
-  return async (e) => {
-    e.preventDefault();
-    if (!validatePasswords(formData, setPasswordError)) return;
-    setLoading(true);
-    setError('');
-    setSuccess('');
-    try { await tryConfirmReset(token, formData, navigate, setSuccess, setError, setLoading); }
-    catch { setError('Network error. Please try again.'); setLoading(false); }
-  };
-}
-
-function SuccessMessage({ success }) {
-  if (!success) return null;
+function AuthBrand() {
   return (
     <div className={styles.success}>
       <strong>✅ Success!</strong>
@@ -103,8 +57,69 @@ function ResetCard({ formData, loading, error, success, passwordError, onSubmit,
 export default function PasswordResetConfirm() {
   const { token } = useParams();
   const navigate = useNavigate();
-  const form = useConfirmForm();
-  const handleSubmit = buildSubmitHandler({ ...form, token, navigate });
+  const [formData, setFormData] = useState({
+    new_password: '',
+    confirm_password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+
+    if (passwordError) {
+      setPasswordError('');
+    }
+  };
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    setPasswordError('');
+
+    if (formData.new_password !== formData.confirm_password) {
+      setPasswordError('The two passwords do not match!');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/password-reset/confirm/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: token,
+          new_password: formData.new_password,
+          confirm_password: formData.confirm_password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(data.message);
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setError(data.error || data.confirm_password || 'Failed to reset password');
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      setLoading(false);
+    }
+  };
+
   return (
     <PasswordResetPageLayout>
       <div className={styles.container}>
