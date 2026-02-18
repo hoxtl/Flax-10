@@ -69,6 +69,36 @@ class SocietyEventSerialiser(serializers.ModelSerializer):
         ]
 
 
+class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
+    """Serializer for society events displayed in personal calendar."""
+    society_name = serializers.CharField(source='society.name', read_only=True)
+    society_color = serializers.SerializerMethodField()
+    source = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SocietyEvent
+        fields = [
+            'id', 'title', 'description', 'location', 'start_time', 'end_time',
+            'society', 'society_name', 'society_color', 'source'
+        ]
+
+    def get_society_color(self, obj):
+        return get_society_color(obj.society_id)
+
+    def get_source(self, obj):
+        return 'society'
+
+
+SOCIETY_COLORS = [
+    '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3',
+    '#00BCD4', '#009688', '#4CAF50', '#FF9800', '#FF5722',
+]
+
+
+def get_society_color(society_id):
+    return SOCIETY_COLORS[society_id % len(SOCIETY_COLORS)]
+
+
 class SocietyDetailSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
     tags = SocietyTagSerialiser(many=True, read_only=True)

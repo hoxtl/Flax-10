@@ -14,14 +14,7 @@ from .event_helpers import (
     expand_recurring_events
 )
 from .timetable_service import sync_timetable_if_needed
-
-
-def safe_sync_timetable():
-    """Safely attempt timetable sync, ignoring errors"""
-    try:
-        sync_timetable_if_needed()
-    except Exception:
-        pass
+from .society_sync_service import get_synced_society_events
 
 
 @api_view(['GET', 'POST'])
@@ -34,14 +27,19 @@ def event_list(request):
 
 def get_events(request):
     safe_sync_timetable(request.user)
-    base_events = CalendarEvent.objects.filter(user=request.user)
-    filtered = filter_events_by_date_range(base_events, request.query_params)
-    
-    start = parse_date_param(request.query_params.get('start'))
-    end = parse_date_param(request.query_params.get('end'))
+    personal = get_personal_events(request.user, request.query_params)
+    society = get_synced_society_events(request.user)
+    return Response(personal + society)
+
+
+def get_personal_events(user, query_params):
+    base_events = CalendarEvent.objects.filter(user=user)
+    filtered = filter_events_by_date_range(base_events, query_params)
+    start = parse_date_param(query_params.get('start'))
+    end = parse_date_param(query_params.get('end'))
     expanded = expand_recurring_events(filtered, start, end)
-    
-    return Response(CalendarEventSerialiser(expanded, many=True).data)
+    return CalendarEventSerialiser(expanded, many=True).data
+
 
 def safe_sync_timetable(user):
     try:
@@ -49,11 +47,11 @@ def safe_sync_timetable(user):
     except Exception:
         pass
 
+
 def create_event(request):
     serialiser = CalendarEventCreateSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    
     overlap = check_event_overlap(request.user, serialiser.validated_data)
     event = serialiser.save(user=request.user)
     response_data = CalendarEventSerialiser(event).data
