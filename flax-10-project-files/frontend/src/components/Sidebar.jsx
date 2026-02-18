@@ -82,10 +82,13 @@ function NavItem({ item, isActive, open, onClick }) {
       {isActive && <ActivePill />}
     </motion.button>);}
 
-function SidebarNav({ active, onChange, open }) {
+function SidebarNav({ active, onChange, open, user }) {
   return (
     <nav className={styles.nav}>
-      {APP_ROUTES.map((n) => (
+      {APP_ROUTES.filter(route => {
+        if (route.isAdminOnly) return user?.isAdmin;
+        return true;
+      }).map((n) => (
         <NavItem
           key={n.id}
           item={n}
@@ -98,7 +101,7 @@ function SidebarNav({ active, onChange, open }) {
   );
 }
 
-export default function Sidebar({ active, onChange }) {
+export default function Sidebar({ active, onChange, user }) {
   const [open, setOpen] = useState(false);
   const w = open ? EXPANDED_W : COLLAPSED_W;
   return (
@@ -110,5 +113,5 @@ export default function Sidebar({ active, onChange }) {
       onMouseLeave={() => setOpen(false)}
     >
       <SidebarHeader open={open} />
-      <SidebarNav active={active} onChange={onChange} open={open} />
+      <SidebarNav active={active} onChange={onChange} open={open} user={user}/>
     </motion.aside>);}
