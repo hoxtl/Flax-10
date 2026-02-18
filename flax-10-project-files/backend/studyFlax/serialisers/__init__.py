@@ -4,3 +4,4 @@ from .module_serialiser import ModuleSerialiser
 from .enrollment_serialisers import EnrollmentSerialiser
 from .auth_serialisers import RegistrationUserSerialiser, UserSerialiser, LoggedUserSerialiser
 from .notification_serialisers import NotificationSerialiser
+from .deadline_serialisers import DeadlineSerialiser
