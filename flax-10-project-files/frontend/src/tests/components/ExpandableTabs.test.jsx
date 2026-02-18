@@ -63,4 +63,13 @@ describe('ExpandableTabs', () => {
     fireEvent.click(screen.getAllByRole('button')[0]);
     expect(screen.getByText('Alpha')).toBeTruthy();
   });
+
+  it('does not deselect when clicking inside the container', () => {
+    const onChange = vi.fn();
+    const { container } = render(<ExpandableTabs tabs={tabs} onChange={onChange} />);
+    fireEvent.click(screen.getAllByRole('button')[0]); 
+    onChange.mockClear();
+    fireEvent.mouseDown(container.firstChild); 
+    expect(onChange).not.toHaveBeenCalled(); 
+  });
 });

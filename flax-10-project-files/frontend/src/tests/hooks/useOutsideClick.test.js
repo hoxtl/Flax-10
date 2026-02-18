@@ -137,4 +137,22 @@ describe('useOutsideClick', () => {
     taskMenuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(setTaskMenuId).not.toHaveBeenCalled();
   });
+
+  it('does not call setMenuOpen when clicking inside menuRef', () => {
+    const { menuEl, setMenuOpen } = setup(true);
+    menuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    expect(setMenuOpen).not.toHaveBeenCalled();
+  });
+  
+  it('does not call setTaskMenuId when clicking inside taskMenuRef', () => {
+    const { taskMenuEl, setTaskMenuId } = setup(true);
+    taskMenuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    expect(setTaskMenuId).not.toHaveBeenCalled();
+  });
+  
+  it('does not call onClose when clicking inside panelRef', () => {
+    const { el, onClose } = setup(true);
+    el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });
