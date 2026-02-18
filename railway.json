@@ -4,6 +4,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate --noinput && python manage.py collectstatic && gunicorn Flax10.wsgi:application --bind 0.0.0.0:8080 -k gthread --workers 4 --threads 2 --timeout 120"
+    "startCommand": "/bin/sh -c "python manage.py migrate --noinput && python manage.py collectstatic && gunicorn Flax10.wsgi:application --bind 0.0.0.0:8080 -k gthread --workers 4 --threads 2 --timeout 120""
   }
 }
