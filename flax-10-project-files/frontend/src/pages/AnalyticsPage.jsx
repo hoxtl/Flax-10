@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import analyticsService from '../api/analyticsService';
 import SummaryCards from '../components/Analytics/SummaryCards';
 import ProductivityCards from '../components/Analytics/ProductivityCards';
@@ -11,36 +12,50 @@ import AIInsightsTab from '../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../components/Analytics/InsightCards';
 import styles from './AnalyticsPage.module.css';
 
-const TABS = [
-  { id: 'overview', label: '📊 Overview' },
-  { id: 'ai', label: '🤖 AI Insights' },
+const PERIODS = [
+  { label: '7d', value: 7 },
+  { label: '30d', value: 30 },
+  { label: '90d', value: 90 },
 ];
 
-const AnalyticsPage = () => {
+const TABS = [
+  { id: 'Overview', icon: '📊' },
+  { id: 'AI Insights', icon: '✨' },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+export default function AnalyticsPage() {
+  const [period, setPeriod] = useState(30);
+  const [activeTab, setActiveTab] = useState('Overview');
   const [data, setData] = useState(null);
   const [progressData, setProgressData] = useState(null);
-  const [themeData, setThemeData] = useState(null);
+  const [themeStats, setThemeStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [period, setPeriod] = useState(30);
-  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     const fetchAll = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        const [analyticsData, progress, themeStats] = await Promise.all([
+        const [summary, progress, theme] = await Promise.all([
           analyticsService.getSummary(period),
           analyticsService.getProgress(period),
           analyticsService.getThemeStats(period),
         ]);
-        setData(analyticsData);
+        setData(summary);
         setProgressData(progress);
-        setThemeData(themeStats);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load analytics data');
-        console.error(err);
+        setThemeStats(theme);
+      } catch {
+        setError('Failed to load analytics data.');
       } finally {
         setLoading(false);
       }
@@ -48,84 +63,148 @@ const AnalyticsPage = () => {
     fetchAll();
   }, [period]);
 
-  if (loading) return <div className={styles.loading}>Loading analytics...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
-  if (!data) return <div className={styles.noData}>No data available</div>;
-
   return (
-    <div className={styles.analyticsPage}>
-      <div className={styles.header}>
-        <h1>Study Analytics</h1>
-        <div className={styles.periodSelector}>
-          {[7, 30, 90].map(d => (
-            <button key={d} className={period === d ? styles.active : ''} onClick={() => setPeriod(d)}>
-              {d} Days
+    <div className={styles.page}>
+      <motion.div
+        className={styles.header}
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div>
+          <h1 className={styles.title}>Analytics</h1>
+          <p className={styles.subtitle}>Your study patterns & performance</p>
+        </div>
+        <div className={styles.periodToggle}>
+          {PERIODS.map(p => (
+            <button
+              key={p.value}
+              className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
+              onClick={() => setPeriod(p.value)}
+            >
+              {p.label}
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      <div className={styles.tabs}>
-        {TABS.map(tab => (
+      <motion.div
+        className={styles.tabBar}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.35 }}
+      >
+        {TABS.map(({ id, icon }) => (
           <button
-            key={tab.id}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            key={id}
+            className={`${styles.tab} ${activeTab === id ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab(id)}
           >
-            {tab.label}
+            <span>{icon}</span>
+            <span>{id}</span>
+            {activeTab === id && (
+              <motion.div className={styles.tabIndicator} layoutId="tabIndicator" />
+            )}
           </button>
         ))}
-      </div>
+      </motion.div>
 
-      {activeTab === 'overview' && (
-        <>
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Overview</h2>
-            <SummaryCards summary={data.summary} />
-          </section>
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Productivity</h2>
-            <ProductivityCards summary={data.summary} progressSummary={progressData?.summary} />
-          </section>
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Insights</h2>
-            <div className={styles.insightCardsRow}>
-              <ConsistencyScore summary={data.summary} progressSummary={progressData?.summary} periodDays={period} />
-              <PeakHoursCard heatmapData={data.heatmap.data} />
-            </div>
-          </section>
-          <div className={styles.chartsGrid}>
-            <div className={styles.chartCard}>
-              <h2>Study Hours Over Time</h2>
-              <StudyHoursChart data={data.daily_breakdown} />
-            </div>
-            <div className={styles.chartCard}>
-              <h2>Daily Work vs Break</h2>
-              <DailyBreakdownChart data={data.daily_breakdown} />
-            </div>
-            {progressData && (
-              <div className={styles.chartCard}>
-                <h2>Planned vs Actual Study Time</h2>
-                <PlannedVsActualChart data={progressData.daily_progress} />
-              </div>
-            )}
-            <div className={styles.chartCard}>
-              <h2>Study Pattern Heatmap</h2>
-              <StudyHeatmap heatmapData={data.heatmap} />
-            </div>
-            {themeData && (
-              <div className={styles.chartCard}>
-                <h2>Light vs Dark Mode Usage</h2>
-                <ThemeUsageChart themeStats={themeData} />
-              </div>
-            )}
-          </div>
-        </>
+      {error && <div className={styles.errorBanner}>{error}</div>}
+
+      {loading && (
+        <div className={styles.skeletonWrap}>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className={styles.skeleton} style={{ animationDelay: `${i * 0.08}s` }} />
+          ))}
+        </div>
       )}
 
-      {activeTab === 'ai' && <AIInsightsTab period={period} />}
+      <AnimatePresence mode="wait">
+        {!loading && data && activeTab === 'Overview' && (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className={styles.overviewWrap}
+          >
+            <motion.section custom={0} variants={fadeUp} initial="hidden" animate="visible">
+              <SummaryCards data={data} />
+            </motion.section>
+
+            <motion.div className={styles.twoCol} custom={1} variants={fadeUp} initial="hidden" animate="visible">
+              <div className={styles.card}>
+                <p className={styles.cardLabel}>Productivity</p>
+                <ProductivityCards data={data} progressData={progressData} />
+              </div>
+              <div className={styles.card}>
+                <p className={styles.cardLabel}>Insights</p>
+                <div className={styles.insightRow}>
+                  <ConsistencyScore data={data} />
+                  <PeakHoursCard data={data} />
+                </div>
+              </div>
+            </motion.div>
+
+            <div className={styles.chartsGrid}>
+              {[
+                {
+                  title: 'Study Hours',
+                  el: <StudyHoursChart data={data.daily_breakdown} />,
+                  i: 2,
+                },
+                {
+                  title: 'Daily Breakdown',
+                  el: <DailyBreakdownChart data={data.daily_breakdown} />,
+                  i: 3,
+                },
+                progressData && {
+                  title: 'Planned vs Actual',
+                  el: <PlannedVsActualChart data={progressData.daily_progress} />,
+                  i: 4,
+                  wide: true,
+                },
+                {
+                  title: 'Focus Heatmap',
+                  el: <StudyHeatmap heatmapData={data.heatmap} />,
+                  i: 5,
+                  wide: true,
+                },
+                themeStats && {
+                  title: 'Theme Usage',
+                  el: <ThemeUsageChart themeStats={themeStats} />,
+                  i: 6,
+                },
+              ].filter(Boolean).map(({ title, el, i, wide }) => (
+                <motion.div
+                  key={title}
+                  className={`${styles.card} ${wide ? styles.wide : ''}`}
+                  custom={i}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <p className={styles.cardLabel}>{title}</p>
+                  {el}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {!loading && activeTab === 'AI Insights' && (
+          <motion.div
+            key="ai"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <AIInsightsTab period={period} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
-};
-
-export default AnalyticsPage;
+}
