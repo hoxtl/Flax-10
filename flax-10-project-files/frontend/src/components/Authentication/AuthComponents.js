@@ -43,11 +43,24 @@ export const SignUpContainer = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    position: relative; /* Change to relative so the container expands with form height */
-    opacity: ${(props) => (props.$signIn ? "0" : "1")};
-    display: ${(props) => (props.$signIn ? "none" : "block")};
+    position: relative;
     transform: none;
-    z-index: 5;
+    display: ${(props) => (props.$signIn ? "none" : "block")};
+
+    /* Mobile Animation: Quick Fade Out (0.2s), Slower Fade In (0.5s) */
+    animation: ${(props) =>
+      !props.$signIn ? "fadeIn 0.5s ease-out forwards" : "none"};
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 `;
 
@@ -65,10 +78,12 @@ export const SignInContainer = styled.div`
   @media (max-width: 768px) {
     width: 100%;
     position: relative;
-    opacity: ${(props) => (props.$signIn ? "1" : "0")};
-    display: ${(props) => (props.$signIn ? "block" : "none")};
     transform: none;
-    z-index: 5;
+    display: ${(props) => (props.$signIn ? "block" : "none")};
+
+    /* Mobile Animation: Quick Fade Out (0.2s), Slower Fade In (0.5s) */
+    animation: ${(props) =>
+      props.$signIn ? "fadeIn 0.5s ease-out forwards" : "none"};
   }
 `;
 
@@ -333,10 +348,10 @@ export const MobileToggleButton = styled.div`
     color: rgba(43, 30, 20, 0.6);
 
     span {
+      padding: 5px;
       color: #9e7e5d;
       font-weight: 700;
       cursor: pointer;
-      margin-left: 5px;
       text-decoration: underline;
     }
   }
