@@ -37,7 +37,7 @@ export function AuthFooter({ absolute = false }) {
       textAlign: "center",
       padding: "4px 0 8px",
       fontSize: 11,
-      color: "rgba(10,7,5,0.35)",
+      color: "rgba(0, 0, 0, 0.35)",
       userSelect: "none",
       letterSpacing: "0.02em",
     }}>
