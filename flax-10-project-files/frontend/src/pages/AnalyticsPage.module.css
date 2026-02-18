@@ -1,0 +1,103 @@
+.analyticsPage {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.periodSelector {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--surface-secondary);
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.periodSelector button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.periodSelector button:hover {
+  background: var(--surface-tertiary);
+}
+
+.periodSelector button.active {
+  background: var(--primary);
+  color: white;
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.chartCard {
+  background: var(--surface-primary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chartCard h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.loading,
+.error,
+.noData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  color: var(--error);
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border-color, rgba(0,0,0,0.08)); }
+.tab { padding: 0.6rem 1.25rem; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--text-secondary); font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+.tab:hover { color: var(--text-primary); }
+.activeTab { color: var(--primary, #4CAF50); border-bottom-color: var(--primary, #4CAF50); }
+.insightCardsRow { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.section { margin-bottom: 2rem; }
+.sectionTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
