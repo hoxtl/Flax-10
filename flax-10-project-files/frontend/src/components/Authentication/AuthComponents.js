@@ -4,12 +4,22 @@ import { Link } from "react-router-dom";
 export const Container = styled.div`
   background-color: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(74, 52, 33, 0.18), 0 8px 24px rgba(74, 52, 33, 0.10);
+  box-shadow:
+    0 20px 60px rgba(74, 52, 33, 0.18),
+    0 8px 24px rgba(74, 52, 33, 0.1);
   position: relative;
   overflow: hidden;
   width: 860px;
   max-width: 100%;
-  min-height: 460px;
+  min-height: 480px;
+
+  @media (max-width: 768px) {
+    /* Allow the card to grow with content on mobile for the long Sign Up form */
+    min-height: 520px;
+    height: auto;
+    width: 100%;
+    margin: 0 16px;
+  }
 `;
 
 export const SignUpContainer = styled.div`
@@ -23,13 +33,22 @@ export const SignUpContainer = styled.div`
   z-index: 1;
 
   ${(props) =>
-    props.$signIn !== true
+    !props.$signIn
       ? `
     transform: translateX(100%);
     opacity: 1;
     z-index: 5;
   `
       : ""}
+
+  @media (max-width: 768px) {
+    width: 100%;
+    position: relative; /* Change to relative so the container expands with form height */
+    opacity: ${(props) => (props.$signIn ? "0" : "1")};
+    display: ${(props) => (props.$signIn ? "none" : "block")};
+    transform: none;
+    z-index: 5;
+  }
 `;
 
 export const SignInContainer = styled.div`
@@ -41,7 +60,16 @@ export const SignInContainer = styled.div`
   width: 50%;
   z-index: 2;
 
-  ${(props) => (props.$signIn !== true ? `transform: translateX(100%);` : "")}
+  ${(props) => (!props.$signIn ? `transform: translateX(100%);` : "")}
+
+  @media (max-width: 768px) {
+    width: 100%;
+    position: relative;
+    opacity: ${(props) => (props.$signIn ? "1" : "0")};
+    display: ${(props) => (props.$signIn ? "block" : "none")};
+    transform: none;
+    z-index: 5;
+  }
 `;
 
 export const Form = styled.form`
@@ -74,7 +102,9 @@ export const Input = styled.input`
   border-radius: 8px;
   color: #2b1e14;
   font-size: 14px;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
   box-sizing: border-box;
 
   &:focus {
@@ -101,17 +131,26 @@ export const Button = styled.button`
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
   overflow: hidden;
   will-change: transform;
-  box-shadow: 0 8px 24px rgba(74, 52, 33, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 8px 24px rgba(74, 52, 33, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   margin-top: 4px;
 
   &::before {
     content: "";
     position: absolute;
     inset: -45% -70%;
-    background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
+    background: linear-gradient(
+      120deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.28) 50%,
+      transparent 65%
+    );
     transform: translateX(-60%) rotate(8deg);
     opacity: 0;
     pointer-events: none;
@@ -123,7 +162,9 @@ export const Button = styled.button`
   }
 
   @keyframes btnSheen {
-    to { transform: translateX(60%) rotate(8deg); }
+    to {
+      transform: translateX(60%) rotate(8deg);
+    }
   }
 
   &:hover:not(:disabled) {
@@ -131,12 +172,22 @@ export const Button = styled.button`
     box-shadow: 0 14px 36px rgba(74, 52, 33, 0.28);
   }
 
-  &:active:not(:disabled) { transform: translateY(0px) scale(0.99); }
-  &:focus { outline: 2px solid rgba(74, 52, 33, 0.28); outline-offset: 3px; }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &:active:not(:disabled) {
+    transform: translateY(0px) scale(0.99);
+  }
+  &:focus {
+    outline: 2px solid rgba(74, 52, 33, 0.28);
+    outline-offset: 3px;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    &::before { animation: none !important; }
+    &::before {
+      animation: none !important;
+    }
     transition: none !important;
   }
 `;
@@ -145,7 +196,9 @@ export const GhostButton = styled(Button)`
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 255, 255, 0.55);
   color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(8px);
 
   &:hover:not(:disabled) {
@@ -160,7 +213,10 @@ export const Anchor = styled.a`
   font-size: 13px;
   text-decoration: none;
 
-  &:hover { color: #4a3421; text-decoration: underline; }
+  &:hover {
+    color: #4a3421;
+    text-decoration: underline;
+  }
 `;
 
 export const OverlayContainer = styled.div`
@@ -173,7 +229,11 @@ export const OverlayContainer = styled.div`
   transition: transform 0.6s ease-in-out;
   z-index: 100;
 
-  ${(props) => (props.$signIn !== true ? `transform: translateX(-100%);` : "")}
+  ${(props) => (!props.$signIn ? `transform: translateX(-100%);` : "")}
+
+  @media (max-width: 768px) {
+    display: none; /* Hide the brown overlay entirely on mobile */
+  }
 `;
 
 export const Overlay = styled.div`
@@ -192,11 +252,26 @@ export const Overlay = styled.div`
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.06) 0%, transparent 60%);
+    background: radial-gradient(
+      ellipse at 70% 30%,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 60%
+    );
     pointer-events: none;
   }
 
   ${(props) => (props.$signIn !== true ? `transform: translateX(50%);` : "")}
+
+  @media (max-width: 768px) {
+    left: 0;
+    top: -100%;
+    width: 100%;
+    height: 200%;
+    ${(props) =>
+      props.$signIn !== true
+        ? `transform: translateY(50%);`
+        : "transform: translateY(0);"}
+  }
 `;
 
 export const OverlayPanel = styled.div`
@@ -242,5 +317,27 @@ export const PasswordResetLink = styled(Link)`
   align-self: center;
   transition: color 0.15s ease;
 
-  &:hover { color: #4a3421; text-decoration: underline; }
+  &:hover {
+    color: #4a3421;
+    text-decoration: underline;
+  }
+`;
+
+export const MobileToggleButton = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(43, 30, 20, 0.6);
+
+    span {
+      color: #9e7e5d;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 5px;
+      text-decoration: underline;
+    }
+  }
 `;
