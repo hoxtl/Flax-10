@@ -1,103 +1,179 @@
-.analyticsPage {
-  padding: 2rem;
+.page {
+  padding: 2rem 2.5rem;
   max-width: 1400px;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 .header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin: 0 0 0.2rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.periodToggle {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.25rem;
+}
+
+.periodBtn {
+  background: none;
+  border: none;
+  padding: 0.375rem 0.875rem;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.periodBtn:hover {
+  color: var(--text);
+  background: var(--hover);
+}
+
+.periodActive {
+  background: var(--primary) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.tabBar {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
   margin-bottom: 2rem;
 }
 
-.header h1 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.periodSelector {
+.tab {
+  position: relative;
   display: flex;
-  gap: 0.5rem;
-  background: var(--surface-secondary);
-  padding: 0.25rem;
-  border-radius: 8px;
-}
-
-.periodSelector button {
-  padding: 0.5rem 1rem;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
   border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border-radius: 6px;
+  padding: 0.625rem 1.1rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.2s;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: color 0.18s ease;
 }
 
-.periodSelector button:hover {
-  background: var(--surface-tertiary);
-}
+.tab:hover { color: var(--text); }
+.tabActive { color: var(--primary) !important; }
 
-.periodSelector button.active {
+.tabIndicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
   background: var(--primary);
-  color: white;
+  border-radius: 2px 2px 0 0;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+[data-theme="dark"] .card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+
+.cardLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.overviewWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.insightRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .chartsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
 }
 
-.chartCard {
-  background: var(--surface-primary);
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.wide { grid-column: 1 / -1; }
+
+.errorBanner {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
+  border-radius: 10px;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
 }
 
-.chartCard h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
+.skeletonWrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
 }
 
-.loading,
-.error,
-.noData {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  font-size: 1.25rem;
-  color: var(--text-secondary);
+.skeleton {
+  height: 100px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
 }
 
-.error {
-  color: var(--error);
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-.section {
-  margin-bottom: 2rem;
+@media (max-width: 900px) {
+  .page { padding: 1.25rem 1rem; }
+  .twoCol { grid-template-columns: 1fr; }
+  .chartsGrid { grid-template-columns: 1fr; }
+  .wide { grid-column: auto; }
 }
-
-.sectionTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 1rem;
-}
-
-.tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border-color, rgba(0,0,0,0.08)); }
-.tab { padding: 0.6rem 1.25rem; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--text-secondary); font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-.tab:hover { color: var(--text-primary); }
-.activeTab { color: var(--primary, #4CAF50); border-bottom-color: var(--primary, #4CAF50); }
-.insightCardsRow { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.section { margin-bottom: 2rem; }
-.sectionTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
