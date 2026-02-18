@@ -5,7 +5,10 @@ import styles from './CalendarPage.module.css';
 import { EventModal } from '../components/Calendar/EventModal/EventModal';
 import { EventDetailPopup } from '../components/Calendar/EventDetailPopup';
 import { useTags } from '../context/TagContext';
-import { useEventActions } from '../components/Calendar/hooks/useCalendarEvents';
+import { useCalendarEvents, useEventActions } from '../components/Calendar/hooks/useCalendarEvents';
+import { getEventType } from '../components/Calendar/utils/eventUtils';
+import { disenrolByModuleId } from '../api/module_api';
+import { unsyncCalendar } from '../api/societyApi';
 
 export default function CalendarPage() {
     const { filter, allEvents } = useCalendar();
@@ -42,12 +45,14 @@ function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { removeEvent } = useEventActions();
+    const { loadEvents } = useCalendarEvents();
     const tags = useTags();
 
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, tags);
-    const actions = getCalendarPopupActions(popupEvent, openModal, removeEvent, closePopup);
+    const handlers = { openModal, removeEvent, closePopup, loadEvents };
+    const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
 
@@ -58,10 +63,35 @@ function getEventTag(event, tags) {
     return tags.getTag(event.tag);
 }
 
-function getCalendarPopupActions(event, openModal, removeEvent, closePopup) {
-    if (event.source === 'society') return null;
+function getCalendarPopupActions(event, handlers) {
+    const type = getEventType(event);
+    if (type === 'personal') return getPersonalActions(event, handlers);
+    if (type === 'module') return getModuleActions(event, handlers);
+    if (type === 'society') return getSocietyActions(event, handlers);
+    return null;
+}
+
+function getPersonalActions(event, { openModal, removeEvent, closePopup }) {
     return [
         { label: 'Edit', onClick: () => { closePopup(); openModal(event); } },
         { label: 'Delete', variant: 'danger', onClick: () => { closePopup(); removeEvent(event.id); } }
     ];
+}
+
+function getModuleActions(event, { closePopup, loadEvents }) {
+    const handleLeave = async () => {
+        closePopup();
+        await disenrolByModuleId(event.module);
+        loadEvents();
+    };
+    return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
+}
+
+function getSocietyActions(event, { closePopup, loadEvents }) {
+    const handleUnsync = async () => {
+        closePopup();
+        await unsyncCalendar(event.society_id);
+        loadEvents();
+    };
+    return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }

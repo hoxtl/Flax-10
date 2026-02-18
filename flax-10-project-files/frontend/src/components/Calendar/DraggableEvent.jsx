@@ -4,13 +4,14 @@ import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
+import { getEventType } from './utils/eventUtils';
 import { useTags } from '../../context/TagContext';
 import { EventMenuButton } from './EventMenu';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
-    const isSocietyEvent = event.source === 'society';
-    if (readOnly || isSocietyEvent) return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    const eventType = getEventType(event);
+    if (readOnly || eventType !== 'personal') return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
     return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
 }
 
@@ -19,7 +20,7 @@ function ReadOnlyEvent({ event, style, minWidth }) {
     const height = parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
     const eventStyle = buildReadOnlyStyle(style, event);
-    const className = event.source === 'society' ? 'draggable-event society-event' : 'draggable-event';
+    const className = getReadOnlyClassName(event);
 
     const handleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -31,6 +32,13 @@ function ReadOnlyEvent({ event, style, minWidth }) {
             <EventContent event={event} height={height} width={width} minWidth={minWidth} />
         </div>
     );
+}
+
+function getReadOnlyClassName(event) {
+    const type = getEventType(event);
+    if (type === 'society') return 'draggable-event society-event';
+    if (type === 'module' || type === 'timetable') return 'draggable-event timetable-event';
+    return 'draggable-event';
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
