@@ -13,6 +13,7 @@ from .calendar.timetableSourceModel import *
 # Module
 from .modules.moduleModel import *
 from .modules.enrollmentModel import *
+from .modules.deadlineModel import *
 
 # Notifications
 from .notifications.notificationModel import *
