@@ -51,6 +51,13 @@ export const updateAnnouncement = (societyId, announcementId, data) =>
 export const deleteAnnouncement = (societyId, announcementId) =>
     deleteRequest(`${BASE}/${societyId}/announcements/${announcementId}/`);
 
+// Calendar Sync
+export const getSyncStatus = (societyId) => fetchApi(`${BASE}/${societyId}/calendar-sync-status/`);
+
+export const syncCalendar = (societyId) => postJson(`${BASE}/${societyId}/calendar-sync/`, {});
+
+export const unsyncCalendar = (societyId) => deleteRequest(`${BASE}/${societyId}/calendar-unsync/`);
+
 // Events
 export const fetchSocietyEvents = (societyId) => fetchApi(`${BASE}/${societyId}/events/`);
 

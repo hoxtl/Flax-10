@@ -9,6 +9,7 @@ import { EventModal } from "../../../../Calendar/EventModal/EventModal";
 import TagFilterBar from "../../tags/TagFilterBar";
 import TagManager from "../../tags/TagManager";
 import EventDetailPopup from "./EventDetailPopup";
+import SyncButton from "./SyncButton";
 
 export default function CalendarTab(props) {
     return (
@@ -18,35 +19,33 @@ export default function CalendarTab(props) {
     );
 }
 
-function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement }) {
+function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
 
-    const handleEventClick = (event, rect) => setPopupState({ event, rect });
-    const closePopup = () => setPopupState({ event: null, rect: null });
-
     return (
         <div className={styles.calendarTab}>
             {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
-            <CalendarHeader date={selectedDate} setDate={setSelectedDate} />
+            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} />
             <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
             <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
-                readOnly={!editMode} onEventClick={editMode ? null : handleEventClick} customTags={tags} />
+                readOnly={!editMode} onEventClick={editMode ? null : (e, r) => setPopupState({ event: e, rect: r })} customTags={tags} />
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
             {popupState.event && <EventDetailPopup event={popupState.event} tags={tags} anchorRect={popupState.rect}
-                onClose={closePopup} onViewAnnouncement={onViewAnnouncement} />}
+                onClose={() => setPopupState({ event: null, rect: null })} onViewAnnouncement={onViewAnnouncement} />}
         </div>
     );
 }
 
-function CalendarHeader({ date, setDate }) {
+function CalendarHeader({ date, setDate, societyId, isMember }) {
     return (
         <div className={styles.calendarHeader}>
             <NavButtons date={date} setDate={setDate} />
             <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
+            {isMember && <SyncButton societyId={societyId} />}
         </div>
     );
 }
@@ -66,23 +65,18 @@ function NavButtons({ date, setDate }) {
 function SocietyEventModal({ eventHandlers, tags, editMode }) {
     const { isModalOpen, closeModal, modalEvent, modalInitialDate } = useEventModal();
     if (!isModalOpen || !editMode) return null;
-
-    const handleSubmit = (data) => {
-        const eventId = modalEvent?._baseId || modalEvent?.id;
-        if (data._delete && eventId) {
-            eventHandlers?.onDelete?.(eventId);
-        } else if (eventId) {
-            eventHandlers?.onUpdate?.(eventId, data);
-        } else {
-            eventHandlers?.onAdd?.(data);
-        }
-        closeModal();
-    };
-
     return (
         <EventModal event={modalEvent} initialDate={modalInitialDate} onClose={closeModal}
-            showReminder={false} customTags={tags} onSubmit={handleSubmit} />
+            showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)} />
     );
+}
+
+function handleModalSubmit(data, modalEvent, eventHandlers, closeModal) {
+    const eventId = modalEvent?._baseId || modalEvent?.id;
+    if (data._delete && eventId) eventHandlers?.onDelete?.(eventId);
+    else if (eventId) eventHandlers?.onUpdate?.(eventId, data);
+    else eventHandlers?.onAdd?.(data);
+    closeModal();
 }
 
 function convertEvents(events, tags) {
@@ -93,5 +87,3 @@ function filterEvents(events, tagFilters) {
     if (!tagFilters || tagFilters.length === 0) return events;
     return events.filter(e => tagFilters.includes(e.tag));
 }
-
-
