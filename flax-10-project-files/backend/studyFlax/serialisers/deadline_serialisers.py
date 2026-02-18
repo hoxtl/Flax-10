@@ -17,9 +17,8 @@ class DeadlineSerialiser(serializers.ModelSerializer):
 
     def validate_end_due_date(self, value):
         start = self.initial_data.get('start_due_date')
-        if value and start:
-            if value <= start:
-                raise serializers.ValidationError("End time must be after start time.")
+        if value and start and value <= start:
+            raise serializers.ValidationError("End time must be after start time.")
         return value
 
 
