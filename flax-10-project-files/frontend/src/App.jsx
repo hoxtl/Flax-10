@@ -114,9 +114,7 @@ function AuthScreen() {
           </motion.div>
         </AnimatePresence>
       </div>
-    </ScreenWrap>
-  );
-}
+    </ScreenWrap>);}
 
 function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
   return (
@@ -192,6 +190,4 @@ export default function App() {
           {screen === "app" && <AppScreen key="app" activeNav={activeNav} setActiveNav={setActiveNav} user={user} />}
         </AnimatePresence>
       </div>
-    </ThemeProvider>
-  );
-}
+    </ThemeProvider>);}
