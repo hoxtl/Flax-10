@@ -80,9 +80,7 @@ function NavItem({ item, isActive, open, onClick }) {
       <span className={styles.icon}>{item.icon}</span>
       <AnimatePresence>{open && <NavLabel label={item.label} />}</AnimatePresence>
       {isActive && <ActivePill />}
-    </motion.button>
-  );
-}
+    </motion.button>);}
 
 function SidebarNav({ active, onChange, open }) {
   return (
@@ -113,6 +111,4 @@ export default function Sidebar({ active, onChange }) {
     >
       <SidebarHeader open={open} />
       <SidebarNav active={active} onChange={onChange} open={open} />
-    </motion.aside>
-  );
-}
+    </motion.aside>);}
