@@ -22,11 +22,27 @@ function Separator() {
   return <div className={styles.separator} aria-hidden="true" />;
 }
 
+function TabLabel({ title }) {
+  return (
+    <motion.span
+      variants={spanVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={transition}
+      className={styles.tabLabel}
+    >
+      {title}
+    </motion.span>
+  );
+}
+
 function Tab({ tab, index, isSelected, onSelect }) {
   const Icon = tab.icon;
+  const cls = `${styles.tab} ${isSelected ? styles.tabActive : ""}`;
   return (
     <motion.button
-      className={`${styles.tab} ${isSelected ? styles.tabActive : ""}`}
+      className={cls}
       variants={buttonVariants}
       initial={false}
       animate="animate"
@@ -36,60 +52,49 @@ function Tab({ tab, index, isSelected, onSelect }) {
     >
       <Icon size={18} />
       <AnimatePresence initial={false}>
-        {isSelected && (
-          <motion.span
-            variants={spanVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={transition}
-            className={styles.tabLabel}
-          >
-            {tab.title}
-          </motion.span>
-        )}
+        {isSelected && <TabLabel title={tab.title} />}
       </AnimatePresence>
     </motion.button>
   );
 }
 
-export function ExpandableTabs({ tabs, onChange }) {
-  const [selected, setSelected] = useState(null);
-  const ref = useRef(null);
-
+function useClickOutside(ref, onClose) {
   useEffect(() => {
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setSelected(null);
-        onChange?.(null);
-      }
+      if (ref.current && !ref.current.contains(e.target)) onClose();
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [onChange]);
+  }, [ref, onClose]);
+}
 
+function useTabState(onChange) {
+  const [selected, setSelected] = useState(null);
+  const deselect = () => { setSelected(null); onChange?.(null); };
   const handleSelect = (index) => {
     const next = selected === index ? null : index;
     setSelected(next);
     onChange?.(next);
   };
+  return { selected, deselect, handleSelect };
+}
 
+function TabList({ tabs, selected, onSelect }) {
+  return tabs.map((tab, index) => {
+    if (tab.type === "separator") return <Separator key={`sep-${index}`} />;
+    return (
+      <Tab key={tab.title} tab={tab} index={index} isSelected={selected === index} onSelect={onSelect} />
+    );
+  });
+}
+
+export function ExpandableTabs({ tabs, onChange }) {
+  const ref = useRef(null);
+  const { selected, deselect, handleSelect } = useTabState(onChange);
+  useClickOutside(ref, deselect);
   return (
     <div ref={ref} className={styles.container}>
-      {tabs.map((tab, index) => {
-        if (tab.type === "separator") {
-          return <Separator key={`sep-${index}`} />;
-        }
-        return (
-          <Tab
-            key={tab.title}
-            tab={tab}
-            index={index}
-            isSelected={selected === index}
-            onSelect={handleSelect}
-          />
-        );
-      })}
+      <TabList tabs={tabs} selected={selected} onSelect={handleSelect} />
     </div>
   );
 }
