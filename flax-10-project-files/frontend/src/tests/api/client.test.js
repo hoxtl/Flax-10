@@ -3,6 +3,7 @@ import { fetchApi } from '../../api/client';
 
 describe('fetchApi', () => {
     beforeEach(() => {
+        localStorage.clear();
         global.fetch = vi.fn();
     });
 

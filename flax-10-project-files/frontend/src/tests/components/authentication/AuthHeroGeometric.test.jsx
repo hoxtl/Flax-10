@@ -10,6 +10,10 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
+vi.mock('../../../components/Authentication/AuthHeroGeometric.module.css', () => ({
+  default: { hero: 'hero', glow: 'glow', layer: 'layer', fade: 'fade', shapeWrap: 'shapeWrap' }
+}));
+
 describe('AuthHeroGeometric', () => {
   it('renders without crashing', () => {
     const { container } = render(<AuthHeroGeometric />);
