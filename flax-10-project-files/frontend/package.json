@@ -14,8 +14,8 @@
     "coverage-report-clover": "vitest run --coverage --coverage.reporter=clover --coverage.reportOnFailure=true"
   },
   "dependencies": {
-    "framer-motion": "^12.34.0",
-    "frimousse": "^0.2.0",
+    "framer-motion": "^12.34.1",
+    "lucide-react": "^0.574.0",
     "mapbox-gl": "^3.18.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
