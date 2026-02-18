@@ -109,6 +109,6 @@ class SocietyDetailSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Society
         fields = [
-            'id', 'name', 'bio', 'about', 'image', 'is_ratified',
+            'id', 'name', 'bio', 'about', 'image', 'is_ratified', 'ratification_status',
             'date_created', 'member_count', 'tags', 'images', 'announcements', 'events'
         ]
