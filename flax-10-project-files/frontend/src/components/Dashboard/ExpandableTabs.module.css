@@ -3,7 +3,7 @@
     align-items: center;
     gap: 4px;
 }
-  
+
 .tab {
     display: flex;
     align-items: center;
@@ -20,7 +20,7 @@
     white-space: nowrap;
     overflow: hidden;
 }
-  
+
 .tab:hover {
     background: var(--hover);
     color: var(--text);
@@ -31,7 +31,7 @@
 }
 
 .tab:focus-visible {
-    outline: none;  
+    outline: none;
 }
 
 .tabActive {
