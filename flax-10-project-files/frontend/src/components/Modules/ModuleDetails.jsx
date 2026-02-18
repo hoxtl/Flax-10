@@ -1,6 +1,7 @@
 import {formatTime, formatDuration } from '../../utils/moduleUtils.js';
 import styles from './ModuleDetails.module.css';
 
+// Detail view for a module - includes schedule, description and enrol button
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     return (
         <div className={styles.container}>
@@ -16,6 +17,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
         </div>
     );
 }
+
 function DetailsHeader({ module, is_enrolled }) {
     return (
         <div className={styles.headerSection}>
