@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = '/api';
 
 function authHeaders(extra = {}) {
   const token = localStorage.getItem('token');
