@@ -10,7 +10,6 @@ import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
-
 import { getUserSettings } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
@@ -21,18 +20,7 @@ import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
-
-const screenAnim = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-};
-
-const pageAnim = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-};
+const fadeAnim = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
 
 function readUser() {
   const s = localStorage.getItem("user");
@@ -69,15 +57,7 @@ async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
   finally { setIsLoadingTheme(false); }
 }
 
-function useAppState() {
-  const [activeNav, setActiveNav] = useState("home");
-  const [initialTheme, setInitialTheme] = useState("light");
-  const [isLoadingTheme, setIsLoadingTheme] = useState(true);
-  const [user, setUser] = useState(() => readUser());
-  const [authed, setAuthed] = useState(() => isAuthenticated());
-  const [showWelcome, setShowWelcome] = useState(
-    () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1"
-  );
+function useSyncAuth(setAuthed, setUser, setShowWelcome) {
   useEffect(() => {
     const sync = () => {
       setAuthed(isAuthenticated());
@@ -86,24 +66,38 @@ function useAppState() {
     };
     window.addEventListener("auth-changed", sync);
     return () => window.removeEventListener("auth-changed", sync);
-  }, []);
+  }, [setAuthed, setUser, setShowWelcome]);
+}
+
+function useAppState() {
+  const [activeNav, setActiveNav] = useState("home");
+  const [initialTheme, setInitialTheme] = useState("light");
+  const [isLoadingTheme, setIsLoadingTheme] = useState(true);
+  const [user, setUser] = useState(() => readUser());
+  const [authed, setAuthed] = useState(() => isAuthenticated());
+  const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
+  useSyncAuth(setAuthed, setUser, setShowWelcome);
   useEffect(() => { loadTheme(authed, setInitialTheme, setIsLoadingTheme); }, [authed]);
   return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
 }
 
 function ScreenWrap({ animKey, children }) {
   return (
-    <motion.div
-      key={animKey}
-      variants={screenAnim}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      transition={{ duration: 0.25 }}
-      style={{ position: "absolute", inset: 0 }}
-    >
+    <motion.div key={animKey} variants={fadeAnim} initial="initial" animate="animate"
+      exit="exit" transition={{ duration: 0.25 }} style={{ position: "absolute", inset: 0 }}>
       {children}
     </motion.div>
+  );
+}
+
+function AuthRoutes({ location }) {
+  return (
+    <Routes location={location}>
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/reset-password" element={<PasswordResetRequest />} />
+      <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 
@@ -113,36 +107,22 @@ function AuthScreen() {
     <ScreenWrap animKey="auth">
       <div style={{ position: "relative", height: "100vh" }}>
         <AnimatePresence>
-          <motion.div
-            key={location.pathname}
-            variants={screenAnim}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.22 }}
-            style={{ position: "absolute", inset: 0 }}
-          >
-            <Routes location={location}>
-              <Route path="/login" element={<AuthPage />} />
-              <Route path="/reset-password" element={<PasswordResetRequest />} />
-              <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
+          <motion.div key={location.pathname} variants={fadeAnim} initial="initial"
+            animate="animate" exit="exit" transition={{ duration: 0.22 }}
+            style={{ position: "absolute", inset: 0 }}>
+            <AuthRoutes location={location} />
           </motion.div>
         </AnimatePresence>
       </div>
-    </ScreenWrap>
-  );
+    </ScreenWrap>);
 }
 
 function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
   return (
     <ScreenWrap animKey="welcome">
-      <WelcomeLanding
-        user={user}
+      <WelcomeLanding user={user}
         onExplore={() => onExplore(setShowWelcome, setActiveNav)}
-        onBackToAuth={onBackToAuth}
-      />
+        onBackToAuth={onBackToAuth} />
     </ScreenWrap>
   );
 }
@@ -157,15 +137,9 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
   return (
     <div style={{ position: "relative", height: "100%" }}>
       <AnimatePresence>
-        <motion.div
-          key={activeNav}
-          variants={pageAnim}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={{ duration: 0.18 }}
-          style={{ position: "absolute", inset: 0 }}
-        >
+        <motion.div key={activeNav} variants={fadeAnim} initial="initial"
+          animate="animate" exit="exit" transition={{ duration: 0.18 }}
+          style={{ position: "absolute", inset: 0 }}>
           <DashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </motion.div>
       </AnimatePresence>
@@ -173,27 +147,41 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
   );
 }
 
+function AppProviders({ children }) {
+  return (
+    <NotificationProvider>
+      <CalendarProvider>
+        <TagProvider>
+          {children}
+          <NotificationToast />
+        </TagProvider>
+      </CalendarProvider>
+    </NotificationProvider>
+  );
+}
+
 function AppScreen({ activeNav, setActiveNav, user }) {
   return (
     <ScreenWrap animKey="app">
-      <NotificationProvider>
-        <CalendarProvider>
-          <TagProvider>
-            <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
-              <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
-            </DashboardLayout>
-            <NotificationToast />
-          </TagProvider>
-        </CalendarProvider>
-      </NotificationProvider>
+      <AppProviders>
+        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
+          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
+        </DashboardLayout>
+      </AppProviders>
     </ScreenWrap>
   );
+}
+
+function resolveScreen(authed, user, showWelcome) {
+  if (!authed || !user) return "auth";
+  if (showWelcome) return "welcome";
+  return "app";
 }
 
 export default function App() {
   const { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome } = useAppState();
   if (isLoadingTheme) return null;
-  const screen = (!authed || !user) ? "auth" : showWelcome ? "welcome" : "app";
+  const screen = resolveScreen(authed, user, showWelcome);
   return (
     <ThemeProvider initialTheme={initialTheme}>
       <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden" }}>
@@ -203,6 +191,5 @@ export default function App() {
           {screen === "app" && <AppScreen key="app" activeNav={activeNav} setActiveNav={setActiveNav} user={user} />}
         </AnimatePresence>
       </div>
-    </ThemeProvider>
-  );
+    </ThemeProvider>);
 }

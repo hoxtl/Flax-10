@@ -11,20 +11,29 @@ import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
 import { TestimonialsMarquee } from "../components/Authentication/TestimonialsMarquee";
 import { AuthBrand, AuthFooter } from "../components/Authentication/AuthBranding";
 
+const pageStyle = {
+  height: "100vh", width: "100vw", background: "#f0ede8",
+  display: "flex", flexDirection: "column", overflow: "hidden", position: "relative",
+};
+
+const formWrapStyle = {
+  flex: "1 1 0", minHeight: 0, display: "flex",
+  justifyContent: "center", alignItems: "center", zIndex: 2, padding: "40px 24px 8px",
+};
+
 function AuthBackground() {
   return (
-    <div aria-hidden="true" style={{ position: "fixed", inset: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))", zIndex: 0 }} />
+    <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 0,
+      background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" }} />
   );
 }
 
 async function tryRegister(signUpData) {
-  try { return await authService.register(signUpData); }
-  catch { return null; }
+  try { return await authService.register(signUpData); } catch { return null; }
 }
 
 async function tryLogin(signInData) {
-  try { return await authService.login(signInData); }
-  catch { return null; }
+  try { return await authService.login(signInData); } catch { return null; }
 }
 
 async function submitSignUp(signUpData, setError, setLoading) {
@@ -70,38 +79,32 @@ function AuthForms({ signIn, error, loading, signUpData, updateSignUpField, sign
   );
 }
 
+function AuthFormSection({ state }) {
+  return (
+    <div style={formWrapStyle}>
+      <AuthForms {...state} />
+    </div>
+  );
+}
+
+function AuthTestimonialsSection() {
+  return (
+    <div style={{ flexShrink: 0, zIndex: 1 }}>
+      <TestimonialsMarquee />
+      <AuthFooter />
+    </div>
+  );
+}
+
 export default function AuthPage() {
   const state = useAuthPage();
   return (
-    <div style={{
-      height: "100vh",
-      width: "100vw",
-      background: "#f0ede8",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden",
-      position: "relative"
-    }}>
+    <div style={pageStyle}>
       <AuthHeroGeometric />
       <AuthBackground />
       <AuthBrand />
-
-      <div style={{
-        flex: "1 1 0",
-        minHeight: 0,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 2,
-        padding: "40px 24px 8px",
-      }}>
-        <AuthForms {...state} />
-      </div>
-
-      <div style={{ flexShrink: 0, zIndex: 1 }}>
-        <TestimonialsMarquee />
-        <AuthFooter />
-      </div>
+      <AuthFormSection state={state} />
+      <AuthTestimonialsSection />
     </div>
   );
 }
