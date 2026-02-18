@@ -1,0 +1,73 @@
+.section {
+    width: 100%;
+    padding: 16px 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: transparent;
+  }
+  
+  .heading {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 24px;
+  }
+  
+  .title {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(43, 30, 20, 0.45);
+    margin: 0;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  
+  .subtitle {
+    display: none;
+  }
+  
+  .marqueeWrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 4px 0;
+  }
+  
+  .track {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+    animation: marquee 50s linear infinite;
+  }
+  
+  .track:hover {
+    animation-play-state: paused;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.333%); }
+  }
+  
+  .fadeLeft {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 120px;
+    background: linear-gradient(to right, #f0ede8, transparent);
+    pointer-events: none;
+  }
+  
+  .fadeRight {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 120px;
+    background: linear-gradient(to left, #f0ede8, transparent);
+    pointer-events: none;
+  }
