@@ -2,37 +2,43 @@ import styles from './SummaryCards.module.css';
 
 const ProductivityCard = ({ icon, label, value, unit, color, subtitle }) => (
   <div className={styles.card} style={{ borderLeftColor: color }}>
-    <div className={styles.icon}>{icon}</div>
+    <div className={styles.iconWrap} style={{ background: color + '18', color }}>
+      <span className={styles.icon}>{icon}</span>
+    </div>
     <div className={styles.content}>
-      <div className={styles.label}>{label}</div>
-      <div className={styles.value}>
-        {value ?? '—'}
+      <p className={styles.label}>{label}</p>
+      <div className={styles.valueRow}>
+        <span className={styles.value}>{value ?? '—'}</span>
         {value != null && unit && <span className={styles.unit}>{unit}</span>}
       </div>
-      {subtitle && <div className={styles.subtitle}>{subtitle}</div>}
+      {subtitle && <p className={styles.label} style={{ marginTop: '0.15rem' }}>{subtitle}</p>}
     </div>
   </div>
 );
 
-const ProductivityCards = ({ summary, progressSummary }) => {
+const ProductivityCards = ({ data, progressData }) => {
+  const summary = data?.summary;
+  const progressSummary = progressData?.summary;
+  if (!summary) return null;
+
   const ratio = summary.work_break_ratio;
   const adherence = progressSummary?.adherence_percentage;
 
   return (
-    <div className={styles.summaryGrid}>
+    <div className={styles.grid} style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
       <ProductivityCard
         icon="⚖️"
         label="Work / Break Ratio"
         value={ratio ? `${ratio}:1` : null}
         color="#2196F3"
-        subtitle="Minutes of work per minute of break"
+        subtitle="Work per break minute"
       />
       <ProductivityCard
         icon="🚀"
         label="Overtime Sessions"
         value={summary.overtime_sessions}
         color="#F44336"
-        subtitle="Sessions that ran past planned time"
+        subtitle="Ran past planned time"
       />
       <ProductivityCard
         icon="🎯"
@@ -40,7 +46,7 @@ const ProductivityCards = ({ summary, progressSummary }) => {
         value={adherence}
         unit="%"
         color="#9C27B0"
-        subtitle="Actual vs planned study time"
+        subtitle="Actual vs planned"
       />
       <ProductivityCard
         icon="📅"
@@ -48,7 +54,7 @@ const ProductivityCards = ({ summary, progressSummary }) => {
         value={progressSummary?.total_planned_hours}
         unit="hrs"
         color="#FF9800"
-        subtitle="From your calendar events"
+        subtitle="From your calendar"
       />
     </div>
   );
