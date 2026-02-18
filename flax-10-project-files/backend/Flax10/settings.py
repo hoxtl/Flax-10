@@ -1,5 +1,8 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -117,3 +120,4 @@ DEFAULT_FROM_EMAIL = 'StudyFlax <StudyFlax@gmail.com>'
 
 # ✅ Frontend URL
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
