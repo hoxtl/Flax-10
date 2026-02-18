@@ -12,27 +12,22 @@ function isClickOutside(element, event) {
 function useClickOutside(ref, onClose, isActive) {
   useEffect(() => {
     if (!isActive) return;
-
     const handler = (e) => {
       if (isClickOutside(ref.current, e)) onClose();
     };
-
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [ref, onClose, isActive]);
 }
 
-// Dropdown header with user info
 function DropdownHeader({ user, profilePhotoUrl }) {
   const initials = getInitials(user?.name) || "?";
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
-
   const displayName =
     user?.name ||
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
     "User";
-
   return (
     <div className={styles.dropdownHeader}>
       <div className={styles.avatarLarge}>
@@ -44,20 +39,16 @@ function DropdownHeader({ user, profilePhotoUrl }) {
       </div>
       <div className={styles.userInfo}>
         <div className={styles.userName}>{displayName}</div>
-        <div className={styles.userMeta}>
-          {year} · {major}
-        </div>
+        <div className={styles.userMeta}>{year} · {major}</div>
       </div>
     </div>
   );
 }
 
-// Single menu item
 function MenuItem({ icon, label, onClick, isDanger }) {
   const className = isDanger
     ? `${styles.menuItem} ${styles.menuItemDanger}`
     : styles.menuItem;
-
   return (
     <button className={className} onClick={onClick}>
       <span className={styles.menuIcon}>{icon}</span>
@@ -70,17 +61,15 @@ function Divider() {
   return <div className={styles.divider} />;
 }
 
-// Dropdown menu content
-function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user, profilePhotoUrl }) {
+function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, onProfileClick, user, profilePhotoUrl }) {
   const dropdownRef = useRef(null);
   useClickOutside(dropdownRef, onClose, isOpen);
-
   if (!isOpen) return null;
-
   return (
     <div className={styles.dropdown} ref={dropdownRef}>
       <DropdownHeader user={user} profilePhotoUrl={profilePhotoUrl} />
       <Divider />
+      <MenuItem icon="👤" label="Profile" onClick={onProfileClick} />
       <MenuItem icon="⚙️" label="Settings" onClick={onSettingsClick} />
       <Divider />
       <MenuItem icon="🚪" label="Log out" onClick={onLogoutClick} isDanger />
@@ -88,7 +77,6 @@ function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, user, p
   );
 }
 
-// Avatar button
 function AvatarButton({ initials, profilePhotoUrl, onClick }) {
   return (
     <button className={styles.avatar} onClick={onClick} aria-label="User menu">
@@ -101,40 +89,30 @@ function AvatarButton({ initials, profilePhotoUrl, onClick }) {
   );
 }
 
-// Main profile dropdown
-export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }) {
+async function loadProfileData(setProfileData) {
+  try {
+    const data = await getUserProfile();
+    setProfileData(data);
+    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+    if (data.profile_photo_url) {
+      currentUser.profile_photo_url = data.profile_photo_url;
+      localStorage.setItem("user", JSON.stringify(currentUser));
+    }
+  } catch (error) {
+    console.error("Failed to load profile:", error);
+  }
+}
+
+export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const initials = getInitials(user?.name) || "?";
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await getUserProfile();
-        setProfileData(data);
+  useEffect(() => { loadProfileData(setProfileData); }, []);
 
-        // Update localStorage with fresh profile photo URL
-        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-        if (data.profile_photo_url) {
-          currentUser.profile_photo_url = data.profile_photo_url;
-          localStorage.setItem("user", JSON.stringify(currentUser));
-        }
-      } catch (error) {
-        console.error("Failed to load profile:", error);
-      }
-    };
-    loadProfile();
-  }, []);
-
-  const handleSettingsClick = () => {
-    setIsOpen(false);
-    onSettingsClick?.();
-  };
-
-  const handleLogoutClick = () => {
-    setIsOpen(false);
-    onLogoutClick?.();
-  };
+  const handleSettingsClick = () => { setIsOpen(false); onSettingsClick?.(); };
+  const handleLogoutClick = () => { setIsOpen(false); onLogoutClick?.(); };
+  const handleProfileClick = () => { setIsOpen(false); onProfileClick?.(); };
 
   const displayUser = {
     ...user,
@@ -156,6 +134,7 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick }
         onClose={() => setIsOpen(false)}
         onSettingsClick={handleSettingsClick}
         onLogoutClick={handleLogoutClick}
+        onProfileClick={handleProfileClick}
         user={displayUser}
         profilePhotoUrl={profilePhotoUrl}
       />

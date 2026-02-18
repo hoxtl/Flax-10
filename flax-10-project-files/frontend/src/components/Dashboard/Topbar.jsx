@@ -4,7 +4,9 @@ import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { NotificationCenter } from "../Notifications";
 import { getDisplayName } from "../Authentication/utils/userDisplay";
+import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
+import { Bell, Plus } from "lucide-react";
 
 function getFirstName(user) {
   const displayName = (getDisplayName(user) || "").trim();
@@ -38,40 +40,55 @@ function SearchInput() {
   );
 }
 
-function AddButton({ onClick }) {
+function QuickTabs({ onAddClick }) {
+  const tabs = [
+    { title: "Add", icon: Plus, autoCollapse: true },
+    { type: "separator" },
+    { title: "Notifications", icon: Bell },
+  ];
+  const handleChange = (index) => {
+    if (index === 0) onAddClick?.();
+  };
+  return <ExpandableTabs tabs={tabs} onChange={handleChange} />;
+}
+
+function ActionPill({ onAddClick }) {
   return (
-    <button className={styles.addBtn} onClick={onClick}>
-      <span className={styles.addIcon}>+</span>
-    </button>
+    <div className={styles.actionPill}>
+      <ThemeToggle />
+      <div className={styles.pillDivider} />
+      <QuickTabs onAddClick={onAddClick} />
+    </div>
   );
 }
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick }) {
+function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
-      <ThemeToggle />
-      <AddButton onClick={onAddClick} />
+      <ActionPill onAddClick={onAddClick} />
       <NotificationCenter />
-      <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} />
+      <ProfileDropdown
+        user={user}
+        onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick}
+        onProfileClick={onProfileClick}
+      />
     </div>
   );
 }
 
-function TopBarLeft({ onToggle, user }) {
-  return (
-    <div className={styles.left}>
-      <button className={styles.toggle} onClick={onToggle}>☰</button>
-      <TopBarGreeting user={user} />
-    </div>
-  );
-}
-
-export default function TopBar({ onToggle, onAddClick, user, onSettingsClick, onLogoutClick }) {
+export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <header className={styles.container}>
-      <TopBarLeft onToggle={onToggle} user={user} />
-      <TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} />
+      <TopBarGreeting user={user} />
+      <TopBarActions
+        onAddClick={onAddClick}
+        user={user}
+        onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick}
+        onProfileClick={onProfileClick}
+      />
     </header>
   );
 }
