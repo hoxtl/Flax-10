@@ -1,14 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import analyticsService from '../../api/analyticsService';
 import AnimatedList from './AnimatedList';
 import styles from './AIInsightsTab.module.css';
 
 function InsightsPanel({ insights, loading, onGenerate, period }) {
-  const insightLines = insights
-    ? insights.split('\n').filter(l => l.trim())
-    : [];
-
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
@@ -31,23 +29,30 @@ function InsightsPanel({ insights, loading, onGenerate, period }) {
             </motion.div>
           )}
 
-          {!loading && insightLines.length > 0 && (
-            <motion.div key="insights"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}>
-              <AnimatedList
-                items={insightLines}
-                renderItem={(line, i, isSelected) => (
-                  <div className={`${styles.insightItem} ${isSelected ? styles.insightSelected : ''}`}>
-                    <span className={styles.insightNum}>{String(i + 1).padStart(2, '0')}</span>
-                    <p className={styles.insightText}>{line}</p>
-                  </div>
-                )}
-              />
+          {!loading && insights && (
+            <motion.div key="insights" className={styles.insightsScrollBody}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+              <div className={styles.markdownBody}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h1: ({children}) => <h1 className={styles.mdH1}>{children}</h1>,
+                    h2: ({children}) => <h2 className={styles.mdH2}>{children}</h2>,
+                    h3: ({children}) => <h3 className={styles.mdH3}>{children}</h3>,
+                    p:  ({children}) => <p  className={styles.mdP}>{children}</p>,
+                    li: ({children}) => <li className={styles.mdLi}>{children}</li>,
+                    ul: ({children}) => <ul className={styles.mdUl}>{children}</ul>,
+                    ol: ({children}) => <ol className={styles.mdOl}>{children}</ol>,
+                    strong: ({children}) => <strong className={styles.mdStrong}>{children}</strong>,
+                  }}
+                >
+                  {insights}
+                </ReactMarkdown>
+              </div>
             </motion.div>
           )}
 
-          {!loading && insightLines.length === 0 && (
+          {!loading && !insights && (
             <motion.div key="empty" className={styles.centeredState}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className={styles.emptyIcon}>🤖</div>
@@ -147,9 +152,26 @@ function ChatPanel({ period }) {
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
               {msg.role === 'assistant' && <div className={styles.avatar}>✦</div>}
               <div className={`${styles.bubble} ${msg.role === 'user' ? styles.bubbleUser : styles.bubbleAI}`}>
-                {msg.content.split('\n').filter(l => l.trim()).map((line, j) => (
-                  <p key={`m${i}l${j}`} className={styles.bubbleLine}>{line}</p>
-                ))}
+                {msg.role === 'user'
+                  ? <p className={styles.bubbleLine}>{msg.content}</p>
+                  : <div className={styles.markdownBody}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          h1: ({children}) => <h1 className={styles.mdH1}>{children}</h1>,
+                          h2: ({children}) => <h2 className={styles.mdH2}>{children}</h2>,
+                          h3: ({children}) => <h3 className={styles.mdH3}>{children}</h3>,
+                          p:  ({children}) => <p  className={styles.mdP}>{children}</p>,
+                          li: ({children}) => <li className={styles.mdLi}>{children}</li>,
+                          ul: ({children}) => <ul className={styles.mdUl}>{children}</ul>,
+                          ol: ({children}) => <ol className={styles.mdOl}>{children}</ol>,
+                          strong: ({children}) => <strong className={styles.mdStrong}>{children}</strong>,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                }
               </div>
             </motion.div>
           ))}
