@@ -27,29 +27,25 @@ function Tab({ tab, index, isSelected, onSelect }) {
   return (
     <motion.button
       className={`${styles.tab} ${isSelected ? styles.tabActive : ""}`}
-      variants={buttonVariants}
-      initial={false}
-      animate="animate"
-      custom={isSelected}
-      onClick={() => onSelect(index)}
-      transition={transition}
+      variants={buttonVariants} initial={false} animate="animate" custom={isSelected}
+      onClick={() => onSelect(index)} transition={transition}
     >
       <Icon size={18} />
-      <AnimatePresence initial={false}>
-        {isSelected && (
-          <motion.span
-            variants={spanVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={transition}
-            className={styles.tabLabel}
-          >
-            {tab.title}
-          </motion.span>
-        )}
-      </AnimatePresence>
+      <TabLabel title={tab.title} isSelected={isSelected} />
+      {tab.badge > 0 && <span className={styles.badge}>{tab.badge > 9 ? '9+' : tab.badge}</span>}
     </motion.button>
+  );
+}
+
+function TabLabel({ title, isSelected }) {
+  return (
+    <AnimatePresence initial={false}>
+      {isSelected && (
+        <motion.span variants={spanVariants} initial="initial" animate="animate" exit="exit" transition={transition} className={styles.tabLabel}>
+          {title}
+        </motion.span>
+      )}
+    </AnimatePresence>
   );
 }
 
