@@ -14,15 +14,26 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from pathlib import Path
+
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.views.static import serve
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATICFILES_DIR = BASE_DIR / "studyFlax" / "static"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("studyFlax.urls.api_urls")),
     re_path(r"^(?!api/|admin/|static/|media/).*$",
-        TemplateView.as_view(template_name="index.html"),
-        name="spa"
+        serve,{
+            "path": "index.html",
+            "document_root": STATICFILES_DIR,
+        },
+        name="spa",
     ),
 ]
 
