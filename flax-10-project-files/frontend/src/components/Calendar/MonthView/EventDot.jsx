@@ -1,16 +1,18 @@
 import { useDrag } from '../hooks/useDragDrop';
 import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
+import { getEventType } from '../utils/eventUtils';
 
 export function EventDot({ e, onEventClick, customTags }) {
-    const isSocietyEvent = e.source === 'society';
-    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, isSocietyEvent);
+    const eventType = getEventType(e);
+    const isReadOnly = eventType !== 'personal';
+    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType);
 
     return (
         <div className={className} title={getTitle(e)} onClick={onClick}
             style={{ backgroundColor: color, color: 'white', borderLeft: 'none' }}
-            {...(isSocietyEvent ? {} : dragProps)}>
-            {isSocietyEvent && <span className="society-indicator">●</span>}
+            {...(isReadOnly ? {} : dragProps)}>
+            {eventType === 'society' && <span className="society-indicator">●</span>}
             {e.title}
         </div>
     );
@@ -21,7 +23,7 @@ function getTitle(event) {
     return event.title;
 }
 
-function useEventDotLogic(event, onEventClick, customTags, isSociety) {
+function useEventDotLogic(event, onEventClick, customTags, eventType) {
     const { openPopup } = useEventPopup();
     const globalTags = useTags();
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
@@ -35,7 +37,7 @@ function useEventDotLogic(event, onEventClick, customTags, isSociety) {
 
     return {
         color: getEventColor(event, customTags, globalTags),
-        className: getEventClassName(isDragging, isSociety),
+        className: getEventClassName(eventType, isDragging),
         onClick: handleClick,
         dragProps
     };
@@ -48,10 +50,11 @@ function getEventColor(event, customTags, globalTags) {
     return globalTags.getTag(event.tag)?.color || '#9E7E5D';
 }
 
-function getEventClassName(isDragging, isSociety) {
+function getEventClassName(eventType, isDragging) {
     let className = 'month-event-dot';
-    if (isDragging && !isSociety) className += ' dragging';
-    if (isSociety) className += ' society-event';
+    if (isDragging && eventType === 'personal') className += ' dragging';
+    if (eventType === 'society') className += ' society-event';
+    else if (eventType !== 'personal') className += ' timetable-event';
     return className;
 }
 
