@@ -8,15 +8,19 @@ import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
-    if (readOnly) return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    const isSocietyEvent = event.source === 'society';
+    if (readOnly || isSocietyEvent) return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
     return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
 }
 
 function ReadOnlyEvent({ event, style, minWidth }) {
     const height = parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
+    const eventStyle = buildReadOnlyStyle(style, event);
+    const className = event.source === 'society' ? 'draggable-event society-event' : 'draggable-event';
+
     return (
-        <div className="draggable-event" style={style}>
+        <div className={className} style={eventStyle}>
             <EventContent event={event} height={height} width={width} minWidth={minWidth} />
         </div>
     );
@@ -76,9 +80,15 @@ function ResizeHandle({ onStart }) {
 function EventContent({ event, height, width, minWidth }) {
     const showTime = height >= 30 && width >= minWidth;
     const showDesc = height >= 60 && width >= minWidth;
+    const isSociety = event.source === 'society';
+
     return (
         <div className="event-content">
-            <div className="event-title">{event.title}</div>
+            <div className="event-title">
+                {isSociety && <span className="society-badge">●</span>}
+                {event.title}
+            </div>
+            {isSociety && showTime && <div className="society-name">{event.society_name}</div>}
             {showTime && <TimeDisplay event={event} />}
             {showDesc && event.description && <div className="event-description">{event.description}</div>}
         </div>
@@ -89,6 +99,14 @@ function TimeDisplay({ event }) {
     const startTime = formatTime(new Date(event.start_time));
     const endTime = formatTime(new Date(event.end_time));
     return <div className="event-time">{startTime} - {endTime}</div>;
+}
+
+function buildReadOnlyStyle(baseStyle, event) {
+    const style = { ...baseStyle };
+    if (event.source === 'society' && event.society_color) {
+        style.borderLeftColor = event.society_color;
+    }
+    return style;
 }
 
 function buildStyle(baseStyle, resizePreview, theme) {
