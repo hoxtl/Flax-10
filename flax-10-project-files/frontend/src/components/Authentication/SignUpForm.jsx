@@ -15,6 +15,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
     <Components.SignUpContainer $signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Create Account</Components.Title>
+        <div style={{ height: "12px" }} />
 
         {fields.map(field => (
           <Components.Input
@@ -29,7 +30,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
           />
         ))}
 
-        <div style={{ height: "8px" }} />
+        <div style={{ height: "16px" }} />
 
         <Components.Button type="submit" disabled={loading}>
           {loading ? 'Creating account...' : 'Sign Up'}

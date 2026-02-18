@@ -1,4 +1,3 @@
-// src/components/Authentication/AuthComponents.js
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
@@ -10,7 +9,7 @@ export const Container = styled.div`
   overflow: hidden;
   width: 860px;
   max-width: 100%;
-  min-height: 420px;
+  min-height: 460px;
 `;
 
 export const SignUpContainer = styled.div`
@@ -51,10 +50,10 @@ export const Form = styled.form`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 36px 52px;
+  padding: 28px 52px;
   height: 100%;
   text-align: center;
-  gap: 10px;
+  gap: 8px;
   box-sizing: border-box;
 `;
 
@@ -70,7 +69,7 @@ export const Title = styled.h1`
 export const Input = styled.input`
   background-color: #f7f5f2;
   border: 1.5px solid rgba(74, 52, 33, 0.12);
-  padding: 13px 18px;
+  padding: 8px 18px;
   width: 100%;
   border-radius: 8px;
   color: #2b1e14;
