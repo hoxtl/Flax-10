@@ -44,7 +44,9 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onClose={() => setShowCoverModal(false)} onUpdate={updateImages} />}
             {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onDelete={handleDelete}
                 members={members} onFetchMembers={handlers.fetchMembers} onUpdateRole={handlers.updateMemberRole}
-                onRemoveMember={handlers.removeMember} onAddCollaborator={handlers.addCollaborator} />}
+                onRemoveMember={handlers.removeMember} onAddCollaborator={handlers.addCollaborator}
+                ratificationStatus={society.ratification_status} isRatified={society.is_ratified}
+                onRequestRatification={handlers.requestRatification} />}
         </div>
     );
 }
@@ -52,11 +54,13 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 function buildHandlers(hookData) {
     const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
-        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator } = hookData;
+        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
+        requestRatification } = hookData;
     return {
         updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
-        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator
+        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
+        requestRatification
     };
 }
 

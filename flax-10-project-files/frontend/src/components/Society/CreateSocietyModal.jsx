@@ -4,7 +4,7 @@ import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
 
 export default function CreateSocietyModal({ onClose, onCreate }) {
-    const [form, setForm] = useState(getInitialForm());
+    const [form, setForm] = useState({ name: "", bio: "", collaborators: [] });
     const [showCollabModal, setShowCollabModal] = useState(false);
     const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
@@ -33,10 +33,6 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
                 onAdd={handleAddCollaborators} existingUsernames={form.collaborators.map(c => c.username)} />}
         </>
     );
-}
-
-function getInitialForm() {
-    return { name: "", bio: "", isRatified: false, collaborators: [] };
 }
 
 function ModalHeader({ onClose }) {
