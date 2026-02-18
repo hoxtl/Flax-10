@@ -27,16 +27,16 @@ def event_list(request):
 
 def get_events(request):
     safe_sync_timetable(request.user)
-    personal = get_personal_events(request.user, request.query_params)
-    society = get_synced_society_events(request.user)
+    start = parse_date_param(request.query_params.get('start'))
+    end = parse_date_param(request.query_params.get('end'))
+    personal = get_personal_events(request.user, request.query_params, start, end)
+    society = get_synced_society_events(request.user, start, end)
     return Response(personal + society)
 
 
-def get_personal_events(user, query_params):
+def get_personal_events(user, query_params, start, end):
     base_events = CalendarEvent.objects.filter(user=user)
     filtered = filter_events_by_date_range(base_events, query_params)
-    start = parse_date_param(query_params.get('start'))
-    end = parse_date_param(query_params.get('end'))
     expanded = expand_recurring_events(filtered, start, end)
     return CalendarEventSerialiser(expanded, many=True).data
 
