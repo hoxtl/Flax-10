@@ -19,3 +19,4 @@ from .notifications.notificationModel import *
 
 # Timer
 from .timer import *
+from .timer.themeSessionModel import ThemeSession
