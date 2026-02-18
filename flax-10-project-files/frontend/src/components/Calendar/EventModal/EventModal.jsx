@@ -16,6 +16,4 @@ export function EventModal({ event, onClose, initialType, initialDate }) {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <ModalContent onClose={onClose} {...logic} />
-        </div>
-    );
-}
+        </div>);}
