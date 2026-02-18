@@ -54,7 +54,8 @@
   
   .fadeLeft {
     position: absolute;
-    inset-y: 0;
+    top: 0;
+    bottom: 0;
     left: 0;
     width: 120px;
     background: linear-gradient(to right, #f0ede8, transparent);
@@ -63,7 +64,8 @@
   
   .fadeRight {
     position: absolute;
-    inset-y: 0;
+    top: 0;
+    bottom: 0;
     right: 0;
     width: 120px;
     background: linear-gradient(to left, #f0ede8, transparent);
