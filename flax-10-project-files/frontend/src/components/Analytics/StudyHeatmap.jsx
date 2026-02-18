@@ -10,7 +10,7 @@ const StudyHeatmap = ({ heatmapData }) => {
   
   // Get color intensity based on value
   const getColor = (value) => {
-    if (value === 0) return theme === 'dark' ? '#1a1a1a' : '#f5f5f5';
+    if (value === 0) return theme === 'dark' ? '#1a1a1a' : '#f9f9f9';
     
     const intensity = value / maxValue;
     const baseColor = theme === 'dark' 
