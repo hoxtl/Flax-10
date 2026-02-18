@@ -7,6 +7,9 @@ NOTIFICATION_TYPES = [
     ('society_event', 'Society Event'),
     ('society_announcement', 'Society Announcement'),
     ('reminder', 'Reminder'),
+    ('ratification_request', 'Ratification Request'),
+    ('ratification_approved', 'Ratification Approved'),
+    ('ratification_rejected', 'Ratification Rejected'),
 ]
 
 
