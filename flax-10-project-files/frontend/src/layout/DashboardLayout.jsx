@@ -50,9 +50,7 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
   return (
     <>
       <div className={styles.backdrop} onClick={onClose} />
-      <div className={styles.drawer}>
-        <Sidebar user={user} active={activeNav} onChange={onPick} />
-      </div>
+      <div className={styles.drawer}><Sidebar user={user} active={activeNav} onChange={onPick} /></div>
     </>
   );
 }
@@ -61,9 +59,7 @@ function PageContent({ activeNav, children }) {
   const isMapPage = activeNav === "map";
   const mapStyle = { padding: 0, overflow: "hidden", height: "100%" };
   return (
-    <div className={styles.content} style={isMapPage ? mapStyle : undefined}>
-      {children}
-    </div>
+    <div className={styles.content} style={isMapPage ? mapStyle : undefined}>{children}</div>
   );
 }
 
@@ -85,10 +81,8 @@ function QuickAddGate({ open, onClose, onSelectType }) {
 
 function EventModalGate({ modal }) {
   if (!modal.isModalOpen) return null;
-  return (
-    <EventModal event={modal.modalEvent} initialType={modal.modalType}
-      initialDate={modal.modalInitialDate} onClose={modal.closeModal} />
-  );
+  return <EventModal event={modal.modalEvent} initialType={modal.modalType}
+    initialDate={modal.modalInitialDate} onClose={modal.closeModal} />;
 }
 
 function useDashboardState(activeNav, onNavChange) {
@@ -125,23 +119,30 @@ function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal })
   );
 }
 
+function DashboardMain({ state, onNavChange, children }) {
+  const { user, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, activeNav, modal, onSelectType } = state;
+  return (
+    <>
+      <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)}
+        onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick}
+        onProfileClick={() => onNavChange?.("profile")} selectedDate={selectedDate}
+        showWeekBar={showWeekBar} activeNav={activeNav}>{children}
+      </MainArea>
+      <DashboardModals showQuickAdd={showQuickAdd} setShowQuickAdd={setShowQuickAdd}
+        onSelectType={onSelectType} modal={modal} />
+    </>
+  );
+}
+
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
-  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd,
-    setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType } = state;
+  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav } = state;
   return (
     <div className={styles.root}>
       <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
         user={user} activeNav={activeNav} onNavChange={onNavChange}
         onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
-      <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)}
-        onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick}
-        onProfileClick={() => onNavChange?.("profile")} selectedDate={selectedDate}
-        showWeekBar={showWeekBar} activeNav={activeNav}>
-        {children}
-      </MainArea>
-      <DashboardModals showQuickAdd={showQuickAdd} setShowQuickAdd={setShowQuickAdd}
-        onSelectType={onSelectType} modal={modal} />
+      <DashboardMain state={{ ...state, activeNav }} onNavChange={onNavChange}>{children}</DashboardMain>
       <FloatingTasks />
     </div>
   );

@@ -24,36 +24,34 @@ function Separator() {
 
 function TabLabel({ title }) {
   return (
-    <motion.span
-      variants={spanVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      transition={transition}
-      className={styles.tabLabel}
-    >
+    <motion.span variants={spanVariants} initial="initial" animate="animate"
+      exit="exit" transition={transition} className={styles.tabLabel}>
       {title}
     </motion.span>
   );
 }
 
-function Tab({ tab, index, isSelected, onSelect }) {
-  const Icon = tab.icon;
-  const cls = `${styles.tab} ${isSelected ? styles.tabActive : ""}`;
+function TabIcon({ icon: Icon }) {
+  return <Icon size={18} />;
+}
+
+function TabInner({ tab, isSelected }) {
   return (
-    <motion.button
-      className={cls}
-      variants={buttonVariants}
-      initial={false}
-      animate="animate"
-      custom={isSelected}
-      onClick={() => onSelect(index)}
-      transition={transition}
-    >
-      <Icon size={18} />
+    <>
+      <TabIcon icon={tab.icon} />
       <AnimatePresence initial={false}>
         {isSelected && <TabLabel title={tab.title} />}
       </AnimatePresence>
+    </>
+  );
+}
+
+function Tab({ tab, index, isSelected, onSelect }) {
+  const cls = `${styles.tab} ${isSelected ? styles.tabActive : ""}`;
+  return (
+    <motion.button className={cls} variants={buttonVariants} initial={false}
+      animate="animate" custom={isSelected} onClick={() => onSelect(index)} transition={transition}>
+      <TabInner tab={tab} isSelected={isSelected} />
     </motion.button>
   );
 }
@@ -82,9 +80,7 @@ function useTabState(onChange) {
 function TabList({ tabs, selected, onSelect }) {
   return tabs.map((tab, index) => {
     if (tab.type === "separator") return <Separator key={`sep-${index}`} />;
-    return (
-      <Tab key={tab.title} tab={tab} index={index} isSelected={selected === index} onSelect={onSelect} />
-    );
+    return <Tab key={tab.title} tab={tab} index={index} isSelected={selected === index} onSelect={onSelect} />;
   });
 }
 
