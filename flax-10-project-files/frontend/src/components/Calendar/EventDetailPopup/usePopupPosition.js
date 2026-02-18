@@ -1,3 +1,6 @@
+const POPUP_HEIGHT_ESTIMATE = 250;
+const POPUP_MARGIN = 8;
+
 export function usePopupPosition(anchorRect) {
     if (!anchorRect) return getCenteredPosition();
     return getAnchoredPosition(anchorRect);
@@ -8,7 +11,13 @@ function getCenteredPosition() {
 }
 
 function getAnchoredPosition(anchorRect) {
-    const top = anchorRect.bottom + 8;
-    const left = Math.max(8, anchorRect.left);
-    return { top: `${top}px`, left: `${left}px`, position: "fixed" };
+    const spaceBelow = window.innerHeight - anchorRect.bottom;
+    const spaceAbove = anchorRect.top;
+    const openAbove = spaceBelow < POPUP_HEIGHT_ESTIMATE && spaceAbove > spaceBelow;
+
+    const top = openAbove ? anchorRect.top - POPUP_MARGIN : anchorRect.bottom + POPUP_MARGIN;
+    const transform = openAbove ? 'translateY(-100%)' : 'none';
+    const left = Math.max(POPUP_MARGIN, Math.min(anchorRect.left, window.innerWidth - 380));
+
+    return { top: `${top}px`, left: `${left}px`, transform, position: "fixed" };
 }

@@ -66,3 +66,17 @@ export function useEventModal() {
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
     return { modalEvent, modalType, modalInitialDate, isModalOpen, openModal, closeModal };
 }
+
+export function useEventPopup() {
+    const context = useContext(CalendarContext);
+    const dispatch = useContext(CalendarDispatchContext);
+
+    if (!context || !dispatch) {
+        return { popupEvent: null, popupAnchorRect: null, openPopup: () => {}, closePopup: () => {} };
+    }
+
+    const { popupEvent, popupAnchorRect } = context;
+    const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
+    const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
+    return { popupEvent, popupAnchorRect, openPopup, closePopup };
+}
