@@ -1,6 +1,7 @@
 # Auth
 from .auth.userModel import *
 from .auth.userSettingsModel import *
+from .auth.resetPasswordTokenModel import ResetPasswordToken
 
 # Calendar
 from .calendar.calendarEventModel import *
@@ -15,3 +16,6 @@ from .modules.enrollmentModel import *
 
 # Notifications
 from .notifications.notificationModel import *
+
+# Timer
+from .timer import *

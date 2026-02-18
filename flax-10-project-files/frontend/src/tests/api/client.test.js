@@ -17,7 +17,6 @@ describe('fetchApi', () => {
             status: 200,
             json: async () => mockData,
         });
-
         const data = await fetchApi('/test');
         expect(data).toEqual(mockData);
         expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.any(Object));
@@ -38,7 +37,6 @@ describe('fetchApi', () => {
             status: 200,
             json: async () => ({}),
         });
-
         await fetchApi('/test', { method: 'POST' });
         expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
             method: 'POST',
@@ -54,7 +52,6 @@ describe('fetchApi', () => {
             status: 400,
             json: async () => ({ detail: 'Validation failed' }),
         });
-
         await expect(fetchApi('/test')).rejects.toThrow('Validation failed');
     });
 
@@ -64,7 +61,6 @@ describe('fetchApi', () => {
             status: 500,
             json: async () => { throw new Error('parse error'); },
         });
-
         await expect(fetchApi('/test')).rejects.toThrow('Request failed');
     });
 

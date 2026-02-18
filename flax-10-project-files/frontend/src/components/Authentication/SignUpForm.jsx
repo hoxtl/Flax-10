@@ -1,9 +1,6 @@
 import React from 'react';
 import * as Components from '../Authentication/AuthComponents';
 
-/**
- * Authentication component for user sign up
- */
 export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading }) => {
   const fields = [
     { name: 'first_name', type: 'text', placeholder: 'First Name' },
@@ -15,10 +12,11 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
   ];
 
   return (
-    <Components.SignUpContainer signIn={signIn}>
+    <Components.SignUpContainer $signIn={signIn}>
       <Components.Form onSubmit={onSubmit}>
         <Components.Title>Create Account</Components.Title>
-        
+        <div style={{ height: "12px" }} />
+
         {fields.map(field => (
           <Components.Input
             key={field.name}
@@ -31,9 +29,11 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
             disabled={loading}
           />
         ))}
-        
+
+        <div style={{ height: "16px" }} />
+
         <Components.Button type="submit" disabled={loading}>
-          {loading ? 'Registering Account...' : 'Sign Up'}
+          {loading ? 'Creating account...' : 'Sign Up'}
         </Components.Button>
       </Components.Form>
     </Components.SignUpContainer>

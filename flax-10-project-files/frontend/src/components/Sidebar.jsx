@@ -1,66 +1,90 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Sidebar.module.css";
-import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
-import { getPreferredFirstName } from "../utils/userDisplay";
 
-function SidebarHeader({ collapsed }) {
+const EXPANDED_W = 224;
+const COLLAPSED_W = 72;
+const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
+const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
+const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
+
+function LogoMark() {
   return (
-    <div className={`${styles.header} ${collapsed ? styles.headerCollapsed : ""}`}>
-      {!collapsed && <span className={styles.brand}>StudyFlax</span>}
+    <motion.div
+      className={styles.logoMark}
+      whileHover={{ rotate: 8, scale: 1.08 }}
+      transition={LOGO_SPRING}
+    />
+  );
+}
+
+function BrandName() {
+  return (
+    <motion.span
+      className={styles.brand}
+      initial={{ opacity: 0, x: -6 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -6 }}
+      transition={{ duration: 0.18 }}
+    >
+      StudyFlax
+    </motion.span>
+  );
+}
+
+function SidebarHeader({ open }) {
+  return (
+    <div className={styles.header}>
+      <LogoMark />
+      <AnimatePresence>{open && <BrandName />}</AnimatePresence>
     </div>
   );
 }
 
-function NavItem({ item, isActive, collapsed, onClick }) {
-  const cls = [
-    styles.navItem,
-    collapsed ? styles.navItemCollapsed : styles.navItemExpanded,
-    isActive ? styles.navItemActive : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+function NavLabel({ label }) {
   return (
-    <button onClick={onClick} className={cls}>
+    <motion.span
+      className={styles.label}
+      initial={{ opacity: 0, x: -4, width: 0 }}
+      animate={{ opacity: 1, x: 0, width: "auto" }}
+      exit={{ opacity: 0, x: -4, width: 0 }}
+      transition={{ duration: 0.16 }}
+    >
+      {label}
+    </motion.span>
+  );
+}
+
+function ActivePill() {
+  return (
+    <motion.span
+      className={styles.activePill}
+      layoutId="activePill"
+      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+    />
+  );
+}
+
+function NavItem({ item, isActive, open, onClick }) {
+  const cls = `${styles.navItem} ${isActive ? styles.navItemActive : ""}`;
+  return (
+    <motion.button
+      onClick={onClick}
+      className={cls}
+      style={{ justifyContent: open ? "flex-start" : "center" }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
+      transition={NAV_SPRING}
+    >
       <span className={styles.icon}>{item.icon}</span>
-      {!collapsed && <span className={styles.label}>{item.label}</span>}
-    </button>
+      <AnimatePresence>{open && <NavLabel label={item.label} />}</AnimatePresence>
+      {isActive && <ActivePill />}
+    </motion.button>
   );
 }
 
-function SidebarUserProfile({ collapsed, user }) {
-  const firstName = getPreferredFirstName(user); 
-  const initials = getInitials(firstName) || "?";
-  const year = user?.year ? `Year ${user.year}` : "Year 2";
-  const major = user?.major || "CS";
-
-  return (
-    <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
-      <div className={styles.avatar}>{initials}</div>
-
-      {!collapsed && (
-        <div className={styles.userText}>
-          <div className={styles.userName}>{firstName}</div> 
-          <div className={styles.userMeta}>{year} · {major}</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function Sidebar({ active, onChange, collapsed, user }) {
-  const W = collapsed ? 72 : 224;
-
-  return (
-    <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
-      <SidebarHeader collapsed={collapsed} />
-      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
-      <SidebarUserProfile collapsed={collapsed} user={user} />
-    </aside>
-  );
-}
-
-function SidebarNav({ active, onChange, collapsed }) {
+function SidebarNav({ active, onChange, open }) {
   return (
     <nav className={styles.nav}>
       {APP_ROUTES.map((n) => (
@@ -68,10 +92,27 @@ function SidebarNav({ active, onChange, collapsed }) {
           key={n.id}
           item={n}
           isActive={active === n.id}
-          collapsed={collapsed}
+          open={open}
           onClick={() => onChange?.(n.id)}
         />
       ))}
     </nav>
+  );
+}
+
+export default function Sidebar({ active, onChange }) {
+  const [open, setOpen] = useState(false);
+  const w = open ? EXPANDED_W : COLLAPSED_W;
+  return (
+    <motion.aside
+      className={styles.sidebar}
+      animate={{ width: w, minWidth: w }}
+      transition={SIDEBAR_SPRING}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <SidebarHeader open={open} />
+      <SidebarNav active={active} onChange={onChange} open={open} />
+    </motion.aside>
   );
 }
