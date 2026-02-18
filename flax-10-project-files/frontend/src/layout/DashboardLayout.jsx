@@ -75,7 +75,7 @@ function PageContent({ activeNav, children }) {
   );
 }
 
-function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, selectedDate, showWeekBar, activeNav, children }) {
+function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
   return (
     <div className={styles.main}>
       <TopBar
@@ -83,6 +83,7 @@ function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, selectedDa
         onAddClick={onQuickAdd}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
+        onProfileClick={onProfileClick}
       />
       {showWeekBar && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
@@ -144,7 +145,16 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
     <div className={styles.root}>
       <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} />
       <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user} activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-      <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)} onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick} selectedDate={selectedDate} showWeekBar={showWeekBar} activeNav={activeNav}>
+      <MainArea
+        user={user}
+        onQuickAdd={() => setShowQuickAdd(true)}
+        onSettingsClick={() => onNavChange?.("settings")}
+        onLogoutClick={handleLogoutClick}
+        onProfileClick={() => onNavChange?.("profile")}
+        selectedDate={selectedDate}
+        showWeekBar={showWeekBar}
+        activeNav={activeNav}
+      >
         {children}
       </MainArea>
       <QuickAddGate open={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSelectType={onSelectType} />

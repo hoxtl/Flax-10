@@ -8,31 +8,12 @@ import { useAuthForm } from "../hooks/useAuthForm";
 import { authService } from "../api/authService";
 import { validatePasswords, getErrorMessage, saveUserData } from "../utils/authHelpers";
 import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
-
-function AuthBrand() {
-  return (
-    <div style={{ position: "absolute", top: 18, left: 20, zIndex: 3, userSelect: "none", pointerEvents: "none" }}>
-      <div style={{ fontSize: 12, letterSpacing: "0.34em", fontWeight: 800, color: "rgba(43,30,20,0.62)" }}>
-        STUDYFLAX
-      </div>
-      <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, letterSpacing: "0.02em", color: "rgba(43,30,20,0.42)" }}>
-        Built for calm study.
-      </div>
-    </div>
-  );
-}
-
-function AuthFooter() {
-  return (
-    <div style={{ position: "absolute", bottom: 18, left: 0, right: 0, zIndex: 3, textAlign: "center", fontSize: 12, color: "rgba(10,7,5,0.45)", userSelect: "none", pointerEvents: "none" }}>
-      Always secure. No ads. Free forever.
-    </div>
-  );
-}
+import { TestimonialsMarquee } from "../components/Authentication/TestimonialsMarquee";
+import { AuthBrand, AuthFooter } from "../components/Authentication/AuthBranding";
 
 function AuthBackground() {
   return (
-    <div aria-hidden="true" style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))", zIndex: 0 }} />
+    <div aria-hidden="true" style={{ position: "fixed", inset: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))", zIndex: 0 }} />
   );
 }
 
@@ -92,13 +73,34 @@ function AuthForms({ signIn, error, loading, signUpData, updateSignUpField, sign
 export default function AuthPage() {
   const state = useAuthPage();
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
+    <div style={{
+      height: "100vh",
+      width: "100vw",
+      background: "#f0ede8",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      position: "relative"
+    }}>
       <AuthHeroGeometric />
       <AuthBackground />
       <AuthBrand />
-      <AuthFooter />
-      <div style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+
+      <div style={{
+        flex: "1 1 0",
+        minHeight: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 2,
+        padding: "40px 24px 8px",
+      }}>
         <AuthForms {...state} />
+      </div>
+
+      <div style={{ flexShrink: 0, zIndex: 1 }}>
+        <TestimonialsMarquee />
+        <AuthFooter />
       </div>
     </div>
   );

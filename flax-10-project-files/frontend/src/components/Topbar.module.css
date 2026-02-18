@@ -131,6 +131,33 @@
   cursor: pointer;
 }
 
+.actionPill {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2px;
+  gap: 2px;
+  box-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
+  height: 36px;
+}
+
+.pillDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+:root[data-theme="dark"] .actionPill {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
 :root[data-theme="dark"] .container {
   background: rgba(26, 19, 16, 0.80);
   border-bottom: 1px solid rgba(180, 164, 144, 0.10);
