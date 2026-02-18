@@ -5,16 +5,8 @@ import AuthHeroGeometric from '../components/Authentication/AuthHeroGeometric';
 import { AuthBrand, AuthFooter } from '../components/Authentication/AuthBranding';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
-const bgStyle = {
-  position: "absolute", inset: 0, zIndex: 0,
-  background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))",
-};
-
-const centerStyle = {
-  position: "relative", zIndex: 1, display: "flex",
-  justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "2rem",
-};
+const bgStyle = { position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" };
+const centerStyle = { position: "relative", zIndex: 1, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "2rem" };
 
 function useConfirmForm() {
   const [formData, setFormData] = useState({ new_password: '', confirm_password: '' });
@@ -31,12 +23,10 @@ function useConfirmForm() {
 
 async function postConfirmReset(token, formData) {
   const res = await fetch(`${API_BASE_URL}/auth/password-reset/confirm/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, new_password: formData.new_password, confirm_password: formData.confirm_password }),
   });
-  const data = await res.json();
-  return { ok: res.ok, data };
+  return { ok: res.ok, data: await res.json() };
 }
 
 function validatePasswords(formData, setPasswordError) {
@@ -47,6 +37,12 @@ function validatePasswords(formData, setPasswordError) {
   return true;
 }
 
+async function tryConfirmReset(token, formData, navigate, setSuccess, setError, setLoading) {
+  const { ok, data } = await postConfirmReset(token, formData);
+  if (ok) { setSuccess(data.message); setTimeout(() => navigate('/login'), 2000); }
+  else { setError(data.error || data.confirm_password || 'Failed to reset password'); setLoading(false); }
+}
+
 function buildSubmitHandler({ formData, token, navigate, setLoading, setError, setSuccess, setPasswordError }) {
   return async (e) => {
     e.preventDefault();
@@ -54,14 +50,8 @@ function buildSubmitHandler({ formData, token, navigate, setLoading, setError, s
     setLoading(true);
     setError('');
     setSuccess('');
-    try {
-      const { ok, data } = await postConfirmReset(token, formData);
-      if (ok) { setSuccess(data.message); setTimeout(() => navigate('/login'), 2000); }
-      else { setError(data.error || data.confirm_password || 'Failed to reset password'); setLoading(false); }
-    } catch {
-      setError('Network error. Please try again.');
-      setLoading(false);
-    }
+    try { await tryConfirmReset(token, formData, navigate, setSuccess, setError, setLoading); }
+    catch { setError('Network error. Please try again.'); setLoading(false); }
   };
 }
 
@@ -113,20 +103,28 @@ function ResetCard({ formData, loading, error, success, passwordError, onSubmit,
   );
 }
 
-export default function PasswordResetConfirm() {
-  const { token } = useParams();
-  const navigate = useNavigate();
-  const form = useConfirmForm();
-  const handleSubmit = buildSubmitHandler({ ...form, token, navigate });
+function ConfirmPageLayout({ children }) {
   return (
     <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
       <AuthHeroGeometric />
       <div aria-hidden="true" style={bgStyle} />
       <AuthBrand />
       <AuthFooter absolute />
-      <div style={centerStyle}>
-        <div className={styles.container}>
-          <ResetCard {...form} onSubmit={handleSubmit} onChange={form.handleChange} />
-        </div>
+      <div style={centerStyle}>{children}</div>
+    </div>
+  );
+}
+
+export default function PasswordResetConfirm() {
+  const { token } = useParams();
+  const navigate = useNavigate();
+  const form = useConfirmForm();
+  const handleSubmit = buildSubmitHandler({ ...form, token, navigate });
+  return (
+    <ConfirmPageLayout>
+      <div className={styles.container}>
+        <ResetCard {...form} onSubmit={handleSubmit} onChange={form.handleChange} />
       </div>
-    </div>);}
+    </ConfirmPageLayout>
+  );
+}
