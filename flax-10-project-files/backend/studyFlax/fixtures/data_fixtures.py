@@ -35,7 +35,7 @@ recurrence_fixtures = (
     ('monthly', 1),
 )
 
-event_title = (
+event_title_fixtures = (
     "Finish Report", "Start essay", "Meeting with advisor", "Attend lecture", "Review notes", "Start application"
 )
 

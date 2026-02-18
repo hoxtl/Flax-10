@@ -11,7 +11,7 @@ from studyFlax.models import (
 
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
-    event_title_prefixes, event_title_suffixes, event_title, first_name_fixtures, last_name_fixtures
+    event_title_fixtures, first_name_fixtures, last_name_fixtures
 )
 
 User = get_user_model()
@@ -79,8 +79,8 @@ class Command(BaseCommand):
         self.stdout.write(f"Seeding {needed} users...")
         users_to_create = []
         for _ in range(needed):
-            first_name = self.faker.first_name()
-            last_name = self.faker.last_name()
+            first_name = random.choice(first_name_fixtures)
+            last_name = random.choice(last_name_fixtures)
             username = f"{first_name.lower()}{last_name.lower()}{self.faker.random_int(1, 99)}"
             email = f"{first_name}.{last_name}@{self.faker.domain_name()}"
 
@@ -182,7 +182,7 @@ class Command(BaseCommand):
                 duration_minutes = random.choice([30, 45, 60, 90, 120, 180])
                 end_time = start_time + timedelta(minutes=duration_minutes)
 
-                title = f"{random.choice(event_title_prefixes)} {random.choice(event_title_suffixes)}"
+                title = random.choice(event_title_fixtures)
 
                 # Randomly assign relations
                 tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
