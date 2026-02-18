@@ -1,22 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
-    getWeekDays,
-    getMonthDays,
-    getStartOfWeek,
-    getStartOfMonth,
-    getEndOfMonth,
-    addDays,
-    isSameDay,
-    isSameMonth,
-    formatTime,
-    formatDate,
-    formatMonthYear,
-    addWeeks,
-    addMonths,
-    getGreeting,
-    startOfDay,
-    isToday,
-    formatDayLabel,
+    getWeekDays, getMonthDays, getStartOfWeek, getStartOfMonth, getEndOfMonth,
+    addDays, isSameDay, isSameMonth, addWeeks, addMonths, startOfDay, isToday,
+    formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
     parseDateInput
 } from '../../utils/dateUtils';
 
@@ -54,8 +40,8 @@ describe('dateUtils', () => {
 
     describe('Helpers', () => {
         it('getStartOfWeek', () => {
-            const d = getStartOfWeek(new Date(2026, 1, 18)); // Wed Feb 18
-            expect(d.getDate()).toBe(15); // Sun Feb 15
+            const d = getStartOfWeek(new Date(2026, 1, 18));
+            expect(d.getDate()).toBe(15);
         });
 
         it('getStartOfMonth', () => {

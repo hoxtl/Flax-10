@@ -1,35 +1,29 @@
 const API_BASE = 'http://localhost:8000/api';
 
-export async function getUserSettings() {
+function authHeaders(extra = {}) {
   const token = localStorage.getItem('token');
-  const response = await fetch(`${API_BASE}/settings/`, {
-    headers: {
-      'Authorization': `Token ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch settings');
-  }
-  
+  return { 'Authorization': `Token ${token}`, 'Content-Type': 'application/json', ...extra };
+}
+
+async function apiFetch(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, options);
+  if (!response.ok) throw new Error(`Request failed: ${path}`);
   return response.json();
 }
 
-export async function updateUserSettings(settings) {
+export function getUserSettings() {
+  return apiFetch('/settings/', { headers: authHeaders() });
+}
+
+export function updateUserSettings(settings) {
+  return apiFetch('/settings/', { method: 'PATCH', headers: authHeaders(), body: JSON.stringify(settings) });
+}
+
+export function getUserProfile() {
+  return apiFetch('/profile/', { headers: authHeaders() });
+}
+
+export function updateUserProfile(formData) {
   const token = localStorage.getItem('token');
-  const response = await fetch(`${API_BASE}/settings/`, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': `Token ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(settings),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to update settings');
-  }
-  
-  return response.json();
+  return apiFetch('/profile/', { method: 'PATCH', headers: { 'Authorization': `Token ${token}` }, body: formData });
 }

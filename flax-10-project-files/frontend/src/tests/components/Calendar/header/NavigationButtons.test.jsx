@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { NavigationButtons } from '../../../../components/Calendar/header/NavigationButtons';
@@ -78,11 +77,9 @@ describe('NavigationButtons', () => {
     it('should open date picker on calendar click', () => {
         const showPickerSpy = vi.fn();
         HTMLInputElement.prototype.showPicker = showPickerSpy;
-
         render(<NavigationButtons {...defaultProps} />);
         const calendarBtn = screen.getByText('🗓️');
         fireEvent.click(calendarBtn);
-
         expect(showPickerSpy).toHaveBeenCalled();
     });
 });

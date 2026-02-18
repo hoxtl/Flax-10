@@ -1,29 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import ToDoPanel from "./ToDoPanel";
 import styles from "./FloatingTasks.module.css";
 
 const OPEN_KEY = "flax_todo_open_v1";
 
-export default function FloatingTasks() {
-  const [open, setOpen] = useState(() => {
-    try {
-      const raw = localStorage.getItem(OPEN_KEY);
-      return raw ? JSON.parse(raw) : false;
-    } catch {
-      return false;
-    }
-  });
+function loadOpenState() {
+  try {
+    const raw = localStorage.getItem(OPEN_KEY);
+    return raw ? JSON.parse(raw) : false;
+  } catch {
+    return false;
+  }
+}
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(OPEN_KEY, JSON.stringify(open));
-    } catch {}
-  }, [open]);
+function saveOpenState(open) {
+  try {
+    localStorage.setItem(OPEN_KEY, JSON.stringify(open));
+  } catch {}
+}
 
-  return createPortal(
+function FloatingTasksPortal({ open, setOpen, fabRef }) {
+  return (
     <>
       <button
+        ref={fabRef}
         className={styles.fab}
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close to-do" : "Open to-do"}
@@ -31,9 +32,15 @@ export default function FloatingTasks() {
       >
         To-do
       </button>
+      <ToDoPanel open={open} onClose={() => setOpen(false)} fabRef={fabRef} />
+    </>);}
 
-      <ToDoPanel open={open} onClose={() => setOpen(false)} />
-    </>,
+export default function FloatingTasks() {
+  const fabRef = useRef(null);
+  const [open, setOpen] = useState(loadOpenState);
+  useEffect(() => saveOpenState(open), [open]);
+  return createPortal(
+    <FloatingTasksPortal open={open} setOpen={setOpen} fabRef={fabRef} />,
     document.body
   );
 }

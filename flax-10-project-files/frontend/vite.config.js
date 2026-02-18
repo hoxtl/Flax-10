@@ -21,6 +21,16 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ["text", "text-summary", "html", "lcov"],
       reportOnFailure: true,
+      all: true,  
+      include: ['src/**/*.{js,jsx}'], 
+      exclude: [  
+        'node_modules/',
+        'src/main.jsx',
+        'src/**/*.test.{js,jsx}',
+        'src/tests/**',
+        '**/*.config.js',
+        'src/setupTests.js',
+      ],
     },
   },
 })
