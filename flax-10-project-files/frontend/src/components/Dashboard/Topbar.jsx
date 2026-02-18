@@ -2,7 +2,8 @@ import styles from "./Topbar.module.css";
 import { DAYS, MONTHS } from "../../lib/uiConstants";
 import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
-import { NotificationCenter } from "../Notifications";
+import { useNotifications } from "../../context/NotificationContext";
+import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
@@ -41,13 +42,16 @@ function SearchInput() {
 }
 
 function QuickTabs({ onAddClick }) {
+  const { togglePanel, notifications } = useNotifications();
+  const unreadCount = notifications.filter(n => !n.read).length;
   const tabs = [
     { title: "Add", icon: Plus, autoCollapse: true },
     { type: "separator" },
-    { title: "Notifications", icon: Bell },
+    { title: "Notifications", icon: Bell, badge: unreadCount },
   ];
   const handleChange = (index) => {
     if (index === 0) onAddClick?.();
+    if (index === 2) togglePanel();
   };
   return <ExpandableTabs tabs={tabs} onChange={handleChange} />;
 }
@@ -58,6 +62,7 @@ function ActionPill({ onAddClick }) {
       <ThemeToggle />
       <div className={styles.pillDivider} />
       <QuickTabs onAddClick={onAddClick} />
+      <NotificationPanel />
     </div>
   );
 }
@@ -67,7 +72,6 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
     <div className={styles.actions}>
       <SearchInput />
       <ActionPill onAddClick={onAddClick} />
-      <NotificationCenter />
       <ProfileDropdown
         user={user}
         onSettingsClick={onSettingsClick}
