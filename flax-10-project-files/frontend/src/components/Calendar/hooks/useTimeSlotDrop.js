@@ -17,9 +17,9 @@ export function useTimeSlotDrop(hour, date) {
     return { mergedProps: buildMergedProps(dropProps, isOver, setHi, onClick), isOver, highlightQuarter: highlightQuarter };
 }
 
-function onDropAction(payload, e, hour, date, actions, events, setHighlight) {
+async function onDropAction(payload, e, hour, date, actions, events, setHighlight) {
     setHighlight(null);
-    dispatchDrop(payload, date, getDropMinutes(hour, e), actions.addEvent, actions.editEvent, actions.addException, events);
+    await dispatchDrop(payload, date, getDropMinutes(hour, e), actions.addEvent, actions.editEvent, actions.addException, events);
 }
 
 function onClickAction(e, hour, date, openModal) {
@@ -32,11 +32,11 @@ function getDropMinutes(hour, e) {
     return hour * 60 + minuteOffset;
 }
 
-function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, allEvents) {
+async function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, allEvents) {
     if (payload.type === 'TAG') {
-        createEventFromTag(payload.data, date, minutes, addEvent, allEvents);
+        await createEventFromTag(payload.data, date, minutes, addEvent, allEvents);
     } else if (payload.type === 'EVENT') {
-        moveEventToTime(payload.data, date, minutes, addEvent, editEvent, addException, allEvents);
+        await moveEventToTime(payload.data, date, minutes, addEvent, editEvent, addException, allEvents);
     }
 }
 
@@ -79,7 +79,7 @@ function openEventModalAtTime(date, startMinutes, openModal) {
     openModal({ start_time: start, end_time: end });
 }
 
-function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
+async function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
     const start = createDateAtMinutes(date, startMinutes);
     const end = new Date(start);
     end.setMinutes(end.getMinutes() + (tag.default_duration || 60));
@@ -90,29 +90,29 @@ function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
         end_time: end.toISOString(),
     };
     if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
-    addEvent(newEvent);
+    await addEvent(newEvent);
 }
 
-function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
+async function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
     if (hasRecurrence(event)) {
-        handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents);
+        await handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents);
     } else {
-        executeMove(event, date, startMinutes, editEvent, allEvents);
+        await executeMove(event, date, startMinutes, editEvent, allEvents);
     }
 }
 
-function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
+async function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
     const choice = window.confirm(
         'This is a recurring event.\n\nOK = Change time for ALL occurrences\nCancel = Move only this occurrence'
     );
     if (choice) {
-        updateAllOccurrences(event, startMinutes, editEvent, allEvents);
+        await updateAllOccurrences(event, startMinutes, editEvent, allEvents);
     } else {
-        moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents);
+        await moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents);
     }
 }
 
-function updateAllOccurrences(event, startMinutes, editEvent, allEvents) {
+async function updateAllOccurrences(event, startMinutes, editEvent, allEvents) {
     const originalStart = new Date(event.start_time);
     const newStart = new Date(originalStart);
     newStart.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
@@ -122,7 +122,7 @@ function updateAllOccurrences(event, startMinutes, editEvent, allEvents) {
     const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
     const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
     if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
-    editEvent(baseEventId, updateData);
+    await editEvent(baseEventId, updateData);
 }
 
 async function moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents) {
@@ -150,13 +150,13 @@ function getDateString(dateTime) {
     return new Date(dateTime).toISOString().slice(0, 10);
 }
 
-function executeMove(event, date, startMinutes, editEvent, allEvents) {
+async function executeMove(event, date, startMinutes, editEvent, allEvents) {
     const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
     const baseEventId = extractBaseEventId(event.id);
     const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
     const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
     if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
-    editEvent(baseEventId, updateData);
+    await editEvent(baseEventId, updateData);
 }
 
 function calculateNewTimes(event, date, startMinutes) {
