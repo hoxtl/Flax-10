@@ -58,6 +58,10 @@ export const syncCalendar = (societyId) => postJson(`${BASE}/${societyId}/calend
 
 export const unsyncCalendar = (societyId) => deleteRequest(`${BASE}/${societyId}/calendar-unsync/`);
 
+// Ratification
+export const requestRatification = (societyId) =>
+    postJson(`${BASE}/${societyId}/ratification/request/`, {});
+
 // Events
 export const fetchSocietyEvents = (societyId) => fetchApi(`${BASE}/${societyId}/events/`);
 

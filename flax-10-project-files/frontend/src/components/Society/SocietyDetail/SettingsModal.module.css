@@ -123,3 +123,54 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+.ratifyBtn {
+    padding: 0.5rem 1rem;
+    background: var(--primary-color, #9E7E5D);
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.ratifyBtn:hover {
+    filter: brightness(1.1);
+}
+
+.ratifyInfo {
+    color: var(--muted, #6b7280);
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.statusApproved {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #d1fae5;
+    color: #047857;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusPending {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #fef3c7;
+    color: #b45309;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusRejected {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-right: 0.75rem;
+}

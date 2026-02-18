@@ -197,12 +197,18 @@ export function useSocietyDetail(societyId) {
         return member;
     };
 
+    const requestRatification = async () => {
+        await api.requestRatification(societyId);
+        setSociety(prev => ({ ...prev, ratification_status: 'pending' }));
+    };
+
     return {
         society, loading, error, refresh: loadSociety, updateSociety,
         addTag, updateTag, deleteTag,
         addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent,
         joinSociety, leaveSociety, deleteSociety,
-        members, fetchMembers, updateMemberRole, removeMember, addCollaborator
+        members, fetchMembers, updateMemberRole, removeMember, addCollaborator,
+        requestRatification
     };
 }
