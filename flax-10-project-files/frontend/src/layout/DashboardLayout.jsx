@@ -22,29 +22,21 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function parseStoredUser(user) {
-  const name =
-    user.first_name && user.last_name
-      ? `${user.first_name} ${user.last_name}`
-      : user.username;
-  return {
-    name,
-    year: user.year ? `Year ${user.year}` : "Year: ",
-    major: user.major || "Major: ",
-    email: user.email,
-    username: user.username,
-  };
+  const name = user.first_name && user.last_name
+    ? `${user.first_name} ${user.last_name}` : user.username;
+  return { name, year: user.year ? `Year ${user.year}` : "Year: ",
+    major: user.major || "Major: ", email: user.email, username: user.username };
 }
 
 function getUser() {
-  const userString = localStorage.getItem("user");
-  if (!userString) return undefined;
-  try { return parseStoredUser(JSON.parse(userString)); }
+  const s = localStorage.getItem("user");
+  if (!s) return undefined;
+  try { return parseStoredUser(JSON.parse(s)); }
   catch (err) { console.error("Error parsing user data:", err); }
 }
 
 async function handleLogoutClick() {
-  try { await authService.logout(); }
-  catch (_) {}
+  try { await authService.logout(); } catch (_) {}
   finally { clearUserData(); }
 }
 
@@ -78,13 +70,8 @@ function PageContent({ activeNav, children }) {
 function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
   return (
     <div className={styles.main}>
-      <TopBar
-        user={user}
-        onAddClick={onQuickAdd}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-        onProfileClick={onProfileClick}
-      />
+      <TopBar user={user} onAddClick={onQuickAdd} onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
       {showWeekBar && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
     </div>
@@ -99,29 +86,9 @@ function QuickAddGate({ open, onClose, onSelectType }) {
 function EventModalGate({ modal }) {
   if (!modal.isModalOpen) return null;
   return (
-    <EventModal
-      event={modal.modalEvent}
-      initialType={modal.modalType}
-      initialDate={modal.modalInitialDate}
-      onClose={modal.closeModal}
-    />
+    <EventModal event={modal.modalEvent} initialType={modal.modalType}
+      initialDate={modal.modalInitialDate} onClose={modal.closeModal} />
   );
-}
-
-function useNavState(onNavChange, setMobileSidebarOpen) {
-  const onPickNav = (id) => {
-    onNavChange?.(id);
-    setMobileSidebarOpen(false);
-  };
-  return { onPickNav };
-}
-
-function useModalState(modal, selectedDate, setShowQuickAdd) {
-  const onSelectType = (type) => {
-    setShowQuickAdd(false);
-    modal.openModal(null, type, selectedDate);
-  };
-  return { onSelectType };
 }
 
 function useDashboardState(activeNav, onNavChange) {
@@ -134,31 +101,47 @@ function useDashboardState(activeNav, onNavChange) {
   const selectedDate = calendarState?.selectedDate || new Date();
   const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
-  const { onPickNav } = useNavState(onNavChange, setMobileSidebarOpen);
-  const { onSelectType } = useModalState(modal, selectedDate, setShowQuickAdd);
+  const onPickNav = (id) => { onNavChange?.(id); setMobileSidebarOpen(false); };
+  const onSelectType = (type) => { setShowQuickAdd(false); modal.openModal(null, type, selectedDate); };
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType };
 }
 
-export default function DashboardLayout({ activeNav, onNavChange, children }) {
-  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType } = useDashboardState(activeNav, onNavChange);
+function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNavChange, onPickNav, setMobileSidebarOpen }) {
   return (
-    <div className={styles.root}>
+    <>
       <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} />
-      <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user} activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-      <MainArea
-        user={user}
-        onQuickAdd={() => setShowQuickAdd(true)}
-        onSettingsClick={() => onNavChange?.("settings")}
-        onLogoutClick={handleLogoutClick}
-        onProfileClick={() => onNavChange?.("profile")}
-        selectedDate={selectedDate}
-        showWeekBar={showWeekBar}
-        activeNav={activeNav}
-      >
-        {children}
-      </MainArea>
+      <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user}
+        activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
+    </>
+  );
+}
+
+function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal }) {
+  return (
+    <>
       <QuickAddGate open={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSelectType={onSelectType} />
       <EventModalGate modal={modal} />
+    </>
+  );
+}
+
+export default function DashboardLayout({ activeNav, onNavChange, children }) {
+  const state = useDashboardState(activeNav, onNavChange);
+  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd,
+    setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType } = state;
+  return (
+    <div className={styles.root}>
+      <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
+        user={user} activeNav={activeNav} onNavChange={onNavChange}
+        onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
+      <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)}
+        onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick}
+        onProfileClick={() => onNavChange?.("profile")} selectedDate={selectedDate}
+        showWeekBar={showWeekBar} activeNav={activeNav}>
+        {children}
+      </MainArea>
+      <DashboardModals showQuickAdd={showQuickAdd} setShowQuickAdd={setShowQuickAdd}
+        onSelectType={onSelectType} modal={modal} />
       <FloatingTasks />
     </div>
   );
