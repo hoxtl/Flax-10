@@ -3,62 +3,64 @@ import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../utils/userUtils";
 import { getUserProfile } from "../api/userService";
 
-function isClickOutside(element, event) {
-  if (!element) return false;
-  return !element.contains(event.target);
-}
-
 function useClickOutside(ref, onClose, isActive) {
   useEffect(() => {
     if (!isActive) return;
-    const handler = (e) => {
-      if (isClickOutside(ref.current, e)) onClose();
-    };
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [ref, onClose, isActive]);
 }
 
+function AvatarImage({ src }) {
+  return <img src={src} alt="Profile" className={styles.avatarImage} />;
+}
+
+function HeaderAvatar({ profilePhotoUrl, initials }) {
+  return (
+    <div className={styles.avatarLarge}>
+      {profilePhotoUrl ? <AvatarImage src={profilePhotoUrl} /> : initials}
+    </div>
+  );
+}
+
+function HeaderUserInfo({ displayName, year, major }) {
+  return (
+    <div className={styles.userInfo}>
+      <div className={styles.userName}>{displayName}</div>
+      <div className={styles.userMeta}>{year} · {major}</div>
+    </div>
+  );
+}
+
+function resolveDisplayName(user) {
+  return user?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "User";
+}
+
 function DropdownHeader({ user, profilePhotoUrl }) {
   const initials = getInitials(user?.name) || "?";
+  const displayName = resolveDisplayName(user);
   const year = user?.year || "Year 2";
   const major = user?.major || "CS";
-  const displayName =
-    user?.name ||
-    `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
-    "User";
   return (
     <div className={styles.dropdownHeader}>
-      <div className={styles.avatarLarge}>
-        {profilePhotoUrl ? (
-          <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
-        ) : (
-          initials
-        )}
-      </div>
-      <div className={styles.userInfo}>
-        <div className={styles.userName}>{displayName}</div>
-        <div className={styles.userMeta}>{year} · {major}</div>
-      </div>
+      <HeaderAvatar profilePhotoUrl={profilePhotoUrl} initials={initials} />
+      <HeaderUserInfo displayName={displayName} year={year} major={major} />
     </div>
   );
 }
 
 function MenuItem({ icon, label, onClick, isDanger }) {
-  const className = isDanger
-    ? `${styles.menuItem} ${styles.menuItemDanger}`
-    : styles.menuItem;
+  const cls = isDanger ? `${styles.menuItem} ${styles.menuItemDanger}` : styles.menuItem;
   return (
-    <button className={className} onClick={onClick}>
+    <button className={cls} onClick={onClick}>
       <span className={styles.menuIcon}>{icon}</span>
       <span>{label}</span>
     </button>
   );
 }
 
-function Divider() {
-  return <div className={styles.divider} />;
-}
+function Divider() { return <div className={styles.divider} />; }
 
 function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, onProfileClick, user, profilePhotoUrl }) {
   const dropdownRef = useRef(null);
@@ -79,64 +81,55 @@ function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, onProfi
 function AvatarButton({ initials, profilePhotoUrl, onClick }) {
   return (
     <button className={styles.avatar} onClick={onClick} aria-label="User menu">
-      {profilePhotoUrl ? (
-        <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
-      ) : (
-        initials
-      )}
+      {profilePhotoUrl ? <AvatarImage src={profilePhotoUrl} /> : initials}
     </button>
   );
 }
 
-async function loadProfileData(setProfileData) {
-  try {
-    const data = await getUserProfile();
-    setProfileData(data);
-    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-    if (data.profile_photo_url) {
-      currentUser.profile_photo_url = data.profile_photo_url;
-      localStorage.setItem("user", JSON.stringify(currentUser));
-    }
-  } catch (error) {
-    console.error("Failed to load profile:", error);
-  }
+async function fetchProfileData() {
+  try { return await getUserProfile(); }
+  catch (error) { console.error("Failed to load profile:", error); return null; }
 }
 
-export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
+function updateLocalStoragePhoto(url) {
+  const current = JSON.parse(localStorage.getItem("user") || "{}");
+  current.profile_photo_url = url;
+  localStorage.setItem("user", JSON.stringify(current));
+}
+
+async function loadProfileData(setProfileData) {
+  const data = await fetchProfileData();
+  if (!data) return;
+  setProfileData(data);
+  if (data.profile_photo_url) updateLocalStoragePhoto(data.profile_photo_url);
+}
+
+function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
-  const initials = getInitials(user?.name) || "?";
-
   useEffect(() => { loadProfileData(setProfileData); }, []);
-
   const handleSettingsClick = () => { setIsOpen(false); onSettingsClick?.(); };
   const handleLogoutClick = () => { setIsOpen(false); onLogoutClick?.(); };
   const handleProfileClick = () => { setIsOpen(false); onProfileClick?.(); };
+  return { isOpen, setIsOpen, profileData, handleSettingsClick, handleLogoutClick, handleProfileClick };
+}
 
-  const displayUser = {
-    ...user,
-    year: profileData?.year || user?.year,
-    major: profileData?.major || user?.major,
-  };
+function buildDisplayUser(user, profileData) {
+  return { ...user, year: profileData?.year || user?.year, major: profileData?.major || user?.major };
+}
 
+export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
+  const { isOpen, setIsOpen, profileData, handleSettingsClick, handleLogoutClick, handleProfileClick } =
+    useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick);
+  const initials = getInitials(user?.name) || "?";
   const profilePhotoUrl = profileData?.profile_photo_url;
-
+  const displayUser = buildDisplayUser(user, profileData);
   return (
     <div className={styles.container}>
-      <AvatarButton
-        initials={initials}
-        profilePhotoUrl={profilePhotoUrl}
-        onClick={() => setIsOpen(!isOpen)}
-      />
-      <DropdownMenu
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onSettingsClick={handleSettingsClick}
-        onLogoutClick={handleLogoutClick}
-        onProfileClick={handleProfileClick}
-        user={displayUser}
-        profilePhotoUrl={profilePhotoUrl}
-      />
+      <AvatarButton initials={initials} profilePhotoUrl={profilePhotoUrl} onClick={() => setIsOpen(!isOpen)} />
+      <DropdownMenu isOpen={isOpen} onClose={() => setIsOpen(false)}
+        onSettingsClick={handleSettingsClick} onLogoutClick={handleLogoutClick}
+        onProfileClick={handleProfileClick} user={displayUser} profilePhotoUrl={profilePhotoUrl} />
     </div>
   );
 }
