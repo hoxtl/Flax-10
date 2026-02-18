@@ -22,7 +22,6 @@ from django.urls import path, include, re_path
 from django.views.static import serve
 from django.views.generic import TemplateView
 
-STATICFILES_DIR = BASE_DIR / "studyFlax" / "static"
 
 
 urlpatterns = [
