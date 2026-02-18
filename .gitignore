@@ -23,6 +23,9 @@ db.sqlite3
 .coverage.*
 htmlcov/
 
+# Media files
+media/
+
 # OS Files
 .DS_Store
 Thumbs.db
