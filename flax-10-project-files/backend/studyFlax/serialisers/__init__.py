@@ -6,5 +6,6 @@ from .auth_serialisers import RegistrationUserSerialiser, UserSerialiser, Logged
 from .notification_serialisers import NotificationSerialiser
 from .society_serialisers import (
     SocietyListSerialiser, SocietyDetailSerialiser, SocietyMembershipSerialiser,
-    SocietyTagSerialiser, SocietyAnnouncementSerialiser, SocietyEventSerialiser
+    SocietyTagSerialiser, SocietyAnnouncementSerialiser, SocietyEventSerialiser,
+    SocietyEventCalendarSerialiser, get_society_color
 )
