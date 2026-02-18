@@ -20,7 +20,8 @@ from studyFlax.views.settings.user_settings_view import user_settings_view
 from studyFlax.views.society import (
     society_list, society_detail, membership_list, membership_detail,
     society_tag_list, society_tag_detail, announcement_list, announcement_detail,
-    event_list as society_event_list, event_detail as society_event_detail
+    event_list as society_event_list, event_detail as society_event_detail,
+    sync_status, sync_calendar, unsync_calendar
 )
 from studyFlax.views.user.profile_view import profile_view
 from studyFlax.views.user.check_username_view import check_username
@@ -62,6 +63,9 @@ urlpatterns = [
     path("societies/<int:society_id>/announcements/<int:announcement_id>/", announcement_detail, name="society-announcement-detail"),
     path("societies/<int:society_id>/events/", society_event_list, name="society-events"),
     path("societies/<int:society_id>/events/<int:event_id>/", society_event_detail, name="society-event-detail"),
+    path("societies/<int:society_id>/calendar-sync/", sync_calendar, name="society-calendar-sync"),
+    path("societies/<int:society_id>/calendar-unsync/", unsync_calendar, name="society-calendar-unsync"),
+    path("societies/<int:society_id>/calendar-sync-status/", sync_status, name="society-calendar-sync-status"),
     path("profile/", profile_view, name='user-profile'),
     path("check-username/", check_username, name='check-username'),
     path("users/search/", user_search, name='user-search'),
