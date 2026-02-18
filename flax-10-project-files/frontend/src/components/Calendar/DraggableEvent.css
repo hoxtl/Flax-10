@@ -17,6 +17,10 @@
     z-index: 10;
 }
 
+.draggable-event:hover button[class*="menuButton"] {
+    opacity: 1;
+}
+
 /* Lift effect while dragging */
 .draggable-event.dragging {
     opacity: 0.7;

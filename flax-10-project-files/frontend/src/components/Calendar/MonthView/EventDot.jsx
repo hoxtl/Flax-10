@@ -1,5 +1,5 @@
 import { useDrag } from '../hooks/useDragDrop';
-import { useEventModal } from '../../../context/CalendarContext';
+import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 
 export function EventDot({ e, onEventClick, customTags }) {
@@ -22,15 +22,15 @@ function getTitle(event) {
 }
 
 function useEventDotLogic(event, onEventClick, customTags, isSociety) {
-    const { openModal } = useEventModal();
+    const { openPopup } = useEventPopup();
     const globalTags = useTags();
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
 
     const handleClick = (ev) => {
         ev.stopPropagation();
-        if (isSociety) return;
-        if (onEventClick) onEventClick(event, ev.currentTarget.getBoundingClientRect());
-        else openModal(event);
+        const rect = ev.currentTarget.getBoundingClientRect();
+        if (onEventClick) onEventClick(event, rect);
+        else openPopup(event, rect);
     };
 
     return {

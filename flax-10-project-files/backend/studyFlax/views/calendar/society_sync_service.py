@@ -8,7 +8,7 @@ def get_synced_society_events(user, start_date=None, end_date=None):
     synced_ids = get_synced_society_ids(user)
     if not synced_ids:
         return []
-    events = SocietyEvent.objects.filter(society_id__in=synced_ids).select_related('society')
+    events = SocietyEvent.objects.filter(society_id__in=synced_ids).select_related('society', 'tag')
     return expand_and_serialize(events, start_date, end_date)
 
 
@@ -99,4 +99,6 @@ def serialize_event(event, idx, start_override=None, end_override=None):
         'society_id': event.society_id,
         'society_name': event.society.name,
         'society_color': get_society_color(event.society_id),
+        'tag_name': event.tag.label if event.tag else None,
+        'tag_color': event.tag.color if event.tag else None,
     }
