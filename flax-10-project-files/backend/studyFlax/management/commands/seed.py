@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from faker import Faker
 
 from studyFlax.models import (
-    Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, User, TimetableSource, Notification
+    Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, User
 )
 
 from studyFlax.fixtures.data_fixtures import (
@@ -79,8 +79,13 @@ class Command(BaseCommand):
         self.stdout.write(f"Seeding {needed} users...")
         users_to_create = []
         for _ in range(needed):
-            first_name = random.choice(first_name_fixtures)
-            last_name = random.choice(last_name_fixtures)
+            while True:
+                first_name = random.choice(first_name_fixtures)
+                last_name = random.choice(last_name_fixtures)
+
+                if not User.objects.filter(first_name=first_name, last_name=last_name).exists() and not any(u.first_name == first_name and u.last_name == last_name for u in users_to_create):
+                    break
+
             username = f"{first_name.lower()}{last_name.lower()}{self.faker.random_int(1, 99)}"
             email = f"{first_name}.{last_name}@{self.faker.domain_name()}"
 
