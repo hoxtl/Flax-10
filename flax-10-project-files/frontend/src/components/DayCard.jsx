@@ -61,6 +61,7 @@ export default function DayCard({ e, onDelete, onClick, date }) {
   const { getTag } = useTags();
   const theme = getTag(e.tag);
   const t = theme || { color: "#94A3B8", icon: "⭐" };
+  const icon = isDeadlineEvent(e) ? "⏳" : t.icon;
   return (
     <article className={styles.card} style={{ "--accent": t.color }} onClick={onClick}>
       <div className={styles.row}>
