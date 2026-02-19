@@ -1,0 +1,81 @@
+.sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    padding-top: 16px;
+}
+
+.section {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+    margin: 0 0 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+}
+
+.pinnedTitle {
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.pinnedContent {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.eventTitle {
+    margin: 0 0 4px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.eventDate {
+    margin: 0;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 20px;
+}
+
+.addButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.addBtn {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px dashed var(--primary);
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--primary);
+    transition: all 0.2s;
+}
+
+.addBtn:hover {
+    background: var(--hover-light);
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        width: 100%;
+    }
+}

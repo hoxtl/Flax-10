@@ -3,8 +3,16 @@ import { describe, it, expect, vi } from 'vitest';
 import { CalendarProvider, useCalendar, useCalendarDispatch, useEventModal } from '../../context/CalendarContext';
 import { useEffect } from 'react';
 
+<<<<<<< HEAD
+// setup tests?
+// Since we test context, we need a consumer component.
+
+vi.mock('../../components/Notifications/hooks/useReminderNotifications', () => ({
+    useReminderNotifications: vi.fn(),
+=======
 vi.mock('../../hooks/useReminderNotifications', () => ({
   useReminderNotifications: vi.fn(),
+>>>>>>> main
 }));
 
 const TestConsumer = () => {

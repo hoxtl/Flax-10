@@ -17,6 +17,10 @@
     z-index: 10;
 }
 
+.draggable-event:hover button[class*="menuButton"] {
+    opacity: 1;
+}
+
 /* Lift effect while dragging */
 .draggable-event.dragging {
     opacity: 0.7;
@@ -87,4 +91,31 @@
 /* More visible indicator while actively resizing */
 .draggable-event.resizing .resize-handle {
     background: linear-gradient(transparent, rgba(139, 115, 85, 0.3));
+}
+
+/* Read-only events - shared styling */
+.draggable-event.society-event,
+.draggable-event.timetable-event {
+    cursor: default;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+}
+
+.draggable-event.society-event:hover,
+.draggable-event.timetable-event:hover {
+    transform: none;
+}
+
+.society-badge {
+    margin-right: 4px;
+    font-size: 0.5rem;
+}
+
+.society-name {
+    font-size: 0.55rem;
+    color: #888;
+    font-weight: 500;
+    margin-top: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
