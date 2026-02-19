@@ -1,10 +1,20 @@
+import styled from "styled-components";
 import * as Components from '../Authentication/AuthComponents';
+
+const OverlayTitle = styled.h2`
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.96);
+  margin: 0;
+  letter-spacing: -0.2px;
+  text-align: center;
+  line-height: 1.3;
+`;
 
 function LeftPanel({ signIn, onToggle }) {
   return (
     <Components.LeftOverlayPanel $signIn={signIn}>
-      <Components.Title>Log In</Components.Title>
-      <Components.Paragraph>Log back in to use StudyFlax!</Components.Paragraph>
+      <OverlayTitle>Already have an account?</OverlayTitle>
       <Components.GhostButton onClick={() => onToggle(true)}>Sign In</Components.GhostButton>
     </Components.LeftOverlayPanel>
   );
@@ -13,8 +23,7 @@ function LeftPanel({ signIn, onToggle }) {
 function RightPanel({ signIn, onToggle }) {
   return (
     <Components.RightOverlayPanel $signIn={signIn}>
-      <Components.Title>Welcome to StudyFlax!</Components.Title>
-      <Components.Paragraph>Sign up to use StudyFlax!</Components.Paragraph>
+      <OverlayTitle>Join StudyFlax</OverlayTitle>
       <Components.GhostButton onClick={() => onToggle(false)}>Sign Up</Components.GhostButton>
     </Components.RightOverlayPanel>
   );
