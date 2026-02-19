@@ -124,6 +124,17 @@ export function useSocietyDetail(societyId) {
             ...prev,
             announcements: [...(prev.announcements || []), announcement]
         }));
+        if (data.addAsEvent) {
+            try {
+                await addEvent({
+                    ...data,
+                    description: data.content,
+                    tag: data.tag || null
+                });
+            } catch (error) {
+                console.error('Failed to add event for announcement:', error);
+            }
+        }
         return announcement;
     };
 
@@ -150,6 +161,18 @@ export function useSocietyDetail(societyId) {
         const apiData = transformAnnouncementData(data);
         const updated = await api.updateAnnouncement(societyId, announcementId, apiData);
         setSociety(prev => ({ ...prev, announcements: prev.announcements.map(a => a.id === announcementId ? updated : a) }));
+
+        if (data.addAsEvent) {
+            try {
+                await addEvent({
+                    ...data,
+                    description: data.content,
+                    tag: data.tag || null
+                });
+            } catch (error) {
+                console.error('Failed to add event for announcement update:', error);
+            }
+        }
         return updated;
     };
 
