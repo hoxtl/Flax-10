@@ -48,6 +48,10 @@ def tag_detail(request, pk):
         return delete_tag(tag)
 
 def update_tag(tag, data):
+    if tag.name.lower() == 'other' and 'name' in data:
+        if data['name'].lower() != 'other':
+            return Response({'error': 'Cannot rename Other tag'}, status=status.HTTP_400_BAD_REQUEST)
+
     serialiser = TagSerialiser(tag, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
