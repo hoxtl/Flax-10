@@ -51,7 +51,6 @@ function CardBody({ e, date }) {
       <Header e={e} />
       <Sub e={e} />
       {isDeadlineEvent(e) ? <DeadlineMeta e={e} /> : <Meta e={e} date={date} />}
-      <Meta e={e} date={date} />
       <Footer e={e} />
     </div>
   );
@@ -65,7 +64,7 @@ export default function DayCard({ e, onDelete, onClick, date }) {
   return (
     <article className={styles.card} style={{ "--accent": t.color }} onClick={onClick}>
       <div className={styles.row}>
-        <div className={styles.iconWrap}>{t.icon}</div>
+        <div className={styles.iconWrap}>{icon}</div>
         <CardBody e={e} date={date} />
         <DeleteButton id={e.id} onDelete={onDelete} />
       </div>
