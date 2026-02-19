@@ -4,17 +4,27 @@ import AnnouncementModal from "./tabs/announcementTab/AnnouncementModal";
 import { EventModal } from "../../Calendar/EventModal/EventModal";
 import { formatDateTime } from "../../Calendar/utils/dateUtils";
 
-export default function SocietySidebar({ society, editMode, onAddAnnouncement, onAddEvent, tags }) {
+export default function SocietySidebar({ society, editMode, onAddAnnouncement, onUpdateAnnouncement, onAddEvent, tags }) {
     const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
     const [showEventModal, setShowEventModal] = useState(false);
     const pinned = society.announcements?.find(a => a.pinned);
     const nextEvent = society.events?.[0];
 
+    const handleAnnouncementSubmit = (data, conflictingAnnouncement) => {
+        if (conflictingAnnouncement) {
+            onUpdateAnnouncement?.(conflictingAnnouncement.id, { ...conflictingAnnouncement, pinned: false });
+        }
+        onAddAnnouncement?.(data);
+        setShowAnnouncementModal(false);
+    };
+
     return (
         <aside className={styles.sidebar}>
             <SidebarContent pinned={pinned} next={nextEvent} editMode={editMode} />
             {editMode && <AddButtons onAnnouncement={() => setShowAnnouncementModal(true)} onEvent={() => setShowEventModal(true)} />}
-            {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)} onSubmit={(d) => { onAddAnnouncement?.(d); setShowAnnouncementModal(false); }} tags={tags} />}
+            {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)}
+                onSubmit={handleAnnouncementSubmit}
+                tags={tags} societyId={society.id} announcements={society.announcements} />}
             {showEventModal && <EventModal onClose={() => setShowEventModal(false)} showReminder={false} customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEventModal(false); }} />}
         </aside>
     );

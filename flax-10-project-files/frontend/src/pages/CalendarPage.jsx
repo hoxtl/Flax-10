@@ -96,7 +96,9 @@ function getSocietyActions(event, { closePopup, loadEvents, navigate }) {
             label: 'View Announcement',
             onClick: () => {
                 closePopup();
-                navigate(`/societies/${event.society_id}`);
+                navigate(`/societies/${event.society_id}`, {
+                    state: { activeTab: 'announcements', announcementId: event.announcement }
+                });
             }
         });
     }

@@ -101,4 +101,5 @@ def serialize_event(event, idx, start_override=None, end_override=None):
         'society_color': get_society_color(event.society_id),
         'tag_name': event.tag.label if event.tag else None,
         'tag_color': event.tag.color if event.tag else None,
+        'announcement': event.announcement.id if event.announcement else None,
     }

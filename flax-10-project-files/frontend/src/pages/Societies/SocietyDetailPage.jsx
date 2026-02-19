@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styles from "./SocietyDetailPage.module.css";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
 import SocietyHero from "../../components/Society/SocietyDetail/SocietyHero";
@@ -13,10 +14,25 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
     const { society, loading, error, updateSociety, members } = hookData;
     const [activeTab, setActiveTab] = useState("calendar");
+    const [focusAnnouncementId, setFocusAnnouncementId] = useState(null);
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state?.activeTab) {
+            setActiveTab(location.state.activeTab);
+            if (location.state.announcementId) setFocusAnnouncementId(location.state.announcementId);
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
+
+    const handleTabChange = (tab, announcementId = null) => {
+        setActiveTab(tab);
+        setFocusAnnouncementId(announcementId);
+    };
 
     if (loading) return <div className={styles.page}>Loading...</div>;
     if (error || !society) return <NotFound onBack={onBack} />;
@@ -37,8 +53,8 @@ export default function SocietyDetailPage({ societyId, onBack }) {
             <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
                 onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
                 canEdit={canEdit} onToggleEditMode={() => setEditMode(!editMode)} />
-            <MainContent activeTab={activeTab} setActiveTab={setActiveTab} society={society}
-                editMode={editMode} handlers={handlers} />
+            <MainContent activeTab={activeTab} setActiveTab={handleTabChange} society={society}
+                editMode={editMode} handlers={handlers} focusAnnouncementId={focusAnnouncementId} />
             {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}
             {showCoverModal && <CoverImageModal images={getImageUrls(society.images)} availablePhotos={availablePhotos}
                 onClose={() => setShowCoverModal(false)} onUpdate={updateImages} />}
@@ -92,7 +108,7 @@ function NotFound({ onBack }) {
     );
 }
 
-function MainContent({ activeTab, setActiveTab, society, editMode, handlers }) {
+function MainContent({ activeTab, setActiveTab, society, editMode, handlers, focusAnnouncementId }) {
     const tags = society.tags || [];
     const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
     const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
@@ -102,10 +118,11 @@ function MainContent({ activeTab, setActiveTab, society, editMode, handlers }) {
             <div className={styles.tabSection}>
                 <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} society={society}
                     editMode={editMode} onUpdate={handlers.updateSociety} eventHandlers={eventHandlers}
-                    announcementHandlers={announcementHandlers} tags={tags} tagHandlers={tagHandlers} />
+                    announcementHandlers={announcementHandlers} tags={tags} tagHandlers={tagHandlers}
+                    focusAnnouncementId={focusAnnouncementId} />
             </div>
             <SocietySidebar society={society} editMode={editMode} tags={tags}
-                onAddAnnouncement={handlers.addAnnouncement} onAddEvent={handlers.addEvent} />
+                onAddAnnouncement={handlers.addAnnouncement} onUpdateAnnouncement={handlers.updateAnnouncement} onAddEvent={handlers.addEvent} />
         </div>
     );
 }

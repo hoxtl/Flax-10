@@ -16,8 +16,8 @@ function mapAnnouncementToForm(base, announcement) {
 
     return {
         ...base,
-        title: announcement.title,
-        content: announcement.content,
+        title: announcement.title || "",
+        content: announcement.content || "",
         tag: announcement.tagId || null,
         images: images,
         pinned: announcement.pinned || false,
@@ -26,7 +26,7 @@ function mapAnnouncementToForm(base, announcement) {
 }
 
 export function validateForm(form) {
-    if (!form.title.trim()) return "Title is required";
+    if (!form.title?.trim()) return "Title is required";
     if (!form.addAsEvent) return null;
     return validateEventFields(form);
 }

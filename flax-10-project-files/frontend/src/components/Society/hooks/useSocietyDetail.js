@@ -37,7 +37,8 @@ function transformIsoEventData(data) {
         all_day: data.all_day || false,
         tag: parseTagId(data.tag),
         recurrence: getRecurrence(data),
-        recurrence_end_date: getRecurrenceEndDate(data)
+        recurrence_end_date: getRecurrenceEndDate(data),
+        announcement: data.announcement || null
     };
 }
 
@@ -129,7 +130,8 @@ export function useSocietyDetail(societyId) {
                 await addEvent({
                     ...data,
                     description: data.content,
-                    tag: data.tag || null
+                    tag: data.tag || null,
+                    announcement: announcement.id
                 });
             } catch (error) {
                 console.error('Failed to add event for announcement:', error);
@@ -164,13 +166,22 @@ export function useSocietyDetail(societyId) {
 
         if (data.addAsEvent) {
             try {
-                await addEvent({
+                const eventId = updated.event_id || data.event_id;
+
+                const eventData = {
                     ...data,
                     description: data.content,
-                    tag: data.tag || null
-                });
+                    tag: data.tag || null,
+                    announcement: updated.id
+                };
+
+                if (eventId) {
+                    await updateEvent(eventId, eventData);
+                } else {
+                    await addEvent(eventData);
+                }
             } catch (error) {
-                console.error('Failed to add event for announcement update:', error);
+                console.error('Failed to sync event for announcement update:', error);
             }
         }
         return updated;
