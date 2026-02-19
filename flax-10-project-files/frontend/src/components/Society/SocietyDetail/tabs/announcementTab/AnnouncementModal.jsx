@@ -20,9 +20,10 @@ export default function AnnouncementModal({ onClose, onSubmit, tags = [], announ
                     setForm(prev => ({
                         ...prev,
                         addAsEvent: true,
-                        start_time: event.start_time,
-                        end_time: event.end_time,
-                        recurrence: event.recurrence
+                        start_time: event.start_time?.slice(0, 16),
+                        end_time: event.end_time?.slice(0, 16),
+                        recurrence: event.recurrence,
+                        all_day: event.all_day
                     }));
                 })
                 .catch(e => console.error("Failed to load linked event", e));

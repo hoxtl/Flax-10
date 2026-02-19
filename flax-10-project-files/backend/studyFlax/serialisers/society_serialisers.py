@@ -64,6 +64,12 @@ class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
 class SocietyEventSerialiser(serializers.ModelSerializer):
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.announcement:
+            representation['title'] = f"📢 {instance.title}"
+        return representation
+
     class Meta:
         model = SocietyEvent
         fields = [

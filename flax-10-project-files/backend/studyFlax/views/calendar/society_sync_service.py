@@ -90,7 +90,7 @@ def add_year(dt):
 def serialize_event(event, idx, start_override=None, end_override=None):
     return {
         'id': f"society_{event.society_id}_{event.id}_{idx}",
-        'title': event.title,
+        'title': f"📢 {event.title}" if event.announcement else event.title,
         'description': event.description,
         'start_time': (start_override or event.start_time).isoformat(),
         'end_time': (end_override or event.end_time).isoformat(),

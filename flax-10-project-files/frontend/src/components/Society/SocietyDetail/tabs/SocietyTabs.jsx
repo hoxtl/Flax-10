@@ -9,14 +9,15 @@ const TABS = [
     { id: "announcements", label: "Announcements" }
 ];
 
-function SocietyTabs({ activeTab, onTabChange, society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, focusAnnouncementId }) {
+export default function SocietyTabs({ activeTab, onTabChange, society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, focusAnnouncementId, onEditAnnouncement }) {
     return (
         <div className={styles.container}>
             <TabBar activeTab={activeTab} onTabChange={onTabChange} />
             <TabContent activeTab={activeTab} society={society} editMode={editMode}
                 onUpdate={onUpdate} eventHandlers={eventHandlers} announcementHandlers={announcementHandlers}
                 tags={tags} tagHandlers={tagHandlers} onTabChange={onTabChange}
-                focusAnnouncementId={focusAnnouncementId} />
+                focusAnnouncementId={focusAnnouncementId}
+                onEditAnnouncement={onEditAnnouncement} />
         </div>
     );
 }
@@ -34,12 +35,12 @@ function TabButton({ tab, isActive, onClick }) {
     return <button className={className} onClick={onClick}>{tab.label}</button>;
 }
 
-function TabContent({ activeTab, society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, onTabChange, focusAnnouncementId }) {
+function TabContent({ activeTab, society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, onTabChange, focusAnnouncementId, onEditAnnouncement }) {
     if (activeTab === 'about') return <TabWrapper><AboutTab about={society.about} editMode={editMode} onUpdate={(text) => onUpdate?.({ about: text })} /></TabWrapper>;
-    if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab announcements={society.announcements} editMode={editMode} handlers={announcementHandlers} tags={tags} societyId={society.id} focusAnnouncementId={focusAnnouncementId} /></TabWrapper>;
+    if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab announcements={society.announcements} editMode={editMode} handlers={announcementHandlers} tags={tags} societyId={society.id} focusAnnouncementId={focusAnnouncementId} onEdit={onEditAnnouncement} /></TabWrapper>;
     return <TabWrapper><CalendarTab events={society.events} editMode={editMode} eventHandlers={eventHandlers}
         tags={tags} tagHandlers={tagHandlers} onViewAnnouncement={(id) => onTabChange('announcements', id)}
-        societyId={society.id} isMember={!!society.role} /></TabWrapper>;
+        societyId={society.id} isMember={!!society.role} onEditAnnouncement={onEditAnnouncement} announcements={society.announcements} /></TabWrapper>;
 }
 
 function TabWrapper({ children }) {

@@ -19,7 +19,7 @@ export default function CalendarTab(props) {
     );
 }
 
-function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember }) {
+function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember, onEditAnnouncement, announcements }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
@@ -37,7 +37,12 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
                 readOnly={!editMode}
                 onEventClick={(e, r) => {
                     if (editMode) {
-                        openModal(e, 'society', e.start_time);
+                        if (e.announcement && onEditAnnouncement) {
+                            const announcement = announcements?.find(a => a.id === e.announcement);
+                            if (announcement) onEditAnnouncement(announcement);
+                        } else {
+                            openModal(e, 'society', e.start_time);
+                        }
                     } else {
                         setPopupState({ event: e, rect: r });
                     }
