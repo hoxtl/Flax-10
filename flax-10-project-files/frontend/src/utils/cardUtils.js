@@ -55,3 +55,15 @@ const THEMES = {
   task: { accent: "#FBBF24", icon: "✅" },
   other: { accent: "#94A3B8", icon: "⭐" },
 };
+
+//Functions to represent deadline event as a widget
+export function isDeadlineEvent(e) {
+  return e.source === 'module_deadline';
+}
+
+export function formatDeadlineDate(e) {
+  if (!e.start_time) return '-';
+  const data = new Date(e.start_time);
+  return `Due: ${date.toLocaleDateString('en-GB', {dat: 'numeric', month: 'long', year:'numeric'
+  })}, ${formatTime(date)}`;
+}
