@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
 from studyFlax.models import CalendarEvent
+from datetime import timedelta
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -26,15 +27,22 @@ def create_enrollments(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     enrollment = serialiser.save()
     module = enrollment.module
-    CalendarEvent.objects.create(
+
+    for week in range(10):
+        lecture_start = module.start_time + timedelta(weeks=week)
+        lecture_end = module.end_time + timedelta(weeks=week)
+        CalendarEvent.objects.get_or_create(
             user=request.user,
-            module=module,
             title=f"Lecture: {module.module_name}",
-            start_time=module.start_time,
-            end_time=module.end_time,
-            recurrence_rule = module.recurrence_rule,
-            location=module.location,
-            source="module_enrollment" )
+            start_time=lecture_start,
+            defaults={
+                'end_time': lecture_end,
+                'location': module.location,
+                'description': module.module_name,
+                'priority': 'high',
+                'source': 'module_enrollment',
+            }
+        )
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'DELETE'])
