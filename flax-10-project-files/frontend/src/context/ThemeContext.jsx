@@ -53,8 +53,6 @@ export function ThemeProvider({ children, initialTheme = 'light' }) {
     setThemeState(newTheme);
   }
 
-export function ThemeProvider({ children, initialTheme = 'light' }) {
-  const { theme, setTheme, toggleTheme } = useThemeState(initialTheme);
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
