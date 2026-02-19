@@ -53,6 +53,7 @@ class UserSerialiser(serializers.ModelSerializer):
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
             'role',
+            'is_superuser',
         ]
         read_only_fields = ['id']
 
