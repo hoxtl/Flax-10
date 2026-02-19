@@ -23,7 +23,7 @@ from studyFlax.views.authentication.password_reset_request_view import reset_pas
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
 from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
-
+from studyFlax.views.user.settings_views import onboarding_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -57,4 +57,5 @@ urlpatterns = [
     path('analytics/theme-stats/', get_theme_stats, name='analytics-theme-stats'),
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
+    path('onboarding/', onboarding_view, name='onboarding'),
 ]

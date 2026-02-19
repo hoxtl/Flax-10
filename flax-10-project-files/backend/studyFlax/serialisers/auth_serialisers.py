@@ -42,7 +42,6 @@ class UserSerialiser(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
     major = serializers.SerializerMethodField()
 
-    # ✅ profile-page additions
     bio = serializers.CharField(read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
 
@@ -62,16 +61,15 @@ class UserSerialiser(serializers.ModelSerializer):
 
     def get_year(self, obj):
         try:
-            year = obj.settings.year if hasattr(obj, 'settings') and obj.settings.year else '2'
-            return year if year.startswith('Year') else f'Year {year}'
+            return obj.settings.year if hasattr(obj, 'settings') and obj.settings.year else ''
         except UserSettings.DoesNotExist:
-            return 'Year 2'
+            return ''
 
     def get_major(self, obj):
         try:
-            return obj.settings.major if hasattr(obj, 'settings') and obj.settings.major else 'Computer Science'
+            return obj.settings.major if hasattr(obj, 'settings') and obj.settings.major else ''
         except UserSettings.DoesNotExist:
-            return 'Computer Science'
+            return ''
 
     def get_profile_photo_url(self, obj):
         if obj.profile_photo:

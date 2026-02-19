@@ -6,12 +6,14 @@ from django.contrib.auth import get_user_model
 from faker import Faker
 
 from studyFlax.models import (
-    Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, User
+    Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, User, Module, Enrollment
 )
 
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
-    event_title_fixtures, course_fixtures, description_fixtures, location_fixtures
+    event_title_fixtures, course_fixtures, description_fixtures,
+    location_fixtures, lecture_theatre_fixtures, module_fixtures,
+    course_to_module_prefixes
 )
 
 User = get_user_model()
@@ -19,7 +21,6 @@ User = get_user_model()
 class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
-    # Config
     USER_COUNT = 25
     EVENTS_PER_USER_RANGE = (60, 90)
     DEFAULT_PASSWORD = '1234'
@@ -44,6 +45,10 @@ class Command(BaseCommand):
         self.rules = list(RecurrenceRule.objects.all())
 
         self.create_events_for_users()
+
+        self.create_modules()
+        self.modules = list(Module.objects.all())
+        self.create_enrollments()
 
         self.stdout.write(self.style.SUCCESS('Seeding complete!'))
         self.print_stats()
@@ -78,8 +83,8 @@ class Command(BaseCommand):
             while True:
                 first_name = self.faker.first_name()
                 last_name = self.faker.last_name()
-
-                if not User.objects.filter(first_name=first_name, last_name=last_name).exists() and not any(u.first_name == first_name and u.last_name == last_name for u in users_to_create):
+                if (not User.objects.filter(first_name=first_name, last_name=last_name).exists()
+                        and not any(u.first_name == first_name and u.last_name == last_name for u in users_to_create)):
                     break
 
             base_username = f"{first_name.lower()}.{last_name.lower()}"
@@ -90,13 +95,7 @@ class Command(BaseCommand):
                 counter += 1
 
             email = f"{first_name.lower()}.{last_name.lower()}@kcl.ac.uk"
-
-            user = User(
-                username=username,
-                email=email,
-                first_name=first_name,
-                last_name=last_name
-            )
+            user = User(username=username, email=email, first_name=first_name, last_name=last_name)
             user.set_password(self.DEFAULT_PASSWORD)
             users_to_create.append(user)
 
@@ -118,10 +117,7 @@ class Command(BaseCommand):
         """Creates base recurrence rules from fixtures."""
         self.stdout.write("Seeding recurrence rules...")
         for freq, interval in recurrence_fixtures:
-            RecurrenceRule.objects.get_or_create(
-                frequency=freq,
-                interval=interval
-            )
+            RecurrenceRule.objects.get_or_create(frequency=freq, interval=interval)
 
     def create_categories(self):
         """Creates categories from fixtures."""
@@ -130,10 +126,8 @@ class Command(BaseCommand):
             user = None
             if not is_default and self.users and random.random() > 0.7:
                 user = random.choice(self.users)
-
             Category.objects.get_or_create(
-                name=name,
-                user=user,
+                name=name, user=user,
                 defaults={'color': color, 'is_default': is_default}
             )
 
@@ -152,8 +146,7 @@ class Command(BaseCommand):
                 user = random.choice(self.users)
 
             Tag.objects.get_or_create(
-                name=name,
-                user=user,
+                name=name, user=user,
                 defaults={
                     'category': category,
                     'default_duration': duration,
@@ -218,10 +211,93 @@ class Command(BaseCommand):
 
         print(f"\nCreated {total_events} events across {len(self.users)} users.")
 
+    def get_next_weekday(self, weekday_offset):
+        """Returns a date that lands on a weekday (Mon-Fri). weekday_offset 0=Mon, 4=Fri."""
+        now = timezone.now()
+        # Start from tomorrow to avoid today
+        days_ahead = 1
+        candidate = now + timedelta(days=days_ahead)
+        # Advance until we hit the target weekday
+        while candidate.weekday() != weekday_offset:
+            days_ahead += 1
+            candidate = now + timedelta(days=days_ahead)
+        return days_ahead
+
+    def create_modules(self):
+        """Creates KCL modules seeded by admin user. Lectures only on weekdays."""
+        self.stdout.write("Seeding modules...")
+        admin = User.objects.filter(is_superuser=True).first()
+        weekly_rule = RecurrenceRule.objects.filter(frequency='weekly', interval=1).first()
+
+        for code, name, description in module_fixtures:
+            if Module.objects.filter(module_code=code).exists():
+                continue
+
+            # Pick a random weekday (Mon=0 to Fri=4)
+            weekday = random.randint(0, 4)
+            day_offset = self.get_next_weekday(weekday)
+
+            hour = random.choice([9, 10, 11, 14, 15, 16])
+            start_time = timezone.now().replace(
+                hour=hour, minute=0, second=0, microsecond=0
+            ) + timedelta(days=day_offset)
+            end_time = start_time + timedelta(hours=2)
+
+            Module.objects.create(
+                module_code=code,
+                module_name=name,
+                description=description,
+                created_by=admin,
+                start_time=start_time,
+                end_time=end_time,
+                location=random.choice(lecture_theatre_fixtures),
+                recurrence_rule=weekly_rule,
+            )
+
+    def create_enrollments(self):
+        """Enrolls each user in modules relevant to their course and creates lecture calendar events."""
+        self.stdout.write("Seeding enrollments and lecture events...")
+        enrollments_to_create = []
+        lecture_tag = next((t for t in self.tags if t.name == 'Lecture'), None)
+        users_with_settings = User.objects.all().select_related('settings')
+
+        for user in users_with_settings:
+            major = user.settings.major if hasattr(user, 'settings') and user.settings else None
+            prefixes = course_to_module_prefixes.get(major, [])
+            relevant_modules = [m for m in self.modules if any(m.module_code.startswith(p) for p in prefixes)]
+
+            if not prefixes or len(relevant_modules) == 0:
+                relevant_modules = random.sample(self.modules, min(4, len(self.modules)))
+
+            for module in relevant_modules:
+                if not Enrollment.objects.filter(student=user, module=module).exists():
+                    enrollments_to_create.append(Enrollment(student=user, module=module))
+
+                for week in range(10):
+                    lecture_start = module.start_time + timedelta(weeks=week)
+                    lecture_end = lecture_start + timedelta(hours=2)
+                    CalendarEvent.objects.get_or_create(
+                        user=user,
+                        title=f"Lecture: {module.module_name}",
+                        start_time=lecture_start,
+                        defaults={
+                            'end_time': lecture_end,
+                            'location': module.location,
+                            'description': module.module_name,
+                            'tag': lecture_tag,
+                            'priority': 'high',
+                        }
+                    )
+
+        Enrollment.objects.bulk_create(enrollments_to_create, ignore_conflicts=True)
+        self.stdout.write(f"Created {len(enrollments_to_create)} enrollments.")
+
     def print_stats(self):
-        print("="*30)
+        print("=" * 30)
         print(f"Users: {User.objects.count()}")
+        print(f"Modules: {Module.objects.count()}")
+        print(f"Enrollments: {Enrollment.objects.count()}")
         print(f"Categories: {Category.objects.count()}")
         print(f"Tags: {Tag.objects.count()}")
         print(f"Events: {CalendarEvent.objects.count()}")
-        print("="*30)
+        print("=" * 30)
