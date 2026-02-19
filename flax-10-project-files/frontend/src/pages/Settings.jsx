@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./Settings.module.css";
 import { useTheme } from "../context/ThemeContext";
 import { updateUserSettings } from '../api/userService';
+import { KCL_DEPARTMENTS } from "../lib/kclCourses";
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -176,6 +177,16 @@ function getYearOptions() {
   ];
 }
 
+function getCourseOptions() {
+  const options = [{ value: "", label: "Select your course" }];
+  Object.entries(KCL_DEPARTMENTS).forEach(([dept, courses]) => {
+    courses.forEach(course => {
+      options.push({ value: course, label: `${course} (${dept})` });
+    });
+  });
+  return options;
+}
+
 // Account form
 function AccountForm({ user, onSave, isSaving }) {
   const [formData, setFormData] = useState(getInitialAccountData(user));
@@ -230,12 +241,13 @@ function AccountForm({ user, onSave, isSaving }) {
           options={getYearOptions()}
         />
 
-        <FormInput
+        <FormSelect
           id="major"
+          name="major"
           label="Major"
           value={formData.major}
           onChange={handleChange}
-          maxLength={100}
+          options={getCourseOptions()}
         />
       </div>
 
