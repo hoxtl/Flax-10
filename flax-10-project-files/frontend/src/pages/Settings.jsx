@@ -91,21 +91,35 @@ function FormInput({ id, label, type = "text", value, onChange, required, name, 
 }
 
 // Form select field
-function FormSelect({ id, label, value, onChange, options, name }) {
+function FormSelect({ id, label, value, onChange, options, name, grouped }) {
   return (
     <div className={styles.formGroup}>
       <label htmlFor={id}>{label}</label>
       <select id={id} name={name || id} value={value} onChange={onChange}>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
+        {grouped ? (
+          <>
+            <option value="">Select your course</option>
+            {options.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </>
+        ) : (
+          options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))
+        )}
       </select>
     </div>
   );
 }
-
 // Theme selector component
 function ThemeSelector({ value, onChange }) {
   return (
@@ -165,26 +179,19 @@ function getInitialAccountData(user) {
 // Get year options
 function getYearOptions() {
   return [
-    { value: "Foundation Year", label: "Foundation Year" },
+    { value: "Foundation", label: "Foundation" },
     { value: "Year 1", label: "Year 1" },
     { value: "Year 2", label: "Year 2" },
     { value: "Year 3", label: "Year 3" },
     { value: "Year 4", label: "Year 4" },
-    { value: "Year 5", label: "Year 5" },
-    { value: "Year 6", label: "Year 6" },
-    { value: "Year 7", label: "Year 7" },
-    { value: "Year 8", label: "Year 8" }
   ];
 }
 
 function getCourseOptions() {
-  const options = [{ value: "", label: "Select your course" }];
-  Object.entries(KCL_DEPARTMENTS).forEach(([dept, courses]) => {
-    courses.forEach(course => {
-      options.push({ value: course, label: `${course} (${dept})` });
-    });
-  });
-  return options;
+  return Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
+    label: dept,
+    options: courses.map(course => ({ value: course, label: course }))
+  }));
 }
 
 // Account form
@@ -244,10 +251,11 @@ function AccountForm({ user, onSave, isSaving }) {
         <FormSelect
           id="major"
           name="major"
-          label="Major"
+          label="Course"
           value={formData.major}
           onChange={handleChange}
           options={getCourseOptions()}
+          grouped={true}
         />
       </div>
 
