@@ -23,6 +23,7 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
+    const { openModal } = useEventModal(); // Moved hook to top level
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
     const closePopup = () => setPopupState({ event: null, rect: null });
@@ -33,7 +34,15 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
             <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} />
             <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
             <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
-                readOnly={!editMode} onEventClick={editMode ? null : (e, r) => setPopupState({ event: e, rect: r })} customTags={tags} />
+                readOnly={!editMode}
+                onEventClick={(e, r) => {
+                    if (editMode) {
+                        openModal(e, 'society', e.start_time);
+                    } else {
+                        setPopupState({ event: e, rect: r });
+                    }
+                }}
+                customTags={tags} />
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
             {popupState.event && <EventDetailPopup event={popupState.event} anchorRect={popupState.rect}
                 tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
