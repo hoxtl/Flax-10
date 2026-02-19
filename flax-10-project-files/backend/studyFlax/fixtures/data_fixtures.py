@@ -105,14 +105,14 @@ location_fixtures = (
 
 # Lecture theatre locations — used only for module seeding
 lecture_theatre_fixtures = (
-    "Bush House Auditorium BH (N) 0, Strand, London WC2B 4PJ",
-    "Waterloo FWB B5, Franklin-Wilkins Building, London SE1 9NH",
-    "Edmond J. Safra Lecture Theatre, Strand, London WC2R 2LS",
-    "New Hunt's House Lecture Theatre 1, Guy's Campus, London SE1 9RT",
-    "IET Kelvin Lecture Theatre, Strand, London WC2R 2LS",
-    "Harris Lecture Theatre, Strand, London WC2R 2LS",
-    "Nevin Lecture Theatre, Guy's Campus, London SE1 9RT",
-    "Wolfson Lecture Theatre, Strand, London WC2R 2LS",
+    "Bush House Auditorium BH (N) 0, Strand Campus",
+    "Waterloo FWB B5, Waterloo Campus",
+    "Edmond J. Safra Lecture Theatre, Strand Campus",
+    "New Hunt's House Lecture Theatre 1, Guy's Campus",
+    "IET Kelvin Lecture Theatre",
+    "Harris Lecture Theatre, Strand, Denmark Hill Campus",
+    "Nevin Lecture Theatre, Guy's Campus",
+    "Wolfson Lecture Theatre, St Thomas Campus",
 )
 
 # Format: (module_code, module_name, description)
