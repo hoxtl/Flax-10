@@ -21,6 +21,8 @@ from studyFlax.views.user.profile_view import profile_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
+from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
+from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 
 
 urlpatterns = [
@@ -49,4 +51,10 @@ urlpatterns = [
     path("check-username/", check_username, name='check-username'),
     path("auth/password-reset/request/", reset_password_view, name='password-reset-request'),
     path("auth/password-reset/confirm/", confirm_password_reset_view, name='password-reset-confirm'),
+    path('analytics/summary/', get_analytics_summary, name='analytics-summary'),
+    path('analytics/progress/', get_progress_data, name='analytics-progress'),
+    path('analytics/theme-session/', log_theme_session, name='analytics-theme-session'),
+    path('analytics/theme-stats/', get_theme_stats, name='analytics-theme-stats'),
+    path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
+    path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
 ]
