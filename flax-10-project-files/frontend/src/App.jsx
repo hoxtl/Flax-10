@@ -17,6 +17,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { TimerProvider } from "./context/TimerContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationToast } from "./components/Notifications";
+import { TimerProvider } from "./context/TimerContext";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 

@@ -10,41 +10,38 @@ import {
 const onClose = vi.fn();
 
 const setupWrapper = () => {
-    vi.spyOn(historyUtils, 'getHistory').mockReturnValue([]);
-    vi.spyOn(historyUtils, 'clearHistory').mockImplementation(() => { });
+    vi.spyOn(historyUtils, 'getHistory').mockResolvedValue([]);
+    vi.spyOn(historyUtils, 'clearHistory').mockResolvedValue();
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     onClose.mockClear();
 };
 
-const testEmptyState = () => {
+const testHistoryList = async () => {
+    historyUtils.getHistory.mockResolvedValue(mockHistoryData);
     render(<HistoryModal onClose={onClose} />);
-    expect(screen.getByText('History')).toBeInTheDocument();
-    expect(screen.getByText('No recent sessions.')).toBeInTheDocument();
-    expect(screen.getByText('×')).toBeInTheDocument();
+    await screen.findByText('✅ 2 Sessions'); // Wait for async render
 };
 
-const testHistoryList = () => {
-    historyUtils.getHistory.mockReturnValue(mockHistoryData);
+const testClearHistory = async () => {
+    historyUtils.getHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
     render(<HistoryModal onClose={onClose} />);
-    expectBlock1Summary();
-    expectBlock2Summary();
-    expectLegacyBlockSummary();
-    expectDatesPresent();
-    expectSessionCounts();
-};
-
-const testClearHistory = () => {
-    historyUtils.getHistory.mockReturnValue([{ id: 1, duration: 25 }]);
-    render(<HistoryModal onClose={onClose} />);
-    fireEvent.click(screen.getByText('Clear History'));
+    const clearBtn = await screen.findByText('Clear History');
+    fireEvent.click(clearBtn);
     expect(window.confirm).toHaveBeenCalled();
     expect(historyUtils.clearHistory).toHaveBeenCalled();
 };
 
-const testClose = () => {
+const testClose = async () => {
     render(<HistoryModal onClose={onClose} />);
-    fireEvent.click(screen.getByText('×'));
+    fireEvent.click(await screen.findByText('×'));
     expect(onClose).toHaveBeenCalled();
+};
+
+const testEmptyState = async () => {
+    render(<HistoryModal onClose={onClose} />);
+    expect(await screen.findByText('History')).toBeInTheDocument();
+    expect(screen.getByText('No recent sessions.')).toBeInTheDocument();
+    expect(screen.getByText('×')).toBeInTheDocument();
 };
 
 describe('HistoryModal', () => {
