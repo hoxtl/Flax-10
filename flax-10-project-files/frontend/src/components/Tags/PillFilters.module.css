@@ -1,0 +1,61 @@
+.row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  padding: 10px 2px 4px 2px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Base pill style */
+.pill {
+  margin-bottom: 8px;
+  border: none;
+  border-radius: 22px;
+  padding: 7px 17px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill:hover {
+  background: var(--pill-hover);
+}
+
+/* Inactive */
+.inactive {
+  background: var(--pill-bg);
+  color: var(--muted);
+  box-shadow: none;
+}
+
+/* Active */
+.active {
+  background: var(--primary);
+  box-shadow: 0 6px 18px rgba(158, 126, 93, 0.18);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Count inside */
+.count {
+  font-weight: 800;
+}
+
+/* Color dot for custom tags */
+.colorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}

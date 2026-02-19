@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { useTimerLogic } from '../hooks/useTimerLogic';
+import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
 
 const TimerContext = createContext(null);
 
