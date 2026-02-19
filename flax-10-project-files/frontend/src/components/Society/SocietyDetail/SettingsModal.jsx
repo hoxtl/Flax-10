@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
+import { RatificationSection } from "./RatificationSection";
 
 async function addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator) {
     const existingMember = (members || []).find(m => m.username === user.username);
@@ -45,42 +46,6 @@ function ModalHeader({ onClose }) {
         <div className={styles.header}>
             <h3 className={styles.title}>Society Settings</h3>
             <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-        </div>
-    );
-}
-
-function RatificationSection({ status, isRatified, onRequest }) {
-    if (isRatified) return <RatificationStatus label="Ratified" className={styles.statusApproved} />;
-    if (status === 'pending') return <RatificationStatus label="Pending Approval" className={styles.statusPending} />;
-    if (status === 'rejected') return <RatificationRejected onRequest={onRequest} />;
-    return <RatificationRequest onRequest={onRequest} />;
-}
-
-function RatificationStatus({ label, className }) {
-    return (
-        <div className={styles.section}>
-            <h4 className={styles.sectionTitle}>Ratification Status</h4>
-            <span className={className}>{label}</span>
-        </div>
-    );
-}
-
-function RatificationRejected({ onRequest }) {
-    return (
-        <div className={styles.section}>
-            <h4 className={styles.sectionTitle}>Ratification Status</h4>
-            <span className={styles.statusRejected}>Rejected</span>
-            <button className={styles.ratifyBtn} onClick={onRequest}>Request Again</button>
-        </div>
-    );
-}
-
-function RatificationRequest({ onRequest }) {
-    return (
-        <div className={styles.section}>
-            <h4 className={styles.sectionTitle}>Ratification</h4>
-            <p className={styles.ratifyInfo}>Request ratification to gain official society status.</p>
-            <button className={styles.ratifyBtn} onClick={onRequest}>Request Ratification</button>
         </div>
     );
 }

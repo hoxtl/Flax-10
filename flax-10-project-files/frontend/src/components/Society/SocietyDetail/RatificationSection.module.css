@@ -1,0 +1,132 @@
+.section {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.title {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    color: var(--muted, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info {
+    color: var(--muted, #6b7280);
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.requestBtn {
+    padding: 0.5rem 1rem;
+    background: var(--primary-color, #9E7E5D);
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.requestBtn:hover { filter: brightness(1.1); }
+
+.statusApproved {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #d1fae5;
+    color: #047857;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusPending {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #fef3c7;
+    color: #b45309;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusRejected {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-right: 0.75rem;
+}
+
+.toggleSection { margin-top: 0.5rem; }
+
+.toggleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggleLabel {
+    font-weight: 500;
+    color: var(--text, #1f2937);
+}
+
+.toggleHint {
+    font-size: 0.8rem;
+    color: var(--muted, #6b7280);
+    margin: 0.25rem 0 0 0;
+}
+
+.toggle {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--border, #d1d5db);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+}
+
+.toggleOn { background: var(--primary-color, #9E7E5D); }
+
+.toggleKnob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.toggleOn .toggleKnob { transform: translateX(20px); }
+
+.notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: #fef3c7;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #92400e;
+}
+
+.noticeIcon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fbbf24;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
