@@ -100,10 +100,10 @@ describe('NotificationContext', () => {
 
         expect(screen.getByTestId('isOpen')).toHaveTextContent('closed');
 
-        act(() => { screen.getByText('Toggle').click(); });
+        await act(async () => { screen.getByText('Toggle').click(); });
         expect(screen.getByTestId('isOpen')).toHaveTextContent('open');
 
-        act(() => { screen.getByText('Close').click(); });
+        await act(async () => { screen.getByText('Close').click(); });
         expect(screen.getByTestId('isOpen')).toHaveTextContent('closed');
     });
 

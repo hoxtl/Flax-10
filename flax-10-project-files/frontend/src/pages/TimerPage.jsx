@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './TimerPage.module.css';
+import { useNotificationPermission } from '../components/Timer/utils/timerUtils';
 import { useTimerContext } from '../context/TimerContext';
-import { useNotificationPermission } from '../hooks/timerUtils';
 import { MainSection, PopupSection } from '../components/Timer/WrapperComponents';
 
 function NotificationPrompt({ permission, request }) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from '../../pages/TimerPage.module.css';
-import { noiseGenerator } from '../../utils/noiseUtils';
+import { noiseGenerator } from './utils/noiseUtils';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {

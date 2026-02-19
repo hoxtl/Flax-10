@@ -1,12 +1,17 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import * as api from '../api/notificationApi';
+import { requestPermission, sendBrowserNotification } from '../components/Notifications/utils/browserNotification';
+import { playNotificationSound } from '../components/Notifications/utils/notificationSound';
 
 const NotificationContext = createContext(null);
+const POLL_INTERVAL = 30000;
 
 export function NotificationProvider({ children }) {
     const { notifications, setNotifications, loading } = useNotificationLoader();
     const [isOpen, setIsOpen] = useState(false);
     const actions = useNotificationActions(setNotifications);
+
+    useNotificationPolling(notifications, setNotifications);
 
     const value = {
         notifications, isOpen, hasUnread: notifications.some(n => !n.read), loading, ...actions,
@@ -21,6 +26,7 @@ function useNotificationLoader() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        requestPermission();
         api.fetchNotifications()
             .then(setNotifications)
             .catch(err => console.error('Failed to fetch notifications:', err))
@@ -28,6 +34,36 @@ function useNotificationLoader() {
     }, []);
 
     return { notifications, setNotifications, loading };
+}
+
+function useNotificationPolling(notifications, setNotifications) {
+    const knownIds = useRef(new Set());
+
+    useEffect(() => {
+        notifications.forEach(n => knownIds.current.add(n.id));
+    }, [notifications]);
+
+    useEffect(() => {
+        const interval = setInterval(() => pollNotifications(knownIds.current, setNotifications), POLL_INTERVAL);
+        return () => clearInterval(interval);
+    }, [setNotifications]);
+}
+
+async function pollNotifications(knownIds, setNotifications) {
+    try {
+        const fresh = await api.fetchNotifications();
+        const newOnes = fresh.filter(n => !knownIds.has(n.id));
+        if (newOnes.length > 0) {
+            newOnes.forEach(n => notifyUser(n));
+            newOnes.forEach(n => knownIds.add(n.id));
+            setNotifications(fresh);
+        }
+    } catch (err) { console.error('Failed to poll notifications:', err); }
+}
+
+function notifyUser(notification) {
+    sendBrowserNotification(notification.title, notification.message);
+    playNotificationSound();
 }
 
 function useNotificationActions(set) {
