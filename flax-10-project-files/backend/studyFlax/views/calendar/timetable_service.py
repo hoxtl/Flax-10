@@ -1,5 +1,6 @@
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone as dt_timezone
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 from django.utils import timezone as django_timezone
 from icalendar import Calendar
