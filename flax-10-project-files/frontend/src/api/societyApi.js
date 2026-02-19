@@ -63,8 +63,7 @@ export const requestRatification = (societyId) =>
     postJson(`${BASE}/${societyId}/ratification/request/`, {});
 
 // Events
-export const fetchSocietyEvents = (societyId) => fetchApi(`${BASE}/${societyId}/events/`);
-
+export const fetchSocietyEvent = (societyId, eventId) => fetchApi(`${BASE}/${societyId}/events/${eventId}/`);
 export const createSocietyEvent = (societyId, data) =>
     postJson(`${BASE}/${societyId}/events/`, data);
 

@@ -49,13 +49,16 @@ class SocietyListSerialiser(serializers.ModelSerializer):
 class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
-
+    event_id = serializers.SerializerMethodField()
     class Meta:
         model = SocietyAnnouncement
         fields = [
             'id', 'title', 'content', 'tag', 'tag_data',
-            'pinned', 'images', 'created_at', 'updated_at'
+            'pinned', 'images', 'created_at', 'updated_at', 'event_id'
         ]
+    def get_event_id(self, obj):
+        event = obj.events.first()
+        return event.id if event else None
 
 
 class SocietyEventSerialiser(serializers.ModelSerializer):
@@ -79,7 +82,7 @@ class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
-            'society', 'society_name', 'society_color', 'source'
+            'society', 'society_name', 'society_color', 'source', 'announcement'
         ]
 
     def get_society_color(self, obj):
