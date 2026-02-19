@@ -80,8 +80,8 @@ function ProfileStats({ profileData, upcomingEventCount, onModulesClick, onTasks
 
 function ProfileBio({ user, profileData }) {
   const fullName = user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "Guest";
-  const year = profileData?.year || user?.year || "Year 2";
-  const major = profileData?.major || user?.major || "Computer Science";
+  const year = profileData?.year || user?.year || "";
+  const major = profileData?.major || user?.major || "";
   return (
     <div className={styles.bio}>
       <div className={styles.fullName}>{fullName}</div>

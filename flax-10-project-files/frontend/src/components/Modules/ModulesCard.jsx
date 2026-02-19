@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { isEnrolledIn } from '../../utils/moduleUtils';
-import { formatWeekdayTime, formatDuration } from '../../utils/moduleUtils.js';
+import { formatWeekdayTime, formatDuration, getDepartment } from '../../utils/moduleUtils.js';
 import styles from './ModulesCard.module.css';
 
 export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete }) {
@@ -25,7 +25,7 @@ function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle }) {
         </div>
     );
 }
-// Returns CSS class based on enrollment and role 
+
 function GetCardClass(enrolled, is_teacher) {
     let cls = styles.card;
     if (enrolled) cls += ` ${styles.enrolled}`;
@@ -37,11 +37,15 @@ function CardHeader({ module, enrolled }) {
     return (
         <div className={styles.cardHeader}>
             <div className={styles.iconWrap}>📚</div>
-            <span className={styles.moduleCode}>{module.module_code}</span>
+            <div>
+                <span className={styles.moduleCode}>{module.module_code}</span>
+                <div className={styles.department}>{getDepartment(module.module_code)}</div>
+            </div>
             {enrolled && <span className={styles.enrolledBadge}>✓ Enrolled</span>}
         </div>
     );
 }
+
 function Description({ text }) {
     const [is_expanded, setIsExpanded] = useState(false);
     const is_long = text.length > 180;
@@ -63,9 +67,11 @@ function ScheduleMeta({ module }) {
         </div>
     );
 }
+
 function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
+
 function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle }) {
     return (
         <div className={styles.actions}>
@@ -73,6 +79,7 @@ function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle }) {
         </div>
     );
 }
+
 function TeacherActions({ onEdit, onDelete }) {
     return (
         <>
@@ -81,6 +88,7 @@ function TeacherActions({ onEdit, onDelete }) {
         </>
     );
 }
+
 function StudentAction({ enrolled, onToggle }) {
     return <button className={enrolled ? styles.unenrollButton : styles.enrollButton} onClick={onToggle}>{enrolled ? '× Leave Module' : '+ Enroll'}</button>;
 }
