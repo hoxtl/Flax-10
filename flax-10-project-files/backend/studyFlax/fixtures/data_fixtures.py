@@ -49,3 +49,28 @@ event_title_fixtures = (
     "Reading Group", "Coding Sprint", "Submit Assignment", "Doctor's Appointment", "Volunteering Shift",
     "Clean Workspace", "Weekly Planning", "Social Night", "Mindfulness Break"
 )
+
+course_fixtures = (
+    "Computer Science",
+    "Artificial Intelligence",
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Law",
+    "Medicine",
+    "Biomedical Science",
+    "Neuroscience",
+    "Psychology",
+    "Nursing",
+    "Business Management",
+    "Economics",
+    "Politics",
+    "History",
+    "English Literature",
+    "Philosophy",
+    "Film Studies",
+    "Digital Humanities",
+    "Dentistry",
+    "Geography",
+    "International Relations",
+)
