@@ -67,3 +67,12 @@ export function formatDeadlineDate(e) {
   return `Due: ${date.toLocaleDateString('en-GB', {dat: 'numeric', month: 'long', year:'numeric'
   })}, ${formatTime(date)}`;
 }
+
+export function getDeadlineCountdown(e) {
+  const difference = new Date(e.start_time) - new Date()
+  if (difference < 0) return 'Past due';
+  const days = Math.floor(diff/86400000)
+  if (days > 0 ) return `${days} days remaining!`;
+  const hours = Math.floor(difference / 3600000);
+  return hours > 0 ? `${hours}h remaining` : 'Due today';
+}
