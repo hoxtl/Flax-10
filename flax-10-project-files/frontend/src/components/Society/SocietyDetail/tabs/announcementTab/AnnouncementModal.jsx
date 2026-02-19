@@ -8,7 +8,7 @@ import { TagField } from "../../../../Calendar/EventModal/components/TagField";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 
-export default function AnnouncementModal({ onClose, onSubmit, tags = [], announcement = null, societyId }) {
+export default function AnnouncementModal({ onClose, onSubmit, tags = [], announcement = null, societyId, announcements = [] }) {
     const [form, setForm] = useState(getInitialForm(announcement));
     const [error, setError] = useState("");
     const fileRef = useRef(null);
@@ -33,15 +33,26 @@ export default function AnnouncementModal({ onClose, onSubmit, tags = [], announ
         <div className={styles.backdrop} onMouseDown={onClose}>
             <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
                 error={error} setError={setError} onClose={onClose}
-                onSubmit={() => handleSubmit(form, setError, onSubmit)}
+                onSubmit={(f, conflict) => handleSubmit(f, setError, onSubmit, announcements, conflict)}
                 isEdit={!!announcement} setForm={setForm} />
         </div>
     );
 }
 
-function handleSubmit(form, setError, onSubmit) {
+function handleSubmit(form, setError, onSubmit, announcements, conflict) {
     const error = validateForm(form);
     if (error) return setError(error);
+
+    if (form.pinned) {
+        const currentPinned = announcements.find(a => a.pinned && a.id !== form.id);
+        if (currentPinned) {
+            const confirmReplace = window.confirm(
+                `"${currentPinned.title}" is currently pinned. Do you want to unpin it and pin this one instead?`
+            );
+            if (!confirmReplace) return;
+            return onSubmit(form, currentPinned);
+        }
+    }
     onSubmit(form);
 }
 
@@ -51,7 +62,7 @@ function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, on
             <ModalHeader onClose={onClose} isEdit={isEdit} />
             {error && <div className={styles.error}>{error}</div>}
             <FormFields form={form} update={update} setForm={setForm} fileRef={fileRef} tags={tags} />
-            <ModalFooter onClose={onClose} onSubmit={onSubmit} isEdit={isEdit} />
+            <ModalFooter onClose={onClose} onSubmit={() => onSubmit(form)} isEdit={isEdit} />
         </div>
     );
 }

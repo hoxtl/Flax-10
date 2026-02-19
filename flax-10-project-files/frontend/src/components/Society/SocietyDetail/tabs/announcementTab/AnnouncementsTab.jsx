@@ -3,30 +3,49 @@ import styles from "../tabs.module.css";
 import AnnouncementModal from "./AnnouncementModal";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
 
-export default function AnnouncementsTab({ announcements = [], editMode, handlers, tags, societyId }) {
+export default function AnnouncementsTab({ announcements = [], editMode, handlers, tags, societyId, focusAnnouncementId }) {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
-
-    const handleSave = (data) => { saveAnnouncement(data, handlers); setEditingAnnouncement(null); };
 
     return (
         <>
-            <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={setEditingAnnouncement} tags={tags} />
+            <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={setEditingAnnouncement} tags={tags} focusAnnouncementId={focusAnnouncementId} />
             {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={tags}
-                onClose={() => setEditingAnnouncement(null)} onSubmit={handleSave} societyId={societyId} />}
+                onClose={() => setEditingAnnouncement(null)} onSubmit={(data, conflict) => {
+                    if (conflict) {
+                        handlers?.onUpdate?.(conflict.id, { ...conflict, pinned: false });
+                    }
+                    if (data.id) handlers?.onUpdate?.(data.id, data);
+                    else handlers?.onAdd?.(data);
+                    setEditingAnnouncement(null);
+                }}
+                societyId={societyId} announcements={announcements} />}
         </>
     );
 }
 
-function saveAnnouncement(data, handlers) {
+function saveAnnouncement(data, handlers, conflictingAnnouncement) {
+    if (conflictingAnnouncement) {
+        handlers?.onUpdate?.(conflictingAnnouncement.id, { ...conflictingAnnouncement, pinned: false });
+    }
     if (data.id) return handlers?.onUpdate?.(data.id, data);
     return handlers?.onAdd?.(data);
 }
 
-function AnnouncementsList({ announcements, editMode, onEdit, tags }) {
+function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
+
     return (
         <div className={styles.announcementList}>
-            {announcements.map(a => <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)} tag={tags?.find(t => t.id === a.tag)} />)}
+            {announcements.map(a => (
+                <AnnouncementCard
+                    key={a.id}
+                    announcement={a}
+                    editMode={editMode}
+                    onEdit={() => onEdit(a)}
+                    tag={tags?.find(t => t.id === a.tag)}
+                    isFocused={String(a.id) === String(focusAnnouncementId)}
+                />
+            ))}
         </div>
     );
 }
@@ -36,9 +55,20 @@ function EmptyAnnouncements({ editMode }) {
     return <p className={styles.empty}>No announcements yet.</p>;
 }
 
-function AnnouncementCard({ announcement, editMode, onEdit, tag }) {
+import { useEffect, useRef } from "react";
+
+function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused }) {
+    const cardRef = useRef(null);
+    useEffect(() => {
+        if (isFocused && cardRef.current) {
+            cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            cardRef.current.classList.add(styles.highlight);
+            setTimeout(() => cardRef.current?.classList.remove(styles.highlight), 2000);
+        }
+    }, [isFocused]);
+
     return (
-        <div className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
+        <div ref={cardRef} className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
             {editMode && <EditButton onClick={onEdit} />}
             <CardHeader announcement={announcement} tag={tag} />
             <p className={styles.announcementContent}>{announcement.content}</p>

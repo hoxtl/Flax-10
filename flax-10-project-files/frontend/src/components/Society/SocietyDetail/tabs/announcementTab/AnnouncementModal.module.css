@@ -9,7 +9,7 @@
 }
 
 .modal {
-    width: min(500px, 90vw);
+    width: min(600px, 90vw);
     max-height: 90vh;
     overflow-y: auto;
     background: var(--bg);
@@ -138,9 +138,10 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 16px;
+    padding: 20px;
     background: var(--panel);
     border-radius: 12px;
+    margin-top: 24px;
 }
 
 .toggle {
