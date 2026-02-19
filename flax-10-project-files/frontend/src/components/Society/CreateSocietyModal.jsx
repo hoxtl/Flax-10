@@ -2,9 +2,10 @@ import { useState } from "react";
 import styles from "./CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
+import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 
 export default function CreateSocietyModal({ onClose, onCreate }) {
-    const [form, setForm] = useState({ name: "", bio: "", collaborators: [] });
+    const [form, setForm] = useState({ name: "", bio: "", requestRatification: false, collaborators: [] });
     const [showCollabModal, setShowCollabModal] = useState(false);
     const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
@@ -54,7 +55,7 @@ function FormFields({ form, update, onOpenCollabModal, onRoleChange, onRemove })
             <BioField value={form.bio} onChange={v => update("bio", v)} />
             <CollaboratorsField collaborators={form.collaborators} onOpen={onOpenCollabModal}
                 onRoleChange={onRoleChange} onRemove={onRemove} />
-            <RatifiedToggle value={form.isRatified} onChange={v => update("isRatified", v)} />
+            <RatificationToggle requested={form.requestRatification} onToggle={v => update("requestRatification", v)} />
         </div>
     );
 }
@@ -88,39 +89,6 @@ function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
             <button type="button" className={styles.addCollabBtn} onClick={onOpen}>+ Add Collaborators</button>
             <p className={styles.hint}>Collaborators can edit society details and manage events</p>
         </div>
-    );
-}
-
-function RatifiedToggle({ value, onChange }) {
-    return (
-        <div className={styles.field}>
-            <div className={styles.toggleRow}>
-                <div>
-                    <label className={styles.label}>Ratified Society</label>
-                    <p className={styles.hint}>Ratified societies are officially recognized by the university</p>
-                </div>
-                <Toggle checked={value} onChange={onChange} />
-            </div>
-            {value && <RatifiedNotice />}
-        </div>
-    );
-}
-
-function RatifiedNotice() {
-    return (
-        <div className={styles.notice}>
-            <span className={styles.noticeIcon}>i</span>
-            <span>Ratification requires verification. Your society will show as pending until approved.</span>
-        </div>
-    );
-}
-
-function Toggle({ checked, onChange }) {
-    return (
-        <button className={`${styles.toggle} ${checked ? styles.toggleOn : ""}`}
-            onClick={() => onChange(!checked)} type="button">
-            <span className={styles.toggleKnob} />
-        </button>
     );
 }
 
