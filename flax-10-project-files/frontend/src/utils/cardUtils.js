@@ -63,15 +63,15 @@ export function isDeadlineEvent(e) {
 
 export function formatDeadlineDate(e) {
   if (!e.start_time) return '-';
-  const data = new Date(e.start_time);
-  return `Due: ${date.toLocaleDateString('en-GB', {dat: 'numeric', month: 'long', year:'numeric'
+  const date = new Date(e.start_time);
+  return `Due: ${date.toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year:'numeric'
   })}, ${formatTime(date)}`;
 }
 
 export function getDeadlineCountdown(e) {
   const difference = new Date(e.start_time) - new Date()
   if (difference < 0) return 'Past due';
-  const days = Math.floor(diff/86400000)
+  const days = Math.floor(difference/86400000)
   if (days > 0 ) return `${days} days remaining!`;
   const hours = Math.floor(difference / 3600000);
   return hours > 0 ? `${hours}h remaining` : 'Due today';
