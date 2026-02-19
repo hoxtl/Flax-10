@@ -11,7 +11,7 @@ from studyFlax.models import (
 
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
-    event_title_fixtures, first_name_fixtures, last_name_fixtures
+    event_title_fixtures, first_name_fixtures, last_name_fixtures, course_fixtures
 )
 
 User = get_user_model()
@@ -107,6 +107,8 @@ class Command(BaseCommand):
                 user=user,
                 theme=random.choice(['light', 'dark']),
                 timezone=self.faker.timezone(),
+                year=random.choice(['Foundation Year', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7', 'Year 8']),
+                major=random.choice(course_fixtures),
             ))
         UserSettings.objects.bulk_create(settings_to_create)
 
@@ -156,7 +158,7 @@ class Command(BaseCommand):
                 defaults={
                     'category': category,
                     'default_duration': duration,
-                    'color': self.faker.hex_color()
+                    'color': self.faker.hex_color(),
                 }
             )
 
