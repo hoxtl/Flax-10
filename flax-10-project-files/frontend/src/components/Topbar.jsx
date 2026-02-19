@@ -5,6 +5,7 @@ import ProfileDropdown from "./ProfileDropdown";
 import { getDisplayName } from "../utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
+import MiniTimer from "./MiniTimer";
 import { Bell, Plus } from "lucide-react";
 
 function getFirstName(user) {
@@ -76,10 +77,11 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
   );
 }
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting user={user} />
+      <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <TopBarActions
         onAddClick={onAddClick}
         user={user}
