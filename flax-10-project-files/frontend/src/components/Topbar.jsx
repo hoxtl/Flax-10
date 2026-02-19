@@ -6,6 +6,7 @@ import { getDisplayName } from "../utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import { Bell, Plus } from "lucide-react";
+import { TypingAnimation } from "./TypingAnimation";
 
 function getFirstName(user) {
   const displayName = (getDisplayName(user) || "").trim();
@@ -23,7 +24,11 @@ function TopBarGreeting({ user }) {
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
-        {!!firstName && <h1 className={styles.name}>{firstName}</h1>}
+        {!!firstName && (
+          <h1 className={styles.name}>
+            <TypingAnimation text={firstName} duration={180} />
+          </h1>
+        )}
         <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
     </div>
