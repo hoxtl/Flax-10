@@ -34,44 +34,25 @@ event_title_fixtures = (
     "Sam's Birthday Pres", "Movie Night with Housemates",
     "FaceTime with Home", "Prep for seminar",
     "Morning Run before 9am", "Gym with Jake",
-    "Yoga before Lectures", "Internship Application Deadline", 
+    "Yoga before Lectures", "Internship Application Deadline",
     "Spring Week Interview", "CV Drop-in Session", "Email my Tutor",
     "Sort out Student Finance", "Pay Rent",
     "Renew Railcard", "Book Dentist",
     "GP Appointment", "Laundry (overdue)", "Deep Clean the Kitchen",
     "IKEA Trip with Mia", "Inpost parcel return", "Group project meeting",
     "Do mock exam", "Review notes",
-
-    # KCL specific
     "Study at Maughan Library", "Bush House Lab Session", "King's Sport Gym Session",
     "KCLSU Basketball Event", "Revision at FWB with friends", "Somerset House Visit",
     "KCL Careers Fair Prep", "King's Volunteering Shift",
     "KEATS Coursework Submission", "Denmark Hill Placement", "St Thomas Hospital Visit",
-    "KCL Research Seminar", "Strand Roof Terrace Break", "KCL Mental Health Workshop", 
+    "KCL Research Seminar", "Strand Roof Terrace Break", "KCL Mental Health Workshop",
 )
 
 course_fixtures = (
-    "Computer Science",
-    "Artificial Intelligence",
-    "Mathematics",
-    "Physics",
-    "Chemistry",
-    "Law",
-    "Medicine",
-    "Biomedical Science",
-    "Neuroscience",
-    "Psychology",
-    "Nursing",
-    "Business Management",
-    "Economics",
-    "Politics",
-    "History",
-    "English Literature",
-    "Philosophy",
-    "Film Studies",
-    "Digital Humanities",
-    "Dentistry",
-    "Geography",
+    "Computer Science", "Artificial Intelligence", "Mathematics", "Physics", "Chemistry",
+    "Law", "Medicine", "Biomedical Science", "Neuroscience", "Psychology", "Nursing",
+    "Business Management", "Economics", "Politics", "History", "English Literature",
+    "Philosophy", "Film Studies", "Dentistry", "Geography",
     "International Relations",
 )
 
@@ -100,11 +81,11 @@ description_fixtures = (
     "Make sure to eat before this.",
 )
 
+# General event locations (cafes, stations, campus areas)
 location_fixtures = (
     "Bush House, Strand, London WC2B 4PJ",
     "Maughan Library, Chancery Lane, London WC2A 1LR",
     "Franklin-Wilkins Building, 150 Stamford St, London SE1 9NH",
-    "Waterloo Bridge Wing, Waterloo Bridge, London SE1 8WT",
     "King's Building, Strand, London WC2R 2LS",
     "Guy's Campus, Great Maze Pond, London SE1 9RT",
     "St Thomas' Hospital, Westminster Bridge Rd, London SE1 7EH",
@@ -121,3 +102,163 @@ location_fixtures = (
     "Tesco Express, Strand, London WC2R 0DX",
     "Lidl, The Cut, London SE1 8LF",
 )
+
+# Lecture theatre locations — used only for module seeding
+lecture_theatre_fixtures = (
+    "Bush House Auditorium BH (N) 0, Strand, London WC2B 4PJ",
+    "Waterloo FWB B5, Franklin-Wilkins Building, London SE1 9NH",
+    "Edmond J. Safra Lecture Theatre, Strand, London WC2R 2LS",
+    "New Hunt's House Lecture Theatre 1, Guy's Campus, London SE1 9RT",
+    "IET Kelvin Lecture Theatre, Strand, London WC2R 2LS",
+    "Harris Lecture Theatre, Strand, London WC2R 2LS",
+    "Nevin Lecture Theatre, Guy's Campus, London SE1 9RT",
+    "Wolfson Lecture Theatre, Strand, London WC2R 2LS",
+)
+
+# Format: (module_code, module_name, description)
+module_fixtures = (
+    # Computer Science / AI
+    ("CS4101", "Introduction to Programming", "Fundamentals of programming using Python. Covers variables, loops, functions and data structures."),
+    ("CS4202", "Data Structures & Algorithms", "Core algorithms and data structures including trees, graphs, sorting and searching."),
+    ("CS4303", "Software Engineering", "Software development lifecycle, agile methods, version control and team project work."),
+    ("CS4404", "Databases & Information Systems", "Relational databases, SQL, data modelling and information retrieval."),
+    ("AI4101", "Machine Learning Fundamentals", "Supervised and unsupervised learning, neural networks, and model evaluation."),
+    ("AI4202", "Natural Language Processing", "Text processing, language models, sentiment analysis and sequence modelling."),
+    # Engineering
+    ("EE4101", "Circuit Theory & Electronics", "Fundamentals of electrical circuits, components, and electronic systems."),
+    ("EE4202", "Digital Systems & Logic Design", "Boolean algebra, logic gates, combinational and sequential digital circuits."),
+    ("EE4303", "Signals & Systems", "Signal processing, Fourier transforms, filtering and communication systems."),
+    ("GN4101", "Engineering Mathematics", "Mathematical methods for engineers including calculus, ODEs and linear algebra."),
+    ("GN4202", "Engineering Design & Materials", "Design principles, material properties, manufacturing processes and sustainability."),
+    ("GN4303", "Thermodynamics & Fluid Mechanics", "Energy, heat transfer, fluid behaviour and engineering applications."),
+    # Mathematics
+    ("MA4101", "Calculus I", "Differential and integral calculus. Limits, derivatives, integrals and applications."),
+    ("MA4202", "Linear Algebra", "Vectors, matrices, linear transformations, eigenvalues and eigenvectors."),
+    ("MA4303", "Probability & Statistics", "Probability theory, distributions, hypothesis testing and statistical inference."),
+    ("MA4404", "Real Analysis", "Sequences, series, continuity, differentiation and integration on the real line."),
+    # Physics
+    ("PH4101", "Classical Mechanics", "Newtonian mechanics, energy, momentum, rotational motion and oscillations."),
+    ("PH4202", "Electromagnetism", "Electric and magnetic fields, Maxwell's equations and electromagnetic waves."),
+    ("PH4303", "Quantum Mechanics", "Wave-particle duality, Schrödinger equation, and quantum states."),
+    # Life Sciences / Medicine / Biomedical
+    ("LS4101", "Cell Biology", "Cell structure, function, division and molecular biology fundamentals."),
+    ("LS4202", "Biochemistry Foundations", "Proteins, enzymes, metabolism and molecular interactions in living systems."),
+    ("LS4303", "Human Anatomy", "Structure and function of the human body systems."),
+    ("LS4404", "Physiology", "Mechanisms of body function including cardiovascular, respiratory and renal systems."),
+    # Law
+    ("LW4101", "Contract Law", "Formation and enforcement of contracts, offer and acceptance, consideration and breach."),
+    ("LW4202", "Constitutional Law", "UK constitutional principles, parliamentary sovereignty and human rights law."),
+    ("LW4303", "Criminal Law", "Principles of criminal liability, offences against the person and defences."),
+    # Psychology / Neuroscience
+    ("PS4101", "Introduction to Psychology", "Cognitive, social and developmental psychology. Research methods and key theories."),
+    ("PS4202", "Cognitive Neuroscience", "Neural basis of perception, memory, attention and decision-making."),
+    ("PS4303", "Research Methods in Psychology", "Experimental design, statistics and ethics in psychological research."),
+    # Business / Economics
+    ("BM4101", "Business Strategy", "Strategic analysis, competitive advantage, market positioning and case studies."),
+    ("BM4202", "Accounting & Finance", "Financial statements, budgeting, investment appraisal and management accounting."),
+    ("EC4101", "Microeconomics", "Supply and demand, market structures, consumer theory and welfare economics."),
+    ("EC4202", "Macroeconomics", "GDP, inflation, unemployment, monetary policy and international trade."),
+    # History
+    ("HI4101", "Modern British History", "British political and social history from 1850 to the present day."),
+    ("HI4202", "European History 1914-1945", "The causes and consequences of the First and Second World Wars."),
+    ("HI4303", "Global History", "Colonialism, decolonisation and the making of the modern world."),
+    # English / Humanities
+    ("EN4101", "Literary Theory", "Critical frameworks for reading literature including structuralism, post-colonialism and feminism."),
+    ("EN4202", "Modern Fiction", "Close reading of 20th and 21st century novels and short stories."),
+    ("PL4101", "Ethics & Political Philosophy", "Justice, rights, liberty and the foundations of political authority."),
+    ("PL4202", "Philosophy of Mind", "Consciousness, mental representation, and the mind-body problem."),
+    # Geography / Politics / IR
+    ("GE4101", "Human Geography", "Urbanisation, migration, globalisation and spatial inequality."),
+    ("PO4101", "Introduction to Politics", "Political institutions, ideologies, and comparative government."),
+    ("IR4101", "International Relations Theory", "Realism, liberalism, constructivism and the structure of world politics."),
+    # Nursing / Dentistry
+    ("NU4101", "Foundations of Nursing Practice", "Patient care principles, clinical skills and professional ethics."),
+    ("DE4101", "Oral Biology", "Structure and function of teeth, supporting tissues and oral health."),
+    # Languages 
+    ("FR4101", "French Language I", "Introductory French for beginners. Speaking, listening, reading and writing skills."),
+    ("FR4202", "French Language II", "Intermediate French. Grammar consolidation, conversation and written expression."),
+    ("SP4101", "Spanish Language I", "Introductory Spanish. Core grammar, vocabulary and everyday communication skills."),
+    ("SP4202", "Spanish Language II", "Intermediate Spanish. Cultural contexts, literature and advanced conversation."),
+    ("GL4101", "German Language I", "Introductory German. Pronunciation, grammar foundations and practical communication."),
+    ("GL4202", "German Language II", "Intermediate German. Reading, writing, conversation and cultural context."),
+    ("AR4101", "Arabic Language I", "Modern Standard Arabic script, pronunciation, grammar and basic conversation."),
+    ("ZH4101", "Mandarin Chinese I", "Introduction to Mandarin. Pinyin, tones, characters and everyday expressions."),
+    # Arts
+    ("FA4101", "History of Art", "Survey of Western art from the Renaissance to the contemporary period."),
+    ("FA4202", "Contemporary Art & Theory", "Critical frameworks for understanding art since 1960."),
+    ("TH4101", "Introduction to Theatre Studies", "Performance theory, dramatic texts and the history of theatre."),
+    ("MU4101", "Music History", "Western classical music from Bach to the 20th century."),
+    ("MU4202", "Music Theory", "Notation, harmony, counterpoint and compositional techniques."),
+    ("CL4101", "Classical Studies", "Greek and Roman literature, history and culture in translation."),
+    ("CR4101", "Creative Writing", "Fiction, poetry and non-fiction workshops with peer critique."),
+)
+
+# Maps course names to relevant module code prefixes for enrollment
+course_to_module_prefixes = {
+    "Computer Science": ["CS"],
+    "Computer Science with Management": ["CS", "BM"],
+    "Artificial Intelligence": ["CS", "AI"],
+    "Mathematics": ["MA"],
+    "Physics": ["PH", "MA"],
+    "Electronic Engineering": ["EE", "PH", "MA"],
+    "General Engineering": ["GN", "PH", "MA"],
+    "Chemistry": ["PH", "LS"],
+    "Medicine": ["LS"],
+    "Biomedical Science": ["LS"],
+    "Neuroscience": ["LS", "PS"],
+    "Psychology": ["PS"],
+    "Midwifery": ["NU"],
+    "Nursing": ["NU", "LS"],
+    "Dentistry": ["DE"],
+    "Law": ["LW"],
+    "Business Management": ["BM", "EC"],
+    "Accounting & Finance": ["BM", "EC"],
+    "Economics": ["EC", "BM"],
+    "International Management": ["BM", "EC"],
+    "History": ["HI"],
+    "English Literature": ["EN"],
+    "Philosophy": ["PL"],
+    "Film Studies": ["EN", "TH"],
+    "Politics": ["PO", "IR"],
+    "International Relations": ["IR", "PO"],
+    "Geography": ["GE", "PO"],
+    "Modern Languages": ["FR", "SP", "GL", "AR", "ZH"],
+    "French": ["FR"],
+    "Spanish": ["SP"],
+    "German": ["GL"],
+    "Music": ["MU"],
+    "Classical Studies": ["CL"],
+}
+
+# Maps module code prefix to faculty department
+module_prefix_to_department = {
+    "CS": "Natural, Mathematical & Engineering Sciences",
+    "AI": "Natural, Mathematical & Engineering Sciences",
+    "MA": "Natural, Mathematical & Engineering Sciences",
+    "PH": "Natural, Mathematical & Engineering Sciences",
+    "EE": "Natural, Mathematical & Engineering Sciences",
+    "GN": "Natural, Mathematical & Engineering Sciences",
+    "LS": "Life Sciences & Medicine",
+    "LW": "Law",
+    "PS": "Psychiatry, Psychology & Neuroscience",
+    "BM": "Business",
+    "EC": "Business",
+    "HI": "Arts & Humanities",
+    "EN": "Arts & Humanities",
+    "PL": "Arts & Humanities",
+    "GE": "Social Science & Public Policy",
+    "PO": "Social Science & Public Policy",
+    "IR": "Social Science & Public Policy",
+    "NU": "Nursing, Midwifery & Palliative Care",
+    "DE": "Dentistry, Oral & Craniofacial Sciences",
+    "FR": "Arts & Humanities",
+    "SP": "Arts & Humanities",
+    "GL": "Arts & Humanities",
+    "AR": "Arts & Humanities",
+    "ZH": "Arts & Humanities",
+    "FA": "Arts & Humanities",
+    "TH": "Arts & Humanities",
+    "MU": "Arts & Humanities",
+    "CL": "Arts & Humanities",
+    "CR": "Arts & Humanities",
+}
