@@ -3,7 +3,7 @@ import styles from "../tabs.module.css";
 import AnnouncementModal from "./AnnouncementModal";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
 
-export default function AnnouncementsTab({ announcements = [], editMode, handlers, tags }) {
+export default function AnnouncementsTab({ announcements = [], editMode, handlers, tags, societyId }) {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
 
     const handleSave = (data) => { saveAnnouncement(data, handlers); setEditingAnnouncement(null); };
@@ -12,7 +12,7 @@ export default function AnnouncementsTab({ announcements = [], editMode, handler
         <>
             <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={setEditingAnnouncement} tags={tags} />
             {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={tags}
-                onClose={() => setEditingAnnouncement(null)} onSubmit={handleSave} />}
+                onClose={() => setEditingAnnouncement(null)} onSubmit={handleSave} societyId={societyId} />}
         </>
     );
 }

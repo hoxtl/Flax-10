@@ -100,6 +100,9 @@ function filterEvents(events, tagFilters) {
 }
 
 function getPopupActions(event, onViewAnnouncement) {
+    if (event?.announcement && onViewAnnouncement) {
+        return [{ label: 'View Announcement', onClick: () => onViewAnnouncement(event.announcement) }];
+    }
     if (!event?.announcementId || !onViewAnnouncement) return null;
     return [{ label: 'View Announcement', onClick: onViewAnnouncement }];
 }

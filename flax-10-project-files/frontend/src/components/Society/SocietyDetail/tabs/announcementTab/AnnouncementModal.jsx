@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./AnnouncementModal.module.css";
 import { getInitialForm, validateForm, handleFileSelect, MAX_IMAGES } from "./AnnouncementModalHelpers";
 import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
@@ -6,13 +6,28 @@ import { RecurrenceField } from "../../../../Calendar/EventModal/components/Recu
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
 import "../../../../Calendar/EventModal/EventModal.css";
+import { fetchSocietyEvent } from "../../../../../api/societyApi";
 
-export default function AnnouncementModal({ onClose, onSubmit, tags = [], announcement = null }) {
+export default function AnnouncementModal({ onClose, onSubmit, tags = [], announcement = null, societyId }) {
     const [form, setForm] = useState(getInitialForm(announcement));
     const [error, setError] = useState("");
     const fileRef = useRef(null);
-
     const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
+    useEffect(() => {
+        if (announcement?.event_id && societyId) {
+            fetchSocietyEvent(societyId, announcement.event_id)
+                .then(event => {
+                    setForm(prev => ({
+                        ...prev,
+                        addAsEvent: true,
+                        start_time: event.start_time,
+                        end_time: event.end_time,
+                        recurrence: event.recurrence
+                    }));
+                })
+                .catch(e => console.error("Failed to load linked event", e));
+        }
+    }, [announcement, societyId]);
 
     return (
         <div className={styles.backdrop} onMouseDown={onClose}>

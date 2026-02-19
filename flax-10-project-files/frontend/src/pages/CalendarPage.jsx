@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Calendar } from '../components/Calendar/Calendar';
 import PillFilters from '../components/Tags/PillFilters';
 import { useCalendar, useCalendarDispatch, useEventModal, useEventPopup } from '../context/CalendarContext';
@@ -47,11 +48,12 @@ function EventPopupContainer() {
     const { removeEvent } = useEventActions();
     const { loadEvents } = useCalendarEvents();
     const tags = useTags();
+    const navigate = useNavigate();
 
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, tags);
-    const handlers = { openModal, removeEvent, closePopup, loadEvents };
+    const handlers = { openModal, removeEvent, closePopup, loadEvents, navigate };
     const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
@@ -87,11 +89,23 @@ function getModuleActions(event, { closePopup, loadEvents }) {
     return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
 }
 
-function getSocietyActions(event, { closePopup, loadEvents }) {
+function getSocietyActions(event, { closePopup, loadEvents, navigate }) {
+    const actions = [];
+    if (event.announcement) {
+        actions.push({
+            label: 'View Announcement',
+            onClick: () => {
+                closePopup();
+                navigate(`/societies/${event.society_id}`);
+            }
+        });
+    }
+
     const handleUnsync = async () => {
         closePopup();
         await unsyncCalendar(event.society_id);
         loadEvents();
     };
-    return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
+    actions.push({ label: 'Unsync', variant: 'danger', onClick: handleUnsync });
+    return actions;
 }
