@@ -4,7 +4,7 @@ export async function getDeadlines(module_id) {
     return fetchApi(`/modules/${module_id}/deadlines/`);
 }
 
-export async function createDeadline(module_id) {
+export async function createDeadline(module_id, data) {
     return fetchApi(`/modules/${module_id}/deadlines/`, {
         method: 'POST',
         body: JSON.stringify(data)
