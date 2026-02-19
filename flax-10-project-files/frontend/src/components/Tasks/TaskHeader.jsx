@@ -14,9 +14,7 @@ function TopMenu({ anyCompleted, onClearCompleted }) {
         <span className={styles.menuIcon} aria-hidden="true">🪄</span>
         <span className={styles.menuLabel}>Clear completed tasks</span>
       </button>
-    </div>
-  );
-}
+    </div>);}
 
 function MenuWrap({ menuRef, menuOpen, setMenuOpen, anyCompleted, onClearCompleted }) {
   return (
