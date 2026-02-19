@@ -16,6 +16,7 @@ import { TagProvider } from "./context/TagContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationToast } from "./components/Notifications";
+import { TimerProvider } from "./context/TimerContext";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 
@@ -212,8 +213,10 @@ function AppProviders({ children }) {
     <NotificationProvider>
       <CalendarProvider>
         <TagProvider>
-          {children}
-          <NotificationToast />
+          <TimerProvider>
+            {children}
+            <NotificationToast />
+          </TimerProvider>
         </TagProvider>
       </CalendarProvider>
     </NotificationProvider>
