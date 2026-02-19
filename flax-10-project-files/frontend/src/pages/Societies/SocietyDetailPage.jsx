@@ -9,29 +9,33 @@ import SocietySidebar from "../../components/Society/SocietyDetail/SocietySideba
 import CoverImageModal from "../../components/Society/SocietyDetail/imageHandlers/CoverImageModal";
 import ImageGalleryModal from "../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal";
 import SettingsModal from "../../components/Society/SocietyDetail/SettingsModal";
+import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal";
 
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
     const { society, loading, error, updateSociety, members } = hookData;
-    const [activeTab, setActiveTab] = useState("calendar");
-    const [focusAnnouncementId, setFocusAnnouncementId] = useState(null);
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState(location.state?.activeTab || "calendar");
+    const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
+    const [editingAnnouncement, setEditingAnnouncement] = useState(null);
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const location = useLocation();
 
     useEffect(() => {
         if (location.state?.activeTab) {
-            setActiveTab(location.state.activeTab);
-            if (location.state.announcementId) setFocusAnnouncementId(location.state.announcementId);
             window.history.replaceState({}, document.title);
         }
-    }, [location]);
+    }, []);
 
     const handleTabChange = (tab, announcementId = null) => {
         setActiveTab(tab);
         setFocusAnnouncementId(announcementId);
+    };
+
+    const handleAnnouncementSave = (data, conflictingAnnouncement) => {
+        const { updateAnnouncement, addAnnouncement } = buildHandlers(hookData);
     };
 
     if (loading) return <div className={styles.page}>Loading...</div>;
@@ -54,7 +58,8 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
                 canEdit={canEdit} onToggleEditMode={() => setEditMode(!editMode)} />
             <MainContent activeTab={activeTab} setActiveTab={handleTabChange} society={society}
-                editMode={editMode} handlers={handlers} focusAnnouncementId={focusAnnouncementId} />
+                editMode={editMode} handlers={handlers} focusAnnouncementId={focusAnnouncementId}
+                onEditAnnouncement={setEditingAnnouncement} />
             {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}
             {showCoverModal && <CoverImageModal images={getImageUrls(society.images)} availablePhotos={availablePhotos}
                 onClose={() => setShowCoverModal(false)} onUpdate={updateImages} />}
@@ -63,6 +68,15 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onRemoveMember={handlers.removeMember} onAddCollaborator={handlers.addCollaborator}
                 ratificationStatus={society.ratification_status} isRatified={society.is_ratified}
                 onRequestRatification={handlers.requestRatification} />}
+            {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={society.tags}
+                onClose={() => setEditingAnnouncement(null)}
+                onSubmit={(data, conflict) => {
+                    if (conflict) handlers.updateAnnouncement(conflict.id, { ...conflict, pinned: false });
+                    if (data.id) handlers.updateAnnouncement(data.id, data);
+                    else handlers.addAnnouncement(data);
+                    setEditingAnnouncement(null);
+                }}
+                societyId={societyId} announcements={society.announcements} />}
         </div>
     );
 }
@@ -108,7 +122,7 @@ function NotFound({ onBack }) {
     );
 }
 
-function MainContent({ activeTab, setActiveTab, society, editMode, handlers, focusAnnouncementId }) {
+function MainContent({ activeTab, setActiveTab, society, editMode, handlers, focusAnnouncementId, onEditAnnouncement }) {
     const tags = society.tags || [];
     const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
     const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
@@ -119,7 +133,7 @@ function MainContent({ activeTab, setActiveTab, society, editMode, handlers, foc
                 <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} society={society}
                     editMode={editMode} onUpdate={handlers.updateSociety} eventHandlers={eventHandlers}
                     announcementHandlers={announcementHandlers} tags={tags} tagHandlers={tagHandlers}
-                    focusAnnouncementId={focusAnnouncementId} />
+                    focusAnnouncementId={focusAnnouncementId} onEditAnnouncement={onEditAnnouncement} />
             </div>
             <SocietySidebar society={society} editMode={editMode} tags={tags}
                 onAddAnnouncement={handlers.addAnnouncement} onUpdateAnnouncement={handlers.updateAnnouncement} onAddEvent={handlers.addEvent} />

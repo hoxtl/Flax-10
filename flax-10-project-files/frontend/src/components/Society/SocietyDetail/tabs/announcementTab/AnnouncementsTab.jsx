@@ -1,25 +1,9 @@
 import { useState } from "react";
 import styles from "../tabs.module.css";
-import AnnouncementModal from "./AnnouncementModal";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
-
-export default function AnnouncementsTab({ announcements = [], editMode, handlers, tags, societyId, focusAnnouncementId }) {
-    const [editingAnnouncement, setEditingAnnouncement] = useState(null);
-
+export default function AnnouncementsTab({ announcements = [], editMode, tags, focusAnnouncementId, onEdit }) {
     return (
-        <>
-            <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={setEditingAnnouncement} tags={tags} focusAnnouncementId={focusAnnouncementId} />
-            {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={tags}
-                onClose={() => setEditingAnnouncement(null)} onSubmit={(data, conflict) => {
-                    if (conflict) {
-                        handlers?.onUpdate?.(conflict.id, { ...conflict, pinned: false });
-                    }
-                    if (data.id) handlers?.onUpdate?.(data.id, data);
-                    else handlers?.onAdd?.(data);
-                    setEditingAnnouncement(null);
-                }}
-                societyId={societyId} announcements={announcements} />}
-        </>
+        <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={onEdit} tags={tags} focusAnnouncementId={focusAnnouncementId} />
     );
 }
 

@@ -89,19 +89,8 @@ function getModuleActions(event, { closePopup, loadEvents }) {
     return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
 }
 
-function getSocietyActions(event, { closePopup, loadEvents, navigate }) {
+function getSocietyActions(event, { closePopup, loadEvents }) {
     const actions = [];
-    if (event.announcement) {
-        actions.push({
-            label: 'View Announcement',
-            onClick: () => {
-                closePopup();
-                navigate(`/societies/${event.society_id}`, {
-                    state: { activeTab: 'announcements', announcementId: event.announcement }
-                });
-            }
-        });
-    }
 
     const handleUnsync = async () => {
         closePopup();
