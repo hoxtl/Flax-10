@@ -28,24 +28,18 @@ def notification_list(request):
 @api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def notification_detail(request, pk):
-    # Filter by user
     notification = get_object_or_404(Notification, pk=pk, user=request.user)
-    
     if request.method == 'GET':
         serialiser = NotificationSerialiser(notification)
         return Response(serialiser.data)
-    
     if request.method == 'PATCH':
         serialiser = NotificationSerialiser(notification, data=request.data, partial=True)
         if serialiser.is_valid():
             serialiser.save()
             return Response(serialiser.data)
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # DELETE
-    notification.delete()
+        notification.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

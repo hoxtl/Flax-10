@@ -1,44 +1,99 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Sidebar.module.css";
-import { getInitials } from "../utils/userUtils";
 import { APP_ROUTES } from "../lib/routes";
-import { getPreferredFirstName } from "../utils/userDisplay";
-import { getUserProfile } from "../api/userService";
 
-function SidebarHeader({ collapsed }) {
+const EXPANDED_W = 224;
+const COLLAPSED_W = 72;
+const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
+const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
+const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
+
+function LogoMark() {
   return (
-    <div className={`${styles.header} ${collapsed ? styles.headerCollapsed : ""}`}>
-      {!collapsed && <span className={styles.brand}>StudyFlax</span>}
+    <motion.div
+      className={styles.logoMark}
+      whileHover={{ rotate: 8, scale: 1.08 }}
+      transition={LOGO_SPRING}
+    />
+  );
+}
+
+function BrandName() {
+  return (
+    <motion.span
+      className={styles.brand}
+      initial={{ opacity: 0, x: -6 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -6 }}
+      transition={{ duration: 0.18 }}
+    >
+      StudyFlax
+    </motion.span>
+  );
+}
+
+function SidebarHeader({ open }) {
+  return (
+    <div className={styles.header}>
+      <LogoMark />
+      <AnimatePresence>{open && <BrandName />}</AnimatePresence>
     </div>
   );
 }
 
-function NavItem({ item, isActive, collapsed, onClick }) {
-  const cls = [
-    styles.navItem,
-    collapsed ? styles.navItemCollapsed : styles.navItemExpanded,
-    isActive ? styles.navItemActive : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+function NavLabel({ label }) {
   return (
-    <button onClick={onClick} className={cls}>
-      <span className={styles.icon}>{item.icon}</span>
-      {!collapsed && <span className={styles.label}>{item.label}</span>}
-    </button>
+    <motion.span
+      className={styles.label}
+      initial={{ opacity: 0, x: -4, width: 0 }}
+      animate={{ opacity: 1, x: 0, width: "auto" }}
+      exit={{ opacity: 0, x: -4, width: 0 }}
+      transition={{ duration: 0.16 }}
+    >
+      {label}
+    </motion.span>
   );
 }
 
-function SidebarNav({ active, onChange, collapsed }) {
+function ActivePill() {
+  return (
+    <motion.span
+      className={styles.activePill}
+      layoutId="activePill"
+      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+    />
+  );
+}
+
+function NavItem({ item, isActive, open, onClick }) {
+  const cls = `${styles.navItem} ${isActive ? styles.navItemActive : ""}`;
+  return (
+    <motion.button
+      onClick={onClick}
+      className={cls}
+      style={{ justifyContent: open ? "flex-start" : "center" }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
+      transition={NAV_SPRING}
+    >
+      <span className={styles.icon}>{item.icon}</span>
+      <AnimatePresence>{open && <NavLabel label={item.label} />}</AnimatePresence>
+      {isActive && <ActivePill />}
+    </motion.button>);}
+
+function SidebarNav({ active, onChange, open, user }) {
   return (
     <nav className={styles.nav}>
-      {APP_ROUTES.map((n) => (
+      {APP_ROUTES.filter(route => {
+        if (route.isAdminOnly) return user?.isAdmin;
+        return true;
+      }).map((n) => (
         <NavItem
           key={n.id}
           item={n}
           isActive={active === n.id}
-          collapsed={collapsed}
+          open={open}
           onClick={() => onChange?.(n.id)}
         />
       ))}
@@ -46,91 +101,17 @@ function SidebarNav({ active, onChange, collapsed }) {
   );
 }
 
-function SidebarFooter({ active, onChange, collapsed, user }) {
-  const [profileData, setProfileData] = useState(null);
-
-  const loadProfile = useCallback(async () => {
-    try {
-      const data = await getUserProfile();
-      setProfileData(data);
-    } catch (e) {
-      console.error("Failed to load profile:", e);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadProfile();
-
-    const onAuthChanged = () => loadProfile();
-    window.addEventListener("auth-changed", onAuthChanged);
-
-    const onProfileUpdated = () => loadProfile();
-    window.addEventListener("profile-updated", onProfileUpdated);
-
-    return () => {
-      window.removeEventListener("auth-changed", onAuthChanged);
-      window.removeEventListener("profile-updated", onProfileUpdated);
-    };
-  }, [loadProfile]);
-
-  const displayName =
-    profileData?.username ||
-    user?.username ||
-    getPreferredFirstName(user) ||
-    "User";
-
-  const initials = getInitials(displayName) || "?";
-
-  const yearRaw = profileData?.year ?? user?.year;
-  const year = yearRaw
-    ? String(yearRaw).startsWith("Year")
-      ? String(yearRaw)
-      : `Year ${yearRaw}`
-    : "Year 2";
-
-  const major = profileData?.major || user?.major || "CS";
-
-  const profilePhotoUrl = profileData?.profile_photo_url || user?.profile_photo_url;
-
+export default function Sidebar({ active, onChange, user }) {
+  const [open, setOpen] = useState(false);
+  const w = open ? EXPANDED_W : COLLAPSED_W;
   return (
-    <div className={styles.sidebarFooter}>
-      <NavItem
-        item={{ id: "profile", icon: "👤", label: "Profile" }}
-        isActive={active === "profile"}
-        collapsed={collapsed}
-        onClick={() => onChange?.("profile")}
-      />
-
-      <div className={`${styles.user} ${collapsed ? styles.userCollapsed : styles.userExpanded}`}>
-        <div className={styles.avatar}>
-          {profilePhotoUrl ? (
-            <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} />
-          ) : (
-            initials
-          )}
-        </div>
-
-        {!collapsed && (
-          <div className={styles.userText}>
-            <div className={styles.userName}>{displayName}</div>
-            <div className={styles.userMeta}>
-              {year} · {major}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export default function Sidebar({ active, onChange, collapsed, user }) {
-  const W = collapsed ? 72 : 224;
-
-  return (
-    <aside className={styles.sidebar} style={{ width: W, minWidth: W }}>
-      <SidebarHeader collapsed={collapsed} />
-      <SidebarNav active={active} onChange={onChange} collapsed={collapsed} />
-      <SidebarFooter active={active} onChange={onChange} collapsed={collapsed} user={user} />
-    </aside>
-  );
-}
+    <motion.aside
+      className={styles.sidebar}
+      animate={{ width: w, minWidth: w }}
+      transition={SIDEBAR_SPRING}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <SidebarHeader open={open} />
+      <SidebarNav active={active} onChange={onChange} open={open} user={user}/>
+    </motion.aside>);}
