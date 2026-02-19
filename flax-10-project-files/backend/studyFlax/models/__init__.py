@@ -21,3 +21,4 @@ from .notifications.notificationModel import *
 from .society import *
 # Timer
 from .timer import *
+from .timer.themeSessionModel import ThemeSession

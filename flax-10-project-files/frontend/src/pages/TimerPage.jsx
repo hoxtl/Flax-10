@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './TimerPage.module.css';
-import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
 import { useNotificationPermission } from '../components/Timer/utils/timerUtils';
+import { useTimerContext } from '../context/TimerContext';
 import { MainSection, PopupSection } from '../components/Timer/WrapperComponents';
 
 function NotificationPrompt({ permission, request }) {
@@ -10,7 +10,7 @@ function NotificationPrompt({ permission, request }) {
 }
 
 export default function TimerPage() {
-  const timerData = useTimerLogic();
+  const timerData = useTimerContext();
   const [showHistory, setShowHistory] = useState(false);
   const { permission, request } = useNotificationPermission();
   return (
