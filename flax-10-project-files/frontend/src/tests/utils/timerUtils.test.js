@@ -34,9 +34,11 @@ const mockGain = () => ({
     gain: { setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() }
 });
 
-const mockAudioContext = () => ({
-    createOscillator: mockOscillator, createGain: mockGain,
-    currentTime: 0, destination: {}
+const mockAudioContext = vi.fn(function () {
+    return {
+        createOscillator: mockOscillator, createGain: mockGain,
+        currentTime: 0, destination: {}
+    };
 });
 
 const setupMocks = () => {
@@ -44,7 +46,7 @@ const setupMocks = () => {
     global.Notification = Object.assign(NotificationMock, {
         permission: 'granted', requestPermission: vi.fn()
     });
-    global.window.AudioContext = vi.fn().mockImplementation(mockAudioContext);
+    global.window.AudioContext = mockAudioContext;
 };
 
 const testAutoAdvance = () => {
