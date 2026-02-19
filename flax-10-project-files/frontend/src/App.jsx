@@ -4,8 +4,8 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
-
 import WelcomeLanding from "./pages/WelcomeLanding";
+import { ThemeProvider } from './context/ThemeContext';
 import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
@@ -13,7 +13,6 @@ import Profile from "./pages/Profile";
 import { getUserSettings } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
-import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { NotificationToast } from "./components/Notifications";
 import { TimerProvider } from "./context/TimerContext";

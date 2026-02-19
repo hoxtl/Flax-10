@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import styles from "./Home.module.css";
-import PillFilters from "../components/PillFilters";
-import DateNavigator from "../components/DateNavigator";
-import { isToday, overlapsDay } from "../utils/dateUtils";
+import PillFilters from "../components/Tags/PillFilters";
+import DateNavigator from "../components/Home/DateNavigator";
+import { isToday, overlapsDay } from "../components/Calendar/utils/dateUtils";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../context/CalendarContext";
-import { useCalendarEvents, useEventActions } from "../hooks/useCalendarEvents";
-import CardGrid from "../components/CardGrid";
+import { useCalendarEvents, useEventActions } from "../components/Calendar/hooks/useCalendarEvents";
+import CardGrid from "../components/Home/CardGrid";
 
 function getScheduleTitle(selectedDate) {
   return isToday(selectedDate) ? "Today's schedule" : "Schedule";

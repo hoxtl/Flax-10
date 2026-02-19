@@ -10,8 +10,9 @@
     align-items: center;
 }
 
-.frequency-select {
+.recurrence-row .frequency-select {
     flex: 1;
+    padding-right: 32px;
 }
 
 .interval-input {
@@ -39,10 +40,6 @@
     display: flex;
     gap: 10px;
     align-items: center;
-}
-
-.end-type-select {
-    flex: 1;
 }
 
 .end-date-input {

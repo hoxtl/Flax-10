@@ -21,7 +21,7 @@ vi.mock('../../../api/tagApi', () => ({
     updateTag: vi.fn(),
 }));
 
-vi.mock('../../../hooks/useReminderNotifications', () => ({
+vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 

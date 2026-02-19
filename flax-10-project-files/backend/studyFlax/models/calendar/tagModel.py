@@ -8,6 +8,7 @@ class Tag(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     color = models.CharField(max_length=7, default='#9E7E5D')
+    icon = models.CharField(max_length=10, default='🏷️')
     is_default = models.BooleanField(default=False)
     default_duration = models.IntegerField(default=60, help_text="Default duration in minutes")
 

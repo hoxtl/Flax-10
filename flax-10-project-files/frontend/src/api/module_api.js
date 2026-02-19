@@ -45,3 +45,10 @@ export async function disenrolFromModule(enrollment_id) {
     });
 }
 
+export async function disenrolByModuleId(module_id) {
+    const enrollments = await getEnrollments();
+    const enrollment = enrollments.find(e => e.module === module_id);
+    if (!enrollment) throw new Error('Not enrolled in this module');
+    return disenrolFromModule(enrollment.id);
+}
+

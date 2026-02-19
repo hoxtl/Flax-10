@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DashboardLayout.module.css";
-import Sidebar from "../components/Sidebar";
-import TopBar from "../components/Topbar";
-import WeekBar from "../components/WeekBar";
-import QuickAddModal from "../components/QuickAddModal";
+import Sidebar from "../components/Dashboard/Sidebar";
+import TopBar from "../components/Dashboard/Topbar";
+import WeekBar from "../components/Dashboard/WeekBar";
+import QuickAddModal from "../components/Dashboard/QuickAddModal";
 import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
-import { clearUserData } from "../utils/authHelpers";
+import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingTasks from "../components/Tasks/FloatingTasks";
 import { useLocation } from "react-router-dom";
 
@@ -24,8 +24,10 @@ function useIsMobile(breakpoint = 900) {
 function parseStoredUser(user) {
   const name = user.first_name && user.last_name
     ? `${user.first_name} ${user.last_name}` : user.username;
-  return { name, year: user.year ? `Year ${user.year}` : "Year: ",
-    major: user.major || "Major: ", email: user.email, username: user.username, isAdmin: !!user.is_superuser };
+  return {
+    name, year: user.year ? `Year ${user.year}` : "Year: ",
+    major: user.major || "Major: ", email: user.email, username: user.username, isAdmin: !!user.is_superuser
+  };
 }
 
 function getUser() {
@@ -36,7 +38,7 @@ function getUser() {
 }
 
 async function handleLogoutClick() {
-  try { await authService.logout(); } catch (_) {}
+  try { await authService.logout(); } catch (_) { }
   finally { clearUserData(); }
 }
 

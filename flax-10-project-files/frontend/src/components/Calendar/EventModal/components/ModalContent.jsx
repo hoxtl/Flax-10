@@ -59,12 +59,12 @@ function ModalActions({ onCancel, onConfirm }) {
     );
 }
 
-function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, handleDelete }) {
+function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, handleDelete, showReminder, tags }) {
     return (
         <div className="modal-content" onClick={e => e.stopPropagation()}>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
-            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} />
+            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} showReminder={showReminder} tags={tags} />
         </div>
     );
 }

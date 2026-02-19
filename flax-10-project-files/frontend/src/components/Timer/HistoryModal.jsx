@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './HistoryModal.module.css';
-import { getHistory, clearHistory } from '../../utils/historyUtils';
-import { groupHistoryByBlock, formatDate, formatTimeRange } from '../../utils/historyFormatter';
+import { getHistory, clearHistory } from './utils/historyUtils';
+import { groupHistoryByBlock, formatDate, formatTimeRange } from './utils/historyFormatter';
 
 const HistoryHeader = ({ onClose }) => (
     <div className={styles.header}>
