@@ -26,7 +26,7 @@ function parseStoredUser(user) {
     ? `${user.first_name} ${user.last_name}` : user.username;
   return {
     name, year: user.year ? `Year ${user.year}` : "Year: ",
-    major: user.major || "Major: ", email: user.email, username: user.username
+    major: user.major || "Major: ", email: user.email, username: user.username, isAdmin: !!user.is_superuser
   };
 }
 
