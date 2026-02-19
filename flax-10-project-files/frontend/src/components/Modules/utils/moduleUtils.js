@@ -1,3 +1,28 @@
+const MODULE_PREFIX_TO_DEPARTMENT = {
+    CS: "Natural, Mathematical & Engineering Sciences",
+    AI: "Natural, Mathematical & Engineering Sciences",
+    MA: "Natural, Mathematical & Engineering Sciences",
+    PH: "Natural, Mathematical & Engineering Sciences",
+    LS: "Life Sciences & Medicine",
+    LW: "Law",
+    PS: "Psychiatry, Psychology & Neuroscience",
+    BM: "Business",
+    EC: "Business",
+    HI: "Arts & Humanities",
+    EN: "Arts & Humanities",
+    PL: "Arts & Humanities",
+    GE: "Social Science & Public Policy",
+    PO: "Social Science & Public Policy",
+    IR: "Social Science & Public Policy",
+    NU: "Nursing, Midwifery & Palliative Care",
+    DE: "Dentistry, Oral & Craniofacial Sciences",
+};
+
+export function getDepartment(module_code) {
+    const prefix = module_code?.match(/^[A-Z]+/)?.[0];
+    return MODULE_PREFIX_TO_DEPARTMENT[prefix] || "King's College London";
+}
+
 export function isEnrolledIn(module_id, enrollments) {
     return enrollments.some(e => e.module === module_id);
 }

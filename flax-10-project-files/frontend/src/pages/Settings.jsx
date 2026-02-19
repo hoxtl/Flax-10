@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Settings.module.css";
 import { useTheme } from "../context/ThemeContext";
-import { updateUserSettings } from '../api/userService';
+import { updateUserSettings, getUserProfile } from '../api/userService';
+import { KCL_DEPARTMENTS } from "../lib/kclCourses";
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
-// Single tab button
 function TabButton({ id, label, isActive, onClick }) {
   const className = `${styles.tab} ${isActive ? styles.tabActive : ""}`;
   return (
@@ -16,33 +16,23 @@ function TabButton({ id, label, isActive, onClick }) {
   );
 }
 
-// Tab navigation
 function SettingsTabs({ activeTab, onChange }) {
   const tabs = [
     { id: "account", label: "Account" },
     { id: "security", label: "Security" },
     { id: "preferences", label: "Preferences" },
   ];
-
   return (
     <div className={styles.tabs}>
       {tabs.map((tab) => (
-        <TabButton
-          key={tab.id}
-          id={tab.id}
-          label={tab.label}
-          isActive={activeTab === tab.id}
-          onClick={onChange}
-        />
+        <TabButton key={tab.id} id={tab.id} label={tab.label} isActive={activeTab === tab.id} onClick={onChange} />
       ))}
     </div>
   );
 }
 
-// Success banner
 function SuccessBanner({ message }) {
   if (!message) return null;
-
   return (
     <div className={styles.successBanner}>
       <span>✅</span>
@@ -51,10 +41,8 @@ function SuccessBanner({ message }) {
   );
 }
 
-// Error message
 function ErrorMessage({ message }) {
   if (!message) return null;
-
   return (
     <div className={styles.errorMessage}>
       <span>⚠️</span>
@@ -63,10 +51,8 @@ function ErrorMessage({ message }) {
   );
 }
 
-// Form input field
 function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength }) {
   const remaining_chars = maxLength ? maxLength - value.length : null;
-
   return (
     <div className={styles.formGroup}>
       <label htmlFor={id}>{label}
@@ -76,52 +62,45 @@ function FormInput({ id, label, type = "text", value, onChange, required, name, 
           </span>
         )}
       </label>
-      <input
-        type={type}
-        id={id}
-        name={name || id}
-        value={value}
-        onChange={onChange}
-        required={required}
-        maxLength={maxLength}
-      />
+      <input type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} />
     </div>
   );
 }
 
-// Form select field
-function FormSelect({ id, label, value, onChange, options, name }) {
+function FormSelect({ id, label, value, onChange, options, name, grouped }) {
   return (
     <div className={styles.formGroup}>
       <label htmlFor={id}>{label}</label>
       <select id={id} name={name || id} value={value} onChange={onChange}>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
+        {grouped ? (
+          <>
+            <option value="">Select your course</option>
+            {options.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+            ))}
+          </>
+        ) : (
+          options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))
+        )}
       </select>
     </div>
   );
 }
 
-// Theme selector component
 function ThemeSelector({ value, onChange }) {
   return (
     <div className={styles.themeSelector}>
-      <button
-        type="button"
-        className={`${styles.themeOption} ${value === 'light' ? styles.active : ''}`}
-        onClick={() => onChange('light')}
-      >
+      <button type="button" className={`${styles.themeOption} ${value === 'light' ? styles.active : ''}`} onClick={() => onChange('light')}>
         <span className={styles.themeIcon}>☀️</span>
         <span className={styles.themeLabel}>Light</span>
       </button>
-      <button
-        type="button"
-        className={`${styles.themeOption} ${value === 'dark' ? styles.active : ''}`}
-        onClick={() => onChange('dark')}
-      >
+      <button type="button" className={`${styles.themeOption} ${value === 'dark' ? styles.active : ''}`} onClick={() => onChange('dark')}>
         <span className={styles.themeIcon}>🌙</span>
         <span className={styles.themeLabel}>Dark</span>
       </button>
@@ -129,7 +108,6 @@ function ThemeSelector({ value, onChange }) {
   );
 }
 
-// Form section header
 function SectionHeader({ title, description }) {
   return (
     <div className={styles.formSection}>
@@ -139,7 +117,6 @@ function SectionHeader({ title, description }) {
   );
 }
 
-// Submit button
 function SubmitButton({ isSaving, label, savingLabel }) {
   return (
     <div className={styles.formActions}>
@@ -150,35 +127,45 @@ function SubmitButton({ isSaving, label, savingLabel }) {
   );
 }
 
-// Get initial account data
 function getInitialAccountData(user) {
   return {
     firstName: user?.first_name || "",
     lastName: user?.last_name || "",
     email: user?.email || "",
-    year: user?.year || "Year 2",
-    major: user?.major || "Computer Science",
+    year: user?.year || "",
+    major: user?.major || "",
   };
 }
 
-// Get year options
 function getYearOptions() {
   return [
-    { value: "Foundation Year", label: "Foundation Year" },
+    { value: "Foundation", label: "Foundation" },
     { value: "Year 1", label: "Year 1" },
     { value: "Year 2", label: "Year 2" },
     { value: "Year 3", label: "Year 3" },
     { value: "Year 4", label: "Year 4" },
-    { value: "Year 5", label: "Year 5" },
-    { value: "Year 6", label: "Year 6" },
-    { value: "Year 7", label: "Year 7" },
-    { value: "Year 8", label: "Year 8" }
   ];
 }
 
-// Account form
+function getCourseOptions() {
+  return Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
+    label: dept,
+    options: courses.map(course => ({ value: course, label: course }))
+  }));
+}
+
 function AccountForm({ user, onSave, isSaving }) {
   const [formData, setFormData] = useState(getInitialAccountData(user));
+
+  useEffect(() => {
+    getUserProfile().then(data => {
+      setFormData(prev => ({
+        ...prev,
+        year: data?.year || "",
+        major: data?.major || "",
+      }));
+    }).catch(() => {});
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -193,71 +180,54 @@ function AccountForm({ user, onSave, isSaving }) {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <SectionHeader title="Personal Information" />
-      
-      <FormInput
-        id="firstName"
-        name="firstName"
-        label="First Name"
-        value={formData.firstName}
-        onChange={handleChange}
-        required
-      />
-
-      <FormInput
-        id="lastName"
-        name="lastName"
-        label="Last Name"
-        value={formData.lastName}
-        onChange={handleChange}
-        required
-      />
-
-      <FormInput
-        id="email"
-        label="Email Address"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
+      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={handleChange} required />
+      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={handleChange} required />
+      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={handleChange} required />
 
       <div className={styles.formRow}>
-        <FormSelect
-          id="year"
-          label="Year"
-          value={formData.year}
-          onChange={handleChange}
-          options={getYearOptions()}
-        />
+        <FormSelect id="year" label="Year" value={formData.year} onChange={handleChange} options={getYearOptions()} />
 
-        <FormInput
-          id="major"
-          label="Major"
-          value={formData.major}
-          onChange={handleChange}
-          maxLength={100}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>Course</label>
+          {formData.major ? (
+            <div style={{
+              padding: '0.6rem 0.8rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border, #ddd)',
+              background: 'var(--muted-bg, #f5f5f5)',
+              color: 'var(--muted)',
+              fontSize: '0.95rem',
+            }}>
+              {formData.major}
+            </div>
+          ) : (
+            <FormSelect
+              id="major"
+              name="major"
+              label=""
+              value={formData.major}
+              onChange={handleChange}
+              options={getCourseOptions()}
+              grouped={true}
+            />
+          )}
+          <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' }}>
+            {formData.major
+              ? '🔒 Course cannot be changed after initial setup.'
+              : '⚠️ Choose carefully — this cannot be changed later.'}
+          </p>
+        </div>
       </div>
 
-      <SubmitButton
-        isSaving={isSaving}
-        label="Save Changes"
-        savingLabel="Saving..."
-      />
+      <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
     </form>
   );
 }
 
-// Get initial password data
 function getInitialPasswordData() {
-  return {
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  };
+  return { currentPassword: "", newPassword: "", confirmPassword: "" };
 }
 
-// Security form
 function SecurityForm({ onSave, isSaving, error }) {
   const [formData, setFormData] = useState(getInitialPasswordData());
 
@@ -273,55 +243,19 @@ function SecurityForm({ onSave, isSaving, error }) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <SectionHeader
-        title="Change Password"
-        description="Ensure your password is at least 8 characters long"
-      />
-
+      <SectionHeader title="Change Password" description="Ensure your password is at least 8 characters long" />
       <ErrorMessage message={error} />
-
-      <FormInput
-        id="currentPassword"
-        label="Current Password"
-        type="password"
-        value={formData.currentPassword}
-        onChange={handleChange}
-        required
-      />
-
-      <FormInput
-        id="newPassword"
-        label="New Password"
-        type="password"
-        value={formData.newPassword}
-        onChange={handleChange}
-        required
-      />
-
-      <FormInput
-        id="confirmPassword"
-        label="Confirm New Password"
-        type="password"
-        value={formData.confirmPassword}
-        onChange={handleChange}
-        required
-      />
-
-      <SubmitButton
-        isSaving={isSaving}
-        label="Change Password"
-        savingLabel="Changing..."
-      />
+      <FormInput id="currentPassword" label="Current Password" type="password" value={formData.currentPassword} onChange={handleChange} required />
+      <FormInput id="newPassword" label="New Password" type="password" value={formData.newPassword} onChange={handleChange} required />
+      <FormInput id="confirmPassword" label="Confirm New Password" type="password" value={formData.confirmPassword} onChange={handleChange} required />
+      <SubmitButton isSaving={isSaving} label="Change Password" savingLabel="Changing..." />
     </form>
   );
 }
 
-// Preferences panel
 function PreferencesPanel({ onSave, isSaving }) {
   const { theme, setTheme } = useTheme();
-  const [formData, setFormData] = useState({
-    theme: theme,
-  });
+  const [formData, setFormData] = useState({ theme });
 
   function handleThemeChange(newTheme) {
     setFormData(prev => ({ ...prev, theme: newTheme }));
@@ -335,11 +269,7 @@ function PreferencesPanel({ onSave, isSaving }) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <SectionHeader
-        title="Appearance"
-        description="Customize how StudyFlax looks"
-      />
-
+      <SectionHeader title="Appearance" description="Customize how StudyFlax looks" />
       <div className={styles.formGroup}>
         <label>Theme</label>
         <p className={styles.formDescription}>
@@ -347,45 +277,28 @@ function PreferencesPanel({ onSave, isSaving }) {
         </p>
         <ThemeSelector value={formData.theme} onChange={handleThemeChange} />
       </div>
-
-      <SubmitButton
-        isSaving={isSaving}
-        label="Save Preferences"
-        savingLabel="Saving..."
-      />
+      <SubmitButton isSaving={isSaving} label="Save Preferences" savingLabel="Saving..." />
     </form>
   );
 }
 
-// Page header
 function SettingsHeader({ onBack }) {
   return (
     <div className={styles.header}>
-      <button className={styles.backButton} onClick={onBack}>
-        ←
-      </button>
+      <button className={styles.backButton} onClick={onBack}>←</button>
       <h1 className={styles.title}>Settings</h1>
     </div>
   );
 }
 
-// Show success message temporarily
 function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);
   setTimeout(() => setter(""), duration);
 }
 
-// Validate password length
-function isPasswordTooShort(password) {
-  return password.length < 8;
-}
+function isPasswordTooShort(password) { return password.length < 8; }
+function passwordsDoNotMatch(pass1, pass2) { return pass1 !== pass2; }
 
-// Validate passwords match
-function passwordsDoNotMatch(pass1, pass2) {
-  return pass1 !== pass2;
-}
-
-// Main Settings page
 export default function Settings({ user, onBack }) {
   const [activeTab, setActiveTab] = useState("account");
   const [isSaving, setIsSaving] = useState(false);
@@ -406,10 +319,7 @@ export default function Settings({ user, onBack }) {
 
       const response = await fetch(`${API_BASE_URL}/settings/`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
         body: JSON.stringify({
           first_name: data.firstName,
           last_name: data.lastName,
@@ -424,19 +334,14 @@ export default function Settings({ user, onBack }) {
         if (responseData.user) {
           localStorage.setItem('user', JSON.stringify(responseData.user));
           showTemporaryMessage(setSuccessMessage, "The account has been updated!");
-
-          setTimeout(() => {
-            onBack();
-            window.location.reload();
-          }, 1000);
-        }
-        else {
+          setTimeout(() => { onBack(); window.location.reload(); }, 1000);
+        } else {
           setPasswordError(responseData.error || "The account update has failed...");
         }
       }
     } catch (error) {
-      console.error("Update account error: ", error)
-      setPasswordError("Action failed, please try again...")
+      console.error("Update account error: ", error);
+      setPasswordError("Action failed, please try again...");
     } finally {
       setIsSaving(false);
     }
@@ -444,7 +349,7 @@ export default function Settings({ user, onBack }) {
 
   const handlePasswordSave = async (data) => {
     setPasswordError("");
-    
+
     if (isPasswordTooShort(data.newPassword)) {
       setPasswordError("Password must be at least 8 characters long");
       return;
@@ -466,13 +371,8 @@ export default function Settings({ user, onBack }) {
 
       const response = await fetch(`${API_BASE_URL}/settings/`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`
-        },
-        body: JSON.stringify({
-          password: data.newPassword
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
+        body: JSON.stringify({ password: data.newPassword })
       });
 
       if (!response.ok) {
@@ -481,14 +381,12 @@ export default function Settings({ user, onBack }) {
       }
 
       showTemporaryMessage(setSuccessMessage, "Password changed successfully! Please log in again with your new password.");
-      
-      // Log out user after password change
       setTimeout(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';
       }, 2000);
-      
+
     } catch (error) {
       console.error('Password change error:', error);
       setPasswordError(error.message || "Failed to change password");
@@ -501,11 +399,9 @@ export default function Settings({ user, onBack }) {
     setIsSaving(true);
     try {
       const response = await updateUserSettings({ theme: data.theme });
-      
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user));
       }
-      
       showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
     } catch (error) {
       console.error("Failed to save preferences:", error);
@@ -519,23 +415,15 @@ export default function Settings({ user, onBack }) {
     <div className={styles.container}>
       <SettingsHeader onBack={onBack} />
       <SuccessBanner message={successMessage} />
-
       <div className={styles.content}>
         <SettingsTabs activeTab={activeTab} onChange={setActiveTab} />
-
         <div className={styles.panel}>
           {activeTab === "account" && (
             <AccountForm user={user} onSave={handleAccountSave} isSaving={isSaving} />
           )}
-
           {activeTab === "security" && (
-            <SecurityForm
-              onSave={handlePasswordSave}
-              isSaving={isSaving}
-              error={passwordError}
-            />
+            <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />
           )}
-
           {activeTab === "preferences" && (
             <PreferencesPanel onSave={handlePreferencesSave} isSaving={isSaving} />
           )}

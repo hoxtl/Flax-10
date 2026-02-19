@@ -10,7 +10,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
-import { getUserSettings } from "./api/userService";
+import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -18,6 +18,7 @@ import { NotificationToast } from "./components/Notifications";
 import { TimerProvider } from "./context/TimerContext";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
+import OnboardingModal from "./components/OnboardingModal";
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 const fadeAnim = {
@@ -223,20 +224,29 @@ function AppProviders({ children }) {
 }
 
 function AppScreen({ activeNav, setActiveNav, user }) {
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    getUserProfile().then(data => {
+      if (!data?.major || data.major === "") {
+        setShowOnboarding(true);
+      }
+    }).catch(() => {});
+  }, []);
+
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
-        <DashboardLayout
-          activeNav={activeNav}
-          onNavChange={setActiveNav}
-          user={user}
-        >
-          <AnimatedDashboardContent
-            activeNav={activeNav}
-            setActiveNav={setActiveNav}
-            user={user}
-          />
+        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
+          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </DashboardLayout>
+        <OnboardingModal
+          isOpen={showOnboarding}
+          onComplete={() => {
+            setShowOnboarding(false);
+            window.location.reload();
+          }}
+        />
       </AppProviders>
     </ScreenWrap>
   );
