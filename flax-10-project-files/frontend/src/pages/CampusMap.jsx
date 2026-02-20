@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
+import { tflService } from '../api/tflService';
 
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -95,6 +96,10 @@ export default function CampusMap() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [locating, setLocating] = useState(false);
   const [instructionMode, setInstructionMode] = useState(false);
+  const [tflInstructionMode, setTflInstructionMode] = useState(false);
+  const [tflRouteInfo, setTflRouteInfo] = useState(null);
+  const [loadingTflRoute, setLoadingTflRoute] = useState(false);
+  const [tflRouteError, setTflRouteError] = useState('');
 
   useEffect(() => {
     if (map.current) return;
@@ -179,6 +184,24 @@ export default function CampusMap() {
           'line-opacity': 0.3,
         },
       }, 'route-line');
+
+      map.current.addSource('tfl-route', {
+        type: 'geojson',
+        data: {type: 'FeatureCollection', features: []}
+      });
+
+      map.current.addLayer({
+        id: 'tfl-route-line',
+        type: 'line',
+        source: 'tfl-route',
+        layout: {'line-join': 'round', 'line-cap': 'round'},
+        paint: {
+          'line-color': '#0019A8',
+          'line-width': 5,
+          'line-opacity': 0.8,
+          'line-dasharray': [2, 2],
+        },
+      }, 'route-line-border');
 
       routeLayerAdded.current = true;
       setMapLoaded(true);
@@ -348,8 +371,64 @@ export default function CampusMap() {
     }
   }, [startLocation, selectedCampus]);
 
+
+  const calculateTflRoute = useCallback(async () => {
+    if (!startLocation || !selectedCampus) return;
+
+    setLoadingTflRoute(true);
+    setTflRouteError('');
+    setTflRouteInfo(null);
+
+    const { lng, lat } = startLocation;
+    const [dstLng, dstLat] = selectedCampus.coords;
+
+    try {
+      const tflJourney = await tflService.journeyPlanner(lat, lng, dstLat, dstLng);
+      if (!tflJourney) {
+        setTflRouteError('No TfL journey found between the two selected locations...');
+        return;
+      }
+      setTflRouteInfo(tflJourney);
+
+      if (tflJourney.legs && tflJourney.legs.length > 0) {
+        const journeyCoords = [];
+        tflJourney.legs.forEach(leg => {
+          if (leg.path) {
+            journeyCoords.push(...leg.path);
+          }
+        });
+
+        if (journeyCoords.length > 0 && map.current.getSource('tfl-route')) {
+          map.current.getSource('tfl-route').setData({
+            type: 'FeatureCollection',
+            features: [{
+              type: 'Feature',
+              geometry: {
+                type: 'LineString',
+                coordinates: journeyCoords
+              }
+            }]
+          });
+        }
+      }
+    }
+    catch (error) {
+      console.error('Calculate TFL route error: ', error);
+      setTflRouteError('Failed to calculate TfL route, please try again...')
+    } finally {
+      setLoadingTflRoute(false);
+    }
+  }, [startLocation, selectedCampus]);
+
   const resetRoute = () => {
     map.current?.getSource('route').setData({
+      type: 'FeatureCollection',
+      features: [],
+    });
+  };
+
+  const resetTflRoute = () => {
+    map.current?.getSource('tfl-route').setData({
       type: 'FeatureCollection',
       features: [],
     });
@@ -358,11 +437,14 @@ export default function CampusMap() {
   useEffect(() => {
     if (startLocation && selectedCampus) {
       calculateRoute();
+      calculateTflRoute();
     } else if (routeLayerAdded.current) {
       resetRoute();
+      resetTflRoute();
       setRouteInfo(null);
+      setTflRouteInfo(null);
     }
-  }, [startLocation, selectedCampus, calculateRoute]);
+  }, [startLocation, selectedCampus, calculateRoute, calculateTflRoute]);
 
   // Use GPS of user's device
   const handleGeolocate = () => {
@@ -383,15 +465,19 @@ export default function CampusMap() {
   const handleClearStart = () => {
     setStartLocation(null);
     setRouteInfo(null);
+    setTflRouteInfo(null);
     if (startMarker.current) { startMarker.current.remove(); startMarker.current = null; }
     if (startPopup.current) { startPopup.current.remove(); startPopup.current = null; }
     resetRoute();
+    resetTflRoute();
   };
 
   const handleClearCampus = () => {
     setSelectedCampus(null);
     setRouteInfo(null);
+    setTflRouteInfo(null);
     resetRoute();
+    resetTflRoute();
   };
 
   const flyToCampus = (campus) => {
@@ -546,21 +632,81 @@ export default function CampusMap() {
               </div>
 
               {/* TFL API TRANSPORT MODES */}
-              {[
-                { icon: '🚍', name: 'Bus', note: 'Requires TfL API' },
-                { icon: '🚆', name: 'Tube / Rail', note: 'Requires TfL API' },
-              ].map((mode) => (
-                <div key={mode.name} className={`${styles.modeCard} ${styles.modeCardDisabled}`}>
+              {loadingTflRoute ? (
+                <div className={styles.modeCard}>
+                  <div className={styles.loadingRoute}>
+                    <span className={styles.spinner} />
+                    <span>Checking public transport...</span>
+                  </div>
+                </div>
+              ) : tflRouteError ? (
+                <div className={styles.modeCard}>
                   <div className={styles.modeCardHeader}>
-                    <span className={styles.modeIcon}>{mode.icon}</span>
+                    <span className={styles.modeIcon}>🚇</span>
                     <div className={styles.modeInfo}>
-                      <span className={styles.modeName}>{mode.name}</span>
-                      <span className={`${styles.modeBadge} ${styles.modeBadgeSoon}`}>To be added...</span>
+                      <span className={styles.modeName}>Public Transport</span>
                     </div>
                   </div>
-                  <p className={styles.modeComingSoonNote}>{mode.note}</p>
+                  <p className={styles.routeError}>{tflRouteError}</p>
                 </div>
-              ))}
+              ) : tflRouteInfo ? (
+                <div className={styles.modeCard}>
+                  <div className={styles.modeCardHeader}>
+                    <span className={styles.modeIcon}>🚇</span>
+                    <div className={styles.modeInfo}>
+                      <span className={styles.modeName}>Public Transport</span>
+                      <span className={styles.modeBadge}>Bus, Tube and Rail</span>
+                    </div>
+                  </div>
+                  <div className={styles.modeStats}>
+                    <div className={styles.modeStat}>
+                      <span className={styles.modeStatValue}>{tflRouteInfo.duration} min</span>
+                      <span className={styles.modeStatLabel}>Duration</span>
+                    </div>
+                    <div className={styles.modeStatDivider} />
+                    <div className={styles.modeStat}>
+                      <span className={styles.modeStatValue}>{tflRouteInfo.legs.length}</span>
+                      <span className={styles.modeStatLabel}>Stops</span>
+                    </div>
+                  </div>
+
+                  <button
+                    className={styles.stepsToggle}
+                    onClick={() => setTflInstructionMode(!tflInstructionMode)}
+                  >
+                    {tflInstructionMode ? 'Hide' : 'Show'} step-by-step directions
+                    <span>{tflInstructionMode ? '▲' : '▼'}</span>
+                  </button>
+
+                  {tflInstructionMode && (
+                    <div className={styles.tflJourneySteps}>
+                      {tflRouteInfo.legs.map((leg, i) => (
+                        <div key={i} className={styles.tflLeg}>
+                          <div className={styles.tflLegIcon}>
+                            {leg.mode === 'walking' ? '🚶' :
+                            leg.mode === 'bus' ? '🚌' :
+                            leg.mode === 'tube' ? '🚇' :
+                            leg.mode === 'dlr' ? '🚊' :
+                            leg.mode === 'overground' ? '🚆' :
+                            leg.mode === 'national-rail' ? '🚄' : '🚇'}
+                          </div>
+                          <div className={styles.tflLegContent}>
+                            <span className={styles.tflLegMode}>
+                              {leg.mode === 'walking' ? 'Walk' :
+                              leg.mode === 'bus' ? `Bus ${leg.routeOptions[0]?.name || ''}` :
+                              leg.routeOptions[0]?.name || leg.mode}
+                            </span>
+                            <span className={styles.tflLegDetail}>
+                              {leg.departurePoint} → {leg.arrivalPoint}
+                            </span>
+                            <span className={styles.tflLegTime}>{leg.duration} min</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
           ) : null}
         </section>
