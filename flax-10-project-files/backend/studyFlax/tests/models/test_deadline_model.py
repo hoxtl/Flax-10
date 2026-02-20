@@ -52,6 +52,12 @@ class DeadlineModelTests(TestCase):
             self.create_deadline(deadline_type=t)
         self.assertEqual(Deadline.objects.count(), 4)
     
+    def test_deadline_deleted_with_module(self):
+        """ Test deadlines are deleted when corresponding module is deleted."""
+        self.create_deadline()
+        self.module.delete()
+        self.assertEqual(Deadline.objects.count(), 0)
+            
     def test_str_representation(self):
         """ Test string representation of deadline model"""
         deadline = self.create_deadline(title='Essay')
