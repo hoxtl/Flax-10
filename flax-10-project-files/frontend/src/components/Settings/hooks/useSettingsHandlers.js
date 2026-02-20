@@ -34,10 +34,16 @@ async function savePassword(data, setPasswordError, setSuccessMessage, setIsSavi
 }
 
 async function savePreferences(data, setSuccessMessage, setIsSaving) {
-  const response = await updateUserSettings({ theme: data.theme }).catch(() => null);
-  if (response?.user) saveUserToStorage(response.user);
-  showTemporaryMessage(setSuccessMessage, response ? "Preferences saved!" : "Failed to save preferences");
-  setIsSaving(false);
+  try {
+    const response = await updateUserSettings({ theme: data.theme });
+    if (response?.user) saveUserToStorage(response.user);
+    showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
+  } catch (error) {
+    console.error("Failed to save preferences:", error);
+    showTemporaryMessage(setSuccessMessage, "Failed to save preferences");
+  } finally {
+    setIsSaving(false);
+  }
 }
 
 export default function useSettingsHandlers() {
@@ -46,7 +52,8 @@ export default function useSettingsHandlers() {
   const [passwordError, setPasswordError] = useState("");
 
   const handleAccountSave = async (data) => {
-    setIsSaving(true); setPasswordError("");
+    setIsSaving(true);
+    setPasswordError("");
     await saveAccount(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
 
