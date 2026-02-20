@@ -370,13 +370,6 @@
   flex-shrink: 0;
 }
 
-.modeComingSoonNote {
-  margin: 0;
-  font-size: 0.72rem;
-  color: var(--muted, rgba(var(--brown-text), 0.40));
-  font-style: italic;
-}
-
 .stepsToggle {
   display: flex;
   align-items: center;
@@ -620,7 +613,7 @@
 .locPopup {
   font-size: 0.9rem;
   font-weight: 700;
-  color: rgba(var(--brown-text) 0.88);
+  color: rgba(var(--brown-text), 0.88);
 }
 
 .tflJourneySteps {
