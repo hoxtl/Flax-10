@@ -11,15 +11,19 @@ async function submitOnboarding(year, major) {
   });
 }
 
-export default function useOnboarding() {
+function useOnboardingState() {
   const [year, setYear] = useState("");
   const [major, setMajor] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  return { year, setYear, major, setMajor, confirmed, setConfirmed, loading, setLoading, done, setDone };
+}
 
+export default function useOnboarding() {
+  const state = useOnboardingState();
+  const { year, major, confirmed, setMajor, setConfirmed, setLoading, setDone } = state;
   const handleMajorChange = (val) => { setMajor(val); setConfirmed(false); };
-
   const handleSubmit = async () => {
     if (!year || !major || !confirmed) return;
     setLoading(true);
@@ -27,6 +31,5 @@ export default function useOnboarding() {
     setLoading(false);
     setDone(true);
   };
-
-  return { year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, done, handleSubmit };
+  return { ...state, handleMajorChange, handleSubmit };
 }
