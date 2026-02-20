@@ -5,13 +5,7 @@ import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI
 import styles from "../../pages/Settings/Settings.module.css";
 
 function getInitialData(user) {
-  return {
-    firstName: user?.first_name || "",
-    lastName: user?.last_name || "",
-    email: user?.email || "",
-    year: user?.year || "",
-    major: user?.major || "",
-  };
+  return { firstName: user?.first_name || "", lastName: user?.last_name || "", email: user?.email || "", year: user?.year || "", major: user?.major || "" };
 }
 
 function getYearOptions() {
@@ -25,71 +19,79 @@ function getCourseOptions() {
   }));
 }
 
+const lockedStyle = { padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border, #ddd)', background: 'var(--muted-bg, #f5f5f5)', color: 'var(--muted)', fontSize: '0.95rem' };
+const wrapStyle = { display: 'flex', flexDirection: 'column', flex: 1 };
+const labelStyle = { fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' };
+const hintStyle = { fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' };
+
+function CourseLabel({ children }) {
+  return <label style={labelStyle}>Course</label>;
+}
+
 function LockedCourseField({ major }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <label style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>Course</label>
-      <div style={{
-        padding: '0.6rem 0.8rem',
-        borderRadius: '8px',
-        border: '1px solid var(--border, #ddd)',
-        background: 'var(--muted-bg, #f5f5f5)',
-        color: 'var(--muted)',
-        fontSize: '0.95rem',
-      }}>
-        {major}
-      </div>
-      <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' }}>
-        🔒 Course cannot be changed after initial setup.
-      </p>
+    <div style={wrapStyle}>
+      <CourseLabel />
+      <div style={lockedStyle}>{major}</div>
+      <p style={hintStyle}>🔒 Course cannot be changed after initial setup.</p>
     </div>
   );
 }
 
 function EditableCourseField({ value, onChange }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <label style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>Course</label>
+    <div style={wrapStyle}>
+      <CourseLabel />
       <FormSelect id="major" name="major" label="" value={value} onChange={onChange} options={getCourseOptions()} grouped={true} />
-      <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' }}>
-        ⚠️ Choose carefully — this cannot be changed later.
-      </p>
+      <p style={hintStyle}>⚠️ Choose carefully — this cannot be changed later.</p>
     </div>
   );
 }
 
-export default function AccountForm({ user, onSave, isSaving }) {
+function useAccountForm(user) {
   const [formData, setFormData] = useState(getInitialData(user));
-
   useEffect(() => {
     getUserProfile().then(data => {
       setFormData(prev => ({ ...prev, year: data?.year || "", major: data?.major || "" }));
     }).catch(() => {});
   }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  return { formData, handleChange };
+}
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
-  };
+function PersonalInfoFields({ formData, onChange }) {
+  return (
+    <>
+      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required />
+      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required />
+      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required />
+    </>
+  );
+}
 
+function CourseRow({ formData, onChange }) {
+  return (
+    <div className={styles.formRow}>
+      <FormSelect id="year" label="Year" value={formData.year} onChange={onChange} options={getYearOptions()} />
+      {formData.major
+        ? <LockedCourseField major={formData.major} />
+        : <EditableCourseField value={formData.major} onChange={onChange} />
+      }
+    </div>
+  );
+}
+
+export default function AccountForm({ user, onSave, isSaving }) {
+  const { formData, handleChange } = useAccountForm(user);
+  const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <SectionHeader title="Personal Information" />
-      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={handleChange} required />
-      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={handleChange} required />
-      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={handleChange} required />
-      <div className={styles.formRow}>
-        <FormSelect id="year" label="Year" value={formData.year} onChange={handleChange} options={getYearOptions()} />
-        {formData.major
-          ? <LockedCourseField major={formData.major} />
-          : <EditableCourseField value={formData.major} onChange={handleChange} />
-        }
-      </div>
+      <PersonalInfoFields formData={formData} onChange={handleChange} />
+      <CourseRow formData={formData} onChange={handleChange} />
       <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
     </form>
   );
