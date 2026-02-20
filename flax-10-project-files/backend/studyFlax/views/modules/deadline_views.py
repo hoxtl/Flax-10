@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Deadline, Module
 from studyFlax.serialisers import DeadlineSerialiser
 from  .deadline_event_helpers import create_deadline_events, sync_deadline_events, delete_deadline_events
+from django.utils import timezone
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -13,7 +14,7 @@ def deadline_list(request, module_id):
     module = get_object_or_404(Module, id=module_id)
     if request.method == 'GET':
         return get_deadlines(module)
-    return create_deadline(request)
+    return create_deadline(request, module)
 
 def get_deadlines(module):
     deadlines = Deadline.objects.filter(module=module)
@@ -25,7 +26,7 @@ def create_deadline(request,module):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     deadline = serialiser.save(module=module)
-    create_deadline_events(deadline, module)
+    create_deadline_events(deadline)
     return Response(DeadlineSerialiser(deadline).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -52,4 +53,12 @@ def delete_deadline(request, deadline):
     deadline.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def upcoming_deadlines(request):
+    deadlines = Deadline.objects.filter(
+        module__enrollments__student=request.user,
+        start_due_date__gte=timezone.now()
+    ).order_by('start_due_date')[:10]
+    return Response(DeadlineSerialiser(deadlines, many=True).data)
     
