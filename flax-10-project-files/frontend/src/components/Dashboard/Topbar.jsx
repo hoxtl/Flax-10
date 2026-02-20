@@ -9,6 +9,7 @@ import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import { Bell, Plus } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
+import UserSearch from "../Social/UserSearch";
 
 function getFirstName(user) {
   const displayName = (getDisplayName(user) || "").trim();
@@ -38,12 +39,7 @@ function TopBarGreeting({ user }) {
 }
 
 function SearchInput() {
-  return (
-    <div className={styles.search}>
-      <span className={styles.searchIcon}>🔍</span>
-      <input className={styles.searchInput} placeholder="Search…" />
-    </div>
-  );
+  return <UserSearch />;
 }
 
 function QuickTabs({ onAddClick }) {
