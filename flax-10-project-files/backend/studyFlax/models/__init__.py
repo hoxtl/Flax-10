@@ -19,6 +19,10 @@ from .notifications.notificationModel import *
 
 # Society
 from .society import *
+
 # Timer
 from .timer import *
 from .timer.themeSessionModel import ThemeSession
+
+# Task 
+from studyFlax.models.tasks.taskModel import Task, TaskList
