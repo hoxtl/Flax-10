@@ -75,3 +75,19 @@ class EnrollmentViewTests(BaseTestCase):
         enrollment = Enrollment.objects.create(student=self.user, module=self.module)
         response = self.client.get(f'/api/enrollments/{enrollment.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_enrollment_creates_deadline_events(self):
+        """ Test enrollment into a module, updates calendar with deadlines"""
+        self.user.role = 'teacher'
+        self.user.save()
+        Deadline.objects.create(
+            module=self.module, title='CW1',
+            deadline_type='coursework',
+            start_due_date=timezone.now() + timedelta(days=7),
+        )
+        self.user.role = 'student'
+        self.user.save()
+        self.client.post('/api/enrollments/', {'module': self.module.id}, format='json')
+        self.assertTrue(CalendarEvent.objects.filter(
+            user=self.user, source='module_deadline'
+        ).exists())
