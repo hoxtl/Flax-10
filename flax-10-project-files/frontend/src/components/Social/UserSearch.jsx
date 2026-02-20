@@ -47,8 +47,8 @@ export default function UserSearch() {
                         <p className={styles.emptyText}>Searching...</p>
                     ) : results.length > 0 ? (
                         <div className={styles.userList}>
-                            {results.map(u => (
-                                <div key={u.id} className={styles.userItem}>
+                            {results.map((u, index) => (
+                                <div key={u.id || u.username || index} className={styles.userItem}>
                                     <div className={styles.userInfo}>
                                         <div className={styles.avatar}>{u.first_name?.[0] || u.username[0]}</div>
                                         <div className={styles.userNameDetails}>
