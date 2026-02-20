@@ -1,14 +1,31 @@
-import React from 'react';
-import * as Components from '../Authentication/AuthComponents';
+import React from "react";
+import * as Components from "../Authentication/AuthComponents";
 
-export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading }) => {
+export const SignUpForm = ({
+  signIn,
+  formData,
+  updateField,
+  onSubmit,
+  loading,
+  onToggle,
+}) => {
   const fields = [
-    { name: 'first_name', type: 'text', placeholder: 'First Name' },
-    { name: 'last_name', type: 'text', placeholder: 'Last Name' },
-    { name: 'username', type: 'text', placeholder: 'Username' },
-    { name: 'email', type: 'email', placeholder: 'Email' },
-    { name: 'password', type: 'password', placeholder: 'Password', minLength: 8 },
-    { name: 'password2', type: 'password', placeholder: 'Confirm Password', minLength: 8 }
+    { name: "first_name", type: "text", placeholder: "First Name" },
+    { name: "last_name", type: "text", placeholder: "Last Name" },
+    { name: "username", type: "text", placeholder: "Username" },
+    { name: "email", type: "email", placeholder: "Email" },
+    {
+      name: "password",
+      type: "password",
+      placeholder: "Password",
+      minLength: 8,
+    },
+    {
+      name: "password2",
+      type: "password",
+      placeholder: "Confirm Password",
+      minLength: 8,
+    },
   ];
 
   return (
@@ -17,7 +34,7 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
         <Components.Title>Create Account</Components.Title>
         <div style={{ height: "12px" }} />
 
-        {fields.map(field => (
+        {fields.map((field) => (
           <Components.Input
             key={field.name}
             type={field.type}
@@ -33,8 +50,13 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading })
         <div style={{ height: "16px" }} />
 
         <Components.Button type="submit" disabled={loading}>
-          {loading ? 'Creating account...' : 'Sign Up'}
+          {loading ? "Creating account..." : "Sign Up"}
         </Components.Button>
+
+        <Components.MobileToggleButton>
+          Already have an account?
+          <span onClick={() => onToggle(true)}>Sign In</span>
+        </Components.MobileToggleButton>
       </Components.Form>
     </Components.SignUpContainer>
   );
