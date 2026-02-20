@@ -170,6 +170,7 @@ export default function CampusMap() {
           'line-color': '#FF0000',
           'line-width': 5,
           'line-opacity': 0.9,
+          'line-dasharray': [2,2],
         },
       });
 
@@ -184,24 +185,6 @@ export default function CampusMap() {
           'line-opacity': 0.3,
         },
       }, 'route-line');
-
-      map.current.addSource('tfl-route', {
-        type: 'geojson',
-        data: {type: 'FeatureCollection', features: []}
-      });
-
-      map.current.addLayer({
-        id: 'tfl-route-line',
-        type: 'line',
-        source: 'tfl-route',
-        layout: {'line-join': 'round', 'line-cap': 'round'},
-        paint: {
-          'line-color': '#0019A8',
-          'line-width': 5,
-          'line-opacity': 0.8,
-          'line-dasharray': [2, 2],
-        },
-      }, 'route-line-border');
 
       routeLayerAdded.current = true;
       setMapLoaded(true);
@@ -389,28 +372,6 @@ export default function CampusMap() {
         return;
       }
       setTflRouteInfo(tflJourney);
-
-      if (tflJourney.legs && tflJourney.legs.length > 0) {
-        const journeyCoords = [];
-        tflJourney.legs.forEach(leg => {
-          if (leg.path) {
-            journeyCoords.push(...leg.path);
-          }
-        });
-
-        if (journeyCoords.length > 0 && map.current.getSource('tfl-route')) {
-          map.current.getSource('tfl-route').setData({
-            type: 'FeatureCollection',
-            features: [{
-              type: 'Feature',
-              geometry: {
-                type: 'LineString',
-                coordinates: journeyCoords
-              }
-            }]
-          });
-        }
-      }
     }
     catch (error) {
       console.error('Calculate TFL route error: ', error);
@@ -420,27 +381,24 @@ export default function CampusMap() {
     }
   }, [startLocation, selectedCampus]);
 
-  const resetRoute = () => {
-    map.current?.getSource('route').setData({
+  const resetRoute = (routeID) => {
+    const source = map.current?.getSource(routeID);
+
+    if (!source) return;
+
+    source.setData({
       type: 'FeatureCollection',
       features: [],
     });
   };
 
-  const resetTflRoute = () => {
-    map.current?.getSource('tfl-route').setData({
-      type: 'FeatureCollection',
-      features: [],
-    });
-  };
 
   useEffect(() => {
     if (startLocation && selectedCampus) {
       calculateRoute();
       calculateTflRoute();
     } else if (routeLayerAdded.current) {
-      resetRoute();
-      resetTflRoute();
+      resetRoute('route');
       setRouteInfo(null);
       setTflRouteInfo(null);
     }
@@ -468,16 +426,14 @@ export default function CampusMap() {
     setTflRouteInfo(null);
     if (startMarker.current) { startMarker.current.remove(); startMarker.current = null; }
     if (startPopup.current) { startPopup.current.remove(); startPopup.current = null; }
-    resetRoute();
-    resetTflRoute();
+    resetRoute('route');
   };
 
   const handleClearCampus = () => {
     setSelectedCampus(null);
     setRouteInfo(null);
     setTflRouteInfo(null);
-    resetRoute();
-    resetTflRoute();
+    resetRoute('route');
   };
 
   const flyToCampus = (campus) => {
@@ -558,7 +514,7 @@ export default function CampusMap() {
                 onClick={() => { setSelectedCampus(campus); flyToCampus(campus); }}
               >
                 <span className={styles.campusDot} style={{ background: campus.color }} />
-                <span className={styles.campusBtnName}>{campus.shortName}</span>
+                <span>{campus.shortName}</span>
               </button>
             ))}
           </div>
@@ -584,7 +540,7 @@ export default function CampusMap() {
           ) : routeError ? (
             <div className={styles.routeError}>{routeError}</div>
           ) : routeInfo ? (
-            <div className={styles.routeResults}>
+            <>
               {/* Walking card */}
               <div className={styles.modeCard}>
                 <div className={styles.modeCardHeader}>
@@ -707,7 +663,7 @@ export default function CampusMap() {
                   )}
                 </div>
               ) : null}
-            </div>
+            </>
           ) : null}
         </section>
 
