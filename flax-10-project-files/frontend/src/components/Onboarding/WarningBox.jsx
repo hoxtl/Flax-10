@@ -1,5 +1,3 @@
-import styles from "./OnboardingModal.module.css";
-
 const boxStyle = {
   marginTop: '1rem', padding: '0.85rem 1rem', borderRadius: '8px',
   background: 'var(--warning-bg, #fff8e6)',

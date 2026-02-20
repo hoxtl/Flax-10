@@ -165,9 +165,7 @@ function ModalForm({ form, user, onClose, onSubmit }) {
       <UsernameField username={username} setUsername={setUsername} />
       <BioField bio={bio} setBio={setBio} />
       <FormActions loading={loading} onClose={onClose} />
-    </form>
-  );
-}
+    </form>);}
 
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   const form = useProfileForm(user);

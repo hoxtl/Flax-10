@@ -66,9 +66,7 @@ function DropdownMenu({ isOpen, grouped, options, value, onSelect }) {
             : <FlatOptions options={options} value={value} onSelect={onSelect} />}
         </motion.div>
       )}
-    </AnimatePresence>
-  );
-}
+    </AnimatePresence>);}
 
 function useDropdownOptions(options, grouped) {
   const allOptions = grouped
