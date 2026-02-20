@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FormInput, SectionHeader, SubmitButton, ErrorMessage } from "./SettingsUI";
-import styles from "../../pages/Settings.module.css";
+import styles from "../../pages/Settings/Settings.module.css";
 
 function getInitialData() {
   return { currentPassword: "", newPassword: "", confirmPassword: "" };

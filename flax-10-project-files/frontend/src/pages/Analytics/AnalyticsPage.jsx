@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import analyticsService from '../api/analyticsService';
-import SummaryCards from '../components/Analytics/SummaryCards';
-import ProductivityCards from '../components/Analytics/ProductivityCards';
-import StudyHoursChart from '../components/Analytics/StudyHoursChart';
-import DailyBreakdownChart from '../components/Analytics/DailyBreakdownChart';
-import StudyHeatmap from '../components/Analytics/StudyHeatmap';
-import PlannedVsActualChart from '../components/Analytics/PlannedVsActualChart';
-import ThemeUsageChart from '../components/Analytics/ThemeUsageChart';
-import AIInsightsTab from '../components/Analytics/AIInsightsTab';
-import { ConsistencyScore, PeakHoursCard } from '../components/Analytics/InsightCards';
+import analyticsService from '../../api/analyticsService';
+import SummaryCards from '../../components/Analytics/SummaryCards';
+import ProductivityCards from '../../components/Analytics/ProductivityCards';
+import StudyHoursChart from '../../components/Analytics/StudyHoursChart';
+import DailyBreakdownChart from '../../components/Analytics/DailyBreakdownChart';
+import StudyHeatmap from '../../components/Analytics/StudyHeatmap';
+import PlannedVsActualChart from '../../components/Analytics/PlannedVsActualChart';
+import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
+import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
+import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
 import styles from './AnalyticsPage.module.css';
 
 const PERIODS = [

@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import * as Components from "../components/Authentication/AuthComponents";
-import { SignUpForm } from "../components/Authentication/SignUpForm";
-import { SignInForm } from "../components/Authentication/SignInForm";
-import { AuthOverlay } from "../components/Authentication/Overlay";
-import { ErrorMessage } from "../components/Authentication/ErrorMessage";
-import { useAuthForm } from "../components/Authentication/hooks/useAuthForm";
-import { authService } from "../api/authService";
-import { validatePasswords, getErrorMessage, saveUserData } from "../components/Authentication/utils/authHelpers";
-import AuthHeroGeometric from "../components/Authentication/AuthHeroGeometric";
-import { TestimonialsMarquee } from "../components/Authentication/TestimonialsMarquee";
+import * as Components from "../../components/Authentication/AuthComponents";
+import { SignUpForm } from "../../components/Authentication/SignUpForm";
+import { SignInForm } from "../../components/Authentication/SignInForm";
+import { AuthOverlay } from "../../components/Authentication/Overlay";
+import { ErrorMessage } from "../../components/Authentication/ErrorMessage";
+import { useAuthForm } from "../../components/Authentication/hooks/useAuthForm";
+import { authService } from "../../api/authService";
+import { validatePasswords, getErrorMessage, saveUserData } from "../../components/Authentication/utils/authHelpers";
+import AuthHeroGeometric from "../../components/Authentication/AuthHeroGeometric";
+import { TestimonialsMarquee } from "../../components/Authentication/TestimonialsMarquee";
 import {
   AuthBrand,
   AuthFooter,
-} from "../components/Authentication/AuthBranding";
+} from "../../components/Authentication/AuthBranding";
 
 const pageStyle = {
   height: "100vh",

@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { Calendar } from '../components/Calendar/Calendar';
-import PillFilters from '../components/Tags/PillFilters';
-import { useCalendar, useCalendarDispatch, useEventModal, useEventPopup } from '../context/CalendarContext';
+import { Calendar } from '../../components/Calendar/Calendar';
+import PillFilters from '../../components/Tags/PillFilters';
+import { useCalendar, useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import styles from './CalendarPage.module.css';
-import { EventModal } from '../components/Calendar/EventModal/EventModal';
-import { EventDetailPopup } from '../components/Calendar/EventDetailPopup';
-import { useTags } from '../context/TagContext';
-import { useCalendarEvents, useEventActions } from '../components/Calendar/hooks/useCalendarEvents';
-import { getEventType } from '../components/Calendar/utils/eventUtils';
-import { disenrolByModuleId } from '../api/module_api';
-import { unsyncCalendar } from '../api/societyApi';
+import { EventModal } from '../../components/Calendar/EventModal/EventModal';
+import { EventDetailPopup } from '../../components/Calendar/EventDetailPopup';
+import { useTags } from '../../context/TagContext';
+import { useCalendarEvents, useEventActions } from '../../components/Calendar/hooks/useCalendarEvents';
+import { getEventType } from '../../components/Calendar/utils/eventUtils';
+import { disenrolByModuleId } from '../../api/module_api';
+import { unsyncCalendar } from '../../api/societyApi';
 
 export default function CalendarPage() {
     const { filter, allEvents } = useCalendar();

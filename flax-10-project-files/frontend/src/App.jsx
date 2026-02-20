@@ -4,21 +4,22 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
-import WelcomeLanding from "./pages/WelcomeLanding";
-import { ThemeProvider } from './context/ThemeContext';
-import DashboardLayout from "./layout/DashboardLayout";
-import AuthPage from "./pages/AuthPage";
-import Settings from "./pages/Settings";
-import Profile from "./pages/Profile/Profile";
 import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
-import { NotificationToast } from "./components/Notifications";
 import { TimerProvider } from "./context/TimerContext";
-import PasswordResetRequest from "./pages/PasswordResetRequest";
-import PasswordResetConfirm from "./pages/PasswordResetConfirm";
+import { ThemeProvider } from "./context/ThemeContext";
+import { NotificationToast } from "./components/Notifications";
+
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
+import DashboardLayout from "./layout/DashboardLayout";
+import WelcomeLanding from "./pages/Welcome/WelcomeLanding";
+import AuthPage from "./pages/Auth/AuthPage";
+import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
+import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
+import Settings from "./pages/Settings/Settings";
+import Profile from "./pages/Profile/Profile";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
