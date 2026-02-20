@@ -16,7 +16,6 @@ def tag_list(request):
 
 
 def get_tags(request):
-    # Get default tags OR user's custom tags
     tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True))
     serialiser = TagSerialiser(tags, many=True)
     return Response(serialiser.data)
@@ -27,7 +26,6 @@ def create_tag(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # Save with user assignment
     serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
@@ -44,17 +42,31 @@ def tag_detail(request, pk):
         return Response(TagSerialiser(tag).data)
     if request.method == 'PATCH':
         if tag.is_default:
-            return Response({'error': 'Cannot edit default tags'}, status=status.HTTP_400_BAD_REQUEST)
+            return update_default_tag_icon(tag, request.data)
         return update_tag(tag, request.data)
     if request.method == 'DELETE':
         return delete_tag(tag)
 
 def update_tag(tag, data):
+    if tag.name.lower() == 'other' and 'name' in data:
+        if data['name'].lower() != 'other':
+            return Response({'error': 'Cannot rename Other tag'}, status=status.HTTP_400_BAD_REQUEST)
+
     serialiser = TagSerialiser(tag, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
     return Response(serialiser.data)
+
+
+def update_default_tag_icon(tag, data):
+    icon = data.get('icon')
+    if not icon:
+        return Response({'error': 'Only icon can be edited for default tags'}, status=status.HTTP_400_BAD_REQUEST)
+    tag.icon = icon
+    tag.save()
+    return Response(TagSerialiser(tag).data)
+
 
 def delete_tag(tag):
     if tag.is_default:

@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { NavigationButtons } from '../../../../components/Calendar/header/NavigationButtons';
-import { isSameDay, parseDateInput } from '../../../../utils/dateUtils';
+import { isSameDay, parseDateInput } from '../../../../components/Calendar/utils/dateUtils';
 import { useCalendar } from '../../../../context/CalendarContext';
 
-vi.mock('../../../../utils/dateUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
     getWeekRange: vi.fn(() => 'Jan 15 - 21, 2026'),
     formatMonthYear: vi.fn(() => 'January 2026'),
     parseDateInput: vi.fn(),
@@ -74,11 +74,11 @@ describe('NavigationButtons', () => {
         useCalendar.mockReturnValue({ viewMode: 'week' }); // Reset
     });
 
-    it('should open date picker on calendar click', () => {
+    it('should open date picker on calendar click', async () => {
         const showPickerSpy = vi.fn();
         HTMLInputElement.prototype.showPicker = showPickerSpy;
         render(<NavigationButtons {...defaultProps} />);
-        const calendarBtn = screen.getByText('🗓️');
+        const calendarBtn = screen.getByText('📅');
         fireEvent.click(calendarBtn);
         expect(showPickerSpy).toHaveBeenCalled();
     });

@@ -1,20 +1,40 @@
-import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
+import { useCalendarData, useCalendarDispatch } from '../../../context/CalendarContext';
 import { WeekdayHeader } from './WeekdayHeader';
 import { WeekRow } from './WeekRow';
 import './MonthView.css';
 
-export function MonthView() {
-    const { selectedDate, events } = useCalendar();
-    const dispatch = useCalendarDispatch();
-    const weeks = getMonthWeeks(selectedDate);
+/*
+    Shows full month view of the calendar.
+    Props are optional - falls back to CalendarContext if not provided.
+*/
+export function MonthView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly, onEventClick, customTags }) {
+    const data = useCalendarData({ selectedDate: propDate, events: propEvents });
+    const contextDispatch = useCalendarDispatch();
+    const weeks = getMonthWeeks(data.selectedDate);
+
+    const handleDateSelect = onDateSelect || createDispatchHandler(contextDispatch);
+
     return (
         <div className="month-view">
             <WeekdayHeader />
-            <div className="month-grid">
-                {weeks.map((week, i) => (
-                    <WeekRow key={i} days={week} events={events} cur={selectedDate} dispatch={dispatch} />
-                ))}
-            </div>
+            <MonthGrid weeks={weeks} events={data.events} cur={data.selectedDate} onDateSelect={handleDateSelect}
+                readOnly={readOnly} onEventClick={onEventClick} customTags={customTags} />
+        </div>
+    );
+}
+
+function createDispatchHandler(dispatch) {
+    if (!dispatch) return null;
+    return (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+}
+
+function MonthGrid({ weeks, events, cur, onDateSelect, readOnly, onEventClick, customTags }) {
+    return (
+        <div className="month-grid">
+            {weeks.map((week, i) => (
+                <WeekRow key={i} days={week} events={events} cur={cur} onDateSelect={onDateSelect}
+                    readOnly={readOnly} onEventClick={onEventClick} customTags={customTags} />
+            ))}
         </div>
     );
 }
