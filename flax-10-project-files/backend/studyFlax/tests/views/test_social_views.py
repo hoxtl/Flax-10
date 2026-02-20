@@ -8,9 +8,9 @@ User = get_user_model()
 class FollowViewTests(APITestCase):
 
     def setUp(self):
-        self.user1 = User.objects.create_user(username="user1", password="password")
-        self.user2 = User.objects.create_user(username="user2", password="password")
-        self.user3 = User.objects.create_user(username="user3", password="password")
+        self.user1 = User.objects.create_user(username="user1", email="user1@example.com", password="password")
+        self.user2 = User.objects.create_user(username="user2", email="user2@example.com", password="password")
+        self.user3 = User.objects.create_user(username="user3", email="user3@example.com", password="password")
         self.client.force_authenticate(user=self.user1)
 
     def test_follow_user(self):
@@ -59,7 +59,7 @@ class FollowViewTests(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        results = response.data.get('results', response.data)
+        results = response.data['results'] if isinstance(response.data, dict) and 'results' in response.data else response.data
         self.assertEqual(len(results), 2)
         follower_ids = [u['id'] for u in results]
         self.assertIn(self.user1.id, follower_ids)
@@ -74,7 +74,7 @@ class FollowViewTests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        results = response.data.get('results', response.data)
+        results = response.data['results'] if isinstance(response.data, dict) and 'results' in response.data else response.data
         self.assertEqual(len(results), 2)
         following_ids = [u['id'] for u in results]
         self.assertIn(self.user2.id, following_ids)
