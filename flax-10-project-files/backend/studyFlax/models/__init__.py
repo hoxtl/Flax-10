@@ -22,3 +22,6 @@ from .society import *
 # Timer
 from .timer import *
 from .timer.themeSessionModel import ThemeSession
+
+# Social
+from .social import *
