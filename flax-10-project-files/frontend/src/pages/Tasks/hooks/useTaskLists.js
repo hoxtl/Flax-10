@@ -1,0 +1,29 @@
+import { useState, useEffect, useCallback } from "react";
+import { fetchTaskLists, createTaskList, deleteTaskList } from "../../../api/taskService";
+
+export default function useTaskLists() {
+    const [lists, setLists] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const load = useCallback(() => {
+        fetchTaskLists()
+            .then(setLists)
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    const addList = async (data) => {
+        const created = await createTaskList(data);
+        setLists(prev => [...prev, created]);
+        return created;
+    };
+
+    const removeList = async (id) => {
+        await deleteTaskList(id);
+        setLists(prev => prev.filter(l => l.id !== id));
+    };
+
+    return { lists, loading, addList, removeList, reload: load };
+}
