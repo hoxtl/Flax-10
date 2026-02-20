@@ -11,20 +11,25 @@ function CheckMark() {
   );
 }
 
+function GroupedOptionItem({ opt, value, onSelect, index }) {
+  return (
+    <motion.button type="button" key={opt.value}
+      initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.15, delay: index * 0.02 }}
+      onClick={() => onSelect(opt.value)}
+      className={`${styles.dropdownItem} ${value === opt.value ? styles.dropdownItemActive : ''}`}>
+      <span>{opt.label}</span>
+      {value === opt.value && <CheckMark />}
+    </motion.button>
+  );
+}
+
 function GroupedOptions({ options, value, onSelect }) {
   return options.map((group) => (
     <div key={group.label}>
       <div className={styles.dropdownGroup}>{group.label}</div>
       {group.options.map((opt, i) => (
-        <motion.button type="button" key={opt.value}
-          initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.15, delay: i * 0.02 }}
-          onClick={() => onSelect(opt.value)}
-          className={`${styles.dropdownItem} ${value === opt.value ? styles.dropdownItemActive : ''}`}
-        >
-          <span>{opt.label}</span>
-          {value === opt.value && <CheckMark />}
-        </motion.button>
+        <GroupedOptionItem key={opt.value} opt={opt} value={value} onSelect={onSelect} index={i} />
       ))}
     </div>
   ));

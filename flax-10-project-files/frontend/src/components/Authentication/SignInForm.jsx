@@ -38,9 +38,7 @@ function SignInActions({ loading, onToggle }) {
         Don't have an account?
         <span onClick={() => onToggle(false)}>Sign Up</span>
       </Components.MobileToggleButton>
-    </>
-  );
-}
+    </>);}
 
 export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading, onToggle }) => (
   <Components.SignInContainer $signIn={signIn}>

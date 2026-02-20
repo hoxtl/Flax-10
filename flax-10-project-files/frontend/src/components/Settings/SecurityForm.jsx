@@ -29,4 +29,5 @@ export default function SecurityForm({ onSave, isSaving, error }) {
       <ErrorMessage message={error} />
       <PasswordFields formData={formData} onChange={handleChange} />
       <SubmitButton isSaving={isSaving} label="Change Password" savingLabel="Changing..." />
-    </form>);}
+    </form>
+  );}
