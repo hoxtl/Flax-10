@@ -1,6 +1,9 @@
 import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
+import { useState, useEffect } from "react";
+import { getFollowers, getFollowing } from "../../api/socialService";
+import UserListModal from "../../components/Social/UserListModal";
 
 function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
@@ -105,6 +108,30 @@ function TasksModal({ isOpen, onClose }) {
   );
 }
 
+function SocialDataModal({ isOpen, onClose, title, fetchFn, userId }) {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    if (isOpen && userId) {
+      fetchFn(userId)
+        .then(data => setUsers(data.results || data))
+        .catch(err => console.error("Failed to fetch users", err));
+    } else {
+      setUsers([]);
+    }
+  }, [isOpen, userId, fetchFn]);
+
+  if (!isOpen) return null;
+
+  return (
+    <UserListModal
+      title={title}
+      users={users}
+      onClose={onClose}
+    />
+  );
+}
+
 function EditModals({ user, state, modules }) {
   const {
     showModules, setShowModules,
@@ -122,6 +149,21 @@ function EditModals({ user, state, modules }) {
       />
       <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} />
       <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />
+
+      <SocialDataModal
+        isOpen={state.showFollowers}
+        onClose={() => state.setShowFollowers(false)}
+        title="Followers"
+        fetchFn={getFollowers}
+        userId={(profileData || user)?.id}
+      />
+      <SocialDataModal
+        isOpen={state.showFollowing}
+        onClose={() => state.setShowFollowing(false)}
+        title="Following"
+        fetchFn={getFollowing}
+        userId={(profileData || user)?.id}
+      />
     </>
   );
 }

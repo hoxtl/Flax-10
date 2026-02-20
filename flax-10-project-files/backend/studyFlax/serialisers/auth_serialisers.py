@@ -44,6 +44,9 @@ class UserSerialiser(serializers.ModelSerializer):
 
     bio = serializers.CharField(read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
+    follower_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -51,6 +54,7 @@ class UserSerialiser(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
+            'follower_count', 'following_count', 'is_following',
             'role',
             'is_superuser',
         ]
@@ -77,6 +81,18 @@ class UserSerialiser(serializers.ModelSerializer):
             if request:
                 return request.build_absolute_uri(obj.profile_photo.url)
         return None
+
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
+
+    def get_is_following(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.followers.filter(follower=request.user).exists()
+        return False
 
 
 class LoggedUserSerialiser(serializers.Serializer):

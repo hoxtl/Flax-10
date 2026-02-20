@@ -34,11 +34,15 @@ function useModalState() {
   const [showTasks, setShowTasks] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
   return {
     showModules, setShowModules,
     showTasks, setShowTasks,
     showEvents, setShowEvents,
     showEditProfile, setShowEditProfile,
+    showFollowers, setShowFollowers,
+    showFollowing, setShowFollowing,
   };
 }
 
@@ -62,12 +66,14 @@ export function useProfileBodyData(state) {
 }
 
 export function useProfileContent(state) {
-  const { profileData, setShowModules, setShowTasks, setShowEvents, setShowEditProfile } = state;
+  const { profileData, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowFollowers, setShowFollowing } = state;
   const handlers = {
     onModulesClick: () => setShowModules(true),
     onTasksClick: () => setShowTasks(true),
     onEventsClick: () => setShowEvents(true),
     onEditProfile: () => setShowEditProfile(true),
+    onFollowersClick: () => setShowFollowers(true),
+    onFollowingClick: () => setShowFollowing(true),
   };
   return { profileData, handlers };
 }
