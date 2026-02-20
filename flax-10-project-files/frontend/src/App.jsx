@@ -9,7 +9,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import DashboardLayout from "./layout/DashboardLayout";
 import AuthPage from "./pages/AuthPage";
 import Settings from "./pages/Settings";
-import Profile from "./pages/Profile";
+import Profile from "./pages/Profile/Profile";
 import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
