@@ -253,7 +253,9 @@ function checkFunctionLength(targetDir) {
           },
         });
       } catch (error) {
-        console.error(`Parse error in ${shortenPath(filePath)}: ${error.message}`);
+        if (!isTest) {
+          console.error(`Parse error in ${shortenPath(filePath)}: ${error.message}`);
+        }
       }
     }
   }

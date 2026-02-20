@@ -1,12 +1,11 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
 import { updateUserSettings } from '../api/userService';
+import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../api/settingsApi';
 import { SettingsTabs, SuccessBanner } from "../components/Settings/SettingsUI";
 import AccountForm from "../components/Settings/AccountForm";
 import SecurityForm from "../components/Settings/SecurityForm";
 import PreferencesPanel from "../components/Settings/PreferencesPanel";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);
@@ -34,70 +33,58 @@ export default function Settings({ user, onBack }) {
   const handleAccountSave = async (data) => {
     setIsSaving(true);
     setPasswordError("");
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) { setPasswordError("You are not logged in, please try again..."); return; }
 
-      const response = await fetch(`${API_BASE_URL}/settings/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
-        body: JSON.stringify({ first_name: data.firstName, last_name: data.lastName, year: data.year, major: data.major })
-      });
-      const responseData = await response.json();
-
-      if (response.ok && responseData.user) {
-        localStorage.setItem('user', JSON.stringify(responseData.user));
-        showTemporaryMessage(setSuccessMessage, "The account has been updated!");
-        setTimeout(() => { onBack(); window.location.reload(); }, 1000);
-      } else {
-        setPasswordError(responseData.error || "The account update has failed...");
-      }
-    } catch {
-      setPasswordError("Action failed, please try again...");
-    } finally {
+    if (!hasToken()) {
+      setPasswordError("You are not logged in, please try again...");
       setIsSaving(false);
+      return;
     }
+
+    const { ok, data: res } = await patchSettings({
+      first_name: data.firstName,
+      last_name: data.lastName,
+      year: data.year,
+      major: data.major,
+    }).catch(() => ({ ok: false, data: {} }));
+
+    if (ok && res.user) {
+      saveUserToStorage(res.user);
+      showTemporaryMessage(setSuccessMessage, "The account has been updated!");
+      setTimeout(() => { onBack(); window.location.reload(); }, 1000);
+    } else {
+      setPasswordError(res.error || "The account update has failed...");
+    }
+
+    setIsSaving(false);
   };
 
   const handlePasswordSave = async (data) => {
     setPasswordError("");
     if (isPasswordTooShort(data.newPassword)) { setPasswordError("Password must be at least 8 characters long"); return; }
     if (passwordsDoNotMatch(data.newPassword, data.confirmPassword)) { setPasswordError("New passwords do not match"); return; }
+    if (!hasToken()) { setPasswordError("You are not logged in"); return; }
 
     setIsSaving(true);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) { setPasswordError("You are not logged in"); return; }
+    const { ok, data: res } = await patchSettings({ password: data.newPassword })
+      .catch(() => ({ ok: false, data: { error: "Failed to change password" } }));
 
-      const response = await fetch(`${API_BASE_URL}/settings/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
-        body: JSON.stringify({ password: data.newPassword })
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to change password');
-      }
-      showTemporaryMessage(setSuccessMessage, "Password changed! Please log in again.");
-      setTimeout(() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/login'; }, 2000);
-    } catch (error) {
-      setPasswordError(error.message || "Failed to change password");
-    } finally {
+    if (!ok) {
+      setPasswordError(res.error || "Failed to change password");
       setIsSaving(false);
+      return;
     }
+
+    showTemporaryMessage(setSuccessMessage, "Password changed! Please log in again.");
+    setTimeout(clearAuthAndRedirect, 2000);
+    setIsSaving(false);
   };
 
   const handlePreferencesSave = async (data) => {
     setIsSaving(true);
-    try {
-      const response = await updateUserSettings({ theme: data.theme });
-      if (response.user) localStorage.setItem('user', JSON.stringify(response.user));
-      showTemporaryMessage(setSuccessMessage, "Preferences saved successfully!");
-    } catch {
-      showTemporaryMessage(setSuccessMessage, "Failed to save preferences");
-    } finally {
-      setIsSaving(false);
-    }
+    const response = await updateUserSettings({ theme: data.theme }).catch(() => null);
+    if (response?.user) saveUserToStorage(response.user);
+    showTemporaryMessage(setSuccessMessage, response ? "Preferences saved!" : "Failed to save preferences");
+    setIsSaving(false);
   };
 
   return (
