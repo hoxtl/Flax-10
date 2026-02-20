@@ -57,9 +57,9 @@ class DeadlineModelTests(TestCase):
         self.create_deadline()
         self.module.delete()
         self.assertEqual(Deadline.objects.count(), 0)
-            
+
     def test_str_representation(self):
         """ Test string representation of deadline model"""
         deadline = self.create_deadline(title='Essay')
-        self.assertIn('CS101', str(deadline))
+        self.assertIn('5CCS2SEG', str(deadline))
         self.assertIn('Essay', str(deadline))
