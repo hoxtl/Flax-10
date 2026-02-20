@@ -43,8 +43,7 @@ async function handleLogoutClick() {
 }
 
 function DesktopSidebar({ isMobile, user, activeNav, onNavChange }) {
-  if (isMobile) return null;
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} />;
+  return <Sidebar user={user} active={activeNav} onChange={onNavChange} isMobile={isMobile} />;
 }
 
 function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
@@ -102,13 +101,16 @@ function useDashboardState(activeNav, onNavChange) {
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType };
 }
 
-function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNavChange, onPickNav, setMobileSidebarOpen }) {
+function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onPickNav, setMobileSidebarOpen }) {
   return (
-    <>
-      <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} />
-      <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user}
-        activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-    </>
+    <Sidebar
+      user={user}
+      active={activeNav}
+      onChange={onPickNav}
+      isMobile={isMobile}
+      isOpen={mobileSidebarOpen}
+      onToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+    />
   );
 }
 
