@@ -8,7 +8,6 @@ import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
-import FloatingTasks from "../components/Tasks/FloatingTasks";
 import { useLocation } from "react-router-dom";
 
 function useIsMobile(breakpoint = 900) {
@@ -145,7 +144,6 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         user={user} activeNav={activeNav} onNavChange={onNavChange}
         onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
       <DashboardMain state={{ ...state, activeNav }} onNavChange={onNavChange}>{children}</DashboardMain>
-      <FloatingTasks />
     </div>
   );
 }
