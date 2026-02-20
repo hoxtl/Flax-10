@@ -31,7 +31,7 @@ class Command(BaseCommand):
         self.users = list(User.objects.filter(is_staff=False))
         self.create_recurrence_rules()
         self.create_categories()
-        self.categories = list(Category.objects.all())  # needed by create_tags
+        self.categories = list(Category.objects.all()) 
         self.create_tags()
         self._load_shared_data()
         self.create_events_for_users()

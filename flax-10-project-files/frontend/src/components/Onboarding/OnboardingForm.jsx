@@ -1,3 +1,10 @@
+import AnimatedDropdown from "./AnimatedDropdown";
+import WarningBox from "./WarningBox";
+import styles from "./OnboardingModal.module.css";
+import { motion, AnimatePresence } from "framer-motion";
+
+const YEARS = ["Foundation", "Year 1", "Year 2", "Year 3", "Year 4"];
+
 function YearCourseFields({ year, setYear, major, handleMajorChange, courseOptions }) {
   return (
     <>
