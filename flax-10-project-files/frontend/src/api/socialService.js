@@ -1,21 +1,17 @@
-import api from './client';
+import { fetchApi } from './client';
 
 export const followUser = async (userId) => {
-    const response = await api.post(`/social/${userId}/follow/`);
-    return response.data;
+    return await fetchApi(`/social/${userId}/follow/`, { method: 'POST' });
 };
 
 export const unfollowUser = async (userId) => {
-    const response = await api.post(`/social/${userId}/unfollow/`);
-    return response.data;
+    return await fetchApi(`/social/${userId}/unfollow/`, { method: 'POST' });
 };
 
 export const getFollowers = async (userId) => {
-    const response = await api.get(`/social/${userId}/followers/`);
-    return response.data;
+    return await fetchApi(`/social/${userId}/followers/`);
 };
 
 export const getFollowing = async (userId) => {
-    const response = await api.get(`/social/${userId}/following/`);
-    return response.data;
+    return await fetchApi(`/social/${userId}/following/`);
 };
