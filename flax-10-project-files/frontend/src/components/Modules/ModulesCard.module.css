@@ -161,3 +161,15 @@
 .unenrollButton:hover {
     background: rgba(225, 29, 72, 0.15);
 }
+.deadlineButton {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+.deadlineButton:hover {
+    background: var(--hover);
+}
