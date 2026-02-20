@@ -1,0 +1,3 @@
+# Signals are imported when the app is ready
+from . import society_notifications  # noqa
+from . import ratification_notifications  # noqa

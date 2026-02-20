@@ -1,6 +1,6 @@
 import { useCalendarDispatch } from '../../../context/CalendarContext';
-import { useHoverSummary } from '../../../hooks/useHoverSummary';
-import { isToday, overlapsDay } from '../../../utils/dateUtils';
+import { useHoverSummary } from '../hooks/useHoverSummary';
+import { isToday, overlapsDay } from '../utils/dateUtils';
 import { HoverSummary } from './HoverSummary';
 
 export function YearDay({ date, events }) {

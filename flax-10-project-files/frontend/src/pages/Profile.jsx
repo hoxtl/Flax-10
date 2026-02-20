@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
-import { getInitials } from "../utils/userUtils";
-import EditProfileModal from "../components/EditProfileModal";
+import { getInitials } from "../components/Authentication/utils/userUtils";
+import EditProfileModal from "../components/Dashboard/EditProfileModal";
 import { getUserProfile } from "../api/userService";
 import { getEvents } from "../api/event_api";
 
@@ -80,8 +80,8 @@ function ProfileStats({ profileData, upcomingEventCount, onModulesClick, onTasks
 
 function ProfileBio({ user, profileData }) {
   const fullName = user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "Guest";
-  const year = profileData?.year || user?.year || "Year 2";
-  const major = profileData?.major || user?.major || "Computer Science";
+  const year = profileData?.year || user?.year || "";
+  const major = profileData?.major || user?.major || "";
   return (
     <div className={styles.bio}>
       <div className={styles.fullName}>{fullName}</div>
@@ -92,6 +92,15 @@ function ProfileBio({ user, profileData }) {
 }
 
 function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEventsClick, onEditProfile, upcomingEventCount }) {
+  const fullName = user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "Guest";
+  const username = user?.username || "guest";
+  const year = profileData?.year || user?.year || "Year 2";
+  const major = profileData?.major || user?.major || "Computer Science";
+
+  const moduleCount = profileData?.module_count || 0;
+  const taskCount = profileData?.task_count || 0;
+  const eventCount = profileData?.event_count || 0;
+
   return (
     <div className={styles.header}>
       <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
@@ -175,13 +184,48 @@ function RangeButtons({ range, onRangeChange }) {
 }
 
 function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
-  const rangeLabels = { today: 'Today', week: 'This Week', month: 'This Month' };
+  const rangeLabels = {
+    'today': 'Today',
+    'week': 'This Week',
+    'month': 'This Month'
+  };
+
+  const title = `Events - ${rangeLabels[range]} (${events.length})`;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Events - ${rangeLabels[range]} (${events.length})`}>
-      <RangeButtons range={range} onRangeChange={onRangeChange} />
-      {events.length > 0
-        ? events.map((e, i) => <EventItem key={i} title={e.title} startTime={e.start_time} location={e.location} />)
-        : <p className={styles.emptyMessage}>No events found for this period</p>}
+    <Modal isOpen={isOpen} onClose={onClose} title={title}>
+      <div className={styles.rangeSelector}>
+        <button
+          className={range === 'today' ? styles.rangeActive : ''}
+          onClick={() => onRangeChange('today')}
+        >
+          Today
+        </button>
+        <button
+          className={range === 'week' ? styles.rangeActive : ''}
+          onClick={() => onRangeChange('week')}
+        >
+          This Week
+        </button>
+        <button
+          className={range === 'month' ? styles.rangeActive : ''}
+          onClick={() => onRangeChange('month')}
+        >
+          This Month
+        </button>
+      </div>
+      {events.length > 0 ? (
+        events.map((event, i) => (
+          <EventItem
+            key={i}
+            title={event.title}
+            startTime={event.start_time}
+            location={event.location}
+          />
+        ))
+      ) : (
+        <p className={styles.emptyMessage}>No events found for this period</p>
+      )}
     </Modal>
   );
 }
@@ -229,4 +273,5 @@ export default function Profile({ user }) {
         <ModulesGrid modules={modules} />
       </div>
       <ProfileModals state={state} user={user} profileData={profileData} modules={modules} filteredEvents={filteredEvents} />
-    </div>);}
+    </div>);
+}

@@ -8,7 +8,7 @@ export function RecurrenceField({ value, onChange }) {
 
     return (
         <div className="form-field recurrence-field">
-            <label>Recurrence</label>
+            <label>Repeat</label>
             <RecurrenceOptions frequency={frequency} interval={interval} onChange={updateField} />
             {hasRecurrence && <EndRepeatField endDate={end_date} onChange={updateField} />}
         </div>
@@ -30,6 +30,7 @@ function FrequencySelect({ frequency, onChange }) {
             <option value="none">None</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
+            <option value="biweekly">Biweekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
         </select>

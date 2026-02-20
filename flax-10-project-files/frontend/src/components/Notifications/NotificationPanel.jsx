@@ -1,5 +1,6 @@
 import { useNotifications } from '../../context/NotificationContext';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { MoreHorizontal } from 'lucide-react';
 import './NotificationPanel.css';
 
 export function NotificationPanel() {
@@ -40,11 +41,33 @@ function PanelHeader({ onMarkAllRead, onClearAll, count }) {
 }
 
 function HeaderActions({ count, onMarkAllRead, onClearAll }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef(null);
+    useClickOutside(ref, () => setIsOpen(false), isOpen);
+
     if (count === 0) return null;
+
     return (
-        <div className="header-actions">
-            <button className="mark-read-btn" onClick={onMarkAllRead}>Mark all read</button>
-            <button className="clear-all-btn" onClick={onClearAll}>Clear all</button>
+        <div className="action-menu-container" ref={ref}>
+            <MenuTrigger onClick={() => setIsOpen(!isOpen)} />
+            {isOpen && <MenuDropdown onRead={onMarkAllRead} onClear={onClearAll} close={() => setIsOpen(false)} />}
+        </div>
+    );
+}
+
+function MenuTrigger({ onClick }) {
+    return (
+        <button className="action-menu-btn" onClick={onClick}>
+            <MoreHorizontal size={18} />
+        </button>
+    );
+}
+
+function MenuDropdown({ onRead, onClear, close }) {
+    return (
+        <div className="action-menu">
+            <button className="action-menu-item" onClick={() => { onRead(); close(); }}>Mark all read</button>
+            <button className="action-menu-item danger" onClick={() => { onClear(); close(); }}>Clear all</button>
         </div>
     );
 }

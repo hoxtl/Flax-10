@@ -15,6 +15,7 @@ class BaseTestCase(TestCase):
             last_name="User"
         )
         self.create_sample_tags()
+        self.client.force_authenticate(user=self.user)
     
     def create_sample_tags(self):
         """Create sample tags in database."""
