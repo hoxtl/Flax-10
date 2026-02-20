@@ -19,7 +19,7 @@ function getCourseOptions() {
   }));
 }
 
-const lockedStyle = { padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border, #ddd)', background: 'var(--muted-bg, #f5f5f5)', color: 'var(--muted)', fontSize: '0.95rem' };
+const lockedStyle = { padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--search-bg)', color: 'var(--muted)', fontSize: '0.95rem' };
 const wrapStyle = { display: 'flex', flexDirection: 'column', flex: 1 };
 const labelStyle = { fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' };
 const hintStyle = { fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' };
