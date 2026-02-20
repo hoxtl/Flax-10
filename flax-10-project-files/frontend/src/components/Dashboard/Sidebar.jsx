@@ -9,6 +9,16 @@ const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
 const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
 const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
 
+function Hamburger({ onClick }) {
+  return (
+    <button className={styles.hamburger} onClick={onClick}>
+      <div className={styles.hamburgerLine} />
+      <div className={styles.hamburgerLine} />
+      <div className={styles.hamburgerLine} />
+    </button>
+  );
+}
+
 function LogoMark() {
   return (
     <motion.div
@@ -33,10 +43,10 @@ function BrandName() {
   );
 }
 
-function SidebarHeader({ open }) {
+function SidebarHeader({ open, isMobile, onToggle }) {
   return (
     <div className={styles.header}>
-      <LogoMark />
+      {isMobile ? <Hamburger onClick={onToggle} /> : <LogoMark />}
       <AnimatePresence>{open && <BrandName />}</AnimatePresence>
     </div>
   );
@@ -78,14 +88,18 @@ function NavItem({ item, isActive, open, onClick }) {
       transition={NAV_SPRING}
     >
       <span className={styles.icon}>{item.icon}</span>
-      <AnimatePresence>{open && <NavLabel label={item.label} />}</AnimatePresence>
+      <AnimatePresence>
+        {open && <NavLabel label={item.label} />}
+      </AnimatePresence>
       {isActive && <ActivePill />}
-    </motion.button>);}
+    </motion.button>
+  );
+}
 
 function SidebarNav({ active, onChange, open, user }) {
   return (
     <nav className={styles.nav}>
-      {APP_ROUTES.filter(route => {
+      {APP_ROUTES.filter((route) => {
         if (route.isAdminOnly) return user?.isAdmin;
         return true;
       }).map((n) => (
@@ -101,17 +115,35 @@ function SidebarNav({ active, onChange, open, user }) {
   );
 }
 
-export default function Sidebar({ active, onChange, user }) {
-  const [open, setOpen] = useState(false);
-  const w = open ? EXPANDED_W : COLLAPSED_W;
+export default function Sidebar({
+  active,
+  onChange,
+  user,
+  isMobile,
+  isOpen,
+  onToggle,
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const open = isMobile ? isOpen : isHovered;
+
+  // On mobile the sidebar takes 100% of the viewport width.
+  const getWidth = () => {
+    if (isMobile) return open ? "100vw" : COLLAPSED_W;
+    return open ? EXPANDED_W : COLLAPSED_W;
+  };
+
+  const w = getWidth();
+
   return (
     <motion.aside
       className={styles.sidebar}
       animate={{ width: w, minWidth: w }}
       transition={SIDEBAR_SPRING}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
     >
-      <SidebarHeader open={open} />
-      <SidebarNav active={active} onChange={onChange} open={open} user={user}/>
-    </motion.aside>);}
+      <SidebarHeader open={open} isMobile={isMobile} onToggle={onToggle} />
+      <SidebarNav active={active} onChange={onChange} open={open} user={user} />
+    </motion.aside>
+  );
+}
