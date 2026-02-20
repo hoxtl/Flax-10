@@ -6,6 +6,7 @@ import { isToday, overlapsDay } from "../utils/dateUtils";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../hooks/useCalendarEvents";
 import CardGrid from "../components/CardGrid";
+import DeadlinesWidget from "../components/Modules/DeadlinesWidget";
 
 function getScheduleTitle(selectedDate) {
   return isToday(selectedDate) ? "Today's schedule" : "Schedule";
@@ -50,6 +51,7 @@ export default function Home() {
       <FiltersBar activeFilter={activeFilter} onChange={setActiveFilter} dayItems={dayItems} />
       <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
       <div className={styles.content}>
+        {isToday(selectedDate) && <DeadlinesWidget />}
         <CardGrid items={filtered} onDelete={removeEvent} onEdit={handleEdit} date={selectedDate} />
       </div>
     </div>
