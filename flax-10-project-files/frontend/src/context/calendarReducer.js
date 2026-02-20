@@ -53,9 +53,6 @@ function toggleFilter(filter, payload) {
     return result.length > 0 ? result : ['all'];
 }
 
-/*
-    This function is used to handle the calendar reducer.
-*/
 export function calendarReducer(state, action) {
     const handler = handlers[action.type];
     return handler ? handler(state, action.payload) : state;
