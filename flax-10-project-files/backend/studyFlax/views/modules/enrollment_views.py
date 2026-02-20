@@ -28,11 +28,9 @@ def create_enrollments(request):
     enrollment = serialiser.save()
     module = enrollment.module
     CalendarEvent.objects.create(
-            user=request.user,
-            module=module,
+            user=request.user,module=module,
             title=f"Lecture: {module.module_name}",
-            start_time=module.start_time,
-            end_time=module.end_time,
+            start_time=module.start_time,end_time=module.end_time,
             recurrence_rule = module.recurrence_rule,
             location=module.location,
             source="module_enrollment")
