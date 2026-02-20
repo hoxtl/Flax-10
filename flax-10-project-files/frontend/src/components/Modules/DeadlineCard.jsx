@@ -1,6 +1,6 @@
 import { formatFullDateTime } from "../../utils/moduleUtils";
 import { getDeadlineCountdown } from "../../utils/cardUtils";
-import styles from '../ModulesCard.module.css';
+import styles from './ModulesCard.module.css';
 
 const DEADLINES = { exam: 'Exam', coursework: 'Coursework', quiz: 'Quiz', presentation: 'Presentation' };
 

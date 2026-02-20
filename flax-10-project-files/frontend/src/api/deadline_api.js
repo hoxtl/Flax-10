@@ -1,4 +1,4 @@
-import {fetchApi} from '/.client.js';
+import {fetchApi} from './client.js';
 
 export async function getDeadlines(module_id) {
     return fetchApi(`/modules/${module_id}/deadlines/`);
