@@ -5,6 +5,9 @@ router = DefaultRouter()
 from studyFlax.views.timerViews import StudySessionViewSet
 router.register(r'timer/history', StudySessionViewSet, basename='study-session')
 
+from studyFlax.views.social.follow_views import FollowViewSet
+router.register(r'social', FollowViewSet, basename='social')
+
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
