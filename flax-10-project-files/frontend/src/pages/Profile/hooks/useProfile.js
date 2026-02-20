@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../../api/userService";
-import { getEvents } from "../../../api/event_api";
+import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
 
 async function tryLoadProfile(setProfileData, setLoading) {

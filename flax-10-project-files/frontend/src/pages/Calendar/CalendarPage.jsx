@@ -8,7 +8,7 @@ import { EventDetailPopup } from '../../components/Calendar/EventDetailPopup';
 import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from '../../components/Calendar/hooks/useCalendarEvents';
 import { getEventType } from '../../components/Calendar/utils/eventUtils';
-import { disenrolByModuleId } from '../../api/module_api';
+import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
 
 export default function CalendarPage() {
