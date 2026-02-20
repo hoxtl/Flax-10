@@ -23,3 +23,7 @@ export async function deleteDeadline(module_id, deadline_id) {
         method: "DELETE"
     });   
 }
+
+export async function getUpcomingDeadlines() {
+    return fetchApi('/deadlines/upcoming/')
+}
