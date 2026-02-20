@@ -28,8 +28,10 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
         self.create_admin_user()
         self.create_random_users()
+        self.users = list(User.objects.filter(is_staff=False))
         self.create_recurrence_rules()
         self.create_categories()
+        self.categories = list(Category.objects.all())  # needed by create_tags
         self.create_tags()
         self._load_shared_data()
         self.create_events_for_users()
