@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createModule, updateModule } from '../../api/module_api';
+import { createModule, updateModule } from '../../api/moduleApi';
 import { serialiseModule } from './utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from './utils/moduleHelpers';
 import styles from './ModuleForm.module.css'
