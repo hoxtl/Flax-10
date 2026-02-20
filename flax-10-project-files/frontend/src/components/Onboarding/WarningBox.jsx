@@ -1,5 +1,3 @@
-import styles from "./OnboardingModal.module.css";
-
 export default function WarningBox({ major, confirmed, onConfirm }) {
   return (
     <div style={{

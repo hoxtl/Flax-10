@@ -46,26 +46,25 @@ async function savePreferences(data, setSuccessMessage, setIsSaving) {
   }
 }
 
-export default function useSettingsHandlers() {
+function useSettingsState() {
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  return { isSaving, setIsSaving, successMessage, setSuccessMessage, passwordError, setPasswordError };
+}
 
+export default function useSettingsHandlers() {
+  const { isSaving, setIsSaving, successMessage, setSuccessMessage, passwordError, setPasswordError } = useSettingsState();
   const handleAccountSave = async (data) => {
-    setIsSaving(true);
-    setPasswordError("");
+    setIsSaving(true); setPasswordError("");
     await saveAccount(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
-
   const handlePasswordSave = async (data) => {
     setPasswordError("");
     await savePassword(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
-
   const handlePreferencesSave = async (data) => {
     setIsSaving(true);
     await savePreferences(data, setSuccessMessage, setIsSaving);
   };
-
-  return { isSaving, successMessage, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave };
-}
+  return { isSaving, successMessage, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave };}
