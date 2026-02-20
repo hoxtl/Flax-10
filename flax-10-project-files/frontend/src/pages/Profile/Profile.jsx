@@ -2,7 +2,6 @@ import styles from "./Profile.module.css";
 import { buildInitials, buildFullName } from "./utils/profileHelpers";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
 import ProfileModals from "./ProfileModals";
-import UserSearch from "../../components/Social/UserSearch";
 
 function ProfileAvatar({ user, profilePhotoUrl }) {
   return (
@@ -108,7 +107,6 @@ function ProfileContent({ user, state }) {
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}
       />
-      <UserSearch />
       <ModulesGrid modules={modules} />
     </div>
   );

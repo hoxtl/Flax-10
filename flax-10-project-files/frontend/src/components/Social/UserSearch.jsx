@@ -34,6 +34,7 @@ export default function UserSearch() {
 
     return (
         <div className={styles.searchContainer}>
+            <span className={styles.searchIcon}>🔍</span>
             <input
                 type="text"
                 className={styles.searchInput}
