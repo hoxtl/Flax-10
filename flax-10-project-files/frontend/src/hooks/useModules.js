@@ -69,7 +69,7 @@ export default function useModules() {
     const [enrollments, setEnrollments] = useState([]);
     const { addNotification} = useNotifications();
     function notify (message, type) {
-        addNotification({title: type === 'error' ? 'Error' : 'Success', message});
+        addNotification({title: type === 'error' ? 'Error' : 'Success', message, notification_type: type});
     }
     useEffect(() => {loadData(setLoading, setModules, setEnrollments, notify);}, []);
     return useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify)
