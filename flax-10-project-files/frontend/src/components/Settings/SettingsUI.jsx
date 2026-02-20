@@ -1,4 +1,4 @@
-import styles from "../../pages/Settings.module.css";
+import styles from "../../pages/Settings/Settings.module.css";
 
 export function TabButton({ id, label, isActive, onClick }) {
   return (

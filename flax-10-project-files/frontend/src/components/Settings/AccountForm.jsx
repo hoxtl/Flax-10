@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getUserProfile } from '../../api/userService';
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI";
-import styles from "../../pages/Settings.module.css";
+import styles from "../../pages/Settings/Settings.module.css";
 
 function getInitialData(user) {
   return {

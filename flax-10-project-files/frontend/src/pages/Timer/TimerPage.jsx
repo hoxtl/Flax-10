@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import styles from './TimerPage.module.css';
-import { useNotificationPermission } from '../components/Timer/utils/timerUtils';
-import { useTimerContext } from '../context/TimerContext';
-import { MainSection, PopupSection } from '../components/Timer/WrapperComponents';
+import { useNotificationPermission } from '../../components/Timer/utils/timerUtils';
+import { useTimerContext } from '../../context/TimerContext';
+import { MainSection, PopupSection } from '../../components/Timer/WrapperComponents';
 
 function NotificationPrompt({ permission, request }) {
   if (permission !== 'default') return null;

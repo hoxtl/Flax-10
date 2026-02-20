@@ -1,10 +1,10 @@
-import Home from "../pages/Home";
-import CalendarPage from "../pages/CalendarPage";
+import Home from "../pages/Home/Home";
+import CalendarPage from "../pages/Calendar/CalendarPage";
 import SocietiesPage from "../pages/Societies/SocietiesPage";
-import ModulesPage from "../pages/ModulesPage"
-import CampusMap from "../pages/CampusMap";
-import TimerPage from "../pages/TimerPage";
-import AnalyticsPage from "../pages/AnalyticsPage";
+import ModulesPage from "../pages/Modules/ModulesPage";
+import CampusMap from "../pages/CampusMap/CampusMap";
+import TimerPage from "../pages/Timer/TimerPage";
+import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
 import AdminPage from "../pages/AdminPage";
 
 export const APP_ROUTES = [

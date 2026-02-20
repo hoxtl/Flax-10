@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { SectionHeader, SubmitButton, ThemeSelector } from "./SettingsUI";
-import styles from "../../pages/Settings.module.css";
+import styles from "../../pages/Settings/Settings.module.css";
 
 export default function PreferencesPanel({ onSave, isSaving }) {
   const { theme, setTheme } = useTheme();

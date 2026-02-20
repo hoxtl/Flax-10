@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { isEnrolledIn } from '../components/Modules/utils/moduleUtils.js';
-import { filterModules } from '../components/Modules/utils/moduleUtils.js';
-import useModules from '../components/Modules/hooks/useModules.js';
-import ModuleGrid from '../components/Modules/ModuleGrid.jsx';
-import ModuleForm from '../components/Modules/ModuleForm.jsx';
-import ModuleDetails from '../components/Modules/ModuleDetails.jsx';
+import { isEnrolledIn } from '../../components/Modules/utils/moduleUtils.js';
+import { filterModules } from '../../components/Modules/utils/moduleUtils.js';
+import useModules from '../../components/Modules/hooks/useModules.js';
+import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
+import ModuleForm from '../../components/Modules/ModuleForm.jsx';
+import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 
 export default function ModulesPage() {

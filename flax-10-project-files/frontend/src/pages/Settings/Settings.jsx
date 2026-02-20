@@ -1,10 +1,10 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
-import { SettingsTabs, SuccessBanner } from "../components/Settings/SettingsUI";
-import AccountForm from "../components/Settings/AccountForm";
-import SecurityForm from "../components/Settings/SecurityForm";
-import PreferencesPanel from "../components/Settings/PreferencesPanel";
-import useSettingsHandlers from "../components/Settings/hooks/useSettingsHandlers";
+import { SettingsTabs, SuccessBanner } from "../../components/Settings/SettingsUI";
+import AccountForm from "../../components/Settings/AccountForm";
+import SecurityForm from "../../components/Settings/SecurityForm";
+import PreferencesPanel from "../../components/Settings/PreferencesPanel";
+import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
 
 function SettingsHeader({ onBack }) {
   return (
