@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
 from studyFlax.models import CalendarEvent
+from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -34,7 +35,8 @@ def create_enrollments(request):
             end_time=module.end_time,
             recurrence_rule = module.recurrence_rule,
             location=module.location,
-            source="module_enrollment" )
+            source="module_enrollment")
+    create_enrollment_deadline_events(request.user, module)
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'DELETE'])
@@ -47,12 +49,13 @@ def enrollment_detail(request, enrollment_id):
     return delete_enrollment(request, enrollment, user)
 def delete_enrollment(request, enrollment, user):
     if enrollment.student != user:
-        return Response( {"error": "You can only un-enroll yourself."}, status = status.HTTP_403_FORBIDDEN)
+        return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
     
     CalendarEvent.objects.filter( 
         user=user,
         module=enrollment.module,
-        source="module_enrollment").delete()
+        source__in=["module_enrollment", "module_deadline"]
+    ).delete()
     enrollment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
