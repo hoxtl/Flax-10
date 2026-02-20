@@ -21,7 +21,7 @@ from studyFlax.views.user.profile_view import profile_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
-from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail
+from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -51,4 +51,5 @@ urlpatterns = [
     path("auth/password-reset/confirm/", confirm_password_reset_view, name='password-reset-confirm'),
     path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline_list"),
     path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
+    path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
 ]
