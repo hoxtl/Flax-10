@@ -18,7 +18,7 @@ import { NotificationToast } from "./components/Notifications";
 import { TimerProvider } from "./context/TimerContext";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
-import OnboardingModal from "./components/OnboardingModal";
+import OnboardingModal from "./components/Onboarding/OnboardingModal";
 
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 const fadeAnim = {
