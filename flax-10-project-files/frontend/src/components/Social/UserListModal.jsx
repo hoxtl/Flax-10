@@ -15,9 +15,9 @@ export default function UserListModal({ title, users, onClose, onUserClick }) {
                     {users.length === 0 ? (
                         <p className={styles.emptyText}>No users found.</p>
                     ) : (
-                        users.map(u => (
+                        users.map((u, index) => (
                             <div
-                                key={u.id}
+                                key={u.id || u.username || index}
                                 className={styles.userItem}
                                 onClick={() => onUserClick && onUserClick(u)}
                             >
