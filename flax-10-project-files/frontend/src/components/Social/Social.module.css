@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--overlay-bg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,14 +12,14 @@
 }
 
 .modalContent {
-    background: white;
+    background: var(--panel);
     padding: 24px;
     border-radius: 12px;
     width: 90%;
     max-width: 400px;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--shadow-color);
 }
 
 .modalHeader {
@@ -40,7 +40,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    color: var(--muted);
 }
 
 .userList {
@@ -59,7 +59,7 @@
 }
 
 .userItem:hover {
-    background-color: #f5f5f5;
+    background-color: var(--hover);
 }
 
 .userInfo {
@@ -72,12 +72,12 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #e0e0e0;
+    background-color: var(--pill-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: #333;
+    color: var(--text);
     text-transform: uppercase;
 }
 
@@ -88,12 +88,12 @@
 
 .userFullName {
     font-weight: 500;
-    color: #333;
+    color: var(--text);
 }
 
 .userHandle {
     font-size: 0.85rem;
-    color: #888;
+    color: var(--muted);
 }
 
 .followButton {
@@ -102,15 +102,15 @@
     border: none;
     font-weight: 500;
     cursor: pointer;
-    background-color: #007bff;
-    color: white;
+    background-color: var(--primary);
+    color: var(--c-white);
     transition: all 0.2s;
 }
 
 .followButton.following {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
+    background-color: var(--pill-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
 }
 
 .followButton:hover {
@@ -118,9 +118,9 @@
 }
 
 .followButton.following:hover {
-    background-color: #ffebee;
-    color: #d32f2f;
-    border-color: #d32f2f;
+    background-color: var(--danger-bg);
+    color: var(--danger);
+    border-color: var(--danger-border);
 }
 
 /* User Search Styles */
@@ -144,11 +144,11 @@
     padding: 0.75rem;
     padding-left: 32px;
     /* icon padding */
-    border: 1px solid var(--border, #e5e7eb);
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 1rem;
-    background: var(--bg, #fff);
-    color: var(--text, #1f2937);
+    background: var(--search-bg);
+    color: var(--text);
     box-sizing: border-box;
     transition: width 0.2s ease, border-color 0.15s, box-shadow 0.15s;
 }
@@ -157,7 +157,7 @@
     width: 300px;
     /* Expand on focus */
     outline: none;
-    border-color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
 }
 
 .searchResults {
@@ -169,10 +169,10 @@
     /* Match expanded input */
     max-height: 250px;
     overflow-y: auto;
-    background: var(--bg, #fff);
-    border: 1px solid var(--border, #e5e7eb);
+    background: var(--panel);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
     z-index: 1000;
 }
 
@@ -191,16 +191,16 @@
     background: none;
     border-radius: 0;
     text-align: left;
-    color: var(--text, #1f2937);
+    color: var(--text);
     font-size: 0.95rem;
 }
 
 .searchContainer .userItem:hover {
-    background: var(--hover, #f9fafb);
+    background: var(--hover);
 }
 
 .emptyText {
     text-align: center;
-    color: #888;
+    color: var(--muted);
     padding: 20px;
 }
