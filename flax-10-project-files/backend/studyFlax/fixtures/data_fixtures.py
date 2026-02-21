@@ -265,9 +265,9 @@ module_prefix_to_department = {
 
 # Society fixtures
 society_fixtures = (
-    ("Tech Society", "Passionate about technology and innovation.", "We host hackathons, workshops, and networking events for tech enthusiasts.", "https://example.com/tech.jpg"),
-    ("Art Club", "Creative expression through various mediums.", "A community for artists to share ideas and work on collaborative projects.", "https://example.com/art.jpg"),
-    ("Photography Soc", "Capturing moments through the lens.", "Weekly photo walks and exhibitions to showcase student photography.", "https://example.com/photo.jpg"),
-    ("Board Game Society", "Fun and games for everyone.", "Join us for weekly board game nights and tournaments.", "https://example.com/games.jpg"),
-    ("Literature Society", "Exploring the world through books.", "Book club discussions and writing workshops for literature lovers.", "https://example.com/lit.jpg"),
+    ("Tech Society", "Passionate about technology and innovation.", "We host hackathons, workshops, and networking events for tech enthusiasts.", "https://picsum.photos/seed/tech/800/600"),
+    ("Art Club", "Creative expression through various mediums.", "A community for artists to share ideas and work on collaborative projects.", "https://picsum.photos/seed/art/800/600"),
+    ("Photography Soc", "Capturing moments through the lens.", "Weekly photo walks and exhibitions to showcase student photography.", "https://picsum.photos/seed/photo/800/600"),
+    ("Board Game Society", "Fun and games for everyone.", "Join us for weekly board game nights and tournaments.", "https://picsum.photos/seed/games/800/600"),
+    ("Literature Society", "Exploring the world through books.", "Book club discussions and writing workshops for literature lovers.", "https://picsum.photos/seed/lit/800/600"),
 )
