@@ -16,7 +16,7 @@ function UserFooter({ user, open, onSettings, onLogout, onProfile }) {
     <div className={styles.sidebarFooter}>
       <AnimatePresence>
         {showMenu && (
-          <motion.div 
+          <motion.div
             className={styles.userMenu}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -24,18 +24,18 @@ function UserFooter({ user, open, onSettings, onLogout, onProfile }) {
           >
             <button onClick={onProfile}>Profile</button>
             <button onClick={onSettings}>Settings</button>
-            <button onClick={onLogout} className={styles.logoutBtn}>Logout</button>
+            <button onClick={onLogout} className={styles.logoutBtn}>
+              Log out
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <button 
+      <button
         className={`${styles.userRow} ${open ? styles.userRowExpanded : styles.userRowCollapsed}`}
         onClick={() => setShowMenu(!showMenu)}
       >
-        <div className={styles.avatar}>
-          {user?.name?.charAt(0) || "U"}
-        </div>
+        <div className={styles.avatar}>{user?.name?.charAt(0) || "U"}</div>
         {open && (
           <div className={styles.userInfo}>
             <span className={styles.userName}>{user?.name}</span>
@@ -153,10 +153,26 @@ function SidebarNav({ active, onChange, open, user }) {
   );
 }
 
-export default function Sidebar({ active, onChange, user, isMobile, isOpen, onToggle, onSettingsClick, onLogoutClick, onProfileClick }) {
+export default function Sidebar({
+  active,
+  onChange,
+  user,
+  isMobile,
+  isOpen,
+  onToggle,
+  onSettingsClick,
+  onLogoutClick,
+  onProfileClick,
+}) {
   const [isHovered, setIsHovered] = useState(false);
   const open = isMobile ? isOpen : isHovered;
-  const w = isMobile ? (open ? "100vw" : COLLAPSED_W) : (open ? EXPANDED_W : COLLAPSED_W);
+  const w = isMobile
+    ? open
+      ? "100vw"
+      : COLLAPSED_W
+    : open
+      ? EXPANDED_W
+      : COLLAPSED_W;
 
   return (
     <motion.aside
@@ -169,9 +185,9 @@ export default function Sidebar({ active, onChange, user, isMobile, isOpen, onTo
       <SidebarHeader open={open} isMobile={isMobile} onToggle={onToggle} />
       <SidebarNav active={active} onChange={onChange} open={open} user={user} />
 
-      <UserFooter 
-        user={user} 
-        open={open} 
+      <UserFooter
+        user={user}
+        open={open}
         onSettings={onSettingsClick}
         onLogout={onLogoutClick}
         onProfile={onProfileClick}
