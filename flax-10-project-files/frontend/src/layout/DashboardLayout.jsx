@@ -120,13 +120,14 @@ function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal })
 }
 
 function DashboardMain({ state, onNavChange, children }) {
-  const { user, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, activeNav, modal, onSelectType } = state;
+  const { user, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, activeNav, modal, onSelectType, isMobile } = state;
   return (
     <>
       <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)}
         onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick}
         onProfileClick={() => onNavChange?.("profile")} selectedDate={selectedDate}
-        showWeekBar={showWeekBar} activeNav={activeNav}>{children}
+        showWeekBar={showWeekBar} activeNav={activeNav}
+        isMobile={isMobile}>{children}
       </MainArea>
       <DashboardModals showQuickAdd={showQuickAdd} setShowQuickAdd={setShowQuickAdd}
         onSelectType={onSelectType} modal={modal} />
