@@ -21,12 +21,22 @@ function UserFooter({ user, open, onSettings, onLogout, onProfile, isMobile }) {
       <AnimatePresence>
         {showMenu && (
           <>
-            <div className={styles.menuBackdrop} onClick={() => setShowMenu(false)} />
+            <div
+              className={styles.menuBackdrop}
+              onClick={() => setShowMenu(false)}
+            />
             <motion.div
               className={styles.userMenu}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
+              transition={{
+                type: "tween",
+                ease: "easeOut",
+                duration: 0.2,
+                exit: { duration: 0.13 },
+                scale: 0.5,
+              }}
             >
               <button onClick={onProfile}>Profile</button>
               <button onClick={onSettings}>Settings</button>
