@@ -1,19 +1,35 @@
-import { useMonthDayDrop } from '../../../hooks/useMonthDayDrop';
+import { useMonthDayDrop } from '../hooks/useMonthDayDrop';
 import { useEventModal } from '../../../context/CalendarContext';
-import { isSameDay } from '../../../utils/dateUtils';
+import { isSameDay } from '../utils/dateUtils';
 import { DayEvents } from './DayEvents';
 
-export function DayCell({ day, events, isCur, dispatch }) {
+export function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, customTags }) {
+    if (readOnly) return <ReadOnlyDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} customTags={customTags} />;
+    return <EditableDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} customTags={customTags} />;
+}
+
+function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, customTags }) {
+    const isToday = isSameDay(day, new Date());
+    const className = buildCellClass(isCur, isToday, false);
+    return (
+        <div className={className} onClick={() => onDateSelect?.(day)}>
+            <span className="day-number">{day.getDate()}</span>
+            <DayEvents events={events} onEventClick={onEventClick} customTags={customTags} />
+        </div>
+    );
+}
+
+function EditableDayCell({ day, events, isCur, onDateSelect, onEventClick, customTags }) {
     const isToday = isSameDay(day, new Date());
     const { dropProps, isOver } = useMonthDayDrop(day);
-    const cellProps = mergeDayProps(dropProps, dispatch, day);
+    const cellProps = buildCellProps(dropProps, onDateSelect, day);
     const className = buildCellClass(isCur, isToday, isOver);
 
     return (
         <div className={className} {...cellProps}>
             <span className="day-number">{day.getDate()}</span>
             <AddEventBtn day={day} />
-            <DayEvents events={events} />
+            <DayEvents events={events} onEventClick={onEventClick} customTags={customTags} />
         </div>
     );
 }
@@ -35,16 +51,8 @@ function createDraftEvent(date) {
     return { start_time: start, end_time: end };
 }
 
-function handleDayClick(dispatch, day) {
-    dispatch({ type: 'SET_SELECTED_DATE', payload: day });
-    dispatch({ type: 'SET_VIEW_MODE', payload: 'day' });
-}
-
-function mergeDayProps(dropProps, dispatch, day) {
-    return {
-        ...dropProps,
-        onClick: () => handleDayClick(dispatch, day)
-    };
+function buildCellProps(dropProps, onDateSelect, day) {
+    return { ...dropProps, onClick: () => onDateSelect?.(day) };
 }
 
 function buildCellClass(isCurrentMonth, isToday, isOver) {

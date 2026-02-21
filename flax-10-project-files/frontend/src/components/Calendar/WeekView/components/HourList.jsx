@@ -1,12 +1,12 @@
 import { HourCell } from './HourCell';
 import { getHoursOfDay } from '../../DayView/dayViewHelpers';
 
-export function HourList({ date }) {
+export function HourList({ date, readOnly }) {
     const hours = getHoursOfDay();
     return (
         <>
             {hours.map(hour => (
-                <HourCell key={hour} hour={hour} date={date} />
+                <HourCell key={hour} hour={hour} date={date} readOnly={readOnly} />
             ))}
         </>
     );

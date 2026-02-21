@@ -18,5 +18,8 @@ from .modules.deadlineModel import *
 # Notifications
 from .notifications.notificationModel import *
 
+# Society
+from .society import *
 # Timer
 from .timer import *
+from .timer.themeSessionModel import ThemeSession

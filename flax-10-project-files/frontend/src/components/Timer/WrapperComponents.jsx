@@ -1,4 +1,4 @@
-import styles from '../../pages/TimerPage.module.css';
+import styles from "../../pages/Timer/TimerPage.module.css";
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';

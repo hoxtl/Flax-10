@@ -1,4 +1,4 @@
-import {formatTime, formatDuration } from '../../utils/moduleUtils.js';
+import { formatTime, formatDuration } from './utils/moduleUtils.js';
 import styles from './ModuleDetails.module.css';
 
 // Detail view for a module - includes schedule, description and enrol button

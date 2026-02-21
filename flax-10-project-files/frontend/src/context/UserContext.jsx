@@ -4,6 +4,7 @@ const UserContext = createContext(null);
 
 function getInitialUser() {
   return {
+    id: 1,
     name: "Jane",
     email: "jane@kcl.ac.uk",
     year: "Year 2",

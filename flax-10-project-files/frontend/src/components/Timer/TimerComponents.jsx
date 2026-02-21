@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import styles from '../../pages/TimerPage.module.css';
-import { noiseGenerator } from '../../utils/noiseUtils';
+import styles from "../../pages/Timer/TimerPage.module.css";
+import { noiseGenerator } from './utils/noiseUtils';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {
@@ -80,7 +80,7 @@ const BufferedInput = ({ label, value, ...props }) => {
     return (
         <div className={styles.settingItem}>
             <label className={styles.label}>{label}</label>
-            <input type="number" className={styles.input} value={local} onChange={onChange} onBlur={onBlur} onKeyDown={onKeyDown} />
+            <input type="number" className={styles.input} value={local} onChange={onChange} onBlur={onBlur} onKeyDown={onKeyDown} onFocus={(e) => e.target.select()} />
         </div>
     );
 };

@@ -4,7 +4,7 @@ import {
     addDays, isSameDay, isSameMonth, addWeeks, addMonths, startOfDay, isToday,
     formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
     parseDateInput
-} from '../../utils/dateUtils';
+} from '../../components/Calendar/utils/dateUtils';
 
 describe('dateUtils', () => {
     const date = new Date(2026, 1, 15);
@@ -51,7 +51,7 @@ describe('dateUtils', () => {
 
         it('getEndOfMonth', () => {
             const d = getEndOfMonth(date);
-            expect(d.getDate()).toBe(28); // Feb 2026
+            expect(d.getDate()).toBe(28);
         });
 
         it('addDays', () => {
@@ -76,7 +76,7 @@ describe('dateUtils', () => {
 
         it('addMonths', () => {
             const d = addMonths(date, 1);
-            expect(d.getMonth()).toBe(2); // March
+            expect(d.getMonth()).toBe(2);
         });
 
         it('startOfDay', () => {
@@ -119,16 +119,12 @@ describe('dateUtils', () => {
     describe('Greeting', () => {
         it('should return greeting based on time', () => {
             vi.useFakeTimers();
-
             vi.setSystemTime(new Date(2026, 1, 15, 9, 0));
             expect(getGreeting()).toBe('Good morning');
-
             vi.setSystemTime(new Date(2026, 1, 15, 14, 0));
             expect(getGreeting()).toBe('Good afternoon');
-
             vi.setSystemTime(new Date(2026, 1, 15, 20, 0));
             expect(getGreeting()).toBe('Good evening');
-
             vi.useRealTimers();
         });
     });
@@ -145,7 +141,7 @@ describe('dateUtils', () => {
         });
 
         it('overlapsDay (true)', async () => {
-            const { overlapsDay } = await import('../../utils/dateUtils');
+            const { overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
             const day = new Date(2026, 1, 15);
             expect(overlapsDay(new Date(2026, 1, 15, 10), new Date(2026, 1, 15, 11), day)).toBe(true);
             expect(overlapsDay(new Date(2026, 1, 15, 0), new Date(2026, 1, 16, 0), day)).toBe(true);
@@ -154,7 +150,7 @@ describe('dateUtils', () => {
         });
 
         it('overlapsDay (false)', async () => {
-            const { overlapsDay } = await import('../../utils/dateUtils');
+            const { overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
             const day = new Date(2026, 1, 15);
             expect(overlapsDay(new Date(2026, 1, 14, 10), new Date(2026, 1, 14, 11), day)).toBe(false);
             expect(overlapsDay(new Date(2026, 1, 16, 10), new Date(2026, 1, 16, 11), day)).toBe(false);
@@ -163,12 +159,9 @@ describe('dateUtils', () => {
         });
 
         it('isAllDayEvent', async () => {
-            const { isAllDayEvent } = await import('../../utils/dateUtils');
-            // 24 hours
+            const { isAllDayEvent } = await import('../../components/Calendar/utils/dateUtils');
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(true);
-            // < 24 hours
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 9) })).toBe(false);
-            // > 24 hours
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 17, 10) })).toBe(true);
         });
     });

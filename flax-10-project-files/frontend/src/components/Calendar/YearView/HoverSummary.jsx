@@ -1,5 +1,6 @@
+import { useRef, useLayoutEffect, useState } from 'react';
 import { useTags } from '../../../context/TagContext';
-import { isSameDay } from '../../../utils/dateUtils';
+import { isSameDay } from '../utils/dateUtils';
 
 export function HoverSummary({ events, date }) {
     if (!events || events.length === 0) return <EmptySummary />;
@@ -16,12 +17,45 @@ function EmptySummary() {
 }
 
 function EventList({ events, date }) {
+    const ref = useRef(null);
+    const style = useSmartPositioning(ref);
+    const visibleEvents = events.slice(0, 5);
+    const extraCount = events.length > 5 ? events.length - 5 : 0;
+
     return (
-        <div className="hover-summary">
-            {events.slice(0, 5).map(e => <SummaryItem key={e.id} event={e} date={date} />)}
-            {events.length > 5 && <MoreCount count={events.length - 5} />}
+        <div className="hover-summary" ref={ref} style={style}>
+            {visibleEvents.map(e => <SummaryItem key={e.id} event={e} date={date} />)}
+            {extraCount > 0 && <MoreCount count={extraCount} />}
         </div>
     );
+}
+
+function useSmartPositioning(ref) {
+    const [style, setStyle] = useState({});
+
+    useLayoutEffect(() => {
+        if (ref.current?.parentElement) {
+            const rect = ref.current.parentElement.getBoundingClientRect();
+            setStyle(calculateRelativeStyle(rect));
+        }
+    }, []);
+
+    return style;
+}
+
+function calculateRelativeStyle(parentRect) {
+    const WIDTH = 280, PADDING = 10, WIN_W = window.innerWidth;
+    const centerX = parentRect.left + (parentRect.width / 2);
+
+    // Clamp center based X to be within screen bounds
+    let targetScreenX = centerX - (WIDTH / 2);
+    targetScreenX = Math.max(PADDING, Math.min(targetScreenX, WIN_W - WIDTH - PADDING));
+
+    // Convert to relative left offset
+    return {
+        left: `${targetScreenX - parentRect.left}px`,
+        transform: 'none'
+    };
 }
 
 function SummaryItem({ event, date }) {
@@ -38,9 +72,8 @@ function SummaryItem({ event, date }) {
 }
 
 function MoreCount({ count }) {
-    const style = { color: '#6b7280', paddingLeft: '14px' };
     return (
-        <div className="summary-event" style={style}>
+        <div className="summary-event" style={{ color: '#6b7280', paddingLeft: '14px' }}>
             +{count} more events
         </div>
     );

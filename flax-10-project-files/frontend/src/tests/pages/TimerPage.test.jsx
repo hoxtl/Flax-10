@@ -67,24 +67,29 @@ const testBreakModalEnter = () => {
     helpers.expectTimer('05:00');
 };
 
-const testHistoryModal = () => {
-    vi.spyOn(historyUtils, 'getHistory').mockReturnValue([{ id: 1, duration: 25 }]);
+const testHistoryModal = async () => {
+    vi.useRealTimers();
+    vi.spyOn(historyUtils, 'getHistory').mockResolvedValue([{ id: 1, duration: 25 }]);
     helpers.renderTimerPage();
     helpers.clickHistory();
-    helpers.expectButton('Clear History');
+    // Wait for modal to load data
+    expect(await screen.findByText('Clear History')).toBeInTheDocument();
 };
 
-const testHistoryModalClose = () => {
+const testHistoryModalClose = async () => {
+    vi.useRealTimers();
+    // Mock getHistory so it doesn't crash
+    vi.spyOn(historyUtils, 'getHistory').mockResolvedValue([]);
     helpers.renderTimerPage();
     helpers.clickHistory();
-    // Assuming the close button is '×' as seen in HistoryModal.jsx (implied)
-    const closeButtons = screen.getAllByRole('button');
-    const closeBtn = closeButtons.find(b => b.textContent === '×');
-    if (closeBtn) {
-        fireEvent.click(closeBtn);
-        // Verify 'Clear History' is gone
-        expect(screen.queryByText('Clear History')).not.toBeInTheDocument();
-    }
+
+    // Find close button by text (×) or role
+    const closeBtn = await screen.findByText('×');
+    fireEvent.click(closeBtn);
+
+    // Check if modal is closed (Clear History should not be visible)
+    await screen.findByText('Start'); // Ensure we are back on main screen
+    expect(screen.queryByText('Clear History')).not.toBeInTheDocument();
 };
 
 describe('TimerPage Integration', () => {

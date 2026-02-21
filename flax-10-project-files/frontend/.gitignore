@@ -3,6 +3,9 @@ dist/
 dist-ssr/
 .vite/
 
+# Media files
+media/
+
 # Logs
 logs
 *.log

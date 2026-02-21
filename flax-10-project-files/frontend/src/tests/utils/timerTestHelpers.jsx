@@ -1,11 +1,17 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import TimerPage from '../../pages/TimerPage';
+import TimerPage from '../../pages/Timer/TimerPage';
 import { TimerSettings } from '../../components/Timer/TimerComponents';
 import * as historyUtils from '../../utils/historyUtils';
 import { vi } from 'vitest';
 
+import { TimerProvider } from '../../context/TimerContext';
+
 /** Renders TimerPage with necessary providers/mocks implicitly handled if needed */
-export const renderTimerPage = () => render(<TimerPage />);
+export const renderTimerPage = () => render(
+    <TimerProvider>
+        <TimerPage />
+    </TimerProvider>
+);
 
 /** Renders TimerSettings in isolation */
 export const renderTimerSettings = (props) => render(<TimerSettings {...props} />);

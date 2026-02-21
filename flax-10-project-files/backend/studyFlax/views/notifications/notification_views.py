@@ -16,7 +16,6 @@ def notification_list(request):
 
 
 def get_notifications(request):
-    # Filter by current user only
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     serialiser = NotificationSerialiser(notifications, many=True)
     return Response(serialiser.data)
@@ -26,7 +25,6 @@ def create_notification(request):
     serialiser = NotificationSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    # Assign to current user
     serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
@@ -43,7 +41,6 @@ def notification_detail(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_all_read(request):
-    # Only mark current user's notifications
     Notification.objects.filter(user=request.user).update(read=True)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -51,6 +48,5 @@ def mark_all_read(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def clear_all(request):
-    # Only clear current user's notifications
     Notification.objects.filter(user=request.user).delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
