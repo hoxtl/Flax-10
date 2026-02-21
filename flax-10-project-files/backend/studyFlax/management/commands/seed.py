@@ -1,15 +1,15 @@
 import random
+from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent, 
     UserSettings, Module, Enrollment,
-    Society, SocietyMembership, SocietyTag,
+    Society, SocietyMembership, SocietyTag, SocietyEvent
 )
-from studyFlax.fixtures.data_fixtures import category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures
-from .seed_helpers import (
-    build_users_list, build_settings_for_new_users, build_events_for_user,
-    build_module_event, get_user_modules, build_lecture_events, create_lecture_event
+from studyFlax.fixtures.data_fixtures import (
+    category_fixtures, tag_fixtures, recurrence_fixtures, 
+    module_fixtures, society_fixtures, location_fixtures
 )
 
 User = get_user_model()
@@ -44,6 +44,7 @@ class Command(BaseCommand):
         self.create_enrollments()
         self.create_societies()
         self.create_society_memberships()
+        self.create_society_events()
         self.stdout.write(self.style.SUCCESS('Seeding complete!'))
         self.print_stats()  
 
@@ -134,14 +135,16 @@ class Command(BaseCommand):
     def create_societies(self):
         self.stdout.write("Seeding societies...")
         for name, bio, about, image in society_fixtures:
+            status = random.choice(['approved', 'pending', 'rejected', 'none'])
             society, _ = Society.objects.get_or_create(
                 name=name,
                 defaults={
                     'bio': bio, 'about': about, 'image': image,
-                    'ratification_status': 'approved', 'is_ratified': True
+                    'ratification_status': status, 'is_ratified': (status == 'approved')
                 }
             )
         self._seed_society_tags(society)
+
     def _seed_society_tags(self, society):
         from faker import Faker
         f = Faker('en_GB')
@@ -168,6 +171,27 @@ class Command(BaseCommand):
                 user=member, society=society, defaults={'role': 'member'}
             )
 
+    def create_society_events(self):
+        self.stdout.write("Seeding society events...")
+        for society in Society.objects.all():
+            self._seed_events_for_society(society)
+
+    def _seed_events_for_society(self, society):
+        from faker import Faker
+        f = Faker('en_GB')
+        tags = list(society.tags.all())
+        for _ in range(random.randint(2, 5)):
+            start = f.date_time_between(start_date='-1M', end_date='+2M')
+            SocietyEvent.objects.create(
+                society=society,
+                title=f.sentence(nb_words=3),
+                description=f.paragraph(),
+                location=random.choice(location_fixtures),
+                start_time=start,
+                end_time=start + timedelta(minutes=random.choice([60, 90, 120])),
+                tag=random.choice(tags) if tags else None
+            )
+
     def print_stats(self):
         print("=" * 30)
         print(f"Users: {User.objects.count()}")
@@ -178,4 +202,5 @@ class Command(BaseCommand):
         print(f"Events: {CalendarEvent.objects.count()}")
         print(f"Societies: {Society.objects.count()}")
         print(f"Society Memberships: {SocietyMembership.objects.count()}")
+        print(f"Society Events: {SocietyEvent.objects.count()}")
         print("=" * 30)
