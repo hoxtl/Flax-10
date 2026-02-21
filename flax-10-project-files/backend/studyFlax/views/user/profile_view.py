@@ -11,14 +11,12 @@ from django.utils import timezone
 
 
 def get_module_data(user):
-    """Gets module codes and count from enrollments."""
     enrollments = Enrollment.objects.filter(student=user).select_related('module')
     module_codes = sorted([e.module.module_code for e in enrollments])
     return module_codes, len(module_codes)
 
 
 def get_event_counts(user):
-    """Gets event counts by time range."""
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     all_events = CalendarEvent.objects.filter(user=user)
@@ -32,17 +30,48 @@ def get_event_counts(user):
 
 
 def build_profile_response(user, request):
-    """Builds the full profile response dict."""
     module_codes, module_count = get_module_data(user)
     event_counts = get_event_counts(user)
-
     user_data = UserSerialiser(user, context={'request': request}).data
     user_data.update(event_counts)
     user_data['module_count'] = module_count
     user_data['task_count'] = 0
     user_data['modules'] = module_codes
-
     return user_data
+
+
+def update_username(user, data):
+    new_username = data.get('username')
+    if not new_username or new_username == user.username:
+        return None
+    if User.objects.filter(username=new_username).exists():
+        return Response({'error': 'Username already taken'}, status=status.HTTP_400_BAD_REQUEST)
+    user.username = new_username
+    return None
+
+
+def set_photo(user, files):
+    user.profile_photo = files['profile_photo']
+
+def remove_photo(user):
+    user.profile_photo = None
+
+def update_photo(user, data, files):
+    if 'profile_photo' in files:
+        user.profile_photo = files['profile_photo']
+        return
+    if data.get('remove_photo') == 'true':
+        user.profile_photo = None
+
+def apply_profile_patch(user, data, files):
+    error = update_username(user, data)
+    if error:
+        return error
+    if 'bio' in data:
+        user.bio = data['bio']
+    update_photo(user, data, files)
+    user.save()
+    return None
 
 
 @api_view(['GET', 'PATCH'])
@@ -50,26 +79,7 @@ def build_profile_response(user, request):
 def profile_view(request):
     if request.method == 'GET':
         return Response(build_profile_response(request.user, request))
-
-    elif request.method == 'PATCH':
-        user = request.user
-
-        if 'username' in request.data:
-            new_username = request.data['username']
-            if new_username != user.username:
-                if User.objects.filter(username=new_username).exists():
-                    return Response(
-                        {'error': 'Username already taken'},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                user.username = new_username
-
-        if 'bio' in request.data:
-            user.bio = request.data['bio']
-        if 'profile_photo' in request.FILES:
-            user.profile_photo = request.FILES['profile_photo']
-        elif request.data.get('remove_photo') == 'true':
-            user.profile_photo = None
-
-        user.save()
-        return Response(build_profile_response(user, request))
+    error = apply_profile_patch(request.user, request.data, request.FILES)
+    if error:
+        return error
+    return Response(build_profile_response(request.user, request))

@@ -25,9 +25,7 @@ export default function CalendarPage() {
             <Calendar />
             <EventModalContainer />
             <EventPopupContainer />
-        </div>
-    );
-}
+        </div>);}
 
 function EventModalContainer() {
     const { isModalOpen, closeModal, modalEvent, modalType, modalInitialDate } = useEventModal();
@@ -39,8 +37,7 @@ function EventModalContainer() {
             initialType={modalType}
             initialDate={modalInitialDate}
         />
-    );
-}
+    );}
 
 function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();

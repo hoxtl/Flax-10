@@ -48,7 +48,6 @@ export function useProfileState() {
   const modalState = useModalState();
   const handleSaveProfile = async () => {
     await reload();
-    modalState.setShowEditProfile(false);
   };
   return { profileData, loading, handleSaveProfile, ...eventsState, ...modalState };
 }

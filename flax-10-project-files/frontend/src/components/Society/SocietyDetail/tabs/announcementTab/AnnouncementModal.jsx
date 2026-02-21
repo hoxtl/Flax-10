@@ -26,8 +26,7 @@ export default function AnnouncementModal({ onClose, onSubmit, tags = [], announ
                         all_day: event.all_day
                     }));
                 })
-                .catch(e => console.error("Failed to load linked event", e));
-        }
+                .catch(e => console.error("Failed to load linked event", e));}
     }, [announcement, societyId]);
 
     return (
@@ -43,7 +42,6 @@ export default function AnnouncementModal({ onClose, onSubmit, tags = [], announ
 function handleSubmit(form, setError, onSubmit, announcements, conflict) {
     const error = validateForm(form);
     if (error) return setError(error);
-
     if (form.pinned) {
         const currentPinned = announcements.find(a => a.pinned && a.id !== form.id);
         if (currentPinned) {
@@ -52,10 +50,8 @@ function handleSubmit(form, setError, onSubmit, announcements, conflict) {
             );
             if (!confirmReplace) return;
             return onSubmit(form, currentPinned);
-        }
-    }
-    onSubmit(form);
-}
+        }}
+    onSubmit(form);}
 
 function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, onSubmit, isEdit }) {
     return (
@@ -65,8 +61,7 @@ function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, on
             <FormFields form={form} update={update} setForm={setForm} fileRef={fileRef} tags={tags} />
             <ModalFooter onClose={onClose} onSubmit={() => onSubmit(form)} isEdit={isEdit} />
         </div>
-    );
-}
+    );}
 
 function ModalHeader({ onClose, isEdit }) {
     return (

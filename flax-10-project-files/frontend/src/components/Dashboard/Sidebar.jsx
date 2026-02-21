@@ -82,20 +82,15 @@ function NavItem({ item, isActive, open, onClick }) {
       {isActive && <ActivePill />}
     </motion.button>);}
 
+function getRoutes(user) {
+  return APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
+}
+
 function SidebarNav({ active, onChange, open, user }) {
   return (
     <nav className={styles.nav}>
-      {APP_ROUTES.filter(route => {
-        if (route.isAdminOnly) return user?.isAdmin;
-        return true;
-      }).map((n) => (
-        <NavItem
-          key={n.id}
-          item={n}
-          isActive={active === n.id}
-          open={open}
-          onClick={() => onChange?.(n.id)}
-        />
+      {getRoutes(user).map((n) => (
+        <NavItem key={n.id} item={n} isActive={active === n.id} open={open} onClick={() => onChange?.(n.id)} />
       ))}
     </nav>
   );

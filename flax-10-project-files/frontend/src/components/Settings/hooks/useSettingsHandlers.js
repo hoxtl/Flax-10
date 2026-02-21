@@ -33,32 +33,38 @@ async function savePassword(data, setPasswordError, setSuccessMessage, setIsSavi
   setIsSaving(false);
 }
 
-async function savePreferences(data, setSuccessMessage, setIsSaving) {
-  const response = await updateUserSettings({ theme: data.theme }).catch(() => null);
+async function tryUpdateSettings(data) {
+  const response = await updateUserSettings({ theme: data.theme });
   if (response?.user) saveUserToStorage(response.user);
-  showTemporaryMessage(setSuccessMessage, response ? "Preferences saved!" : "Failed to save preferences");
+  return response;
+}
+
+async function savePreferences(data, setSuccessMessage, setIsSaving) {
+  const response = await tryUpdateSettings(data).catch(() => null);
+  const msg = response ? "Preferences saved successfully!" : "Failed to save preferences";
+  showTemporaryMessage(setSuccessMessage, msg);
   setIsSaving(false);
 }
 
-export default function useSettingsHandlers() {
+function useSettingsState() {
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  return { isSaving, setIsSaving, successMessage, setSuccessMessage, passwordError, setPasswordError };
+}
 
+export default function useSettingsHandlers() {
+  const { isSaving, setIsSaving, successMessage, setSuccessMessage, passwordError, setPasswordError } = useSettingsState();
   const handleAccountSave = async (data) => {
     setIsSaving(true); setPasswordError("");
     await saveAccount(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
-
   const handlePasswordSave = async (data) => {
     setPasswordError("");
     await savePassword(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
-
   const handlePreferencesSave = async (data) => {
     setIsSaving(true);
     await savePreferences(data, setSuccessMessage, setIsSaving);
   };
-
-  return { isSaving, successMessage, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave };
-}
+  return { isSaving, successMessage, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave };}

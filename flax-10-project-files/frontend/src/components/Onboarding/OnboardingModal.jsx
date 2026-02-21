@@ -12,21 +12,25 @@ function getCourseOptions() {
   }));
 }
 
+function ModalContent({ state, onComplete }) {
+  return (
+    <AnimatePresence mode="wait">
+      {state.done
+        ? <SuccessScreen key="success" major={state.major} onComplete={onComplete} />
+        : <OnboardingForm key="form" {...state} courseOptions={getCourseOptions()} />
+      }
+    </AnimatePresence>
+  );
+}
+
 export default function OnboardingModal({ isOpen, onComplete }) {
   const state = useOnboarding();
   if (!isOpen) return null;
-
   return (
     <div className={styles.overlay}>
       <motion.div className={styles.modal}
-        initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.3 }}
-      >
-        <AnimatePresence mode="wait">
-          {state.done
-            ? <SuccessScreen key="success" major={state.major} onComplete={onComplete} />
-            : <OnboardingForm key="form" {...state} courseOptions={getCourseOptions()} />
-          }
-        </AnimatePresence>
+        initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <ModalContent state={state} onComplete={onComplete} />
       </motion.div>
     </div>
   );

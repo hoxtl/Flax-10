@@ -105,21 +105,23 @@ function TasksModal({ isOpen, onClose }) {
   );
 }
 
+function EditProfileSection({ state }) {
+  const { showEditProfile, setShowEditProfile, handleSaveProfile, profileData } = state;
+  return (
+    <EditProfileModal
+      user={profileData}
+      isOpen={showEditProfile}
+      onClose={() => setShowEditProfile(false)}
+      onSave={handleSaveProfile}
+    />
+  );
+}
+
 function EditModals({ user, state, modules }) {
-  const {
-    showModules, setShowModules,
-    showTasks, setShowTasks,
-    showEditProfile, setShowEditProfile,
-    handleSaveProfile, profileData,
-  } = state;
+  const { showModules, setShowModules, showTasks, setShowTasks } = state;
   return (
     <>
-      <EditProfileModal
-        user={profileData || user}
-        isOpen={showEditProfile}
-        onClose={() => setShowEditProfile(false)}
-        onSave={handleSaveProfile}
-      />
+      <EditProfileSection state={state} />
       <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} />
       <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />
     </>
