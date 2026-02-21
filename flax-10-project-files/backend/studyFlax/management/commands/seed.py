@@ -254,7 +254,54 @@ class Command(BaseCommand):
                 location=random.choice(lecture_theatre_fixtures),
                 recurrence_rule=weekly_rule,
             )
+    def create_deadline_calendar_event(self, user, deadline):
+        """Creates a calendar event for a single deadline for a given user."""
+        CalendarEvent.objects.get_or_create(
+            user=user,
+            title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
+            start_time=deadline.start_due_date,
+            defaults={
+                'end_time': deadline.end_due_date or deadline.start_due_date,
+                'location': deadline.location,
+                'description': deadline.description,
+                'priority': 'high',
+            }
+        )
 
+    #Pick a unique due date for each deadline in the module
+    def get_offset(self, used_offsets): 
+        while True:
+            day_offset = random.randint(7, 30)
+            if day_offset not in used_offsets:
+                used_offsets.add(day_offset)
+                return day_offset
+            
+    def create_deadlines(self):
+        """ Creates deadlines relevant for each seeded module."""
+        self.stdout.write("Seeding deadlines...")
+        deadlines_to_create = []
+        now = timezone.now()
+        for module in self.modules: #retrieves subject specific deadlines, or default deadlines
+            prefix = module.module_code[:2]
+            templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
+            used_offsets = set()
+
+            for deadline_type, title, description in templates:
+                day_offset = self.get_offset(used_offsets) 
+                hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
+                start_due = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
+                end_due = start_due + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
+                location = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
+
+                if not Deadline.objects.filter(module=module, title=title).exists():
+                        deadlines_to_create.append(Deadline(
+                            module=module, title=title, deadline_type=deadline_type, description=description, 
+                            start_due_date=start_due, end_due_date=end_due, location=location,
+                        ))
+
+        Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
+        self.stdout.write(f"Created {len(deadlines_to_create)} deadlines across {len(self.modules)} modules.")
+    
     def create_enrollments(self):
         """Enrolls each user in modules relevant to their course and creates lecture calendar events."""
         self.stdout.write("Seeding enrollments and lecture events...")
@@ -289,66 +336,13 @@ class Command(BaseCommand):
                             'priority': 'high',
                         }
                     )
+                
+                for deadline in module.deadlines.all():
+                    self.create_deadline_calendar_event(user,deadline)
 
         Enrollment.objects.bulk_create(enrollments_to_create, ignore_conflicts=True)
         self.stdout.write(f"Created {len(enrollments_to_create)} enrollments.")
 
-    def create_deadlines(self):
-        """ Creates deadlines relevant for each seeded module."""
-        self.stdout.write("Seeding deadlines...")
-        deadlines_to_create = []
-        now = timezone.now()
-
-        for module in self.modules:
-            prefix = module.module_code[:2]
-            templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
-            used_offsets = set()
-            for deadline_type, title, description in templates:
-                while True:
-                    day_offset = random.randint(7,30)
-                    if day_offset not in used_offsets:
-                        used_offsets.add(day_offset)
-                        break
-                
-                hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
-                start_due = now.replace(
-                hour=hour, minute=0, second=0, microsecond=0
-            ) + timedelta(days=day_offset)
-                
-            end_due = None
-            if deadline_type in ("exam", "presentation"):
-                end_due = start_due + timedelta(hours=2)
-            location = None
-            if deadline_type in ("exam", "presentation"): 
-                location = random.choice(lecture_theatre_fixtures)
-
-            if not Deadline.objects.filter(module=module, title=title).exists():
-                    deadlines_to_create.append(Deadline(
-                        module=module,
-                        title=title,
-                        deadline_type=deadline_type,
-                        description=description,
-                        start_due_date=start_due,
-                        end_due_date=end_due,
-                        location=location,
-                    ))
-        Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
-        self.stdout.write(f"Created {len(deadlines_to_create)} deadlines across {len(self.modules)} modules.")
-    
-    def create_deadline_calendar_event(self, user, deadline):
-        """Creates a calendar event for a single deadline."""
-        CalendarEvent.objects.get_or_create(
-            user=user,
-            title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
-            start_time=deadline.start_due_date,
-            defaults={
-                'end_time': deadline.end_due_date or deadline.start_due_date,
-                'location': deadline.location,
-                'description': deadline.description,
-                'priority': 'high',
-            }
-        ) 
-    
     def print_stats(self):
         print("=" * 30)
         print(f"Users: {User.objects.count()}")
