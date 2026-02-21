@@ -76,11 +76,7 @@ function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
 
-<<<<<<< HEAD
-function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines }) {
-=======
-function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle }) {
->>>>>>> origin/main
+function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines  }) {
     return (
         <div className={styles.actions}>
             {isTeacher
@@ -90,11 +86,7 @@ function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle }) {
     );
 }
 
-<<<<<<< HEAD
-function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
-=======
-function TeacherActions({ onEdit, onDelete }) {
->>>>>>> origin/main
+function TeacherActions({ onEdit, onDelete,onManageDeadlines }) {
     return (
         <>
             <button className={styles.deadlineButton} onClick={onManageDeadlines}>📋 Deadlines</button>
