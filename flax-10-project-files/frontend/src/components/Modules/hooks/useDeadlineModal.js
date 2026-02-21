@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getDeadlines, createDeadline, updateDeadline, deleteDeadline } from '../api/deadline_api';
+import { getDeadlines, createDeadline, updateDeadline, deleteDeadline} from '../../../api/deadlineApi';
 
 function useDeadlineList(module_id) {
     const [deadlines, setDeadlines] = useState([]);
