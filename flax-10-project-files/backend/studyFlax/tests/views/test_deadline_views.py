@@ -105,3 +105,7 @@ class DeadlineViewTests(BaseTestCase):
         self.assertTrue(CalendarEvent.objects.filter(
             user=self.user, source='module_deadline'
         ).exists())
+    
+    def deadline_payload(self):
+        return dict(title='New Deadline', deadline_type='coursework',
+            start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
