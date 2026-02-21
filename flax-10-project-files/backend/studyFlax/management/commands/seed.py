@@ -7,6 +7,8 @@ from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_module_event, get_user_modules, build_lecture_events, create_lecture_event,
     build_deadlines_for_module, create_deadline_calendar_event
+    build_meal_events, build_module_event, get_user_modules,
+    build_lecture_events, create_lecture_event,
 )
 
 User = get_user_model()
@@ -14,9 +16,16 @@ User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
+
     USER_COUNT = 25
     EVENTS_PER_USER_RANGE = (60, 90)
     DEFAULT_PASSWORD = '1234'
+
+    FIXTURE_USERS = [
+        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk', 'first_name': 'John', 'last_name': 'Doe', 'is_superuser': True, 'is_staff': True},
+        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk', 'first_name': 'Jane', 'last_name': 'Doe', 'is_superuser': False, 'is_staff': False},
+        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk', 'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+    ]
 
     def _load_shared_data(self):
         self.users = list(User.objects.filter(is_staff=False))
@@ -28,11 +37,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
         self.create_admin_user()
+        self.create_fixture_users()
         self.create_random_users()
         self.users = list(User.objects.filter(is_staff=False))
         self.create_recurrence_rules()
         self.create_categories()
-        self.categories = list(Category.objects.all()) 
+        self.categories = list(Category.objects.all())
         self.create_tags()
         self._load_shared_data()
         self.create_events_for_users()
@@ -40,15 +50,28 @@ class Command(BaseCommand):
         self.modules = list(Module.objects.all())
         self.create_deadlines()
         self.create_enrollments()
-        self.stdout.write(self.style.SUCCESS('Seeding complete!'))
         self.print_stats()
 
     def create_admin_user(self):
         if User.objects.filter(username='johndoe').exists():
             return
-        User.objects.create_superuser(username='johndoe', email='john.doe@example.com',
-                                      password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe')
+        User.objects.create_superuser(
+            username='johndoe', email='john.doe@example.com',
+            password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe',
+        )
         self.stdout.write(self.style.SUCCESS("Created admin user: johndoe"))
+
+    def create_fixture_users(self):
+        self.stdout.write("Seeding fixture users...")
+        for data in self.FIXTURE_USERS:
+            if User.objects.filter(username=data['username']).exists():
+                continue
+            user = User(**{k: v for k, v in data.items() if k not in ('is_superuser', 'is_staff')})
+            user.is_superuser = data['is_superuser']
+            user.is_staff = data['is_staff']
+            user.set_password('1234')
+            user.save()
+            self.stdout.write(f"  Created user: {data['username']}")
 
     def create_random_users(self):
         needed = self.USER_COUNT - User.objects.count()
@@ -76,19 +99,29 @@ class Command(BaseCommand):
         f = Faker('en_GB')
         for name, duration in tag_fixtures:
             category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-            user = category.user if category and category.user else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
-            Tag.objects.get_or_create(name=name, user=user, defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()})
+            user = (
+                category.user if category and category.user
+                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
+            )
+            Tag.objects.get_or_create(
+                name=name, user=user,
+                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
+            )
 
     def create_events_for_users(self):
         self.stdout.write("Seeding events for users...")
         total = 0
         for i, user in enumerate(self.users):
             print(f"Processing user {i+1}/{len(self.users)}: {user.username}", end='\r')
-            from faker import Faker
-            count = Faker('en_GB').random_int(*self.EVENTS_PER_USER_RANGE)
-            events = build_events_for_user(user, self.tags, self.rules, count)
-            CalendarEvent.objects.bulk_create(events)
-            total += len(events)
+
+            personal_events = build_events_for_user(user, self.tags, self.rules, 0)
+            CalendarEvent.objects.bulk_create(personal_events)
+
+            meal_events = build_meal_events(user, self.tags)
+            CalendarEvent.objects.bulk_create(meal_events)
+
+            total += len(personal_events) + len(meal_events)
+
         print(f"\nCreated {total} events across {len(self.users)} users.")
 
     def _create_module(self, code, name, description, admin, weekly_rule):
@@ -105,20 +138,23 @@ class Command(BaseCommand):
     def _should_enroll(self, user, module):
         return not Enrollment.objects.filter(student=user, module=module).exists()
 
-    def _enroll_if_needed(self, user, module, enrollments):
+    def _enroll_if_needed(self, user, module, enrollments, is_core=False):
         if self._should_enroll(user, module):
-            enrollments.append(Enrollment(student=user, module=module))
+            enrollments.append(Enrollment(student=user, module=module, is_core=is_core))
 
-    def _process_module(self, user, module, lecture_tag, enrollments):
-        self._enroll_if_needed(user, module, enrollments)
+    def _process_module(self, user, module, lecture_tag, enrollments, is_core=False):
+        self._enroll_if_needed(user, module, enrollments, is_core)
         for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
             create_lecture_event(u, mod, start, end, tag)
         for deadline in module.deadlines.all():
             create_deadline_calendar_event(user, deadline)
 
     def _process_user_modules(self, user, lecture_tag, enrollments):
-        for module in get_user_modules(user, self.modules):
-            self._process_module(user, module, lecture_tag, enrollments)
+        core, extras = get_user_modules(user, self.modules)
+        for module in core:
+            self._process_module(user, module, lecture_tag, enrollments, is_core=True)
+        for module in extras:
+            self._process_module(user, module, lecture_tag, enrollments, is_core=False)
 
     def create_enrollments(self):
         self.stdout.write("Seeding enrollments and lecture events...")
@@ -138,12 +174,19 @@ class Command(BaseCommand):
         self.stdout.write(f"Created {len(deadlines_to_create)} deadlines")
 
     def print_stats(self):
-        print("=" * 30)
-        print(f"Users: {User.objects.count()}")
-        print(f"Modules: {Module.objects.count()}")
-        print(f"Enrollments: {Enrollment.objects.count()}")
-        print(f"Categories: {Category.objects.count()}")
-        print(f"Tags: {Tag.objects.count()}")
-        print(f"Events: {CalendarEvent.objects.count()}")
-        print(f"Deadlines: {Deadline.objects.count()}")
-        print("=" * 30)
+        stats = [
+            ("Users",       User.objects.count()),
+            ("Modules",     Module.objects.count()),
+            ("Enrollments", Enrollment.objects.count()),
+            ("Categories",  Category.objects.count()),
+            ("Tags",        Tag.objects.count()),
+            ("Events",      CalendarEvent.objects.count()),
+            ("Deadlines",   Deadline.objects.count()),
+        ]
+        self.stdout.write("\n" + self.style.SUCCESS("✅ Seeding complete!"))
+        self.stdout.write(self.style.SUCCESS("─" * 35))
+        for label, count in stats:
+            self.stdout.write(f"  {self.style.SUCCESS('●')} {label:<14} {self.style.WARNING(str(count))}")
+        self.stdout.write(self.style.SUCCESS("─" * 35))
+        self.stdout.write(f"  {self.style.HTTP_INFO('Fixture users: johndoe (admin), janedoe, charlie')}")
+        self.stdout.write(f"  {self.style.HTTP_INFO('Password: 1234')}\n")
