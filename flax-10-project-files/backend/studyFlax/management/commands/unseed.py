@@ -36,7 +36,8 @@ def restore_superusers(superusers_data, stdout):
     if not superusers_data:
         return
     stdout.write("Restoring superusers...")
-    User.objects.bulk_create([User(**data) for data in superusers_data])
+    for data in superusers_data:
+        User.objects.create_superuser(**data)
 
 
 def confirm_truncate(tables, stdout):
