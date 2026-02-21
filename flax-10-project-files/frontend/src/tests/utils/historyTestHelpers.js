@@ -1,20 +1,22 @@
 import { screen } from '@testing-library/react';
 
+const currentYear = new Date().getFullYear();
+
 export const mockHistoryData = [
     {
-        id: 1, date: '2023-01-01T12:00:00Z', startTime: '2023-01-01T12:00:00Z', endTime: '2023-01-01T12:25:00Z',
+        id: 1, date: `${currentYear}-01-01T12:00:00Z`, startTime: `${currentYear}-01-01T12:00:00Z`, endTime: `${currentYear}-01-01T12:25:00Z`,
         duration: 25, breakDuration: 5, sessionCount: 1, studyBlockId: 'block_1', status: 'Completed'
     },
     {
-        id: 2, date: '2023-01-01T12:30:00Z', startTime: '2023-01-01T12:30:00Z', endTime: '2023-01-01T12:55:00Z',
+        id: 2, date: `${currentYear}-01-01T12:30:00Z`, startTime: `${currentYear}-01-01T12:30:00Z`, endTime: `${currentYear}-01-01T12:55:00Z`,
         duration: 25, breakDuration: 0, sessionCount: 2, studyBlockId: 'block_1', status: 'Completed'
     },
     {
-        id: 3, date: '2023-01-02T14:30:00Z', startTime: '2023-01-02T14:00:00Z', endTime: '2023-01-02T14:30:00Z',
+        id: 3, date: `${currentYear}-01-02T14:30:00Z`, startTime: `${currentYear}-01-02T14:00:00Z`, endTime: `${currentYear}-01-02T14:30:00Z`,
         duration: 30, breakDuration: 0, studyBlockId: 'block_2', status: 'Completed'
     },
     {
-        id: 4, date: '2023-01-03T10:00:00Z', duration: 60, status: 'Completed' // Legacy
+        id: 4, date: `${currentYear}-01-03T10:00:00Z`, duration: 60, status: 'Completed' // Legacy
     }
 ];
 

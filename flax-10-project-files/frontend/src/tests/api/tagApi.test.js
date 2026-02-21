@@ -12,7 +12,7 @@ describe('tagApi', () => {
     });
 
     it('should fetch tags', async () => {
-        await api.fetchTags();
+        await api.getTags();
         expect(fetchApi).toHaveBeenCalledWith('/tags/');
     });
 

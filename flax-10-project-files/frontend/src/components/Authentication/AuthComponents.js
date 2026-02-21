@@ -1,16 +1,25 @@
-// src/components/Authentication/AuthComponents.js
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 export const Container = styled.div`
   background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(74, 52, 33, 0.18), 0 10px 10px rgba(74, 52, 33, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(74, 52, 33, 0.18),
+    0 8px 24px rgba(74, 52, 33, 0.1);
   position: relative;
   overflow: hidden;
-  width: 850px;
+  width: 860px;
   max-width: 100%;
-  min-height: 650px;
+  min-height: 480px;
+
+  @media (max-width: 768px) {
+    /* Allow the card to grow with content on mobile for the long Sign Up form */
+    min-height: 520px;
+    height: auto;
+    width: 100%;
+    margin: 0 16px;
+  }
 `;
 
 export const SignUpContainer = styled.div`
@@ -24,13 +33,35 @@ export const SignUpContainer = styled.div`
   z-index: 1;
 
   ${(props) =>
-    props.$signIn !== true
+    !props.$signIn
       ? `
     transform: translateX(100%);
     opacity: 1;
     z-index: 5;
   `
       : ""}
+
+  @media (max-width: 768px) {
+    width: 100%;
+    position: relative;
+    transform: none;
+    display: ${(props) => (props.$signIn ? "none" : "block")};
+
+    /* Mobile Animation: Quick Fade Out (0.2s), Slower Fade In (0.5s) */
+    animation: ${(props) =>
+      !props.$signIn ? "fadeIn 0.5s ease-out forwards" : "none"};
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
 export const SignInContainer = styled.div`
@@ -42,7 +73,18 @@ export const SignInContainer = styled.div`
   width: 50%;
   z-index: 2;
 
-  ${(props) => (props.$signIn !== true ? `transform: translateX(100%);` : "")}
+  ${(props) => (!props.$signIn ? `transform: translateX(100%);` : "")}
+
+  @media (max-width: 768px) {
+    width: 100%;
+    position: relative;
+    transform: none;
+    display: ${(props) => (props.$signIn ? "block" : "none")};
+
+    /* Mobile Animation: Quick Fade Out (0.2s), Slower Fade In (0.5s) */
+    animation: ${(props) =>
+      props.$signIn ? "fadeIn 0.5s ease-out forwards" : "none"};
+  }
 `;
 
 export const Form = styled.form`
@@ -51,57 +93,68 @@ export const Form = styled.form`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 0 50px;
+  padding: 28px 52px;
   height: 100%;
   text-align: center;
+  gap: 8px;
+  box-sizing: border-box;
 `;
 
 export const Title = styled.h1`
-  font-weight: bold;
-  margin: 0;
-  font-size: 45px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  font-size: 28px;
   text-align: center;
-  padding-left: 20px;
+  color: #2b1e14;
+  letter-spacing: -0.3px;
 `;
 
 export const Input = styled.input`
-  background-color: #f0ede8;
-  border: 1px solid rgba(74, 52, 33, 0.18);
-  padding: 12px 15px;
-  margin: 8px 0;
+  background-color: #f7f5f2;
+  border: 1.5px solid rgba(74, 52, 33, 0.12);
+  padding: 8px 18px;
   width: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
   color: #2b1e14;
+  font-size: 14px;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+  box-sizing: border-box;
 
   &:focus {
     outline: none;
     border-color: #9e7e5d;
     background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.12);
   }
 
   &::placeholder {
-    color: rgba(43, 30, 20, 0.55);
+    color: rgba(43, 30, 20, 0.42);
   }
 `;
 
 export const Button = styled.button`
   position: relative;
   border-radius: 999px;
-  border: 1px solid rgba(74, 52, 33, 0.38);
-  background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
+  border: 1.5px solid rgba(74, 52, 33, 0.4);
+  background: linear-gradient(180deg, #5c3f28 0%, #3c2a1a 100%);
   color: rgba(255, 255, 255, 0.96);
-  font-size: 12px;
-  font-weight: 650;
-  padding: 12px 45px;
-  letter-spacing: 0.02em;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 13px 44px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
   overflow: hidden;
   will-change: transform;
-  box-shadow: 0 10px 28px rgba(74, 52, 33, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 8px 24px rgba(74, 52, 33, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  margin-top: 4px;
 
   &::before {
     content: "";
@@ -110,13 +163,12 @@ export const Button = styled.button`
     background: linear-gradient(
       120deg,
       transparent 35%,
-      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0.28) 50%,
       transparent 65%
     );
     transform: translateX(-60%) rotate(8deg);
     opacity: 0;
     pointer-events: none;
-    box-shadow: 0 20px 50px rgba(74, 52, 33, 0.28);
   }
 
   &:hover:not(:disabled)::before {
@@ -132,55 +184,49 @@ export const Button = styled.button`
 
   &:hover:not(:disabled) {
     transform: translateY(-1px) scale(1.01);
-    background: transparent;
-    color: rgba(74, 52, 33, 0.92);
-    border-color: rgba(74, 52, 33, 0.92);
-    box-shadow: 0 18px 42px rgba(74, 52, 33, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    box-shadow: 0 14px 36px rgba(74, 52, 33, 0.28);
   }
 
   &:active:not(:disabled) {
     transform: translateY(0px) scale(0.99);
   }
-
   &:focus {
     outline: 2px solid rgba(74, 52, 33, 0.28);
     outline-offset: 3px;
   }
-
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  &:disabled::before {
-    display: none;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     &::before {
       animation: none !important;
-      transition: none !important;
     }
     transition: none !important;
   }
 `;
 
 export const GhostButton = styled(Button)`
-  background: rgba(255, 255, 255, 0.66);
-  border-color: rgba(74, 52, 33, 0.14);
-  color: rgba(43, 30, 20, 0.92);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: rgba(74, 52, 33, 0.18);
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 `;
 
 export const Anchor = styled.a`
   color: #9e7e5d;
-  font-size: 14px;
+  font-size: 13px;
   text-decoration: none;
-  margin: 15px 0;
 
   &:hover {
     color: #4a3421;
@@ -198,14 +244,17 @@ export const OverlayContainer = styled.div`
   transition: transform 0.6s ease-in-out;
   z-index: 100;
 
-  ${(props) => (props.$signIn !== true ? `transform: translateX(-100%);` : "")}
+  ${(props) => (!props.$signIn ? `transform: translateX(-100%);` : "")}
+
+  @media (max-width: 768px) {
+    display: none; /* Hide the brown overlay entirely on mobile */
+  }
 `;
 
 export const Overlay = styled.div`
-  background: linear-gradient(135deg, #9e7e5d 0%, #81725b 50%, #4a3421 100%);
+  background: linear-gradient(150deg, #7a6148 0%, #5c4530 40%, #3c2a1a 100%);
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: 0 0;
   color: #ffffff;
   position: relative;
   left: -100%;
@@ -214,7 +263,30 @@ export const Overlay = styled.div`
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
 
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 70% 30%,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
   ${(props) => (props.$signIn !== true ? `transform: translateX(50%);` : "")}
+
+  @media (max-width: 768px) {
+    left: 0;
+    top: -100%;
+    width: 100%;
+    height: 200%;
+    ${(props) =>
+      props.$signIn !== true
+        ? `transform: translateY(50%);`
+        : "transform: translateY(0);"}
+  }
 `;
 
 export const OverlayPanel = styled.div`
@@ -230,6 +302,7 @@ export const OverlayPanel = styled.div`
   width: 50%;
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
+  gap: 24px;
 `;
 
 export const LeftOverlayPanel = styled(OverlayPanel)`
@@ -239,7 +312,6 @@ export const LeftOverlayPanel = styled(OverlayPanel)`
 export const RightOverlayPanel = styled(OverlayPanel)`
   right: 0;
   transform: translateX(1%);
-
   ${(props) => (props.$signIn !== true ? `transform: translateX(20%);` : "")}
 `;
 
@@ -247,22 +319,40 @@ export const Paragraph = styled.p`
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
-  letter-spacing: 0.5px;
-  margin: 20px 0 30px;
-  color: #ffffff;
-  max-width: 280px;
+  letter-spacing: 0.3px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 240px;
 `;
 
 export const PasswordResetLink = styled(Link)`
-  color: #9e7e5d;
+  color: rgba(158, 126, 93, 0.9);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 13px;
   align-self: center;
-  margin-top: 0.5rem;
-  transition: all 0.1s ease-in-out;
+  transition: color 0.15s ease;
 
   &:hover {
     color: #4a3421;
     text-decoration: underline;
+  }
+`;
+
+export const MobileToggleButton = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(43, 30, 20, 0.6);
+
+    span {
+      padding: 5px;
+      color: #9e7e5d;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
 `;

@@ -5,7 +5,7 @@ import { TimeRow } from './TimeRow';
 import { ActionButtons } from './ActionButtons';
 import { ReminderField } from './ReminderField';
 
-export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete }) {
+export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, showReminder = true, tags }) {
     const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
     const setRecurrence = (r) => setForm(f => ({ ...f, recurrence: r }));
     const setReminder = (r) => setForm(f => ({ ...f, reminder: r }));
@@ -13,11 +13,11 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete }) 
         <form onSubmit={onSubmit}>
             <FormField label="Title" value={form.title} onChange={update('title')} required />
             <FormField label="Description" type="textarea" value={form.description} onChange={update('description')} />
-            <TagField value={form.tag} onChange={update('tag')} />
+            <TagField value={form.tag} onChange={update('tag')} customTags={tags} />
             <FormField label="Location" value={form.location} onChange={update('location')} placeholder="e.g. Room 214" />
             <TimeRow form={form} update={update} setForm={setForm} />
             <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
-            <ReminderField value={form.reminder} onChange={setReminder} />
+            {showReminder && <ReminderField value={form.reminder} onChange={setReminder} />}
             <ActionButtons isEditing={isEditing} onDelete={onDelete} />
         </form>
     );

@@ -6,7 +6,11 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
 from studyFlax.models import CalendarEvent
+<<<<<<< HEAD
 from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
+=======
+from datetime import timedelta
+>>>>>>> origin/main
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -33,6 +37,7 @@ def create_enrollments(request):
             start_time=module.start_time,end_time=module.end_time,
             recurrence_rule = module.recurrence_rule,
             location=module.location,
+            priority='high',
             source="module_enrollment")
     create_enrollment_deadline_events(request.user, module)
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)

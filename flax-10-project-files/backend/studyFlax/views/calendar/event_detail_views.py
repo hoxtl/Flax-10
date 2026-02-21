@@ -13,9 +13,8 @@ from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def event_detail(request, pk):
-    # Filter by user - users can only access their own events
     event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
-    
+
     if request.method == 'GET': 
         return get_event(event)
     if request.method == 'PUT': 
@@ -29,7 +28,7 @@ def get_event(event):
 
 
 def update_event(event, data):
-    serialiser = CalendarEventCreateSerialiser(event, data=data)
+    serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
