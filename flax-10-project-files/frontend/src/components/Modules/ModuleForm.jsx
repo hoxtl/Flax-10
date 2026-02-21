@@ -32,9 +32,7 @@ async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubm
     } catch (err) {
         setErrors({ submit: err.message });
     } finally {
-        setSubmitting(false);
-    }
-}
+        setSubmitting(false);}}
 
 //Form container with all field sections and submit / cancel actions
 function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmit, onCancel }) {
