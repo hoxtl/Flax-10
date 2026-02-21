@@ -73,27 +73,33 @@ export function FormInput({ id, label, type = "text", value, onChange, required,
   );
 }
 
+function GroupedOptions({ options }) {
+  return (
+    <>
+      <option value="" disabled>Select your course</option>
+      {options.map((group) => (
+        <optgroup key={group.label} label={group.label}>
+          {group.options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </optgroup>
+      ))}
+    </>
+  );
+}
+
+function FlatOptions({ options }) {
+  return options.map((opt) => (
+    <option key={opt.value} value={opt.value}>{opt.label}</option>
+  ));
+}
+
 export function FormSelect({ id, label, value, onChange, options, name, grouped }) {
   return (
     <div className={styles.formGroup}>
       <label htmlFor={id}>{label}</label>
       <select id={id} name={name || id} value={value} onChange={onChange}>
-        {grouped ? (
-          <>
-            <option value="">Select your course</option>
-            {options.map((group) => (
-              <optgroup key={group.label} label={group.label}>
-                {group.options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </optgroup>
-            ))}
-          </>
-        ) : (
-          options.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))
-        )}
+        {grouped ? <GroupedOptions options={options} /> : <FlatOptions options={options} />}
       </select>
     </div>
   );

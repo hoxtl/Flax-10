@@ -33,9 +33,7 @@ function TopBarGreeting({ user }) {
         )}
         <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
-    </div>
-  );
-}
+    </div>);}
 
 function SearchInput() {
   return (

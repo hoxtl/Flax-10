@@ -3,11 +3,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from studyFlax.models import Enrollment
-from studyFlax.serialisers import EnrollmentSerialiser
-from studyFlax.models import CalendarEvent
 from datetime import timedelta
 from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
+from studyFlax.models import Enrollment, CalendarEvent
+from studyFlax.serialisers import EnrollmentSerialiser
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -43,16 +42,16 @@ def create_enrollments(request):
 @permission_classes([IsAuthenticated])
 def enrollment_detail(request, enrollment_id):
     enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    user = request.user
     if request.method == 'GET':
         return Response(EnrollmentSerialiser(enrollment).data)
-    return delete_enrollment(request, enrollment, user)
-def delete_enrollment(request, enrollment, user):
-    if enrollment.student != user:
+    return delete_enrollment(request, enrollment)
+
+def delete_enrollment(request, enrollment):
+    if enrollment.student != request.user:
         return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
     
     CalendarEvent.objects.filter( 
-        user=user,
+        user=request.user,
         module=enrollment.module,
         source__in=["module_enrollment", "module_deadline"]
     ).delete()

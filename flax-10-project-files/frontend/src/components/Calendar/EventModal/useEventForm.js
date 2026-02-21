@@ -1,7 +1,3 @@
-/*
-    This file is used to handle the form logic for the event modal.
-*/
-
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
 import { useEventActions } from '../hooks/useCalendarEvents';
@@ -21,8 +17,7 @@ export function useEventForm(event, onClose, options = {}) {
     const handleCancelSave = () => setOverlapWarning(null);
     const handleDelete = options.customSubmit ? () => { options.customSubmit({ ...form, _delete: true }); onClose(); } : () => confirmDelete(event, actions, onClose);
 
-    return { form, setForm, error, overlapWarning, isEditing: !!event?.id, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete };
-}
+    return { form, setForm, error, overlapWarning, isEditing: !!event?.id, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete };}
 
 function createCustomSubmitHandler(form, customSubmit, onClose, setError) {
     return (e) => {

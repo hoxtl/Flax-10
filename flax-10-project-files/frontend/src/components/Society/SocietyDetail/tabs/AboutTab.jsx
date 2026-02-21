@@ -25,6 +25,4 @@ function AboutEditor({ text, onUpdate }) {
                     {isDirty ? "Save Changes" : "Saved"}
                 </button>
             </div>
-        </div>
-    );
-}
+        </div>);}
