@@ -20,4 +20,7 @@ class DeadlineSerialiser(serializers.ModelSerializer):
             raise serializers.ValidationError("End time must be after start time")
         return validated_data
 
-
+class DeadlineSummarySerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Deadline
+        fields = ['id', 'title', 'deadline_type', 'start_due_date']
