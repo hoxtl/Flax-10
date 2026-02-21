@@ -131,6 +131,43 @@ class Command(BaseCommand):
         Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
         self.stdout.write(f"Created {len(enrollments)} enrollments.")
 
+    def create_societies(self):
+        self.stdout.write("Seeding societies...")
+        for name, bio, about, image in society_fixtures:
+            society, _ = Society.objects.get_or_create(
+                name=name,
+                defaults={
+                    'bio': bio, 'about': about, 'image': image,
+                    'ratification_status': 'approved', 'is_ratified': True
+                }
+            )
+        self._seed_society_tags(society)
+    def _seed_society_tags(self, society):
+        from faker import Faker
+        f = Faker('en_GB')
+        tags = ["Social", "Academic", "Career", "Hobbies", "Sports"]
+        for label in random.sample(tags, random.randint(1, 3)):
+            SocietyTag.objects.get_or_create(
+                society=society, label=label,
+                defaults={'color': f.hex_color()}
+            )
+
+    def create_society_memberships(self):
+        self.stdout.write("Seeding society memberships...")
+        for society in Society.objects.all():
+            self._seed_society_members(society)
+
+    def _seed_society_members(self, society):
+        admin = random.choice(self.users)
+        SocietyMembership.objects.get_or_create(
+            user=admin, society=society, defaults={'role': 'admin'}
+        )
+        members = random.sample(self.users, random.randint(5, 15))
+        for member in members:
+            SocietyMembership.objects.get_or_create(
+                user=member, society=society, defaults={'role': 'member'}
+            )
+
     def print_stats(self):
         print("=" * 30)
         print(f"Users: {User.objects.count()}")
@@ -139,4 +176,6 @@ class Command(BaseCommand):
         print(f"Categories: {Category.objects.count()}")
         print(f"Tags: {Tag.objects.count()}")
         print(f"Events: {CalendarEvent.objects.count()}")
+        print(f"Societies: {Society.objects.count()}")
+        print(f"Society Memberships: {SocietyMembership.objects.count()}")
         print("=" * 30)
