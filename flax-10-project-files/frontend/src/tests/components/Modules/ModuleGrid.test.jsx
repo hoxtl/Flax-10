@@ -21,7 +21,7 @@ describe('ModuleGrid', () => {
             { id: 2, module_code: '4CCS1DST', module_name: 'Data Structures' },
         ];
         render(<ModuleGrid {...mockParameters} modules={modules} />);
-        expect(screen.getByText('SoftwareEngineering')).toBeInTheDocument();
+        expect(screen.getByText('Software Engineering')).toBeInTheDocument();
         expect(screen.getByText('Data Structures')).toBeInTheDocument();
     });
 

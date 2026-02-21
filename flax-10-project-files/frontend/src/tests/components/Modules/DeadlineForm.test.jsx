@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import DeadlineForm from '../../../components/Modules/DeadlineForm';
 
-vi.mock('../../../utils/deadlineUtils', () => ({
+vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     DEADLINE_TYPES: [
         { value: 'coursework', label: 'Coursework' },
         { value: 'exam', label: 'Exam' },
