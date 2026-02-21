@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import styles from "./Home.module.css";
 import PillFilters from "../../components/Tags/PillFilters";
 import DateNavigator from "../../components/Home/DateNavigator";
+import TodayTasks from "../../components/Home/TodayTasks";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
@@ -51,6 +52,7 @@ export default function Home() {
       <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
       <div className={styles.content}>
         <CardGrid items={filtered} onDelete={removeEvent} onEdit={handleEdit} date={selectedDate} />
+        <TodayTasks />
       </div>
     </div>
   );
