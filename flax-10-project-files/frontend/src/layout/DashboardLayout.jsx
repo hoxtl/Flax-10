@@ -42,20 +42,6 @@ async function handleLogoutClick() {
   finally { clearUserData(); }
 }
 
-function DesktopSidebar({ isMobile, user, activeNav, onNavChange }) {
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} isMobile={isMobile} />;
-}
-
-function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
-  if (!isMobile || !open) return null;
-  return (
-    <>
-      <div className={styles.backdrop} onClick={onClose} />
-      <div className={styles.drawer}><Sidebar user={user} active={activeNav} onChange={onPick} /></div>
-    </>
-  );
-}
-
 function PageContent({ activeNav, children }) {
   const isMapPage = activeNav === "map";
   const mapStyle = { padding: 0, overflow: "hidden", height: "100%" };
@@ -64,11 +50,18 @@ function PageContent({ activeNav, children }) {
   );
 }
 
-function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
+function MainArea({ isMobile, user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
   return (
     <div className={styles.main}>
-      <TopBar user={user} onAddClick={onQuickAdd} onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
+      {!isMobile && (
+        <TopBar 
+          user={user} 
+          onAddClick={onQuickAdd} 
+          onSettingsClick={onSettingsClick}
+          onLogoutClick={onLogoutClick} 
+          onProfileClick={onProfileClick} 
+        />
+      )}
       {showWeekBar && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
     </div>
@@ -101,7 +94,7 @@ function useDashboardState(activeNav, onNavChange) {
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType };
 }
 
-function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onPickNav, setMobileSidebarOpen }) {
+function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onPickNav, setMobileSidebarOpen, onSettings, onLogout, onProfile }) {
   return (
     <Sidebar
       user={user}
@@ -110,6 +103,9 @@ function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onPic
       isMobile={isMobile}
       isOpen={mobileSidebarOpen}
       onToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+      onSettingsClick={onSettings}
+      onLogoutClick={onLogout}
+      onProfileClick={onProfile}
     />
   );
 }
@@ -143,10 +139,16 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav } = state;
   return (
     <div className={styles.root}>
-      <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
-        user={user} activeNav={activeNav} onNavChange={onNavChange}
-        onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
-      <DashboardMain state={{ ...state, activeNav }} onNavChange={onNavChange}>{children}</DashboardMain>
+      <DashboardSidebars 
+        {...state} 
+        activeNav={activeNav} 
+        onSettings={() => onNavChange("settings")}
+        onLogout={handleLogoutClick}
+        onProfile={() => onNavChange("profile")}
+      />
+      <DashboardMain state={{ ...state, activeNav, isMobile }} onNavChange={onNavChange}>
+        {children}
+      </DashboardMain>
       <FloatingTasks />
     </div>
   );
