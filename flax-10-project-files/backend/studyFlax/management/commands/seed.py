@@ -17,6 +17,12 @@ class Command(BaseCommand):
     EVENTS_PER_USER_RANGE = (60, 90)
     DEFAULT_PASSWORD = '1234'
 
+    FIXTURE_USERS = [
+        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk', 'first_name': 'John', 'last_name': 'Doe', 'is_superuser': True, 'is_staff': True},
+        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk', 'first_name': 'Jane', 'last_name': 'Doe', 'is_superuser': False, 'is_staff': False},
+        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk', 'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+    ]
+
     def _load_shared_data(self):
         self.users = list(User.objects.filter(is_staff=False))
         self.categories = list(Category.objects.all())
@@ -27,6 +33,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
         self.create_admin_user()
+        self.create_fixture_users()
         self.create_random_users()
         self.users = list(User.objects.filter(is_staff=False))
         self.create_recurrence_rules()
@@ -38,7 +45,6 @@ class Command(BaseCommand):
         self.create_modules()
         self.modules = list(Module.objects.all())
         self.create_enrollments()
-        self.stdout.write(self.style.SUCCESS('Seeding complete!'))
         self.print_stats()
 
     def create_admin_user(self):
@@ -47,6 +53,18 @@ class Command(BaseCommand):
         User.objects.create_superuser(username='johndoe', email='john.doe@example.com',
                                       password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe')
         self.stdout.write(self.style.SUCCESS("Created admin user: johndoe"))
+
+    def create_fixture_users(self):
+        self.stdout.write("Seeding fixture users...")
+        for data in self.FIXTURE_USERS:
+            if User.objects.filter(username=data['username']).exists():
+                continue
+            user = User(**{k: v for k, v in data.items() if k not in ('is_superuser', 'is_staff')})
+            user.is_superuser = data['is_superuser']
+            user.is_staff = data['is_staff']
+            user.set_password('1234')
+            user.save()
+            self.stdout.write(f"  Created user: {data['username']}")
 
     def create_random_users(self):
         needed = self.USER_COUNT - User.objects.count()
@@ -126,11 +144,18 @@ class Command(BaseCommand):
         self.stdout.write(f"Created {len(enrollments)} enrollments.")
 
     def print_stats(self):
-        print("=" * 30)
-        print(f"Users: {User.objects.count()}")
-        print(f"Modules: {Module.objects.count()}")
-        print(f"Enrollments: {Enrollment.objects.count()}")
-        print(f"Categories: {Category.objects.count()}")
-        print(f"Tags: {Tag.objects.count()}")
-        print(f"Events: {CalendarEvent.objects.count()}")
-        print("=" * 30)
+        stats = [
+            ("Users",       User.objects.count()),
+            ("Modules",     Module.objects.count()),
+            ("Enrollments", Enrollment.objects.count()),
+            ("Categories",  Category.objects.count()),
+            ("Tags",        Tag.objects.count()),
+            ("Events",      CalendarEvent.objects.count()),
+        ]
+        self.stdout.write("\n" + self.style.SUCCESS("✅ Seeding complete!"))
+        self.stdout.write(self.style.SUCCESS("─" * 35))
+        for label, count in stats:
+            self.stdout.write(f"  {self.style.SUCCESS('●')} {label:<14} {self.style.WARNING(str(count))}")
+        self.stdout.write(self.style.SUCCESS("─" * 35))
+        self.stdout.write(f"  {self.style.HTTP_INFO('Fixture users: johndoe (admin), janedoe, charlie')}")
+        self.stdout.write(f"  {self.style.HTTP_INFO('Password: 1234')}\n")
