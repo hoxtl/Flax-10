@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getDeadlineCountdown, getDeadlineUrgency, formatDeadlineDateTime, DEADLINE_LABELS, DEADLINE_TYPES, TYPES_WITH_LOCATION } from '../../utils/deadlineUtils';
+import { getDeadlineCountdown, getDeadlineUrgency, formatDeadlineDateTime,
+    DEADLINE_LABELS, DEADLINE_TYPES, TYPES_WITH_LOCATION } from '../../components/Modules/utils/deadlineUtils';
 
 describe('deadlineUtils', () => {
     beforeEach(() => {
