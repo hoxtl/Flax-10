@@ -284,4 +284,13 @@
     padding: 12px 24px;
     justify-content: flex-start !important;
   }
+
+  .userMenu {
+    position: fixed;
+    bottom: 75px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    z-index: 9999;
+  }
 }
