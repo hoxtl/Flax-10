@@ -13,7 +13,7 @@ const mockHook = {
     toggleEnrollment: vi.fn(),
 };
 
-vi.mock('../../hooks/useModules', () => ({ default: () => mockHook }));
+vi.mock('../../../components/Modules/hooks/useModules', () => ({ default: () => mockHook }));
 vi.mock('../../utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     filterModules: vi.fn((modules) => modules),
