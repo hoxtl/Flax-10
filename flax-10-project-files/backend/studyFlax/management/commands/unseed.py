@@ -14,6 +14,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("No superusers found. The database will be completely emptied."))
 
         tables_to_truncate = [
+            'studyFlax_deadline',
+            'studyFlax_enrollment',
+            'studyFlax_module',
             'studyFlax_calendarevent',
             'studyFlax_tag',
             'studyFlax_category',
