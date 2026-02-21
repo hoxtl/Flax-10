@@ -121,18 +121,21 @@ class Command(BaseCommand):
     def _should_enroll(self, user, module):
         return not Enrollment.objects.filter(student=user, module=module).exists()
 
-    def _enroll_if_needed(self, user, module, enrollments):
+    def _enroll_if_needed(self, user, module, enrollments, is_core=False):
         if self._should_enroll(user, module):
-            enrollments.append(Enrollment(student=user, module=module))
+            enrollments.append(Enrollment(student=user, module=module, is_core=is_core))
 
-    def _process_module(self, user, module, lecture_tag, enrollments):
-        self._enroll_if_needed(user, module, enrollments)
+    def _process_module(self, user, module, lecture_tag, enrollments, is_core=False):
+        self._enroll_if_needed(user, module, enrollments, is_core)
         for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
             create_lecture_event(u, mod, start, end, tag)
 
     def _process_user_modules(self, user, lecture_tag, enrollments):
-        for module in get_user_modules(user, self.modules):
-            self._process_module(user, module, lecture_tag, enrollments)
+        core, extras = get_user_modules(user, self.modules)
+        for module in core:
+            self._process_module(user, module, lecture_tag, enrollments, is_core=True)
+        for module in extras:
+            self._process_module(user, module, lecture_tag, enrollments, is_core=False)
 
     def create_enrollments(self):
         self.stdout.write("Seeding enrollments and lecture events...")
