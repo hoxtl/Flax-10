@@ -105,12 +105,12 @@
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
+
 .sidebarFooter {
   margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  padding: 4px 10px 0 10px;
-  gap: 2px;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  position: relative;
 }
 
 /* ── User row ────────────────────────────────────────────────────────────── */
@@ -131,17 +131,17 @@
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .avatarImage {
@@ -156,9 +156,9 @@
 }
 
 .userName {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--user-details-text);
+  color: var(--text);
   white-space: nowrap;
 }
 
