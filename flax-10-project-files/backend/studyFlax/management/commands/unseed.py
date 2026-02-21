@@ -5,14 +5,14 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 TABLES = [
-    'studyFlax_deadline',
+    # 'studyFlax_deadline',
     'studyFlax_enrollment',
     'studyFlax_module',
     'studyFlax_calendarevent',
     'studyFlax_tag',
     'studyFlax_category',
-    'studyFlax_task',
-    'studyFlax_tasklist',
+    # 'studyFlax_task',
+    # 'studyFlax_tasklist',
     'studyFlax_recurrencerule',
     'studyFlax_usersettings',
     'studyFlax_notification',
