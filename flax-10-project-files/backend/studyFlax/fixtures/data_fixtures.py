@@ -1,5 +1,5 @@
 from zoneinfo import ZoneInfo
-
+# Format: (name, color, is_default)
 category_fixtures = (
     ('Work', '#FF5733', True),
     ('University', '#33FF57', True),
@@ -9,6 +9,7 @@ category_fixtures = (
     ('Health', '#33FFF5', False),
 )
 
+# Format: (name, default_duration_minutes)
 tag_fixtures = (
     ('Lecture', 120),
     ('Practical', 90),
@@ -19,6 +20,7 @@ tag_fixtures = (
     ('Assignment Deadline', 0),
 )
 
+# Format: (frequency, interval)
 recurrence_fixtures = (
     ('daily', 1),
     ('weekly', 1),
@@ -112,6 +114,7 @@ dinner_fixtures = (
     "Baked aubergine parmigiana",
 )
 
+# Event descriptions
 description_fixtures = (
     "Need to get this done before the deadline.",
     "Need to review the slides before this.",
@@ -137,6 +140,7 @@ description_fixtures = (
     "Make sure to eat before this.",
 )
 
+# Locations
 location_fixtures = (
     "Bush House, Strand, London WC2B 4PJ",
     "Maughan Library, Chancery Lane, London WC2A 1LR",
@@ -169,6 +173,8 @@ lecture_theatre_fixtures = (
     "Wolfson Lecture Theatre, St Thomas Campus",
 )
 
+# Modules
+# Format: (module_code, module_name, description)
 module_fixtures = (
     # Computer Science
     ("CS4101", "Introduction to Programming", "Fundamentals of programming using Python. Covers variables, loops, functions and data structures."),
@@ -176,7 +182,7 @@ module_fixtures = (
     ("CS4303", "Software Engineering", "Software development lifecycle, agile methods, version control and team project work."),
     ("CS4404", "Databases & Information Systems", "Relational databases, SQL, data modelling and information retrieval."),
 
-    # Artificial Intelligence 
+    # Artificial Intelligence
     ("AI4101", "Machine Learning Fundamentals", "Supervised and unsupervised learning, neural networks, and model evaluation."),
     ("AI4202", "Natural Language Processing", "Text processing, language models, sentiment analysis and sequence modelling."),
 
@@ -185,7 +191,7 @@ module_fixtures = (
     ("EE4202", "Digital Systems & Logic Design", "Boolean algebra, logic gates, combinational and sequential digital circuits."),
     ("EE4303", "Signals & Systems", "Signal processing, Fourier transforms, filtering and communication systems."),
 
-    # General Engineering 
+    # General Engineering
     ("GN4101", "Engineering Mathematics", "Mathematical methods for engineers including calculus, ODEs and linear algebra."),
     ("GN4202", "Engineering Design & Materials", "Design principles, material properties, manufacturing processes and sustainability."),
     ("GN4303", "Thermodynamics & Fluid Mechanics", "Energy, heat transfer, fluid behaviour and engineering applications."),
@@ -196,45 +202,45 @@ module_fixtures = (
     ("MA4303", "Probability & Statistics", "Probability theory, distributions, hypothesis testing and statistical inference."),
     ("MA4404", "Real Analysis", "Sequences, series, continuity, differentiation and integration on the real line."),
 
-    # Physics
+    # Physics 
     ("PH4101", "Classical Mechanics", "Newtonian mechanics, energy, momentum, rotational motion and oscillations."),
     ("PH4202", "Electromagnetism", "Electric and magnetic fields, Maxwell's equations and electromagnetic waves."),
     ("PH4303", "Quantum Mechanics", "Wave-particle duality, Schrödinger equation, and quantum states."),
 
-    # Life Sciences 
+    # Life Sciences / Medicine / Biomedical 
     ("LS4101", "Cell Biology", "Cell structure, function, division and molecular biology fundamentals."),
     ("LS4202", "Biochemistry Foundations", "Proteins, enzymes, metabolism and molecular interactions in living systems."),
     ("LS4303", "Human Anatomy", "Structure and function of the human body systems."),
     ("LS4404", "Physiology", "Mechanisms of body function including cardiovascular, respiratory and renal systems."),
 
-    # Law
+    #Law
     ("LW4101", "Contract Law", "Formation and enforcement of contracts, offer and acceptance, consideration and breach."),
     ("LW4202", "Constitutional Law", "UK constitutional principles, parliamentary sovereignty and human rights law."),
     ("LW4303", "Criminal Law", "Principles of criminal liability, offences against the person and defences."),
 
-    # Psychology and Neuroscience
+    # Psychology / Neuroscience
     ("PS4101", "Introduction to Psychology", "Cognitive, social and developmental psychology. Research methods and key theories."),
     ("PS4202", "Cognitive Neuroscience", "Neural basis of perception, memory, attention and decision-making."),
     ("PS4303", "Research Methods in Psychology", "Experimental design, statistics and ethics in psychological research."),
 
-    # Business and Economics
+    #  Business / Economics 
     ("BM4101", "Business Strategy", "Strategic analysis, competitive advantage, market positioning and case studies."),
     ("BM4202", "Accounting & Finance", "Financial statements, budgeting, investment appraisal and management accounting."),
     ("EC4101", "Microeconomics", "Supply and demand, market structures, consumer theory and welfare economics."),
     ("EC4202", "Macroeconomics", "GDP, inflation, unemployment, monetary policy and international trade."),
 
-    # History
+    # History 
     ("HI4101", "Modern British History", "British political and social history from 1850 to the present day."),
     ("HI4202", "European History 1914-1945", "The causes and consequences of the First and Second World Wars."),
     ("HI4303", "Global History", "Colonialism, decolonisation and the making of the modern world."),
 
-    # English Literature and Philosophy
+    # English Literature & Philosophy 
     ("EN4101", "Literary Theory", "Critical frameworks for reading literature including structuralism, post-colonialism and feminism."),
     ("EN4202", "Modern Fiction", "Close reading of 20th and 21st century novels and short stories."),
     ("PL4101", "Ethics & Political Philosophy", "Justice, rights, liberty and the foundations of political authority."),
     ("PL4202", "Philosophy of Mind", "Consciousness, mental representation, and the mind-body problem."),
 
-    # Social Science
+    # Social Science 
     ("GE4101", "Human Geography", "Urbanisation, migration, globalisation and spatial inequality."),
     ("PO4101", "Introduction to Politics", "Political institutions, ideologies, and comparative government."),
     ("IR4101", "International Relations Theory", "Realism, liberalism, constructivism and the structure of world politics."),
@@ -242,37 +248,42 @@ module_fixtures = (
     # Nursing 
     ("NU4101", "Foundations of Nursing Practice", "Patient care principles, clinical skills and professional ethics."),
     ("NU4102", "Anatomy & Physiology for Nurses", "Body systems and their functions with a focus on clinical application."),
-    ("NU4203", "Mental Health Nursing", "Therapeutic communication, mental health assessment and care planning for patients with psychological conditions."),
-    ("NU4204", "Adult Nursing in Acute Settings", "Managing patients in high-dependency environments including post-operative and emergency care."),
-    
-    # Dentistry
+    ("NU4203", "Mental Health Nursing", "Therapeutic communication, mental health assessment and care planning."),
+    ("NU4204", "Adult Nursing in Acute Settings", "Managing patients in high-dependency and emergency care environments."),
+    ("NU4205", "Child and Family Nursing", "Paediatric care principles, family-centred nursing and safeguarding."),
+
+    # Dentistry 
     ("DE4101", "Oral Biology", "Structure and function of teeth, supporting tissues and oral health."),
 
-    # Modern Languages =
-    ("FR4101", "French Language I", "Introductory French for beginners. Speaking, listening, reading and writing skills."),
-    ("FR4202", "French Language II", "Intermediate French. Grammar consolidation, conversation and written expression."),
-    ("SP4101", "Spanish Language I", "Introductory Spanish. Core grammar, vocabulary and everyday communication skills."),
-    ("SP4202", "Spanish Language II", "Intermediate Spanish. Cultural contexts, literature and advanced conversation."),
-    ("GL4101", "German Language I", "Introductory German. Pronunciation, grammar foundations and practical communication."),
-    ("GL4202", "German Language II", "Intermediate German. Reading, writing, conversation and cultural context."),
-    ("AR4101", "Arabic Language I", "Modern Standard Arabic script, pronunciation, grammar and basic conversation."),
-    ("ZH4101", "Mandarin Chinese I", "Introduction to Mandarin. Pinyin, tones, characters and everyday expressions."),
-   # Arts
+    # Modern Languages
+    ("FR4101", "French Language I", "Introductory French: core grammar, practical speaking, listening and reading skills."),
+
+    ("SP4303", "Latin American Literature and Identity", "García Márquez, Luiselli, magical realism and postcolonial identity."),
+    ("SP4404", "Spanish in the Contemporary World", "Politics, media, activism and the global reach of the Spanish language."),
+
+    ("GL4101", "German Language I", "Introductory German: pronunciation, grammar foundations and practical communication."),
+    ("GL4303", "German History Through Language", "Weimar Republic, Third Reich and reunification through primary sources."),
+    ("GL4404", "Contemporary German Society", "Migration, identity politics and modern Germany in text and media."),
+
+    ("AR4303", "Arabic Media and Politics", "News broadcasts, speeches and social media in Arabic."),
+    ("ZH4303", "Chinese Society and Culture", "Contemporary China through film, literature and media."),
+    ("IT4101", "Italian Language I", "Core Italian grammar, conversational skills and cultural introduction."),
+    ("PT4101", "Portuguese Language I", "Brazilian Portuguese grammar foundations and everyday communication."),
+
+    # Arts 
     ("FA4101", "History of Art", "Survey of Western art from the Renaissance to the contemporary period."),
     ("FA4202", "Contemporary Art & Theory", "Critical frameworks for understanding art since 1960."),
     ("TH4101", "Introduction to Theatre Studies", "Performance theory, dramatic texts and the history of theatre."),
     ("MU4101", "Music History", "Western classical music from Bach to the 20th century."),
     ("MU4202", "Music Theory", "Notation, harmony, counterpoint and compositional techniques."),
-    ("CL4101", "Classical Studies", "Greek and Roman literature, history and culture in translation."),
-    ("CR4101", "Creative Writing", "Fiction, poetry and non-fiction workshops with peer critique."),
 )
 
 course_fixtures = (
     "Computer Science", "Artificial Intelligence", "Mathematics", "Physics", "Chemistry",
     "Law", "Medicine", "Biomedical Science", "Neuroscience", "Psychology", "Nursing",
     "Business Management", "Economics", "Politics", "History", "English Literature",
-    "Philosophy", "Film Studies", "Dentistry", "Geography",
-    "International Relations",
+    "Philosophy", "Film Studies", "Dentistry", "Geography", "International Relations",
+    "French", "Spanish", "German", "Modern Languages", "Music", "Classical Studies",
 )
 
 course_to_module_prefixes = {
@@ -307,6 +318,8 @@ course_to_module_prefixes = {
     "French": ["FR"],
     "Spanish": ["SP"],
     "German": ["GL"],
+    "Italian": ["IT"],
+    "Portuguese": ["PT"],
     "Music": ["MU"],
     "Classical Studies": ["CL"],
 }
@@ -336,9 +349,127 @@ module_prefix_to_department = {
     "GL": "Arts & Humanities",
     "AR": "Arts & Humanities",
     "ZH": "Arts & Humanities",
+    "IT": "Arts & Humanities",
+    "PT": "Arts & Humanities",
     "FA": "Arts & Humanities",
     "TH": "Arts & Humanities",
     "MU": "Arts & Humanities",
     "CL": "Arts & Humanities",
     "CR": "Arts & Humanities",
+}
+
+# Deadline fixtures
+# Format: (deadline_type, title, description)
+# Generic fallback used when a module prefix has no specific entry below.
+deadline_fixtures = (
+    ("coursework", "Coursework 1", "Submit via KEATS by the deadline. Check the module page for submission instructions."),
+    ("coursework", "Coursework 2", "Worth 50 marks, assessing weeks 1–5. Full brief available on KEATS."),
+    ("quiz", "Multiple Choice Quiz", "Short online quiz on KEATS covering recent lecture topics."),
+    ("exam", "Final Exam", "Final exam covering the entire module. Good luck!"),
+    ("presentation", "Group Presentation", "Group presentation in class, at least 15 mins. Slides to be uploaded to KEATS."),
+)
+
+# Maps specific deadlines to modules via module code prefix.
+# Format: (deadline_type, title, description)
+module_deadline_fixtures = {
+    "CS": [
+        ("coursework", "Programming Project", "Create a Time Management System for students. Submit code and report via KEATS."),
+        ("exam", "Final exam", "Closed-book written exam covering all lecture materials."),
+        ("quiz", "KEATS Quiz", "5 questions to help revise material over reading week."),
+    ],
+    "AI": [
+        ("coursework", "Programming Project", "Evaluate a machine learning model of your choice. Submit evaluation via KEATS."),
+        ("exam", "Final Exam", "Computer exam covering all topics. Derivations and conceptual questions included."),
+        ("quiz", "KEATS Quiz", "5 questions to help revise material over reading week."),
+    ],
+    "MA": [
+        ("coursework", "Practice Problems", "Complete all questions from the assignment. Submit online for automatic feedback."),
+        ("exam", "Final exam", "In-person written exam. No calculators unless specified."),
+        ("exam", "Final exam", "Closed book exam with formula sheet provided."),
+    ],
+    "PH": [
+        ("coursework", "Lab report", "Write up your Hooke's Law experiment. Include data, error analysis and conclusions."),
+        ("exam", "Final exam", "Closed-book written exam. Covers the full module and includes formula sheet."),
+    ],
+    "EE": [
+        ("coursework", "Lab Report", "Document your Arduino lab experiment. Include circuit diagram measurements. Submit via KEATS."),
+        ("exam", "Final exam", "Open-book written exam with data sheet. Check KEATS for allowed materials."),
+    ],
+    "GN": [
+        ("coursework", "Design Portfolio", "Detailed portfolio of all design work. Include sketches and calculations."),
+        ("exam", "Final exam", "Comprehensive exam. Check KEATS for room allocation."),
+    ],
+    "LS": [
+        ("coursework", "Individual Lab Report", "Write up your practical session. Include methodology and data analysis."),
+        ("exam", "Reading Week Exam", "Multiple choice and short answer questions covering weeks 1–5."),
+        ("quiz", "KEATS Quiz", "15 questions assessing your understanding of the module so far."),
+    ],
+    "LW": [
+        ("coursework", "Legal Essay", "Critical legal essay on your assigned question. 1500 words."),
+        ("exam", "Final exam", "Open-book written exam. No annotations permitted."),
+        ("presentation", "Class Presentation", "Oral advocacy exercise. Prepare legal arguments for your view of the problem."),
+    ],
+    "PS": [
+        ("coursework", "Research Report", "Write up your research study in the discussed format. Submit through KEATS."),
+        ("exam", "Final exam", "Closed-book written exam with essay questions."),
+    ],
+    "BM": [
+        ("coursework", "Business Case Study", "Analyse your assigned company. 2500 words."),
+        ("exam", "Final exam", "Closed-book written exam with case study and essay questions."),
+        ("presentation", "Pitch Presentation", "Present your business proposal to a panel. 15 minutes plus Q&A."),
+    ],
+    "EC": [
+        ("coursework", "Economics Essay", "Analytical essay applying economic theory to a real-world issue. 2000 words."),
+        ("exam", "Mid-Term Exam", "Written exam with data response and short answer questions covering weeks 1–5."),
+        ("exam", "Final exam", "Closed-book exam covering the full module syllabus."),
+    ],
+    "HI": [
+        ("coursework", "Essay", "Historical essay on your assigned question. 2500 words. Chicago footnote referencing."),
+        ("exam", "Final exam", "Unseen written exam. Two essay questions from a choice of six."),
+    ],
+    "EN": [
+        ("coursework", "Essay", "Critical essay on the module texts. 2500 words. MLA referencing required."),
+        ("exam", "Final exam", "Unseen written exam. Essay questions on set texts and themes from the module."),
+        ("presentation", "Seminar Presentation", "Lead a 15-minute seminar discussion on your assigned text or topic."),
+    ],
+    "PL": [
+        ("coursework", "Philosophy Essay", "Argumentative essay defending your assigned philosophical position. 2000 words."),
+        ("exam", "Final exam", "Closed-book written exam. Two extended essay questions from a choice of five."),
+    ],
+    "PO": [
+        ("coursework", "Policy Brief", "1500-word policy brief on your assigned political issue. Clear recommendations required."),
+        ("exam", "Final exam", "Closed-book written exam. Two essay questions from a choice of six."),
+    ],
+    "IR": [
+        ("coursework", "Essay", "Analytical essay applying IR theory to a current international issue. 2500 words."),
+        ("exam", "Final exam", "Closed-book exam. Two essay questions covering all theories and case studies."),
+    ],
+    "NU": [
+        ("coursework", "Reflective Practice Portfolio", "Document and reflect on clinical placements using the Gibbs Reflective Cycle."),
+        ("exam", "Final exam", "Written exam with clinical scenario and short answer questions."),
+    ],
+    "DE": [
+        ("coursework", "Clinical Case Report", "Document a patient case including diagnosis and treatment plan. 1500 words."),
+        ("exam", "Final exam", "Written exam covering biology content. Multiple choice and extended answer questions."),
+    ],
+    "FR": [
+        ("coursework", "Written Assignment", "French essay or translation exercise as specified on KEATS."),
+        ("exam", "Written Exam", "Formal written exam including grammar, translation and essay components."),
+    ],
+    "SP": [
+        ("coursework", "Written Assignment", "Spanish written exercise as specified on KEATS. Focus on grammar accuracy."),
+        ("exam", "Written Exam", "Formal exam with grammar, translation and essay sections."),
+    ],
+    "GL": [
+        ("coursework", "Written Assignment", "German written exercise submitted via KEATS. Grammar and vocabulary assessed."),
+        ("exam", "Written Exam", "Formal written exam with grammar, reading comprehension and essay questions."),
+    ],
+    "AR": [
+        ("coursework", "Written Assignment", "Arabic written exercise submitted via KEATS."),
+        ("exam", "Written Exam", "Formal written exam with grammar, translation and reading comprehension."),
+    ],
+    "ZH": [
+        ("coursework", "Written Assignment", "Mandarin written exercise submitted via KEATS."),
+        ("exam", "Written Exam", "Formal written exam with character recognition and translation components."),
+    ],
 }
