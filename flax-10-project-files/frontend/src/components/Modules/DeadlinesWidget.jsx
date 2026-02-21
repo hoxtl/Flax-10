@@ -17,7 +17,7 @@ export default function DeadlinesWidget() {
 function useUpcomingDeadlines() {
     const [deadlines, setDeadlines] = useState([]);
     useEffect(() => {
-        getUpcomingDeadlines().then(setDeadlines).catch(() => {});
+        getUpcomingDeadlines().then(data => setDeadlines(data.slice(0,3))).catch(() => {});
     }, []);
     return deadlines;
 }
