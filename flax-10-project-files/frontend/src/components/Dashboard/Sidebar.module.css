@@ -197,6 +197,12 @@
   text-align: left;
 }
 
+.userEmail {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 /* ── Hamburger Icon ──────────────────────────────────────────────────────── */
 .hamburger {
   display: flex;
