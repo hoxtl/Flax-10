@@ -14,7 +14,7 @@ const mockModal = {
     close: vi.fn(),
 };
 
-vi.mock('../../../hooks/useDeadlineModal', () => ({
+vi.mock('../../../components/Modules/hooks/useDeadlineModal', () => ({
     useDeadlineModal: () => mockModal,
 }));
 
