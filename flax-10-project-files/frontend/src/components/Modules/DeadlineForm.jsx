@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../../utils/deadlineUtils.js';
+import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from './utils/deadlineUtils.js';
 import styles from './DeadlineForm.module.css';
 
 const EMPTY_FORM = { title: '', deadline_type: 'coursework', start_due_date: '', end_due_date: '', location: '', description: '' };
