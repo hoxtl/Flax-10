@@ -1,7 +1,11 @@
 import random
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from studyFlax.models import Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, Module, Enrollment
+from studyFlax.models import (
+    Category, Tag, RecurrenceRule, CalendarEvent, 
+    UserSettings, Module, Enrollment,
+    Society, SocietyMembership, SocietyTag,
+)
 from studyFlax.fixtures.data_fixtures import category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
@@ -38,8 +42,10 @@ class Command(BaseCommand):
         self.create_modules()
         self.modules = list(Module.objects.all())
         self.create_enrollments()
+        self.create_societies()
+        self.create_society_memberships()
         self.stdout.write(self.style.SUCCESS('Seeding complete!'))
-        self.print_stats()
+        self.print_stats()  
 
     def create_admin_user(self):
         if User.objects.filter(username='johndoe').exists():
