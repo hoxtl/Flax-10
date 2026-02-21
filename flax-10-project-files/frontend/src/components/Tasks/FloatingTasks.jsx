@@ -33,14 +33,22 @@ function FloatingTasksPortal({ open, setOpen, fabRef }) {
         To-do
       </button>
       <ToDoPanel open={open} onClose={() => setOpen(false)} fabRef={fabRef} />
-    </>);}
+    </>
+  );
+}
 
-export default function FloatingTasks() {
+export default function FloatingTasks({ isMobile, sidebarOpen }) {
   const fabRef = useRef(null);
   const [open, setOpen] = useState(loadOpenState);
+
   useEffect(() => saveOpenState(open), [open]);
+
+  if (isMobile && sidebarOpen) {
+    return null;
+  }
+
   return createPortal(
     <FloatingTasksPortal open={open} setOpen={setOpen} fabRef={fabRef} />,
-    document.body
+    document.body,
   );
 }

@@ -149,7 +149,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       <DashboardMain state={{ ...state, activeNav, isMobile }} onNavChange={onNavChange}>
         {children}
       </DashboardMain>
-      <FloatingTasks />
+      <FloatingTasks isMobile={isMobile} sidebarOpen={mobileSidebarOpen} />
     </div>
   );
 }
