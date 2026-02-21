@@ -42,6 +42,11 @@
 
 .content { flex: 1; min-width: 0; }
 
+.titleWrapper {
+    display: block;
+    width: 100%;
+}
+
 .title {
     font-size: 0.9rem;
     font-weight: 600;
@@ -49,7 +54,11 @@
     display: block;
     word-break: break-word;
 }
-.completed .title { text-decoration: line-through; }
+
+.completed .title {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
 
 .meta {
     display: flex;
@@ -96,6 +105,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     z-index: 10;
+    min-width: 100px;
 }
 .menu button {
     display: block;
@@ -103,32 +113,12 @@
     padding: 0.5rem 1rem;
     background: none;
     border: none;
-    color: var(--danger);
+    color: var(--text);
     font-size: 0.85rem;
     cursor: pointer;
     text-align: left;
 }
 .menu button:hover { background: var(--hover); }
-
-.titleWrapper {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-}
-
-.strikethrough {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 100%;
-    height: 16px;
-}
-
-.strikePath {
-    stroke: var(--text);
-}
-
 .deleteBtn { color: var(--danger) !important; }
 
 .overlay {
@@ -157,14 +147,12 @@
     justify-content: space-between;
     padding: 1.25rem 1.5rem 0;
 }
-
 .editHeader h3 {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--text);
     margin: 0;
 }
-
 .editHeader button {
     background: none;
     border: none;
@@ -191,7 +179,6 @@
     font-weight: 600;
     box-sizing: border-box;
 }
-
 .editInput:focus { outline: none; border-color: var(--primary); }
 
 .editDesc {
@@ -205,7 +192,6 @@
     resize: none;
     box-sizing: border-box;
 }
-
 .editDesc:focus { outline: none; border-color: var(--primary); }
 
 .editRow {
@@ -219,14 +205,12 @@
     flex-direction: column;
     gap: 0.3rem;
 }
-
 .editField label {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
 }
-
 .editField select, .editField input {
     padding: 0.5rem 0.6rem;
     border: 1px solid var(--border);
@@ -265,5 +249,4 @@
     font-weight: 600;
     cursor: pointer;
 }
-
 .saveBtn:disabled { opacity: 0.5; }

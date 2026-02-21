@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models.tasks.taskModel import Task, TaskList
 from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSerialiser
 
-from studyFlax.models.calendar.eventModel import Event
+from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.calendar.tagModel import Tag
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 
