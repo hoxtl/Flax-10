@@ -5,7 +5,8 @@ from studyFlax.models import Category, Tag, RecurrenceRule, CalendarEvent, UserS
 from studyFlax.fixtures.data_fixtures import category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
-    build_module_event, get_user_modules, build_lecture_events, create_lecture_event
+    build_meal_events, build_module_event, get_user_modules,
+    build_lecture_events, create_lecture_event,
 )
 
 User = get_user_model()
@@ -13,6 +14,7 @@ User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
+
     USER_COUNT = 25
     EVENTS_PER_USER_RANGE = (60, 90)
     DEFAULT_PASSWORD = '1234'
@@ -38,7 +40,7 @@ class Command(BaseCommand):
         self.users = list(User.objects.filter(is_staff=False))
         self.create_recurrence_rules()
         self.create_categories()
-        self.categories = list(Category.objects.all()) 
+        self.categories = list(Category.objects.all())
         self.create_tags()
         self._load_shared_data()
         self.create_events_for_users()
@@ -50,8 +52,10 @@ class Command(BaseCommand):
     def create_admin_user(self):
         if User.objects.filter(username='johndoe').exists():
             return
-        User.objects.create_superuser(username='johndoe', email='john.doe@example.com',
-                                      password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe')
+        User.objects.create_superuser(
+            username='johndoe', email='john.doe@example.com',
+            password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe',
+        )
         self.stdout.write(self.style.SUCCESS("Created admin user: johndoe"))
 
     def create_fixture_users(self):
@@ -92,19 +96,29 @@ class Command(BaseCommand):
         f = Faker('en_GB')
         for name, duration in tag_fixtures:
             category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-            user = category.user if category and category.user else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
-            Tag.objects.get_or_create(name=name, user=user, defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()})
+            user = (
+                category.user if category and category.user
+                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
+            )
+            Tag.objects.get_or_create(
+                name=name, user=user,
+                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
+            )
 
     def create_events_for_users(self):
         self.stdout.write("Seeding events for users...")
         total = 0
         for i, user in enumerate(self.users):
             print(f"Processing user {i+1}/{len(self.users)}: {user.username}", end='\r')
-            from faker import Faker
-            count = Faker('en_GB').random_int(*self.EVENTS_PER_USER_RANGE)
-            events = build_events_for_user(user, self.tags, self.rules, count)
-            CalendarEvent.objects.bulk_create(events)
-            total += len(events)
+
+            personal_events = build_events_for_user(user, self.tags, self.rules, 0)
+            CalendarEvent.objects.bulk_create(personal_events)
+
+            meal_events = build_meal_events(user, self.tags)
+            CalendarEvent.objects.bulk_create(meal_events)
+
+            total += len(personal_events) + len(meal_events)
+
         print(f"\nCreated {total} events across {len(self.users)} users.")
 
     def _create_module(self, code, name, description, admin, weekly_rule):

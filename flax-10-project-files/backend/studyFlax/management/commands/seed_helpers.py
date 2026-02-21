@@ -1,24 +1,21 @@
 import random
-from datetime import date, datetime, timedelta
-from zoneinfo import ZoneInfo
-from django.utils import timezone
+from datetime import date, datetime, timedelta, timezone as dt_timezone
 from django.contrib.auth import get_user_model
 from faker import Faker
 from studyFlax.models import CalendarEvent, UserSettings
 from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
-    location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes
+    location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
+    breakfast_fixtures, lunch_fixtures, dinner_fixtures,
 )
 
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
 
-# Seeding anchored to the start of term, not today
-SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=ZoneInfo("Europe/London"))
-SEED_DAYS = 365  # personal events cover a full year
+SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
+SEED_DAYS = 365
 
-# Reading week: no lectures between these dates (inclusive)
 READING_WEEK_START = date(2026, 2, 23)
 READING_WEEK_END   = date(2026, 2, 27)
 
@@ -28,18 +25,18 @@ def _in_reading_week(dt):
     return READING_WEEK_START <= d <= READING_WEEK_END
 
 
-# ---------------------------------------------------------------------------
-# User helpers
-# ---------------------------------------------------------------------------
-
 def is_name_taken(first, last, existing):
-    return (User.objects.filter(first_name=first, last_name=last).exists()
-            or any(u.first_name == first and u.last_name == last for u in existing))
+    return (
+        User.objects.filter(first_name=first, last_name=last).exists()
+        or any(u.first_name == first and u.last_name == last for u in existing)
+    )
 
 
 def is_username_taken(username, existing):
-    return (User.objects.filter(username=username).exists()
-            or any(u.username == username for u in existing))
+    return (
+        User.objects.filter(username=username).exists()
+        or any(u.username == username for u in existing)
+    )
 
 
 def generate_unique_name(existing):
@@ -92,17 +89,11 @@ def build_settings_for_new_users():
     ]
 
 
-# ---------------------------------------------------------------------------
-# Personal event helpers
-# ---------------------------------------------------------------------------
-
 def build_event(user, title, tags, day_offset, hour):
-    """Single personal event anchored to SEED_START. Never recurs."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
     user_tags = [t for t in tags if t.user == user or t.user is None]
     tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
-
     return CalendarEvent(
         user=user,
         title=title,
@@ -124,9 +115,9 @@ def _fresh_week_titles():
 
 def build_events_for_user(user, tags, rules, count):
     """
-    Seed personal events for SEED_DAYS days from SEED_START.
-    Titles reshuffle every week so each week looks different.
-    Personal events happen during reading week too — only lectures skip it.
+    Seeds personal (non-meal) events for SEED_DAYS from SEED_START.
+    Titles reshuffle each week so no two weeks look alike, and the same
+    title never appears twice within the same week.
     """
     non_lecture_hours = [8, 13, 17, 19, 20]
     events = []
@@ -151,21 +142,51 @@ def build_events_for_user(user, tags, rules, count):
     return events
 
 
-# ---------------------------------------------------------------------------
-# Module / lecture helpers
-# ---------------------------------------------------------------------------
+def build_meal_events(user, tags):
+    """
+    Seeds breakfast (08:00), lunch (12:30) and dinner (19:00) for every day
+    in the seeding range. Each list rotates by day index so meals vary daily
+    without repeating the same combination two days in a row.
+
+    Title is the meal label (e.g. "Breakfast"), description is the specific
+    meal so the timeline card shows both a clear heading and a readable subtitle.
+    """
+    meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
+    events = []
+
+    for day_offset in range(SEED_DAYS):
+        base = SEED_START + timedelta(days=day_offset)
+
+        # (label, description_fixture_list, start_h, start_m, end_h, end_m)
+        meals = [
+            ("Breakfast", breakfast_fixtures, 8,  0,  8,  30),
+            ("Lunch",     lunch_fixtures,     12, 30, 13, 15),
+            ("Dinner",    dinner_fixtures,    19,  0, 19, 45),
+        ]
+
+        for label, fixture_list, sh, sm, eh, em in meals:
+            description = fixture_list[day_offset % len(fixture_list)]
+            events.append(CalendarEvent(
+                user=user,
+                title=label,
+                description=description,
+                start_time=base.replace(hour=sh, minute=sm, second=0, microsecond=0),
+                end_time=base.replace(hour=eh, minute=em, second=0, microsecond=0),
+                source="personal",
+                tag=meal_tag,
+                recurrence_rule=None,
+            ))
+
+    return events
+
 
 def _first_weekday_from(start_dt, weekday):
-    """Return the first datetime >= start_dt that falls on the given weekday (0=Mon)."""
     days_ahead = (weekday - start_dt.weekday()) % 7
     return start_dt + timedelta(days=days_ahead)
 
 
 def build_module_event(code, name, description, admin, weekly_rule):
-    """
-    Schedule the module's first lecture on a random weekday on or after SEED_START.
-    """
-    weekday = random.randint(0, 4)  # Mon–Fri
+    weekday = random.randint(0, 4)
     hour = random.choice([9, 10, 11, 14, 15, 16])
     first_lecture = _first_weekday_from(SEED_START, weekday).replace(
         hour=hour, minute=0, second=0
@@ -209,9 +230,9 @@ def create_lecture_event(user, module, start, end, lecture_tag):
 
 def build_lecture_events(user, module, lecture_tag):
     """
-    Generate exactly 10 lecture instances, one per week, skipping reading week.
-    If a slot falls in reading week it is pushed to the following week so the
-    total always reaches 10 sessions.
+    Returns exactly 10 lecture instances, spaced one week apart, skipping
+    reading week. Any slot that falls within reading week is deferred to the
+    following week so the module still delivers all 10 sessions.
     """
     sessions = []
     candidate = module.start_time
