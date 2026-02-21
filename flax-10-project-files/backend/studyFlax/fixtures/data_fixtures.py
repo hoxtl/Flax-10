@@ -262,3 +262,13 @@ module_prefix_to_department = {
     "CL": "Arts & Humanities",
     "CR": "Arts & Humanities",
 }
+
+#Format: (deadline_type, title, description)
+deadline_fixtures = (
+    ("coursework", "Coursework 1", "Submit via KEATS by the deadline. Check the module page for submission instructions."),
+    ("coursework", "Coursework 2", "This coursework is wworth 50 marks and assesses weeks 1-5. Full coursework brief is available on KEATS"),
+    ("quiz", "Multiple Choice Quiz", "This is a short online quiz on KEATS, covering recent lecture topics."),
+    ("exam", "Final Exam", "Final exam covering the entire module. Good luck!"),
+    ("presentation", "Group Presentation", "Group presentation in class, should be at least 15mins long. Slides to be uploaded onto KEATS."),
+)
+
