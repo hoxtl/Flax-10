@@ -1,0 +1,111 @@
+.card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    transition: box-shadow 0.15s;
+    position: relative;
+}
+.card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+
+.completed { opacity: 0.5; }
+
+.left {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    flex: 1;
+    min-width: 0;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: border-color 0.15s;
+}
+.checkbox:hover { border-color: var(--primary); }
+
+.content { flex: 1; min-width: 0; }
+
+.title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+    word-break: break-word;
+}
+.completed .title { text-decoration: line-through; }
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    align-items: center;
+}
+
+.priority {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.module {
+    font-size: 0.72rem;
+    background: var(--pill-bg);
+    color: var(--muted);
+    padding: 0.1rem 0.45rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.dueBadge, .time { font-size: 0.72rem; color: var(--muted); }
+
+.menuBtn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.menuBtn:hover { background: var(--hover); }
+
+.menu {
+    position: absolute;
+    top: 2rem;
+    right: 0.5rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+.menu button {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    color: var(--danger);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+}
+.menu button:hover { background: var(--hover); }
