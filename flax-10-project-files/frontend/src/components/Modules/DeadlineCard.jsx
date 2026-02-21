@@ -1,5 +1,5 @@
-import { formatFullDateTime } from "../../utils/moduleUtils.js";
-import { getDeadlineCountdown, DEADLINE_LABELS } from "../../utils/deadlineUtils.js";
+import { formatFullDateTime } from './utils/moduleUtils';
+import { getDeadlineCountdown, DEADLINE_LABELS } from "./utils/deadlineUtils.js";
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {
