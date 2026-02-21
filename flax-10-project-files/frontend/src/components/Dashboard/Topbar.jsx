@@ -7,7 +7,7 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
-import { Bell, Plus } from "lucide-react";
+import { Bell } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
 
 function getFirstName(user) {
@@ -44,37 +44,34 @@ function SearchInput() {
   );
 }
 
-function QuickTabs({ onAddClick }) {
+function QuickTabs() {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
   const tabs = [
-    { title: "Add", icon: Plus, autoCollapse: true },
-    { type: "separator" },
     { title: "Notifications", icon: Bell, badge: unreadCount },
   ];
   const handleChange = (index) => {
-    if (index === 0) onAddClick?.();
-    if (index === 2) togglePanel();
+    if (index === 0) togglePanel();
   };
   return <ExpandableTabs tabs={tabs} onChange={handleChange} />;
 }
 
-function ActionPill({ onAddClick }) {
+function ActionPill() {
   return (
     <div className={styles.actionPill}>
       <ThemeToggle />
       <div className={styles.pillDivider} />
-      <QuickTabs onAddClick={onAddClick} />
+      <QuickTabs />
       <NotificationPanel />
     </div>
   );
 }
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
-      <ActionPill onAddClick={onAddClick} />
+      <ActionPill />
       <ProfileDropdown
         user={user}
         onSettingsClick={onSettingsClick}
@@ -85,12 +82,11 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
   );
 }
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting user={user} />
       <TopBarActions
-        onAddClick={onAddClick}
         user={user}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
