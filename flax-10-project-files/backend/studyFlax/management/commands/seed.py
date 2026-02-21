@@ -1,11 +1,12 @@
 import random
 from datetime import timedelta
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent, 
     UserSettings, Module, Enrollment,
-    Society, SocietyMembership, SocietyTag, SocietyEvent
+    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
 )
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, 
@@ -49,6 +50,7 @@ class Command(BaseCommand):
         self.create_societies()
         self.create_society_memberships()
         self.create_society_events()
+        self.create_society_images()
         self.stdout.write(self.style.SUCCESS('Seeding complete!'))
         self.print_stats()  
 
@@ -185,7 +187,7 @@ class Command(BaseCommand):
         f = Faker('en_GB')
         tags = list(society.tags.all())
         for _ in range(random.randint(2, 5)):
-            start = f.date_time_between(start_date='-1M', end_date='+2M')
+            start = timezone.make_aware(f.date_time_between(start_date='-1M', end_date='+2M'))
             SocietyEvent.objects.create(
                 society=society,
                 title=f.sentence(nb_words=3),
@@ -194,6 +196,25 @@ class Command(BaseCommand):
                 start_time=start,
                 end_time=start + timedelta(minutes=random.choice([60, 90, 120])),
                 tag=random.choice(tags) if tags else None
+            )
+
+    def create_society_images(self):
+        self.stdout.write("Seeding society images...")
+        for society in Society.objects.all():
+            self._seed_images_for_society(society)
+
+    def _seed_images_for_society(self, society):
+        if society.image:
+            SocietyImage.objects.get_or_create(
+                society=society, url=society.image, defaults={'is_cover': True}
+            )
+        from faker import Faker
+        f = Faker('en_GB')
+        for _ in range(random.randint(2, 4)):
+            SocietyImage.objects.create(
+                society=society,
+                url=f"https://picsum.photos/seed/{random.randint(1, 1000)}/800/600",
+                is_cover=False
             )
 
     def print_stats(self):
@@ -207,4 +228,5 @@ class Command(BaseCommand):
         print(f"Societies: {Society.objects.count()}")
         print(f"Society Memberships: {SocietyMembership.objects.count()}")
         print(f"Society Events: {SocietyEvent.objects.count()}")
+        print(f"Society Images: {SocietyImage.objects.count()}")
         print("=" * 30)
