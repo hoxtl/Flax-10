@@ -10,7 +10,8 @@ def event_data(deadline, user):
         end_time=deadline.end_due_date or deadline.start_due_date, 
         location=deadline.location,
         external_id = str(deadline.id),
-        source='module_deadline'
+        source='module_deadline',
+        priority='high'
     )
 
 #Creates deadline events when deadline is added via Details Page
