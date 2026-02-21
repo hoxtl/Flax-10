@@ -46,6 +46,15 @@ event_title_fixtures = (
     "KCL Careers Fair Prep", "King's Volunteering Shift",
     "KEATS Coursework Submission", "Denmark Hill Placement", "St Thomas Hospital Visit",
     "KCL Research Seminar", "Strand Roof Terrace Break", "KCL Mental Health Workshop",
+
+    "Take a Shower", "Have a coffee", "Meal Prep for tomorrow", "Bike to Campus", "Walk to the Strand",
+    "Call Mum", "Call Dad", "Call Linda", "Call Yin", "Text the group chat", "Buy handbag from TkMaxx for Susan",
+    "Haircut at the barber", "Evening walk along the Thames", "Sunset run by Waterloo Bridge",
+    "Meditate before bed", "Wind-down reading", "Plan tomorrow",
+    "Journal entry", "Tidy desk before sleep", "Pack bag for tomorrow",
+    "Reply to emails", "Check KEATS announcements", "Quick 20-min power nap",
+    "Stretch after sitting", "Grab lunch", "Bring in bins", "Water the plants",
+    "Order shirts from Shein", "Track spending this week", "Book train back to Manny",
 )
 
 course_fixtures = (
