@@ -278,11 +278,16 @@
 
   .navItem {
     padding: 12px 0;
+    padding-left: 10px;
   }
 
   :global(.sidebar[style*="width: 100vw"]) .navItem {
     padding: 12px 24px;
     justify-content: flex-start !important;
+  }
+
+  .sidebarClosed .navItem {
+    padding-left: 0;
   }
 
   .sidebarClosed .userMenu {
