@@ -145,7 +145,7 @@ function EditProfileSection({ state }) {
 }
 
 function EditModals({ user, state, modules }) {
-  const { showModules, setShowModules, showTasks, setShowTasks } = state;
+  const { showModules, setShowModules, showTasks, setShowTasks, profileData } = state;
   return (
     <>
       <EditProfileSection state={state} />
