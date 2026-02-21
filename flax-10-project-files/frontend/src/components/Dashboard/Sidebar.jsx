@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Sidebar.module.css";
 import { APP_ROUTES } from "../../lib/routes";
@@ -9,25 +9,33 @@ const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
 const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
 const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
 
-function UserFooter({ user, open, onSettings, onLogout, onProfile }) {
+function UserFooter({ user, open, onSettings, onLogout, onProfile, isMobile }) {
   const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    setShowMenu(false);
+  }, [open]);
 
   return (
     <div className={styles.sidebarFooter}>
       <AnimatePresence>
         {showMenu && (
-          <motion.div
-            className={styles.userMenu}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-          >
-            <button onClick={onProfile}>Profile</button>
-            <button onClick={onSettings}>Settings</button>
-            <button onClick={onLogout} className={styles.logoutBtn}>
-              Log out
-            </button>
-          </motion.div>
+          <>
+            <div className={styles.menuBackdrop} onClick={() => setShowMenu(false)} />
+            <motion.div
+              className={styles.userMenu}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+            >
+              <button onClick={onProfile}>Profile</button>
+              <button onClick={onSettings}>Settings</button>
+              <div className={styles.menuDivider} />
+              <button onClick={onLogout} className={styles.logoutBtn}>
+                Log out
+              </button>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
@@ -188,6 +196,7 @@ export default function Sidebar({
       <UserFooter
         user={user}
         open={open}
+        isMobile={isMobile}
         onSettings={onSettingsClick}
         onLogout={onLogoutClick}
         onProfile={onProfileClick}
