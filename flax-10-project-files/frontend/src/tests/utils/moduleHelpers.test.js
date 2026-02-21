@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateForm, getFormData } from '../../utils/moduleHelpers';
+import { validateForm, getFormData } from '../../components/Modules/utils/moduleHelpers';
 
 describe('moduleHelpers', () => {
     it('getFormData returns default empty form', () => {
