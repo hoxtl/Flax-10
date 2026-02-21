@@ -49,16 +49,19 @@ function useNotificationPolling(notifications, setNotifications) {
     }, [setNotifications]);
 }
 
+function processNewNotifications(fresh, knownIds, setNotifications) {
+    const newOnes = fresh.filter(n => !knownIds.has(n.id));
+    if (newOnes.length === 0) return;
+    newOnes.forEach(n => { notifyUser(n); knownIds.add(n.id); });
+    setNotifications(fresh);
+}
+  
 async function pollNotifications(knownIds, setNotifications) {
-    try {
-        const fresh = await api.fetchNotifications();
-        const newOnes = fresh.filter(n => !knownIds.has(n.id));
-        if (newOnes.length > 0) {
-            newOnes.forEach(n => notifyUser(n));
-            newOnes.forEach(n => knownIds.add(n.id));
-            setNotifications(fresh);
-        }
-    } catch (err) { console.error('Failed to poll notifications:', err); }
+    const fresh = await api.fetchNotifications().catch(err => {
+      console.error('Failed to poll notifications:', err);
+      return null;
+    });
+    if (fresh) processNewNotifications(fresh, knownIds, setNotifications);
 }
 
 function notifyUser(notification) {

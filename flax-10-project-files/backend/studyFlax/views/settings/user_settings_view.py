@@ -7,47 +7,44 @@ from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialis
 from studyFlax.serialisers.auth_serialisers import UserSerialiser
 
 
+def update_user_name(user, data):
+    if 'first_name' in data:
+        user.first_name = data['first_name']
+    if 'last_name' in data:
+        user.last_name = data['last_name']
+
+def update_user_password(user, data):
+    password = data.get('password')
+    if not password:
+        return None
+    if len(password) < 8:
+        return Response({'error': 'Password must be at least 8 characters'}, status=status.HTTP_400_BAD_REQUEST)
+    user.set_password(password)
+    return None
+
+def apply_user_updates(user, data):
+    update_user_name(user, data)
+    error = update_user_password(user, data)
+    if error:
+        return error
+    user.save()
+    return None
+
+def patch_settings(settings, data, user):
+    serialiser = UserSettingsSerialiser(settings, data=data, partial=True)
+    if not serialiser.is_valid():
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+    serialiser.save()
+    return Response({'settings': serialiser.data, 'user': UserSerialiser(user).data})
+
+
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
-    """
-    User settings view function to get or update user settings.
-    """
-    settings, created = UserSettings.objects.get_or_create(user=request.user)
-
+    settings, _ = UserSettings.objects.get_or_create(user=request.user)
     if request.method == 'GET':
-        settings_serialiser = UserSettingsSerialiser(settings)
-        return Response(settings_serialiser.data)
-
-    elif request.method == 'PATCH':
-        user = request.user
-
-        # Update first and last name
-        if 'first_name' in request.data:
-            user.first_name = request.data['first_name']
-    
-        if 'last_name' in request.data:
-            user.last_name = request.data['last_name']
-        
-        # Change password if provided
-        if 'password' in request.data:
-            new_password = request.data['password']
-            if new_password and len(new_password) >= 8:
-                user.set_password(new_password)  # This hashes the password properly
-            else:
-                return Response(
-                    {'error': 'Password must be at least 8 characters'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        
-        user.save()
-
-        # Update settings
-        settings_serialiser = UserSettingsSerialiser(settings, data=request.data, partial=True)
-
-        if settings_serialiser.is_valid():
-            settings_serialiser.save()
-            user_data = UserSerialiser(request.user).data
-            return Response({'settings': settings_serialiser.data, 'user': user_data})
-        
-        return Response(settings_serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(UserSettingsSerialiser(settings).data)
+    error = apply_user_updates(request.user, request.data)
+    if error:
+        return error
+    return patch_settings(settings, request.data, request.user)
