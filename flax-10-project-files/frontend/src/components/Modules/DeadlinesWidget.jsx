@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getUpcomingDeadlines } from "../../api/deadline_api";
-import { getDeadlineCountdown, getDeadlineUrgency, formatDeadlineDateTime, DEADLINE_LABELS } from "../../utils/deadlineUtils";
+import { getUpcomingDeadlines } from "../../api/deadlineApi";
+import { getDeadlineCountdown, getDeadlineUrgency, formatDeadlineDateTime, DEADLINE_LABELS } from "./utils/deadlineUtils";
 import styles from "./DeadlinesWidget.module.css";
 
 export default function DeadlinesWidget() {
