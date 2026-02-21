@@ -6,11 +6,8 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
 from studyFlax.models import CalendarEvent
-<<<<<<< HEAD
-from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
-=======
 from datetime import timedelta
->>>>>>> origin/main
+from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
