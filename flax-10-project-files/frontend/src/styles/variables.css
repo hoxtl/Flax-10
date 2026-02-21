@@ -68,46 +68,46 @@
   --c-olive: #6d6050;
   --c-cocoa: #2a1e15;
 
-  --bg: #120D0A;
-  --panel: #1A1310;
-  --sidebar: #151008;
-  --border: rgba(180, 164, 144, 0.15);
+  --bg: #0E0A08;
+  --panel: #211810;         
+  --sidebar: #181008;
+
+  --border: rgba(180, 164, 144, 0.22);   
 
   /* Topbar */
-  --topbar-bg: rgba(26, 19, 16, 0.80);
-  --topbar-border: rgba(180, 164, 144, 0.10);
+  --topbar-bg: rgba(26, 19, 16, 0.85);
+  --topbar-border: rgba(180, 164, 144, 0.12);
   --search-glass: rgba(255, 255, 255, 0.05);
 
-  --text: rgba(255, 255, 255, 0.92);
-  --text-dark: rgba(255, 255, 255, 0.92);
-  --muted: rgba(200, 184, 164, 0.65);
+  --text: rgba(255, 255, 255, 0.94);    
+  --text-dark: rgba(255, 255, 255, 0.94);
+  --muted: rgba(210, 195, 175, 0.70);   
 
-  --primary: #B8936D;
+  --primary: #C49A74;                    
   --primary-strong: #D4B896;
   --accent: #9A8A84;
   --danger: #ff4d4f;
   --danger-bg: rgba(207, 19, 34, 0.1);
   --danger-border: rgba(207, 19, 34, 0.3);
 
-  --hover: rgba(180, 164, 144, 0.10);
-  --hover-light: rgba(180, 164, 144, 0.12);
-  --active: rgba(180, 164, 144, 0.16);
+  --hover: rgba(180, 164, 144, 0.13);
+  --hover-light: rgba(180, 164, 144, 0.14);
+  --active: rgba(180, 164, 144, 0.18);
 
-  --pill-bg: rgba(180, 164, 144, 0.12);
-  --pill-hover: rgba(180, 164, 144, 0.20);
+  --pill-bg: rgba(180, 164, 144, 0.16);  
+  --pill-hover: rgba(180, 164, 144, 0.24);
 
-  --calendar-bg: #120D0A;
-  --weekbar-bg: #1A1310;
-  --search-bg: #151008;
+  --calendar-bg: #0E0A08;
+  --weekbar-bg: #211810;
+  --search-bg: #181008;
   --btn-black: #2a2a2a;
   --btn-black-hover: #1a1a1a;
-  --event-card-bg: #1A1310;
+  --event-card-bg: #2A1E14;           
   --nav-btn-bg: #2a2a2a;
   --nav-btn-hover: #1a1a1a;
-  --sidebar-active: rgba(180, 164, 144, 0.16);
-  --user-details-text: rgba(255, 255, 255, 0.92);
+  --sidebar-active: rgba(180, 164, 144, 0.18);
+  --user-details-text: rgba(255, 255, 255, 0.94);
 
-  /* Modules */
   --success-bg: rgba(46, 125, 50, 0.15);
   --success-text: #81c784;
   --error-bg: rgba(220, 38, 38, 0.15);
@@ -116,10 +116,7 @@
   --warning-bg: rgba(217, 119, 6, 0.15);
   --warning-border: rgba(217, 119, 6, 0.3);
   --warning-text: #fbbf24;
-
-
 }
-
 .MuiChartsAxis-tickLabel text,
 .MuiChartsLegend-label text {
   fill: var(--muted) !important;
