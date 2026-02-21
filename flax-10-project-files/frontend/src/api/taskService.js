@@ -1,28 +1,30 @@
-import api from './axios';
+import { fetchApi } from './client.js';
 
 export const fetchTaskLists = () =>
-    api.get('/tasks/lists/').then(r => r.data);
+    fetchApi('/tasks/lists/');
 
 export const createTaskList = (data) =>
-    api.post('/tasks/lists/', data).then(r => r.data);
+    fetchApi('/tasks/lists/', { method: 'POST', body: JSON.stringify(data) });
 
 export const updateTaskList = (id, data) =>
-    api.patch(`/tasks/lists/${id}/`, data).then(r => r.data);
+    fetchApi(`/tasks/lists/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
 
 export const deleteTaskList = (id) =>
-    api.delete(`/tasks/lists/${id}/`);
+    fetchApi(`/tasks/lists/${id}/`, { method: 'DELETE' });
 
-export const fetchTasks = (params = {}) =>
-    api.get('/tasks/', { params }).then(r => r.data);
+export const fetchTasks = (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetchApi(`/tasks/${query ? '?' + query : ''}`);
+};
 
 export const createTask = (data) =>
-    api.post('/tasks/', data).then(r => r.data);
+    fetchApi('/tasks/', { method: 'POST', body: JSON.stringify(data) });
 
 export const updateTask = (id, data) =>
-    api.patch(`/tasks/${id}/`, data).then(r => r.data);
+    fetchApi(`/tasks/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
 
 export const deleteTask = (id) =>
-    api.delete(`/tasks/${id}/`);
+    fetchApi(`/tasks/${id}/`, { method: 'DELETE' });
 
 export const logTaskTime = (id, minutes) =>
-    api.post(`/tasks/${id}/log-time/`, { minutes }).then(r => r.data);
+    fetchApi(`/tasks/${id}/log-time/`, { method: 'POST', body: JSON.stringify({ minutes }) });

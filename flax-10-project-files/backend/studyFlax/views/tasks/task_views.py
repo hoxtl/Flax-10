@@ -6,10 +6,12 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models.tasks.taskModel import Task, TaskList
 from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSerialiser
 
+from studyFlax.models.calendar.eventModel import Event
+from studyFlax.models.calendar.tagModel import Tag
+from django.utils import timezone
 
 def get_user_lists(user):
     return TaskList.objects.filter(user=user).order_by('created_at')
-
 
 def get_user_tasks(user, params):
     qs = Task.objects.filter(user=user)
@@ -21,7 +23,6 @@ def get_user_tasks(user, params):
         qs = qs.filter(completed=params['completed'] == 'true')
     return qs.order_by('completed', 'priority', 'due_date')
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def task_list_list(request):
@@ -32,7 +33,6 @@ def task_list_list(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
-
 
 @api_view(['PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -47,7 +47,6 @@ def task_list_detail(request, list_id):
     serialiser.save()
     return Response(serialiser.data)
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def task_list(request):
@@ -58,7 +57,6 @@ def task_list(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
-
 
 @api_view(['PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -73,7 +71,6 @@ def task_detail(request, task_id):
     serialiser.save()
     return Response(serialiser.data)
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def log_task_time(request, task_id):
@@ -82,3 +79,26 @@ def log_task_time(request, task_id):
     task.time_spent_minutes += minutes
     task.save()
     return Response({'time_spent_minutes': task.time_spent_minutes})
+
+    def create_calendar_event_for_task(task):
+    if not task.add_to_calendar or not task.due_date:
+        return
+    Event.objects.create(
+        user=task.user,
+        title=f"Task: {task.title}",
+        start=task.due_date,
+        end=task.due_date,
+        color="#8b5cf6",
+    )
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def task_list(request):
+    if request.method == 'GET':
+        return Response(TaskSerialiser(get_user_tasks(request.user, request.query_params), many=True).data)
+    serialiser = TaskSerialiser(data=request.data)
+    if not serialiser.is_valid():
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+    task = serialiser.save(user=request.user)
+    create_calendar_event_for_task(task)
+    return Response(serialiser.data, status=status.HTTP_201_CREATED)
