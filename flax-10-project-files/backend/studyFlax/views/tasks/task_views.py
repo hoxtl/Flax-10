@@ -8,6 +8,8 @@ from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSeria
 
 from studyFlax.models.calendar.eventModel import Event
 from studyFlax.models.calendar.tagModel import Tag
+from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+
 from django.utils import timezone
 
 def get_user_lists(user):
@@ -80,15 +82,16 @@ def log_task_time(request, task_id):
     task.save()
     return Response({'time_spent_minutes': task.time_spent_minutes})
 
-    def create_calendar_event_for_task(task):
+def create_calendar_event_for_task(task):
     if not task.add_to_calendar or not task.due_date:
         return
-    Event.objects.create(
+    CalendarEvent.objects.create(
         user=task.user,
         title=f"Task: {task.title}",
-        start=task.due_date,
-        end=task.due_date,
-        color="#8b5cf6",
+        start_time=task.due_date,
+        end_time=task.due_date,
+        description=task.description or "",
+        source="task",
     )
 
 @api_view(['GET', 'POST'])

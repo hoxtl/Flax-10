@@ -5,7 +5,15 @@ import styles from "./CreateTaskModal.module.css";
 function useModules() {
     const [modules, setModules] = useState([]);
     useEffect(() => {
-        getEnrollments().then(data => setModules(data)).catch(() => {});
+        getEnrollments()
+            .then(data => {
+                const normalised = data.map(e => ({
+                    id: typeof e.module === 'object' ? e.module.id : e.module,
+                    module_code: e.module_code || e.module?.module_code || e.module?.code || "Unknown"
+                }));
+                setModules(normalised);
+            })
+            .catch(() => {});
     }, []);
     return modules;
 }
@@ -78,7 +86,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                             <label>Module</label>
                             <select value={form.module} onChange={e => set("module", e.target.value)}>
                                 <option value="">No module</option>
-                                {modules.map(e => <option key={e.module} value={e.module}>{e.module_code}</option>)}
+                                {modules.map(e => <option key={e.id} value={e.id}>{e.module_code}</option>)}
                             </select>
                         </div>
                         <div className={styles.field}>
