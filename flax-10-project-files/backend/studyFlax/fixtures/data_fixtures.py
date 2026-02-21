@@ -257,8 +257,7 @@ module_fixtures = (
     ("GL4202", "German Language II", "Intermediate German. Reading, writing, conversation and cultural context."),
     ("AR4101", "Arabic Language I", "Modern Standard Arabic script, pronunciation, grammar and basic conversation."),
     ("ZH4101", "Mandarin Chinese I", "Introduction to Mandarin. Pinyin, tones, characters and everyday expressions."),
-
-    # Arts and Humanities =
+   # Arts
     ("FA4101", "History of Art", "Survey of Western art from the Renaissance to the contemporary period."),
     ("FA4202", "Contemporary Art & Theory", "Critical frameworks for understanding art since 1960."),
     ("TH4101", "Introduction to Theatre Studies", "Performance theory, dramatic texts and the history of theatre."),
