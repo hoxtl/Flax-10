@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions
 from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.serialisers.timerSerializer import StudySessionSerializer
+from studyFlax.serialisers.timer_serialisers import StudySessionSerializer
 
 class StudySessionViewSet(viewsets.ModelViewSet):
     """
