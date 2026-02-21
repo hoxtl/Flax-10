@@ -236,6 +236,10 @@
   background: var(--hover);
 }
 
+.logoutBtn {
+  color: #ef4444 !important;
+}
+
 /* ── Hamburger Icon ──────────────────────────────────────────────────────── */
 .hamburger {
   display: flex;
