@@ -184,6 +184,7 @@ export default function Sidebar({
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const open = isMobile ? isOpen : isHovered;
+  const sidebarStatusClass = open ? styles.sidebarOpen : styles.sidebarClosed;
   const w = isMobile
     ? open
       ? "100vw"
@@ -194,7 +195,7 @@ export default function Sidebar({
 
   return (
     <motion.aside
-      className={styles.sidebar}
+      className={`${styles.sidebar} ${sidebarStatusClass}`}
       animate={{ width: w, minWidth: w }}
       transition={SIDEBAR_SPRING}
       onMouseEnter={() => !isMobile && setIsHovered(true)}
