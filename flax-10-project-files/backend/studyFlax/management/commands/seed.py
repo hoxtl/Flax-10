@@ -348,6 +348,7 @@ class Command(BaseCommand):
         print(f"Users: {User.objects.count()}")
         print(f"Modules: {Module.objects.count()}")
         print(f"Enrollments: {Enrollment.objects.count()}")
+        print(f"Deadlines: {Deadline.objects.count()}")
         print(f"Categories: {Category.objects.count()}")
         print(f"Tags: {Tag.objects.count()}")
         print(f"Events: {CalendarEvent.objects.count()}")
