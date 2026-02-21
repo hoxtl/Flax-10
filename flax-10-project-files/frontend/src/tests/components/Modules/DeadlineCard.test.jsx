@@ -2,12 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import DeadlineCard from '../../../components/Modules/DeadlineCard';
 
-vi.mock('../../../utils/deadlineUtils', () => ({
+vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     getDeadlineCountdown: vi.fn(() => '5 days remaining'),
     DEADLINE_LABELS: { exam: 'Exam', coursework: 'Coursework', quiz: 'Quiz', presentation: 'Presentation' },
 }));
 
-vi.mock('../../../utils/moduleUtils', () => ({
+vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     formatFullDateTime: vi.fn(() => 'Friday, 6 March 2026, 10:00'),
 }));
 
