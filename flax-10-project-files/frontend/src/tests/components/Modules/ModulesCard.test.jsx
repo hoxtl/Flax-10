@@ -2,10 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModulesCard from '../../../components/Modules/ModulesCard';
 
-vi.mock('../../../utils/moduleUtils', () => ({
+vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     formatWeekdayTime: vi.fn(() => 'Mondays at 09:00'),
     formatDuration: vi.fn(() => '1h'),
+    getDepartment: vi.fn(() => "King's College London"),
 }));
 
 vi.mock('../ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
@@ -56,7 +57,7 @@ describe('ModulesCard', () => {
     });
 
     it('should render leave button when enrolled', async () => {
-        const { isEnrolledIn } = await import('../../../utils/moduleUtils');
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValueOnce(true);
         render(<ModulesCard {...mockParameters} />);
         expect(screen.getByText('× Leave Module')).toBeInTheDocument();
