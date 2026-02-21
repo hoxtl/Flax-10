@@ -11,6 +11,10 @@ from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, 
     module_fixtures, society_fixtures, location_fixtures
 )
+from .seed_helpers import (
+    build_users_list, build_settings_for_new_users, build_events_for_user,
+    build_module_event, get_user_modules, build_lecture_events, create_lecture_event
+)
 
 User = get_user_model()
 
@@ -143,7 +147,7 @@ class Command(BaseCommand):
                     'ratification_status': status, 'is_ratified': (status == 'approved')
                 }
             )
-        self._seed_society_tags(society)
+            self._seed_society_tags(society)
 
     def _seed_society_tags(self, society):
         from faker import Faker
