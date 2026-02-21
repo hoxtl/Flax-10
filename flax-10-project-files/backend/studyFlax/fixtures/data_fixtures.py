@@ -159,7 +159,7 @@ location_fixtures = (
     "Temple Station, Victoria Embankment, London WC2R 2PH",
     "Holborn Station, High Holborn, London WC1V 7PP",
     "Tesco Express, Strand, London WC2R 0DX",
-    "Lidl, The Cut, London SE1 8LF",
+    "The Shard",
 )
 
 lecture_theatre_fixtures = (
