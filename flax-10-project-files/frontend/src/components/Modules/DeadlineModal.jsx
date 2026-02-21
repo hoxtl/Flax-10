@@ -1,4 +1,4 @@
-import { useDeadlineModal } from '../../hooks/useDeadlineModal';
+import { useDeadlineModal } from './hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';
 import styles from './DeadlineModal.module.css';
