@@ -203,6 +203,39 @@
   white-space: nowrap;
 }
 
+/* The Popup Menu */
+.userMenu {
+  position: absolute;
+  bottom: 100%;
+  left: 8px;
+  right: 8px;
+  background: var(--sidebar);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+}
+
+.userMenu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.userMenu button:hover {
+  background: var(--hover);
+}
+
 /* ── Hamburger Icon ──────────────────────────────────────────────────────── */
 .hamburger {
   display: flex;
