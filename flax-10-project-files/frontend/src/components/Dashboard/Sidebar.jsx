@@ -9,6 +9,44 @@ const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
 const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
 const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
 
+function UserFooter({ user, open, onSettings, onLogout, onProfile }) {
+  const [showMenu, setShowMenu] = useState(false);
+
+  return (
+    <div className={styles.sidebarFooter}>
+      <AnimatePresence>
+        {showMenu && (
+          <motion.div 
+            className={styles.userMenu}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+          >
+            <button onClick={onProfile}>Profile</button>
+            <button onClick={onSettings}>Settings</button>
+            <button onClick={onLogout} className={styles.logoutBtn}>Logout</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <button 
+        className={`${styles.userRow} ${open ? styles.userRowExpanded : styles.userRowCollapsed}`}
+        onClick={() => setShowMenu(!showMenu)}
+      >
+        <div className={styles.avatar}>
+          {user?.name?.charAt(0) || "U"}
+        </div>
+        {open && (
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>{user?.name}</span>
+            <span className={styles.userEmail}>{user?.email}</span>
+          </div>
+        )}
+      </button>
+    </div>
+  );
+}
+
 function Hamburger({ onClick }) {
   return (
     <button className={styles.hamburger} onClick={onClick}>
@@ -115,24 +153,10 @@ function SidebarNav({ active, onChange, open, user }) {
   );
 }
 
-export default function Sidebar({
-  active,
-  onChange,
-  user,
-  isMobile,
-  isOpen,
-  onToggle,
-}) {
+export default function Sidebar({ active, onChange, user, isMobile, isOpen, onToggle, onSettingsClick, onLogoutClick, onProfileClick }) {
   const [isHovered, setIsHovered] = useState(false);
   const open = isMobile ? isOpen : isHovered;
-
-  // On mobile the sidebar takes 100% of the viewport width.
-  const getWidth = () => {
-    if (isMobile) return open ? "100vw" : COLLAPSED_W;
-    return open ? EXPANDED_W : COLLAPSED_W;
-  };
-
-  const w = getWidth();
+  const w = isMobile ? (open ? "100vw" : COLLAPSED_W) : (open ? EXPANDED_W : COLLAPSED_W);
 
   return (
     <motion.aside
@@ -144,6 +168,14 @@ export default function Sidebar({
     >
       <SidebarHeader open={open} isMobile={isMobile} onToggle={onToggle} />
       <SidebarNav active={active} onChange={onChange} open={open} user={user} />
+
+      <UserFooter 
+        user={user} 
+        open={open} 
+        onSettings={onSettingsClick}
+        onLogout={onLogoutClick}
+        onProfile={onProfileClick}
+      />
     </motion.aside>
   );
 }
