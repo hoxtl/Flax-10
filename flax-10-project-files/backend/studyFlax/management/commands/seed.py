@@ -1,12 +1,18 @@
 import random
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from studyFlax.models import Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, Module, Enrollment
-from studyFlax.fixtures.data_fixtures import category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures
+from studyFlax.models import (
+    Category, Tag, RecurrenceRule, CalendarEvent,
+    UserSettings, Module, Enrollment, 
+)
+from studyFlax.fixtures.data_fixtures import (
+    category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
+)
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
     build_lecture_events, create_lecture_event,
+    # build_deadlines_for_module, create_deadline_calendar_event,
 )
 
 User = get_user_model()
@@ -15,22 +21,21 @@ User = get_user_model()
 class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
-    USER_COUNT = 25
-    EVENTS_PER_USER_RANGE = (60, 90)
-    DEFAULT_PASSWORD = '1234'
+    USER_COUNT         = 25
+    DEFAULT_PASSWORD   = '1234'
 
     FIXTURE_USERS = [
-        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk', 'first_name': 'John', 'last_name': 'Doe', 'is_superuser': True, 'is_staff': True},
-        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk', 'first_name': 'Jane', 'last_name': 'Doe', 'is_superuser': False, 'is_staff': False},
-        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk', 'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',   'is_superuser': True,  'is_staff': True},
+        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',   'is_superuser': False, 'is_staff': False},
+        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
     ]
 
     def _load_shared_data(self):
-        self.users = list(User.objects.filter(is_staff=False))
+        self.users      = list(User.objects.filter(is_staff=False))
         self.categories = list(Category.objects.all())
-        self.tags = list(Tag.objects.all())
-        self.rules = list(RecurrenceRule.objects.all())
-        self.modules = list(Module.objects.all())
+        self.tags       = list(Tag.objects.all())
+        self.rules      = list(RecurrenceRule.objects.all())
+        self.modules    = list(Module.objects.all())
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
@@ -46,6 +51,7 @@ class Command(BaseCommand):
         self.create_events_for_users()
         self.create_modules()
         self.modules = list(Module.objects.all())
+        # self.create_deadlines()
         self.create_enrollments()
         self.print_stats()
 
@@ -65,8 +71,8 @@ class Command(BaseCommand):
                 continue
             user = User(**{k: v for k, v in data.items() if k not in ('is_superuser', 'is_staff')})
             user.is_superuser = data['is_superuser']
-            user.is_staff = data['is_staff']
-            user.set_password('1234')
+            user.is_staff     = data['is_staff']
+            user.set_password(self.DEFAULT_PASSWORD)
             user.save()
             self.stdout.write(f"  Created user: {data['username']}")
 
@@ -88,7 +94,10 @@ class Command(BaseCommand):
         self.stdout.write("Seeding categories...")
         for name, color, is_default in category_fixtures:
             user = random.choice(self.users) if not is_default and self.users and random.random() > 0.7 else None
-            Category.objects.get_or_create(name=name, user=user, defaults={'color': color, 'is_default': is_default})
+            Category.objects.get_or_create(
+                name=name, user=user,
+                defaults={'color': color, 'is_default': is_default},
+            )
 
     def create_tags(self):
         self.stdout.write("Seeding tags...")
@@ -127,29 +136,39 @@ class Command(BaseCommand):
 
     def create_modules(self):
         self.stdout.write("Seeding modules...")
-        admin = User.objects.filter(is_superuser=True).first()
+        admin       = User.objects.filter(is_superuser=True).first()
         weekly_rule = RecurrenceRule.objects.filter(frequency='weekly', interval=1).first()
         for code, name, description in module_fixtures:
             self._create_module(code, name, description, admin, weekly_rule)
 
+    # def create_deadlines(self):
+        # self.stdout.write("Seeding deadlines...")
+        # deadlines_to_create = []
+        # for module in self.modules:
+           # deadlines_to_create.extend(build_deadlines_for_module(module))
+        # Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
+        #$ self.stdout.write(f"Created {len(deadlines_to_create)} deadlines.")
+
     def _should_enroll(self, user, module):
         return not Enrollment.objects.filter(student=user, module=module).exists()
 
-    def _enroll_if_needed(self, user, module, enrollments, is_core=False):
+    def _enroll_if_needed(self, user, module, enrollments):
         if self._should_enroll(user, module):
-            enrollments.append(Enrollment(student=user, module=module, is_core=is_core))
+            enrollments.append(Enrollment(student=user, module=module))
 
-    def _process_module(self, user, module, lecture_tag, enrollments, is_core=False):
-        self._enroll_if_needed(user, module, enrollments, is_core)
+    def _process_module(self, user, module, lecture_tag, enrollments):
+        self._enroll_if_needed(user, module, enrollments)
         for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
             create_lecture_event(u, mod, start, end, tag)
+        # for deadline in module.deadlines.all():
+        #    create_deadline_calendar_event(user, deadline)
 
     def _process_user_modules(self, user, lecture_tag, enrollments):
         core, extras = get_user_modules(user, self.modules)
         for module in core:
-            self._process_module(user, module, lecture_tag, enrollments, is_core=True)
+            self._process_module(user, module, lecture_tag, enrollments)
         for module in extras:
-            self._process_module(user, module, lecture_tag, enrollments, is_core=False)
+            self._process_module(user, module, lecture_tag, enrollments)
 
     def create_enrollments(self):
         self.stdout.write("Seeding enrollments and lecture events...")
@@ -168,6 +187,7 @@ class Command(BaseCommand):
             ("Categories",  Category.objects.count()),
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),
+            # ("Deadlines",   Deadline.objects.count()),
         ]
         self.stdout.write("\n" + self.style.SUCCESS("✅ Seeding complete!"))
         self.stdout.write(self.style.SUCCESS("─" * 35))
