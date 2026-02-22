@@ -7,7 +7,7 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
-import MiniTimer from "./MiniTimer";
+import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
 

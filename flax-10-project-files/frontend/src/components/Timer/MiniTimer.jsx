@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './MiniTimer.module.css';
-import { formatTime } from './Timer/TimerComponents';
-import { useTimerContext } from '../context/TimerContext';
+import { formatTime } from './TimerComponents';
+import { useTimerContext } from '../../context/TimerContext';
 
 export default function MiniTimer({ onNavigate, activeNav }) {
   const { isActive, timeLeft, mode, isOvertime, isBreakOvertime } = useTimerContext();
