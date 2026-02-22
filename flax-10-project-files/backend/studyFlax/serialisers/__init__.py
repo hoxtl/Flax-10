@@ -9,3 +9,4 @@ from .society_serialisers import (
     SocietyTagSerialiser, SocietyAnnouncementSerialiser, SocietyEventSerialiser,
     SocietyEventCalendarSerialiser, get_society_color
 )
+from .deadline_serialisers import DeadlineSerialiser

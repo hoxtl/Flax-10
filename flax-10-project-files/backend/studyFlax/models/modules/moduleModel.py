@@ -2,7 +2,6 @@ from django.db import models
 from ..auth.userModel import User
 from ..calendar.recurrenceRuleModel import RecurrenceRule
 
-#Refactor - separate LectureEvent model
 class Module(models.Model):
     module_code = models.CharField(max_length=20, unique=True)
     module_name = models.CharField(max_length=200)
