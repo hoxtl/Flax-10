@@ -18,7 +18,6 @@ class TaskList(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.name}"
 
-
 class Task(models.Model):
     PRIORITY_CHOICES = [
         ('low', 'Low'),
@@ -36,6 +35,10 @@ class Task(models.Model):
     completed = models.BooleanField(default=False)
     add_to_calendar = models.BooleanField(default=False)
     time_spent_minutes = models.PositiveIntegerField(default=0)
+
+    estimated_blocks = models.PositiveIntegerField(null=True, blank=True)
+    completed_blocks = models.PositiveIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

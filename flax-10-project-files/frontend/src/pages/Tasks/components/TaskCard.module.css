@@ -42,8 +42,11 @@
 
 .content { flex: 1; min-width: 0; }
 
-.titleWrapper {
-    display: block;
+.titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     width: 100%;
 }
 
@@ -53,6 +56,7 @@
     color: var(--text);
     display: block;
     word-break: break-word;
+    flex: 1;
 }
 
 .completed .title {
@@ -85,6 +89,56 @@
 
 .dueBadge, .time { font-size: 0.72rem; color: var(--muted); }
 
+/* Study Now button */
+.studyNowBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.12s;
+}
+.studyNowBtn:hover {
+    opacity: 0.85;
+    transform: scale(1.08);
+}
+
+/* Flax blocks progress bar */
+.flaxWrap {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.4rem;
+}
+
+.flaxBar {
+    flex: 1;
+    height: 4px;
+    background: var(--pill-bg);
+    border-radius: 9999px;
+    overflow: hidden;
+    max-width: 120px;
+}
+
+.flaxFill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+.flaxLabel {
+    font-size: 0.65rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+/* Context menu */
 .menuBtn {
     background: none;
     border: none;
@@ -121,6 +175,7 @@
 .menu button:hover { background: var(--hover); }
 .deleteBtn { color: var(--danger) !important; }
 
+/* ── Edit modal ─────────────────────────────────── */
 .overlay {
     position: fixed;
     inset: 0;

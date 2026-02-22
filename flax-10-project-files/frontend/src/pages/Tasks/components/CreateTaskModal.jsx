@@ -8,8 +8,8 @@ function useModules() {
         getEnrollments()
             .then(data => {
                 const normalised = data.map(e => ({
-                    id: typeof e.module === 'object' ? e.module.id : e.module,
-                    module_code: e.module_code || e.module?.module_code || e.module?.code || "Unknown"
+                    id: typeof e.module === "object" ? e.module.id : e.module,
+                    module_code: e.module_code || e.module?.module_code || e.module?.code || "Unknown",
                 }));
                 setModules(normalised);
             })
@@ -20,8 +20,13 @@ function useModules() {
 
 function useForm(defaultListId) {
     const [form, setForm] = useState({
-        title: "", description: "", priority: "medium",
-        due_date: "", task_list: defaultListId || "", module: "",
+        title: "",
+        description: "",
+        priority: "medium",
+        due_date: "",
+        task_list: defaultListId || "",
+        module: "",
+        estimated_blocks: "",
         add_to_calendar: false,
     });
     const set = (field, value) => setForm(p => ({ ...p, [field]: value }));
@@ -50,6 +55,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
             task_list: form.task_list || null,
             module: form.module || null,
             due_date: form.due_date || null,
+            estimated_blocks: form.estimated_blocks ? Number(form.estimated_blocks) : null,
         };
         await onSave(payload);
         setSaving(false);
@@ -61,8 +67,20 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
             <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
                 <ModalHeader onClose={onClose} />
                 <div className={styles.body}>
-                    <input className={styles.titleInput} placeholder="Task title" value={form.title} onChange={e => set("title", e.target.value)} autoFocus />
-                    <textarea className={styles.desc} placeholder="Description (optional)" value={form.description} onChange={e => set("description", e.target.value)} rows={2} />
+                    <input
+                        className={styles.titleInput}
+                        placeholder="Task title"
+                        value={form.title}
+                        onChange={e => set("title", e.target.value)}
+                        autoFocus
+                    />
+                    <textarea
+                        className={styles.desc}
+                        placeholder="Description (optional)"
+                        value={form.description}
+                        onChange={e => set("description", e.target.value)}
+                        rows={2}
+                    />
                     <div className={styles.row}>
                         <div className={styles.field}>
                             <label>Priority</label>
@@ -91,17 +109,40 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                         </div>
                         <div className={styles.field}>
                             <label>Due date</label>
-                            <input type="datetime-local" value={form.due_date} onChange={e => set("due_date", e.target.value)} />
+                            <input
+                                type="datetime-local"
+                                value={form.due_date}
+                                onChange={e => set("due_date", e.target.value)}
+                            />
                         </div>
                     </div>
+                    <div className={styles.field}>
+                        <label>🟫 Flax blocks (estimated time)</label>
+                        <input
+                            type="number"
+                            min="1"
+                            max="20"
+                            placeholder="e.g. 3  ·  each block = 25 min focus session"
+                            value={form.estimated_blocks}
+                            onChange={e => set("estimated_blocks", e.target.value)}
+                        />
+                    </div>
                     <label className={styles.checkRow}>
-                        <input type="checkbox" checked={form.add_to_calendar} onChange={e => set("add_to_calendar", e.target.checked)} />
+                        <input
+                            type="checkbox"
+                            checked={form.add_to_calendar}
+                            onChange={e => set("add_to_calendar", e.target.checked)}
+                        />
                         Add to calendar
                     </label>
                 </div>
                 <div className={styles.footer}>
                     <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-                    <button className={styles.saveBtn} onClick={handleSubmit} disabled={saving || !form.title.trim()}>
+                    <button
+                        className={styles.saveBtn}
+                        onClick={handleSubmit}
+                        disabled={saving || !form.title.trim()}
+                    >
                         {saving ? "Saving..." : "Add Task"}
                     </button>
                 </div>

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import styles from "./Home.module.css";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
+import analyticsService from "../../api/analyticsService";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks, updateTask } from "../../api/taskService";
@@ -108,7 +109,6 @@ function useHomeData(selectedDate) {
     return { dayEvents, dayTasks, toggleTask };
 }
 
-// ── Detail overlay (read-only, shown on left-click) ───────────────────────────
 function DetailOverlay({ item, icon, accentColor, onClose }) {
     const isTask = item._type === "task";
     const start  = new Date(item.start_time || item.due_date);
@@ -176,7 +176,7 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
     );
 }
 
-// ── Right-click context menu ──────────────────────────────────────────────────
+// Right-click context menu
 function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
     const ref = useRef(null);
 
@@ -205,7 +205,7 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
     );
 }
 
-// ── Timeline row ──────────────────────────────────────────────────────────────
+// Timeline row
 function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
     const { getTag } = useTags();
     const [showDetail, setShowDetail] = useState(false);
@@ -315,8 +315,22 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
     );
 }
 
-function FreeGap({ minutes }) {
+function FreeGap({ minutes, pendingTasks }) {
     const nav = useNavigate();
+    const [dismissed, setDismissed] = useState(false);
+
+    // Pick the highest-priority task that could plausibly fit in the gap.
+    const suggestedTask = useMemo(() => {
+        if (!pendingTasks?.length) return null;
+        return pendingTasks.find(t => {
+            const blocks = t.estimated_blocks || 0;
+            const estMins = blocks > 0 ? blocks * 25 : 0;
+            return estMins === 0 || estMins <= minutes;
+        }) || null;
+    }, [pendingTasks, minutes]);
+
+    if (dismissed) return null;
+
     return (
         <div className={styles.gapRow}>
             <div className={styles.spine}>
@@ -329,11 +343,84 @@ function FreeGap({ minutes }) {
             </div>
             <div className={styles.freeGap}>
                 <span className={styles.freeIcon}>⏱</span>
-                <span className={styles.freeText}>
-                    You have <strong>{fmtDuration(minutes)} free</strong>. Anything you'd like to slot in?
-                </span>
-                <button className={styles.freeBtn} onClick={() => nav("/tasks")}>View tasks</button>
+                <div className={styles.freeBody}>
+                    <span className={styles.freeText}>
+                        You have <strong>{fmtDuration(minutes)} free</strong>.
+                    </span>
+                    {suggestedTask && (
+                        <span className={styles.freeSuggest}>
+                            How about <strong>{suggestedTask.title}</strong>?
+                            <button
+                                className={styles.freeStartBtn}
+                                onClick={() => nav(`/timer?taskId=${suggestedTask.id}`)}
+                            >
+                                ▶ Start
+                            </button>
+                        </span>
+                    )}
+                </div>
+                <div className={styles.freeActions}>
+                    <button className={styles.freeBtn} onClick={() => nav("/tasks")}>View tasks</button>
+                    <button className={styles.freeDismiss} onClick={() => setDismissed(true)} aria-label="Dismiss">✕</button>
+                </div>
             </div>
+        </div>
+    );
+}
+
+
+// Mini stats bar 
+function HomeStatsBar({ events, tasks }) {
+    const nav = useNavigate();
+    const [analytics, setAnalytics] = useState(null);
+
+    useEffect(() => {
+        analyticsService.getSummary(7)
+            .then(setAnalytics)
+            .catch(() => {});
+    }, []);
+
+    const plannedMins = useMemo(() => {
+        return events.reduce((acc, ev) => {
+            if (!ev.start_time || !ev.end_time) return acc;
+            return acc + Math.round((new Date(ev.end_time) - new Date(ev.start_time)) / 60000);
+        }, 0);
+    }, [events]);
+
+    const overdueCount = tasks.filter(t => t.due_date && new Date(t.due_date) < new Date()).length;
+
+    return (
+        <div className={styles.statsBar}>
+            <div className={styles.statChip}>
+                <span className={styles.statIcon}>📅</span>
+                <span className={styles.statVal}>{fmtDuration(plannedMins)}</span>
+                <span className={styles.statLabel}>planned today</span>
+            </div>
+            <div className={styles.statChip}>
+                <span className={styles.statIcon}>🎯</span>
+                <span className={styles.statVal}>{tasks.length}</span>
+                <span className={styles.statLabel}>pending tasks</span>
+                {overdueCount > 0 && (
+                    <span className={styles.statOverdue}>{overdueCount} overdue</span>
+                )}
+            </div>
+            {analytics && (
+                <>
+                    <div className={styles.statChip}>
+                        <span className={styles.statIcon}>🔥</span>
+                        <span className={styles.statVal}>{analytics.current_streak ?? 0}</span>
+                        <span className={styles.statLabel}>day streak</span>
+                    </div>
+                    <div className={styles.statChip}>
+                        <span className={styles.statIcon}>🗓️</span>
+                        <span className={styles.statVal}>{analytics.active_days ?? 0}</span>
+                        <span className={styles.statLabel}>active days this week</span>
+                    </div>
+                </>
+            )}
+            <button className={styles.statLink} onClick={() => nav("/analytics")}>
+                Full analytics →
+            </button>
         </div>
     );
 }
@@ -376,10 +463,11 @@ export default function Home() {
     return (
         <div className={styles.page}>
             <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
+            <HomeStatsBar events={sortedEvents} tasks={sortedTasks} />
             <div className={styles.timeline}>
                 {!hasContent && <EmptyDay />}
                 {hasContent && timelineWithGaps.map((entry, i) => {
-                    if (entry.type === "gap") return <FreeGap key={`gap-${i}`} minutes={entry.minutes} />;
+                    if (entry.type === "gap") return <FreeGap key={`gap-${i}`} minutes={entry.minutes} pendingTasks={sortedTasks} />;
                     const item = entry.data;
                     const itemIndex = itemEntries.findIndex(e => e === entry);
                     return (
