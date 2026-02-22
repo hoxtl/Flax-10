@@ -46,6 +46,10 @@ class UserSerialiser(serializers.ModelSerializer):
     follower_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
     is_following = serializers.SerializerMethodField()
+    is_mutual_following = serializers.SerializerMethodField()
+    modules = serializers.SerializerMethodField()
+    study_hours_this_week = serializers.SerializerMethodField()
+    study_streak = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -53,7 +57,8 @@ class UserSerialiser(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
-            'follower_count', 'following_count', 'is_following',
+            'follower_count', 'following_count', 'is_following', 'is_mutual_following',
+            'modules', 'study_hours_this_week', 'study_streak',
             'role',
             'is_superuser',
         ]
@@ -89,6 +94,34 @@ class UserSerialiser(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.followers.filter(follower=request.user).exists()
         return False
+
+    def get_is_mutual_following(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+            
+        if request.user == obj:
+            return True
+            
+        user_follows_obj = obj.followers.filter(follower=request.user).exists()
+        obj_follows_user = request.user.followers.filter(follower=obj).exists()
+        return user_follows_obj and obj_follows_user
+
+    def get_modules(self, obj):
+        settings = getattr(obj, 'settings', None)
+        return getattr(settings, 'modules', []) if settings else []
+
+    def get_study_hours_this_week(self, obj):
+        if not self.get_is_mutual_following(obj):
+            return None
+        # Placeholder for exact implementation, needs StudySession logic
+        return 0
+
+    def get_study_streak(self, obj):
+        if not self.get_is_mutual_following(obj):
+            return None
+        # Placeholder for exact implementation, needs StudySession logic
+        return 0
 
 
 class LoggedUserSerialiser(serializers.Serializer):
