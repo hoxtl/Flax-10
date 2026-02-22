@@ -52,7 +52,9 @@ export default function Discover({ onNavChange }) {
     }, [searchQuery]);
 
     // Derived state for client-side module filtering
+    const currentUser = JSON.parse(localStorage.getItem("user")) || {};
     const filteredUsers = users.filter(u => {
+        if (u.id === currentUser.id || u.username === currentUser.username) return false;
         if (!moduleFilter) return true;
 
         // Ensure graceful fallback if modules isn't returned

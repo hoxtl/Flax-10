@@ -34,10 +34,13 @@ function TopBarGreeting({ user }) {
         )}
         <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
-    </div>);}
+    </div>);
+}
 
-function SearchInput() {
-  return <UserSearch />;
+function SearchInput({ onNavChange }) {
+  return <UserSearch onUserSelect={(u) => {
+    onNavChange?.(`profile_${u.id}`);
+  }} />;
 }
 
 function QuickTabs({ onAddClick }) {
@@ -66,10 +69,10 @@ function ActionPill({ onAddClick }) {
   );
 }
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange }) {
   return (
     <div className={styles.actions}>
-      <SearchInput />
+      <SearchInput onNavChange={onNavChange} />
       <ActionPill onAddClick={onAddClick} />
       <ProfileDropdown
         user={user}
@@ -81,7 +84,7 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
   );
 }
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting user={user} />
@@ -91,6 +94,7 @@ export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClic
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
         onProfileClick={onProfileClick}
+        onNavChange={onNavChange}
       />
     </header>
   );

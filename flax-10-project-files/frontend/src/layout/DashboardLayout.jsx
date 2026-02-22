@@ -65,11 +65,11 @@ function PageContent({ activeNav, children }) {
   );
 }
 
-function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
+function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, selectedDate, showWeekBar, activeNav, children }) {
   return (
     <div className={styles.main}>
       <TopBar user={user} onAddClick={onQuickAdd} onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
+        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} />
       {showWeekBar && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
     </div>
@@ -127,7 +127,7 @@ function DashboardMain({ state, onNavChange, children }) {
     <>
       <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)}
         onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick}
-        onProfileClick={() => onNavChange?.("profile")} selectedDate={selectedDate}
+        onProfileClick={() => onNavChange?.("profile")} onNavChange={onNavChange} selectedDate={selectedDate}
         showWeekBar={showWeekBar} activeNav={activeNav}>{children}
       </MainArea>
       <DashboardModals showQuickAdd={showQuickAdd} setShowQuickAdd={setShowQuickAdd}
