@@ -1,8 +1,8 @@
-from django.test import TestCase
+from rest_framework.test import APITestCase
 from studyFlax.models import Tag, CalendarEvent, RecurrenceRule
 from .fixtures import get_sample_tags, SAMPLE_TAGS
 
-class BaseTestCase(TestCase):
+class BaseTestCase(APITestCase):
     """Base test case with common setup."""
     
     def setUp(self):
