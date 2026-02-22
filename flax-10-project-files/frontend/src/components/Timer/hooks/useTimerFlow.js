@@ -3,7 +3,14 @@ import { useCompletionCheck } from '../utils/timerUtils';
 import { saveSession } from '../utils/historyUtils';
 
 const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
-    saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current, t.task);
+    saveSession(
+        t.workTime,
+        t.breakTime,
+        t.completedSessions + 1,
+        studyBlockId.current,
+        t.task,
+        t.taskId      
+    );
     const next = t.completedSessions + 1;
     t.setCompletedSessions(next);
 
@@ -11,7 +18,9 @@ const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
         studyBlockId.current = Date.now();
         return setModal('goal');
     }
-    t.setMode('work'); t.setTimeLeft(t.workTime * 60); t.setIsActive(modal !== 'break');
+    t.setMode('work');
+    t.setTimeLeft(t.workTime * 60);
+    t.setIsActive(modal !== 'break');
 };
 
 export function useTimerFlow(t, notify) {
@@ -20,5 +29,10 @@ export function useTimerFlow(t, notify) {
     const startNext = getStartNextHandler(t, studyBlockId, modal, setModal);
 
     useCompletionCheck(t, startNext, notify);
-    return { modal, setModal, startNext, resetBlockId: () => studyBlockId.current = Date.now() };
+    return {
+        modal,
+        setModal,
+        startNext,
+        resetBlockId: () => { studyBlockId.current = Date.now(); },
+    };
 }
