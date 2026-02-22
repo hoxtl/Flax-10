@@ -1,6 +1,8 @@
 import { formatTime, formatDuration } from './utils/moduleUtils.js';
+import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
 import styles from './ModuleDetails.module.css';
 
+// Detail view for a module - includes schedule, description and enrol button
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     return (
         <div className={styles.container}>
@@ -11,11 +13,17 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                 <ScheduleSection module={module} />
                 <hr className={styles.divider} />
                 <DescriptionSection description={module.description} />
+                <hr className={styles.divider} />
+                <div className={styles.descriptionSection}>
+                    <h1 className={styles.sectionTitle}>📋 Deadlines</h1>
+                    <DeadlinesSection deadlines={module.deadlines} />
+                </div>
                 <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
             </div>
         </div>
     );
 }
+
 function DetailsHeader({ module, is_enrolled }) {
     return (
         <div className={styles.headerSection}>
@@ -30,7 +38,7 @@ function DetailsHeader({ module, is_enrolled }) {
 function ScheduleSection({ module }) {
     return (
         <div className={styles.scheduleSection}>
-            <h1 className={styles.sectionTitle}>📅 Schedule -</h1>
+            <h1 className={styles.sectionTitle}>📅 Schedule </h1>
             <div className={styles.scheduleGrid}>
                 <InfoCard icon="🕒" label="Lecture Time" value={`${formatTime(module.start_time)} – ${formatTime(module.end_time)}`} />
                 <InfoCard icon="⏱️" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} />
@@ -61,7 +69,7 @@ function RecurringBadge() {
 function DescriptionSection({ description }) {
     return (
         <div className={styles.descriptionSection}>
-            <h1 className={styles.sectionTitle}> Description -</h1>
+            <h1 className={styles.sectionTitle}> Description </h1>
             <p className={styles.descriptionText}>{description || 'No description provided.'}</p>
         </div>
     );
@@ -70,4 +78,19 @@ function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
     return is_enrolled
         ? <button className={styles.unenrollButton} onClick={onUnenroll}>Leave Module</button>
         : <button className={styles.enrollButton} onClick={onEnroll}>Enroll in Module</button>;
+}
+
+function DeadlinesSection({deadlines}) {
+    if (!deadlines?.length) return <p className={styles.descriptionText}> No deadlines assigned yet.</p>;
+    return (
+        <div className={styles.deadlinesList}>
+            {deadlines.map(d => (
+                <div key={d.id} className={styles.deadlineItem}>
+                    <span className={styles.deadlinesType}> {DEADLINE_LABELS[d.deadline_type]} : </span>
+                    <span className={styles.deadlineTitle}> {d.title}</span>
+                    <span className={styles.deadlineDate}> {formatDeadlineDateTime(d.start_due_date)}</span>
+            </div>
+            ))}
+        </div>
+    );
 }

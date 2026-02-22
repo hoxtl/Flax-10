@@ -1,9 +1,10 @@
 import random
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
-    UserSettings, Module, Enrollment, Deadline,
+    UserSettings, Module, Enrollment, Deadline
 )
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
@@ -11,8 +12,8 @@ from studyFlax.fixtures.data_fixtures import (
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
-    build_lecture_events, create_lecture_event,
-    build_deadlines_for_module, create_deadline_calendar_event,
+    build_lecture_events, create_lecture_event, build_deadlines_for_module, 
+    create_deadline_calendar_event,
 )
 
 User = get_user_model()
@@ -28,6 +29,11 @@ class Command(BaseCommand):
         {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',   'is_superuser': True,  'is_staff': True},
         {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',   'is_superuser': False, 'is_staff': False},
         {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+        {'username': 'amiller', 'email': 'alan.miller@kcl.ac.uk', 'first_name': 'Alan',  'last_name': 'Miller', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',    'first_name': 'Sarah', 'last_name': 'Rahwan', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',     'first_name': 'Himesh', 'last_name': 'Patel',  'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'echen',   'email': 'elaine.chen@kcl.ac.uk', 'first_name': 'Elaine', 'last_name': 'Chen',   'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',    'first_name': 'James',  'last_name': 'Murphy', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
     ]
 
     def _load_shared_data(self):

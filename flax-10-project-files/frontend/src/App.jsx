@@ -205,11 +205,7 @@ function AuthScreen() {
 function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
   return (
     <ScreenWrap animKey="welcome">
-      <WelcomeLanding
-        user={user}
-        onExplore={() => onExplore(setShowWelcome, setActiveNav)}
-        onBackToAuth={onBackToAuth}
-      />
+      <WelcomeLanding user={user} onExplore={() => onExplore(setShowWelcome, setActiveNav)} onBackToAuth={onBackToAuth} />
     </ScreenWrap>
   );
 }
