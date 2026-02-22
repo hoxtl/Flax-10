@@ -65,11 +65,12 @@ function PageContent({ activeNav, children }) {
   );
 }
 
-function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, selectedDate, showWeekBar, activeNav, children }) {
+function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav, selectedDate, showWeekBar, children }) {
   return (
     <div className={styles.main}>
       <TopBar user={user} onAddClick={onQuickAdd} onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} />
+        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick}
+        onNavChange={onNavChange} activeNav={activeNav} />
       {showWeekBar && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
     </div>

@@ -1,8 +1,8 @@
 from rest_framework.test import APITestCase
 from studyFlax.models import Tag, CalendarEvent, RecurrenceRule
 from .fixtures import get_sample_tags, SAMPLE_TAGS
-
-class BaseTestCase(APITestCase):
+from rest_framework.test import APIClient
+class BaseTestCase(TestCase):
     """Base test case with common setup."""
     
     def setUp(self):
@@ -15,6 +15,7 @@ class BaseTestCase(APITestCase):
             last_name="User"
         )
         self.create_sample_tags()
+        self.client = APIClient()
         self.client.force_authenticate(user=self.user)
     
     def create_sample_tags(self):

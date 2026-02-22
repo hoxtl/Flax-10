@@ -7,8 +7,8 @@ from studyFlax.models import CalendarEvent, UserSettings, Deadline
 from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
     location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
-    deadline_fixtures, module_deadline_fixtures,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
+    module_deadline_fixtures, deadline_fixtures,
 )
 
 User = get_user_model()
@@ -295,4 +295,4 @@ def create_deadline_calendar_event(user, deadline):
             'description': deadline.description,
             'priority': 'high',
         },
-    )
+     )
