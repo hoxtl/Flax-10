@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
-    UserSettings, Module, Enrollment
+    UserSettings, Module, Enrollment, Deadline
 )
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
@@ -12,7 +12,8 @@ from studyFlax.fixtures.data_fixtures import (
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
-    build_lecture_events, create_lecture_event,
+    build_lecture_events, create_lecture_event, build_deadlines_for_module, 
+    create_deadline_calendar_event,
 )
 
 User = get_user_model()
@@ -56,7 +57,7 @@ class Command(BaseCommand):
         self.create_events_for_users()
         self.create_modules()
         self.modules = list(Module.objects.all())
-        #self.create_deadlines()
+        self.create_deadlines()
         self.create_enrollments()
         self.print_stats()
 
@@ -146,13 +147,13 @@ class Command(BaseCommand):
         for code, name, description in module_fixtures:
             self._create_module(code, name, description, admin, weekly_rule)
 
-    #def create_deadlines(self):
-        #self.stdout.write("Seeding deadlines...")
-        #deadlines_to_create = []
-        #for module in self.modules:
-            #deadlines_to_create.extend(build_deadlines_for_module(module))
-        #Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
-        #self.stdout.write(f"Created {len(deadlines_to_create)} deadlines.")
+    def create_deadlines(self):
+        self.stdout.write("Seeding deadlines...")
+        deadlines_to_create = []
+        for module in self.modules:
+            deadlines_to_create.extend(build_deadlines_for_module(module))
+        Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
+        self.stdout.write(f"Created {len(deadlines_to_create)} deadlines.")
 
     def _should_enroll(self, user, module):
         return not Enrollment.objects.filter(student=user, module=module).exists()
@@ -165,8 +166,8 @@ class Command(BaseCommand):
         self._enroll_if_needed(user, module, enrollments)
         for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
             create_lecture_event(u, mod, start, end, tag)
-        #for deadline in module.deadlines.all():
-            #create_deadline_calendar_event(user, deadline)
+        for deadline in module.deadlines.all():
+            create_deadline_calendar_event(user, deadline)
 
     def _process_user_modules(self, user, lecture_tag, enrollments):
         core, extras = get_user_modules(user, self.modules)
@@ -192,7 +193,7 @@ class Command(BaseCommand):
             ("Categories",  Category.objects.count()),
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),
-            #("Deadlines",   Deadline.objects.count()),
+            ("Deadlines",   Deadline.objects.count()),
         ]
         self.stdout.write("\n" + self.style.SUCCESS("✅ Seeding complete!"))
         self.stdout.write(self.style.SUCCESS("─" * 35))
