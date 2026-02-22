@@ -5,14 +5,14 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 TABLES = [
-    'studyFlax_deadline',
+    # 'studyFlax_deadline',
     'studyFlax_enrollment',
     'studyFlax_module',
     'studyFlax_calendarevent',
     'studyFlax_tag',
     'studyFlax_category',
-    'studyFlax_task',
-    'studyFlax_tasklist',
+    # 'studyFlax_task',
+    # 'studyFlax_tasklist',
     'studyFlax_recurrencerule',
     'studyFlax_usersettings',
     'studyFlax_notification',
@@ -36,7 +36,8 @@ def restore_superusers(superusers_data, stdout):
     if not superusers_data:
         return
     stdout.write("Restoring superusers...")
-    User.objects.bulk_create([User(**data) for data in superusers_data])
+    for data in superusers_data:
+        User.objects.create_superuser(**data)
 
 
 def confirm_truncate(tables, stdout):
