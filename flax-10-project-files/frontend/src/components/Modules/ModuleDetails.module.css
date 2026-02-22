@@ -185,3 +185,41 @@
         margin-left: 0;
     }
 }
+
+.deadlinesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.deadlineItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+.deadlineType {
+    background: var(--pill-bg);
+    color: var(--primary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.deadlineTitle {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text);
+}
+.deadlineDate {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+}
