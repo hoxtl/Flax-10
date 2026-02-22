@@ -144,13 +144,13 @@ function EditProfileSection({ state }) {
   );
 }
 
-function EditModals({ user, state, modules }) {
+function EditModals({ user, state, modules, isMutualOrSelf }) {
   const { showModules, setShowModules, showTasks, setShowTasks, profileData } = state;
   return (
     <>
-      <EditProfileSection state={state} />
+      {isMutualOrSelf && <EditProfileSection state={state} />}
       <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} />
-      <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />
+      {isMutualOrSelf && <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />}
 
       <SocialDataModal
         isOpen={state.showFollowers}
@@ -170,8 +170,10 @@ function EditModals({ user, state, modules }) {
   );
 }
 
-function EventsModalContainer({ state, filteredEvents }) {
+function EventsModalContainer({ state, filteredEvents, isMutualOrSelf }) {
   const { showEvents, setShowEvents, eventRange, setEventRange } = state;
+  if (!isMutualOrSelf) return null;
+
   return (
     <EventsModal
       isOpen={showEvents}
@@ -183,11 +185,11 @@ function EventsModalContainer({ state, filteredEvents }) {
   );
 }
 
-export default function ProfileModals({ user, state, modules, filteredEvents }) {
+export default function ProfileModals({ user, state, modules, filteredEvents, isMutualOrSelf }) {
   return (
     <>
-      <EditModals user={user} state={state} modules={modules} />
-      <EventsModalContainer state={state} filteredEvents={filteredEvents} />
+      <EditModals user={user} state={state} modules={modules} isMutualOrSelf={isMutualOrSelf} />
+      <EventsModalContainer state={state} filteredEvents={filteredEvents} isMutualOrSelf={isMutualOrSelf} />
     </>
   );
 }
