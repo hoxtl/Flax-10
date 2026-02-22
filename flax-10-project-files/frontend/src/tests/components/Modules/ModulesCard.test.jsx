@@ -1,0 +1,79 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import ModulesCard from '../../../components/Modules/ModulesCard';
+
+vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
+    isEnrolledIn: vi.fn(() => false),
+    formatWeekdayTime: vi.fn(() => 'Mondays at 09:00'),
+    formatDuration: vi.fn(() => '1h'),
+    getDepartment: vi.fn(() => "King's College London"),
+}));
+
+vi.mock('../ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+
+const module = {
+    id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
+    description: null, location: null,
+    start_time: '2026-03-01T09:00:00', end_time: '2026-03-01T10:00:00',
+};
+
+const mockParameters = {
+    module, enrollments: [], isTeacher: false,
+    onViewModule: vi.fn(), onEnrollmentToggle: vi.fn(),
+    onEdit: vi.fn(), onDelete: vi.fn(), onManageDeadlines: vi.fn(),
+};
+
+describe('ModulesCard', () => {
+    it('should render module name and code', () => {
+        render(<ModulesCard {...mockParameters} />);
+        expect(screen.getByText('5CCS2SEG')).toBeInTheDocument();
+        expect(screen.getByText('Software Engineering')).toBeInTheDocument();
+    });
+
+    it('should render enroll button for student', () => {
+        render(<ModulesCard {...mockParameters} />);
+        expect(screen.getByText('+ Enroll')).toBeInTheDocument();
+    });
+
+    it('should render teacher actions for teacher', () => {
+        render(<ModulesCard {...mockParameters} isTeacher={true} />);
+        expect(screen.getByText('✎ Edit')).toBeInTheDocument();
+        expect(screen.getByText('× Delete')).toBeInTheDocument();
+        expect(screen.getByText('📋 Deadlines')).toBeInTheDocument();
+    });
+
+    it('should call onManageDeadlines when deadlines button is clicked', () => {
+        const onManageDeadlines = vi.fn();
+        render(<ModulesCard {...mockParameters} isTeacher={true} onManageDeadlines={onManageDeadlines} />);
+        fireEvent.click(screen.getByText('📋 Deadlines'));
+        expect(onManageDeadlines).toHaveBeenCalled();
+    });
+
+    it('should call onViewModule when card is clicked by student', () => {
+        const onViewModule = vi.fn();
+        render(<ModulesCard {...mockParameters} onViewModule={onViewModule} />);
+        fireEvent.click(screen.getByRole('article'));
+        expect(onViewModule).toHaveBeenCalled();
+    });
+
+    it('should render leave button when enrolled', async () => {
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
+        isEnrolledIn.mockReturnValueOnce(true);
+        render(<ModulesCard {...mockParameters} />);
+        expect(screen.getByText('× Leave Module')).toBeInTheDocument();
+    });
+
+    it('should call onEdit when edit is clicked', () => {
+        const onEdit = vi.fn();
+        render(<ModulesCard {...mockParameters} isTeacher={true} onEdit={onEdit} />);
+        fireEvent.click(screen.getByText('✎ Edit'));
+        expect(onEdit).toHaveBeenCalled();
+    });
+
+    it('should call onDelete when delete is clicked', () => {
+        const onDelete = vi.fn();
+        render(<ModulesCard {...mockParameters} isTeacher={true} onDelete={onDelete} />);
+        fireEvent.click(screen.getByText('× Delete'));
+        expect(onDelete).toHaveBeenCalled();
+    });
+});

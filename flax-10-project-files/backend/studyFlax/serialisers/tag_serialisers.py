@@ -11,4 +11,4 @@ class TagSerialiser(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     class Meta:
         model = Tag
-        fields = ['id', 'name', 'default_duration', 'is_default', 'color', 'category', 'category_name']
+        fields = ['id', 'name', 'icon', 'default_duration', 'is_default', 'color', 'category', 'category_name']

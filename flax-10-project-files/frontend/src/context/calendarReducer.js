@@ -13,6 +13,8 @@ export const initialState = {
     modalInitialDate: null,
     isModalOpen: false,
     filter: ['all'],
+    popupEvent: null,
+    popupAnchorRect: null,
 };
 
 /*
@@ -30,6 +32,8 @@ const handlers = {
     OPEN_MODAL: (state, payload) => openModalHandler(state, payload),
     CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false }),
     SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
+    OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect }),
+    CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null }),
 };
 
 /**
@@ -49,9 +53,6 @@ function toggleFilter(filter, payload) {
     return result.length > 0 ? result : ['all'];
 }
 
-/*
-    This function is used to handle the calendar reducer.
-*/
 export function calendarReducer(state, action) {
     const handler = handlers[action.type];
     return handler ? handler(state, action.payload) : state;

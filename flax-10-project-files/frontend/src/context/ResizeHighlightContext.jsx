@@ -12,5 +12,7 @@ export function ResizeHighlightProvider({ children }) {
 }
 
 export function useResizeHighlight() {
-    return useContext(ResizeHighlightContext);
+    const context = useContext(ResizeHighlightContext);
+    if (!context) return { resizeHighlight: null, setResizeHighlight: () => {} };
+    return context;
 }

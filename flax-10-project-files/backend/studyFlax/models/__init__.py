@@ -13,10 +13,13 @@ from .calendar.timetableSourceModel import *
 # Module
 from .modules.moduleModel import *
 from .modules.enrollmentModel import *
+from .modules.deadlineModel import *
 
 # Notifications
 from .notifications.notificationModel import *
 
+# Society
+from .society import *
 # Timer
 from .timer import *
 from .timer.themeSessionModel import ThemeSession

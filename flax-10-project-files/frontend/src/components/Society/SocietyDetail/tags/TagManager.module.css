@@ -1,0 +1,156 @@
+.manager {
+    padding: 16px;
+    background: var(--panel);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.counter {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.empty {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 8px 0;
+}
+
+.tagList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tagItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--bg);
+    border-radius: 16px;
+    font-size: 0.85rem;
+}
+
+.colorDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.tagLabel {
+    color: var(--text);
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+}
+
+.removeBtn:hover {
+    color: var(--danger, #ef4444);
+}
+
+.addForm {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.input {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.colorPicker {
+    display: flex;
+    gap: 4px;
+}
+
+.colorOption {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+}
+
+.colorOption.selected {
+    border-color: var(--text);
+}
+
+.customColor {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+}
+
+.customColor.selected {
+    border-color: var(--text);
+}
+
+.customColor input {
+    width: 30px;
+    height: 30px;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.addBtn {
+    padding: 8px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.addBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
