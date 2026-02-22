@@ -150,8 +150,9 @@ function ProfileBody({ user, state }) {
   );
 }
 
-export default function Profile({ user }) {
-  const state = useProfileState();
+export default function Profile({ user, viewedUserId }) {
+  const state = useProfileState(viewedUserId);
   if (state.loading) return <div className={styles.container}>Loading...</div>;
+  if (!state.profileData) return <div className={styles.container}>User not found.</div>;
   return <ProfileBody user={user} state={state} />;
 }

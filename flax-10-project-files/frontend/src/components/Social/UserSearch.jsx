@@ -3,7 +3,7 @@ import { searchUsers } from '../../api/userService';
 import FollowButton from './FollowButton';
 import styles from './Social.module.css';
 
-export default function UserSearch() {
+export default function UserSearch({ onUserSelect }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function UserSearch() {
                     ) : results.length > 0 ? (
                         <div className={styles.userList}>
                             {results.map((u, index) => (
-                                <div key={u.id || u.username || index} className={styles.userItem}>
+                                <div key={u.id || u.username || index} className={styles.userItem} onClick={() => onUserSelect?.(u)}>
                                     <div className={styles.userInfo}>
                                         <div className={styles.avatar}>{u.first_name?.[0] || u.username[0]}</div>
                                         <div className={styles.userNameDetails}>

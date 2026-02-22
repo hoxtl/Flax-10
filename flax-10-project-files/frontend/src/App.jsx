@@ -63,10 +63,13 @@ function resolveScreen(authed, user, showWelcome) {
   return "app";
 }
 
-function resolveRouteContent(activeNav, user) {
+function resolveRouteContent(activeNav, user, setActiveNav) {
   const route = APP_ROUTES.find((r) => r.id === activeNav) || APP_ROUTES[0];
   const el = route.element;
-  if (el && typeof el === "object") return { ...el, props: { ...el.props, user } };
+  if (el && typeof el === "object") {
+    // Inject user and setActiveNav into the component's props
+    return { ...el, props: { ...el.props, user, onNavChange: setActiveNav } };
+  }
   return el;
 }
 
@@ -96,7 +99,7 @@ async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
 function checkOnboarding(setShowOnboarding) {
   getUserProfile()
     .then(data => { if (!data?.major || data.major === "") setShowOnboarding(true); })
-    .catch(() => {});
+    .catch(() => { });
 }
 
 // Custom hooks
@@ -214,7 +217,11 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings") return <Settings user={user} onBack={() => setActiveNav("home")} />;
   if (activeNav === "profile") return <Profile user={user} onBack={() => setActiveNav("home")} />;
-  return resolveRouteContent(activeNav, user);
+  if (activeNav.startsWith("profile_")) {
+    const viewedUserId = activeNav.split("_")[1];
+    return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} />;
+  }
+  return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {

@@ -3,9 +3,9 @@ import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
 import FollowButton from "../../components/Social/FollowButton";
 
-function UserCard({ user }) {
+function UserCard({ user, onNavChange }) {
     return (
-        <div className={styles.userCard}>
+        <div className={styles.userCard} onClick={() => onNavChange(`profile_${user.id}`)}>
             <div className={styles.avatar}>
                 {user.first_name?.[0] || user.username[0]}
             </div>
@@ -24,7 +24,7 @@ function UserCard({ user }) {
     );
 }
 
-export default function Discover() {
+export default function Discover({ onNavChange }) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -96,7 +96,7 @@ export default function Discover() {
                 <div className={styles.grid}>
                     {filteredUsers.length > 0 ? (
                         filteredUsers.map(u => (
-                            <UserCard key={u.id} user={u} />
+                            <UserCard key={u.id} user={u} onNavChange={onNavChange} />
                         ))
                     ) : (
                         <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>
