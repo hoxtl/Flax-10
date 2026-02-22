@@ -7,11 +7,6 @@ import { APP_ROUTES } from "./lib/routes";
 import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
-<<<<<<< HEAD
-import { ThemeProvider } from "./context/ThemeContext";
-import { TimerProvider } from "./context/TimerContext";
-=======
->>>>>>> main
 import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -54,12 +49,8 @@ const AUTH_MOTION = {
 function readUser() {
   const s = localStorage.getItem("user");
   if (!s) return null;
-<<<<<<< HEAD
-  try { return JSON.parse(s); } catch { return null; }
-=======
   try { return JSON.parse(s); }
   catch { return null; }
->>>>>>> main
 }
 
 function isAuthenticated() {
@@ -100,15 +91,12 @@ async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
     setInitialTheme(s.theme || "light");
   } catch { setInitialTheme("light"); }
   finally { setIsLoadingTheme(false); }
-<<<<<<< HEAD
-=======
 }
 
 function checkOnboarding(setShowOnboarding) {
   getUserProfile()
     .then(data => { if (!data?.major || data.major === "") setShowOnboarding(true); })
     .catch(() => {});
->>>>>>> main
 }
 
 // Custom hooks
@@ -137,11 +125,7 @@ function useAppState() {
   const [authed, setAuthed] = useState(() => isAuthenticated());
   const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
   useSyncAuth(setAuthed, setUser, setShowWelcome);
-<<<<<<< HEAD
-  useEffect(() => { loadTheme(authed, setInitialTheme, setIsLoadingTheme); }, [authed]);
-=======
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
->>>>>>> main
   return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
 }
 
@@ -154,10 +138,6 @@ function useOnboardingCheck() {
 // Layout wrappers
 function ScreenWrap({ animKey, children }) {
   return (
-<<<<<<< HEAD
-    <motion.div key={animKey} variants={fadeAnim} initial="initial" animate="animate" exit="exit"
-      transition={{ duration: 0.25 }} style={{ position: "absolute", inset: 0 }}>
-=======
     <motion.div
       key={animKey}
       variants={fadeAnim}
@@ -165,7 +145,6 @@ function ScreenWrap({ animKey, children }) {
       transition={{ duration: 0.25 }}
       style={ROOT_STYLE}
     >
->>>>>>> main
       {children}
     </motion.div>
   );
@@ -212,14 +191,7 @@ function AuthScreen() {
     <ScreenWrap animKey="auth">
       <div style={AUTH_WRAP_STYLE}>
         <AnimatePresence>
-<<<<<<< HEAD
-          <motion.div key={location.pathname} variants={fadeAnim} initial="initial" animate="animate"
-            exit="exit" transition={{ duration: 0.22 }} style={{ position: "absolute", inset: 0 }}>
-            <AuthRoutes location={location} />
-          </motion.div>
-=======
           <AnimatedAuthRoutes location={location} />
->>>>>>> main
         </AnimatePresence>
       </div>
     </ScreenWrap>
@@ -245,12 +217,7 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
   return (
     <div style={DASH_WRAP_STYLE}>
       <AnimatePresence>
-<<<<<<< HEAD
-        <motion.div key={activeNav} variants={fadeAnim} initial="initial" animate="animate"
-          exit="exit" transition={{ duration: 0.18 }} style={{ position: "absolute", inset: 0 }}>
-=======
         <motion.div key={activeNav} {...DASH_MOTION}>
->>>>>>> main
           <DashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </motion.div>
       </AnimatePresence>
@@ -287,18 +254,6 @@ function renderScreen(screen, state) {
 
 // Root
 export default function App() {
-<<<<<<< HEAD
-  const { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome } = useAppState();
-  if (isLoadingTheme) return null;
-  const screen = resolveScreen(authed, user, showWelcome);
-  return (
-    <ThemeProvider initialTheme={initialTheme}>
-      <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden" }}>
-        <AnimatePresence>
-          {screen === "auth" && <AuthScreen key="auth" />}
-          {screen === "welcome" && <WelcomeScreen key="welcome" user={user} setShowWelcome={setShowWelcome} setActiveNav={setActiveNav} />}
-          {screen === "app" && <AppScreen key="app" activeNav={activeNav} setActiveNav={setActiveNav} user={user} />}
-=======
   const state = useAppState();
   if (state.isLoadingTheme) return null;
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
@@ -307,7 +262,6 @@ export default function App() {
       <div style={ROOT_STYLE}>
         <AnimatePresence>
           {renderScreen(screen, state)}
->>>>>>> main
         </AnimatePresence>
       </div>
     </ThemeProvider>
