@@ -3,14 +3,14 @@ import { getUserProfile, getAnotherUserProfile } from "../../../api/userService"
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
 
-async function tryLoadProfile(setProfileData, setLoading, userId) {
+async function tryLoadProfile(setProfileData, setLoading, userId, isPolling = false) {
   try {
     const data = userId ? await getAnotherUserProfile(userId) : await getUserProfile();
     setProfileData(data);
   } catch (e) {
     console.error('Failed to load profile:', e);
   } finally {
-    setLoading(false);
+    if (!isPolling) setLoading(false);
   }
 }
 
@@ -27,9 +27,30 @@ async function tryLoadEvents(setAllEvents, userId) {
 function useProfileData(userId) {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    tryLoadProfile(setProfileData, setLoading, userId);
+    const intervalId = setInterval(() => {
+      tryLoadProfile(setProfileData, setLoading, userId, true);
+    }, 5000); // Poll every 5 seconds for real-time cross-device sync
+
+    return () => clearInterval(intervalId);
+  }, [userId]);
+
   const reload = () => tryLoadProfile(setProfileData, setLoading, userId);
-  useEffect(() => { reload(); }, [userId]);
-  return { profileData, loading, reload };
+
+  const setOptimisticFollow = (isFollowing) => {
+    setProfileData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        is_following: isFollowing,
+        follower_count: Math.max(0, prev.follower_count + (isFollowing ? 1 : -1))
+      };
+    });
+  };
+
+  return { profileData, loading, reload, setOptimisticFollow };
 }
 
 function useEventsData(userId) {
@@ -57,13 +78,13 @@ function useModalState() {
 }
 
 export function useProfileState(userId) {
-  const { profileData, loading, reload } = useProfileData(userId);
+  const { profileData, loading, reload, setOptimisticFollow } = useProfileData(userId);
   const eventsState = useEventsData(userId);
   const modalState = useModalState();
   const handleSaveProfile = async () => {
     await reload();
   };
-  return { profileData, loading, handleSaveProfile, ...eventsState, ...modalState };
+  return { profileData, loading, handleSaveProfile, reload, setOptimisticFollow, ...eventsState, ...modalState };
 }
 
 export function useProfileBodyData(state) {
@@ -75,8 +96,10 @@ export function useProfileBodyData(state) {
 }
 
 export function useProfileContent(state) {
-  const { profileData, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowFollowers, setShowFollowing } = state;
+  const { profileData, reload, setOptimisticFollow, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowFollowers, setShowFollowing } = state;
   const handlers = {
+    reload,
+    setOptimisticFollow,
     onModulesClick: () => setShowModules(true),
     onTasksClick: () => setShowTasks(true),
     onEventsClick: () => setShowEvents(true),

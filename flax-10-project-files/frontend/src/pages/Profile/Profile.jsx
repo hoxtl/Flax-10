@@ -59,7 +59,14 @@ function ProfileHeaderTop({ user, onEditProfile, isSelf }) {
         <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
       ) : (
         <div className={styles.followAction}>
-          <FollowButton userId={user?.id} initialIsFollowing={user?.is_following} />
+          <FollowButton
+            userId={user?.id}
+            initialIsFollowing={user?.is_following}
+            onToggle={(newState) => {
+              user?.setOptimisticFollow?.(newState);
+              user?.reload?.();
+            }}
+          />
         </div>
       )}
     </div>
@@ -86,7 +93,7 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
     <div className={styles.header}>
       <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
       <ProfileHeaderInfo
-        user={user}
+        user={{ ...user, reload: handlers.reload, setOptimisticFollow: handlers.setOptimisticFollow }}
         profileData={profileData}
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}

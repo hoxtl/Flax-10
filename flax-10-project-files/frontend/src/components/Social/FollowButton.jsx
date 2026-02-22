@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { followUser, unfollowUser } from '../../api/socialService';
 import styles from './Social.module.css';
 
 export default function FollowButton({ userId, initialIsFollowing, onToggle }) {
     const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
     const [loading, setLoading] = useState(false);
+
+    // Sync button state when polled data updates from external components
+    useEffect(() => {
+        setIsFollowing(initialIsFollowing);
+    }, [initialIsFollowing]);
 
     const handleToggle = async (e) => {
         e.stopPropagation();

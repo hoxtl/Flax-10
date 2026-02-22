@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0004_merge_0002_themesession_0003_backfill_other_tags'),
+        ('studyFlax', '0002_deadline'),
     ]
 
     operations = [
