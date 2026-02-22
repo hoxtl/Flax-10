@@ -207,23 +207,3 @@
 .deadlineButton:hover {
     background: var(--hover);
 }
-
-.deadlinesSummary {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.8125rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--border);
-}
-
-.deadlinesLabel {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.125rem;
-}
-
-.deadlineItem {
-    color: var(--muted);
-    padding-left: 0.5rem;
-}
