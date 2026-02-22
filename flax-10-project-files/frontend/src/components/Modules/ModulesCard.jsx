@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
-import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
 import styles from './ModulesCard.module.css';
 
 export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines }) {
@@ -18,20 +17,6 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     );
 }
 
-function DeadlinesSummary({deadlines}) {
-    if (!deadlines?.length) return null;
-    return (
-        <div className={styles.deadlinesSummary}>
-            <span className={styles.deadlinesLabel}> 📋 Deadlines</span>
-            {deadlines.slice(0,3).map(d => (
-                <span key={d.id} className={styles.deadlineItem}>
-                    {DEADLINE_LABELS[d.deadline_type]} : {d.title} - {formatDeadlineDateTime(d.start_due_date)}
-                </span>
-            ))}
-        </div>
-    );
-}
-
 function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.content}>
@@ -39,7 +24,6 @@ function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onM
             <h3 className={styles.moduleTitle}>{module.module_name}</h3>
             {module.description && <Description text={module.description} />}
             <ScheduleMeta module={module} />
-            <DeadlinesSummary deadlines={module.deadlines} /> 
             <CardActions isTeacher={isTeacher} enrolled={enrolled}
                 onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
         </div>
