@@ -23,6 +23,7 @@ class TaskSerialiser(serializers.ModelSerializer):
             'id', 'task_list', 'list_name', 'module', 'module_code',
             'title', 'description', 'priority', 'due_date',
             'completed', 'add_to_calendar', 'time_spent_minutes',
+            'estimated_blocks', 'completed_blocks',
             'created_at', 'updated_at'
         ]
 
