@@ -1,220 +1,204 @@
 import random
-from datetime import timedelta
-from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from faker import Faker
 
 from studyFlax.models import (
-    Category, Tag, RecurrenceRule, CalendarEvent, UserSettings, User
+    Category, Tag, RecurrenceRule, CalendarEvent,
+    UserSettings, Module, Enrollment, Deadline
 )
-
 from studyFlax.fixtures.data_fixtures import (
-    category_fixtures, tag_fixtures, recurrence_fixtures,
-    event_title_fixtures, first_name_fixtures, last_name_fixtures
+    category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
+)
+from .seed_helpers import (
+    build_users_list, build_settings_for_new_users, build_events_for_user,
+    build_meal_events, build_module_event, get_user_modules,
+    build_lecture_events, create_lecture_event, build_deadlines_for_module, 
+    create_deadline_calendar_event,
 )
 
 User = get_user_model()
 
+
 class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
-    # Config
-    USER_COUNT = 20
-    EVENTS_PER_USER_RANGE = (10, 30) # Min and max events per user
-    DEFAULT_PASSWORD = '1234'
+    USER_COUNT         = 25
+    DEFAULT_PASSWORD   = '1234'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.faker = Faker('en_GB')
+    FIXTURE_USERS = [
+        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',   'is_superuser': True,  'is_staff': True},
+        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',   'is_superuser': False, 'is_staff': False},
+        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+        {'username': 'amiller', 'email': 'alan.miller@kcl.ac.uk', 'first_name': 'Alan',  'last_name': 'Miller', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',    'first_name': 'Sarah', 'last_name': 'Rahwan', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',     'first_name': 'Himesh', 'last_name': 'Patel',  'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'echen',   'email': 'elaine.chen@kcl.ac.uk', 'first_name': 'Elaine', 'last_name': 'Chen',   'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',    'first_name': 'James',  'last_name': 'Murphy', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+    ]
+
+    def _load_shared_data(self):
+        self.users      = list(User.objects.filter(is_staff=False))
+        self.categories = list(Category.objects.all())
+        self.tags       = list(Tag.objects.all())
+        self.rules      = list(RecurrenceRule.objects.all())
+        self.modules    = list(Module.objects.all())
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
-
         self.create_admin_user()
-
+        self.create_fixture_users()
         self.create_random_users()
-        # Refresh user list so we have all IDs available
         self.users = list(User.objects.filter(is_staff=False))
-
         self.create_recurrence_rules()
         self.create_categories()
-        # Refresh lists for linking later
         self.categories = list(Category.objects.all())
         self.create_tags()
-        self.tags = list(Tag.objects.all())
-        self.rules = list(RecurrenceRule.objects.all())
-
+        self._load_shared_data()
         self.create_events_for_users()
-
-        self.stdout.write(self.style.SUCCESS('Seeding complete!'))
+        self.create_modules()
+        self.modules = list(Module.objects.all())
+        self.create_deadlines()
+        self.create_enrollments()
         self.print_stats()
 
-    # Helper Functions
-
     def create_admin_user(self):
-        """Ensures John Doe superuser exists."""
-        adminName = 'johndoe'
-        if User.objects.filter(username=adminName).exists():
-            self.stdout.write(f"Admin user '{adminName}' already exists.")
-        else:
-            User.objects.create_superuser(
-                username=adminName,
-                email='john.doe@example.com',
-                password=self.DEFAULT_PASSWORD,
-                first_name='John',
-                last_name='Doe'
-            )
-            self.stdout.write(self.style.SUCCESS(f"Created admin user: {adminName}"))
+        if User.objects.filter(username='johndoe').exists():
+            return
+        User.objects.create_superuser(
+            username='johndoe', email='john.doe@example.com',
+            password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe',
+        )
+        self.stdout.write(self.style.SUCCESS("Created admin user: johndoe"))
+
+    def create_fixture_users(self):
+        self.stdout.write("Seeding fixture users...")
+        for data in self.FIXTURE_USERS:
+            if User.objects.filter(username=data['username']).exists():
+                continue
+            user = User(**{k: v for k, v in data.items() if k not in ('is_superuser', 'is_staff')})
+            user.is_superuser = data['is_superuser']
+            user.is_staff     = data['is_staff']
+            user.set_password(self.DEFAULT_PASSWORD)
+            user.save()
+            self.stdout.write(f"  Created user: {data['username']}")
 
     def create_random_users(self):
-        """Creates fake users based on number in USER_COUNT."""
-        current_count = User.objects.count()
-        needed = self.USER_COUNT - current_count
-
+        needed = self.USER_COUNT - User.objects.count()
         if needed <= 0:
             self.stdout.write("Enough users already exist.")
             return
-
         self.stdout.write(f"Seeding {needed} users...")
-        users_to_create = []
-        for _ in range(needed):
-            while True:
-                first_name = random.choice(first_name_fixtures)
-                last_name = random.choice(last_name_fixtures)
-
-                if not User.objects.filter(first_name=first_name, last_name=last_name).exists() and not any(u.first_name == first_name and u.last_name == last_name for u in users_to_create):
-                    break
-
-            username = f"{first_name.lower()}{last_name.lower()}{self.faker.random_int(1, 99)}"
-            email = f"{first_name}.{last_name}@{self.faker.domain_name()}"
-
-            user = User(
-                username=username,
-                email=email,
-                first_name=first_name,
-                last_name=last_name
-            )
-            user.set_password(self.DEFAULT_PASSWORD)
-            users_to_create.append(user)
-
-        User.objects.bulk_create(users_to_create, ignore_conflicts=True)
-
-        new_users = User.objects.filter(settings__isnull=True)
-        settings_to_create = []
-        for user in new_users:
-            settings_to_create.append(UserSettings(
-                user=user,
-                theme=random.choice(['light', 'dark']),
-                timezone=self.faker.timezone(),
-            ))
-        UserSettings.objects.bulk_create(settings_to_create)
+        User.objects.bulk_create(build_users_list(needed), ignore_conflicts=True)
+        UserSettings.objects.bulk_create(build_settings_for_new_users())
 
     def create_recurrence_rules(self):
-        """Creates base recurrence rules from fixtures."""
         self.stdout.write("Seeding recurrence rules...")
         for freq, interval in recurrence_fixtures:
-            RecurrenceRule.objects.get_or_create(
-                frequency=freq,
-                interval=interval
-            )
+            RecurrenceRule.objects.get_or_create(frequency=freq, interval=interval)
 
     def create_categories(self):
-        """Creates categories from fixtures."""
         self.stdout.write("Seeding categories...")
         for name, color, is_default in category_fixtures:
-            # Create some global ones (where there's no user) and some specific ones randomly
-            user = None
-            if not is_default and self.users and random.random() > 0.7:
-                user = random.choice(self.users)
-
+            user = random.choice(self.users) if not is_default and self.users and random.random() > 0.7 else None
             Category.objects.get_or_create(
-                name=name,
-                user=user,
-                defaults={'color': color, 'is_default': is_default}
+                name=name, user=user,
+                defaults={'color': color, 'is_default': is_default},
             )
 
     def create_tags(self):
-        """Creates tags from fixtures, linking to categories randomly."""
         self.stdout.write("Seeding tags...")
+        from faker import Faker
+        f = Faker('en_GB')
         for name, duration in tag_fixtures:
-            # Randomly assign to a category sometimes
-            category = None
-            if self.categories and random.random() > 0.3:
-                category = random.choice(self.categories)
-
-            # Randomly assign to a user sometimes if the category isn't already assigned to someone else
-            user = None
-            if category and category.user:
-                user = category.user
-            elif self.users and random.random() > 0.7:
-                user = random.choice(self.users)
-
+            category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
+            user = (
+                category.user if category and category.user
+                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
+            )
             Tag.objects.get_or_create(
-                name=name,
-                user=user,
-                defaults={
-                    'category': category,
-                    'default_duration': duration,
-                    'color': self.faker.hex_color()
-                }
+                name=name, user=user,
+                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
             )
 
     def create_events_for_users(self):
-        """Iterates through users and creates random events for them."""
         self.stdout.write("Seeding events for users...")
-        
-        priority_choices = ['low', 'medium', 'high', 'urgent']
-        total_events = 0
-
+        total = 0
         for i, user in enumerate(self.users):
             print(f"Processing user {i+1}/{len(self.users)}: {user.username}", end='\r')
 
-            num_events = self.faker.random_int(*self.EVENTS_PER_USER_RANGE)
-            
-            # Filter tags/categories relevant to this user (their own OR globals)
-            user_tags = [t for t in self.tags if t.user == user or t.user is None]
+            personal_events = build_events_for_user(user, self.tags, self.rules, 0)
+            CalendarEvent.objects.bulk_create(personal_events)
 
-            events_to_create = []
-            for _ in range(num_events):
-                # Generate random start time within next 60 days
-                start_time = timezone.now() + timedelta(
-                    days=self.faker.random_int(0, 60),
-                    hours=self.faker.random_int(0, 23),
-                    minutes=random.choice([0, 15, 30, 45])
-                )
-                # Generate duration between 30 mins and 3 hours
-                duration_minutes = random.choice([30, 45, 60, 90, 120, 180])
-                end_time = start_time + timedelta(minutes=duration_minutes)
+            meal_events = build_meal_events(user, self.tags)
+            CalendarEvent.objects.bulk_create(meal_events)
 
-                title = random.choice(event_title_fixtures)
+            total += len(personal_events) + len(meal_events)
 
-                # Randomly assign relations
-                tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
-                rule = random.choice(self.rules) if self.rules and random.random() > 0.8 else None
-                
-                events_to_create.append(CalendarEvent(
-                    user=user,
-                    title=title,
-                    description=self.faker.sentence() if random.random() > 0.5 else "",
-                    start_time=start_time,
-                    end_time=end_time,
-                    location=self.faker.address() if random.random() > 0.7 else None,
-                    tag=tag,
-                    priority=random.choice(priority_choices),
-                    recurrence_rule=rule
-                ))
-            
-            CalendarEvent.objects.bulk_create(events_to_create)
-            total_events += len(events_to_create)
-            
-        print(f"\nCreated {total_events} events across {len(self.users)} users.")
+        print(f"\nCreated {total} events across {len(self.users)} users.")
 
+    def _create_module(self, code, name, description, admin, weekly_rule):
+        if not Module.objects.filter(module_code=code).exists():
+            Module.objects.create(**build_module_event(code, name, description, admin, weekly_rule))
+
+    def create_modules(self):
+        self.stdout.write("Seeding modules...")
+        admin       = User.objects.filter(is_superuser=True).first()
+        weekly_rule = RecurrenceRule.objects.filter(frequency='weekly', interval=1).first()
+        for code, name, description in module_fixtures:
+            self._create_module(code, name, description, admin, weekly_rule)
+
+    def create_deadlines(self):
+        self.stdout.write("Seeding deadlines...")
+        deadlines_to_create = []
+        for module in self.modules:
+            deadlines_to_create.extend(build_deadlines_for_module(module))
+        Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
+        self.stdout.write(f"Created {len(deadlines_to_create)} deadlines.")
+
+    def _should_enroll(self, user, module):
+        return not Enrollment.objects.filter(student=user, module=module).exists()
+
+    def _enroll_if_needed(self, user, module, enrollments):
+        if self._should_enroll(user, module):
+            enrollments.append(Enrollment(student=user, module=module))
+
+    def _process_module(self, user, module, lecture_tag, enrollments):
+        self._enroll_if_needed(user, module, enrollments)
+        for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
+            create_lecture_event(u, mod, start, end, tag)
+        for deadline in module.deadlines.all():
+            create_deadline_calendar_event(user, deadline)
+
+    def _process_user_modules(self, user, lecture_tag, enrollments):
+        core, extras = get_user_modules(user, self.modules)
+        for module in core:
+            self._process_module(user, module, lecture_tag, enrollments)
+        for module in extras:
+            self._process_module(user, module, lecture_tag, enrollments)
+
+    def create_enrollments(self):
+        self.stdout.write("Seeding enrollments and lecture events...")
+        lecture_tag = next((t for t in self.tags if t.name == 'Lecture'), None)
+        enrollments = []
+        for user in User.objects.all().select_related('settings'):
+            self._process_user_modules(user, lecture_tag, enrollments)
+        Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
+        self.stdout.write(f"Created {len(enrollments)} enrollments.")
 
     def print_stats(self):
-        print("="*30)
-        print(f"Users: {User.objects.count()}")
-        print(f"Categories: {Category.objects.count()}")
-        print(f"Tags: {Tag.objects.count()}")
-        print(f"Events: {CalendarEvent.objects.count()}")
-        print("="*30)
+        stats = [
+            ("Users",       User.objects.count()),
+            ("Modules",     Module.objects.count()),
+            ("Enrollments", Enrollment.objects.count()),
+            ("Categories",  Category.objects.count()),
+            ("Tags",        Tag.objects.count()),
+            ("Events",      CalendarEvent.objects.count()),
+            ("Deadlines",   Deadline.objects.count()),
+        ]
+        self.stdout.write("\n" + self.style.SUCCESS("✅ Seeding complete!"))
+        self.stdout.write(self.style.SUCCESS("─" * 35))
+        for label, count in stats:
+            self.stdout.write(f"  {self.style.SUCCESS('●')} {label:<14} {self.style.WARNING(str(count))}")
+        self.stdout.write(self.style.SUCCESS("─" * 35))
+        self.stdout.write(f"  {self.style.HTTP_INFO('Fixture users: johndoe (admin), janedoe, charlie')}")
+        self.stdout.write(f"  {self.style.HTTP_INFO('Password: 1234')}\n")

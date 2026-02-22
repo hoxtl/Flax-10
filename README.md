@@ -21,6 +21,11 @@ The project is called `StudyFlax`.  It currently consists of:
 ## Deployed version of the application
 The deployed version of the application can be found at [*INSERT LINK*].
 
+## User Fixtures and Admin
+1. Admin: johndoe | Password: 1234
+2. Regular user: janedoe | Password: 1234
+3. Regular user: charlie | Password: 1234
+
 ## Installation instructions
 
 (Installation of Nix is assumed for the following instruction. If not please access https://nixos.org/download/#download-nix for instructions.)

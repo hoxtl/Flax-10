@@ -1,0 +1,141 @@
+.hero {
+    height: 310px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.7));
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+}
+
+.editLayer {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.content {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    width: 100%;
+    position: relative;
+    z-index: 6;
+    pointer-events: none;
+}
+
+.nameWrapper,
+.imageCount,
+.nameInput {
+    pointer-events: auto;
+}
+
+.name {
+    color: white;
+    font-size: 2rem;
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nameWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.nameWrapper:hover {
+    opacity: 0.9;
+}
+
+.nameInput {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    width: 100%;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.editIcon {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.nameWrapper:hover .editIcon {
+    opacity: 1;
+}
+
+.imageCount {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+}
+
+.editLabel {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 16px 32px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+}
+
+.arrowBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.2s;
+    z-index: 20;
+    padding: 0;
+}
+
+.hero:hover .arrowBtn {
+    opacity: 1;
+}
+
+.arrowBtn:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.leftArrow {
+    left: 20px;
+}
+
+.rightArrow {
+    right: 20px;
+}

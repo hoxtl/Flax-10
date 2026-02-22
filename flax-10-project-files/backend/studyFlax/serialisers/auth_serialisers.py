@@ -41,8 +41,6 @@ class UserSerialiser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     year = serializers.SerializerMethodField()
     major = serializers.SerializerMethodField()
-
-    # ✅ profile-page additions
     bio = serializers.CharField(read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
 
@@ -60,25 +58,21 @@ class UserSerialiser(serializers.ModelSerializer):
     def get_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
 
+    def get_settings_field(self, obj, field):
+        settings = getattr(obj, 'settings', None)
+        return getattr(settings, field, '') or ''
+
     def get_year(self, obj):
-        try:
-            year = obj.settings.year if hasattr(obj, 'settings') and obj.settings.year else '2'
-            return year if year.startswith('Year') else f'Year {year}'
-        except UserSettings.DoesNotExist:
-            return 'Year 2'
+        return self.get_settings_field(obj, 'year')
 
     def get_major(self, obj):
-        try:
-            return obj.settings.major if hasattr(obj, 'settings') and obj.settings.major else 'Computer Science'
-        except UserSettings.DoesNotExist:
-            return 'Computer Science'
+        return self.get_settings_field(obj, 'major')
 
     def get_profile_photo_url(self, obj):
-        if obj.profile_photo:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.profile_photo.url)
-        return None
+        if not obj.profile_photo:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.profile_photo.url) if request else None
 
 
 class LoggedUserSerialiser(serializers.Serializer):

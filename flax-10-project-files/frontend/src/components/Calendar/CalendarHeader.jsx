@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
-import { addDays, formatDate, getWeekDays, formatMonthYear } from "../../utils/dateUtils";
-import { getEvents } from "../../api/event_api";
-import { importTimetable } from "../../api/timetable_api";
-import { getDateRangeForView } from "../../hooks/calendarHelpers";
+import { addDays, formatDate, getWeekDays, formatMonthYear } from './utils/dateUtils';
+import { getEvents } from "../../api/eventApi";
+import { importTimetable } from "../../api/timetableApi";
+import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { NavigationButtons } from "./header/NavigationButtons";
 import { ViewModeToggle } from "./header/ViewModeToggle";
 import TimetableImportModal from '../TimetableImportModal';

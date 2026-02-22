@@ -1,4 +1,6 @@
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
@@ -22,6 +24,7 @@ a {
   color: var(--primary);
   text-decoration: inherit;
 }
+
 
 a:hover {
   color: var(--primary-strong);
@@ -54,10 +57,11 @@ button {
   transition: all 0.25s;
 }
 
+
 button:focus,
 button:focus-visible {
   outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Dark theme transitions */
@@ -74,21 +78,21 @@ button:focus-visible {
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background: rgba(180,164,144,0.07);
+  background: rgba(180, 164, 144, 0.07);
   border-color: var(--border);
   color: var(--text);
 }
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: rgba(180,164,144,0.55);
+  color: rgba(180, 164, 144, 0.55);
 }
 
 [data-theme="dark"] input:focus,
 [data-theme="dark"] select:focus,
 [data-theme="dark"] textarea:focus {
-  border-color: rgba(183,146,107,0.55);
-  box-shadow: 0 0 0 3px rgba(183,146,107,0.35);
+  border-color: rgba(183, 146, 107, 0.55);
+  box-shadow: 0 0 0 3px rgba(183, 146, 107, 0.35);
 }
 
 /* Buttons in dark mode */

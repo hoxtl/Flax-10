@@ -16,6 +16,11 @@ vi.mock('../../../context/CalendarContext', async () => {
     };
 });
 
+vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
+    useReminderNotifications: vi.fn(),
+}));
+
+// Mock TagContext to ensure useTags works without real provider issues
 vi.mock('../../../context/TagContext', async () => {
     return {
         TagProvider: ({ children }) => <div>{children}</div>,
@@ -33,7 +38,7 @@ const mockBinder = {
     onMouseLeave: vi.fn(),
 };
 
-vi.mock('../../../hooks/useHoverSummary', () => ({
+vi.mock('../../../components/Calendar/hooks/useHoverSummary', () => ({
     useHoverSummary: () => ({
         isHovered: true,
         showSummary: true,

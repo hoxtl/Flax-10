@@ -1,33 +1,32 @@
 import { useRef } from 'react';
-import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
-import { getWeekDays, isSameDay, overlapsDay } from '../../../utils/dateUtils';
+import { useCalendarData, useCalendarDispatch } from '../../../context/CalendarContext';
+import { getWeekDays, isSameDay, overlapsDay } from '../utils/dateUtils';
 import { DayColumn } from './DayColumn';
 import { AllDayRow } from './components/AllDayRow';
 import { TimeLabels } from './TimeLabels';
-import { useAutoScroll } from '../../../hooks/useAutoScroll';
+import { useAutoScroll } from '../hooks/useAutoScroll';
 import './WeekView.css';
 
 /**
  * Week view shows 7 day columns with hour rows.
- * Each column shows that day's events.
+ * Props are optional - falls back to CalendarContext if not provided.
  */
-import { shouldShowInTimeGrid } from '../../../utils/eventDisplayUtils';
+import { shouldShowInTimeGrid } from '../utils/eventDisplayUtils';
 
-export function WeekView() {
-    const { selectedDate, events } = useCalendar();
-    const weekDays = getWeekDays(selectedDate);
-    const eventsForWeek = getEventsForWeek(events, weekDays);
+export function WeekView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly }) {
+    const data = useCalendarData({ selectedDate: propDate, events: propEvents });
+    const weekDays = getWeekDays(data.selectedDate);
+    const eventsForWeek = getEventsForWeek(data.events, weekDays);
     const scrollRef = useWeekScroll(eventsForWeek, weekDays);
+
     return (
         <div className="week-view" ref={scrollRef}>
             <div className="sticky-header">
-                <WeekHeader days={weekDays} />
-                <AllDayRow days={weekDays} events={eventsForWeek} />
+                <WeekHeader days={weekDays} onDateSelect={onDateSelect} readOnly={readOnly} />
+                <AllDayRow days={weekDays} events={eventsForWeek} readOnly={readOnly} />
             </div>
-            <WeekGrid days={weekDays} events={eventsForWeek} />
-        </div>
-    );
-}
+            <WeekGrid days={weekDays} events={eventsForWeek} readOnly={readOnly} />
+        </div>);}
 
 function useWeekScroll(events, weekDays) {
     const scrollRef = useRef(null);
@@ -36,7 +35,7 @@ function useWeekScroll(events, weekDays) {
     return scrollRef;
 }
 
-function WeekGrid({ days, events }) {
+function WeekGrid({ days, events, readOnly }) {
     return (
         <div className="week-grid">
             <TimeLabels />
@@ -45,6 +44,7 @@ function WeekGrid({ days, events }) {
                     key={day.toISOString()}
                     date={day}
                     events={getTimedEventsForDay(events, day)}
+                    readOnly={readOnly}
                 />
             ))}
         </div>
@@ -74,13 +74,16 @@ function getEventsForWeek(events, weekDays) {
 /**
  * Header row showing day names and dates.
  */
-function WeekHeader({ days }) {
+function WeekHeader({ days, onDateSelect, readOnly }) {
     const dispatch = useCalendarDispatch();
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const today = new Date();
     const handleDayClick = (day) => {
-        dispatch({ type: 'SET_SELECTED_DATE', payload: day });
-        dispatch({ type: 'SET_VIEW_MODE', payload: 'day' });
+        if (onDateSelect) return onDateSelect(day);
+        if (dispatch) {
+            dispatch({ type: 'SET_SELECTED_DATE', payload: day });
+            dispatch({ type: 'SET_VIEW_MODE', payload: 'day' });
+        }
     };
     return (
         <div className="week-header">
