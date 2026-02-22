@@ -2,8 +2,6 @@ import styles from "./Profile.module.css";
 import { buildInitials, buildFullName } from "./utils/profileHelpers";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
 import ProfileModals from "./ProfileModals";
-import { useUser } from "../../context/UserContext";
-
 function ProfileAvatar({ user, profilePhotoUrl }) {
   return (
     <div className={styles.avatar}>
@@ -51,22 +49,27 @@ function ProfileBio({ user, profileData }) {
   );
 }
 
-function ProfileHeaderTop({ user, onEditProfile }) {
+import FollowButton from "../../components/Social/FollowButton";
+
+function ProfileHeaderTop({ user, onEditProfile, isSelf }) {
   return (
     <div className={styles.headerTop}>
       <h1 className={styles.username}>{user?.username || "guest"}</h1>
-      <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
+      {isSelf ? (
+        <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
+      ) : (
+        <div className={styles.followAction}>
+          <FollowButton userId={user?.id} initialIsFollowing={user?.is_following} />
+        </div>
+      )}
     </div>
   );
 }
 
-function ProfileHeaderInfo({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf }) {
-  const currentUser = useUser();
-  const isSelf = profileData?.username === currentUser?.username || user?.username === currentUser?.username;
-
+function ProfileHeaderInfo({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
   return (
     <div className={styles.headerInfo}>
-      <ProfileHeaderTop user={user} onEditProfile={isSelf ? handlers.onEditProfile : undefined} />
+      <ProfileHeaderTop user={user} onEditProfile={isSelf ? handlers.onEditProfile : undefined} isSelf={isSelf} />
       <ProfileStats
         profileData={profileData}
         upcomingEventCount={upcomingEventCount}
@@ -78,7 +81,7 @@ function ProfileHeaderInfo({ user, profileData, upcomingEventCount, handlers, is
   );
 }
 
-function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf }) {
+function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
   return (
     <div className={styles.header}>
       <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
@@ -88,6 +91,7 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}
         isMutualOrSelf={isMutualOrSelf}
+        isSelf={isSelf}
       />
     </div>
   );
@@ -106,7 +110,7 @@ function ModulesGrid({ modules }) {
   );
 }
 
-function ProfileContent({ user, state, isMutualOrSelf }) {
+function ProfileContent({ user, state, isMutualOrSelf, isSelf }) {
   const { profileData, handlers } = useProfileContent(state);
   const { modules, upcomingEventCount } = useProfileBodyData(state);
   return (
@@ -117,12 +121,13 @@ function ProfileContent({ user, state, isMutualOrSelf }) {
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}
         isMutualOrSelf={isMutualOrSelf}
+        isSelf={isSelf}
       />
       <ModulesGrid modules={modules} />
 
       {!isMutualOrSelf && (
         <div className={styles.privateMessage}>
-          🔒 Follow back to see their calendar and study stats
+          🔒 Become mutuals to see each other's calendar and plan meetings smoothly
         </div>
       )}
     </div>
@@ -131,14 +136,14 @@ function ProfileContent({ user, state, isMutualOrSelf }) {
 
 function ProfileBody({ user, state }) {
   const { filteredEvents, modules } = useProfileBodyData(state);
-  const currentUser = useUser();
+  const currentUser = user;
   const profileData = state.profileData;
-  const isSelf = profileData?.username === currentUser?.username;
+  const isSelf = profileData?.username === currentUser?.username || !profileData;
   const isMutualOrSelf = isSelf || profileData?.is_mutual_following;
 
   return (
     <div className={styles.container}>
-      <ProfileContent user={user} state={state} isMutualOrSelf={isMutualOrSelf} />
+      <ProfileContent user={currentUser} state={state} isMutualOrSelf={isMutualOrSelf} isSelf={isSelf} />
       <ProfileModals
         user={user}
         state={state}
