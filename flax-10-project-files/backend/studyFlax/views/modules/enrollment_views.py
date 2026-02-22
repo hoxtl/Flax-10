@@ -7,6 +7,7 @@ from datetime import timedelta
 from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
 from studyFlax.models import Enrollment, CalendarEvent
 from studyFlax.serialisers import EnrollmentSerialiser
+from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -46,10 +47,19 @@ def enrollment_detail(request, enrollment_id):
         return Response(EnrollmentSerialiser(enrollment).data)
     return delete_enrollment(request, enrollment)
 
+#Retrieves users course from settings and checks if module code belongs to course
+def is_core_module(user, module):
+    user_course = getattr(getattr(user, 'settings', None), 'major', None)
+    if not user_course:
+        return False
+    core_prefixes = course_to_module_prefixes.get(user_course, [])
+    return module.module_code[:2] in core_prefixes
+
 def delete_enrollment(request, enrollment):
     if enrollment.student != request.user:
         return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
-    
+    if is_core_module(request.user, enrollment.module):
+        return Response({"error": "You cannot leave a module that is part of your core course."}, status=status.HTTP_403_FORBIDDEN)
     CalendarEvent.objects.filter( 
         user=request.user,
         module=enrollment.module,
@@ -58,4 +68,4 @@ def delete_enrollment(request, enrollment):
     enrollment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
+
