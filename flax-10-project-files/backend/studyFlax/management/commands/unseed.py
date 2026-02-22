@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 TABLES = [
-    # 'studyFlax_deadline',
+    'studyFlax_deadline',
     'studyFlax_enrollment',
     'studyFlax_module',
     'studyFlax_calendarevent',
