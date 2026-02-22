@@ -28,6 +28,11 @@ class Command(BaseCommand):
         {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',   'is_superuser': True,  'is_staff': True},
         {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',   'is_superuser': False, 'is_staff': False},
         {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+        {'username': 'amiller', 'email': 'alan.miller@kcl.ac.uk', 'first_name': 'Alan',  'last_name': 'Miller', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',    'first_name': 'Sarah', 'last_name': 'Rahwan', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',     'first_name': 'Himesh', 'last_name': 'Patel',  'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'echen',   'email': 'elaine.chen@kcl.ac.uk', 'first_name': 'Elaine', 'last_name': 'Chen',   'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
+        {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',    'first_name': 'James',  'last_name': 'Murphy', 'is_superuser': False, 'is_staff': True, 'role': 'teacher'},
     ]
 
     def _load_shared_data(self):
