@@ -1,31 +1,41 @@
 import { useState, useEffect } from "react";
-import { getUserProfile } from "../../../api/userService";
+import { getUserProfile, getAnotherUserProfile } from "../../../api/userService";
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
 
-async function tryLoadProfile(setProfileData, setLoading) {
-  try { const data = await getUserProfile(); setProfileData(data); }
-  catch (e) { console.error('Failed to load profile:', e); }
-  finally { setLoading(false); }
+async function tryLoadProfile(setProfileData, setLoading, userId) {
+  try {
+    const data = userId ? await getAnotherUserProfile(userId) : await getUserProfile();
+    setProfileData(data);
+  } catch (e) {
+    console.error('Failed to load profile:', e);
+  } finally {
+    setLoading(false);
+  }
 }
 
-async function tryLoadEvents(setAllEvents) {
-  try { const data = await getEvents(); setAllEvents(data || []); }
-  catch (e) { console.error('Failed to load events:', e); }
+async function tryLoadEvents(setAllEvents, userId) {
+  try {
+    const params = userId ? { user_id: userId } : {};
+    const data = await getEvents(params);
+    setAllEvents(data || []);
+  } catch (e) {
+    console.error('Failed to load events:', e);
+  }
 }
 
-function useProfileData() {
+function useProfileData(userId) {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const reload = () => tryLoadProfile(setProfileData, setLoading);
-  useEffect(() => { reload(); }, []);
+  const reload = () => tryLoadProfile(setProfileData, setLoading, userId);
+  useEffect(() => { reload(); }, [userId]);
   return { profileData, loading, reload };
 }
 
-function useEventsData() {
+function useEventsData(userId) {
   const [allEvents, setAllEvents] = useState([]);
   const [eventRange, setEventRange] = useState('month');
-  useEffect(() => { tryLoadEvents(setAllEvents); }, []);
+  useEffect(() => { tryLoadEvents(setAllEvents, userId); }, [userId]);
   return { allEvents, eventRange, setEventRange };
 }
 
@@ -46,9 +56,9 @@ function useModalState() {
   };
 }
 
-export function useProfileState() {
-  const { profileData, loading, reload } = useProfileData();
-  const eventsState = useEventsData();
+export function useProfileState(userId) {
+  const { profileData, loading, reload } = useProfileData(userId);
+  const eventsState = useEventsData(userId);
   const modalState = useModalState();
   const handleSaveProfile = async () => {
     await reload();

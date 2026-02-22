@@ -83,3 +83,14 @@ def profile_view(request):
     if error:
         return error
     return Response(build_profile_response(request.user, request))
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def another_user_profile_view(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+    return Response(build_profile_response(user, request))

@@ -25,12 +25,34 @@ def event_list(request):
     return create_event(request)
 
 
+from studyFlax.models import User
+
 def get_events(request):
-    safe_sync_timetable(request.user)
+    requested_user_id = request.query_params.get('user_id')
+    
+    if requested_user_id:
+        try:
+            target_user = User.objects.get(id=requested_user_id)
+        except User.DoesNotExist:
+            return Response([])
+            
+        # Check mutual following
+        if target_user != request.user:
+            user_follows_target = target_user.followers.filter(follower=request.user).exists()
+            target_follows_user = request.user.followers.filter(follower=target_user).exists()
+            
+            if not (user_follows_target and target_follows_user):
+                return Response([]) # Gracefully deny access
+    else:
+        target_user = request.user
+        safe_sync_timetable(target_user) # Only sync if it's the current user
+
     start = parse_date_param(request.query_params.get('start'))
     end = parse_date_param(request.query_params.get('end'))
-    personal = get_personal_events(request.user, request.query_params, start, end)
-    society = get_synced_society_events(request.user, start, end)
+    
+    personal = get_personal_events(target_user, request.query_params, start, end)
+    society = get_synced_society_events(target_user, start, end)
+    
     return Response(personal + society)
 
 
