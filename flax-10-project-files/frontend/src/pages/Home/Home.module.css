@@ -10,7 +10,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 1rem;
-  padding: 0.75rem 1.25rem 0;
+  padding: 0.75rem 0.75rem 0;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
@@ -20,7 +20,7 @@
 .timeline {
   min-height: 0;
   overflow: auto;
-  padding: 0.25rem 0.25rem 1.5rem;
+  padding: 0.1rem 0 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -56,7 +56,7 @@
   align-items: stretch;
   gap: 0.35rem;
   flex-shrink: 0;
-  width: 60px;
+  width: 52px;
 }
 
 .spineTime {
@@ -65,7 +65,7 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
   text-align: right;
-  width: 36px;
+  width: 30px;
   flex-shrink: 0;
   padding-top: 18px;
   line-height: 1;
@@ -862,24 +862,12 @@
   color: var(--text);
 }
 
-.pastSummary::-webkit-details-marker {
-  display: none;
-}
-
 .pastCount {
   font-weight: 800;
   color: var(--muted);
   margin-left: 0.25rem;
 }
 
-.pastHint {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 10%, transparent);
-  padding: 0.2rem 0.55rem;
-  border-radius: 9999px;
-}
 
 .pastBody {
   border-top: 1px solid var(--border);
