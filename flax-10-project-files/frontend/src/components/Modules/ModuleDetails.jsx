@@ -82,14 +82,15 @@ function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
 
 function DeadlinesSection({deadlines}) {
     if (!deadlines?.length) return <p className={styles.descriptionText}> No deadlines assigned yet.</p>;
+    const sorted = [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
     return (
         <div className={styles.deadlinesList}>
-            {deadlines.map(d => (
+            {sorted.map(d => (
                 <div key={d.id} className={styles.deadlineItem}>
                     <span className={styles.deadlinesType}> {DEADLINE_LABELS[d.deadline_type]} : </span>
                     <span className={styles.deadlineTitle}> {d.title}</span>
                     <span className={styles.deadlineDate}> {formatDeadlineDateTime(d.start_due_date)}</span>
-            </div>
+                </div>
             ))}
         </div>
     );
