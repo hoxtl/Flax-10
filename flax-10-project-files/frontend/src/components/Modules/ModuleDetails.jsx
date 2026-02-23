@@ -10,12 +10,12 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
             <div className={styles.content}>
                 <DetailsHeader module={module} is_enrolled={is_enrolled} />
                 <hr className={styles.divider} />
-                <ScheduleSection module={module} />
-                <hr className={styles.divider} />
                 <DescriptionSection description={module.description} />
                 <hr className={styles.divider} />
+                <ScheduleSection module={module} />
+                <hr className={styles.divider} />
                 <div className={styles.descriptionSection}>
-                    <h1 className={styles.sectionTitle}>📋 Deadlines</h1>
+                    <h1 className={styles.sectionTitle}>Deadlines</h1>
                     <DeadlinesSection deadlines={module.deadlines} />
                 </div>
                 <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
@@ -48,7 +48,7 @@ function DetailsHeader({ module, is_enrolled }) {
 function ScheduleSection({ module }) {
     return (
         <div className={styles.scheduleSection}>
-            <h1 className={styles.sectionTitle}>📅 Schedule </h1>
+            <h1 className={styles.sectionTitle}>Schedule </h1>
             <div className={styles.scheduleGrid}>
                 <InfoCard icon="🕒" label="Lecture Time" value={`${formatTime(module.start_time)} – ${formatTime(module.end_time)}`} />
                 <InfoCard icon="⏱️" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} />
@@ -90,16 +90,21 @@ function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
         : <button className={styles.enrollButton} onClick={onEnroll}>Enroll in Module</button>;
 }
 
-function DeadlinesSection({deadlines}) {
-    if (!deadlines?.length) return <p className={styles.descriptionText}> No deadlines assigned yet.</p>;
+function DeadlinesSection({ deadlines }) {
+    if (!deadlines?.length) return <p className={styles.descriptionText}>No deadlines assigned yet.</p>;
     const sorted = [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
     return (
         <div className={styles.deadlinesList}>
-            {sorted.map(d => (
+            {sorted.map((d, i) => (
                 <div key={d.id} className={styles.deadlineItem}>
-                    <span className={styles.deadlinesType}> {DEADLINE_LABELS[d.deadline_type]} : </span>
-                    <span className={styles.deadlineTitle}> {d.title}</span>
-                    <span className={styles.deadlineDate}> {formatDeadlineDateTime(d.start_due_date)}</span>
+                    <span className={styles.deadlineIndex}>{i + 1}</span>
+                    <div className={styles.deadlineBody}>
+                        <div className={styles.deadlineTitleRow}>
+                            <span className={styles.deadlinesType}>{DEADLINE_LABELS[d.deadline_type]}</span>
+                            <span className={styles.deadlineTitle}>{d.title}</span>
+                        </div>
+                        <span className={styles.deadlineDate}>{formatDeadlineDateTime(d.start_due_date)}</span>
+                    </div>
                 </div>
             ))}
         </div>

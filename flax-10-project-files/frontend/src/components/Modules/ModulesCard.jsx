@@ -81,7 +81,7 @@ function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManage
         <div className={styles.actions}>
             {isTeacher
                 ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
-                : <StudentAction enrolled={enrolled} onToggle={onToggle} />}
+                : <StudentAction enrolled={enrolled} onToggle={Deadlines} />}
         </div>
     );
 }
@@ -89,7 +89,7 @@ function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManage
 function TeacherActions({ onEdit, onDelete,onManageDeadlines }) {
     return (
         <>
-            <button className={styles.deadlineButton} onClick={onManageDeadlines}>📋 Deadlines</button>
+            <button className={styles.deadlineButton} onClick={onManageDeadlines}>Deadlines</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
         </>
