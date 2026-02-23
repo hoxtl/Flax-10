@@ -2,6 +2,7 @@ import styles from "./Profile.module.css";
 import { buildInitials, buildFullName } from "./utils/profileHelpers";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
 import ProfileModals from "./ProfileModals";
+import { ProfileCalendar } from "./ProfileCalendar";
 function ProfileAvatar({ user, profilePhotoUrl }) {
   return (
     <div className={styles.avatar}>
@@ -119,7 +120,7 @@ function ModulesGrid({ modules }) {
 
 function ProfileContent({ user, state, isMutualOrSelf, isSelf }) {
   const { profileData, handlers } = useProfileContent(state);
-  const { modules, upcomingEventCount } = useProfileBodyData(state);
+  const { modules, upcomingEventCount, filteredEvents } = useProfileBodyData(state);
   return (
     <div className={styles.content}>
       <ProfileHeader
@@ -132,9 +133,13 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf }) {
       />
       <ModulesGrid modules={modules} />
 
-      {!isMutualOrSelf && (
+      {!isMutualOrSelf ? (
         <div className={styles.privateMessage}>
           🔒 Become mutuals to see each other's calendar and plan meetings smoothly
+        </div>
+      ) : (
+        <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+          <ProfileCalendar events={filteredEvents} />
         </div>
       )}
     </div>
