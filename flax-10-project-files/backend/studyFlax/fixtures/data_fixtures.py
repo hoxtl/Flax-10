@@ -1,5 +1,5 @@
 from zoneinfo import ZoneInfo
-# Format: (name, color, is_default)
+
 category_fixtures = (
     ('Work', '#FF5733', True),
     ('University', '#33FF57', True),
@@ -9,7 +9,6 @@ category_fixtures = (
     ('Health', '#33FFF5', False),
 )
 
-# Format: (name, default_duration_minutes)
 tag_fixtures = (
     ('Lecture', 120),
     ('Practical', 90),
@@ -20,7 +19,6 @@ tag_fixtures = (
     ('Assignment Deadline', 0),
 )
 
-# Format: (frequency, interval)
 recurrence_fixtures = (
     ('daily', 1),
     ('weekly', 1),
@@ -114,7 +112,6 @@ dinner_fixtures = (
     "Baked aubergine parmigiana",
 )
 
-# Event descriptions
 description_fixtures = (
     "Need to get this done before the deadline.",
     "Need to review the slides before this.",
@@ -140,7 +137,6 @@ description_fixtures = (
     "Make sure to eat before this.",
 )
 
-# Locations
 location_fixtures = (
     "Bush House, Strand, London WC2B 4PJ",
     "Maughan Library, Chancery Lane, London WC2A 1LR",
@@ -173,104 +169,66 @@ lecture_theatre_fixtures = (
     "Wolfson Lecture Theatre, St Thomas Campus",
 )
 
-# Modules
-# Format: (module_code, module_name, description)
 module_fixtures = (
-    # Computer Science
     ("CS4101", "Introduction to Programming", "Fundamentals of programming using Python. Covers variables, loops, functions and data structures."),
     ("CS4202", "Data Structures & Algorithms", "Core algorithms and data structures including trees, graphs, sorting and searching."),
     ("CS4303", "Software Engineering", "Software development lifecycle, agile methods, version control and team project work."),
     ("CS4404", "Databases & Information Systems", "Relational databases, SQL, data modelling and information retrieval."),
-
-    # Artificial Intelligence
     ("AI4101", "Machine Learning Fundamentals", "Supervised and unsupervised learning, neural networks, and model evaluation."),
     ("AI4202", "Natural Language Processing", "Text processing, language models, sentiment analysis and sequence modelling."),
-
-    # Electronic Engineering
     ("EE4101", "Circuit Theory & Electronics", "Fundamentals of electrical circuits, components, and electronic systems."),
     ("EE4202", "Digital Systems & Logic Design", "Boolean algebra, logic gates, combinational and sequential digital circuits."),
     ("EE4303", "Signals & Systems", "Signal processing, Fourier transforms, filtering and communication systems."),
-
-    # General Engineering
     ("GN4101", "Engineering Mathematics", "Mathematical methods for engineers including calculus, ODEs and linear algebra."),
     ("GN4202", "Engineering Design & Materials", "Design principles, material properties, manufacturing processes and sustainability."),
     ("GN4303", "Thermodynamics & Fluid Mechanics", "Energy, heat transfer, fluid behaviour and engineering applications."),
-
-    # Mathematics
     ("MA4101", "Calculus I", "Differential and integral calculus. Limits, derivatives, integrals and applications."),
     ("MA4202", "Linear Algebra", "Vectors, matrices, linear transformations, eigenvalues and eigenvectors."),
     ("MA4303", "Probability & Statistics", "Probability theory, distributions, hypothesis testing and statistical inference."),
     ("MA4404", "Real Analysis", "Sequences, series, continuity, differentiation and integration on the real line."),
-
-    # Physics 
     ("PH4101", "Classical Mechanics", "Newtonian mechanics, energy, momentum, rotational motion and oscillations."),
     ("PH4202", "Electromagnetism", "Electric and magnetic fields, Maxwell's equations and electromagnetic waves."),
     ("PH4303", "Quantum Mechanics", "Wave-particle duality, Schrödinger equation, and quantum states."),
-
-    # Life Sciences / Medicine / Biomedical 
     ("LS4101", "Cell Biology", "Cell structure, function, division and molecular biology fundamentals."),
     ("LS4202", "Biochemistry Foundations", "Proteins, enzymes, metabolism and molecular interactions in living systems."),
     ("LS4303", "Human Anatomy", "Structure and function of the human body systems."),
     ("LS4404", "Physiology", "Mechanisms of body function including cardiovascular, respiratory and renal systems."),
-
-    #Law
     ("LW4101", "Contract Law", "Formation and enforcement of contracts, offer and acceptance, consideration and breach."),
     ("LW4202", "Constitutional Law", "UK constitutional principles, parliamentary sovereignty and human rights law."),
     ("LW4303", "Criminal Law", "Principles of criminal liability, offences against the person and defences."),
-
-    # Psychology / Neuroscience
     ("PS4101", "Introduction to Psychology", "Cognitive, social and developmental psychology. Research methods and key theories."),
     ("PS4202", "Cognitive Neuroscience", "Neural basis of perception, memory, attention and decision-making."),
     ("PS4303", "Research Methods in Psychology", "Experimental design, statistics and ethics in psychological research."),
-
-    #  Business / Economics 
     ("BM4101", "Business Strategy", "Strategic analysis, competitive advantage, market positioning and case studies."),
     ("BM4202", "Accounting & Finance", "Financial statements, budgeting, investment appraisal and management accounting."),
     ("EC4101", "Microeconomics", "Supply and demand, market structures, consumer theory and welfare economics."),
     ("EC4202", "Macroeconomics", "GDP, inflation, unemployment, monetary policy and international trade."),
-
-    # History 
     ("HI4101", "Modern British History", "British political and social history from 1850 to the present day."),
     ("HI4202", "European History 1914-1945", "The causes and consequences of the First and Second World Wars."),
     ("HI4303", "Global History", "Colonialism, decolonisation and the making of the modern world."),
-
-    # English Literature & Philosophy 
     ("EN4101", "Literary Theory", "Critical frameworks for reading literature including structuralism, post-colonialism and feminism."),
     ("EN4202", "Modern Fiction", "Close reading of 20th and 21st century novels and short stories."),
     ("PL4101", "Ethics & Political Philosophy", "Justice, rights, liberty and the foundations of political authority."),
     ("PL4202", "Philosophy of Mind", "Consciousness, mental representation, and the mind-body problem."),
-
-    # Social Science 
     ("GE4101", "Human Geography", "Urbanisation, migration, globalisation and spatial inequality."),
     ("PO4101", "Introduction to Politics", "Political institutions, ideologies, and comparative government."),
     ("IR4101", "International Relations Theory", "Realism, liberalism, constructivism and the structure of world politics."),
-
-    # Nursing 
     ("NU4101", "Foundations of Nursing Practice", "Patient care principles, clinical skills and professional ethics."),
     ("NU4102", "Anatomy & Physiology for Nurses", "Body systems and their functions with a focus on clinical application."),
     ("NU4203", "Mental Health Nursing", "Therapeutic communication, mental health assessment and care planning."),
     ("NU4204", "Adult Nursing in Acute Settings", "Managing patients in high-dependency and emergency care environments."),
     ("NU4205", "Child and Family Nursing", "Paediatric care principles, family-centred nursing and safeguarding."),
-
-    # Dentistry 
     ("DE4101", "Oral Biology", "Structure and function of teeth, supporting tissues and oral health."),
-
-    # Modern Languages
     ("FR4101", "French Language I", "Introductory French: core grammar, practical speaking, listening and reading skills."),
-
-    ("SP4303", "Latin American Literature and Identity", "García Márquez, Luiselli, magical realism and postcolonial identity."),
+    ("SP4303", "Latin American Literature and Identity", "Garcia Marquez, Luiselli, magical realism and postcolonial identity."),
     ("SP4404", "Spanish in the Contemporary World", "Politics, media, activism and the global reach of the Spanish language."),
-
     ("GL4101", "German Language I", "Introductory German: pronunciation, grammar foundations and practical communication."),
     ("GL4303", "German History Through Language", "Weimar Republic, Third Reich and reunification through primary sources."),
     ("GL4404", "Contemporary German Society", "Migration, identity politics and modern Germany in text and media."),
-
     ("AR4303", "Arabic Media and Politics", "News broadcasts, speeches and social media in Arabic."),
     ("ZH4303", "Chinese Society and Culture", "Contemporary China through film, literature and media."),
     ("IT4101", "Italian Language I", "Core Italian grammar, conversational skills and cultural introduction."),
     ("PT4101", "Portuguese Language I", "Brazilian Portuguese grammar foundations and everyday communication."),
-
-    # Arts 
     ("FA4101", "History of Art", "Survey of Western art from the Renaissance to the contemporary period."),
     ("FA4202", "Contemporary Art & Theory", "Critical frameworks for understanding art since 1960."),
     ("TH4101", "Introduction to Theatre Studies", "Performance theory, dramatic texts and the history of theatre."),
@@ -358,19 +316,14 @@ module_prefix_to_department = {
     "CR": "Arts & Humanities",
 }
 
-# Deadline fixtures
-# Format: (deadline_type, title, description)
-# Generic fallback used when a module prefix has no specific entry below.
 deadline_fixtures = (
     ("coursework", "Coursework 1", "Submit via KEATS by the deadline. Check the module page for submission instructions."),
-    ("coursework", "Coursework 2", "Worth 50 marks, assessing weeks 1–5. Full brief available on KEATS."),
+    ("coursework", "Coursework 2", "Worth 50 marks, assessing weeks 1-5. Full brief available on KEATS."),
     ("quiz", "Multiple Choice Quiz", "Short online quiz on KEATS covering recent lecture topics."),
     ("exam", "Final Exam", "Final exam covering the entire module. Good luck!"),
     ("presentation", "Group Presentation", "Group presentation in class, at least 15 mins. Slides to be uploaded to KEATS."),
 )
 
-# Maps specific deadlines to modules via module code prefix.
-# Format: (deadline_type, title, description)
 module_deadline_fixtures = {
     "CS": [
         ("coursework", "Programming Project", "Create a Time Management System for students. Submit code and report via KEATS."),
@@ -388,11 +341,11 @@ module_deadline_fixtures = {
         ("exam", "Final exam", "Closed book exam with formula sheet provided."),
     ],
     "PH": [
-        ("coursework", "Lab report", "Write up your Hooke's Law experiment. Include data, error analysis and conclusions."),
+        ("coursework", "Lab report", "Write up your experiment. Include data, error analysis and conclusions."),
         ("exam", "Final exam", "Closed-book written exam. Covers the full module and includes formula sheet."),
     ],
     "EE": [
-        ("coursework", "Lab Report", "Document your Arduino lab experiment. Include circuit diagram measurements. Submit via KEATS."),
+        ("coursework", "Lab Report", "Document your lab experiment. Include circuit diagram and measurements. Submit via KEATS."),
         ("exam", "Final exam", "Open-book written exam with data sheet. Check KEATS for allowed materials."),
     ],
     "GN": [
@@ -401,7 +354,7 @@ module_deadline_fixtures = {
     ],
     "LS": [
         ("coursework", "Individual Lab Report", "Write up your practical session. Include methodology and data analysis."),
-        ("exam", "Reading Week Exam", "Multiple choice and short answer questions covering weeks 1–5."),
+        ("exam", "Reading Week Exam", "Multiple choice and short answer questions covering weeks 1-5."),
         ("quiz", "KEATS Quiz", "15 questions assessing your understanding of the module so far."),
     ],
     "LW": [
@@ -420,7 +373,7 @@ module_deadline_fixtures = {
     ],
     "EC": [
         ("coursework", "Economics Essay", "Analytical essay applying economic theory to a real-world issue. 2000 words."),
-        ("exam", "Mid-Term Exam", "Written exam with data response and short answer questions covering weeks 1–5."),
+        ("exam", "Mid-Term Exam", "Written exam with data response and short answer questions covering weeks 1-5."),
         ("exam", "Final exam", "Closed-book exam covering the full module syllabus."),
     ],
     "HI": [
@@ -473,3 +426,142 @@ module_deadline_fixtures = {
         ("exam", "Written Exam", "Formal written exam with character recognition and translation components."),
     ],
 }
+
+# Per-module-prefix task templates
+# Format: (title_template, description, priority, estimated_blocks, days_from_now)
+# {module} and {module_name} are replaced at seed time with the user's actual enrolled module
+module_task_templates = {
+    "CS": [
+        ("{module} programming assignment", "Complete the coding task and submit via KEATS. Test your solution locally first.", "high", 4, 3),
+        ("{module} past paper", "Work through the past exam paper under timed conditions.", "high", 3, 5),
+        ("{module} revision: data structures", "Review lecture notes and re-implement key algorithms from scratch.", "medium", 2, 2),
+        ("{module} group project check-in", "Review teammates' pull requests and update your section of the codebase.", "urgent", 2, 1),
+    ],
+    "AI": [
+        ("{module} model evaluation writeup", "Write up the evaluation section for the ML coursework.", "high", 3, 3),
+        ("{module} lecture notes review", "Go through neural network slides and annotate key formulas.", "medium", 2, 2),
+        ("{module} past paper", "Work through the past exam paper under timed conditions.", "high", 4, 5),
+    ],
+    "MA": [
+        ("{module} problem set", "Complete all questions from the assignment sheet. Submit online.", "medium", 3, 3),
+        ("{module} revision session", "Go through lecture examples and redo the harder problem sheet questions.", "medium", 2, 2),
+        ("{module} exam prep", "Work through past papers and note which topics need more focus.", "high", 4, 5),
+    ],
+    "PH": [
+        ("{module} lab report", "Write up the practical. Include methodology, data, error analysis and conclusions.", "high", 4, 4),
+        ("{module} problem set", "Complete the worksheet from this week's lecture. Show full working.", "medium", 3, 2),
+        ("{module} revision", "Review derivations and key equations. Make a formula sheet.", "medium", 2, 3),
+    ],
+    "EE": [
+        ("{module} lab report", "Document the experiment. Include circuit diagram, measurements and analysis.", "high", 3, 4),
+        ("{module} problem sheet", "Complete the circuit analysis questions from this week.", "medium", 2, 2),
+        ("{module} exam prep", "Past paper practice — focus on questions you got wrong last time.", "high", 4, 5),
+    ],
+    "GN": [
+        ("{module} design portfolio update", "Add this week's design sketches and calculations to your portfolio.", "high", 3, 3),
+        ("{module} problem set", "Complete the engineering maths worksheet.", "medium", 2, 2),
+    ],
+    "LS": [
+        ("{module} lab report", "Write up the lab practical. Include methodology and data analysis.", "high", 4, 3),
+        ("{module} essay plan", "Draft a 300-word outline for the upcoming essay.", "urgent", 2, 1),
+        ("{module} KEATS quiz", "Complete the online quiz before midnight. Review lecture notes first.", "urgent", 1, 1),
+        ("{module} revision: key pathways", "Make a diagram of the main metabolic/cellular pathways from this week.", "medium", 2, 4),
+    ],
+    "LW": [
+        ("{module} essay", "Critical legal essay on your assigned question. 1500 words. Submit via KEATS.", "high", 5, 4),
+        ("{module} seminar prep", "Read the assigned cases and prepare three discussion points.", "medium", 2, 1),
+        ("{module} revision", "Review lecture notes and compile a list of key cases with brief facts.", "medium", 3, 3),
+    ],
+    "PS": [
+        ("{module} research report draft", "Write up the introduction and method sections.", "medium", 3, 4),
+        ("{module} reading", "Read the assigned journal articles and annotate key findings.", "medium", 2, 2),
+        ("{module} revision", "Review cognitive models and make flashcards for key studies.", "medium", 2, 3),
+    ],
+    "BM": [
+        ("{module} case study analysis", "Analyse the assigned company. 2500 words.", "high", 6, 4),
+        ("{module} seminar prep", "Read the Harvard case and prepare two strategic recommendations.", "medium", 2, 1),
+        ("{module} revision", "Review strategic frameworks: Porter's Five Forces, SWOT, PESTLE.", "medium", 2, 3),
+    ],
+    "EC": [
+        ("{module} economics essay", "Analytical essay applying theory to a real-world issue. 2000 words.", "medium", 4, 5),
+        ("{module} problem set", "Complete the microeconomics worksheet from this week's lecture.", "medium", 2, 2),
+        ("{module} revision", "Review supply/demand models and go through past short-answer questions.", "medium", 2, 3),
+    ],
+    "HI": [
+        ("{module} essay", "Historical essay on your assigned question. 2500 words. Chicago referencing.", "high", 5, 5),
+        ("{module} seminar reading", "Read the set texts and prepare three discussion points for seminar.", "medium", 2, 1),
+        ("{module} source analysis", "Annotate the primary source document — consider context, bias and significance.", "medium", 2, 3),
+    ],
+    "EN": [
+        ("{module} essay", "Close reading essay on the assigned text. 2500 words. MLA referencing.", "high", 5, 5),
+        ("{module} seminar presentation", "Prepare a 10-minute seminar discussion on your assigned passage.", "high", 3, 2),
+        ("{module} reading", "Read the set text for this week and annotate key themes.", "medium", 2, 1),
+    ],
+    "PL": [
+        ("{module} essay", "Argumentative philosophy essay. 2000 words. Defend your assigned position.", "medium", 5, 5),
+        ("{module} seminar prep", "Read the set chapter and prepare two objections for discussion.", "medium", 2, 1),
+        ("{module} revision", "Make flashcards for key arguments, philosophers and counter-arguments.", "low", 2, 4),
+    ],
+    "PO": [
+        ("{module} policy brief", "1500-word policy brief on your assigned political issue.", "medium", 3, 4),
+        ("{module} seminar prep", "Read the assigned article and prepare three discussion questions.", "medium", 2, 1),
+    ],
+    "IR": [
+        ("{module} essay", "Analytical essay applying IR theory to a current issue. 2500 words.", "high", 5, 5),
+        ("{module} seminar prep", "Read the assigned chapters and prepare a brief summary of each theory.", "medium", 2, 1),
+    ],
+    "NU": [
+        ("{module} reflective portfolio entry", "Write a Gibbs cycle reflection on last week's clinical placement.", "high", 3, 2),
+        ("{module} OSCE prep", "Practise the clinical skill steps and review the assessment criteria.", "urgent", 3, 3),
+    ],
+    "DE": [
+        ("{module} clinical case report", "Document the patient case — diagnosis, treatment plan and reflection.", "high", 4, 4),
+        ("{module} anatomy revision", "Review the oral anatomy diagrams and label key structures from memory.", "medium", 2, 2),
+    ],
+    "FR": [
+        ("{module} written assignment", "Complete the French essay or translation exercise from KEATS.", "medium", 3, 4),
+        ("{module} vocabulary practice", "Review this week's vocab list and write example sentences for each term.", "low", 1, 2),
+        ("{module} oral prep", "Practise speaking the set topic aloud — record yourself and review.", "medium", 2, 3),
+    ],
+    "SP": [
+        ("{module} written assignment", "Complete the Spanish written exercise from KEATS.", "medium", 3, 4),
+        ("{module} vocabulary practice", "Review this week's vocab list and write example sentences.", "low", 1, 2),
+        ("{module} oral prep", "Practise speaking the set topic aloud — record yourself and review.", "medium", 2, 3),
+        ("{module} grammar exercise", "Complete the grammar worksheet focusing on the subjunctive.", "medium", 2, 1),
+    ],
+    "GL": [
+        ("{module} written assignment", "Complete the German written exercise from KEATS.", "medium", 3, 4),
+        ("{module} vocabulary practice", "Review this week's vocab list and write example sentences.", "low", 1, 2),
+        ("{module} translation practice", "Translate the set passage from German to English and check with model answer.", "medium", 2, 3),
+    ],
+    "AR": [
+        ("{module} written assignment", "Complete the Arabic written exercise from KEATS.", "medium", 3, 4),
+        ("{module} script practice", "Practise writing this week's new vocabulary in Arabic script.", "low", 1, 2),
+    ],
+    "ZH": [
+        ("{module} written assignment", "Complete the Mandarin written exercise from KEATS.", "medium", 3, 4),
+        ("{module} character practice", "Write out this week's new characters 10 times each.", "low", 1, 2),
+    ],
+    "MU": [
+        ("{module} listening log entry", "Write a 200-word analytical response to the set recording.", "medium", 2, 3),
+        ("{module} theory exercise", "Complete the harmony worksheet from this week's tutorial.", "medium", 2, 2),
+    ],
+    "GE": [
+        ("{module} essay", "Essay on the assigned geographic concept. 2000 words.", "medium", 4, 5),
+        ("{module} seminar prep", "Read the set article and annotate key arguments.", "medium", 2, 1),
+    ],
+}
+
+# Generic personal tasks seeded for every user regardless of course
+personal_task_fixtures = (
+    ("Reply to supervisor email", "Confirm your project meeting time and attach the latest draft.", "urgent", 1, 0),
+    ("Book revision room at Maughan", "Reserve a silent study room for the upcoming exam period.", "medium", 1, 2),
+    ("Update CV", "Add the latest project or placement before applying to grad roles.", "medium", 2, 6),
+    ("Research internship deadlines", "Check application deadlines for your target companies.", "high", 1, 3),
+    ("Submit KEATS quiz", "Weekly online quiz — must be done before midnight tonight.", "urgent", 1, 1),
+    ("Flashcard deck: this week's content", "Make Anki cards for the key concepts from this week's lectures.", "low", 2, 5),
+    ("Book dentist appointment", "Overdue — call and book for sometime next month.", "low", 1, 4),
+    ("Track spending this week", "Log all expenses and check you're on budget.", "low", 1, 3),
+    ("Plan the week ahead", "Look at the week's deadlines and block out study time in your calendar.", "medium", 1, 0),
+    ("Email personal tutor", "Check in with your personal tutor — ask about the upcoming assessment.", "medium", 1, 2),
+)

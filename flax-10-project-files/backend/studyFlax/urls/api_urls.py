@@ -51,7 +51,7 @@ from studyFlax.views.notifications import notification_list, notification_detail
 from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 
-# --- Misc ---
+# Misc 
 from studyFlax.views.hello import hello
 
 urlpatterns = [

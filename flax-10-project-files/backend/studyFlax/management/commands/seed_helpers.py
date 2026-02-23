@@ -7,7 +7,6 @@ from studyFlax.models import CalendarEvent, UserSettings
 from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
     location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
-    # deadline_fixtures, # module_deadline_fixtures,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
 )
 
@@ -116,11 +115,6 @@ def _fresh_week_titles():
 
 
 def build_events_for_user(user, tags, rules, count):
-    """
-    Seeds personal (non-meal) events for SEED_DAYS from SEED_START.
-    Titles reshuffle each week so no two weeks look alike, and the same
-    title never appears twice within the same week.
-    """
     non_lecture_hours = [8, 13, 17, 19, 20]
     events = []
     week_titles  = []
@@ -145,14 +139,6 @@ def build_events_for_user(user, tags, rules, count):
 
 
 def build_meal_events(user, tags):
-    """
-    Seeds Breakfast (08:00), Lunch (12:30) and Dinner (19:00) for every day
-    in the seeding range. Each fixture list rotates by day index so meals vary
-    daily without repeating the same combination two days running.
-
-    Title is the meal label; description is the specific food item so the
-    timeline card shows a clear heading and a readable subtitle.
-    """
     meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
     events   = []
 
@@ -228,11 +214,6 @@ def create_lecture_event(user, module, start, end, lecture_tag):
 
 
 def build_lecture_events(user, module, lecture_tag):
-    """
-    Returns exactly 10 lecture instances spaced one week apart, skipping
-    reading week. Any slot that falls within reading week is deferred to the
-    following week so the module still delivers all 10 sessions.
-    """
     sessions  = []
     candidate = module.start_time
     while len(sessions) < 10:
@@ -246,53 +227,3 @@ def build_lecture_events(user, module, lecture_tag):
             ))
         candidate += timedelta(weeks=1)
     return sessions
-
-
-def _get_random_offset(used_offsets):
-    while True:
-        day_offset = random.randint(7, 30)
-        if day_offset not in used_offsets:
-            used_offsets.add(day_offset)
-            return day_offset
-
-
-def build_deadlines_for_module(module):
-    prefix    = module.module_code[:2]
-    templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
-    used_offsets = set()
-    deadlines    = []
-    now = timezone.now()
-
-    for deadline_type, title, description in templates:
-        day_offset = _get_random_offset(used_offsets)
-        hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
-        start_due  = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
-        end_due    = start_due + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
-        location   = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
-
-        if not Deadline.objects.filter(module=module, title=title).exists():
-            deadlines.append(Deadline(
-                module=module,
-                title=title,
-                deadline_type=deadline_type,
-                description=description,
-                start_due_date=start_due,
-                end_due_date=end_due,
-                location=location,
-            ))
-
-    return deadlines
-
-
-def create_deadline_calendar_event(user, deadline):
-    CalendarEvent.objects.get_or_create(
-        user=user,
-        title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
-        start_time=deadline.start_due_date,
-        defaults={
-            'end_time': deadline.end_due_date or deadline.start_due_date,
-            'location': deadline.location,
-            'description': deadline.description,
-            'priority': 'high',
-        },
-    )
