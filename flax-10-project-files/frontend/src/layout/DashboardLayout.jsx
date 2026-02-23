@@ -112,12 +112,15 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
         user={user} activeNav={activeNav} onNavChange={onNavChange}
         onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
-      <div className={styles.main}>
-        <TopBar user={user} onSettingsClick={() => onNavChange?.("settings")}
-          onLogoutClick={handleLogoutClick} onProfileClick={() => onNavChange?.("profile")} />
-        {showWeekBar && <WeekBar date={selectedDate} />}
-        <PageContent activeNav={activeNav}>{children}</PageContent>
-      </div>
+      <MainArea user={user}
+        onSettingsClick={() => onNavChange?.("settings")}
+        onLogoutClick={handleLogoutClick}
+        onProfileClick={() => onNavChange?.("profile")}
+        selectedDate={selectedDate}
+        showWeekBar={showWeekBar}
+        activeNav={activeNav}>
+        {children}
+      </MainArea>
       <EventModalGate modal={modal} />
     </div>
   );

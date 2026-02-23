@@ -1,22 +1,19 @@
 import { createContext, useContext } from 'react';
 import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
 
-const TimerContext = createContext(null);
-
-export function TimerProvider({ children }) {
-    const timerData = useTimerLogic();
-
-    return (
-        <TimerContext.Provider value={timerData}>
-            {children}
-        </TimerContext.Provider>
-    );
-}
+const TimerContext = createContext();
 
 export function useTimerContext() {
-    const context = useContext(TimerContext);
-    if (!context) {
-        throw new Error('useTimerContext must be used within a TimerProvider');
-    }
-    return context;
+  const context = useContext(TimerContext);
+  if (!context) throw new Error('useTimerContext must be used within TimerProvider');
+  return context;
+}
+
+export function TimerProvider({ children }) {
+  const timerData = useTimerLogic();
+  return (
+    <TimerContext.Provider value={timerData}>
+      {children}
+    </TimerContext.Provider>
+  );
 }

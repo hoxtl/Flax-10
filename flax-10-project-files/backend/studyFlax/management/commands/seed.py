@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
-    UserSettings, Module, Enrollment,
+    UserSettings, Module, Enrollment, Deadline,
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
 from studyFlax.fixtures.data_fixtures import (
@@ -15,7 +15,8 @@ from studyFlax.fixtures.data_fixtures import (
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
-    build_lecture_events, create_lecture_event,
+    build_lecture_events, create_lecture_event, build_deadlines_for_module,
+    create_deadline_calendar_event,
 )
 
 User = get_user_model()
@@ -28,10 +29,24 @@ class Command(BaseCommand):
     DEFAULT_PASSWORD = '1234'
 
     FIXTURE_USERS = [
-        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',   'is_superuser': True,  'is_staff': True},
-        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',   'is_superuser': False, 'is_staff': False},
-        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',    'is_superuser': True,  'is_staff': True},
+        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',    'is_superuser': False, 'is_staff': False},
+        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith',  'is_superuser': False, 'is_staff': False},
+        {'username': 'amiller', 'email': 'a.miller@kcl.ac.uk',  'first_name': 'Alice',   'last_name': 'Miller', 'is_superuser': False, 'is_staff': False},
+        {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',  'first_name': 'Sam',     'last_name': 'Rahwan', 'is_superuser': False, 'is_staff': False},
+        {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',   'first_name': 'Hina',    'last_name': 'Patel',  'is_superuser': False, 'is_staff': False},
+        {'username': 'echen',   'email': 'e.chen@kcl.ac.uk',    'first_name': 'Eric',    'last_name': 'Chen',   'is_superuser': False, 'is_staff': False},
+        {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',  'first_name': 'James',   'last_name': 'Murphy', 'is_superuser': False, 'is_staff': False},
     ]
+
+    ROLE_LABELS = {
+        'johndoe': 'admin',
+        'janedoe': 'student', 'charlie': 'student',
+        'amiller': 'teacher', 'srahwan': 'teacher',
+        'hpatel':  'teacher', 'echen':   'teacher', 'jmurphy': 'teacher',
+    }
+
+    TEACHER_USERNAMES = {'amiller', 'srahwan', 'hpatel', 'echen', 'jmurphy'}
 
     def _load_shared_data(self):
         self.users      = list(User.objects.filter(is_staff=False))
@@ -54,6 +69,7 @@ class Command(BaseCommand):
         self.create_events_for_users()
         self.create_modules()
         self.modules = list(Module.objects.all())
+        self.create_deadlines()
         self.create_enrollments()
         self.create_tasks()
         self.print_stats()
@@ -62,29 +78,32 @@ class Command(BaseCommand):
         if User.objects.filter(username='johndoe').exists():
             return
         User.objects.create_superuser(
-            username='johndoe', email='john.doe@example.com',
+            username='johndoe', email='john.doe@kcl.ac.uk',
             password=self.DEFAULT_PASSWORD, first_name='John', last_name='Doe',
         )
-        self.stdout.write(self.style.SUCCESS("Created admin user: johndoe"))
+        self.stdout.write(f"  {'johndoe':<12} admin")
 
     def create_fixture_users(self):
-        self.stdout.write("Seeding fixture users...")
+        self.stdout.write("Creating fixture users...")
         for data in self.FIXTURE_USERS:
             if User.objects.filter(username=data['username']).exists():
                 continue
             user = User(**{k: v for k, v in data.items() if k not in ('is_superuser', 'is_staff')})
             user.is_superuser = data['is_superuser']
             user.is_staff     = data['is_staff']
+            if data['username'] in self.TEACHER_USERNAMES:
+                user.role = 'teacher'
             user.set_password(self.DEFAULT_PASSWORD)
             user.save()
-            self.stdout.write(f"  Created user: {data['username']}")
+            role = self.ROLE_LABELS.get(data['username'], '')
+            self.stdout.write(f"  {data['username']:<12} {role}")
 
     def create_random_users(self):
         needed = self.USER_COUNT - User.objects.count()
         if needed <= 0:
             self.stdout.write("Enough users already exist.")
             return
-        self.stdout.write(f"Seeding {needed} users...")
+        self.stdout.write(f"Seeding {needed} random users...")
         User.objects.bulk_create(build_users_list(needed), ignore_conflicts=True)
         UserSettings.objects.bulk_create(build_settings_for_new_users())
 
@@ -121,24 +140,35 @@ class Command(BaseCommand):
         self.stdout.write("Seeding events for users...")
         total = 0
         for i, user in enumerate(self.users):
-            print(f"Processing user {i+1}/{len(self.users)}: {user.username}", end='\r')
+            print(f"  Processing user {i+1}/{len(self.users)}: {user.username}", end='\r')
             personal_events = build_events_for_user(user, self.tags, self.rules, 0)
             CalendarEvent.objects.bulk_create(personal_events)
             meal_events = build_meal_events(user, self.tags)
             CalendarEvent.objects.bulk_create(meal_events)
             total += len(personal_events) + len(meal_events)
-        print(f"\nCreated {total} events across {len(self.users)} users.")
+        print(f"  Created {total} events across {len(self.users)} users.          ")
 
-    def _create_module(self, code, name, description, admin, weekly_rule):
+    def _create_module(self, code, name, description, teacher, weekly_rule):
         if not Module.objects.filter(module_code=code).exists():
-            Module.objects.create(**build_module_event(code, name, description, admin, weekly_rule))
+            Module.objects.create(**build_module_event(code, name, description, teacher, weekly_rule))
 
     def create_modules(self):
         self.stdout.write("Seeding modules...")
-        admin       = User.objects.filter(is_superuser=True).first()
+        teachers = list(User.objects.filter(role='teacher'))
+        if not teachers:
+            teachers = [User.objects.filter(is_superuser=True).first()]
         weekly_rule = RecurrenceRule.objects.filter(frequency='weekly', interval=1).first()
-        for code, name, description in module_fixtures:
-            self._create_module(code, name, description, admin, weekly_rule)
+        for i, (code, name, description) in enumerate(module_fixtures):
+            teacher = teachers[i % len(teachers)]
+            self._create_module(code, name, description, teacher, weekly_rule)
+
+    def create_deadlines(self):
+        self.stdout.write("Seeding deadlines...")
+        deadlines_to_create = []
+        for module in self.modules:
+            deadlines_to_create.extend(build_deadlines_for_module(module))
+        Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
+        self.stdout.write(f"  Created {len(deadlines_to_create)} deadlines.")
 
     def _should_enroll(self, user, module):
         return not Enrollment.objects.filter(student=user, module=module).exists()
@@ -151,6 +181,8 @@ class Command(BaseCommand):
         self._enroll_if_needed(user, module, enrollments)
         for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
             create_lecture_event(u, mod, start, end, tag)
+        for deadline in module.deadlines.all():
+            create_deadline_calendar_event(user, deadline)
 
     def _process_user_modules(self, user, lecture_tag, enrollments):
         core, extras = get_user_modules(user, self.modules)
@@ -166,7 +198,7 @@ class Command(BaseCommand):
         for user in User.objects.all().select_related('settings'):
             self._process_user_modules(user, lecture_tag, enrollments)
         Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
-        self.stdout.write(f"Created {len(enrollments)} enrollments.")
+        self.stdout.write(f"  Created {len(enrollments)} enrollments.")
 
     def create_tasks(self):
         self.stdout.write("Seeding tasks...")
@@ -184,7 +216,6 @@ class Command(BaseCommand):
                 user=user, name="Personal", defaults={"category": "personal"}
             )
 
-            # Seed tasks from the user's actual enrolled modules
             enrolled_modules = list(
                 Enrollment.objects.filter(student=user).select_related('module')
             )
@@ -196,7 +227,6 @@ class Command(BaseCommand):
                     continue
                 seen_prefixes.add(prefix)
                 templates = module_task_templates.get(prefix, [])
-                # Pick up to 2 tasks per module to keep it realistic
                 for title_tmpl, description, priority, estimated_blocks, days_from_now in templates[:2]:
                     title = title_tmpl.format(module=mod.module_code, module_name=mod.module_name)
                     due = (now + timedelta(days=days_from_now)).replace(
@@ -215,7 +245,6 @@ class Command(BaseCommand):
                     )
                     total += 1
 
-            # Seed generic personal tasks for everyone
             for title, description, priority, estimated_blocks, days_from_now in personal_task_fixtures:
                 due = (now + timedelta(days=days_from_now)).replace(
                     hour=23, minute=59, second=0, microsecond=0
@@ -233,20 +262,40 @@ class Command(BaseCommand):
                 )
                 total += 1
 
-        self.stdout.write(f"Created {total} tasks.")
+        self.stdout.write(f"  Created {total} tasks.")
 
     def print_stats(self):
+        div = "─" * 40
+        self.stdout.write("")
+        self.stdout.write(self.style.SUCCESS(div))
+        self.stdout.write(self.style.SUCCESS("  ✅  Seeding complete"))
+        self.stdout.write(self.style.SUCCESS(div))
+
+        self.stdout.write("")
+        self.stdout.write("  Fixture users  (password: 1234)")
+        self.stdout.write(f"  {'johndoe':<12}  superuser / admin")
+        self.stdout.write(f"  {'janedoe':<12}  student")
+        self.stdout.write(f"  {'charlie':<12}  student")
+        self.stdout.write(f"  {'amiller':<12}  teacher")
+        self.stdout.write(f"  {'srahwan':<12}  teacher")
+        self.stdout.write(f"  {'hpatel':<12}  teacher")
+        self.stdout.write(f"  {'echen':<12}  teacher")
+        self.stdout.write(f"  {'jmurphy':<12}  teacher")
+
+        self.stdout.write("")
+        self.stdout.write("  Database")
         stats = [
             ("Users",       User.objects.count()),
             ("Modules",     Module.objects.count()),
             ("Enrollments", Enrollment.objects.count()),
+            ("Deadlines",   Deadline.objects.count()),
+            ("Tasks",       Task.objects.count()),
             ("Categories",  Category.objects.count()),
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),
-            ("Tasks",       Task.objects.count()),
         ]
-        self.stdout.write("\n" + self.style.SUCCESS("Seeding complete!"))
         for label, count in stats:
-            self.stdout.write(f"  {self.style.SUCCESS('●')} {label:<14} {self.style.WARNING(str(count))}")
-        self.stdout.write(f"  {self.style.HTTP_INFO('Fixture users: johndoe (admin), janedoe, charlie')}")
-        self.stdout.write(f"  {self.style.HTTP_INFO('Password: 1234')}\n")
+            self.stdout.write(f"  {label:<14}  {count}")
+        self.stdout.write("")
+        self.stdout.write(self.style.SUCCESS(div))
+        self.stdout.write("")

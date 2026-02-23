@@ -86,6 +86,7 @@ export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfile
   return (
     <header className={styles.container}>
       <TopBarGreeting user={user} />
+      <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <TopBarActions
         user={user}
         onSettingsClick={onSettingsClick}
