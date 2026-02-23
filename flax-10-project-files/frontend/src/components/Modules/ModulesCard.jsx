@@ -20,7 +20,7 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
 function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.content}>
-            {isTeacher ? <CardHeader module={module}  /> : <CardHeader module={module} enrolled={enrolled} />}
+            {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} />}
             <h3 className={styles.moduleTitle}>{module.module_name}</h3>
             {module.description && <Description text={module.description} />}
             <ScheduleMeta module={module} />
@@ -76,20 +76,20 @@ function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
 
-function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines  }) {
+function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.actions}>
             {isTeacher
                 ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
-                : <StudentAction enrolled={enrolled} onToggle={Deadlines} />}
+                : <StudentAction enrolled={enrolled} onToggle={onToggle} />}
         </div>
     );
 }
 
-function TeacherActions({ onEdit, onDelete,onManageDeadlines }) {
+function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
     return (
         <>
-            <button className={styles.deadlineButton} onClick={onManageDeadlines}>Deadlines</button>
+            <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
         </>
