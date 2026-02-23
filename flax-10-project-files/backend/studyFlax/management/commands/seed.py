@@ -24,9 +24,14 @@ class Command(BaseCommand):
     DEFAULT_PASSWORD = '1234'
 
     FIXTURE_USERS = [
-        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',   'is_superuser': True,  'is_staff': True},
-        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',   'is_superuser': False, 'is_staff': False},
-        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith', 'is_superuser': False, 'is_staff': False},
+        {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',      'is_superuser': True,  'is_staff': True},
+        {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',      'is_superuser': False, 'is_staff': False},
+        {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith',    'is_superuser': False, 'is_staff': False},
+        {'username': 'amiller', 'email': 'a.miller@kcl.ac.uk',  'first_name': 'Alice',   'last_name': 'Miller',   'is_superuser': False, 'is_staff': False},
+        {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',  'first_name': 'Sam',     'last_name': 'Rahwan',   'is_superuser': False, 'is_staff': False},
+        {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',   'first_name': 'Hina',    'last_name': 'Patel',    'is_superuser': False, 'is_staff': False},
+        {'username': 'echen',   'email': 'e.chen@kcl.ac.uk',    'first_name': 'Eric',    'last_name': 'Chen',     'is_superuser': False, 'is_staff': False},
+        {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',  'first_name': 'James',   'last_name': 'Murphy',   'is_superuser': False, 'is_staff': False},
     ]
 
     def _load_shared_data(self):
@@ -65,12 +70,18 @@ class Command(BaseCommand):
 
     def create_fixture_users(self):
         self.stdout.write("Creating fixture users...")
-        role_labels = {
-            'johndoe': 'admin',
-            'janedoe': 'student', 'charlie': 'student',
-            'amiller': 'teacher', 'srahwan': 'teacher',
-            'hpatel':  'teacher', 'echen':   'teacher', 'jmurphy': 'teacher',
-        }
+        teacher_usernames = {'amiller', 'srahwan', 'hpatel', 'echen', 'jmurphy'}
+        for data in self.FIXTURE_USERS:
+            if User.objects.filter(username=data['username']).exists():
+                continue
+            user = User(**{k: v for k, v in data.items() if k not in ('is_superuser', 'is_staff')})
+            user.is_superuser = data['is_superuser']
+            user.is_staff = data['is_staff']
+            if data['username'] in teacher_usernames:
+                user.role = 'teacher'
+            user.set_password(self.DEFAULT_PASSWORD)
+            user.save()
+
         for data in self.FIXTURE_USERS:
             if User.objects.filter(username=data['username']).exists():
                 continue
@@ -132,16 +143,19 @@ class Command(BaseCommand):
             total += len(personal_events) + len(meal_events)
         print(f"\nCreated {total} events across {len(self.users)} users.")
 
-    def _create_module(self, code, name, description, admin, weekly_rule):
+    def _create_module(self, code, name, description, teacher, weekly_rule):
         if not Module.objects.filter(module_code=code).exists():
-            Module.objects.create(**build_module_event(code, name, description, admin, weekly_rule))
+            Module.objects.create(**build_module_event(code, name, description, teacher, weekly_rule))
 
     def create_modules(self):
         self.stdout.write("Seeding modules...")
-        admin       = User.objects.filter(is_superuser=True).first()
+        teachers = list(User.objects.filter(role='teacher'))
+        if not teachers:
+            teachers = [User.objects.filter(is_superuser=True).first()]
         weekly_rule = RecurrenceRule.objects.filter(frequency='weekly', interval=1).first()
-        for code, name, description in module_fixtures:
-            self._create_module(code, name, description, admin, weekly_rule)
+        for i, (code, name, description) in enumerate(module_fixtures):
+            teacher = teachers[i % len(teachers)]
+            self._create_module(code, name, description, teacher, weekly_rule)
 
     def _should_enroll(self, user, module):
         return not Enrollment.objects.filter(student=user, module=module).exists()

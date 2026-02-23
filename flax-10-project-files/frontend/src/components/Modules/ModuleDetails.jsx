@@ -32,9 +32,19 @@ function DetailsHeader({ module, is_enrolled }) {
                 {is_enrolled && <span className={styles.enrolledBadge}>✓ Enrolled</span>}
             </div>
             <h1 className={styles.moduleTitle}>{module.module_name}</h1>
-            <p className={styles.createdBy}>Created by {module.created_by_name || 'Unknown'}</p>
-        </div>);
+            <div className={styles.moduleLeader}>
+                <span className={styles.moduleLeaderLabel}>Module Leader</span>
+                <span className={styles.moduleLeaderName}>{module.created_by_name || 'Unknown'}</span>
+                {module.created_by_email && (
+                    <a href={`mailto:${module.created_by_email}`} className={styles.moduleLeaderEmail}>
+                        {module.created_by_email}
+                    </a>
+                )}
+            </div>
+        </div>
+    );
 }
+
 function ScheduleSection({ module }) {
     return (
         <div className={styles.scheduleSection}>
