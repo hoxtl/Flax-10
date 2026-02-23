@@ -157,13 +157,16 @@ function ProfileBody({ user, state }) {
         modules={modules}
         filteredEvents={filteredEvents}
         isMutualOrSelf={isMutualOrSelf}
+        onNavChange={state.onNavChange}
       />
     </div>
   );
 }
 
-export default function Profile({ user, viewedUserId }) {
+export default function Profile({ user, viewedUserId, onBack, onNavChange }) {
   const state = useProfileState(viewedUserId);
+  state.onNavChange = onNavChange;
+
   if (state.loading) return <div className={styles.container}>Loading...</div>;
   if (!state.profileData) return <div className={styles.container}>User not found.</div>;
   return <ProfileBody user={user} state={state} />;

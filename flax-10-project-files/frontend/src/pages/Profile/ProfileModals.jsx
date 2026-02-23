@@ -108,7 +108,7 @@ function TasksModal({ isOpen, onClose }) {
   );
 }
 
-function SocialDataModal({ isOpen, onClose, title, fetchFn, userId }) {
+function SocialDataModal({ isOpen, onClose, title, fetchFn, userId, onNavChange }) {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -128,6 +128,10 @@ function SocialDataModal({ isOpen, onClose, title, fetchFn, userId }) {
       title={title}
       users={users}
       onClose={onClose}
+      onUserClick={(u) => {
+        onClose(); // close the modal first
+        if (onNavChange) onNavChange(`profile_${u.id}`);
+      }}
     />
   );
 }
@@ -144,7 +148,7 @@ function EditProfileSection({ state }) {
   );
 }
 
-function EditModals({ user, state, modules, isMutualOrSelf }) {
+function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
   const { showModules, setShowModules, showTasks, setShowTasks, profileData } = state;
   return (
     <>
@@ -158,6 +162,7 @@ function EditModals({ user, state, modules, isMutualOrSelf }) {
         title="Followers"
         fetchFn={getFollowers}
         userId={(profileData || user)?.id}
+        onNavChange={onNavChange}
       />
       <SocialDataModal
         isOpen={state.showFollowing}
@@ -165,6 +170,7 @@ function EditModals({ user, state, modules, isMutualOrSelf }) {
         title="Following"
         fetchFn={getFollowing}
         userId={(profileData || user)?.id}
+        onNavChange={onNavChange}
       />
     </>
   );
@@ -185,10 +191,10 @@ function EventsModalContainer({ state, filteredEvents, isMutualOrSelf }) {
   );
 }
 
-export default function ProfileModals({ user, state, modules, filteredEvents, isMutualOrSelf }) {
+export default function ProfileModals({ user, state, modules, filteredEvents, isMutualOrSelf, onNavChange }) {
   return (
     <>
-      <EditModals user={user} state={state} modules={modules} isMutualOrSelf={isMutualOrSelf} />
+      <EditModals user={user} state={state} modules={modules} isMutualOrSelf={isMutualOrSelf} onNavChange={onNavChange} />
       <EventsModalContainer state={state} filteredEvents={filteredEvents} isMutualOrSelf={isMutualOrSelf} />
     </>
   );
