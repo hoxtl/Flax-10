@@ -601,59 +601,19 @@
 }
 
 /* ── Mini stats bar (Rule of Three) ──────────────────────────── */
-.miniStats {
+.statsBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.65rem 1.5rem;
+  padding: 0.5rem 1.5rem 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   flex-shrink: 0;
+  overflow-x: auto;
 }
 
-.miniStatsInner {
-  display: flex;
-  gap: 2rem;
-}
-
-.miniStat {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.miniStatClickable {
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 0.2rem 0.5rem;
-  margin: -0.2rem -0.5rem;
-  transition: background 0.12s;
-}
-.miniStatClickable:hover { background: var(--hover); }
-
-.miniStatIcon { font-size: 1.1rem; }
-
-.miniStatText {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.miniStatValue {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-
-.miniStatUrgent { color: var(--danger); }
-
-.miniStatUnit {
-  font-size: 0.68rem;
-  color: var(--muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.statsBar > :first-child {
+  flex: 1;
 }
 
 .statLink {
@@ -859,13 +819,10 @@
   }
 }
 
-.rightSidebar {
-  display: flex;
-  flex-direction: column;
-  border-left: 1px solid var(--border);
-  background: var(--bg);
+.rightSidebar > * {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  gap: 0;
 }
 
 .miniTimer {
@@ -1057,4 +1014,42 @@
   padding: 0.3rem 0.5rem;
   cursor: pointer;
   margin-top: 0.15rem;
+}
+
+.deadlinesDetails {
+  margin: 0.5rem 1.25rem 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.deadlinesSummary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.deadlinesSummary::-webkit-details-marker {
+  display: none;
+}
+
+.deadlinesHint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+}
+
+.deadlinesBody {
+  border-top: 1px solid var(--border);
+  padding: 0.25rem 0;
 }
