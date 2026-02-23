@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear } from '../../components/Calendar/utils/dateUtils';
 import { NavigationButtons } from "../../components/Calendar/header/NavigationButtons";
@@ -36,6 +37,10 @@ function ProfileCalendarHeader() {
 
     const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
     const jumpToDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+
+    useEffect(() => {
+        dispatch({ type: 'SET_VIEW_MODE', payload: 'month' });
+    }, [dispatch]);
 
     return (
         <div className="calendar-header">
