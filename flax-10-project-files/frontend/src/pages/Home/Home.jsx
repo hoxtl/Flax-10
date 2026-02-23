@@ -282,15 +282,6 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
   );
 }
 
-function TflStatus() {
-  return (
-    <span className={styles.tflBadge} title="TfL status — live integration coming soon">
-      <span className={styles.tflDot} />
-      <span className={styles.tflLabel}>TfL</span>
-    </span>
-  );
-}
-
 function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
   const { getTag } = useTags();
   const [showDetail, setShowDetail] = useState(false);
@@ -382,7 +373,6 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
               {lect && item.location && (
                 <span className={styles.cardLocation}>
                   <span className={styles.locationText}>{item.location.split(",")[0]}</span>
-                  <TflStatus />
                 </span>
               )}
             </div>
@@ -686,12 +676,14 @@ export default function Home() {
 
       <div className={styles.mainLayout}>
         <div className={styles.timeline}>
+
           {pastItems.length > 0 && (
-            <details className={styles.pastDetails}>
-              <summary className={styles.pastSummary}>
-                Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
-                <span className={styles.pastHint}>Collapse</span>
-              </summary>
+            <div className={styles.pastDetails}>
+              <div className={styles.pastSummary}>
+                <span>
+                  Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
+                </span>
+              </div>
 
               <div className={styles.pastBody}>
                 {pastItems.map((item, idx) => (
@@ -706,7 +698,7 @@ export default function Home() {
                   />
                 ))}
               </div>
-            </details>
+            </div>
           )}
 
           {timelineItems.length === 0 && <EmptyDay />}
