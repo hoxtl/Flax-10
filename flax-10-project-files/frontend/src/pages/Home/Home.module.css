@@ -233,32 +233,6 @@
   max-width: 140px;
 }
 
-.tflBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: color-mix(in srgb, #009b77 12%, transparent);
-  border: 1px solid color-mix(in srgb, #009b77 30%, transparent);
-  border-radius: 9999px;
-  padding: 0.05rem 0.4rem;
-  font-size: 0.6rem;
-  flex-shrink: 0;
-}
-
-.tflDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #009b77;
-  flex-shrink: 0;
-}
-
-.tflLabel {
-  font-weight: 700;
-  color: #009b77;
-  letter-spacing: 0.02em;
-}
-
 .checkBtn {
   width: 22px;
   height: 22px;
