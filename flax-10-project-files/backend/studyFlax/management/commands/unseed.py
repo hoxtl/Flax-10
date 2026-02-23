@@ -18,6 +18,8 @@ TABLES = [
     'studyFlax_notification',
     'studyFlax_timetablesource',
     'studyFlax_user',
+    'studyFlax_studysession',
+    'studyFlax_themesession',
 ]
 
 EXCLUDE_FIELDS = {'id', 'password', 'last_login', 'date_joined'}
