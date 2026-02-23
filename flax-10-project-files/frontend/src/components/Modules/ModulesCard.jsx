@@ -3,6 +3,13 @@ import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
 import styles from './ModulesCard.module.css';
 
+function GetCardClass(enrolled, is_teacher) {
+    let cls = styles.card;
+    if (enrolled) cls += ` ${styles.enrolled}`;
+    if (!is_teacher) cls += ` ${styles.clickable}`;
+    return cls;
+}
+
 export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines }) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const enrollment = enrollments?.find(e => e.module === module.id);

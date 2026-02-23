@@ -10,6 +10,7 @@ import { fetchTasks, updateTask } from "../../api/taskService";
 import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
 import { useNavigate } from "react-router-dom";
+import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
 
 const PRIORITY_COLOURS = {
     urgent: "var(--danger)",
@@ -368,6 +369,7 @@ export default function Home() {
     return (
         <div className={styles.page}>
             <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
+            {isToday(selectedDate) && <DeadlinesWidget />}
             <HomeStatsBar />
             <div className={styles.mainLayout}>
                 <div className={styles.timeline}>
