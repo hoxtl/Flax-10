@@ -709,7 +709,7 @@ export default function Home() {
             </details>
           )}
 
-          {!hasUpcoming && <EmptyDay />}
+          {timelineItems.length === 0 && <EmptyDay />}
 
           {hasUpcoming &&
             upcomingTimeline.map((entry, i) => {
