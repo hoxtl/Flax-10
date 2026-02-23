@@ -18,6 +18,8 @@ from .seed_helpers import (
     build_lecture_events, create_lecture_event, build_deadlines_for_module,
     create_deadline_calendar_event,
 )
+from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.timer.themeSessionModel import ThemeSession
 
 User = get_user_model()
 
@@ -72,6 +74,7 @@ class Command(BaseCommand):
         self.create_deadlines()
         self.create_enrollments()
         self.create_tasks()
+        self.create_study_sessions()
         self.print_stats()
 
     def create_admin_user(self):
@@ -263,6 +266,68 @@ class Command(BaseCommand):
                 total += 1
 
         self.stdout.write(f"  Created {total} tasks.")
+
+
+    def create_study_sessions(self):
+        self.stdout.write("Seeding study sessions...")
+        from datetime import datetime, timedelta
+        import random
+
+        now = timezone.now()
+        fixture_users = User.objects.filter(username__in=['charlie', 'janedoe'])
+        total = 0
+
+        for user in fixture_users:
+            for day_offset in range(30):
+                if random.random() < 0.6:
+                    continue
+                sessions_that_day = random.randint(1, 3)
+                for _ in range(sessions_that_day):
+                    hour = random.choice([9, 10, 11, 14, 15, 16, 20, 21])
+                    work_mins = random.choice([25, 50, 75])
+                    break_mins = (work_mins // 25) * 5
+                    session_count = work_mins // 25
+                    start = (now - timedelta(days=day_offset)).replace(
+                        hour=hour, minute=0, second=0, microsecond=0
+                    )
+                    end = start + timedelta(minutes=work_mins + break_mins)
+                    block_id = int(start.timestamp() * 1000)
+                    StudySession.objects.get_or_create(
+                        user=user,
+                        study_block_id=block_id,
+                        defaults={
+                            'start_time': start,
+                            'end_time': end,
+                            'duration': work_mins,
+                            'break_duration': break_mins,
+                            'session_count': session_count,
+                            'task': random.choice([
+                                'CS4303 programming assignment',
+                                'HI4101 essay',
+                                'Research internship deadlines',
+                                'Reply to supervisor email',
+                                'Plan the week ahead',
+                            ]),
+                            'status': 'Completed',
+                        }
+                    )
+                    total += 1
+
+            for day_offset in range(30):
+                theme = 'light' if random.random() > 0.2 else 'dark'
+                duration = random.randint(60, 480)
+                started = (now - timedelta(days=day_offset)).replace(hour=8, minute=0, second=0, microsecond=0)
+                ThemeSession.objects.get_or_create(
+                    user=user,
+                    started_at=started,
+                    defaults={
+                        'theme': theme,
+                        'ended_at': started + timedelta(minutes=duration),
+                        'duration_minutes': duration,
+                    }
+                )
+
+        self.stdout.write(f"  Created {total} study sessions.")
 
     def print_stats(self):
         div = "─" * 40
