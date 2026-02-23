@@ -4,6 +4,9 @@ import styles from './Social.module.css';
 export default function UserListModal({ title, users, onClose, onUserClick }) {
     if (!users) return null;
 
+    // Get the current user to verify we don't show the follow button next to their own name
+    const currentUser = JSON.parse(localStorage.getItem('user')) || {};
+
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
@@ -30,10 +33,12 @@ export default function UserListModal({ title, users, onClose, onUserClick }) {
                                         <span className={styles.userHandle}>@{u.username}</span>
                                     </div>
                                 </div>
-                                <FollowButton
-                                    userId={u.id}
-                                    initialIsFollowing={u.is_following}
-                                />
+                                {u.id !== currentUser.id && u.username !== currentUser.username && (
+                                    <FollowButton
+                                        userId={u.id}
+                                        initialIsFollowing={u.is_following}
+                                    />
+                                )}
                             </div>
                         ))
                     )}
