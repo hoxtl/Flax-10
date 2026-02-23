@@ -1,14 +1,17 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-
 import styles from "./Home.module.css";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import analyticsService from "../../api/analyticsService";
-import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
+import {
+  useCalendar,
+  useCalendarDispatch,
+  useEventModal,
+} from "../../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks, updateTask } from "../../api/taskService";
 import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
+import { useNavigate } from "react-router-dom";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
 import { InsightsPanel } from "../../components/Analytics/AIInsightsTab";
 
@@ -19,34 +22,45 @@ const PRIORITY_COLOURS = {
   low: "var(--muted)",
 };
 
-/** Format ISO datetime string into HH:mm (UK). */
+/** Format a datetime string as HH:MM (GB). */
 function formatTime(dateStr) {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return new Date(dateStr).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
-/** Convert minutes to a friendly duration string (e.g., 75 -> "1h 15m"). */
+/** Convert minutes to a human duration label. */
 function fmtDuration(mins) {
-  if (!mins || mins <= 0) return "";
+  if (mins == null) return "";
   if (mins < 60) return `${mins}m`;
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   return m ? `${h}h ${m}m` : `${h}h`;
 }
 
+/** Returns true if `now` is between start and end (inclusive). */
 function isNow(startStr, endStr) {
   if (!startStr || !endStr) return false;
   const now = new Date();
   return new Date(startStr) <= now && now <= new Date(endStr);
 }
 
+/** Returns true if endStr is before now. */
 function isPast(endStr) {
-  return endStr && new Date(endStr) < new Date();
+  if (!endStr) return false;
+  return new Date(endStr) < new Date();
 }
 
 function isLecture(item) {
   const t = (item.title || "").toLowerCase();
-  return t.includes("lecture") || t.includes("seminar") || t.includes("tutorial") || item.source === "timetable";
+  return (
+    t.includes("lecture") ||
+    t.includes("seminar") ||
+    t.includes("tutorial") ||
+    item.source === "timetable"
+  );
 }
 
 function extractModuleCode(str) {
@@ -54,11 +68,9 @@ function extractModuleCode(str) {
   return match ? match[1] : null;
 }
 
-/** Pick an emoji icon based on event/task content. */
 function resolveEventIcon(event, tagIcon) {
   const t = (event.title || "").toLowerCase();
   const src = (event.source || "").toLowerCase();
-
   if (t === "breakfast") return "🌅";
   if (t === "lunch") return "🥗";
   if (t === "dinner") return "🍽️";
@@ -80,39 +92,37 @@ function resolveEventIcon(event, tagIcon) {
   return "📅";
 }
 
-/** Inserts "gap" rows between chronological items when gap >= 30 mins. */
+/** Inserts “gap” entries between items when the free time is >= 30 mins. */
 function computeTimelineWithGaps(sortedItems) {
   const result = [];
   for (let i = 0; i < sortedItems.length; i++) {
     result.push({ type: "item", data: sortedItems[i] });
 
     if (i < sortedItems.length - 1) {
-      const curEnd = new Date(sortedItems[i].end_time || sortedItems[i].due_date);
+      const curEnd = new Date(sortedItems[i].end_time || sortedItems[i].due_date || sortedItems[i].start_time);
       const nextStart = new Date(sortedItems[i + 1].start_time || sortedItems[i + 1].due_date);
       const gapMins = Math.round((nextStart - curEnd) / 60000);
-
       if (gapMins >= 30) result.push({ type: "gap", minutes: gapMins });
     }
   }
   return result;
 }
 
-/** Fetch tasks once + filter events/tasks for the selected day. */
+/** Loads events (context) + tasks (API) and derives date-specific slices. */
 function useHomeData(selectedDate) {
   const { events } = useCalendar();
   const [tasks, setTasks] = useState([]);
-
   useCalendarEvents();
 
   useEffect(() => {
     fetchTasks()
-      .then((data) => setTasks((data || []).filter((t) => !t.completed)))
+      .then((data) => setTasks(data.filter((t) => !t.completed)))
       .catch(() => {});
   }, []);
 
   const dayEvents = useMemo(() => {
-    return (events || []).filter((e) =>
-      overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate),
+    return events.filter((e) =>
+      overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate)
     );
   }, [events, selectedDate]);
 
@@ -121,12 +131,19 @@ function useHomeData(selectedDate) {
     const todayEnd = new Date(selectedDate);
     todayEnd.setHours(23, 59, 59, 999);
 
-    return tasks.filter((t) => t.due_date && new Date(t.due_date) <= todayEnd);
+    return tasks.filter((t) => {
+      if (!t.due_date) return false;
+      return new Date(t.due_date) <= todayEnd;
+    });
   }, [tasks, selectedDate]);
 
   const toggleTask = async (id) => {
-    await updateTask(id, { completed: true });
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    try {
+      await updateTask(id, { completed: true });
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+    } catch {
+      // silent
+    }
   };
 
   return { dayEvents, dayTasks, allTasks: tasks, toggleTask };
@@ -140,7 +157,6 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
 
   const active = !isTask && isNow(item.start_time, item.end_time);
   const lect = !isTask && isLecture(item);
-
   const modCode = lect
     ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description))
     : null;
@@ -157,15 +173,12 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
             <div className={styles.detailMeta}>
               {active && <span className={styles.nowPill}>Now</span>}
               {isTask && <span className={styles.taskPill}>Task</span>}
-
               <span className={styles.detailTime}>
                 {formatTime(item.start_time || item.due_date)}
                 {end ? ` – ${formatTime(item.end_time)}` : ""}
               </span>
-
               {durationMins > 0 && <span className={styles.detailDur}>{fmtDuration(durationMins)}</span>}
             </div>
-
             <h2 className={styles.detailTitle}>{item.title}</h2>
           </div>
 
@@ -207,7 +220,7 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
                 className={styles.detailRowText}
                 style={{
                   color: PRIORITY_COLOURS[item.priority],
-                  fontWeight: 600,
+                  fontWeight: 700,
                   textTransform: "capitalize",
                 }}
               >
@@ -223,7 +236,9 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
             </div>
           )}
 
-          {!item.description && !item.location && <p className={styles.detailEmpty}>No additional details.</p>}
+          {!item.description && !item.location && (
+            <p className={styles.detailEmpty}>No additional details.</p>
+          )}
         </div>
       </div>
     </div>
@@ -243,13 +258,22 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
 
   return (
     <div ref={ref} className={styles.contextMenu} style={{ top: y, left: x }}>
-      <button className={styles.contextItem} onClick={() => { onEdit(item); onClose(); }}>
+      <button
+        className={styles.contextItem}
+        onClick={() => {
+          onEdit(item);
+          onClose();
+        }}
+      >
         ✏️ Edit
       </button>
       <div className={styles.contextDivider} />
       <button
         className={`${styles.contextItem} ${styles.contextDelete}`}
-        onClick={() => { onDelete(item.id); onClose(); }}
+        onClick={() => {
+          onDelete(item.id);
+          onClose();
+        }}
       >
         🗑️ Delete
       </button>
@@ -272,17 +296,18 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
   const [ctxMenu, setCtxMenu] = useState(null);
 
   const isTask = item._type === "task";
-  const theme = (!isTask && getTag(item.tag)) || {
-    color: isTask ? PRIORITY_COLOURS[item.priority] : "#94A3B8",
-    icon: "📅",
-  };
+  const theme =
+    (!isTask && getTag(item.tag)) || {
+      color: isTask ? PRIORITY_COLOURS[item.priority] : "#94A3B8",
+      icon: "📅",
+    };
 
   const icon = isTask ? "🎯" : resolveEventIcon(item, theme.icon);
   const active = !isTask && isNow(item.start_time, item.end_time);
   const past = !active && isPast(item.end_time || item.due_date);
   const lect = !isTask && isLecture(item);
 
-  const accentColor = isTask ? (PRIORITY_COLOURS[item.priority] || "var(--muted)") : theme.color;
+  const accentColor = isTask ? PRIORITY_COLOURS[item.priority] : theme.color;
 
   const startTime = formatTime(item.start_time || item.due_date);
   const endTime = !isTask ? formatTime(item.end_time) : null;
@@ -293,8 +318,11 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
       : null;
 
   const modCode = lect
-    ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description))
+    ? item.module_code ||
+      extractModuleCode(item.title) ||
+      extractModuleCode(item.description)
     : null;
+
   const modName = lect ? item.description : null;
 
   const handleContextMenu = useCallback((e) => {
@@ -307,7 +335,6 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
       <div className={`${styles.timelineRow} ${active ? styles.rowActive : ""} ${past ? styles.rowPast : ""}`}>
         <div className={styles.spine}>
           <div className={styles.spineTime}>{startTime}</div>
-
           <div className={styles.spineTrack}>
             <div className={styles.spineLine} style={{ background: isFirst ? "transparent" : "var(--border)" }} />
             <div className={styles.spineNode} style={{ background: past ? "var(--border)" : accentColor }} />
@@ -363,7 +390,10 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
           {isTask && (
             <button
               className={styles.checkBtn}
-              onClick={(e) => { e.stopPropagation(); onToggle?.(item.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle?.(item.id);
+              }}
               title="Mark complete"
             >
               <span className={styles.checkInner} />
@@ -456,7 +486,11 @@ function MiniStat({ label, value }) {
 function HomeStatsPills({ data }) {
   const streak = data?.current_streak ?? data?.streak ?? 0;
   const todayMins =
-    data?.today_minutes ?? data?.today_work_minutes ?? data?.today_total_minutes ?? null;
+    data?.today_minutes ??
+    data?.today_work_minutes ??
+    data?.today_total_minutes ??
+    null;
+
   const consistency = data?.consistency_score ?? data?.consistency ?? null;
 
   const todayLabel = todayMins == null ? "—" : fmtDuration(todayMins);
@@ -501,7 +535,7 @@ function TaskWidgetRow({ task }) {
           <span className={styles.twTitle}>{task.title}</span>
           <span className={styles.twMeta}>
             {task.module_code && <span className={styles.twModule}>{task.module_code}</span>}
-            {estMins && <span className={styles.twTime}>{fmtDuration(estMins)}</span>}
+            {estMins ? <span className={styles.twTime}>{fmtDuration(estMins)}</span> : null}
           </span>
         </div>
       </div>
@@ -515,10 +549,7 @@ function TaskWidget({ tasks }) {
   const topTasks = useMemo(() => {
     const p = { urgent: 0, high: 1, medium: 2, low: 3 };
     return [...(tasks || [])]
-      .sort(
-        (a, b) =>
-          (p[a.priority] - p[b.priority]) || (new Date(a.due_date) - new Date(b.due_date)),
-      )
+      .sort((a, b) => (p[a.priority] - p[b.priority]) || (new Date(a.due_date || 0) - new Date(b.due_date || 0)))
       .slice(0, 5);
   }, [tasks]);
 
@@ -550,15 +581,6 @@ function TaskWidget({ tasks }) {
   );
 }
 
-function EmptyDay() {
-  return (
-    <div className={styles.empty}>
-      <span className={styles.emptyIcon}>📭</span>
-      <p>Nothing scheduled for this day</p>
-    </div>
-  );
-}
-
 function StudyCoachPanel() {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -569,7 +591,7 @@ function StudyCoachPanel() {
       const res = await analyticsService.getAiInsights(30);
       setInsights(res.insights);
     } catch {
-      // ignore
+      // silent
     } finally {
       setLoading(false);
     }
@@ -585,18 +607,14 @@ function StudyCoachPanel() {
   );
 }
 
-function CoachCTA() {
-    return (
-      <div className={styles.coachCta}>
-        <div>
-          <div className={styles.coachCtaTitle}>✨ Want a personalised schedule?</div>
-          <div className={styles.coachCtaText}>
-            Generate a plan based on your streak, peak hours, and deadlines.
-          </div>
-        </div>
-      </div>
-    );
-  }
+function EmptyDay() {
+  return (
+    <div className={styles.empty}>
+      <span className={styles.emptyIcon}>📭</span>
+      <p>Nothing scheduled for this day</p>
+    </div>
+  );
+}
 
 export default function Home() {
   const { selectedDate } = useCalendar();
@@ -606,23 +624,52 @@ export default function Home() {
 
   const { dayEvents, dayTasks, allTasks, toggleTask } = useHomeData(selectedDate);
 
-  const setSelectedDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
+  const setSelectedDate = (date) =>
+    dispatch({ type: "SET_SELECTED_DATE", payload: date });
+
   const scheduleTitle = isToday(selectedDate) ? "Today's schedule" : "Schedule";
 
   const sortedEvents = useMemo(() => {
-    return [...(dayEvents || [])].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    return [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
   }, [dayEvents]);
 
   const sortedTasks = useMemo(() => {
     const p = { urgent: 0, high: 1, medium: 2, low: 3 };
-    return [...(dayTasks || [])].sort((a, b) => p[a.priority] - p[b.priority]);
+    return [...dayTasks].sort((a, b) => p[a.priority] - p[b.priority]);
   }, [dayTasks]);
 
-  const timelineWithGaps = useMemo(() => computeTimelineWithGaps(sortedEvents), [sortedEvents]);
-  const itemEntries = useMemo(() => timelineWithGaps.filter((e) => e.type === "item"), [timelineWithGaps]);
+  const timelineItems = useMemo(() => {
+    const events = sortedEvents.map((e) => ({ ...e, _type: "event" }));
+    const tasks = sortedTasks.map((t) => ({ ...t, _type: "task" }));
+    const merged = [...events, ...tasks];
 
-  const hasContent = sortedEvents.length > 0;
-  const widgetTasks = isToday(selectedDate) ? dayTasks : (allTasks || []).slice(0, 5);
+    return merged.sort((a, b) => {
+      const aTime = new Date(a.start_time || a.due_date || 0);
+      const bTime = new Date(b.start_time || b.due_date || 0);
+      return aTime - bTime;
+    });
+  }, [sortedEvents, sortedTasks]);
+
+  const now = new Date();
+
+  const pastItems = useMemo(() => {
+    return timelineItems.filter((it) => {
+      const end = it.end_time || it.due_date || it.start_time;
+      if (!end) return false;
+      return new Date(end) < now && !isNow(it.start_time, it.end_time);
+    });
+  }, [timelineItems, now]);
+
+  const upcomingItems = useMemo(() => {
+    return timelineItems.filter((it) => !pastItems.includes(it));
+  }, [timelineItems, pastItems]);
+
+  const upcomingTimeline = useMemo(() => computeTimelineWithGaps(upcomingItems), [upcomingItems]);
+  const upcomingItemEntries = upcomingTimeline.filter((e) => e.type === "item");
+
+  const hasUpcoming = upcomingItems.length > 0;
+
+  const widgetTasks = isToday(selectedDate) ? dayTasks : allTasks.slice(0, 5);
 
   return (
     <div className={styles.page}>
@@ -646,10 +693,33 @@ export default function Home() {
 
       <div className={styles.mainLayout}>
         <div className={styles.timeline}>
-          {!hasContent && <EmptyDay />}
+          {pastItems.length > 0 && (
+            <details className={styles.pastDetails}>
+              <summary className={styles.pastSummary}>
+                Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
+                <span className={styles.pastHint}>Collapse</span>
+              </summary>
 
-          {hasContent &&
-            timelineWithGaps.map((entry, i) => {
+              <div className={styles.pastBody}>
+                {pastItems.map((item, idx) => (
+                  <TimelineRow
+                    key={`${item._type}-${item.id}`}
+                    item={item}
+                    isFirst={idx === 0}
+                    isLast={idx === pastItems.length - 1}
+                    onDelete={removeEvent}
+                    onEdit={(ev) => openModal(ev, ev.tag)}
+                    onToggle={toggleTask}
+                  />
+                ))}
+              </div>
+            </details>
+          )}
+
+          {!hasUpcoming && <EmptyDay />}
+
+          {hasUpcoming &&
+            upcomingTimeline.map((entry, i) => {
               if (entry.type === "gap") {
                 return (
                   <FreeGap
@@ -661,14 +731,14 @@ export default function Home() {
               }
 
               const item = entry.data;
-              const itemIndex = itemEntries.findIndex((e) => e === entry);
+              const itemIndex = upcomingItemEntries.findIndex((e) => e === entry);
 
               return (
                 <TimelineRow
                   key={`${item._type}-${item.id}`}
                   item={item}
                   isFirst={itemIndex === 0}
-                  isLast={itemIndex === itemEntries.length - 1}
+                  isLast={itemIndex === upcomingItemEntries.length - 1}
                   onDelete={removeEvent}
                   onEdit={(ev) => openModal(ev, ev.tag)}
                   onToggle={toggleTask}
@@ -677,11 +747,28 @@ export default function Home() {
             })}
         </div>
 
-        <div className={styles.rightSidebar}>
-            <TaskWidget tasks={widgetTasks} />
-            <CoachCTA />
-            <StudyCoachPanel />
-        </div>
+        <aside className={styles.rightSidebar}>
+          <TaskWidget tasks={widgetTasks} />
+
+          <div className={styles.coachPromo}>
+            <div className={styles.coachPromoTitle}>✨ Want a personalised schedule?</div>
+            <div className={styles.coachPromoText}>
+              Use Study Coach to generate a plan based on your streak, peak hours, and deadlines.
+            </div>
+          </div>
+
+          <div className={styles.coachCard}>
+            <div className={styles.coachCardHeader}>
+              <div>
+                <div className={styles.coachCardTitle}>Study Analysis</div>
+                <div className={styles.coachCardSub}>Last 30 days · AI generated</div>
+              </div>
+            </div>
+            <div className={styles.coachCardBody}>
+              <StudyCoachPanel />
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
