@@ -2,8 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
-import { tflService } from '../api/tflService';
-
+import { tflService } from "../../api/tflService";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 

@@ -38,7 +38,7 @@ export const tflService = {
                 })),
             };
         }
-        catch {error} {
+        catch (error) {
             console.error('TFL API journeyPlanner error: ', error);
             throw error;
         }
