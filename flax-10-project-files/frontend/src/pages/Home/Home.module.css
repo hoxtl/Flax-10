@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .timeline {
@@ -73,7 +73,6 @@
   box-shadow: 0 0 0 3px var(--bg);
 }
 
-/* Dashed node for free gap */
 .spineNodeDash {
   width: 8px;
   height: 8px;
@@ -107,9 +106,11 @@
   transform: translateY(-1px);
 }
 
-.cardActive {
-  border-width: 1.5px;
-}
+.cardActive { border-width: 1.5px; }
+
+/* Past events dim automatically */
+.rowPast { opacity: 0.5; transition: opacity 0.2s; }
+.cardPast { background: var(--bg) !important; }
 
 /* ── Card internals ───────────────────────────────────────────── */
 .cardLeft {
@@ -201,6 +202,50 @@
   margin-top: 0.05rem;
 }
 
+/* Lecture location row with TfL badge */
+.cardLocation {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.1rem;
+}
+
+.locationText {
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+/* TfL status badge (placeholder — teammate integrating live data) */
+.tflBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: color-mix(in srgb, #009b77 12%, transparent);
+  border: 1px solid color-mix(in srgb, #009b77 30%, transparent);
+  border-radius: 9999px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+
+.tflDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #009b77;
+  flex-shrink: 0;
+}
+
+.tflLabel {
+  font-weight: 700;
+  color: #009b77;
+  letter-spacing: 0.02em;
+}
+
 /* Pills */
 .modulePill {
   font-size: 0.65rem;
@@ -274,9 +319,9 @@
 }
 
 .freeIcon { font-size: 0.9rem; flex-shrink: 0; color: var(--muted); }
-
 .freeText { flex: 1; color: var(--muted); }
 .freeText strong { color: var(--primary); font-weight: 700; }
+.freeLeft { flex: 1; }
 
 .freeBtn {
   background: var(--primary);
@@ -291,6 +336,26 @@
   flex-shrink: 0;
 }
 .freeBtn:hover { opacity: 0.85; }
+
+.freeStartBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.freeStartBtn:hover { opacity: 0.85; }
+
+.freeActions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
 
 /* ── Empty state ──────────────────────────────────────────────── */
 .empty {
@@ -307,7 +372,6 @@
 .emptyIcon { font-size: 2rem; }
 .empty p { font-size: 0.9rem; margin: 0; }
 
-/* Legacy classes kept for DateNavigator compatibility */
 .sectionLabel {
   font-size: 0.7rem;
   font-weight: 700;
@@ -370,10 +434,7 @@
   margin-top: 2px;
 }
 
-.detailTopText {
-  flex: 1;
-  min-width: 0;
-}
+.detailTopText { flex: 1; min-width: 0; }
 
 .detailMeta {
   display: flex;
@@ -486,7 +547,7 @@
   padding: 0.75rem 0;
 }
 
-/* ── Right-click context menu ─────────────────────────────────── */
+/* ── Context menu ─────────────────────────────────────────────── */
 .contextMenu {
   position: fixed;
   z-index: 300;
@@ -531,7 +592,6 @@
 .contextDelete { color: var(--danger); }
 .contextDelete:hover { background: rgba(239, 68, 68, 0.08); }
 
-/* Meal description subtitle on card */
 .cardSubRow {
   display: flex;
   align-items: center;
@@ -540,92 +600,243 @@
   margin-top: 0.05rem;
 }
 
-/* ── Stats bar ────────────────────────────────────────────────── */
-.statsBar {
-  padding: 1rem 1.25rem 0.75rem;
+/* ── Mini stats bar (Rule of Three) ──────────────────────────── */
+.miniStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1.5rem;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   flex-shrink: 0;
 }
 
-.statsHeader {
+.miniStatsInner {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
+  gap: 2rem;
 }
 
-.statsTitle {
-  font-size: 0.72rem;
+.miniStat {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.miniStatClickable {
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 0.2rem 0.5rem;
+  margin: -0.2rem -0.5rem;
+  transition: background 0.12s;
+}
+.miniStatClickable:hover { background: var(--hover); }
+
+.miniStatIcon { font-size: 1.1rem; }
+
+.miniStatText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.miniStatValue {
+  font-size: 1.05rem;
   font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.miniStatUrgent { color: var(--danger); }
+
+.miniStatUnit {
+  font-size: 0.68rem;
   color: var(--muted);
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
 }
 
 .statLink {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.78rem;
   color: var(--primary);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.2rem 0.4rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
   border-radius: 6px;
   transition: background 0.12s;
 }
-.statLink:hover { background: var(--hover); }
+.statLink:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
 
-/* ── FreeGap with task suggestion ────────────────────────────── */
-.freeBody {
+/* ── Three-column main layout ─────────────────────────────────── */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  min-height: 0;
   flex: 1;
+  overflow: auto;
+}
+
+/* ── Task widget (left column) ────────────────────────────────── */
+.taskWidget {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
 }
 
-.freeSuggest {
-  font-size: 0.75rem;
-  color: var(--muted);
+.taskWidgetHeader {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-.freeSuggest strong { color: var(--text); }
-
-.freeStartBtn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.15rem 0.55rem;
-  border-radius: 9999px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.freeStartBtn:hover { opacity: 0.85; }
-
-.freeActions {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+  justify-content: space-between;
+  padding: 0.9rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
-.freeDismiss {
+.taskWidgetTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.taskWidgetLink {
+  font-size: 0.72rem;
+  color: var(--primary);
   background: none;
   border: none;
-  color: var(--muted);
-  font-size: 0.75rem;
   cursor: pointer;
-  padding: 0.2rem 0.3rem;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
   border-radius: 5px;
   transition: background 0.12s;
 }
-.freeDismiss:hover { background: var(--hover); }
+.taskWidgetLink:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+
+.taskWidgetList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+}
+
+.taskWidgetEmpty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.taskWidgetEmptyIcon { font-size: 1.8rem; }
+
+.taskWidgetEmptyText {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.taskWidgetEmptyBtn {
+  font-size: 0.75rem;
+  color: var(--primary);
+  background: none;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  transition: background 0.12s, color 0.12s;
+}
+.taskWidgetEmptyBtn:hover { background: var(--primary); color: white; }
+
+/* Task widget rows */
+.twRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  gap: 0.5rem;
+  transition: background 0.1s;
+}
+.twRow:hover { background: var(--hover); }
+.twRow:last-child { border-bottom: none; }
+
+.twLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.twDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.3rem;
+}
+
+.twBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.twTitle {
+  font-size: 0.78rem;
+  font-weight: 550;
+  color: var(--text);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.twMeta {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.twModule {
+  font-size: 0.66rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.twTime {
+  font-size: 0.66rem;
+  color: var(--muted);
+}
+
+.twStart {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: opacity 0.12s, transform 0.12s;
+}
+.twStart:hover { opacity: 0.85; transform: scale(1.08); }
 
 .priorityBadge {
   font-size: 0.68rem;
@@ -634,10 +845,216 @@
   opacity: 0.85;
 }
 
-.mainLayout {
-  display: grid;
-  grid-template-columns: 1fr 400px;
-  min-height: 0;
-  flex: 1;
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .mainLayout { grid-template-columns: 240px 1fr 360px; }
+}
+
+@media (max-width: 860px) {
+  .mainLayout { grid-template-columns: 1fr; }
+  .taskWidget {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 200px;
+  }
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  overflow-y: auto;
+  gap: 0;
+}
+
+.miniTimer {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.miniTimerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.miniTimerTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.miniTimerLink {
+  font-size: 0.7rem;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.miniTimerTask {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.miniTimerTaskLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.miniTimerTaskName {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniTimerDisplay {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.miniTimerMode {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.miniTimerBtns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.miniTimerStart {
+  flex: 1;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.miniTimerStart:hover { opacity: 0.85; }
+
+.miniTimerReset {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--hover);
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: background 0.12s;
+}
+.miniTimerReset:hover { background: var(--border); }
+
+.focusChart {
+  padding: 1rem;
+  flex: 1;
+}
+
+.focusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.focusTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.focusLink {
+  font-size: 0.7rem;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.focusEmpty {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.focusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.focusCode {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.focusBarWrap {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.focusBar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.focusPct {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--muted);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.miniTimerSelect {
+  width: 100%;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  margin-top: 0.15rem;
 }
