@@ -13,7 +13,7 @@
   flex-direction: column;
 }
 
-/* Spine + card row */
+/* ── Spine + card row ─────────────────────────────────────────── */
 .timelineRow {
   display: flex;
   align-items: stretch;
@@ -28,7 +28,7 @@
   min-height: 52px;
 }
 
-/* Left spine */
+/* ── Left spine ───────────────────────────────────────────────── */
 .spine {
   display: flex;
   flex-direction: row;
@@ -84,7 +84,7 @@
   opacity: 0.5;
 }
 
-/* Card */
+/* ── Card ─────────────────────────────────────────────────────── */
 .card {
   flex: 1;
   display: flex;
@@ -111,7 +111,7 @@
   border-width: 1.5px;
 }
 
-/* Card internals */
+/* ── Card internals ───────────────────────────────────────────── */
 .cardLeft {
   display: flex;
   align-items: center;
@@ -220,7 +220,7 @@
   font-weight: 600;
 }
 
-/* Buttons */
+/* ── Buttons ──────────────────────────────────────────────────── */
 .deleteBtn {
   background: none;
   border: none;
@@ -259,7 +259,7 @@
 }
 .checkBtn:hover .checkInner { background: var(--primary); }
 
-/* Free gap banner */
+/* ── Free gap banner ──────────────────────────────────────────── */
 .freeGap {
   flex: 1;
   display: flex;
@@ -292,7 +292,7 @@
 }
 .freeBtn:hover { opacity: 0.85; }
 
-/* Empty state */
+/* ── Empty state ──────────────────────────────────────────────── */
 .empty {
   flex: 1;
   display: flex;
@@ -317,7 +317,7 @@
   padding: 0.75rem 0 0.25rem 0.5rem;
 }
 
-/* Detail overlay */
+/* ── Detail overlay ───────────────────────────────────────────── */
 .overlayBackdrop {
   position: fixed;
   inset: 0;
@@ -455,17 +455,21 @@
 
 .detailRow {
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  padding: 0.6rem 0.75rem;
-  background: var(--hover);
-  border-radius: 10px;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
 }
+.detailRow:last-child { border-bottom: none; }
 
-.detailRowIcon {
-  font-size: 0.95rem;
+.detailRowLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
   flex-shrink: 0;
-  margin-top: 1px;
+  width: 54px;
 }
 
 .detailRowText {
@@ -534,4 +538,106 @@
   gap: 0.35rem;
   flex-wrap: wrap;
   margin-top: 0.05rem;
+}
+
+/* ── Stats bar ────────────────────────────────────────────────── */
+.statsBar {
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.statsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.statsTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statLink {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+.statLink:hover { background: var(--hover); }
+
+/* ── FreeGap with task suggestion ────────────────────────────── */
+.freeBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.freeSuggest {
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.freeSuggest strong { color: var(--text); }
+
+.freeStartBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.freeStartBtn:hover { opacity: 0.85; }
+
+.freeActions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.freeDismiss {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+  border-radius: 5px;
+  transition: background 0.12s;
+}
+.freeDismiss:hover { background: var(--hover); }
+
+.priorityBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  opacity: 0.85;
+}
+
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
 }

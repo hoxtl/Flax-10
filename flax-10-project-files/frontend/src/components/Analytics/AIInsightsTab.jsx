@@ -85,7 +85,7 @@ function TypingIndicator() {
   );
 }
 
-function ChatPanel({ period }) {
+export function ChatPanel({ period }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

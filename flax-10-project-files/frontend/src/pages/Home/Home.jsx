@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import styles from "./Home.module.css";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import analyticsService from "../../api/analyticsService";
+import { ChatPanel } from "../../components/Analytics/AIInsightsTab";
+import SummaryCards from "../../components/Analytics/SummaryCards";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks, updateTask } from "../../api/taskService";
@@ -33,34 +35,26 @@ function isNow(startStr, endStr) {
 }
 
 function resolveEventIcon(event, tagIcon) {
-    const t   = (event.title  || "").toLowerCase();
+    const t = (event.title || "").toLowerCase();
     const src = (event.source || "").toLowerCase();
-
-    if (t === "breakfast")                                                  return "🌅";
-    if (t === "lunch")                                                      return "🥗";
-    if (t === "dinner")                                                     return "🍽️";
-    if (t.includes("lecture"))                                              return "📖";
-    if (t.includes("seminar") || t.includes("tutorial"))                   return "📖";
-    if (t.includes("practical") || t.includes("lab"))                      return "🔬";
-    if (t.includes("workshop"))                                            return "🛠️";
-    if (t.includes("dentist"))                                             return "🦷";
+    if (t === "breakfast") return "🌅";
+    if (t === "lunch") return "🥗";
+    if (t === "dinner") return "🍽️";
+    if (t.includes("lecture") || t.includes("seminar") || t.includes("tutorial")) return "📖";
+    if (t.includes("practical") || t.includes("lab")) return "🔬";
+    if (t.includes("workshop")) return "🛠️";
+    if (t.includes("dentist")) return "🦷";
     if (t.includes("gp") || t.includes("doctor") || t.includes("appointment")) return "🩺";
-    if (t.includes("hospital"))                                            return "🏥";
-    if (t.includes("gym") || t.includes("sport"))                          return "🏋️";
-    if (t.includes("run") || t.includes("jog"))                            return "🏃";
-    if (t.includes("yoga"))                                                return "🧘";
-    if (t.includes("walk"))                                                return "🚶";
+    if (t.includes("gym") || t.includes("sport")) return "🏋️";
+    if (t.includes("run") || t.includes("jog")) return "🏃";
+    if (t.includes("yoga")) return "🧘";
     if (t.includes("coffee") || t.includes("costa") || t.includes("pret")) return "☕";
     if (t.includes("call") || t.includes("facetime") || t.includes("phone")) return "📞";
-    if (t.includes("meeting") || t.includes("group project"))              return "🤝";
-    if (t.includes("shop") || t.includes("tesco") || t.includes("lidl"))  return "🛒";
-    if (t.includes("laundry"))                                             return "🫧";
-    if (t.includes("clean"))                                               return "🧹";
-    if (t.includes("bike") || t.includes("cycling"))                       return "🚲";
+    if (t.includes("meeting") || t.includes("group project")) return "🤝";
     if (t.includes("study") || t.includes("revision") || t.includes("library")) return "📚";
-    if (t.includes("deadline") || t.includes("submission"))                return "⚠️";
-    if (src === "timetable")                                               return "📖";
-    if (tagIcon && tagIcon !== "📅")                                       return tagIcon;
+    if (t.includes("deadline") || t.includes("submission")) return "⚠️";
+    if (src === "timetable") return "📖";
+    if (tagIcon && tagIcon !== "📅") return tagIcon;
     return "📅";
 }
 
@@ -69,9 +63,9 @@ function computeTimelineWithGaps(sortedItems) {
     for (let i = 0; i < sortedItems.length; i++) {
         result.push({ type: "item", data: sortedItems[i] });
         if (i < sortedItems.length - 1) {
-            const endCurrent = new Date(sortedItems[i].end_time   || sortedItems[i].start_time || sortedItems[i].due_date);
-            const startNext  = new Date(sortedItems[i + 1].start_time || sortedItems[i + 1].due_date);
-            const gapMins    = Math.round((startNext - endCurrent) / 60000);
+            const endCur = new Date(sortedItems[i].end_time || sortedItems[i].due_date);
+            const startNext = new Date(sortedItems[i + 1].start_time || sortedItems[i + 1].due_date);
+            const gapMins = Math.round((startNext - endCur) / 60000);
             if (gapMins >= 30) result.push({ type: "gap", minutes: gapMins });
         }
     }
@@ -111,8 +105,8 @@ function useHomeData(selectedDate) {
 
 function DetailOverlay({ item, icon, accentColor, onClose }) {
     const isTask = item._type === "task";
-    const start  = new Date(item.start_time || item.due_date);
-    const end    = item.end_time ? new Date(item.end_time) : null;
+    const start = new Date(item.start_time || item.due_date);
+    const end = item.end_time ? new Date(item.end_time) : null;
     const durationMins = end ? Math.round((end - start) / 60000) : null;
     const active = !isTask && isNow(item.start_time, item.end_time);
 
@@ -131,7 +125,7 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
                                 {formatTime(item.start_time || item.due_date)}
                                 {end ? ` – ${formatTime(item.end_time)}` : ""}
                             </span>
-                            {durationMins && durationMins > 0 && (
+                            {durationMins > 0 && (
                                 <span className={styles.detailDur}>{fmtDuration(durationMins)}</span>
                             )}
                         </div>
@@ -139,35 +133,34 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
                     </div>
                     <button className={styles.detailClose} onClick={onClose}>✕</button>
                 </div>
-
                 <div className={styles.detailBody}>
                     {item.description && (
                         <div className={styles.detailRow}>
-                            <span className={styles.detailRowIcon}>📝</span>
+                            <span className={styles.detailRowLabel}>Notes</span>
                             <span className={styles.detailRowText}>{item.description}</span>
                         </div>
                     )}
                     {item.location && (
                         <div className={styles.detailRow}>
-                            <span className={styles.detailRowIcon}>📍</span>
+                            <span className={styles.detailRowLabel}>Where</span>
                             <span className={styles.detailRowText}>{item.location}</span>
                         </div>
                     )}
                     {isTask && item.priority && (
                         <div className={styles.detailRow}>
-                            <span className={styles.detailRowIcon}>🎯</span>
+                            <span className={styles.detailRowLabel}>Priority</span>
                             <span className={styles.detailRowText} style={{ color: PRIORITY_COLOURS[item.priority], fontWeight: 600, textTransform: "capitalize" }}>
-                                {item.priority} priority
+                                {item.priority}
                             </span>
                         </div>
                     )}
                     {isTask && item.module_code && (
                         <div className={styles.detailRow}>
-                            <span className={styles.detailRowIcon}>📚</span>
+                            <span className={styles.detailRowLabel}>Module</span>
                             <span className={styles.detailRowText}>{item.module_code}</span>
                         </div>
                     )}
-                    {!item.description && !item.location && !isTask && (
+                    {!item.description && !item.location && (
                         <p className={styles.detailEmpty}>No additional details.</p>
                     )}
                 </div>
@@ -176,53 +169,40 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
     );
 }
 
-// Right-click context menu
 function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
     const ref = useRef(null);
-
     useEffect(() => {
-        const handler = (e) => {
-            if (ref.current && !ref.current.contains(e.target)) onClose();
-        };
+        const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
     }, [onClose]);
 
     return (
-        <div
-            ref={ref}
-            className={styles.contextMenu}
-            style={{ top: y, left: x }}
-        >
-            <button className={styles.contextItem} onClick={() => { onEdit(item); onClose(); }}>
-                <span>✏️</span> Edit
-            </button>
+        <div ref={ref} className={styles.contextMenu} style={{ top: y, left: x }}>
+            <button className={styles.contextItem} onClick={() => { onEdit(item); onClose(); }}>✏️ Edit</button>
             <div className={styles.contextDivider} />
-            <button className={`${styles.contextItem} ${styles.contextDelete}`} onClick={() => { onDelete(item.id); onClose(); }}>
-                <span>🗑️</span> Delete
-            </button>
+            <button className={`${styles.contextItem} ${styles.contextDelete}`} onClick={() => { onDelete(item.id); onClose(); }}>🗑️ Delete</button>
         </div>
     );
 }
 
-// Timeline row
 function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
     const { getTag } = useTags();
     const [showDetail, setShowDetail] = useState(false);
     const [ctxMenu, setCtxMenu] = useState(null);
 
-    const isTask     = item._type === "task";
-    const theme      = (!isTask && getTag(item.tag)) || { color: isTask ? PRIORITY_COLOURS[item.priority] : "#94A3B8", icon: "📅" };
-    const icon       = isTask ? "🎯" : resolveEventIcon(item, theme.icon);
-    const active     = !isTask && isNow(item.start_time, item.end_time);
-    const isOverdue  = new Date(item.end_time || item.due_date) < new Date();
+    const isTask = item._type === "task";
+    const theme = (!isTask && getTag(item.tag)) || { color: isTask ? PRIORITY_COLOURS[item.priority] : "#94A3B8", icon: "📅" };
+    const icon = isTask ? "🎯" : resolveEventIcon(item, theme.icon);
+    const active = !isTask && isNow(item.start_time, item.end_time);
+    const isOverdue = new Date(item.end_time || item.due_date) < new Date();
     const accentColor = isTask ? PRIORITY_COLOURS[item.priority] : theme.color;
 
-    const startTime    = formatTime(item.start_time || item.due_date);
-    const endTime      = !isTask ? formatTime(item.end_time) : null;
-    const startDate    = new Date(item.start_time || item.due_date);
-    const endDate      = !isTask && item.end_time ? new Date(item.end_time) : null;
-    const durationMins = endDate ? Math.round((endDate - startDate) / 60000) : null;
+    const startTime = formatTime(item.start_time || item.due_date);
+    const endTime = !isTask ? formatTime(item.end_time) : null;
+    const durationMins = (!isTask && item.end_time)
+        ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
+        : null;
 
     const handleContextMenu = useCallback((e) => {
         e.preventDefault();
@@ -248,35 +228,25 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
                     onContextMenu={handleContextMenu}
                 >
                     <div className={styles.cardLeft}>
-                        <div className={styles.cardIcon} style={{ background: accentColor + "22" }}>
+                        <div className={styles.cardIcon} style={{ background: accentColor + "20" }}>
                             {icon}
                         </div>
                         <div className={styles.cardBody}>
                             <div className={styles.cardMeta}>
                                 {endTime && <span className={styles.cardTime}>{startTime}–{endTime}</span>}
-                                {durationMins && durationMins > 0 && (
-                                    <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>
-                                )}
+                                {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
                                 {active && <span className={styles.nowBadge}>Now</span>}
-                                {isTask && <span className={styles.taskBadge}>Task</span>}
+                                {isTask && item.priority && (
+                                    <span className={styles.priorityBadge} style={{ color: PRIORITY_COLOURS[item.priority] }}>
+                                        {item.priority}
+                                    </span>
+                                )}
                             </div>
-                            <span className={styles.cardTitle} style={{ opacity: isOverdue && !active ? 0.5 : 1 }}>
+                            <span className={styles.cardTitle} style={{ opacity: isOverdue && !active ? 0.45 : 1 }}>
                                 {item.title}
                             </span>
-                            {item.description && (
-                                <span className={styles.cardSub}>{item.description}</span>
-                            )}
-                            {!isTask && item.location && (
-                                <span className={styles.cardSub}>📍 {item.location}</span>
-                            )}
-                            {isTask && (
-                                <div className={styles.cardSubRow}>
-                                    <span style={{ color: PRIORITY_COLOURS[item.priority], fontSize: "0.7rem", fontWeight: 600 }}>
-                                        ● {item.priority}
-                                    </span>
-                                    {item.module_code && <span className={styles.modulePill}>{item.module_code}</span>}
-                                    {isOverdue && <span className={styles.overduePill}>Overdue</span>}
-                                </div>
+                            {isTask && item.module_code && (
+                                <span className={styles.cardSub}>{item.module_code}</span>
                             )}
                         </div>
                     </div>
@@ -285,6 +255,7 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
                         <button
                             className={styles.checkBtn}
                             onClick={e => { e.stopPropagation(); onToggle?.(item.id); }}
+                            title="Mark complete"
                         >
                             <span className={styles.checkInner} />
                         </button>
@@ -293,23 +264,10 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
             </div>
 
             {showDetail && (
-                <DetailOverlay
-                    item={item}
-                    icon={icon}
-                    accentColor={accentColor}
-                    onClose={() => setShowDetail(false)}
-                />
+                <DetailOverlay item={item} icon={icon} accentColor={accentColor} onClose={() => setShowDetail(false)} />
             )}
-
             {ctxMenu && (
-                <ContextMenu
-                    x={ctxMenu.x}
-                    y={ctxMenu.y}
-                    item={item}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                    onClose={() => setCtxMenu(null)}
-                />
+                <ContextMenu x={ctxMenu.x} y={ctxMenu.y} item={item} onEdit={onEdit} onDelete={onDelete} onClose={() => setCtxMenu(null)} />
             )}
         </>
     );
@@ -317,19 +275,13 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
 
 function FreeGap({ minutes, pendingTasks }) {
     const nav = useNavigate();
-    const [dismissed, setDismissed] = useState(false);
-
-    // Pick the highest-priority task that could plausibly fit in the gap.
     const suggestedTask = useMemo(() => {
         if (!pendingTasks?.length) return null;
         return pendingTasks.find(t => {
-            const blocks = t.estimated_blocks || 0;
-            const estMins = blocks > 0 ? blocks * 25 : 0;
+            const estMins = (t.estimated_blocks || 0) * 25;
             return estMins === 0 || estMins <= minutes;
         }) || null;
     }, [pendingTasks, minutes]);
-
-    if (dismissed) return null;
 
     return (
         <div className={styles.gapRow}>
@@ -342,89 +294,41 @@ function FreeGap({ minutes, pendingTasks }) {
                 </div>
             </div>
             <div className={styles.freeGap}>
-                <span className={styles.freeIcon}>⏱</span>
-                <div className={styles.freeBody}>
+                <div className={styles.freeLeft}>
                     <span className={styles.freeText}>
-                        You have <strong>{fmtDuration(minutes)} free</strong>.
+                        You have <strong>{fmtDuration(minutes)} free</strong>
+                        {suggestedTask ? ` · slot in ${suggestedTask.title}?` : " · slot anything?"}
                     </span>
-                    {suggestedTask && (
-                        <span className={styles.freeSuggest}>
-                            How about <strong>{suggestedTask.title}</strong>?
-                            <button
-                                className={styles.freeStartBtn}
-                                onClick={() => nav(`/timer?taskId=${suggestedTask.id}`)}
-                            >
-                                ▶ Start
-                            </button>
-                        </span>
-                    )}
                 </div>
                 <div className={styles.freeActions}>
-                    <button className={styles.freeBtn} onClick={() => nav("/tasks")}>View tasks</button>
-                    <button className={styles.freeDismiss} onClick={() => setDismissed(true)} aria-label="Dismiss">✕</button>
+                    {suggestedTask && (
+                        <button className={styles.freeStartBtn} onClick={() => nav(`/timer?taskId=${suggestedTask.id}`)}>
+                            ▶ Start
+                        </button>
+                    )}
+                    <button className={styles.freeBtn} onClick={() => nav("/tasks")}>Tasks</button>
                 </div>
             </div>
         </div>
     );
 }
 
-
-// Mini stats bar 
-function HomeStatsBar({ events, tasks }) {
+function HomeStatsBar() {
     const nav = useNavigate();
-    const [analytics, setAnalytics] = useState(null);
-
+    const [analyticsData, setAnalyticsData] = useState(null);
     useEffect(() => {
-        analyticsService.getSummary(7)
-            .then(setAnalytics)
-            .catch(() => {});
+        analyticsService.getSummary(7).then(setAnalyticsData).catch(() => {});
     }, []);
-
-    const plannedMins = useMemo(() => {
-        return events.reduce((acc, ev) => {
-            if (!ev.start_time || !ev.end_time) return acc;
-            return acc + Math.round((new Date(ev.end_time) - new Date(ev.start_time)) / 60000);
-        }, 0);
-    }, [events]);
-
-    const overdueCount = tasks.filter(t => t.due_date && new Date(t.due_date) < new Date()).length;
-
     return (
         <div className={styles.statsBar}>
-            <div className={styles.statChip}>
-                <span className={styles.statIcon}>📅</span>
-                <span className={styles.statVal}>{fmtDuration(plannedMins)}</span>
-                <span className={styles.statLabel}>planned today</span>
+            <div className={styles.statsHeader}>
+                <span className={styles.statsTitle}>This week</span>
+                <button className={styles.statLink} onClick={() => nav("/analytics")}>Full analytics →</button>
             </div>
-            <div className={styles.statChip}>
-                <span className={styles.statIcon}>🎯</span>
-                <span className={styles.statVal}>{tasks.length}</span>
-                <span className={styles.statLabel}>pending tasks</span>
-                {overdueCount > 0 && (
-                    <span className={styles.statOverdue}>{overdueCount} overdue</span>
-                )}
-            </div>
-            {analytics && (
-                <>
-                    <div className={styles.statChip}>
-                        <span className={styles.statIcon}>🔥</span>
-                        <span className={styles.statVal}>{analytics.current_streak ?? 0}</span>
-                        <span className={styles.statLabel}>day streak</span>
-                    </div>
-                    <div className={styles.statChip}>
-                        <span className={styles.statIcon}>🗓️</span>
-                        <span className={styles.statVal}>{analytics.active_days ?? 0}</span>
-                        <span className={styles.statLabel}>active days this week</span>
-                    </div>
-                </>
-            )}
-            <button className={styles.statLink} onClick={() => nav("/analytics")}>
-                Full analytics →
-            </button>
+            <SummaryCards data={analyticsData} />
         </div>
     );
 }
-
 function EmptyDay() {
     return (
         <div className={styles.empty}>
@@ -445,43 +349,48 @@ export default function Home() {
     const scheduleTitle = isToday(selectedDate) ? "Today's schedule" : "Schedule";
 
     const sortedEvents = [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    const sortedTasks  = [...dayTasks].sort((a, b) => {
+    const sortedTasks = [...dayTasks].sort((a, b) => {
         const p = { urgent: 0, high: 1, medium: 2, low: 3 };
         return p[a.priority] - p[b.priority];
     });
 
     const allSorted = useMemo(() => {
-        const taskItems  = sortedTasks.map(t => ({ ...t, _type: "task",  start_time: t.due_date, end_time: t.due_date }));
+        const taskItems = sortedTasks.map(t => ({ ...t, _type: "task", start_time: t.due_date, end_time: t.due_date }));
         const eventItems = sortedEvents.map(e => ({ ...e, _type: "event" }));
         return [...eventItems, ...taskItems].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
     }, [sortedEvents, sortedTasks]);
 
     const timelineWithGaps = useMemo(() => computeTimelineWithGaps(allSorted), [allSorted]);
     const itemEntries = timelineWithGaps.filter(e => e.type === "item");
-    const hasContent  = allSorted.length > 0;
+    const hasContent = allSorted.length > 0;
 
     return (
         <div className={styles.page}>
             <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
-            <HomeStatsBar events={sortedEvents} tasks={sortedTasks} />
-            <div className={styles.timeline}>
-                {!hasContent && <EmptyDay />}
-                {hasContent && timelineWithGaps.map((entry, i) => {
-                    if (entry.type === "gap") return <FreeGap key={`gap-${i}`} minutes={entry.minutes} pendingTasks={sortedTasks} />;
-                    const item = entry.data;
-                    const itemIndex = itemEntries.findIndex(e => e === entry);
-                    return (
-                        <TimelineRow
-                            key={`${item._type}-${item.id}`}
-                            item={item}
-                            isFirst={itemIndex === 0}
-                            isLast={itemIndex === itemEntries.length - 1}
-                            onDelete={removeEvent}
-                            onEdit={(ev) => openModal(ev, ev.tag)}
-                            onToggle={toggleTask}
-                        />
-                    );
-                })}
+            <HomeStatsBar />
+            <div className={styles.mainLayout}>
+                <div className={styles.timeline}>
+                    {!hasContent && <EmptyDay />}
+                    {hasContent && timelineWithGaps.map((entry, i) => {
+                        if (entry.type === "gap") return (
+                            <FreeGap key={`gap-${i}`} minutes={entry.minutes} pendingTasks={sortedTasks} />
+                        );
+                        const item = entry.data;
+                        const itemIndex = itemEntries.findIndex(e => e === entry);
+                        return (
+                            <TimelineRow
+                                key={`${item._type}-${item.id}`}
+                                item={item}
+                                isFirst={itemIndex === 0}
+                                isLast={itemIndex === itemEntries.length - 1}
+                                onDelete={removeEvent}
+                                onEdit={(ev) => openModal(ev, ev.tag)}
+                                onToggle={toggleTask}
+                            />
+                        );
+                    })}
+                </div>
+                <ChatPanel period={30} />
             </div>
         </div>
     );
