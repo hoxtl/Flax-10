@@ -7,6 +7,22 @@ export default function UserListModal({ title, users, onClose, onUserClick }) {
     // Get the current user to verify we don't show the follow button next to their own name
     const currentUser = JSON.parse(localStorage.getItem('user')) || {};
 
+    // Sort users: 
+    // 1. Current user
+    // 2. Users the current user is following
+    // 3. Everyone else
+    const sortedUsers = [...users].sort((a, b) => {
+        const aIsMe = a.id === currentUser.id || a.username === currentUser.username;
+        const bIsMe = b.id === currentUser.id || b.username === currentUser.username;
+        if (aIsMe) return -1;
+        if (bIsMe) return 1;
+
+        if (a.is_following && !b.is_following) return -1;
+        if (!a.is_following && b.is_following) return 1;
+
+        return 0; // maintain original order for the rest
+    });
+
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
@@ -15,10 +31,10 @@ export default function UserListModal({ title, users, onClose, onUserClick }) {
                     <button className={styles.closeBtn} onClick={onClose}>&times;</button>
                 </div>
                 <div className={styles.userList}>
-                    {users.length === 0 ? (
+                    {sortedUsers.length === 0 ? (
                         <p className={styles.emptyText}>No users found.</p>
                     ) : (
-                        users.map((u, index) => (
+                        sortedUsers.map((u, index) => (
                             <div
                                 key={u.id || u.username || index}
                                 className={styles.userItem}
