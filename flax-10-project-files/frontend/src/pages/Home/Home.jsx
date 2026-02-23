@@ -9,7 +9,8 @@ import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
 import { useNavigate } from "react-router-dom";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
-import { useTimerContext } from "../../context/TimerContext";
+import { InsightsPanel } from "../../components/Analytics/AIInsightsTab";
+import SummaryCards from "../../components/Analytics/SummaryCards";
 
 const PRIORITY_COLOURS = {
     urgent: "var(--danger)",
@@ -377,61 +378,20 @@ function FreeGap({ minutes, pendingTasks }) {
 
 /* ── Mini stats bar — Rule of Three ──────────────────────────────── */
 
-function MiniStatsBar({ tasks }) {
+function StatsBar() {
     const nav = useNavigate();
-    const [summary, setSummary] = useState(null);
+    const [data, setData] = useState(null);
 
     useEffect(() => {
-        analyticsService.getSummary(7).then(setSummary).catch(() => {});
+        analyticsService.getSummary(7).then(setData).catch(() => {});
     }, []);
 
-    const todayTasks = useMemo(() => tasks.filter(t => {
-        if (!t.due_date) return false;
-        return new Date(t.due_date).toDateString() === new Date().toDateString();
-    }), [tasks]);
-
-    const urgentCount = todayTasks.filter(t => t.priority === "urgent" || t.priority === "high").length;
-
-    const stats = [
-        {
-            icon: "🔥",
-            value: summary?.summary?.current_streak_days ?? "–",
-            unit: "day streak",
-        },
-        {
-            icon: "✅",
-            value: todayTasks.length,
-            unit: urgentCount > 0 ? `${urgentCount} urgent` : "due today",
-            urgent: urgentCount > 0,
-            onClick: () => nav("/tasks"),
-        },
-        {
-            icon: "📖",
-            value: summary?.summary?.total_study_hours ?? "–",
-            unit: "hrs this week",
-        },
-    ];
-
     return (
-        <div className={styles.miniStats}>
-            <div className={styles.miniStatsInner}>
-                {stats.map((s, i) => (
-                    <div
-                        key={i}
-                        className={`${styles.miniStat} ${s.onClick ? styles.miniStatClickable : ""}`}
-                        onClick={s.onClick}
-                    >
-                        <span className={styles.miniStatIcon}>{s.icon}</span>
-                        <div className={styles.miniStatText}>
-                            <span className={`${styles.miniStatValue} ${s.urgent ? styles.miniStatUrgent : ""}`}>
-                                {s.value}
-                            </span>
-                            <span className={styles.miniStatUnit}>{s.unit}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <button className={styles.statLink} onClick={() => nav("/analytics")}>Full analytics →</button>
+        <div className={styles.statsBar}>
+            <SummaryCards data={data} />
+            <button className={styles.statLink} onClick={() => nav("/analytics")}>
+                Full analytics →
+            </button>
         </div>
     );
 }
@@ -455,13 +415,6 @@ function TaskWidgetRow({ task }) {
                     </span>
                 </div>
             </div>
-            <button
-                className={styles.twStart}
-                onClick={() => nav(`/timer?taskId=${task.id}`)}
-                title="Start study session"
-            >
-                ▶
-            </button>
         </div>
     );
 }
@@ -585,6 +538,26 @@ function ModuleFocusChart({ tasks }) {
     );
 }
 
+
+function StudyCoachPanel() {
+    const [insights, setInsights] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const generate = async () => {
+        setLoading(true);
+        try {
+            const res = await analyticsService.getAiInsights(30);
+            setInsights(res.insights);
+        } catch {
+            // silently fail
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return <InsightsPanel insights={insights} loading={loading} onGenerate={generate} period={30} />;
+}
+
 /* ── Home ─────────────────────────────────────────────────────────── */
 
 export default function Home() {
@@ -615,8 +588,16 @@ export default function Home() {
     return (
         <div className={styles.page}>
             <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
-            {<DeadlinesWidget />}
-            <MiniStatsBar tasks={allTasks} />
+            <details className={styles.deadlinesDetails}>
+                <summary className={styles.deadlinesSummary}>
+                    Upcoming deadlines
+                    <span className={styles.deadlinesHint}>View</span>
+                </summary>
+                <div className={styles.deadlinesBody}>
+                    <DeadlinesWidget />
+                </div>
+            </details>
+            <StatsBar />
             <div className={styles.mainLayout}>
                 {/* Left: today's tasks */}
                 <TaskWidget tasks={widgetTasks} />
@@ -646,8 +627,7 @@ export default function Home() {
 
                 {/* Right: study coach */}
                 <div className={styles.rightSidebar}>
-                    <MiniTimer activeTask={sortedTasks[0] || null} />
-                    <ModuleFocusChart tasks={allTasks} />
+                    <StudyCoachPanel />
                 </div>
             </div>
         </div>

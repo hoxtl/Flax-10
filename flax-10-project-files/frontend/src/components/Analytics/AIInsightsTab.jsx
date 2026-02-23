@@ -6,7 +6,7 @@ import analyticsService from '../../api/analyticsService';
 import AnimatedList from './AnimatedList';
 import styles from './AIInsightsTab.module.css';
 
-function InsightsPanel({ insights, loading, onGenerate, period }) {
+export function InsightsPanel({ insights, loading, onGenerate, period }) {
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
