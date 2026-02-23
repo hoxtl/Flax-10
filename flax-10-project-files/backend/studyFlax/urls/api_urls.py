@@ -50,9 +50,8 @@ from studyFlax.views.notifications import notification_list, notification_detail
 # Analytics
 from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
-
-# Misc 
-from studyFlax.views.hello import hello
+from studyFlax.views.user.settings_views import onboarding_view
+from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -127,4 +126,8 @@ urlpatterns = [
     path('analytics/theme-stats/', get_theme_stats, name='analytics-theme-stats'),
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
+    path('onboarding/', onboarding_view, name='onboarding'),
+    path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline_list"),
+    path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
+    path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
 ]

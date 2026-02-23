@@ -3,11 +3,12 @@ from datetime import date, datetime, timedelta, timezone as dt_timezone
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from faker import Faker
-from studyFlax.models import CalendarEvent, UserSettings
+from studyFlax.models import CalendarEvent, UserSettings, Deadline
 from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
     location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
+    module_deadline_fixtures, deadline_fixtures,
 )
 
 User = get_user_model()
@@ -227,3 +228,53 @@ def build_lecture_events(user, module, lecture_tag):
             ))
         candidate += timedelta(weeks=1)
     return sessions
+
+
+def _get_random_offset(used_offsets):
+    while True:
+        day_offset = random.randint(7, 30)
+        if day_offset not in used_offsets:
+            used_offsets.add(day_offset)
+            return day_offset
+
+
+def build_deadlines_for_module(module):
+    prefix    = module.module_code[:2]
+    templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
+    used_offsets = set()
+    deadlines    = []
+    now = timezone.now()
+
+    for deadline_type, title, description in templates:
+        day_offset = _get_random_offset(used_offsets)
+        hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
+        start_due  = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
+        end_due    = start_due + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
+        location   = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
+
+        if not Deadline.objects.filter(module=module, title=title).exists():
+            deadlines.append(Deadline(
+                module=module,
+                title=title,
+                deadline_type=deadline_type,
+                description=description,
+                start_due_date=start_due,
+                end_due_date=end_due,
+                location=location,
+            ))
+
+    return deadlines
+
+
+def create_deadline_calendar_event(user, deadline):
+    CalendarEvent.objects.get_or_create(
+        user=user,
+        title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
+        start_time=deadline.start_due_date,
+        defaults={
+            'end_time': deadline.end_due_date or deadline.start_due_date,
+            'location': deadline.location,
+            'description': deadline.description,
+            'priority': 'high',
+        },
+    )

@@ -329,6 +329,7 @@ function HomeStatsBar() {
         </div>
     );
 }
+
 function EmptyDay() {
     return (
         <div className={styles.empty}>
