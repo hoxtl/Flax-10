@@ -15,7 +15,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                 <ScheduleSection module={module} />
                 <hr className={styles.divider} />
                 <div className={styles.descriptionSection}>
-                    <h1 className={styles.sectionTitle}>Deadlines</h1>
+                    <h1 className={styles.sectionTitle}>Assignments</h1>
                     <DeadlinesSection deadlines={module.deadlines} />
                 </div>
                 <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
