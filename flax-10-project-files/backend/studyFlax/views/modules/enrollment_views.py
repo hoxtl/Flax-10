@@ -47,7 +47,6 @@ def enrollment_detail(request, enrollment_id):
         return Response(EnrollmentSerialiser(enrollment).data)
     return delete_enrollment(request, enrollment)
 
-#Retrieves users course from settings and checks if module code belongs to course
 def is_core_module(user, module):
     user_course = getattr(getattr(user, 'settings', None), 'major', None)
     if not user_course:

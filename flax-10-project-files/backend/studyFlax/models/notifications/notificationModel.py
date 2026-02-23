@@ -12,7 +12,6 @@ NOTIFICATION_TYPES = [
     ('ratification_rejected', 'Ratification Rejected'),
 ]
 
-
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
     title = models.CharField(max_length=200)
