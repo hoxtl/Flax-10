@@ -21,21 +21,21 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 11px;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid transparent;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: transparent;       
+    border: 1px solid var(--border);
     transition: background 150ms ease;
 }
 
 .row.urgent {
-    background: var(--hover-light);
-    border-color: var(--warning-border);
+    background: var(--deadline-urgent-bg);
+    border-color: transparent;
 }
 
 .row.critical {
-    background: var(--hover-light);
-    border-color: var(--warning-border);
+    background: var(--error-bg);
+    border-color: var(--error-border);
 }
 
 .icon {
@@ -68,7 +68,7 @@
 
 .date {
     font-size: 0.82rem;
-    color: var(--text);
+    color: var(--muted);
 }
 
 .type {
