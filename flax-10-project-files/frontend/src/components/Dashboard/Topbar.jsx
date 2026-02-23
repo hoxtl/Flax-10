@@ -7,6 +7,7 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
+import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
 
@@ -33,9 +34,7 @@ function TopBarGreeting({ user }) {
         )}
         <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
-    </div>
-  );
-}
+    </div>);}
 
 function SearchInput() {
   return (
@@ -87,10 +86,11 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
   );
 }
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting user={user} />
+      <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <TopBarActions
         onAddClick={onAddClick}
         user={user}

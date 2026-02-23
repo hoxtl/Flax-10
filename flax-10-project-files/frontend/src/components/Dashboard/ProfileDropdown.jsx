@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../Authentication/utils/userUtils";
-import { getPreferredFirstName, getDisplayName } from "../Authentication/utils/userDisplay";
 import { getUserProfile } from "../../api/userService";
 
 function useClickOutside(ref, onClose, isActive) {
