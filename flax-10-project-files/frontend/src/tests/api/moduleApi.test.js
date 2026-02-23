@@ -39,7 +39,7 @@ describe('moduleApi', () => {
         expect(fetchApi).toHaveBeenCalledWith('/modules/1/', expect.objectContaining({ method: 'DELETE' }));
     });
 
-    it('gshould get enrollments', async () => {
+    it('should get enrollments', async () => {
         await api.getEnrollments();
         expect(fetchApi).toHaveBeenCalledWith('/enrollments/');
     });
@@ -52,5 +52,18 @@ describe('moduleApi', () => {
     it('should disenrol a student from a module', async () => {
         await api.disenrolFromModule(3);
         expect(fetchApi).toHaveBeenCalledWith('/enrollments/3/', expect.objectContaining({ method: 'DELETE' }));
+    });
+
+    it('should disenrol by module id when enrollment exists', async () => {
+        fetchApi.mockResolvedValueOnce([{ id: 10, module: 7 }]); 
+        fetchApi.mockResolvedValueOnce(undefined);              
+        await api.disenrolByModuleId(7);
+        expect(fetchApi).toHaveBeenCalledWith('/enrollments/');
+        expect(fetchApi).toHaveBeenCalledWith('/enrollments/10/', expect.objectContaining({ method: 'DELETE' }));
+    });
+
+    it('should throw when not enrolled in module', async () => {
+        fetchApi.mockResolvedValueOnce([{ id: 10, module: 99 }]); 
+        await expect(api.disenrolByModuleId(7)).rejects.toThrow('Not enrolled in this module');
     });
 });
