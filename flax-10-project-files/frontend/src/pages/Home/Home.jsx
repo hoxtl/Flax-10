@@ -2,8 +2,6 @@ import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import styles from "./Home.module.css";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import analyticsService from "../../api/analyticsService";
-import { ChatPanel } from "../../components/Analytics/AIInsightsTab";
-import SummaryCards from "../../components/Analytics/SummaryCards";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks, updateTask } from "../../api/taskService";
@@ -11,6 +9,7 @@ import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
 import { useNavigate } from "react-router-dom";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
+import { useTimerContext } from "../../context/TimerContext";
 
 const PRIORITY_COLOURS = {
     urgent: "var(--danger)",
@@ -25,7 +24,7 @@ function formatTime(dateStr) {
 }
 
 function fmtDuration(mins) {
-    if (mins < 60) return `${mins} min`;
+    if (mins < 60) return `${mins}m`;
     const h = Math.floor(mins / 60), m = mins % 60;
     return m ? `${h}h ${m}m` : `${h}h`;
 }
@@ -33,6 +32,20 @@ function fmtDuration(mins) {
 function isNow(startStr, endStr) {
     const now = new Date();
     return new Date(startStr) <= now && now <= new Date(endStr);
+}
+
+function isPast(endStr) {
+    return endStr && new Date(endStr) < new Date();
+}
+
+function isLecture(item) {
+    const t = (item.title || "").toLowerCase();
+    return t.includes("lecture") || t.includes("seminar") || t.includes("tutorial") || item.source === "timetable";
+}
+
+function extractModuleCode(str) {
+    const match = (str || "").match(/\b([A-Z]{2,3}\d{4})\b/);
+    return match ? match[1] : null;
 }
 
 function resolveEventIcon(event, tagIcon) {
@@ -101,8 +114,10 @@ function useHomeData(selectedDate) {
         setTasks(prev => prev.filter(t => t.id !== id));
     };
 
-    return { dayEvents, dayTasks, toggleTask };
+    return { dayEvents, dayTasks, allTasks: tasks, toggleTask };
 }
+
+/* ── Detail overlay ───────────────────────────────────────────────── */
 
 function DetailOverlay({ item, icon, accentColor, onClose }) {
     const isTask = item._type === "task";
@@ -110,14 +125,16 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
     const end = item.end_time ? new Date(item.end_time) : null;
     const durationMins = end ? Math.round((end - start) / 60000) : null;
     const active = !isTask && isNow(item.start_time, item.end_time);
+    const lect = !isTask && isLecture(item);
+    const modCode = lect
+        ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description))
+        : null;
 
     return (
         <div className={styles.overlayBackdrop} onMouseDown={onClose}>
             <div className={styles.detailCard} onMouseDown={e => e.stopPropagation()}>
                 <div className={styles.detailTop} style={{ background: accentColor + "18" }}>
-                    <div className={styles.detailIconLarge} style={{ background: accentColor + "28" }}>
-                        {icon}
-                    </div>
+                    <div className={styles.detailIconLarge} style={{ background: accentColor + "28" }}>{icon}</div>
                     <div className={styles.detailTopText}>
                         <div className={styles.detailMeta}>
                             {active && <span className={styles.nowPill}>Now</span>}
@@ -126,16 +143,25 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
                                 {formatTime(item.start_time || item.due_date)}
                                 {end ? ` – ${formatTime(item.end_time)}` : ""}
                             </span>
-                            {durationMins > 0 && (
-                                <span className={styles.detailDur}>{fmtDuration(durationMins)}</span>
-                            )}
+                            {durationMins > 0 && <span className={styles.detailDur}>{fmtDuration(durationMins)}</span>}
                         </div>
                         <h2 className={styles.detailTitle}>{item.title}</h2>
                     </div>
                     <button className={styles.detailClose} onClick={onClose}>✕</button>
                 </div>
                 <div className={styles.detailBody}>
-                    {item.description && (
+                    {/* Lectures: show module code + name instead of "Notes" */}
+                    {lect && (modCode || item.description) && (
+                        <div className={styles.detailRow}>
+                            <span className={styles.detailRowLabel}>Module</span>
+                            <span className={styles.detailRowText}>
+                                {modCode && <strong>{modCode}</strong>}
+                                {modCode && item.description && " · "}
+                                {item.description}
+                            </span>
+                        </div>
+                    )}
+                    {!lect && item.description && (
                         <div className={styles.detailRow}>
                             <span className={styles.detailRowLabel}>Notes</span>
                             <span className={styles.detailRowText}>{item.description}</span>
@@ -170,6 +196,8 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
     );
 }
 
+/* ── Context menu ─────────────────────────────────────────────────── */
+
 function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
     const ref = useRef(null);
     useEffect(() => {
@@ -187,6 +215,19 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
     );
 }
 
+/* ── TfL placeholder ──────────────────────────────────────────────── */
+
+function TflStatus() {
+    return (
+        <span className={styles.tflBadge} title="TfL status — live integration coming soon">
+            <span className={styles.tflDot} />
+            <span className={styles.tflLabel}>TfL</span>
+        </span>
+    );
+}
+
+/* ── Timeline row ─────────────────────────────────────────────────── */
+
 function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
     const { getTag } = useTags();
     const [showDetail, setShowDetail] = useState(false);
@@ -196,7 +237,8 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
     const theme = (!isTask && getTag(item.tag)) || { color: isTask ? PRIORITY_COLOURS[item.priority] : "#94A3B8", icon: "📅" };
     const icon = isTask ? "🎯" : resolveEventIcon(item, theme.icon);
     const active = !isTask && isNow(item.start_time, item.end_time);
-    const isOverdue = new Date(item.end_time || item.due_date) < new Date();
+    const past = !active && isPast(item.end_time || item.due_date);
+    const lect = !isTask && isLecture(item);
     const accentColor = isTask ? PRIORITY_COLOURS[item.priority] : theme.color;
 
     const startTime = formatTime(item.start_time || item.due_date);
@@ -205,6 +247,11 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
         ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
         : null;
 
+    const modCode = lect
+        ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description))
+        : null;
+    const modName = lect ? item.description : null;
+
     const handleContextMenu = useCallback((e) => {
         e.preventDefault();
         setCtxMenu({ x: e.clientX, y: e.clientY });
@@ -212,24 +259,24 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
 
     return (
         <>
-            <div className={`${styles.timelineRow} ${active ? styles.rowActive : ""}`}>
+            <div className={`${styles.timelineRow} ${active ? styles.rowActive : ""} ${past ? styles.rowPast : ""}`}>
                 <div className={styles.spine}>
                     <div className={styles.spineTime}>{startTime}</div>
                     <div className={styles.spineTrack}>
                         <div className={styles.spineLine} style={{ background: isFirst ? "transparent" : "var(--border)" }} />
-                        <div className={styles.spineNode} style={{ background: accentColor }} />
+                        <div className={styles.spineNode} style={{ background: past ? "var(--border)" : accentColor }} />
                         <div className={styles.spineLine} style={{ background: isLast ? "transparent" : "var(--border)" }} />
                     </div>
                 </div>
 
                 <div
-                    className={`${styles.card} ${active ? styles.cardActive : ""}`}
+                    className={`${styles.card} ${active ? styles.cardActive : ""} ${past ? styles.cardPast : ""}`}
                     style={active ? { borderColor: accentColor } : {}}
                     onClick={() => setShowDetail(true)}
                     onContextMenu={handleContextMenu}
                 >
                     <div className={styles.cardLeft}>
-                        <div className={styles.cardIcon} style={{ background: accentColor + "20" }}>
+                        <div className={styles.cardIcon} style={{ background: past ? "var(--hover)" : accentColor + "20" }}>
                             {icon}
                         </div>
                         <div className={styles.cardBody}>
@@ -243,11 +290,25 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
                                     </span>
                                 )}
                             </div>
-                            <span className={styles.cardTitle} style={{ opacity: isOverdue && !active ? 0.45 : 1 }}>
-                                {item.title}
-                            </span>
+                            <span className={styles.cardTitle}>{item.title}</span>
+                            {/* Lecture subtitle: module code + module name */}
+                            {lect && (modCode || modName) && (
+                                <span className={styles.cardSub}>
+                                    {modCode && <strong>{modCode}</strong>}
+                                    {modCode && modName && " · "}
+                                    {modName}
+                                </span>
+                            )}
+                            {/* Task subtitle: module code */}
                             {isTask && item.module_code && (
                                 <span className={styles.cardSub}>{item.module_code}</span>
+                            )}
+                            {/* Lecture location + TfL badge */}
+                            {lect && item.location && (
+                                <span className={styles.cardLocation}>
+                                    <span className={styles.locationText}>{item.location.split(",")[0]}</span>
+                                    <TflStatus />
+                                </span>
                             )}
                         </div>
                     </div>
@@ -274,6 +335,8 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
     );
 }
 
+/* ── Free gap ─────────────────────────────────────────────────────── */
+
 function FreeGap({ minutes, pendingTasks }) {
     const nav = useNavigate();
     const suggestedTask = useMemo(() => {
@@ -298,15 +361,13 @@ function FreeGap({ minutes, pendingTasks }) {
                 <div className={styles.freeLeft}>
                     <span className={styles.freeText}>
                         You have <strong>{fmtDuration(minutes)} free</strong>
-                        {suggestedTask ? ` · slot in ${suggestedTask.title}?` : " · slot anything?"}
+                        {suggestedTask
+                            ? <> · slot in <strong>{suggestedTask.title}?</strong></>
+                            : " · slot anything?"
+                        }
                     </span>
                 </div>
                 <div className={styles.freeActions}>
-                    {suggestedTask && (
-                        <button className={styles.freeStartBtn} onClick={() => nav(`/timer?taskId=${suggestedTask.id}`)}>
-                            ▶ Start
-                        </button>
-                    )}
                     <button className={styles.freeBtn} onClick={() => nav("/tasks")}>Tasks</button>
                 </div>
             </div>
@@ -314,22 +375,130 @@ function FreeGap({ minutes, pendingTasks }) {
     );
 }
 
-function HomeStatsBar() {
+/* ── Mini stats bar — Rule of Three ──────────────────────────────── */
+
+function MiniStatsBar({ tasks }) {
     const nav = useNavigate();
-    const [analyticsData, setAnalyticsData] = useState(null);
+    const [summary, setSummary] = useState(null);
+
     useEffect(() => {
-        analyticsService.getSummary(7).then(setAnalyticsData).catch(() => {});
+        analyticsService.getSummary(7).then(setSummary).catch(() => {});
     }, []);
+
+    const todayTasks = useMemo(() => tasks.filter(t => {
+        if (!t.due_date) return false;
+        return new Date(t.due_date).toDateString() === new Date().toDateString();
+    }), [tasks]);
+
+    const urgentCount = todayTasks.filter(t => t.priority === "urgent" || t.priority === "high").length;
+
+    const stats = [
+        {
+            icon: "🔥",
+            value: summary?.summary?.current_streak_days ?? "–",
+            unit: "day streak",
+        },
+        {
+            icon: "✅",
+            value: todayTasks.length,
+            unit: urgentCount > 0 ? `${urgentCount} urgent` : "due today",
+            urgent: urgentCount > 0,
+            onClick: () => nav("/tasks"),
+        },
+        {
+            icon: "📖",
+            value: summary?.summary?.total_study_hours ?? "–",
+            unit: "hrs this week",
+        },
+    ];
+
     return (
-        <div className={styles.statsBar}>
-            <div className={styles.statsHeader}>
-                <span className={styles.statsTitle}>This week</span>
-                <button className={styles.statLink} onClick={() => nav("/analytics")}>Full analytics →</button>
+        <div className={styles.miniStats}>
+            <div className={styles.miniStatsInner}>
+                {stats.map((s, i) => (
+                    <div
+                        key={i}
+                        className={`${styles.miniStat} ${s.onClick ? styles.miniStatClickable : ""}`}
+                        onClick={s.onClick}
+                    >
+                        <span className={styles.miniStatIcon}>{s.icon}</span>
+                        <div className={styles.miniStatText}>
+                            <span className={`${styles.miniStatValue} ${s.urgent ? styles.miniStatUrgent : ""}`}>
+                                {s.value}
+                            </span>
+                            <span className={styles.miniStatUnit}>{s.unit}</span>
+                        </div>
+                    </div>
+                ))}
             </div>
-            <SummaryCards data={analyticsData} />
+            <button className={styles.statLink} onClick={() => nav("/analytics")}>Full analytics →</button>
         </div>
     );
 }
+
+/* ── Task widget ──────────────────────────────────────────────────── */
+
+function TaskWidgetRow({ task }) {
+    const nav = useNavigate();
+    const color = PRIORITY_COLOURS[task.priority] || "var(--muted)";
+    const estMins = task.estimated_blocks ? task.estimated_blocks * 25 : null;
+
+    return (
+        <div className={styles.twRow}>
+            <div className={styles.twLeft}>
+                <span className={styles.twDot} style={{ background: color }} />
+                <div className={styles.twBody}>
+                    <span className={styles.twTitle}>{task.title}</span>
+                    <span className={styles.twMeta}>
+                        {task.module_code && <span className={styles.twModule}>{task.module_code}</span>}
+                        {estMins && <span className={styles.twTime}>{fmtDuration(estMins)}</span>}
+                    </span>
+                </div>
+            </div>
+            <button
+                className={styles.twStart}
+                onClick={() => nav(`/timer?taskId=${task.id}`)}
+                title="Start study session"
+            >
+                ▶
+            </button>
+        </div>
+    );
+}
+
+function TaskWidget({ tasks }) {
+    const nav = useNavigate();
+    const topTasks = useMemo(() => {
+        const p = { urgent: 0, high: 1, medium: 2, low: 3 };
+        return [...tasks]
+            .sort((a, b) => (p[a.priority] - p[b.priority]) || (new Date(a.due_date) - new Date(b.due_date)))
+            .slice(0, 5);
+    }, [tasks]);
+
+    return (
+        <div className={styles.taskWidget}>
+            <div className={styles.taskWidgetHeader}>
+                <span className={styles.taskWidgetTitle}>Today's tasks</span>
+                <button className={styles.taskWidgetLink} onClick={() => nav("/tasks")}>All tasks →</button>
+            </div>
+            {topTasks.length === 0 ? (
+                <div className={styles.taskWidgetEmpty}>
+                    <span className={styles.taskWidgetEmptyIcon}>🎉</span>
+                    <p className={styles.taskWidgetEmptyText}>Nothing due today.</p>
+                    <button className={styles.taskWidgetEmptyBtn} onClick={() => nav("/tasks")}>
+                        Get ahead →
+                    </button>
+                </div>
+            ) : (
+                <div className={styles.taskWidgetList}>
+                    {topTasks.map(task => <TaskWidgetRow key={task.id} task={task} />)}
+                </div>
+            )}
+        </div>
+    );
+}
+
+/* ── Empty day ────────────────────────────────────────────────────── */
 
 function EmptyDay() {
     return (
@@ -340,12 +509,90 @@ function EmptyDay() {
     );
 }
 
+function MiniTimer({ activeTask }) {
+    const nav = useNavigate();
+    const t = useTimerContext();
+    const mins = Math.floor((t.timeLeft || 0) / 60);
+    const secs = (t.timeLeft || 0) % 60;
+    const display = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    const isRunning = t.isRunning;
+
+    return (
+        <div className={styles.miniTimer}>
+            <div className={styles.miniTimerHeader}>
+                <span className={styles.miniTimerTitle}>🍅 Focus</span>
+                <button className={styles.miniTimerLink} onClick={() => nav("/timer")}>Full timer →</button>
+            </div>
+            {activeTask && (
+                <div className={styles.miniTimerTask}>
+                    <span className={styles.miniTimerTaskLabel}>Working on</span>
+                    <span className={styles.miniTimerTaskName}>{activeTask.title}</span>
+                </div>
+            )}
+            <div className={styles.miniTimerDisplay}>{display}</div>
+            <div className={styles.miniTimerMode}>
+                {t.mode === "work" ? "🔥 Focus Time" : "☕ Break"} · Session {t.session || 1} of {t.sessions || 4}
+            </div>
+            <div className={styles.miniTimerBtns}>
+                <button
+                    className={styles.miniTimerStart}
+                    onClick={() => isRunning ? t.pause() : t.start()}
+                >
+                    {isRunning ? "⏸ Pause" : "▶ Start"}
+                </button>
+                <button className={styles.miniTimerReset} onClick={() => t.reset()}>↺</button>
+            </div>
+        </div>
+    );
+}
+
+function ModuleFocusChart({ tasks }) {
+    const nav = useNavigate();
+    const counts = useMemo(() => {
+        const map = {};
+        tasks.forEach(t => {
+            const code = t.module_code;
+            if (!code) return;
+            map[code] = (map[code] || 0) + (t.estimated_blocks || 1);
+        });
+        return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    }, [tasks]);
+
+    const total = counts.reduce((s, [, v]) => s + v, 0);
+    const COLOURS = ["#9E7E5D", "#5C6BC0", "#26A69A", "#EF6C00", "#7B1FA2"];
+
+    return (
+        <div className={styles.focusChart}>
+            <div className={styles.focusHeader}>
+                <span className={styles.focusTitle}>📊 Module Focus</span>
+                <button className={styles.focusLink} onClick={() => nav("/analytics")}>Analytics →</button>
+            </div>
+            {counts.length === 0 ? (
+                <p className={styles.focusEmpty}>Add tasks with modules to see focus breakdown</p>
+            ) : counts.map(([code, val], i) => (
+                <div key={code} className={styles.focusRow}>
+                    <span className={styles.focusCode}>{code}</span>
+                    <div className={styles.focusBarWrap}>
+                        <div
+                            className={styles.focusBar}
+                            style={{ width: `${(val / total) * 100}%`, background: COLOURS[i % COLOURS.length] }}
+                        />
+                    </div>
+                    <span className={styles.focusPct}>{Math.round((val / total) * 100)}%</span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+/* ── Home ─────────────────────────────────────────────────────────── */
+
 export default function Home() {
     const { selectedDate } = useCalendar();
     const dispatch = useCalendarDispatch();
     const { removeEvent } = useEventActions();
     const { openModal } = useEventModal();
-    const { dayEvents, dayTasks, toggleTask } = useHomeData(selectedDate);
+    const { dayEvents, dayTasks, allTasks, toggleTask } = useHomeData(selectedDate);
 
     const setSelectedDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
     const scheduleTitle = isToday(selectedDate) ? "Today's schedule" : "Schedule";
@@ -357,21 +604,24 @@ export default function Home() {
     });
 
     const allSorted = useMemo(() => {
-        const taskItems = sortedTasks.map(t => ({ ...t, _type: "task", start_time: t.due_date, end_time: t.due_date }));
-        const eventItems = sortedEvents.map(e => ({ ...e, _type: "event" }));
-        return [...eventItems, ...taskItems].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    }, [sortedEvents, sortedTasks]);
+        return [...sortedEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    }, [sortedEvents]);
 
     const timelineWithGaps = useMemo(() => computeTimelineWithGaps(allSorted), [allSorted]);
     const itemEntries = timelineWithGaps.filter(e => e.type === "item");
     const hasContent = allSorted.length > 0;
+    const widgetTasks = isToday(selectedDate) ? dayTasks : allTasks.slice(0, 5);
 
     return (
         <div className={styles.page}>
             <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
-            {isToday(selectedDate) && <DeadlinesWidget />}
-            <HomeStatsBar />
+            {<DeadlinesWidget />}
+            <MiniStatsBar tasks={allTasks} />
             <div className={styles.mainLayout}>
+                {/* Left: today's tasks */}
+                <TaskWidget tasks={widgetTasks} />
+
+                {/* Centre: timeline */}
                 <div className={styles.timeline}>
                     {!hasContent && <EmptyDay />}
                     {hasContent && timelineWithGaps.map((entry, i) => {
@@ -393,7 +643,12 @@ export default function Home() {
                         );
                     })}
                 </div>
-                <ChatPanel period={30} />
+
+                {/* Right: study coach */}
+                <div className={styles.rightSidebar}>
+                    <MiniTimer activeTask={sortedTasks[0] || null} />
+                    <ModuleFocusChart tasks={allTasks} />
+                </div>
             </div>
         </div>
     );
