@@ -129,3 +129,26 @@
 .row.critical .countdown {
     animation: pulse 1.5s ease-in-out infinite;
 }
+
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+  
+.viewAllBtn {
+    font-size: 0.72rem;
+    color: var(--primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 650;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+  
+.viewAllBtn:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
