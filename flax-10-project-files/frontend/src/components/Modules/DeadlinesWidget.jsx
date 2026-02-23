@@ -37,6 +37,9 @@ function DeadlineRow({ deadline }) {
 function DeadlineRowBody({ deadline }) {
     return (
         <div className={styles.body}>
+            <span className={styles.moduleLabel}>
+                {deadline.module_code} — {deadline.module_name}
+            </span>
             <div className={styles.titleRow}>
                 <span className={styles.type}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
                 <span className={styles.title}>{deadline.title}</span>

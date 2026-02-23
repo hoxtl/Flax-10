@@ -4,13 +4,13 @@ from django.utils.dateparse import parse_datetime
 
 class DeadlineSerialiser(serializers.ModelSerializer):
     module_code = serializers.CharField(source='module.module_code', read_only=True)
-    module_name = serializers.CharField(source='module.module_name', read_only=True)  # add this
+    module_name = serializers.CharField(source='module.module_name', read_only=True) 
     end_due_date = serializers.DateTimeField(required=False, allow_null=True)
 
     class Meta:
         model = Deadline
-        fields = ['id', 'module', 'module_code', 'module_name', 'title', 'deadline_type',  # add module_name here
-                  'description', 'start_due_date', 'end_due_date', 'location']
+        fields = ['id', 'module', 'module_code', 'module_name', 'title',  # ← add module_name here
+                  'deadline_type', 'description', 'start_due_date', 'end_due_date', 'location']
         read_only_fields = ['module']
 
     def validate(self, validated_data):
