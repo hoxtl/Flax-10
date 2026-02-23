@@ -9,6 +9,7 @@ import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import { Bell } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
+import MiniTimer from '../Timer/MiniTimer';
 
 function getFirstName(user) {
   const displayName = (getDisplayName(user) || "").trim();
@@ -82,7 +83,7 @@ function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick })
   );
 }
 
-export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
+export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting user={user} />
