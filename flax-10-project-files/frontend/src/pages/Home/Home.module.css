@@ -8,7 +8,7 @@
 
 .mainLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 1rem;
   padding: 0.75rem 1.25rem 0;
   max-width: 1400px;
@@ -631,9 +631,9 @@
   flex-direction: column;
   gap: 0.1rem;
   padding: 0.45rem 0.7rem;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 12px;
-  background: var(--panel);
+  background: color-mix(in srgb, var(--panel) 70%, var(--bg));
   min-width: 90px;
 }
 
@@ -940,6 +940,13 @@
   padding: 0.75rem;
   min-height: 0;
   flex: 1;
+}
+
+.streakHint {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 650;
+  white-space: nowrap;
 }
 
 @media (max-width: 980px) {
