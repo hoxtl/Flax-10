@@ -59,10 +59,10 @@ class FollowViewSet(viewsets.GenericViewSet):
         followers = User.objects.filter(following__followed=target_user)
         page = self.paginate_queryset(followers)
         if page is not None:
-            serializer = FollowUserSerializer(page, many=True)
+            serializer = FollowUserSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-        serializer = FollowUserSerializer(followers, many=True)
+        serializer = FollowUserSerializer(followers, many=True, context={'request': request})
         return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
@@ -76,8 +76,8 @@ class FollowViewSet(viewsets.GenericViewSet):
         following = User.objects.filter(followers__follower=target_user)
         page = self.paginate_queryset(following)
         if page is not None:
-            serializer = FollowUserSerializer(page, many=True)
+            serializer = FollowUserSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-        serializer = FollowUserSerializer(following, many=True)
+        serializer = FollowUserSerializer(following, many=True, context={'request': request})
         return Response(serializer.data)

@@ -6,9 +6,17 @@ User = get_user_model()
 
 class FollowUserSerializer(serializers.ModelSerializer):
     """Serializer for displaying simple user info in follow lists."""
+    is_following = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name')
+        fields = ('id', 'username', 'first_name', 'last_name', 'is_following')
+
+    def get_is_following(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.followers.filter(follower=request.user).exists()
+        return False
 
 
 class FollowSerializer(serializers.ModelSerializer):
