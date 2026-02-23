@@ -55,7 +55,7 @@ from studyFlax.views.modules.deadline_views import deadline_list, deadline_detai
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("hello/", hello, name="hello"),
+    #path("hello/", hello, name="hello"),
 
     # Authentication
     path("auth/register/", register_view, name='auth-register'),
