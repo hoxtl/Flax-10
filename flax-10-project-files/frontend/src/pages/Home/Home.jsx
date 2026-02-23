@@ -13,7 +13,8 @@ import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
 import { useNavigate } from "react-router-dom";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
-import { InsightsPanel } from "../../components/Analytics/AIInsightsTab";
+import HomeStudyCoachCard from "../../components/Home/HomeStudyCoachCard";
+
 
 const PRIORITY_COLOURS = {
   urgent: "var(--danger)",
@@ -483,39 +484,67 @@ function MiniStat({ label, value }) {
   );
 }
 
-function HomeStatsPills({ data }) {
-  const streak = data?.current_streak ?? data?.streak ?? 0;
+function HomeStatsPills({ summary, progress }) {
+  const streak = summary?.current_streak ?? summary?.streak ?? 0;
+
   const todayMins =
-    data?.today_minutes ??
-    data?.today_work_minutes ??
-    data?.today_total_minutes ??
+    summary?.today_minutes ??
+    summary?.today_work_minutes ??
+    summary?.today_total_minutes ??
     null;
 
-  const consistency = data?.consistency_score ?? data?.consistency ?? null;
+  const adherence =
+    progress?.adherence_percentage ??
+    progress?.adherence ??
+    null;
+
+  const peak =
+    progress?.peak_hour ??
+    progress?.peak_hours?.[0] ??
+    null;
 
   const todayLabel = todayMins == null ? "—" : fmtDuration(todayMins);
-  const consistencyLabel = consistency == null ? "—" : `${Math.round(consistency)}%`;
+  const adherenceLabel = adherence == null ? "—" : `${Math.round(adherence)}%`;
+  const peakLabel = peak == null ? "—" : formatPeakHour(peak);
 
   return (
     <div className={styles.pillsRow}>
       <MiniStat label="Today" value={todayLabel} />
       <MiniStat label="Streak" value={`${streak}d`} />
-      <MiniStat label="Consistency" value={consistencyLabel} />
+      <MiniStat label="Adherence" value={adherenceLabel} />
+      <MiniStat label="Peak" value={peakLabel} />
+      <span className={styles.streakHint}>{streakHint(streak)}</span>
     </div>
   );
 }
 
+function formatPeakHour(v) {
+  // Accepts "21", 21, "21:00", etc.
+  const n = typeof v === "number" ? v : parseInt(String(v).slice(0, 2), 10);
+  if (Number.isNaN(n)) return "—";
+  const hour = ((n % 24) + 24) % 24;
+  return `${String(hour).padStart(2, "0")}:00`;
+}
+
+function streakHint(streak) {
+  if (!streak) return "⚠️ Restart your streak today";
+  if (streak >= 3) return `🔥 ${streak} day streak — keep it going`;
+  return `✅ ${streak} day streak`;
+}
+
 function StatsBar() {
   const nav = useNavigate();
-  const [data, setData] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [progress, setProgress] = useState(null);
 
   useEffect(() => {
-    analyticsService.getSummary(7).then(setData).catch(() => {});
+    analyticsService.getSummary(7).then(setSummary).catch(() => {});
+    analyticsService.getProgress(7).then(setProgress).catch(() => {});
   }, []);
 
   return (
     <div className={styles.statsBar}>
-      <HomeStatsPills data={data} />
+      <HomeStatsPills summary={summary} progress={progress} />
       <button className={styles.statLink} onClick={() => nav("/analytics")}>
         Full analytics →
       </button>
@@ -578,32 +607,6 @@ function TaskWidget({ tasks }) {
         </div>
       )}
     </div>
-  );
-}
-
-function StudyCoachPanel() {
-  const [insights, setInsights] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const generate = async () => {
-    setLoading(true);
-    try {
-      const res = await analyticsService.getAiInsights(30);
-      setInsights(res.insights);
-    } catch {
-      // silent
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <InsightsPanel
-      insights={insights}
-      loading={loading}
-      onGenerate={generate}
-      period={30}
-    />
   );
 }
 
@@ -679,16 +682,6 @@ export default function Home() {
         scheduleTitle={scheduleTitle}
       />
 
-      <details className={styles.deadlinesDetails}>
-        <summary className={styles.deadlinesSummary}>
-          Upcoming deadlines
-          <span className={styles.deadlinesHint}>View</span>
-        </summary>
-        <div className={styles.deadlinesBody}>
-          <DeadlinesWidget />
-        </div>
-      </details>
-
       <StatsBar />
 
       <div className={styles.mainLayout}>
@@ -749,26 +742,10 @@ export default function Home() {
 
         <aside className={styles.rightSidebar}>
           <TaskWidget tasks={widgetTasks} />
-
-          <div className={styles.coachPromo}>
-            <div className={styles.coachPromoTitle}>✨ Want a personalised schedule?</div>
-            <div className={styles.coachPromoText}>
-              Use Study Coach to generate a plan based on your streak, peak hours, and deadlines.
-            </div>
-          </div>
-
-          <div className={styles.coachCard}>
-            <div className={styles.coachCardHeader}>
-              <div>
-                <div className={styles.coachCardTitle}>Study Analysis</div>
-                <div className={styles.coachCardSub}>Last 30 days · AI generated</div>
-              </div>
-            </div>
-            <div className={styles.coachCardBody}>
-              <StudyCoachPanel />
-            </div>
-          </div>
+          <DeadlinesWidget mode="next" limit={6} showViewAll />
+          <HomeStudyCoachCard />
         </aside>
+
       </div>
     </div>
   );
