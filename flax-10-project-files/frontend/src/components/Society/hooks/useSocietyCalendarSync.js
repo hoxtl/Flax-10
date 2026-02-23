@@ -41,6 +41,4 @@ async function handleToggle(societyId, isSynced, setIsSynced, setLoading) {
     } catch (err) {
         console.error('Failed to toggle sync:', err);
     } finally {
-        setLoading(false);
-    }
-}
+        setLoading(false);}}

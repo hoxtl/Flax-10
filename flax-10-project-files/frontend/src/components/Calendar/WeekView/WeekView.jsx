@@ -26,9 +26,7 @@ export function WeekView({ selectedDate: propDate, events: propEvents, onDateSel
                 <AllDayRow days={weekDays} events={eventsForWeek} readOnly={readOnly} />
             </div>
             <WeekGrid days={weekDays} events={eventsForWeek} readOnly={readOnly} />
-        </div>
-    );
-}
+        </div>);}
 
 function useWeekScroll(events, weekDays) {
     const scrollRef = useRef(null);

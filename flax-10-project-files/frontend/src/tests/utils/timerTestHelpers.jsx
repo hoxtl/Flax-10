@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import TimerPage from '../../pages/TimerPage';
+import TimerPage from '../../pages/Timer/TimerPage';
 import { TimerSettings } from '../../components/Timer/TimerComponents';
 import * as historyUtils from '../../utils/historyUtils';
 import { vi } from 'vitest';
