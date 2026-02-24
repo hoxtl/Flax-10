@@ -62,18 +62,23 @@
 .arrowBtn {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  border: none;
-  background: var(--pill-bg);
-  color: var(--text);
-  font-size: 1.1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
   line-height: 1;
 }
-.arrowBtn:hover { background: var(--hover); }
+.arrowBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--border);
+}
 
 /* ── Week strip ──────────────────────────────────────────────── */
 .strip {
