@@ -64,6 +64,7 @@ export default function ListSidebar({
     onDeleteList,
     onRenameList,
     onUnarchiveList,
+    onPermanentlyDeleteList,
     archivedLists = [],
 }) {
     const [ctxMenu,      setCtxMenu]      = useState(null);
@@ -170,15 +171,27 @@ export default function ListSidebar({
                             {archivedLists.map(list => (
                                 <div key={list.id} className={styles.archiveItem}>
                                     <span className={styles.archiveName}>{list.name}</span>
-                                    {onUnarchiveList && (
-                                        <button
-                                            type="button"
-                                            className={styles.restoreBtn}
-                                            onClick={() => onUnarchiveList(list.id)}
-                                        >
-                                            Restore
-                                        </button>
-                                    )}
+                                    <div className={styles.archiveActions}>
+                                        {onUnarchiveList && (
+                                            <button
+                                                type="button"
+                                                className={styles.restoreBtn}
+                                                onClick={() => onUnarchiveList(list.id)}
+                                            >
+                                                Restore
+                                            </button>
+                                        )}
+                                        {onPermanentlyDeleteList && (
+                                            <button
+                                                type="button"
+                                                className={styles.deletePermanentBtn}
+                                                onClick={() => onPermanentlyDeleteList(list.id)}
+                                                title="Permanently delete list"
+                                            >
+                                                Delete
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>

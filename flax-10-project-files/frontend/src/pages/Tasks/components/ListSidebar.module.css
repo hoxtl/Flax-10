@@ -333,6 +333,13 @@
     color: var(--muted);
 }
 
+.archiveActions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+}
+
 .archiveName {
     flex: 1;
     font-size: 0.78rem;
@@ -356,3 +363,16 @@
     transition: background 0.1s;
 }
 .restoreBtn:hover { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+
+.deletePermanentBtn {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #dc2626;
+    background: color-mix(in srgb, #dc2626 10%, transparent);
+    border: none;
+    border-radius: 9999px;
+    padding: 0.18rem 0.5rem;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.deletePermanentBtn:hover { background: color-mix(in srgb, #dc2626 20%, transparent); }
