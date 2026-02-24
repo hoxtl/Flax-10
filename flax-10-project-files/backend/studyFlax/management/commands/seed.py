@@ -8,10 +8,11 @@ from studyFlax.models import (
     UserSettings, Module, Enrollment, Deadline,
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
+
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
-    module_task_templates, personal_task_fixtures,
-)
+    module_task_templates, personal_task_fixtures, task_list_fixtures)
+
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
@@ -212,19 +213,27 @@ class Command(BaseCommand):
             if Task.objects.filter(user=user).exists():
                 continue
 
-            uni_list, _ = TaskList.objects.get_or_create(
-                user=user, name="University", defaults={"category": "uni"}
-            )
-            personal_list, _ = TaskList.objects.get_or_create(
-                user=user, name="Personal", defaults={"category": "personal"}
-            )
+            # ── Create all task lists for this user ──
+            lists_by_name = {}
+            for list_name, list_category, list_emoji in task_list_fixtures:
+                tl, _ = TaskList.objects.get_or_create(
+                    user=user,
+                    name=list_name,
+                    defaults={"category": list_category},
+                )
+                lists_by_name[list_name] = tl
 
+            # Fallback references
+            uni_list      = lists_by_name.get("University")
+            personal_list = lists_by_name.get("Personal")
+
+            # ── Module tasks ──
             enrolled_modules = list(
                 Enrollment.objects.filter(student=user).select_related('module')
             )
             seen_prefixes = set()
             for enrollment in enrolled_modules:
-                mod = enrollment.module
+                mod    = enrollment.module
                 prefix = mod.module_code[:2]
                 if prefix in seen_prefixes:
                     continue
@@ -232,7 +241,7 @@ class Command(BaseCommand):
                 templates = module_task_templates.get(prefix, [])
                 for title_tmpl, description, priority, estimated_blocks, days_from_now in templates[:2]:
                     title = title_tmpl.format(module=mod.module_code, module_name=mod.module_name)
-                    due = (now + timedelta(days=days_from_now)).replace(
+                    due   = (now + timedelta(days=days_from_now)).replace(
                         hour=23, minute=59, second=0, microsecond=0
                     )
                     Task.objects.create(
@@ -248,13 +257,15 @@ class Command(BaseCommand):
                     )
                     total += 1
 
-            for title, description, priority, estimated_blocks, days_from_now in personal_task_fixtures:
-                due = (now + timedelta(days=days_from_now)).replace(
+            # ── Personal tasks ──
+            for title, description, priority, estimated_blocks, days_from_now, list_name in personal_task_fixtures:
+                due  = (now + timedelta(days=days_from_now)).replace(
                     hour=23, minute=59, second=0, microsecond=0
                 )
+                task_list = lists_by_name.get(list_name, personal_list)
                 Task.objects.create(
                     user=user,
-                    task_list=personal_list,
+                    task_list=task_list,
                     module=None,
                     title=title,
                     description=description,

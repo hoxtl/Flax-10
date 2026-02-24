@@ -1,86 +1,56 @@
-import { useState, useEffect } from "react";
-import { getEnrollments } from "../../../api/moduleApi";
+import { useState } from "react";
+import DateTimePicker from "./DateTimePicker";
 import styles from "./CreateTaskModal.module.css";
 
-function useModules() {
-    const [modules, setModules] = useState([]);
-    useEffect(() => {
-        getEnrollments()
-            .then(data => {
-                const normalised = data.map(e => ({
-                    id: typeof e.module === "object" ? e.module.id : e.module,
-                    module_code: e.module_code || e.module?.module_code || e.module?.code || "Unknown",
-                }));
-                setModules(normalised);
-            })
-            .catch(() => {});
-    }, []);
-    return modules;
-}
-
-function useForm(defaultListId) {
-    const [form, setForm] = useState({
-        title: "",
-        description: "",
-        priority: "medium",
-        due_date: "",
-        task_list: defaultListId || "",
-        module: "",
-        estimated_blocks: "",
-        add_to_calendar: false,
-    });
-    const set = (field, value) => setForm(p => ({ ...p, [field]: value }));
-    return { form, set };
-}
-
-function ModalHeader({ onClose }) {
-    return (
-        <div className={styles.header}>
-            <h2 className={styles.title}>New Task</h2>
-            <button className={styles.closeBtn} onClick={onClose}>×</button>
-        </div>
-    );
-}
-
 export default function CreateTaskModal({ lists, defaultListId, onSave, onClose }) {
-    const { form, set } = useForm(defaultListId);
-    const modules = useModules();
+    const [form, setForm] = useState({
+        title:            "",
+        description:      "",
+        priority:         "medium",
+        due_date:         "",
+        task_list:        defaultListId || (lists[0]?.id ?? ""),
+    });
     const [saving, setSaving] = useState(false);
 
-    const handleSubmit = async () => {
+    const set = (field, val) => setForm(p => ({ ...p, [field]: val }));
+
+    const handleSave = async () => {
         if (!form.title.trim()) return;
         setSaving(true);
-        const payload = {
-            ...form,
-            task_list: form.task_list || null,
-            module: form.module || null,
-            due_date: form.due_date || null,
-            estimated_blocks: form.estimated_blocks ? Number(form.estimated_blocks) : null,
-        };
-        await onSave(payload);
+        await onSave({ ...form, due_date: form.due_date || null });
         setSaving(false);
         onClose();
     };
 
+    const handleKey = (e) => { if (e.key === "Escape") onClose(); };
+
     return (
-        <div className={styles.overlay} onMouseDown={onClose}>
+        <div className={styles.overlay} onMouseDown={onClose} onKeyDown={handleKey}>
             <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ModalHeader onClose={onClose} />
+                {/* Header */}
+                <div className={styles.header}>
+                    <h2 className={styles.title}>New task</h2>
+                    <button className={styles.closeBtn} onClick={onClose}>✕</button>
+                </div>
+
+                {/* Body */}
                 <div className={styles.body}>
                     <input
                         className={styles.titleInput}
-                        placeholder="Task title"
+                        placeholder="Task title…"
                         value={form.title}
                         onChange={e => set("title", e.target.value)}
                         autoFocus
                     />
+
                     <textarea
                         className={styles.desc}
                         placeholder="Description (optional)"
+                        rows={2}
                         value={form.description}
                         onChange={e => set("description", e.target.value)}
-                        rows={2}
                     />
+
                     <div className={styles.row}>
                         <div className={styles.field}>
                             <label>Priority</label>
@@ -94,56 +64,34 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                         <div className={styles.field}>
                             <label>List</label>
                             <select value={form.task_list} onChange={e => set("task_list", e.target.value)}>
-                                <option value="">No list</option>
-                                {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                                {lists.map(l => (
+                                    <option key={l.id} value={l.id}>
+                                        {l.icon ? `${l.icon} ` : ""}{l.name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
-                    <div className={styles.row}>
-                        <div className={styles.field}>
-                            <label>Module</label>
-                            <select value={form.module} onChange={e => set("module", e.target.value)}>
-                                <option value="">No module</option>
-                                {modules.map(e => <option key={e.id} value={e.id}>{e.module_code}</option>)}
-                            </select>
-                        </div>
-                        <div className={styles.field}>
-                            <label>Due date</label>
-                            <input
-                                type="datetime-local"
-                                value={form.due_date}
-                                onChange={e => set("due_date", e.target.value)}
-                            />
-                        </div>
-                    </div>
+
                     <div className={styles.field}>
-                        <label>🟫 Flax blocks (estimated time)</label>
-                        <input
-                            type="number"
-                            min="1"
-                            max="20"
-                            placeholder="e.g. 3  ·  each block = 25 min focus session"
-                            value={form.estimated_blocks}
-                            onChange={e => set("estimated_blocks", e.target.value)}
+                        <label>Due date & time</label>
+                        <DateTimePicker
+                            value={form.due_date}
+                            onChange={val => set("due_date", val)}
+                            placeholder="Pick date & time (optional)"
                         />
                     </div>
-                    <label className={styles.checkRow}>
-                        <input
-                            type="checkbox"
-                            checked={form.add_to_calendar}
-                            onChange={e => set("add_to_calendar", e.target.checked)}
-                        />
-                        Add to calendar
-                    </label>
                 </div>
+
+                {/* Footer */}
                 <div className={styles.footer}>
                     <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
                     <button
                         className={styles.saveBtn}
-                        onClick={handleSubmit}
+                        onClick={handleSave}
                         disabled={saving || !form.title.trim()}
                     >
-                        {saving ? "Saving..." : "Add Task"}
+                        {saving ? "Saving…" : "Add task"}
                     </button>
                 </div>
             </div>

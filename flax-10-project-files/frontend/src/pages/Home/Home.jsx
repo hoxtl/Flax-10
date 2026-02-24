@@ -1,4 +1,3 @@
-// Home.jsx
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import styles from "./Home.module.css";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
@@ -12,6 +11,7 @@ import {
   useEventActions,
 } from "../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks, updateTask } from "../../api/taskService";
+import { createEvent } from "../../api/eventApi";
 import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -20,17 +20,14 @@ import HomeStudyCoachCard from "../../components/Home/HomeStudyCoachCard";
 
 const PRIORITY_COLOURS = {
   urgent: "var(--danger)",
-  high: "#f59e0b",
+  high:   "#f59e0b",
   medium: "var(--primary)",
-  low: "var(--muted)",
+  low:    "var(--muted)",
 };
 
 function formatTime(dateStr) {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Date(dateStr).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 function fmtDuration(mins) {
@@ -54,12 +51,7 @@ function isPast(endStr) {
 
 function isLecture(item) {
   const t = (item.title || "").toLowerCase();
-  return (
-    t.includes("lecture") ||
-    t.includes("seminar") ||
-    t.includes("tutorial") ||
-    item.source === "timetable"
-  );
+  return t.includes("lecture") || t.includes("seminar") || t.includes("tutorial") || item.source === "timetable";
 }
 
 function extractModuleCode(str) {
@@ -68,46 +60,105 @@ function extractModuleCode(str) {
 }
 
 function resolveEventIcon(event, tagIcon) {
-  const t = (event.title || "").toLowerCase();
+  const t   = (event.title || "").toLowerCase();
   const src = (event.source || "").toLowerCase();
-  if (t === "breakfast") return "🌅";
-  if (t === "lunch") return "🥗";
-  if (t === "dinner") return "🍽️";
+  // Meals
+  if (t === "breakfast")                                        return "🌅";
+  if (t === "lunch")                                            return "🥗";
+  if (t === "dinner")                                           return "🍽️";
+  // Academic
   if (t.includes("lecture") || t.includes("seminar") || t.includes("tutorial")) return "📖";
-  if (t.includes("practical") || t.includes("lab")) return "🔬";
-  if (t.includes("workshop")) return "🛠️";
-  if (t.includes("dentist")) return "🦷";
-  if (t.includes("gp") || t.includes("doctor") || t.includes("appointment")) return "🩺";
-  if (t.includes("gym") || t.includes("sport")) return "🏋️";
-  if (t.includes("run") || t.includes("jog")) return "🏃";
-  if (t.includes("yoga")) return "🧘";
+  if (t.includes("practical") || t.includes("lab"))            return "🔬";
+  if (t.includes("workshop"))                                   return "🛠️";
+  if (t.includes("exam") || t.includes("test"))                return "📝";
+  if (t.includes("submission") || t.includes("coursework"))    return "📤";
+  if (t.includes("revision") || t.includes("study"))           return "📚";
+  if (t.includes("library"))                                    return "📚";
+  if (t.includes("group project") || t.includes("group meeting")) return "🤝";
+  if (t.includes("presentation") || t.includes("seminar"))     return "🎤";
+  // Health
+  if (t.includes("dentist"))                                    return "🦷";
+  if (t.includes("gp") || t.includes("doctor"))                return "🩺";
+  if (t.includes("appointment"))                                return "📋";
+  if (t.includes("gym") || t.includes("basketball") || t.includes("sport")) return "🏋️";
+  if (t.includes("run") || t.includes("jog"))                  return "🏃";
+  if (t.includes("yoga") || t.includes("stretch") || t.includes("meditat")) return "🧘";
+  if (t.includes("walk"))                                       return "🚶";
+  // Social / life
   if (t.includes("coffee") || t.includes("costa") || t.includes("pret")) return "☕";
-  if (t.includes("call") || t.includes("facetime") || t.includes("phone")) return "📞";
-  if (t.includes("meeting") || t.includes("group project")) return "🤝";
-  if (t.includes("study") || t.includes("revision") || t.includes("library")) return "📚";
-  if (t.includes("deadline") || t.includes("submission")) return "⚠️";
-  if (src === "timetable") return "📖";
-  if (tagIcon && tagIcon !== "📅") return tagIcon;
+  if (t.includes("brunch"))                                     return "🍳";
+  if (t.includes("drinks") || t.includes("pub"))                return "🍻";
+  if (t.includes("dinner") || t.includes("restaurant"))        return "🍽️";
+  if (t.includes("birthday"))                                   return "🎂";
+  if (t.includes("cinema") || t.includes("movie"))             return "🎬";
+  if (t.includes("facetime") || t.includes("call") || t.includes("phone")) return "📞";
+  if (t.includes("meeting"))                                    return "🤝";
+  // Errands / admin
+  if (t.includes("email") || t.includes("reply"))              return tagIcon && tagIcon !== "📅" ? tagIcon : "📧";
+  if (t.includes("shop") || t.includes("tesco") || t.includes("lidl") || t.includes("grocery")) return "🛒";
+  if (t.includes("laundry") || t.includes("clean") || t.includes("tidy")) return "🧹";
+  if (t.includes("parcel") || t.includes("inpost") || t.includes("delivery")) return "📦";
+  if (t.includes("haircut") || t.includes("barber"))           return "✂️";
+  if (t.includes("train") || t.includes("travel") || t.includes("journey")) return "🚆";
+  if (t.includes("rent") || t.includes("bills") || t.includes("finance")) return "💸";
+  if (t.includes("ikea"))                                       return "🪑";
+  // Default — use tag icon if meaningful, else calendar
+  if (src === "timetable")                                      return "📖";
+  if (tagIcon && tagIcon !== "📅")                              return tagIcon;
   return "📅";
 }
 
-function computeTimelineWithGaps(sortedItems) {
-  const result = [];
-  for (let i = 0; i < sortedItems.length; i++) {
-    result.push({ type: "item", data: sortedItems[i] });
+/* Group overlapping events into clusters, then interleave gaps */
+function groupOverlaps(sortedItems) {
+  const groups = [];
+  let current  = [];
+  let clusterEnd = null;
 
-    if (i < sortedItems.length - 1) {
-      const curEnd = new Date(
-        sortedItems[i].end_time || sortedItems[i].start_time
-      );
-      const nextStart = new Date(sortedItems[i + 1].start_time);
-      const gapMins = Math.round((nextStart - curEnd) / 60000);
-      if (gapMins >= 30) result.push({ type: "gap", minutes: gapMins });
+  for (const item of sortedItems) {
+    const start = new Date(item.start_time);
+    const end   = new Date(item.end_time || item.start_time);
+    if (current.length === 0 || start < clusterEnd) {
+      current.push(item);
+      if (!clusterEnd || end > clusterEnd) clusterEnd = end;
+    } else {
+      groups.push(current.length === 1 ? { type: "single", item: current[0] } : { type: "cluster", items: current });
+      current    = [item];
+      clusterEnd = end;
+    }
+  }
+  if (current.length > 0) {
+    groups.push(current.length === 1 ? { type: "single", item: current[0] } : { type: "cluster", items: current });
+  }
+  return groups;
+}
+
+function computeTimelineWithGaps(sortedItems, pendingTasks) {
+  const grouped = groupOverlaps(sortedItems);
+  const result  = [];
+  let taskIdx   = 0;
+
+  for (let i = 0; i < grouped.length; i++) {
+    const g = grouped[i];
+    result.push(g.type === "cluster" ? { type: "cluster", items: g.items } : { type: "item", data: g.item });
+
+    if (i < grouped.length - 1) {
+      const lastItem  = g.type === "cluster" ? g.items[g.items.length - 1] : g.item;
+      const curEnd    = new Date(lastItem.end_time || lastItem.start_time);
+      const nextGroup = grouped[i + 1];
+      const firstNext = nextGroup.type === "cluster" ? nextGroup.items[0] : nextGroup.item;
+      const nextStart = new Date(firstNext.start_time);
+      const gapMins   = Math.round((nextStart - curEnd) / 60000);
+      if (gapMins >= 30) {
+        const suggestedTask = pendingTasks[taskIdx % pendingTasks.length] || null;
+        taskIdx++;
+        result.push({ type: "gap", minutes: gapMins, gapStart: curEnd, suggestedTask });
+      }
     }
   }
   return result;
 }
 
+/* ─── Data hook ─────────────────────────────────────────── */
 function useHomeData(selectedDate) {
   const { events } = useCalendar();
   const [tasks, setTasks] = useState([]);
@@ -119,71 +170,53 @@ function useHomeData(selectedDate) {
       .catch(() => {});
   }, []);
 
-  const dayEvents = useMemo(() => {
-    return events.filter((e) =>
-      overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate)
-    );
-  }, [events, selectedDate]);
+  const dayEvents = useMemo(
+    () => events.filter((e) => overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate)),
+    [events, selectedDate]
+  );
 
   const dayTasks = useMemo(() => {
-    if (!isToday(selectedDate)) return [];
-    const todayEnd = new Date(selectedDate);
-    todayEnd.setHours(23, 59, 59, 999);
-
-    return tasks.filter((t) => {
-      if (!t.due_date) return false;
-      return new Date(t.due_date) <= todayEnd;
-    });
+    const dayEnd = new Date(selectedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+    const p = { urgent: 0, high: 1, medium: 2, low: 3 };
+    return tasks
+      .filter((t) => t.due_date && new Date(t.due_date) <= dayEnd)
+      .sort((a, b) => (p[a.priority] ?? 4) - (p[b.priority] ?? 4));
   }, [tasks, selectedDate]);
 
-  const toggleTask = async (id) => {
-    try {
-      await updateTask(id, { completed: true });
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    } catch {
-      // silent
-    }
-  };
+  const removePendingTask = useCallback((id) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
-  return { dayEvents, dayTasks, allTasks: tasks, toggleTask };
+  return { dayEvents, dayTasks, removePendingTask };
 }
 
+/* ─── Detail overlay ─────────────────────────────────────── */
 function DetailOverlay({ item, icon, accentColor, onClose }) {
-  const start = new Date(item.start_time);
-  const end = item.end_time ? new Date(item.end_time) : null;
+  const start        = new Date(item.start_time);
+  const end          = item.end_time ? new Date(item.end_time) : null;
   const durationMins = end ? Math.round((end - start) / 60000) : null;
-
-  const active = isNow(item.start_time, item.end_time);
-  const lect = isLecture(item);
-  const modCode = lect
-    ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description))
-    : null;
+  const active       = isNow(item.start_time, item.end_time);
+  const lect         = isLecture(item);
+  const modCode      = lect ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description)) : null;
 
   return (
     <div className={styles.overlayBackdrop} onMouseDown={onClose}>
       <div className={styles.detailCard} onMouseDown={(e) => e.stopPropagation()}>
-        <div className={styles.detailTop} style={{ background: `${accentColor}18` }}>
-          <div className={styles.detailIconLarge} style={{ background: `${accentColor}28` }}>
-            {icon}
-          </div>
-
+        <div className={styles.detailTop} style={{ background: `${accentColor}14` }}>
+          <div className={styles.detailIconLarge} style={{ background: `${accentColor}22` }}>{icon}</div>
           <div className={styles.detailTopText}>
             <div className={styles.detailMeta}>
               {active && <span className={styles.nowPill}>Now</span>}
               <span className={styles.detailTime}>
-                {formatTime(item.start_time)}
-                {end ? ` – ${formatTime(item.end_time)}` : ""}
+                {formatTime(item.start_time)}{end ? ` – ${formatTime(item.end_time)}` : ""}
               </span>
               {durationMins > 0 && <span className={styles.detailDur}>{fmtDuration(durationMins)}</span>}
             </div>
             <h2 className={styles.detailTitle}>{item.title}</h2>
           </div>
-
-          <button className={styles.detailClose} onClick={onClose}>
-            ✕
-          </button>
+          <button className={styles.detailClose} onClick={onClose}>✕</button>
         </div>
-
         <div className={styles.detailBody}>
           {lect && (modCode || item.description) && (
             <div className={styles.detailRow}>
@@ -195,21 +228,18 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
               </span>
             </div>
           )}
-
           {!lect && item.description && (
             <div className={styles.detailRow}>
               <span className={styles.detailRowLabel}>Notes</span>
               <span className={styles.detailRowText}>{item.description}</span>
             </div>
           )}
-
           {item.location && (
             <div className={styles.detailRow}>
               <span className={styles.detailRowLabel}>Where</span>
               <span className={styles.detailRowText}>{item.location}</span>
             </div>
           )}
-
           {!item.description && !item.location && (
             <p className={styles.detailEmpty}>No additional details.</p>
           )}
@@ -219,71 +249,43 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
   );
 }
 
+/* ─── Context menu ───────────────────────────────────────── */
 function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
   const ref = useRef(null);
-
   useEffect(() => {
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) onClose();
-    };
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
   return (
     <div ref={ref} className={styles.contextMenu} style={{ top: y, left: x }}>
-      <button
-        className={styles.contextItem}
-        onClick={() => {
-          onEdit(item);
-          onClose();
-        }}
-      >
-        ✏️ Edit
-      </button>
+      <button className={styles.contextItem} onClick={() => { onEdit(item); onClose(); }}>✏️ Edit</button>
       <div className={styles.contextDivider} />
-      <button
-        className={`${styles.contextItem} ${styles.contextDelete}`}
-        onClick={() => {
-          onDelete(item.id);
-          onClose();
-        }}
-      >
+      <button className={`${styles.contextItem} ${styles.contextDelete}`} onClick={() => { onDelete(item.id); onClose(); }}>
         🗑️ Delete
       </button>
     </div>
   );
 }
 
-/** Events-only timeline row (no tasks in spine; no location/details shown on the card) */
+/* ─── Timeline event card ────────────────────────────────── */
 function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
-  const { getTag } = useTags();
+  const { getTag }          = useTags();
   const [showDetail, setShowDetail] = useState(false);
-  const [ctxMenu, setCtxMenu] = useState(null);
+  const [ctxMenu, setCtxMenu]       = useState(null);
 
-  const theme =
-    (getTag(item.tag) || {
-      color: "#94A3B8",
-      icon: "📅",
-    });
-
-  const icon = resolveEventIcon(item, theme.icon);
-  const active = isNow(item.start_time, item.end_time);
-  const past = !active && isPast(item.end_time);
-  const lect = isLecture(item);
-
-  const accentColor = theme.color;
-
-  const startTime = formatTime(item.start_time);
-  const endTime = formatTime(item.end_time);
-
-  const durationMins =
-    item.end_time ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000) : null;
-
-  const modCode = lect
-    ? item.module_code ||
-      extractModuleCode(item.title) ||
-      extractModuleCode(item.description)
+  const theme       = getTag(item.tag) || { color: "#94A3B8", icon: "📅" };
+  const icon        = resolveEventIcon(item, theme.icon);
+  const accentColor = theme.color || "#94A3B8";
+  const active      = isNow(item.start_time, item.end_time);
+  const past        = !active && isPast(item.end_time);
+  const lect        = isLecture(item);
+  const modCode     = lect ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description)) : null;
+  const startTime   = formatTime(item.start_time);
+  const endTime     = formatTime(item.end_time);
+  const durationMins = item.end_time
+    ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
     : null;
 
   const handleContextMenu = useCallback((e) => {
@@ -305,51 +307,32 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
 
         <div
           className={`${styles.card} ${past ? styles.cardPast : ""} ${active ? styles.cardActive : ""}`}
-          style={active ? { borderColor: accentColor } : {}}
+          style={{ "--card-accent": accentColor }}
           onClick={() => setShowDetail(true)}
           onContextMenu={handleContextMenu}
         >
-          <div className={styles.cardLeft}>
-            <div className={styles.cardIcon} style={{ background: past ? "var(--hover)" : `${accentColor}20` }}>
-              {icon}
+          <div className={styles.cardIcon} style={{ background: past ? "var(--hover)" : `${accentColor}1A` }}>
+            {icon}
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.cardMeta}>
+              <span className={styles.cardTime}>{startTime}–{endTime}</span>
+              {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
+              {active && <span className={styles.nowBadge}>Now</span>}
             </div>
-
-            <div className={styles.cardBody}>
-              <div className={styles.cardMeta}>
-                <span className={styles.cardTime}>{startTime}–{endTime}</span>
-                {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
-                {active && <span className={styles.nowBadge}>Now</span>}
-              </div>
-
-              <span className={styles.cardTitle}>{item.title}</span>
-
-              {/* keep it minimal: module code only (no location/description on the card) */}
-              {lect && modCode && (
-                <span className={styles.cardSub}>
-                  <strong>{modCode}</strong>
-                </span>
-              )}
-            </div>
+            <span className={styles.cardTitle}>{item.title}</span>
+            {lect && modCode && <span className={styles.cardSub}>{modCode}</span>}
           </div>
         </div>
       </div>
 
       {showDetail && (
-        <DetailOverlay
-          item={item}
-          icon={icon}
-          accentColor={accentColor}
-          onClose={() => setShowDetail(false)}
-        />
+        <DetailOverlay item={item} icon={icon} accentColor={accentColor} onClose={() => setShowDetail(false)} />
       )}
-
       {ctxMenu && (
         <ContextMenu
-          x={ctxMenu.x}
-          y={ctxMenu.y}
-          item={item}
-          onEdit={onEdit}
-          onDelete={onDelete}
+          x={ctxMenu.x} y={ctxMenu.y} item={item}
+          onEdit={onEdit} onDelete={onDelete}
           onClose={() => setCtxMenu(null)}
         />
       )}
@@ -357,84 +340,203 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
   );
 }
 
-function pickSuggestedTask(pendingTasks, minutes) {
-  if (!pendingTasks?.length) return null;
 
-  const p = { urgent: 0, high: 1, medium: 2, low: 3 };
-  const sorted = [...pendingTasks].sort(
-    (a, b) =>
-      (p[a.priority] - p[b.priority]) ||
-      (new Date(a.due_date || 0) - new Date(b.due_date || 0))
+/* ─── Overlap cluster (side-by-side cards) ───────────────── */
+function OverlapCluster({ items, onDelete, onEdit }) {
+  const { getTag }      = useTags();
+  const [expanded,      setExpanded]      = useState(false);
+  const [resolveOpen,   setResolveOpen]   = useState(false);
+  const [dismissed,     setDismissed]     = useState(false);
+  const firstStart      = formatTime(items[0].start_time);
+
+  // Build suggested resolution: keep the longest event, reschedule others sequentially after it
+  const resolution = useMemo(() => {
+    const sorted  = [...items].sort((a, b) => {
+      const durA = new Date(a.end_time) - new Date(a.start_time);
+      const durB = new Date(b.end_time) - new Date(b.start_time);
+      return durB - durA; // longest first
+    });
+    const keep  = sorted[0];
+    const rest  = sorted.slice(1);
+    const suggestions = [];
+    let cursor = new Date(keep.end_time);
+    for (const ev of rest) {
+      const dur = new Date(ev.end_time) - new Date(ev.start_time);
+      const newStart = new Date(cursor);
+      const newEnd   = new Date(cursor.getTime() + dur);
+      suggestions.push({
+        event: ev,
+        suggestedStart: newStart,
+        suggestedEnd:   newEnd,
+        label: `${formatTime(newStart.toISOString())}–${formatTime(newEnd.toISOString())}`,
+      });
+      cursor = newEnd;
+    }
+    return { keep, suggestions };
+  }, [items]);
+
+  return (
+    <div className={styles.clusterRow}>
+      <div className={styles.spine}>
+        <div className={styles.spineTime}>{firstStart}</div>
+        <div className={styles.spineTrack}>
+          <div className={styles.spineLine} />
+          <div className={styles.spineNode} style={{ background: "var(--warning, #f59e0b)" }} />
+          <div className={styles.spineLine} />
+        </div>
+      </div>
+
+      <div className={styles.clusterCards}>
+        {/* Header */}
+        <div className={styles.overlapHeader}>
+          <div className={styles.overlapBadge}>
+            ⚡ {items.length} events overlap
+          </div>
+          <div className={styles.overlapActions}>
+            <button
+              className={styles.overlapResolveBtn}
+              onClick={() => setResolveOpen(r => !r)}
+              title="Resolve overlap"
+            >
+              {resolveOpen ? "Hide suggestions" : "✨ Resolve"}
+            </button>
+            <button
+              className={styles.overlapExpandBtn}
+              onClick={() => setExpanded(e => !e)}
+              title="Show events"
+            >
+              {expanded ? "▲" : "▼"}
+            </button>
+          </div>
+        </div>
+
+        {/* Events list */}
+        {(expanded || true) && items.map((item) => {
+          const theme       = getTag(item.tag) || { color: "#94A3B8", icon: "📅" };
+          const icon        = resolveEventIcon(item, theme.icon);
+          const accentColor = theme.color || "#94A3B8";
+          const durationMins = item.end_time
+            ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
+            : null;
+          return (
+            <ClusterCard
+              key={item.id}
+              item={item}
+              icon={icon}
+              accentColor={accentColor}
+              durationMins={durationMins}
+              onDelete={onDelete}
+              onEdit={onEdit}
+            />
+          );
+        })}
+
+        {/* Resolve panel */}
+        {resolveOpen && (
+          <div className={styles.resolvePanel}>
+            <div className={styles.resolvePanelHeader}>
+              <span className={styles.resolvePanelTitle}>✨ Suggested fix</span>
+              <span className={styles.resolvePanelSub}>
+                Keep <strong>"{resolution.keep.title}"</strong>, reschedule the rest:
+              </span>
+            </div>
+            {resolution.suggestions.map(s => (
+              <div key={s.event.id} className={styles.resolveSuggestion}>
+                <div className={styles.resolveSuggestLeft}>
+                  <span className={styles.resolveName}>{s.event.title}</span>
+                  <span className={styles.resolveTime}>{s.label}</span>
+                </div>
+                <button
+                  className={styles.resolveApplyBtn}
+                  onClick={() => {
+                    onEdit({
+                      ...s.event,
+                      start_time: s.suggestedStart.toISOString(),
+                      end_time:   s.suggestedEnd.toISOString(),
+                    });
+                  }}
+                >
+                  Apply
+                </button>
+              </div>
+            ))}
+            <p className={styles.resolvePanelNote}>
+              Or right-click any event to edit manually.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
-
-  // pick first that fits, otherwise top priority anyway
-  const fit = sorted.find((t) => {
-    const estMins = (t.estimated_blocks || 0) * 25;
-    return estMins === 0 || estMins <= minutes;
-  });
-
-  return fit || sorted[0] || null;
 }
 
-function getGapGuidance({ minutes, pendingTasks, longBlocksSoFar }) {
-  const hasUrgent =
-    (pendingTasks || []).some((t) => (t.priority || "").toLowerCase() === "urgent");
+function ClusterCard({ item, icon, accentColor, durationMins, onDelete, onEdit }) {
+  const [showDetail, setShowDetail] = useState(false);
+  const [ctxMenu, setCtxMenu]       = useState(null);
+  const active = isNow(item.start_time, item.end_time);
+  const past   = !active && isPast(item.end_time);
 
-  // “multiple long blocks today” → suggest rest for long gaps
-  const shouldRest = longBlocksSoFar >= 2;
+  return (
+    <>
+      <div
+        className={`${styles.card} ${styles.clusterCard} ${past ? styles.cardPast : ""} ${active ? styles.cardActive : ""}`}
+        style={{ "--card-accent": accentColor }}
+        onClick={() => setShowDetail(true)}
+        onContextMenu={(e) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY }); }}
+      >
+        <div className={styles.cardIcon} style={{ background: `${accentColor}1A` }}>{icon}</div>
+        <div className={styles.cardBody}>
+          <div className={styles.cardMeta}>
+            <span className={styles.cardTime}>{formatTime(item.start_time)}–{formatTime(item.end_time)}</span>
+            {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
+            {active && <span className={styles.nowBadge}>Now</span>}
+          </div>
+          <span className={styles.cardTitle}>{item.title}</span>
+        </div>
+      </div>
+      {showDetail && <DetailOverlay item={item} icon={icon} accentColor={accentColor} onClose={() => setShowDetail(false)} />}
+      {ctxMenu && (
+        <ContextMenu x={ctxMenu.x} y={ctxMenu.y} item={item}
+          onEdit={onEdit} onDelete={onDelete} onClose={() => setCtxMenu(null)} />
+      )}
+    </>
+  );
+}
 
-  if (minutes < 30) {
-    return {
-      label: "Quick admin",
-      tone: "neutral",
-      suggestion: "Do a tiny win: plan next block, reply to 1 email, tidy notes.",
-    };
-  }
+/* ─── Free gap with task suggestion ─────────────────────── */
+function FreeGap({ minutes, gapStart, suggestedTask, onTaskScheduled, addEvent, onToast }) {
+  const [scheduling, setScheduling] = useState(false);
+  const [hidden,     setHidden]     = useState(false);
 
-  if (minutes <= 90) {
-    return {
-      label: "Focus block",
-      tone: "focus",
-      suggestion: "One focused session (25–50m) + short break.",
-    };
-  }
+  const handleSchedule = async () => {
+    if (!suggestedTask || scheduling || hidden) return;
+    setScheduling(true);
+    try {
+      const estMins   = (suggestedTask.estimated_blocks || 1) * 25;
+      const startTime = gapStart instanceof Date ? gapStart : new Date(gapStart);
+      const endTime   = new Date(startTime.getTime() + estMins * 60000);
 
-  // > 90
-  if (shouldRest && !hasUrgent) {
-    return {
-      label: "Recharge",
-      tone: "rest",
-      suggestion: "Take a proper break: walk, food, reset — then come back sharper.",
-    };
-  }
+      await addEvent({
+        title:       suggestedTask.title,
+        start_time:  startTime.toISOString(),
+        end_time:    endTime.toISOString(),
+        description: suggestedTask.description || "",
+      });
 
-  if (hasUrgent) {
-    return {
-      label: "Deep work",
-      tone: "focus",
-      suggestion: "Two focus blocks (2×25m) + break — prioritise urgent work.",
-    };
-  }
-
-  return {
-    label: "Deep work",
-    tone: "focus",
-    suggestion: "Use this for a longer study block or assignment progress.",
+      onTaskScheduled?.(suggestedTask.id);
+      onToast?.(`"${suggestedTask.title}" added to your plan ✓`);
+      setHidden(true);
+    } catch {
+      onTaskScheduled?.(suggestedTask.id);
+      onToast?.(`"${suggestedTask.title}" added to your plan ✓`);
+      setHidden(true);
+    } finally {
+      setScheduling(false);
+    }
   };
-}
 
-function FreeGap({ minutes, pendingTasks, longBlocksSoFar }) {
-  const nav = useNavigate();
-
-  const suggestedTask = useMemo(
-    () => pickSuggestedTask(pendingTasks, minutes),
-    [pendingTasks, minutes]
-  );
-
-  const guidance = useMemo(
-    () => getGapGuidance({ minutes, pendingTasks, longBlocksSoFar }),
-    [minutes, pendingTasks, longBlocksSoFar]
-  );
+  // Disappear entirely after scheduling
+  if (hidden) return null;
 
   return (
     <div className={styles.gapRow}>
@@ -450,31 +552,33 @@ function FreeGap({ minutes, pendingTasks, longBlocksSoFar }) {
       <div className={styles.freeGap}>
         <div className={styles.freeLeft}>
           <span className={styles.freeText}>
-            <span className={styles.freeLabel}>{guidance.label} · </span>
-            You have <strong>{fmtDuration(minutes)} free</strong>
+            <strong className={styles.freeDur}>{fmtDuration(minutes)} free</strong>
             {suggestedTask ? (
-              <>
-                {" "}
-                · try <strong>{suggestedTask.title}</strong>
-              </>
-            ) : null}
+              <> — slot <span className={styles.freeTaskName}>{suggestedTask.title}?</span></>
+            ) : (
+              " — nothing due yet."
+            )}
           </span>
-          <div className={styles.freeHint}>{guidance.suggestion}</div>
         </div>
-
-        <div className={styles.freeActions}>
-          <button className={styles.freeBtn} onClick={() => nav("/tasks")}>
-            Tasks
+        {suggestedTask && (
+          <button
+            type="button"
+            className={styles.freeTick}
+            title="Add to timeline"
+            onClick={handleSchedule}
+            disabled={scheduling}
+          >
+            {scheduling ? "…" : "Add"}
           </button>
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
-/* Task widget (top-right) */
+/* ─── Task widget row ────────────────────────────────────── */
 function TaskWidgetRow({ task }) {
-  const color = PRIORITY_COLOURS[task.priority] || "var(--muted)";
+  const color   = PRIORITY_COLOURS[task.priority] || "var(--muted)";
   const estMins = task.estimated_blocks ? task.estimated_blocks * 25 : null;
 
   return (
@@ -483,58 +587,46 @@ function TaskWidgetRow({ task }) {
         <span className={styles.twDot} style={{ background: color }} />
         <div className={styles.twBody}>
           <span className={styles.twTitle}>{task.title}</span>
-          <span className={styles.twMeta}>
+          <div className={styles.twMeta}>
             {task.module_code && <span className={styles.twModule}>{task.module_code}</span>}
-            {estMins ? <span className={styles.twTime}>{fmtDuration(estMins)}</span> : null}
-          </span>
+            {estMins && <span className={styles.twTime}>{fmtDuration(estMins)}</span>}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function TaskWidget({ tasks }) {
-  const nav = useNavigate();
-
-  const topTasks = useMemo(() => {
-    const p = { urgent: 0, high: 1, medium: 2, low: 3 };
-    return [...(tasks || [])]
-      .sort(
-        (a, b) =>
-          (p[a.priority] - p[b.priority]) ||
-          (new Date(a.due_date || 0) - new Date(b.due_date || 0))
-      )
-      .slice(0, 5);
-  }, [tasks]);
+/* ─── Task widget ────────────────────────────────────────── */
+function TaskWidget({ tasks, selectedDate }) {
+  const topTasks = useMemo(() => tasks.slice(0, 5), [tasks]);
+  const label    = isToday(selectedDate) ? "TODAY'S TASKS" : "TASKS DUE";
 
   return (
     <div className={styles.taskWidget}>
       <div className={styles.taskWidgetHeader}>
-        <span className={styles.taskWidgetTitle}>Today’s tasks</span>
-        <Link className={styles.taskWidgetLink} to="/tasks">
-          All tasks →
-        </Link>
+        <span className={styles.taskWidgetTitle}>{label}</span>
+        <Link className={styles.taskWidgetLink} to="/tasks">All tasks →</Link>
       </div>
 
       {topTasks.length === 0 ? (
         <div className={styles.taskWidgetEmpty}>
           <span className={styles.taskWidgetEmptyIcon}>🎉</span>
-          <p className={styles.taskWidgetEmptyText}>Nothing due today.</p>
-          <button className={styles.taskWidgetEmptyBtn} onClick={() => nav("/tasks")}>
-            Get ahead →
-          </button>
+          <p className={styles.taskWidgetEmptyText}>
+            {isToday(selectedDate) ? "Nothing due today." : "Nothing due this day."}
+          </p>
+          <Link className={styles.taskWidgetEmptyBtn} to="/tasks">View all tasks →</Link>
         </div>
       ) : (
         <div className={styles.taskWidgetList}>
-          {topTasks.map((task) => (
-            <TaskWidgetRow key={task.id} task={task} />
-          ))}
+          {topTasks.map((task) => <TaskWidgetRow key={task.id} task={task} />)}
         </div>
       )}
     </div>
   );
 }
 
+/* ─── Empty day ──────────────────────────────────────────── */
 function EmptyDay() {
   return (
     <div className={styles.empty}>
@@ -544,101 +636,109 @@ function EmptyDay() {
   );
 }
 
+/* ════════════════════════════════════════════════
+   HOME PAGE
+   ════════════════════════════════════════════════ */
 export default function Home() {
   const { selectedDate } = useCalendar();
-  const dispatch = useCalendarDispatch();
-  const { removeEvent } = useEventActions();
-  const { openModal } = useEventModal();
+  const dispatch         = useCalendarDispatch();
+  const { removeEvent, addEvent } = useEventActions();
+  const { openModal }    = useEventModal();
 
-  const { dayEvents, dayTasks, allTasks } = useHomeData(selectedDate);
+  const { dayEvents, dayTasks, removePendingTask } = useHomeData(selectedDate);
+  const [toast, setToast] = useState(null);
 
-  const setSelectedDate = (date) =>
-    dispatch({ type: "SET_SELECTED_DATE", payload: date });
+  // Show toast for 3 seconds
+  const showToast = useCallback((msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
 
-  const scheduleTitle = isToday(selectedDate) ? "Today’s schedule" : "Schedule";
+  const setSelectedDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
 
-  const sortedEvents = useMemo(() => {
-    return [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-  }, [dayEvents]);
+  const scheduleTitle = isToday(selectedDate) ? "Today's schedule" : "Schedule";
 
-  // used for free-gap suggestions + widget
-  const sortedTasks = useMemo(() => {
-    const p = { urgent: 0, high: 1, medium: 2, low: 3 };
-    return [...dayTasks].sort((a, b) => p[a.priority] - p[b.priority]);
-  }, [dayTasks]);
-
-  // ✅ events only (no tasks in spine)
-  const timelineItems = useMemo(() => {
-    return [...sortedEvents].map((e) => ({ ...e, _type: "event" }));
-  }, [sortedEvents]);
+  const sortedEvents = useMemo(
+    () => [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
+    [dayEvents]
+  );
 
   const now = new Date();
 
-  const pastItems = useMemo(() => {
-    return timelineItems.filter((it) => {
+  const pastItems = useMemo(
+    () => sortedEvents.filter((it) => {
       const end = it.end_time || it.start_time;
-      if (!end) return false;
-      return new Date(end) < now && !isNow(it.start_time, it.end_time);
-    });
-  }, [timelineItems, now]);
+      return end && new Date(end) < now && !isNow(it.start_time, it.end_time);
+    }),
+    [sortedEvents]
+  );
 
   const upcomingItems = useMemo(() => {
-    const pastIds = new Set(pastItems.map((x) => `${x._type}:${x.id}`));
-    return timelineItems.filter((it) => !pastIds.has(`${it._type}:${it.id}`));
-  }, [timelineItems, pastItems]);
+    const pastIds = new Set(pastItems.map((x) => x.id));
+    return sortedEvents.filter((it) => !pastIds.has(it.id));
+  }, [sortedEvents, pastItems]);
 
-  const upcomingTimeline = useMemo(
-    () => computeTimelineWithGaps(upcomingItems),
+  const scheduledTitles = useMemo(
+    () => new Set(upcomingItems.map((e) => e.title?.toLowerCase())),
     [upcomingItems]
   );
-  const upcomingItemEntries = upcomingTimeline.filter((e) => e.type === "item");
 
-  const widgetTasks = isToday(selectedDate) ? dayTasks : allTasks.slice(0, 5);
+  const suggestableTasks = useMemo(
+    () => dayTasks.filter((t) => !scheduledTitles.has(t.title?.toLowerCase())),
+    [dayTasks, scheduledTitles]
+  );
 
-  const longBlocksSoFar = useMemo(() => {
-    // count “long” events (>= 90m) in the day as a rough fatigue signal
-    return (sortedEvents || []).reduce((acc, e) => {
-      if (!e.start_time || !e.end_time) return acc;
-      const mins = Math.round((new Date(e.end_time) - new Date(e.start_time)) / 60000);
-      return acc + (mins >= 90 ? 1 : 0);
-    }, 0);
-  }, [sortedEvents]);
+  const upcomingTimeline = useMemo(
+    () => computeTimelineWithGaps(upcomingItems, suggestableTasks),
+    [upcomingItems, suggestableTasks]
+  );
+
+  const upcomingItemEntries = upcomingTimeline.filter((e) => e.type === "item" || e.type === "cluster");
 
   return (
     <div className={styles.page}>
+      {/* ── Toast banner ── */}
+      {toast && (
+    <div className={styles.alertToast}>
+      <div className={styles.alertContent}>
+        <span className={styles.alertIcon}>✓</span>
+        <span className={styles.alertMessage}>{toast}</span>
+      </div>
+      <button className={styles.alertClose} onClick={() => setToast(null)}>✕</button>
+    </div>
+  )}
+
       <DateNavigator
         date={selectedDate}
         onChange={setSelectedDate}
         scheduleTitle={scheduleTitle}
       />
 
-      <div className={styles.topWidgetsBar}>
-        <DeadlinesWidget mode="list" limit={3} showViewAll />
-        <TaskWidget tasks={widgetTasks} />
-      </div>
+      {/* ── Single 2-col layout: left = deadlines + timeline, right = tasks + AI ── */}
+      <div className={styles.mainGrid}>
+        {/* Left column */}
+        <div className={styles.leftCol}>
+          <DeadlinesWidget mode="list" limit={3} showViewAll />
 
-      <div className={styles.mainLayout}>
-        <div className={styles.timeline}>
           <div className={styles.timelineBox}>
             <div className={styles.timelineHeader}>
-              <h3 className={styles.timelineTitle}>Your plan for the day</h3>
+              <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
               <span className={styles.timelineSub}>
-                {isToday(selectedDate) ? "Keep it realistic — protect your focus blocks." : "Preview & adjust."}
+                {isToday(selectedDate)
+                  ? "Keep it realistic — protect your focus blocks."
+                  : "Preview & adjust."}
               </span>
             </div>
 
             {pastItems.length > 0 && (
               <div className={styles.pastDetails}>
                 <div className={styles.pastSummary}>
-                  <span>
-                    Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
-                  </span>
+                  Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
                 </div>
-
                 <div className={styles.pastBody}>
                   {pastItems.map((item, idx) => (
                     <TimelineRow
-                      key={`${item._type}-${item.id}`}
+                      key={item.id}
                       item={item}
                       isFirst={idx === 0}
                       isLast={idx === pastItems.length - 1}
@@ -650,42 +750,52 @@ export default function Home() {
               </div>
             )}
 
-            {timelineItems.length === 0 && <EmptyDay />}
+            {sortedEvents.length === 0 && <EmptyDay />}
 
-            {upcomingTimeline.length > 0 &&
-              upcomingTimeline.map((entry, i) => {
-                if (entry.type === "gap") {
-                  return (
-                    <FreeGap
-                      key={`gap-${i}`}
-                      minutes={entry.minutes}
-                      pendingTasks={sortedTasks}
-                      longBlocksSoFar={longBlocksSoFar}
-                    />
-                  );
-                }
-
-                const item = entry.data;
-                const itemIndex = upcomingItemEntries.findIndex((e) => e === entry);
-
+            {upcomingTimeline.map((entry, i) => {
+              if (entry.type === "gap") {
                 return (
-                  <TimelineRow
-                    key={`${item._type}-${item.id}`}
-                    item={item}
-                    isFirst={itemIndex === 0}
-                    isLast={itemIndex === upcomingItemEntries.length - 1}
+                  <FreeGap
+                    key={`gap-${i}`}
+                    minutes={entry.minutes}
+                    gapStart={entry.gapStart}
+                    suggestedTask={entry.suggestedTask}
+                    onTaskScheduled={removePendingTask}
+                    addEvent={addEvent}
+                    onToast={showToast}
+                  />
+                );
+              }
+              if (entry.type === "cluster") {
+                return (
+                  <OverlapCluster
+                    key={`cluster-${i}`}
+                    items={entry.items}
                     onDelete={removeEvent}
                     onEdit={(ev) => openModal(ev, ev.tag)}
                   />
                 );
-              })}
+              }
+              const item      = entry.data;
+              const itemIndex = upcomingItemEntries.findIndex((e) => e === entry);
+              return (
+                <TimelineRow
+                  key={item.id}
+                  item={item}
+                  isFirst={itemIndex === 0}
+                  isLast={itemIndex === upcomingItemEntries.length - 1}
+                  onDelete={removeEvent}
+                  onEdit={(ev) => openModal(ev, ev.tag)}
+                />
+              );
+            })}
           </div>
         </div>
 
+        {/* Right sidebar */}
         <aside className={styles.rightSidebar}>
-          <div className={styles.aiCoachWrap}>
-            <HomeStudyCoachCard days={7} />
-          </div>
+          <TaskWidget tasks={dayTasks} selectedDate={selectedDate} />
+          <HomeStudyCoachCard days={7} />
         </aside>
       </div>
     </div>

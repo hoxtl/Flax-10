@@ -9,28 +9,50 @@ import styles from "./TasksPage.module.css";
 
 function useFilteredTasks(tasks, activeListId, activeFilter) {
     return useMemo(() => {
-        const now = new Date();
+        const now      = new Date();
         const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
-        const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
-        let filtered = activeListId ? tasks.filter(t => t.task_list === activeListId) : tasks;
-        if (activeFilter === "overdue") return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now);
-        if (activeFilter === "today") return filtered.filter(t => t.due_date && new Date(t.due_date) <= todayEnd && new Date(t.due_date) >= new Date().setHours(0,0,0,0));
-        if (activeFilter === "week") return filtered.filter(t => t.due_date && new Date(t.due_date) <= weekEnd);
+        const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
+
+        let filtered = activeListId
+            ? tasks.filter(t => String(t.task_list) === String(activeListId))
+            : tasks;
+
+        if (activeFilter === "overdue")
+            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now);
+        if (activeFilter === "today")
+            return filtered.filter(t => t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd);
+        if (activeFilter === "week")
+            return filtered.filter(t => t.due_date && new Date(t.due_date) <= weekEnd);
         return filtered;
     }, [tasks, activeListId, activeFilter]);
 }
 
 export default function TasksPage() {
-    const { lists, loading: listsLoading, addList, removeList } = useTaskLists();
+    const { lists, loading: listsLoading, addList, removeList, renameList } = useTaskLists();
     const { tasks, addTask, editTask, removeTask, toggleComplete } = useTasks();
-    const [activeListId, setActiveListId] = useState(null);
-    const [activeFilter, setActiveFilter] = useState("all");
-    const [showTaskModal, setShowTaskModal] = useState(false);
-    const [showListModal, setShowListModal] = useState(false);
+    const [activeListId,    setActiveListId]    = useState(null);
+    const [activeFilter,    setActiveFilter]    = useState("all");
+    const [showTaskModal,   setShowTaskModal]   = useState(false);
+    const [showListModal,   setShowListModal]   = useState(false);
+    const [archivedLists,   setArchivedLists]   = useState([]);
 
     const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter);
 
-    if (listsLoading) return <div className={styles.loading}>Loading...</div>;
+    const handleDeleteList = (listId) => {
+        const list = lists.find(l => l.id === listId);
+        if (list) setArchivedLists(prev => [...prev, list]);
+        removeList(listId);
+        if (activeListId === listId) { setActiveListId(null); setActiveFilter("all"); }
+    };
+
+    const handleUnarchiveList = (listId) => {
+        const list = archivedLists.find(l => l.id === listId);
+        if (!list) return;
+        setArchivedLists(prev => prev.filter(l => l.id !== listId));
+        addList({ name: list.name, icon: list.icon, color: list.color });
+    };
+
+    if (listsLoading) return <div className={styles.loading}>Loading…</div>;
 
     return (
         <div className={styles.page}>
@@ -42,16 +64,18 @@ export default function TasksPage() {
                 onSelectList={setActiveListId}
                 onSelectFilter={setActiveFilter}
                 onNewList={() => setShowListModal(true)}
-                onDeleteList={removeList}
-                onAddTask={() => setShowTaskModal(true)}
+                onDeleteList={handleDeleteList}
+                onRenameList={renameList}
+                onUnarchiveList={handleUnarchiveList}
+                archivedLists={archivedLists}
             />
             <TaskFeed
                 tasks={filteredTasks}
+                lists={lists}
                 activeFilter={activeFilter}
                 onToggleComplete={toggleComplete}
                 onDeleteTask={removeTask}
                 onEditTask={editTask}
-                onAddTask={() => setShowTaskModal(true)}
             />
             {showTaskModal && (
                 <CreateTaskModal
