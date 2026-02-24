@@ -29,7 +29,7 @@ function sortTasks(tasks, sortBy) {
     });
 }
 
-function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, defaultCollapsed = false }) {
+function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, defaultCollapsed = false, hideDueBadge = false }) {
     const [collapsed, setCollapsed] = useState(defaultCollapsed);
     const sorted = useMemo(() => sortTasks(tasks, sortBy), [tasks, sortBy]);
 
@@ -60,6 +60,7 @@ function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDel
                                 onToggle={() => onToggleComplete(task.id)}
                                 onDelete={() => onDeleteTask(task.id)}
                                 onEdit={data => onEditTask(task.id, data)}
+                                hideDueBadge={hideDueBadge}
                             />
                         );
                     })}
@@ -167,8 +168,8 @@ export default function TaskFeed({
                     </div>
                 )}
 
-                {overdue.length > 0 && <Section title="Overdue" emoji="⚠️" tasks={overdue} {...sectionProps} />}
-                <Section title="Today" emoji="📅" tasks={today} {...sectionProps} />
+                {overdue.length > 0 && <Section title="Overdue" emoji="⚠️" tasks={overdue} hideDueBadge {...sectionProps} />}
+                <Section title="Today" emoji="📅" tasks={today} hideDueBadge {...sectionProps} />
                 <Section title="This week" emoji="📆" tasks={thisWeek} {...sectionProps} />
                 <Section title="Later" emoji="🗓️" tasks={later} {...sectionProps} defaultCollapsed={later.length > 8} />
 
