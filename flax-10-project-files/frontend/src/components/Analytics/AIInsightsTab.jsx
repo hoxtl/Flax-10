@@ -5,44 +5,22 @@ import remarkGfm from "remark-gfm";
 import analyticsService from "../../api/analyticsService";
 import styles from "./AIInsightsTab.module.css";
 
-export function InsightsPanel({
-  insights,
-  loading,
-  onGenerate,
-  period,
-  compact = false,
-}) {
+export function InsightsPanel({ insights, loading, onGenerate, period, compact = false }) {
   return (
     <div className={styles.panel}>
-      {/* Full header on Analytics page */}
+      {/* On Home we already show a CTA header, so hide this */}
       {!compact && (
         <div className={styles.panelHeader}>
           <div>
             <h3 className={styles.panelTitle}>Study Analysis</h3>
             <p className={styles.panelSub}>Last {period} days · AI generated</p>
           </div>
-
           <button
             className={styles.generateBtn}
             onClick={onGenerate}
             disabled={loading}
-            type="button"
           >
             {loading ? <span className={styles.btnSpinner} /> : <>✦ Generate</>}
-          </button>
-        </div>
-      )}
-
-      {/* Compact header on Home (only the button; CTA lives outside this panel) */}
-      {compact && (
-        <div className={styles.panelHeaderCompact}>
-          <button
-            className={styles.generateBtn}
-            onClick={onGenerate}
-            disabled={loading}
-            type="button"
-          >
-            {loading ? <span className={styles.btnSpinner} /> : <>Generate ✦</>}
           </button>
         </div>
       )}
@@ -74,28 +52,14 @@ export function InsightsPanel({
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    h1: ({ children }) => (
-                      <h1 className={styles.mdH1}>{children}</h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className={styles.mdH2}>{children}</h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className={styles.mdH3}>{children}</h3>
-                    ),
+                    h1: ({ children }) => <h1 className={styles.mdH1}>{children}</h1>,
+                    h2: ({ children }) => <h2 className={styles.mdH2}>{children}</h2>,
+                    h3: ({ children }) => <h3 className={styles.mdH3}>{children}</h3>,
                     p: ({ children }) => <p className={styles.mdP}>{children}</p>,
-                    li: ({ children }) => (
-                      <li className={styles.mdLi}>{children}</li>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className={styles.mdUl}>{children}</ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className={styles.mdOl}>{children}</ol>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className={styles.mdStrong}>{children}</strong>
-                    ),
+                    li: ({ children }) => <li className={styles.mdLi}>{children}</li>,
+                    ul: ({ children }) => <ul className={styles.mdUl}>{children}</ul>,
+                    ol: ({ children }) => <ol className={styles.mdOl}>{children}</ol>,
+                    strong: ({ children }) => <strong className={styles.mdStrong}>{children}</strong>,
                   }}
                 >
                   {insights}
@@ -104,7 +68,8 @@ export function InsightsPanel({
             </motion.div>
           )}
 
-          {!loading && !insights && (
+          {/* On Home, don’t show the duplicate “Ready to analyse” paragraph */}
+          {!loading && !insights && !compact && (
             <motion.div
               key="empty"
               className={styles.centeredState}
@@ -113,19 +78,25 @@ export function InsightsPanel({
             >
               <div className={styles.emptyIcon}>🤖</div>
               <p className={styles.emptyTitle}>Ready to analyse</p>
+              <p className={styles.emptyText}>
+                Get a personalised breakdown of your study patterns, peak hours, and a recommended schedule.
+              </p>
+            </motion.div>
+          )}
 
-              {!compact && (
-                <p className={styles.emptyText}>
-                  Get a personalised breakdown of your study patterns, peak hours,
-                  and a recommended schedule.
-                </p>
-              )}
-
-              {compact && (
-                <p className={styles.emptyText}>
-                  Tap <strong>Generate</strong> to get a quick plan.
-                </p>
-              )}
+          {/* On Home in compact mode, keep it clean */}
+          {!loading && !insights && compact && (
+            <motion.div
+              key="empty-compact"
+              className={styles.centeredState}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <div className={styles.emptyIcon}>🤖</div>
+              <p className={styles.emptyTitle}>Generate your plan</p>
+              <p className={styles.emptyText}>
+                Tap “Generate” to get a personalised schedule suggestion.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -174,10 +145,7 @@ export function ChatPanel({ period }) {
 
     try {
       const res = await analyticsService.aiChat(updated, period);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: res.reply },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
     } catch {
       setError("Could not get a response. Please try again.");
     } finally {
@@ -199,13 +167,8 @@ export function ChatPanel({ period }) {
           <h3 className={styles.panelTitle}>Study Coach</h3>
           <p className={styles.panelSub}>Ask anything about your habits</p>
         </div>
-
         {messages.length > 0 && (
-          <button
-            className={styles.clearBtn}
-            onClick={() => setMessages([])}
-            type="button"
-          >
+          <button className={styles.clearBtn} onClick={() => setMessages([])}>
             Clear
           </button>
         )}
@@ -224,14 +187,12 @@ export function ChatPanel({ period }) {
               <p className={styles.emptyText}>
                 I have access to your real study data. Ask me anything.
               </p>
-
               <div className={styles.suggestions}>
                 {SUGGESTIONS.map((s, i) => (
                   <button
                     key={`sug-${i}`}
                     className={styles.suggestion}
                     onClick={() => send(s)}
-                    type="button"
                   >
                     {s}
                   </button>
@@ -250,10 +211,7 @@ export function ChatPanel({ period }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
-              {msg.role === "assistant" && (
-                <div className={styles.avatar}>✦</div>
-              )}
-
+              {msg.role === "assistant" && <div className={styles.avatar}>✦</div>}
               <div
                 className={`${styles.bubble} ${
                   msg.role === "user" ? styles.bubbleUser : styles.bubbleAI
@@ -266,30 +224,14 @@ export function ChatPanel({ period }) {
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        h1: ({ children }) => (
-                          <h1 className={styles.mdH1}>{children}</h1>
-                        ),
-                        h2: ({ children }) => (
-                          <h2 className={styles.mdH2}>{children}</h2>
-                        ),
-                        h3: ({ children }) => (
-                          <h3 className={styles.mdH3}>{children}</h3>
-                        ),
-                        p: ({ children }) => (
-                          <p className={styles.mdP}>{children}</p>
-                        ),
-                        li: ({ children }) => (
-                          <li className={styles.mdLi}>{children}</li>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className={styles.mdUl}>{children}</ul>
-                        ),
-                        ol: ({ children }) => (
-                          <ol className={styles.mdOl}>{children}</ol>
-                        ),
-                        strong: ({ children }) => (
-                          <strong className={styles.mdStrong}>{children}</strong>
-                        ),
+                        h1: ({ children }) => <h1 className={styles.mdH1}>{children}</h1>,
+                        h2: ({ children }) => <h2 className={styles.mdH2}>{children}</h2>,
+                        h3: ({ children }) => <h3 className={styles.mdH3}>{children}</h3>,
+                        p: ({ children }) => <p className={styles.mdP}>{children}</p>,
+                        li: ({ children }) => <li className={styles.mdLi}>{children}</li>,
+                        ul: ({ children }) => <ul className={styles.mdUl}>{children}</ul>,
+                        ol: ({ children }) => <ol className={styles.mdOl}>{children}</ol>,
+                        strong: ({ children }) => <strong className={styles.mdStrong}>{children}</strong>,
                       }}
                     >
                       {msg.content}
@@ -331,7 +273,6 @@ export function ChatPanel({ period }) {
           className={styles.sendBtn}
           onClick={() => send()}
           disabled={loading || !input.trim()}
-          type="button"
         >
           ↑
         </button>
