@@ -1,20 +1,22 @@
+// Home.jsx
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import styles from "./Home.module.css";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
-import analyticsService from "../../api/analyticsService";
 import {
   useCalendar,
   useCalendarDispatch,
   useEventModal,
 } from "../../context/CalendarContext";
-import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
+import {
+  useCalendarEvents,
+  useEventActions,
+} from "../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks, updateTask } from "../../api/taskService";
 import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
 import HomeStudyCoachCard from "../../components/Home/HomeStudyCoachCard";
-
 
 const PRIORITY_COLOURS = {
   urgent: "var(--danger)",
@@ -23,7 +25,6 @@ const PRIORITY_COLOURS = {
   low: "var(--muted)",
 };
 
-/** Format a datetime string as HH:MM (GB). */
 function formatTime(dateStr) {
   if (!dateStr) return "";
   return new Date(dateStr).toLocaleTimeString("en-GB", {
@@ -32,7 +33,6 @@ function formatTime(dateStr) {
   });
 }
 
-/** Convert minutes to a human duration label. */
 function fmtDuration(mins) {
   if (mins == null) return "";
   if (mins < 60) return `${mins}m`;
@@ -41,14 +41,12 @@ function fmtDuration(mins) {
   return m ? `${h}h ${m}m` : `${h}h`;
 }
 
-/** Returns true if `now` is between start and end (inclusive). */
 function isNow(startStr, endStr) {
   if (!startStr || !endStr) return false;
   const now = new Date();
   return new Date(startStr) <= now && now <= new Date(endStr);
 }
 
-/** Returns true if endStr is before now. */
 function isPast(endStr) {
   if (!endStr) return false;
   return new Date(endStr) < new Date();
@@ -93,15 +91,16 @@ function resolveEventIcon(event, tagIcon) {
   return "📅";
 }
 
-/** Inserts “gap” entries between items when the free time is >= 30 mins. */
 function computeTimelineWithGaps(sortedItems) {
   const result = [];
   for (let i = 0; i < sortedItems.length; i++) {
     result.push({ type: "item", data: sortedItems[i] });
 
     if (i < sortedItems.length - 1) {
-      const curEnd = new Date(sortedItems[i].end_time || sortedItems[i].due_date || sortedItems[i].start_time);
-      const nextStart = new Date(sortedItems[i + 1].start_time || sortedItems[i + 1].due_date);
+      const curEnd = new Date(
+        sortedItems[i].end_time || sortedItems[i].start_time
+      );
+      const nextStart = new Date(sortedItems[i + 1].start_time);
       const gapMins = Math.round((nextStart - curEnd) / 60000);
       if (gapMins >= 30) result.push({ type: "gap", minutes: gapMins });
     }
@@ -109,7 +108,6 @@ function computeTimelineWithGaps(sortedItems) {
   return result;
 }
 
-/** Loads events (context) + tasks (API) and derives date-specific slices. */
 function useHomeData(selectedDate) {
   const { events } = useCalendar();
   const [tasks, setTasks] = useState([]);
@@ -117,7 +115,7 @@ function useHomeData(selectedDate) {
 
   useEffect(() => {
     fetchTasks()
-      .then((data) => setTasks(data.filter((t) => !t.completed)))
+      .then((data) => setTasks((data || []).filter((t) => !t.completed)))
       .catch(() => {});
   }, []);
 
@@ -151,13 +149,12 @@ function useHomeData(selectedDate) {
 }
 
 function DetailOverlay({ item, icon, accentColor, onClose }) {
-  const isTask = item._type === "task";
-  const start = new Date(item.start_time || item.due_date);
+  const start = new Date(item.start_time);
   const end = item.end_time ? new Date(item.end_time) : null;
   const durationMins = end ? Math.round((end - start) / 60000) : null;
 
-  const active = !isTask && isNow(item.start_time, item.end_time);
-  const lect = !isTask && isLecture(item);
+  const active = isNow(item.start_time, item.end_time);
+  const lect = isLecture(item);
   const modCode = lect
     ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description))
     : null;
@@ -173,9 +170,8 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
           <div className={styles.detailTopText}>
             <div className={styles.detailMeta}>
               {active && <span className={styles.nowPill}>Now</span>}
-              {isTask && <span className={styles.taskPill}>Task</span>}
               <span className={styles.detailTime}>
-                {formatTime(item.start_time || item.due_date)}
+                {formatTime(item.start_time)}
                 {end ? ` – ${formatTime(item.end_time)}` : ""}
               </span>
               {durationMins > 0 && <span className={styles.detailDur}>{fmtDuration(durationMins)}</span>}
@@ -211,29 +207,6 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
             <div className={styles.detailRow}>
               <span className={styles.detailRowLabel}>Where</span>
               <span className={styles.detailRowText}>{item.location}</span>
-            </div>
-          )}
-
-          {isTask && item.priority && (
-            <div className={styles.detailRow}>
-              <span className={styles.detailRowLabel}>Priority</span>
-              <span
-                className={styles.detailRowText}
-                style={{
-                  color: PRIORITY_COLOURS[item.priority],
-                  fontWeight: 700,
-                  textTransform: "capitalize",
-                }}
-              >
-                {item.priority}
-              </span>
-            </div>
-          )}
-
-          {isTask && item.module_code && (
-            <div className={styles.detailRow}>
-              <span className={styles.detailRowLabel}>Module</span>
-              <span className={styles.detailRowText}>{item.module_code}</span>
             </div>
           )}
 
@@ -282,40 +255,36 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
   );
 }
 
-function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
+/** Events-only timeline row (no tasks in spine; no location/details shown on the card) */
+function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
   const { getTag } = useTags();
   const [showDetail, setShowDetail] = useState(false);
   const [ctxMenu, setCtxMenu] = useState(null);
 
-  const isTask = item._type === "task";
   const theme =
-    (!isTask && getTag(item.tag)) || {
-      color: isTask ? PRIORITY_COLOURS[item.priority] : "#94A3B8",
+    (getTag(item.tag) || {
+      color: "#94A3B8",
       icon: "📅",
-    };
+    });
 
-  const icon = isTask ? "🎯" : resolveEventIcon(item, theme.icon);
-  const active = !isTask && isNow(item.start_time, item.end_time);
-  const past = !active && isPast(item.end_time || item.due_date);
-  const lect = !isTask && isLecture(item);
+  const icon = resolveEventIcon(item, theme.icon);
+  const active = isNow(item.start_time, item.end_time);
+  const past = !active && isPast(item.end_time);
+  const lect = isLecture(item);
 
-  const accentColor = isTask ? PRIORITY_COLOURS[item.priority] : theme.color;
+  const accentColor = theme.color;
 
-  const startTime = formatTime(item.start_time || item.due_date);
-  const endTime = !isTask ? formatTime(item.end_time) : null;
+  const startTime = formatTime(item.start_time);
+  const endTime = formatTime(item.end_time);
 
   const durationMins =
-    !isTask && item.end_time
-      ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
-      : null;
+    item.end_time ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000) : null;
 
   const modCode = lect
     ? item.module_code ||
       extractModuleCode(item.title) ||
       extractModuleCode(item.description)
     : null;
-
-  const modName = lect ? item.description : null;
 
   const handleContextMenu = useCallback((e) => {
     e.preventDefault();
@@ -324,7 +293,7 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
 
   return (
     <>
-      <div className={`${styles.timelineRow} ${active ? styles.rowActive : ""} ${past ? styles.rowPast : ""}`}>
+      <div className={`${styles.timelineRow} ${past ? styles.rowPast : ""}`}>
         <div className={styles.spine}>
           <div className={styles.spineTime}>{startTime}</div>
           <div className={styles.spineTrack}>
@@ -335,7 +304,7 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
         </div>
 
         <div
-          className={`${styles.card} ${active ? styles.cardActive : ""} ${past ? styles.cardPast : ""}`}
+          className={`${styles.card} ${past ? styles.cardPast : ""} ${active ? styles.cardActive : ""}`}
           style={active ? { borderColor: accentColor } : {}}
           onClick={() => setShowDetail(true)}
           onContextMenu={handleContextMenu}
@@ -347,49 +316,21 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
 
             <div className={styles.cardBody}>
               <div className={styles.cardMeta}>
-                {endTime && <span className={styles.cardTime}>{startTime}–{endTime}</span>}
+                <span className={styles.cardTime}>{startTime}–{endTime}</span>
                 {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
                 {active && <span className={styles.nowBadge}>Now</span>}
-
-                {isTask && item.priority && (
-                  <span className={styles.priorityBadge} style={{ color: PRIORITY_COLOURS[item.priority] }}>
-                    {item.priority}
-                  </span>
-                )}
               </div>
 
               <span className={styles.cardTitle}>{item.title}</span>
 
-              {lect && (modCode || modName) && (
+              {/* keep it minimal: module code only (no location/description on the card) */}
+              {lect && modCode && (
                 <span className={styles.cardSub}>
-                  {modCode && <strong>{modCode}</strong>}
-                  {modCode && modName && " · "}
-                  {modName}
-                </span>
-              )}
-
-              {isTask && item.module_code && <span className={styles.cardSub}>{item.module_code}</span>}
-
-              {lect && item.location && (
-                <span className={styles.cardLocation}>
-                  <span className={styles.locationText}>{item.location.split(",")[0]}</span>
+                  <strong>{modCode}</strong>
                 </span>
               )}
             </div>
           </div>
-
-          {isTask && (
-            <button
-              className={styles.checkBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggle?.(item.id);
-              }}
-              title="Mark complete"
-            >
-              <span className={styles.checkInner} />
-            </button>
-          )}
         </div>
       </div>
 
@@ -416,18 +357,84 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, onToggle }) {
   );
 }
 
-function FreeGap({ minutes, pendingTasks }) {
+function pickSuggestedTask(pendingTasks, minutes) {
+  if (!pendingTasks?.length) return null;
+
+  const p = { urgent: 0, high: 1, medium: 2, low: 3 };
+  const sorted = [...pendingTasks].sort(
+    (a, b) =>
+      (p[a.priority] - p[b.priority]) ||
+      (new Date(a.due_date || 0) - new Date(b.due_date || 0))
+  );
+
+  // pick first that fits, otherwise top priority anyway
+  const fit = sorted.find((t) => {
+    const estMins = (t.estimated_blocks || 0) * 25;
+    return estMins === 0 || estMins <= minutes;
+  });
+
+  return fit || sorted[0] || null;
+}
+
+function getGapGuidance({ minutes, pendingTasks, longBlocksSoFar }) {
+  const hasUrgent =
+    (pendingTasks || []).some((t) => (t.priority || "").toLowerCase() === "urgent");
+
+  // “multiple long blocks today” → suggest rest for long gaps
+  const shouldRest = longBlocksSoFar >= 2;
+
+  if (minutes < 30) {
+    return {
+      label: "Quick admin",
+      tone: "neutral",
+      suggestion: "Do a tiny win: plan next block, reply to 1 email, tidy notes.",
+    };
+  }
+
+  if (minutes <= 90) {
+    return {
+      label: "Focus block",
+      tone: "focus",
+      suggestion: "One focused session (25–50m) + short break.",
+    };
+  }
+
+  // > 90
+  if (shouldRest && !hasUrgent) {
+    return {
+      label: "Recharge",
+      tone: "rest",
+      suggestion: "Take a proper break: walk, food, reset — then come back sharper.",
+    };
+  }
+
+  if (hasUrgent) {
+    return {
+      label: "Deep work",
+      tone: "focus",
+      suggestion: "Two focus blocks (2×25m) + break — prioritise urgent work.",
+    };
+  }
+
+  return {
+    label: "Deep work",
+    tone: "focus",
+    suggestion: "Use this for a longer study block or assignment progress.",
+  };
+}
+
+function FreeGap({ minutes, pendingTasks, longBlocksSoFar }) {
   const nav = useNavigate();
 
-  const suggestedTask = useMemo(() => {
-    if (!pendingTasks?.length) return null;
-    return (
-      pendingTasks.find((t) => {
-        const estMins = (t.estimated_blocks || 0) * 25;
-        return estMins === 0 || estMins <= minutes;
-      }) || null
-    );
-  }, [pendingTasks, minutes]);
+  const suggestedTask = useMemo(
+    () => pickSuggestedTask(pendingTasks, minutes),
+    [pendingTasks, minutes]
+  );
+
+  const guidance = useMemo(
+    () => getGapGuidance({ minutes, pendingTasks, longBlocksSoFar }),
+    [minutes, pendingTasks, longBlocksSoFar]
+  );
 
   return (
     <div className={styles.gapRow}>
@@ -443,16 +450,16 @@ function FreeGap({ minutes, pendingTasks }) {
       <div className={styles.freeGap}>
         <div className={styles.freeLeft}>
           <span className={styles.freeText}>
+            <span className={styles.freeLabel}>{guidance.label} · </span>
             You have <strong>{fmtDuration(minutes)} free</strong>
             {suggestedTask ? (
               <>
                 {" "}
-                · slot in <strong>{suggestedTask.title}?</strong>
+                · try <strong>{suggestedTask.title}</strong>
               </>
-            ) : (
-              " · slot anything?"
-            )}
+            ) : null}
           </span>
+          <div className={styles.freeHint}>{guidance.suggestion}</div>
         </div>
 
         <div className={styles.freeActions}>
@@ -465,83 +472,7 @@ function FreeGap({ minutes, pendingTasks }) {
   );
 }
 
-function MiniStat({ label, value }) {
-  return (
-    <div className={styles.miniStat}>
-      <span className={styles.miniStatLabel}>{label}</span>
-      <span className={styles.miniStatValue}>{value}</span>
-    </div>
-  );
-}
-
-function HomeStatsPills({ summary, progress }) {
-  const streak = summary?.current_streak ?? summary?.streak ?? 0;
-
-  const todayMins =
-    summary?.today_minutes ??
-    summary?.today_work_minutes ??
-    summary?.today_total_minutes ??
-    null;
-
-  const adherence =
-    progress?.adherence_percentage ??
-    progress?.adherence ??
-    null;
-
-  const peak =
-    progress?.peak_hour ??
-    progress?.peak_hours?.[0] ??
-    null;
-
-  const todayLabel = todayMins == null ? "—" : fmtDuration(todayMins);
-  const adherenceLabel = adherence == null ? "—" : `${Math.round(adherence)}%`;
-  const peakLabel = peak == null ? "—" : formatPeakHour(peak);
-
-  return (
-    <div className={styles.pillsRow}>
-      <MiniStat label="Today" value={todayLabel} />
-      <MiniStat label="Streak" value={`${streak}d`} />
-      <MiniStat label="Adherence" value={adherenceLabel} />
-      <MiniStat label="Peak" value={peakLabel} />
-      <span className={styles.streakHint}>{streakHint(streak)}</span>
-    </div>
-  );
-}
-
-function formatPeakHour(v) {
-  // Accepts "21", 21, "21:00", etc.
-  const n = typeof v === "number" ? v : parseInt(String(v).slice(0, 2), 10);
-  if (Number.isNaN(n)) return "—";
-  const hour = ((n % 24) + 24) % 24;
-  return `${String(hour).padStart(2, "0")}:00`;
-}
-
-function streakHint(streak) {
-  if (!streak) return "⚠️ Restart your streak today";
-  if (streak >= 3) return `🔥 ${streak} day streak — keep it going`;
-  return `✅ ${streak} day streak`;
-}
-
-function StatsBar() {
-  const nav = useNavigate();
-  const [summary, setSummary] = useState(null);
-  const [progress, setProgress] = useState(null);
-
-  useEffect(() => {
-    analyticsService.getSummary(7).then(setSummary).catch(() => {});
-    analyticsService.getProgress(7).then(setProgress).catch(() => {});
-  }, []);
-
-  return (
-    <div className={styles.statsBar}>
-      <HomeStatsPills summary={summary} progress={progress} />
-      <button className={styles.statLink} onClick={() => nav("/analytics")}>
-        Full analytics →
-      </button>
-    </div>
-  );
-}
-
+/* Task widget (top-right) */
 function TaskWidgetRow({ task }) {
   const color = PRIORITY_COLOURS[task.priority] || "var(--muted)";
   const estMins = task.estimated_blocks ? task.estimated_blocks * 25 : null;
@@ -568,17 +499,21 @@ function TaskWidget({ tasks }) {
   const topTasks = useMemo(() => {
     const p = { urgent: 0, high: 1, medium: 2, low: 3 };
     return [...(tasks || [])]
-      .sort((a, b) => (p[a.priority] - p[b.priority]) || (new Date(a.due_date || 0) - new Date(b.due_date || 0)))
+      .sort(
+        (a, b) =>
+          (p[a.priority] - p[b.priority]) ||
+          (new Date(a.due_date || 0) - new Date(b.due_date || 0))
+      )
       .slice(0, 5);
   }, [tasks]);
 
   return (
     <div className={styles.taskWidget}>
       <div className={styles.taskWidgetHeader}>
-        <span className={styles.taskWidgetTitle}>Today's tasks</span>
-        <button className={styles.taskWidgetLink} onClick={() => nav("/tasks")}>
+        <span className={styles.taskWidgetTitle}>Today’s tasks</span>
+        <Link className={styles.taskWidgetLink} to="/tasks">
           All tasks →
-        </button>
+        </Link>
       </div>
 
       {topTasks.length === 0 ? (
@@ -615,54 +550,59 @@ export default function Home() {
   const { removeEvent } = useEventActions();
   const { openModal } = useEventModal();
 
-  const { dayEvents, dayTasks, allTasks, toggleTask } = useHomeData(selectedDate);
+  const { dayEvents, dayTasks, allTasks } = useHomeData(selectedDate);
 
   const setSelectedDate = (date) =>
     dispatch({ type: "SET_SELECTED_DATE", payload: date });
 
-  const scheduleTitle = isToday(selectedDate) ? "Today's schedule" : "Schedule";
+  const scheduleTitle = isToday(selectedDate) ? "Today’s schedule" : "Schedule";
 
   const sortedEvents = useMemo(() => {
     return [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
   }, [dayEvents]);
 
+  // used for free-gap suggestions + widget
   const sortedTasks = useMemo(() => {
     const p = { urgent: 0, high: 1, medium: 2, low: 3 };
     return [...dayTasks].sort((a, b) => p[a.priority] - p[b.priority]);
   }, [dayTasks]);
 
+  // ✅ events only (no tasks in spine)
   const timelineItems = useMemo(() => {
-    const events = sortedEvents.map((e) => ({ ...e, _type: "event" }));
-    const tasks = sortedTasks.map((t) => ({ ...t, _type: "task" }));
-    const merged = [...events, ...tasks];
-
-    return merged.sort((a, b) => {
-      const aTime = new Date(a.start_time || a.due_date || 0);
-      const bTime = new Date(b.start_time || b.due_date || 0);
-      return aTime - bTime;
-    });
-  }, [sortedEvents, sortedTasks]);
+    return [...sortedEvents].map((e) => ({ ...e, _type: "event" }));
+  }, [sortedEvents]);
 
   const now = new Date();
 
   const pastItems = useMemo(() => {
     return timelineItems.filter((it) => {
-      const end = it.end_time || it.due_date || it.start_time;
+      const end = it.end_time || it.start_time;
       if (!end) return false;
       return new Date(end) < now && !isNow(it.start_time, it.end_time);
     });
   }, [timelineItems, now]);
 
   const upcomingItems = useMemo(() => {
-    return timelineItems.filter((it) => !pastItems.includes(it));
+    const pastIds = new Set(pastItems.map((x) => `${x._type}:${x.id}`));
+    return timelineItems.filter((it) => !pastIds.has(`${it._type}:${it.id}`));
   }, [timelineItems, pastItems]);
 
-  const upcomingTimeline = useMemo(() => computeTimelineWithGaps(upcomingItems), [upcomingItems]);
+  const upcomingTimeline = useMemo(
+    () => computeTimelineWithGaps(upcomingItems),
+    [upcomingItems]
+  );
   const upcomingItemEntries = upcomingTimeline.filter((e) => e.type === "item");
 
-  const hasUpcoming = upcomingItems.length > 0;
-
   const widgetTasks = isToday(selectedDate) ? dayTasks : allTasks.slice(0, 5);
+
+  const longBlocksSoFar = useMemo(() => {
+    // count “long” events (>= 90m) in the day as a rough fatigue signal
+    return (sortedEvents || []).reduce((acc, e) => {
+      if (!e.start_time || !e.end_time) return acc;
+      const mins = Math.round((new Date(e.end_time) - new Date(e.start_time)) / 60000);
+      return acc + (mins >= 90 ? 1 : 0);
+    }, 0);
+  }, [sortedEvents]);
 
   return (
     <div className={styles.page}>
@@ -672,72 +612,81 @@ export default function Home() {
         scheduleTitle={scheduleTitle}
       />
 
-      <StatsBar />
+      <div className={styles.topWidgetsBar}>
+        <DeadlinesWidget mode="list" limit={3} showViewAll />
+        <TaskWidget tasks={widgetTasks} />
+      </div>
 
       <div className={styles.mainLayout}>
         <div className={styles.timeline}>
+          <div className={styles.timelineBox}>
+            <div className={styles.timelineHeader}>
+              <h3 className={styles.timelineTitle}>Your plan for the day</h3>
+              <span className={styles.timelineSub}>
+                {isToday(selectedDate) ? "Keep it realistic — protect your focus blocks." : "Preview & adjust."}
+              </span>
+            </div>
 
-          {pastItems.length > 0 && (
-            <div className={styles.pastDetails}>
-              <div className={styles.pastSummary}>
-                <span>
-                  Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
-                </span>
+            {pastItems.length > 0 && (
+              <div className={styles.pastDetails}>
+                <div className={styles.pastSummary}>
+                  <span>
+                    Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
+                  </span>
+                </div>
+
+                <div className={styles.pastBody}>
+                  {pastItems.map((item, idx) => (
+                    <TimelineRow
+                      key={`${item._type}-${item.id}`}
+                      item={item}
+                      isFirst={idx === 0}
+                      isLast={idx === pastItems.length - 1}
+                      onDelete={removeEvent}
+                      onEdit={(ev) => openModal(ev, ev.tag)}
+                    />
+                  ))}
+                </div>
               </div>
+            )}
 
-              <div className={styles.pastBody}>
-                {pastItems.map((item, idx) => (
+            {timelineItems.length === 0 && <EmptyDay />}
+
+            {upcomingTimeline.length > 0 &&
+              upcomingTimeline.map((entry, i) => {
+                if (entry.type === "gap") {
+                  return (
+                    <FreeGap
+                      key={`gap-${i}`}
+                      minutes={entry.minutes}
+                      pendingTasks={sortedTasks}
+                      longBlocksSoFar={longBlocksSoFar}
+                    />
+                  );
+                }
+
+                const item = entry.data;
+                const itemIndex = upcomingItemEntries.findIndex((e) => e === entry);
+
+                return (
                   <TimelineRow
                     key={`${item._type}-${item.id}`}
                     item={item}
-                    isFirst={idx === 0}
-                    isLast={idx === pastItems.length - 1}
+                    isFirst={itemIndex === 0}
+                    isLast={itemIndex === upcomingItemEntries.length - 1}
                     onDelete={removeEvent}
                     onEdit={(ev) => openModal(ev, ev.tag)}
-                    onToggle={toggleTask}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {timelineItems.length === 0 && <EmptyDay />}
-
-          {hasUpcoming &&
-            upcomingTimeline.map((entry, i) => {
-              if (entry.type === "gap") {
-                return (
-                  <FreeGap
-                    key={`gap-${i}`}
-                    minutes={entry.minutes}
-                    pendingTasks={sortedTasks}
                   />
                 );
-              }
-
-              const item = entry.data;
-              const itemIndex = upcomingItemEntries.findIndex((e) => e === entry);
-
-              return (
-                <TimelineRow
-                  key={`${item._type}-${item.id}`}
-                  item={item}
-                  isFirst={itemIndex === 0}
-                  isLast={itemIndex === upcomingItemEntries.length - 1}
-                  onDelete={removeEvent}
-                  onEdit={(ev) => openModal(ev, ev.tag)}
-                  onToggle={toggleTask}
-                />
-              );
-            })}
+              })}
+          </div>
         </div>
 
         <aside className={styles.rightSidebar}>
-          <TaskWidget tasks={widgetTasks} />
-          <DeadlinesWidget mode="next" limit={6} showViewAll />
-          <HomeStudyCoachCard />
+          <div className={styles.aiCoachWrap}>
+            <HomeStudyCoachCard days={7} />
+          </div>
         </aside>
-
       </div>
     </div>
   );
