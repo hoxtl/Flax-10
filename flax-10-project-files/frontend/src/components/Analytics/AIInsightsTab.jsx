@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import analyticsService from '../../api/analyticsService';
-import AnimatedList from './AnimatedList';
 import styles from './AIInsightsTab.module.css';
 
 export function InsightsPanel({ insights, loading, onGenerate, period }) {

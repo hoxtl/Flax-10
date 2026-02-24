@@ -3,30 +3,30 @@
     border: 1px solid var(--border);
     border-radius: 14px;
     overflow: hidden;
-}
-
-.top {
+  }
+  
+  .top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 10px;
     padding: 0.9rem 1rem 0.75rem;
     border-bottom: 1px solid var(--border);
-}
-
-.title {
+  }
+  
+  .title {
     font-size: 0.8rem;
     font-weight: 850;
     color: var(--text);
-}
-
-.sub {
+  }
+  
+  .sub {
     font-size: 0.7rem;
     color: var(--muted);
     margin-top: 0.1rem;
-}
-
-.linkBtn {
+  }
+  
+  .linkBtn {
     font-size: 0.72rem;
     color: var(--primary);
     background: none;
@@ -36,34 +36,35 @@
     padding: 0.2rem 0.4rem;
     border-radius: 6px;
     white-space: nowrap;
-}
-
-.linkBtn:hover {
+  }
+  
+  .linkBtn:hover {
     background: color-mix(in srgb, var(--primary) 10%, transparent);
-}
-
-.body {
+  }
+  
+  .body {
     padding: 0.85rem 1rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
-}
-
-.summary {
+  }
+  
+  .summary {
     margin: 0;
     font-size: 0.78rem;
     color: var(--text);
     line-height: 1.45;
-}
-
-.placeholder {
-margin: 0;
-font-size: 0.78rem;
-color: var(--muted);
-line-height: 1.45;
-}
-
-.primaryBtn {
+    white-space: pre-wrap;
+  }
+  
+  .placeholder {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  
+  .primaryBtn {
     background: var(--primary);
     color: white;
     border: none;
@@ -72,9 +73,31 @@ line-height: 1.45;
     font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
-}
-
-.primaryBtn:disabled {
+  }
+  
+  .primaryBtn:disabled {
     opacity: 0.7;
     cursor: default;
-}
+  }
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .viewLink {
+    font-size: 0.72rem;
+    color: var(--primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 650;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    width: fit-content;
+  }
+  
+  .viewLink:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }

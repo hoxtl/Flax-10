@@ -8,7 +8,7 @@
 
 .nav {
   flex-shrink: 0;
-  padding: 0.9rem 1.25rem 0.5rem;
+  padding: 0.65rem 1rem 0.4rem;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
 }
@@ -28,7 +28,7 @@
 }
 
 .monthLabel {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
@@ -79,7 +79,7 @@
 .strip {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.2rem;
+  gap: 0.15rem;
 }
 
 .dayCell {
@@ -87,7 +87,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.15rem;
-  padding: 0.4rem 0.1rem 0.35rem;
+  padding: 0.3rem 0.1rem 0.3rem;
   border-radius: 12px;
   border: none;
   background: none;
@@ -118,12 +118,12 @@
 }
 
 .dayNum {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
   border-radius: 50%;

@@ -30,32 +30,17 @@ export default function DeadlinesWidget({
     return (
       <div className={styles.widget}>
         <div className={styles.headerRow}>
-          <span className={styles.heading}>Next deadline</span>
+          <span className={styles.heading}>Upcoming deadlines</span>
           {showViewAll && (
             <button className={styles.viewAllBtn} onClick={() => nav("/modules")}>
               View all →
             </button>
           )}
         </div>
-
-        <div className={`${styles.row} ${styles[urgency]}`}>
-          <span className={styles.icon}>⏳</span>
-
-          <div className={styles.body}>
-            <div className={styles.titleRow}>
-              <span className={styles.type}>{DEADLINE_LABELS[d.deadline_type]}</span>
-              <span className={styles.title}>{d.title}</span>
-            </div>
-            <span className={styles.moduleLabel}>
-              {d.module_code} — {d.module_name}
-            </span>
-          </div>
-
-          <div className={styles.timeColumn}>
-            <span className={styles.date}>{formatDeadlineDateTime(d.start_due_date)}</span>
-            <span className={`${styles.countdown} ${styles[urgency]}`}>{countdown}</span>
-          </div>
-        </div>
+    
+        {deadlines.map((deadline) => (
+          <DeadlineRow key={deadline.id} deadline={deadline} />
+        ))}
       </div>
     );
   }
