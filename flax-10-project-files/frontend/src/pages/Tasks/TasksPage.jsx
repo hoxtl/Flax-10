@@ -31,12 +31,19 @@ export default function TasksPage() {
     const { lists, loading: listsLoading, addList, removeList, renameList } = useTaskLists();
     const { tasks, addTask, editTask, removeTask, toggleComplete } = useTasks();
     const [activeListId,    setActiveListId]    = useState(null);
-    const [activeFilter,    setActiveFilter]    = useState("all");
+    const [activeFilter,   setActiveFilter]    = useState("all");
     const [showTaskModal,   setShowTaskModal]   = useState(false);
     const [showListModal,   setShowListModal]   = useState(false);
     const [archivedLists,   setArchivedLists]   = useState([]);
+    const [toastUndo,       setToastUndo]      = useState(null);
 
     const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter);
+
+    const handleUndoAddTask = () => {
+        if (!toastUndo) return;
+        removeTask(toastUndo.taskId);
+        setToastUndo(null);
+    };
 
     const handleDeleteList = (listId) => {
         const list = lists.find(l => l.id === listId);
@@ -88,9 +95,20 @@ export default function TasksPage() {
                 <CreateTaskModal
                     lists={lists}
                     defaultListId={activeListId}
-                    onSave={addTask}
+                    onSave={async (data) => {
+                        const created = await addTask(data);
+                        setToastUndo(created ? { taskId: created.id, title: created.title } : null);
+                        if (created) setTimeout(() => setToastUndo(null), 5000);
+                    }}
                     onClose={() => setShowTaskModal(false)}
                 />
+            )}
+            {toastUndo && (
+                <div className={styles.toast}>
+                    <span>Task added.</span>
+                    <button type="button" className={styles.toastUndoBtn} onClick={handleUndoAddTask}>Undo</button>
+                    <button type="button" className={styles.toastClose} onClick={() => setToastUndo(null)}>✕</button>
+                </div>
             )}
             {showListModal && (
                 <CreateListModal
