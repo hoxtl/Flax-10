@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from "../../pages/Timer/TimerPage.module.css";
 import { noiseGenerator } from './utils/noiseUtils';
 
@@ -160,15 +160,97 @@ const handleTaskKey = (e) => {
     if (e.key === 'Enter') e.target.blur();
 };
 
-export const TaskInput = ({ value, onChange }) => (
-    <div className={styles.taskInputContainer}>
-        <input
-            type="text"
-            className={styles.taskInput}
-            placeholder="What are you working on? 🎯"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={handleTaskKey}
-        />
-    </div>
-);
+/** Task input with optional pick-from-tasks list (sorted by urgency, auto-start on select) */
+const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
+
+export const TaskInput = ({ value, onChange, onTaskSelect }) => {
+    const [open, setOpen] = useState(false);
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const ref = useRef(null);
+
+    const loadTasks = useCallback(() => {
+        setLoading(true);
+        import('../../api/taskService').then(({ fetchTasks }) =>
+            fetchTasks()
+                .then((data) => {
+                    const list = (data || []).filter((t) => !t.completed);
+                    list.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4));
+                    setTasks(list.slice(0, 25));
+                })
+                .catch(() => setTasks([]))
+                .finally(() => setLoading(false))
+        );
+    }, []);
+
+    useEffect(() => {
+        if (!open) return;
+        const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, [open]);
+
+    const handleOpen = () => {
+        if (!open) loadTasks();
+        setOpen((o) => !o);
+    };
+
+    const selectTask = (task) => {
+        onChange(task.title);
+        setOpen(false);
+        onTaskSelect?.(task);
+    };
+
+    return (
+        <div className={styles.taskInputWrap}>
+            <div className={styles.taskInputContainer} ref={ref}>
+                <input
+                    type="text"
+                    className={styles.taskInput}
+                    placeholder="What are you working on? 🎯"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    onKeyDown={handleTaskKey}
+                />
+                <div className={styles.taskInputActions}>
+                    <span className={styles.taskInputHint}>Pick a task to start focused work</span>
+                    <button
+                        type="button"
+                        className={styles.taskPickBtn}
+                        onClick={handleOpen}
+                        title="Pick from your tasks (sorted by urgency)"
+                    >
+                        Pick task
+                    </button>
+                </div>
+                {open && (
+                    <div className={styles.taskPickDropdown}>
+                        <div className={styles.taskPickHeader}>Sort by urgency</div>
+                        {loading ? (
+                            <div className={styles.taskPickEmpty}>Loading…</div>
+                        ) : tasks.length === 0 ? (
+                            <div className={styles.taskPickEmpty}>No tasks. Add some on the Tasks page.</div>
+                        ) : (
+                            tasks.map((task) => (
+                                <button
+                                    key={task.id}
+                                    type="button"
+                                    className={`${styles.taskPickItem} ${value === task.title ? styles.taskPickItemSelected : ''}`}
+                                    onClick={() => selectTask(task)}
+                                >
+                                    <span className={styles.taskPickTitle}>{task.title}</span>
+                                    <span className={styles.taskPickMeta}>
+                                        {task.priority && <span className={styles.taskPickPriority}>{task.priority}</span>}
+                                        {task.estimated_blocks && (
+                                            <span className={styles.taskPickEst}>{task.estimated_blocks * 25}m</span>
+                                        )}
+                                    </span>
+                                </button>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
