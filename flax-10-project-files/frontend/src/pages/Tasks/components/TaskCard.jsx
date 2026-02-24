@@ -108,7 +108,7 @@ function EditTaskModal({ task, onSave, onClose }) {
     );
 }
 
-export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, listColor }) {
+export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, listColor, hideDueBadge = false }) {
     const [showMenu, setShowMenu] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const nav = useNavigate();
@@ -169,7 +169,7 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                             <span className={styles.moduleBadge}>{task.module_code}</span>
                         )}
 
-                        {due && (
+                        {due && !hideDueBadge && (
                             <span className={`${styles.dueBadge} ${styles[due.status]}`}>
                                 {due.status === "overdue" ? "⚠️" : "📅"} {due.label}
                             </span>
