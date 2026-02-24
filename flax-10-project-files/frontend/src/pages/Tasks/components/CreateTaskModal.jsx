@@ -33,7 +33,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                     <button className={styles.closeBtn} onClick={onClose}>✕</button>
                 </div>
 
-                {/* Body */}
+                {/* Body — compact layout so date picker is visible without scrolling */}
                 <div className={styles.body}>
                     <input
                         className={styles.titleInput}
@@ -51,9 +51,9 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                         onChange={e => set("description", e.target.value)}
                     />
 
-                    <div className={styles.row}>
+                    <div className={styles.rowThree}>
                         <div className={styles.field}>
-                            <label>Priority</label>
+                            <label>PRIORITY</label>
                             <select value={form.priority} onChange={e => set("priority", e.target.value)}>
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
@@ -62,7 +62,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                             </select>
                         </div>
                         <div className={styles.field}>
-                            <label>List</label>
+                            <label>LIST</label>
                             <select value={form.task_list} onChange={e => set("task_list", e.target.value)}>
                                 {lists.map(l => (
                                     <option key={l.id} value={l.id}>
@@ -71,15 +71,14 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                                 ))}
                             </select>
                         </div>
-                    </div>
-
-                    <div className={styles.field}>
-                        <label>Due date & time</label>
-                        <DateTimePicker
-                            value={form.due_date}
-                            onChange={val => set("due_date", val)}
-                            placeholder="Pick date & time (optional)"
-                        />
+                        <div className={styles.field}>
+                            <label>DUE DATE & TIME</label>
+                            <DateTimePicker
+                                value={form.due_date}
+                                onChange={val => set("due_date", val)}
+                                placeholder="Pick date & time (optional)"
+                            />
+                        </div>
                     </div>
                 </div>
 
