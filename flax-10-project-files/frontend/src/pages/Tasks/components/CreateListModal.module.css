@@ -1,0 +1,304 @@
+/* ── Overlay / Modal shell ────────────────────────────────── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    animation: fadeIn 0.12s ease;
+  }
+  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+  
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 48px rgba(0,0,0,0.15);
+    animation: slideUp 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    overflow: hidden;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(10px) scale(0.97) }
+    to   { opacity:1; transform:translateY(0) scale(1) }
+  }
+  
+  /* ── Header ──────────────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.4rem 0;
+    flex-shrink: 0;
+  }
+  .title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+  .closeBtn {
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+  .closeBtn:hover { background: var(--hover); color: var(--text); }
+  
+  /* ── Body ────────────────────────────────────────────────── */
+  .body {
+    padding: 0.85rem 1.4rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    flex: 1;
+  }
+  
+  /* ── Name input ──────────────────────────────────────────── */
+  .nameInput {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.92rem;
+    font-weight: 600;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .nameInput:focus { border-color: var(--primary); }
+  .nameInput::placeholder { font-weight: 400; }
+  
+  /* ── Field row ───────────────────────────────────────────── */
+  .fieldRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .fieldLabel {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+  }
+  
+  /* ── Icon area ───────────────────────────────────────────── */
+  .iconArea {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .iconTrigger {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .iconTrigger:hover, .iconTriggerOpen { border-color: var(--primary); }
+  .iconDisplay    { font-size: 1.2rem; line-height: 1; }
+  .iconPlaceholder{ color: var(--muted); font-size: 0.82rem; }
+  .clearIcon {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.65rem;
+    cursor: pointer;
+    padding: 0.25rem 0.4rem;
+    border-radius: 5px;
+  }
+  .clearIcon:hover { background: var(--hover); color: var(--text); }
+  
+  /* ── Picker dropdown ─────────────────────────────────────── */
+  .pickerDropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 400;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+    background: var(--panel);
+    overflow: hidden;
+    animation: fadeIn 0.12s ease;
+  }
+  
+  /* ── Frimousse picker internals ──────────────────────────── */
+  .frimousseRoot {
+    width: 320px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    color: var(--text);
+  }
+  .frimousseSearchRow {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .frimousseSearchIcon { font-size: 0.82rem; opacity: 0.5; }
+  .frimousseSearch {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .frimousseSearch::placeholder { color: var(--muted); }
+  .frimousseViewport {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+  }
+  .frimousseList  { padding-bottom: 0.25rem; user-select: none; }
+  .frimousseRow   { display: flex; flex-wrap: wrap; padding: 0 0.25rem; }
+  .frimousseEmoji {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+  }
+  .frimousseEmoji:hover { background: var(--hover); }
+  .frimousseCategory {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding: 0.55rem 0.6rem 0.25rem;
+  }
+  .frimousseLoading,
+  .frimousseEmpty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  
+  /* Fallback grid */
+  .fallbackGrid {
+    width: 260px;
+    padding: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  .fallbackHint {
+    width: 100%;
+    font-size: 0.65rem;
+    color: var(--muted);
+    padding: 0.3rem 0.2rem 0;
+    margin: 0;
+  }
+  
+  /* ── Colour grid ─────────────────────────────────────────── */
+  .colorGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .colorSwatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    flex-shrink: 0;
+  }
+  .colorSwatch:hover { transform: scale(1.18); }
+  .colorSwatchActive { border-color: var(--text); transform: scale(1.18); }
+  
+  /* ── Preview ─────────────────────────────────────────────── */
+  .preview {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.6rem 0.75rem;
+    background: color-mix(in srgb, var(--list-color, var(--primary)) 6%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--list-color, var(--primary)) 30%, var(--border));
+    border-left: 3px solid var(--list-color, var(--primary));
+    border-radius: 9px;
+  }
+  .previewDot  { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .previewIcon { font-size:0.9rem; }
+  .previewName {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* ── Footer ──────────────────────────────────────────────── */
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0.85rem 1.4rem 1.1rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .cancelBtn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .cancelBtn:hover { background: var(--hover); }
+  .saveBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.45rem 1.2rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .saveBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .saveBtn:hover:not(:disabled) { opacity: 0.85; }

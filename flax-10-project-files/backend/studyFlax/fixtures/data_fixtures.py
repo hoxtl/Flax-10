@@ -1,32 +1,33 @@
 from zoneinfo import ZoneInfo
 
 category_fixtures = (
-    ('Work', '#FF5733', True),
+    ('Work',       '#FF5733', True),
     ('University', '#33FF57', True),
-    ('Personal', '#3357FF', True),
-    ('Chores', '#FF33A8', False),
-    ('Social', '#A833FF', False),
-    ('Health', '#33FFF5', False),
+    ('Personal',   '#3357FF', True),
+    ('Chores',     '#FF33A8', False),
+    ('Social',     '#A833FF', False),
+    ('Health',     '#33FFF5', False),
 )
 
 tag_fixtures = (
-    ('Lecture', 120),
-    ('Practical', 90),
-    ('Study Session', 120),
-    ('Meeting', 30),
-    ('Gym', 60),
-    ('Grocery Shopping', 45),
-    ('Assignment Deadline', 0),
+    ('Lecture',             120),
+    ('Practical',            90),
+    ('Study Session',       120),
+    ('Meeting',              30),
+    ('Gym',                  60),
+    ('Grocery Shopping',     45),
+    ('Assignment Deadline',   0),
 )
 
 recurrence_fixtures = (
-    ('daily', 1),
-    ('weekly', 1),
-    ('weekly', 2),
+    ('daily',   1),
+    ('weekly',  1),
+    ('weekly',  2),
     ('monthly', 1),
 )
 
 event_title_fixtures = (
+    # Errands & life admin
     "Lidl Run", "Tesco Express at Midnight", "Meal Prep Sunday",
     "Coffee with Mum at Costa", "Dinner at Grandma's",
     "Brunch with the Girls", "Drinks with Flatmates",
@@ -57,6 +58,40 @@ event_title_fixtures = (
     "Stretch after sitting", "Grab lunch from Pret", "Bring in bins",
     "Water the plants", "Order weekly shop", "Track spending this week",
     "Book train home", "Drop off parcel at InPost",
+    # More variety
+    "Morning stretches", "Plan meals for the week",
+    "Grocery order online", "Sort through wardrobe",
+    "Call insurance", "Chase up landlord",
+    "Print lecture notes", "Study at Starbucks",
+    "Library group session", "Evening run by the Thames",
+    "Sunset walk", "Watch a documentary",
+    "Batch cook for the week", "Post something on LinkedIn",
+    "Review internship feedback", "Practice presentation",
+    "Team meeting online", "Tutor session",
+    "Office hours with lecturer", "Update Notion board",
+    "Check module forum", "Print train ticket",
+    "Book accommodation", "Sort laundry",
+    "Quick power nap", "Pick up medication",
+    "Return library books", "Renew bus pass",
+    "Print ID document", "Log hours for placement",
+    "Team retrospective", "Sprint planning",
+    "Stand-up meeting", "Pair programming session",
+    "Code review", "Debugging session",
+    "Read a chapter", "Write in journal",
+    "Stretch and breathe", "Gratitude journalling",
+    "Language practice - Duolingo", "Watch lecture recording",
+    "Annotate papers", "Make mind map",
+    "Record voice notes", "Film study vlog",
+    "KCLSU badminton Event", "KCLSU football five-a-side",
+    "Netball with society", "Swimming at King's Sport",
+    "Pilates class", "Run to Tower Bridge",
+    "Pick up dry cleaning", "Post card to grandma",
+    "Sort student email aliases", "File expenses claim",
+    "Book flights home", "Budget review",
+    "Archive old notes", "Delete spam emails",
+    "Update LinkedIn", "Draft personal statement",
+    "Mock interview prep", "Career fair networking",
+    "Meet with careers advisor", "Apply for vacation scheme",
 )
 
 breakfast_fixtures = (
@@ -245,41 +280,41 @@ course_fixtures = (
 )
 
 course_to_module_prefixes = {
-    "Computer Science": ["CS"],
+    "Computer Science":              ["CS"],
     "Computer Science with Management": ["CS", "BM"],
-    "Artificial Intelligence": ["CS", "AI"],
-    "Mathematics": ["MA"],
-    "Physics": ["PH", "MA"],
-    "Electronic Engineering": ["EE", "PH", "MA"],
-    "General Engineering": ["GN", "PH", "MA"],
-    "Chemistry": ["PH", "LS"],
-    "Medicine": ["LS"],
-    "Biomedical Science": ["LS"],
-    "Neuroscience": ["LS", "PS"],
-    "Psychology": ["PS"],
-    "Midwifery": ["NU"],
-    "Nursing": ["NU", "LS"],
-    "Dentistry": ["DE"],
-    "Law": ["LW"],
-    "Business Management": ["BM", "EC"],
-    "Accounting & Finance": ["BM", "EC"],
-    "Economics": ["EC", "BM"],
-    "International Management": ["BM", "EC"],
-    "History": ["HI"],
-    "English Literature": ["EN"],
-    "Philosophy": ["PL"],
-    "Film Studies": ["EN", "TH"],
-    "Politics": ["PO", "IR"],
-    "International Relations": ["IR", "PO"],
-    "Geography": ["GE", "PO"],
-    "Modern Languages": ["FR", "SP", "GL", "AR", "ZH"],
-    "French": ["FR"],
-    "Spanish": ["SP"],
-    "German": ["GL"],
-    "Italian": ["IT"],
-    "Portuguese": ["PT"],
-    "Music": ["MU"],
-    "Classical Studies": ["CL"],
+    "Artificial Intelligence":       ["CS", "AI"],
+    "Mathematics":                   ["MA"],
+    "Physics":                       ["PH", "MA"],
+    "Electronic Engineering":        ["EE", "PH", "MA"],
+    "General Engineering":           ["GN", "PH", "MA"],
+    "Chemistry":                     ["PH", "LS"],
+    "Medicine":                      ["LS"],
+    "Biomedical Science":            ["LS"],
+    "Neuroscience":                  ["LS", "PS"],
+    "Psychology":                    ["PS"],
+    "Midwifery":                     ["NU"],
+    "Nursing":                       ["NU", "LS"],
+    "Dentistry":                     ["DE"],
+    "Law":                           ["LW"],
+    "Business Management":           ["BM", "EC"],
+    "Accounting & Finance":          ["BM", "EC"],
+    "Economics":                     ["EC", "BM"],
+    "International Management":      ["BM", "EC"],
+    "History":                       ["HI"],
+    "English Literature":            ["EN"],
+    "Philosophy":                    ["PL"],
+    "Film Studies":                  ["EN", "TH"],
+    "Politics":                      ["PO", "IR"],
+    "International Relations":       ["IR", "PO"],
+    "Geography":                     ["GE", "PO"],
+    "Modern Languages":              ["FR", "SP", "GL", "AR", "ZH"],
+    "French":                        ["FR"],
+    "Spanish":                       ["SP"],
+    "German":                        ["GL"],
+    "Italian":                       ["IT"],
+    "Portuguese":                    ["PT"],
+    "Music":                         ["MU"],
+    "Classical Studies":             ["CL"],
 }
 
 module_prefix_to_department = {
@@ -317,11 +352,11 @@ module_prefix_to_department = {
 }
 
 deadline_fixtures = (
-    ("coursework", "Coursework 1", "Submit via KEATS by the deadline. Check the module page for submission instructions."),
-    ("coursework", "Coursework 2", "Worth 50 marks, assessing weeks 1-5. Full brief available on KEATS."),
-    ("quiz", "Multiple Choice Quiz", "Short online quiz on KEATS covering recent lecture topics."),
-    ("exam", "Final Exam", "Final exam covering the entire module. Good luck!"),
-    ("presentation", "Group Presentation", "Group presentation in class, at least 15 mins. Slides to be uploaded to KEATS."),
+    ("coursework",   "Coursework 1",        "Submit via KEATS by the deadline. Check the module page for submission instructions."),
+    ("coursework",   "Coursework 2",        "Worth 50 marks, assessing weeks 1-5. Full brief available on KEATS."),
+    ("quiz",         "Multiple Choice Quiz", "Short online quiz on KEATS covering recent lecture topics."),
+    ("exam",         "Final Exam",          "Final exam covering the entire module. Good luck!"),
+    ("presentation", "Group Presentation",  "Group presentation in class, at least 15 mins. Slides to be uploaded to KEATS."),
 )
 
 module_deadline_fixtures = {
@@ -457,139 +492,209 @@ module_deadline_fixtures = {
 
 # Per-module-prefix task templates
 # Format: (title_template, description, priority, estimated_blocks, days_from_now)
-# {module} and {module_name} are replaced at seed time with the user's actual enrolled module
 module_task_templates = {
     "CS": [
-        ("{module} programming assignment", "Complete the coding task and submit via KEATS. Test your solution locally first.", "high", 4, 3),
-        ("{module} past paper", "Work through the past exam paper under timed conditions.", "high", 3, 5),
-        ("{module} revision: data structures", "Review lecture notes and re-implement key algorithms from scratch.", "medium", 2, 2),
-        ("{module} group project check-in", "Review teammates' pull requests and update your section of the codebase.", "urgent", 2, 1),
+        ("{module} programming assignment",    "Complete the coding task and submit via KEATS. Test your solution locally first.", "high",   4, 3),
+        ("{module} past paper",                "Work through the past exam paper under timed conditions.",                         "high",   3, 5),
+        ("{module} revision: data structures", "Review lecture notes and re-implement key algorithms from scratch.",               "medium", 2, 2),
+        ("{module} group project check-in",    "Review teammates' pull requests and update your section of the codebase.",         "urgent", 2, 1),
     ],
     "AI": [
-        ("{module} model evaluation writeup", "Write up the evaluation section for the ML coursework.", "high", 3, 3),
-        ("{module} lecture notes review", "Go through neural network slides and annotate key formulas.", "medium", 2, 2),
-        ("{module} past paper", "Work through the past exam paper under timed conditions.", "high", 4, 5),
+        ("{module} model evaluation writeup", "Write up the evaluation section for the ML coursework.",              "high",   3, 3),
+        ("{module} lecture notes review",     "Go through neural network slides and annotate key formulas.",          "medium", 2, 2),
+        ("{module} past paper",               "Work through the past exam paper under timed conditions.",             "high",   4, 5),
     ],
     "MA": [
-        ("{module} problem set", "Complete all questions from the assignment sheet. Submit online.", "medium", 3, 3),
-        ("{module} revision session", "Go through lecture examples and redo the harder problem sheet questions.", "medium", 2, 2),
-        ("{module} exam prep", "Work through past papers and note which topics need more focus.", "high", 4, 5),
+        ("{module} problem set",      "Complete all questions from the assignment sheet. Submit online.",              "medium", 3, 3),
+        ("{module} revision session", "Go through lecture examples and redo the harder problem sheet questions.",      "medium", 2, 2),
+        ("{module} exam prep",        "Work through past papers and note which topics need more focus.",               "high",   4, 5),
     ],
     "PH": [
-        ("{module} lab report", "Write up the practical. Include methodology, data, error analysis and conclusions.", "high", 4, 4),
-        ("{module} problem set", "Complete the worksheet from this week's lecture. Show full working.", "medium", 3, 2),
-        ("{module} revision", "Review derivations and key equations. Make a formula sheet.", "medium", 2, 3),
+        ("{module} lab report",  "Write up the practical. Include methodology, data, error analysis and conclusions.", "high",   4, 4),
+        ("{module} problem set", "Complete the worksheet from this week's lecture. Show full working.",               "medium", 3, 2),
+        ("{module} revision",    "Review derivations and key equations. Make a formula sheet.",                       "medium", 2, 3),
     ],
     "EE": [
-        ("{module} lab report", "Document the experiment. Include circuit diagram, measurements and analysis.", "high", 3, 4),
-        ("{module} problem sheet", "Complete the circuit analysis questions from this week.", "medium", 2, 2),
-        ("{module} exam prep", "Past paper practice — focus on questions you got wrong last time.", "high", 4, 5),
+        ("{module} lab report",   "Document the experiment. Include circuit diagram, measurements and analysis.", "high",   3, 4),
+        ("{module} problem sheet","Complete the circuit analysis questions from this week.",                       "medium", 2, 2),
+        ("{module} exam prep",    "Past paper practice — focus on questions you got wrong last time.",             "high",   4, 5),
     ],
     "GN": [
-        ("{module} design portfolio update", "Add this week's design sketches and calculations to your portfolio.", "high", 3, 3),
-        ("{module} problem set", "Complete the engineering maths worksheet.", "medium", 2, 2),
+        ("{module} design portfolio update", "Add this week's design sketches and calculations to your portfolio.", "high",   3, 3),
+        ("{module} problem set",             "Complete the engineering maths worksheet.",                           "medium", 2, 2),
     ],
     "LS": [
-        ("{module} lab report", "Write up the lab practical. Include methodology and data analysis.", "high", 4, 3),
-        ("{module} essay plan", "Draft a 300-word outline for the upcoming essay.", "urgent", 2, 1),
-        ("{module} KEATS quiz", "Complete the online quiz before midnight. Review lecture notes first.", "urgent", 1, 1),
-        ("{module} revision: key pathways", "Make a diagram of the main metabolic/cellular pathways from this week.", "medium", 2, 4),
+        ("{module} lab report",          "Write up the lab practical. Include methodology and data analysis.",           "high",   4, 3),
+        ("{module} essay plan",          "Draft a 300-word outline for the upcoming essay.",                             "urgent", 2, 1),
+        ("{module} KEATS quiz",          "Complete the online quiz before midnight. Review lecture notes first.",        "urgent", 1, 1),
+        ("{module} revision: key pathways", "Make a diagram of the main metabolic/cellular pathways from this week.",   "medium", 2, 4),
     ],
     "LW": [
-        ("{module} essay", "Critical legal essay on your assigned question. 1500 words. Submit via KEATS.", "high", 5, 4),
-        ("{module} seminar prep", "Read the assigned cases and prepare three discussion points.", "medium", 2, 1),
-        ("{module} revision", "Review lecture notes and compile a list of key cases with brief facts.", "medium", 3, 3),
+        ("{module} essay",      "Critical legal essay on your assigned question. 1500 words. Submit via KEATS.", "high",   5, 4),
+        ("{module} seminar prep","Read the assigned cases and prepare three discussion points.",                  "medium", 2, 1),
+        ("{module} revision",   "Review lecture notes and compile a list of key cases with brief facts.",        "medium", 3, 3),
     ],
     "PS": [
-        ("{module} research report draft", "Write up the introduction and method sections.", "medium", 3, 4),
-        ("{module} reading", "Read the assigned journal articles and annotate key findings.", "medium", 2, 2),
-        ("{module} revision", "Review cognitive models and make flashcards for key studies.", "medium", 2, 3),
+        ("{module} research report draft", "Write up the introduction and method sections.",                           "medium", 3, 4),
+        ("{module} reading",               "Read the assigned journal articles and annotate key findings.",            "medium", 2, 2),
+        ("{module} revision",              "Review cognitive models and make flashcards for key studies.",             "medium", 2, 3),
     ],
     "BM": [
-        ("{module} case study analysis", "Analyse the assigned company. 2500 words.", "high", 6, 4),
-        ("{module} seminar prep", "Read the Harvard case and prepare two strategic recommendations.", "medium", 2, 1),
-        ("{module} revision", "Review strategic frameworks: Porter's Five Forces, SWOT, PESTLE.", "medium", 2, 3),
+        ("{module} case study analysis", "Analyse the assigned company. 2500 words.",                                  "high",   6, 4),
+        ("{module} seminar prep",        "Read the Harvard case and prepare two strategic recommendations.",           "medium", 2, 1),
+        ("{module} revision",            "Review strategic frameworks: Porter's Five Forces, SWOT, PESTLE.",           "medium", 2, 3),
     ],
     "EC": [
-        ("{module} economics essay", "Analytical essay applying theory to a real-world issue. 2000 words.", "medium", 4, 5),
-        ("{module} problem set", "Complete the microeconomics worksheet from this week's lecture.", "medium", 2, 2),
-        ("{module} revision", "Review supply/demand models and go through past short-answer questions.", "medium", 2, 3),
+        ("{module} economics essay", "Analytical essay applying theory to a real-world issue. 2000 words.",            "medium", 4, 5),
+        ("{module} problem set",     "Complete the microeconomics worksheet from this week's lecture.",                "medium", 2, 2),
+        ("{module} revision",        "Review supply/demand models and go through past short-answer questions.",        "medium", 2, 3),
     ],
     "HI": [
-        ("{module} essay", "Historical essay on your assigned question. 2500 words. Chicago referencing.", "high", 5, 5),
-        ("{module} seminar reading", "Read the set texts and prepare three discussion points for seminar.", "medium", 2, 1),
-        ("{module} source analysis", "Annotate the primary source document — consider context, bias and significance.", "medium", 2, 3),
+        ("{module} essay",       "Historical essay on your assigned question. 2500 words. Chicago referencing.", "high",   5, 5),
+        ("{module} seminar reading","Read the set texts and prepare three discussion points for seminar.",       "medium", 2, 1),
+        ("{module} source analysis","Annotate the primary source document — consider context, bias and significance.", "medium", 2, 3),
     ],
     "EN": [
-        ("{module} essay", "Close reading essay on the assigned text. 2500 words. MLA referencing.", "high", 5, 5),
-        ("{module} seminar presentation", "Prepare a 10-minute seminar discussion on your assigned passage.", "high", 3, 2),
-        ("{module} reading", "Read the set text for this week and annotate key themes.", "medium", 2, 1),
+        ("{module} essay",              "Close reading essay on the assigned text. 2500 words. MLA referencing.", "high",   5, 5),
+        ("{module} seminar presentation","Prepare a 10-minute seminar discussion on your assigned passage.",      "high",   3, 2),
+        ("{module} reading",            "Read the set text for this week and annotate key themes.",               "medium", 2, 1),
     ],
     "PL": [
-        ("{module} essay", "Argumentative philosophy essay. 2000 words. Defend your assigned position.", "medium", 5, 5),
-        ("{module} seminar prep", "Read the set chapter and prepare two objections for discussion.", "medium", 2, 1),
-        ("{module} revision", "Make flashcards for key arguments, philosophers and counter-arguments.", "low", 2, 4),
+        ("{module} essay",      "Argumentative philosophy essay. 2000 words. Defend your assigned position.", "medium", 5, 5),
+        ("{module} seminar prep","Read the set chapter and prepare two objections for discussion.",            "medium", 2, 1),
+        ("{module} revision",   "Make flashcards for key arguments, philosophers and counter-arguments.",     "low",    2, 4),
     ],
     "PO": [
-        ("{module} policy brief", "1500-word policy brief on your assigned political issue.", "medium", 3, 4),
-        ("{module} seminar prep", "Read the assigned article and prepare three discussion questions.", "medium", 2, 1),
+        ("{module} policy brief",  "1500-word policy brief on your assigned political issue.",              "medium", 3, 4),
+        ("{module} seminar prep",  "Read the assigned article and prepare three discussion questions.",    "medium", 2, 1),
     ],
     "IR": [
-        ("{module} essay", "Analytical essay applying IR theory to a current issue. 2500 words.", "high", 5, 5),
-        ("{module} seminar prep", "Read the assigned chapters and prepare a brief summary of each theory.", "medium", 2, 1),
+        ("{module} essay",      "Analytical essay applying IR theory to a current issue. 2500 words.",   "high",   5, 5),
+        ("{module} seminar prep","Read the assigned chapters and prepare a brief summary of each theory.","medium", 2, 1),
     ],
     "NU": [
-        ("{module} reflective portfolio entry", "Write a Gibbs cycle reflection on last week's clinical placement.", "high", 3, 2),
-        ("{module} OSCE prep", "Practise the clinical skill steps and review the assessment criteria.", "urgent", 3, 3),
+        ("{module} reflective portfolio entry", "Write a Gibbs cycle reflection on last week's clinical placement.", "high",   3, 2),
+        ("{module} OSCE prep",                  "Practise the clinical skill steps and review the assessment criteria.", "urgent", 3, 3),
     ],
     "DE": [
-        ("{module} clinical case report", "Document the patient case — diagnosis, treatment plan and reflection.", "high", 4, 4),
-        ("{module} anatomy revision", "Review the oral anatomy diagrams and label key structures from memory.", "medium", 2, 2),
+        ("{module} clinical case report", "Document the patient case — diagnosis, treatment plan and reflection.", "high",   4, 4),
+        ("{module} anatomy revision",     "Review the oral anatomy diagrams and label key structures from memory.", "medium", 2, 2),
     ],
     "FR": [
         ("{module} written assignment", "Complete the French essay or translation exercise from KEATS.", "medium", 3, 4),
-        ("{module} vocabulary practice", "Review this week's vocab list and write example sentences for each term.", "low", 1, 2),
-        ("{module} oral prep", "Practise speaking the set topic aloud — record yourself and review.", "medium", 2, 3),
+        ("{module} vocabulary practice","Review this week's vocab list and write example sentences for each term.", "low", 1, 2),
+        ("{module} oral prep",          "Practise speaking the set topic aloud — record yourself and review.", "medium", 2, 3),
     ],
     "SP": [
         ("{module} written assignment", "Complete the Spanish written exercise from KEATS.", "medium", 3, 4),
-        ("{module} vocabulary practice", "Review this week's vocab list and write example sentences.", "low", 1, 2),
-        ("{module} oral prep", "Practise speaking the set topic aloud — record yourself and review.", "medium", 2, 3),
-        ("{module} grammar exercise", "Complete the grammar worksheet focusing on the subjunctive.", "medium", 2, 1),
+        ("{module} vocabulary practice","Review this week's vocab list and write example sentences.", "low", 1, 2),
+        ("{module} oral prep",          "Practise speaking the set topic aloud — record yourself and review.", "medium", 2, 3),
+        ("{module} grammar exercise",   "Complete the grammar worksheet focusing on the subjunctive.", "medium", 2, 1),
     ],
     "GL": [
-        ("{module} written assignment", "Complete the German written exercise from KEATS.", "medium", 3, 4),
+        ("{module} written assignment",  "Complete the German written exercise from KEATS.", "medium", 3, 4),
         ("{module} vocabulary practice", "Review this week's vocab list and write example sentences.", "low", 1, 2),
-        ("{module} translation practice", "Translate the set passage from German to English and check with model answer.", "medium", 2, 3),
+        ("{module} translation practice","Translate the set passage from German to English and check with model answer.", "medium", 2, 3),
     ],
     "AR": [
         ("{module} written assignment", "Complete the Arabic written exercise from KEATS.", "medium", 3, 4),
-        ("{module} script practice", "Practise writing this week's new vocabulary in Arabic script.", "low", 1, 2),
+        ("{module} script practice",    "Practise writing this week's new vocabulary in Arabic script.", "low", 1, 2),
     ],
     "ZH": [
-        ("{module} written assignment", "Complete the Mandarin written exercise from KEATS.", "medium", 3, 4),
-        ("{module} character practice", "Write out this week's new characters 10 times each.", "low", 1, 2),
+        ("{module} written assignment",  "Complete the Mandarin written exercise from KEATS.", "medium", 3, 4),
+        ("{module} character practice",  "Write out this week's new characters 10 times each.", "low", 1, 2),
     ],
     "MU": [
         ("{module} listening log entry", "Write a 200-word analytical response to the set recording.", "medium", 2, 3),
-        ("{module} theory exercise", "Complete the harmony worksheet from this week's tutorial.", "medium", 2, 2),
+        ("{module} theory exercise",     "Complete the harmony worksheet from this week's tutorial.", "medium", 2, 2),
     ],
     "GE": [
-        ("{module} essay", "Essay on the assigned geographic concept. 2000 words.", "medium", 4, 5),
-        ("{module} seminar prep", "Read the set article and annotate key arguments.", "medium", 2, 1),
+        ("{module} essay",       "Essay on the assigned geographic concept. 2000 words.", "medium", 4, 5),
+        ("{module} seminar prep","Read the set article and annotate key arguments.", "medium", 2, 1),
     ],
 }
 
-# Generic personal tasks seeded for every user regardless of course
+# ── Task lists seeded per user ─────────────────────────────────────────────
+# Format: (name, category, emoji)
+task_list_fixtures = (
+    ("University",   "uni",      "📘"),
+    ("Personal",     "personal", "🟡"),
+    ("Internships",  "personal", "💼"),
+    ("Health",       "personal", "🏃"),
+    ("Finance",      "personal", "💰"),
+    ("Reading List", "personal", "📖"),
+    ("Home & Admin", "personal", "🏠"),
+)
+
+# ── Personal tasks seeded for every user ───────────────────────────────────
+# Format: (title, description, priority, estimated_blocks, days_from_now, list_name)
+# list_name must match one of the names in task_list_fixtures above
 personal_task_fixtures = (
-    ("Reply to supervisor email", "Confirm your project meeting time and attach the latest draft.", "urgent", 1, 0),
-    ("Book revision room at Maughan", "Reserve a silent study room for the upcoming exam period.", "medium", 1, 2),
-    ("Update CV", "Add the latest project or placement before applying to grad roles.", "medium", 2, 6),
-    ("Research internship deadlines", "Check application deadlines for your target companies.", "high", 1, 3),
-    ("Submit KEATS quiz", "Weekly online quiz — must be done before midnight tonight.", "urgent", 1, 1),
-    ("Flashcard deck: this week's content", "Make Anki cards for the key concepts from this week's lectures.", "low", 2, 5),
-    ("Book dentist appointment", "Overdue — call and book for sometime next month.", "low", 1, 4),
-    ("Track spending this week", "Log all expenses and check you're on budget.", "low", 1, 3),
-    ("Plan the week ahead", "Look at the week's deadlines and block out study time in your calendar.", "medium", 1, 0),
-    ("Email personal tutor", "Check in with your personal tutor — ask about the upcoming assessment.", "medium", 1, 2),
+    # ── Urgent / today ──
+    ("Reply to supervisor email",       "Confirm your project meeting time and attach the latest draft.",             "urgent", 1,  0, "University"),
+    ("Plan the week ahead",             "Look at the week's deadlines and block out study time in your calendar.",   "medium", 1,  0, "Personal"),
+    ("Check KEATS announcements",       "Scan all module pages for new posts, resources or changes.",                "low",    1,  0, "University"),
+
+    # ── Day 1 ──
+    ("Submit KEATS quiz",               "Weekly online quiz — must be done before midnight tonight.",                "urgent", 1,  1, "University"),
+    ("Email personal tutor",            "Check in — ask about the upcoming assessment.",                             "medium", 1,  1, "University"),
+    ("Morning run",                     "30 min — don't skip it this week.",                                         "low",    1,  1, "Health"),
+
+    # ── Day 2 ──
+    ("Book revision room at Maughan",   "Reserve a silent study room for the upcoming exam period.",                 "medium", 1,  2, "University"),
+    ("Make flashcards: this week",      "Make Anki cards for the key concepts from this week's lectures.",          "low",    2,  2, "University"),
+    ("Track spending this week",        "Log all expenses and check you're on budget.",                              "low",    1,  2, "Finance"),
+
+    # ── Day 3 ──
+    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "high",   1,  3, "Internships"),
+    ("Prep for seminar",                "Re-read the set text and write two discussion points.",                     "medium", 2,  3, "University"),
+    ("GP appointment",                  "Nothing urgent — just a general check-up.",                                 "low",    1,  3, "Health"),
+
+    # ── Day 4 ──
+    ("Book dentist appointment",        "Overdue — call and book for sometime next month.",                          "low",    1,  4, "Health"),
+    ("Print lecture notes",             "Print the PDFs from KEATS for this week.",                                  "low",    1,  4, "University"),
+    ("Review past exam paper",          "Work through one past paper under timed conditions.",                       "high",   4,  4, "University"),
+
+    # ── Day 5 ──
+    ("Update CV",                       "Add the latest project or placement before applying to grad roles.",        "medium", 2,  5, "Internships"),
+    ("Read journal article",            "Annotate the assigned paper for next week's seminar.",                      "medium", 2,  5, "Reading List"),
+    ("Draft personal statement section","Write 200 words on your academic motivation.",                              "high",   3,  5, "Internships"),
+
+    # ── Day 6 ──
+    ("Tidy desk and study space",       "A clear space = a clear mind. 15 mins max.",                                "low",    1,  6, "Home & Admin"),
+    ("Plan next week's meals",          "Decide on 3-4 dinners and write a shopping list.",                         "low",    1,  6, "Home & Admin"),
+    ("Submit lab report draft",         "Send draft to supervisor for early feedback.",                              "high",   3,  6, "University"),
+
+    # ── Day 7 ──
+    ("Weekly review",                   "Go through what you completed and what carried over from last week.",       "medium", 1,  7, "Personal"),
+    ("Renew railcard",                  "Check expiry date and renew online before it runs out.",                   "low",    1,  7, "Finance"),
+    ("Respond to LinkedIn messages",    "Reply to any internship or network messages.",                              "medium", 1,  7, "Internships"),
+
+    # ── Day 8-10 ──
+    ("Apply to summer internship",      "Submit application before deadline — check requirements on portal.",       "urgent", 2,  8, "Internships"),
+    ("Gym session",                     "Upper body + core. Don't skip leg day next time.",                         "low",    2,  9, "Health"),
+    ("Practice interview questions",    "Go through the STAR method for behavioural questions.",                    "high",   2,  10, "Internships"),
+
+    # ── Day 11-14 ──
+    ("Buy train ticket home",           "Book the cheapest advance ticket while they're still available.",          "medium", 1,  11, "Finance"),
+    ("Mid-semester self-assessment",    "Reflect on your progress and identify two areas to improve.",              "medium", 2,  12, "Personal"),
+    ("Revision timetable",              "Build a realistic revision plan mapping topics to days.",                   "high",   2,  14, "University"),
+
+    # ── Day 15-21 ──
+    ("Past paper practice",             "Work through the full past paper and mark your answers.",                  "high",   4,  15, "University"),
+    ("Sort student email aliases",      "Check your KCL email is forwarded correctly.",                             "low",    1,  16, "Home & Admin"),
+    ("Deep clean the kitchen",          "Full wipe-down — fridge, oven, surfaces.",                                 "low",    2,  18, "Home & Admin"),
+    ("Flashcard review session",        "Go through your full Anki deck and reset anything overdue.",              "medium", 2,  21, "University"),
+
+    # ── Day 22-35 ──
+    ("Exam technique practice",         "Work on timing — try answering questions in strict timed blocks.",         "high",   3,  22, "University"),
+    ("Reach out to alumni network",     "Message two people for a 15-minute informational chat.",                   "medium", 2,  25, "Internships"),
+    ("Final essay proofread",           "Read it aloud to catch any awkward phrasing or errors.",                  "urgent", 2,  28, "University"),
+    ("Budget review",                   "Check your spending against this month's budget.",                         "medium", 1,  30, "Finance"),
+    ("Back up laptop files",            "Upload everything to Google Drive or external hard drive.",                "low",    1,  35, "Home & Admin"),
+
+    # ── Reading list ──
+    ("Read: Thinking, Fast and Slow",   "Kahneman — read chapters 1-5 and take notes.",                             "low",    3,  10, "Reading List"),
+    ("Read: The Pragmatic Programmer",  "Chapter 2-3. Note anything applicable to your project.",                   "low",    2,  14, "Reading List"),
+    ("Read: Why Nations Fail",          "First 4 chapters. Consider how it connects to your IR module.",            "low",    3,  20, "Reading List"),
 )
