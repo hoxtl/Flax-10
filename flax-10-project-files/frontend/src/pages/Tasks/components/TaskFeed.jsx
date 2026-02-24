@@ -69,7 +69,15 @@ function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDel
     );
 }
 
-export default function TaskFeed({ tasks, lists, activeFilter, onToggleComplete, onDeleteTask, onEditTask }) {
+export default function TaskFeed({
+    tasks,
+    lists,
+    activeFilter,
+    onToggleComplete,
+    onDeleteTask,
+    onEditTask,
+    onCreateTask,
+}) {
     const [search, setSearch]     = useState("");
     const [sortBy, setSortBy]     = useState("priority");
     const [showDone, setShowDone] = useState(false);
@@ -111,7 +119,7 @@ export default function TaskFeed({ tasks, lists, activeFilter, onToggleComplete,
 
     return (
         <div className={styles.feed}>
-            {/* ── Toolbar — search + sort only ── */}
+            {/* ── Toolbar — search + sort + add ── */}
             <div className={styles.toolbar}>
                 <div className={styles.searchWrap}>
                     <span className={styles.searchIcon}>🔍</span>
@@ -138,6 +146,16 @@ export default function TaskFeed({ tasks, lists, activeFilter, onToggleComplete,
                         <option value="alpha">A → Z</option>
                     </select>
                 </div>
+
+                {onCreateTask && (
+                    <button
+                        type="button"
+                        className={styles.addBtn}
+                        onClick={onCreateTask}
+                    >
+                        + New task
+                    </button>
+                )}
             </div>
 
             {/* ── Task sections ── */}

@@ -12,8 +12,36 @@ export function useEventForm(event, onClose, options = {}) {
 
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
 
-    const handleSubmit = options.customSubmit ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError) : (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], false);
-    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], true);
+    const handleSubmit = options.customSubmit
+        ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError)
+        : (e) => validateAndSubmit(
+            e,
+            form,
+            event,
+            actions,
+            onClose,
+            setError,
+            setOverlapWarning,
+            calendarContext?.events || [],
+            false,
+        );
+
+    // When user chooses "Save anyway", clear the warning view first so
+    // any backend errors are shown in the normal form error banner.
+    const handleConfirmSave = () => {
+        setOverlapWarning(null);
+        return validateAndSubmit(
+            null,
+            form,
+            event,
+            actions,
+            onClose,
+            setError,
+            setOverlapWarning,
+            calendarContext?.events || [],
+            true,
+        );
+    };
     const handleCancelSave = () => setOverlapWarning(null);
     const handleDelete = options.customSubmit ? () => { options.customSubmit({ ...form, _delete: true }); onClose(); } : () => confirmDelete(event, actions, onClose);
 

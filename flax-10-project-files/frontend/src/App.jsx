@@ -63,10 +63,20 @@ function resolveScreen(authed, user, showWelcome) {
   return "app";
 }
 
-function resolveRouteContent(activeNav, user) {
+function resolveRouteContent(activeNav, user, setActiveNav) {
   const route = APP_ROUTES.find((r) => r.id === activeNav) || APP_ROUTES[0];
   const el = route.element;
-  if (el && typeof el === "object") return { ...el, props: { ...el.props, user } };
+  // Inject shared props (like user and navigation callback) into route elements
+  if (el && typeof el === "object") {
+    return {
+      ...el,
+      props: {
+        ...el.props,
+        user,
+        onNavigate: setActiveNav,
+      },
+    };
+  }
   return el;
 }
 
@@ -210,7 +220,7 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings") return <Settings user={user} onBack={() => setActiveNav("home")} />;
   if (activeNav === "profile") return <Profile user={user} onBack={() => setActiveNav("home")} />;
-  return resolveRouteContent(activeNav, user);
+  return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {

@@ -66,7 +66,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                             <select value={form.task_list} onChange={e => set("task_list", e.target.value)}>
                                 {lists.map(l => (
                                     <option key={l.id} value={l.id}>
-                                        {l.icon ? `${l.icon} ` : ""}{l.name}
+                                        {l.name}
                                     </option>
                                 ))}
                             </select>

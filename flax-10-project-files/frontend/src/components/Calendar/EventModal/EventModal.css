@@ -153,8 +153,51 @@
 
 .modal-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: flex-end;
     gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-secondary,
+.btn-primary {
+    min-width: 110px;
+    padding: 0.5rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-secondary {
+    background: var(--bg);
+    color: var(--muted);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.overlap-warning .modal-body {
+    padding: 0.75rem 0 0;
+}
+
+.overlap-warning .overlap-list {
+    margin: 0.5rem 0 0.75rem;
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
 }
 
 .select-with-color {

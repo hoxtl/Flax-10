@@ -15,6 +15,7 @@ import { createEvent } from "../../api/eventApi";
 import DateNavigator from "../../components/Home/DateNavigator";
 import { useTags } from "../../context/TagContext";
 import { useNavigate, Link } from "react-router-dom";
+import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
 import HomeStudyCoachCard from "../../components/Home/HomeStudyCoachCard";
 
@@ -342,7 +343,7 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
 
 
 /* ─── Overlap cluster (side-by-side cards) ───────────────── */
-function OverlapCluster({ items, onDelete, onEdit }) {
+function OverlapCluster({ items, onDelete, onApplySuggestion }) {
   const { getTag }      = useTags();
   const [expanded,      setExpanded]      = useState(false);
   const [resolveOpen,   setResolveOpen]   = useState(false);
@@ -426,7 +427,6 @@ function OverlapCluster({ items, onDelete, onEdit }) {
               accentColor={accentColor}
               durationMins={durationMins}
               onDelete={onDelete}
-              onEdit={onEdit}
             />
           );
         })}
@@ -448,13 +448,7 @@ function OverlapCluster({ items, onDelete, onEdit }) {
                 </div>
                 <button
                   className={styles.resolveApplyBtn}
-                  onClick={() => {
-                    onEdit({
-                      ...s.event,
-                      start_time: s.suggestedStart.toISOString(),
-                      end_time:   s.suggestedEnd.toISOString(),
-                    });
-                  }}
+                  onClick={() => onApplySuggestion?.(s)}
                 >
                   Apply
                 </button>
@@ -598,7 +592,7 @@ function TaskWidgetRow({ task }) {
 }
 
 /* ─── Task widget ────────────────────────────────────────── */
-function TaskWidget({ tasks, selectedDate }) {
+function TaskWidget({ tasks, selectedDate, onViewAllTasks }) {
   const topTasks = useMemo(() => tasks.slice(0, 5), [tasks]);
   const label    = isToday(selectedDate) ? "TODAY'S TASKS" : "TASKS DUE";
 
@@ -606,7 +600,13 @@ function TaskWidget({ tasks, selectedDate }) {
     <div className={styles.taskWidget}>
       <div className={styles.taskWidgetHeader}>
         <span className={styles.taskWidgetTitle}>{label}</span>
-        <Link className={styles.taskWidgetLink} to="/tasks">All tasks →</Link>
+        <button
+          type="button"
+          className={styles.taskWidgetLink}
+          onClick={() => onViewAllTasks?.()}
+        >
+          All tasks →
+        </button>
       </div>
 
       {topTasks.length === 0 ? (
@@ -615,7 +615,13 @@ function TaskWidget({ tasks, selectedDate }) {
           <p className={styles.taskWidgetEmptyText}>
             {isToday(selectedDate) ? "Nothing due today." : "Nothing due this day."}
           </p>
-          <Link className={styles.taskWidgetEmptyBtn} to="/tasks">View all tasks →</Link>
+          <button
+            type="button"
+            className={styles.taskWidgetEmptyBtn}
+            onClick={() => onViewAllTasks?.()}
+          >
+            View all tasks →
+          </button>
         </div>
       ) : (
         <div className={styles.taskWidgetList}>
@@ -639,10 +645,10 @@ function EmptyDay() {
 /* ════════════════════════════════════════════════
    HOME PAGE
    ════════════════════════════════════════════════ */
-export default function Home() {
+export default function Home({ onNavigate }) {
   const { selectedDate } = useCalendar();
   const dispatch         = useCalendarDispatch();
-  const { removeEvent, addEvent } = useEventActions();
+  const { removeEvent, addEvent, editEvent } = useEventActions();
   const { openModal }    = useEventModal();
 
   const { dayEvents, dayTasks, removePendingTask } = useHomeData(selectedDate);
@@ -772,7 +778,13 @@ export default function Home() {
                     key={`cluster-${i}`}
                     items={entry.items}
                     onDelete={removeEvent}
-                    onEdit={(ev) => openModal(ev, ev.tag)}
+                    onApplySuggestion={async (suggestion) => {
+                      await editEvent(extractBaseEventId(suggestion.event.id), {
+                        start_time: suggestion.suggestedStart.toISOString(),
+                        end_time:   suggestion.suggestedEnd.toISOString(),
+                      });
+                      showToast("Overlap resolved and schedule updated.");
+                    }}
                   />
                 );
               }
@@ -794,8 +806,15 @@ export default function Home() {
 
         {/* Right sidebar */}
         <aside className={styles.rightSidebar}>
-          <TaskWidget tasks={dayTasks} selectedDate={selectedDate} />
-          <HomeStudyCoachCard days={7} />
+          <TaskWidget
+            tasks={dayTasks}
+            selectedDate={selectedDate}
+            onViewAllTasks={() => onNavigate?.("tasks")}
+          />
+          <HomeStudyCoachCard
+            days={7}
+            onNavigateAnalytics={() => onNavigate?.("analytics")}
+          />
         </aside>
       </div>
     </div>

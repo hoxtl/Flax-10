@@ -49,6 +49,7 @@
     border-radius: 14px;
     overflow: hidden;
     align-self: start;
+    width: 100%;
   }
   
   .taskWidgetHeader {
