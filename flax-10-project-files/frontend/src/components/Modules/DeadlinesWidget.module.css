@@ -161,3 +161,29 @@
 .viewAllBtn:hover {
     background: color-mix(in srgb, var(--primary) 10%, transparent);
 }
+
+/* --- Make widget tight (no forced height) --- */
+.widget,
+.container,
+.card {
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start;
+}
+
+/* If there’s a list wrapper that was stretching */
+.list,
+.body,
+.content {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Kill extra bottom padding that can look like whitespace */
+.widget,
+.container,
+.card,
+.body,
+.content {
+  padding-bottom: 0.75rem; /* adjust if you want, but keep it small */
+}

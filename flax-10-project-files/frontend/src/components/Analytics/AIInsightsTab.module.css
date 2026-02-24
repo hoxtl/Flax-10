@@ -39,6 +39,13 @@
   flex-shrink: 0;
 }
 
+.panelHeaderCompact {
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--border);
+}
+
 .panelTitle {
   font-size: 0.95rem;
   font-weight: 650;
