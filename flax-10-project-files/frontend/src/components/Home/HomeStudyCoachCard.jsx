@@ -1,19 +1,25 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import analyticsService from "../../api/analyticsService";
 import styles from "./HomeStudyCoachCard.module.css";
 
-export default function HomeStudyCoachCard({ days = 7 }) {
+export default function HomeStudyCoachCard({ days = 7, onNavigateAnalytics }) {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState(null);
 
   const generate = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await analyticsService.getAiInsights(days);
       setInsights(res?.insights || "");
-    } catch {
-      // silent
+    } catch (err) {
+      const msg = err?.message || "";
+      if (msg.includes("OpenAI API key not configured") || msg.includes("OpenAI package not installed")) {
+        setError("AI study coach isn’t configured yet on this account.");
+      } else {
+        setError("Couldn’t generate insights right now. Try again in a moment.");
+      }
     } finally {
       setLoading(false);
     }
@@ -27,7 +33,13 @@ export default function HomeStudyCoachCard({ days = 7 }) {
           <span className={styles.sub}>
             Get a quick study plan based on your week — peak hours, gaps, and priorities.
           </span>
-          <Link className={styles.link} to="/analytics">Want detailed insights? →</Link>
+          <button
+            type="button"
+            className={styles.link}
+            onClick={() => onNavigateAnalytics?.()}
+          >
+            Want detailed insights? →
+          </button>
         </div>
         <button
           type="button"
@@ -40,6 +52,11 @@ export default function HomeStudyCoachCard({ days = 7 }) {
       </div>
 
       <div className={styles.body}>
+        {error && (
+          <div className={styles.errorText}>
+            {error}
+          </div>
+        )}
         {loading && (
           <div className={styles.centeredState}>
             <div className={styles.spinner} />

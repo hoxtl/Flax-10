@@ -76,6 +76,7 @@ export default function TasksPage() {
                 onToggleComplete={toggleComplete}
                 onDeleteTask={removeTask}
                 onEditTask={editTask}
+                onCreateTask={() => setShowTaskModal(true)}
             />
             {showTaskModal && (
                 <CreateTaskModal

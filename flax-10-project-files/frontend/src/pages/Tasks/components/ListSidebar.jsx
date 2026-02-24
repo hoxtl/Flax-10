@@ -63,6 +63,7 @@ export default function ListSidebar({
     onNewList,
     onDeleteList,
     onRenameList,
+    onUnarchiveList,
     archivedLists = [],
 }) {
     const [ctxMenu,      setCtxMenu]      = useState(null);
@@ -142,7 +143,6 @@ export default function ListSidebar({
                                     onClick={() => { onSelectList(list.id); onSelectFilter("all"); }}
                                 >
                                     <span className={styles.listDot} style={{ background: color }} />
-                                    <span className={styles.listIcon}>{list.icon || "📋"}</span>
                                     <span className={styles.listName}>{list.name}</span>
                                     {count > 0 && <span className={styles.listCount}>{count}</span>}
                                 </button>
@@ -169,8 +169,16 @@ export default function ListSidebar({
                         <div className={styles.archiveList}>
                             {archivedLists.map(list => (
                                 <div key={list.id} className={styles.archiveItem}>
-                                    <span className={styles.listIcon}>{list.icon || "📋"}</span>
                                     <span className={styles.archiveName}>{list.name}</span>
+                                    {onUnarchiveList && (
+                                        <button
+                                            type="button"
+                                            className={styles.restoreBtn}
+                                            onClick={() => onUnarchiveList(list.id)}
+                                        >
+                                            Restore
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
