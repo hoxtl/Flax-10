@@ -1,3 +1,4 @@
+// src/components/Home/HomeStudyCoachCard.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import analyticsService from "../../api/analyticsService";
@@ -22,26 +23,42 @@ export default function HomeStudyCoachCard({ days = 7 }) {
   };
 
   return (
-    <div style={{ borderRadius: 14, overflow: "hidden" }}>
-      <InsightsPanel
-        insights={insights}
-        loading={loading}
-        onGenerate={generate}
-        period={days}
-      />
+    <div className={styles.wrap}>
+      {/* Top CTA bar */}
+      <div className={styles.cta}>
+        <div className={styles.ctaText}>
+          <div className={styles.ctaTitle}>Want a personalised schedule?</div>
+          <div className={styles.ctaSub}>
+            Get a quick study plan based on your week — peak hours, gaps, and
+            priorities.
+          </div>
+        </div>
+
+        <button
+          className={styles.ctaLink}
+          type="button"
+          onClick={() => nav("/analytics")}
+        >
+          Want detailed insights? →
+        </button>
+      </div>
+
+      {/* Reuse the Analytics widget in compact mode */}
+      <div className={styles.widgetShell}>
+        <InsightsPanel
+          insights={insights}
+          loading={loading}
+          onGenerate={generate}
+          period={days}
+          compact
+        />
+      </div>
+
+      {/* Bottom link (optional, but you had this before) */}
       <button
+        className={styles.viewAllBtn}
+        type="button"
         onClick={() => nav("/analytics")}
-        style={{
-          width: "100%",
-          border: "none",
-          background: "transparent",
-          padding: "0.6rem 0.85rem",
-          cursor: "pointer",
-          fontWeight: 650,
-          color: "var(--primary)",
-          textAlign: "left",
-          borderTop: "1px solid var(--border)",
-        }}
       >
         View full AI coach →
       </button>
