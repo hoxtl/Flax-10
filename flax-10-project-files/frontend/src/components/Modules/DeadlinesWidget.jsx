@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import {
   getDeadlineCountdown,
@@ -22,9 +21,6 @@ export default function DeadlinesWidget() {
         {/* Header — consistent with Today's Tasks & AI card */}
         <div className={styles.headerRow}>
           <span className={styles.heading}>Upcoming Deadlines</span>
-          <Link to="/modules" className={styles.viewAllBtn}>
-            View all →
-          </Link>
         </div>
 
         {deadlines.map((deadline) => (
@@ -57,36 +53,21 @@ function useUpcomingDeadlines() {
   return deadlines;
 }
 
-/* ─── Single row ──────────────────────────────── */
+/* ─── Single row — simplified: title + due & countdown only ── */
 function DeadlineRow({ deadline, onClick }) {
   const urgency = getDeadlineUrgency(deadline.start_due_date);
   const countdown = getDeadlineCountdown(deadline.start_due_date);
+  const dueStr = formatDeadlineDateTime(deadline.start_due_date);
 
   return (
     <div
       className={`${styles.row} ${styles[urgency] || ""}`}
       onClick={onClick}
     >
-      <span className={styles.icon}>⏳</span>
-
       <div className={styles.body}>
-        <div className={styles.titleRow}>
-          <span className={styles.type}>
-            {DEADLINE_LABELS[deadline.deadline_type] ?? deadline.deadline_type}
-          </span>
-          <span className={styles.title}>{deadline.title}</span>
-        </div>
-        <span className={styles.moduleLabel}>
-          {deadline.module_code} — {deadline.module_name}
-        </span>
-      </div>
-
-      <div className={styles.timeColumn}>
-        <span className={styles.date}>
-          {formatDeadlineDateTime(deadline.start_due_date)}
-        </span>
-        <span className={`${styles.countdown} ${styles[urgency] || ""}`}>
-          {countdown}
+        <span className={styles.title}>{deadline.title}</span>
+        <span className={styles.meta}>
+          {dueStr} · <span className={`${styles.countdown} ${styles[urgency] || ""}`}>{countdown}</span>
         </span>
       </div>
     </div>
