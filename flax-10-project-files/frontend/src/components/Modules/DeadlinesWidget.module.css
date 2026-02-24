@@ -91,59 +91,30 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 2px;
   }
-  
-  .titleRow {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
+
   .title {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
-  .type {
-    font-size: 0.65rem;
-    font-weight: 600;
-    background: var(--pill-bg);
-    color: var(--primary);
-    padding: 1px 6px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  
-  .moduleLabel {
-    font-size: 0.65rem;
-    font-weight: 500;
+
+  .meta {
+    font-size: 0.68rem;
     color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
-  /* ── Right-side temporal column ── */
-  .timeColumn {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1px;
-    flex-shrink: 0;
+
+  .meta .countdown {
+    font-weight: 700;
   }
-  
-  .date {
-    font-size: 0.65rem;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-  
+
   .countdown {
     font-size: 0.72rem;
     font-weight: 700;
