@@ -52,6 +52,11 @@ export default function TasksPage() {
         addList({ name: list.name, icon: list.icon, color: list.color });
     };
 
+    const handlePermanentlyDeleteList = (listId) => {
+        if (!window.confirm("Permanently delete this list? You won’t be able to restore it.")) return;
+        setArchivedLists(prev => prev.filter(l => l.id !== listId));
+    };
+
     if (listsLoading) return <div className={styles.loading}>Loading…</div>;
 
     return (
@@ -67,6 +72,7 @@ export default function TasksPage() {
                 onDeleteList={handleDeleteList}
                 onRenameList={renameList}
                 onUnarchiveList={handleUnarchiveList}
+                onPermanentlyDeleteList={handlePermanentlyDeleteList}
                 archivedLists={archivedLists}
             />
             <TaskFeed
