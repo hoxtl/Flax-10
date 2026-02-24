@@ -17,6 +17,7 @@
  * Dependencies: none (pure React + CSS modules)
  */
 import { useState, useRef, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import styles from "./DateTimePicker.module.css";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -54,6 +55,22 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
   const [minute,  setMinute]  = useState(parsed ? parsed.getMinutes() : 0);
 
   const ref = useRef(null);
+  const dropdownRef = useRef(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+
+  // Position dropdown when opening (so it's not clipped by modal overflow)
+  useEffect(() => {
+    if (!open || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const gap = 6;
+    const dropdownHeight = 320;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
+    setDropdownPos({
+      top: openAbove ? rect.top - dropdownHeight - gap : rect.bottom + gap,
+      left: rect.left,
+    });
+  }, [open]);
 
   // Sync selDate/time when value prop changes externally
   useEffect(() => {
@@ -69,10 +86,13 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     }
   }, [value]);
 
-  // Close on outside click
+  // Close on outside click (trigger and portaled dropdown are separate)
   useEffect(() => {
     if (!open) return;
-    const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const h = e => {
+      if (ref.current?.contains(e.target) || dropdownRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
@@ -128,9 +148,18 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
         )}
       </button>
 
-      {/* Dropdown */}
-      {open && (
-        <div className={styles.dropdown}>
+      {/* Dropdown — rendered in portal so it's not clipped by modal */}
+      {open && createPortal(
+        <div
+          ref={dropdownRef}
+          className={styles.dropdown}
+          style={{
+            position: "fixed",
+            top: dropdownPos.top,
+            left: dropdownPos.left,
+            zIndex: 10000,
+          }}
+        >
           {/* Month navigation */}
           <div className={styles.calHeader}>
             <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
@@ -189,7 +218,8 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
               Done
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
