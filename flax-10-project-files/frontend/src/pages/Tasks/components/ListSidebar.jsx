@@ -1,3 +1,5 @@
+// list side bar for the tasks page
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./ListSidebar.module.css";
 
@@ -10,7 +12,8 @@ function listColour(list, idx) {
     return list.color || LIST_COLOURS[idx % LIST_COLOURS.length];
 }
 
-function RenameInput({ value, onSave, onCancel }) {
+
+function RenameInput({ value, onSave, onCancel}) {
     const [val, setVal] = useState(value);
     const ref = useRef(null);
     useEffect(() => { ref.current?.focus(); ref.current?.select(); }, []);
