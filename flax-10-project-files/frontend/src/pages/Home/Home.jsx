@@ -136,7 +136,6 @@ function groupOverlaps(sortedItems) {
 function computeTimelineWithGaps(sortedItems, pendingTasks) {
   const grouped = groupOverlaps(sortedItems);
   const result  = [];
-  let taskIdx   = 0;
 
   for (let i = 0; i < grouped.length; i++) {
     const g = grouped[i];
@@ -150,8 +149,8 @@ function computeTimelineWithGaps(sortedItems, pendingTasks) {
       const nextStart = new Date(firstNext.start_time);
       const gapMins   = Math.round((nextStart - curEnd) / 60000);
       if (gapMins >= 30) {
-        const suggestedTask = pendingTasks[taskIdx % pendingTasks.length] || null;
-        taskIdx++;
+        const fits = (t) => ((t.estimated_blocks || 1) * 25) <= gapMins;
+        const suggestedTask = pendingTasks.find(fits) || pendingTasks[0] || null;
         result.push({ type: "gap", minutes: gapMins, gapStart: curEnd, suggestedTask });
       }
     }
@@ -271,23 +270,26 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
 }
 
 /* ─── Timeline event card ────────────────────────────────── */
-function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
+function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, dayTasks }) {
   const { getTag }          = useTags();
   const [showDetail, setShowDetail] = useState(false);
   const [ctxMenu, setCtxMenu]       = useState(null);
 
   const theme       = getTag(item.tag) || { color: "#94A3B8", icon: "📅" };
   const icon        = resolveEventIcon(item, theme.icon);
-  const accentColor = theme.color || "#94A3B8";
+  const durationMins = item.end_time
+    ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
+    : null;
+  const matchTask   = dayTasks?.find((t) => (t.title || "").trim() === (item.title || "").trim());
+  const accentColor = matchTask ? (PRIORITY_COLOURS[matchTask.priority] || theme.color) : (theme.color || "#94A3B8");
   const active      = isNow(item.start_time, item.end_time);
   const past        = !active && isPast(item.end_time);
   const lect        = isLecture(item);
   const modCode     = lect ? (item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description)) : null;
   const startTime   = formatTime(item.start_time);
   const endTime     = formatTime(item.end_time);
-  const durationMins = item.end_time
-    ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
-    : null;
+
+  const cardHeight = durationMins != null ? Math.max(40, Math.min(180, Math.round(durationMins * 1.8))) : undefined;
 
   const handleContextMenu = useCallback((e) => {
     e.preventDefault();
@@ -308,7 +310,7 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit }) {
 
         <div
           className={`${styles.card} ${past ? styles.cardPast : ""} ${active ? styles.cardActive : ""}`}
-          style={{ "--card-accent": accentColor }}
+          style={{ "--card-accent": accentColor, minHeight: cardHeight ? `${cardHeight}px` : undefined }}
           onClick={() => setShowDetail(true)}
           onContextMenu={handleContextMenu}
         >
@@ -518,11 +520,11 @@ function FreeGap({ minutes, gapStart, suggestedTask, onTaskScheduled, addEvent, 
       });
 
       onTaskScheduled?.(suggestedTask.id);
-      onToast?.(`"${suggestedTask.title}" added to your plan ✓`);
+      onToast?.(`"${suggestedTask.title}" added to your plan`);
       setHidden(true);
     } catch {
       onTaskScheduled?.(suggestedTask.id);
-      onToast?.(`"${suggestedTask.title}" added to your plan ✓`);
+      onToast?.(`"${suggestedTask.title}" added to your plan`);
       setHidden(true);
     } finally {
       setScheduling(false);
@@ -558,11 +560,11 @@ function FreeGap({ minutes, gapStart, suggestedTask, onTaskScheduled, addEvent, 
           <button
             type="button"
             className={styles.freeTick}
-            title="Add to timeline"
+            title="Suggest and add to timeline"
             onClick={handleSchedule}
             disabled={scheduling}
           >
-            {scheduling ? "…" : "Add"}
+            {scheduling ? "…" : "Suggest"}
           </button>
         )}
       </div>
@@ -648,6 +650,7 @@ function EmptyDay() {
 export default function Home({ onNavigate }) {
   const { selectedDate } = useCalendar();
   const dispatch         = useCalendarDispatch();
+  const { loadEvents }   = useCalendarEvents();
   const { removeEvent, addEvent, editEvent } = useEventActions();
   const { openModal }    = useEventModal();
 
@@ -701,6 +704,15 @@ export default function Home({ onNavigate }) {
 
   const upcomingItemEntries = upcomingTimeline.filter((e) => e.type === "item" || e.type === "cluster");
 
+  const mustDoTasks = useMemo(() => {
+    if (!isToday(selectedDate)) return [];
+    const todayEnd = new Date(selectedDate);
+    todayEnd.setHours(23, 59, 59, 999);
+    return dayTasks.filter(
+      (t) => t.priority === "urgent" && t.due_date && new Date(t.due_date) <= todayEnd
+    );
+  }, [dayTasks, selectedDate]);
+
   return (
     <div className={styles.page}>
       {/* ── Toast banner ── */}
@@ -736,6 +748,22 @@ export default function Home({ onNavigate }) {
               </span>
             </div>
 
+            {mustDoTasks.length > 0 && (
+              <div className={styles.mustDoSection}>
+                <div className={styles.mustDoLabel}>Must do today</div>
+                <div className={styles.mustDoList}>
+                  {mustDoTasks.map((task) => (
+                    <div key={task.id} className={styles.mustDoItem} style={{ "--priority": PRIORITY_COLOURS[task.priority] || "var(--primary)" }}>
+                      <span className={styles.mustDoTitle}>{task.title}</span>
+                      {task.estimated_blocks && (
+                        <span className={styles.mustDoEst}>{task.estimated_blocks * 25}m</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {pastItems.length > 0 && (
               <div className={styles.pastDetails}>
                 <div className={styles.pastSummary}>
@@ -746,6 +774,7 @@ export default function Home({ onNavigate }) {
                     <TimelineRow
                       key={item.id}
                       item={item}
+                      dayTasks={dayTasks}
                       isFirst={idx === 0}
                       isLast={idx === pastItems.length - 1}
                       onDelete={removeEvent}
@@ -779,11 +808,18 @@ export default function Home({ onNavigate }) {
                     items={entry.items}
                     onDelete={removeEvent}
                     onApplySuggestion={async (suggestion) => {
-                      await editEvent(extractBaseEventId(suggestion.event.id), {
-                        start_time: suggestion.suggestedStart.toISOString(),
-                        end_time:   suggestion.suggestedEnd.toISOString(),
-                      });
-                      showToast("Overlap resolved and schedule updated.");
+                      try {
+                        const baseId = extractBaseEventId(suggestion.event.id);
+                        await editEvent(baseId, {
+                          start_time: suggestion.suggestedStart.toISOString(),
+                          end_time:   suggestion.suggestedEnd.toISOString(),
+                        });
+                        await loadEvents();
+                        showToast("Overlap resolved and schedule updated.");
+                      } catch (err) {
+                        console.error("Apply suggestion failed:", err);
+                        showToast("Could not apply — try right-click to edit manually.");
+                      }
                     }}
                   />
                 );
@@ -794,6 +830,7 @@ export default function Home({ onNavigate }) {
                 <TimelineRow
                   key={item.id}
                   item={item}
+                  dayTasks={dayTasks}
                   isFirst={itemIndex === 0}
                   isLast={itemIndex === upcomingItemEntries.length - 1}
                   onDelete={removeEvent}
