@@ -296,3 +296,145 @@ def create_deadline_calendar_event(user, deadline):
             'priority': 'high',
         },
      )
+
+# ---------------------------------------------------------------------------
+# Study session & theme session seeding
+# ---------------------------------------------------------------------------
+
+TASK_LABELS = [
+    'CS4303 programming assignment',
+    'HI4101 essay',
+    'MA4201 problem set',
+    'PH4102 lab report',
+    'Literature review',
+    'Revision: data structures',
+    'Revision: algorithms',
+    'Group project planning',
+    'Reply to supervisor email',
+    'Plan the week ahead',
+    'Past paper practice',
+    'Reading week catch-up',
+]
+
+
+def build_study_sessions_for_user(user, profile='balanced'):
+    """
+    Returns a list of StudySession instances across the past 90 days.
+
+    Profiles:
+      'balanced'   – steady weekday studier, short weekend dips   (janedoe)
+      'night_owl'  – late evening sessions, irregular weekends     (charlie)
+      'consistent' – high volume, long streaks                     (random fixture users)
+    """
+    from studyFlax.models.timer.sessionModel import StudySession
+
+    now      = timezone.now()
+    sessions = []
+
+    # profile-specific knobs
+    if profile == 'night_owl':
+        preferred_hours     = [20, 21, 22, 23]
+        weekend_probability = 0.55
+        skip_day_prob       = 0.25
+        work_choices        = [25, 50, 75, 100]
+    elif profile == 'consistent':
+        preferred_hours     = [9, 10, 14, 15, 16]
+        weekend_probability = 0.70
+        skip_day_prob       = 0.10
+        work_choices        = [50, 75, 100, 125]
+    else:  # balanced
+        preferred_hours     = [9, 10, 11, 14, 15, 16]
+        weekend_probability = 0.40
+        skip_day_prob       = 0.20
+        work_choices        = [25, 50, 75]
+
+    for day_offset in range(90):
+        session_date = now - timedelta(days=day_offset)
+        is_weekend   = session_date.weekday() >= 5
+
+        # decide whether to study today
+        if is_weekend and random.random() > weekend_probability:
+            continue
+        if not is_weekend and random.random() < skip_day_prob:
+            continue
+
+        sessions_today = random.randint(1, 3)
+        hours_used     = random.sample(preferred_hours, min(sessions_today, len(preferred_hours)))
+
+        for hour in hours_used:
+            work_mins  = random.choice(work_choices)
+            break_mins = (work_mins // 25) * 5
+            n_sessions = work_mins // 25
+            status     = 'Overtime' if random.random() < 0.08 else 'Completed'
+
+            start = session_date.replace(hour=hour, minute=0, second=0, microsecond=0)
+            end   = start + timedelta(minutes=work_mins + break_mins)
+
+            block_id = int(start.timestamp() * 1000)
+
+            sessions.append(StudySession(
+                user=user,
+                study_block_id=block_id,
+                start_time=start,
+                end_time=end,
+                duration=work_mins,
+                break_duration=break_mins,
+                session_count=n_sessions,
+                task=random.choice(TASK_LABELS),
+                status=status,
+            ))
+
+    return sessions
+
+
+def build_theme_sessions_for_user(user, profile='balanced'):
+    """
+    Returns a list of ThemeSession instances across the past 90 days.
+
+    Profiles:
+      'balanced'   – mostly light, some dark afternoons
+      'night_owl'  – mostly dark, especially evenings (20-23h)
+      'consistent' – mixed, slight light preference
+    """
+    from studyFlax.models.timer.themeSessionModel import ThemeSession
+
+    now      = timezone.now()
+    sessions = []
+
+    for day_offset in range(90):
+        base = now - timedelta(days=day_offset)
+
+        if profile == 'night_owl':
+            # daytime: short light session, evening: long dark session
+            slots = [
+                (8,  'light', random.randint(30, 90)),
+                (20, 'dark',  random.randint(90, 240)),
+                (22, 'dark',  random.randint(30, 90)),
+            ]
+        elif profile == 'consistent':
+            slots = [
+                (9,  'light', random.randint(60, 180)),
+                (14, 'light', random.randint(60, 120)),
+                (19, 'dark',  random.randint(30, 90)),
+            ]
+        else:  # balanced
+            slots = [
+                (9,  'light', random.randint(60, 180)),
+                (13, 'light', random.randint(30, 90)),
+                (20, 'dark',  random.randint(30, 120)),
+            ]
+
+        for hour, theme, duration in slots:
+            if random.random() < 0.15:   # occasional skip for realism
+                continue
+            started = base.replace(hour=hour, minute=0, second=0, microsecond=0)
+            ended   = started + timedelta(minutes=duration)
+            sessions.append(ThemeSession(
+                user=user,
+                theme=theme,
+                started_at=started,
+                ended_at=ended,
+                duration_minutes=duration,
+            ))
+
+    return sessions
