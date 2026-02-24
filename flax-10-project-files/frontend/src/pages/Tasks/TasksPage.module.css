@@ -11,3 +11,41 @@
     height: 100%;
     color: var(--muted);
 }
+
+.toast {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+.toastUndoBtn {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    color: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.toastUndoBtn:hover { background: rgba(255,255,255,0.35); }
+.toastClose {
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.8;
+    cursor: pointer;
+    padding: 0.2rem;
+    font-size: 0.75rem;
+}
+.toastClose:hover { opacity: 1; }
