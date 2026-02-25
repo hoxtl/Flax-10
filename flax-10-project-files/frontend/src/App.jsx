@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
@@ -242,16 +242,33 @@ function OnboardingWrapper({ onComplete }) {
 }
 
 function AppScreen({ activeNav, setActiveNav, user }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  useSyncNavFromUrl(location.pathname, setActiveNav);
+  const handleNavChange = (id) => {
+    setActiveNav(id);
+    const route = APP_ROUTES.find((r) => r.id === id);
+    if (route) navigate(route.path);
+  };
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
-        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
+        <DashboardLayout activeNav={activeNav} onNavChange={handleNavChange} user={user}>
           <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </DashboardLayout>
         <OnboardingWrapper />
       </AppProviders>
     </ScreenWrap>
   );
+}
+
+// Sync URL pathname -> activeNav so Links (e.g. /modules?code=X) switch the view
+function useSyncNavFromUrl(pathname, setActiveNav) {
+  useEffect(() => {
+    const path = pathname || "/";
+    const route = APP_ROUTES.find((r) => r.path === path);
+    if (route) setActiveNav(route.id);
+  }, [pathname, setActiveNav]);
 }
 
 // Screen render
