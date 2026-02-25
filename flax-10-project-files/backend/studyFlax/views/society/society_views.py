@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.society import Society, SocietyMembership
 from studyFlax.serialisers import SocietyListSerialiser
+from .helpers import handle_image_urls
 
 
 @api_view(['GET', 'POST'])
@@ -43,5 +44,6 @@ def create_society(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     society = serialiser.save()
+    handle_image_urls(society, request.data)
     SocietyMembership.objects.create(user=request.user, society=society, role='admin')
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
