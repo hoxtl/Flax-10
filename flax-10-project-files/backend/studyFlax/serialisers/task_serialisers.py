@@ -7,7 +7,7 @@ class TaskListSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = TaskList
-        fields = ['id', 'name', 'category', 'task_count', 'created_at']
+        fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at']
 
     def get_task_count(self, obj):
         return obj.tasks.filter(completed=False).count()

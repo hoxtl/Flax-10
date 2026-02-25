@@ -13,6 +13,7 @@ class TaskList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_lists')
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='personal')
+    archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
