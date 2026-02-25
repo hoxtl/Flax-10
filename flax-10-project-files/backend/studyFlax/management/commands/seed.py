@@ -9,8 +9,8 @@ from studyFlax.models import (
     Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
 )
 from studyFlax.fixtures.data_fixtures import (
-    category_fixtures, tag_fixtures, recurrence_fixtures, 
-    module_fixtures, society_fixtures, location_fixtures
+    category_fixtures, tag_fixtures, recurrence_fixtures,
+    module_fixtures, society_seed_data, location_fixtures
 )
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
