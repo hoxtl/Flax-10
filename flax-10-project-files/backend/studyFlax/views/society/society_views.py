@@ -40,7 +40,10 @@ def get_user_membership(user, society):
 
 
 def create_society(request):
-    serialiser = SocietyListSerialiser(data=request.data)
+    data = request.data.copy()
+    if not data.get('admin_emails'):
+        data['admin_emails'] = request.user.email
+    serialiser = SocietyListSerialiser(data=data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     society = serialiser.save()
