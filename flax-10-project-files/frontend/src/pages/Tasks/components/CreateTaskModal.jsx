@@ -1,99 +1,190 @@
-import { useState } from "react";
+/**
+ * CreateTaskModal.jsx
+ *
+ * Modal for creating a new task. Provides a lightweight, canvas-style form with
+ * borderless inputs, priority and study-block chips, and optional due date.
+ * Matches dashboard card styling (rounded corners, cohesive hierarchy).
+ */
+
+import { useState, useMemo } from "react";
+import { Flag, Clock } from "lucide-react";
 import DateTimePicker from "./DateTimePicker";
 import styles from "./CreateTaskModal.module.css";
+import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
+const PRIORITY_OPTIONS = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+  { value: "urgent", label: "Urgent" },
+];
+
+const STUDY_BLOCK_OPTIONS = [
+  { value: 1, label: "25m" },
+  { value: 2, label: "50m" },
+  { value: 3, label: "1h 15m" },
+  { value: 4, label: "1h 40m" },
+];
+
+const FALLBACK_COLOURS = FOCUS_BLOCK_COLOURS_HEX;
+
+/**
+ * Resolves display colour for a task list (stored colour or fallback by index).
+ * @param {Object} list - Task list object (may have .color, .id).
+ * @param {number} idx - Index in the lists array for fallback.
+ * @returns {string} Hex colour.
+ */
+function getListColor(list, idx) {
+  if (list?.color) return list.color;
+  try {
+    if (list?.id && typeof window !== "undefined") {
+      const s = localStorage.getItem("listColor:" + list.id);
+      if (s) return s;
+    }
+  } catch (_) {}
+  return FALLBACK_COLOURS[idx % FALLBACK_COLOURS.length];
+}
+
+/**
+ * Create Task modal. Public props: lists, defaultListId, onSave, onClose.
+ */
 export default function CreateTaskModal({ lists, defaultListId, onSave, onClose }) {
-    const [form, setForm] = useState({
-        title:            "",
-        description:      "",
-        priority:         "medium",
-        due_date:         "",
-        task_list:        defaultListId || (lists[0]?.id ?? ""),
-    });
-    const [saving, setSaving] = useState(false);
+  const sortedLists = useMemo(
+    () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
+    [lists]
+  );
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    due_date: "",
+    task_list: defaultListId || (sortedLists[0]?.id ?? ""),
+    estimated_blocks: 1,
+  });
+  const [saving, setSaving] = useState(false);
 
-    const set = (field, val) => setForm(p => ({ ...p, [field]: val }));
+  const selectedList = useMemo(
+    () => sortedLists.find((l) => String(l.id) === String(form.task_list)),
+    [sortedLists, form.task_list]
+  );
+  const selectedListColor = selectedList
+    ? getListColor(selectedList, sortedLists.indexOf(selectedList))
+    : null;
 
-    const handleSave = async () => {
-        if (!form.title.trim()) return;
-        setSaving(true);
-        await onSave({ ...form, due_date: form.due_date || null });
-        setSaving(false);
-        onClose();
-    };
+  const set = (field, val) => setForm((p) => ({ ...p, [field]: val }));
 
-    const handleKey = (e) => { if (e.key === "Escape") onClose(); };
+  const handleSave = async () => {
+    if (!form.title.trim()) return;
+    setSaving(true);
+    await onSave({ ...form, due_date: form.due_date || null });
+    setSaving(false);
+    onClose();
+  };
 
-    return (
-        <div className={styles.overlay} onMouseDown={onClose} onKeyDown={handleKey}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                {/* Header */}
-                <div className={styles.header}>
-                    <h2 className={styles.title}>New task</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>✕</button>
-                </div>
+  const handleKey = (e) => {
+    if (e.key === "Escape") onClose();
+  };
 
-                {/* Body — compact layout so date picker is visible without scrolling */}
-                <div className={styles.body}>
-                    <input
-                        className={styles.titleInput}
-                        placeholder="Task title…"
-                        value={form.title}
-                        onChange={e => set("title", e.target.value)}
-                        autoFocus
-                    />
-
-                    <textarea
-                        className={styles.desc}
-                        placeholder="Description (optional)"
-                        rows={2}
-                        value={form.description}
-                        onChange={e => set("description", e.target.value)}
-                    />
-
-                    <div className={styles.rowThree}>
-                        <div className={styles.field}>
-                            <label>PRIORITY</label>
-                            <select value={form.priority} onChange={e => set("priority", e.target.value)}>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
-                        </div>
-                        <div className={styles.field}>
-                            <label>LIST</label>
-                            <select value={form.task_list} onChange={e => set("task_list", e.target.value)}>
-                                {lists.map(l => (
-                                    <option key={l.id} value={l.id}>
-                                        {l.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className={styles.field}>
-                            <label>DUE DATE & TIME</label>
-                            <DateTimePicker
-                                value={form.due_date}
-                                onChange={val => set("due_date", val)}
-                                placeholder="Pick date & time (optional)"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className={styles.footer}>
-                    <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-                    <button
-                        className={styles.saveBtn}
-                        onClick={handleSave}
-                        disabled={saving || !form.title.trim()}
-                    >
-                        {saving ? "Saving…" : "Add task"}
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className={styles.overlay} onMouseDown={onClose} onKeyDown={handleKey}>
+      <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>New task</h2>
+          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
+            ✕
+          </button>
         </div>
-    );
+
+        <div className={styles.body}>
+          <div className={styles.canvas}>
+            <input
+              className={styles.titleInput}
+              placeholder="What do you need to do?"
+              value={form.title}
+              onChange={(e) => set("title", e.target.value)}
+              autoFocus
+            />
+            <textarea
+              className={styles.desc}
+              placeholder="Description (optional)"
+              rows={2}
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+            />
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.iconGroup}>
+              <Flag className={styles.icon} size={16} aria-hidden />
+              <div className={styles.chipGroup}>
+                {PRIORITY_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`${styles.chip} ${form.priority === value ? styles.chipActive : ""}`}
+                    onClick={() => set("priority", value)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.chipGroup}>
+              {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`}
+                  onClick={() => set("estimated_blocks", value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.iconGroup}>
+              <Clock className={styles.icon} size={16} aria-hidden />
+              <DateTimePicker
+                value={form.due_date}
+                onChange={(val) => set("due_date", val)}
+                placeholder="Pick date & time (optional)"
+              />
+            </div>
+            <div className={styles.listWrap}>
+              <span className={styles.listWrapLabel}>Focus block</span>
+              {selectedListColor && (
+                <span className={styles.listDot} style={{ background: selectedListColor }} />
+              )}
+              <select
+                value={form.task_list}
+                onChange={(e) => set("task_list", e.target.value)}
+                className={styles.select}
+                aria-label="Focus block"
+              >
+                {sortedLists.map((l) => (
+                  <option key={l.id} value={l.id}>{l.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.footer}>
+          <button type="button" className={styles.cancelBtn} onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className={styles.saveBtn}
+            onClick={handleSave}
+            disabled={saving || !form.title.trim()}
+          >
+            {saving ? "Saving…" : "Add task"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

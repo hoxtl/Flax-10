@@ -28,13 +28,12 @@ function useFilteredTasks(tasks, activeListId, activeFilter) {
 }
 
 export default function TasksPage() {
-    const { lists, loading: listsLoading, addList, removeList, renameList } = useTaskLists();
-    const { tasks, addTask, editTask, removeTask, toggleComplete } = useTasks();
+    const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
+    const { tasks, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
     const [activeListId,    setActiveListId]    = useState(null);
     const [activeFilter,   setActiveFilter]    = useState("all");
     const [showTaskModal,   setShowTaskModal]   = useState(false);
     const [showListModal,   setShowListModal]   = useState(false);
-    const [archivedLists,   setArchivedLists]   = useState([]);
     const [toastUndo,       setToastUndo]      = useState(null);
 
     const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter);
@@ -46,22 +45,18 @@ export default function TasksPage() {
     };
 
     const handleDeleteList = (listId) => {
-        const list = lists.find(l => l.id === listId);
-        if (list) setArchivedLists(prev => [...prev, list]);
         removeList(listId);
         if (activeListId === listId) { setActiveListId(null); setActiveFilter("all"); }
     };
 
-    const handleUnarchiveList = (listId) => {
-        const list = archivedLists.find(l => l.id === listId);
-        if (!list) return;
-        setArchivedLists(prev => prev.filter(l => l.id !== listId));
-        addList({ name: list.name, icon: list.icon, color: list.color });
+    const handleUnarchiveList = async (listId) => {
+        await restoreList(listId);
+        reloadTasks();
     };
 
-    const handlePermanentlyDeleteList = (listId) => {
+    const handlePermanentlyDeleteList = async (listId) => {
         if (!window.confirm("Permanently delete this list? You won’t be able to restore it.")) return;
-        setArchivedLists(prev => prev.filter(l => l.id !== listId));
+        await permanentlyDeleteList(listId);
     };
 
     if (listsLoading) return <div className={styles.loading}>Loading…</div>;
