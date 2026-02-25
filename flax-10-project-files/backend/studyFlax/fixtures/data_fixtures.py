@@ -363,7 +363,7 @@ society_seed_data = [
     {
         'name': 'Tech Society',
         'bio': 'Passionate about technology and innovation.',
-        'about': 'We host hackathons, workshops, and networking events for tech enthusiasts.',
+        'about': 'We host hackathons, workshops, and networking events for tech enthusiasts.\nAdmin: johndoe@gmail.com',
         'image': 'http://localhost:8000/static/seed_images/societies/tech.jpg',
         'tags': ['Workshop', 'Hackathon', 'Networking'],
         'events': [
@@ -376,7 +376,7 @@ society_seed_data = [
     {
         'name': 'Art Club',
         'bio': 'Creative expression through various mediums.',
-        'about': 'A community for artists to share ideas and work on collaborative projects.',
+        'about': 'A community for artists to share ideas and work on collaborative projects.\nAdmin: johndoe@gmail.com',
         'image': 'http://localhost:8000/static/seed_images/societies/art.jpg',
         'tags': ['Exhibition', 'Workshop', 'Social'],
         'events': [
@@ -389,7 +389,7 @@ society_seed_data = [
     {
         'name': 'Photography Society',
         'bio': 'Capturing moments through the lens.',
-        'about': 'Weekly photo walks and exhibitions to showcase student photography.',
+        'about': 'Weekly photo walks and exhibitions to showcase student photography.\nAdmin: johndoe@gmail.com',
         'image': 'http://localhost:8000/static/seed_images/societies/photography.jpg',
         'tags': ['Photo Walk', 'Exhibition', 'Workshop'],
         'events': [
@@ -402,7 +402,7 @@ society_seed_data = [
     {
         'name': 'Board Game Society',
         'bio': 'Fun and games for everyone.',
-        'about': 'Join us for weekly board game nights and tournaments.',
+        'about': 'Join us for weekly board game nights and tournaments.\nAdmin: johndoe@gmail.com',
         'image': 'http://localhost:8000/static/seed_images/societies/boardgames.jpg',
         'tags': ['Game Night', 'Tournament', 'Social'],
         'events': [
@@ -415,7 +415,7 @@ society_seed_data = [
     {
         'name': 'Literature Society',
         'bio': 'Exploring the world through books.',
-        'about': 'Book club discussions and writing workshops for literature lovers.',
+        'about': 'Book club discussions and writing workshops for literature lovers.\nAdmin: johndoe@gmail.com',
         'image': 'http://localhost:8000/static/seed_images/societies/literature.jpg',
         'tags': ['Book Club', 'Workshop', 'Reading'],
         'events': [
