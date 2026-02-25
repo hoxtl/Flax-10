@@ -8,7 +8,6 @@ import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
-import FloatingTasks from "../components/Tasks/FloatingTasks";
 import { useLocation } from "react-router-dom";
 
 function useIsMobile(breakpoint = 900) {
@@ -65,11 +64,12 @@ function PageContent({ activeNav, children }) {
   );
 }
 
-function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
+function MainArea({ user, onQuickAdd, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav, selectedDate, showWeekBar, children }) {
   return (
     <div className={styles.main}>
       <TopBar user={user} onAddClick={onQuickAdd} onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
+        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick}
+        onNavChange={onNavChange} activeNav={activeNav} />
       {showWeekBar && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
     </div>
@@ -127,8 +127,8 @@ function DashboardMain({ state, onNavChange, children }) {
     <>
       <MainArea user={user} onQuickAdd={() => setShowQuickAdd(true)}
         onSettingsClick={() => onNavChange?.("settings")} onLogoutClick={handleLogoutClick}
-        onProfileClick={() => onNavChange?.("profile")} selectedDate={selectedDate}
-        showWeekBar={showWeekBar} activeNav={activeNav}>{children}
+        onProfileClick={() => onNavChange?.("profile")} onNavChange={onNavChange}
+        activeNav={activeNav} selectedDate={selectedDate} showWeekBar={showWeekBar}>{children}
       </MainArea>
       <DashboardModals showQuickAdd={showQuickAdd} setShowQuickAdd={setShowQuickAdd}
         onSelectType={onSelectType} modal={modal} />
@@ -145,7 +145,6 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         user={user} activeNav={activeNav} onNavChange={onNavChange}
         onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
       <DashboardMain state={{ ...state, activeNav }} onNavChange={onNavChange}>{children}</DashboardMain>
-      <FloatingTasks />
     </div>
   );
 }

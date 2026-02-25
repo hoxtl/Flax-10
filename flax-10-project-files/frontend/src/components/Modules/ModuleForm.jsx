@@ -51,10 +51,10 @@ function NameFields({ form_data, errors, is_editing, onChange }) {
     return (
         <>
             <FormGroup label="Module Code" error={errors.module_code} required>
-                <input type="text" className={getInput(errors.module_code, styles)} value={form_data.module_code} onChange={(e) => onChange('module_code', e.target.value)} placeholder="e.g., CS101" disabled={is_editing} />
+                <input type="text" className={getInput(errors.module_code, styles)} value={form_data.module_code} onChange={(e) => onChange('module_code', e.target.value)} placeholder="e.g., 5CCS2SEG" disabled={is_editing} />
             </FormGroup>
             <FormGroup label="Module Name" error={errors.module_name} required>
-                <input type="text" className={getInput(errors.module_name, styles)} value={form_data.module_name} onChange={(e) => onChange('module_name', e.target.value)} placeholder="e.g., Introduction to Computer Science" />
+                <input type="text" className={getInput(errors.module_name, styles)} value={form_data.module_name} onChange={(e) => onChange('module_name', e.target.value)} placeholder="e.g., Software Engineering" />
             </FormGroup>
         </>
     );
@@ -67,7 +67,7 @@ function DescriptionLocationFields({ form_data, onChange }) {
                 <textarea className={styles.textarea} value={form_data.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Brief description of the module..." rows={4} />
             </FormGroup>
             <FormGroup label="Location">
-                <input type="text" className={styles.input} value={form_data.location} onChange={(e) => onChange('location', e.target.value)} placeholder="e.g., Room 301, Building A" />
+                <input type="text" className={styles.input} value={form_data.location} onChange={(e) => onChange('location', e.target.value)} placeholder="e.g., Bush House, 2.09" />
             </FormGroup>
         </>
     );

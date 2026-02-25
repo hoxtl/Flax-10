@@ -10,26 +10,60 @@ TABLES = [
     'studyFlax_timetablesource', 'studyFlax_user',
     'studyFlax_society', 'studyFlax_societymembership', 'studyFlax_societytag',
     'studyFlax_societyevent', 'studyFlax_societyimage',
+    'studyFlax_deadline',
+    'studyFlax_enrollment',
+    'studyFlax_module',
+    'studyFlax_calendarevent',
+    'studyFlax_tag',
+    'studyFlax_category',
+    'studyFlax_task',
+    'studyFlax_tasklist',
+    'studyFlax_recurrencerule',
+    'studyFlax_usersettings',
+    'studyFlax_notification',
+    'studyFlax_timetablesource',
+    'studyFlax_user',
+    'studyFlax_studysession',
+    'studyFlax_themesession',
 ]
 
+EXCLUDE_FIELDS = {'id', 'password', 'last_login', 'date_joined'}
+
+
 def get_superuser_data():
-    ids = list(User.objects.filter(is_superuser=True).values_list('id', flat=True))
-    return list(User.objects.filter(id__in=ids).values()) if ids else []
+    return [
+        {k: v for k, v in u.items() if k not in EXCLUDE_FIELDS}
+        for u in User.objects.filter(is_superuser=True).values()
+    ]
+
 
 def truncate_tables(cursor, tables, stdout):
     for table in tables:
         cursor.execute(f'TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;')
-        stdout.write(f"Truncated {table}.")
+        stdout.write(f"  ✓  {table}")
+
 
 def restore_superusers(superusers_data, stdout):
     if not superusers_data:
         return
-    stdout.write("Restoring superusers...")
-    User.objects.bulk_create([User(**data) for data in superusers_data])
+    for data in superusers_data:
+        User.objects.create_superuser(password='1234', **data)
 
-def confirm_truncate(tables, stdout):
-    stdout.write(f"About to TRUNCATE: {', '.join(tables)}")
-    return input("Are you sure? This is irreversible. (yes/no): ") == 'yes'
+
+def confirm_truncate(stdout):
+    div = "─" * 40
+    stdout.write("")
+    stdout.write(div)
+    stdout.write("  ⚠️   python manage.py unseed")
+    stdout.write(div)
+    stdout.write("")
+    stdout.write(f"  This will wipe {len(TABLES)} tables and reset all sequences.")
+    stdout.write("  Superusers will be preserved and restored after.")
+    stdout.write("")
+    answer = input("  Type 'yes' to confirm: ")
+    stdout.write("")
+    return answer == 'yes'
+
 
 class Command(BaseCommand):
     help = 'Cleans the database using PostgreSQL TRUNCATE CASCADE, preserving superusers.'
@@ -37,11 +71,28 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         superusers_data = get_superuser_data()
         if not superusers_data:
-            self.stdout.write(self.style.WARNING("No superusers found. Database will be completely emptied."))
-        if not confirm_truncate(TABLES, self.stdout):
-            self.stdout.write("Operation cancelled.")
+            self.stdout.write(self.style.WARNING("  No superusers found — database will be completely emptied."))
+
+        if not confirm_truncate(self.stdout):
+            self.stdout.write("  Cancelled.")
+            self.stdout.write("")
             return
+
+        self.stdout.write("  Clearing tables...")
         with connection.cursor() as cursor:
             truncate_tables(cursor, TABLES, self.stdout)
+
+        self.stdout.write("")
+        self.stdout.write("  Restoring superusers...")
         restore_superusers(superusers_data, self.stdout)
-        self.stdout.write(self.style.SUCCESS('Database cleaned successfully. Superusers restored.'))
+        for su in superusers_data:
+            self.stdout.write(f"  ✓  {su.get('username', '?')}")
+
+        div = "─" * 40
+        self.stdout.write("")
+        self.stdout.write(self.style.SUCCESS(div))
+        self.stdout.write(self.style.SUCCESS("  ✅  Database cleared"))
+        self.stdout.write(self.style.SUCCESS(div))
+        self.stdout.write("")
+        self.stdout.write("  Run  python manage.py seed  to reseed.")
+        self.stdout.write("")
