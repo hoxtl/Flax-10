@@ -1,30 +1,22 @@
 import { useState } from "react";
 import styles from "./CreateListModal.module.css";
-
-// ── Color palette ─────────────────────────────────────────────────────────────
-const COLOUR_PALETTE = [
-  { hex: "#6366f1", label: "Indigo"  },
-  { hex: "#10b981", label: "Emerald" },
-  { hex: "#f59e0b", label: "Amber"   },
-  { hex: "#ec4899", label: "Pink"    },
-  { hex: "#8b5cf6", label: "Violet"  },
-  { hex: "#06b6d4", label: "Cyan"    },
-  { hex: "#ef4444", label: "Red"     },
-  { hex: "#84cc16", label: "Lime"    },
-  { hex: "#f97316", label: "Orange"  },
-  { hex: "#94a3b8", label: "Slate"   },
-];
+import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 export default function CreateListModal({ onSave, onClose }) {
   const [name,       setName]       = useState("");
-  const [color,      setColor]      = useState(COLOUR_PALETTE[0].hex);
+  const [color,      setColor]      = useState(FOCUS_BLOCK_PALETTE[0].hex);
+  const [customColor, setCustomColor] = useState("");
+  const [useCustom,   setUseCustom]  = useState(false);
   const [saving,     setSaving]     = useState(false);
+
+  const effectiveColor = useCustom && customColor ? customColor : color;
 
   const handleSave = async () => {
     if (!name.trim()) return;
+    const finalColor = useCustom && customColor ? customColor : color;
     setSaving(true);
-    await onSave({ name: name.trim(), color });
+    await onSave({ name: name.trim(), color: finalColor });
     setSaving(false);
     onClose();
   };
@@ -34,16 +26,17 @@ export default function CreateListModal({ onSave, onClose }) {
       <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
 
         <div className={styles.header}>
-          <h2 className={styles.title}>New list</h2>
+          <h2 className={styles.title}>New focus block</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
         <div className={styles.body}>
+          <p className={styles.subtitle}>Scheduled focus time — give it a name and colour</p>
 
           {/* Name */}
           <input
             className={styles.nameInput}
-            placeholder="List name…"
+            placeholder="Focus block name…"
             value={name}
             onChange={e => setName(e.target.value)}
             autoFocus
@@ -54,22 +47,42 @@ export default function CreateListModal({ onSave, onClose }) {
           <div className={styles.fieldRow}>
             <span className={styles.fieldLabel}>COLOUR</span>
             <div className={styles.colorGrid}>
-              {COLOUR_PALETTE.map(c => (
+              {FOCUS_BLOCK_PALETTE.map(c => (
                 <button
                   key={c.hex}
-                  className={`${styles.colorSwatch} ${color === c.hex ? styles.colorSwatchActive : ""}`}
+                  type="button"
+                  className={`${styles.colorSwatch} ${!useCustom && color === c.hex ? styles.colorSwatchActive : ""}`}
                   style={{ background: c.hex }}
-                  onClick={() => setColor(c.hex)}
+                  onClick={() => { setColor(c.hex); setUseCustom(false); }}
                   title={c.label}
                 />
               ))}
             </div>
+            <div className={styles.customColorRow}>
+              <label className={styles.customColorLabel}>
+                <input
+                  type="checkbox"
+                  checked={useCustom}
+                  onChange={e => setUseCustom(e.target.checked)}
+                />
+                <span>Custom colour</span>
+              </label>
+              {useCustom && (
+                <input
+                  type="color"
+                  className={styles.customColorInput}
+                  value={customColor || color}
+                  onChange={e => setCustomColor(e.target.value)}
+                  title="Pick a custom colour"
+                />
+              )}
+            </div>
           </div>
 
           {/* Preview */}
-          <div className={styles.preview} style={{ "--list-color": color }}>
-            <span className={styles.previewDot} style={{ background: color }} />
-            <span className={styles.previewName}>{name || "List name"}</span>
+          <div className={styles.preview} style={{ "--list-color": effectiveColor }}>
+            <span className={styles.previewDot} style={{ background: effectiveColor }} />
+            <span className={styles.previewName}>{name || "Focus block name"}</span>
           </div>
 
         </div>
@@ -81,7 +94,7 @@ export default function CreateListModal({ onSave, onClose }) {
             onClick={handleSave}
             disabled={saving || !name.trim()}
           >
-            {saving ? "Creating…" : "Create list"}
+            {saving ? "Creating…" : "Create focus block"}
           </button>
         </div>
       </div>

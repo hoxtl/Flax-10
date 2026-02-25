@@ -2,16 +2,18 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./ListSidebar.module.css";
-
-const LIST_COLOURS = [
-    "#6366f1", "#10b981", "#f59e0b", "#ec4899",
-    "#8b5cf6", "#06b6d4", "#ef4444", "#84cc16", "#f97316", "#94a3b8",
-];
+import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 function listColour(list, idx) {
-    return list.color || LIST_COLOURS[idx % LIST_COLOURS.length];
+    try {
+        if (list?.color) return list.color;
+        if (list?.id && typeof window !== "undefined") {
+            const stored = localStorage.getItem("listColor:" + list.id);
+            if (stored) return stored;
+        }
+    } catch (_) {}
+    return FOCUS_BLOCK_COLOURS_HEX[idx % FOCUS_BLOCK_COLOURS_HEX.length];
 }
-
 
 function RenameInput({ value, onSave, onCancel}) {
     const [val, setVal] = useState(value);
@@ -47,7 +49,7 @@ function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
             </button>
             <div className={styles.ctxDivider} />
             <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}>
-                🗑️ Delete list
+                🗑️ Delete focus block
             </button>
         </div>
     );
@@ -117,8 +119,8 @@ export default function ListSidebar({
                 ))}
             </nav>
 
-            {/* ── My Lists ── */}
-            <div className={styles.sectionLabel}>MY LISTS</div>
+            {/* ── Focus blocks ── */}
+            <div className={styles.sectionLabel}>FOCUS BLOCKS</div>
             <nav className={styles.nav}>
                 {lists.map((list, idx) => {
                     const color  = listColour(list, idx);
@@ -151,12 +153,12 @@ export default function ListSidebar({
                         </div>
                     );
                 })}
-                {lists.length === 0 && <p className={styles.emptyLists}>No lists yet</p>}
+                {lists.length === 0 && <p className={styles.emptyLists}>No focus blocks yet</p>}
             </nav>
 
             {/* ── Explicit create button ── */}
             <button className={styles.createListBtn} onClick={onNewList}>
-                + Create new list
+                + Add focus block
             </button>
 
             {/* ── Archived section ── */}

@@ -9,7 +9,7 @@ export default function useTasks(filters = {}) {
         setLoading(true);
         fetchTasks(filters)
             .then(setTasks)
-            .catch(console.error)
+            .catch(() => {})
             .finally(() => setLoading(false));
     }, [JSON.stringify(filters)]);
 
@@ -17,8 +17,9 @@ export default function useTasks(filters = {}) {
 
     const addTask = async (data) => {
         const created = await createTask(data);
-        setTasks(prev => [created, ...prev]);
-        return created;
+        const merged = { ...created, task_list: created.task_list ?? data.task_list };
+        setTasks(prev => [merged, ...prev]);
+        return merged;
     };
 
     const editTask = async (id, data) => {

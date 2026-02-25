@@ -84,6 +84,13 @@
   }
   .nameInput:focus { border-color: var(--primary); }
   .nameInput::placeholder { font-weight: 400; }
+
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0 0 -0.25rem;
+    line-height: 1.35;
+  }
   
   /* ── Field row ───────────────────────────────────────────── */
   .fieldRow {
@@ -246,6 +253,31 @@
   }
   .colorSwatch:hover { transform: scale(1.18); }
   .colorSwatchActive { border-color: var(--text); transform: scale(1.18); }
+
+  .customColorRow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+  .customColorLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .customColorLabel input { accent-color: var(--primary); }
+  .customColorInput {
+    width: 36px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--bg);
+  }
   
   /* ── Preview ─────────────────────────────────────────────── */
   .preview {
