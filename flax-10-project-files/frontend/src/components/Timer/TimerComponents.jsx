@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from "../../pages/Timer/TimerPage.module.css";
 import { noiseGenerator } from './utils/noiseUtils';
+import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {
@@ -160,28 +161,47 @@ const handleTaskKey = (e) => {
     if (e.key === 'Enter') e.target.blur();
 };
 
-/** Task input with optional pick-from-tasks list (sorted by urgency, auto-start on select) */
+/** Task input with optional pick-from-tasks list (sort by urgency or time, auto-start on select) */
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
+const SORT_URGENCY = 'urgency';
+const SORT_TIME = 'time';
 
 export const TaskInput = ({ value, onChange, onTaskSelect }) => {
     const [open, setOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [sortBy, setSortBy] = useState(SORT_URGENCY);
+    const [search, setSearch] = useState('');
     const ref = useRef(null);
 
-    const loadTasks = useCallback(() => {
+    const loadTasks = useCallback((sort = sortBy) => {
         setLoading(true);
-        import('../../api/taskService').then(({ fetchTasks }) =>
-            fetchTasks()
-                .then((data) => {
-                    const list = (data || []).filter((t) => !t.completed);
+        Promise.all([
+            import('../../api/taskService').then(({ fetchTasks }) => fetchTasks()),
+            import('../../api/taskService').then(({ fetchTaskLists }) => fetchTaskLists()),
+        ])
+            .then(([tasksData, listsData]) => {
+                const listMap = {};
+                (listsData || []).forEach((list, idx) => {
+                    listMap[String(list.id)] = {
+                        name: list.name || 'Other',
+                        color: list.color || FOCUS_BLOCK_COLOURS_HEX[idx % FOCUS_BLOCK_COLOURS_HEX.length],
+                    };
+                });
+                let list = (tasksData || []).filter((t) => !t.completed).map((t) => {
+                    const listInfo = listMap[String(t.task_list)] || { name: 'Other', color: '#94a3b8' };
+                    return { ...t, list_name: listInfo.name, list_color: listInfo.color };
+                });
+                if (sort === SORT_TIME) {
+                    list.sort((a, b) => ((a.estimated_blocks || 1) - (b.estimated_blocks || 1)) || ((PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)));
+                } else {
                     list.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4));
-                    setTasks(list.slice(0, 25));
-                })
-                .catch(() => setTasks([]))
-                .finally(() => setLoading(false))
-        );
-    }, []);
+                }
+                setTasks(list.slice(0, 50));
+            })
+            .catch(() => setTasks([]))
+            .finally(() => setLoading(false));
+    }, [sortBy]);
 
     useEffect(() => {
         if (!open) return;
@@ -201,54 +221,99 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
         onTaskSelect?.(task);
     };
 
+    const searchLower = (search || '').toLowerCase().trim();
+    const filteredTasks = searchLower
+        ? tasks.filter((t) => (t.title || '').toLowerCase().includes(searchLower) || (t.list_name || '').toLowerCase().includes(searchLower))
+        : tasks;
+
     return (
         <div className={styles.taskInputWrap}>
+            {value && (
+                <div className={styles.currentTaskLabel}>Current focus</div>
+            )}
             <div className={styles.taskInputContainer} ref={ref}>
                 <input
                     type="text"
-                    className={styles.taskInput}
+                    className={`${styles.taskInput} ${value ? styles.taskInputHasValue : ''}`}
                     placeholder="What are you working on? 🎯"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     onKeyDown={handleTaskKey}
                 />
                 <div className={styles.taskInputActions}>
-                    <span className={styles.taskInputHint}>Pick a task to start focused work</span>
+                    <span className={styles.taskInputHint}>Choose a task to start</span>
                     <button
                         type="button"
                         className={styles.taskPickBtn}
                         onClick={handleOpen}
-                        title="Pick from your tasks (sorted by urgency)"
+                        title="Select a task"
                     >
-                        Pick task
+                        Select Task
                     </button>
                 </div>
                 {open && (
-                    <div className={styles.taskPickDropdown}>
-                        <div className={styles.taskPickHeader}>Sort by urgency</div>
+                    <>
+                    <div className={styles.taskPickBackdrop} onClick={() => setOpen(false)} />
+                    <div className={styles.taskPickDropdown} role="dialog" aria-label="Select task">
+                        <div className={styles.taskPickSearchRow}>
+                            <span className={styles.taskPickSearchIcon} aria-hidden>🔍</span>
+                            <input
+                                type="text"
+                                className={styles.taskPickSearchInput}
+                                placeholder="Search tasks…"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                        <div className={styles.taskPickSortRow}>
+                            <label htmlFor="task-pick-sort" className={styles.taskPickSortLabel}>Sort</label>
+                            <select
+                                id="task-pick-sort"
+                                className={styles.taskPickSortSelect}
+                                value={sortBy}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    setSortBy(v);
+                                    loadTasks(v);
+                                }}
+                            >
+                                <option value={SORT_URGENCY}>Urgency</option>
+                                <option value={SORT_TIME}>Time</option>
+                            </select>
+                        </div>
                         {loading ? (
                             <div className={styles.taskPickEmpty}>Loading…</div>
-                        ) : tasks.length === 0 ? (
-                            <div className={styles.taskPickEmpty}>No tasks. Add some on the Tasks page.</div>
+                        ) : filteredTasks.length === 0 ? (
+                            <div className={styles.taskPickEmpty}>{searchLower ? 'No tasks match.' : 'No tasks. Add some on the Tasks page.'}</div>
                         ) : (
-                            tasks.map((task) => (
-                                <button
-                                    key={task.id}
-                                    type="button"
-                                    className={`${styles.taskPickItem} ${value === task.title ? styles.taskPickItemSelected : ''}`}
-                                    onClick={() => selectTask(task)}
-                                >
-                                    <span className={styles.taskPickTitle}>{task.title}</span>
-                                    <span className={styles.taskPickMeta}>
-                                        {task.priority && <span className={styles.taskPickPriority}>{task.priority}</span>}
-                                        {task.estimated_blocks && (
-                                            <span className={styles.taskPickEst}>{task.estimated_blocks * 25}m</span>
-                                        )}
-                                    </span>
-                                </button>
-                            ))
+                            <div className={styles.taskPickList}>
+                                {filteredTasks.map((task) => {
+                                    const duration = task.estimated_blocks ? `${task.estimated_blocks * 25}m` : '25m';
+                                    const listName = task.list_name || 'Other';
+                                    const listColor = task.list_color || '#94a3b8';
+                                    return (
+                                        <button
+                                            key={task.id}
+                                            type="button"
+                                            className={`${styles.taskPickItem} ${value === task.title ? styles.taskPickItemSelected : ''}`}
+                                            onClick={() => selectTask(task)}
+                                        >
+                                            <span className={styles.taskPickTitle}>{task.title}</span>
+                                            <span
+                                                className={styles.taskPickListPill}
+                                                style={{ background: `${listColor}22`, color: listColor }}
+                                            >
+                                                {listName}
+                                            </span>
+                                            <span className={styles.taskPickDuration}>{duration}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         )}
                     </div>
+                    </>
                 )}
             </div>
         </div>

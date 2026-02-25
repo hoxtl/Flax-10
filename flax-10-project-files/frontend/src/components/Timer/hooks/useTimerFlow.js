@@ -11,6 +11,11 @@ const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
         t.task,
         t.taskId      
     );
+    if (t.taskId) {
+        import('../../../api/taskService').then(({ updateTask }) => {
+            updateTask(t.taskId, { completed: true }).catch(() => {});
+        });
+    }
     const next = t.completedSessions + 1;
     t.setCompletedSessions(next);
 
