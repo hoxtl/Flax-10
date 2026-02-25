@@ -5,6 +5,9 @@
   --c-caramel: #9E7E5D;
   --c-olive: #81725B;
   --c-cocoa: #4A3421;
+  --c-brown: #2B1E14;
+  --c-red: #FF0000;
+  --c-green: #2A7A3A;
 
   --bg: #ffffff;
   --panel: #f6f4f1;
@@ -45,6 +48,9 @@
   --sidebar-active: rgba(100, 116, 139, 0.12);
   --user-details-text: #1e1b2e;
 
+  --card-bg: #ffffff;
+  --surface: #fafaf9;
+
   --success-bg: #e8f5e9;
   --success-text: #2e7d32;
   --error-bg: #fee2e2;
@@ -53,24 +59,11 @@
   --warning-bg: #fff4e6;
   --warning-border: #ffd8a8;
   --warning-text: #d97706;
+
+  --deadline-urgent-bg: #fef9e0;
+  --deadline-urgent-border: #f5c842;
+
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
-
-  /* To-do list panel */
-  --todo-accent: #ff4d8d;
-  --todo-divider: rgba(255, 255, 255, 0.18);
-  --todo-bg: rgba(0, 0, 0, 0.64);
-  --todo-text: rgba(255, 255, 255, 0.92);
-  --todo-muted: rgba(255, 255, 255, 0.62);
-  --todo-border: rgba(255, 255, 255, 0.16);
-  --todo-hover: rgba(255, 255, 255, 0.08);
-  --todo-menu-bg: rgba(0, 0, 0, 0.22);
-  --todo-item-bg: rgba(0, 0, 0, 0.40);
-  --todo-scrollbar: rgba(255, 255, 255, 0.22);
-  --todo-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
-  --todo-input-text: rgba(255, 255, 255, 0.92);
-  --todo-input-border: transparent;
-
-
 }
 
 :root[data-theme="dark"] {
@@ -120,7 +113,9 @@
   --sidebar-active: rgba(180, 164, 144, 0.16);
   --user-details-text: rgba(255, 255, 255, 0.92);
 
-  /* Modules */
+  --card-bg: #1A1310;
+  --surface: #1f1713;
+
   --success-bg: rgba(46, 125, 50, 0.15);
   --success-text: #81c784;
   --error-bg: rgba(220, 38, 38, 0.15);
@@ -130,20 +125,8 @@
   --warning-border: rgba(217, 119, 6, 0.3);
   --warning-text: #fbbf24;
 
-  /* To-do panel */
-  --todo-accent: #ff4d8d;
-  --todo-divider: rgba(255, 255, 255, 0.16);
-  --todo-bg: rgba(0, 0, 0, 0.72);
-  --todo-text: rgba(255, 255, 255, 0.92);
-  --todo-muted: rgba(255, 255, 255, 0.62);
-  --todo-border: rgba(255, 255, 255, 0.14);
-  --todo-hover: rgba(255, 255, 255, 0.10);
-  --todo-menu-bg: rgba(0, 0, 0, 0.28);
-  --todo-item-bg: rgba(0, 0, 0, 0.46);
-  --todo-scrollbar: rgba(255, 255, 255, 0.26);
-  --todo-shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
-  --todo-input-text: rgba(255, 255, 255, 0.92);
-  --todo-input-border: transparent;
+  --deadline-urgent-bg: rgba(239, 45, 45, 0.08);
+  --deadline-urgent-border: rgba(223, 223, 223, 0.25);
 }
 
 .MuiChartsAxis-tickLabel text,

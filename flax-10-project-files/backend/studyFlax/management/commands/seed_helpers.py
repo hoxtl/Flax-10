@@ -1,35 +1,52 @@
 import random
-from datetime import timedelta
+from datetime import date, datetime, timedelta, timezone as dt_timezone
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from faker import Faker
-from studyFlax.models import CalendarEvent, UserSettings
+from studyFlax.models import CalendarEvent, UserSettings, Deadline
 from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
-    location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes
+    location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
+    breakfast_fixtures, lunch_fixtures, dinner_fixtures,
+    module_deadline_fixtures, deadline_fixtures,
 )
 
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
 
+SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
+SEED_DAYS  = 365
+
+READING_WEEK_START = date(2026, 2, 23)
+READING_WEEK_END   = date(2026, 2, 27)
+
+
+def _in_reading_week(dt):
+    d = dt.date() if hasattr(dt, 'date') else dt
+    return READING_WEEK_START <= d <= READING_WEEK_END
+
 
 def is_name_taken(first, last, existing):
-    return (User.objects.filter(first_name=first, last_name=last).exists()
-            or any(u.first_name == first and u.last_name == last for u in existing))
+    return (
+        User.objects.filter(first_name=first, last_name=last).exists()
+        or any(u.first_name == first and u.last_name == last for u in existing)
+    )
+
 
 def is_username_taken(username, existing):
-    return (User.objects.filter(username=username).exists()
-            or any(u.username == username for u in existing))
+    return (
+        User.objects.filter(username=username).exists()
+        or any(u.username == username for u in existing)
+    )
 
-def has_unique_name(first, last, existing):
-    return not is_name_taken(first, last, existing)
 
 def generate_unique_name(existing):
     first, last = faker.first_name(), faker.last_name()
-    while not has_unique_name(first, last, existing):
+    while is_name_taken(first, last, existing):
         first, last = faker.first_name(), faker.last_name()
     return first, last
+
 
 def generate_unique_username(first, last, existing):
     base = f"{first.lower()}.{last.lower()}"
@@ -39,12 +56,18 @@ def generate_unique_username(first, last, existing):
         counter += 1
     return username
 
+
 def build_user(first, last, existing):
     username = generate_unique_username(first, last, existing)
-    user = User(username=username, email=f"{first.lower()}.{last.lower()}@kcl.ac.uk",
-                first_name=first, last_name=last)
+    user = User(
+        username=username,
+        email=f"{first.lower()}.{last.lower()}@kcl.ac.uk",
+        first_name=first,
+        last_name=last,
+    )
     user.set_password(DEFAULT_PASSWORD)
     return user
+
 
 def build_users_list(needed):
     users_to_create = []
@@ -53,79 +76,365 @@ def build_users_list(needed):
         users_to_create.append(build_user(first, last, users_to_create))
     return users_to_create
 
+
 def build_settings_for_new_users():
     new_users = User.objects.filter(settings__isnull=True)
-    return [UserSettings(user=u, theme=random.choice(['light', 'dark']),
-                         timezone='Europe/London',
-                         year=random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
-                         major=random.choice(course_fixtures)) for u in new_users]
+    return [
+        UserSettings(
+            user=u,
+            theme=random.choice(['light', 'dark']),
+            timezone='Europe/London',
+            year=random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
+            major=random.choice(course_fixtures),
+        )
+        for u in new_users
+    ]
 
-def pick_available_title(used_this_week):
-    available = [t for t in event_title_fixtures if t not in used_this_week]
-    return random.choice(available) if available else None
 
-def build_event(user, title, tags, rules, day_offset):
-    hour = random.choice([8, 10, 12, 14, 16, 18, 20])
-    start = timezone.now().replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
-    tag = random.choice(tags) if tags and random.random() > 0.2 else None
-    rule = random.choice(rules) if rules and random.random() > 0.8 else None
+def build_event(user, title, tags, day_offset, hour):
+    start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
+    duration = random.choice([60, 90, 120])
+    user_tags = [t for t in tags if t.user == user or t.user is None]
+    tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
     return CalendarEvent(
-        user=user, title=title,
+        user=user,
+        title=title,
         description=random.choice(description_fixtures) if random.random() > 0.3 else "",
-        start_time=start, end_time=start + timedelta(minutes=random.choice([60, 90, 120])),
+        start_time=start,
+        end_time=start + timedelta(minutes=duration),
         location=random.choice(location_fixtures) if random.random() > 0.7 else None,
-        tag=tag, priority=random.choice(['low', 'medium', 'high', 'urgent']),
-        recurrence_rule=rule
+        tag=tag,
+        priority=random.choice(['low', 'medium', 'high', 'urgent']),
+        recurrence_rule=None,
     )
 
-def build_event_for_week(user, user_tags, rules, day_offset, used_per_week):
-    week = day_offset // 7
-    used = used_per_week.get(week, set())
-    title = pick_available_title(used)
-    if not title:
-        return None
-    used_per_week.setdefault(week, set()).add(title)
-    return build_event(user, title, user_tags, rules, day_offset)
+
+def _fresh_week_titles():
+    titles = list(event_title_fixtures)
+    random.shuffle(titles)
+    return titles
+
 
 def build_events_for_user(user, tags, rules, count):
-    user_tags = [t for t in tags if t.user == user or t.user is None]
-    used_per_week = {}
-    offsets = [faker.random_int(0, 60) for _ in range(count)]
-    raw = [build_event_for_week(user, user_tags, rules, off, used_per_week) for off in offsets]
-    return [e for e in raw if e]
+    """
+    Seeds personal (non-meal) events for SEED_DAYS from SEED_START.
+    Titles reshuffle each week so no two weeks look alike, and the same
+    title never appears twice within the same week.
+    """
+    non_lecture_hours = [8, 13, 17, 19, 20]
+    events = []
+    week_titles  = []
+    current_week = -1
 
-def get_next_weekday_offset(weekday_offset):
-    now, days_ahead = timezone.now(), 1
-    candidate = now + timedelta(days=days_ahead)
-    while candidate.weekday() != weekday_offset:
-        days_ahead += 1
-        candidate = now + timedelta(days=days_ahead)
-    return days_ahead
+    for day_offset in range(SEED_DAYS):
+        week = day_offset // 7
+        if week != current_week:
+            week_titles  = _fresh_week_titles()
+            current_week = week
+
+        daily_count = random.randint(1, 2)
+        day_hours = random.sample(non_lecture_hours, min(daily_count, len(non_lecture_hours)))
+
+        for hour in day_hours:
+            if not week_titles:
+                week_titles = _fresh_week_titles()
+            title = week_titles.pop()
+            events.append(build_event(user, title, tags, day_offset, hour))
+
+    return events
+
+
+def build_meal_events(user, tags):
+    """
+    Seeds Breakfast (08:00), Lunch (12:30) and Dinner (19:00) for every day
+    in the seeding range. Each fixture list rotates by day index so meals vary
+    daily without repeating the same combination two days running.
+
+    Title is the meal label; description is the specific food item so the
+    timeline card shows a clear heading and a readable subtitle.
+    """
+    meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
+    events   = []
+
+    for day_offset in range(SEED_DAYS):
+        base = SEED_START + timedelta(days=day_offset)
+        meals = [
+            ("Breakfast", breakfast_fixtures, 8,  0,  8,  30),
+            ("Lunch",     lunch_fixtures,     12, 30, 13, 15),
+            ("Dinner",    dinner_fixtures,    19,  0, 19, 45),
+        ]
+        for label, fixture_list, sh, sm, eh, em in meals:
+            description = fixture_list[day_offset % len(fixture_list)]
+            events.append(CalendarEvent(
+                user=user,
+                title=label,
+                description=description,
+                start_time=base.replace(hour=sh, minute=sm, second=0, microsecond=0),
+                end_time=base.replace(hour=eh, minute=em, second=0, microsecond=0),
+                source="personal",
+                tag=meal_tag,
+                recurrence_rule=None,
+            ))
+
+    return events
+
+
+def _first_weekday_from(start_dt, weekday):
+    days_ahead = (weekday - start_dt.weekday()) % 7
+    return start_dt + timedelta(days=days_ahead)
+
 
 def build_module_event(code, name, description, admin, weekly_rule):
-    day_offset = get_next_weekday_offset(random.randint(0, 4))
-    hour = random.choice([9, 10, 11, 14, 15, 16])
-    start = timezone.now().replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
-    return dict(module_code=code, module_name=name, description=description,
-                created_by=admin, start_time=start, end_time=start + timedelta(hours=2),
-                location=random.choice(lecture_theatre_fixtures), recurrence_rule=weekly_rule)
+    weekday = random.randint(0, 4)
+    hour    = random.choice([9, 10, 11, 14, 15, 16])
+    first_lecture = _first_weekday_from(SEED_START, weekday).replace(
+        hour=hour, minute=0, second=0
+    )
+    return dict(
+        module_code=code,
+        module_name=name,
+        description=description,
+        created_by=admin,
+        start_time=first_lecture,
+        end_time=first_lecture + timedelta(hours=2),
+        location=random.choice(lecture_theatre_fixtures),
+        recurrence_rule=weekly_rule,
+    )
+
 
 def get_user_modules(user, all_modules):
-    major = getattr(getattr(user, 'settings', None), 'major', None)
+    major    = getattr(getattr(user, 'settings', None), 'major', None)
     prefixes = course_to_module_prefixes.get(major, [])
-    relevant = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)]
-    return relevant if relevant else random.sample(all_modules, min(4, len(all_modules)))
+    core     = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)][:3]
+    non_core = [m for m in all_modules if m not in core]
+    extras   = random.sample(non_core, min(1, len(non_core)))
+    return core, extras
 
-def build_lecture_events(user, module, lecture_tag):
-    events = []
-    for week in range(10):
-        start = module.start_time + timedelta(weeks=week)
-        events.append((user, module, start, start + timedelta(hours=2), lecture_tag))
-    return events
 
 def create_lecture_event(user, module, start, end, lecture_tag):
     CalendarEvent.objects.get_or_create(
-        user=user, title=f"Lecture: {module.module_name}", start_time=start,
-        defaults={'end_time': end, 'location': module.location,
-                  'description': module.module_name, 'tag': lecture_tag, 'priority': 'high'}
+        user=user,
+        title=f"Lecture: {module.module_name}",
+        start_time=start,
+        defaults={
+            'end_time': end,
+            'location': module.location,
+            'description': module.module_name,
+            'tag': lecture_tag,
+            'priority': 'high',
+            'recurrence_rule': None,
+        },
     )
+
+
+def build_lecture_events(user, module, lecture_tag):
+    """
+    Returns exactly 10 lecture instances spaced one week apart, skipping
+    reading week. Any slot that falls within reading week is deferred to the
+    following week so the module still delivers all 10 sessions.
+    """
+    sessions  = []
+    candidate = module.start_time
+    while len(sessions) < 10:
+        if not _in_reading_week(candidate):
+            sessions.append((
+                user,
+                module,
+                candidate,
+                candidate + timedelta(hours=2),
+                lecture_tag,
+            ))
+        candidate += timedelta(weeks=1)
+    return sessions
+
+
+def _get_random_offset(used_offsets):
+    while True:
+        day_offset = random.randint(7, 30)
+        if day_offset not in used_offsets:
+            used_offsets.add(day_offset)
+            return day_offset
+
+
+def build_deadlines_for_module(module):
+    prefix    = module.module_code[:2]
+    templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
+    used_offsets = set()
+    deadlines    = []
+    now = timezone.now()
+
+    for deadline_type, title, description in templates:
+        day_offset = _get_random_offset(used_offsets)
+        hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
+        start_due  = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
+        end_due    = start_due + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
+        location   = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
+
+        if not Deadline.objects.filter(module=module, title=title).exists():
+            deadlines.append(Deadline(
+                module=module,
+                title=title,
+                deadline_type=deadline_type,
+                description=description,
+                start_due_date=start_due,
+                end_due_date=end_due,
+                location=location,
+            ))
+
+    return deadlines
+
+
+def create_deadline_calendar_event(user, deadline):
+    CalendarEvent.objects.get_or_create(
+        user=user,
+        title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
+        start_time=deadline.start_due_date,
+        defaults={
+            'end_time': deadline.end_due_date or deadline.start_due_date,
+            'location': deadline.location,
+            'description': deadline.description,
+            'priority': 'high',
+        },
+     )
+
+# ---------------------------------------------------------------------------
+# Study session & theme session seeding
+# ---------------------------------------------------------------------------
+
+TASK_LABELS = [
+    'CS4303 programming assignment',
+    'HI4101 essay',
+    'MA4201 problem set',
+    'PH4102 lab report',
+    'Literature review',
+    'Revision: data structures',
+    'Revision: algorithms',
+    'Group project planning',
+    'Reply to supervisor email',
+    'Plan the week ahead',
+    'Past paper practice',
+    'Reading week catch-up',
+]
+
+
+def build_study_sessions_for_user(user, profile='balanced'):
+    """
+    Returns a list of StudySession instances across the past 90 days.
+
+    Profiles:
+      'balanced'   – steady weekday studier, short weekend dips   (janedoe)
+      'night_owl'  – late evening sessions, irregular weekends     (charlie)
+      'consistent' – high volume, long streaks                     (random fixture users)
+    """
+    from studyFlax.models.timer.sessionModel import StudySession
+
+    now      = timezone.now()
+    sessions = []
+
+    # profile-specific knobs
+    if profile == 'night_owl':
+        preferred_hours     = [20, 21, 22, 23]
+        weekend_probability = 0.55
+        skip_day_prob       = 0.25
+        work_choices        = [25, 50, 75, 100]
+    elif profile == 'consistent':
+        preferred_hours     = [9, 10, 14, 15, 16]
+        weekend_probability = 0.70
+        skip_day_prob       = 0.10
+        work_choices        = [50, 75, 100, 125]
+    else:  # balanced
+        preferred_hours     = [9, 10, 11, 14, 15, 16]
+        weekend_probability = 0.40
+        skip_day_prob       = 0.20
+        work_choices        = [25, 50, 75]
+
+    for day_offset in range(90):
+        session_date = now - timedelta(days=day_offset)
+        is_weekend   = session_date.weekday() >= 5
+
+        # decide whether to study today
+        if is_weekend and random.random() > weekend_probability:
+            continue
+        if not is_weekend and random.random() < skip_day_prob:
+            continue
+
+        sessions_today = random.randint(1, 3)
+        hours_used     = random.sample(preferred_hours, min(sessions_today, len(preferred_hours)))
+
+        for hour in hours_used:
+            work_mins  = random.choice(work_choices)
+            break_mins = (work_mins // 25) * 5
+            n_sessions = work_mins // 25
+            status     = 'Overtime' if random.random() < 0.08 else 'Completed'
+
+            start = session_date.replace(hour=hour, minute=0, second=0, microsecond=0)
+            end   = start + timedelta(minutes=work_mins + break_mins)
+
+            block_id = int(start.timestamp() * 1000)
+
+            sessions.append(StudySession(
+                user=user,
+                study_block_id=block_id,
+                start_time=start,
+                end_time=end,
+                duration=work_mins,
+                break_duration=break_mins,
+                session_count=n_sessions,
+                task=random.choice(TASK_LABELS),
+                status=status,
+            ))
+
+    return sessions
+
+
+def build_theme_sessions_for_user(user, profile='balanced'):
+    """
+    Returns a list of ThemeSession instances across the past 90 days.
+
+    Profiles:
+      'balanced'   – mostly light, some dark afternoons
+      'night_owl'  – mostly dark, especially evenings (20-23h)
+      'consistent' – mixed, slight light preference
+    """
+    from studyFlax.models.timer.themeSessionModel import ThemeSession
+
+    now      = timezone.now()
+    sessions = []
+
+    for day_offset in range(90):
+        base = now - timedelta(days=day_offset)
+
+        if profile == 'night_owl':
+            # daytime: short light session, evening: long dark session
+            slots = [
+                (8,  'light', random.randint(30, 90)),
+                (20, 'dark',  random.randint(90, 240)),
+                (22, 'dark',  random.randint(30, 90)),
+            ]
+        elif profile == 'consistent':
+            slots = [
+                (9,  'light', random.randint(60, 180)),
+                (14, 'light', random.randint(60, 120)),
+                (19, 'dark',  random.randint(30, 90)),
+            ]
+        else:  # balanced
+            slots = [
+                (9,  'light', random.randint(60, 180)),
+                (13, 'light', random.randint(30, 90)),
+                (20, 'dark',  random.randint(30, 120)),
+            ]
+
+        for hour, theme, duration in slots:
+            if random.random() < 0.15:   # occasional skip for realism
+                continue
+            started = base.replace(hour=hour, minute=0, second=0, microsecond=0)
+            ended   = started + timedelta(minutes=duration)
+            sessions.append(ThemeSession(
+                user=user,
+                theme=theme,
+                started_at=started,
+                ended_at=ended,
+                duration_minutes=duration,
+            ))
+
+    return sessions
