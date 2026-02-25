@@ -105,6 +105,23 @@
     text-transform: capitalize;
 }
 
+.bubbleModule {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: filter 0.15s ease;
+    background: #E8F5E9;
+    color: #2D4F32;
+}
+.bubbleModule:hover {
+    filter: brightness(0.95);
+}
+
 .module {
     font-size: 0.72rem;
     background: var(--pill-bg);

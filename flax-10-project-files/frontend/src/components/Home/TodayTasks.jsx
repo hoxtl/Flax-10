@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { fetchTasks, updateTask } from "../../api/taskService";
 import styles from "./TodayTasks.module.css";
 
@@ -53,7 +53,11 @@ function TaskRow({ task, onToggle }) {
                     <span style={{ color: PRIORITY_COLOURS[task.priority] }} className={styles.priority}>
                         ● {task.priority}
                     </span>
-                    {task.module_code && <span className={styles.module}>{task.module_code}</span>}
+                    {task.module_code && (
+                        <Link to={`/modules?code=${encodeURIComponent(task.module_code)}`} className={styles.bubbleModule}>
+                            {task.module_code}
+                        </Link>
+                    )}
                     {isOverdue && <span className={styles.overdue}>Overdue</span>}
                 </div>
             </div>
