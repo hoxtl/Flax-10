@@ -1,13 +1,9 @@
 import { useState, useMemo } from "react";
 import TaskCard from "./TaskCard";
 import styles from "./TaskFeed.module.css";
+import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
-
-const LIST_COLOURS = [
-    "#6366f1", "#10b981", "#f59e0b", "#ec4899",
-    "#8b5cf6", "#06b6d4", "#ef4444", "#84cc16", "#f97316", "#94a3b8",
-];
 
 function sortTasks(tasks, sortBy) {
     return [...tasks].sort((a, b) => {
@@ -29,21 +25,32 @@ function sortTasks(tasks, sortBy) {
     });
 }
 
-function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, defaultCollapsed = false, hideDueBadge = false }) {
+function getListColor(list) {
+    if (list?.color) return list.color;
+    try {
+        if (list?.id && typeof window !== "undefined") {
+            const s = localStorage.getItem("listColor:" + list.id);
+            if (s) return s;
+        }
+    } catch (_) {}
+    return FOCUS_BLOCK_COLOURS_HEX[(list?.idx ?? 0) % FOCUS_BLOCK_COLOURS_HEX.length];
+}
+
+function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, defaultCollapsed = false, hideDueBadge = false, isOverdueSection = false }) {
     const [collapsed, setCollapsed] = useState(defaultCollapsed);
     const sorted = useMemo(() => sortTasks(tasks, sortBy), [tasks, sortBy]);
 
     if (tasks.length === 0) return null;
 
     return (
-        <div className={styles.section}>
+        <div className={`${styles.section} ${isOverdueSection ? styles.sectionOverdue : ""}`}>
             <button
-                className={styles.sectionHeader}
+                className={`${styles.sectionHeader} ${isOverdueSection ? styles.sectionHeaderDanger : ""}`}
                 onClick={() => setCollapsed(c => !c)}
             >
                 <span className={styles.sectionEmoji}>{emoji}</span>
                 <span className={styles.sectionTitle}>{title}</span>
-                <span className={styles.sectionBadge}>{tasks.length}</span>
+                <span className={styles.sectionCountCircle} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
                 <span className={styles.sectionChevron}>{collapsed ? "▶" : "▼"}</span>
             </button>
 
@@ -56,11 +63,12 @@ function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDel
                                 key={task.id}
                                 task={task}
                                 listName={list?.name}
-                                listColor={list?.color || LIST_COLOURS[(list?.idx || 0) % LIST_COLOURS.length]}
+                                listColor={getListColor(list)}
                                 onToggle={() => onToggleComplete(task.id)}
                                 onDelete={() => onDeleteTask(task.id)}
                                 onEdit={data => onEditTask(task.id, data)}
                                 hideDueBadge={hideDueBadge}
+                                isOverdue={isOverdueSection}
                             />
                         );
                     })}
@@ -116,6 +124,9 @@ export default function TaskFeed({
 
     const hasAny = filtered.length > 0;
 
+    const isBrandNew = tasks.length === 0;
+    const isAllCompleted = tasks.length > 0 && pending.length === 0;
+
     const sectionProps = { sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask };
 
     return (
@@ -162,13 +173,30 @@ export default function TaskFeed({
             {/* ── Task sections ── */}
             <div className={styles.sections}>
                 {!hasAny && (
-                    <div className={styles.empty}>
-                        <span className={styles.emptyIcon}>🎉</span>
-                        <p>{search ? `No tasks matching "${search}"` : "All clear — no tasks here!"}</p>
+                    <div className={styles.emptyState}>
+                        <span className={styles.emptyStateIcon} aria-hidden>
+                            {search ? "🔍" : isBrandNew ? "🪴" : "🐈"}
+                        </span>
+                        <p className={styles.emptyStateText}>
+                            {search
+                                ? `No tasks match "${search}"`
+                                : isBrandNew
+                                ? "A fresh start! What's the first goal you'll plant here?"
+                                : "All chores are done. Time for a cat nap?"}
+                        </p>
+                        {!search && isBrandNew && onCreateTask && (
+                            <button
+                                type="button"
+                                className={styles.emptyStateAddBtn}
+                                onClick={onCreateTask}
+                            >
+                                + Add Task
+                            </button>
+                        )}
                     </div>
                 )}
 
-                {overdue.length > 0 && <Section title="Overdue" emoji="⚠️" tasks={overdue} hideDueBadge {...sectionProps} />}
+                {overdue.length > 0 && <Section title="Overdue" emoji="⚠️" tasks={overdue} hideDueBadge isOverdueSection {...sectionProps} />}
                 <Section title="Today" emoji="📅" tasks={today} hideDueBadge {...sectionProps} />
                 <Section title="This week" emoji="📆" tasks={thisWeek} {...sectionProps} />
                 <Section title="Later" emoji="🗓️" tasks={later} {...sectionProps} defaultCollapsed={later.length > 8} />
@@ -176,8 +204,8 @@ export default function TaskFeed({
                 {completed.length > 0 && (
                     <div className={styles.completedSection}>
                         <button className={styles.completedToggle} onClick={() => setShowDone(s => !s)}>
-                            <span>✓ Completed</span>
-                            <span className={styles.sectionBadge}>{completed.length}</span>
+                            <span>✓ completed</span>
+                            <span className={styles.sectionCountCircle} aria-label={`${completed.length} tasks`}>{completed.length}</span>
                             <span className={styles.sectionChevron}>{showDone ? "▼" : "▶"}</span>
                         </button>
                         {showDone && (
@@ -189,7 +217,7 @@ export default function TaskFeed({
                                             key={task.id}
                                             task={task}
                                             listName={list?.name}
-                                            listColor={list?.color || LIST_COLOURS[(list?.idx || 0) % LIST_COLOURS.length]}
+                                            listColor={getListColor(list)}
                                             onToggle={() => onToggleComplete(task.id)}
                                             onDelete={() => onDeleteTask(task.id)}
                                             onEdit={data => onEditTask(task.id, data)}
