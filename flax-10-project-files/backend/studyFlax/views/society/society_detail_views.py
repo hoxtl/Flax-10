@@ -6,7 +6,8 @@ from studyFlax.models.society import Society, SocietyImage
 from studyFlax.serialisers import SocietyDetailSerialiser
 from .helpers import (
     get_society_or_404, get_membership, is_society_admin,
-    society_not_found_response, permission_denied_response
+    society_not_found_response, permission_denied_response,
+    handle_image_urls
 )
 
 
@@ -45,13 +46,6 @@ def update_society(request, society):
     return get_society_detail(request.user, society)
 
 
-def handle_image_urls(society, data):
-    image_urls = data.get('image_urls') or data.get('images')
-    if image_urls is None:
-        return
-    society.images.all().delete()
-    for url in image_urls:
-        SocietyImage.objects.create(society=society, url=url, is_cover=True)
 
 
 def delete_society(request, society):
