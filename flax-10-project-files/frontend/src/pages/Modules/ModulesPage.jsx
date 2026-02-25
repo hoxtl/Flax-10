@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { isEnrolledIn } from '../../components/Modules/utils/moduleUtils.js';
 import { filterModules } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
@@ -9,6 +10,7 @@ import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 
 function useModulesPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
     const [search_query, setSearchQuery] = useState('');
@@ -18,6 +20,38 @@ function useModulesPage() {
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
+
+    const codeFromUrl = searchParams.get('code');
+    const moduleIdFromUrl = searchParams.get('moduleId');
+
+    useEffect(() => {
+        if (!codeFromUrl && !moduleIdFromUrl) return;
+        if (hook.loading) return;
+        if (moduleIdFromUrl && hook.modules) {
+            const id = Number(moduleIdFromUrl);
+            const match = hook.modules.find((m) => m.id === id);
+            if (match) {
+                setViewingModule(match);
+                const next = new URLSearchParams(searchParams);
+                next.delete('moduleId');
+                setSearchParams(next.toString(), { replace: true });
+                return;
+            }
+        }
+        if (codeFromUrl && hook.modules) {
+            const norm = (s) => (s || '').toUpperCase().replace(/\s/g, '');
+            const code = norm(codeFromUrl);
+            const match = hook.modules?.find((m) => norm(m.module_code) === code);
+            if (match) {
+                setViewingModule(match);
+                setSearchParams({}, { replace: true });
+            } else {
+                setSearchQuery(codeFromUrl.trim());
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [codeFromUrl, moduleIdFromUrl, hook.loading, hook.modules, searchParams, setSearchParams]);
+
     return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }
 

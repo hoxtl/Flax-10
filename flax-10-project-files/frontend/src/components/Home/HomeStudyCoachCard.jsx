@@ -2,31 +2,48 @@ import { useState } from "react";
 import analyticsService from "../../api/analyticsService";
 import styles from "./HomeStudyCoachCard.module.css";
 
-export default function HomeStudyCoachCard({ days = 7, onNavigateAnalytics }) {
-  const [insights, setInsights] = useState(null);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState(null);
+export default function HomeStudyCoachCard({
+  days = 7,
+  onNavigateAnalytics,
+  insights: controlledInsights,
+  loading: controlledLoading,
+  error: controlledError,
+  onGenerate,
+  compactHeader = false,
+}) {
+  const [localInsights, setLocalInsights] = useState(null);
+  const [localLoading, setLocalLoading] = useState(false);
+  const [localError, setLocalError] = useState(null);
+  const isControlled = onGenerate != null;
+  const insights = isControlled ? controlledInsights : localInsights;
+  const loading = isControlled ? controlledLoading : localLoading;
+  const error = isControlled ? controlledError : localError;
 
   const generate = async () => {
-    setLoading(true);
-    setError(null);
+    if (isControlled && onGenerate) {
+      onGenerate();
+      return;
+    }
+    setLocalLoading(true);
+    setLocalError(null);
     try {
       const res = await analyticsService.getAiInsights(days);
-      setInsights(res?.insights || "");
+      setLocalInsights(res?.insights || "");
     } catch (err) {
       const msg = err?.message || "";
       if (msg.includes("OpenAI API key not configured") || msg.includes("OpenAI package not installed")) {
-        setError("AI study coach isn’t configured yet on this account.");
+        setLocalError("AI study coach isn’t configured yet on this account.");
       } else {
-        setError("Couldn’t generate insights right now. Try again in a moment.");
+        setLocalError("Couldn’t generate insights right now. Try again in a moment.");
       }
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
   return (
     <div className={styles.card}>
+      {!compactHeader && (
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.title}>WANT A PERSONALISED SCHEDULE?</span>
@@ -50,6 +67,7 @@ export default function HomeStudyCoachCard({ days = 7, onNavigateAnalytics }) {
           {loading ? "…" : "Generate ✦"}
         </button>
       </div>
+      )}
 
       <div className={styles.body}>
         {error && (
@@ -71,9 +89,9 @@ export default function HomeStudyCoachCard({ days = 7, onNavigateAnalytics }) {
         {!loading && !insights && (
           <div className={styles.centeredState}>
             <span className={styles.emptyIcon}>🤖</span>
-            <p className={styles.emptyTitle}>Generate your plan</p>
+            <p className={styles.emptyTitle}>Study plan</p>
             <p className={styles.stateText}>
-              Tap "Generate" to get a personalised schedule suggestion.
+              {compactHeader ? "Use the Generate button in the plan header above." : "Tap \"Generate\" to get a personalised schedule suggestion."}
             </p>
           </div>
         )}

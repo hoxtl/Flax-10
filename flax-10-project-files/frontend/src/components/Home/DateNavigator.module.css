@@ -1,14 +1,8 @@
-/* Dot colour tokens — defined here so they're easy to adjust */
-:root {
-  --dot-lecture:  #5B8DEF;
-  --dot-meal:     #E8A44A;
-  --dot-health:   #52C47A;
-  --dot-deadline: #F55F5F;
-}
+/* Dot colours use semantic vars from variables.css: --dot-lecture (study), --dot-meal (neutral), --dot-health, --dot-deadline (urgent), --dot-personal */
 
 .nav {
   flex-shrink: 0;
-  padding: 0.65rem 1rem 0.4rem;
+  padding: 0.4rem 1rem 0.35rem;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
 }
@@ -18,7 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
 .headerLeft {
@@ -80,20 +74,20 @@
   border-color: var(--border);
 }
 
-/* ── Week strip ──────────────────────────────────────────────── */
+/* ── Week strip (compact) ────────────────────────────────────── */
 .strip {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
 .dayCell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.15rem;
-  padding: 0.3rem 0.1rem 0.3rem;
-  border-radius: 12px;
+  gap: 0.08rem;
+  padding: 0.2rem 0.05rem 0.2rem;
+  border-radius: 8px;
   border: none;
   background: none;
   cursor: pointer;
@@ -115,20 +109,20 @@
 }
 
 .dayName {
-  font-size: 0.62rem;
+  font-size: 0.56rem;
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .dayNum {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -137,22 +131,21 @@
 /* ── Dots ────────────────────────────────────────────────────── */
 .dots {
   display: flex;
-  gap: 2.5px;
+  gap: 2px;
   align-items: center;
-  height: 6px;
-  min-height: 6px;
+  height: 4px;
+  min-height: 4px;
 }
 
 .dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* Empty placeholder keeps the row height consistent on days with no events */
 .dotPlaceholder {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   display: block;
 }
