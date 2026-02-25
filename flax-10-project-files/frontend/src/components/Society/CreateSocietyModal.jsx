@@ -23,7 +23,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 function useCreateSocietyForm(onCreate, onClose) {
-    const [form, setForm] = useState({ name: "", bio: "", requestRatification: false, collaborators: [], images: [] });
+    const [form, setForm] = useState({ name: "", bio: "", adminEmails: "", requestRatification: false, collaborators: [], images: [] });
     const [showCollabModal, setShowCollabModal] = useState(false);
     const [showPhotoModal, setShowPhotoModal] = useState(false);
     const update = (field, value) => setForm(p => ({ ...p, [field]: value }));
@@ -76,6 +76,7 @@ function FormFields({ form, update, setShowCollabModal, setShowPhotoModal }) {
         <div className={styles.form}>
             <NameField value={form.name} onChange={handlers.name} />
             <BioField value={form.bio} onChange={handlers.bio} />
+            <AdminEmailsField value={form.adminEmails} onChange={handlers.adminEmails} />
             <PhotosField images={form.images} onOpen={() => setShowPhotoModal(true)} />
             <CollaboratorsField collaborators={form.collaborators} onOpen={() => setShowCollabModal(true)}
                 onRoleChange={handlers.role} onRemove={handlers.remove} />
@@ -88,6 +89,7 @@ function getFieldHandlers(form, update) {
     return {
         name: v => update("name", v),
         bio: v => update("bio", v),
+        adminEmails: v => update("adminEmails", v),
         ratification: v => update("requestRatification", v),
         role: (id, role) => update("collaborators", form.collaborators.map(c => c.id === id ? { ...c, role } : c)),
         remove: id => update("collaborators", form.collaborators.filter(c => c.id !== id))
@@ -110,6 +112,17 @@ function BioField({ value, onChange }) {
             <label className={styles.label}>Bio / Description</label>
             <textarea className={styles.textarea} value={value} onChange={e => onChange(e.target.value)}
                 placeholder="What is your society about?" rows={3} />
+        </div>
+    );
+}
+
+function AdminEmailsField({ value, onChange }) {
+    return (
+        <div className={styles.field}>
+            <label className={styles.label}>Admin Emails (optional)</label>
+            <input className={styles.input} value={value} onChange={e => onChange(e.target.value)}
+                placeholder="e.g. contact@society.com, admin@society.com" />
+            <p className={styles.hint}>Comma separated. Defaults to your email if empty.</p>
         </div>
     );
 }
