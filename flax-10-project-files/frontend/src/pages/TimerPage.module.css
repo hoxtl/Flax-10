@@ -394,3 +394,9 @@
     color: #9ca3af;
     font-style: italic;
 }
+
+@media (max-width: 900px) {
+    .historyButton {
+        display: none !important;
+    }
+}
