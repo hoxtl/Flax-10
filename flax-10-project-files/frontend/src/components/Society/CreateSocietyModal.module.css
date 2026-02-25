@@ -77,6 +77,13 @@
     margin: 0;
 }
 
+.error {
+    color: #ff4d4f;
+    font-size: 0.8rem;
+    margin: 0;
+    font-weight: 500;
+}
+
 .input {
     padding: 12px 14px;
     border: 1px solid var(--border, #e5e7eb);
