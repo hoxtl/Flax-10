@@ -140,16 +140,9 @@ class Command(BaseCommand):
 
     def create_societies(self):
         self.stdout.write("Seeding societies...")
-        for name, bio, about, image in society_fixtures:
-            status = random.choice(['approved', 'pending', 'rejected', 'none'])
-            society, _ = Society.objects.update_or_create(
-                name=name,
-                defaults={
-                    'bio': bio, 'about': about, 'image': image,
-                    'ratification_status': status, 'is_ratified': (status == 'approved')
-                }
-            )
-            self._seed_society_tags(society)
+        for data in society_seed_data:
+            society = self._create_society_from_config(data)
+            self._seed_society_tags_from_config(society, data.get('tags', []))
 
     def _seed_images_for_society(self, society):
         if society.image:
