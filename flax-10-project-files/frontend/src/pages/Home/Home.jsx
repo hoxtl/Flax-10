@@ -18,13 +18,38 @@ import { useNavigate, Link } from "react-router-dom";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
 import HomeStudyCoachCard from "../../components/Home/HomeStudyCoachCard";
+import analyticsService from "../../api/analyticsService";
+import { getHistory } from "../../components/Timer/utils/historyUtils";
+import { getModules } from "../../api/moduleApi";
+import { useTimerContext } from "../../context/TimerContext";
+import { formatTime as formatTimerSeconds } from "../../components/Timer/TimerComponents";
 
 const PRIORITY_COLOURS = {
-  urgent: "var(--danger)",
-  high:   "#f59e0b",
-  medium: "var(--primary)",
-  low:    "var(--muted)",
+  urgent: "var(--urgent)",
+  high:   "var(--study)",
+  medium: "var(--personal)",
+  low:    "var(--neutral)",
 };
+
+/* Unified color language: study = caramel/gold, life = greige */
+const STUDY_ACCENT = "#c4a35a";
+const LIFE_ACCENT  = "#9c8f7e";
+function eventAccentColor(item, matchTask, themeColor) {
+  if (matchTask) return PRIORITY_COLOURS[matchTask.priority] || themeColor;
+  if (isLecture(item) || /lecture|seminar|tutorial|revision|study|library|exam|coursework/i.test(item.title || "")) return STUDY_ACCENT;
+  if (/gym|lunch|dinner|breakfast|run|yoga|walk|coffee|cinema|drinks|meeting|shop|laundry/i.test(item.title || "")) return LIFE_ACCENT;
+  return themeColor || "#94A3B8";
+}
+
+/* 3px left border by type: meals grey, study blue, urgent red, health green, personal/admin purple */
+function scheduleCardBorderColor(item, matchTask) {
+  if (matchTask?.priority === "urgent" || /deadline|urgent|due|submission/i.test(item.title || "")) return "#E85555";
+  if (isLecture(item) || /lecture|seminar|tutorial|revision|study|library|exam|coursework/i.test(item.title || "")) return "#4A7CF7";
+  if (/gym|run|yoga|walk|sport|exercise/i.test(item.title || "")) return "#22C897";
+  if (/breakfast|lunch|dinner|coffee|meal/i.test(item.title || "")) return "#6B7280";
+  if (/cinema|drinks|meeting|shop|laundry|personal|admin/i.test(item.title || "")) return "#8B5CF6";
+  return "#6B7280";
+}
 
 function formatTime(dateStr) {
   if (!dateStr) return "";
@@ -39,10 +64,68 @@ function fmtDuration(mins) {
   return m ? `${h}h ${m}m` : `${h}h`;
 }
 
+function getTimeOfDay(date) {
+  const d = date instanceof Date ? date : new Date(date);
+  const h = d.getHours();
+  if (h < 12) return "morning";
+  if (h < 17) return "afternoon";
+  return "evening";
+}
+
+function getNowBannerIdleMessage({ nextItem, selectedDate }) {
+  const timeOfDay = getTimeOfDay(selectedDate);
+  if (timeOfDay === "morning" && nextItem) {
+    return `🌅 Fresh start — your first block begins at ${formatTime(nextItem.start_time)}`;
+  }
+  if (timeOfDay === "afternoon") {
+    return "☕ Free window — want to tackle a quick win?";
+  }
+  return "🌱 Garden's quiet. Time to plant tomorrow's goals?";
+}
+
+/** Context-aware motivation header for Plan for the Day. Uses currentTime, totalTasks, completedTasks, lectureCount. */
+function getMotivationMessage(currentTime, totalTasks, completedTasks, lectureCount) {
+  const hour = currentTime.getHours();
+  const isMorning = hour < 12;
+  const isEvening = hour >= 18;
+  const pct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const highCompletion = totalTasks > 0 && (pct >= 50 || completedTasks >= 2);
+
+  if (isEvening && highCompletion) {
+    return "Great work today. You've tackled the bulk of your schedule. Time for a breather?";
+  }
+  if (completedTasks > 0) {
+    return `${pct}% of your day is complete — ${completedTasks} goal${completedTasks === 1 ? "" : "s"} crushed!`;
+  }
+  if (lectureCount > 3) {
+    return `It's a big academic day with ${lectureCount} lectures. Pace yourself!`;
+  }
+  if (isMorning) {
+    const taskWord = totalTasks === 1 ? "task" : "tasks";
+    const lectWord = lectureCount === 1 ? "lecture" : "lectures";
+    return `Good morning! You have ${totalTasks} ${taskWord} and ${lectureCount} ${lectWord} today. Let's get started!`;
+  }
+  if (totalTasks === 0) {
+    return "Your garden is quiet. Time to plant something?";
+  }
+  return `You have ${totalTasks} item${totalTasks === 1 ? "" : "s"} today. You've got this!`;
+}
+
 function isNow(startStr, endStr) {
   if (!startStr || !endStr) return false;
   const now = new Date();
   return new Date(startStr) <= now && now <= new Date(endStr);
+}
+
+/** Percent through the event (0–100) for the current time; null if not active. */
+function getNowLinePercent(startStr, endStr) {
+  if (!startStr || !endStr) return null;
+  const now = new Date();
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  if (now < start || now > end) return null;
+  const p = ((now - start) / (end - start)) * 100;
+  return Math.max(0, Math.min(100, p));
 }
 
 function isPast(endStr) {
@@ -158,15 +241,247 @@ function computeTimelineWithGaps(sortedItems, pendingTasks) {
   return result;
 }
 
-/* ─── Data hook ─────────────────────────────────────────── */
+/* Daily progress ring: percentage of today's scheduled items completed (past events / total) */
+function DailyProgressRing({ dayEvents }) {
+  const { completed, total, pct } = useMemo(() => {
+    const totalCount = dayEvents.length;
+    const completedCount = dayEvents.filter((e) => isPast(e.end_time)).length;
+    const value = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
+    return { completed: completedCount, total: totalCount, pct: value };
+  }, [dayEvents]);
+
+  const r = 22;
+  const circumference = 2 * Math.PI * r;
+  const offset = circumference * (1 - pct / 100);
+
+  return (
+    <div className={styles.progressRingWrap} title={`${completed} of ${total} done today`}>
+      <svg className={styles.progressRingSvg} viewBox="0 0 52 52" aria-hidden>
+        <circle
+          className={styles.progressRingBg}
+          cx="26"
+          cy="26"
+          r={r}
+          fill="none"
+          strokeWidth="4"
+        />
+        <circle
+          className={styles.progressRingFill}
+          cx="26"
+          cy="26"
+          r={r}
+          fill="none"
+          strokeWidth="4"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          transform="rotate(-90 26 26)"
+        />
+      </svg>
+      <span className={styles.progressRingLabel}>{total ? `${pct}%` : "—"}</span>
+    </div>
+  );
+}
+
+/* Day progress ring for right column: ring + "X of Y done" above To Schedule */
+function DayProgressRingSidebar({ completed, total }) {
+  const pct = total ? Math.round((completed / total) * 100) : 0;
+  const r = 28;
+  const circumference = 2 * Math.PI * r;
+  const offset = circumference * (1 - pct / 100);
+
+  return (
+    <div className={styles.dayProgressRingSidebar}>
+      <div className={styles.dayProgressRingCircle}>
+        <svg viewBox="0 0 64 64" aria-hidden>
+          <circle className={styles.dayProgressRingBg} cx="32" cy="32" r={r} fill="none" strokeWidth="4" />
+          <circle
+            className={styles.dayProgressRingFill}
+            cx="32"
+            cy="32"
+            r={r}
+            fill="none"
+            strokeWidth="4"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            transform="rotate(-90 32 32)"
+          />
+        </svg>
+      </div>
+      <span className={styles.dayProgressRingText}>{total ? `${completed} of ${total} done` : "No blocks today"}</span>
+    </div>
+  );
+}
+
+/* Active timer card: countdown + progress when a timer is running (replaces progress ring + task widget in that state) */
+function ActiveTimerCard({ onOpenTimer }) {
+  const { isActive, timeLeft, mode, progress, task, isOvertime, isBreakOvertime } = useTimerContext();
+  if (!isActive) return null;
+
+  const label = mode === "work"
+    ? (isOvertime ? "Overtime" : "Focus")
+    : (isBreakOvertime ? "Break overtime" : "Break");
+  const pct = Math.min(100, Math.max(0, typeof progress === "number" ? progress : 0));
+
+  return (
+    <div className={styles.activeTimerCard}>
+      <div className={styles.activeTimerCardHeader}>
+        <span className={styles.activeTimerCardLabel}>{label}</span>
+        <button
+          type="button"
+          className={styles.activeTimerCardLink}
+          onClick={() => onOpenTimer?.()}
+        >
+          Open timer →
+        </button>
+      </div>
+      <div className={styles.activeTimerCountdown}>{formatTimerSeconds(timeLeft)}</div>
+      {task && mode === "work" && (
+        <p className={styles.activeTimerTaskName}>{task}</p>
+      )}
+      <div className={styles.activeTimerProgressTrack}>
+        <div
+          className={styles.activeTimerProgressFill}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* Now & Next slim banner with progress ring and free-gap message */
+function NowNextCard({ dayEvents, upcomingItems, selectedDate }) {
+  const nowItem = useMemo(
+    () => dayEvents.find((e) => isNow(e.start_time, e.end_time)),
+    [dayEvents]
+  );
+  const nextItem = upcomingItems[0] ?? null;
+  const nextText = nextItem
+    ? `${nextItem.title} at ${formatTime(nextItem.start_time)}`
+    : "Nothing scheduled";
+
+  const hasActiveNow = !!nowItem;
+  const idleMessage = useMemo(
+    () => getNowBannerIdleMessage({ nextItem, selectedDate }),
+    [nextItem, selectedDate]
+  );
+
+  return (
+    <div
+      className={`${styles.nowNextBanner} ${hasActiveNow ? styles.nowNextBannerActive : styles.nowNextBannerIdle}`}
+    >
+      <DailyProgressRing dayEvents={dayEvents} />
+      <span className={styles.nowNextPart}>
+        <span className={styles.nowNextLabel}>NOW:</span>{" "}
+        {hasActiveNow ? (
+          <span className={styles.nowNextCurrent}>{nowItem.title}</span>
+        ) : (
+          <span className={styles.nowNextIdle}>{idleMessage}</span>
+        )}
+      </span>
+      <span className={styles.nowNextSep}>·</span>
+      <span className={styles.nowNextPart}>
+        <span className={styles.nowNextLabel}>UP NEXT:</span> {nextText}
+      </span>
+    </div>
+  );
+}
+
+/* Unified Hero at top: Active Focus Session (when timer running) or Start a Seed (task selector + Start) */
+function FocusHeroCard({ tasks, onStartTask, onOpenTimer }) {
+  const timer = useTimerContext();
+  const { isActive, timeLeft, task, progress, setIsActive, mode, isOvertime, isBreakOvertime } = timer;
+  const [selectedTaskId, setSelectedTaskId] = useState("");
+  const topTasks = useMemo(() => tasks.slice(0, 50), [tasks]);
+
+  if (isActive) {
+    const label = mode === "work"
+      ? (isOvertime ? "Overtime" : "Focus")
+      : (isBreakOvertime ? "Break overtime" : "Break");
+    const pct = Math.min(100, Math.max(0, typeof progress === "number" ? progress : 0));
+    return (
+      <div className={styles.focusHero}>
+        <div className={styles.focusHeroActive}>
+          <span className={styles.focusHeroLabel}>{label}</span>
+          <div className={styles.focusHeroCountdown}>{formatTimerSeconds(timeLeft)}</div>
+          {task && mode === "work" && (
+            <p className={styles.focusHeroTaskName}>{task}</p>
+          )}
+          <div className={styles.focusHeroProgressTrack}>
+            <div
+              className={styles.focusHeroProgressFill}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <div className={styles.focusHeroActions}>
+            <button
+              type="button"
+              className={styles.focusHeroBtnSecondary}
+              onClick={() => setIsActive(false)}
+            >
+              Pause
+            </button>
+            <button
+              type="button"
+              className={styles.focusHeroBtnPrimary}
+              onClick={() => onOpenTimer?.()}
+            >
+              Open timer →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.focusHero}>
+      <div className={styles.focusHeroSeed}>
+        <h2 className={styles.focusHeroSeedTitle}>Start a Seed</h2>
+        <p className={styles.focusHeroSeedSub}>Pick a task and grow your focus.</p>
+        <div className={styles.focusHeroSeedRow}>
+          <select
+            className={styles.focusHeroSelect}
+            value={selectedTaskId}
+            onChange={(e) => setSelectedTaskId(e.target.value)}
+            aria-label="Choose a task"
+          >
+            <option value="">Choose a task…</option>
+            {topTasks.map((t) => (
+              <option key={t.id} value={String(t.id)}>{t.title}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className={styles.focusHeroStartBtn}
+            disabled={!selectedTaskId}
+            onClick={() => {
+              if (!selectedTaskId) return;
+              const t = topTasks.find((x) => String(x.id) === selectedTaskId);
+              if (t) onStartTask(t);
+            }}
+          >
+            Start
+          </button>
+        </div>
+        {topTasks.length === 0 && (
+          <p className={styles.focusHeroSeedEmpty}>No tasks yet. Add one from Tasks.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* Data hook */
 function useHomeData(selectedDate) {
   const { events } = useCalendar();
-  const [tasks, setTasks] = useState([]);
+  const [allTasks, setAllTasks] = useState([]);
   useCalendarEvents();
 
   useEffect(() => {
     fetchTasks()
-      .then((data) => setTasks((data || []).filter((t) => !t.completed)))
+      .then((data) => setAllTasks(data || []))
       .catch(() => {});
   }, []);
 
@@ -176,22 +491,23 @@ function useHomeData(selectedDate) {
   );
 
   const dayTasks = useMemo(() => {
+    const incomplete = allTasks.filter((t) => !t.completed);
     const dayEnd = new Date(selectedDate);
     dayEnd.setHours(23, 59, 59, 999);
     const p = { urgent: 0, high: 1, medium: 2, low: 3 };
-    return tasks
+    return incomplete
       .filter((t) => t.due_date && new Date(t.due_date) <= dayEnd)
       .sort((a, b) => (p[a.priority] ?? 4) - (p[b.priority] ?? 4));
-  }, [tasks, selectedDate]);
+  }, [allTasks, selectedDate]);
 
   const removePendingTask = useCallback((id) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    setAllTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  return { dayEvents, dayTasks, removePendingTask };
+  return { dayEvents, dayTasks, allTasks, removePendingTask };
 }
 
-/* ─── Detail overlay ─────────────────────────────────────── */
+/* Detail overlay */
 function DetailOverlay({ item, icon, accentColor, onClose }) {
   const start        = new Date(item.start_time);
   const end          = item.end_time ? new Date(item.end_time) : null;
@@ -249,7 +565,15 @@ function DetailOverlay({ item, icon, accentColor, onClose }) {
   );
 }
 
-/* ─── Context menu ───────────────────────────────────────── */
+/* Small monochromatic icons for context menu */
+const IconPencil = () => (
+  <svg className={styles.contextIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+);
+const IconTrash = () => (
+  <svg className={styles.contextIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+);
+
+/* Context menu — clean dropdown with blur */
 function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -259,18 +583,20 @@ function ContextMenu({ x, y, item, onEdit, onDelete, onClose }) {
   }, [onClose]);
 
   return (
-    <div ref={ref} className={styles.contextMenu} style={{ top: y, left: x }}>
-      <button className={styles.contextItem} onClick={() => { onEdit(item); onClose(); }}>✏️ Edit</button>
+    <div ref={ref} className={styles.contextMenu} style={{ top: y, left: x }} role="menu">
+      <button type="button" role="menuitem" className={styles.contextItem} onClick={() => { onEdit(item); onClose(); }}>
+        <IconPencil /> Edit
+      </button>
       <div className={styles.contextDivider} />
-      <button className={`${styles.contextItem} ${styles.contextDelete}`} onClick={() => { onDelete(item.id); onClose(); }}>
-        🗑️ Delete
+      <button type="button" role="menuitem" className={`${styles.contextItem} ${styles.contextDelete}`} onClick={() => { onDelete(item.id); onClose(); }}>
+        <IconTrash /> Delete
       </button>
     </div>
   );
 }
 
-/* ─── Timeline event card ────────────────────────────────── */
-function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, dayTasks }) {
+/* Timeline event card */
+function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, dayTasks, asPastBar }) {
   const { getTag }          = useTags();
   const [showDetail, setShowDetail] = useState(false);
   const [ctxMenu, setCtxMenu]       = useState(null);
@@ -281,7 +607,8 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, dayTasks }) {
     ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
     : null;
   const matchTask   = dayTasks?.find((t) => (t.title || "").trim() === (item.title || "").trim());
-  const accentColor = matchTask ? (PRIORITY_COLOURS[matchTask.priority] || theme.color) : (theme.color || "#94A3B8");
+  const accentColor = eventAccentColor(item, matchTask, theme.color);
+  const borderColor = scheduleCardBorderColor(item, matchTask);
   const active      = isNow(item.start_time, item.end_time);
   const past        = !active && isPast(item.end_time);
   const lect        = isLecture(item);
@@ -291,42 +618,79 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, dayTasks }) {
 
   const cardHeight = durationMins != null ? Math.max(40, Math.min(180, Math.round(durationMins * 1.8))) : undefined;
 
+  const actionBtnRef = useRef(null);
   const handleContextMenu = useCallback((e) => {
     e.preventDefault();
     setCtxMenu({ x: e.clientX, y: e.clientY });
   }, []);
+  const openActionMenu = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (actionBtnRef.current) {
+      const rect = actionBtnRef.current.getBoundingClientRect();
+      setCtxMenu({ x: rect.left, y: rect.bottom + 4 });
+    }
+  }, []);
+
+  const isThinBar = asPastBar || past;
+  const startHour = item.start_time ? new Date(item.start_time).getHours() : 12;
+  const timeOfDayClass = startHour < 12 ? styles.timeOfDayMorning : startHour >= 17 ? styles.timeOfDayEvening : null;
+  const nowLineTop = active ? getNowLinePercent(item.start_time, item.end_time) : null;
 
   return (
     <>
-      <div className={`${styles.timelineRow} ${past ? styles.rowPast : ""}`}>
-        <div className={styles.spine}>
-          <div className={styles.spineTime}>{startTime}</div>
-          <div className={styles.spineTrack}>
-            <div className={styles.spineLine} style={{ background: isFirst ? "transparent" : "var(--border)" }} />
-            <div className={styles.spineNode} style={{ background: past ? "var(--border)" : accentColor }} />
-            <div className={styles.spineLine} style={{ background: isLast ? "transparent" : "var(--border)" }} />
-          </div>
+      <div className={`${styles.timelineRow} ${past ? styles.rowPast : ""} ${isThinBar ? styles.rowThinBar : ""}`}>
+        <div className={styles.gutter}>
+          <span className={styles.gutterTime}>{startTime}</span>
+          {durationMins > 0 && <span className={styles.gutterDur}>{fmtDuration(durationMins)}</span>}
         </div>
 
-        <div
-          className={`${styles.card} ${past ? styles.cardPast : ""} ${active ? styles.cardActive : ""}`}
-          style={{ "--card-accent": accentColor, minHeight: cardHeight ? `${cardHeight}px` : undefined }}
-          onClick={() => setShowDetail(true)}
-          onContextMenu={handleContextMenu}
-        >
-          <div className={styles.cardIcon} style={{ background: past ? "var(--hover)" : `${accentColor}1A` }}>
-            {icon}
-          </div>
-          <div className={styles.cardBody}>
-            <div className={styles.cardMeta}>
-              <span className={styles.cardTime}>{startTime}–{endTime}</span>
-              {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
-              {active && <span className={styles.nowBadge}>Now</span>}
+        {isThinBar ? (
+          <div
+            className={styles.pastBar}
+            style={{ background: `linear-gradient(90deg, ${accentColor}40, ${accentColor}15)` }}
+            onClick={() => setShowDetail(true)}
+            onContextMenu={handleContextMenu}
+            title={item.title}
+          />
+        ) : (
+          <div
+            className={`${styles.card} ${active ? styles.cardActive : ""} ${timeOfDayClass || ""} ${styles.cardWithNowLine}`}
+            style={{
+              "--card-accent": borderColor,
+              minHeight: cardHeight ? `${cardHeight}px` : undefined,
+              "--now-line-top": nowLineTop != null ? `${nowLineTop}%` : undefined,
+            }}
+            onClick={() => setShowDetail(true)}
+            onContextMenu={handleContextMenu}
+          >
+            {active && nowLineTop != null && (
+              <div className={styles.nowIndicatorLine} aria-hidden />
+            )}
+            <div className={styles.cardIcon} style={{ background: `${accentColor}1A` }}>
+              <span className={styles.cardIconEmoji}>{icon}</span>
             </div>
-            <span className={styles.cardTitle}>{item.title}</span>
-            {lect && modCode && <span className={styles.cardSub}>{modCode}</span>}
+            <div className={styles.cardBody}>
+              <div className={styles.cardMeta}>
+                {active && <span className={styles.nowBadge}>Now</span>}
+              </div>
+              <span className={styles.cardTitle}>{item.title}</span>
+              {lect && modCode && <span className={styles.cardSub}>{modCode}</span>}
+            </div>
+            <div className={styles.cardActionBar}>
+              <button
+                ref={actionBtnRef}
+                type="button"
+                className={styles.cardActionBtn}
+                onClick={openActionMenu}
+                aria-label="Schedule options"
+                aria-haspopup="menu"
+              >
+                <svg className={styles.cardActionKebab} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" /></svg>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {showDetail && (
@@ -344,13 +708,34 @@ function TimelineRow({ item, isFirst, isLast, onDelete, onEdit, dayTasks }) {
 }
 
 
-/* ─── Overlap cluster (side-by-side cards) ───────────────── */
-function OverlapCluster({ items, onDelete, onApplySuggestion }) {
+/* Overlap cluster */
+function OverlapCluster({ items, onDelete, onEdit, onApplySuggestion }) {
   const { getTag }      = useTags();
   const [expanded,      setExpanded]      = useState(false);
   const [resolveOpen,   setResolveOpen]   = useState(false);
   const [dismissed,     setDismissed]     = useState(false);
   const firstStart      = formatTime(items[0].start_time);
+
+  const clusterTimeRange = useMemo(() => {
+    let minStart = Infinity;
+    let maxEnd = -Infinity;
+    items.forEach((it) => {
+      const s = new Date(it.start_time).getTime();
+      const e = new Date(it.end_time || it.start_time).getTime();
+      if (s < minStart) minStart = s;
+      if (e > maxEnd) maxEnd = e;
+    });
+    return { start: minStart === Infinity ? null : minStart, end: maxEnd === -Infinity ? null : maxEnd };
+  }, [items]);
+
+  const nowLinePercent = useMemo(() => {
+    if (!clusterTimeRange.start || !clusterTimeRange.end) return null;
+    const now = Date.now();
+    if (now < clusterTimeRange.start || now > clusterTimeRange.end) return null;
+    return Math.max(0, Math.min(100, ((now - clusterTimeRange.start) / (clusterTimeRange.end - clusterTimeRange.start)) * 100));
+  }, [clusterTimeRange]);
+
+  const hasActiveNow = items.some((it) => isNow(it.start_time, it.end_time));
 
   // Build suggested resolution: keep the longest event, reschedule others sequentially after it
   const resolution = useMemo(() => {
@@ -380,16 +765,18 @@ function OverlapCluster({ items, onDelete, onApplySuggestion }) {
 
   return (
     <div className={styles.clusterRow}>
-      <div className={styles.spine}>
-        <div className={styles.spineTime}>{firstStart}</div>
-        <div className={styles.spineTrack}>
-          <div className={styles.spineLine} />
-          <div className={styles.spineNode} style={{ background: "var(--warning, #f59e0b)" }} />
-          <div className={styles.spineLine} />
-        </div>
+      <div className={styles.gutter}>
+        <span className={styles.gutterTime}>{firstStart}</span>
       </div>
 
       <div className={styles.clusterCards}>
+        {hasActiveNow && nowLinePercent != null && (
+          <div
+            className={styles.clusterNowLine}
+            style={{ top: `${nowLinePercent}%` }}
+            aria-hidden
+          />
+        )}
         {/* Header */}
         <div className={styles.overlapHeader}>
           <div className={styles.overlapBadge}>
@@ -413,25 +800,32 @@ function OverlapCluster({ items, onDelete, onApplySuggestion }) {
           </div>
         </div>
 
-        {/* Events list */}
-        {(expanded || true) && items.map((item) => {
-          const theme       = getTag(item.tag) || { color: "#94A3B8", icon: "📅" };
-          const icon        = resolveEventIcon(item, theme.icon);
-          const accentColor = theme.color || "#94A3B8";
-          const durationMins = item.end_time
-            ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
-            : null;
-          return (
-            <ClusterCard
-              key={item.id}
-              item={item}
-              icon={icon}
-              accentColor={accentColor}
-              durationMins={durationMins}
-              onDelete={onDelete}
-            />
-          );
-        })}
+        {/* Events list: side-by-side when overlapping */}
+        {(expanded || true) && (
+          <div className={styles.clusterCardsRow}>
+            {items.map((item) => {
+              const theme       = getTag(item.tag) || { color: "#94A3B8", icon: "📅" };
+              const icon        = resolveEventIcon(item, theme.icon);
+              const accentColor = eventAccentColor(item, null, theme.color);
+              const borderColor = scheduleCardBorderColor(item, null);
+              const durationMins = item.end_time
+                ? Math.round((new Date(item.end_time) - new Date(item.start_time)) / 60000)
+                : null;
+              return (
+                <ClusterCard
+                  key={item.id}
+                  item={item}
+                  icon={icon}
+                  accentColor={accentColor}
+                  borderColor={borderColor}
+                  durationMins={durationMins}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                />
+              );
+            })}
+          </div>
+        )}
 
         {/* Resolve panel */}
         {resolveOpen && (
@@ -466,28 +860,51 @@ function OverlapCluster({ items, onDelete, onApplySuggestion }) {
   );
 }
 
-function ClusterCard({ item, icon, accentColor, durationMins, onDelete, onEdit }) {
+function ClusterCard({ item, icon, accentColor, borderColor, durationMins, onDelete, onEdit }) {
   const [showDetail, setShowDetail] = useState(false);
   const [ctxMenu, setCtxMenu]       = useState(null);
+  const actionBtnRef = useRef(null);
   const active = isNow(item.start_time, item.end_time);
   const past   = !active && isPast(item.end_time);
+  const barColor = borderColor ?? accentColor;
+
+  const openActionMenu = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (actionBtnRef.current) {
+      const rect = actionBtnRef.current.getBoundingClientRect();
+      setCtxMenu({ x: rect.left, y: rect.bottom + 4 });
+    }
+  }, []);
 
   return (
     <>
       <div
         className={`${styles.card} ${styles.clusterCard} ${past ? styles.cardPast : ""} ${active ? styles.cardActive : ""}`}
-        style={{ "--card-accent": accentColor }}
+        style={{ "--card-accent": barColor }}
         onClick={() => setShowDetail(true)}
         onContextMenu={(e) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY }); }}
       >
-        <div className={styles.cardIcon} style={{ background: `${accentColor}1A` }}>{icon}</div>
+        <div className={styles.cardIcon} style={{ background: `${accentColor}1A` }}>
+          <span className={styles.cardIconEmoji}>{icon}</span>
+        </div>
         <div className={styles.cardBody}>
           <div className={styles.cardMeta}>
-            <span className={styles.cardTime}>{formatTime(item.start_time)}–{formatTime(item.end_time)}</span>
-            {durationMins > 0 && <span className={styles.cardDur}>{fmtDuration(durationMins)}</span>}
             {active && <span className={styles.nowBadge}>Now</span>}
           </div>
           <span className={styles.cardTitle}>{item.title}</span>
+        </div>
+        <div className={styles.cardActionBar}>
+          <button
+            ref={actionBtnRef}
+            type="button"
+            className={styles.cardActionBtn}
+            onClick={openActionMenu}
+            aria-label="Schedule options"
+            aria-haspopup="menu"
+          >
+            <svg className={styles.cardActionKebab} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" /></svg>
+          </button>
         </div>
       </div>
       {showDetail && <DetailOverlay item={item} icon={icon} accentColor={accentColor} onClose={() => setShowDetail(false)} />}
@@ -499,163 +916,314 @@ function ClusterCard({ item, icon, accentColor, durationMins, onDelete, onEdit }
   );
 }
 
-/* ─── Free gap with task suggestion ─────────────────────── */
-function FreeGap({ minutes, gapStart, suggestedTask, onTaskScheduled, addEvent, onToast }) {
+/* Empty slot with Quick Add */
+function FreeGap({ minutes, gapStart, suggestedTask, quickAddTasks = [], onTaskScheduled, addEvent, onToast }) {
   const [scheduling, setScheduling] = useState(false);
-  const [hidden,     setHidden]     = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  const handleSchedule = async () => {
-    if (!suggestedTask || scheduling || hidden) return;
+  const topTasks = (quickAddTasks && quickAddTasks.length > 0) ? quickAddTasks.slice(0, 3) : (suggestedTask ? [suggestedTask] : []);
+
+  const scheduleTask = async (task) => {
+    if (!task || scheduling || hidden) return;
     setScheduling(true);
     try {
-      const estMins   = (suggestedTask.estimated_blocks || 1) * 25;
+      const estMins   = (task.estimated_blocks || 1) * 25;
       const startTime = gapStart instanceof Date ? gapStart : new Date(gapStart);
       const endTime   = new Date(startTime.getTime() + estMins * 60000);
-
       await addEvent({
-        title:       suggestedTask.title,
+        title:       task.title,
         start_time:  startTime.toISOString(),
         end_time:    endTime.toISOString(),
-        description: suggestedTask.description || "",
+        description: task.description || "",
       });
-
-      onTaskScheduled?.(suggestedTask.id);
-      onToast?.(`"${suggestedTask.title}" added to your plan`);
+      onTaskScheduled?.(task.id);
+      onToast?.(`"${task.title}" added to your plan`);
       setHidden(true);
+      setQuickOpen(false);
     } catch {
-      onTaskScheduled?.(suggestedTask.id);
-      onToast?.(`"${suggestedTask.title}" added to your plan`);
+      onTaskScheduled?.(task.id);
       setHidden(true);
+      setQuickOpen(false);
     } finally {
       setScheduling(false);
     }
   };
 
-  // Disappear entirely after scheduling
+  useEffect(() => {
+    if (!quickOpen) return;
+    const close = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setQuickOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [quickOpen]);
+
   if (hidden) return null;
 
   return (
-    <div className={styles.gapRow}>
-      <div className={styles.spine}>
-        <div className={styles.spineTime} />
-        <div className={styles.spineTrack}>
-          <div className={styles.spineLine} />
-          <div className={styles.spineNodeDash} />
-          <div className={styles.spineLine} />
+    <div className={styles.gapDividerRow} ref={menuRef}>
+      <span className={styles.gapDividerLine} />
+      <span className={styles.gapDividerDuration}>{fmtDuration(minutes)}</span>
+      <button
+        type="button"
+        className={styles.gapDividerPlus}
+        onClick={() => setQuickOpen((o) => !o)}
+        title={`${fmtDuration(minutes)} free — add task`}
+        aria-label="Add task to slot"
+      >
+        +
+      </button>
+      <span className={styles.gapDividerLine} />
+      {quickOpen && topTasks.length > 0 && (
+        <div className={styles.quickAddMenu}>
+          <span className={styles.quickAddTitle}>Quick add</span>
+          {topTasks.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={styles.quickAddItem}
+              onClick={() => scheduleTask(t)}
+              disabled={scheduling}
+            >
+              {t.title}
+            </button>
+          ))}
         </div>
-      </div>
-
-      <div className={styles.freeGap}>
-        <div className={styles.freeLeft}>
-          <span className={styles.freeText}>
-            <strong className={styles.freeDur}>{fmtDuration(minutes)} free</strong>
-            {suggestedTask ? (
-              <> — slot <span className={styles.freeTaskName}>{suggestedTask.title}?</span></>
-            ) : (
-              " — nothing due yet."
-            )}
-          </span>
-        </div>
-        {suggestedTask && (
-          <button
-            type="button"
-            className={styles.freeTick}
-            title="Suggest and add to timeline"
-            onClick={handleSchedule}
-            disabled={scheduling}
-          >
-            {scheduling ? "…" : "Suggest"}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Task widget row ────────────────────────────────────── */
-function TaskWidgetRow({ task }) {
-  const color   = PRIORITY_COLOURS[task.priority] || "var(--muted)";
-  const estMins = task.estimated_blocks ? task.estimated_blocks * 25 : null;
-
-  return (
-    <div className={styles.twRow}>
-      <div className={styles.twLeft}>
-        <span className={styles.twDot} style={{ background: color }} />
-        <div className={styles.twBody}>
-          <span className={styles.twTitle}>{task.title}</span>
-          <div className={styles.twMeta}>
-            {task.module_code && <span className={styles.twModule}>{task.module_code}</span>}
-            {estMins && <span className={styles.twTime}>{fmtDuration(estMins)}</span>}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Task widget ────────────────────────────────────────── */
-function TaskWidget({ tasks, selectedDate, onViewAllTasks }) {
-  const topTasks = useMemo(() => tasks.slice(0, 5), [tasks]);
-  const label    = isToday(selectedDate) ? "TODAY'S TASKS" : "TASKS DUE";
-
-  return (
-    <div className={styles.taskWidget}>
-      <div className={styles.taskWidgetHeader}>
-        <span className={styles.taskWidgetTitle}>{label}</span>
-        <button
-          type="button"
-          className={styles.taskWidgetLink}
-          onClick={() => onViewAllTasks?.()}
-        >
-          All tasks →
-        </button>
-      </div>
-
-      {topTasks.length === 0 ? (
-        <div className={styles.taskWidgetEmpty}>
-          <span className={styles.taskWidgetEmptyIcon}>🎉</span>
-          <p className={styles.taskWidgetEmptyText}>
-            {isToday(selectedDate) ? "Nothing due today." : "Nothing due this day."}
-          </p>
-          <button
-            type="button"
-            className={styles.taskWidgetEmptyBtn}
-            onClick={() => onViewAllTasks?.()}
-          >
-            View all tasks →
-          </button>
-        </div>
-      ) : (
-        <div className={styles.taskWidgetList}>
-          {topTasks.map((task) => <TaskWidgetRow key={task.id} task={task} />)}
+      )}
+      {quickOpen && topTasks.length === 0 && (
+        <div className={styles.quickAddMenu}>
+          <span className={styles.quickAddEmptyIcon} aria-hidden>🪴</span>
+          <span className={styles.quickAddEmpty}>Your garden is quiet</span>
         </div>
       )}
     </div>
   );
 }
 
-/* ─── Empty day ──────────────────────────────────────────── */
-function EmptyDay() {
+/* Task widget row */
+function TaskWidgetRow({ task, onPlay, isActiveInTimer }) {
+  const color   = PRIORITY_COLOURS[task.priority] || "var(--muted)";
+  const estMins = task.estimated_blocks ? task.estimated_blocks * 25 : null;
+  const priorityClass = task.priority === "urgent" ? styles.twDotUrgent
+    : task.priority === "high" ? styles.twDotHigh
+    : task.priority === "low" ? styles.twDotLow
+    : "";
+  const moduleId = task.moduleId ?? task.module_id;
+  const moduleCode = task.module_code;
+  const assignmentType = (task.assignment_type || task.deadline_type || "").toLowerCase();
+  const typeBubbleClass =
+    assignmentType === "exam" ? styles.twBubbleExam
+    : assignmentType === "coursework" ? styles.twBubbleCoursework
+    : assignmentType === "lab" ? styles.twBubbleOther
+    : null;
+  const typeLabel = assignmentType === "exam" ? "Exam" : assignmentType === "coursework" ? "Coursework" : assignmentType === "lab" ? "Lab" : null;
+  const moduleHref = moduleId ? `/modules?moduleId=${moduleId}` : (moduleCode ? `/modules?code=${encodeURIComponent(moduleCode)}` : "/modules");
+
   return (
-    <div className={styles.empty}>
-      <span className={styles.emptyIcon}>📭</span>
-      <p>Nothing scheduled for this day</p>
+    <div className={`${styles.twRow} ${isActiveInTimer ? styles.twRowActiveTimer : ""}`}>
+      <div className={styles.twLeft}>
+        <span className={`${styles.twDot} ${priorityClass}`} style={{ background: color }} />
+        <div className={styles.twBody}>
+          <span className={styles.twTitle}>{task.title}</span>
+          <div className={styles.twMeta}>
+            {(moduleCode || moduleId) && (
+              <Link to={moduleHref} className={`${styles.twBubble} ${styles.twBubbleModule}`} onClick={(e) => e.stopPropagation()}>
+                {moduleCode || `Module ${moduleId}`}
+              </Link>
+            )}
+            {typeLabel && typeBubbleClass && (
+              <span className={`${styles.twBubble} ${typeBubbleClass}`}>{typeLabel}</span>
+            )}
+            {estMins && <span className={styles.twTime}>{fmtDuration(estMins)}</span>}
+          </div>
+        </div>
+      </div>
+      {onPlay && !task.completed && (
+        <button
+          type="button"
+          className={styles.twPlay}
+          title="Start timer for this task"
+          onClick={() => onPlay(task)}
+        >
+          ▶
+        </button>
+      )}
     </div>
   );
 }
 
-/* ════════════════════════════════════════════════
-   HOME PAGE
-   ════════════════════════════════════════════════ */
+/* Task widget — always visible; context-aware empty: brand new vs all completed */
+function TaskWidget({ tasks, selectedDate, onViewAllTasks, onPlay, onAddTask, backlogLabel, activeTimerTaskId, isBrandNew, isAllCompleted }) {
+  const topTasks = useMemo(() => tasks.slice(0, 5), [tasks]);
+  const label    = backlogLabel ? "TO SCHEDULE" : (isToday(selectedDate) ? "TODAY'S TASKS" : "TASKS DUE");
+  const isEmpty  = topTasks.length === 0;
+
+  const emptyMessage = isBrandNew
+    ? "A fresh start! What's the first goal you'll plant here?"
+    : isAllCompleted
+    ? "All chores are done. Time for a cat nap?"
+    : "Your garden is clear";
+  const emptyIcon = isBrandNew ? "🪴" : isAllCompleted ? "🐈" : "🪴";
+
+  return (
+    <div className={styles.taskWidget}>
+      <div className={styles.taskWidgetHeader}>
+        <span className={styles.taskWidgetTitle}>{label}</span>
+        <div className={styles.taskWidgetHeaderActions}>
+          {isEmpty && onAddTask && (
+            <button
+              type="button"
+              className={styles.taskWidgetAddBtn}
+              onClick={onAddTask}
+              title="Add task"
+              aria-label="Add task"
+            >
+              +
+            </button>
+          )}
+          <button
+            type="button"
+            className={styles.taskWidgetLink}
+            onClick={() => onViewAllTasks?.()}
+          >
+            All tasks →
+          </button>
+        </div>
+      </div>
+
+      {isEmpty ? (
+        <div className={styles.taskWidgetEmpty}>
+          <span className={styles.taskWidgetEmptyIcon} aria-hidden>{emptyIcon}</span>
+          <p className={styles.taskWidgetEmptyText}>{emptyMessage}</p>
+          {onAddTask && (isBrandNew || !isAllCompleted) && (
+            <button
+              type="button"
+              className={styles.taskWidgetEmptyBtn}
+              onClick={onAddTask}
+            >
+              + Add Task
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className={styles.taskWidgetList}>
+          {topTasks.map((task) => (
+            <TaskWidgetRow
+              key={task.id}
+              task={task}
+              onPlay={onPlay}
+              isActiveInTimer={activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Empty day — Zen state when no tasks scheduled */
+function EmptyDay() {
+  return (
+    <div className={styles.empty}>
+      <span className={styles.emptyIcon}>🪴</span>
+      <p>Your garden is quiet</p>
+      <p className={styles.emptySub}>Time to plant tomorrow&apos;s goals?</p>
+    </div>
+  );
+}
+
+/* HOME PAGE */
 export default function Home({ onNavigate }) {
+  const navigate         = useNavigate();
   const { selectedDate } = useCalendar();
   const dispatch         = useCalendarDispatch();
   const { loadEvents }   = useCalendarEvents();
   const { removeEvent, addEvent, editEvent } = useEventActions();
   const { openModal }    = useEventModal();
 
-  const { dayEvents, dayTasks, removePendingTask } = useHomeData(selectedDate);
+  const { dayEvents, dayTasks, allTasks, removePendingTask } = useHomeData(selectedDate);
+  const isBrandNewTasks = (allTasks || []).length === 0;
+  const isAllTasksCompleted = (allTasks || []).length > 0 && (allTasks || []).filter((t) => !t.completed).length === 0;
+  const { isActive: timerIsActive } = useTimerContext();
   const [toast, setToast] = useState(null);
+  const [pastCollapsed, setPastCollapsed] = useState(true);
+  const [coachInsights, setCoachInsights] = useState(null);
+  const [recentGrowthTask, setRecentGrowthTask] = useState(null);
+  const [coachLoading, setCoachLoading] = useState(false);
+  const [coachError, setCoachError] = useState(null);
+  const [activeTimerTaskId, setActiveTimerTaskId] = useState(null);
+  const [modulesList, setModulesList] = useState([]);
+  const [highlightedModuleId, setHighlightedModuleId] = useState(null);
+  const moduleOverviewRef = useRef(null);
+  useEffect(() => {
+    const read = () => { try { setActiveTimerTaskId(sessionStorage.getItem("timerTaskId")); } catch (_) {} };
+    read();
+    window.addEventListener("focus", read);
+    return () => window.removeEventListener("focus", read);
+  }, []);
+
+  useEffect(() => {
+    if (!isToday(selectedDate)) {
+      setRecentGrowthTask(null);
+      return;
+    }
+    let cancelled = false;
+    const fetchTodayGrowth = () => {
+      getHistory()
+        .then((history) => {
+          if (cancelled || !Array.isArray(history)) return;
+          const todayStr = new Date(selectedDate).toDateString();
+          const todaySessions = history.filter((s) => {
+            const end = s.end_time ?? s.endTime ?? s.date;
+            return end && new Date(end).toDateString() === todayStr;
+          });
+          if (todaySessions.length === 0) {
+            setRecentGrowthTask(null);
+            return;
+          }
+          const byEnd = [...todaySessions].sort(
+            (a, b) => new Date(b.end_time ?? b.endTime ?? b.date) - new Date(a.end_time ?? a.endTime ?? a.date)
+          );
+          const taskName = (byEnd[0].task || "").trim() || "Focus";
+          setRecentGrowthTask(taskName);
+        })
+        .catch(() => setRecentGrowthTask(null));
+    };
+    fetchTodayGrowth();
+    const onFocus = () => { if (isToday(selectedDate)) fetchTodayGrowth(); };
+    window.addEventListener("focus", onFocus);
+    return () => { cancelled = true; window.removeEventListener("focus", onFocus); };
+  }, [selectedDate]);
+
+  useEffect(() => {
+    getModules().then((list) => setModulesList(Array.isArray(list) ? list : [])).catch(() => setModulesList([]));
+  }, []);
+
+  const handleModuleTagClick = useCallback((moduleId, moduleCode) => {
+    moduleOverviewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setHighlightedModuleId(String(moduleId || ""));
+    setTimeout(() => setHighlightedModuleId(null), 2500);
+  }, []);
+
+  const generateCoach = useCallback(async () => {
+    setCoachLoading(true);
+    setCoachError(null);
+    try {
+      const res = await analyticsService.getAiInsights(7);
+      setCoachInsights(res?.insights || "");
+    } catch (err) {
+      const msg = err?.message || "";
+      setCoachError(
+        msg.includes("OpenAI API key not configured") || msg.includes("OpenAI package not installed")
+          ? "AI study coach isn't configured yet."
+          : "Couldn't generate insights. Try again in a moment."
+      );
+    } finally {
+      setCoachLoading(false);
+    }
+  }, []);
 
   // Show toast for 3 seconds
   const showToast = useCallback((msg) => {
@@ -687,6 +1255,37 @@ export default function Home({ onNavigate }) {
     return sortedEvents.filter((it) => !pastIds.has(it.id));
   }, [sortedEvents, pastItems]);
 
+  /* Include overlapping past events in timeline so both show side-by-side in the same time block */
+  const upcomingForTimeline = useMemo(() => {
+    const upcomingIds = new Set(upcomingItems.map((e) => e.id));
+    const pastThatOverlap = pastItems.filter((past) => {
+      const pastStart = new Date(past.start_time);
+      const pastEnd = new Date(past.end_time || past.start_time);
+      return upcomingItems.some((up) => {
+        const upStart = new Date(up.start_time);
+        const upEnd = new Date(up.end_time || up.start_time);
+        return pastEnd > upStart && pastStart < upEnd;
+      });
+    });
+    const combined = [...upcomingItems, ...pastThatOverlap];
+    return combined.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  }, [upcomingItems, pastItems]);
+
+  const pastIdsShownInTimeline = useMemo(
+    () => new Set(
+      pastItems.filter((past) => {
+        const pastEnd = new Date(past.end_time || past.start_time);
+        return upcomingItems.some((up) => pastEnd > new Date(up.start_time) && new Date(past.start_time) < new Date(up.end_time || up.start_time));
+      }).map((p) => p.id)
+    ),
+    [pastItems, upcomingItems]
+  );
+
+  const pastItemsForSection = useMemo(
+    () => pastItems.filter((p) => !pastIdsShownInTimeline.has(p.id)),
+    [pastItems, pastIdsShownInTimeline]
+  );
+
   const scheduledTitles = useMemo(
     () => new Set(upcomingItems.map((e) => e.title?.toLowerCase())),
     [upcomingItems]
@@ -698,24 +1297,50 @@ export default function Home({ onNavigate }) {
   );
 
   const upcomingTimeline = useMemo(
-    () => computeTimelineWithGaps(upcomingItems, suggestableTasks),
-    [upcomingItems, suggestableTasks]
+    () => computeTimelineWithGaps(upcomingForTimeline, suggestableTasks),
+    [upcomingForTimeline, suggestableTasks]
   );
 
   const upcomingItemEntries = upcomingTimeline.filter((e) => e.type === "item" || e.type === "cluster");
 
   const mustDoTasks = useMemo(() => {
-    if (!isToday(selectedDate)) return [];
-    const todayEnd = new Date(selectedDate);
-    todayEnd.setHours(23, 59, 59, 999);
+    const dayEnd = new Date(selectedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+    const dayStart = new Date(selectedDate);
+    dayStart.setHours(0, 0, 0, 0);
     return dayTasks.filter(
-      (t) => t.priority === "urgent" && t.due_date && new Date(t.due_date) <= todayEnd
+      (t) => (t.priority === "urgent" || t.priority === "high") && t.due_date && new Date(t.due_date) <= dayEnd && new Date(t.due_date) >= dayStart
     );
   }, [dayTasks, selectedDate]);
 
+  const dayProgress = useMemo(() => {
+    if (!isToday(selectedDate)) return null;
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(selectedDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    const now = new Date();
+    if (now < startOfDay) return { percent: 0, message: "Your day hasn't started yet — get set!" };
+    if (now > endOfDay) return { percent: 100, message: "Your day is complete — well done!" };
+    const percent = Math.round(((now - startOfDay) / (endOfDay - startOfDay + 1)) * 100);
+    const message = percent >= 100
+      ? "Your day is complete — well done!"
+      : `${percent}% of your day is complete — you're doing great!`;
+    return { percent: Math.min(100, percent), message };
+  }, [selectedDate]);
+
+  const lectureCount = useMemo(
+    () => sortedEvents.filter(isLecture).length,
+    [sortedEvents]
+  );
+
+  const motivationMessage = useMemo(() => {
+    if (!isToday(selectedDate)) return null;
+    return getMotivationMessage(now, sortedEvents.length, pastItems.length, lectureCount);
+  }, [selectedDate, now, sortedEvents.length, pastItems.length, lectureCount]);
+
   return (
     <div className={styles.page}>
-      {/* ── Toast banner ── */}
       {toast && (
     <div className={styles.alertToast}>
       <div className={styles.alertContent}>
@@ -732,25 +1357,108 @@ export default function Home({ onNavigate }) {
         scheduleTitle={scheduleTitle}
       />
 
-      {/* ── Single 2-col layout: left = deadlines + timeline, right = tasks + AI ── */}
-      <div className={styles.mainGrid}>
-        {/* Left column */}
-        <div className={styles.leftCol}>
-          <DeadlinesWidget mode="list" limit={3} showViewAll />
+      <div className={styles.bentoGrid}>
+        <div className={styles.bentoHero}>
+          <FocusHeroCard
+            tasks={dayTasks}
+            onStartTask={(t) => {
+              try { sessionStorage.setItem("timerTaskId", String(t.id)); } catch (_) {}
+              navigate(`/timer?taskId=${t.id}`);
+              onNavigate?.("timer");
+            }}
+            onOpenTimer={() => {
+              navigate("/timer");
+              onNavigate?.("timer");
+            }}
+          />
+        </div>
+        <div className={styles.bentoNowNext}>
+          <NowNextCard dayEvents={sortedEvents} upcomingItems={upcomingItems} selectedDate={selectedDate} />
+        </div>
 
+        <section className={styles.bentoDeadlines}>
+          <DeadlinesWidget onModuleTagClick={handleModuleTagClick} />
+        </section>
+
+        <section
+          id="module-overview"
+          ref={moduleOverviewRef}
+          className={styles.bentoModuleOverview}
+        >
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionHeaderLabel}>Modules</span>
+            <h3 className={styles.sectionHeaderTitle}>
+              <span className={styles.sectionHeaderIcon} aria-hidden>📚</span>
+              Module Overview
+            </h3>
+          </div>
+          {modulesList.length === 0 ? (
+            <p className={styles.moduleOverviewEmpty}>No modules yet. Add modules from the Modules page.</p>
+          ) : (
+            <div className={styles.moduleOverviewGrid}>
+              {modulesList.slice(0, 6).map((mod) => (
+                <Link
+                  key={mod.id}
+                  to={`/modules?moduleId=${mod.id}`}
+                  className={`${styles.moduleOverviewCard} ${highlightedModuleId && String(mod.id) === highlightedModuleId ? styles.moduleOverviewCardHighlight : ""}`}
+                  data-module-id={mod.id}
+                >
+                  <span className={styles.moduleOverviewCardCode}>{mod.module_code}</span>
+                  <span className={styles.moduleOverviewCardName}>{mod.module_name || mod.title}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div className={styles.bentoPlan}>
           <div className={styles.timelineBox}>
+            {/* Sleek progress bar at top: Sage → Terracotta; task-based when there are tasks */}
+            {isToday(selectedDate) && (
+              <div className={styles.dayProgressWrap}>
+                <div className={styles.dayProgressTrack}>
+                  <div
+                    className={styles.dayProgressFill}
+                    style={{
+                      width: `${sortedEvents.length > 0
+                        ? Math.round((pastItems.length / sortedEvents.length) * 100)
+                        : dayProgress?.percent ?? 0}%`,
+                    }}
+                  />
+                </div>
+                <p className={styles.dayProgressLabel}>
+                  {motivationMessage ?? dayProgress?.message ?? "Your plan for today"}
+                </p>
+                {recentGrowthTask && (
+                  <div className={styles.recentGrowthBadge}>
+                    🌱 {recentGrowthTask} completed!
+                  </div>
+                )}
+              </div>
+            )}
             <div className={styles.timelineHeader}>
-              <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
-              <span className={styles.timelineSub}>
-                {isToday(selectedDate)
-                  ? "Keep it realistic — protect your focus blocks."
-                  : "Preview & adjust."}
-              </span>
+              <div>
+                <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
+                {!isToday(selectedDate) && (
+                <span className={styles.timelineSub}>Preview & adjust.</span>
+              )}
+              </div>
+              <button
+                type="button"
+                className={styles.headerGenerateBtn}
+                onClick={generateCoach}
+                disabled={coachLoading}
+              >
+                {coachLoading ? "…" : "Generate"}
+              </button>
             </div>
 
+            <div className={styles.timelineTrack}>
+              <div className={styles.timelineTrackLine} aria-hidden />
+              <div className={styles.timelineTrackContent}>
             {mustDoTasks.length > 0 && (
               <div className={styles.mustDoSection}>
-                <div className={styles.mustDoLabel}>Must do today</div>
+                <div className={styles.mustDoLabel}>{isToday(selectedDate) ? "Must do today" : "Due this day"}</div>
                 <div className={styles.mustDoList}>
                   {mustDoTasks.map((task) => (
                     <div key={task.id} className={styles.mustDoItem} style={{ "--priority": PRIORITY_COLOURS[task.priority] || "var(--primary)" }}>
@@ -764,24 +1472,32 @@ export default function Home({ onNavigate }) {
               </div>
             )}
 
-            {pastItems.length > 0 && (
+            {pastItemsForSection.length > 0 && (
               <div className={styles.pastDetails}>
-                <div className={styles.pastSummary}>
-                  Earlier today <span className={styles.pastCount}>({pastItems.length})</span>
-                </div>
-                <div className={styles.pastBody}>
-                  {pastItems.map((item, idx) => (
-                    <TimelineRow
-                      key={item.id}
-                      item={item}
-                      dayTasks={dayTasks}
-                      isFirst={idx === 0}
-                      isLast={idx === pastItems.length - 1}
-                      onDelete={removeEvent}
-                      onEdit={(ev) => openModal(ev, ev.tag)}
-                    />
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  className={styles.pastSummary}
+                  onClick={() => setPastCollapsed((c) => !c)}
+                >
+                  Earlier today <span className={styles.pastCount}>({pastItemsForSection.length})</span>
+                  <span className={styles.pastChevron}>{pastCollapsed ? "▼" : "▲"}</span>
+                </button>
+                {!pastCollapsed && (
+                  <div className={styles.pastBody}>
+                    {pastItemsForSection.map((item, idx) => (
+                      <TimelineRow
+                        key={item.id}
+                        item={item}
+                        dayTasks={dayTasks}
+                        isFirst={idx === 0}
+                        isLast={idx === pastItemsForSection.length - 1}
+                        onDelete={removeEvent}
+                        onEdit={(ev) => openModal(ev, ev.tag)}
+                        asPastBar
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -795,6 +1511,7 @@ export default function Home({ onNavigate }) {
                     minutes={entry.minutes}
                     gapStart={entry.gapStart}
                     suggestedTask={entry.suggestedTask}
+                    quickAddTasks={suggestableTasks}
                     onTaskScheduled={removePendingTask}
                     addEvent={addEvent}
                     onToast={showToast}
@@ -807,6 +1524,7 @@ export default function Home({ onNavigate }) {
                     key={`cluster-${i}`}
                     items={entry.items}
                     onDelete={removeEvent}
+                    onEdit={(ev) => openModal(ev, ev.tag)}
                     onApplySuggestion={async (suggestion) => {
                       try {
                         const baseId = extractBaseEventId(suggestion.event.id);
@@ -817,7 +1535,6 @@ export default function Home({ onNavigate }) {
                         await loadEvents();
                         showToast("Overlap resolved and schedule updated.");
                       } catch (err) {
-                        console.error("Apply suggestion failed:", err);
                         showToast("Could not apply — try right-click to edit manually.");
                       }
                     }}
@@ -838,19 +1555,46 @@ export default function Home({ onNavigate }) {
                 />
               );
             })}
+            </div>
+            </div>
           </div>
         </div>
 
-        {/* Right sidebar */}
-        <aside className={styles.rightSidebar}>
-          <TaskWidget
-            tasks={dayTasks}
-            selectedDate={selectedDate}
-            onViewAllTasks={() => onNavigate?.("tasks")}
-          />
+        <aside className={styles.bentoTasks}>
+          {timerIsActive ? (
+            <ActiveTimerCard
+              onOpenTimer={() => {
+                navigate("/timer");
+                onNavigate?.("timer");
+              }}
+            />
+          ) : (
+            <>
+              <DayProgressRingSidebar completed={pastItems.length} total={sortedEvents.length} />
+              <TaskWidget
+                tasks={suggestableTasks}
+                selectedDate={selectedDate}
+                onViewAllTasks={() => onNavigate?.("tasks")}
+                onAddTask={() => onNavigate?.("tasks")}
+                onPlay={(t) => {
+                  try { sessionStorage.setItem("timerTaskId", String(t.id)); } catch (_) {}
+                  navigate(`/timer?taskId=${t.id}`);
+                  onNavigate?.("timer");
+                }}
+                backlogLabel
+                activeTimerTaskId={activeTimerTaskId}
+                isBrandNew={isBrandNewTasks}
+                isAllCompleted={isAllTasksCompleted}
+              />
+            </>
+          )}
           <HomeStudyCoachCard
             days={7}
             onNavigateAnalytics={() => onNavigate?.("analytics")}
+            insights={coachInsights}
+            loading={coachLoading}
+            error={coachError}
+            onGenerate={generateCoach}
           />
         </aside>
       </div>
