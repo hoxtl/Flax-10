@@ -4,7 +4,23 @@ import styles from "./CoverImageModal.module.css";
 export default function CoverImageModal({ images, availablePhotos, onClose, onUpdate }) {
     const [view, setView] = useState("list");
 
-    const handleAdd = (img) => { onUpdate([...images, img]); setView("list"); };
+    const handleAdd = (img) => {
+        if (images.length >= 5) {
+            alert("Maximum of 5 images allowed per society.");
+            return;
+        }
+        onUpdate([...images, img]);
+        setView("list");
+    };
+    <button
+        className={styles.addCard}
+        onClick={images.length < 5 ? onAddClick : () => alert("Maximum of 5 images reached")}
+        disabled={images.length >= 5}
+        title={images.length >= 5 ? "Maximum 5 images reached" : "Add image"}
+        style={images.length >= 5 ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+    >
+        <span className={styles.addIcon}>+</span>
+    </button>
     const handleDelete = (index) => onUpdate(images.filter((_, i) => i !== index));
     const handlePin = (index) => onUpdate([images[index], ...images.filter((_, i) => i !== index)]);
 
