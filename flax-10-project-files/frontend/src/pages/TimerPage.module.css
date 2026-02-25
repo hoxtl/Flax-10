@@ -432,3 +432,9 @@
         margin-bottom: 0.5rem;
     }
 }
+
+@media (max-width: 380px) {
+    .taskInput input::placeholder {
+        color: transparent;
+    }
+}
