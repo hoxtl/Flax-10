@@ -41,6 +41,30 @@
     font-size: 0.95rem;
 }
 
+.emailList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.emailLink {
+    color: var(--primary);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.emailLink:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.error {
+    color: #ff4d4f;
+    font-size: 0.85rem;
+    margin: 4px 0 0 0;
+    font-weight: 500;
+}
+
 .editorContainer {
     display: flex;
     flex-direction: column;
