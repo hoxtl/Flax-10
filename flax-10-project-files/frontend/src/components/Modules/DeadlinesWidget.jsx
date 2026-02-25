@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import {
   getDeadlineCountdown,
@@ -9,18 +10,33 @@ import {
 import styles from "./DeadlinesWidget.module.css";
 
 /* ─── Main widget ─────────────────────────────── */
-export default function DeadlinesWidget() {
+export default function DeadlinesWidget({ onModuleTagClick }) {
+  const navigate = useNavigate();
   const deadlines = useUpcomingDeadlines();
   const [selected, setSelected] = useState(null);
+
+  const handleModuleClick = (moduleId, moduleCode) => {
+    if (onModuleTagClick) {
+      onModuleTagClick(moduleId, moduleCode);
+    } else {
+      const url = moduleId ? `/modules?moduleId=${moduleId}` : (moduleCode ? `/modules?code=${encodeURIComponent(moduleCode)}` : "/modules");
+      navigate(url);
+    }
+  };
 
   if (!deadlines.length) return null;
 
   return (
     <>
       <div className={styles.widget}>
-        {/* Header — consistent with Today's Tasks & AI card */}
         <div className={styles.headerRow}>
-          <span className={styles.heading}>Upcoming Deadlines</span>
+          <div className={styles.headerContent}>
+            <span className={styles.headerLabel}>Deadlines</span>
+            <h2 className={styles.headerTitle}>
+              <span className={styles.headerIcon} aria-hidden>🕐</span>
+              Upcoming Deadlines
+            </h2>
+          </div>
         </div>
 
         {deadlines.map((deadline) => (
@@ -28,6 +44,7 @@ export default function DeadlinesWidget() {
             key={deadline.id}
             deadline={deadline}
             onClick={() => setSelected(deadline)}
+            onModuleClick={onModuleTagClick ? handleModuleClick : undefined}
           />
         ))}
       </div>
@@ -53,11 +70,28 @@ function useUpcomingDeadlines() {
   return deadlines;
 }
 
-/* ─── Single row — simplified: title + due & countdown only ── */
-function DeadlineRow({ deadline, onClick }) {
+/* ─── Single row: title, then bubbles (module + type), countdown pill ── */
+function DeadlineRow({ deadline, onClick, onModuleClick }) {
   const urgency = getDeadlineUrgency(deadline.start_due_date);
   const countdown = getDeadlineCountdown(deadline.start_due_date);
   const dueStr = formatDeadlineDateTime(deadline.start_due_date);
+  const typeKey = (deadline.deadline_type || "coursework").toLowerCase();
+  const typeLabel = DEADLINE_LABELS[deadline.deadline_type] ?? deadline.deadline_type ?? "Coursework";
+  const moduleId = deadline.module ?? deadline.module_id;
+  const moduleCode = deadline.module_code;
+  const typeBubbleClass =
+    typeKey === "exam" ? "bubbleExam"
+    : typeKey === "coursework" ? "bubbleCoursework"
+    : "bubbleOther";
+
+  const moduleHref = moduleId ? `/modules?moduleId=${moduleId}` : (moduleCode ? `/modules?code=${encodeURIComponent(moduleCode)}` : "/modules");
+
+  const handleBubbleClick = (e) => {
+    e.stopPropagation();
+    if (onModuleClick) {
+      onModuleClick(moduleId, moduleCode);
+    }
+  };
 
   return (
     <div
@@ -65,9 +99,38 @@ function DeadlineRow({ deadline, onClick }) {
       onClick={onClick}
     >
       <div className={styles.body}>
-        <span className={styles.title}>{deadline.title}</span>
-        <span className={styles.meta}>
-          {dueStr} · <span className={`${styles.countdown} ${styles[urgency] || ""}`}>{countdown}</span>
+        <div className={styles.rowContent}>
+          <span className={styles.title}>{deadline.title}</span>
+          <div className={styles.bubbleRow}>
+            {(moduleCode || moduleId) && (
+              onModuleClick ? (
+                <button
+                  type="button"
+                  className={`${styles.bubble} ${styles.bubbleModule}`}
+                  onClick={handleBubbleClick}
+                >
+                  {moduleCode || `Module ${moduleId}`}
+                </button>
+              ) : (
+                <Link
+                  to={moduleHref}
+                  className={`${styles.bubble} ${styles.bubbleModule}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {moduleCode || `Module ${moduleId}`}
+                </Link>
+              )
+            )}
+            <span className={`${styles.bubble} ${styles[typeBubbleClass]}`}>
+              {typeLabel}
+            </span>
+          </div>
+        </div>
+        <span
+          className={`${styles.pill} ${styles[urgency] || ""}`}
+          title={dueStr}
+        >
+          {countdown}
         </span>
       </div>
     </div>
@@ -102,7 +165,19 @@ function DeadlineDetailModal({ deadline, onClose }) {
           <div className={styles.modalRow}>
             <span className={styles.modalLabel}>Module</span>
             <span className={styles.modalValue}>
-              <strong>{deadline.module_code}</strong> — {deadline.module_name}
+              {deadline.module_code ? (
+                <>
+                  <Link to={`/modules?code=${encodeURIComponent(deadline.module_code)}`} className={styles.moduleCodeLink} onClick={onClose}>
+                    <strong>{deadline.module_code}</strong>
+                  </Link>
+                  {deadline.module_name && ` — ${deadline.module_name}`}
+                </>
+              ) : (
+                <>
+                  <strong>{deadline.module_code}</strong>
+                  {deadline.module_name && ` — ${deadline.module_name}`}
+                </>
+              )}
             </span>
           </div>
 
@@ -114,8 +189,8 @@ function DeadlineDetailModal({ deadline, onClose }) {
           </div>
 
           <div className={styles.modalRow}>
-            <span className={styles.modalLabel}>Time left</span>
-            <span className={`${styles.modalValue} ${styles[urgency] || ""}`}>
+            <span className={styles.modalLabel}>Left</span>
+            <span className={`${styles.modalValue} ${styles.modalTag} ${styles[urgency] || ""}`}>
               {countdown}
             </span>
           </div>

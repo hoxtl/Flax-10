@@ -24,16 +24,21 @@ export function formatDeadlineDateTime(dateStr) {
 
 export function getDeadlineCountdown(dateStr) {
     const diff = new Date(dateStr) - new Date();
-    if (diff < 0) return 'Past due';
+    if (diff < 0) return 'Overdue';
     const days = Math.floor(diff / 86_400_000);
-    if (days > 0) return `${days} days remaining`;
+    if (days > 0) return `${days}d`;
     const hours = Math.floor(diff / 3_600_000);
-    return hours > 0 ? `${hours}h remaining` : 'Due today';
+    return hours > 0 ? `${hours}h` : 'Today';
 }
 
 export function getDeadlineUrgency(dateStr) {
     const days = Math.floor((new Date(dateStr) - new Date()) / 86_400_000);
-    if (days <= 3) return 'critical';
-    if (days <= 7) return 'urgent';
+    if (days < 3) return 'critical';
+    if (days < 7) return 'urgent';
     return 'normal';
+}
+
+/** Days remaining (integer). Negative if overdue. */
+export function getDaysRemaining(dateStr) {
+    return Math.floor((new Date(dateStr) - new Date()) / 86_400_000);
 }
