@@ -223,6 +223,8 @@ def create_lecture_event(user, module, start, end, lecture_tag):
             'tag': lecture_tag,
             'priority': 'high',
             'recurrence_rule': None,
+            'module': module,
+            'source': 'module_enrollment',
         },
     )
 
@@ -294,6 +296,9 @@ def create_deadline_calendar_event(user, deadline):
             'location': deadline.location,
             'description': deadline.description,
             'priority': 'high',
+            'module': deadline.module,
+            'source': 'module_deadline',
+            'external_id': str(deadline.id),
         },
      )
 
