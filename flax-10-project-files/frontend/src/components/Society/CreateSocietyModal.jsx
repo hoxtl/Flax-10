@@ -5,6 +5,11 @@ import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
 
+const isValidEmail = (email) => {
+    const trimmed = email.trim();
+    return trimmed.includes("@") && trimmed.split("@")[0].length > 0 && trimmed.split("@")[1].length > 0;
+};
+
 export default function CreateSocietyModal({ onClose, onCreate }) {
     const logic = useCreateSocietyForm(onCreate, onClose);
     return (
@@ -33,11 +38,15 @@ function useCreateSocietyForm(onCreate, onClose) {
         update("collaborators", [...form.collaborators, ...newCollabs]);
     };
 
+    const emailList = form.adminEmails.split(",").filter(e => e.trim());
+    const emailsInvalid = emailList.length > 0 && !emailList.every(isValidEmail);
+
     return {
         form, update, showCollabModal, setShowCollabModal, showPhotoModal, setShowPhotoModal,
         collabModalProps: getCollabModalProps(form, setShowCollabModal, handleAddCollabs),
         photoModalProps: getPhotoModalProps(form, setShowPhotoModal, update),
-        isCreateDisabled: !form.name.trim(),
+        isCreateDisabled: !form.name.trim() || emailsInvalid,
+        emailsInvalid,
         handleSubmit: () => onCreate(form)
     };
 }
@@ -70,13 +79,13 @@ function ModalHeader({ onClose }) {
     );
 }
 
-function FormFields({ form, update, setShowCollabModal, setShowPhotoModal }) {
+function FormFields({ form, update, setShowCollabModal, setShowPhotoModal, emailsInvalid }) {
     const handlers = getFieldHandlers(form, update);
     return (
         <div className={styles.form}>
             <NameField value={form.name} onChange={handlers.name} />
             <BioField value={form.bio} onChange={handlers.bio} />
-            <AdminEmailsField value={form.adminEmails} onChange={handlers.adminEmails} />
+            <AdminEmailsField value={form.adminEmails} onChange={handlers.adminEmails} invalid={emailsInvalid} />
             <PhotosField images={form.images} onOpen={() => setShowPhotoModal(true)} />
             <CollaboratorsField collaborators={form.collaborators} onOpen={() => setShowCollabModal(true)}
                 onRoleChange={handlers.role} onRemove={handlers.remove} />
@@ -116,12 +125,13 @@ function BioField({ value, onChange }) {
     );
 }
 
-function AdminEmailsField({ value, onChange }) {
+function AdminEmailsField({ value, onChange, invalid }) {
     return (
         <div className={styles.field}>
             <label className={styles.label}>Admin Emails (optional)</label>
             <input className={styles.input} value={value} onChange={e => onChange(e.target.value)}
                 placeholder="e.g. contact@society.com, admin@society.com" />
+            {invalid && <p className={styles.error}>Please check all emails are valid</p>}
             <p className={styles.hint}>Comma separated. Defaults to your email if empty.</p>
         </div>
     );
