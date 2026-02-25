@@ -144,47 +144,63 @@ class Command(BaseCommand):
             society = self._create_society_from_config(data)
             self._seed_society_tags_from_config(society, data.get('tags', []))
 
-    def _seed_images_for_society(self, society):
-        if society.image:
-            SocietyImage.objects.filter(society=society, is_cover=True).delete()
-            SocietyImage.objects.create(
-                society=society, is_cover=True, url=society.image
-            )
-        current_count = society.images.count()
-        if current_count < 5:
-            from faker import Faker
-            f = Faker('en_GB')
-            for _ in range(5 - current_count):
-                SocietyImage.objects.create(
-                    society=society,
-                    url=f"https://picsum.photos/seed/{society.name}{_}/800/600",
-                    is_cover=False
-                )
+    def _create_society_from_config(self, data):
+        status = random.choice(['approved', 'pending', 'rejected', 'none'])
+        society, _ = Society.objects.update_or_create(
+            name=data['name'],
+            defaults={
+                'bio': data['bio'], 'about': data['about'], 'image': data['image'],
+                'ratification_status': status, 'is_ratified': (status == 'approved')
+            }
+        )
+        return society
+
+    def _seed_society_tags_from_config(self, society, tag_labels):
+        from faker import Faker
+        f = Faker('en_GB')
+        for label in tag_labels:
+            SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
+
+    def _get_society_config(self, society):
+        return next((s for s in society_seed_data if s['name'] == society.name), None)
 
     def _seed_events_for_society(self, society):
         from faker import Faker
         f = Faker('en_GB')
+        config = self._get_society_config(society)
+        events = config.get('events', []) if config else []
         tags = list(society.tags.all())
-        for _ in range(random.randint(2, 5)):
-            start = timezone.make_aware(f.date_time_between(start_date='-1M', end_date='+2M'))
-            SocietyEvent.objects.create(
-                society=society,
-                title=f.catch_phrase(),
-                description=f.bs().capitalize() + ".",
-                location=random.choice(location_fixtures),
-                start_time=start,
-                end_time=start + timedelta(minutes=random.choice([60, 90, 120])),
-                tag=random.choice(tags) if tags else None
-            )
+        for event_data in events:
+            self._create_society_event(society, event_data, tags, f)
 
-    def _seed_society_tags(self, society):
-        from faker import Faker
-        f = Faker('en_GB')
-        tags = ["Social", "Academic", "Career", "Hobbies", "Sports"]
-        for label in random.sample(tags, random.randint(1, 3)):
-            SocietyTag.objects.get_or_create(
-                society=society, label=label,
-                defaults={'color': f.hex_color()}
+    def _create_society_event(self, society, event_data, tags, faker):
+        start = timezone.make_aware(faker.date_time_between(start_date='-1M', end_date='+2M'))
+        SocietyEvent.objects.get_or_create(
+            society=society, title=event_data['title'],
+            defaults={
+                'description': event_data['description'],
+                'location': random.choice(location_fixtures),
+                'start_time': start,
+                'end_time': start + timedelta(minutes=random.choice([60, 90, 120])),
+                'tag': random.choice(tags) if tags else None
+            }
+        )
+
+    def _seed_images_for_society(self, society):
+        self._set_cover_image(society)
+        self._add_extra_images(society)
+
+    def _set_cover_image(self, society):
+        if not society.image:
+            return
+        SocietyImage.objects.filter(society=society, is_cover=True).delete()
+        SocietyImage.objects.create(society=society, is_cover=True, url=society.image)
+
+    def _add_extra_images(self, society):
+        current_count = society.images.count()
+        for i in range(5 - current_count):
+            SocietyImage.objects.create(
+                society=society, url=f"https://picsum.photos/seed/{society.name}{i}/800/600", is_cover=False
             )
 
     def create_society_memberships(self):
