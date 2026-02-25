@@ -12,20 +12,9 @@ export default function CoverImageModal({ images, availablePhotos, onClose, onUp
         onUpdate([...images, img]);
         setView("list");
     };
-    <button
-        className={styles.addCard}
-        onClick={images.length < 5 ? onAddClick : () => alert("Maximum of 5 images reached")}
-        disabled={images.length >= 5}
-        title={images.length >= 5 ? "Maximum 5 images reached" : "Add image"}
-        style={images.length >= 5 ? { opacity: 0.5, cursor: "not-allowed" } : {}}
-    >
-        <span className={styles.addIcon}>+</span>
-    </button>
     const handleDelete = (index) => onUpdate(images.filter((_, i) => i !== index));
     const handlePin = (index) => onUpdate([images[index], ...images.filter((_, i) => i !== index)]);
-
     if (view === "add") return <AddCoverView onClose={() => setView("list")} onAdd={handleAdd} availablePhotos={availablePhotos} />;
-
     return (
         <div className={styles.backdrop} onMouseDown={onClose}>
             <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
@@ -41,7 +30,15 @@ function ImageGrid({ images, onDelete, onPin, onAddClick }) {
     return (
         <div className={styles.grid}>
             {images.map((img, i) => <ImageCard key={i} src={img} index={i} onDelete={() => onDelete(i)} onPin={() => onPin(i)} />)}
-            <button className={styles.addCard} onClick={onAddClick}><span className={styles.addIcon}>+</span></button>
+            <button
+                className={styles.addCard}
+                onClick={images.length < 5 ? onAddClick : () => alert("Maximum of 5 images reached")}
+                disabled={images.length >= 5}
+                title={images.length >= 5 ? "Maximum 5 images reached" : "Add image"}
+                style={images.length >= 5 ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+            >
+                <span className={styles.addIcon}>+</span>
+            </button>
         </div>
     );
 }
