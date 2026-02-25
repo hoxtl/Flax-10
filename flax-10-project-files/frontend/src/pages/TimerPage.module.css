@@ -416,3 +416,19 @@
     gap: 0.5rem;
     transition: background 0.2s;
 }
+
+.mobileHistoryBtn:active {
+    background: #e5e7eb;
+    transform: scale(0.98);
+}
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 2rem;
+        margin-top: 1rem;
+    }
+    
+    .header {
+        margin-bottom: 0.5rem;
+    }
+}
