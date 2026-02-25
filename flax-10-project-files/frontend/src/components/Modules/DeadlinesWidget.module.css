@@ -2,32 +2,63 @@
    DeadlinesWidget  —  compact, consistent heading
    ════════════════════════════════════════════════ */
 
-   .widget {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+  .widget {
+    background: var(--home-bg-card, #FFFFFF);
+    border: none;
+    border-radius: var(--home-card-radius, 1.5rem);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 0;
-    height: auto;          /* shrink to content height */
+    height: auto;
+    transition: box-shadow 0.2s ease;
+  }
+  .widget:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
   }
   
-  /* ── Header row ── */
+  /* ── Header: label above title + icon ── */
   .headerRow {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 0.9rem 1rem 0.7rem;     /* matches taskWidgetHeader + ctaTop exactly */
-    border-bottom: 1px solid var(--border);
+    padding: var(--home-card-padding, 1rem 1.25rem);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     flex-shrink: 0;
   }
-  
-  /* ── Consistent widget heading ── */
-  .heading {
-    font-size: 0.78rem;
+  .headerContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .headerLabel {
+    font-size: 0.75rem;
     font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9ca3af;
+  }
+  .headerTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+  }
+  .headerIcon {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+  
+  /* ── Legacy heading (keep for modal etc) ── */
+  .heading {
+    font-size: 20px;
+    font-weight: 500;
     color: var(--text);
     letter-spacing: -0.01em;
     text-transform: uppercase;
@@ -35,48 +66,31 @@
     display: block;
   }
   
-  .viewAllBtn {
-    font-size: 0.72rem;
-    color: var(--primary);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 650;
-    padding: 0.2rem 0.4rem;
-    border-radius: 6px;
-    white-space: nowrap;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .viewAllBtn:hover {
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
-  }
-  
   /* ── Deadline rows ── */
   .row {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 0.4rem 0.75rem;
+    padding: 16px 0.75rem 16px 1rem;
     border-radius: 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--home-border-soft, rgba(0, 0, 0, 0.04));
+    border-left: 4px solid transparent;
     cursor: pointer;
     transition: background 0.12s;
   }
   .row:last-child  { border-bottom: none; }
-  .row:hover       { filter: brightness(0.97); }
-  
-  /* Urgency backgrounds — with subtle radius so they don't look like rectangles */
-  .row.urgent {
-    background: var(--deadline-urgent-bg);
-    border-color: transparent;
-  }
-  
+  .row:hover       { background: rgba(0, 0, 0, 0.03); }
+
   .row.critical {
-    background: var(--error-bg);
-    border-color: var(--error-border);
+    border-left-color: #E85555;
+  }
+  .row.urgent {
+    border-left-color: #F59E0B;
+  }
+  .row.normal {
+    border-left-color: #84A98C;
   }
   
   /* ── Row internals ── */
@@ -90,18 +104,46 @@
     flex: 1;
     min-width: 0;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .rowContent {
+    flex: 1;
+    min-width: 0;
+    display: flex;
     flex-direction: column;
-    gap: 2px;
+    align-items: flex-start;
+    gap: 0;
   }
 
   .title {
-    font-size: 0.75rem;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
   }
+
+  /* Muted color pills: soft red <3 days, amber 3–7, sage >7 days; aligned right */
+  .pill {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+    opacity: 0.92;
+  }
+  /* Urgency pills: 1–3d red, 4–7d amber, 8+ grey */
+  .pill.normal   { color: #fff; background: #6B7280; }
+  .pill.urgent   { color: #1A1A1A; background: #F59E0B; }
+  .pill.critical { color: #fff; background: #E85555; }
 
   .meta {
     font-size: 0.68rem;
@@ -132,6 +174,49 @@
   
   .row.critical .countdown {
     animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* ── Bubble tags: Module = brown/flax; type = existing ── */
+  .bubbleRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
+    margin-top: 0.35rem;
+  }
+  .bubble {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: filter 0.15s ease, transform 0.15s ease;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .bubble:hover {
+    filter: brightness(0.95);
+    transform: scale(1.05);
+  }
+  .bubbleModule {
+    background: color-mix(in srgb, var(--primary) 22%, #fff);
+    color: var(--primary-strong);
+  }
+  .bubbleExam {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+  .bubbleCoursework {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+  .bubbleOther {
+    background: #F3F4F6;
+    color: #4B5563;
   }
   
   /* ════════════════════════════════════════════════
@@ -249,3 +334,12 @@
   .modalValue.urgent   { color: var(--warning-text); font-weight: 700; }
   .modalValue.critical { color: var(--error-text);   font-weight: 700; }
   .modalValue.normal   { color: var(--primary);      font-weight: 700; }
+
+  .moduleCodeLink {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .moduleCodeLink:hover {
+    text-decoration: underline;
+  }
