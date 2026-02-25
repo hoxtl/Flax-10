@@ -8,6 +8,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding: 0 2rem;
 }
 
 /* ── Toolbar ── */
@@ -80,31 +81,36 @@
 }
 
 .sortSelect {
-    padding: 0.4rem 0.6rem;
+    padding: 0.44rem 0.9rem;
     background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 9999px;
     font-size: 0.8rem;
+    font-weight: 600;
     color: var(--text);
     outline: none;
     cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
-.sortSelect:focus { border-color: var(--primary); }
+.sortSelect:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
+}
 
 .addBtn {
-    padding: 0.44rem 0.9rem;
+    padding: 0.5rem 1rem;
     background: var(--primary);
     border: none;
     border-radius: 9999px;
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
     flex-shrink: 0;
-    transition: opacity 0.15s;
+    transition: opacity 0.15s, background 0.15s;
     white-space: nowrap;
 }
-.addBtn:hover { opacity: 0.88; }
+.addBtn:hover { opacity: 0.92; background: color-mix(in srgb, var(--primary) 90%, #000); }
 
 /* ── Sections scroll area ── */
 .sections {
@@ -122,13 +128,27 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
-    padding: 3rem 1rem;
-    color: var(--muted);
-    font-size: 0.875rem;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
 }
-.emptyIcon { font-size: 2rem; }
-.empty p { margin: 0; text-align: center; }
+
+.emptyIcon {
+    width: 48px;
+    height: 48px;
+    color: #8D7355;
+    opacity: 0.85;
+    flex-shrink: 0;
+}
+
+.empty p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #8D7355;
+    max-width: 20rem;
+    line-height: 1.4;
+}
 
 .emptyAddBtn {
     margin-top: 0.5rem;
@@ -144,9 +164,63 @@
 }
 .emptyAddBtn:hover { opacity: 0.88; }
 
+/* ── Empty state (list empty) ── */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 5rem 1.5rem;
+    text-align: center;
+}
+
+.emptyStateIcon {
+    font-size: 3rem;
+    line-height: 1;
+    opacity: 0.9;
+}
+
+.emptyStateText {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    max-width: 22rem;
+    line-height: 1.45;
+}
+
+.emptyStateAddBtn {
+    margin-top: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: var(--primary);
+    border: none;
+    border-radius: 9999px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, filter 0.15s;
+}
+.emptyStateAddBtn:hover {
+    filter: brightness(1.08);
+}
+
 /* ── Section ── */
 .section {
     margin-bottom: 0.25rem;
+}
+
+.sectionOverdue .sectionBody {
+    background: #FEF2F2;
+    border-radius: 0 0 8px 8px;
+    padding: 0.5rem 0.25rem 0.5rem 0.5rem;
+    margin-top: -2px;
+}
+
+.sectionOverdue .sectionHeader {
+    background: #FEF2F2;
+    border-radius: 8px 8px 0 0;
 }
 
 .sectionHeader {
@@ -164,30 +238,51 @@
 }
 .sectionHeader:hover { background: var(--hover); }
 
+.sectionHeaderDanger {
+    color: #b91c1c;
+}
+.sectionHeaderDanger .sectionTitle { color: #b91c1c; }
+.sectionHeaderDanger .sectionEmoji { opacity: 1; }
+
 .sectionEmoji {
     font-size: 0.85rem;
     flex-shrink: 0;
 }
 
 .sectionTitle {
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+    color: #8D7355;
     flex: 1;
 }
 
-.sectionBadge {
-    font-size: 0.65rem;
+.sectionCountCircle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 0.35rem;
+    font-size: 0.68rem;
     font-weight: 700;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 9999px;
-    padding: 0.1rem 0.45rem;
-    min-width: 18px;
-    text-align: center;
+    color: #6B5344;
+    background: color-mix(in srgb, #8D7355 20%, var(--bg));
+    border-radius: 50%;
+}
+
+.sectionCountWrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.sectionCountLabel {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: #8D7355;
+    opacity: 0.85;
 }
 
 .sectionChevron {
@@ -286,16 +381,27 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+    color: #8D7355;
     border-radius: 8px;
     transition: background 0.1s;
 }
 .completedToggle:hover { background: var(--hover); }
 .completedToggle span:first-child { flex: 1; text-align: left; }
+
+.completedToggle .sectionCountCircle {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 0.35rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #6B5344;
+    background: color-mix(in srgb, #8D7355 20%, var(--bg));
+    border-radius: 50%;
+}
 
 .completedCards {
     display: flex;
