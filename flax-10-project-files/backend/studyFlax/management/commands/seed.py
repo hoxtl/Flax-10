@@ -152,10 +152,10 @@ class Command(BaseCommand):
             self._seed_society_tags(society)
 
     def _seed_images_for_society(self, society):
-        keyword = society.name.split()[0].lower() 
         if society.image:
-            SocietyImage.objects.update_or_create(
-                society=society, is_cover=True, defaults={'url': society.image}
+            SocietyImage.objects.filter(society=society, is_cover=True).delete()
+            SocietyImage.objects.create(
+                society=society, is_cover=True, url=society.image
             )
         current_count = society.images.count()
         if current_count < 5:
