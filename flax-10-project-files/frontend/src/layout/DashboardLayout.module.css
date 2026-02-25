@@ -1,5 +1,6 @@
 .root {
   display: flex;
+  gap: 32px;
   height: 100vh;
   overflow: hidden;
   background: var(--bg);
@@ -16,13 +17,14 @@
 .content {
   flex: 1;
   overflow: auto;
+  padding: 1.5rem 1.75rem 2rem;
 }
 
-/* Mobile overlay behind sidebar drawer */
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
   z-index: 50;
 }
 
@@ -32,4 +34,5 @@
   top: 0;
   bottom: 0;
   z-index: 60;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }

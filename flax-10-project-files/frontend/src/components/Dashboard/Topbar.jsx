@@ -1,39 +1,48 @@
+import { useState, useEffect } from "react";
 import styles from "./Topbar.module.css";
-import { DAYS, MONTHS } from "../../lib/uiConstants";
-import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
 import { NotificationPanel } from "../Notifications/NotificationPanel";
-import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import { Bell } from "lucide-react";
-import { TypingAnimation } from "./TypingAnimation";
 
-function getFirstName(user) {
-  const displayName = (getDisplayName(user) || "").trim();
-  return displayName ? displayName.split(" ")[0] : "";
+function useCurrentTime() {
+  const [time, setTime] = useState(() =>
+    new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: true })
+  );
+  useEffect(() => {
+    const t = setInterval(() => {
+      setTime(new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: true }));
+    }, 60000);
+    return () => clearInterval(t);
+  }, []);
+  return time;
 }
 
-function getCurrentDateString() {
-  const now = new Date();
-  return `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+function useCurrentDate() {
+  const [dateStr, setDateStr] = useState(() =>
+    new Date().toLocaleDateString("en-GB", { weekday: "long", month: "long", day: "numeric" })
+  );
+  useEffect(() => {
+    const t = setInterval(() => {
+      setDateStr(new Date().toLocaleDateString("en-GB", { weekday: "long", month: "long", day: "numeric" }));
+    }, 60000);
+    return () => clearInterval(t);
+  }, []);
+  return dateStr;
 }
 
-function TopBarGreeting({ user }) {
-  const firstName = getFirstName(user);
+function TopBarGreeting() {
+  const time = useCurrentTime();
+  const dateStr = useCurrentDate();
   return (
     <div className={styles.greeting}>
-      <span className={styles.subGreeting}>{getGreeting()}!</span>
-      <div className={styles.nameRow}>
-        {!!firstName && (
-          <h1 className={styles.name}>
-            <TypingAnimation text={firstName} duration={180} />
-          </h1>
-        )}
-        <span className={styles.date}>{getCurrentDateString()}</span>
-      </div>
-    </div>);}
+      <span className={styles.bigTime}>{time}</span>
+      <span className={styles.dateSub}>{dateStr}</span>
+    </div>
+  );
+}
 
 function SearchInput() {
   return (
@@ -85,7 +94,7 @@ function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick })
 export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
-      <TopBarGreeting user={user} />
+      <TopBarGreeting />
       <TopBarActions
         user={user}
         onSettingsClick={onSettingsClick}
