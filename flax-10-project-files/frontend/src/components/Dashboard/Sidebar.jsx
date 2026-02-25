@@ -98,15 +98,23 @@ function SidebarNav({ active, onChange, open, user }) {
 
 export default function Sidebar({ active, onChange, user }) {
   const [open, setOpen] = useState(false);
-  const w = open ? EXPANDED_W : COLLAPSED_W;
+  const [pinned, setPinned] = useState(false);
+  const isExpanded = open;
+  const w = isExpanded ? EXPANDED_W : COLLAPSED_W;
+  const toggleCollapse = () => {
+    setOpen((o) => !o);
+    setPinned((p) => !p);
+  };
   return (
     <motion.aside
       className={styles.sidebar}
       animate={{ width: w, minWidth: w }}
       transition={SIDEBAR_SPRING}
       onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseLeave={() => { if (!pinned) setOpen(false); }}
     >
-      <SidebarHeader open={open} />
-      <SidebarNav active={active} onChange={onChange} open={open} user={user}/>
-    </motion.aside>);}
+      <SidebarHeader open={isExpanded} />
+      <SidebarNav active={active} onChange={onChange} open={isExpanded} user={user}/>
+    </motion.aside>
+  );
+}
