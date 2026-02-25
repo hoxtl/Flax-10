@@ -17,11 +17,19 @@ const TimerHeader = ({ onOpenHistory, isMobile }) => (
 );
 
 /** Main timer UI layout including visuals, controls, and settings */
-export const MainSection = ({ t, onOpenHistory }) => (
+export const MainSection = ({ t, onOpenHistory, isMobile }) => (
     <>
-        <TimerHeader onOpenHistory={onOpenHistory} />
+        <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />
         <TaskInput value={t.task} onChange={t.setTask} />
+
+        {isMobile && (
+            <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>
+                View History 📜
+            </button>
+        )}
+
         <TreeAnimation progress={t.progress} mode={t.mode} />
+
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
         <SessionStatus current={t.completedSessions} total={t.targetSessions} />
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
