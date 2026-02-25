@@ -335,6 +335,8 @@ class Command(BaseCommand):
         SocietyMembership.objects.get_or_create(
             user=admin, society=society, defaults={'role': 'admin'}
         )
+        society.admin_emails = admin.email
+        society.save()
         members = random.sample(self.users, random.randint(5, 15))
         for member in members:
             SocietyMembership.objects.get_or_create(
