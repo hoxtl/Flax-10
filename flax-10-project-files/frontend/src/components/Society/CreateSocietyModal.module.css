@@ -237,3 +237,21 @@
     border-color: var(--primary-color, #9E7E5D);
     color: var(--primary-color, #9E7E5D);
 }
+
+.photoSummary {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+}
+
+.summaryCard {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    border: 1px solid var(--border, #e5e7eb);
+}
