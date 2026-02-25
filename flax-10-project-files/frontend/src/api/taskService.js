@@ -1,7 +1,12 @@
 import { fetchApi } from './client.js';
 
-export const fetchTaskLists = () =>
-    fetchApi('/tasks/lists/');
+export const fetchTaskLists = (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetchApi(`/tasks/lists/${query ? '?' + query : ''}`);
+};
+
+export const fetchArchivedTaskLists = () =>
+    fetchApi('/tasks/lists/?archived=true');
 
 export const createTaskList = (data) =>
     fetchApi('/tasks/lists/', { method: 'POST', body: JSON.stringify(data) });
@@ -16,6 +21,9 @@ export const fetchTasks = (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return fetchApi(`/tasks/${query ? '?' + query : ''}`);
 };
+
+export const getTask = (id) =>
+    fetchApi(`/tasks/${id}/`);
 
 export const createTask = (data) =>
     fetchApi('/tasks/', { method: 'POST', body: JSON.stringify(data) });
