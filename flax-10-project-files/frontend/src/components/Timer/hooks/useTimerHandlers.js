@@ -6,6 +6,6 @@ export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId) {
             t.setMode('break'); t.setTimeLeft(t.breakTime * 60); t.setIsActive(true);
         },
         goal: () => { t.resetTimer(); setModal(null); resetBlockId(); },
-        overtimeBreak: () => { t.setIsActive(false); startNext(); }
+        overtimeBreak: () => { t.setIsActive(false); startNext(); },
     };
 }

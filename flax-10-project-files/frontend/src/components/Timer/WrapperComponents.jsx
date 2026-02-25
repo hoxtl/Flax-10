@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import styles from "../../pages/Timer/TimerPage.module.css";
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
@@ -15,19 +16,31 @@ const TimerHeader = ({ onOpenHistory }) => (
 );
 
 /** Main timer UI layout including visuals, controls, and settings */
-export const MainSection = ({ t, onOpenHistory }) => (
-    <>
-        <TimerHeader onOpenHistory={onOpenHistory} />
-        <TaskInput value={t.task} onChange={t.setTask} />
-        <TreeAnimation progress={t.progress} mode={t.mode} />
-        <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
-        <SessionStatus current={t.completedSessions} total={t.targetSessions} />
-        <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
-        <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} />
-        <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
-        <SoundSelector />
-    </>
-);
+export const MainSection = ({ t, onOpenHistory }) => {
+    const handleTaskSelect = useCallback((task) => {
+        t.setTask(task.title);
+        const mins = (task.estimated_blocks || 1) * 25;
+        t.updateTime('work', mins);
+        t.setTimeLeft(mins * 60);
+        t.setIsActive(true);
+        if (task.list_color != null) t.setSelectedTaskColor(task.list_color);
+        try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
+    }, [t]);
+
+    return (
+        <>
+            <TimerHeader onOpenHistory={onOpenHistory} />
+            <TaskInput value={t.task} onChange={t.setTask} onTaskSelect={handleTaskSelect} />
+            <TreeAnimation progress={t.progress} mode={t.mode} />
+            <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
+            <SessionStatus current={t.completedSessions} total={t.targetSessions} />
+            <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
+            <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} />
+            <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
+            <SoundSelector />
+        </>
+    );
+};
 
 /** Container for all timerrelated modals and popups */
 export const PopupSection = ({ t, showHistory, onCloseHistory }) => (
