@@ -269,7 +269,7 @@ society_seed_data = [
         'name': 'Tech Society',
         'bio': 'Passionate about technology and innovation.',
         'about': 'We host hackathons, workshops, and networking events for tech enthusiasts.',
-        'image': 'seed_images/societies/tech.jpg',
+        'image': './seed_images/societies/tech.jpg',
         'tags': ['Workshop', 'Hackathon', 'Networking'],
         'events': [
             {'title': 'Intro to Web Dev Workshop', 'description': 'Learn HTML, CSS and JavaScript basics.'},
@@ -282,7 +282,7 @@ society_seed_data = [
         'name': 'Art Club',
         'bio': 'Creative expression through various mediums.',
         'about': 'A community for artists to share ideas and work on collaborative projects.',
-        'image': 'seed_images/societies/art.jpg',
+        'image': './seed_images/societies/art.jpg',
         'tags': ['Exhibition', 'Workshop', 'Social'],
         'events': [
             {'title': 'Life Drawing Session', 'description': 'Sketch from live models.'},
@@ -295,7 +295,7 @@ society_seed_data = [
         'name': 'Photography Society',
         'bio': 'Capturing moments through the lens.',
         'about': 'Weekly photo walks and exhibitions to showcase student photography.',
-        'image': 'seed_images/societies/photography.jpg',
+        'image': './seed_images/societies/photography.jpg',
         'tags': ['Photo Walk', 'Exhibition', 'Workshop'],
         'events': [
             {'title': 'Golden Hour Photo Walk', 'description': 'Sunset shoot at South Bank.'},
@@ -308,7 +308,7 @@ society_seed_data = [
         'name': 'Board Game Society',
         'bio': 'Fun and games for everyone.',
         'about': 'Join us for weekly board game nights and tournaments.',
-        'image': 'seed_images/societies/boardgames.jpg',
+        'image': './seed_images/societies/boardgames.jpg',
         'tags': ['Game Night', 'Tournament', 'Social'],
         'events': [
             {'title': 'Weekly Game Night', 'description': 'Catan, Ticket to Ride and more.'},
@@ -321,7 +321,7 @@ society_seed_data = [
         'name': 'Literature Society',
         'bio': 'Exploring the world through books.',
         'about': 'Book club discussions and writing workshops for literature lovers.',
-        'image': 'seed_images/societies/literature.jpg',
+        'image': './seed_images/societies/literature.jpg',
         'tags': ['Book Club', 'Workshop', 'Reading'],
         'events': [
             {'title': 'Monthly Book Club', 'description': "Discussing this month's pick."},
