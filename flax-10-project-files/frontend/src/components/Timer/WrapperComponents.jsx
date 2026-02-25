@@ -5,12 +5,14 @@ import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
 /** Header component with title and history toggle */
-const TimerHeader = ({ onOpenHistory }) => (
+const TimerHeader = ({ onOpenHistory, isMobile }) => (
     <div className={styles.header}>
         <div className={styles.title}>Study Timer</div>
-        <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
-            History 📜
-        </button>
+        {!isMobile && (
+            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
+                History 📜
+            </button>
+        )}
     </div>
 );
 
