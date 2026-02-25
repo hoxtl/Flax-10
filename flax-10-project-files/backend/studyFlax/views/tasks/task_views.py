@@ -9,8 +9,8 @@ from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSeria
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 
 
-def get_user_lists(user):
-    return TaskList.objects.filter(user=user).order_by("created_at")
+def get_user_lists(user, archived=False):
+    return TaskList.objects.filter(user=user, archived=archived).order_by("created_at")
 
 
 def get_user_tasks(user, params):
@@ -41,7 +41,8 @@ def create_calendar_event_for_task(task: Task):
 @permission_classes([IsAuthenticated])
 def task_list_list(request):
     if request.method == "GET":
-        lists = get_user_lists(request.user)
+        archived = request.query_params.get("archived", "false").lower() == "true"
+        lists = get_user_lists(request.user, archived=archived)
         return Response(TaskListSerialiser(lists, many=True).data)
 
     serialiser = TaskListSerialiser(data=request.data)
@@ -60,7 +61,12 @@ def task_list_detail(request, list_id):
         task_list.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    serialiser = TaskListSerialiser(task_list, data=request.data, partial=True)
+    data = request.data
+    # Restore from archive: set archived=False and mark all tasks in this list as completed
+    if data.get("archived") is False and getattr(task_list, "archived", False):
+        Task.objects.filter(task_list=task_list).update(completed=True)
+
+    serialiser = TaskListSerialiser(task_list, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
