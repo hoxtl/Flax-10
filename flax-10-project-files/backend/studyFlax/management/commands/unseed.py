@@ -8,6 +8,8 @@ TABLES = [
     'studyFlax_calendarevent', 'studyFlax_tag', 'studyFlax_category',
     'studyFlax_recurrencerule', 'studyFlax_usersettings', 'studyFlax_notification',
     'studyFlax_timetablesource', 'studyFlax_user',
+    'studyFlax_society', 'studyFlax_societymembership', 'studyFlax_societytag',
+    'studyFlax_societyevent', 'studyFlax_societyimage',
 ]
 
 def get_superuser_data():
