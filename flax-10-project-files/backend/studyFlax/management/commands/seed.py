@@ -142,7 +142,7 @@ class Command(BaseCommand):
         self.stdout.write("Seeding societies...")
         for name, bio, about, image in society_fixtures:
             status = random.choice(['approved', 'pending', 'rejected', 'none'])
-            society, _ = Society.objects.get_or_create(
+            society, _ = Society.objects.update_or_create(
                 name=name,
                 defaults={
                     'bio': bio, 'about': about, 'image': image,
@@ -150,6 +150,39 @@ class Command(BaseCommand):
                 }
             )
             self._seed_society_tags(society)
+
+    def _seed_images_for_society(self, society):
+        keyword = society.name.split()[0].lower() 
+        if society.image:
+            SocietyImage.objects.update_or_create(
+                society=society, is_cover=True, defaults={'url': society.image}
+            )
+        current_count = society.images.count()
+        if current_count < 5:
+            from faker import Faker
+            f = Faker('en_GB')
+            for _ in range(5 - current_count):
+                SocietyImage.objects.create(
+                    society=society,
+                    url=f"https://picsum.photos/seed/{society.name}{_}/800/600",
+                    is_cover=False
+                )
+
+    def _seed_events_for_society(self, society):
+        from faker import Faker
+        f = Faker('en_GB')
+        tags = list(society.tags.all())
+        for _ in range(random.randint(2, 5)):
+            start = timezone.make_aware(f.date_time_between(start_date='-1M', end_date='+2M'))
+            SocietyEvent.objects.create(
+                society=society,
+                title=f.catch_phrase(),
+                description=f.bs().capitalize() + ".",
+                location=random.choice(location_fixtures),
+                start_time=start,
+                end_time=start + timedelta(minutes=random.choice([60, 90, 120])),
+                tag=random.choice(tags) if tags else None
+            )
 
     def _seed_society_tags(self, society):
         from faker import Faker
@@ -182,40 +215,10 @@ class Command(BaseCommand):
         for society in Society.objects.all():
             self._seed_events_for_society(society)
 
-    def _seed_events_for_society(self, society):
-        from faker import Faker
-        f = Faker('en_GB')
-        tags = list(society.tags.all())
-        for _ in range(random.randint(2, 5)):
-            start = timezone.make_aware(f.date_time_between(start_date='-1M', end_date='+2M'))
-            SocietyEvent.objects.create(
-                society=society,
-                title=f.sentence(nb_words=3),
-                description=f.paragraph(),
-                location=random.choice(location_fixtures),
-                start_time=start,
-                end_time=start + timedelta(minutes=random.choice([60, 90, 120])),
-                tag=random.choice(tags) if tags else None
-            )
-
     def create_society_images(self):
         self.stdout.write("Seeding society images...")
         for society in Society.objects.all():
             self._seed_images_for_society(society)
-
-    def _seed_images_for_society(self, society):
-        if society.image:
-            SocietyImage.objects.get_or_create(
-                society=society, url=society.image, defaults={'is_cover': True}
-            )
-        from faker import Faker
-        f = Faker('en_GB')
-        for _ in range(random.randint(2, 4)):
-            SocietyImage.objects.create(
-                society=society,
-                url=f"https://picsum.photos/seed/{random.randint(1, 1000)}/800/600",
-                is_cover=False
-            )
 
     def print_stats(self):
         print("=" * 30)
