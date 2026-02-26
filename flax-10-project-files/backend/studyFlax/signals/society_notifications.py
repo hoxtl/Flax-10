@@ -1,13 +1,23 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from studyFlax.models.society import SocietyEvent, SocietyAnnouncement, SocietyMembership
 from studyFlax.models.notifications.notificationModel import Notification
 
 
+@receiver(pre_save, sender=SocietyEvent)
+def cache_old_event_state(sender, instance, **kwargs):
+    if instance.pk:
+        instance._is_update = True
+    else:
+        instance._is_update = False
+
+
 @receiver(post_save, sender=SocietyEvent)
 def notify_members_on_event(sender, instance, created, **kwargs):
     if created:
-        notify_society_members(instance.society, build_event_notification(instance))
+        notify_society_members(instance.society, build_event_notification(instance, 'new'))
+    elif getattr(instance, '_is_update', False):
+        notify_society_members(instance.society, build_event_notification(instance, 'updated'))
 
 
 @receiver(post_save, sender=SocietyAnnouncement)
@@ -26,9 +36,10 @@ def build_notification(user, data):
     return Notification(user=user, **data)
 
 
-def build_event_notification(event):
+def build_event_notification(event, action='new'):
+    action_text = 'New event' if action == 'new' else 'Event updated'
     return {
-        'title': f"New event in {event.society.name}",
+        'title': f"{action_text} in {event.society.name}",
         'message': f"{event.title} - {format_event_time(event)}",
         'notification_type': 'society_event',
         'society_id': event.society_id,
