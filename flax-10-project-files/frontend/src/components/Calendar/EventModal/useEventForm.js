@@ -20,9 +20,9 @@ export function useEventForm(event, onClose, options = {}) {
     const handleCancelSave = () => setOverlapWarning(null);
     const handleDeleteRequest = () => setShowDeleteConfirm(true);
     const handleDeleteCancel = () => setShowDeleteConfirm(false);
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = async () => {
         if (options.customSubmit) { options.customSubmit({ ...form, _delete: true }); onClose(); }
-        else executeDelete(event, actions, onClose);
+        else await executeDelete(event, actions, onClose);
     };
 
     return {
