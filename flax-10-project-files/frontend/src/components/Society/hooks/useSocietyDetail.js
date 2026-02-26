@@ -191,9 +191,17 @@ export function useSocietyDetail(societyId) {
     });
 
     const deleteAnnouncement = async (announcementId) => {
+        const announcement = society?.announcements?.find(a => a.id === announcementId);
+        const linkedEventId = announcement?.event_id;
         await api.deleteAnnouncement(societyId, announcementId);
-        setSociety(prev => ({ ...prev, announcements: prev.announcements.filter(a => a.id !== announcementId) }));
+        setSociety(prev => removeAnnouncementAndEvent(prev, announcementId, linkedEventId));
     };
+
+    const removeAnnouncementAndEvent = (prev, announcementId, eventId) => ({
+        ...prev,
+        announcements: prev.announcements.filter(a => a.id !== announcementId),
+        events: eventId ? prev.events.filter(e => e.id !== eventId) : prev.events
+    });
 
     const joinSociety = async () => {
         await api.joinSociety(societyId);
