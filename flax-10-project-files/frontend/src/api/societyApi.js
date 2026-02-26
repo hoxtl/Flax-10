@@ -73,6 +73,9 @@ export const updateSocietyEvent = (societyId, eventId, data) =>
 export const deleteSocietyEvent = (societyId, eventId) =>
     deleteRequest(`${BASE}/${societyId}/events/${eventId}/`);
 
+export const addExceptionDate = (societyId, eventId, date) =>
+    postJson(`${BASE}/${societyId}/events/${eventId}/exception/`, { date });
+
 // Helpers
 function postJson(url, data) {
     return fetchApi(url, { method: 'POST', body: JSON.stringify(data) });
