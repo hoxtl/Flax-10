@@ -14,6 +14,43 @@
     background: var(--bg);
 }
 
+.focusModeTransition {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    z-index: 10;
+}
+
+.focusModeTransitionText {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-sage-primary, #52796f);
+    letter-spacing: 0.04em;
+}
+
+.focusModeTransitionDot {
+    animation: focusModeTransitionBlink 0.6s ease-in-out infinite;
+}
+
+@keyframes focusModeTransitionBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.mainContentWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    flex: 1;
+}
+
 .header {
     display: flex;
     align-items: center;
@@ -85,6 +122,32 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Resume / Start / Pause text button (no play circle) */
+.timerResumeBtn {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--color-sage-primary);
+    background: transparent;
+    color: var(--color-sage-primary);
+}
+.timerResumeBtn:hover {
+    background: rgba(139, 166, 143, 0.12);
+}
+.timerResumeBtnActive {
+    background: var(--color-sage-primary);
+    color: white;
+    border-color: var(--color-sage-primary);
+}
+.timerResumeBtnActive:hover {
+    filter: brightness(1.05);
 }
 
 .button {
@@ -175,6 +238,11 @@
 .modeIndicator.break {
     background: #ecfdf5;
     color: #059669;
+}
+
+.modeIndicator.paused {
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 .overtime {

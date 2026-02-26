@@ -8,24 +8,34 @@ import { useNotify } from '../../Notifications/hooks/useNotify';
 function useTaskIdFromUrl() {
     return useMemo(() => {
         const params = new URLSearchParams(window.location.search);
-        const fromUrl = params.get('taskId');
-        if (fromUrl) return fromUrl;
+        return params.get('taskId');
+    }, []);
+}
+
+function useTaskMetaFromStorage() {
+    return useMemo(() => {
         try {
-            const fromStorage = sessionStorage.getItem('timerTaskId');
-            if (fromStorage) {
+            const id = sessionStorage.getItem('timerTaskId');
+            const title = sessionStorage.getItem('timerTaskTitle');
+            const categoryColor = sessionStorage.getItem('timerTaskCategoryColor');
+            if (id) {
                 sessionStorage.removeItem('timerTaskId');
-                return fromStorage;
+                if (title) sessionStorage.removeItem('timerTaskTitle');
+                if (categoryColor) sessionStorage.removeItem('timerTaskCategoryColor');
+                return { id, title: title || null, categoryColor: categoryColor || null };
             }
         } catch (_) {}
         return null;
     }, []);
 }
 
-export function useTimerLogic() {
+export function useTimerLogic(activeTaskIdFromContext, setActiveTaskIdFromContext, activeTaskMetaFromContext) {
     const t = useTimer();
     const [task, setTaskState] = useState('');
     const [selectedTaskColor, setSelectedTaskColor] = useState(null);
-    const taskId = useTaskIdFromUrl();
+    const taskIdFromUrl = useTaskIdFromUrl();
+    const metaFromStorage = useTaskMetaFromStorage();
+    const taskId = activeTaskIdFromContext ?? taskIdFromUrl ?? (metaFromStorage?.id ?? null);
     const notify = useNotify();
 
     const setTask = useCallback((v) => {
@@ -33,22 +43,38 @@ export function useTimerLogic() {
         if (!v) setSelectedTaskColor(null);
     }, []);
 
+    /* When coming from Task Card Play: use meta (title + categoryColor) immediately */
+    useEffect(() => {
+        if (activeTaskIdFromContext && activeTaskMetaFromContext?.title) {
+            setTask(activeTaskMetaFromContext.title);
+            if (activeTaskMetaFromContext.categoryColor) setSelectedTaskColor(activeTaskMetaFromContext.categoryColor);
+        }
+    }, [activeTaskIdFromContext, activeTaskMetaFromContext, setTask]);
+
     useEffect(() => {
         if (!taskId) return;
+        const meta = activeTaskIdFromContext ? activeTaskMetaFromContext : metaFromStorage;
+        if (meta?.title) {
+            setTask(meta.title);
+            if (meta.categoryColor) setSelectedTaskColor(meta.categoryColor);
+        }
         import('../../../api/taskService').then(({ getTask }) => {
             getTask(taskId)
                 .then((taskData) => {
-                    if (taskData && taskData.title) {
-                        setTask(taskData.title);
+                    if (taskData) {
+                        if (!meta?.title && taskData.title) setTask(taskData.title);
                         const mins = ((taskData.estimated_blocks || 1) * 25);
                         t.updateTime('work', mins);
                         t.setTimeLeft(mins * 60);
-                        t.setIsActive(true);
+                        if (taskData.task_list?.color) setSelectedTaskColor(taskData.task_list.color);
                     }
+                    if (setActiveTaskIdFromContext) setActiveTaskIdFromContext(null);
                 })
-                .catch(() => {});
+                .catch(() => {
+                    if (setActiveTaskIdFromContext) setActiveTaskIdFromContext(null);
+                });
         });
-    }, [taskId, setTask]);
+    }, [taskId, setTask, setActiveTaskIdFromContext, activeTaskIdFromContext, activeTaskMetaFromContext, metaFromStorage]);
     const { modal, setModal, startNext, resetBlockId } = useTimerFlow(
         { ...t, task, taskId },
         notify

@@ -16,28 +16,57 @@ export const TimerDisplay = ({ timeLeft, mode, isOvertime }) => {
     return <div className={className}>{formatTime(timeLeft)}</div>;
 };
 
-const getModeText = (mode, isOvertime, isBreakOvertime) => {
-    if (mode === 'work') return isOvertime ? '🚀 Overtime' : '🔥 Focus Time';
+const getModeText = (mode, isOvertime, isBreakOvertime, isActive, timeLeft, workTime) => {
+    if (mode === 'work') {
+        if (!isActive) {
+            const fullWorkSeconds = ((workTime ?? 25) * 60);
+            const left = timeLeft ?? fullWorkSeconds;
+            const neverStarted = left >= fullWorkSeconds - 1;
+            if (neverStarted) return '🔥 Focus Time';
+            return 'Focus Paused — take a breather';
+        }
+        return isOvertime ? '🚀 Overtime' : '🔥 Focus Time';
+    }
     return isBreakOvertime ? '⏳ Break Overtime' : '☕ Break Time';
 };
 
-export const ModeIndicator = ({ mode, isOvertime, isBreakOvertime }) => (
-    <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
-        {getModeText(mode, isOvertime, isBreakOvertime)}
-    </div>
-);
+export const ModeIndicator = ({ mode, isOvertime, isBreakOvertime, isActive, timeLeft, workTime }) => {
+    const fullWork = ((workTime ?? 25) * 60);
+    const showPausedStyle = mode === 'work' && !isActive && (timeLeft != null && timeLeft < fullWork - 1);
+    return (
+        <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''} ${showPausedStyle ? styles.paused : ''}`}>
+            {getModeText(mode, isOvertime, isBreakOvertime, isActive, timeLeft, workTime)}
+        </div>
+    );
+};
 
 export const SessionStatus = ({ current, total }) => (
     <div className={styles.sessionStatus}>Session {current + 1} of {total}</div>
 );
 
-/** Action buttons for timer */
-export const TimerControls = ({ isActive, onToggle, onReset }) => (
-    <div className={styles.controls}>
-        <button className={`${styles.button} ${styles.primary}`} onClick={onToggle}>{isActive ? 'Pause' : 'Start'}</button>
-        <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>
-    </div>
-);
+/** Action buttons: Start / Resume / Pause / Reset — Show "Start" when session loaded but not yet started (full time left). */
+export const TimerControls = ({ isActive, onToggle, onReset, timeLeft, task, workTime }) => {
+    const hasSession = !!(task || timeLeft > 0);
+    const fullWorkSeconds = (workTime || 25) * 60;
+    const neverStarted = hasSession && !isActive && timeLeft >= fullWorkSeconds - 1;
+    const buttonLabel = isActive ? 'Pause' : (neverStarted ? 'Start' : hasSession ? 'Resume' : 'Start');
+    return (
+        <div className={styles.controls}>
+            <button
+                type="button"
+                className={`${styles.timerResumeBtn} ${isActive ? styles.timerResumeBtnActive : ''}`}
+                onClick={onToggle}
+                aria-label={buttonLabel}
+                title={buttonLabel}
+            >
+                {buttonLabel}
+            </button>
+            {hasSession && (
+                <button className={`${styles.button} ${styles.danger}`} onClick={onReset} title="Reset session">Reset</button>
+            )}
+        </div>
+    );
+};
 
 // Helpers for useBufferedInput
 const handleInput = (e, min, setLocal, onError) => {
@@ -229,7 +258,7 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
     return (
         <div className={styles.taskInputWrap}>
             {value && (
-                <div className={styles.currentTaskLabel}>Current focus</div>
+                <div className={styles.currentTaskLabel}>Currently focusing on:</div>
             )}
             <div className={styles.taskInputContainer} ref={ref}>
                 <input
