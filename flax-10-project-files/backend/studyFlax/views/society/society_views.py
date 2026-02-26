@@ -51,3 +51,24 @@ def create_society(request):
     handle_image_urls(society, request.data)
     SocietyMembership.objects.create(user=request.user, society=society, role='admin')
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def publish_changes(request, society_id):
+    society = get_society_or_404(society_id)
+    if not society:
+        return society_not_found_response()
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
+    notify_society_members(society, build_update_notification(society))
+    return Response({'status': 'published'})
+
+
+def build_update_notification(society):
+    return {
+        'title': f"{society.name} has been updated",
+        'message': 'Check out the latest changes to events and announcements.',
+        'notification_type': 'society_update',
+        'society_id': society.id,
+    }

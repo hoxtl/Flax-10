@@ -23,7 +23,7 @@ from studyFlax.views.society import (
     event_list as society_event_list, event_detail as society_event_detail,
     sync_status, sync_calendar, unsync_calendar,
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
-    add_society_event_exception
+    add_society_event_exception, publish_changes
 )
 from studyFlax.views.user.profile_view import profile_view
 from studyFlax.views.user.check_username_view import check_username
@@ -72,6 +72,7 @@ urlpatterns = [
     path("societies/<int:society_id>/calendar-sync/", sync_calendar, name="society-calendar-sync"),
     path("societies/<int:society_id>/calendar-unsync/", unsync_calendar, name="society-calendar-unsync"),
     path("societies/<int:society_id>/calendar-sync-status/", sync_status, name="society-calendar-sync-status"),
+    path("societies/<int:society_id>/publish/", publish_changes, name="society-publish-changes"),
     path("societies/<int:society_id>/ratification/request/", request_ratification, name="society-ratification-request"),
     path("societies/<int:society_id>/ratification/approve/", approve_ratification, name="society-ratification-approve"),
     path("societies/<int:society_id>/ratification/reject/", reject_ratification, name="society-ratification-reject"),
