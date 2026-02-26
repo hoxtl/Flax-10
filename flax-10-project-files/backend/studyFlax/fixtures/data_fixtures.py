@@ -395,6 +395,18 @@ module_deadline_fixtures = {
         ("presentation", "Design Review Presentation", "10-minute group presentation of your design concept to a panel. Q&A follows. Slides to be uploaded to KEATS by 09:00 on the day."),
         ("exam", "Summer Term Exam", "Closed-book written exam. Covers thermodynamics, materials, and engineering mathematics. Formula sheet provided. Check KEATS for room."),
     ],
+    "LS4101": [
+        ("coursework", "Lab Report: Microscopy", "Full write-up of your microscopy practical. Include labelled diagrams, methodology and interpretation. Submit via KEATS."),
+        ("quiz", "Microscopy Quiz", "Online quiz on KEATS covering microscope use, staining and cell identification. Recommended before the lab report."),
+        ("coursework", "Cell Division Diagram Assignment", "Produce annotated diagrams of mitosis and meiosis stages. Submit via KEATS."),
+        ("exam", "Summer Term Exam", "Closed-book written exam at Guy's or St Thomas' campus. Covers cell structure, division and molecular biology. Bring student ID."),
+    ],
+    "LS4202": [
+        ("coursework", "Enzyme Kinetics Problems", "Complete the problem set on Michaelis-Menten kinetics and inhibition. Submit calculations via KEATS."),
+        ("coursework", "Protein Folding Assignment", "Written assignment on protein structure, folding and denaturation. Submit via KEATS."),
+        ("quiz", "Metabolic Pathway Quiz", "KEATS quiz on glycolysis, TCA cycle and key regulatory steps. Formative but recommended."),
+        ("exam", "Summer Term Exam", "Closed-book written exam. Covers enzymes, metabolism and molecular interactions. Check KEATS for room."),
+    ],
     "LS": [
         ("coursework", "Lab Practical Report", "Full write-up of your laboratory session. Use the standard scientific report format: introduction, methods, results, discussion. Submit via KEATS."),
         ("exam", "Reading Week Progress Test", "In-person multiple choice and short answer exam held during reading week. Covers weeks 1–5. Check KEATS for time and room allocation."),
@@ -525,6 +537,16 @@ module_task_templates = {
         ("{module} design portfolio update", "Add this week's design sketches and calculations to your portfolio.", "high",   3, 3),
         ("{module} problem set",             "Complete the engineering maths worksheet.",                           "medium", 2, 2),
     ],
+    "LS4101": [
+        ("{module} Lab Report: Microscopy",       "Write up the microscopy practical. Include labelled diagrams and interpretation.", "high",   4, 3),
+        ("{module} Microscopy Quiz prep",        "Review staining techniques and cell identification before the KEATS quiz.",         "urgent", 1, 1),
+        ("{module} Cell Division Diagram",      "Produce annotated mitosis and meiosis diagrams. Submit via KEATS.",               "medium", 2, 5),
+    ],
+    "LS4202": [
+        ("{module} Enzyme Kinetics Problems",     "Complete the Michaelis-Menten and inhibition problem set. Submit via KEATS.",       "high",   4, 2),
+        ("{module} Protein Folding Assignment", "Draft the protein structure and folding section. Check KEATS for rubric.",        "medium", 3, 4),
+        ("{module} Metabolic Pathway Quiz",      "Revise glycolysis and TCA cycle before the KEATS quiz.",                          "urgent", 2, 6),
+    ],
     "LS": [
         ("{module} lab report",          "Write up the lab practical. Include methodology and data analysis.",           "high",   4, 3),
         ("{module} essay plan",          "Draft a 300-word outline for the upcoming essay.",                             "urgent", 2, 1),
@@ -614,6 +636,12 @@ module_task_templates = {
         ("{module} essay",       "Essay on the assigned geographic concept. 2000 words.", "medium", 4, 5),
         ("{module} seminar prep","Read the set article and annotate key arguments.", "medium", 2, 1),
     ],
+}
+
+# Module-specific pill colors for Action Hub / Today's Plan (LS4101/LS4202 distinct)
+MODULE_PILL_COLORS = {
+    "LS4101": "#5D4037",   # Deep Earth Brown
+    "LS4202": "#C4A77D",   # Muted Clay
 }
 
 # ── Task lists seeded per user ─────────────────────────────────────────────
