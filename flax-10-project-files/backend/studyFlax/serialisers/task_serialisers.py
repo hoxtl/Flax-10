@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from studyFlax.models.tasks.taskModel import Task, TaskList
 
 
@@ -22,7 +23,7 @@ class TaskSerialiser(serializers.ModelSerializer):
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code',
             'title', 'description', 'priority', 'due_date',
-            'completed', 'add_to_calendar', 'time_spent_minutes',
+            'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
             'estimated_blocks', 'completed_blocks',
             'created_at', 'updated_at'
         ]
@@ -32,3 +33,11 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
+
+    def update(self, instance, validated_data):
+        completed = validated_data.get('completed')
+        if completed is True and not instance.completed_at:
+            validated_data['completed_at'] = timezone.now()
+        elif completed is False:
+            validated_data['completed_at'] = None
+        return super().update(instance, validated_data)
