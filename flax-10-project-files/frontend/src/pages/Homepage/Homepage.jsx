@@ -343,8 +343,37 @@ function getNowVibe(now, selectedDate, sortedEvents, isTodayFn) {
   };
 }
 
+/** Compute top-3 peak hours from 7×24 heatmap matrix (minutes per [day][hour]) */
+function getPeakHours(heatmap) {
+  if (!heatmap?.data || !Array.isArray(heatmap.data)) return [];
+  const hourTotals = Array(24).fill(0);
+  for (const dayRow of heatmap.data) {
+    for (let h = 0; h < dayRow.length; h++) {
+      hourTotals[h] += dayRow[h] || 0;
+    }
+  }
+  return hourTotals
+    .map((total, hour) => ({ hour, total }))
+    .filter((h) => h.total > 0)
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 3);
+}
+
+/** Returns true if any upcoming deadline is within daysThreshold with low focus (< 2 logged hrs today) */
+function getUrgencyLevel(deadlines, analyticsProgress) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayEntry = (analyticsProgress?.daily_progress || []).find((d) => d.date === todayStr);
+  const todayActual = todayEntry?.actual_hours ?? 0;
+  const critical = (deadlines || []).some((d) => {
+    if (!d.start_due_date) return false;
+    const daysLeft = (new Date(d.start_due_date) - new Date()) / (1000 * 60 * 60 * 24);
+    return daysLeft >= 0 && daysLeft < 3;
+  });
+  return critical && todayActual < 2 ? "urgent" : "normal";
+}
+
 /** Context-aware heads-up for NOW hero: analyzes schedule/tasks and returns message + upNext. */
-function getNowHeadsUp(now, selectedDate, sortedEvents, isTodayFn) {
+function getNowHeadsUp(now, selectedDate, sortedEvents, isTodayFn, peakHours) {
   const defaultMessage = "Ready when you are. Your schedule is clear.";
   const defaultUpNext = null;
   if (!isTodayFn(selectedDate) || !sortedEvents?.length) {
@@ -357,6 +386,33 @@ function getNowHeadsUp(now, selectedDate, sortedEvents, isTodayFn) {
   const hour = now.getHours();
   const mins = now.getMinutes();
   const nowMins = hour * 60 + mins;
+
+  // Peak productivity window (from heatmap data)
+  if (peakHours?.length) {
+    const isPeakHour = peakHours.some((p) => p.hour === hour);
+    const rank = peakHours.findIndex((p) => p.hour === hour);
+    if (isPeakHour && rank === 0) {
+      return {
+        message: "You're in the zone! This is your #1 most productive hour. Push through that coursework! 🔥",
+        upNext: nextItem ? { title: nextItem.title ?? "Block", time: nextItem.start_time } : null,
+        isPeak: true,
+      };
+    }
+    if (isPeakHour) {
+      return {
+        message: `Peak window! This is one of your top productivity hours. Great time for deep work. ⚡`,
+        upNext: nextItem ? { title: nextItem.title ?? "Block", time: nextItem.start_time } : null,
+        isPeak: true,
+      };
+    }
+    // Low energy window (not in top 3, afternoon)
+    if (hour >= 13 && hour < 16 && !isPeakHour) {
+      return {
+        message: "This is usually a low-energy time for you. Perfect for admin tasks, emails, or a quick break. 📮",
+        upNext: nextItem ? { title: nextItem.title ?? "Block", time: nextItem.start_time } : null,
+      };
+    }
+  }
 
   // Afternoon slump: 2 PM – 4 PM
   if (hour >= 14 && hour < 16) {
@@ -1789,6 +1845,8 @@ function MiniTimeline({
   onDelete,
   onReschedule,
   getTag,
+  completedEventIds = new Set(),
+  onToggleComplete,
 }) {
   const [conflictPopoverRowId, setConflictPopoverRowId] = useState(null);
   const [slotPopoverRowId, setSlotPopoverRowId] = useState(null);
@@ -1933,9 +1991,20 @@ function MiniTimeline({
       if (end != null) prevEndMins = end;
     }
     /* Group consecutive overlapping events into one row for side-by-side (50% width) conflict display */
+    /* Also inject hour-mark rows at each hour boundary for the time rail */
     const finalRows = [];
+    let lastInjectedHour = -1;
     for (let i = 0; i < sorted.length; i++) {
       const r = sorted[i];
+      // Inject hour mark when the hour changes (skip "now" markers which have nowMins, not startMins)
+      const rStartMins = r.type !== "now" ? (r.startMins ?? r.gapStartMins ?? null) : null;
+      if (rStartMins != null) {
+        const rowHour = DAY_START_HOUR + Math.floor(rStartMins / 60);
+        if (rowHour !== lastInjectedHour) {
+          finalRows.push({ type: "hourMark", id: `hour-${rowHour}`, hour: rowHour });
+          lastInjectedHour = rowHour;
+        }
+      }
       if (r.type === "event" && r.isOverlap && r.overlapGroupIndex === 0) {
         const group = [r];
         for (let j = i + 1; j < sorted.length && sorted[j].type === "event" && sorted[j].overlapGroupIndex > 0; j++) {
@@ -1977,6 +2046,17 @@ function MiniTimeline({
           </div>
         )}
         {rows.map((row, index) => {
+          if (row.type === "hourMark") {
+            return (
+              <div key={row.id} className={styles.planTimelineHourMark}>
+                <span className={styles.planTimelineHourMarkLabel}>
+                  {String(row.hour).padStart(2, "0")}:00
+                </span>
+                <span className={styles.planTimelineHourMarkDot} aria-hidden />
+                <span className={styles.planTimelineHourMarkLine} aria-hidden />
+              </div>
+            );
+          }
           if (row.type === "tinyGap") {
             const mins = row.minutes ?? (row.endMins - row.startMins);
             return (
@@ -2017,9 +2097,13 @@ function MiniTimeline({
             const { suggested: suggestedTask, top3: top3Tasks } = getTasksThatFitGap(suggestableTasks || [], row.minutes);
             const gapStartDate = getGapStartDate(row.gapStartMins);
             const showSlotPopover = slotPopoverRowId === row.id;
-            const cardLabel = suggestedTask
-              ? `Time to finish: ${suggestedTask.title}`
-              : `${durationStr} focus window`;
+            // Time-of-day contextual suggestion
+            const gapHour = DAY_START_HOUR + Math.floor(row.gapStartMins / 60);
+            const gapContext = gapHour < 12
+              ? (row.minutes >= 60 ? "Deep Work" : "Lecture Review")
+              : gapHour < 17
+              ? (row.minutes >= 60 ? "Assignment" : "Email / Admin")
+              : "Review Notes";
             return (
               <div
                 key={row.id}
@@ -2039,13 +2123,14 @@ function MiniTimeline({
                   className={`${styles.planTimelineFreeWindow} ${styles.planTimelineFreeWindowDashed}`}
                   ref={showSlotPopover ? slotPopoverRef : undefined}
                 >
+                  <span className={styles.planTimelineGapContextChip}>{gapContext}</span>
                   {suggestedTask ? (
-                    <span className={styles.planTimelineGapRecommendation} title={suggestedTask.title}>
-                      You could finish: <strong>{suggestedTask.title}</strong>
+                    <span className={styles.planTimelineGapSlotCta} title={suggestedTask.title}>
+                      Slot in: <strong>{suggestedTask.title}</strong>
                     </span>
                   ) : (
-                    <span className={styles.planTimelineFreeWindowDuration} title={cardLabel}>
-                      {durationStr} focus window
+                    <span className={styles.planTimelineFreeWindowDuration} title={`${durationStr} free`}>
+                      {durationStr} free
                     </span>
                   )}
                   {onQuickStart && (
@@ -2295,6 +2380,29 @@ function MiniTimeline({
                     {matchTask.completed ? "✓" : ""}
                   </button>
                 )}
+                {/* Event completion checkbox — shown when no matchTask or as override */}
+                {!matchTask && onToggleComplete && (
+                  <button
+                    type="button"
+                    className={`${styles.planTimelineEventCheck} ${completedEventIds.has(row.id) ? styles.planTimelineEventCheckDone : ""}`}
+                    onClick={(e) => { e.stopPropagation(); onToggleComplete(row.id); }}
+                    aria-label={completedEventIds.has(row.id) ? "Mark incomplete" : "Mark complete"}
+                    title={completedEventIds.has(row.id) ? "Completed" : "Mark as done"}
+                  >
+                    {completedEventIds.has(row.id) ? "✓" : ""}
+                  </button>
+                )}
+                {/* Missed session prompt: past + not completed */}
+                {isPast && !completedEventIds.has(row.id) && !matchTask?.completed && onReschedule && isToday(selectedDate) && (
+                  <button
+                    type="button"
+                    className={styles.planTimelineMissedBtn}
+                    onClick={(e) => { e.stopPropagation(); onReschedule(item); }}
+                    title="Reschedule this missed session"
+                  >
+                    Reschedule?
+                  </button>
+                )}
               </div>
               {showConflictPopover && (
                 <div className={styles.planTimelineConflictPopover}>
@@ -2522,6 +2630,8 @@ export default function Homepage({ onNavigate }) {
   const [now, setNow] = useState(() => new Date());
   const [scheduleCountdownSecs, setScheduleCountdownSecs] = useState(null);
   const [analyticsSummary, setAnalyticsSummary] = useState(null);
+  const [analyticsProgress, setAnalyticsProgress] = useState(null);
+  const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
   const moduleOverviewRef = useRef(null);
   const actionHubRef = useRef(null);
   const nowCardRef = useRef(null);
@@ -2583,6 +2693,7 @@ export default function Homepage({ onNavigate }) {
 
   useEffect(() => {
     analyticsService.getSummary(7).then((data) => setAnalyticsSummary(data)).catch(() => setAnalyticsSummary(null));
+    analyticsService.getProgress(7).then((data) => setAnalyticsProgress(data)).catch(() => setAnalyticsProgress(null));
   }, []);
 
   /* When work timer hits 0 in the NOW widget: soft chime + subtle +1 XP sparks */
@@ -2656,6 +2767,31 @@ export default function Homepage({ onNavigate }) {
     () => (modulesList || []).filter((m) => isEnrolledIn(m.id, enrollments)),
     [modulesList, enrollments]
   );
+
+  // Analytics-derived intelligence
+  const peakHours = useMemo(() => getPeakHours(analyticsSummary?.heatmap), [analyticsSummary]);
+  const urgencyLevel = useMemo(
+    () => getUrgencyLevel(upcomingDeadlines, analyticsProgress),
+    [upcomingDeadlines, analyticsProgress]
+  );
+  const isUrgentOrange = urgencyLevel === "urgent";
+
+  // Today's Planned vs Actual for the nudge card
+  const todayPlannedVsActual = useMemo(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const entry = (analyticsProgress?.daily_progress || []).find((d) => d.date === todayStr);
+    return entry ? { planned: entry.planned_hours || 0, actual: entry.actual_hours || 0 } : null;
+  }, [analyticsProgress]);
+
+  // Weekly heatmap summary: total focus minutes per day of current week
+  const weeklyHeatmap = useMemo(() => {
+    if (!analyticsSummary?.heatmap?.data) return null;
+    const { data, days } = analyticsSummary.heatmap;
+    return (data || []).map((dayRow, i) => ({
+      label: (days?.[i] || ["M", "T", "W", "T", "F", "S", "S"][i] || ""),
+      total: (dayRow || []).reduce((s, v) => s + (v || 0), 0),
+    }));
+  }, [analyticsSummary]);
 
   const getTaskCategoryPillMeta = useCallback((task) => {
     const listId = task.task_list != null ? String(task.task_list) : null;
@@ -2828,23 +2964,30 @@ export default function Homepage({ onNavigate }) {
       const end = item.end_time ? new Date(item.end_time) : new Date(start.getTime() + 25 * 60000);
       const durationMins = Math.round((end - start) / 60000) || 25;
       const slot = getNextFreeSlotToday(sortedEvents, selectedDate, durationMins);
+      if (!slot) {
+        await handleRescheduleTomorrow(item);
+        return;
+      }
       const baseId = extractBaseEventId(item.id);
+      const optimisticItem = { ...item, start_time: slot.start.toISOString(), end_time: slot.end.toISOString() };
+      // Optimistic update — move event in local state immediately
+      removeEvent(item.id);
+      addEvent(optimisticItem);
+      showToast(`"${item.title}" → ${formatTime(slot.start.toISOString())}`);
       try {
-        if (slot) {
-          await editEvent(baseId, {
-            start_time: slot.start.toISOString(),
-            end_time: slot.end.toISOString(),
-          });
-          await loadEvents();
-          showToast(`"${item.title}" moved to ${formatTime(slot.start.toISOString())}`);
-        } else {
-          await handleRescheduleTomorrow(item);
-        }
+        await editEvent(baseId, {
+          start_time: slot.start.toISOString(),
+          end_time: slot.end.toISOString(),
+        });
+        await loadEvents(); // sync with server
       } catch {
+        // Rollback optimistic change
+        removeEvent(item.id);
+        addEvent(item);
         showToast("Couldn't reschedule. Try again.");
       }
     },
-    [selectedDate, sortedEvents, editEvent, loadEvents, showToast, handleRescheduleTomorrow]
+    [selectedDate, sortedEvents, editEvent, loadEvents, showToast, handleRescheduleTomorrow, addEvent, removeEvent]
   );
 
   const handleQuickStartGap = useCallback(
@@ -3452,12 +3595,13 @@ export default function Homepage({ onNavigate }) {
         scheduleTitle={scheduleTitle}
       />
 
-      <div className={`${styles.bentoGrid} ${hasTimerSession ? styles.focusModeActive : ""}`}>
-        {/* Top Triage Row: Hero + Action Hub (left) | Deadlines (center) */}
-        <div className={styles.triageRow}>
-          {/* Left: Hero (compact) + Action Hub stacked */}
-          <div className={styles.triageLeft}>
-            {/* Hero: compact NOW unit — glass, tank left, vibe/coaching right */}
+      <div
+        className={`${styles.bentoGrid} ${hasTimerSession ? styles.focusModeActive : ""} ${isUrgentOrange ? styles.urgentOrangeActive : ""}`}
+        style={isUrgentOrange ? { "--urgency-accent": "#FF9F67" } : {}}
+      >
+        {/* Left Column: NOW Hero + Action Hub — ~25% */}
+        <div className={styles.bentoLeft}>
+          {/* Hero: compact NOW unit — tank left, vibe/coaching right */}
             {(() => {
               const nowVibe = !hasTimerSession && isToday(selectedDate) && (sortedEvents || []).length > 0
                 ? getNowVibe(now, selectedDate, sortedEvents || [], isToday)
@@ -3568,7 +3712,7 @@ export default function Homepage({ onNavigate }) {
                 <>
                   {(() => {
                     const headsUp = isToday(selectedDate)
-                      ? getNowHeadsUp(now, selectedDate, sortedEvents || [], isToday)
+                      ? getNowHeadsUp(now, selectedDate, sortedEvents || [], isToday, peakHours)
                       : { message: "Select today to see your flow", upNext: null };
                     const isGapState = (sortedEvents || []).length > 0 && headsUp.upNext;
                     return (
@@ -3813,23 +3957,9 @@ export default function Homepage({ onNavigate }) {
                 </>
               )}
             </div>
-          </div>
-
-          {/* Deadlines: wide center, coral border, monospace countdowns — no Manage link here */}
-          <div className={styles.triageDeadlines}>
-            {(upcomingDeadlines || []).length > 0 ? (
-              <DeadlinesWidget variant="triage" onModuleTagClick={handleModuleTagClick} />
-            ) : (
-              <div className={styles.triageDeadlinesEmpty}>
-                <span className={styles.triageDeadlinesEmptyIcon} aria-hidden>🕐</span>
-                <span>No upcoming deadlines</span>
-              </div>
-            )}
-          </div>
-
         </div>
 
-        {/* Spine: Timeline — no internal scroll; daily summary + read-first modal on card click */}
+        {/* Center Column: Timeline — ~50% */}
         <div className={styles.bentoSpine}>
           <div className={styles.timelineBox}>
             {isToday(selectedDate) && planTimelineFocusWindowMinutes > 0 && (
@@ -3896,20 +4026,96 @@ export default function Homepage({ onNavigate }) {
                   onDelete={removeEvent}
                   onReschedule={handleReschedule}
                   getTag={getTag}
+                  completedEventIds={completedEventIds}
+                  onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(eventId)) next.delete(eventId);
+                    else next.add(eventId);
+                    return next;
+                  })}
                 />
               </motion.div>
             </div>
           </div>
         </div>
 
+        {/* Right Column: Deadlines (top) + Active Enrollment (24px below via gap) — ~25% */}
         <div className={styles.bentoRight}>
+          {/* Planned vs Actual Nudge — accountability mini-chart */}
+          {todayPlannedVsActual && (() => {
+            const { planned, actual } = todayPlannedVsActual;
+            const maxH = Math.max(planned, actual, 0.5);
+            const showWarn = actual < planned * 0.5 && new Date().getHours() >= 14;
+            return (
+              <div className={styles.pvaNudgeCard}>
+                <p className={styles.pvaNudgeTitle}>Today's Focus</p>
+                <div className={styles.pvaBarsWrap}>
+                  <div className={styles.pvaBarRow}>
+                    <span className={styles.pvaBarLabel}>Planned</span>
+                    <div className={styles.pvaBarTrack}>
+                      <div className={`${styles.pvaBarFill} ${styles.pvaBarFillPlanned}`} style={{ width: `${Math.min(100, (planned / maxH) * 100)}%` }} />
+                    </div>
+                    <span className={styles.pvaBarVal}>{planned.toFixed(1)}h</span>
+                  </div>
+                  <div className={styles.pvaBarRow}>
+                    <span className={styles.pvaBarLabel}>Actual</span>
+                    <div className={styles.pvaBarTrack}>
+                      <div className={`${styles.pvaBarFill} ${styles.pvaBarFillActual}`} style={{ width: `${Math.min(100, (actual / maxH) * 100)}%` }} />
+                    </div>
+                    <span className={styles.pvaBarVal}>{actual.toFixed(1)}h</span>
+                  </div>
+                </div>
+                {showWarn && (
+                  <span className={styles.pvaNudgeWarn}>⚠ Behind schedule — start a focus session!</span>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Weekly Rhythm Mini-Heatmap */}
+          {weeklyHeatmap && (() => {
+            const maxTotal = Math.max(...weeklyHeatmap.map((d) => d.total), 1);
+            return (
+              <div className={styles.weeklyHeatmapCard}>
+                <p className={styles.weeklyHeatmapTitle}>Weekly Rhythm</p>
+                <div className={styles.weeklyHeatmapRow}>
+                  {weeklyHeatmap.map((day, i) => {
+                    const intensity = day.total / maxTotal;
+                    const bg = intensity < 0.01
+                      ? "rgba(107, 83, 68, 0.06)"
+                      : `rgba(132, 169, 140, ${0.15 + intensity * 0.75})`;
+                    return (
+                      <div key={i} className={styles.weeklyHeatmapCell} title={`${day.label}: ${Math.round(day.total)}m`}>
+                        <div className={styles.weeklyHeatmapBlock} style={{ background: bg }} />
+                        <span className={styles.weeklyHeatmapDayLabel}>{day.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Upcoming Deadlines — pinned to top of right column */}
+          <div className={styles.triageDeadlines}>
+            {(upcomingDeadlines || []).length > 0 ? (
+              <DeadlinesWidget variant="triage" onModuleTagClick={handleModuleTagClick} />
+            ) : (
+              <div className={styles.triageDeadlinesEmpty}>
+                <span className={styles.triageDeadlinesEmptyIcon} aria-hidden>🕐</span>
+                <span>No upcoming deadlines</span>
+              </div>
+            )}
+          </div>
+
+          {/* Active Enrollment — 24px below via parent gap */}
           <div className={styles.enrollmentCard}>
             <h3 className={styles.enrollmentTitle}>Active Enrollment</h3>
             <div className={styles.enrollmentNumberWrap}>
               <span className={styles.enrollmentNumber} aria-hidden>
                 {(enrolledModules || []).length}
               </span>
-              <p className={styles.enrollmentNumberLabel}>Modules</p>
+              <span className={styles.enrollmentNumberLabel}> Modules enrolled</span>
             </div>
             <div className={styles.enrollmentDots} aria-hidden>
               <span className={styles.enrollmentDotSage} />
