@@ -8,12 +8,28 @@ RATIFICATION_STATUS = [
     ('rejected', 'Rejected'),
 ]
 
+SOCIETY_CATEGORIES = [
+    ('sports', 'Sports'),
+    ('cultural', 'Cultural'),
+    ('academic', 'Academic'),
+    ('arts', 'Arts'),
+    ('social', 'Social'),
+    ('gaming', 'Gaming'),
+    ('music', 'Music'),
+    ('dance', 'Dance'),
+    ('religious', 'Religious'),
+    ('professional', 'Professional'),
+    ('volunteering', 'Volunteering'),
+    ('media', 'Media'),
+]
+
 
 class Society(models.Model):
     name = models.CharField(max_length=200)
     bio = models.CharField(max_length=500, blank=True, default="")
     about = models.TextField(blank=True, default="")
     image = models.TextField(blank=True, null=True)
+    category = models.CharField(max_length=20, choices=SOCIETY_CATEGORIES, blank=True, default="")
     is_ratified = models.BooleanField(default=False)
     ratification_status = models.CharField(max_length=20, choices=RATIFICATION_STATUS, default='none')
     admin_emails = models.TextField(blank=True, default="")
