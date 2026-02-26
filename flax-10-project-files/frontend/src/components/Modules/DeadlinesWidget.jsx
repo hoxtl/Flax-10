@@ -5,15 +5,21 @@ import {
   getDeadlineCountdown,
   getDeadlineUrgency,
   formatDeadlineDateTime,
+  getTimeRemainingCountdown,
+  getDueInPhrase,
+  getTimeRemainingMonospace,
+  isDeadlineUnder24h,
   DEADLINE_LABELS,
 } from "./utils/deadlineUtils";
 import styles from "./DeadlinesWidget.module.css";
 
 /* ─── Main widget ─────────────────────────────── */
-export default function DeadlinesWidget({ onModuleTagClick }) {
+export default function DeadlinesWidget({ onModuleTagClick, variant }) {
   const navigate = useNavigate();
   const deadlines = useUpcomingDeadlines();
   const [selected, setSelected] = useState(null);
+  const isTriage = variant === "triage";
+  useTriageTick(isTriage);
 
   const handleModuleClick = (moduleId, moduleCode) => {
     if (onModuleTagClick) {
@@ -28,7 +34,7 @@ export default function DeadlinesWidget({ onModuleTagClick }) {
 
   return (
     <>
-      <div className={styles.widget}>
+      <div className={`${styles.widget} ${isTriage ? styles.widgetTriage : ""}`}>
         <div className={styles.headerRow}>
           <div className={styles.headerContent}>
             <span className={styles.headerLabel}>Deadlines</span>
@@ -43,8 +49,9 @@ export default function DeadlinesWidget({ onModuleTagClick }) {
           <DeadlineRow
             key={deadline.id}
             deadline={deadline}
+            isTriage={isTriage}
             onClick={() => setSelected(deadline)}
-            onModuleClick={onModuleTagClick ? handleModuleClick : undefined}
+            onModuleClick={handleModuleClick}
           />
         ))}
       </div>
@@ -70,67 +77,49 @@ function useUpcomingDeadlines() {
   return deadlines;
 }
 
-/* ─── Single row: title, then bubbles (module + type), countdown pill ── */
-function DeadlineRow({ deadline, onClick, onModuleClick }) {
+/* Tick every second in triage so monospace countdown updates */
+function useTriageTick(isTriage) {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!isTriage) return;
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [isTriage]);
+}
+
+/* ─── Single row: Pill A (Module) + Pill B (Assessment) → Task Name → Countdown ── */
+function DeadlineRow({ deadline, isTriage, onClick, onModuleClick }) {
   const urgency = getDeadlineUrgency(deadline.start_due_date);
-  const countdown = getDeadlineCountdown(deadline.start_due_date);
+  const under24h = isDeadlineUnder24h(deadline.start_due_date);
   const dueStr = formatDeadlineDateTime(deadline.start_due_date);
-  const typeKey = (deadline.deadline_type || "coursework").toLowerCase();
-  const typeLabel = DEADLINE_LABELS[deadline.deadline_type] ?? deadline.deadline_type ?? "Coursework";
-  const moduleId = deadline.module ?? deadline.module_id;
-  const moduleCode = deadline.module_code;
-  const typeBubbleClass =
-    typeKey === "exam" ? "bubbleExam"
-    : typeKey === "coursework" ? "bubbleCoursework"
-    : "bubbleOther";
-
-  const moduleHref = moduleId ? `/modules?moduleId=${moduleId}` : (moduleCode ? `/modules?code=${encodeURIComponent(moduleCode)}` : "/modules");
-
-  const handleBubbleClick = (e) => {
-    e.stopPropagation();
-    if (onModuleClick) {
-      onModuleClick(moduleId, moduleCode);
-    }
-  };
+  const moduleCode = deadline.module_code || (deadline.module_name ? deadline.module_name.replace(/\s+/g, "").slice(0, 6) : "") || "MOD";
+  const assessmentLabel = (DEADLINE_LABELS[deadline.deadline_type] || (deadline.deadline_type && String(deadline.deadline_type).charAt(0).toUpperCase() + String(deadline.deadline_type).slice(1)) || "Task");
+  const timeLabel = isTriage ? getTimeRemainingMonospace(deadline.start_due_date) : getTimeRemainingCountdown(deadline.start_due_date);
 
   return (
     <div
-      className={`${styles.row} ${styles[urgency] || ""}`}
+      className={`${styles.row} ${styles[urgency] || ""} ${isTriage ? styles.rowTriage : ""}`}
       onClick={onClick}
     >
       <div className={styles.body}>
         <div className={styles.rowContent}>
-          <span className={styles.title}>{deadline.title}</span>
-          <div className={styles.bubbleRow}>
-            {(moduleCode || moduleId) && (
-              onModuleClick ? (
-                <button
-                  type="button"
-                  className={`${styles.bubble} ${styles.bubbleModule}`}
-                  onClick={handleBubbleClick}
-                >
-                  {moduleCode || `Module ${moduleId}`}
-                </button>
-              ) : (
-                <Link
-                  to={moduleHref}
-                  className={`${styles.bubble} ${styles.bubbleModule}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {moduleCode || `Module ${moduleId}`}
-                </Link>
-              )
-            )}
-            <span className={`${styles.bubble} ${styles[typeBubbleClass]}`}>
-              {typeLabel}
+          <div className={styles.pillsRow}>
+            <span
+              className={styles.pillModule}
+              onClick={(e) => { e.stopPropagation(); onModuleClick?.(deadline.module ?? deadline.module_id, deadline.module_code); }}
+              title={deadline.module_name || deadline.module_code}
+            >
+              {moduleCode.length > 4 ? moduleCode.slice(0, 4) : moduleCode}
             </span>
+            <span className={styles.pillAssessment}>{assessmentLabel}</span>
           </div>
+          <span className={styles.title}>{deadline.title}</span>
         </div>
         <span
-          className={`${styles.pill} ${styles[urgency] || ""}`}
+          className={`${styles.countdownPill} ${under24h ? styles.countdownCoral : styles.countdownCharcoal}`}
           title={dueStr}
         >
-          {countdown}
+          {timeLabel}
         </span>
       </div>
     </div>
