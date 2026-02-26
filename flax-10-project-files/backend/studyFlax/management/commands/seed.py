@@ -15,7 +15,7 @@ from studyFlax.fixtures.data_fixtures import (
 
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
-    build_meal_events, build_module_event, get_user_modules,
+    build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
     build_lecture_events, create_lecture_event, build_deadlines_for_module,
     create_deadline_calendar_event,
 )
@@ -129,15 +129,18 @@ class Command(BaseCommand):
         self.stdout.write("Seeding tags...")
         from faker import Faker
         f = Faker('en_GB')
+        ROUTINE_COLOR = '#94a3b8'   # neutral slate so Academic (Sage) and Personal stand out
+        WELLNESS_COLOR = '#94a3b8'
         for name, duration in tag_fixtures:
             category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
             user = (
                 category.user if category and category.user
                 else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
             )
+            color = ROUTINE_COLOR if name == 'Routine' else (WELLNESS_COLOR if name == 'Wellness' else f.hex_color())
             Tag.objects.get_or_create(
                 name=name, user=user,
-                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
+                defaults={'category': category, 'default_duration': duration, 'color': color},
             )
 
     def create_events_for_users(self):
@@ -149,7 +152,9 @@ class Command(BaseCommand):
             CalendarEvent.objects.bulk_create(personal_events)
             meal_events = build_meal_events(user, self.tags)
             CalendarEvent.objects.bulk_create(meal_events)
-            total += len(personal_events) + len(meal_events)
+            today_events = build_today_afternoon_events(user, self.tags)
+            CalendarEvent.objects.bulk_create(today_events)
+            total += len(personal_events) + len(meal_events) + len(today_events)
         print(f"  Created {total} events across {len(self.users)} users.          ")
 
     def _create_module(self, code, name, description, teacher, weekly_rule):

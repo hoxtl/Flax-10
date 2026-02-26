@@ -139,8 +139,44 @@ def build_events_for_user(user, tags, rules, count):
     return events
 
 
+def build_today_afternoon_events(user, tags):
+    """Five mock events for today between 14:30 and 20:00: Academic, Social, Admin + 2 more."""
+    now = timezone.now()
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    user_tags = [t for t in tags if t.user == user or t.user is None]
+    tag = random.choice(user_tags) if user_tags else None
+
+    slots = [
+        (14, 30, 60, "Review notes", "Academic"),
+        (15, 30, 30, "Coffee with flatmates", "Social"),
+        (16, 30, 45, "Reply to emails", "Admin"),
+        (17, 45, 60, "Study at library", "Academic"),
+        (19, 0, 30, "Plan tomorrow", "Admin"),
+    ]
+    events = []
+    for hour, minute, duration_min, title, _ in slots:
+        start = today.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if start.tzinfo is None:
+            start = timezone.make_aware(start)
+        end = start + timedelta(minutes=duration_min)
+        events.append(CalendarEvent(
+            user=user,
+            title=title,
+            description="",
+            start_time=start,
+            end_time=end,
+            tag=tag,
+            priority=random.choice(['low', 'medium', 'high']),
+            recurrence_rule=None,
+        ))
+    return events
+
+
 def build_meal_events(user, tags):
-    meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
+    """Meals (Breakfast, Lunch, Dinner) use Routine or Wellness tag — NOT Academic/Work."""
+    routine_tag = next((t for t in tags if t.name == 'Routine'), None)
+    wellness_tag = next((t for t in tags if t.name == 'Wellness'), None)
+    meal_tag = routine_tag or wellness_tag or (tags[0] if tags else None)
     events   = []
 
     for day_offset in range(SEED_DAYS):
