@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar } from '../../components/Calendar/Calendar';
 import PillFilters from '../../components/Tags/PillFilters';
@@ -10,6 +11,7 @@ import { useCalendarEvents, useEventActions } from '../../components/Calendar/ho
 import { getEventType } from '../../components/Calendar/utils/eventUtils';
 import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
+import ConfirmModal from '../../components/shared/ConfirmModal';
 
 export default function CalendarPage() {
     const { filter, allEvents } = useCalendar();
@@ -46,13 +48,32 @@ function EventPopupContainer() {
     const { loadEvents } = useCalendarEvents();
     const tags = useTags();
     const navigate = useNavigate();
+    const [deleteEvent, setDeleteEvent] = useState(null);
 
+    const handleDeleteRequest = (event) => { closePopup(); setDeleteEvent(event); };
+    const handleDeleteConfirm = async () => { await removeEvent(deleteEvent.id); setDeleteEvent(null); };
+    const handleDeleteCancel = () => setDeleteEvent(null);
+
+    if (deleteEvent) {
+        return <DeleteConfirmModal event={deleteEvent} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
+    }
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, tags);
-    const handlers = { openModal, removeEvent, closePopup, loadEvents, navigate };
+    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate };
     const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
+}
+
+function DeleteConfirmModal({ event, onConfirm, onCancel }) {
+    return (
+        <ConfirmModal
+            title="Delete Event"
+            message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`}
+            onConfirm={onConfirm}
+            onCancel={onCancel}
+        />
+    );
 }
 
 function getEventTag(event, tags) {
@@ -70,10 +91,10 @@ function getCalendarPopupActions(event, handlers) {
     return null;
 }
 
-function getPersonalActions(event, { openModal, removeEvent, closePopup }) {
+function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
     return [
         { label: 'Edit', onClick: () => { closePopup(); openModal(event); } },
-        { label: 'Delete', variant: 'danger', onClick: () => { closePopup(); removeEvent(event.id); } }
+        { label: 'Delete', variant: 'danger', onClick: () => onDeleteRequest(event) }
     ];
 }
 
