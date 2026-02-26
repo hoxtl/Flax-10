@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TopBar from '../../components/Topbar';
+import TopBar from '../../components/Dashboard/TopBar';
 
 vi.mock('../../components/ProfileDropdown', () => ({
   default: ({ onSettingsClick, onLogoutClick, onProfileClick }) => (

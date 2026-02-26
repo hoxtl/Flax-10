@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import styles from "./DashboardLayout.module.css";
+import { useLocation } from "react-router-dom";
+
+import { authService } from "../api/authService";
+import { useEventModal, useCalendar } from "../context/CalendarContext";
+import { clearUserData } from "../components/Authentication/utils/authHelpers";
+
 import Sidebar from "../components/Dashboard/Sidebar";
-import TopBar from "../components/Dashboard/Topbar";
+import TopBar from "../components/Dashboard/TopBar";
 import WeekBar from "../components/Dashboard/WeekBar";
 import { EventModal } from "../components/Calendar/EventModal/EventModal";
-import { useEventModal, useCalendar } from "../context/CalendarContext";
-import { authService } from "../api/authService";
-import { clearUserData } from "../components/Authentication/utils/authHelpers";
-import { useLocation } from "react-router-dom";
+
+import styles from "./DashboardLayout.module.css";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);

@@ -13,7 +13,7 @@ vi.mock("../../components/Sidebar", () => ({
   ),
 }));
 
-vi.mock("../../components/Topbar", () => ({
+vi.mock("../../components/Dashboard/TopBar", () => ({
   default: ({ onAddClick, onLogoutClick }) => (
     <div data-testid="topbar">
       <button onClick={onAddClick}>Quick Add</button>
