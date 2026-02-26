@@ -111,17 +111,17 @@
     width: 100%;
     margin-top: 16px;
     padding: 12px;
-    background: #2563eb;
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s;
 }
 
 .addBtn:hover {
-    background: #1d4ed8;
+    opacity: 0.9;
 }
 
 /* Form Styles */
@@ -194,7 +194,7 @@
 }
 
 .saveBtn {
-    background: #2563eb;
+    background: var(--primary);
     color: white;
 }
 
@@ -229,7 +229,7 @@
 }
 
 .emojiPreviewBtn:hover {
-    border-color: var(--primary-color, #2563eb);
+    border-color: var(--primary);
     background: var(--hover, #f8fafc);
 }
 

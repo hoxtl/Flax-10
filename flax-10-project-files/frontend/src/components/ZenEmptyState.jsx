@@ -12,7 +12,7 @@ function SproutSvg({ className, ...props }) {
     );
 }
 
-export default function ZenEmptyState({ text = "Your garden is quiet. Time to plant some new goals?", children, className, calm }) {
+export default function ZenEmptyState({ text = "All caught up! Time for a break?", children, className, calm }) {
     return (
         <div className={`${styles.wrap} ${className || ""}`}>
             <SproutSvg className={styles.icon} />
