@@ -1,0 +1,138 @@
+.widget {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+}
+
+.label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.count {
+    background: var(--pill-bg);
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 9999px;
+}
+
+.viewAll {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.row:last-child { border-bottom: none; }
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: border-color 0.15s;
+}
+.checkbox:hover { border-color: var(--primary); }
+
+.info { flex: 1; min-width: 0; }
+
+.title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+}
+
+.meta {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.2rem;
+    flex-wrap: wrap;
+}
+
+.priority {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.bubbleModule {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: filter 0.15s ease;
+    background: #E8F5E9;
+    color: #2D4F32;
+}
+.bubbleModule:hover {
+    filter: brightness(0.95);
+}
+
+.module {
+    font-size: 0.72rem;
+    background: var(--pill-bg);
+    color: var(--muted);
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.overdue {
+    font-size: 0.72rem;
+    color: var(--danger);
+    font-weight: 600;
+}
