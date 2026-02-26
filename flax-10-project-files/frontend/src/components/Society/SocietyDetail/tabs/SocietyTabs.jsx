@@ -40,7 +40,7 @@ function TabContent({ activeTab, society, editMode, onUpdate, eventHandlers, ann
     if (activeTab === 'announcements') return <TabWrapper><AnnouncementsTab announcements={society.announcements} editMode={editMode} handlers={announcementHandlers} tags={tags} societyId={society.id} focusAnnouncementId={focusAnnouncementId} onEdit={onEditAnnouncement} /></TabWrapper>;
     return <TabWrapper><CalendarTab events={society.events} editMode={editMode} eventHandlers={eventHandlers}
         tags={tags} tagHandlers={tagHandlers} onViewAnnouncement={(id) => onTabChange('announcements', id)}
-        societyId={society.id} isMember={!!society.role} onEditAnnouncement={onEditAnnouncement} announcements={society.announcements} /></TabWrapper>;
+        societyId={society.id} isMember={society.is_member} onEditAnnouncement={onEditAnnouncement} announcements={society.announcements} /></TabWrapper>;
 }
 
 function TabWrapper({ children }) {
