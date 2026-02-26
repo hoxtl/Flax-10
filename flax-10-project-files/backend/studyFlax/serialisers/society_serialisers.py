@@ -50,19 +50,45 @@ class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
     event_id = serializers.SerializerMethodField()
+
+    def create(self, validated_data):
+        instance = SocietyAnnouncement(**validated_data)
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        return super().update(instance, validated_data)
+
+    def get_event_id(self, obj):
+        event = obj.events.first()
+        return event.id if event else None
+
     class Meta:
         model = SocietyAnnouncement
         fields = [
             'id', 'title', 'content', 'tag', 'tag_data',
             'pinned', 'images', 'created_at', 'updated_at', 'event_id'
         ]
-    def get_event_id(self, obj):
-        event = obj.events.first()
-        return event.id if event else None
 
 
 class SocietyEventSerialiser(serializers.ModelSerializer):
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
+
+    def create(self, validated_data):
+        instance = SocietyEvent(**validated_data)
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

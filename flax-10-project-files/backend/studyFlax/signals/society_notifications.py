@@ -14,6 +14,8 @@ def cache_old_event_state(sender, instance, **kwargs):
 
 @receiver(post_save, sender=SocietyEvent)
 def notify_members_on_event(sender, instance, created, **kwargs):
+    if getattr(instance, '_skip_notification', False):
+        return
     if created:
         notify_society_members(instance.society, build_event_notification(instance, 'new'))
     elif getattr(instance, '_is_update', False):
@@ -22,6 +24,8 @@ def notify_members_on_event(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=SocietyAnnouncement)
 def notify_members_on_announcement(sender, instance, created, **kwargs):
+    if getattr(instance, '_skip_notification', False):
+        return
     if created:
         notify_society_members(instance.society, build_announcement_notification(instance))
 
@@ -30,16 +34,14 @@ def notify_members_on_announcement(sender, instance, created, **kwargs):
 def handle_announcement_delete(sender, instance, **kwargs):
     has_event = instance.events.exists()
     instance.events.all().delete()
-    notify_society_members(instance.society, build_delete_notification(instance, has_event))
+    if not getattr(instance, '_skip_notification', False):
+        notify_society_members(instance.society, build_delete_notification(instance, has_event))
 
 
 @receiver(pre_delete, sender=SocietyEvent)
 def handle_event_delete(sender, instance, **kwargs):
-    # Don't notify if the deletion is triggered by an announcement deletion
-    # (that is already handled in handle_announcement_delete)
-    if instance.announcement:
+    if instance.announcement or getattr(instance, '_skip_notification', False):
         return
-        
     notify_society_members(instance.society, {
         'title': f"Event cancelled in {instance.society.name}",
         'message': f'"{instance.title}" has been removed from the calendar.',

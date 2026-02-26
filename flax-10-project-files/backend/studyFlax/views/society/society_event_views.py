@@ -30,11 +30,17 @@ def get_events(society):
 def create_event(request, society):
     if not is_society_admin(request.user, society):
         return permission_denied_response()
-    serialiser = SocietyEventSerialiser(data=request.data)
+    silent = is_silent_request(request)
+    context = {'skip_notification': silent}
+    serialiser = SocietyEventSerialiser(data=request.data, context=context)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save(society=society)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
+
+
+def is_silent_request(request):
+    return request.query_params.get('silent', '').lower() == 'true'
 
 
 @api_view(['GET', 'PATCH', 'DELETE'])
@@ -52,9 +58,10 @@ def event_detail(request, society_id, event_id):
         return Response(SocietyEventSerialiser(event).data)
     if not is_society_admin(request.user, society):
         return permission_denied_response()
+    silent = is_silent_request(request)
     if request.method == 'DELETE':
-        return delete_event(event)
-    return update_event(event, request.data)
+        return delete_event(event, silent)
+    return update_event(event, request.data, silent)
 
 
 def get_event_or_none(society, event_id):
@@ -64,15 +71,18 @@ def get_event_or_none(society, event_id):
         return None
 
 
-def update_event(event, data):
-    serialiser = SocietyEventSerialiser(event, data=data, partial=True)
+def update_event(event, data, silent=False):
+    context = {'skip_notification': silent}
+    serialiser = SocietyEventSerialiser(event, data=data, partial=True, context=context)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
     return Response(serialiser.data)
 
 
-def delete_event(event):
+def delete_event(event, silent=False):
+    if silent:
+        event._skip_notification = True
     event.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
