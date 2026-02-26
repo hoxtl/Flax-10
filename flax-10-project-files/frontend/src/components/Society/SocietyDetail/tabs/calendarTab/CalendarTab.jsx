@@ -66,7 +66,7 @@ function handlePopupDelete(event, handlers, closePopup) {
         const choice = isRecurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
         const baseId = extractBaseEventId(event.id, event);
 
-        if (choice) handlers?.onDelete?.(baseId);
+        if (choice) handlers?.onDelete?.(baseId, event.title);
         else {
             const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
             handlers?.onAddException?.(baseId, dateStr);
