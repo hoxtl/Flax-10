@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import styles from "../../pages/Timer/TimerPage.module.css";
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
@@ -27,15 +27,25 @@ export const MainSection = ({ t, onOpenHistory }) => {
         try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
     }, [t]);
 
+    useEffect(() => {
+        try {
+            const suggested = sessionStorage.getItem('timerSuggestedTask');
+            if (suggested && typeof t.setTask === 'function') {
+                t.setTask(suggested);
+                sessionStorage.removeItem('timerSuggestedTask');
+            }
+        } catch (_) {}
+    }, [t]);
+
     return (
         <>
             <TimerHeader onOpenHistory={onOpenHistory} />
             <TaskInput value={t.task} onChange={t.setTask} onTaskSelect={handleTaskSelect} />
             <TreeAnimation progress={t.progress} mode={t.mode} />
-            <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
+            <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} isActive={t.isActive} timeLeft={t.timeLeft} workTime={t.workTime} />
             <SessionStatus current={t.completedSessions} total={t.targetSessions} />
             <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
-            <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} />
+            <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} timeLeft={t.timeLeft} task={t.task} workTime={t.workTime} />
             <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
             <SoundSelector />
         </>
