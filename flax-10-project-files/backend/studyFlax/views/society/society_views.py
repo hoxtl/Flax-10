@@ -61,14 +61,30 @@ def publish_changes(request, society_id):
         return society_not_found_response()
     if not is_society_admin(request.user, society):
         return permission_denied_response()
-    notify_society_members(society, build_update_notification(society))
+    changes = request.data
+    notification = build_update_notification(society, changes)
+    notify_society_members(society, notification)
     return Response({'status': 'published'})
 
 
-def build_update_notification(society):
+def build_update_notification(society, changes):
+    message = build_change_message(changes)
     return {
         'title': f"{society.name} has been updated",
-        'message': 'Check out the latest changes to events and announcements.',
+        'message': message or 'Check out the latest changes.',
         'notification_type': 'society_update',
         'society_id': society.id,
     }
+
+
+def build_change_message(changes):
+    parts = []
+    parts.extend(format_change_list(changes.get('events_added', []), 'New event'))
+    parts.extend(format_change_list(changes.get('events_updated', []), 'Updated event'))
+    parts.extend(format_change_list(changes.get('announcements_added', []), 'New announcement'))
+    parts.extend(format_change_list(changes.get('announcements_updated', []), 'Updated announcement'))
+    return ' | '.join(parts) if parts else None
+
+
+def format_change_list(items, prefix):
+    return [f"{prefix}: {item}" for item in items[:3]]
