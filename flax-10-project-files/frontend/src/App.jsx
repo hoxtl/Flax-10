@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
-import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
 import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
@@ -21,6 +20,8 @@ import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
+
+import "./App.css";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";

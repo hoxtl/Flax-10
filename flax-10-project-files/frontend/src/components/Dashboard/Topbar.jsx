@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import styles from "./Topbar.module.css";
-import ProfileDropdown from "./ProfileDropdown";
+import { Bell } from "lucide-react";
+
 import { useNotifications } from "../../context/NotificationContext";
+import ProfileDropdown from "./ProfileDropdown";
 import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
-import { Bell } from "lucide-react";
+
+import styles from "./TopBar.module.css";
 
 function useCurrentTime() {
   const [time, setTime] = useState(() =>

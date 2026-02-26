@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import styles from "./Sidebar.module.css";
+
 import { APP_ROUTES } from "../../lib/routes";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
+
+import styles from "./Sidebar.module.css";
 
 const EXPANDED_W = 224;
 const COLLAPSED_W = 72;
