@@ -14,7 +14,8 @@ function useModulesPage() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
     const [search_query, setSearchQuery] = useState('');
-    const [filter_mode, setFilterMode] = useState('all');
+    const filterFromUrl = searchParams.get('filter');
+    const [filter_mode, setFilterMode] = useState(filterFromUrl === 'enrolled' ? 'enrolled' : 'all');
     const [show_form, setShowForm] = useState(false);
     const [editing_module, setEditingModule] = useState(null);
     const [viewing_module, setViewingModule] = useState(null);

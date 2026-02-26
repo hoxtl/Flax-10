@@ -159,13 +159,16 @@ function buildEventData(form) {
 }
 
 function buildBaseEventData(form) {
+    const title = (form.title || "").trim();
+    const isRoutineTitle = /^(breakfast|lunch|dinner|sleep|brunch|coffee|meal\s*prep)$/i.test(title);
+    const tag = form.tag != null && form.tag !== "" ? form.tag : (isRoutineTitle ? "Routine" : null);
     return {
         title: form.title,
         description: form.description,
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
-        location: form.location || '',
-        tag: form.tag || null,
+        location: form.location || "",
+        tag,
         reminder_minutes: form.reminder,
         all_day: form.all_day,
     };
