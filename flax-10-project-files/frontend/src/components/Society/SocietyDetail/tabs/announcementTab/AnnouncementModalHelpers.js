@@ -35,15 +35,7 @@ function extractImageUrls(images) {
 export function validateForm(form) {
     if (!form.title?.trim()) return "Title is required";
     if (!form.addAsEvent) return null;
-    return validateEventFields(form);
-}
-
-function validateEventFields(form) {
-    if (!form.start_time) return "Start time is required for event";
-    if (form.end_time && form.end_time < form.start_time) {
-        return "End time must be after start time";
-    }
-    return null;
+    return validateEventTimes(form);
 }
 
 export function handleFileSelect(file, onAdd, fileRef) {
