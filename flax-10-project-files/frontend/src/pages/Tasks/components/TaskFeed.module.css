@@ -7,14 +7,84 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
     padding: 0 32px;
 }
 
-/* ── Create Task bar (above toolbar) ── */
+/* Dynamic list header — title, subtitle, divider; 40px below divider to content */
+.listHeader {
+    flex-shrink: 0;
+    padding: 24px 24px 0;
+    margin-bottom: 24px;
+    animation: taskFeedHeaderFade 0.25s ease;
+}
+
+@keyframes taskFeedHeaderFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.listHeaderTitle {
+    font-family: var(--font-body);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--restoration-earth, #6B5344);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.listHeaderSubtitle {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: #64748b;
+    margin: 8px 0 16px;
+    line-height: 1.45;
+}
+
+.listHeaderDivider {
+    height: 1px;
+    background: rgba(107, 83, 68, 0.25);
+    border: none;
+    margin: 0;
+}
+
+/* ── Sub-header: Identity left | Zen gap (min 100px) | Global Actions right ── */
+.subHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 100px;
+    padding: 0 24px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--bg);
+    position: relative;
+    z-index: 2;
+}
+.subHeader .createBarWrap {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 360px;
+}
+.subHeader .toolbar {
+    flex-shrink: 0;
+    border-bottom: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.subHeaderSpacer {
+    flex: 1 1 100px;
+    min-width: 100px;
+}
+
+/* ── Create Task bar (Quick Capture) ── */
 .createBarWrap {
     flex-shrink: 0;
-    padding: 16px 24px 8px;
+    padding: 0;
     border-bottom: none;
     display: flex;
     flex-direction: column;
@@ -29,7 +99,7 @@
     color: var(--text-muted-sage);
 }
 
-/* ── Toolbar ── */
+/* ── Toolbar (global actions: search, sort, full planning) ── */
 .toolbar {
     display: flex;
     align-items: center;
@@ -39,43 +109,43 @@
     flex-shrink: 0;
     background: var(--bg);
 }
-
+.toolbar .searchWrap {
+    width: 200px;
+    flex: 0 0 200px;
+}
 .searchWrap {
-    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
 }
-
 .searchIcon {
     position: absolute;
-    left: 12px;
+    left: 10px;
     font-size: 0.78rem;
     pointer-events: none;
     opacity: 0.5;
 }
-
 .searchInput {
     width: 100%;
-    padding: 8px 32px 8px 32px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    padding: 8px 28px 8px 32px;
+    background: transparent;
+    border: 1px solid rgba(107, 83, 68, 0.25);
+    border-radius: 10px;
     font-size: 0.82rem;
     font-weight: 500;
     color: var(--text);
     outline: none;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
-}
-.searchInput:focus {
-    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
-    border-color: var(--primary);
+    box-shadow: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 .searchInput::placeholder {
     color: var(--muted);
 }
-
+.searchInput:focus {
+    border-color: var(--restoration-earth, #6B5344);
+    box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.12);
+    background: rgba(255, 255, 255, 0.6);
+}
 .searchClear {
     position: absolute;
     right: 8px;
@@ -140,11 +210,21 @@
 }
 .addBtn:hover { opacity: 0.92; background: color-mix(in srgb, var(--primary) 90%, #1e293b); }
 
-/* ── Sections scroll area ── */
+/* ── Sections scroll area — overflow contained here so header dropdowns are not clipped ── */
+.sectionsWrap {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+}
 .sections {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    padding: 12px 24px 24px;
+    padding: 24px 24px 24px;
     display: flex;
     flex-direction: column;
     gap: 8px;

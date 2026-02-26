@@ -9,6 +9,17 @@ import styles from "./TaskFeed.module.css";
 
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 
+/** Subtitle by list type for dynamic header. */
+function getListSubtitle(listName, listCategory, isEmpty) {
+  if (isEmpty) return "This garden is currently empty. Ready to plant some goals?";
+  const name = (listName || "").toLowerCase();
+  const cat = (listCategory || "").toLowerCase();
+  if (cat === "uni" || /university|academic|reading list/i.test(name)) return "Academic excellence is a marathon, not a sprint. Focus on your core objectives.";
+  if (cat === "personal" || /personal|health|wellness|finance|home/i.test(name)) return "Nurturing the gardener is as important as tending the garden. Balance is key.";
+  if (cat === "society" || /internship|work|project|admin/i.test(name)) return "Brick by brick, system by system. Building the future one task at a time.";
+  return "A clear mind leads to a clear path. What is the next right move for today?";
+}
+
 /** Routine/event tasks (meals, lectures, etc.) auto-pass when time has passed — exclude from Overdue. */
 function isRoutineOrEventTask(task) {
   if (!task) return false;
@@ -98,6 +109,7 @@ export default function TaskFeed({
     lists,
     activeFilter,
     activeListId,
+    activeModuleCode,
     defaultDueDateForNewTask,
     onToggleComplete,
     onDeleteTask,
@@ -163,63 +175,85 @@ export default function TaskFeed({
       }
     }, []);
 
+    const activeList = useMemo(() => {
+      if (!activeListId || !lists?.length) return null;
+      return lists.find(l => String(l.id) === String(activeListId)) || null;
+    }, [activeListId, lists]);
+
+    const headerTitle = activeList
+        ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
+        : (activeModuleCode || "All tasks");
+    const headerSubtitle = getListSubtitle(
+      activeList?.name,
+      activeList?.category,
+      tasks.length === 0
+    );
+
     const sectionProps = { sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask };
 
     return (
         <div className={styles.feed}>
-            {/* Create Task bar — single-line entry; always visible */}
-            {onAddTask && (
-                <div className={styles.createBarWrap}>
-                    <span className={styles.quickCaptureLabel}>Quick Capture</span>
-                    <CreateTaskBar
-                        lists={lists}
-                        defaultListId={activeListId}
-                        defaultDueDate={defaultDueDateForNewTask}
-                        onAddTask={onAddTask}
-                    />
-                </div>
-            )}
+            {/* Dynamic list header — title + subtitle + divider; 100% horizontal focus */}
+            <header className={styles.listHeader} key={activeListId ?? "all"}>
+                <h1 className={styles.listHeaderTitle}>{headerTitle}</h1>
+                <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>
+                <div className={styles.listHeaderDivider} aria-hidden />
+            </header>
 
-            {/* Toolbar — search + sort + full modal trigger */}
-            <div className={styles.toolbar}>
-                <div className={styles.searchWrap}>
-                    <span className={styles.searchIcon}>🔍</span>
-                    <input
-                        className={styles.searchInput}
-                        placeholder="Search tasks…"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                    />
-                    {search && (
-                        <button className={styles.searchClear} onClick={() => setSearch("")}>✕</button>
+            {/* Sub-header: Identity (Quick Capture) left | Zen gap | Global Actions (Search, Sort, + Full Planning) right */}
+            <div className={styles.subHeader}>
+                {onAddTask ? (
+                    <div className={styles.createBarWrap}>
+                        <span className={styles.quickCaptureLabel}>Quick Capture</span>
+                        <CreateTaskBar
+                            lists={lists}
+                            defaultListId={activeListId}
+                            defaultDueDate={defaultDueDateForNewTask}
+                            onAddTask={onAddTask}
+                        />
+                    </div>
+                ) : (
+                    <div className={styles.subHeaderSpacer} aria-hidden />
+                )}
+                <div className={styles.toolbar}>
+                    <div className={styles.searchWrap}>
+                        <span className={styles.searchIcon} aria-hidden>🔍</span>
+                        <input
+                            className={styles.searchInput}
+                            placeholder="Search tasks…"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        />
+                        {search && (
+                            <button className={styles.searchClear} onClick={() => setSearch("")} aria-label="Clear search">✕</button>
+                        )}
+                    </div>
+                    <div className={styles.sortWrap}>
+                        <label className={styles.sortLabel}>SORT</label>
+                        <select
+                            className={styles.sortSelect}
+                            value={sortBy}
+                            onChange={e => setSortBy(e.target.value)}
+                        >
+                            <option value="priority">Priority</option>
+                            <option value="due">Due date</option>
+                            <option value="alpha">A → Z</option>
+                        </select>
+                    </div>
+                    {onCreateTask && (
+                        <button
+                            type="button"
+                            className={styles.addBtn}
+                            onClick={onCreateTask}
+                        >
+                            + Full Planning
+                        </button>
                     )}
                 </div>
-
-                <div className={styles.sortWrap}>
-                    <label className={styles.sortLabel}>SORT</label>
-                    <select
-                        className={styles.sortSelect}
-                        value={sortBy}
-                        onChange={e => setSortBy(e.target.value)}
-                    >
-                        <option value="priority">Priority</option>
-                        <option value="due">Due date</option>
-                        <option value="alpha">A → Z</option>
-                    </select>
-                </div>
-
-                {onCreateTask && (
-                    <button
-                        type="button"
-                        className={styles.addBtn}
-                        onClick={onCreateTask}
-                    >
-                        + Full Planning
-                    </button>
-                )}
             </div>
 
-            {/* Task sections or empty state — below Create Task bar, never overlapping */}
+            {/* Task sections or empty state — inside sectionsWrap so overflow is contained and header dropdowns are not clipped */}
+            <div className={styles.sectionsWrap}>
             <div className={styles.sections}>
                 {showZenEmptyState && (
                     <div className={styles.emptyState}>
@@ -284,6 +318,7 @@ export default function TaskFeed({
                         )}
                     </div>
                 )}
+            </div>
             </div>
         </div>
     );
