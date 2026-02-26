@@ -140,6 +140,12 @@
   gap: 1.25rem;
 }
 
+.chartContainerMin {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
 .wide { grid-column: 1 / -1; }
 
 .errorBanner {
