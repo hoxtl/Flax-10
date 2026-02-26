@@ -75,3 +75,38 @@ def update_event(event, data):
 def delete_event(event):
     event.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_society_event_exception(request, society_id, event_id):
+    society = get_society_or_404(society_id)
+    if not society: return society_not_found_response()
+    
+    event = get_event_or_none(society, event_id)
+    if not event: return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not is_society_admin(request.user, society): return permission_denied_response()
+    
+    date = request.data.get('date')
+    if not date: return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if event.recurrence == 'none':
+        return Response({'error': 'Event has no recurrence'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    if date not in event.exception_dates:
+        event.exception_dates.append(date)
+        event.save()
+        notify_exception(event, date)
+        
+    return Response(SocietyEventSerialiser(event).data)
+
+
+def notify_exception(event, date):
+    from studyFlax.signals.society_notifications import notify_society_members
+    notify_society_members(event.society, {
+        'title': f"Event occurrence cancelled in {event.society.name}",
+        'message': f'"{event.title}" on {date} has been removed from the calendar.',
+        'notification_type': 'society_event',
+        'society_id': event.society_id,
+    })

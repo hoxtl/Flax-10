@@ -33,6 +33,21 @@ def handle_announcement_delete(sender, instance, **kwargs):
     notify_society_members(instance.society, build_delete_notification(instance, has_event))
 
 
+@receiver(pre_delete, sender=SocietyEvent)
+def handle_event_delete(sender, instance, **kwargs):
+    # Don't notify if the deletion is triggered by an announcement deletion
+    # (that is already handled in handle_announcement_delete)
+    if instance.announcement:
+        return
+        
+    notify_society_members(instance.society, {
+        'title': f"Event cancelled in {instance.society.name}",
+        'message': f'"{instance.title}" has been removed from the calendar.',
+        'notification_type': 'society_event',
+        'society_id': instance.society_id,
+    })
+
+
 def notify_society_members(society, notification_data):
     members = SocietyMembership.objects.filter(society=society).select_related('user')
     notifications = [build_notification(m.user, notification_data) for m in members]
