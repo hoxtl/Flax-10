@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import styles from "../../pages/Timer/TimerPage.module.css";
+
 import { noiseGenerator } from './utils/noiseUtils';
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
+
+import styles from "../../pages/Timer/TimerPage.module.css";
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {

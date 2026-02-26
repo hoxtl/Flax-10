@@ -1,9 +1,11 @@
 import { useCallback, useEffect } from "react";
-import styles from "../../pages/Timer/TimerPage.module.css";
+
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
+
+import styles from "../../pages/Timer/TimerPage.module.css";
 
 /** Header component with title and history toggle */
 const TimerHeader = ({ onOpenHistory }) => (

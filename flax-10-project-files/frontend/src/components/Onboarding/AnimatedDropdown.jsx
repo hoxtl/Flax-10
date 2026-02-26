@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";
+
 import styles from "./OnboardingModal.module.css";
 
 function CheckMark() {

@@ -1,6 +1,8 @@
-import { useNotifications } from '../../context/NotificationContext';
 import { useEffect, useRef, useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
+
+import { useNotifications } from '../../context/NotificationContext';
+
 import './NotificationPanel.css';
 
 export function NotificationPanel() {

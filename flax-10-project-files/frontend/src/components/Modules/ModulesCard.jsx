@@ -3,7 +3,7 @@ import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
 import styles from './ModulesCard.module.css';
 
-function GetCardClass(enrolled, is_teacher) {
+function getCardClass(enrolled, is_teacher) {
     let cls = styles.card;
     if (enrolled) cls += ` ${styles.enrolled}`;
     if (!is_teacher) cls += ` ${styles.clickable}`;
@@ -16,7 +16,7 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     const isCore = enrollment?.is_core || false;
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
-        <article className={GetCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
+        <article className={getCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
             <CardBody module={module} enrolled={enrolled} isTeacher={isTeacher}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
