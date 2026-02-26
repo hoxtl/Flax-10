@@ -193,10 +193,13 @@ export default function TaskFeed({
 
     return (
         <div className={styles.feed}>
-            {/* Dynamic list header — title + subtitle + divider; 100% horizontal focus */}
+            {/* Dynamic list header — title (max 50%, ellipsis) | zen gap | subtitle under; grid-aligned */}
             <header className={styles.listHeader} key={activeListId ?? "all"}>
-                <h1 className={styles.listHeaderTitle}>{headerTitle}</h1>
-                <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>
+                <div className={styles.listHeaderTitleWrap}>
+                    <h1 className={styles.listHeaderTitle} title={headerTitle}>{headerTitle}</h1>
+                    <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>
+                </div>
+                <div className={styles.listHeaderZen} aria-hidden />
                 <div className={styles.listHeaderDivider} aria-hidden />
             </header>
 
