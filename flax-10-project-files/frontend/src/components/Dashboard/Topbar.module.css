@@ -2,13 +2,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.75rem 1rem 1.5rem;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 16px 24px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--frame-border);
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 40;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .greeting {
@@ -54,11 +57,11 @@
 }
 
 .searchInput {
-  padding-left: 2rem;
-  padding-right: 0.875rem;
-  height: 2.25rem;
+  padding-left: 32px;
+  padding-right: 16px;
+  height: 40px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.8125rem;
   outline: none;
   background: var(--bg);
@@ -79,7 +82,7 @@
 .addBtn {
   width: 36px;
   height: 36px;
-  border-radius: 9px;
+  border-radius: 12px;
   background: linear-gradient(135deg, var(--primary), var(--primary-strong));
   border: none;
   cursor: pointer;
@@ -142,5 +145,5 @@
 }
 
 :root[data-theme="dark"] .container {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: none;
 }

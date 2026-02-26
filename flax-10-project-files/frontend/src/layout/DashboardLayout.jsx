@@ -105,6 +105,7 @@ function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNav
 }
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
+  // Primary navigation: permanent sidebar (desktop) / drawer (mobile). Users never need to go "Home" to reach other sections.
   const state = useDashboardState(activeNav, onNavChange);
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav } = state;
   return (
