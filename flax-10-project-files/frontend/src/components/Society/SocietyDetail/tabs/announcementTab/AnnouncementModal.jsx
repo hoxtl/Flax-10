@@ -72,15 +72,16 @@ function handleSubmit(form, setError, onSubmit, announcements, conflict) {
         }}
     onSubmit(form);}
 
-function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, onSubmit, isEdit }) {
+function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, onSubmit, isEdit, onDeleteClick }) {
     return (
         <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
             <ModalHeader onClose={onClose} isEdit={isEdit} />
             {error && <div className={styles.error}>{error}</div>}
             <FormFields form={form} update={update} setForm={setForm} fileRef={fileRef} tags={tags} />
-            <ModalFooter onClose={onClose} onSubmit={() => onSubmit(form)} isEdit={isEdit} />
+            <ModalFooter onClose={onClose} onSubmit={() => onSubmit(form)} isEdit={isEdit} onDelete={onDeleteClick} />
         </div>
-    );}
+    );
+}
 
 function ModalHeader({ onClose, isEdit }) {
     return (
@@ -175,13 +176,16 @@ function EventFields({ form, update, setForm }) {
     );
 }
 
-function ModalFooter({ onClose, onSubmit, isEdit }) {
+function ModalFooter({ onClose, onSubmit, isEdit, onDelete }) {
     return (
         <div className={styles.footer}>
-            <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-            <button className={styles.submitBtn} onClick={onSubmit}>
-                {isEdit ? "Save Changes" : "Add Announcement"}
-            </button>
+            {isEdit && <button className={styles.deleteBtn} onClick={onDelete}>Delete</button>}
+            <div className={styles.footerRight}>
+                <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
+                <button className={styles.submitBtn} onClick={onSubmit}>
+                    {isEdit ? "Save Changes" : "Add Announcement"}
+                </button>
+            </div>
         </div>
     );
 }
