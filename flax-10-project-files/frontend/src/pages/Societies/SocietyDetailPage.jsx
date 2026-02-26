@@ -76,7 +76,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onRequestRatification={handlers.requestRatification} />}
             {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={society.tags}
                 onClose={() => setEditingAnnouncement(null)}
-                onDelete={(id) => { handlers.deleteAnnouncement(id); setEditingAnnouncement(null); }}
+                onDelete={(id) => { handlers.deleteAnnouncement(id, editingAnnouncement.title); setEditingAnnouncement(null); }}
                 onSubmit={(data, conflict) => {
                     if (conflict) handlers.updateAnnouncement(conflict.id, { ...conflict, pinned: false });
                     if (data.id) handlers.updateAnnouncement(data.id, data);
