@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./SocietyDetailPage.module.css";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
+import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
 import SocietyHero from "../../components/Society/SocietyDetail/SocietyHero";
 import SocietyInfo from "../../components/Society/SocietyDetail/SocietyInfo";
 import SocietyTabs from "../../components/Society/SocietyDetail/tabs/SocietyTabs";
@@ -13,7 +14,7 @@ import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/annou
 
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
-    const { society, loading, error, updateSociety, members } = hookData;
+    const { society, loading, error, updateSociety, members, publishChanges } = hookData;
     const location = useLocation();
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || "calendar");
     const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
@@ -34,8 +35,9 @@ export default function SocietyDetailPage({ societyId, onBack }) {
         setFocusAnnouncementId(announcementId);
     };
 
-    const handleAnnouncementSave = (data, conflictingAnnouncement) => {
-        const { updateAnnouncement, addAnnouncement } = buildHandlers(hookData);
+    const handleToggleEditMode = async () => {
+        if (editMode) await publishChanges();
+        setEditMode(!editMode);
     };
 
     if (loading) return <div className={styles.page}>Loading...</div>;
@@ -43,7 +45,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 
     const canEdit = society.is_admin;
     const availablePhotos = getAvailablePhotos(society);
-    const handlers = buildHandlers(hookData);
+    const handlers = buildHandlers(hookData, editMode);
     const updateImages = (imgs) => updateSociety({ images: imgs, image: imgs[0] || null });
     const handleDelete = async () => { await handlers.deleteSociety(); onBack(); };
 
@@ -56,7 +58,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onEditImages={() => setShowCoverModal(true)} />
             <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
                 onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
-                canEdit={canEdit} onToggleEditMode={() => setEditMode(!editMode)} />
+                canEdit={canEdit} onToggleEditMode={handleToggleEditMode} />
             <MainContent activeTab={activeTab} setActiveTab={handleTabChange} society={society}
                 editMode={editMode} handlers={handlers} focusAnnouncementId={focusAnnouncementId}
                 onEditAnnouncement={setEditingAnnouncement} />
