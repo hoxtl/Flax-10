@@ -84,12 +84,12 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 
 function buildHandlers(hookData) {
     const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
+        addEvent, updateEvent, deleteEvent, addException, addTag, deleteTag, joinSociety, leaveSociety,
         deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
         requestRatification } = hookData;
     return {
         updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
+        addEvent, updateEvent, deleteEvent, addException, addTag, deleteTag, joinSociety, leaveSociety,
         deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
         requestRatification
     };
@@ -126,7 +126,7 @@ function NotFound({ onBack }) {
 function MainContent({ activeTab, setActiveTab, society, editMode, handlers, focusAnnouncementId, onEditAnnouncement }) {
     const tags = society.tags || [];
     const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
-    const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
+    const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent, onAddException: handlers.addException };
     const announcementHandlers = { onAdd: handlers.addAnnouncement, onUpdate: handlers.updateAnnouncement, onDelete: handlers.deleteAnnouncement };
     return (
         <div className={styles.mainContent}>
