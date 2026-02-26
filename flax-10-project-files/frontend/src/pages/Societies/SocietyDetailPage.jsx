@@ -15,6 +15,7 @@ import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/annou
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
     const { society, loading, error, updateSociety, members, publishChanges } = hookData;
+    const changeTracker = useChangeTracker();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || "calendar");
     const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
@@ -36,7 +37,10 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     };
 
     const handleToggleEditMode = async () => {
-        if (editMode) await publishChanges();
+        if (editMode && changeTracker.hasChanges()) {
+            await publishChanges(changeTracker.getChangeSummary());
+            changeTracker.resetChanges();
+        }
         setEditMode(!editMode);
     };
 
@@ -45,7 +49,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 
     const canEdit = society.is_admin;
     const availablePhotos = getAvailablePhotos(society);
-    const handlers = buildHandlers(hookData, editMode);
+    const handlers = buildHandlers(hookData, editMode, changeTracker);
     const updateImages = (imgs) => updateSociety({ images: imgs, image: imgs[0] || null });
     const handleDelete = async () => { await handlers.deleteSociety(); onBack(); };
 
@@ -84,16 +88,68 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     );
 }
 
-function buildHandlers(hookData) {
+function buildHandlers(hookData, editMode, changeTracker) {
     const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent, addException, addTag, deleteTag, joinSociety, leaveSociety,
         deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
         requestRatification } = hookData;
+    const { trackEvent, trackAnnouncement } = changeTracker;
     return {
-        updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addException, addTag, deleteTag, joinSociety, leaveSociety,
-        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
-        requestRatification
+        updateSociety, addTag, deleteTag, joinSociety, leaveSociety, deleteSociety,
+        fetchMembers, updateMemberRole, removeMember, addCollaborator, requestRatification,
+        addEvent: wrapAddEvent(addEvent, editMode, trackEvent),
+        updateEvent: wrapUpdateEvent(updateEvent, editMode, trackEvent),
+        deleteEvent: wrapDeleteEvent(deleteEvent, editMode, trackEvent),
+        addException: (eventId, date) => addException(eventId, date, editMode),
+        addAnnouncement: wrapAddAnnouncement(addAnnouncement, editMode, trackAnnouncement),
+        updateAnnouncement: wrapUpdateAnnouncement(updateAnnouncement, editMode, trackAnnouncement),
+        deleteAnnouncement: wrapDeleteAnnouncement(deleteAnnouncement, editMode, trackAnnouncement)
+    };
+}
+
+function wrapAddEvent(addEvent, silent, track) {
+    return async (data) => {
+        const result = await addEvent(data, silent);
+        if (silent) track('Added', data.title);
+        return result;
+    };
+}
+
+function wrapUpdateEvent(updateEvent, silent, track) {
+    return async (eventId, data) => {
+        const result = await updateEvent(eventId, data, silent);
+        if (silent) track('Updated', data.title);
+        return result;
+    };
+}
+
+function wrapDeleteEvent(deleteEvent, silent, track) {
+    return async (eventId, title = 'Event') => {
+        await deleteEvent(eventId, silent);
+        if (silent) track('Deleted', title);
+    };
+}
+
+function wrapAddAnnouncement(addAnnouncement, silent, track) {
+    return async (data) => {
+        const result = await addAnnouncement(data, silent);
+        if (silent) track('Added', data.title);
+        return result;
+    };
+}
+
+function wrapUpdateAnnouncement(updateAnnouncement, silent, track) {
+    return async (announcementId, data) => {
+        const result = await updateAnnouncement(announcementId, data, silent);
+        if (silent) track('Updated', data.title);
+        return result;
+    };
+}
+
+function wrapDeleteAnnouncement(deleteAnnouncement, silent, track) {
+    return async (announcementId, title = 'Announcement') => {
+        await deleteAnnouncement(announcementId, silent);
+        if (silent) track('Deleted', title);
     };
 }
 
