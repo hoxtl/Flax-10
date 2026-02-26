@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
-import { Sparkles, CalendarClock } from "lucide-react";
+import { Sparkles, CalendarClock, RotateCw, Pencil } from "lucide-react";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import {
@@ -43,21 +43,28 @@ function taskDurationMins(task) {
   return (task.estimated_blocks || 1) * 25;
 }
 
-/** Returns tasks that fit in gapMinutes (duration <= gap), sorted by urgency. */
+/** Returns tasks that fit in gapMinutes. Prioritizes tasks due within 48 hours, then by urgency/overdue. */
 function getTasksThatFitGap(tasks, gapMinutes) {
   if (!tasks?.length || gapMinutes < 25) return { suggested: null, top3: [] };
   const now = new Date();
+  const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
   const fits = (t) => taskDurationMins(t) <= gapMinutes;
-  const byUrgency = (a, b) => {
-    const aOverdue = a.due_date && new Date(a.due_date) < now;
-    const bOverdue = b.due_date && new Date(b.due_date) < now;
+  const bySmartScheduler = (a, b) => {
+    const aDue = a.due_date ? new Date(a.due_date) : null;
+    const bDue = b.due_date ? new Date(b.due_date) : null;
+    const aIn48 = aDue && aDue <= in48h;
+    const bIn48 = bDue && bDue <= in48h;
+    if (aIn48 && !bIn48) return -1;
+    if (!aIn48 && bIn48) return 1;
+    const aOverdue = aDue && aDue < now;
+    const bOverdue = bDue && bDue < now;
     if (aOverdue && !bOverdue) return -1;
     if (!aOverdue && bOverdue) return 1;
-    if (a.due_date && b.due_date) return new Date(a.due_date) - new Date(b.due_date);
+    if (aDue && bDue) return aDue - bDue;
     const p = { urgent: 0, high: 1, medium: 2, low: 3 };
     return (p[a.priority] ?? 2) - (p[b.priority] ?? 2);
   };
-  const filtered = tasks.filter(fits).sort(byUrgency);
+  const filtered = tasks.filter(fits).sort(bySmartScheduler);
   return { suggested: filtered[0] || null, top3: filtered.slice(0, 3) };
 }
 
@@ -1983,7 +1990,7 @@ function MiniTimeline({
                 <div className={styles.planTimelineTinyGapLineWrap}>
                   <div className={styles.planTimelineTinyGapLine} aria-hidden />
                   <span className={styles.planTimelineTinyGapMicroBreak}>
-                    ☕ {mins}m Reset: Perfect for a quick walk or water break.
+                    {mins}m reset
                   </span>
                 </div>
               </div>
@@ -1997,8 +2004,8 @@ function MiniTimeline({
                 </div>
                 <div className={styles.planTimelineSpineCell} aria-hidden />
                 <div className={styles.planTimelineNowWrap}>
-                  <span className={styles.planTimelineNowLine} aria-hidden />
                   <span className={styles.planTimelineNowTag}>NOW</span>
+                  <span className={styles.planTimelineNowLine} aria-hidden />
                 </div>
               </div>
             );
@@ -2008,13 +2015,11 @@ function MiniTimeline({
               ? `${Math.floor(row.minutes / 60)}h ${row.minutes % 60 ? `${row.minutes % 60}m` : ""}`.trim()
               : `${row.minutes}m`;
             const { suggested: suggestedTask, top3: top3Tasks } = getTasksThatFitGap(suggestableTasks || [], row.minutes);
-            const getModuleOrListLabel = (task) =>
-              task?.module_code || (taskLists || []).find((l) => String(l.id) === String(task?.task_list))?.name || "tasks";
             const gapStartDate = getGapStartDate(row.gapStartMins);
             const showSlotPopover = slotPopoverRowId === row.id;
             const cardLabel = suggestedTask
-              ? `✨ ${durationStr} Focus Window. Perfect for: ${suggestedTask.title} from your ${getModuleOrListLabel(suggestedTask)} list.`
-              : `✨ ${durationStr} Focus Window. Use this time intentionally.`;
+              ? `Time to finish: ${suggestedTask.title}`
+              : `${durationStr} focus window`;
             return (
               <div
                 key={row.id}
@@ -2028,35 +2033,40 @@ function MiniTimeline({
                   </span>
                 </div>
                 <div className={styles.planTimelineSpineCell}>
-                  <span className={styles.planTimelineNode} aria-hidden>✨</span>
+                  <span className={styles.planTimelineNode} aria-hidden />
                 </div>
                 <div
                   className={`${styles.planTimelineFreeWindow} ${styles.planTimelineFreeWindowDashed}`}
                   ref={showSlotPopover ? slotPopoverRef : undefined}
                 >
-                  <span className={styles.planTimelineFreeWindowEmoji} aria-hidden>✨</span>
-                  <span className={styles.planTimelineFreeWindowDuration} title={cardLabel}>
-                    {cardLabel}
-                  </span>
+                  {suggestedTask ? (
+                    <span className={styles.planTimelineGapRecommendation} title={suggestedTask.title}>
+                      You could finish: <strong>{suggestedTask.title}</strong>
+                    </span>
+                  ) : (
+                    <span className={styles.planTimelineFreeWindowDuration} title={cardLabel}>
+                      {durationStr} focus window
+                    </span>
+                  )}
                   {onQuickStart && (
                     <div className={styles.planTimelineFreeWindowActions}>
                       <button
                         type="button"
-                        className={styles.planTimelineFreeBtn}
+                        className={styles.planTimelineFreeBtnQuickSlot}
                         onClick={(e) => {
                           e.stopPropagation();
                           setSlotPopoverRowId((id) => (id === row.id ? null : row.id));
                         }}
-                        aria-label="Slot a task into this window"
-                        aria-expanded={showSlotPopover}
+                        aria-label="Choose a task to slot"
+                        title="Slot task"
                       >
-                        + Slot Task
+                        +
                       </button>
                     </div>
                   )}
                   {showSlotPopover && top3Tasks.length > 0 && (
                     <div className={styles.planTimelineSlotPopover}>
-                      <div className={styles.planTimelineSlotPopoverTitle}>Tasks that fit this window</div>
+                      <div className={styles.planTimelineSlotPopoverTitle}>Slot a task</div>
                       {top3Tasks.map((t) => (
                         <button
                           key={t.id ?? t.title}
@@ -2070,7 +2080,7 @@ function MiniTimeline({
                         >
                           <span className={styles.planTimelineSlotPopoverItemTitle} title={t.title}>{t.title}</span>
                           <span className={styles.planTimelineSlotPopoverItemMeta}>
-                            {(t.estimated_blocks || 1) * 25}m · {getModuleOrListLabel(t)}
+                            {(t.estimated_blocks || 1) * 25}m
                           </span>
                         </button>
                       ))}
@@ -2078,7 +2088,8 @@ function MiniTimeline({
                   )}
                   {showSlotPopover && top3Tasks.length === 0 && (
                     <div className={styles.planTimelineSlotPopover}>
-                      <div className={styles.planTimelineSlotPopoverEmpty}>No tasks fit this window. Try a shorter task or add one.</div>
+                      <div className={styles.planTimelineSlotPopoverTitle}>Slot a task</div>
+                      <div className={styles.planTimelineSlotPopoverEmpty}>No tasks fit this window.</div>
                     </div>
                   )}
                 </div>
@@ -2164,13 +2175,15 @@ function MiniTimeline({
                         </div>
                         {showConflictPopover && (
                           <div className={styles.planTimelineConflictPopover}>
-                            <div className={styles.planTimelineConflictPopoverTitle}>
-                              {nextFreeRow ? `Move to ${formatTime(getGapStartDate(nextFreeRow.gapStartMins).toISOString())} free window?` : "Time Conflict"}
-                            </div>
+                            <div className={styles.planTimelineConflictPopoverTitle}>Resolve conflict</div>
                             <button type="button" className={styles.planTimelineConflictPopoverBtn} onClick={() => { if (nextFreeRow && onConflictAutoMove) { const start = getGapStartDate(nextFreeRow.gapStartMins); const end = new Date(start.getTime() + durationMins * 60000); onConflictAutoMove(item, start, end); setConflictPopoverRowId(null); } }} disabled={!nextFreeRow}>
-                              {nextFreeRow ? "Confirm" : "No free window"}
+                              <RotateCw size={14} strokeWidth={2} aria-hidden />
+                              <span>{nextFreeRow ? "Auto-Reschedule to Next Gap" : "No free window"}</span>
                             </button>
-                            <button type="button" className={styles.planTimelineConflictPopoverBtn} onClick={() => { onEdit?.(item, item.tag); setConflictPopoverRowId(null); }}>Edit Time</button>
+                            <button type="button" className={styles.planTimelineConflictPopoverBtn} onClick={() => { onEdit?.(item, item.tag); setConflictPopoverRowId(null); }}>
+                              <Pencil size={14} strokeWidth={2} aria-hidden />
+                              <span>Manually Adjust</span>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -2285,11 +2298,7 @@ function MiniTimeline({
               </div>
               {showConflictPopover && (
                 <div className={styles.planTimelineConflictPopover}>
-                  <div className={styles.planTimelineConflictPopoverTitle}>
-                    {nextFreeRow
-                      ? `Move this to your ${formatTime(getGapStartDate(nextFreeRow.gapStartMins).toISOString())} Free Window?`
-                      : "Time Conflict"}
-                  </div>
+                  <div className={styles.planTimelineConflictPopoverTitle}>Resolve conflict</div>
                   <button
                     type="button"
                     className={styles.planTimelineConflictPopoverBtn}
@@ -2303,14 +2312,16 @@ function MiniTimeline({
                     }}
                     disabled={!nextFreeRow}
                   >
-                    {nextFreeRow ? "Confirm" : "No free window"}
+                    <RotateCw size={14} strokeWidth={2} aria-hidden />
+                    <span>{nextFreeRow ? "Auto-Reschedule to Next Gap" : "No free window"}</span>
                   </button>
                   <button
                     type="button"
                     className={styles.planTimelineConflictPopoverBtn}
                     onClick={() => { onEdit?.(item, item.tag); setConflictPopoverRowId(null); }}
                   >
-                    Edit Time
+                    <Pencil size={14} strokeWidth={2} aria-hidden />
+                    <span>Manually Adjust</span>
                   </button>
                 </div>
               )}
@@ -2525,9 +2536,9 @@ export default function Homepage({ onNavigate }) {
     return () => window.removeEventListener("focus", read);
   }, []);
 
-  /* Live Laser: real-time 'Now' marker — updates every 30s so the line moves down the timeline */
+  /* Live Compass: recalc every 60s so the NOW line moves without refresh */
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30000);
+    const id = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(id);
   }, []);
 
@@ -3154,114 +3165,89 @@ export default function Homepage({ onNavigate }) {
       .slice(0, 8);
   }, [selectedDate, filteredTasksDueToday, getTag]);
 
-  /** Today's Action Hub: tasks (to-do only, no routine) + major academic/work events only; sorted by time; excludes routine (meals, sleep, commute). */
+  /** Today's Action Hub: task-only. Only tasks due today or tomorrow—no entire week, no later dates. */
   const actionHubList = useMemo(() => {
     if (!isToday(selectedDate)) return [];
     const now = new Date();
-    const todayEnd = new Date(now);
-    todayEnd.setHours(23, 59, 59, 999);
+    const dayStart = new Date(selectedDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(selectedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+    const tomorrowStart = new Date(dayStart);
+    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    const tomorrowEnd = new Date(tomorrowStart);
+    tomorrowEnd.setHours(23, 59, 59, 999);
+    const isDueToday = (t) => {
+      const d = t.due_date ? new Date(t.due_date) : null;
+      return d && d >= dayStart && d <= dayEnd;
+    };
+    const isDueTomorrow = (t) => {
+      const d = t.due_date ? new Date(t.due_date) : null;
+      return d && d >= tomorrowStart && d <= tomorrowEnd;
+    };
 
-    const tasks = (filteredTasksDueToday || [])
-      .filter((t) => !isRoutineOrEventTask(t, getTag))
+    const tasks = (allTasks || [])
+      .filter(
+        (t) =>
+          !t.completed &&
+          !isRoutineOrEventTask(t, getTag) &&
+          (isDueToday(t) || isDueTomorrow(t))
+      )
       .map((t) => {
         const due = t.due_date ? new Date(t.due_date) : null;
-        const isOverdue = !t.completed && due && due < now;
+        const isOverdue = due && due < now;
         let actionHubStatus = "upcoming";
         if (t.completed) actionHubStatus = "completed";
         else if (isOverdue) actionHubStatus = "overdue";
         return {
           type: "task",
           id: `task-${t.id}`,
-          sortTime: due || todayEnd,
-          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : todayEnd,
+          sortTime: due || dayEnd,
+          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : dayEnd,
           isOverdue,
           actionHubStatus,
           ...t,
         };
       });
 
-    const futureTasks = tasks.filter(
-      (t) => !t.completed && t.sortTime >= now && t.sortTime <= todayEnd
-    );
+    const futureTasks = tasks.filter((t) => t.sortTime >= now && t.sortTime <= dayEnd);
     const nowTask = futureTasks.sort(
       (a, b) => new Date(a.sortTime).getTime() - new Date(b.sortTime).getTime()
     )[0];
     if (nowTask) nowTask.actionHubStatus = "now";
 
-    const events = (sortedEvents || [])
-      .filter(isMajorAcademicOrWorkEvent)
-      .map((e) => {
-        const start = e.start_time ? new Date(e.start_time) : null;
-        const end = e.end_time ? new Date(e.end_time) : null;
-        const isPast = end ? end < now : start ? start < now : false;
-        return {
-          type: "event",
-          id: `event-${e.id}`,
-          sortTime: start || now,
-          endTime: end || start || now,
-          isPast,
-          title: e.title,
-          start_time: e.start_time,
-          end_time: e.end_time,
-          location: e.location,
-          link: e.link || e.url,
-          ...e,
-        };
-      });
+    const remaining = tasks.filter((t) => !t.completed);
+    const done = tasks.filter((t) => t.completed);
+    const sorted = [...remaining, ...done];
+    return sorted;
+  }, [selectedDate, allTasks, getTag]);
 
-    const sorted = [...tasks, ...events].sort((a, b) => {
-      const aFirst = a.isOverdue ? 0 : 1;
-      const bFirst = b.isOverdue ? 0 : 1;
-      if (aFirst !== bFirst) return aFirst - bFirst;
-      return new Date(a.sortTime).getTime() - new Date(b.sortTime).getTime();
-    });
-
-    /* Partition: remaining first, then done so completed tasks move to bottom. */
-    const remaining = sorted.filter(
-      (i) => (i.type === "task" && !i.completed) || (i.type === "event" && !i.isPast)
-    );
-    const done = sorted.filter(
-      (i) => (i.type === "task" && i.completed) || (i.type === "event" && i.isPast)
-    );
-    const sortedWithDoneAtBottom = [...remaining, ...done];
-
-    const withGaps = [];
-    for (let i = 0; i < sortedWithDoneAtBottom.length; i++) {
-      if (i > 0) {
-        const prev = sortedWithDoneAtBottom[i - 1];
-        const curr = sortedWithDoneAtBottom[i];
-        const prevEnd = prev.endTime ? new Date(prev.endTime).getTime() : new Date(prev.sortTime).getTime();
-        const currStart = new Date(curr.sortTime).getTime();
-        const gapMins = (currStart - prevEnd) / 60000;
-        if (gapMins >= 30) {
-          withGaps.push({ type: "gap", id: `gap-${i}`, durationMins: Math.round(gapMins) });
-        }
-      }
-      withGaps.push(sortedWithDoneAtBottom[i]);
-    }
-    return withGaps;
-  }, [selectedDate, filteredTasksDueToday, sortedEvents, getTag]);
-
-  /** Show Zen when no items or all done (ignore gap items for done count). */
+  /** Task-only: no events. */
   const actionHubItemsOnly = useMemo(
-    () => actionHubList.filter((i) => i.type === "task" || i.type === "event"),
+    () => actionHubList.filter((i) => i.type === "task"),
     [actionHubList]
   );
   const actionHubAllDone = useMemo(
     () =>
       actionHubItemsOnly.length === 0 ||
-      actionHubItemsOnly.every((i) => (i.type === "task" ? i.completed : i.isPast)),
+      actionHubItemsOnly.every((i) => i.completed),
     [actionHubItemsOnly]
   );
   const actionHubCompletedCount = useMemo(
-    () => actionHubItemsOnly.filter((i) => (i.type === "task" ? i.completed : i.isPast)).length,
+    () => actionHubItemsOnly.filter((i) => i.completed).length,
     [actionHubItemsOnly]
   );
   const actionHubSpineCompletedPct =
     actionHubItemsOnly.length > 0 ? (actionHubCompletedCount / actionHubItemsOnly.length) * 100 : 0;
-  const actionHubRemainingCount = actionHubItemsOnly.filter(
-    (i) => (i.type === "task" && !i.completed) || (i.type === "event" && !i.isPast)
-  ).length;
+  const actionHubRemainingCount = actionHubItemsOnly.filter((i) => !i.completed).length;
+
+  /** Focus hours: task-based (estimated work for hub tasks only). */
+  const actionHubFocusHours = useMemo(() => {
+    const totalMins = actionHubList
+      .filter((t) => !t.completed)
+      .reduce((acc, t) => acc + (t.estimated_blocks || 1) * 25, 0);
+    return totalMins / 60;
+  }, [actionHubList]);
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
   const [replanLoading, setReplanLoading] = useState(false);
@@ -3401,9 +3387,8 @@ export default function Homepage({ onNavigate }) {
   }, [selectedDate, sortedEvents]);
 
   /** Aliases for legacy/cached references (actionHubFocusWindowMinutes, actionHubReadItem). */
-  const actionHubFocusWindowMinutes = planTimelineFocusWindowMinutes;
+  const actionHubFocusWindowMinutes = actionHubFocusHours * 60;
   const actionHubReadItem = planTimelineReadItem;
-  const actionHubFocusHours = planTimelineFocusWindowMinutes / 60;
 
   const prevSeedsCountRef = useRef(seedsCountFromTasks);
   const [seedsBounce, setSeedsBounce] = useState(false);
@@ -3692,17 +3677,15 @@ export default function Homepage({ onNavigate }) {
             <div className={styles.actionHub} ref={actionHubRef}>
               <div className={styles.actionHubHeaderRow}>
                 <h3 className={styles.actionHubTitle}>Today&apos;s Action Hub</h3>
-                {!actionHubAllDone && (
-                  <Link to="/tasks" className={styles.actionHubHeaderLink}>
-                    Manage all tasks →
-                  </Link>
-                )}
+                <Link to="/tasks" className={styles.actionHubHeaderLink}>
+                  Manage all tasks →
+                </Link>
               </div>
-              {isToday(selectedDate) && (actionHubFocusHours > 0 || actionHubRemainingCount > 0) && (
-                <div className={styles.actionHubStatusBar}>
+              {isToday(selectedDate) && (
+                <div className={styles.actionHubPerformanceHeader}>
                   <div className={styles.actionHubStatusPill}>
                     <span className={styles.actionHubStatusStat}>
-                      {actionHubFocusHours < 1 ? `${Math.round(planTimelineFocusWindowMinutes)} min` : `${actionHubFocusHours.toFixed(1)}h`} focused work
+                      {actionHubFocusHours < 1 ? `${Math.round(actionHubFocusWindowMinutes)} min` : `${actionHubFocusHours.toFixed(1)}h`} focus
                     </span>
                     <span className={styles.actionHubStatusDivider} aria-hidden>·</span>
                     <span className={styles.actionHubStatusStat}>
@@ -3715,6 +3698,9 @@ export default function Homepage({ onNavigate }) {
                       style={{ width: `${actionHubSpineCompletedPct}%` }}
                     />
                   </div>
+                  <p className={styles.actionHubMomentumLabel} aria-hidden>
+                    Focus Momentum: {Math.round(actionHubSpineCompletedPct)}% of today&apos;s goals reached.
+                  </p>
                 </div>
               )}
               {!actionHubAllDone && actionHubItemsOnly.length > 0 ? (
@@ -3734,46 +3720,6 @@ export default function Homepage({ onNavigate }) {
                   </div>
                   <motion.ul className={styles.actionHubCardList} layout>
                     {actionHubList.map((item) => {
-                      if (item.type === "gap") {
-                        const hrs = Math.floor(item.durationMins / 60);
-                        const mins = item.durationMins % 60;
-                        const label = hrs > 0 ? `${hrs}h ${mins}m` : `${item.durationMins}m`;
-                        return (
-                          <motion.li key={item.id} className={styles.actionHubGapRow} aria-hidden layout>
-                            <span className={styles.actionHubGapText}>✨ {label} Focus Gap</span>
-                          </motion.li>
-                        );
-                      }
-                      if (item.type === "event") {
-                        const isPast = item.isPast;
-                        const timeStr = item.start_time ? formatTime(item.start_time) : "";
-                        const endStr = item.end_time && item.end_time !== item.start_time ? ` – ${formatTime(item.end_time)}` : "";
-                        return (
-                          <motion.li
-                            key={item.id}
-                            layout
-                            className={`${styles.actionHubCard} ${styles.actionHubCardEvent} ${isPast ? styles.actionHubCardCompleted : ""}`}
-                          >
-                            <div className={styles.actionHubCardPillWrap} />
-                            <div className={styles.actionHubCardBody}>
-                              <div className={styles.actionHubCardRow}>
-                                <span className={styles.actionHubEventIcon} aria-hidden title="Academic/Work">📚</span>
-                                {(item.location || item.link) && (
-                                  <span className={styles.actionHubEventLocation}>
-                                    {item.link ? (
-                                      <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.actionHubEventLink}>Link</a>
-                                    ) : (
-                                      item.location
-                                    )}
-                                  </span>
-                                )}
-                                <span className={styles.actionHubCardTitle} title={item.title}>{item.title}</span>
-                              </div>
-                            </div>
-                          </motion.li>
-                        );
-                      }
-
                       const t = item;
                       const isOverdue = t.actionHubStatus === "overdue";
                       const isNow = t.actionHubStatus === "now";
@@ -3827,24 +3773,23 @@ export default function Homepage({ onNavigate }) {
                                       transition={{ duration: 1, ease: "easeOut" }}
                                       aria-hidden
                                     >
-                                      +{floatingSeedXp} XP
+                                      +50 XP
                                     </motion.span>
                                   )}
                                 </button>
                               )}
                               {t.completed && <span className={styles.actionHubCardDone} aria-hidden>✓</span>}
-                              <span className={styles.actionHubCardTitle} title={t.title}>{t.title}</span>
-                              {!t.completed && isOverdue && (
-                                <button
-                                  type="button"
-                                  className={styles.actionHubReschedule}
-                                  onClick={(e) => { e.stopPropagation(); setRescheduleTask(t); }}
-                                  aria-label={`Reschedule ${t.title}`}
-                                  title="Reschedule"
-                                >
-                                  Reschedule
-                                </button>
+                              {(t.priority === "urgent") && !t.completed && (
+                                <span className={styles.actionHubUrgentDot} aria-hidden title="Urgent" />
                               )}
+                              <span
+                                className={`${styles.actionHubCardTitle} ${
+                                  !t.completed && t.priority === "high" ? styles.actionHubCardTitleHigh : ""
+                                } ${!t.completed && (t.priority === "low" || t.priority === "medium") ? styles.actionHubCardTitleLow : ""}`}
+                                title={t.title}
+                              >
+                                {t.title}
+                              </span>
                             </div>
                           </div>
                         </motion.li>
@@ -3857,7 +3802,8 @@ export default function Homepage({ onNavigate }) {
                   <ZenGardenEmptyState
                     displayName={displayName}
                     sub={null}
-                    message="The slate is clean. You've mastered your momentum for now. ✨"
+                    message="The garden is tended. You're all caught up for today."
+                    illustrationVariant="seedling"
                     action={
                       <Link to="/tasks" className={styles.actionHubLink}>
                         Manage all tasks →

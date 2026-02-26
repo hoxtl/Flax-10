@@ -405,8 +405,10 @@
   .actionHub {
     position: relative;
     border-radius: 12px;
-    border: 1px solid rgba(210, 180, 140, 0.2);
-    background: #F9F8F6;
+    border: 0.5px solid rgba(107, 83, 68, 0.2);
+    background: rgba(249, 248, 246, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     padding: 14px 14px 14px 20px;
     min-width: 0;
@@ -476,8 +478,69 @@
     text-decoration: underline;
     color: #5D4037;
   }
+  .actionHubPerformanceHeader {
+    margin-bottom: 14px;
+    padding-bottom: 0;
+  }
+  .actionHubPerformanceHeader .actionHubStatusPill {
+    background: rgba(238, 220, 130, 0.22);
+    border: 1px solid rgba(210, 180, 140, 0.45);
+    color: #2D2D2D;
+    margin-bottom: 0;
+  }
+  .actionHubPerformanceHeader .actionHubProgressTrack {
+    height: 4px;
+    margin-top: 8px;
+    margin-bottom: 6px;
+    border-radius: 2px;
+  }
+  .actionHubPerformanceHeader .actionHubProgressFill {
+    border-radius: 2px;
+  }
+  .actionHubPerformanceHeader .actionHubProgressLabel {
+    display: none;
+  }
   .actionHubStatusBar {
     margin-bottom: 12px;
+  }
+  .actionHubProgressTrack {
+    height: 28px;
+    margin-top: 0;
+    margin-bottom: 6px;
+    background: rgba(210, 180, 140, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .actionHubProgressFill {
+    height: 100%;
+    background: var(--restoration-sage, #84A98C);
+    border-radius: 8px;
+    transition: width 0.35s ease;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+  }
+  .actionHubProgressLabel {
+    position: relative;
+    z-index: 1;
+    padding: 0 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--restoration-charcoal, #2d352d);
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+  }
+  .actionHubMomentumLabel {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--home-text-meta, #6b7280);
+    margin: 0 0 8px;
+    text-align: center;
   }
   .actionHubStatusPill {
     display: inline-flex;
@@ -503,19 +566,6 @@
   .actionHubStatusDivider {
     color: rgba(107, 83, 68, 0.4);
     font-weight: 400;
-  }
-  .actionHubProgressTrack {
-    height: 3px;
-    margin-top: 8px;
-    background: rgba(210, 180, 140, 0.2);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .actionHubProgressFill {
-    height: 100%;
-    background: var(--restoration-sage, #84A98C);
-    border-radius: 2px;
-    transition: width 0.35s ease;
   }
   .actionHubDailyEnergy {
     font-size: 0.72rem;
@@ -572,19 +622,21 @@
   }
   .actionHubCard {
     position: relative;
-    background: #F9F8F6;
-    border-radius: 8px;
-    border: 1px solid rgba(210, 180, 140, 0.12);
-    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 0.5px solid rgba(107, 83, 68, 0.25);
+    padding: 10px 14px;
     min-height: 0;
     border-left-width: 4px;
     border-left-style: solid;
-    transition: box-shadow 0.25s ease, border-color 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.25s ease, border-color 0.2s ease, transform 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 0 -2px rgba(0, 0, 0, 0.03);
   }
   .actionHubCard:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-    border-color: rgba(210, 180, 140, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 6px 0 -2px rgba(0, 0, 0, 0.04);
+    border-color: rgba(107, 83, 68, 0.3);
   }
   .actionHubCardBorderSage {
     border-left-color: rgba(132, 169, 140, 0.55);
@@ -667,12 +719,17 @@
     border-left-color: rgba(180, 160, 120, 0.45);
   }
   .actionHubCardCompleted {
-    opacity: 0.9;
+    opacity: 1;
     border-left-color: rgba(132, 169, 140, 0.6);
+    transform: scale(0.98);
   }
   .actionHubCardCompleted:hover {
-    border-color: rgba(210, 180, 140, 0.25);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border-color: rgba(107, 83, 68, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 0 -2px rgba(0, 0, 0, 0.03);
+  }
+  .actionHubCardCompleted .actionHubCardTitle {
+    text-decoration: line-through;
+    opacity: 0.4;
   }
   .actionHubCardTime {
     margin-top: 10px;
@@ -716,9 +773,11 @@
     color: var(--restoration-sage, #52796f);
     font-weight: 700;
   }
-  /* Event cards: soft cream, time at bottom */
+  /* Event cards: glass, 12px radius */
   .actionHubCardEvent {
-    background: #F9F8F6;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-left-color: rgba(180, 160, 120, 0.5);
   }
   .actionHubCardEvent .actionHubCardTitle {
@@ -792,8 +851,9 @@
   }
   .actionHubCardPillWrap {
     position: absolute;
-    top: 14px;
+    top: 50%;
     right: 16px;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -845,6 +905,30 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: opacity 0.25s ease, text-decoration 0.25s ease;
+  }
+  .actionHubCardTitleHigh {
+    color: var(--restoration-earth, #6B5344);
+    font-weight: 700;
+  }
+  .actionHubCardTitleLow {
+    color: var(--home-text-meta, #9ca3af);
+    font-weight: 500;
+  }
+  .actionHubUrgentDot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(232, 120, 100, 0.95);
+    flex-shrink: 0;
+    margin-right: 6px;
+    box-shadow: 0 0 8px 2px rgba(232, 120, 100, 0.5);
+    animation: actionHubUrgentDotGlow 2s ease-in-out infinite;
+  }
+  @keyframes actionHubUrgentDotGlow {
+    0%, 100% { box-shadow: 0 0 8px 2px rgba(232, 120, 100, 0.5); opacity: 1; }
+    50% { box-shadow: 0 0 12px 4px rgba(232, 120, 100, 0.7); opacity: 0.9; }
   }
   .actionHubCaughtUp {
     margin: 0;
@@ -857,13 +941,19 @@
     position: absolute;
     left: 50%;
     bottom: 100%;
+    margin-bottom: 2px;
     transform: translateX(-50%);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 700;
-    color: var(--flax-gold, #c4a35a);
+    color: var(--restoration-sage, #87A96B);
     pointer-events: none;
     white-space: nowrap;
-    text-shadow: 0 0 6px rgba(196, 163, 90, 0.4);
+    text-shadow: 0 0 6px rgba(135, 169, 107, 0.4);
+    animation: actionHubFloatingXpUp 1s ease-out forwards;
+  }
+  @keyframes actionHubFloatingXpUp {
+    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-28px); }
   }
   .actionHubList {
     list-style: none;
@@ -2959,20 +3049,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  /* Live Laser: horizontal Flax-Gold line at current time, moves in real-time */
+  /* Live Compass: hairline 1px Flax-Gold line, tight glow; NOW = 6pt monospace left of spine */
   .planTimelineNowLine {
-    height: 2.5px;
+    height: 1px;
     width: 100%;
     background: var(--restoration-flax, #EEDC82);
     flex: 1;
     min-width: 24px;
     border-radius: 0;
-    box-shadow: 0 0 0 1px rgba(238, 220, 130, 0.5), 0 0 8px 0 rgba(238, 220, 130, 0.25);
+    box-shadow: 0 0 0 1px rgba(238, 220, 130, 0.25), 0 0 6px 1px rgba(238, 220, 130, 0.15);
   }
   .planTimelineNowWrap {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     grid-column: 3;
     margin-left: 0;
@@ -2980,18 +3070,19 @@
   }
   .planTimelineNowWrap::before {
     content: "";
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: var(--restoration-flax, #EEDC82);
     flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.95);
+    box-shadow: 0 0 0 1px rgba(249, 248, 246, 0.95), 0 0 4px rgba(238, 220, 130, 0.2);
   }
   .planTimelineNowTag {
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+    font-size: 8px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     color: var(--restoration-earth, #6B5344);
     flex-shrink: 0;
   }
@@ -3017,6 +3108,11 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     z-index: 1;
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    animation: planTimelineCardPop 0.2s ease-out both;
+  }
+  @keyframes planTimelineCardPop {
+    0% { opacity: 0.7; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
   }
   .planTimelineCard:hover {
     border-color: rgba(229, 228, 226, 0.9);
@@ -3053,6 +3149,7 @@
     color: var(--home-text-meta, #9ca3af);
     letter-spacing: 0.02em;
     flex-shrink: 0;
+    opacity: 0.6;
   }
   .planTimelineCardTitle {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
@@ -3082,6 +3179,7 @@
     grid-row: 1;
     align-self: center;
     flex-shrink: 0;
+    opacity: 0.6;
   }
   .planTimelineCardNow {
     background: rgba(132, 169, 140, 0.08);
@@ -3092,7 +3190,8 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(132, 169, 140, 0.18);
   }
   .planTimelineCardPast {
-    opacity: 0.5;
+    opacity: 0.35;
+    filter: grayscale(0.8);
   }
   .planTimelineCardOverlap {
     border-color: #E5E4E2;
@@ -3113,10 +3212,13 @@
     gap: 8px;
     width: 100%;
     min-width: 0;
+    overflow: hidden;
   }
   .planTimelineConflictCardWrap {
-    flex: 1 1 50%;
+    flex: 1 1 0;
     min-width: 0;
+    max-width: 50%;
+    overflow: hidden;
     position: relative;
   }
   .planTimelineTimeConflictBadge {
@@ -3187,6 +3289,7 @@
     border-radius: 4px;
     background: rgba(0, 0, 0, 0.06);
     color: var(--home-text-meta, #9ca3af);
+    opacity: 0.6;
   }
   .planTimelineConflictPopover {
     position: absolute;
@@ -3195,35 +3298,39 @@
     right: 0;
     margin-top: 6px;
     padding: 10px 12px;
-    background: #FBF9F5;
-    border: 1px solid rgba(210, 180, 140, 0.4);
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    background: #F9F8F6;
+    border: 1px solid rgba(210, 180, 140, 0.55);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
     z-index: 20;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
   .planTimelineConflictPopoverTitle {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: #2D2D2D;
-    margin: 0;
+    margin: 0 0 2px;
   }
   .planTimelineConflictPopoverBtn {
-    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(93, 64, 55, 0.3);
-    background: #fff;
+    border: 1px solid rgba(93, 64, 55, 0.25);
+    background: #F9F8F6;
     color: #5D4037;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     text-align: left;
-    transition: background 0.15s;
+    transition: background 0.15s, border-color 0.15s;
   }
   .planTimelineConflictPopoverBtn:hover:not(:disabled) {
-    background: rgba(210, 180, 140, 0.15);
+    background: rgba(210, 180, 140, 0.2);
+    border-color: rgba(107, 83, 68, 0.4);
   }
   .planTimelineConflictPopoverBtn:disabled {
     opacity: 0.6;
@@ -3335,13 +3442,15 @@
   }
   .planTimelineFreeWindowDashed:hover {
     background: rgba(250, 249, 246, 0.85);
-    border-color: rgba(132, 169, 140, 0.3);
+    border-color: rgba(132, 169, 140, 0.4);
+    animation: planTimelineGapPulse 2s ease-in-out infinite;
+  }
+  @keyframes planTimelineGapPulse {
+    0%, 100% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.25); }
+    50% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.5), 0 0 8px rgba(132, 169, 140, 0.15); }
   }
   .planTimelineFreeWindowEmoji {
-    font-size: 0.9rem;
-    line-height: 1;
-    flex-shrink: 0;
-    opacity: 0.7;
+    display: none;
   }
   .planTimelineFreeWindowDuration {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
@@ -3352,6 +3461,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .planTimelineGapRecommendation {
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--home-text-meta, #6b7280);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .planTimelineGapRecommendation strong {
+    color: var(--restoration-sage, #84A98C);
+    font-weight: 700;
   }
   .planTimelineFreeWindowActions {
     flex-shrink: 0;
@@ -3368,11 +3491,11 @@
     left: 0;
     right: 0;
     margin-top: 4px;
-    padding: 8px;
-    background: var(--home-card-bg, #fff);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px 12px;
+    background: #F9F8F6;
+    border: 1px solid rgba(210, 180, 140, 0.55);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -3380,15 +3503,17 @@
   }
   .planTimelineSlotPopoverTitle {
     font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--restoration-charcoal, #2d352d);
-    margin-bottom: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--home-text-meta, #6b7280);
+    margin: 0 0 6px;
   }
   .planTimelineSlotPopoverItem {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    gap: 1px;
     padding: 6px 8px;
     border: none;
     border-radius: 6px;
@@ -3403,7 +3528,7 @@
   }
   .planTimelineSlotPopoverItemTitle {
     font-size: 0.78rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--restoration-charcoal, #2d352d);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3412,27 +3537,42 @@
   }
   .planTimelineSlotPopoverItemMeta {
     font-size: 0.65rem;
+    font-variant-numeric: tabular-nums;
     color: var(--home-text-meta, #6b7280);
+    opacity: 0.8;
   }
   .planTimelineSlotPopoverEmpty {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--home-text-meta, #6b7280);
-    padding: 4px 0;
+    padding: 6px 0;
   }
   .planTimelineFreeBtn {
-    padding: 2px 8px;
-    border-radius: 6px;
-    border: 1px solid var(--restoration-flax);
-    background: transparent;
-    color: var(--restoration-earth);
-    font-size: 0.65rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    margin-left: 4px;
+    display: none;
   }
-  .planTimelineFreeBtn:hover {
-    background: rgba(184, 149, 110, 0.15);
+  .planTimelineFreeBtnQuickSlot {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--restoration-sage, #87A96B);
+    background: rgba(135, 169, 107, 0.15);
+    color: var(--restoration-sage, #87A96B);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+    margin-left: 6px;
+  }
+  .planTimelineFreeBtnQuickSlot:hover {
+    background: var(--restoration-sage, #87A96B);
+    color: #fff;
+    transform: scale(1.08);
   }
   .planTimelineCta {
     display: block;
@@ -5004,13 +5144,11 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* Action Hub Read-First modal — Matte Glass card */
+/* Action Hub Read-First modal — Solid index card (Bone/Cream, 1px Flax) */
 .actionHubReadOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5018,12 +5156,10 @@
 }
 .actionHubReadModal {
   position: relative;
-  background: var(--home-card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #F9F8F6;
+  border: 1px solid rgba(210, 180, 140, 0.55);
   border-radius: var(--home-card-radius);
-  box-shadow: var(--home-card-shadow);
+  box-shadow: 0 8px 32px rgba(74, 52, 33, 0.12);
   padding: 1.25rem 1.5rem;
   max-width: 360px;
   width: 90%;
