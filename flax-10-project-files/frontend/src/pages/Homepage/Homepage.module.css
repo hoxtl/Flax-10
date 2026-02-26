@@ -41,28 +41,46 @@
     background: var(--home-bg);
   }
 
-  /* Dashboard grid: triage row (3-col) then spine + right, then foundation — no internal scroll */
+  /* Dashboard grid: strict 3-column bento — left (25%), center (50%), right (25%) */
   .bentoGrid {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    grid-template-areas:
-      "triage triage"
-      "spine right"
-      "foundation foundation";
-    grid-template-rows: auto auto auto;
-    gap: 0 12px;
+    grid-template-columns: minmax(250px, 1fr) 2fr minmax(250px, 1fr);
+    grid-template-areas: "left center right";
+    grid-template-rows: auto;
+    gap: 12px;
     padding: 18px 24px 24px;
     width: 100%;
     align-items: start;
-    min-height: 0;
+    min-height: calc(100vh - 80px);
   }
-  /* Focus mode: dim Timeline, Action Hub, Deadlines, Spine, Right — hero stays full opacity */
-  .bentoGrid.focusModeActive .triageLeft > *:not(:first-child),
-  .bentoGrid.focusModeActive .triageDeadlines,
+  /* Normalize box model within the bento grid */
+  .bentoGrid, .bentoGrid * { box-sizing: border-box; }
+  /* Focus mode: fade out everything except the NOW hero */
+  .bentoGrid.focusModeActive .bentoLeft > *:not(:first-child) {
+    opacity: 0.08;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
   .bentoGrid.focusModeActive .bentoSpine,
   .bentoGrid.focusModeActive .bentoRight {
-    opacity: 0.7;
-    transition: opacity 0.25s ease;
+    opacity: 0.08;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  /* In focus mode, scale up the timer hero */
+  .bentoGrid.focusModeActive .bentoLeft > *:first-child {
+    transform: scale(1.02);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Urgent Orange: deadline pressure signal */
+  .bentoGrid.urgentOrangeActive .triageDeadlines {
+    border: 1.5px solid var(--urgency-accent, #FF9F67) !important;
+    box-shadow: 0 0 0 3px rgba(255, 159, 103, 0.12);
+  }
+  .bentoGrid.urgentOrangeActive .triageHero {
+    border: 1.5px solid var(--urgency-accent, #FF9F67) !important;
+    box-shadow: 0 0 0 3px rgba(255, 159, 103, 0.10);
   }
 
   /* Top Triage Row: 3-column grid; all align to top */
@@ -77,6 +95,14 @@
     align-items: start;
   }
   .triageLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  /* Left bento column: Action Hub + NOW hero — ~25% width */
+  .bentoLeft {
+    grid-area: left;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -365,13 +391,12 @@
   }
   .triageDeadlines {
     border-radius: 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(107, 83, 68, 0.2);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    background: rgba(255, 255, 255, 0.6);
+    background: #F9F8F6;
     padding: 12px 16px;
     min-width: 0;
+    width: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -405,10 +430,8 @@
   .actionHub {
     position: relative;
     border-radius: 12px;
-    border: 0.5px solid rgba(107, 83, 68, 0.2);
-    background: rgba(249, 248, 246, 0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    background: #F9F8F6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     padding: 14px 14px 14px 20px;
     min-width: 0;
@@ -455,7 +478,7 @@
     font-weight: var(--font-weight-title);
     font-family: var(--font-body);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05rem;
     color: #2D2D2D;
     margin: 0;
   }
@@ -622,17 +645,15 @@
   }
   .actionHubCard {
     position: relative;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: #F9F8F6;
     border-radius: 12px;
-    border: 0.5px solid rgba(107, 83, 68, 0.25);
-    padding: 10px 14px;
+    border: 0.5px solid rgba(107, 83, 68, 0.22);
+    padding: 10px 14px 10px 12px;
     min-height: 0;
     border-left-width: 4px;
     border-left-style: solid;
     transition: box-shadow 0.25s ease, border-color 0.2s ease, transform 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 0 -2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   }
   .actionHubCard:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 6px 0 -2px rgba(0, 0, 0, 0.04);
@@ -663,12 +684,13 @@
     }
   }
   .actionHubCardNow {
+    background: #FFFFFF;
     border-left-width: 4px;
     border-left-color: rgba(93, 64, 55, 0.6);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
   }
   .actionHubCardNow:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
   }
   .actionHubNowDot {
     display: inline-block;
@@ -871,6 +893,10 @@
     background: #4A3421;
     color: #FAF9F6;
     border: none;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .actionHubModulePillList {
     background: #4A3421;
@@ -922,6 +948,7 @@
     border-radius: 50%;
     background: rgba(232, 120, 100, 0.95);
     flex-shrink: 0;
+    align-self: center;
     margin-right: 6px;
     box-shadow: 0 0 8px 2px rgba(232, 120, 100, 0.5);
     animation: actionHubUrgentDotGlow 2s ease-in-out infinite;
@@ -1628,34 +1655,32 @@
     background: var(--home-bg);
   }
   .bentoSpine {
-    grid-area: spine;
+    grid-area: center;
     min-width: 0;
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+    align-self: stretch;
   }
   .bentoRight {
     grid-area: right;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     align-self: start;
   }
   .enrollmentCard {
     border-radius: 12px;
-    border: 1px solid rgba(180, 140, 100, 0.45);
-    background: rgba(210, 180, 140, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    background: #F9F8F6;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
-    min-width: 120px;
-    max-width: 180px;
+    width: 100%;
     transition: box-shadow 0.25s ease, transform 0.25s ease;
   }
   .enrollmentCard:hover {
@@ -1670,12 +1695,16 @@
     color: var(--text-charcoal);
     margin: 0;
     text-transform: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
   .enrollmentNumberWrap {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
   }
   .enrollmentNumber {
     font-family: var(--font-body);
@@ -1739,6 +1768,121 @@
   .enrollmentCta:hover {
     color: var(--primary-strong, #4A3421);
     text-decoration: underline;
+  }
+
+  /* ── Planned vs Actual Nudge Card ── */
+  .pvaNudgeCard {
+    border-radius: 12px;
+    background: #F9F8F6;
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .pvaNudgeTitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(107, 83, 68, 0.6);
+    margin: 0;
+  }
+  .pvaBarsWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .pvaBarRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pvaBarLabel {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: rgba(107, 83, 68, 0.55);
+    width: 40px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .pvaBarTrack {
+    flex: 1;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgba(107, 83, 68, 0.1);
+    overflow: hidden;
+  }
+  .pvaBarFill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+  }
+  .pvaBarFillPlanned { background: #90CAF9; }
+  .pvaBarFillActual  { background: #66BB6A; }
+  .pvaBarVal {
+    font-size: 0.6rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: rgba(107, 83, 68, 0.65);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .pvaNudgeWarn {
+    font-size: 0.65rem;
+    color: #FF9F67;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ── Weekly Mini-Heatmap ── */
+  .weeklyHeatmapCard {
+    border-radius: 12px;
+    background: #F9F8F6;
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .weeklyHeatmapTitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(107, 83, 68, 0.6);
+    margin: 0;
+  }
+  .weeklyHeatmapRow {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+  }
+  .weeklyHeatmapCell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .weeklyHeatmapBlock {
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  .weeklyHeatmapDayLabel {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: rgba(107, 83, 68, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   .bentoFoundation {
@@ -2746,15 +2890,14 @@
   .timeline { display: flex; flex-direction: column; }
 
   .timelineBox {
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(107, 83, 68, 0.2);
     border-radius: 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    background: var(--home-card-bg);
+    background: #F9F8F6;
     overflow: visible;
     transition: box-shadow 0.2s ease;
     position: relative;
+    flex: 1 1 auto;
   }
   .timelineBox:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -2960,6 +3103,44 @@
     min-height: 20px;
     flex-shrink: 0;
   }
+  /* ── Hour Rail Markers ── */
+  .planTimelineHourMark {
+    display: grid;
+    grid-template-columns: 44px 20px 1fr;
+    gap: 0 20px;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .planTimelineHourMarkLabel {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: rgba(107, 83, 68, 0.6);
+    letter-spacing: 0.05em;
+    text-align: right;
+    line-height: 1;
+  }
+  .planTimelineHourMarkDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #F9F8F6;
+    border: 2px solid rgba(107, 83, 68, 0.4);
+    justify-self: center;
+    z-index: 2;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .planTimelineHourMarkLine {
+    height: 1px;
+    background: rgba(107, 83, 68, 0.07);
+    width: 100%;
+  }
+
   /* 32px Sage Green node with emoji (bead-on-a-string) + pop on appear */
   .planTimelineNode {
     width: 32px;
@@ -3098,9 +3279,9 @@
     padding: 0 10px 0 12px;
     margin-left: 0;
     border-radius: 10px;
-    border: 1px solid #E5E4E2;
+    border: 1px solid #D0CEC9;
     background: #FAF9F6;
-    cursor: pointer;
+    cursor: grab;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
     width: 100%;
     min-width: 0;
@@ -3115,8 +3296,9 @@
     100% { opacity: 1; transform: scale(1); }
   }
   .planTimelineCard:hover {
-    border-color: rgba(229, 228, 226, 0.9);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-color: #B8B6B0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    cursor: grabbing;
   }
   .planTimelineCardBody {
     min-width: 0;
@@ -3153,7 +3335,7 @@
   }
   .planTimelineCardTitle {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--flax-charcoal-heading, #1e261e);
     line-height: 1.2;
@@ -3416,6 +3598,69 @@
     border-color: var(--restoration-sage);
     color: #fff;
   }
+
+  /* Event-level completion checkbox (for events without a matched task) */
+  .planTimelineEventCheck {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(107, 83, 68, 0.3);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(107, 83, 68, 0.5);
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+    opacity: 0;
+  }
+  .planTimelineCard:hover .planTimelineEventCheck {
+    opacity: 1;
+  }
+  .planTimelineEventCheck.planTimelineEventCheckDone {
+    opacity: 1;
+    background: rgba(132, 169, 140, 0.2);
+    border-color: var(--restoration-sage, #84A98C);
+    color: var(--restoration-sage, #84A98C);
+  }
+  .planTimelineEventCheck:hover {
+    background: rgba(132, 169, 140, 0.1);
+    border-color: var(--restoration-sage, #84A98C);
+    opacity: 1;
+  }
+
+  /* Missed session reschedule prompt */
+  .planTimelineMissedBtn {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #FF9F67;
+    background: rgba(255, 159, 103, 0.1);
+    border: 1px solid rgba(255, 159, 103, 0.35);
+    border-radius: 9999px;
+    padding: 2px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    opacity: 0;
+  }
+  .planTimelineCard:hover .planTimelineMissedBtn,
+  .planTimelineCardPast .planTimelineMissedBtn {
+    opacity: 1;
+  }
+  .planTimelineMissedBtn:hover {
+    background: rgba(255, 159, 103, 0.22);
+  }
+
   .planTimelineFreeWindow {
     display: flex;
     flex-direction: row;
@@ -3435,14 +3680,14 @@
     position: relative;
   }
   .planTimelineFreeWindowDashed {
-    border: 1px solid #E5E4E2;
+    border: 1.5px dashed rgba(132, 169, 140, 0.45);
     border-radius: 8px;
-    background: rgba(250, 249, 246, 0.5);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    background: rgba(132, 169, 140, 0.04);
+    box-shadow: none;
   }
   .planTimelineFreeWindowDashed:hover {
-    background: rgba(250, 249, 246, 0.85);
-    border-color: rgba(132, 169, 140, 0.4);
+    background: rgba(132, 169, 140, 0.08);
+    border-color: rgba(132, 169, 140, 0.65);
     animation: planTimelineGapPulse 2s ease-in-out infinite;
   }
   @keyframes planTimelineGapPulse {
@@ -3455,12 +3700,43 @@
   .planTimelineFreeWindowDuration {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.65rem;
-    font-weight: 400;
-    color: var(--home-text-meta, #9ca3af);
+    font-weight: 500;
+    color: rgba(107, 83, 68, 0.65);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* Contextual activity suggestion chip */
+  .planTimelineGapContextChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(132, 169, 140, 0.9);
+    background: rgba(132, 169, 140, 0.12);
+    border-radius: 9999px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  /* "Slot in: Task Name" call-to-action inside gaps */
+  .planTimelineGapSlotCta {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: rgba(107, 83, 68, 0.75);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .planTimelineGapSlotCta strong {
+    color: var(--restoration-sage, #84A98C);
+    font-weight: 700;
   }
   .planTimelineGapRecommendation {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
@@ -3903,9 +4179,9 @@
 
   .timelineHeader {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    padding: 10px 14px 8px;
+    padding: 14px 14px 8px;
     border-bottom: none;
     gap: var(--home-space-md);
     flex-wrap: wrap;
@@ -3923,7 +4199,7 @@
   }
 
   .timelineHeaderCta {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--home-text-meta, #9ca3af);
     text-decoration: none;
@@ -3937,10 +4213,11 @@
   .timelineTitle {
     margin: 0;
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-title);
     color: var(--flax-charcoal-heading, #1e261e);
-    letter-spacing: -0.02em;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
   }
 
   .timelineSub {
