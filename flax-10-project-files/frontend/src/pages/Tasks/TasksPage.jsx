@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import useTasks from "./hooks/useTasks";
 import useTaskLists from "./hooks/useTaskLists";
@@ -38,6 +39,7 @@ function getTodayEndISO() {
 }
 
 export default function TasksPage() {
+    const [searchParams] = useSearchParams();
     const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
     const { tasks, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
     const [activeListId,    setActiveListId]    = useState(null);
@@ -45,6 +47,13 @@ export default function TasksPage() {
     const [showTaskModal,   setShowTaskModal]   = useState(false);
     const [showListModal,   setShowListModal]   = useState(false);
     const [toastUndo,       setToastUndo]      = useState(null);
+
+    useEffect(() => {
+        const listParam = searchParams.get("list");
+        if (listParam != null && listParam !== "") setActiveListId(listParam);
+    }, [searchParams]);
+
+    const activeModuleCode = searchParams.get("module") || null;
 
     const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter);
     const defaultDueDateForNewTask = activeFilter === "today" ? getTodayEndISO() : null;
@@ -93,6 +102,7 @@ export default function TasksPage() {
                 lists={lists}
                 activeFilter={activeFilter}
                 activeListId={activeListId}
+                activeModuleCode={activeModuleCode}
                 defaultDueDateForNewTask={defaultDueDateForNewTask}
                 onToggleComplete={toggleComplete}
                 onDeleteTask={removeTask}
@@ -111,6 +121,7 @@ export default function TasksPage() {
                     lists={lists}
                     defaultListId={activeListId}
                     defaultDueDate={defaultDueDateForNewTask}
+                    onCreateList={addList}
                     onSave={async (data) => {
                         const created = await addTask(data);
                         setToastUndo(created ? { taskId: created.id, title: created.title } : null);
