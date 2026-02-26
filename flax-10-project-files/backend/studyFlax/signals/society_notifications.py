@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 from studyFlax.models.society import SocietyEvent, SocietyAnnouncement, SocietyMembership
 from studyFlax.models.notifications.notificationModel import Notification
@@ -26,6 +26,13 @@ def notify_members_on_announcement(sender, instance, created, **kwargs):
         notify_society_members(instance.society, build_announcement_notification(instance))
 
 
+@receiver(pre_delete, sender=SocietyAnnouncement)
+def handle_announcement_delete(sender, instance, **kwargs):
+    has_event = instance.events.exists()
+    instance.events.all().delete()
+    notify_society_members(instance.society, build_delete_notification(instance, has_event))
+
+
 def notify_society_members(society, notification_data):
     members = SocietyMembership.objects.filter(society=society).select_related('user')
     notifications = [build_notification(m.user, notification_data) for m in members]
@@ -50,6 +57,16 @@ def build_announcement_notification(announcement):
     return {
         'title': f"New announcement from {announcement.society.name}",
         'message': announcement.title,
+        'notification_type': 'society_announcement',
+        'society_id': announcement.society_id,
+    }
+
+
+def build_delete_notification(announcement, has_event):
+    message = f'"{announcement.title}" and its event have been removed' if has_event else f'"{announcement.title}" has been removed'
+    return {
+        'title': f"Announcement deleted in {announcement.society.name}",
+        'message': message,
         'notification_type': 'society_announcement',
         'society_id': announcement.society_id,
     }
