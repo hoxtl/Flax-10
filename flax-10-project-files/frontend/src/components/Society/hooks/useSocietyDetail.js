@@ -121,23 +121,16 @@ export function useSocietyDetail(societyId) {
     const addAnnouncement = async (data) => {
         const apiData = transformAnnouncementData(data);
         const announcement = await api.createAnnouncement(societyId, apiData);
-        setSociety(prev => ({
-            ...prev,
-            announcements: [...(prev.announcements || []), announcement]
-        }));
-        if (data.addAsEvent) {
-            try {
-                await addEvent({
-                    ...data,
-                    description: data.content,
-                    tag: data.tag || null,
-                    announcement: announcement.id
-                });
-            } catch (error) {
-                console.error('Failed to add event for announcement:', error);
-            }
-        }
+        setSociety(prev => ({ ...prev, announcements: [...(prev.announcements || []), announcement] }));
+        if (data.addAsEvent) await addAnnouncementEvent(data, announcement);
         return announcement;
+    };
+
+    const addAnnouncementEvent = async (data, announcement) => {
+        try {
+            const eventData = buildAnnouncementEventData(data, announcement);
+            await createLinkedEvent(eventData, announcement.id);
+        } catch (error) { console.error('Failed to add event for announcement:', error); }
     };
 
     const addEvent = async (data) => {
@@ -169,21 +162,35 @@ export function useSocietyDetail(societyId) {
 
     const syncAnnouncementEvent = async (data, announcement) => {
         const eventId = announcement.event_id || data.event_id;
-        if (!data.addAsEvent && eventId) return deleteLinkedEvent(eventId);
+        if (!data.addAsEvent && eventId) return deleteLinkedEvent(eventId, announcement.id);
         if (data.addAsEvent) return upsertLinkedEvent(data, announcement, eventId);
     };
 
-    const deleteLinkedEvent = async (eventId) => {
-        try { await deleteEvent(eventId); }
-        catch (error) { console.error('Failed to delete linked event:', error); }
+    const deleteLinkedEvent = async (eventId, announcementId) => {
+        try {
+            await deleteEvent(eventId);
+            setAnnouncementEventId(announcementId, null);
+        } catch (error) { console.error('Failed to delete linked event:', error); }
     };
 
     const upsertLinkedEvent = async (data, announcement, eventId) => {
         const eventData = buildAnnouncementEventData(data, announcement);
         try {
             if (eventId) await updateEvent(eventId, eventData);
-            else await addEvent(eventData);
+            else await createLinkedEvent(eventData, announcement.id);
         } catch (error) { console.error('Failed to sync event for announcement:', error); }
+    };
+
+    const createLinkedEvent = async (eventData, announcementId) => {
+        const event = await addEvent(eventData);
+        setAnnouncementEventId(announcementId, event.id);
+    };
+
+    const setAnnouncementEventId = (announcementId, eventId) => {
+        setSociety(prev => ({
+            ...prev,
+            announcements: prev.announcements.map(a => a.id === announcementId ? { ...a, event_id: eventId } : a)
+        }));
     };
 
     const buildAnnouncementEventData = (data, announcement) => ({
