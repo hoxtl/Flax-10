@@ -118,76 +118,76 @@ export function useSocietyDetail(societyId) {
         setSociety(prev => ({ ...prev, tags: prev.tags.filter(t => t.id !== tagId) }));
     };
 
-    const addAnnouncement = async (data) => {
+    const addAnnouncement = async (data, silent = false) => {
         const apiData = transformAnnouncementData(data);
-        const announcement = await api.createAnnouncement(societyId, apiData);
+        const announcement = await api.createAnnouncement(societyId, apiData, silent);
         setSociety(prev => ({ ...prev, announcements: [...(prev.announcements || []), announcement] }));
-        if (data.addAsEvent) await addAnnouncementEvent(data, announcement);
+        if (data.addAsEvent) await addAnnouncementEvent(data, announcement, silent);
         return announcement;
     };
 
-    const addAnnouncementEvent = async (data, announcement) => {
+    const addAnnouncementEvent = async (data, announcement, silent = false) => {
         try {
             const eventData = buildAnnouncementEventData(data, announcement);
-            await createLinkedEvent(eventData, announcement.id);
+            await createLinkedEvent(eventData, announcement.id, silent);
         } catch (error) { console.error('Failed to add event for announcement:', error); }
     };
 
-    const addEvent = async (data) => {
+    const addEvent = async (data, silent = false) => {
         const apiData = transformEventData(data);
-        const event = await api.createSocietyEvent(societyId, apiData);
+        const event = await api.createSocietyEvent(societyId, apiData, silent);
         setSociety(prev => ({ ...prev, events: [...(prev.events || []), event] }));
         return event;
     };
 
-    const updateEvent = async (eventId, data) => {
+    const updateEvent = async (eventId, data, silent = false) => {
         const apiData = transformEventData(data);
-        const event = await api.updateSocietyEvent(societyId, eventId, apiData);
+        const event = await api.updateSocietyEvent(societyId, eventId, apiData, silent);
         setSociety(prev => ({ ...prev, events: prev.events.map(e => e.id === eventId ? event : e) }));
         return event;
     };
 
-    const deleteEvent = async (eventId) => {
-        await api.deleteSocietyEvent(societyId, eventId);
+    const deleteEvent = async (eventId, silent = false) => {
+        await api.deleteSocietyEvent(societyId, eventId, silent);
         setSociety(prev => ({ ...prev, events: prev.events.filter(e => e.id !== eventId) }));
     };
 
-    const addException = async (eventId, date) => {
-        await api.addExceptionDate(societyId, eventId, date);
+    const addException = async (eventId, date, silent = false) => {
+        await api.addExceptionDate(societyId, eventId, date, silent);
         await loadSociety();
     };
 
-    const updateAnnouncement = async (announcementId, data) => {
+    const updateAnnouncement = async (announcementId, data, silent = false) => {
         const apiData = transformAnnouncementData(data);
-        const updated = await api.updateAnnouncement(societyId, announcementId, apiData);
+        const updated = await api.updateAnnouncement(societyId, announcementId, apiData, silent);
         setSociety(prev => ({ ...prev, announcements: prev.announcements.map(a => a.id === announcementId ? updated : a) }));
-        await syncAnnouncementEvent(data, updated);
+        await syncAnnouncementEvent(data, updated, silent);
         return updated;
     };
 
-    const syncAnnouncementEvent = async (data, announcement) => {
+    const syncAnnouncementEvent = async (data, announcement, silent = false) => {
         const eventId = announcement.event_id || data.event_id;
-        if (!data.addAsEvent && eventId) return deleteLinkedEvent(eventId, announcement.id);
-        if (data.addAsEvent) return upsertLinkedEvent(data, announcement, eventId);
+        if (!data.addAsEvent && eventId) return deleteLinkedEvent(eventId, announcement.id, silent);
+        if (data.addAsEvent) return upsertLinkedEvent(data, announcement, eventId, silent);
     };
 
-    const deleteLinkedEvent = async (eventId, announcementId) => {
+    const deleteLinkedEvent = async (eventId, announcementId, silent = false) => {
         try {
-            await deleteEvent(eventId);
+            await deleteEvent(eventId, silent);
             setAnnouncementEventId(announcementId, null);
         } catch (error) { console.error('Failed to delete linked event:', error); }
     };
 
-    const upsertLinkedEvent = async (data, announcement, eventId) => {
+    const upsertLinkedEvent = async (data, announcement, eventId, silent = false) => {
         const eventData = buildAnnouncementEventData(data, announcement);
         try {
-            if (eventId) await updateEvent(eventId, eventData);
-            else await createLinkedEvent(eventData, announcement.id);
+            if (eventId) await updateEvent(eventId, eventData, silent);
+            else await createLinkedEvent(eventData, announcement.id, silent);
         } catch (error) { console.error('Failed to sync event for announcement:', error); }
     };
 
-    const createLinkedEvent = async (eventData, announcementId) => {
-        const event = await addEvent(eventData);
+    const createLinkedEvent = async (eventData, announcementId, silent = false) => {
+        const event = await addEvent(eventData, silent);
         setAnnouncementEventId(announcementId, event.id);
     };
 
@@ -202,11 +202,15 @@ export function useSocietyDetail(societyId) {
         ...data, description: data.content, tag: data.tag || null, announcement: announcement.id
     });
 
-    const deleteAnnouncement = async (announcementId) => {
+    const deleteAnnouncement = async (announcementId, silent = false) => {
         const announcement = society?.announcements?.find(a => a.id === announcementId);
         const linkedEventId = announcement?.event_id;
-        await api.deleteAnnouncement(societyId, announcementId);
+        await api.deleteAnnouncement(societyId, announcementId, silent);
         setSociety(prev => removeAnnouncementAndEvent(prev, announcementId, linkedEventId));
+    };
+
+    const publishChanges = async () => {
+        await api.publishChanges(societyId);
     };
 
     const removeAnnouncementAndEvent = (prev, announcementId, eventId) => ({
@@ -264,7 +268,7 @@ export function useSocietyDetail(societyId) {
         addTag, updateTag, deleteTag,
         addAnnouncement, updateAnnouncement, deleteAnnouncement,
         addEvent, updateEvent, deleteEvent, addException,
-        joinSociety, leaveSociety, deleteSociety,
+        joinSociety, leaveSociety, deleteSociety, publishChanges,
         members, fetchMembers, updateMemberRole, removeMember, addCollaborator,
         requestRatification
     };
