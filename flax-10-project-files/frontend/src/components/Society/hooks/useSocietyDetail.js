@@ -152,6 +152,11 @@ export function useSocietyDetail(societyId) {
         setSociety(prev => ({ ...prev, events: prev.events.filter(e => e.id !== eventId) }));
     };
 
+    const addException = async (eventId, date) => {
+        await api.addExceptionDate(societyId, eventId, date);
+        await loadSociety();
+    };
+
     const updateAnnouncement = async (announcementId, data) => {
         const apiData = transformAnnouncementData(data);
         const updated = await api.updateAnnouncement(societyId, announcementId, apiData);
@@ -258,7 +263,7 @@ export function useSocietyDetail(societyId) {
         society, loading, error, refresh: loadSociety, updateSociety,
         addTag, updateTag, deleteTag,
         addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent,
+        addEvent, updateEvent, deleteEvent, addException,
         joinSociety, leaveSociety, deleteSociety,
         members, fetchMembers, updateMemberRole, removeMember, addCollaborator,
         requestRatification
