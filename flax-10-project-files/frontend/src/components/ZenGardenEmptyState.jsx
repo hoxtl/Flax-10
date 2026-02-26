@@ -64,12 +64,40 @@ function ZenGardenIllustration({ className }) {
   );
 }
 
-export default function ZenGardenEmptyState({ displayName, sub = "No overdue or due-soon tasks.", message: messageOverride, action }) {
+/** Minimal seedling for "all caught up" empty state. */
+function SeedlingIllustration({ className }) {
+  return (
+    <svg
+      className={className}
+      width="80"
+      height="64"
+      viewBox="0 0 80 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      {/* Pot */}
+      <path d="M24 32 L28 56 L52 56 L56 32 Z" fill="#e8e0d5" stroke="#6B5344" strokeWidth="1" strokeOpacity="0.4" />
+      <line x1="28" y1="44" x2="52" y2="44" stroke="#6B5344" strokeWidth="0.8" strokeOpacity="0.3" />
+      {/* Soil */}
+      <ellipse cx="40" cy="32" rx="14" ry="4" fill="#8B7355" fillOpacity="0.6" />
+      {/* Stem */}
+      <path d="M40 28 Q40 16 38 8" stroke="#5a6c3d" strokeWidth="2" strokeLinecap="round" fill="none" />
+      {/* Leaves */}
+      <path d="M38 18 Q30 14 28 20 Q36 22 38 18" fill="#84A98C" stroke="#5a6c3d" strokeWidth="0.6" />
+      <path d="M42 18 Q50 12 52 20 Q44 22 42 18" fill="#84A98C" stroke="#5a6c3d" strokeWidth="0.6" />
+      <path d="M40 10 Q36 4 40 2 Q44 4 40 10" fill="#84A98C" stroke="#5a6c3d" strokeWidth="0.5" />
+    </svg>
+  );
+}
+
+export default function ZenGardenEmptyState({ displayName, sub = "No overdue or due-soon tasks.", message: messageOverride, action, illustrationVariant }) {
   const name = (displayName || "").trim() || "friend";
   const message = messageOverride ?? `The garden is at peace. You've earned your rest, ${name}.`;
+  const Illustration = illustrationVariant === "seedling" ? SeedlingIllustration : ZenGardenIllustration;
   return (
     <div className={styles.wrap}>
-      <ZenGardenIllustration className={styles.illustration} />
+      <Illustration className={styles.illustration} />
       <p className={styles.message}>
         {message}
       </p>
