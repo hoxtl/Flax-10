@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import styles from './TimerPage.module.css';
+
 import { useNotificationPermission } from '../../components/Timer/utils/timerUtils';
 import { useTimerContext } from '../../context/TimerContext';
 import { MainSection, PopupSection } from '../../components/Timer/WrapperComponents';
+
+import styles from './TimerPage.module.css';
 
 function NotificationPrompt({ permission, request }) {
   if (permission !== 'default') return null;

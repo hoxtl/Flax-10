@@ -8,9 +8,11 @@
 
 import { useState, useMemo } from "react";
 import { Flag, Clock } from "lucide-react";
+
 import DateTimePicker from "./DateTimePicker";
-import styles from "./CreateTaskModal.module.css";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
+
+import styles from "./CreateTaskModal.module.css";
 
 const PRIORITY_OPTIONS = [
   { value: "low", label: "Low" },

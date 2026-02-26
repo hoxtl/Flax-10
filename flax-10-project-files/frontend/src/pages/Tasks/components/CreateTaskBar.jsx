@@ -3,8 +3,10 @@
  * For full planning (calendar, module, travel time) use the "Full Planning" button.
  */
 import { useState, useMemo, useEffect, useRef } from "react";
+
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
+
 import styles from "./CreateTaskBar.module.css";
 
 const DURATION_OPTIONS = [
