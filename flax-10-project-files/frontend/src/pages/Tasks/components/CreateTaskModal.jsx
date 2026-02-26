@@ -3,11 +3,11 @@
  *
  * Modal for creating a new task. Provides a lightweight, canvas-style form with
  * borderless inputs, priority and study-block chips, and optional due date.
- * Matches dashboard card styling (rounded corners, cohesive hierarchy).
+ * Supports creating a new list directly from the List dropdown when onCreateList is provided.
  */
 
-import { useState, useMemo } from "react";
-import { Flag, Clock } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Flag } from "lucide-react";
 
 import DateTimePicker from "./DateTimePicker";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
@@ -27,6 +27,9 @@ const STUDY_BLOCK_OPTIONS = [
   { value: 3, label: "1h 15m" },
   { value: 4, label: "1h 40m" },
 ];
+
+/** estimated_blocks value -> duration in minutes */
+const BLOCK_MINUTES = { 1: 25, 2: 50, 3: 75, 4: 100 };
 
 const FALLBACK_COLOURS = FOCUS_BLOCK_COLOURS_HEX;
 
@@ -49,10 +52,11 @@ function getListColor(list, idx) {
 
 /**
  * Create Task modal. Public props: lists, defaultListId, onSave, onClose.
+ * Optional: onCreateList — when provided, the List dropdown shows "+ Create new list" and can create a list inline.
  * Optional: showAddToScheduleToggle, addToScheduleLabel — when set, shows a toggle and passes { addToSchedule } as second arg to onSave.
  * Optional: modules — when set, shows "Link to Module" dropdown; each item { id, module_code, module_name or title }.
  */
-export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, onSave, onClose, showAddToScheduleToggle = false, addToScheduleLabel = "Add to today's schedule", modules = [] }) {
+export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, onSave, onClose, onCreateList, showAddToScheduleToggle = false, addToScheduleLabel = "Add to today's schedule", modules = [] }) {
   const sortedLists = useMemo(
     () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
     [lists]
@@ -72,6 +76,31 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
   });
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [listDropdownOpen, setListDropdownOpen] = useState(false);
+  const [showCreateListInput, setShowCreateListInput] = useState(false);
+  const [newListName, setNewListName] = useState("");
+  const [creatingList, setCreatingList] = useState(false);
+  const listDropdownRef = useRef(null);
+  const newListInputRef = useRef(null);
+
+  useEffect(() => {
+    if (showCreateListInput && newListInputRef.current) {
+      newListInputRef.current.focus();
+    }
+  }, [showCreateListInput]);
+
+  useEffect(() => {
+    if (!listDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (listDropdownRef.current && !listDropdownRef.current.contains(e.target)) {
+        setListDropdownOpen(false);
+        setShowCreateListInput(false);
+        setNewListName("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [listDropdownOpen]);
 
   const selectedList = useMemo(
     () => sortedLists.find((l) => String(l.id) === String(form.task_list)),
@@ -80,6 +109,15 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
   const selectedListColor = selectedList
     ? getListColor(selectedList, sortedLists.indexOf(selectedList))
     : null;
+
+  const durationMinutes = BLOCK_MINUTES[form.estimated_blocks] ?? 25;
+  const endTimeDisplay = useMemo(() => {
+    if (!form.due_date) return "—";
+    const start = new Date(form.due_date);
+    const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+  }, [form.due_date, durationMinutes]);
 
   const set = (field, val) => setForm((p) => ({ ...p, [field]: val }));
 
@@ -104,6 +142,23 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
     if (e.key === "Escape") onClose();
   };
 
+  const handleCreateList = async () => {
+    const name = newListName.trim();
+    if (!name || !onCreateList) return;
+    setCreatingList(true);
+    try {
+      const created = await onCreateList({ name, color: FALLBACK_COLOURS[0] });
+      if (created?.id) {
+        setForm((p) => ({ ...p, task_list: String(created.id) }));
+        setShowCreateListInput(false);
+        setNewListName("");
+        setListDropdownOpen(false);
+      }
+    } finally {
+      setCreatingList(false);
+    }
+  };
+
   return (
     <div className={styles.overlay} onMouseDown={onClose} onKeyDown={handleKey}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
@@ -116,38 +171,47 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
 
         <div className={styles.body}>
           <div className={styles.canvas}>
-            <input
-              className={styles.titleInput}
-              placeholder="What do you need to do?"
-              value={form.title}
-              onChange={(e) => set("title", e.target.value)}
-              autoFocus
-            />
-            <textarea
-              className={styles.desc}
-              placeholder="Description (optional)"
-              rows={2}
-              value={form.description}
-              onChange={(e) => set("description", e.target.value)}
-            />
+            <label htmlFor="create-task-title" className={styles.label}>Task name <span className={styles.labelRequired}>*</span></label>
+            <div className={styles.fieldGroup}>
+              <input
+                id="create-task-title"
+                className={styles.titleInput}
+                placeholder="What do you need to do?"
+                value={form.title}
+                onChange={(e) => set("title", e.target.value)}
+                autoFocus
+              />
+            </div>
+            <label htmlFor="create-task-desc" className={styles.label}>Description</label>
+            <div className={styles.fieldGroup}>
+              <textarea
+                id="create-task-desc"
+                className={styles.desc}
+                placeholder="Optional"
+                rows={2}
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+              />
+            </div>
           </div>
 
-          <div className={styles.row}>
-            <div className={styles.iconGroup}>
-              <Flag className={styles.icon} size={16} aria-hidden />
-              <div className={styles.chipGroup}>
-                {PRIORITY_OPTIONS.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    className={`${styles.chip} ${form.priority === value ? styles.chipActive : ""}`}
-                    onClick={() => set("priority", value)}
-                  >
-                    {label}
-                  </button>
-                ))}
+          <div className={styles.timeRow}>
+            <div className={styles.dateTimeWrap}>
+              <label className={styles.gridLabel}>Start time</label>
+              <DateTimePicker
+                value={form.due_date}
+                onChange={(val) => set("due_date", val)}
+                placeholder="Optional"
+              />
+            </div>
+            <div className={styles.endTimeWrap}>
+              <label className={styles.gridLabel}>End time</label>
+              <div className={styles.endTimeDisplay} aria-live="polite">
+                {form.due_date ? endTimeDisplay : "—"}
               </div>
             </div>
+          </div>
+          <div className={styles.durationRow}>
             <div className={styles.chipGroup}>
               {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
                 <button
@@ -163,36 +227,110 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
           </div>
 
           <div className={styles.row}>
-            <div className={styles.iconGroup}>
-              <Clock className={styles.icon} size={16} aria-hidden />
-              <DateTimePicker
-                value={form.due_date}
-                onChange={(val) => set("due_date", val)}
-                placeholder="Pick date & time (optional)"
-              />
-            </div>
             <div className={styles.listWrap}>
-              <span className={styles.listWrapLabel}>List</span>
+              <span className={styles.listWrapLabel}>Category</span>
               {selectedListColor && (
                 <span className={styles.listDot} style={{ background: selectedListColor }} />
               )}
-              <select
-                value={form.task_list}
-                onChange={(e) => set("task_list", e.target.value)}
-                className={styles.select}
-                aria-label="List"
-              >
-                {sortedLists.map((l) => (
-                  <option key={l.id} value={l.id}>{l.name}</option>
-                ))}
-              </select>
+              <div className={styles.listSelectWrap} ref={listDropdownRef}>
+                <button
+                  type="button"
+                  className={styles.listSelectTrigger}
+                  onClick={() => setListDropdownOpen((o) => !o)}
+                  aria-haspopup="listbox"
+                  aria-expanded={listDropdownOpen}
+                  aria-label="List"
+                >
+                  <span className={styles.listSelectValue}>
+                    {selectedList ? selectedList.name : "Select list"}
+                  </span>
+                  <span className={styles.listSelectChevron} aria-hidden>▾</span>
+                </button>
+                {listDropdownOpen && (
+                  <div className={styles.listDropdown} role="listbox">
+                    {sortedLists.map((l) => (
+                      <button
+                        key={l.id}
+                        type="button"
+                        role="option"
+                        aria-selected={String(form.task_list) === String(l.id)}
+                        className={`${styles.listDropdownOption} ${String(form.task_list) === String(l.id) ? styles.listDropdownOptionActive : ""}`}
+                        onClick={() => {
+                          setForm((p) => ({ ...p, task_list: String(l.id) }));
+                          setListDropdownOpen(false);
+                        }}
+                      >
+                        <span className={styles.listOptionDot} style={{ background: getListColor(l, sortedLists.indexOf(l)) }} />
+                        {l.name}
+                      </button>
+                    ))}
+                    {typeof onCreateList === "function" && (
+                      <>
+                        <div className={styles.listDropdownDivider} />
+                        <button
+                          type="button"
+                          className={styles.listDropdownCreate}
+                          onClick={() => setShowCreateListInput((v) => !v)}
+                        >
+                          {showCreateListInput ? "− Hide new list" : "+ New List"}
+                        </button>
+                        <div
+                          className={styles.listCreateSlide}
+                          style={{ maxHeight: showCreateListInput ? 160 : 0 }}
+                        >
+                          <div className={styles.listCreateSlideInner}>
+                            <div className={styles.listCreateInline}>
+                              <input
+                                type="text"
+                                ref={newListInputRef}
+                                className={styles.listCreateInput}
+                                placeholder="List name…"
+                                value={newListName}
+                                onChange={(e) => setNewListName(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleCreateList()}
+                                aria-label="New list name"
+                              />
+                              <button
+                                type="button"
+                                className={styles.listCreateBtn}
+                                onClick={handleCreateList}
+                                disabled={creatingList || !newListName.trim()}
+                              >
+                                {creatingList ? "Creating…" : "Create"}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className={styles.rowBlock}>
+              <span className={styles.rowLabel}>Priority</span>
+              <div className={styles.iconGroup}>
+                <Flag className={styles.icon} size={16} aria-hidden />
+                <div className={styles.chipGroup}>
+                  {PRIORITY_OPTIONS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={`${styles.chip} ${form.priority === value ? styles.chipActive : ""}`}
+                      onClick={() => set("priority", value)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
           {sortedModules.length > 0 && (
             <div className={styles.row}>
               <div className={styles.listWrap} style={{ width: "100%" }}>
-                <span className={styles.listWrapLabel}>Link to Module</span>
+                <span className={styles.listWrapLabel}>Link to module</span>
                 <select
                   value={form.module}
                   onChange={(e) => set("module", e.target.value)}
