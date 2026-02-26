@@ -1,0 +1,137 @@
+.wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.wrap.size140 {
+  width: 140px;
+  height: 140px;
+}
+
+.wrap.size130 {
+  width: 130px;
+  height: 130px;
+}
+
+.tank {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(180, 140, 100, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.liquidWrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.liquid {
+  position: absolute;
+  inset: 0;
+  background: rgba(135, 169, 107, 0.6);
+  opacity: 1;
+  animation: liquidShimmer 8s ease-in-out infinite;
+}
+
+@keyframes liquidShimmer {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.98; filter: brightness(1.02); }
+}
+
+.wave,
+.wave2 {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: -4px;
+  height: 20px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.4) 80%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.wave2 {
+  top: -2px;
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 30%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.25) 70%,
+    transparent 100%
+  );
+}
+
+.bubble,
+.bubbleSmall {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bubble {
+  width: 10px;
+  height: 10px;
+}
+
+.bubbleSmall {
+  width: 6px;
+  height: 6px;
+}
+
+.splash .wave {
+  animation: splashWave 1s ease-out forwards;
+}
+
+/* Paused state: subtle "breathe" on the tank background */
+.wrap.breathe .tank {
+  animation: tankBreathe 2.5s ease-in-out infinite;
+}
+
+@keyframes tankBreathe {
+  0%, 100% { opacity: 1; box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.06); }
+  50% { opacity: 0.92; box-shadow: inset 0 2px 16px rgba(0, 0, 0, 0.08), 0 4px 24px rgba(0, 0, 0, 0.08); }
+}
+
+@keyframes splashWave {
+  0% { transform: translateX(0) scaleY(1); }
+  30% { transform: translateX(-8px) scaleY(1.08); }
+  100% { transform: translateX(0) scaleY(1); }
+}
+
+/* Hover swirl when Ready to Focus button is hovered (parent passes isSwirl) */
+.wrap.swirl .wave,
+.wrap.swirl .wave2 {
+  animation: tankSwirl 1.2s ease-in-out infinite;
+}
+@keyframes tankSwirl {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-6px) rotate(2deg); }
+  75% { transform: translateX(6px) rotate(-2deg); }
+}
