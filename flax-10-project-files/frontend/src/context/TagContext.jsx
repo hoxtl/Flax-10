@@ -80,7 +80,10 @@ function findTag(id, tags) {
 }
 
 function mapBackendTag(tag) {
-    return { id: tag.id, label: tag.name, icon: tag.icon || DEFAULT_ICON, color: tag.color };
+    const label = tag.name || tag.label || '';
+    const neutralColor = '#94a3b8'; // light slate — Routine/Wellness stay neutral so Academic (Sage) and Personal stand out
+    const color = (label === 'Routine' || label === 'Wellness') ? neutralColor : (tag.color || '#9E7E5D');
+    return { id: tag.id, label: tag.name, icon: tag.icon || DEFAULT_ICON, color };
 }
 
 export function useTags() {

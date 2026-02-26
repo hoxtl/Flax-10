@@ -1,4 +1,5 @@
 import styles from "../../pages/Settings/Settings.module.css";
+import PrimaryButton from "../ui/PrimaryButton";
 
 export function TabButton({ id, label, isActive, onClick }) {
   return (
@@ -53,9 +54,9 @@ export function SectionHeader({ title, description }) {
 export function SubmitButton({ isSaving, label, savingLabel }) {
   return (
     <div className={styles.formActions}>
-      <button type="submit" className={styles.btnPrimary} disabled={isSaving}>
+      <PrimaryButton type="submit" disabled={isSaving}>
         {isSaving ? savingLabel : label}
-      </button>
+      </PrimaryButton>
     </div>
   );
 }
