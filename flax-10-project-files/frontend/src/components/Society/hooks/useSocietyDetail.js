@@ -209,8 +209,8 @@ export function useSocietyDetail(societyId) {
         setSociety(prev => removeAnnouncementAndEvent(prev, announcementId, linkedEventId));
     };
 
-    const publishChanges = async () => {
-        await api.publishChanges(societyId);
+    const publishChanges = async (changes = {}) => {
+        await api.publishChanges(societyId, changes);
     };
 
     const removeAnnouncementAndEvent = (prev, announcementId, eventId) => ({

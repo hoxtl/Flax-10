@@ -78,7 +78,7 @@ export const addExceptionDate = (societyId, eventId, date, silent = false) =>
     postJson(`${BASE}/${societyId}/events/${eventId}/exception/${silentQuery(silent)}`, { date });
 
 // Publish changes (sends notification to members)
-export const publishChanges = (societyId) => postJson(`${BASE}/${societyId}/publish/`, {});
+export const publishChanges = (societyId, changes = {}) => postJson(`${BASE}/${societyId}/publish/`, changes);
 
 // Helpers
 function postJson(url, data) {
