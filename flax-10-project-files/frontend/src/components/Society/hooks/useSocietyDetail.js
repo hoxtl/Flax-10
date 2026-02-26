@@ -163,29 +163,32 @@ export function useSocietyDetail(societyId) {
         const apiData = transformAnnouncementData(data);
         const updated = await api.updateAnnouncement(societyId, announcementId, apiData);
         setSociety(prev => ({ ...prev, announcements: prev.announcements.map(a => a.id === announcementId ? updated : a) }));
-
-        if (data.addAsEvent) {
-            try {
-                const eventId = updated.event_id || data.event_id;
-
-                const eventData = {
-                    ...data,
-                    description: data.content,
-                    tag: data.tag || null,
-                    announcement: updated.id
-                };
-
-                if (eventId) {
-                    await updateEvent(eventId, eventData);
-                } else {
-                    await addEvent(eventData);
-                }
-            } catch (error) {
-                console.error('Failed to sync event for announcement update:', error);
-            }
-        }
+        await syncAnnouncementEvent(data, updated);
         return updated;
     };
+
+    const syncAnnouncementEvent = async (data, announcement) => {
+        const eventId = announcement.event_id || data.event_id;
+        if (!data.addAsEvent && eventId) return deleteLinkedEvent(eventId);
+        if (data.addAsEvent) return upsertLinkedEvent(data, announcement, eventId);
+    };
+
+    const deleteLinkedEvent = async (eventId) => {
+        try { await deleteEvent(eventId); }
+        catch (error) { console.error('Failed to delete linked event:', error); }
+    };
+
+    const upsertLinkedEvent = async (data, announcement, eventId) => {
+        const eventData = buildAnnouncementEventData(data, announcement);
+        try {
+            if (eventId) await updateEvent(eventId, eventData);
+            else await addEvent(eventData);
+        } catch (error) { console.error('Failed to sync event for announcement:', error); }
+    };
+
+    const buildAnnouncementEventData = (data, announcement) => ({
+        ...data, description: data.content, tag: data.tag || null, announcement: announcement.id
+    });
 
     const deleteAnnouncement = async (announcementId) => {
         await api.deleteAnnouncement(societyId, announcementId);
