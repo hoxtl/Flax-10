@@ -6,12 +6,13 @@ import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
 import { getEventType } from './utils/eventUtils';
 import { useTags } from '../../context/TagContext';
-import { EventMenuButton } from './EventMenu';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
     const eventType = getEventType(event);
-    if (readOnly || eventType !== 'personal') return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    if (eventType !== 'personal' || readOnly) {
+        return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    }
     return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
 }
 
@@ -42,37 +43,28 @@ function getReadOnlyClassName(event) {
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
-    const { openModal } = useEventModal();
-    const { openPopup, closePopup } = useEventPopup();
-    const { removeEvent, editEvent } = useEventActions();
+    const { editEvent } = useEventActions();
+    const { openPopup } = useEventPopup();
     const theme = useTags().getTag(event.tag);
-    const refs = useEventRefs();
+    const refs = { event: useRef(null), resizeEnded: useRef(false) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
-    const onClick = createPopupClickHandler(refs, isDragging, resize.isResizing, openPopup, event);
+
+    const onClick = (e) => {
+        if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
+        if (isDragging || resize.isResizing) return;
+        const rect = refs.event.current?.getBoundingClientRect();
+        openPopup(event, rect);
+    };
 
     return (
         <EventCard event={event} style={style} theme={theme} refs={refs}
             resize={resize} isDragging={isDragging} dragProps={dragProps}
-            onClick={onClick} minWidth={minWidthForDetails}
-            onEdit={() => { closePopup(); openModal(event); }} onDelete={() => { closePopup(); removeEvent(event.id); }} />
+            onClick={onClick} minWidth={minWidthForDetails} />
     );
 }
 
-function useEventRefs() {
-    return { event: useRef(null), resizeEnded: useRef(false) };
-}
-
-function createPopupClickHandler(refs, isDragging, isResizing, openPopup, event) {
-    return (e) => {
-        if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
-        if (isDragging || isResizing) return;
-        const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect);
-    };
-}
-
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onEdit, onDelete }) {
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth }) {
     const height = resize.resizePreview || parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
     const className = buildClassName(isDragging, resize.isResizing);
@@ -80,7 +72,6 @@ function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, o
 
     return (
         <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
-            {onEdit && onDelete && <EventMenuButton onEdit={onEdit} onDelete={onDelete} />}
             <EventContent event={event} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={resize.handleResizeStart} />
         </div>
