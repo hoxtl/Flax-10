@@ -124,31 +124,20 @@ async function editSingleOccurrence(event, data, actions, baseId) {
     await actions.addEvent(singleEventData);
 }
 
-export async function confirmDelete(event, actions, onClose) {
-    if (hasRecurrence(event)) {
-        await handleRecurringDelete(event, actions, onClose);
-    } else {
-        await handleSingleDelete(event, actions, onClose);
-    }
-}
-
-async function handleRecurringDelete(event, actions, onClose) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Delete ALL occurrences\nCancel = Delete only this occurrence'
-    );
+export async function executeDelete(event, actions, onClose) {
     const baseId = extractBaseEventId(event.id);
-    if (choice) {
-        await actions.removeEvent(baseId);
-    } else {
-        const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
-        await actions.addException(baseId, dateStr);
-    }
+    await actions.removeEvent(baseId);
     onClose();
 }
 
-async function handleSingleDelete(event, actions, onClose) {
-    if (!confirm('Delete this event?')) return;
-    await actions.removeEvent(extractBaseEventId(event.id));
+export function isRecurringEvent(event) {
+    return hasRecurrence(event);
+}
+
+export async function deleteRecurrenceOccurrence(event, actions, onClose) {
+    const baseId = extractBaseEventId(event.id);
+    const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
+    await actions.addException(baseId, dateStr);
     onClose();
 }
 
