@@ -275,8 +275,12 @@ def _get_random_offset(used_offsets):
 
 
 def build_deadlines_for_module(module):
-    prefix    = module.module_code[:2]
-    templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
+    prefix = module.module_code[:2]
+    default_list = list(deadline_fixtures[:3])
+    templates = module_deadline_fixtures.get(
+        module.module_code,
+        module_deadline_fixtures.get(prefix, default_list),
+    )
     used_offsets = set()
     deadlines    = []
     now = timezone.now()
