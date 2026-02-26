@@ -17,6 +17,8 @@ tag_fixtures = (
     ('Gym',                  60),
     ('Grocery Shopping',     45),
     ('Assignment Deadline',   0),
+    ('Routine',               0),   # Breakfast, Lunch, Sleep — not Academic/Work
+    ('Wellness',             60),
 )
 
 recurrence_fixtures = (
