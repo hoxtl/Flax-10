@@ -47,20 +47,28 @@ function getListColor(list, idx) {
 
 /**
  * Create Task modal. Public props: lists, defaultListId, onSave, onClose.
+ * Optional: showAddToScheduleToggle, addToScheduleLabel — when set, shows a toggle and passes { addToSchedule } as second arg to onSave.
+ * Optional: modules — when set, shows "Link to Module" dropdown; each item { id, module_code, module_name or title }.
  */
-export default function CreateTaskModal({ lists, defaultListId, onSave, onClose }) {
+export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, onSave, onClose, showAddToScheduleToggle = false, addToScheduleLabel = "Add to today's schedule", modules = [] }) {
   const sortedLists = useMemo(
     () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
     [lists]
+  );
+  const sortedModules = useMemo(
+    () => [...(modules || [])].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")),
+    [modules]
   );
   const [form, setForm] = useState({
     title: "",
     description: "",
     priority: "medium",
-    due_date: "",
+    due_date: defaultDueDate ?? "",
     task_list: defaultListId || (sortedLists[0]?.id ?? ""),
     estimated_blocks: 1,
+    module: "",
   });
+  const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const selectedList = useMemo(
@@ -76,7 +84,16 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
   const handleSave = async () => {
     if (!form.title.trim()) return;
     setSaving(true);
-    await onSave({ ...form, due_date: form.due_date || null });
+    const payload = {
+      ...form,
+      due_date: form.due_date || null,
+      module: form.module ? Number(form.module) : null,
+    };
+    if (showAddToScheduleToggle) {
+      await onSave(payload, { addToSchedule });
+    } else {
+      await onSave(payload);
+    }
     setSaving(false);
     onClose();
   };
@@ -153,7 +170,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
               />
             </div>
             <div className={styles.listWrap}>
-              <span className={styles.listWrapLabel}>Focus block</span>
+              <span className={styles.listWrapLabel}>List</span>
               {selectedListColor && (
                 <span className={styles.listDot} style={{ background: selectedListColor }} />
               )}
@@ -161,7 +178,7 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
                 value={form.task_list}
                 onChange={(e) => set("task_list", e.target.value)}
                 className={styles.select}
-                aria-label="Focus block"
+                aria-label="List"
               >
                 {sortedLists.map((l) => (
                   <option key={l.id} value={l.id}>{l.name}</option>
@@ -169,6 +186,39 @@ export default function CreateTaskModal({ lists, defaultListId, onSave, onClose 
               </select>
             </div>
           </div>
+
+          {sortedModules.length > 0 && (
+            <div className={styles.row}>
+              <div className={styles.listWrap} style={{ width: "100%" }}>
+                <span className={styles.listWrapLabel}>Link to Module</span>
+                <select
+                  value={form.module}
+                  onChange={(e) => set("module", e.target.value)}
+                  className={styles.select}
+                  aria-label="Link to Module"
+                >
+                  <option value="">No module</option>
+                  {sortedModules.map((m) => (
+                    <option key={m.id} value={m.id}>{m.module_code} – {m.module_name || m.title || ""}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {showAddToScheduleToggle && (
+            <div className={styles.scheduleRow}>
+              <label className={styles.scheduleLabel}>
+                <input
+                  type="checkbox"
+                  checked={addToSchedule}
+                  onChange={(e) => setAddToSchedule(e.target.checked)}
+                  className={styles.scheduleCheckbox}
+                />
+                <span>{addToScheduleLabel}</span>
+              </label>
+            </div>
+          )}
         </div>
 
         <div className={styles.footer}>

@@ -1,5 +1,5 @@
 /**
- * 21 distinct colours for focus blocks (no duplicates or near-duplicates).
+ * 21 distinct colours for lists (no duplicates or near-duplicates).
  * Used in CreateListModal palette, list sidebar, and task modals.
  */
 export const FOCUS_BLOCK_COLOURS = [

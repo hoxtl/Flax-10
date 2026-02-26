@@ -2,21 +2,39 @@
    TaskFeed
    ════════════════════════════════════════════════ */
 
-   .feed {
+.feed {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 0 2rem;
+    padding: 0 32px;
+}
+
+/* ── Create Task bar (above toolbar) ── */
+.createBarWrap {
+    flex-shrink: 0;
+    padding: 16px 24px 8px;
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.quickCaptureLabel {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-task);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted-sage);
 }
 
 /* ── Toolbar ── */
 .toolbar {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 1.25rem 0.75rem;
+    gap: 12px;
+    padding: 8px 24px 12px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     background: var(--bg);
@@ -31,7 +49,7 @@
 
 .searchIcon {
     position: absolute;
-    left: 0.65rem;
+    left: 12px;
     font-size: 0.78rem;
     pointer-events: none;
     opacity: 0.5;
@@ -39,27 +57,34 @@
 
 .searchInput {
     width: 100%;
-    padding: 0.45rem 2rem 0.45rem 2rem;
-    background: var(--panel);
+    padding: 8px 32px 8px 32px;
+    background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 9999px;
+    border-radius: 12px;
     font-size: 0.82rem;
+    font-weight: 500;
     color: var(--text);
     outline: none;
-    transition: border-color 0.15s;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
 }
-.searchInput:focus { border-color: var(--primary); }
-.searchInput::placeholder { color: var(--muted); }
+.searchInput:focus {
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
+    border-color: var(--primary);
+}
+.searchInput::placeholder {
+    color: var(--muted);
+}
 
 .searchClear {
     position: absolute;
-    right: 0.5rem;
+    right: 8px;
     background: none;
     border: none;
     color: var(--muted);
     font-size: 0.7rem;
     cursor: pointer;
-    padding: 0.25rem;
+    padding: 8px;
     line-height: 1;
 }
 .searchClear:hover { color: var(--text); }
@@ -72,54 +97,57 @@
 }
 
 .sortLabel {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-caption);
+    color: var(--text-muted-sage);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
 }
 
 .sortSelect {
-    padding: 0.44rem 0.9rem;
-    background: var(--panel);
-    border: 1.5px solid var(--border);
-    border-radius: 9999px;
+    padding: 8px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
     outline: none;
     cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
 }
 .sortSelect:focus {
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
     border-color: var(--primary);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .addBtn {
-    padding: 0.5rem 1rem;
+    padding: 8px 16px;
     background: var(--primary);
     border: none;
-    border-radius: 9999px;
+    border-radius: 12px;
     color: white;
+    font-family: var(--font-body);
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: var(--font-weight-title);
     cursor: pointer;
     flex-shrink: 0;
     transition: opacity 0.15s, background 0.15s;
     white-space: nowrap;
 }
-.addBtn:hover { opacity: 0.92; background: color-mix(in srgb, var(--primary) 90%, #000); }
+.addBtn:hover { opacity: 0.92; background: color-mix(in srgb, var(--primary) 90%, #1e293b); }
 
 /* ── Sections scroll area ── */
 .sections {
     flex: 1;
     overflow-y: auto;
-    padding: 0.75rem 1.25rem 1.5rem;
+    padding: 12px 24px 24px;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 8px;
 }
 
 /* ── Empty state ── */
@@ -128,15 +156,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 3rem 1.5rem;
+    gap: 12px;
+    padding: 48px 24px;
     text-align: center;
 }
 
 .emptyIcon {
     width: 48px;
     height: 48px;
-    color: #8D7355;
+    color: #334155;
     opacity: 0.85;
     flex-shrink: 0;
 }
@@ -145,17 +173,17 @@
     margin: 0;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #8D7355;
+    color: #334155;
     max-width: 20rem;
     line-height: 1.4;
 }
 
 .emptyAddBtn {
-    margin-top: 0.5rem;
-    padding: 0.45rem 1rem;
+    margin-top: 8px;
+    padding: 8px 16px;
     background: var(--primary);
     border: none;
-    border-radius: 9999px;
+    border-radius: 12px;
     color: white;
     font-size: 0.8rem;
     font-weight: 600;
@@ -170,35 +198,43 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 5rem 1.5rem;
+    gap: 0;
+    padding: 2rem 1.5rem 2.5rem;
     text-align: center;
+    min-height: 200px;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
 }
 
 .emptyStateIcon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     line-height: 1;
-    opacity: 0.9;
+    opacity: 0.85;
+    margin-bottom: 0.75rem;
 }
 
 .emptyStateText {
     margin: 0;
+    font-family: var(--font-body);
     font-size: 0.95rem;
-    font-weight: 500;
-    color: #6b7280;
+    font-weight: var(--font-weight-caption);
+    color: var(--text-muted-sage);
     max-width: 22rem;
     line-height: 1.45;
 }
 
 .emptyStateAddBtn {
-    margin-top: 0.5rem;
-    padding: 0.6rem 1.25rem;
+    margin-top: 8px;
+    padding: 12px 24px;
     background: var(--primary);
     border: none;
-    border-radius: 9999px;
+    border-radius: 12px;
     color: white;
+    font-family: var(--font-body);
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: var(--font-weight-task);
     cursor: pointer;
     transition: opacity 0.15s, filter 0.15s;
 }
@@ -213,25 +249,25 @@
 
 .sectionOverdue .sectionBody {
     background: #FEF2F2;
-    border-radius: 0 0 8px 8px;
-    padding: 0.5rem 0.25rem 0.5rem 0.5rem;
+    border-radius: 0 0 12px 12px;
+    padding: 8px 8px 8px 8px;
     margin-top: -2px;
 }
 
 .sectionOverdue .sectionHeader {
     background: #FEF2F2;
-    border-radius: 8px 8px 0 0;
+    border-radius: 12px 12px 0 0;
 }
 
 .sectionHeader {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.6rem;
+    gap: 8px;
+    padding: 8px 12px;
     background: none;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     text-align: left;
     transition: background 0.1s;
@@ -250,11 +286,12 @@
 }
 
 .sectionTitle {
+    font-family: var(--font-body);
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-title);
     text-transform: lowercase;
     letter-spacing: 0.08em;
-    color: #8D7355;
+    color: var(--text-charcoal);
     flex: 1;
 }
 
@@ -267,8 +304,8 @@
     padding: 0 0.35rem;
     font-size: 0.68rem;
     font-weight: 700;
-    color: #6B5344;
-    background: color-mix(in srgb, #8D7355 20%, var(--bg));
+    color: #334155;
+    background: rgba(51, 65, 85, 0.1);
     border-radius: 50%;
 }
 
@@ -281,7 +318,7 @@
 .sectionCountLabel {
     font-size: 0.62rem;
     font-weight: 600;
-    color: #8D7355;
+    color: #334155;
     opacity: 0.85;
 }
 
@@ -294,24 +331,27 @@
 .sectionBody {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding-left: 0.25rem;
+    gap: 8px;
+    padding-left: 8px;
 }
 
 /* ── Task group (per list) ── */
 .taskGroup {
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--panel);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--glass-border);
+    box-shadow: var(--card-shadow);
 }
 
 .groupHeader {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.5rem 0.75rem;
+    gap: 8px;
+    padding: 8px 12px;
     background: none;
     border: none;
     cursor: pointer;
@@ -360,24 +400,24 @@
 .groupCards {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    padding: 0.35rem;
+    gap: 8px;
+    padding: 8px;
     background: var(--bg);
-    gap: 0.35rem;
 }
 
-/* ── Completed section ── */
+/* ── Recently Harvested (Completed) section ── */
 .completedSection {
-    margin-top: 0.5rem;
-    opacity: 0.7;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
 }
 
 .completedToggle {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 0.6rem;
+    gap: 8px;
+    padding: 8px 12px;
     background: none;
     border: none;
     cursor: pointer;
@@ -385,12 +425,20 @@
     font-weight: 600;
     text-transform: lowercase;
     letter-spacing: 0.08em;
-    color: #8D7355;
-    border-radius: 8px;
+    color: var(--text);
+    border-radius: 12px;
     transition: background 0.1s;
 }
 .completedToggle:hover { background: var(--hover); }
 .completedToggle span:first-child { flex: 1; text-align: left; }
+
+.completedSub {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+}
 
 .completedToggle .sectionCountCircle {
     min-width: 20px;
@@ -398,14 +446,14 @@
     padding: 0 0.35rem;
     font-size: 0.68rem;
     font-weight: 700;
-    color: #6B5344;
-    background: color-mix(in srgb, #8D7355 20%, var(--bg));
+    color: #334155;
+    background: rgba(51, 65, 85, 0.1);
     border-radius: 50%;
 }
 
 .completedCards {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.25rem 0;
+    gap: 8px;
+    padding: 8px 0;
 }

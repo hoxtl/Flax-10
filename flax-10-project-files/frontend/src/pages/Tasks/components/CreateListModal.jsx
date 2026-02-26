@@ -26,17 +26,17 @@ export default function CreateListModal({ onSave, onClose }) {
       <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
 
         <div className={styles.header}>
-          <h2 className={styles.title}>New focus block</h2>
+          <h2 className={styles.title}>New list</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
         <div className={styles.body}>
-          <p className={styles.subtitle}>Scheduled focus time — give it a name and colour</p>
+          <p className={styles.subtitle}>Give your list a name and colour</p>
 
           {/* Name */}
           <input
             className={styles.nameInput}
-            placeholder="Focus block name…"
+            placeholder="List name…"
             value={name}
             onChange={e => setName(e.target.value)}
             autoFocus
@@ -82,7 +82,7 @@ export default function CreateListModal({ onSave, onClose }) {
           {/* Preview */}
           <div className={styles.preview} style={{ "--list-color": effectiveColor }}>
             <span className={styles.previewDot} style={{ background: effectiveColor }} />
-            <span className={styles.previewName}>{name || "Focus block name"}</span>
+            <span className={styles.previewName}>{name || "List name"}</span>
           </div>
 
         </div>
@@ -94,7 +94,7 @@ export default function CreateListModal({ onSave, onClose }) {
             onClick={handleSave}
             disabled={saving || !name.trim()}
           >
-            {saving ? "Creating…" : "Create focus block"}
+            {saving ? "Creating…" : "Create list"}
           </button>
         </div>
       </div>

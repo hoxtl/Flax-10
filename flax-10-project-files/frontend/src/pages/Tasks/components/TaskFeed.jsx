@@ -1,9 +1,22 @@
 import { useState, useMemo } from "react";
 import TaskCard from "./TaskCard";
+import CreateTaskBar from "./CreateTaskBar";
+import ZenGardenEmptyState from "../../../components/ZenGardenEmptyState";
 import styles from "./TaskFeed.module.css";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
+
+/** Routine/event tasks (meals, lectures, etc.) auto-pass when time has passed — exclude from Overdue. */
+function isRoutineOrEventTask(task) {
+  if (!task) return false;
+  const title = (task.title || "").toLowerCase();
+  const tag = (task.tag || "").toString().toLowerCase();
+  if (tag === "routine" || tag === "event") return true;
+  if (/breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title)) return true;
+  if (/lecture|seminar|tutorial|lab\s*session/i.test(title)) return true;
+  return false;
+}
 
 function sortTasks(tasks, sortBy) {
     return [...tasks].sort((a, b) => {
@@ -64,7 +77,7 @@ function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDel
                                 task={task}
                                 listName={list?.name}
                                 listColor={getListColor(list)}
-                                onToggle={() => onToggleComplete(task.id)}
+                                onToggle={() => onToggleComplete(task.id, task.completed)}
                                 onDelete={() => onDeleteTask(task.id)}
                                 onEdit={data => onEditTask(task.id, data)}
                                 hideDueBadge={hideDueBadge}
@@ -82,14 +95,17 @@ export default function TaskFeed({
     tasks,
     lists,
     activeFilter,
+    activeListId,
+    defaultDueDateForNewTask,
     onToggleComplete,
     onDeleteTask,
     onEditTask,
     onCreateTask,
+    onAddTask,
 }) {
     const [search, setSearch]     = useState("");
     const [sortBy, setSortBy]     = useState("priority");
-    const [showDone, setShowDone] = useState(false);
+    const [showDone, setShowDone] = useState(true);
 
     // Build list lookup map: id → { name, color, idx }
     const listMap = useMemo(() => {
@@ -117,21 +133,52 @@ export default function TaskFeed({
     const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
     const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
-    const overdue  = filtered.filter(t => t.due_date && new Date(t.due_date) < now);
+    const overdue  = filtered.filter(t => t.due_date && new Date(t.due_date) < now && !t.completed && !isRoutineOrEventTask(t));
     const today    = filtered.filter(t => t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd);
     const thisWeek = filtered.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); return d > todayEnd && d <= weekEnd; });
     const later    = filtered.filter(t => !t.due_date || new Date(t.due_date) > weekEnd);
 
     const hasAny = filtered.length > 0;
 
-    const isBrandNew = tasks.length === 0;
-    const isAllCompleted = tasks.length > 0 && pending.length === 0;
+    const isZenEmpty = tasks.length === 0 || pending.length === 0;
+    const allCompleted = tasks.length > 0 && pending.length === 0;
+    const showZenEmptyState = !hasAny && isZenEmpty;
+    const showSearchEmptyState = !hasAny && !isZenEmpty;
+
+    const zenMessage = allCompleted
+      ? "The slate is clean. You've mastered your momentum for now. ✨"
+      : null;
+    const zenCtaLabel = allCompleted ? "Plan a new session" : "Add a new seed";
+
+    const displayName = useMemo(() => {
+      try {
+        const raw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+        if (!raw) return null;
+        const u = JSON.parse(raw);
+        return (u.first_name || "").trim() || (u.username || "").trim() || null;
+      } catch {
+        return null;
+      }
+    }, []);
 
     const sectionProps = { sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask };
 
     return (
         <div className={styles.feed}>
-            {/* ── Toolbar — search + sort + add ── */}
+            {/* Create Task bar — single-line entry; always visible */}
+            {onAddTask && (
+                <div className={styles.createBarWrap}>
+                    <span className={styles.quickCaptureLabel}>Quick Capture</span>
+                    <CreateTaskBar
+                        lists={lists}
+                        defaultListId={activeListId}
+                        defaultDueDate={defaultDueDateForNewTask}
+                        onAddTask={onAddTask}
+                    />
+                </div>
+            )}
+
+            {/* Toolbar — search + sort + full modal trigger */}
             <div className={styles.toolbar}>
                 <div className={styles.searchWrap}>
                     <span className={styles.searchIcon}>🔍</span>
@@ -165,34 +212,40 @@ export default function TaskFeed({
                         className={styles.addBtn}
                         onClick={onCreateTask}
                     >
-                        + New task
+                        + Full Planning
                     </button>
                 )}
             </div>
 
-            {/* ── Task sections ── */}
+            {/* Task sections or empty state — below Create Task bar, never overlapping */}
             <div className={styles.sections}>
-                {!hasAny && (
+                {showZenEmptyState && (
                     <div className={styles.emptyState}>
-                        <span className={styles.emptyStateIcon} aria-hidden>
-                            {search ? "🔍" : isBrandNew ? "🪴" : "🐈"}
-                        </span>
-                        <p className={styles.emptyStateText}>
-                            {search
-                                ? `No tasks match "${search}"`
-                                : isBrandNew
-                                ? "A fresh start! What's the first goal you'll plant here?"
-                                : "All chores are done. Time for a cat nap?"}
-                        </p>
-                        {!search && isBrandNew && onCreateTask && (
+                      <ZenGardenEmptyState
+                        displayName={displayName}
+                        sub={null}
+                        message={zenMessage}
+                        action={
+                          onCreateTask ? (
                             <button
-                                type="button"
-                                className={styles.emptyStateAddBtn}
-                                onClick={onCreateTask}
+                              type="button"
+                              className={styles.emptyStateAddBtn}
+                              onClick={onCreateTask}
                             >
-                                + Add Task
+                              {zenCtaLabel}
                             </button>
-                        )}
+                          ) : null
+                        }
+                      />
+                    </div>
+                )}
+
+                {showSearchEmptyState && (
+                    <div className={styles.emptyState}>
+                        <span className={styles.emptyStateIcon} aria-hidden>🔍</span>
+                        <p className={styles.emptyStateText}>
+                            No tasks match "{search}"
+                        </p>
                     </div>
                 )}
 
@@ -204,7 +257,8 @@ export default function TaskFeed({
                 {completed.length > 0 && (
                     <div className={styles.completedSection}>
                         <button className={styles.completedToggle} onClick={() => setShowDone(s => !s)}>
-                            <span>✓ completed</span>
+                            <span>🌱 Recently Harvested</span>
+                            <span className={styles.completedSub}>Completed</span>
                             <span className={styles.sectionCountCircle} aria-label={`${completed.length} tasks`}>{completed.length}</span>
                             <span className={styles.sectionChevron}>{showDone ? "▼" : "▶"}</span>
                         </button>
@@ -218,7 +272,7 @@ export default function TaskFeed({
                                             task={task}
                                             listName={list?.name}
                                             listColor={getListColor(list)}
-                                            onToggle={() => onToggleComplete(task.id)}
+                                            onToggle={() => onToggleComplete(task.id, task.completed)}
                                             onDelete={() => onDeleteTask(task.id)}
                                             onEdit={data => onEditTask(task.id, data)}
                                         />

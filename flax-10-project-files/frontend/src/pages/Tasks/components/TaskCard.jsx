@@ -1,6 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTimerContext } from "../../../context/TimerContext";
+import { useHarvestCelebration } from "../../../context/HarvestCelebrationContext";
+import { getHarvestMessage, isRoutineHarvestTask } from "../../../lib/harvestMessages";
 import DateTimePicker from "./DateTimePicker";
+import { SeedBurst } from "../../../components/HarvestCelebration/SeedBurst";
 import styles from "./TaskCard.module.css";
 
 function useActiveTimerTaskId() {
@@ -59,7 +63,7 @@ function formatDueDate(dueDate) {
     };
 }
 
-function EditTaskModal({ task, onSave, onDelete, onClose }) {
+export function EditTaskModal({ task, onSave, onDelete, onClose }) {
     const [form, setForm] = useState({
         title:       task.title,
         description: task.description || "",
@@ -144,13 +148,37 @@ function EditTaskModal({ task, onSave, onDelete, onClose }) {
 
 export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, listColor, hideDueBadge = false, isOverdue = false }) {
     const [showEdit, setShowEdit] = useState(false);
+    const [seedPop, setSeedPop] = useState(false);
+    const seedPopTimeoutRef = useRef(null);
     const nav = useNavigate();
+    const { setActiveTaskId } = useTimerContext();
+    const { showHarvestToast } = useHarvestCelebration();
     const activeTimerTaskId = useActiveTimerTaskId();
     const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
 
     const due   = formatDueDate(task.due_date);
     const color = PRIORITY_COLOURS[task.priority] || "var(--neutral)";
     const accent = isOverdue ? "var(--urgent)" : color;
+
+    const handleCheckClick = () => {
+        const wasIncomplete = !task.completed;
+        const isRoutine = isRoutineHarvestTask(task);
+        if (wasIncomplete) {
+            if (!isRoutine) setSeedPop(true);
+            const messageContext = { isOverdue, dueStatus: due?.status };
+            showHarvestToast(getHarvestMessage(task, messageContext), { isRoutine });
+            if (!isRoutine && seedPopTimeoutRef.current) clearTimeout(seedPopTimeoutRef.current);
+            if (!isRoutine) {
+                seedPopTimeoutRef.current = setTimeout(() => {
+                    setSeedPop(false);
+                    seedPopTimeoutRef.current = null;
+                }, 500);
+            }
+        }
+        onToggle();
+    };
+
+    useEffect(() => () => { if (seedPopTimeoutRef.current) clearTimeout(seedPopTimeoutRef.current); }, []);
 
     return (
         <>
@@ -161,14 +189,16 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                 {/* Left accent stripe */}
                 <div className={styles.stripe} />
 
-                {/* Checkbox */}
+                {/* Checkbox with seed burst */}
+                <SeedBurst active={seedPop}>
                 <button
                     className={`${styles.check} ${task.completed ? styles.checkDone : ""}`}
-                    onClick={onToggle}
+                    onClick={handleCheckClick}
                     title={task.completed ? "Mark incomplete" : "Mark complete"}
                 >
                     {task.completed && <span className={styles.checkMark}>✓</span>}
                 </button>
+                </SeedBurst>
 
                 {/* Main content — whole area opens edit (description in modal) */}
                 <div
@@ -232,7 +262,10 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                             type="button"
                             className={styles.actionBarBtn}
                             title="Study now"
-                            onClick={() => nav(`/timer?taskId=${task.id}`)}
+                            onClick={() => {
+                                setActiveTaskId(task.id, { title: task.title, categoryColor: listColor || undefined });
+                                nav("/timer", { state: { fromTaskPlay: true } });
+                            }}
                             aria-label="Study now"
                         >
                             <IconPlay />

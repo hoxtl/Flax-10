@@ -27,6 +27,13 @@ function useFilteredTasks(tasks, activeListId, activeFilter) {
     }, [tasks, activeListId, activeFilter]);
 }
 
+/** End of today as ISO string so new tasks from Today view show in Today (due_date >= now && <= todayEnd). */
+function getTodayEndISO() {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d.toISOString();
+}
+
 export default function TasksPage() {
     const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
     const { tasks, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
@@ -37,6 +44,7 @@ export default function TasksPage() {
     const [toastUndo,       setToastUndo]      = useState(null);
 
     const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter);
+    const defaultDueDateForNewTask = activeFilter === "today" ? getTodayEndISO() : null;
 
     const handleUndoAddTask = () => {
         if (!toastUndo) return;
@@ -81,15 +89,25 @@ export default function TasksPage() {
                 tasks={filteredTasks}
                 lists={lists}
                 activeFilter={activeFilter}
+                activeListId={activeListId}
+                defaultDueDateForNewTask={defaultDueDateForNewTask}
                 onToggleComplete={toggleComplete}
                 onDeleteTask={removeTask}
                 onEditTask={editTask}
                 onCreateTask={() => setShowTaskModal(true)}
+                onAddTask={async (data) => {
+                    const created = await addTask(data);
+                    if (created) {
+                        setToastUndo({ taskId: created.id, title: created.title });
+                        setTimeout(() => setToastUndo(null), 5000);
+                    }
+                }}
             />
             {showTaskModal && (
                 <CreateTaskModal
                     lists={lists}
                     defaultListId={activeListId}
+                    defaultDueDate={defaultDueDateForNewTask}
                     onSave={async (data) => {
                         const created = await addTask(data);
                         setToastUndo(created ? { taskId: created.id, title: created.title } : null);
