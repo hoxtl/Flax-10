@@ -8,7 +8,8 @@ import { EventModal } from '../../components/Calendar/EventModal/EventModal';
 import { EventDetailPopup } from '../../components/Calendar/EventDetailPopup';
 import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from '../../components/Calendar/hooks/useCalendarEvents';
-import { getEventType } from '../../components/Calendar/utils/eventUtils';
+import { getEventType, hasRecurrence } from '../../components/Calendar/utils/eventUtils';
+import { executeDelete, deleteRecurrenceOccurrence } from '../../components/Calendar/utils/formUtils';
 import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
 import ConfirmModal from '../../components/shared/ConfirmModal';
@@ -27,7 +28,8 @@ export default function CalendarPage() {
             <Calendar />
             <EventModalContainer />
             <EventPopupContainer />
-        </div>);}
+        </div>);
+}
 
 function EventModalContainer() {
     const { isModalOpen, closeModal, modalEvent, modalType, modalInitialDate } = useEventModal();
@@ -39,23 +41,36 @@ function EventModalContainer() {
             initialType={modalType}
             initialDate={modalInitialDate}
         />
-    );}
+    );
+}
 
 function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
-    const { removeEvent } = useEventActions();
+    const { removeEvent, addException } = useEventActions();
     const { loadEvents } = useCalendarEvents();
     const tags = useTags();
     const navigate = useNavigate();
-    const [deleteEvent, setDeleteEvent] = useState(null);
+    const [deleteEventState, setDeleteEvent] = useState(null);
 
     const handleDeleteRequest = (event) => { closePopup(); setDeleteEvent(event); };
-    const handleDeleteConfirm = async () => { await removeEvent(deleteEvent.id); setDeleteEvent(null); };
+    const handleDeleteConfirm = async () => {
+        if (!deleteEventState) return;
+        try {
+            const recurring = hasRecurrence(deleteEventState);
+            const choice = recurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
+
+            if (choice) await executeDelete(deleteEventState, { removeEvent });
+            else await deleteRecurrenceOccurrence(deleteEventState, { addException });
+        } catch (err) {
+            console.error('Deletion failed:', err);
+        }
+        setDeleteEvent(null);
+    };
     const handleDeleteCancel = () => setDeleteEvent(null);
 
-    if (deleteEvent) {
-        return <DeleteConfirmModal event={deleteEvent} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
+    if (deleteEventState) {
+        return <DeleteConfirmModal event={deleteEventState} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
     }
     if (isModalOpen || !popupEvent) return null;
 
