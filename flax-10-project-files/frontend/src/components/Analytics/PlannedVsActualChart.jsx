@@ -7,6 +7,8 @@ const PlannedVsActualChart = ({ data }) => {
   const dates = last14.map(d => new Date(d.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }));
   const plannedHours = last14.map(d => parseFloat(d.planned_hours));
   const actualHours = last14.map(d => parseFloat(d.actual_hours));
+  const maxVal = Math.max(0.5, ...plannedHours, ...actualHours);
+  const yMax = Math.ceil(maxVal) + 1;
 
   const textColor = theme === 'dark' ? 'rgba(200,184,164,0.85)' : 'rgba(43,30,20,0.55)';
   const gridColor = theme === 'dark' ? 'rgba(180,164,144,0.2)' : 'rgba(74,52,33,0.15)';
@@ -18,7 +20,10 @@ const PlannedVsActualChart = ({ data }) => {
         data: dates,
         tickLabelStyle: { fill: textColor, fontSize: 11 },
       }]}
-      yAxis={[{ tickLabelStyle: { fill: textColor, fontSize: 11 } }]}
+      yAxis={[{
+        tickLabelStyle: { fill: textColor, fontSize: 11 },
+        max: yMax,
+      }]}
       series={[
         { data: plannedHours, label: 'Planned (hrs)', color: '#90CAF9' },
         { data: actualHours, label: 'Actual (hrs)', color: '#4CAF50' },
