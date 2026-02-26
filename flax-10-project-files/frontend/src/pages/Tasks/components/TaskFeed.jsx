@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
+
 import TaskCard from "./TaskCard";
 import CreateTaskBar from "./CreateTaskBar";
 import ZenGardenEmptyState from "../../../components/ZenGardenEmptyState";
-import styles from "./TaskFeed.module.css";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
+
+import styles from "./TaskFeed.module.css";
 
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 

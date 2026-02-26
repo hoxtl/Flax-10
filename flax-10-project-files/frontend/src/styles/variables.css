@@ -114,7 +114,6 @@
   --color-sage-primary: #52796f;
   --color-sage-glow: rgba(82, 121, 111, 0.5);
   --color-border-light: rgba(0, 0, 0, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.5);
 
   /* Progress wave / growth tank (light) */
   --growth-tank-deep: var(--color-sage-dark);
@@ -140,7 +139,6 @@
 
   --now-banner-bg: rgba(255, 255, 255, 0.6);
   --now-banner-bg-idle: rgba(255, 251, 240, 0.6);
-  --glass-bg: rgba(255, 255, 255, 0.5);
 
   /* Home page: solid background */
   --bg-home: var(--bg);
