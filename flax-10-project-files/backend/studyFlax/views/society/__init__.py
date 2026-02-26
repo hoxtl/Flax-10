@@ -1,4 +1,4 @@
-from .society_views import society_list
+from .society_views import society_list, publish_changes
 from .society_detail_views import society_detail
 from .membership_views import membership_list, membership_detail
 from .society_tag_views import society_tag_list, society_tag_detail
