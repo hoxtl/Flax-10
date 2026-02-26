@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import {
   getDeadlineCountdown,
@@ -11,6 +12,7 @@ import {
   isDeadlineUnder24h,
   DEADLINE_LABELS,
 } from "./utils/deadlineUtils";
+
 import styles from "./DeadlinesWidget.module.css";
 
 /* ─── Main widget ─────────────────────────────── */
