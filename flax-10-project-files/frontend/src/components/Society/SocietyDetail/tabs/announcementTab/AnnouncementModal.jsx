@@ -5,38 +5,57 @@ import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
 import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
+import ConfirmModal from "../../../../shared/ConfirmModal";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 
-export default function AnnouncementModal({ onClose, onSubmit, tags = [], announcement = null, societyId, announcements = [] }) {
+export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = [], announcement = null, societyId, announcements = [] }) {
     const [form, setForm] = useState(getInitialForm(announcement));
     const [error, setError] = useState("");
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const fileRef = useRef(null);
     const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
-    useEffect(() => {
-        if (announcement?.event_id && societyId) {
-            fetchSocietyEvent(societyId, announcement.event_id)
-                .then(event => {
-                    setForm(prev => ({
-                        ...prev,
-                        addAsEvent: true,
-                        start_time: event.start_time?.slice(0, 16),
-                        end_time: event.end_time?.slice(0, 16),
-                        recurrence: event.recurrence,
-                        all_day: event.all_day
-                    }));
-                })
-                .catch(e => console.error("Failed to load linked event", e));}
-    }, [announcement, societyId]);
+
+    useEffect(() => { loadLinkedEvent(announcement, societyId, setForm); }, [announcement, societyId]);
+
+    const handleDelete = () => { onDelete?.(announcement.id); onClose(); };
+    const hasEvent = !!announcement?.event_id;
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
-                error={error} setError={setError} onClose={onClose}
-                onSubmit={(f, conflict) => handleSubmit(f, setError, onSubmit, announcements, conflict)}
-                isEdit={!!announcement} setForm={setForm} />
-        </div>
+        <>
+            <div className={styles.backdrop} onMouseDown={onClose}>
+                <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
+                    error={error} setError={setError} onClose={onClose}
+                    onSubmit={(f, conflict) => handleSubmit(f, setError, onSubmit, announcements, conflict)}
+                    isEdit={!!announcement} setForm={setForm}
+                    onDeleteClick={() => setShowDeleteConfirm(true)} />
+            </div>
+            {showDeleteConfirm && <DeleteConfirmModal hasEvent={hasEvent} onConfirm={handleDelete} onCancel={() => setShowDeleteConfirm(false)} />}
+        </>
     );
+}
+
+function loadLinkedEvent(announcement, societyId, setForm) {
+    if (!announcement?.event_id || !societyId) return;
+    fetchSocietyEvent(societyId, announcement.event_id)
+        .then(event => setForm(prev => mergeEventData(prev, event)))
+        .catch(e => console.error("Failed to load linked event", e));
+}
+
+function mergeEventData(prev, event) {
+    return {
+        ...prev, addAsEvent: true,
+        start_time: event.start_time?.slice(0, 16),
+        end_time: event.end_time?.slice(0, 16),
+        recurrence: event.recurrence, all_day: event.all_day
+    };
+}
+
+function DeleteConfirmModal({ hasEvent, onConfirm, onCancel }) {
+    const message = hasEvent
+        ? "This will delete the announcement and its linked event. This cannot be undone."
+        : "Are you sure you want to delete this announcement? This cannot be undone.";
+    return <ConfirmModal title="Delete Announcement" message={message} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
 function handleSubmit(form, setError, onSubmit, announcements, conflict) {
