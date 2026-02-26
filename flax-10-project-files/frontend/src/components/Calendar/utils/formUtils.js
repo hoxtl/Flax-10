@@ -1,5 +1,6 @@
 import { findOverlappingEvents } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
+import { validateDateRange } from './dateValidation';
 
 
 
@@ -75,9 +76,8 @@ function hasOverlaps(data, event, allEvents, setOverlapWarning) {
 }
 
 function validateForm(form) {
-    if (new Date(form.start_time) >= new Date(form.end_time)) return 'Start must be before end';
     if (!form.title.trim()) return 'Title is required';
-    return null;
+    return validateDateRange(form.start_time, form.end_time);
 }
 
 async function submitEvent(event, data, actions, onClose, setError) {
