@@ -3,6 +3,7 @@
     display: flex;
     overflow: hidden;
     gap: 0;
+    font-family: var(--font-body);
 }
 
 .loading {
@@ -15,25 +16,25 @@
 
 .toast {
     position: fixed;
-    bottom: 1.25rem;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    gap: 8px;
+    padding: 8px 16px;
     background: var(--text);
     color: var(--bg);
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 0.82rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.15);
     z-index: 1000;
 }
 .toastUndoBtn {
     background: rgba(255,255,255,0.25);
     border: none;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
+    padding: 8px 16px;
+    border-radius: 12px;
     color: inherit;
     font-size: 0.78rem;
     font-weight: 600;

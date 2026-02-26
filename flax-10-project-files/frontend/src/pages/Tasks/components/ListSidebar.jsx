@@ -4,6 +4,16 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./ListSidebar.module.css";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
+function isRoutineOrEventTask(task) {
+  if (!task) return false;
+  const title = (task.title || "").toLowerCase();
+  const tag = (task.tag || "").toString().toLowerCase();
+  if (tag === "routine" || tag === "event") return true;
+  if (/breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title)) return true;
+  if (/lecture|seminar|tutorial|lab\s*session/i.test(title)) return true;
+  return false;
+}
+
 function listColour(list, idx) {
     try {
         if (list?.color) return list.color;
@@ -49,7 +59,7 @@ function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
             </button>
             <div className={styles.ctxDivider} />
             <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}>
-                🗑️ Delete focus block
+                🗑️ Delete list
             </button>
         </div>
     );
@@ -77,7 +87,7 @@ export default function ListSidebar({
     const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
     const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
-    const overdueCount = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now).length;
+    const overdueCount = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now && !isRoutineOrEventTask(t)).length;
     const todayCount   = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd).length;
     const weekCount    = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) > todayEnd && new Date(t.due_date) <= weekEnd).length;
     const allCount     = tasks.filter(t => !t.completed).length;
@@ -119,8 +129,8 @@ export default function ListSidebar({
                 ))}
             </nav>
 
-            {/* ── Focus blocks ── */}
-            <div className={styles.sectionLabel}>FOCUS BLOCKS</div>
+            {/* ── Lists ── */}
+            <div className={styles.sectionLabel}>LISTS</div>
             <nav className={styles.nav}>
                 {lists.map((list, idx) => {
                     const color  = listColour(list, idx);
@@ -153,12 +163,12 @@ export default function ListSidebar({
                         </div>
                     );
                 })}
-                {lists.length === 0 && <p className={styles.emptyLists}>No focus blocks yet</p>}
+                {lists.length === 0 && <p className={styles.emptyLists}>No lists yet</p>}
             </nav>
 
             {/* ── Explicit create button ── */}
             <button className={styles.createListBtn} onClick={onNewList}>
-                + Add focus block
+                + Add list
             </button>
 
             {/* ── Archived section ── */}

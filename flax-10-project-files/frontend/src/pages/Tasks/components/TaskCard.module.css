@@ -6,20 +6,22 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 0.85rem 0.75rem 0.95rem;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    gap: 12px;
+    padding: 12px 16px 12px 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--glass-border);
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--card-shadow);
     transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
     overflow: hidden;
 }
 
 .card:hover {
-    background: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-    border-color: #E5E7EB;
+    background: var(--glass-bg);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08), var(--card-shadow);
+    border-color: var(--glass-border);
     transform: translateY(-1px);
 }
 
@@ -28,11 +30,11 @@
 }
 
 .cardOverdue {
-    border-left: 3px solid var(--danger);
-    background: color-mix(in srgb, var(--danger) 8%, var(--bg));
+    border-left: 4px solid #fb923c;
+    background: rgba(255, 237, 213, 0.4);
 }
 .cardOverdue:hover {
-    border-left-color: var(--danger);
+    border-left-color: #fb923c;
     background: color-mix(in srgb, var(--danger) 10%, var(--bg));
 }
 
@@ -59,21 +61,21 @@
 /* Priority badge: muted pill — left stripe shows priority color */
 .priorityBadge {
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-task);
     padding: 0.15rem 0.45rem;
     border-radius: 9999px;
     border: none;
     letter-spacing: 0.02em;
     white-space: nowrap;
-    color: #374151;
-    background: #F3F4F6;
+    color: var(--text-charcoal);
+    background: #f1f5f9;
 }
 
 /* ── Checkbox ── */
 .check {
     width: 20px;
     height: 20px;
-    border-radius: 6px;
+    border-radius: 12px;
     border: 2px solid var(--border);
     background: transparent;
     flex-shrink: 0;
@@ -130,7 +132,7 @@
 .actionBarBtn {
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: 12px;
     border: none;
     background: transparent;
     color: var(--muted);
@@ -162,9 +164,10 @@
 }
 
 .title {
+    font-family: var(--font-body);
     font-size: 15px;
-    font-weight: 600;
-    color: #2D2D2D;
+    font-weight: var(--font-weight-task);
+    color: var(--text-charcoal);
     line-height: 1.35;
     word-break: break-word;
 }
@@ -176,7 +179,7 @@
 
 .titleDone {
     text-decoration: line-through;
-    color: var(--muted);
+    color: #94a3b8;
 }
 .titleDone.titleClickable:hover { text-decoration: line-through; }
 
@@ -188,28 +191,29 @@
     flex-wrap: wrap;
 }
 
-/* Flax bubble: Module (Light Sage / Dark Forest) */
+/* Flax bubble: Module (elegant pill) */
 .bubble {
     display: inline-flex;
     align-items: center;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.25rem 0.55rem;
     border-radius: 9999px;
     white-space: nowrap;
     text-decoration: none;
     transition: filter 0.15s ease;
+    letter-spacing: 0.02em;
 }
 .bubble:hover {
     filter: brightness(0.95);
 }
 .bubbleModule {
-    background: #E8F5E9;
-    color: #2D4F32;
+    background: color-mix(in srgb, var(--sage, #52796f) 14%, #fff);
+    color: var(--color-sage-dark, #2D4F32);
 }
 .bubbleModule:hover {
-    background: #E8F5E9;
-    color: #2D4F32;
+    background: color-mix(in srgb, var(--sage, #52796f) 18%, #fff);
+    color: var(--color-sage-dark, #2D4F32);
 }
 
 .bubbleExam {
@@ -236,8 +240,8 @@
     border-radius: 9999px;
     border: none;
     white-space: nowrap;
-    color: #4B5563;
-    background: #F3F4F6;
+    color: #334155;
+    background: #f1f5f9;
 }
 
 .listBadgeDot {
@@ -251,6 +255,8 @@
     font-size: 0.62rem;
     font-weight: 600;
     white-space: nowrap;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 /* Unified urgency colors: today = soft red, this week = amber, else = sage */
@@ -278,11 +284,11 @@
 
 .editModal {
     width: min(480px, 94vw);
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 18px;
+    background: #faf9f6;
+    border: 1px solid rgba(82, 121, 111, 0.2);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.16);
+    box-shadow: 0 4px 24px rgba(74, 52, 33, 0.08);
     animation: slideUp 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -295,21 +301,22 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(82, 121, 111, 0.2);
 }
 
 .editTitle {
+    font-family: var(--font-body);
     font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text);
+    font-weight: var(--font-weight-title);
+    color: var(--text-charcoal);
     margin: 0;
 }
 
 .editClose {
     width: 26px;
     height: 26px;
-    border-radius: 50%;
+    border-radius: 12px;
     background: var(--hover);
     border: none;
     color: var(--muted);
@@ -321,10 +328,10 @@
 .editClose:hover { background: var(--border); color: var(--text); }
 
 .editBody {
-    padding: 1rem 1.25rem;
+    padding: 16px 24px;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 12px;
 }
 
 .editGrid {
@@ -341,36 +348,36 @@
 
 .editLabel {
     font-size: 0.65rem;
-    font-weight: 700;
+    font-weight: var(--font-weight-caption);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--muted);
+    color: var(--text-muted-sage);
 }
 
 .editInput,
 .editSelect {
-    padding: 0.5rem 0.65rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid var(--sage, #52796f);
     border-radius: 8px;
-    font-size: 0.82rem;
-    color: var(--text);
+    font-size: 0.9rem;
+    color: var(--text, #1a1a1a);
     outline: none;
     transition: border-color 0.15s;
     width: 100%;
     box-sizing: border-box;
 }
 .editInput:focus,
-.editSelect:focus { border-color: var(--primary); }
+.editSelect:focus { border-color: var(--color-sage-dark, #3d5a52); }
 
 .editDesc {
-    padding: 0.5rem 0.65rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid var(--sage, #52796f);
     border-radius: 8px;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     font-family: inherit;
-    color: var(--text);
+    color: var(--text, #1a1a1a);
     outline: none;
     resize: vertical;
     width: 100%;
@@ -378,15 +385,15 @@
     font-family: inherit;
     transition: border-color 0.15s;
 }
-.editDesc:focus { border-color: var(--primary); }
+.editDesc:focus { border-color: var(--color-sage-dark, #3d5a52); }
 
 .editFooter {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.6rem;
-    padding: 0.85rem 1.25rem;
-    border-top: 1px solid var(--border);
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid rgba(82, 121, 111, 0.2);
 }
 
 .editDeleteLink {
@@ -413,8 +420,8 @@
 }
 
 .cancelBtn {
-    padding: 0.48rem 1rem;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 12px;
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
@@ -425,15 +432,15 @@
 .cancelBtn:hover { background: var(--hover); }
 
 .saveBtn {
-    padding: 0.48rem 1.1rem;
+    padding: 8px 16px;
     border-radius: 8px;
-    background: #84A98C;
+    background: var(--c-caramel, #9E7E5D);
     border: none;
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, opacity 0.15s;
 }
-.saveBtn:hover { background: #6b8f73; }
+.saveBtn:hover { background: var(--primary-strong, #4A3421); }
 .saveBtn:disabled { opacity: 0.6; cursor: default; }
