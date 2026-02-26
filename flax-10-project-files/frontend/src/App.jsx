@@ -10,6 +10,7 @@ import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { HarvestCelebrationProvider } from "./context/HarvestCelebrationContext";
 import { NotificationToast } from "./components/Notifications";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
@@ -166,8 +167,10 @@ function AppProviders({ children }) {
       <CalendarProvider>
         <TagProvider>
           <TimerProvider>
-            {children}
-            <NotificationToast />
+            <HarvestCelebrationProvider>
+              {children}
+              <NotificationToast />
+            </HarvestCelebrationProvider>
           </TimerProvider>
         </TagProvider>
       </CalendarProvider>
@@ -262,7 +265,6 @@ function AppScreen({ activeNav, setActiveNav, user }) {
   );
 }
 
-// Sync URL pathname -> activeNav so Links (e.g. /modules?code=X) switch the view
 function useSyncNavFromUrl(pathname, setActiveNav) {
   useEffect(() => {
     const path = pathname || "/";
