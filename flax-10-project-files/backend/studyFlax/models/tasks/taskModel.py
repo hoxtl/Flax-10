@@ -34,6 +34,7 @@ class Task(models.Model):
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     due_date = models.DateTimeField(null=True, blank=True)
     completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True, help_text='When the task was marked complete; used for Seeds Grown Today.')
     add_to_calendar = models.BooleanField(default=False)
     time_spent_minutes = models.PositiveIntegerField(default=0)
 
