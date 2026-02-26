@@ -74,7 +74,8 @@ class SocietyEventSerialiser(serializers.ModelSerializer):
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
-            'all_day', 'tag', 'tag_data', 'recurrence', 'recurrence_end_date', 'announcement', 'created_at'
+            'all_day', 'tag', 'tag_data', 'recurrence', 'recurrence_end_date',
+            'exception_dates', 'announcement', 'created_at'
         ]
 
 
@@ -88,7 +89,7 @@ class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
-            'society', 'society_name', 'society_color', 'source', 'announcement'
+            'society', 'society_name', 'society_color', 'source', 'announcement', 'exception_dates'
         ]
 
     def get_society_color(self, obj):
