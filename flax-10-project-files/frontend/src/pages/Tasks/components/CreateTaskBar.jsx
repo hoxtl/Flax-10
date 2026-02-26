@@ -2,7 +2,7 @@
  * Quick Capture bar: task name only (optional duration/list/module).
  * For full planning (calendar, module, travel time) use the "Full Planning" button.
  */
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
@@ -31,6 +31,51 @@ const [taskListId, setTaskListId] = useState(
   const [enrolledModules, setEnrolledModules] = useState([]);
   const popoverRef = useRef(null);
   const listDropdownRef = useRef(null);
+  const listTriggerRef = useRef(null);
+  const moduleTriggerRef = useRef(null);
+  const [listPopoverRect, setListPopoverRect] = useState(null);
+  const [modulePopoverRect, setModulePopoverRect] = useState(null);
+
+  const updateListPopoverRect = useCallback(() => {
+    if (!listTriggerRef.current) return;
+    const r = listTriggerRef.current.getBoundingClientRect();
+    setListPopoverRect({ top: r.bottom + 6, left: r.left, width: Math.max(r.width, 160) });
+  }, []);
+  const updateModulePopoverRect = useCallback(() => {
+    if (!moduleTriggerRef.current) return;
+    const r = moduleTriggerRef.current.getBoundingClientRect();
+    setModulePopoverRect({ top: r.bottom + 8, left: r.left, width: Math.max(r.width, 160) });
+  }, []);
+
+  useEffect(() => {
+    if (listDropdownOpen) {
+      updateListPopoverRect();
+      const onResize = () => updateListPopoverRect();
+      window.addEventListener("scroll", updateListPopoverRect, true);
+      window.addEventListener("resize", onResize);
+      return () => {
+        window.removeEventListener("scroll", updateListPopoverRect, true);
+        window.removeEventListener("resize", onResize);
+      };
+    } else {
+      setListPopoverRect(null);
+    }
+  }, [listDropdownOpen, updateListPopoverRect]);
+
+  useEffect(() => {
+    if (modulePopoverOpen) {
+      updateModulePopoverRect();
+      const onResize = () => updateModulePopoverRect();
+      window.addEventListener("scroll", updateModulePopoverRect, true);
+      window.addEventListener("resize", onResize);
+      return () => {
+        window.removeEventListener("scroll", updateModulePopoverRect, true);
+        window.removeEventListener("resize", onResize);
+      };
+    } else {
+      setModulePopoverRect(null);
+    }
+  }, [modulePopoverOpen, updateModulePopoverRect]);
 
   useEffect(() => {
     if (!listDropdownOpen) return;
@@ -123,6 +168,7 @@ const [taskListId, setTaskListId] = useState(
         </div>
         <div className={styles.moduleWrap} ref={popoverRef}>
           <button
+            ref={moduleTriggerRef}
             type="button"
             className={`${styles.moduleBtn} ${moduleId ? styles.moduleBtnActive : ""}`}
             onClick={() => setModulePopoverOpen((o) => !o)}
@@ -133,7 +179,19 @@ const [taskListId, setTaskListId] = useState(
             📚 {selectedModule ? selectedModule.module_code : "Module"}
           </button>
           {modulePopoverOpen && (
-            <div className={styles.modulePopover}>
+            <div
+              className={styles.modulePopover}
+              style={
+                modulePopoverRect
+                  ? {
+                      position: "fixed",
+                      top: modulePopoverRect.top,
+                      left: modulePopoverRect.left,
+                      minWidth: modulePopoverRect.width,
+                    }
+                  : undefined
+              }
+            >
               <div className={styles.modulePopoverBubbles}>
                 <button
                   type="button"
@@ -168,6 +226,7 @@ const [taskListId, setTaskListId] = useState(
         <span className={styles.actionLabel} aria-hidden>List</span>
         <div className={styles.listDropdownWrap} ref={listDropdownRef}>
           <button
+            ref={listTriggerRef}
             type="button"
             className={styles.listDropdownTrigger}
             onClick={() => setListDropdownOpen((o) => !o)}
@@ -185,6 +244,16 @@ const [taskListId, setTaskListId] = useState(
               className={styles.listDropdownPopover}
               role="listbox"
               aria-label="List"
+              style={
+                listPopoverRect
+                  ? {
+                      position: "fixed",
+                      top: listPopoverRect.top,
+                      left: listPopoverRect.left,
+                      minWidth: listPopoverRect.width,
+                    }
+                  : undefined
+              }
             >
               {sortedLists.map((l) => (
                 <button
