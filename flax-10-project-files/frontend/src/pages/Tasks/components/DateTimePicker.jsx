@@ -138,7 +138,7 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
         onClick={() => setOpen(p => !p)}
       >
         <span className={styles.triggerIcon}>📅</span>
-        <span>{selDate ? formatDisplay(selDate) : placeholder}</span>
+        <span className={selDate ? styles.triggerValueMono : ""}>{selDate ? formatDisplay(selDate) : placeholder}</span>
         {selDate && (
           <button
             type="button"

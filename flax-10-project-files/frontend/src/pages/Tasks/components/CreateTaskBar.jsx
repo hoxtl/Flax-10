@@ -27,8 +27,20 @@ const [taskListId, setTaskListId] = useState(
   const [moduleId, setModuleId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [modulePopoverOpen, setModulePopoverOpen] = useState(false);
+  const [listDropdownOpen, setListDropdownOpen] = useState(false);
   const [enrolledModules, setEnrolledModules] = useState([]);
   const popoverRef = useRef(null);
+  const listDropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!listDropdownOpen) return;
+    const close = (e) => {
+      if (listDropdownRef.current && !listDropdownRef.current.contains(e.target))
+        setListDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [listDropdownOpen]);
 
   useEffect(() => {
     Promise.all([getModules(), getEnrollments()])
@@ -88,10 +100,10 @@ const [taskListId, setTaskListId] = useState(
       <input
         type="text"
         className={styles.input}
-        placeholder="Quick capture…"
+        placeholder="Add a task…"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        aria-label="Quick capture — task name"
+        aria-label="Add a task — task name"
       />
       <div className={styles.actions}>
         <span className={styles.actionLabel} aria-hidden>Duration</span>
@@ -154,22 +166,50 @@ const [taskListId, setTaskListId] = useState(
           )}
         </div>
         <span className={styles.actionLabel} aria-hidden>List</span>
-        <select
-          className={styles.select}
-          value={taskListId}
-          onChange={(e) => setTaskListId(e.target.value)}
-          aria-label="List"
-        >
-          {sortedLists.map((l) => (
-            <option key={l.id} value={l.id}>{l.name}</option>
-          ))}
-        </select>
+        <div className={styles.listDropdownWrap} ref={listDropdownRef}>
+          <button
+            type="button"
+            className={styles.listDropdownTrigger}
+            onClick={() => setListDropdownOpen((o) => !o)}
+            aria-label="Select list"
+            aria-expanded={listDropdownOpen}
+            aria-haspopup="listbox"
+          >
+            <span className={styles.listDropdownValue}>
+              {sortedLists.find((l) => String(l.id) === String(taskListId))?.name || "Select list"}
+            </span>
+            <span className={styles.listDropdownChevron} aria-hidden>▾</span>
+          </button>
+          {listDropdownOpen && (
+            <div
+              className={styles.listDropdownPopover}
+              role="listbox"
+              aria-label="List"
+            >
+              {sortedLists.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  role="option"
+                  aria-selected={String(taskListId) === String(l.id)}
+                  className={`${styles.listDropdownOption} ${String(taskListId) === String(l.id) ? styles.listDropdownOptionActive : ""}`}
+                  onClick={() => {
+                    setTaskListId(l.id);
+                    setListDropdownOpen(false);
+                  }}
+                >
+                  {l.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <button
         type="submit"
         className={styles.addBtn}
         disabled={saving || !title.trim()}
-        aria-label="Quick capture — add task"
+        aria-label="Add a task — add task"
       >
         {saving ? "…" : "Add"}
       </button>

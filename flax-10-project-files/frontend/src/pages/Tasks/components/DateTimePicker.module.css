@@ -1,30 +1,45 @@
 /* ── Wrapper ──────────────────────────────────────────────── */
 .wrap {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-  }
-  
-  /* ── Trigger button ──────────────────────────────────────── */
-  .trigger {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.6rem 0.75rem;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: 9px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text);
-    text-align: left;
-    transition: border-color 0.15s;
-  }
-  .trigger:hover, .triggerOpen { border-color: var(--primary); }
-  .triggerEmpty { color: var(--muted); }
-  .triggerIcon  { font-size: 0.9rem; flex-shrink: 0; }
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* ── Trigger button ──────────────────────────────────────── */
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--restoration-earth, #6B5344);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  color: var(--text);
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.trigger:hover,
+.triggerOpen {
+  border-color: var(--restoration-earth, #6B5344);
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.25);
+}
+
+.triggerEmpty { color: var(--muted); }
+
+.triggerIcon { font-size: 0.9rem; flex-shrink: 0; }
+
+.triggerValueMono {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
   
   .clearBtn {
     margin-left: auto;
@@ -135,16 +150,21 @@
   .timeIcon { font-size: 0.85rem; }
   .timeSep  { font-weight: 700; color: var(--muted); }
   .timeSelect {
-    padding: 0.3rem 0.4rem;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: var(--bg);
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--restoration-earth, #6B5344);
+    border-radius: 8px;
+    background: #fff;
     color: var(--text);
-    font-size: 0.82rem;
+    font-size: 0.9rem;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     cursor: pointer;
     outline: none;
   }
-  .timeSelect:focus { border-color: var(--primary); }
+  .timeSelect:focus {
+    border-color: var(--restoration-earth, #6B5344);
+    box-shadow: 0 0 0 2px rgba(196, 163, 90, 0.2);
+  }
   .doneBtn {
     margin-left: auto;
     background: var(--primary);
