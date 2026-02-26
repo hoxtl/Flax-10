@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
-import { Circle, Calendar } from "lucide-react";
+import { Sparkles, CalendarClock } from "lucide-react";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import {
@@ -13,7 +13,7 @@ import {
   useCalendarEvents,
   useEventActions,
 } from "../../components/Calendar/hooks/useCalendarEvents";
-import { fetchTasks, updateTask, createTask, fetchTaskLists, deleteTask } from "../../api/taskService";
+import { fetchTasks, updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskService";
 import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import { getModules, getEnrollments } from "../../api/moduleApi";
@@ -129,6 +129,15 @@ function formatCountdownTo(dueDateStr) {
 function fmtDurationMinsOnly(mins) {
   if (mins == null) return "";
   return `${mins}m`;
+}
+
+/** Duration for plan timeline card: "1h 30m" or "45m" (no start/end repetition). */
+function fmtDurationShort(mins) {
+  if (mins == null || mins < 0) return "";
+  if (mins < 60) return `${mins}m`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m ? `${h}h ${m}m` : `${h}h`;
 }
 
 function getTimeOfDay(date) {
@@ -581,6 +590,25 @@ function resolveEventIcon(event, tagIcon) {
   if (src === "timetable")                                      return "📖";
   if (tagIcon && tagIcon !== "📅")                              return tagIcon;
   return "📅";
+}
+
+/** Smart Emoji for Plan-for-the-Day cards: title-based seed (Executive Stationery theme). */
+function getPlanCardEmoji(title) {
+  const t = (title || "").toLowerCase();
+  // Food
+  if (/lunch|🥪/.test(t)) return "🥪";
+  if (/coffee|breakfast|☕|brunch|pret|costa/.test(t)) return "☕";
+  if (/dinner|meal|dining|🍽/.test(t)) return "🍽️";
+  // Academic
+  if (/study|revision|library|📚/.test(t)) return "📚";
+  if (/lecture|seminar|tutorial|🎓/.test(t)) return "🎓";
+  // Wellness
+  if (/meditat|yoga|stretch|mindful|🧘/.test(t)) return "🧘";
+  if (/gym|run|walk|jog|sport|exercise|🏃/.test(t)) return "🏃";
+  // Rest
+  if (/sleep|wind-down|wind down|rest|nap|🌙/.test(t)) return "🌙";
+  // Default
+  return "🌱";
 }
 
 /* Group overlapping events into clusters, then interleave gaps */
@@ -1081,7 +1109,16 @@ function isRoutineEvent(item) {
   const title = (item?.title || "").toLowerCase();
   const tagName = (item?.tag_name ?? item?.tag?.name ?? "").toString().toLowerCase();
   if (tagName === "routine" || tagName === "wellness") return true;
-  return /breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title);
+  return /breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack|commute/i.test(title);
+}
+
+/** Event is major academic/work (lecture, seminar, meeting) — only these go in Action Hub. */
+function isMajorAcademicOrWorkEvent(item) {
+  if (!item) return false;
+  if (isRoutineEvent(item)) return false;
+  const title = (item?.title || "").toLowerCase();
+  const tagName = (item?.tag_name ?? item?.tag?.name ?? "").toString().toLowerCase();
+  return /lecture|seminar|meeting|exam|tutorial|lab\s*session|class/i.test(title) || /lecture|seminar|meeting|academic|exam/i.test(tagName);
 }
 
 /** Task is routine (meals/sleep) or event-like (lecture/seminar/tutorial) — auto-pass when time has passed, no overdue. */
@@ -1091,7 +1128,7 @@ function isRoutineOrEventTask(task, getTag) {
   const tagLabel = (getTag && getTag(task.tag)?.label) || (task.tag_name || "").toString();
   const tagLower = tagLabel.toLowerCase();
   if (tagLower === "routine" || tagLower === "wellness" || tagLower === "event") return true;
-  if (/breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title)) return true;
+  if (/breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack|commute/i.test(title)) return true;
   if (/lecture|seminar|tutorial|lab\s*session/i.test(title)) return true;
   return false;
 }
@@ -1703,6 +1740,21 @@ const DAY_END_HOUR = 22;
 const PX_PER_HOUR = 80;
 const PX_PER_MIN = PX_PER_HOUR / 60;
 const MINI_TIMELINE_HEIGHT = (DAY_END_HOUR - DAY_START_HOUR) * PX_PER_HOUR;
+/** Gaps below this get a thin line; 30+ get the full ghost "Gap Card". */
+const GAP_CARD_THRESHOLD_MINS = 30;
+/** Vertical px per minute for Spaced Timeline (distance logic). */
+const SPACED_TIMELINE_PX_PER_MIN = 1.5;
+
+/** Smart gap label and variant by time of day. 08:00–11:00 Morning, 11:00–15:00 Mid-day, 17:00+ Evening. */
+function getSmartWindowLabel(gapStartDate) {
+  const d = gapStartDate instanceof Date ? gapStartDate : new Date(gapStartDate);
+  const hour = d.getHours() + d.getMinutes() / 60;
+  if (hour >= 8 && hour < 11) return { label: "Morning Momentum: Prime for Deep Work. ⚡", variant: "morning" };
+  if (hour >= 11 && hour < 15) return { label: "Mid-day Peak: Tackle your big goals. 🏔️", variant: "midday" };
+  if (hour >= 17 && hour < 24) return { label: "Evening Calm: Reset and reflect. 🌙", variant: "evening" };
+  if (hour >= 5 && hour < 8) return { label: "Early Window: Use intentionally. ⚡", variant: "default" };
+  return { label: "Focus Window: Use this time intentionally. ⚡", variant: "default" };
+}
 
 function minsFromDayStart(d) {
   const date = d instanceof Date ? d : new Date(d);
@@ -1716,14 +1768,29 @@ function MiniTimeline({
   dayTasks,
   tasksDueToday = [],
   suggestableTasks = [],
+  taskLists = [],
   onQuickStart,
   onHarvestToggle,
   onCardClick,
   onEdit,
+  onConflictAutoMove,
   onDelete,
   onReschedule,
   getTag,
 }) {
+  const [conflictPopoverRowId, setConflictPopoverRowId] = useState(null);
+  const conflictPopoverRef = useRef(null);
+
+  useEffect(() => {
+    if (!conflictPopoverRowId) return;
+    const handleClickOutside = (e) => {
+      if (conflictPopoverRef.current && !conflictPopoverRef.current.contains(e.target)) {
+        setConflictPopoverRowId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [conflictPopoverRowId]);
   const dayStart = useMemo(() => {
     const d = new Date(selectedDate);
     d.setHours(DAY_START_HOUR, 0, 0, 0);
@@ -1751,15 +1818,25 @@ function MiniTimeline({
       const startMins = Math.max(0, (start.getHours() - DAY_START_HOUR) * 60 + start.getMinutes());
       const endMins = Math.min((DAY_END_HOUR - DAY_START_HOUR) * 60, (end.getHours() - DAY_START_HOUR) * 60 + end.getMinutes());
 
-      if (lastEndMins != null && startMins - lastEndMins >= 30) {
-        entries.push({
-          type: "free",
-          id: `free-${i}`,
-          startMins: lastEndMins,
-          endMins: startMins,
-          minutes: startMins - lastEndMins,
-          gapStartMins: lastEndMins,
-        });
+      if (lastEndMins != null) {
+        const gapMins = startMins - lastEndMins;
+        if (gapMins > 0 && gapMins < GAP_CARD_THRESHOLD_MINS) {
+          entries.push({
+            type: "tinyGap",
+            id: `tiny-${i}`,
+            startMins: lastEndMins,
+            endMins: startMins,
+          });
+        } else if (gapMins >= GAP_CARD_THRESHOLD_MINS) {
+          entries.push({
+            type: "free",
+            id: `free-${i}`,
+            startMins: lastEndMins,
+            endMins: startMins,
+            minutes: startMins - lastEndMins,
+            gapStartMins: lastEndMins,
+          });
+        }
       }
 
       const isPast = end < now;
@@ -1767,6 +1844,7 @@ function MiniTimeline({
       const matchTask = (dayTasks || []).find((t) => (t.title || "").trim() === (item.title || "").trim())
         || (tasksDueToday || []).find((t) => (t.title || "").trim() === (item.title || "").trim());
       const modCode = item.module_code || extractModuleCode(item.title) || extractModuleCode(item.description);
+      const isRoutine = isRoutineEvent(item);
 
       let isOverlap = false;
       for (let j = 0; j < inWindow.length; j++) {
@@ -1793,12 +1871,69 @@ function MiniTimeline({
         active,
         matchTask,
         isOverlap,
+        isRoutine,
         moduleCode: modCode || null,
       });
       lastEndMins = Math.max(lastEndMins ?? 0, endMins);
     }
 
-    return entries;
+    const sorted = [...entries].sort((a, b) => (a.startMins ?? 0) - (b.startMins ?? 0));
+    const showNow = selectedDate && now && isToday(selectedDate);
+    const nowMins = showNow ? Math.max(0, (now.getHours() - DAY_START_HOUR) * 60 + now.getMinutes()) : null;
+    if (showNow && nowMins != null && nowMins >= 0) {
+      const endMinsOf = (r) => r.endMins ?? (r.gapStartMins ?? 0) + (r.minutes ?? 0);
+      let insertIndex = sorted.length;
+      for (let i = sorted.length - 1; i >= 0; i--) {
+        if (endMinsOf(sorted[i]) <= nowMins) {
+          insertIndex = i + 1;
+          break;
+        }
+      }
+      sorted.splice(insertIndex, 0, { type: "now", id: "now-marker", nowMins });
+    }
+    const startMinsOf = (r) => r.startMins ?? r.gapStartMins ?? r.nowMins ?? 0;
+    const endMinsOf = (r) => (r.type === "now" ? null : (r.endMins ?? (r.gapStartMins ?? 0) + (r.minutes ?? 0)));
+    let prevEndMins = 0;
+    let overlapGroupIndex = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      const r = sorted[i];
+      const start = startMinsOf(r);
+      r.spacingBeforePx = Math.max(0, start - prevEndMins) * SPACED_TIMELINE_PX_PER_MIN;
+      if (r.type === "event") {
+        const prev = sorted[i - 1];
+        const overlapsPrev = prev && prev.type === "event" && prev.endMins > r.startMins && r.endMins > prev.startMins;
+        if (overlapsPrev) overlapGroupIndex += 1;
+        else overlapGroupIndex = 0;
+        r.overlapGroupIndex = overlapGroupIndex;
+      }
+      const end = endMinsOf(r);
+      if (end != null) prevEndMins = end;
+    }
+    /* Group consecutive overlapping events into one row for side-by-side (50% width) conflict display */
+    const finalRows = [];
+    for (let i = 0; i < sorted.length; i++) {
+      const r = sorted[i];
+      if (r.type === "event" && r.isOverlap && r.overlapGroupIndex === 0) {
+        const group = [r];
+        for (let j = i + 1; j < sorted.length && sorted[j].type === "event" && sorted[j].overlapGroupIndex > 0; j++) {
+          group.push(sorted[j]);
+        }
+        finalRows.push({
+          type: "eventGroup",
+          id: `conflict-${r.id}`,
+          items: group,
+          spacingBeforePx: r.spacingBeforePx,
+          startMins: r.startMins,
+          endMins: Math.max(...group.map((x) => x.endMins)),
+        });
+        i += group.length - 1;
+      } else if (r.type === "event") {
+        finalRows.push(r);
+      } else {
+        finalRows.push(r);
+      }
+    }
+    return finalRows;
   }, [sortedEvents, selectedDate, dayStart, dayEnd, now, dayTasks, tasksDueToday]);
 
   const getGapStartDate = useCallback((gapStartMins) => {
@@ -1819,11 +1954,43 @@ function MiniTimeline({
           </div>
         )}
         {rows.map((row, index) => {
+          if (row.type === "tinyGap") {
+            return (
+              <div key={row.id} className={styles.planTimelineRow} style={{ marginTop: row.spacingBeforePx || 0, minHeight: 20 }}>
+                <div className={styles.planTimelineGutter}>
+                  <span className={styles.planTimelineTime}>
+                    {String(Math.floor(DAY_START_HOUR + row.startMins / 60)).padStart(2, "0")}:{String(row.startMins % 60).padStart(2, "0")}
+                  </span>
+                </div>
+                <div className={styles.planTimelineSpineCell} aria-hidden />
+                <div className={styles.planTimelineTinyGapLine} aria-hidden />
+              </div>
+            );
+          }
+          if (row.type === "now") {
+            return (
+              <div key={row.id} className={styles.planTimelineRow} style={{ marginTop: row.spacingBeforePx || 0, minHeight: 28 }}>
+                <div className={styles.planTimelineGutter}>
+                  <span className={styles.planTimelineTime}>{String(Math.floor(DAY_START_HOUR + row.nowMins / 60)).padStart(2, "0")}:{String(row.nowMins % 60).padStart(2, "0")}</span>
+                </div>
+                <div className={styles.planTimelineSpineCell} aria-hidden />
+                <div className={styles.planTimelineNowWrap}>
+                  <span className={styles.planTimelineNowLine} aria-hidden />
+                  <span className={styles.planTimelineNowTag}>NOW</span>
+                </div>
+              </div>
+            );
+          }
           if (row.type === "free") {
+            const gapHeightPx = Math.max(72, (row.minutes || 0) * SPACED_TIMELINE_PX_PER_MIN);
+            const durationStr = row.minutes >= 60
+              ? `${Math.floor(row.minutes / 60)}h ${row.minutes % 60 ? `${row.minutes % 60}m` : ""}`.trim()
+              : `${row.minutes}m`;
             return (
               <div
                 key={row.id}
                 className={styles.planTimelineRow}
+                style={{ marginTop: row.spacingBeforePx || 0 }}
               >
                 <div className={styles.planTimelineGutter}>
                   <span className={styles.planTimelineTime}>
@@ -1831,22 +1998,26 @@ function MiniTimeline({
                     {String(row.gapStartMins % 60).padStart(2, "0")}
                   </span>
                 </div>
-                <div className={`${styles.planTimelineSpine} ${styles.planTimelineSpineFuture}`} aria-hidden />
+                <div className={styles.planTimelineSpineCell}>
+                  <span className={styles.planTimelineNode} aria-hidden>✨</span>
+                </div>
                 <div
-                  className={styles.planTimelineFreeWindow}
+                  className={`${styles.planTimelineFreeWindow} ${styles.planTimelineFreeWindowDashed}`}
+                  style={{ minHeight: gapHeightPx }}
                   onClick={() => onQuickStart?.(getGapStartDate(row.gapStartMins), row.minutes, (suggestableTasks || [])[0])}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onQuickStart?.(getGapStartDate(row.gapStartMins), row.minutes, (suggestableTasks || [])[0]); } }}
                   role="button"
                   tabIndex={0}
+                  aria-label={`Focus window: ${durationStr}. Add a task.`}
                 >
-                  <span className={styles.planTimelineFreeLabel}>
-                    ✨ {row.minutes}m Window: Perfect for a reset or deep work.
-                  </span>
+                  <span className={styles.planTimelineFreeWindowEmoji} aria-hidden>✨</span>
+                  <span className={styles.planTimelineFreeWindowDuration}>{durationStr} Focus Window</span>
                   {onQuickStart && (suggestableTasks || []).length > 0 && (
                     <button
                       type="button"
                       className={styles.planTimelineFreeBtn}
                       onClick={(e) => { e.stopPropagation(); onQuickStart(getGapStartDate(row.gapStartMins), row.minutes, suggestableTasks[0]); }}
+                      aria-label="Quick-plant a task in this window"
                     >
                       Plant a task
                     </button>
@@ -1856,46 +2027,182 @@ function MiniTimeline({
             );
           }
 
-          const { item, isPast, active, matchTask, isOverlap, moduleCode, durationMins } = row;
+          if (row.type === "eventGroup") {
+            const groupItems = row.items;
+            return (
+              <div
+                key={row.id}
+                className={styles.planTimelineRow}
+                style={{ marginTop: row.spacingBeforePx || 0 }}
+              >
+                <div className={styles.planTimelineGutter}>
+                  <span className={styles.planTimelineTime}>
+                    {String(Math.floor(DAY_START_HOUR + row.startMins / 60)).padStart(2, "0")}:{String(row.startMins % 60).padStart(2, "0")}
+                  </span>
+                </div>
+                <div className={styles.planTimelineSpineCell}>
+                  {groupItems.map((r) => (
+                    <span key={r.id} className={styles.planTimelineNode} aria-hidden>
+                      {getPlanCardEmoji(r.item.title)}
+                    </span>
+                  ))}
+                </div>
+                <div className={styles.planTimelineConflictGroup}>
+                  {groupItems.map((r) => {
+                    const { item, isPast, active, matchTask, isRoutine, moduleCode, durationMins } = r;
+                    const startTimeStr = item.start_time ? formatTime(item.start_time) : "";
+                    const endTimeStr = item.end_time && item.end_time !== item.start_time ? formatTime(item.end_time) : "";
+                    const titleClean = stripEmojiFromTitle(item.title);
+                    const showConflictPopover = conflictPopoverRowId === r.id;
+                    const nextFreeRow = onConflictAutoMove && rows.find((fr) => fr.type === "free" && fr.gapStartMins >= r.endMins && fr.minutes >= durationMins);
+                    const handleConflictCardClick = () => {
+                      setConflictPopoverRowId((id) => (id === r.id ? null : r.id));
+                    };
+                    const listForTask = matchTask?.task_list != null ? (taskLists || []).find((l) => String(l.id) === String(matchTask.task_list)) : null;
+                    return (
+                      <div key={r.id} className={styles.planTimelineConflictCardWrap} ref={showConflictPopover ? conflictPopoverRef : undefined}>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          className={`${styles.planTimelineCard} ${styles.planTimelineCardConflict} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isRoutine ? styles.planTimelineCardRoutine : ""}`}
+                          onClick={handleConflictCardClick}
+                          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleConflictCardClick(); } }}
+                          title={item.end_time ? `${item.title} — ${startTimeStr} – ${endTimeStr}` : `${item.title} — ${startTimeStr}`}
+                        >
+                          <div className={styles.planTimelineCardBody}>
+                            <div className={styles.planTimelineCardHeader}>
+                              <span className={styles.planTimelineCardTitle}>{titleClean || item.title}</span>
+                              <div className={styles.planTimelineCardTagsSlot}>
+                                <span className={styles.planTimelineTimeConflictBadge}>Time conflict</span>
+                                <button type="button" className={styles.planTimelineRescheduleBtn} onClick={(e) => { e.stopPropagation(); setConflictPopoverRowId((id) => (id === r.id ? null : r.id)); }} aria-label="Reschedule" title="Reschedule">
+                                  <CalendarClock size={14} strokeWidth={2} aria-hidden />
+                                  <span>Reschedule</span>
+                                </button>
+                                {moduleCode && (
+                                  <Link to={matchTask ? `/tasks?list=${matchTask.task_list}&module=${encodeURIComponent(moduleCode)}` : `/tasks?module=${encodeURIComponent(moduleCode)}`} className={styles.planTimelineModulePillLink} onClick={(e) => e.stopPropagation()}>
+                                    <span className={styles.planTimelineModulePill}>{moduleCode}</span>
+                                  </Link>
+                                )}
+                                {!moduleCode && matchTask?.task_list != null && (() => {
+                                  const list = (taskLists || []).find((l) => String(l.id) === String(matchTask.task_list));
+                                  return (
+                                    <Link to={`/tasks?list=${matchTask.task_list}`} className={styles.planTimelineModulePillLink} onClick={(e) => e.stopPropagation()}>
+                                      <span className={styles.planTimelineModulePill}>{list?.name || "List"}</span>
+                                    </Link>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                            <span className={styles.planTimelineCardMeta}>
+                              {durationMins != null && durationMins > 0 && (
+                                <span className={styles.planTimelineCardDuration}>{startTimeStr} · {fmtDurationShort(durationMins)}</span>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                        {showConflictPopover && (
+                          <div className={styles.planTimelineConflictPopover}>
+                            <div className={styles.planTimelineConflictPopoverTitle}>
+                              {nextFreeRow ? `Move to ${formatTime(getGapStartDate(nextFreeRow.gapStartMins).toISOString())} free window?` : "Time Conflict"}
+                            </div>
+                            <button type="button" className={styles.planTimelineConflictPopoverBtn} onClick={() => { if (nextFreeRow && onConflictAutoMove) { const start = getGapStartDate(nextFreeRow.gapStartMins); const end = new Date(start.getTime() + durationMins * 60000); onConflictAutoMove(item, start, end); setConflictPopoverRowId(null); } }} disabled={!nextFreeRow}>
+                              {nextFreeRow ? "Confirm" : "No free window"}
+                            </button>
+                            <button type="button" className={styles.planTimelineConflictPopoverBtn} onClick={() => { onEdit?.(item, item.tag); setConflictPopoverRowId(null); }}>Edit Time</button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+
+          const { item, isPast, active, matchTask, isOverlap, isRoutine, moduleCode, durationMins } = row;
           const startTimeStr = item.start_time ? formatTime(item.start_time) : "";
           const endTimeStr = item.end_time && item.end_time !== item.start_time ? formatTime(item.end_time) : "";
           const titleClean = stripEmojiFromTitle(item.title);
-
+          const showConflictPopover = conflictPopoverRowId === row.id;
+          const nextFreeRow = isOverlap && onConflictAutoMove && rows.find((r) => r.type === "free" && r.gapStartMins >= row.endMins && r.minutes >= durationMins);
+          const handleConflictCardClick = () => {
+            if (isOverlap) {
+              setConflictPopoverRowId((id) => (id === row.id ? null : row.id));
+              return;
+            }
+            if (onCardClick) onCardClick(item, matchTask);
+            else onEdit?.(item, item.tag);
+          };
+          const listForTask = matchTask?.task_list != null ? (taskLists || []).find((l) => String(l.id) === String(matchTask.task_list)) : null;
+          const listNameLower = (listForTask?.name || "").toLowerCase();
+          const isPersonalList = /personal|health|wellness|finance|home/.test(listNameLower);
           return (
             <div
               key={row.id}
               className={styles.planTimelineRow}
+              style={{
+                marginTop: row.spacingBeforePx || 0,
+              }}
             >
               <div className={styles.planTimelineGutter}>
                 <span className={styles.planTimelineTime}>{startTimeStr}</span>
               </div>
-              <div
-                className={`${styles.planTimelineSpine} ${isPast ? styles.planTimelineSpinePast : styles.planTimelineSpineFuture}`}
-                aria-hidden
-              />
-              <div
-                role="button"
-                tabIndex={0}
-                className={`${styles.planTimelineCard} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isOverlap ? styles.planTimelineCardOverlap : ""}`}
-                onClick={() => (onCardClick ? onCardClick(item, matchTask) : onEdit?.(item, item.tag))}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (onCardClick ? onCardClick(item, matchTask) : onEdit?.(item, item.tag)); } }}
-                title={item.end_time ? `${item.title} — ${startTimeStr} – ${endTimeStr}` : `${item.title} — ${startTimeStr}`}
-              >
-                {isOverlap && (
-                  <span className={styles.planTimelineDoubleBooked}>Double Booked</span>
-                )}
-                {moduleCode && (
-                  <span className={styles.planTimelineModulePill}>{moduleCode}</span>
-                )}
-                <span className={styles.planTimelineCardIcon} aria-hidden>
-                  {matchTask ? <Circle size={14} strokeWidth={2.5} /> : <Calendar size={14} strokeWidth={2} />}
+              <div className={styles.planTimelineSpineCell}>
+                <span className={styles.planTimelineNode} aria-hidden>
+                  {getPlanCardEmoji(item.title)}
                 </span>
+              </div>
+              <div className={styles.planTimelineCardWrap} ref={showConflictPopover ? conflictPopoverRef : undefined}>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className={`${styles.planTimelineCard} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isOverlap ? styles.planTimelineCardOverlap : ""} ${isRoutine ? styles.planTimelineCardRoutine : ""}`}
+                  onClick={handleConflictCardClick}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleConflictCardClick(); } }}
+                  title={item.end_time ? `${item.title} — ${startTimeStr} – ${endTimeStr}` : `${item.title} — ${startTimeStr}`}
+                >
                 <div className={styles.planTimelineCardBody}>
-                  <span className={styles.planTimelineCardTitle}>{titleClean || item.title}</span>
+                  <div className={styles.planTimelineCardHeader}>
+                    <span className={styles.planTimelineCardTitle}>{titleClean || item.title}</span>
+                    <div className={styles.planTimelineCardTagsSlot}>
+                      {isOverlap && (
+                        <>
+                          <span className={styles.planTimelineTimeConflictBadge}>Time conflict</span>
+                          <button
+                            type="button"
+                            className={styles.planTimelineRescheduleBtn}
+                            onClick={(e) => { e.stopPropagation(); setConflictPopoverRowId((id) => (id === row.id ? null : row.id)); }}
+                            aria-label="Reschedule to next free window"
+                            title="Reschedule"
+                          >
+                            <CalendarClock size={14} strokeWidth={2} aria-hidden />
+                            <span>Reschedule</span>
+                          </button>
+                        </>
+                      )}
+                      {moduleCode && (
+                        <Link
+                          to={matchTask ? `/tasks?list=${matchTask.task_list}&module=${encodeURIComponent(moduleCode)}` : `/tasks?module=${encodeURIComponent(moduleCode)}`}
+                          className={styles.planTimelineModulePillLink}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className={styles.planTimelineModulePill}>{moduleCode}</span>
+                        </Link>
+                      )}
+                      {!moduleCode && matchTask?.task_list != null && (() => {
+                        const list = (taskLists || []).find((l) => String(l.id) === String(matchTask.task_list));
+                        const listName = list?.name || "List";
+                        return (
+                          <Link to={`/tasks?list=${matchTask.task_list}`} className={styles.planTimelineModulePillLink} onClick={(e) => e.stopPropagation()}>
+                            <span className={styles.planTimelineModulePill}>{listName}</span>
+                          </Link>
+                        );
+                      })()}
+                    </div>
+                  </div>
                   <span className={styles.planTimelineCardMeta}>
-                    {startTimeStr}{endTimeStr ? ` – ${endTimeStr}` : ""}
                     {durationMins != null && durationMins > 0 && (
-                      <span className={styles.planTimelineCardDuration}> · {durationMins}m</span>
+                      <span className={styles.planTimelineCardDuration}>{startTimeStr} · {fmtDurationShort(durationMins)}</span>
                     )}
                   </span>
                 </div>
@@ -1910,6 +2217,38 @@ function MiniTimeline({
                     {matchTask.completed ? "✓" : ""}
                   </button>
                 )}
+              </div>
+              {showConflictPopover && (
+                <div className={styles.planTimelineConflictPopover}>
+                  <div className={styles.planTimelineConflictPopoverTitle}>
+                    {nextFreeRow
+                      ? `Move this to your ${formatTime(getGapStartDate(nextFreeRow.gapStartMins).toISOString())} Free Window?`
+                      : "Time Conflict"}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.planTimelineConflictPopoverBtn}
+                    onClick={() => {
+                      if (nextFreeRow && onConflictAutoMove) {
+                        const start = getGapStartDate(nextFreeRow.gapStartMins);
+                        const end = new Date(start.getTime() + durationMins * 60000);
+                        onConflictAutoMove(item, start, end);
+                        setConflictPopoverRowId(null);
+                      }
+                    }}
+                    disabled={!nextFreeRow}
+                  >
+                    {nextFreeRow ? "Confirm" : "No free window"}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.planTimelineConflictPopoverBtn}
+                    onClick={() => { onEdit?.(item, item.tag); setConflictPopoverRowId(null); }}
+                  >
+                    Edit Time
+                  </button>
+                </div>
+              )}
               </div>
             </div>
           );
@@ -2189,6 +2528,11 @@ export default function Homepage({ onNavigate }) {
     }
   }, [showCreateTaskModal]);
 
+  /* Fetch task lists on mount so Action Hub can show list names (e.g. University, SEG) and link to /tasks?list= */
+  useEffect(() => {
+    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
+  }, []);
+
   const handleModuleTagClick = useCallback((moduleId, moduleCode) => {
     const url = moduleId
       ? `/modules?moduleId=${moduleId}`
@@ -2239,15 +2583,23 @@ export default function Homepage({ onNavigate }) {
     [modulesList, enrollments]
   );
 
-  const getTaskCategoryPill = useCallback((task) => {
+  const getTaskCategoryPillMeta = useCallback((task) => {
+    const listId = task.task_list != null ? String(task.task_list) : null;
+    const list = (taskLists || []).find((l) => String(l.id) === listId);
+    if (list?.name) return { label: String(list.name).trim().slice(0, 20), listId };
     const modId = task.module_id ?? task.module ?? task.moduleId;
     const mod = (enrolledModules || []).find((m) => String(m.id) === String(modId));
-    if (mod) return (mod.module_code || mod.module_name || `M${mod.id}`).toString().trim().slice(0, 8);
-    if (task.module_code) return String(task.module_code).trim().slice(0, 8);
+    if (mod) return { label: (mod.module_code || mod.module_name || `M${mod.id}`).toString().trim().slice(0, 8), listId: null };
+    if (task.module_code) return { label: String(task.module_code).trim().slice(0, 8), listId: null };
     const tag = getTag && getTag(task.tag);
-    if (tag?.label) return String(tag.label).trim().slice(0, 8);
+    if (tag?.label) return { label: String(tag.label).trim().slice(0, 8), listId: null };
     return null;
-  }, [enrolledModules, getTag]);
+  }, [taskLists, enrolledModules, getTag]);
+
+  const getTaskCategoryPill = useCallback((task) => {
+    const meta = getTaskCategoryPillMeta(task);
+    return meta ? meta.label : null;
+  }, [getTaskCategoryPillMeta]);
 
   /** 'sage' = Academic (left border), 'flax' = Personal. */
   const getTaskCategoryColor = useCallback((task) => {
@@ -2440,6 +2792,22 @@ export default function Homepage({ onNavigate }) {
       }
     },
     [addEvent, loadEvents, showToast]
+  );
+
+  const handleConflictAutoMove = useCallback(
+    async (event, newStart, newEnd) => {
+      try {
+        await editEvent(extractBaseEventId(event.id), {
+          start_time: newStart.toISOString(),
+          end_time: newEnd.toISOString(),
+        });
+        await loadEvents();
+        showToast("Event moved to next available window.");
+      } catch {
+        showToast("Couldn't move event. Try again.");
+      }
+    },
+    [editEvent, loadEvents, showToast]
   );
 
   const scheduledTitles = useMemo(
@@ -2723,7 +3091,7 @@ export default function Homepage({ onNavigate }) {
       .slice(0, 8);
   }, [selectedDate, filteredTasksDueToday, getTag]);
 
-  /** Today's Action Hub: simple to-do list — tasks (checkbox, XP) + events, sorted by time. */
+  /** Today's Action Hub: tasks (to-do only, no routine) + major academic/work events only; sorted by time; excludes routine (meals, sleep, commute). */
   const actionHubList = useMemo(() => {
     if (!isToday(selectedDate)) return [];
     const now = new Date();
@@ -2742,6 +3110,7 @@ export default function Homepage({ onNavigate }) {
           type: "task",
           id: `task-${t.id}`,
           sortTime: due || todayEnd,
+          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : todayEnd,
           isOverdue,
           actionHubStatus,
           ...t,
@@ -2756,45 +3125,80 @@ export default function Homepage({ onNavigate }) {
     )[0];
     if (nowTask) nowTask.actionHubStatus = "now";
 
-    const events = (sortedEvents || []).map((e) => {
-      const start = e.start_time ? new Date(e.start_time) : null;
-      const end = e.end_time ? new Date(e.end_time) : null;
-      const isPast = end ? end < now : start ? start < now : false;
-      return {
-        type: "event",
-        id: `event-${e.id}`,
-        sortTime: start || now,
-        isPast,
-        title: e.title,
-        start_time: e.start_time,
-        end_time: e.end_time,
-        location: e.location,
-        link: e.link || e.url,
-        ...e,
-      };
-    });
+    const events = (sortedEvents || [])
+      .filter(isMajorAcademicOrWorkEvent)
+      .map((e) => {
+        const start = e.start_time ? new Date(e.start_time) : null;
+        const end = e.end_time ? new Date(e.end_time) : null;
+        const isPast = end ? end < now : start ? start < now : false;
+        return {
+          type: "event",
+          id: `event-${e.id}`,
+          sortTime: start || now,
+          endTime: end || start || now,
+          isPast,
+          title: e.title,
+          start_time: e.start_time,
+          end_time: e.end_time,
+          location: e.location,
+          link: e.link || e.url,
+          ...e,
+        };
+      });
 
-    return [...tasks, ...events].sort((a, b) => {
+    const sorted = [...tasks, ...events].sort((a, b) => {
       const aFirst = a.isOverdue ? 0 : 1;
       const bFirst = b.isOverdue ? 0 : 1;
       if (aFirst !== bFirst) return aFirst - bFirst;
       return new Date(a.sortTime).getTime() - new Date(b.sortTime).getTime();
     });
+
+    /* Partition: remaining first, then done so completed tasks move to bottom. */
+    const remaining = sorted.filter(
+      (i) => (i.type === "task" && !i.completed) || (i.type === "event" && !i.isPast)
+    );
+    const done = sorted.filter(
+      (i) => (i.type === "task" && i.completed) || (i.type === "event" && i.isPast)
+    );
+    const sortedWithDoneAtBottom = [...remaining, ...done];
+
+    const withGaps = [];
+    for (let i = 0; i < sortedWithDoneAtBottom.length; i++) {
+      if (i > 0) {
+        const prev = sortedWithDoneAtBottom[i - 1];
+        const curr = sortedWithDoneAtBottom[i];
+        const prevEnd = prev.endTime ? new Date(prev.endTime).getTime() : new Date(prev.sortTime).getTime();
+        const currStart = new Date(curr.sortTime).getTime();
+        const gapMins = (currStart - prevEnd) / 60000;
+        if (gapMins >= 30) {
+          withGaps.push({ type: "gap", id: `gap-${i}`, durationMins: Math.round(gapMins) });
+        }
+      }
+      withGaps.push(sortedWithDoneAtBottom[i]);
+    }
+    return withGaps;
   }, [selectedDate, filteredTasksDueToday, sortedEvents, getTag]);
 
-  /** Show Zen when no items or all done. */
+  /** Show Zen when no items or all done (ignore gap items for done count). */
+  const actionHubItemsOnly = useMemo(
+    () => actionHubList.filter((i) => i.type === "task" || i.type === "event"),
+    [actionHubList]
+  );
   const actionHubAllDone = useMemo(
     () =>
-      actionHubList.length === 0 ||
-      actionHubList.every((i) => (i.type === "task" ? i.completed : i.isPast)),
-    [actionHubList]
+      actionHubItemsOnly.length === 0 ||
+      actionHubItemsOnly.every((i) => (i.type === "task" ? i.completed : i.isPast)),
+    [actionHubItemsOnly]
   );
   const actionHubCompletedCount = useMemo(
-    () => actionHubList.filter((i) => (i.type === "task" ? i.completed : i.isPast)).length,
-    [actionHubList]
+    () => actionHubItemsOnly.filter((i) => (i.type === "task" ? i.completed : i.isPast)).length,
+    [actionHubItemsOnly]
   );
   const actionHubSpineCompletedPct =
-    actionHubList.length > 0 ? (actionHubCompletedCount / actionHubList.length) * 100 : 0;
+    actionHubItemsOnly.length > 0 ? (actionHubCompletedCount / actionHubItemsOnly.length) * 100 : 0;
+  const actionHubRemainingCount = actionHubItemsOnly.filter(
+    (i) => (i.type === "task" && !i.completed) || (i.type === "event" && !i.isPast)
+  ).length;
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
   const [replanLoading, setReplanLoading] = useState(false);
@@ -2894,6 +3298,7 @@ export default function Homepage({ onNavigate }) {
   /** Aliases for legacy/cached references (actionHubFocusWindowMinutes, actionHubReadItem). */
   const actionHubFocusWindowMinutes = planTimelineFocusWindowMinutes;
   const actionHubReadItem = planTimelineReadItem;
+  const actionHubFocusHours = planTimelineFocusWindowMinutes / 60;
 
   const prevSeedsCountRef = useRef(seedsCountFromTasks);
   const [seedsBounce, setSeedsBounce] = useState(false);
@@ -3178,10 +3583,36 @@ export default function Homepage({ onNavigate }) {
           );
           })()}
 
-            {/* Today's Action Hub: simple to-do list — tasks + events, no internal scroll */}
+            {/* Today's Action Hub: execution list — tasks + major academic/work events only; no internal scroll */}
             <div className={styles.actionHub} ref={actionHubRef}>
-              <h3 className={styles.actionHubTitle}>Today&apos;s Action Hub</h3>
-              {!actionHubAllDone && actionHubList.length > 0 ? (
+              <div className={styles.actionHubHeaderRow}>
+                <h3 className={styles.actionHubTitle}>Today&apos;s Action Hub</h3>
+                {!actionHubAllDone && (
+                  <Link to="/tasks" className={styles.actionHubHeaderLink}>
+                    Manage all tasks →
+                  </Link>
+                )}
+              </div>
+              {isToday(selectedDate) && (actionHubFocusHours > 0 || actionHubRemainingCount > 0) && (
+                <div className={styles.actionHubStatusBar}>
+                  <div className={styles.actionHubStatusPill}>
+                    <span className={styles.actionHubStatusStat}>
+                      {actionHubFocusHours < 1 ? `${Math.round(planTimelineFocusWindowMinutes)} min` : `${actionHubFocusHours.toFixed(1)}h`} focused work
+                    </span>
+                    <span className={styles.actionHubStatusDivider} aria-hidden>·</span>
+                    <span className={styles.actionHubStatusStat}>
+                      <strong>{actionHubRemainingCount}</strong> {actionHubRemainingCount === 1 ? "task" : "tasks"} remaining
+                    </span>
+                  </div>
+                  <div className={styles.actionHubProgressTrack} aria-hidden>
+                    <div
+                      className={styles.actionHubProgressFill}
+                      style={{ width: `${actionHubSpineCompletedPct}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {!actionHubAllDone && actionHubItemsOnly.length > 0 ? (
                 <>
                   <div className={styles.actionHubSpineWrap} aria-hidden>
                     <div
@@ -3196,21 +3627,32 @@ export default function Homepage({ onNavigate }) {
                       }}
                     />
                   </div>
-                  <ul className={styles.actionHubCardList}>
+                  <motion.ul className={styles.actionHubCardList} layout>
                     {actionHubList.map((item) => {
+                      if (item.type === "gap") {
+                        const hrs = Math.floor(item.durationMins / 60);
+                        const mins = item.durationMins % 60;
+                        const label = hrs > 0 ? `${hrs}h ${mins}m` : `${item.durationMins}m`;
+                        return (
+                          <motion.li key={item.id} className={styles.actionHubGapRow} aria-hidden layout>
+                            <span className={styles.actionHubGapText}>✨ {label} Focus Gap</span>
+                          </motion.li>
+                        );
+                      }
                       if (item.type === "event") {
                         const isPast = item.isPast;
                         const timeStr = item.start_time ? formatTime(item.start_time) : "";
                         const endStr = item.end_time && item.end_time !== item.start_time ? ` – ${formatTime(item.end_time)}` : "";
                         return (
-                          <li
+                          <motion.li
                             key={item.id}
+                            layout
                             className={`${styles.actionHubCard} ${styles.actionHubCardEvent} ${isPast ? styles.actionHubCardCompleted : ""}`}
                           >
                             <div className={styles.actionHubCardPillWrap} />
                             <div className={styles.actionHubCardBody}>
                               <div className={styles.actionHubCardRow}>
-                                <span className={styles.actionHubEventIcon} aria-hidden title="Event">📅</span>
+                                <span className={styles.actionHubEventIcon} aria-hidden title="Academic/Work">📚</span>
                                 {(item.location || item.link) && (
                                   <span className={styles.actionHubEventLocation}>
                                     {item.link ? (
@@ -3221,10 +3663,9 @@ export default function Homepage({ onNavigate }) {
                                   </span>
                                 )}
                                 <span className={styles.actionHubCardTitle} title={item.title}>{item.title}</span>
-                                <span className={styles.actionHubItemTime}>{timeStr}{endStr}</span>
                               </div>
                             </div>
-                          </li>
+                          </motion.li>
                         );
                       }
 
@@ -3235,8 +3676,9 @@ export default function Homepage({ onNavigate }) {
                       const isCompleted = t.actionHubStatus === "completed";
                       const borderClass = getTaskCategoryColor(t) === "sage" ? styles.actionHubCardBorderSage : styles.actionHubCardBorderFlax;
                       return (
-                        <li
+                        <motion.li
                           key={t.id}
+                          layout
                           className={`${styles.actionHubCard} ${borderClass} ${
                             isOverdue ? styles.actionHubCardOverdue : ""
                           } ${isNow ? styles.actionHubCardNow : ""} ${
@@ -3244,17 +3686,26 @@ export default function Homepage({ onNavigate }) {
                           } ${isCompleted ? styles.actionHubCardCompleted : ""}`}
                         >
                           <div className={styles.actionHubCardPillWrap}>
-                            {isNow && <span className={styles.actionHubActiveBadge}>Active</span>}
-                            {getTaskCategoryPill(t) && (
-                              <span className={styles.actionHubModulePill}>{getTaskCategoryPill(t)}</span>
+                            {getTaskCategoryPillMeta(t) && (() => {
+                              const meta = getTaskCategoryPillMeta(t);
+                              const pillClass = meta.listId ? `${styles.actionHubModulePill} ${styles.actionHubModulePillList}` : styles.actionHubModulePill;
+                              const content = <span className={pillClass}>{meta.label}</span>;
+                              return meta.listId ? (
+                                <Link to={`/tasks?list=${meta.listId}`} className={styles.actionHubPillLink}>{content}</Link>
+                              ) : (
+                                content
+                              );
+                            })()}
+                            {isNow && !t.completed && (
+                              <span className={styles.actionHubNowDot} aria-label="Current task" title="Now" />
+                            )}
+                            {isOverdue && !t.completed && (
+                              <span className={styles.actionHubUrgentBadge}>URGENT</span>
                             )}
                           </div>
                           <div className={styles.actionHubCardBody}>
                             <div className={styles.actionHubCardRow}>
-                              {isOverdue && !t.completed && (
-                                <span className={styles.actionHubIconOverdue} aria-hidden title="Overdue">⚠</span>
-                              )}
-                              {!t.completed && !isOverdue && (
+                              {!t.completed && (
                                 <button
                                   type="button"
                                   className={styles.actionHubCheckbox}
@@ -3278,38 +3729,23 @@ export default function Homepage({ onNavigate }) {
                               )}
                               {t.completed && <span className={styles.actionHubCardDone} aria-hidden>✓</span>}
                               <span className={styles.actionHubCardTitle} title={t.title}>{t.title}</span>
-                              {!t.completed && (
-                                <>
-                                  {isUpcoming && t.due_date && (
-                                    <span className={styles.actionHubCountdown}>{formatCountdownTo(t.due_date)}</span>
-                                  )}
-                                  {isNow && t.due_date && (
-                                    <span className={styles.actionHubItemTime}>{formatTime(t.due_date)}</span>
-                                  )}
-                                  {isOverdue && (
-                                    <button
-                                      type="button"
-                                      className={styles.actionHubReschedule}
-                                      onClick={(e) => { e.stopPropagation(); setRescheduleTask(t); }}
-                                      aria-label={`Reschedule ${t.title}`}
-                                      title="Reschedule"
-                                    >
-                                      📅
-                                    </button>
-                                  )}
-                                </>
+                              {!t.completed && isOverdue && (
+                                <button
+                                  type="button"
+                                  className={styles.actionHubReschedule}
+                                  onClick={(e) => { e.stopPropagation(); setRescheduleTask(t); }}
+                                  aria-label={`Reschedule ${t.title}`}
+                                  title="Reschedule"
+                                >
+                                  Reschedule
+                                </button>
                               )}
                             </div>
                           </div>
-                        </li>
+                        </motion.li>
                       );
                     })}
-                  </ul>
-                  <div className={styles.actionHubFooter}>
-                    <Link to="/tasks" className={styles.actionHubLink}>
-                      Manage all tasks →
-                    </Link>
-                  </div>
+                  </motion.ul>
                 </>
               ) : (
                 <>
@@ -3389,10 +3825,12 @@ export default function Homepage({ onNavigate }) {
                   dayTasks={dayTasks}
                   tasksDueToday={filteredTasksDueToday}
                   suggestableTasks={suggestableTasks}
+                  taskLists={taskLists}
                   onQuickStart={handleQuickStartGap}
                   onHarvestToggle={handleHarvestToggle}
                   onCardClick={(ev, matchTask) => setPlanTimelineReadItem({ event: ev, task: matchTask ?? null })}
                   onEdit={(ev) => openModal(ev, ev.tag)}
+                  onConflictAutoMove={handleConflictAutoMove}
                   onDelete={removeEvent}
                   onReschedule={handleReschedule}
                   getTag={getTag}
@@ -3429,6 +3867,12 @@ export default function Homepage({ onNavigate }) {
         <CreateTaskModal
           lists={taskLists}
           modules={enrolledModules}
+          onCreateList={async (data) => {
+            const created = await createTaskList(data);
+            const list = await fetchTaskLists();
+            setTaskLists(Array.isArray(list) ? list : []);
+            return created;
+          }}
           onSave={async (data, opts) => {
             try {
               const dataToSend = { ...data };
