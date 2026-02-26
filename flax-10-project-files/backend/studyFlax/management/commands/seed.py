@@ -11,7 +11,9 @@ from studyFlax.models.tasks.taskModel import Task, TaskList
 
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
-    module_task_templates, personal_task_fixtures, task_list_fixtures)
+    module_task_templates, personal_task_fixtures, task_list_fixtures,
+    MODULE_PILL_COLORS,
+)
 
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
@@ -131,6 +133,7 @@ class Command(BaseCommand):
         f = Faker('en_GB')
         ROUTINE_COLOR = '#94a3b8'   # neutral slate so Academic (Sage) and Personal stand out
         WELLNESS_COLOR = '#94a3b8'
+        # Module-specific pill colors for Action Hub (LS4101 Deep Earth Brown, LS4202 Muted Clay)
         for name, duration in tag_fixtures:
             category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
             user = (
@@ -141,6 +144,12 @@ class Command(BaseCommand):
             Tag.objects.get_or_create(
                 name=name, user=user,
                 defaults={'category': category, 'default_duration': duration, 'color': color},
+            )
+        # Create display tags for LS4101/LS4202 so module pills can use distinct colors
+        for code, pill_color in MODULE_PILL_COLORS.items():
+            Tag.objects.get_or_create(
+                name=code, user=None,
+                defaults={'category': None, 'default_duration': 0, 'color': pill_color},
             )
 
     def create_events_for_users(self):
@@ -232,19 +241,30 @@ class Command(BaseCommand):
             uni_list      = lists_by_name.get("University")
             personal_list = lists_by_name.get("Personal")
 
-            # ── Module tasks ──
+            # ── Module tasks (unique per enrollment; full module code then prefix) ──
             enrolled_modules = list(
                 Enrollment.objects.filter(student=user).select_related('module')
             )
-            seen_prefixes = set()
+            odd_days  = [1, 3, 5]   # LS4101
+            even_days = [2, 4, 6]   # LS4202
             for enrollment in enrolled_modules:
                 mod    = enrollment.module
                 prefix = mod.module_code[:2]
-                if prefix in seen_prefixes:
-                    continue
-                seen_prefixes.add(prefix)
-                templates = module_task_templates.get(prefix, [])
-                for title_tmpl, description, priority, estimated_blocks, days_from_now in templates[:2]:
+                templates = module_task_templates.get(
+                    mod.module_code,
+                    module_task_templates.get(prefix, []),
+                )
+                for i, (title_tmpl, description, priority, estimated_blocks, days_from_now) in enumerate(templates):
+                    if mod.module_code == 'LS4101':
+                        days_from_now = odd_days[i % len(odd_days)]
+                        # Higher XP for Writing-type (Lab Report, Microscopy, Cell Division)
+                        if any(x in title_tmpl.lower() for x in ('lab', 'microscopy', 'cell division')):
+                            estimated_blocks = estimated_blocks + 1
+                    elif mod.module_code == 'LS4202':
+                        days_from_now = even_days[i % len(even_days)]
+                        # Higher XP for Problem Set-type (Enzyme, Protein Folding, Metabolic)
+                        if any(x in title_tmpl.lower() for x in ('enzyme', 'protein folding', 'metabolic')):
+                            estimated_blocks = estimated_blocks + 1
                     title = title_tmpl.format(module=mod.module_code, module_name=mod.module_name)
                     due   = (now + timedelta(days=days_from_now)).replace(
                         hour=23, minute=59, second=0, microsecond=0
