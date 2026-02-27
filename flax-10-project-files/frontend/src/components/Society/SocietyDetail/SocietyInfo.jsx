@@ -1,10 +1,12 @@
 import { useState } from "react";
 import styles from "./SocietyInfo.module.css";
+import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
 export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode }) {
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
+            <CategorySection category={society.category} editMode={editMode} onSave={(category) => onUpdateSociety?.({ category })} />
             <Stats society={society} />
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
@@ -41,6 +43,23 @@ function BioEditor({ value, setValue, onSave }) {
         <div className={styles.bioEditor}>
             <textarea className={styles.bioInput} value={value} onChange={(e) => setValue(e.target.value)}
                 placeholder="Describe your society..." rows={2} autoFocus />
+            <button className={styles.saveBtn} onClick={onSave}>Save</button>
+        </div>
+    );
+}
+
+function CategorySection({ category, editMode, onSave }) {
+    const [editing, setEditing] = useState(false);
+    const [value, setValue] = useState(category || "");
+
+    if (editing) return <CategoryEditor value={value} setValue={setValue} onSave={() => { onSave(value); setEditing(false); }} />;
+    return <CategoryDisplay category={category} editMode={editMode} onEdit={() => setEditing(true)} />;
+}
+
+function CategoryEditor({ value, setValue, onSave }) {
+    return (
+        <div className={styles.categoryEditor}>
+            <CategorySelector value={value} onChange={setValue} label="" />
             <button className={styles.saveBtn} onClick={onSave}>Save</button>
         </div>
     );

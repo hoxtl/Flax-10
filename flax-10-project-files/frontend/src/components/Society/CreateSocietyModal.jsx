@@ -4,6 +4,7 @@ import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
+import CategorySelector from "./CategorySelector";
 
 const isValidEmail = (email) => {
     const trimmed = email.trim();
@@ -28,7 +29,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 function useCreateSocietyForm(onCreate, onClose) {
-    const [form, setForm] = useState({ name: "", bio: "", adminEmails: "", requestRatification: false, collaborators: [], images: [] });
+    const [form, setForm] = useState({ name: "", bio: "", category: "", adminEmails: "", requestRatification: false, collaborators: [], images: [] });
     const [showCollabModal, setShowCollabModal] = useState(false);
     const [showPhotoModal, setShowPhotoModal] = useState(false);
     const update = (field, value) => setForm(p => ({ ...p, [field]: value }));
@@ -85,6 +86,7 @@ function FormFields({ form, update, setShowCollabModal, setShowPhotoModal, email
         <div className={styles.form}>
             <NameField value={form.name} onChange={handlers.name} />
             <BioField value={form.bio} onChange={handlers.bio} />
+            <CategorySelector value={form.category} onChange={handlers.category} />
             <AdminEmailsField value={form.adminEmails} onChange={handlers.adminEmails} invalid={emailsInvalid} />
             <PhotosField images={form.images} onOpen={() => setShowPhotoModal(true)} />
             <CollaboratorsField collaborators={form.collaborators} onOpen={() => setShowCollabModal(true)}
@@ -98,6 +100,7 @@ function getFieldHandlers(form, update) {
     return {
         name: v => update("name", v),
         bio: v => update("bio", v),
+        category: v => update("category", v),
         adminEmails: v => update("adminEmails", v),
         ratification: v => update("requestRatification", v),
         role: (id, role) => update("collaborators", form.collaborators.map(c => c.id === id ? { ...c, role } : c)),
