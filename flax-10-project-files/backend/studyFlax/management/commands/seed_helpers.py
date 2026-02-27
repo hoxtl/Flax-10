@@ -1,3 +1,11 @@
+"""
+Helper factories for the seed management command.
+
+Each public function is a pure factory — it constructs model instances or
+performs targeted get_or_create calls without orchestrating the overall
+seeding flow. Orchestration lives in seed.Command.
+"""
+
 import random
 from datetime import date, datetime, timedelta, timezone as dt_timezone
 from django.utils import timezone
@@ -28,6 +36,7 @@ def _in_reading_week(dt):
 
 
 def is_name_taken(first, last, existing):
+    """Return True if a user with this first and last name already exists."""
     return (
         User.objects.filter(first_name=first, last_name=last).exists()
         or any(u.first_name == first and u.last_name == last for u in existing)
@@ -35,6 +44,7 @@ def is_name_taken(first, last, existing):
 
 
 def is_username_taken(username, existing):
+    """Return True if the username exists in the database or the given list."""
     return (
         User.objects.filter(username=username).exists()
         or any(u.username == username for u in existing)
@@ -42,6 +52,7 @@ def is_username_taken(username, existing):
 
 
 def generate_unique_name(existing):
+    """Generate a first/last name pair not already used by any user."""
     first, last = faker.first_name(), faker.last_name()
     while is_name_taken(first, last, existing):
         first, last = faker.first_name(), faker.last_name()
@@ -49,6 +60,7 @@ def generate_unique_name(existing):
 
 
 def generate_unique_username(first, last, existing):
+    """Derive a first.last username that is unique, appending a counter if needed."""
     base = f"{first.lower()}.{last.lower()}"
     username, counter = base, 2
     while is_username_taken(username, existing):
@@ -58,6 +70,7 @@ def generate_unique_username(first, last, existing):
 
 
 def build_user(first, last, existing):
+    """Construct an unsaved User with a KCL email address and hashed password."""
     username = generate_unique_username(first, last, existing)
     user = User(
         username=username,
@@ -70,6 +83,7 @@ def build_user(first, last, existing):
 
 
 def build_users_list(needed):
+    """Return a list of *needed* unsaved User instances with unique names and usernames."""
     users_to_create = []
     for _ in range(needed):
         first, last = generate_unique_name(users_to_create)
@@ -78,6 +92,7 @@ def build_users_list(needed):
 
 
 def build_settings_for_new_users():
+    """Return a list of UserSettings instances for every user that has no settings row yet."""
     new_users = User.objects.filter(settings__isnull=True)
     return [
         UserSettings(
@@ -92,6 +107,7 @@ def build_settings_for_new_users():
 
 
 def build_event(user, title, tags, day_offset, hour):
+    """Construct a single unsaved CalendarEvent for *user* at the given day offset and hour."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
     user_tags = [t for t in tags if t.user == user or t.user is None]
@@ -185,6 +201,11 @@ def _first_weekday_from(start_dt, weekday):
 
 
 def build_module_event(code, name, description, admin, weekly_rule):
+    """Return a dict of Module field values for a weekly recurring lecture.
+
+    The first occurrence is scheduled on a random weekday at a random lecture
+    hour starting from SEED_START, placed in a random KCL lecture theatre.
+    """
     weekday = random.randint(0, 4)
     hour    = random.choice([9, 10, 11, 14, 15, 16])
     first_lecture = _first_weekday_from(SEED_START, weekday).replace(
@@ -203,6 +224,12 @@ def build_module_event(code, name, description, admin, weekly_rule):
 
 
 def get_user_modules(user, all_modules):
+    """Return (core_modules, extra_modules) matched to the user's declared major.
+
+    core_modules — up to three modules whose prefix matches the user's course.
+    extra_modules — one randomly chosen module outside the core set, simulating
+    an elective.
+    """
     major    = getattr(getattr(user, 'settings', None), 'major', None)
     prefixes = course_to_module_prefixes.get(major, [])
     core     = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)][:3]
@@ -212,6 +239,11 @@ def get_user_modules(user, all_modules):
 
 
 def create_lecture_event(user, module, start, end, lecture_tag):
+    """Create or fetch the CalendarEvent representing one lecture occurrence.
+
+    Uses get_or_create keyed on (user, title, start_time) so that
+    re-running the seed command never duplicates events.
+    """
     CalendarEvent.objects.get_or_create(
         user=user,
         title=f"Lecture: {module.module_name}",
@@ -259,6 +291,12 @@ def _get_random_offset(used_offsets):
 
 
 def build_deadlines_for_module(module):
+    """Return a list of unsaved Deadline instances for *module*.
+
+    Templates are taken from module_deadline_fixtures using the two-letter
+    module code prefix; deadline_fixtures is used as a fallback. Each
+    deadline is given a unique due-date offset so no two share the same day.
+    """
     prefix    = module.module_code[:2]
     templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
     used_offsets = set()
@@ -287,6 +325,11 @@ def build_deadlines_for_module(module):
 
 
 def create_deadline_calendar_event(user, deadline):
+    """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar.
+
+    Uses get_or_create keyed on (user, title, start_time) so that
+    re-running the seed never duplicates deadline events.
+    """
     CalendarEvent.objects.get_or_create(
         user=user,
         title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
