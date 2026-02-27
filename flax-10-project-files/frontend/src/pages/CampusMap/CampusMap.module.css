@@ -662,3 +662,8 @@
   color: rgba(43, 30, 20, 0.45);
   font-style: italic;
 }
+
+/* TfL Delays Section */
+.statusIcon {
+  font-size: 1rem;
+}
