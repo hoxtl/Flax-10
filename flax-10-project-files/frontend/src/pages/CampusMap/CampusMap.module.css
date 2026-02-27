@@ -689,3 +689,8 @@
   border: 1px solid rgba(var(--c-grey), 0.35);
   border-radius: 10px;
 }
+
+.goodServiceIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
