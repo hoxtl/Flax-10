@@ -1,7 +1,10 @@
-from django.db.models.signals import post_save, pre_save, pre_delete
+from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
 from django.dispatch import receiver
-from studyFlax.models.society import SocietyEvent, SocietyAnnouncement, SocietyMembership
+from studyFlax.models.society import Society, SocietyEvent, SocietyAnnouncement, SocietyMembership
 from studyFlax.models.notifications.notificationModel import Notification
+
+# Track societies being deleted to suppress child notifications
+_deleting_societies = set()
 
 
 @receiver(pre_save, sender=SocietyEvent)
@@ -34,13 +37,14 @@ def notify_members_on_announcement(sender, instance, created, **kwargs):
 def handle_announcement_delete(sender, instance, **kwargs):
     has_event = instance.events.exists()
     instance.events.all().delete()
-    if not getattr(instance, '_skip_notification', False):
-        notify_society_members(instance.society, build_delete_notification(instance, has_event))
+    if should_skip_notification(instance):
+        return
+    notify_society_members(instance.society, build_delete_notification(instance, has_event))
 
 
 @receiver(pre_delete, sender=SocietyEvent)
 def handle_event_delete(sender, instance, **kwargs):
-    if instance.announcement or getattr(instance, '_skip_notification', False):
+    if instance.announcement or should_skip_notification(instance):
         return
     notify_society_members(instance.society, {
         'title': f"Event cancelled in {instance.society.name}",
@@ -48,6 +52,37 @@ def handle_event_delete(sender, instance, **kwargs):
         'notification_type': 'society_event',
         'society_id': instance.society_id,
     })
+
+
+@receiver(pre_delete, sender=Society)
+def handle_society_delete(sender, instance, **kwargs):
+    _deleting_societies.add(instance.id)
+    if getattr(instance, '_skip_notification', False):
+        return
+    members = SocietyMembership.objects.filter(society=instance).select_related('user')
+    notifications = [build_society_delete_notification(m.user, instance) for m in members]
+    Notification.objects.bulk_create(notifications)
+
+
+@receiver(post_delete, sender=Society)
+def cleanup_society_delete(sender, instance, **kwargs):
+    _deleting_societies.discard(instance.id)
+
+
+def build_society_delete_notification(user, society):
+    return Notification(
+        user=user,
+        title=f"Society deleted: {society.name}",
+        message=f"The society '{society.name}' has been removed. You are no longer a member.",
+        notification_type='society_deleted',
+    )
+
+
+def should_skip_notification(instance):
+    """Check if notification should be skipped for this instance."""
+    if getattr(instance, '_skip_notification', False):
+        return True
+    return instance.society_id in _deleting_societies
 
 
 def notify_society_members(society, notification_data):
