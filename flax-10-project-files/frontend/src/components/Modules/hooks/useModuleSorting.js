@@ -11,7 +11,7 @@ export default function useModuleSorting(modules) {
     const by_department = department === 'all' ? modules : 
     modules.filter(m=>getDepartment(m.module_code) === department);
     const results =  sortModules(by_department, sort_by);
-    const page_modules = results.slice(((current_page - 1) * PAGE_SIZE, current_page*PAGE_SIZE));
+    const page_modules = results.slice((current_page - 1) * PAGE_SIZE, current_page*PAGE_SIZE);
     const total_pages = Math.ceil(results.length / PAGE_SIZE);
 
     function handleNewDepartment(department) {
