@@ -5,7 +5,7 @@ import BasePill from "../../components/Tags/BasePill";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
 import SearchBar from "../../components/common/SearchBar";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
-import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS } from "./societyFilters";
+import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 
 const PAGE_SIZE = 20;
 
@@ -62,12 +62,11 @@ function SortDropdown({ value, onChange }) {
 
 function FilterPills({ filters, toggleFilter, clearFilters, societies }) {
     const hasActiveFilters = filters.ratified !== "all" || filters.category !== "all";
-    const counts = useCategoryCounts(societies);
     return (
         <div className={styles.pillContainer}>
             <RatificationPills current={filters.ratified} onChange={v => toggleFilter("ratified", v)} societies={societies} />
             <span className={styles.pillDivider} />
-            <CategoryPills current={filters.category} onChange={v => toggleFilter("category", v)} counts={counts} />
+            <CategoryPills current={filters.category} onChange={v => toggleFilter("category", v)} societies={societies} />
             {hasActiveFilters && <button className={styles.clearPill} onClick={clearFilters}>Clear x</button>}
         </div>
     );
@@ -80,21 +79,11 @@ function RatificationPills({ current, onChange, societies }) {
     ));
 }
 
-function CategoryPills({ current, onChange, counts }) {
+function CategoryPills({ current, onChange, societies }) {
     return SOCIETY_CATEGORIES.map(cat => (
-        <BasePill key={cat.id} label={cat.label} count={counts[cat.id] || 0}
+        <BasePill key={cat.id} label={cat.label} count={countByCategory(societies, cat.id)}
             isActive={current === cat.id} onClick={() => onChange(cat.id)} />
     ));
-}
-
-function useCategoryCounts(societies) {
-    return useMemo(() => buildCategoryCounts(societies), [societies]);
-}
-
-function buildCategoryCounts(societies) {
-    const counts = {};
-    societies.forEach(s => { counts[s.category] = (counts[s.category] || 0) + 1; });
-    return counts;
 }
 
 function SocietyGrid({ items, onSelect }) {
@@ -128,8 +117,8 @@ function filterAndSort(list, search, filters, sortBy) {
 function matchesAllFilters(society, search, filters) {
     const matchesSearch = society.name.toLowerCase().includes(search.toLowerCase());
     const matchesRatified = matchesRatification(society, filters.ratified);
-    const matchesCategory = filters.category === "all" || society.category === filters.category;
-    return matchesSearch && matchesRatified && matchesCategory;
+    const categoryMatch = matchesCategory(society, filters.category);
+    return matchesSearch && matchesRatified && categoryMatch;
 }
 
 function matchesRatification(society, filter) {
