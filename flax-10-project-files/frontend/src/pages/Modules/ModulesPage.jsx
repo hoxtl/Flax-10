@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { isEnrolledIn } from '../../components/Modules/utils/moduleUtils.js';
-import { filterModules } from '../../components/Modules/utils/moduleUtils.js';
+import { useState, useEffect } from 'react';
+import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
+import useModuleSorting  from '../../components/Modules/hooks/useModuleSorting.js';
+import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
+import { ArrowUp } from 'lucide-react';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
 import ModuleForm from '../../components/Modules/ModuleForm.jsx';
@@ -19,6 +21,19 @@ function useModulesPage() {
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
     return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
+}
+
+function useMainView(state) {
+    const {hook , search_query, filter_mode, setSearchQuery, setFilterMode} = state;
+    const filtered = filterModules(hook.modules, hook.enrollments, search_query, filter_mode);
+    const sorting = useModuleSorting(filtered);
+    const search = {
+        query: search_query,
+        filter:filter_mode,
+        onQueryChange: (q) => {setSearchQuery(q); sorting.setCurrentPage(1);},
+        onFilterChange: (f) => {setFilterMode(f); sorting.setCurrentPage(1);},   
+    };
+    return {sorting, search, departments: getDepartments(hook.modules)};
 }
 
 export default function ModulesPage() {
@@ -68,21 +83,34 @@ function DetailsView({ state }) {
 }
 
 function MainView({ state }) {
-    const { hook, is_teacher, search_query, filter_mode, setSearchQuery, setFilterMode, setViewingModule, setEditingModule, setShowForm, setDeadlineModule } = state;
-    const filtered_modules = filterModules(hook.modules, hook.enrollments, search_query, filter_mode);
+    const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule } = state;
+    const {sorting, search, departments} = useMainView(state);
     return (
         <div className={styles.container}>
             <PageHeader is_teacher={is_teacher} onCreateModule={() => { setEditingModule(null); setShowForm(true); }} />
-            <Toolbar search_query={search_query} filter_mode={filter_mode} onSearchChange={setSearchQuery} onFilterChange={setFilterMode} />
-            {filtered_modules.length === 0
-                ? <EmptyState search_query={search_query} />: <ModuleGrid
-                    modules={filtered_modules} enrollments={hook.enrollments} isTeacher={is_teacher}
-                    onViewModule={setViewingModule} onEnrollmentToggle={hook.toggleEnrollment}
-                    onEdit={(m) => { setEditingModule(m); setShowForm(true); }}
-                    onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
-                    onManageDeadlines={setDeadlineModule}
-                  />
-            }</div>);}
+            <Toolbar search={search} sorting={sorting} departments={departments}/>
+            <ModuleResults sorting={sorting} hook={hook} is_teacher={is_teacher} setViewingModule={setViewingModule}
+            setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
+        </div>
+    );
+}
+
+function ModuleResults({sorting, hook, is_teacher, setViewingModule, setEditingModule, setShowForm , setDeadlineModule}) {
+    if (sorting.results.length === 0) return <EmptyState />
+    return (
+        <div>
+            {sorting.current_page > 1 && <Pagination current_page={sorting.current_page} total_pages={sorting.total_pages}
+            onPageChange={sorting.setCurrentPage} />}
+            <ModuleGrid
+                modules={sorting.page_modules} enrollments={hook.enrollments} isTeacher={is_teacher}
+                onViewModule={setViewingModule} onEnrollmentToggle={hook.toggleEnrollment}
+                onEdit={(m) => { setEditingModule(m); setShowForm(true); }} onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
+                onManageDeadlines={setDeadlineModule}
+            />
+            <Pagination current_page = {sorting.current_page} total_pages={sorting.total_pages} onPageChange={sorting.setCurrentPage} />
+        </div>
+    )
+}
 
 function LoadingView() {
     return (
@@ -108,11 +136,25 @@ function PageHeader({ is_teacher, onCreateModule }) {
     );
 }
 
-function Toolbar({ search_query, filter_mode, onSearchChange, onFilterChange }) {
+function Toolbar({ search, sorting, departments }) {
+    const filter_options = [
+        {value:'all', label: 'All Modules'},
+        {value: 'enrolled', label: 'My Enrollments'},
+    ];
+    const dept_options = [
+        {value: 'all', 'label':'All Departments'},
+        ...departments.map(d=> ({value:d, label:d})),
+    ];
+    const sort_options = [
+        {value:'name', label: 'Sort by Name'},
+        {value: 'deadlines', label: 'Sort by Deadlines'},
+    ];
     return (
         <div className={styles.toolbar}>
-            <SearchInput value={search_query} onChange={onSearchChange} />
-            <FilterSelect value={filter_mode} onChange={onFilterChange} />
+            <SearchInput value={search.query} onChange={search.onQueryChange} />
+            <ModuleDropdown value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+            <ModuleDropdown value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+            <ModuleDropdown value={sorting.sort_by} onChange={sorting.handleNewSort} options={sort_options} />
         </div>
     );
 }
@@ -126,15 +168,6 @@ function SearchInput({ value, onChange }) {
     );
 }
 
-function FilterSelect({ value, onChange }) {
-    return (
-        <select className={styles.filterSelect} value={value} onChange={(e) => onChange(e.target.value)}>
-            <option value="all">All Modules</option>
-            <option value="enrolled">My Enrollments</option>
-        </select>
-    );
-}
-
 function EmptyState({ search_query }) {
     const message = search_query ? `No modules found matching "${search_query}"` : 'No modules available yet';
     return (
@@ -144,3 +177,15 @@ function EmptyState({ search_query }) {
         </div>
     );
 }
+
+function Pagination({current_page, total_pages, onPageChange}) {
+    if (total_pages <= 1) return null;
+    return (
+        <div className={styles.pagination}>
+            <button className={styles.pageButton} onClick={() => onPageChange(current_page - 1)} disabled={current_page === 1}>← Previous</button>
+            <span className={styles.pageIndicator}>Page {current_page} of {total_pages}</span>
+            <button className={styles.pageButton} onClick={() => onPageChange(current_page + 1)} disabled={current_page === total_pages}>Next →</button>
+        </div>
+    );
+}
+
