@@ -129,12 +129,17 @@ SOCIETY_DATA = [
     ('Climbing Club', 'Reach new heights.', 'Indoor and outdoor climbing.', 'sports', ['Training', 'Trip', 'Social']),
     ('Athletics Club', 'Track and field.', 'Running, jumping, throwing.', 'sports', ['Training', 'Competition', 'Social']),
 
-    # Cultural (5)
+    # Cultural (10)
     ('Chinese Society', 'Celebrating Chinese culture.', 'Events and language exchange.', 'cultural', ['Cultural', 'Social', 'Festival']),
     ('African Caribbean Society', 'Celebrating heritage.', 'Cultural events and discussions.', 'cultural', ['Cultural', 'Social', 'Performance']),
     ('Indian Society', 'Indian culture and traditions.', 'Diwali, Bollywood nights, and more.', 'cultural', ['Cultural', 'Festival', 'Social']),
     ('Korean Society', 'Korean culture at KCL.', 'K-culture events and socials.', 'cultural', ['Cultural', 'Social', 'Festival']),
     ('Latin American Society', 'Celebrating Latin culture.', 'Dance, food, and music.', 'cultural', ['Cultural', 'Social', 'Performance']),
+    ('Japanese Society', 'Japanese culture and language.', 'Anime, food, and traditions.', 'cultural', ['Cultural', 'Social', 'Festival']),
+    ('Middle Eastern Society', 'Celebrating Middle Eastern heritage.', 'Food, music, and culture.', 'cultural', ['Cultural', 'Social', 'Performance']),
+    ('European Society', 'European cultures united.', 'Exchange and celebration.', 'cultural', ['Cultural', 'Social', 'Festival']),
+    ('South Asian Society', 'South Asian heritage.', 'Festivals and community.', 'cultural', ['Cultural', 'Festival', 'Social']),
+    ('Southeast Asian Society', 'Southeast Asian culture.', 'Food and traditions.', 'cultural', ['Cultural', 'Social', 'Festival']),
 
     # Academic (4)
     ('Tech Society', 'Technology and innovation.', 'Hackathons and workshops.', 'academic', ['Workshop', 'Hackathon', 'Networking']),
