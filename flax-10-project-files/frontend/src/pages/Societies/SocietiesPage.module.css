@@ -139,3 +139,35 @@
     outline: none;
     border-color: #ff4d4f;
 }
+
+.filterBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.sortDropdown,
+.categoryDropdown {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.sortDropdown:focus,
+.categoryDropdown:focus {
+    outline: none;
+    border-color: var(--primary-color, #9E7E5D);
+}
+
+.loadingIndicator {
+    text-align: center;
+    padding: 24px;
+    color: #888;
+    font-size: 0.9rem;
+}
