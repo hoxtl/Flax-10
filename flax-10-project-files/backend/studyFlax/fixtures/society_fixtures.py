@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timedelta
 from django.utils import timezone
 
@@ -8,6 +9,22 @@ SOCIETY_CATEGORIES = [
     'gaming', 'music', 'dance', 'religious', 'professional',
     'volunteering', 'media'
 ]
+
+# 2 images per category for variety
+CATEGORY_IMAGES = {
+    'sports': ['sports1.jpg', 'sports2.jpg'],
+    'cultural': ['cultural1.jpg', 'cultural2.jpg'],
+    'academic': ['academic1.jpg', 'academic2.jpg'],
+    'arts': ['arts1.jpg', 'arts2.jpg'],
+    'social': ['social1.jpg', 'social2.jpg'],
+    'gaming': ['gaming1.jpg', 'gaming2.jpg'],
+    'music': ['music1.jpg', 'music2.jpg'],
+    'dance': ['dance1.jpg', 'dance2.jpg'],
+    'religious': ['religious1.jpg', 'religious2.jpg'],
+    'professional': ['professional1.jpg', 'professional2.jpg'],
+    'volunteering': ['volunteering1.jpg', 'volunteering2.jpg'],
+    'media': ['media1.jpg', 'media2.jpg'],
+}
 
 # Reusable event templates by category
 # Format: (title, description, hour, duration_mins, recurrence, day_of_week)

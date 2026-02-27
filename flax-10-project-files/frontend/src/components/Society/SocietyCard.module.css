@@ -3,6 +3,7 @@
     border-radius: 12px;
     background-size: cover;
     background-position: center;
+    background-color: var(--primary);
     overflow: hidden;
     cursor: pointer;
     display: flex;
@@ -41,5 +42,5 @@
     align-items: flex-end;
     justify-content: flex-start;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.4);
+    background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
 }
