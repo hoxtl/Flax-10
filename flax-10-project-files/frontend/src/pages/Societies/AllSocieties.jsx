@@ -36,9 +36,14 @@ function useFilters() {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ ratified: "all", category: "all" });
     const [sortBy, setSortBy] = useState("name");
-    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
-    const clearFilters = () => setFilters({ ratified: "all", category: "all" });
-    return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
+    const [page, setPage] = useState(1);
+
+    const handleSearch = (value) => { setSearch(value); setPage(1); };
+    const handleSort = (value) => { setSortBy(value); setPage(1); };
+    const toggleFilter = (type, value) => { setFilters(prev => toggleFilterValue(prev, type, value)); setPage(1); };
+    const clearFilters = () => { setFilters({ ratified: "all", category: "all" }); setPage(1); };
+
+    return { search, setSearch: handleSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy: handleSort, page, setPage };
 }
 
 function toggleFilterValue(prev, type, value) {
