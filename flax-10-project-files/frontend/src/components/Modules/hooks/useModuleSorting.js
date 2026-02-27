@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import { getDepartment, sortModules } from '../utils/moduleUtils';
+import { applyFiltersAndSort } from '../utils/moduleUtils.js';
 
 const PAGE_SIZE = 9;
 
@@ -8,9 +8,7 @@ export default function useModuleSorting(modules) {
     const [department, setDepartment] = useState('all');
     const [sort_by, setSortBy] = useState('name');
 
-    const by_department = department === 'all' ? modules : 
-    modules.filter(m=>getDepartment(m.module_code) === department);
-    const results =  sortModules(by_department, sort_by);
+    const results =  applyFiltersAndSort(modules, department, sort_by);
     const page_modules = results.slice((current_page - 1) * PAGE_SIZE, current_page*PAGE_SIZE);
     const total_pages = Math.ceil(results.length / PAGE_SIZE);
 
