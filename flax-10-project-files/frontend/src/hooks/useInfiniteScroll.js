@@ -4,7 +4,6 @@ const DEFAULT_PAGE_SIZE = 12;
 
 export function useInfiniteScroll(items, pageSize = DEFAULT_PAGE_SIZE) {
     const [visibleCount, setVisibleCount] = useState(pageSize);
-    const [pageBreaks, setPageBreaks] = useState([0]);
     const observerRef = useRef(null);
     const sentinelRef = useRef(null);
 
@@ -13,29 +12,38 @@ export function useInfiniteScroll(items, pageSize = DEFAULT_PAGE_SIZE) {
 
     const loadMore = useCallback(() => {
         if (!hasMore) return;
-        setPageBreaks(prev => [...prev, visibleCount]);
         setVisibleCount(prev => Math.min(prev + pageSize, items.length));
-    }, [hasMore, pageSize, items.length, visibleCount]);
+    }, [hasMore, pageSize, items.length]);
 
-    const reset = useCallback(() => {
-        setVisibleCount(pageSize);
-        setPageBreaks([0]);
-    }, [pageSize]);
+    const reset = useCallback(() => setVisibleCount(pageSize), [pageSize]);
 
     useEffect(() => { reset(); }, [items.length, reset]);
 
     useEffect(() => {
-        observerRef.current = createObserver(loadMore);
+        const root = findScrollableParent();
+        observerRef.current = createObserver(loadMore, root);
         if (sentinelRef.current) observerRef.current.observe(sentinelRef.current);
         return () => observerRef.current?.disconnect();
     }, [loadMore]);
 
-    return { visibleItems, hasMore, sentinelRef, pageBreaks, reset };
+    return { visibleItems, hasMore, sentinelRef, reset };
 }
 
-function createObserver(callback) {
-    return new IntersectionObserver(
-        entries => entries[0]?.isIntersecting && callback(),
-        { rootMargin: "200px" }
-    );
+function createObserver(callback, root) {
+    const options = { rootMargin: "200px" };
+    if (root && root !== document.documentElement) options.root = root;
+    return new IntersectionObserver(entries => {
+        if (entries[0]?.isIntersecting) callback();
+    }, options);
+}
+
+function findScrollableParent() {
+    const content = document.querySelector('[class*="content"]');
+    if (content && isScrollable(content)) return content;
+    return null;
+}
+
+function isScrollable(element) {
+    const style = window.getComputedStyle(element);
+    return style.overflow === "auto" || style.overflowY === "auto";
 }

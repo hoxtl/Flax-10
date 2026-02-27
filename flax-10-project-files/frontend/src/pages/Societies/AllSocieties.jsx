@@ -3,6 +3,7 @@ import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import BasePill from "../../components/Tags/BasePill";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
+import SearchBar from "../../components/common/SearchBar";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS } from "./societyFilters";
 
@@ -11,7 +12,7 @@ const PAGE_SIZE = 20;
 export default function AllSocieties({ onBack, onSelect, societies = [] }) {
     const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { visibleItems, hasMore, sentinelRef, pageBreaks } = useInfiniteScroll(filtered, PAGE_SIZE);
+    const { visibleItems, hasMore, sentinelRef } = useInfiniteScroll(filtered, PAGE_SIZE);
 
     return (
         <div className={styles.container}>
@@ -19,7 +20,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [] }) {
             <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
             <SocietyGrid items={visibleItems} onSelect={onSelect} />
             {hasMore && <LoadMoreSentinel sentinelRef={sentinelRef} />}
-            <ScrollToTop pageBreaks={pageBreaks} />
+            <ScrollToTop />
         </div>
     );
 }
@@ -42,8 +43,7 @@ function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
     return (
         <header className={styles.header}>
             <button onClick={onBack} className={styles.backBtn}>← Back</button>
-            <input className={styles.searchBar} value={search} placeholder="Search societies..."
-                onChange={e => setSearch(e.target.value)} />
+            <SearchBar value={search} onChange={setSearch} placeholder="Search societies..." />
             <SortDropdown value={sortBy} onChange={setSortBy} />
         </header>
     );
