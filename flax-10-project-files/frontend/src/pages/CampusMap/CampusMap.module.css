@@ -753,3 +753,9 @@
   font-weight: 700;
   color: var(--c-red);
 }
+
+.disruptionReason {
+  font-size: 0.75rem;
+  color: rgba(var(--c-grey), 0.70);
+  line-height: 1.4;
+}
