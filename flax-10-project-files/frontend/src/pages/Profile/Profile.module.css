@@ -1,12 +1,16 @@
 /* ==========================================================================
    Profile page styles — StudyFlax
-   Warm sand aesthetic, consistent with Analytics/Calendar pages
+   Glassmorphism edition — warm sand + frosted glass
    ========================================================================== */
 
 .container {
-  max-width: 935px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 30px 20px;
+  /* Subtle radial warmth so glass blur has something to refract */
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(158,126,93,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 80% 80%, rgba(170,154,148,0.06) 0%, transparent 70%);
 }
 
 .content { background: transparent; }
@@ -36,6 +40,7 @@
   font-weight: 600;
   flex-shrink: 0;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(158, 126, 93, 0.25);
 }
 
 .avatarImage {
@@ -95,7 +100,6 @@
 .statValue { font-weight: 600; }
 
 .bio { display: flex; flex-direction: column; gap: 3px; }
-
 .fullName  { font-size: 14px; font-weight: 600; color: var(--text); }
 .description { font-size: 14px; color: var(--text); }
 
@@ -111,13 +115,99 @@
 }
 
 /* ---------------------------------------------------------------------------
-   ProfileHome
+   Layout
 --------------------------------------------------------------------------- */
 
 .profileHome {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 12px;
+  align-items: start;
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 20px;
+}
+
+/* ---------------------------------------------------------------------------
+   Glass card base — used by all cards
+--------------------------------------------------------------------------- */
+
+.glassCard {
+  position: relative;
+  background: rgba(246, 244, 241, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(74, 52, 33, 0.06),
+    0 8px 32px rgba(74, 52, 33, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+[data-theme="dark"] .glassCard {
+  background: rgba(26, 19, 16, 0.6);
+  border-color: rgba(180, 164, 144, 0.18);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(180, 164, 144, 0.08);
+}
+
+.glassCard:hover {
+  box-shadow:
+    0 4px 16px rgba(74, 52, 33, 0.10),
+    0 16px 48px rgba(74, 52, 33, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .glassCard:hover {
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 16px 48px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(180, 164, 144, 0.12);
+}
+
+/* Subtle gradient sheen across top of card */
+.glassCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+[data-theme="dark"] .glassCard::before {
+  background: linear-gradient(
+    135deg,
+    rgba(180, 164, 144, 0.08) 0%,
+    transparent 60%
+  );
 }
 
 .cardLabel {
@@ -129,8 +219,6 @@
   margin-bottom: 2px;
 }
 
-.section { display: flex; flex-direction: column; gap: 8px; }
-
 /* ---------------------------------------------------------------------------
    Persona card
 --------------------------------------------------------------------------- */
@@ -138,9 +226,6 @@
 .personaCard {
   display: flex;
   align-items: center;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -150,14 +235,20 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 16px 20px;
-  border-right: 1px solid var(--border);
-  min-width: 110px;
+  padding: 18px 22px;
+  border-right: 1px solid rgba(255, 255, 255, 0.4);
+  min-width: 120px;
   flex-shrink: 0;
+  background: rgba(158, 126, 93, 0.08);
+}
+
+[data-theme="dark"] .personaLeft {
+  border-right-color: rgba(180, 164, 144, 0.15);
+  background: rgba(184, 147, 109, 0.08);
 }
 
 .personaEmoji {
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
@@ -178,8 +269,8 @@
 .personaDesc {
   font-size: 13px;
   color: var(--muted);
-  line-height: 1.55;
-  padding: 14px 20px;
+  line-height: 1.6;
+  padding: 16px 22px;
   margin: 0;
 }
 
@@ -188,10 +279,7 @@
 --------------------------------------------------------------------------- */
 
 .dnaCard {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 20px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -211,42 +299,28 @@
 }
 
 .dnaLegend { display: flex; gap: 16px; flex-wrap: wrap; }
-
 .dnaLegendItem { display: flex; align-items: center; gap: 5px; }
-
 .dnaDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
 .dnaLegendLabel { font-size: 11px; color: var(--muted); }
-
 .dnaLegendPct { font-size: 11px; font-weight: 600; color: var(--text); }
 
 /* ---------------------------------------------------------------------------
-   Mini heatmap — clickable
+   Mini heatmap
 --------------------------------------------------------------------------- */
 
 .heatmapCard {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 20px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   cursor: pointer;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
   outline: none;
   -webkit-user-select: none;
   user-select: none;
 }
 
-.heatmapCard:hover,
-.heatmapCard:focus-visible {
-  border-color: var(--primary);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  transform: translateY(-1px);
-}
-
-.heatmapCard:active { transform: translateY(0); }
+.heatmapCard:hover { border-color: rgba(158, 126, 93, 0.5) !important; }
+.heatmapCard:active { transform: translateY(0) !important; }
 
 .heatmapHeader {
   display: flex;
@@ -254,7 +328,6 @@
   justify-content: space-between;
 }
 
-/* Pill-style link button — looks like a chip */
 .heatmapLinkBtn {
   display: inline-flex;
   align-items: center;
@@ -266,12 +339,7 @@
   border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
   border-radius: 100px;
   padding: 3px 8px 3px 10px;
-  transition: background 0.15s;
-  pointer-events: none; /* card handles the click */
-}
-
-.heatmapCard:hover .heatmapLinkBtn {
-  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  pointer-events: none;
 }
 
 .miniHeatmap { display: flex; gap: 8px; }
@@ -299,10 +367,7 @@
 --------------------------------------------------------------------------- */
 
 .weekCard {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 20px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -316,7 +381,6 @@
   gap: 20px;
 }
 
-/* Ring wrapper */
 .goalRingWrap {
   display: flex;
   flex-direction: column;
@@ -325,7 +389,6 @@
   flex-shrink: 0;
 }
 
-/* Clickable ring button — no native button look */
 .goalRingBtn {
   position: relative;
   width: 84px;
@@ -348,7 +411,7 @@
 }
 
 .goalRingActive .goalRingSvg {
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--primary) 40%, transparent));
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 50%, transparent));
 }
 
 .goalRingSvg {
@@ -384,14 +447,19 @@
   text-align: center;
 }
 
-/* Divider */
-.weekDivider { width: 1px; height: 60px; background: var(--border); flex-shrink: 0; }
+.weekDivider {
+  width: 1px;
+  height: 60px;
+  background: rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
 
-/* Streaks */
+[data-theme="dark"] .weekDivider {
+  background: rgba(180, 164, 144, 0.2);
+}
+
 .streakRow { display: flex; gap: 28px; }
-
 .streakItem { display: flex; flex-direction: column; gap: 2px; }
-
 .streakNum { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; }
 
 .streakMeta {
@@ -402,14 +470,10 @@
   gap: 3px;
 }
 
-.streakNudge {
-  font-size: 10.5px;
-  color: var(--primary);
-  margin-top: 2px;
-}
+.streakNudge { font-size: 10.5px; color: var(--primary); margin-top: 2px; }
 
 /* ---------------------------------------------------------------------------
-   Goal editor panel — slides in from top (ReactBits-inspired reveal)
+   Goal editor panel
 --------------------------------------------------------------------------- */
 
 .goalEditorWrap {
@@ -426,7 +490,7 @@
 
 .goalEditorPanel {
   padding: 14px 16px 4px;
-  border-top: 1px dashed var(--border);
+  border-top: 1px dashed rgba(158, 126, 93, 0.3);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -440,13 +504,8 @@
   color: var(--muted);
 }
 
-.goalEditorHrs {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-}
+.goalEditorHrs { font-size: 14px; font-weight: 700; color: var(--text); }
 
-/* Range slider — custom styled to match app */
 .goalSlider {
   -webkit-appearance: none;
   appearance: none;
@@ -460,7 +519,6 @@
   border-radius: 3px;
   outline: none;
   cursor: pointer;
-  transition: background 0.15s;
 }
 
 .goalSlider::-webkit-slider-thumb {
@@ -472,13 +530,10 @@
   border: 2px solid white;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
-.goalSlider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-}
+.goalSlider::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
 .goalSlider::-moz-range-thumb {
   width: 18px;
@@ -522,7 +577,7 @@
 
 .goalCancelBtn {
   padding: 6px 12px;
-  background: var(--panel);
+  background: rgba(255,255,255,0.4);
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 12px;
@@ -535,21 +590,52 @@
 .goalCancelBtn:hover { color: var(--text); border-color: var(--text); }
 
 /* ---------------------------------------------------------------------------
-   Badges
+   Achievements box — right column
 --------------------------------------------------------------------------- */
 
-.tierGroup { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+.badgesBox {
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+}
 
-.tierGroupHeader { display: flex; align-items: center; gap: 6px; }
+.badgesBox:hover { border-color: rgba(158, 126, 93, 0.5) !important; }
 
-.tierDot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.badgesBoxHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-.tierGroupLabel {
-  font-size: 10px;
+.badgesViewAll {
+  font-size: 11px;
   font-weight: 600;
+  color: var(--primary);
+}
+
+.badgesSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.badgesCount {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.badgesCountLabel {
+  font-size: 12px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
 }
 
 .badgesGrid { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -565,7 +651,13 @@
   font-weight: 500;
   color: var(--text);
   cursor: default;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+[data-theme="dark"] .badge {
+  background: rgba(180, 164, 144, 0.08);
 }
 
 .badge:hover {
@@ -579,16 +671,56 @@
   line-height: 1;
 }
 
+.badgesMore {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+  background: rgba(255,255,255,0.2);
+}
+
+.emptyBadges {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------------------
+   Tier groups (used in modal preview fallback)
+--------------------------------------------------------------------------- */
+
+.tierGroup { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+.tierGroupHeader { display: flex; align-items: center; gap: 6px; }
+.tierDot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.tierGroupLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
 /* ---------------------------------------------------------------------------
    Skeleton
 --------------------------------------------------------------------------- */
 
-.skeletonWrap { display: flex; flex-direction: column; gap: 10px; }
+.skeletonWrap { display: flex; flex-direction: column; gap: 12px; }
 
 .skel {
-  background: var(--panel);
-  border-radius: 12px;
+  background: rgba(246, 244, 241, 0.55);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 16px;
   animation: skelPulse 1.4s ease infinite;
+}
+
+[data-theme="dark"] .skel {
+  background: rgba(26, 19, 16, 0.55);
+  border-color: rgba(180, 164, 144, 0.15);
 }
 
 @keyframes skelPulse {
@@ -596,11 +728,10 @@
   50%       { opacity: 0.3; }
 }
 
-.skelPersona  { height: 68px; }
-.skelWeek     { height: 110px; }
-.skelDna      { height: 60px; }
-.skelHeatmap  { height: 86px; }
-
+.skelPersona  { height: 72px; }
+.skelWeek     { height: 120px; }
+.skelDna      { height: 64px; }
+.skelHeatmap  { height: 90px; }
 .skelBadgeRow { display: flex; gap: 6px; flex-wrap: wrap; }
 .skelBadge    { height: 28px; width: 90px; border-radius: 100px; }
 
@@ -611,7 +742,8 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -622,13 +754,23 @@
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal {
-  background: var(--bg);
-  border-radius: 12px;
-  width: 400px;
-  max-height: 480px;
+  background: rgba(246, 244, 241, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 16px;
+  width: 420px;
+  max-height: 520px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 24px 64px rgba(74, 52, 33, 0.18);
   animation: slideUp 0.22s ease;
+}
+
+[data-theme="dark"] .modal {
+  background: rgba(26, 19, 16, 0.88);
+  border-color: rgba(180, 164, 144, 0.2);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
 }
 
 @keyframes slideUp {
@@ -640,8 +782,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+
+[data-theme="dark"] .modalHeader {
+  border-bottom-color: rgba(180, 164, 144, 0.15);
 }
 
 .modalTitle { font-size: 15px; font-weight: 600; margin: 0; color: var(--text); }
@@ -664,18 +810,18 @@
   align-items: center;
   gap: 12px;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,0.3);
   cursor: pointer;
   transition: background 0.12s;
 }
-.listItem:hover { background: var(--hover); }
+.listItem:hover { background: rgba(255,255,255,0.3); }
 .listItem:last-child { border-bottom: none; }
 
 .listAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--panel);
+  background: rgba(255,255,255,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -691,7 +837,7 @@
   display: flex;
   gap: 8px;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,0.3);
 }
 
 .rangeSelector button {
@@ -699,7 +845,7 @@
   padding: 8px 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  background: rgba(255,255,255,0.3);
   color: var(--text);
   font-size: 13px;
   font-weight: 500;
@@ -708,7 +854,7 @@
   transition: all 0.15s;
 }
 
-.rangeSelector button:hover { background: var(--hover); }
+.rangeSelector button:hover { background: rgba(255,255,255,0.5); }
 
 .rangeActive {
   background: var(--primary) !important;
@@ -722,6 +868,11 @@
    Responsive
 --------------------------------------------------------------------------- */
 
+@media (max-width: 860px) {
+  .twoCol { grid-template-columns: 1fr; }
+  .rightCol { position: static; }
+}
+
 @media (max-width: 768px) {
   .header { gap: 24px; }
   .avatar { width: 80px; height: 80px; font-size: 32px; }
@@ -733,100 +884,4 @@
   .heatmapCell { height: 28px; }
 }
 
-/* ---------------------------------------------------------------------------
-   Two-column layout
---------------------------------------------------------------------------- */
-
-.twoCol {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 10px;
-  align-items: start;
-}
-
-.leftCol {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.rightCol {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: sticky;
-  top: 20px;
-}
-
-/* Achievements box — sits in right column */
-.badgesBox {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.emptyBadges {
-  font-size: 12px;
-  color: var(--muted);
-  margin: 0;
-  line-height: 1.5;
-}
-
-@media (max-width: 768px) {
-  .twoCol {
-    grid-template-columns: 1fr;
-  }
-  .rightCol {
-    position: static;
-  }
-}
-
-/* Badges box — clickable summary in right column */
-.badgesBox:hover { border-color: var(--primary); }
-.badgesBox { transition: border-color 0.2s; }
-
-.badgesBoxHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.badgesViewAll {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--primary);
-}
-
-.badgesSummary {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  margin-bottom: 4px;
-}
-
-.badgesCount {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-}
-
-.badgesCountLabel {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.badgesMore {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 11px;
-  border-radius: 100px;
-  border: 1px solid var(--border);
-  font-size: 12px;
-  color: var(--muted);
-  background: var(--panel);
-}
+.section { display: flex; flex-direction: column; gap: 8px; }
