@@ -707,8 +707,8 @@
 
 .goodServiceText span {
   font-size: 0.75rem;
-  color: var(--c-grey);
-  opacity: 0.70;
+  color: var(--success-text);
+  opacity: 0.80;
 }
 
 .disruptionsList {
