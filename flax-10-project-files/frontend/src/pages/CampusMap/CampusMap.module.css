@@ -700,3 +700,9 @@
   flex-direction: column;
   gap: 2px;
 }
+
+.goodServiceText strong {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--c-green);
+}
