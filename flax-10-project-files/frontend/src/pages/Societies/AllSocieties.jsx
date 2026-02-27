@@ -6,16 +6,19 @@ import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS } from "./societyFilters";
 
+const PAGE_SIZE = 20;
+
 export default function AllSocieties({ onBack, onSelect, societies = [] }) {
     const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { visibleItems, hasMore, sentinelRef, pageBreaks } = useInfiniteScroll(filtered);
+    const { visibleItems, hasMore, sentinelRef, pageBreaks } = useInfiniteScroll(filtered, PAGE_SIZE);
 
     return (
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
-            <FilterBar filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
-            <SocietyGrid items={visibleItems} onSelect={onSelect} hasMore={hasMore} sentinelRef={sentinelRef} />
+            <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
+            <SocietyGrid items={visibleItems} onSelect={onSelect} />
+            {hasMore && <LoadMoreSentinel sentinelRef={sentinelRef} />}
             <ScrollToTop pageBreaks={pageBreaks} />
         </div>
     );
@@ -25,9 +28,14 @@ function useFilters() {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ ratified: "all", category: "all" });
     const [sortBy, setSortBy] = useState("name");
-    const toggleFilter = (type, value) => setFilters(prev => ({ ...prev, [type]: value }));
+    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
     const clearFilters = () => setFilters({ ratified: "all", category: "all" });
     return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
+}
+
+function toggleFilterValue(prev, type, value) {
+    const newValue = prev[type] === value ? "all" : value;
+    return { ...prev, [type]: newValue };
 }
 
 function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
@@ -52,47 +60,42 @@ function SortDropdown({ value, onChange }) {
     );
 }
 
-function FilterBar({ filters, toggleFilter, clearFilters, societies }) {
+function FilterPills({ filters, toggleFilter, clearFilters, societies }) {
     const hasActiveFilters = filters.ratified !== "all" || filters.category !== "all";
     return (
-        <div className={styles.filterBar}>
-            <RatificationFilters current={filters.ratified} onChange={v => toggleFilter("ratified", v)} societies={societies} />
-            <CategoryDropdown current={filters.category} onChange={v => toggleFilter("category", v)} />
+        <div className={styles.pillContainer}>
+            <RatificationPills current={filters.ratified} onChange={v => toggleFilter("ratified", v)} societies={societies} />
+            <span className={styles.pillDivider}>|</span>
+            <CategoryPills current={filters.category} onChange={v => toggleFilter("category", v)} />
             {hasActiveFilters && <button className={styles.clearPill} onClick={clearFilters}>Clear x</button>}
         </div>
     );
 }
 
-function RatificationFilters({ current, onChange, societies }) {
+function RatificationPills({ current, onChange, societies }) {
+    return RATIFICATION_FILTERS.map(opt => (
+        <BasePill key={opt.id} label={`${countForFilter(societies, opt.id)} ${opt.label}`}
+            isActive={current === opt.id} onClick={() => onChange(opt.id)} />
+    ));
+}
+
+function CategoryPills({ current, onChange }) {
+    return SOCIETY_CATEGORIES.map(cat => (
+        <BasePill key={cat.id} label={cat.label} isActive={current === cat.id} onClick={() => onChange(cat.id)} />
+    ));
+}
+
+function SocietyGrid({ items, onSelect }) {
+    if (items.length === 0) return <EmptyState />;
     return (
-        <div className={styles.pillContainer}>
-            {RATIFICATION_FILTERS.map(opt => (
-                <BasePill key={opt.id} label={opt.label} count={countForFilter(societies, opt.id)}
-                    isActive={current === opt.id} onClick={() => onChange(opt.id)} />
-            ))}
+        <div className={styles.grid}>
+            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
         </div>
     );
 }
 
-function CategoryDropdown({ current, onChange }) {
-    return (
-        <select className={styles.categoryDropdown} value={current} onChange={e => onChange(e.target.value)}>
-            <option value="all">All Categories</option>
-            {SOCIETY_CATEGORIES.map(cat => <option key={cat.id} value={cat.id}>{cat.label}</option>)}
-        </select>
-    );
-}
-
-function SocietyGrid({ items, onSelect, hasMore, sentinelRef }) {
-    if (items.length === 0) return <EmptyState />;
-    return (
-        <>
-            <div className={styles.grid}>
-                {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
-            </div>
-            {hasMore && <div ref={sentinelRef} className={styles.loadingIndicator}>Loading more...</div>}
-        </>
-    );
+function LoadMoreSentinel({ sentinelRef }) {
+    return <div ref={sentinelRef} className={styles.loadingIndicator}>Scroll for more...</div>;
 }
 
 function EmptyState() {
