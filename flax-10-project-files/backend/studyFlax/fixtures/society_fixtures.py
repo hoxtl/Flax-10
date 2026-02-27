@@ -113,7 +113,7 @@ def get_events_for_category(category):
 # Society data with categories
 # Format: (name, bio, about, category, tags)
 SOCIETY_DATA = [
-    # Sports (7)
+    # Sports (14)
     ('Football Club', 'The beautiful game at KCL.', 'Weekly training and matches.', 'sports', ['Training', 'Match', 'Social']),
     ('Basketball Society', 'Hoops for all skill levels.', 'Casual and competitive basketball.', 'sports', ['Training', 'Tournament', 'Social']),
     ('Tennis Club', 'Serve, volley, and have fun.', 'Sessions for all levels.', 'sports', ['Training', 'Match', 'Social']),
@@ -121,6 +121,13 @@ SOCIETY_DATA = [
     ('Hiking Society', 'Explore the outdoors.', 'Regular hikes and trips.', 'sports', ['Hike', 'Trip', 'Social']),
     ('Swimming Club', 'Make a splash.', 'Pool sessions and competitions.', 'sports', ['Training', 'Competition', 'Social']),
     ('Rugby Club', 'Try something new.', 'Training for all experience levels.', 'sports', ['Training', 'Match', 'Social']),
+    ('Badminton Society', 'Shuttlecock and smash.', 'Weekly sessions for all levels.', 'sports', ['Training', 'Tournament', 'Social']),
+    ('Volleyball Club', 'Spike and serve.', 'Beach and indoor volleyball.', 'sports', ['Training', 'Match', 'Social']),
+    ('Cricket Society', 'Bat and ball at KCL.', 'Training and matches.', 'sports', ['Training', 'Match', 'Social']),
+    ('Boxing Club', 'Train like a champion.', 'Fitness and technique sessions.', 'sports', ['Training', 'Fitness', 'Social']),
+    ('Cycling Society', 'Two wheels, endless roads.', 'Group rides and tours.', 'sports', ['Ride', 'Trip', 'Social']),
+    ('Climbing Club', 'Reach new heights.', 'Indoor and outdoor climbing.', 'sports', ['Training', 'Trip', 'Social']),
+    ('Athletics Club', 'Track and field.', 'Running, jumping, throwing.', 'sports', ['Training', 'Competition', 'Social']),
 
     # Cultural (5)
     ('Chinese Society', 'Celebrating Chinese culture.', 'Events and language exchange.', 'cultural', ['Cultural', 'Social', 'Festival']),
