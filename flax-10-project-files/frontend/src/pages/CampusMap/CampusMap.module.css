@@ -753,7 +753,8 @@
 
 .disruptionReason {
   font-size: 0.75rem;
-  color: rgba(var(--c-grey), 0.70);
+  color: var(--text);
+  opacity: 0.75;
   line-height: 1.4;
 }
 
