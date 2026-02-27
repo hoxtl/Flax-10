@@ -10,8 +10,9 @@ from studyFlax.models import (
 )
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
-    module_fixtures, society_seed_data, location_fixtures
+    module_fixtures, location_fixtures
 )
+from studyFlax.fixtures.society_fixtures import build_society_seed_data
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
@@ -262,19 +263,20 @@ class Command(BaseCommand):
 
     def create_societies(self):
         self.stdout.write("Seeding societies...")
-        for data in society_seed_data:
+        for data in build_society_seed_data():
             society = self._create_society_from_config(data)
             self._seed_society_tags_from_config(society, data.get('tags', []))
 
     def _create_society_from_config(self, data):
         status = random.choice(['approved', 'pending', 'rejected', 'none'])
-        society, _ = Society.objects.update_or_create(
-            name=data['name'],
-            defaults={
-                'bio': data['bio'], 'about': data['about'], 'image': data['image'],
-                'ratification_status': status, 'is_ratified': (status == 'approved')
-            }
-        )
+        defaults = {
+            'bio': data['bio'], 'about': data['about'],
+            'category': data.get('category', ''),
+            'ratification_status': status, 'is_ratified': (status == 'approved')
+        }
+        if data.get('image'):
+            defaults['image'] = data['image']
+        society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
         return society
 
     def _seed_society_tags_from_config(self, society, tag_labels):
@@ -284,29 +286,33 @@ class Command(BaseCommand):
             SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
 
     def _get_society_config(self, society):
-        return next((s for s in society_seed_data if s['name'] == society.name), None)
+        return next((s for s in build_society_seed_data() if s['name'] == society.name), None)
 
     def _seed_events_for_society(self, society):
-        from faker import Faker
-        f = Faker('en_GB')
         config = self._get_society_config(society)
-        events = config.get('events', []) if config else []
+        if not config:
+            return
         tags = list(society.tags.all())
-        for event_data in events:
-            self._create_society_event(society, event_data, tags, f)
+        for event_template in config.get('events', []):
+            self._create_event_from_template(society, event_template, tags)
 
-    def _create_society_event(self, society, event_data, tags, faker):
-        start = timezone.make_aware(faker.date_time_between(start_date='-1M', end_date='+2M'))
+    def _create_event_from_template(self, society, template, tags):
+        from .seed_helpers import build_event_datetime
+        title, desc, hour, duration, recurrence, day = template
+        start, end = build_event_datetime(hour, duration, day)
         SocietyEvent.objects.get_or_create(
-            society=society, title=event_data['title'],
-            defaults={
-                'description': event_data['description'],
-                'location': random.choice(location_fixtures),
-                'start_time': start,
-                'end_time': start + timedelta(minutes=random.choice([60, 90, 120])),
-                'tag': random.choice(tags) if tags else None
-            }
+            society=society, title=title,
+            defaults=self._build_event_defaults(desc, start, end, recurrence, tags)
         )
+
+    def _build_event_defaults(self, desc, start, end, recurrence, tags):
+        return {
+            'description': desc, 'location': random.choice(location_fixtures),
+            'start_time': start, 'end_time': end,
+            'recurrence': recurrence or 'none',
+            'recurrence_end_date': (start + timedelta(days=90)).date() if recurrence else None,
+            'tag': random.choice(tags) if tags else None
+        }
 
     def _seed_images_for_society(self, society):
         self._set_cover_image(society)
