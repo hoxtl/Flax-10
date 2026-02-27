@@ -5,7 +5,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: var(--primary-color, #6366f1);
+    background: var(--scroll-btn-bg);
     color: white;
     border: none;
     cursor: pointer;
@@ -20,7 +20,7 @@
 
 .scrollBtn:hover {
     transform: scale(1.1);
-    background: var(--primary-hover, #4f46e5);
+    background: var(--scroll-btn-hover);
 }
 
 .scrollBtn:active {
