@@ -1011,8 +1011,9 @@ export default function Homepage({ onNavigate }) {
               sub={`${actionHubCompletedCount} done today. Take a moment — you earned it.`}
             />
           ) : actionHubSpineCompletedPct === 0 ? (
-            /* Nothing done yet — cat empty state */
+            /* Nothing done yet — brown cat */
             <ZenGardenEmptyState
+              illustrationVariant="brownCat"
               message={
                 actionHubItemsOnly.length === 0
                   ? "Your slate is clean."
