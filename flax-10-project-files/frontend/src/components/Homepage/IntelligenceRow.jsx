@@ -97,6 +97,7 @@ export default function IntelligenceRow({
           icon={TrendingUp}
           index={1}
           isVisible={sectionVisible}
+          centeredBody
         >
           {slot2Health}
         </BentoSlot>
@@ -146,6 +147,7 @@ function BentoSlot({
   iconPulse = false,
   index,
   isVisible,
+  centeredBody = false,
   children,
 }) {
   const cardRef = useRef(null);
@@ -184,7 +186,7 @@ function BentoSlot({
             {meta && <span className={styles.bentoMeta}>{meta}</span>}
           </div>
         </div>
-        <div className={styles.bentoBody}>{children}</div>
+        <div className={`${styles.bentoBody} ${centeredBody ? styles.bentoCenteredBody : ""}`}>{children}</div>
       </div>
     </article>
   );

@@ -181,11 +181,13 @@
 .span5 { grid-column: 1 / -1; }
 
 @media (min-width: 768px) {
-  .span1 { grid-column: span 4; grid-row: span 2; }
-  .span2 { grid-column: span 2; grid-row: span 1; }
-  .span3 { grid-column: span 2; grid-row: span 1; }
-  .span4 { grid-column: span 3; grid-row: span 1; }
-  .span5 { grid-column: span 3; grid-row: span 1; }
+  /* Row 1: Today's Tasks (4 cols) + Day Progress (2 cols) */
+  .span1 { grid-column: span 4; }
+  .span2 { grid-column: span 2; }
+  /* Row 2: Deadlines + Focus Windows + Right Now (2 cols each) */
+  .span3 { grid-column: span 2; }
+  .span4 { grid-column: span 2; }
+  .span5 { grid-column: span 2; }
 }
 
 .bentoSlot {
@@ -335,6 +337,14 @@
   font-size: 0.8rem;
   line-height: 1.5;
   color: rgba(45, 53, 45, 0.85);
+}
+
+.bentoCenteredBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .footer {
