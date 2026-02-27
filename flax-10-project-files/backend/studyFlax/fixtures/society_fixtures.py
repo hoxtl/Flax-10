@@ -173,11 +173,15 @@ SOCIETY_DATA = [
     ('Puzzle Society', 'Brain teasers and challenges.', 'Puzzle solving events.', 'gaming', ['Competition', 'Social', 'Workshop']),
     ('Retro Gaming Club', 'Classic games revived.', 'Retro gaming sessions.', 'gaming', ['Game Night', 'Social', 'Tournament']),
 
-    # Music (4)
+    # Music (8)
     ('A Cappella Group', 'Vocal harmony.', 'Arrange and perform.', 'music', ['Rehearsal', 'Performance', 'Social']),
     ('Jazz Band', 'Swing and bebop.', 'Jam sessions and gigs.', 'music', ['Jam Session', 'Performance', 'Workshop']),
     ('Orchestra', 'Classical music.', 'Rehearsals and concerts.', 'music', ['Rehearsal', 'Concert', 'Social']),
     ('DJ Society', 'Beats and mixing.', 'Learn to DJ and perform.', 'music', ['Workshop', 'Performance', 'Social']),
+    ('Rock Band Society', 'Rock and roll.', 'Band sessions and gigs.', 'music', ['Rehearsal', 'Performance', 'Social']),
+    ('Choir', 'Singing together.', 'Choral performances.', 'music', ['Rehearsal', 'Concert', 'Social']),
+    ('Guitar Society', 'Six strings of fun.', 'Learn and jam.', 'music', ['Workshop', 'Jam Session', 'Social']),
+    ('Electronic Music Society', 'Beats and synths.', 'Production workshops.', 'music', ['Workshop', 'Performance', 'Social']),
 
     # Dance (4)
     ('K-Pop Dance Society', 'K-Pop choreography.', 'Learn the latest moves.', 'dance', ['Practice', 'Performance', 'Social']),
