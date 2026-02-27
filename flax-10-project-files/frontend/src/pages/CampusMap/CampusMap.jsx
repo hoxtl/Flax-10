@@ -520,7 +520,7 @@ export default function CampusMap() {
           )}
 
           <div className={styles.lastUpdated}>
-            Updated: {new Date().toLocaleTimeString('en-GB', {
+            Last Updated: {new Date().toLocaleTimeString('en-GB', {
               hour: '2-digit',
               minute: '2-digit'
             })}
