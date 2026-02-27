@@ -4,7 +4,7 @@
  */
 
 import { Link } from "react-router-dom";
-import { RotateCw, Pencil } from "lucide-react";
+import { RotateCw, Pencil, AlertTriangle } from "lucide-react";
 import { formatTime, fmtDurationShort } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
@@ -73,9 +73,9 @@ export function PlanEventRow({
       : null;
   const propMinHeight = durationMins > 0 ? Math.max(56, Math.min(durationMins * 1.2, 180)) : 56;
 
-  /* Event type accent from tag name or title pattern */
+  /* Event type accent — terracotta for conflicts, otherwise type-based */
   const tagName = getTag?.(item.tag)?.name ?? item.tag_name ?? "";
-  const accentColor = getEventAccentColor(item.title, tagName);
+  const accentColor = isOverlap ? "#C0714E" : getEventAccentColor(item.title, tagName);
 
   const handleConflictCardClick = () => {
     if (isOverlap) {
@@ -145,9 +145,7 @@ export function PlanEventRow({
                   {isOverlap && (
                     <>
                       <span className={styles.planTimelineTimeConflictBadge}>
-                        <span className={styles.planTimelineConflictIcon} aria-hidden>
-                          ⚠
-                        </span>{" "}
+                        <AlertTriangle size={11} strokeWidth={2.5} aria-hidden />
                         Conflict
                       </span>
                       <button

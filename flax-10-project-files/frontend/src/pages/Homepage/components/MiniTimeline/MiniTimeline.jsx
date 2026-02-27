@@ -15,8 +15,9 @@ import { HourMarkRow } from "./HourMarkRow";
 import { TinyGapRow } from "./TinyGapRow";
 import { NowRow } from "./NowRow";
 import { PlanFreeRow } from "./PlanFreeRow";
-import { EventGroupRow } from "./EventGroupRow";
+
 import { PlanEventRow } from "./PlanEventRow";
+import { ConflictPairRow } from "./ConflictPairRow";
 
 export function MiniTimeline({
   sortedEvents,
@@ -113,14 +114,10 @@ export function MiniTimeline({
       }
       if (row.type === "eventGroup") {
         return (
-          <EventGroupRow
+          <ConflictPairRow
             key={row.id}
             row={row}
             rows={rows}
-            taskLists={taskLists}
-            conflictPopoverRowId={conflictPopoverRowId}
-            conflictPopoverRef={conflictPopoverRef}
-            setConflictPopoverRowId={setConflictPopoverRowId}
             onConflictAutoMove={onConflictAutoMove}
             onEdit={onEdit}
             getTag={getTag}
@@ -175,7 +172,7 @@ export function MiniTimeline({
           <span className={styles.planTimelineNowStripTimer}>{formatTime(currentBlock.end_time)}</span>
         </div>
       )}
-      <div className={`${styles.planTimelineList} ${rows.some((r) => r.type === "eventGroup" || (r.type === "event" && r.isOverlap)) ? styles.planTimelineListHasConflict : ""}`}>
+      <div className={`${styles.planTimelineList} ${rows.some((r) => r.type === "eventGroup") ? styles.planTimelineListHasConflict : ""}`}>
         {rows.length === 0 && (
           <div className={styles.planTimelineEmpty}>
             <span className={styles.planTimelineEmptyText}>No events scheduled for this day.</span>
