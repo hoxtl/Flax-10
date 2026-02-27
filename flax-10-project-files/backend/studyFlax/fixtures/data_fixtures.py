@@ -142,35 +142,93 @@ description_fixtures = (
 
 # Locations
 location_fixtures = (
+    # Strand Campus
     "Bush House, Strand, London WC2B 4PJ",
-    "Maughan Library, Chancery Lane, London WC2A 1LR",
-    "Franklin-Wilkins Building, 150 Stamford St, London SE1 9NH",
     "King's Building, Strand, London WC2R 2LS",
-    "Guy's Campus, Great Maze Pond, London SE1 9RT",
-    "St Thomas' Hospital, Westminster Bridge Rd, London SE1 7EH",
-    "Denmark Hill Campus, London SE5 9RS",
     "Strand Campus, Strand, London WC2R 2LS",
     "Somerset House, Strand, London WC2R 1LA",
-    "King's Sport, Strand, London WC2R 2LS",
+    "Maughan Library, Chancery Lane, London WC2A 1LR",
+    "King's Sport, Surrey St, London WC2R 2NS",
     "KCLSU, Macadam Building, Surrey St, London WC2R 2NS",
-    "Costa Coffee, Oxford Street, London WC2B 4PJ",
-    "Pret a Manger, Strand, London WC2R 1LA",
-    "London Bridge Station, London SE1 9SP",
+    "Strand Building, Strand, London WC2R 2LS",
+
+    # Waterloo Campus
+    "Franklin-Wilkins Building, 150 Stamford St, London SE1 9NH",
+    "Waterloo Campus, 150 Stamford St, London SE1 9NH",
+    "James Clerk Maxwell Building, 57 Waterloo Rd, London SE1 8WA",
+
+    # Guy's Campus
+    "Guy's Campus, Great Maze Pond, London SE1 9RT",
+    "New Hunt's House, Great Maze Pond, London SE1 9RT",
+    "Guy's Hospital, Great Maze Pond, London SE1 9RT",
+
+    # St Thomas' Campus
+    "St Thomas' Hospital, Westminster Bridge Rd, London SE1 7EH",
+    "St Thomas' Campus, Lambeth Palace Rd, London SE1 7EH",
+
+    # Denmark Hill Campus
+    "Denmark Hill Campus, De Crespigny Park, London SE5 8AF",
+    "Institute of Psychiatry, De Crespigny Park, London SE5 8AF",
+    "King's College Hospital, Denmark Hill, London SE5 9RS",
+
+    # Transport hubs near campuses
     "Temple Station, Victoria Embankment, London WC2R 2PH",
     "Holborn Station, High Holborn, London WC1V 7PP",
+    "Charing Cross Station, Strand, London WC2N 5HS",
+    "Waterloo Station, Waterloo Rd, London SE1 8SW",
+    "London Bridge Station, London Bridge, London SE1 9SP",
+    "Blackfriars Station, Queen Victoria St, London EC4V 3AT",
+    "Southwark Station, The Cut, London SE1 8LN",
+    "Borough Station, Borough High St, London SE1 1JA",
+    "Elephant & Castle Station, Elephant Rd, London SE1 6TE",
+    "Denmark Hill Station, Denmark Hill, London SE5 8RS",
+
+    # Student cafes and food near Strand
+    "Pret a Manger, Strand, London WC2R 1LA",
+    "Costa Coffee, Strand, London WC2R 1AP",
     "Tesco Express, Strand, London WC2R 0DX",
-    "The Shard",
+    "Sainsbury's Local, Kingsway, London WC2B 6TP",
+    "The Refectory, Bush House, London WC2B 4PJ",
+
+    # Student cafes and food near Waterloo and Guy's
+    "Pret a Manger, Waterloo Station, London SE1 8SW",
+    "Greggs, Borough High St, London SE1 1JA",
+    "Borough Market, 8 Southwark St, London SE1 1TL",
+    "EAT, Waterloo Rd, London SE1 8UL",
+
+    # Student cafes and food near Denmark Hill
+    "Costa Coffee, Denmark Hill, London SE5 8RS",
+    "Lidl, Coldharbour Ln, London SE5 9NR",
+    "Nour Cash & Carry, Coldharbour Ln, London SE5 9NR",
 )
 
 lecture_theatre_fixtures = (
-    "Bush House Auditorium BH (N) 0, Strand Campus",
-    "Waterloo FWB B5, Waterloo Campus",
-    "Edmond J. Safra Lecture Theatre, Strand Campus",
-    "New Hunt's House Lecture Theatre 1, Guy's Campus",
-    "IET Kelvin Lecture Theatre",
-    "Harris Lecture Theatre, Strand, Denmark Hill Campus",
-    "Nevin Lecture Theatre, Guy's Campus",
-    "Wolfson Lecture Theatre, St Thomas Campus",
+    # Strand Campus
+    "Bush House Auditorium BH(N)0.01, Strand, London WC2B 4PJ",
+    "Bush House Lecture Theatre BH(S)1.01, Strand, London WC2B 4PJ",
+    "Edmond J. Safra Lecture Theatre, King's Building, Strand, London WC2R 2LS",
+    "K0.16 Lecture Theatre, King's Building, Strand, London WC2R 2LS",
+    "Nash Lecture Theatre, Strand Building, Strand, London WC2R 2LS",
+    "Great Hall, Strand Campus, London WC2R 2LS",
+
+    # Waterloo Campus
+    "FWB B5 Lecture Theatre, Franklin-Wilkins Building, London SE1 9NH",
+    "FWB 1.01 Seminar Room, Franklin-Wilkins Building, London SE1 9NH",
+    "JCM Lecture Theatre, James Clerk Maxwell Building, London SE1 8WA",
+
+    # Guy's Campus
+    "New Hunt's House Lecture Theatre 1, Great Maze Pond, London SE1 9RT",
+    "Nevin Lecture Theatre, New Hunt's House, London SE1 9RT",
+    "Guy's Hospital Lecture Theatre, Great Maze Pond, London SE1 9RT",
+
+    # St Thomas' Campus
+    "Wolfson Lecture Theatre, St Thomas' Hospital, London SE1 7EH",
+    "Weston Education Centre Lecture Theatre, Cutcombe Rd, London SE5 9RJ",
+
+    # Denmark Hill Campus
+    "IET Kelvin Lecture Theatre, Denmark Hill, London SE5 8AF",
+    "Harris Lecture Theatre, De Crespigny Park, London SE5 8AF",
+    "P049 Seminar Room, Institute of Psychiatry, London SE5 8AF",
 )
 
 # Modules
