@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "../../../api/societyApi";
 import { addHourToTime } from "../../Calendar/utils/dateUtils";
+import { useNotify } from "../../Notifications/hooks/useNotify";
 
 function transformAnnouncementData(data) {
     const images = (data.images || [])
@@ -78,6 +79,7 @@ export function useSocietyDetail(societyId) {
     const [society, setSociety] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const notify = useNotify();
 
     const loadSociety = useCallback(async () => {
         if (!societyId) return;
@@ -227,6 +229,7 @@ export function useSocietyDetail(societyId) {
     const leaveSociety = async () => {
         await api.leaveSociety(societyId, 'me');
         setSociety(prev => ({ ...prev, is_member: false, member_count: Math.max(0, prev.member_count - 1) }));
+        notify('Unsync Successful', `Calendar for ${society.name} is now unsynced.`);
     };
 
     const deleteSociety = async () => {
