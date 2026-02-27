@@ -1,0 +1,28 @@
+.scrollBtn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary-color, #6366f1);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, background 0.2s;
+    z-index: 1000;
+}
+
+.scrollBtn:hover {
+    transform: scale(1.1);
+    background: var(--primary-hover, #4f46e5);
+}
+
+.scrollBtn:active {
+    transform: scale(0.95);
+}
