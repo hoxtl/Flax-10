@@ -359,49 +359,18 @@ class Command(BaseCommand):
             self._seed_images_for_society(society)
 
     def print_stats(self):
-        print("=" * 30)
-        print(f"Users: {User.objects.count()}")
-        print(f"Modules: {Module.objects.count()}")
-        print(f"Enrollments: {Enrollment.objects.count()}")
-        print(f"Categories: {Category.objects.count()}")
-        print(f"Tags: {Tag.objects.count()}")
-        print(f"Events: {CalendarEvent.objects.count()}")
-        print(f"Societies: {Society.objects.count()}")
-        print(f"Society Memberships: {SocietyMembership.objects.count()}")
-        print(f"Society Events: {SocietyEvent.objects.count()}")
-        print(f"Society Images: {SocietyImage.objects.count()}")
-        print("=" * 30)
         div = "─" * 40
-        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write(self.style.SUCCESS("  ✅  Seeding complete"))
+        self.stdout.write(self.style.SUCCESS("  Seeding complete"))
         self.stdout.write(self.style.SUCCESS(div))
-
-        self.stdout.write("")
-        self.stdout.write("  Fixture users  (password: 1234)")
-        self.stdout.write(f"  {'johndoe':<12}  superuser / admin")
-        self.stdout.write(f"  {'janedoe':<12}  student")
-        self.stdout.write(f"  {'charlie':<12}  student")
-        self.stdout.write(f"  {'amiller':<12}  teacher")
-        self.stdout.write(f"  {'srahwan':<12}  teacher")
-        self.stdout.write(f"  {'hpatel':<12}  teacher")
-        self.stdout.write(f"  {'echen':<12}  teacher")
-        self.stdout.write(f"  {'jmurphy':<12}  teacher")
-
-        self.stdout.write("")
+        self.stdout.write("  Fixture users (password: 1234)")
+        for user, role in [('johndoe', 'admin'), ('janedoe', 'student'), ('charlie', 'student')]:
+            self.stdout.write(f"  {user:<12}  {role}")
         self.stdout.write("  Database")
         stats = [
-            ("Users",       User.objects.count()),
-            ("Modules",     Module.objects.count()),
-            ("Enrollments", Enrollment.objects.count()),
-            ("Deadlines",   Deadline.objects.count()),
-            #("Tasks",       Task.objects.count()),
-            ("Categories",  Category.objects.count()),
-            ("Tags",        Tag.objects.count()),
-            ("Events",      CalendarEvent.objects.count()),
+            ("Users", User.objects.count()), ("Modules", Module.objects.count()),
+            ("Societies", Society.objects.count()), ("Events", CalendarEvent.objects.count()),
         ]
         for label, count in stats:
             self.stdout.write(f"  {label:<14}  {count}")
-        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write("")
