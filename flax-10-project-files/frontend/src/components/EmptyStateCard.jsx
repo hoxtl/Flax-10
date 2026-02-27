@@ -1,4 +1,4 @@
-import styles from "./ZenGardenEmptyState.module.css";
+import styles from "./EmptyStateCard.module.css";
 
 /**
  * Original tuxedo cat — kept for non-homepage uses.
@@ -31,8 +31,20 @@ function ZenGardenIllustration({ className }) {
       <ellipse cx="78" cy="32" rx="3" ry="4" fill="#5a6c3d" />
       <ellipse cx="62.5" cy="31" rx="1" ry="1.2" fill="#2d352d" />
       <ellipse cx="78.5" cy="31" rx="1" ry="1.2" fill="#2d352d" />
-      <path d="M48 34 H42 M50 38 H43 M50 30 H43" stroke="#3d3d3d" strokeWidth="0.6" strokeLinecap="round" />
-      <path d="M92 34 H98 M90 38 H97 M90 30 H97" stroke="#3d3d3d" strokeWidth="0.6" strokeLinecap="round" />
+      <g>
+        <path d="M48 34 H42 M50 38 H43 M50 30 H43" stroke="#3d3d3d" strokeWidth="0.6" strokeLinecap="round" />
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 50 34; 0 50 34; 15 50 34; -10 50 34; 6 50 34; 0 50 34"
+          keyTimes="0; 0.62; 0.70; 0.78; 0.86; 1.0"
+          dur="4s" begin="1s" repeatCount="indefinite" />
+      </g>
+      <g>
+        <path d="M92 34 H98 M90 38 H97 M90 30 H97" stroke="#3d3d3d" strokeWidth="0.6" strokeLinecap="round" />
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 90 34; 0 90 34; -15 90 34; 10 90 34; -6 90 34; 0 90 34"
+          keyTimes="0; 0.62; 0.70; 0.78; 0.86; 1.0"
+          dur="4s" begin="1.15s" repeatCount="indefinite" />
+      </g>
       <path d="M70 36 L68 39 L72 39 Z" fill="#4a3421" stroke="#3d3d3d" strokeWidth="0.5" />
       <path d="M98 52 Q112 44 108 58 Q104 68 98 64" stroke="#2d2d2d" strokeWidth="3" fill="none" strokeLinecap="round" />
       <path d="M98 52 Q112 44 108 58 Q104 68 98 64" stroke="#1a1a1a" strokeWidth="1.5" fill="none" strokeLinecap="round" />
@@ -81,8 +93,20 @@ function BrownCatIllustration({ className }) {
       <path d="M64 22 Q70 20 76 22" stroke="#5c4533" strokeWidth="0.9" strokeLinecap="round" fill="none" opacity="0.5" />
       <path d="M62 18 Q70 16 78 18" stroke="#5c4533" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.35" />
       {/* Whiskers */}
-      <path d="M48 34 H42 M50 38 H43 M50 30 H43" stroke="#5c4d3e" strokeWidth="0.6" strokeLinecap="round" />
-      <path d="M92 34 H98 M90 38 H97 M90 30 H97" stroke="#5c4d3e" strokeWidth="0.6" strokeLinecap="round" />
+      <g>
+        <path d="M48 34 H42 M50 38 H43 M50 30 H43" stroke="#5c4d3e" strokeWidth="0.6" strokeLinecap="round" />
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 50 34; 0 50 34; 15 50 34; -10 50 34; 6 50 34; 0 50 34"
+          keyTimes="0; 0.62; 0.70; 0.78; 0.86; 1.0"
+          dur="4s" begin="1s" repeatCount="indefinite" />
+      </g>
+      <g>
+        <path d="M92 34 H98 M90 38 H97 M90 30 H97" stroke="#5c4d3e" strokeWidth="0.6" strokeLinecap="round" />
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 90 34; 0 90 34; -15 90 34; 10 90 34; -6 90 34; 0 90 34"
+          keyTimes="0; 0.62; 0.70; 0.78; 0.86; 1.0"
+          dur="4s" begin="1.15s" repeatCount="indefinite" />
+      </g>
       {/* Nose */}
       <path d="M70 36 L68 39 L72 39 Z" fill="#4A3421" />
       {/* Curled tail */}
@@ -147,7 +171,7 @@ function SeedlingIllustration({ className, animated = false }) {
   );
 }
 
-export default function ZenGardenEmptyState({
+export default function EmptyStateCard({
   displayName,
   sub = "No overdue or due-soon tasks.",
   message: messageOverride,

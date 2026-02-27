@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 
 import TaskCard from "./TaskCard";
 import CreateTaskBar from "./CreateTaskBar";
-import ZenGardenEmptyState from "../../../components/ZenGardenEmptyState";
+import EmptyStateCard from "../../../components/EmptyStateCard";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 import styles from "./TaskFeed.module.css";
@@ -260,7 +260,7 @@ export default function TaskFeed({
             <div className={styles.sections}>
                 {showZenEmptyState && (
                     <div className={styles.emptyState}>
-                      <ZenGardenEmptyState
+                      <EmptyStateCard
                         displayName={displayName}
                         sub={null}
                         message={zenMessage}
