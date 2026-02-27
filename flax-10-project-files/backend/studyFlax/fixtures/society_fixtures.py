@@ -217,10 +217,15 @@ SOCIETY_DATA = [
     ('Data Science Society', 'Insights from data.', 'Workshops and projects.', 'professional', ['Workshop', 'Project', 'Networking']),
     ('Product Management Society', 'Building products.', 'PM workshops and case studies.', 'professional', ['Workshop', 'Case Study', 'Networking']),
 
-    # Volunteering (3)
+    # Volunteering (8)
     ('Volunteering Society', 'Give back.', 'Regular volunteering.', 'volunteering', ['Volunteering', 'Social', 'Community']),
     ('Environmental Society', 'Sustainability.', 'Climate action and campaigns.', 'volunteering', ['Campaign', 'Workshop', 'Social']),
     ('RAG Society', 'Raise and Give.', 'Charity fundraising.', 'volunteering', ['Fundraiser', 'Social', 'Community']),
+    ('Tutoring Society', 'Help others learn.', 'Peer tutoring sessions.', 'volunteering', ['Tutoring', 'Social', 'Community']),
+    ('Homeless Outreach Society', 'Supporting the homeless.', 'Outreach and fundraising.', 'volunteering', ['Outreach', 'Fundraiser', 'Community']),
+    ('Animal Welfare Society', 'Helping animals.', 'Shelter visits and fundraising.', 'volunteering', ['Volunteering', 'Fundraiser', 'Social']),
+    ('Refugee Support Society', 'Supporting refugees.', 'Language help and integration.', 'volunteering', ['Volunteering', 'Community', 'Social']),
+    ('Mental Health Society', 'Wellbeing awareness.', 'Campaigns and support.', 'volunteering', ['Campaign', 'Workshop', 'Community']),
 
     # Media (4)
     ('Film Society', 'Cinema lovers.', 'Screenings and filmmaking.', 'media', ['Screening', 'Workshop', 'Social']),
