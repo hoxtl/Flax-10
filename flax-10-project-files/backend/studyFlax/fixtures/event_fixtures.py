@@ -129,11 +129,20 @@ location_fixtures = (
     "KCLSU, Macadam Building, Surrey St, London WC2R 2NS",
     "Strand Building, Strand, London WC2R 2LS",
 
+    "Pret a Manger, Strand, London WC2R 1LA",
+    "Costa Coffee, Strand, London WC2R 1AP",
+    "Tesco Express, Strand, London WC2R 0DX",
+    "Sainsbury's Local, Kingsway, London WC2B 6TP",
+    
     # Waterloo Campus
     "Franklin-Wilkins Building, 150 Stamford St, London SE1 9NH",
     "Waterloo Campus, 150 Stamford St, London SE1 9NH",
     "James Clerk Maxwell Building, 57 Waterloo Rd, London SE1 8WA",
 
+    "Pret a Manger, Waterloo Station, London SE1 8SW",
+    "Greggs, Borough High St, London SE1 1JA",
+    "Borough Market, 8 Southwark St, London SE1 1TL",
+    
     # Guy's Campus
     "Guy's Campus, Great Maze Pond, London SE1 9RT",
     "New Hunt's House, Great Maze Pond, London SE1 9RT",
@@ -148,6 +157,10 @@ location_fixtures = (
     "Institute of Psychiatry, De Crespigny Park, London SE5 8AF",
     "King's College Hospital, Denmark Hill, London SE5 9RS",
 
+    "Costa Coffee, Denmark Hill, London SE5 8RS",
+    "Lidl, Coldharbour Ln, London SE5 9NR",
+    "Nour Cash & Carry, Coldharbour Ln, London SE5 9NR",
+
     # Transport hubs near campuses
     "Temple Station, Victoria Embankment, London WC2R 2PH",
     "Holborn Station, High Holborn, London WC1V 7PP",
@@ -159,24 +172,6 @@ location_fixtures = (
     "Borough Station, Borough High St, London SE1 1JA",
     "Elephant & Castle Station, Elephant Rd, London SE1 6TE",
     "Denmark Hill Station, Denmark Hill, London SE5 8RS",
-
-    # Student cafes and food near Strand
-    "Pret a Manger, Strand, London WC2R 1LA",
-    "Costa Coffee, Strand, London WC2R 1AP",
-    "Tesco Express, Strand, London WC2R 0DX",
-    "Sainsbury's Local, Kingsway, London WC2B 6TP",
-    "The Refectory, Bush House, London WC2B 4PJ",
-
-    # Student cafes and food near Waterloo and Guy's
-    "Pret a Manger, Waterloo Station, London SE1 8SW",
-    "Greggs, Borough High St, London SE1 1JA",
-    "Borough Market, 8 Southwark St, London SE1 1TL",
-    "EAT, Waterloo Rd, London SE1 8UL",
-
-    # Student cafes and food near Denmark Hill
-    "Costa Coffee, Denmark Hill, London SE5 8RS",
-    "Lidl, Coldharbour Ln, London SE5 9NR",
-    "Nour Cash & Carry, Coldharbour Ln, London SE5 9NR",
 )
 
 lecture_theatre_fixtures = (
@@ -187,6 +182,7 @@ lecture_theatre_fixtures = (
     "K0.16 Lecture Theatre, King's Building, Strand, London WC2R 2LS",
     "Nash Lecture Theatre, Strand Building, Strand, London WC2R 2LS",
     "Great Hall, Strand Campus, London WC2R 2LS",
+    "IET Kelvin Lecture Theatre, 2 Savoy Pl, London WC2R 0BL
 
     # Waterloo Campus
     "FWB B5 Lecture Theatre, Franklin-Wilkins Building, London SE1 9NH",
@@ -203,7 +199,6 @@ lecture_theatre_fixtures = (
     "Weston Education Centre Lecture Theatre, Cutcombe Rd, London SE5 9RJ",
 
     # Denmark Hill Campus
-    "IET Kelvin Lecture Theatre, Denmark Hill, London SE5 8AF",
     "Harris Lecture Theatre, De Crespigny Park, London SE5 8AF",
     "P049 Seminar Room, Institute of Psychiatry, London SE5 8AF",
 )
