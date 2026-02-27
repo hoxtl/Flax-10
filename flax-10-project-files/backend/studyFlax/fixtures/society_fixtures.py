@@ -111,98 +111,105 @@ def get_events_for_category(category):
 
 
 # Society data with categories
-# Format: (name, bio, about, category, image_name, tags)
+# Format: (name, bio, about, category, tags)
 SOCIETY_DATA = [
-    # Sports
-    ('Football Club', 'The beautiful game at KCL.', 'Weekly training and matches.', 'sports', None, ['Training', 'Match', 'Social']),
-    ('Basketball Society', 'Hoops for all skill levels.', 'Casual and competitive basketball.', 'sports', None, ['Training', 'Tournament', 'Social']),
-    ('Tennis Club', 'Serve, volley, and have fun.', 'Sessions for all levels.', 'sports', None, ['Training', 'Match', 'Social']),
-    ('Yoga Society', 'Mind, body, and breath.', 'Weekly yoga sessions.', 'sports', None, ['Class', 'Workshop', 'Social']),
-    ('Hiking Society', 'Explore the outdoors.', 'Regular hikes and trips.', 'sports', None, ['Hike', 'Trip', 'Social']),
-    ('Swimming Club', 'Make a splash.', 'Pool sessions and competitions.', 'sports', None, ['Training', 'Competition', 'Social']),
-    ('Rugby Club', 'Try something new.', 'Training for all experience levels.', 'sports', None, ['Training', 'Match', 'Social']),
+    # Sports (7)
+    ('Football Club', 'The beautiful game at KCL.', 'Weekly training and matches.', 'sports', ['Training', 'Match', 'Social']),
+    ('Basketball Society', 'Hoops for all skill levels.', 'Casual and competitive basketball.', 'sports', ['Training', 'Tournament', 'Social']),
+    ('Tennis Club', 'Serve, volley, and have fun.', 'Sessions for all levels.', 'sports', ['Training', 'Match', 'Social']),
+    ('Yoga Society', 'Mind, body, and breath.', 'Weekly yoga sessions.', 'sports', ['Class', 'Workshop', 'Social']),
+    ('Hiking Society', 'Explore the outdoors.', 'Regular hikes and trips.', 'sports', ['Hike', 'Trip', 'Social']),
+    ('Swimming Club', 'Make a splash.', 'Pool sessions and competitions.', 'sports', ['Training', 'Competition', 'Social']),
+    ('Rugby Club', 'Try something new.', 'Training for all experience levels.', 'sports', ['Training', 'Match', 'Social']),
 
-    # Cultural
-    ('Chinese Society', 'Celebrating Chinese culture.', 'Events and language exchange.', 'cultural', None, ['Cultural', 'Social', 'Festival']),
-    ('African Caribbean Society', 'Celebrating heritage.', 'Cultural events and discussions.', 'cultural', None, ['Cultural', 'Social', 'Performance']),
-    ('Indian Society', 'Indian culture and traditions.', 'Diwali, Bollywood nights, and more.', 'cultural', None, ['Cultural', 'Festival', 'Social']),
-    ('Korean Society', 'Korean culture at KCL.', 'K-culture events and socials.', 'cultural', None, ['Cultural', 'Social', 'Festival']),
-    ('Latin American Society', 'Celebrating Latin culture.', 'Dance, food, and music.', 'cultural', None, ['Cultural', 'Social', 'Performance']),
+    # Cultural (5)
+    ('Chinese Society', 'Celebrating Chinese culture.', 'Events and language exchange.', 'cultural', ['Cultural', 'Social', 'Festival']),
+    ('African Caribbean Society', 'Celebrating heritage.', 'Cultural events and discussions.', 'cultural', ['Cultural', 'Social', 'Performance']),
+    ('Indian Society', 'Indian culture and traditions.', 'Diwali, Bollywood nights, and more.', 'cultural', ['Cultural', 'Festival', 'Social']),
+    ('Korean Society', 'Korean culture at KCL.', 'K-culture events and socials.', 'cultural', ['Cultural', 'Social', 'Festival']),
+    ('Latin American Society', 'Celebrating Latin culture.', 'Dance, food, and music.', 'cultural', ['Cultural', 'Social', 'Performance']),
 
-    # Academic
-    ('Tech Society', 'Technology and innovation.', 'Hackathons and workshops.', 'academic', 'tech.jpg', ['Workshop', 'Hackathon', 'Networking']),
-    ('Literature Society', 'Exploring books.', 'Book club and writing workshops.', 'academic', 'literature.jpg', ['Book Club', 'Workshop', 'Reading']),
-    ('Debate Society', 'Argue with style.', 'Weekly debates and competitions.', 'academic', None, ['Debate', 'Workshop', 'Competition']),
-    ('Investment Society', 'Markets and trading.', 'Workshops and competitions.', 'professional', None, ['Workshop', 'Competition', 'Networking']),
-    ('Law Society', 'For future lawyers.', 'Mooting and networking.', 'professional', None, ['Mooting', 'Networking', 'Workshop']),
-    ('MedSoc', 'Medical students society.', 'Academic and social events.', 'academic', None, ['Workshop', 'Social', 'Networking']),
+    # Academic (4)
+    ('Tech Society', 'Technology and innovation.', 'Hackathons and workshops.', 'academic', ['Workshop', 'Hackathon', 'Networking']),
+    ('Literature Society', 'Exploring books.', 'Book club and writing workshops.', 'academic', ['Book Club', 'Workshop', 'Reading']),
+    ('Debate Society', 'Argue with style.', 'Weekly debates and competitions.', 'academic', ['Debate', 'Workshop', 'Competition']),
+    ('MedSoc', 'Medical students society.', 'Academic and social events.', 'academic', ['Workshop', 'Social', 'Networking']),
 
-    # Arts
-    ('Art Club', 'Creative expression.', 'Art projects and exhibitions.', 'arts', 'art.jpg', ['Exhibition', 'Workshop', 'Social']),
-    ('Photography Society', 'Through the lens.', 'Photo walks and exhibitions.', 'arts', 'photography.jpg', ['Photo Walk', 'Exhibition', 'Workshop']),
-    ('Drama Society', 'Theatre and performance.', 'Produce plays and shows.', 'arts', None, ['Rehearsal', 'Performance', 'Social']),
-    ('Film Society', 'Cinema lovers.', 'Screenings and filmmaking.', 'media', None, ['Screening', 'Workshop', 'Social']),
+    # Arts (3)
+    ('Art Club', 'Creative expression.', 'Art projects and exhibitions.', 'arts', ['Exhibition', 'Workshop', 'Social']),
+    ('Photography Society', 'Through the lens.', 'Photo walks and exhibitions.', 'arts', ['Photo Walk', 'Exhibition', 'Workshop']),
+    ('Drama Society', 'Theatre and performance.', 'Produce plays and shows.', 'arts', ['Rehearsal', 'Performance', 'Social']),
 
-    # Gaming
-    ('Board Game Society', 'Fun and games.', 'Weekly game nights.', 'gaming', 'boardgames.jpg', ['Game Night', 'Tournament', 'Social']),
-    ('Esports Society', 'Competitive gaming.', 'Tournaments and teams.', 'gaming', None, ['Tournament', 'Social', 'Training']),
-    ('Chess Club', 'Strategic thinking.', 'Learn and compete.', 'gaming', None, ['Tournament', 'Training', 'Social']),
+    # Gaming (3)
+    ('Board Game Society', 'Fun and games.', 'Weekly game nights.', 'gaming', ['Game Night', 'Tournament', 'Social']),
+    ('Esports Society', 'Competitive gaming.', 'Tournaments and teams.', 'gaming', ['Tournament', 'Social', 'Training']),
+    ('Chess Club', 'Strategic thinking.', 'Learn and compete.', 'gaming', ['Tournament', 'Training', 'Social']),
 
-    # Music
-    ('A Cappella Group', 'Vocal harmony.', 'Arrange and perform.', 'music', None, ['Rehearsal', 'Performance', 'Social']),
-    ('Jazz Band', 'Swing and bebop.', 'Jam sessions and gigs.', 'music', None, ['Jam Session', 'Performance', 'Workshop']),
-    ('Orchestra', 'Classical music.', 'Rehearsals and concerts.', 'music', None, ['Rehearsal', 'Concert', 'Social']),
-    ('DJ Society', 'Beats and mixing.', 'Learn to DJ and perform.', 'music', None, ['Workshop', 'Performance', 'Social']),
+    # Music (4)
+    ('A Cappella Group', 'Vocal harmony.', 'Arrange and perform.', 'music', ['Rehearsal', 'Performance', 'Social']),
+    ('Jazz Band', 'Swing and bebop.', 'Jam sessions and gigs.', 'music', ['Jam Session', 'Performance', 'Workshop']),
+    ('Orchestra', 'Classical music.', 'Rehearsals and concerts.', 'music', ['Rehearsal', 'Concert', 'Social']),
+    ('DJ Society', 'Beats and mixing.', 'Learn to DJ and perform.', 'music', ['Workshop', 'Performance', 'Social']),
 
-    # Dance
-    ('K-Pop Dance Society', 'K-Pop choreography.', 'Learn the latest moves.', 'dance', None, ['Practice', 'Performance', 'Social']),
-    ('Salsa Society', 'Latin dance.', 'Salsa and bachata.', 'dance', None, ['Beginner', 'Social', 'Workshop']),
-    ('Hip Hop Dance', 'Street dance.', 'Classes and battles.', 'dance', None, ['Practice', 'Battle', 'Social']),
-    ('Ballroom Dancing', 'Elegant partner dance.', 'Learn classic dances.', 'dance', None, ['Class', 'Social', 'Competition']),
+    # Dance (4)
+    ('K-Pop Dance Society', 'K-Pop choreography.', 'Learn the latest moves.', 'dance', ['Practice', 'Performance', 'Social']),
+    ('Salsa Society', 'Latin dance.', 'Salsa and bachata.', 'dance', ['Beginner', 'Social', 'Workshop']),
+    ('Hip Hop Dance', 'Street dance.', 'Classes and battles.', 'dance', ['Practice', 'Battle', 'Social']),
+    ('Ballroom Dancing', 'Elegant partner dance.', 'Learn classic dances.', 'dance', ['Class', 'Social', 'Competition']),
 
-    # Religious
-    ('Islamic Society', 'Faith and community.', 'Prayer and events.', 'religious', None, ['Lecture', 'Social', 'Community']),
-    ('Christian Union', 'Faith and fellowship.', 'Meetings and outreach.', 'religious', None, ['Meeting', 'Study', 'Social']),
-    ('Jewish Society', 'Jewish life at KCL.', 'Cultural and religious events.', 'religious', None, ['Cultural', 'Social', 'Festival']),
-    ('Hindu Society', 'Hindu traditions.', 'Festivals and gatherings.', 'religious', None, ['Cultural', 'Festival', 'Social']),
+    # Religious (4)
+    ('Islamic Society', 'Faith and community.', 'Prayer and events.', 'religious', ['Lecture', 'Social', 'Community']),
+    ('Christian Union', 'Faith and fellowship.', 'Meetings and outreach.', 'religious', ['Meeting', 'Study', 'Social']),
+    ('Jewish Society', 'Jewish life at KCL.', 'Cultural and religious events.', 'religious', ['Cultural', 'Social', 'Festival']),
+    ('Hindu Society', 'Hindu traditions.', 'Festivals and gatherings.', 'religious', ['Cultural', 'Festival', 'Social']),
 
-    # Social
-    ('Comedy Society', 'Laughs and good times.', 'Stand-up and improv.', 'social', None, ['Open Mic', 'Workshop', 'Social']),
-    ('Wine Society', 'Fine wines.', 'Tastings and trips.', 'social', None, ['Tasting', 'Social', 'Trip']),
-    ('Cooking Society', 'Culinary adventures.', 'Cook and eat together.', 'social', None, ['Workshop', 'Social', 'Tasting']),
-    ('Coffee Society', 'Coffee appreciation.', 'Tastings and cafe trips.', 'social', None, ['Tasting', 'Social', 'Trip']),
+    # Social (4)
+    ('Comedy Society', 'Laughs and good times.', 'Stand-up and improv.', 'social', ['Open Mic', 'Workshop', 'Social']),
+    ('Wine Society', 'Fine wines.', 'Tastings and trips.', 'social', ['Tasting', 'Social', 'Trip']),
+    ('Cooking Society', 'Culinary adventures.', 'Cook and eat together.', 'social', ['Workshop', 'Social', 'Tasting']),
+    ('Coffee Society', 'Coffee appreciation.', 'Tastings and cafe trips.', 'social', ['Tasting', 'Social', 'Trip']),
 
-    # Volunteering
-    ('Volunteering Society', 'Give back.', 'Regular volunteering.', 'volunteering', None, ['Volunteering', 'Social', 'Community']),
-    ('Environmental Society', 'Sustainability.', 'Climate action and campaigns.', 'volunteering', None, ['Campaign', 'Workshop', 'Social']),
-    ('RAG Society', 'Raise and Give.', 'Charity fundraising.', 'volunteering', None, ['Fundraiser', 'Social', 'Community']),
+    # Professional (2)
+    ('Investment Society', 'Markets and trading.', 'Workshops and competitions.', 'professional', ['Workshop', 'Competition', 'Networking']),
+    ('Law Society', 'For future lawyers.', 'Mooting and networking.', 'professional', ['Mooting', 'Networking', 'Workshop']),
 
-    # Media
-    ('Radio Society', 'Student radio.', 'Run shows and broadcast.', 'media', None, ['Show', 'Workshop', 'Social']),
-    ('Newspaper Society', 'Student journalism.', 'Write and report.', 'media', None, ['Meeting', 'Workshop', 'Social']),
-    ('Podcast Society', 'Audio storytelling.', 'Create and share podcasts.', 'media', None, ['Recording', 'Workshop', 'Social']),
+    # Volunteering (3)
+    ('Volunteering Society', 'Give back.', 'Regular volunteering.', 'volunteering', ['Volunteering', 'Social', 'Community']),
+    ('Environmental Society', 'Sustainability.', 'Climate action and campaigns.', 'volunteering', ['Campaign', 'Workshop', 'Social']),
+    ('RAG Society', 'Raise and Give.', 'Charity fundraising.', 'volunteering', ['Fundraiser', 'Social', 'Community']),
+
+    # Media (4)
+    ('Film Society', 'Cinema lovers.', 'Screenings and filmmaking.', 'media', ['Screening', 'Workshop', 'Social']),
+    ('Radio Society', 'Student radio.', 'Run shows and broadcast.', 'media', ['Show', 'Workshop', 'Social']),
+    ('Newspaper Society', 'Student journalism.', 'Write and report.', 'media', ['Meeting', 'Workshop', 'Social']),
+    ('Podcast Society', 'Audio storytelling.', 'Create and share podcasts.', 'media', ['Recording', 'Workshop', 'Social']),
 ]
 
 
 def build_society_seed_data():
     """Build society seed data from the structured format."""
     result = []
-    for name, bio, about, category, image, tags in SOCIETY_DATA:
-        society = build_society_dict(name, bio, about, category, image, tags)
+    for name, bio, about, category, tags in SOCIETY_DATA:
+        society = build_society_dict(name, bio, about, category, tags)
         result.append(society)
     return result
 
 
-def build_society_dict(name, bio, about, category, image, tags):
+def build_society_dict(name, bio, about, category, tags):
     """Build a single society dictionary."""
-    society = {
+    image = get_random_category_image(category)
+    return {
         'name': name, 'bio': bio, 'about': about,
         'category': category, 'tags': tags,
         'events': get_events_for_category(category),
+        'image': f'http://localhost:8000/static/seed_images/societies/{image}',
     }
-    if image:
-        society['image'] = f'http://localhost:8000/static/seed_images/societies/{image}'
-    return society
+
+
+def get_random_category_image(category):
+    """Get a random image filename for a category."""
+    images = CATEGORY_IMAGES.get(category, CATEGORY_IMAGES['social'])
+    return random.choice(images)
 
 
 def build_event_datetime(hour, duration_mins, day_of_week=None):
