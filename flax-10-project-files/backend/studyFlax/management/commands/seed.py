@@ -3,9 +3,10 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
+
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
-    UserSettings, Module, Enrollment, Deadline,
+    UserSettings, Module, Enrollment, Deadline
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
 
@@ -19,7 +20,8 @@ from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
     build_lecture_events, create_lecture_event, build_deadlines_for_module,
-    create_deadline_calendar_event,
+    create_deadline_calendar_event, build_study_sessions_for_user,
+    build_theme_sessions_for_user,
 )
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.timer.themeSessionModel import ThemeSession
@@ -303,67 +305,50 @@ class Command(BaseCommand):
 
         self.stdout.write(f"  Created {total} tasks.")
 
-
     def create_study_sessions(self):
-        self.stdout.write("Seeding study sessions...")
-        from datetime import datetime, timedelta
-        import random
+        self.stdout.write("Seeding study sessions and theme sessions...")
 
-        now = timezone.now()
-        fixture_users = User.objects.filter(username__in=['charlie', 'janedoe'])
-        total = 0
+        # map username → (study_profile, theme_profile)
+        PROFILES = {
+            'janedoe': ('balanced',    'balanced'),
+            'charlie': ('night_owl',   'night_owl'),
+            'amiller': ('consistent',  'consistent'),
+            'srahwan': ('balanced',    'balanced'),
+            'hpatel':  ('consistent',  'consistent'),
+            'echen':   ('night_owl',   'night_owl'),
+            'jmurphy': ('balanced',    'consistent'),
+        }
 
-        for user in fixture_users:
-            for day_offset in range(30):
-                if random.random() < 0.6:
-                    continue
-                sessions_that_day = random.randint(1, 3)
-                for _ in range(sessions_that_day):
-                    hour = random.choice([9, 10, 11, 14, 15, 16, 20, 21])
-                    work_mins = random.choice([25, 50, 75])
-                    break_mins = (work_mins // 25) * 5
-                    session_count = work_mins // 25
-                    start = (now - timedelta(days=day_offset)).replace(
-                        hour=hour, minute=0, second=0, microsecond=0
-                    )
-                    end = start + timedelta(minutes=work_mins + break_mins)
-                    block_id = int(start.timestamp() * 1000)
-                    StudySession.objects.get_or_create(
-                        user=user,
-                        study_block_id=block_id,
-                        defaults={
-                            'start_time': start,
-                            'end_time': end,
-                            'duration': work_mins,
-                            'break_duration': break_mins,
-                            'session_count': session_count,
-                            'task': random.choice([
-                                'CS4303 programming assignment',
-                                'HI4101 essay',
-                                'Research internship deadlines',
-                                'Reply to supervisor email',
-                                'Plan the week ahead',
-                            ]),
-                            'status': 'Completed',
-                        }
-                    )
-                    total += 1
+        total_study = 0
+        total_theme = 0
 
-            for day_offset in range(30):
-                theme = 'light' if random.random() > 0.2 else 'dark'
-                duration = random.randint(60, 480)
-                started = (now - timedelta(days=day_offset)).replace(hour=8, minute=0, second=0, microsecond=0)
-                ThemeSession.objects.get_or_create(
-                    user=user,
-                    started_at=started,
-                    defaults={
-                        'theme': theme,
-                        'ended_at': started + timedelta(minutes=duration),
-                        'duration_minutes': duration,
-                    }
-                )
+        for username, (study_profile, theme_profile) in PROFILES.items():
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                continue
 
-        self.stdout.write(f"  Created {total} study sessions.")
+            # Study sessions — skip days already seeded
+            study_sessions = [
+                s for s in build_study_sessions_for_user(user, study_profile)
+                if not StudySession.objects.filter(
+                    user=user, study_block_id=s.study_block_id
+                ).exists()
+            ]
+            StudySession.objects.bulk_create(study_sessions, ignore_conflicts=True)
+            total_study += len(study_sessions)
+
+            # Theme sessions — skip slots already seeded
+            theme_sessions = [
+                t for t in build_theme_sessions_for_user(user, theme_profile)
+                if not ThemeSession.objects.filter(
+                    user=user, started_at=t.started_at
+                ).exists()
+            ]
+            ThemeSession.objects.bulk_create(theme_sessions, ignore_conflicts=True)
+            total_theme += len(theme_sessions)
+
+        self.stdout.write(f"  Created {total_study} study sessions, {total_theme} theme sessions.")
 
     def print_stats(self):
         div = "─" * 40
