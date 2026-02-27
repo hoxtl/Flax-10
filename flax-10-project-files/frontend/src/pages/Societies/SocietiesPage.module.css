@@ -136,9 +136,8 @@
     width: 1px;
     height: 24px;
     background: var(--border);
-    margin: 0 8px;
+    margin: 0 8px 8px 8px;
     flex-shrink: 0;
-    align-self: center;
 }
 
 .clearPill {
