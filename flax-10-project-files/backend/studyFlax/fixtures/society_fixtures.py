@@ -163,10 +163,15 @@ SOCIETY_DATA = [
     ('Fashion Society', 'Style and design.', 'Fashion shows and workshops.', 'arts', ['Show', 'Workshop', 'Social']),
     ('Creative Writing Society', 'Words and stories.', 'Writing workshops and readings.', 'arts', ['Workshop', 'Reading', 'Social']),
 
-    # Gaming (3)
+    # Gaming (8)
     ('Board Game Society', 'Fun and games.', 'Weekly game nights.', 'gaming', ['Game Night', 'Tournament', 'Social']),
     ('Esports Society', 'Competitive gaming.', 'Tournaments and teams.', 'gaming', ['Tournament', 'Social', 'Training']),
     ('Chess Club', 'Strategic thinking.', 'Learn and compete.', 'gaming', ['Tournament', 'Training', 'Social']),
+    ('Poker Society', 'Cards and strategy.', 'Poker nights and tournaments.', 'gaming', ['Game Night', 'Tournament', 'Social']),
+    ('Trading Card Society', 'Collect and compete.', 'TCG tournaments and trading.', 'gaming', ['Tournament', 'Trading', 'Social']),
+    ('RPG Society', 'Role-playing adventures.', 'D&D and more.', 'gaming', ['Campaign', 'Social', 'Workshop']),
+    ('Puzzle Society', 'Brain teasers and challenges.', 'Puzzle solving events.', 'gaming', ['Competition', 'Social', 'Workshop']),
+    ('Retro Gaming Club', 'Classic games revived.', 'Retro gaming sessions.', 'gaming', ['Game Night', 'Social', 'Tournament']),
 
     # Music (4)
     ('A Cappella Group', 'Vocal harmony.', 'Arrange and perform.', 'music', ['Rehearsal', 'Performance', 'Social']),
