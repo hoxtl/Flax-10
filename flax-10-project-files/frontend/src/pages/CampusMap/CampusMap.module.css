@@ -682,10 +682,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12PX;
-  background: var(--c-grey);
-  opacity: 0.08;
-  border: 1px solid rgba(var(--c-grey), 0.35);
+  padding: 12px;
+  background: var(--success-bg);
+  border: 1px solid var(--success-bg);
   border-radius: 10px;
 }
 
