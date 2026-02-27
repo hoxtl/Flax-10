@@ -297,7 +297,11 @@ export default function CampusMap() {
     };
 
     fetchDisruptions();
-  })
+
+    const refreshInterval = setInterval(fetchDisruptions, 2 * 60 * 1000);
+
+    return () => clearInterval(refreshInterval);
+  }, []);
 
   useEffect(() => {
     if (!mapLoaded) return;
