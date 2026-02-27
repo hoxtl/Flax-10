@@ -281,6 +281,24 @@ export default function CampusMap() {
         .addTo(map.current);
   }, [startLocation, mapLoaded]);
 
+
+  // Fetch TfL service disruptions
+  useEffect(() => {
+    const fetchDisruptions = async () => {
+      setLoadingDisruptions(true);
+      try {
+        const disruptions = await tflService.getTfLDelays();
+        setDisruptions(disruptions);
+      } catch (error) {
+        console.error('TfL disruption fetch error: ', error);
+      } finally {
+        setLoadingDisruptions(false);
+      }
+    };
+
+    fetchDisruptions();
+  })
+
   useEffect(() => {
     if (!mapLoaded) return;
 
