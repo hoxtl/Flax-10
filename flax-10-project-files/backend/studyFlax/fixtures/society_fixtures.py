@@ -3,25 +3,20 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 
-# Society category choices
-SOCIETY_CATEGORIES = [
-    'sports', 'cultural', 'academic', 'arts', 'social',
-    'gaming', 'music', 'dance', 'religious', 'professional',
-    'volunteering', 'media'
+# Valid society categories (consolidated to 8)
+VALID_CATEGORIES = [
+    'sports', 'cultural', 'academic', 'arts',
+    'social', 'religious', 'volunteering', 'media'
 ]
 
-# 2 images per category for variety
+# Images per category (merged: gaming→social, music/dance→arts, professional→academic)
 CATEGORY_IMAGES = {
     'sports': ['sports1.jpg', 'sports2.jpg'],
     'cultural': ['cultural1.jpg', 'cultural2.jpg'],
-    'academic': ['academic1.jpg', 'academic2.jpg'],
-    'arts': ['arts1.jpg', 'arts2.jpg'],
-    'social': ['social1.jpg', 'social2.jpg'],
-    'gaming': ['gaming1.jpg', 'gaming2.jpg'],
-    'music': ['music1.jpg', 'music2.jpg'],
-    'dance': ['dance1.jpg', 'dance2.jpg'],
+    'academic': ['academic1.jpg', 'academic2.jpg', 'professional1.jpg', 'professional2.jpg'],
+    'arts': ['arts1.jpg', 'arts2.jpg', 'music1.jpg', 'music2.jpg', 'dance1.jpg', 'dance2.jpg'],
+    'social': ['social1.jpg', 'social2.jpg', 'gaming1.jpg', 'gaming2.jpg'],
     'religious': ['religious1.jpg', 'religious2.jpg'],
-    'professional': ['professional1.jpg', 'professional2.jpg'],
     'volunteering': ['volunteering1.jpg', 'volunteering2.jpg'],
     'media': ['media1.jpg', 'media2.jpg'],
 }
