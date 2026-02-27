@@ -476,6 +476,14 @@ export default function CampusMap() {
           <p className={styles.sidebarSubtitle}>Never be late, plan your journeys!</p>
         </div>
 
+        {/* TfL Service Status */}
+        <section className={styles.section}>
+          <div className={styles.sectionLabel}>
+            <span className={styles.statusIcon}>⚠️</span>
+            TfL Line Status
+          </div>
+        </section>
+
         <section className={styles.section}>
           <div className={styles.sectionLabel}>
             <span className={styles.stepBadge}>1</span>
