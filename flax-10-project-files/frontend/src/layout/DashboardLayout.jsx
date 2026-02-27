@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
+import { ChevronUp } from "lucide-react";
 
 import { authService } from "../api/authService";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
@@ -69,11 +71,13 @@ function PageContent({ activeNav, children }) {
 
 function MainArea({ user, onSettingsClick, onLogoutClick, onProfileClick, selectedDate, showWeekBar, activeNav, children }) {
   return (
-    <div className={styles.main}>
-      <TopBar user={user} onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
-      {showWeekBar && <WeekBar date={selectedDate} />}
-      <PageContent activeNav={activeNav}>{children}</PageContent>
+    <div className={styles.main} data-dashboard-main>
+      <div className={styles.mainContent} data-dashboard-main-content>
+        <TopBar user={user} onSettingsClick={onSettingsClick}
+          onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
+        {showWeekBar && <WeekBar date={selectedDate} />}
+        <PageContent activeNav={activeNav}>{children}</PageContent>
+      </div>
     </div>
   );
 }
@@ -107,10 +111,30 @@ function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNav
   );
 }
 
+function ScrollToTopFab({ activeNav, onScrollToTop }) {
+  const isHome = activeNav === "home";
+  if (!isHome) return null;
+  return createPortal(
+    <button
+      type="button"
+      className={styles.scrollToTop}
+      onClick={onScrollToTop}
+      aria-label="Scroll to top"
+    >
+      <ChevronUp size={24} strokeWidth={2.5} />
+    </button>,
+    document.body
+  );
+}
+
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
-  // Primary navigation: permanent sidebar (desktop) / drawer (mobile). Users never need to go "Home" to reach other sections.
   const state = useDashboardState(activeNav, onNavChange);
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav } = state;
+  const scrollToTop = useCallback(() => {
+    const el = document.querySelector("[data-dashboard-main]");
+    if (el) el.scrollTop = 0;
+  }, []);
+
   return (
     <div className={styles.root}>
       <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
@@ -126,6 +150,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         {children}
       </MainArea>
       <EventModalGate modal={modal} />
+      <ScrollToTopFab activeNav={activeNav} onScrollToTop={scrollToTop} />
     </div>
   );
 }

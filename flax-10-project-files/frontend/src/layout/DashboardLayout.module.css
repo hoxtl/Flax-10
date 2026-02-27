@@ -30,6 +30,13 @@
   border-left: 1px solid var(--frame-border);
 }
 
+.mainContent {
+  flex: 1;
+  min-height: min-content;
+  display: flex;
+  flex-direction: column;
+}
+
 .content {
   flex: 1;
   min-height: 0;
@@ -58,4 +65,28 @@
   z-index: 60;
   border-radius: 0 12px 12px 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.scrollToTop {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: #4A3421;
+  color: #F7F6F3;
+  box-shadow: 0 4px 16px rgba(74, 52, 33, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.scrollToTop:hover {
+  background: #3a2817;
+  box-shadow: 0 6px 20px rgba(74, 52, 33, 0.45);
+  transform: translateY(-2px);
 }
