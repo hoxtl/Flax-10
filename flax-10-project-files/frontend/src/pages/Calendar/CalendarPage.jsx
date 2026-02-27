@@ -1,3 +1,7 @@
+import { Calendar } from '../../components/Calendar/Calendar';
+import PillFilters from '../../components/Tags/PillFilters';
+import { useCalendar, useCalendarDispatch } from '../../context/CalendarContext';
+import styles from './CalendarPage.module.css';
 import { EventPopups } from '../../components/Calendar/EventPopups';
 
 export default function CalendarPage() {

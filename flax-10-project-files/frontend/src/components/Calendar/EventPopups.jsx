@@ -23,44 +23,33 @@ export function EventPopups() {
 function EventModalContainer() {
     const { isModalOpen, closeModal, modalEvent, modalType, modalInitialDate } = useEventModal();
     if (!isModalOpen) return null;
-    return (
-        <EventModal
-            event={modalEvent}
-            onClose={closeModal}
-            initialType={modalType}
-            initialDate={modalInitialDate}
-        />
-    );
+    return <EventModal event={modalEvent} onClose={closeModal} initialType={modalType} initialDate={modalInitialDate} />;
+}
+
+function useEventDeletion(closePopup) {
+    const { removeEvent, addException } = useEventActions();
+    const [deleteEventState, setDeleteEvent] = useState(null);
+    const handleDeleteRequest = (event) => { closePopup(); setDeleteEvent(event); };
+    const onConfirm = async () => {
+        if (!deleteEventState) return;
+        const recurring = hasRecurrence(deleteEventState);
+        const choice = recurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
+        if (choice) await executeDelete(deleteEventState, { removeEvent });
+        else await deleteRecurrenceOccurrence(deleteEventState, { addException });
+        setDeleteEvent(null);
+    };
+    return { deleteEventState, handleDeleteRequest, handleDeleteConfirm: onConfirm, handleDeleteCancel: () => setDeleteEvent(null) };
 }
 
 function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
-    const { removeEvent, addException } = useEventActions();
     const { loadEvents } = useCalendarEvents();
     const tags = useTags();
     const navigate = useNavigate();
-    const [deleteEventState, setDeleteEvent] = useState(null);
+    const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
 
-    const handleDeleteRequest = (event) => { closePopup(); setDeleteEvent(event); };
-    const handleDeleteConfirm = async () => {
-        if (!deleteEventState) return;
-        try {
-            const recurring = hasRecurrence(deleteEventState);
-            const choice = recurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
-
-            if (choice) await executeDelete(deleteEventState, { removeEvent });
-            else await deleteRecurrenceOccurrence(deleteEventState, { addException });
-        } catch (err) {
-            console.error('Deletion failed:', err);
-        }
-        setDeleteEvent(null);
-    };
-    const handleDeleteCancel = () => setDeleteEvent(null);
-
-    if (deleteEventState) {
-        return <DeleteConfirmModal event={deleteEventState} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
-    }
+    if (deleteEventState) return <DeleteConfirmModal event={deleteEventState} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, tags);
@@ -70,21 +59,12 @@ function EventPopupContainer() {
 }
 
 function DeleteConfirmModal({ event, onConfirm, onCancel }) {
-    return (
-        <ConfirmModal
-            title="Delete Event"
-            message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`}
-            onConfirm={onConfirm}
-            onCancel={onCancel}
-        />
-    );
+    return <ConfirmModal title="Delete Event" message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
 function getEventTag(event, tags) {
-    if (event.source === 'society' && event.tag_name) {
-        return { label: event.tag_name, color: event.tag_color || event.society_color || '#9E7E5D' };
-    }
-    return tags.getTag(event.tag);
+    const societyTag = { label: event.tag_name, color: event.tag_color || event.society_color || '#9E7E5D' };
+    return (event.source === 'society' && event.tag_name) ? societyTag : tags.getTag(event.tag);
 }
 
 function getCalendarPopupActions(event, handlers) {
@@ -112,12 +92,10 @@ function getModuleActions(event, { closePopup, loadEvents }) {
 }
 
 function getSocietyActions(event, { closePopup, loadEvents }) {
-    const actions = [];
     const handleUnsync = async () => {
         closePopup();
         await unsyncCalendar(event.society_id);
         loadEvents();
     };
-    actions.push({ label: 'Unsync', variant: 'danger', onClick: handleUnsync });
-    return actions;
+    return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }
