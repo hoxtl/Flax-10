@@ -62,11 +62,12 @@ function SortDropdown({ value, onChange }) {
 
 function FilterPills({ filters, toggleFilter, clearFilters, societies }) {
     const hasActiveFilters = filters.ratified !== "all" || filters.category !== "all";
+    const counts = useCategoryCounts(societies);
     return (
         <div className={styles.pillContainer}>
             <RatificationPills current={filters.ratified} onChange={v => toggleFilter("ratified", v)} societies={societies} />
-            <span className={styles.pillDivider}>|</span>
-            <CategoryPills current={filters.category} onChange={v => toggleFilter("category", v)} />
+            <span className={styles.pillDivider} />
+            <CategoryPills current={filters.category} onChange={v => toggleFilter("category", v)} counts={counts} />
             {hasActiveFilters && <button className={styles.clearPill} onClick={clearFilters}>Clear x</button>}
         </div>
     );
@@ -79,10 +80,21 @@ function RatificationPills({ current, onChange, societies }) {
     ));
 }
 
-function CategoryPills({ current, onChange }) {
+function CategoryPills({ current, onChange, counts }) {
     return SOCIETY_CATEGORIES.map(cat => (
-        <BasePill key={cat.id} label={cat.label} isActive={current === cat.id} onClick={() => onChange(cat.id)} />
+        <BasePill key={cat.id} label={cat.label} count={counts[cat.id] || 0}
+            isActive={current === cat.id} onClick={() => onChange(cat.id)} />
     ));
+}
+
+function useCategoryCounts(societies) {
+    return useMemo(() => buildCategoryCounts(societies), [societies]);
+}
+
+function buildCategoryCounts(societies) {
+    const counts = {};
+    societies.forEach(s => { counts[s.category] = (counts[s.category] || 0) + 1; });
+    return counts;
 }
 
 function SocietyGrid({ items, onSelect }) {
