@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
 import { tflService } from "../../api/tflService";
 
+
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 
@@ -99,6 +100,7 @@ export default function CampusMap() {
   const [tflRouteInfo, setTflRouteInfo] = useState(null);
   const [loadingTflRoute, setLoadingTflRoute] = useState(false);
   const [tflRouteError, setTflRouteError] = useState('');
+  const[disruptions, setDisruptions] = useState([]);
 
   useEffect(() => {
     if (map.current) return;
