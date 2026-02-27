@@ -706,3 +706,9 @@
   font-weight: 700;
   color: var(--c-green);
 }
+
+.goodServiceText span {
+  font-size: 0.75rem;
+  color: var(--c-grey);
+  opacity: 0.70;
+}
