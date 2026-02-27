@@ -694,3 +694,9 @@
   font-size: 1.5rem;
   flex-shrink: 0;
 }
+
+.goodServiceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
