@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+
 # Society category choices
 SOCIETY_CATEGORIES = [
     'sports', 'cultural', 'academic', 'arts', 'social',
