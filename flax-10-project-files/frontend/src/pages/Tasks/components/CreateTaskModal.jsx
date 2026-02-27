@@ -21,6 +21,12 @@ const PRIORITY_OPTIONS = [
   { value: "urgent", label: "Urgent" },
 ];
 
+const ENERGY_OPTIONS = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+];
+
 const STUDY_BLOCK_OPTIONS = [
   { value: 1, label: "25m" },
   { value: 2, label: "50m" },
@@ -69,6 +75,7 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
     title: "",
     description: "",
     priority: "medium",
+    energy_level: "medium",
     due_date: defaultDueDate ?? "",
     task_list: defaultListId || (sortedLists[0]?.id ?? ""),
     estimated_blocks: 1,
@@ -323,6 +330,22 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
+            <div className={styles.rowBlock}>
+              <span className={styles.rowLabel}>Energy</span>
+              <div className={styles.chipGroup}>
+                {ENERGY_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`${styles.chip} ${form.energy_level === value ? styles.chipActive : ""}`}
+                    onClick={() => set("energy_level", value)}
+                    title={value === "high" ? "High cognitive load — avoid back-to-back with another high-energy task" : value === "low" ? "Quick / low effort" : "Moderate"}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

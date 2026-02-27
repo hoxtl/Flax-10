@@ -70,6 +70,7 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
         title:       task.title,
         description: task.description || "",
         priority:    task.priority,
+        energy_level: task.energy_level || task.energyLevel || "medium",
         due_date:    task.due_date ? task.due_date.slice(0, 16) : "",
     });
     const [saving, setSaving] = useState(false);
@@ -120,6 +121,19 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>
                                 <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div className={styles.editField}>
+                            <label className={styles.editLabel}>Energy</label>
+                            <select
+                                className={styles.editSelect}
+                                value={form.energy_level}
+                                onChange={e => set("energy_level", e.target.value)}
+                                title="Cognitive load: avoid two High back-to-back"
+                            >
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
                             </select>
                         </div>
                         <div className={styles.editField}>
