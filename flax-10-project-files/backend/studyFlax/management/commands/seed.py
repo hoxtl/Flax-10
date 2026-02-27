@@ -308,7 +308,7 @@ class Command(BaseCommand):
         status = random.choice(['approved', 'pending', 'rejected', 'none'])
         defaults = {
             'bio': data['bio'], 'about': data['about'],
-            'category': data.get('category', ''),
+            'categories': data.get('categories', []),
             'ratification_status': status, 'is_ratified': (status == 'approved')
         }
         if data.get('image'):
