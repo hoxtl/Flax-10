@@ -141,11 +141,17 @@ SOCIETY_DATA = [
     ('South Asian Society', 'South Asian heritage.', 'Festivals and community.', 'cultural', ['Cultural', 'Festival', 'Social']),
     ('Southeast Asian Society', 'Southeast Asian culture.', 'Food and traditions.', 'cultural', ['Cultural', 'Social', 'Festival']),
 
-    # Academic (4)
+    # Academic (10)
     ('Tech Society', 'Technology and innovation.', 'Hackathons and workshops.', 'academic', ['Workshop', 'Hackathon', 'Networking']),
     ('Literature Society', 'Exploring books.', 'Book club and writing workshops.', 'academic', ['Book Club', 'Workshop', 'Reading']),
     ('Debate Society', 'Argue with style.', 'Weekly debates and competitions.', 'academic', ['Debate', 'Workshop', 'Competition']),
     ('MedSoc', 'Medical students society.', 'Academic and social events.', 'academic', ['Workshop', 'Social', 'Networking']),
+    ('Engineering Society', 'Building the future.', 'Projects and industry talks.', 'academic', ['Workshop', 'Project', 'Networking']),
+    ('Physics Society', 'Exploring the universe.', 'Lectures and stargazing.', 'academic', ['Lecture', 'Workshop', 'Social']),
+    ('Chemistry Society', 'Molecules and reactions.', 'Lab demos and events.', 'academic', ['Workshop', 'Demo', 'Social']),
+    ('Biology Society', 'Life sciences at KCL.', 'Field trips and talks.', 'academic', ['Trip', 'Lecture', 'Social']),
+    ('Psychology Society', 'Understanding the mind.', 'Talks and research events.', 'academic', ['Lecture', 'Workshop', 'Social']),
+    ('History Society', 'Learning from the past.', 'Talks and museum trips.', 'academic', ['Lecture', 'Trip', 'Social']),
 
     # Arts (3)
     ('Art Club', 'Creative expression.', 'Art projects and exhibitions.', 'arts', ['Exhibition', 'Workshop', 'Social']),
