@@ -482,6 +482,43 @@ export default function CampusMap() {
             <span className={styles.statusIcon}>⚠️</span>
             TfL Line Status
           </div>
+
+          {loadingDisruptions ? (
+            <div className={styles.loadingDisruptions}>
+              <span className={styles.spinner} />
+              <span>Checking TfL Line status...</span>
+            </div>
+          ) : disruptions.length === 0 ? (
+            <div className={styles.goodService}>
+              <span className={styles.goodServiceIcon}>✅</span>
+              <div className={styles.goodServiceText}>
+                <strong>Good Service!</strong>
+                <span>All TfL lines are running normally</span>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.disruptionsList}>
+              {disruptions.map((disruption, i) => (
+                <div key={i} className={styles.disruptionCard}>
+                  <div
+                    className={styles.disruptionBadge}
+                    style={{ backgroundColor: disruptions.color }}
+                  >
+                    {disruption.lineName}
+                </div>
+                <div className={styles.disruptionContent}>
+                  <div className={styles.disruptionSeverity}>
+                    {disruption.severityDescription}
+                  </div>
+                  <div className={styles.disruptionReason}>
+                    {disruption.reason}
+                  </div>
+                </div>
+              </div>
+              ))}
+            </div>
+          )}
+
         </section>
 
         <section className={styles.section}>
