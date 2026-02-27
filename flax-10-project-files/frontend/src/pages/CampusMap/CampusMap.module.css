@@ -747,3 +747,9 @@
   flex-direction: column;
   gap: 4px;
 }
+
+.disruptionSeverity {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-red);
+}
