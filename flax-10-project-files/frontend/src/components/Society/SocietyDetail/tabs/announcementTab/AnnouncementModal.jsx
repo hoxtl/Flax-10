@@ -5,7 +5,7 @@ import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
 import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
-import ConfirmModal from "../../../../shared/ConfirmModal";
+import ConfirmModal from "../../../../common/ConfirmModal";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 

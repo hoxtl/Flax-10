@@ -12,7 +12,7 @@ import { getEventType, hasRecurrence } from '../../components/Calendar/utils/eve
 import { executeDelete, deleteRecurrenceOccurrence } from '../../components/Calendar/utils/formUtils';
 import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
-import ConfirmModal from '../../components/shared/ConfirmModal';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 export default function CalendarPage() {
     const { filter, allEvents } = useCalendar();
