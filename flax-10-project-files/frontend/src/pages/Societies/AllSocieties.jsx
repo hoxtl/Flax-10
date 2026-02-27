@@ -4,25 +4,32 @@ import styles from "./SocietiesPage.module.css";
 import BasePill from "../../components/Tags/BasePill";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
 import SearchBar from "../../components/common/SearchBar";
-import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import Pagination from "../../components/common/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 
 const PAGE_SIZE = 20;
 
 export default function AllSocieties({ onBack, onSelect, societies = [] }) {
-    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy } = useFilters();
+    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { visibleItems, hasMore, sentinelRef } = useInfiniteScroll(filtered, PAGE_SIZE);
+    const { items, totalPages } = usePagination(filtered, page, PAGE_SIZE);
 
     return (
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
             <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
-            <SocietyGrid items={visibleItems} onSelect={onSelect} />
-            {hasMore && <LoadMoreSentinel sentinelRef={sentinelRef} />}
+            <SocietyGrid items={items} onSelect={onSelect} />
+            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             <ScrollToTop />
         </div>
     );
+}
+
+function usePagination(items, page, pageSize) {
+    const totalPages = Math.ceil(items.length / pageSize);
+    const start = (page - 1) * pageSize;
+    const paginatedItems = items.slice(start, start + pageSize);
+    return { items: paginatedItems, totalPages };
 }
 
 function useFilters() {
