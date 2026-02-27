@@ -86,4 +86,43 @@ export const tflService = {
 
         return poly;
     },
+
+    /**
+     * Getter method to return current TfL service disruptions/delays
+     */
+    async getTfLDelays() {
+        try {
+            const transport_modes = ['tube', 'dlr', 'overground', 'elizabeth-line', 'tram'];
+            const url = `${TFL_BASE}/Line/Mode/${transport_modes.join(',')}/Status?app_key=${TFL_API_KEY}`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`TFL Delays API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            const delays = [];
+
+            data.forEach(line => {
+                line.lineStatuses.forEach(status => {
+                    if (status.statusSeverity < 10) {
+                        delays.push({
+                            lineName: line.name,
+                            mode: line.modeName,
+                            severity: status.statusSeverity,
+                            severityDescription: status.statusSeverityDescription,
+                            reason: status.reason || 'Service Delay/Disruption',
+                            color: this.getDelayLineColor(line.id),
+                        });
+                    }
+                });
+            });
+            return delays;
+        } catch (error) {
+            console.error('TFL Delay Service API error: ', error);
+            return [];
+        }
+    },
 }
