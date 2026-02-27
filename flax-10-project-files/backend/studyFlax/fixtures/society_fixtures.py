@@ -171,15 +171,37 @@ def build_society_seed_data():
     """Build society seed data from the structured format."""
     result = []
     for name, bio, about, category, image, tags in SOCIETY_DATA:
-        society = {
-            'name': name,
-            'bio': bio,
-            'about': about,
-            'category': category,
-            'tags': tags,
-            'events': get_events_for_category(category),
-        }
-        if image:
-            society['image'] = f'http://localhost:8000/static/seed_images/societies/{image}'
+        society = build_society_dict(name, bio, about, category, image, tags)
         result.append(society)
     return result
+
+
+def build_society_dict(name, bio, about, category, image, tags):
+    """Build a single society dictionary."""
+    society = {
+        'name': name, 'bio': bio, 'about': about,
+        'category': category, 'tags': tags,
+        'events': get_events_for_category(category),
+    }
+    if image:
+        society['image'] = f'http://localhost:8000/static/seed_images/societies/{image}'
+    return society
+
+
+def build_event_datetime(hour, duration_mins, day_of_week=None):
+    """Build start and end datetime for an event."""
+    base_date = get_next_occurrence(day_of_week)
+    start = timezone.make_aware(datetime.combine(base_date, datetime.min.time().replace(hour=hour)))
+    end = start + timedelta(minutes=duration_mins)
+    return start, end
+
+
+def get_next_occurrence(day_of_week):
+    """Get the next date for a given day of week (0=Mon, 6=Sun)."""
+    today = timezone.now().date()
+    if day_of_week is None:
+        return today + timedelta(days=7)
+    days_ahead = day_of_week - today.weekday()
+    if days_ahead <= 0:
+        days_ahead += 7
+    return today + timedelta(days=days_ahead)
