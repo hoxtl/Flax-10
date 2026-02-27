@@ -101,6 +101,7 @@ export default function CampusMap() {
   const [loadingTflRoute, setLoadingTflRoute] = useState(false);
   const [tflRouteError, setTflRouteError] = useState('');
   const[disruptions, setDisruptions] = useState([]);
+  const[loadingDisruptions, setLoadingDisruptions] = useState(false);
 
   useEffect(() => {
     if (map.current) return;
