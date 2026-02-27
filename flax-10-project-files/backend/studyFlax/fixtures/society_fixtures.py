@@ -153,10 +153,15 @@ SOCIETY_DATA = [
     ('Psychology Society', 'Understanding the mind.', 'Talks and research events.', 'academic', ['Lecture', 'Workshop', 'Social']),
     ('History Society', 'Learning from the past.', 'Talks and museum trips.', 'academic', ['Lecture', 'Trip', 'Social']),
 
-    # Arts (3)
+    # Arts (8)
     ('Art Club', 'Creative expression.', 'Art projects and exhibitions.', 'arts', ['Exhibition', 'Workshop', 'Social']),
     ('Photography Society', 'Through the lens.', 'Photo walks and exhibitions.', 'arts', ['Photo Walk', 'Exhibition', 'Workshop']),
     ('Drama Society', 'Theatre and performance.', 'Produce plays and shows.', 'arts', ['Rehearsal', 'Performance', 'Social']),
+    ('Painting Society', 'Colors on canvas.', 'Painting sessions and exhibitions.', 'arts', ['Workshop', 'Exhibition', 'Social']),
+    ('Sculpture Club', '3D art creation.', 'Sculpting workshops.', 'arts', ['Workshop', 'Exhibition', 'Social']),
+    ('Digital Art Society', 'Art meets technology.', 'Digital creation workshops.', 'arts', ['Workshop', 'Exhibition', 'Social']),
+    ('Fashion Society', 'Style and design.', 'Fashion shows and workshops.', 'arts', ['Show', 'Workshop', 'Social']),
+    ('Creative Writing Society', 'Words and stories.', 'Writing workshops and readings.', 'arts', ['Workshop', 'Reading', 'Social']),
 
     # Gaming (3)
     ('Board Game Society', 'Fun and games.', 'Weekly game nights.', 'gaming', ['Game Night', 'Tournament', 'Social']),
