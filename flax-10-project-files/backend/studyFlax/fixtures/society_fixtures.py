@@ -227,11 +227,15 @@ SOCIETY_DATA = [
     ('Refugee Support Society', 'Supporting refugees.', 'Language help and integration.', 'volunteering', ['Volunteering', 'Community', 'Social']),
     ('Mental Health Society', 'Wellbeing awareness.', 'Campaigns and support.', 'volunteering', ['Campaign', 'Workshop', 'Community']),
 
-    # Media (4)
+    # Media (8)
     ('Film Society', 'Cinema lovers.', 'Screenings and filmmaking.', 'media', ['Screening', 'Workshop', 'Social']),
     ('Radio Society', 'Student radio.', 'Run shows and broadcast.', 'media', ['Show', 'Workshop', 'Social']),
     ('Newspaper Society', 'Student journalism.', 'Write and report.', 'media', ['Meeting', 'Workshop', 'Social']),
     ('Podcast Society', 'Audio storytelling.', 'Create and share podcasts.', 'media', ['Recording', 'Workshop', 'Social']),
+    ('TV Society', 'Student television.', 'Produce shows and content.', 'media', ['Production', 'Workshop', 'Social']),
+    ('Documentary Society', 'Real stories.', 'Documentary screenings and making.', 'media', ['Screening', 'Production', 'Social']),
+    ('Animation Society', 'Bring drawings to life.', 'Animation workshops.', 'media', ['Workshop', 'Production', 'Social']),
+    ('Social Media Society', 'Digital content.', 'Content creation workshops.', 'media', ['Workshop', 'Social', 'Production']),
 ]
 
 
