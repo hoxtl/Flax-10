@@ -169,11 +169,10 @@ function SearchInput({ value, onChange }) {
 }
 
 function EmptyState({ search_query }) {
-    const message = search_query ? `No modules found matching "${search_query}"` : 'No modules available yet';
     return (
         <div className={styles.emptyState}>
             <span className={styles.emptyIcon}>📚</span>
-            <p>{message}</p>
+            <p>No modules found... </p>
         </div>
     );
 }
