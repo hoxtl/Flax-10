@@ -5,10 +5,13 @@ import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import {
   getDeadlineCountdown,
   getDeadlineUrgency,
+  getDeadlineDotUrgency,
   formatDeadlineDateTime,
   getTimeRemainingCountdown,
   getDueInPhrase,
   getTimeRemainingMonospace,
+  getTimeRemainingClean,
+  getTimeRemainingStamped,
   isDeadlineUnder24h,
   DEADLINE_LABELS,
 } from "./utils/deadlineUtils";
@@ -16,7 +19,7 @@ import {
 import styles from "./DeadlinesWidget.module.css";
 
 /* ─── Main widget ─────────────────────────────── */
-export default function DeadlinesWidget({ onModuleTagClick, variant }) {
+export default function DeadlinesWidget({ onModuleTagClick, variant, hideHeader }) {
   const navigate = useNavigate();
   const deadlines = useUpcomingDeadlines();
   const [selected, setSelected] = useState(null);
@@ -37,15 +40,17 @@ export default function DeadlinesWidget({ onModuleTagClick, variant }) {
   return (
     <>
       <div className={`${styles.widget} ${isTriage ? styles.widgetTriage : ""}`}>
-        <div className={styles.headerRow}>
-          <div className={styles.headerContent}>
-            <span className={styles.headerLabel}>Deadlines</span>
-            <h2 className={styles.headerTitle}>
-              <span className={styles.headerIcon} aria-hidden>🕐</span>
-              Upcoming Deadlines
-            </h2>
+        {!hideHeader && (
+          <div className={styles.headerRow}>
+            <div className={styles.headerContent}>
+              <span className={styles.headerLabel}>Deadlines</span>
+              <h2 className={styles.headerTitle}>
+                <span className={styles.headerIcon} aria-hidden>🕐</span>
+                Upcoming Deadlines
+              </h2>
+            </div>
           </div>
-        </div>
+        )}
 
         {deadlines.map((deadline) => (
           <DeadlineRow
@@ -89,20 +94,26 @@ function useTriageTick(isTriage) {
   }, [isTriage]);
 }
 
-/* ─── Single row: Pill A (Module) + Pill B (Assessment) → Task Name → Countdown ── */
+/* ─── Single row: Urgency dot + Pill A (Module) + Pill B (Assessment) → Task Name → Countdown ── */
 function DeadlineRow({ deadline, isTriage, onClick, onModuleClick }) {
   const urgency = getDeadlineUrgency(deadline.start_due_date);
+  const dotUrgency = getDeadlineDotUrgency(deadline.start_due_date);
   const under24h = isDeadlineUnder24h(deadline.start_due_date);
   const dueStr = formatDeadlineDateTime(deadline.start_due_date);
   const moduleCode = deadline.module_code || (deadline.module_name ? deadline.module_name.replace(/\s+/g, "").slice(0, 6) : "") || "MOD";
   const assessmentLabel = (DEADLINE_LABELS[deadline.deadline_type] || (deadline.deadline_type && String(deadline.deadline_type).charAt(0).toUpperCase() + String(deadline.deadline_type).slice(1)) || "Task");
-  const timeLabel = isTriage ? getTimeRemainingMonospace(deadline.start_due_date) : getTimeRemainingCountdown(deadline.start_due_date);
+  const stamped = getTimeRemainingStamped(deadline.start_due_date);
+  const timeLabelNonTriage = getTimeRemainingCountdown(deadline.start_due_date);
 
   return (
     <div
       className={`${styles.row} ${styles[urgency] || ""} ${isTriage ? styles.rowTriage : ""}`}
       onClick={onClick}
     >
+      <span
+        className={`${styles.urgencyDot} ${styles[`urgencyDot${dotUrgency === 'safe' ? 'Safe' : dotUrgency === 'caution' ? 'Caution' : 'Critical'}`]}`}
+        aria-hidden
+      />
       <div className={styles.body}>
         <div className={styles.rowContent}>
           <div className={styles.pillsRow}>
@@ -121,7 +132,18 @@ function DeadlineRow({ deadline, isTriage, onClick, onModuleClick }) {
           className={`${styles.countdownPill} ${under24h ? styles.countdownCoral : styles.countdownCharcoal}`}
           title={dueStr}
         >
-          {timeLabel}
+          {isTriage ? (
+            stamped.number != null ? (
+              <>
+                <span className={styles.countdownNumber}>{stamped.number}</span>
+                <span className={styles.countdownUnit}> {stamped.unit} left</span>
+              </>
+            ) : (
+              <span className={styles.countdownUnit}>{stamped.unit}</span>
+            )
+          ) : (
+            timeLabelNonTriage
+          )}
         </span>
       </div>
     </div>

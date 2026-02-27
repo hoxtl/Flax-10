@@ -3,12 +3,10 @@
    ════════════════════════════════════════════════ */
 
   .widget {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border, #f1f5f9);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background: #FFFCFA;
+    border: none;
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -17,12 +15,14 @@
     transition: box-shadow 0.2s ease;
   }
   .widget:hover {
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   }
   .widgetTriage {
     background: transparent;
     border: none;
     box-shadow: none;
+    width: 100%;
+    overflow: hidden;
   }
   .widgetTriage:hover {
     box-shadow: none;
@@ -48,25 +48,26 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #2d352d;
+    color: var(--color-sage-primary, #52796f);
   }
   .headerTitle {
     display: flex;
     align-items: center;
     gap: 0.4rem;
     margin: 0;
-    font-family: var(--font-body);
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-title);
-    color: var(--text-charcoal);
-    letter-spacing: -0.02em;
+    font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+    font-size: 1.0rem;
+    font-weight: 500;
+    color: var(--restoration-charcoal, #7B6751);
+    letter-spacing: 0.01em;
+    text-transform: none;
   }
   .widgetTriage .headerLabel,
   .widgetTriage .headerTitle {
-    color: #1e261e;
+    color: var(--restoration-charcoal, #7B6751);
   }
   .widgetTriage .headerLabel {
-    color: #2d352d;
+    color: var(--color-sage-primary, #52796f);
   }
   .headerIcon {
     font-size: 1rem;
@@ -77,6 +78,7 @@
   .heading {
     font-size: 20px;
     font-weight: 500;
+    font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
     color: var(--text);
     letter-spacing: -0.01em;
     text-transform: uppercase;
@@ -88,7 +90,7 @@
   .row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     padding: 16px 0.75rem 16px 1rem;
     border-radius: 0;
     background: transparent;
@@ -102,13 +104,46 @@
   .row:hover       { background: rgba(0, 0, 0, 0.03); }
 
   .row.critical {
-    border-left-color: #E85555;
+    border-left-color: var(--zen-terracotta-muted, #C05A3E);
   }
   .row.urgent {
-    border-left-color: #F59E0B;
+    border-left-color: var(--zen-terracotta-muted, #C05A3E);
   }
   .row.normal {
-    border-left-color: #84A98C;
+    border-left-color: var(--zen-sage, #8C9A86);
+  }
+
+  /* ── Urgency dot (traffic light): far left of each row ── */
+  .urgencyDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  /* 7+ days: solid Sage, soft glow */
+  .urgencyDotSafe {
+    background: #8C9A86;
+    box-shadow: 0 0 10px rgba(140, 154, 134, 0.55), 0 0 4px rgba(140, 154, 134, 0.4);
+  }
+  /* 3–7 days: pulsing Flax Brown/Gold */
+  .urgencyDotCaution {
+    background: #7B6751;
+    box-shadow: 0 0 10px rgba(123, 103, 81, 0.5), 0 0 4px rgba(123, 103, 81, 0.35);
+    animation: deadlineDotPulseCaution 2s ease-in-out infinite;
+  }
+  /* < 3 days: rapidly pulsing Terracotta */
+  .urgencyDotCritical {
+    background: #C05A3E;
+    box-shadow: 0 0 12px rgba(192, 90, 62, 0.6), 0 0 5px rgba(192, 90, 62, 0.4);
+    animation: deadlineDotPulseCritical 0.8s ease-in-out infinite;
+  }
+  @keyframes deadlineDotPulseCaution {
+    0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(123, 103, 81, 0.5), 0 0 4px rgba(123, 103, 81, 0.35); }
+    50%      { opacity: 0.65; box-shadow: 0 0 14px rgba(123, 103, 81, 0.4), 0 0 6px rgba(123, 103, 81, 0.25); }
+  }
+  @keyframes deadlineDotPulseCritical {
+    0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(192, 90, 62, 0.6), 0 0 5px rgba(192, 90, 62, 0.4); }
+    50%      { opacity: 0.7; box-shadow: 0 0 16px rgba(192, 90, 62, 0.5), 0 0 8px rgba(192, 90, 62, 0.35); }
   }
   
   /* ── Row internals ── */
@@ -180,7 +215,7 @@
   .title {
     font-size: 1.05rem;
     font-weight: 600;
-    font-family: var(--home-font-sans, var(--font-body, system-ui, sans-serif));
+    font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
     color: var(--restoration-charcoal, #2d352d);
     line-height: 1.35;
     white-space: nowrap;
@@ -190,18 +225,36 @@
     min-width: 0;
   }
 
-  /* Countdown: monospace, large, bold; coral < 24h, charcoal otherwise */
+  /* Countdown: monospace, tabular-nums so digits never jitter; cleaner typography */
   .countdownPill {
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     white-space: nowrap;
     flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 56px;
+    text-align: right;
+  }
+  /* Stamped look: number larger and bolder, unit in Lexend */
+  .countdownNumber {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1.1em;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+  .countdownUnit {
+    font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+    font-size: 0.92em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
   }
   .countdownCoral {
-    color: var(--soft-coral, #c67b5c);
+    color: var(--zen-terracotta-muted, #C05A3E);
   }
   .countdownCharcoal {
     color: var(--restoration-charcoal, #2d352d);
@@ -248,8 +301,8 @@
   }
   .pillTriageMonospace {
     font-variant-numeric: tabular-nums;
-    font-family: ui-monospace, "Cascadia Code", "SF Mono", Monaco, Consolas, monospace;
-    font-size: 0.95rem;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
     letter-spacing: 0.04em;
   }
   .rowTriage .pillTriage.critical {
@@ -257,6 +310,66 @@
   }
   .rowTriage .pillTriage.urgent {
     color: #b45309;
+  }
+
+  /* ── Triage compact: smaller, wider, no overflow ── */
+  /* Collapse redundant two-line header into one tight line */
+  .widgetTriage .headerRow {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .widgetTriage .headerContent {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+  .widgetTriage .headerLabel {
+    display: none;
+  }
+  .widgetTriage .headerIcon {
+    font-size: 0.8rem;
+  }
+  /* Compact rows: tighter vertical padding */
+  .rowTriage {
+    padding: 7px 10px 7px 10px;
+    gap: 6px;
+  }
+  /* Flatten pills + title into a single horizontal row */
+  .rowTriage .rowContent {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .rowTriage .pillsRow {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    gap: 3px;
+  }
+  .rowTriage .pillModule,
+  .rowTriage .pillAssessment {
+    padding: 1px 6px;
+    font-size: 0.62rem;
+  }
+  /* Deadline title: single line, truncate with ellipsis — never wrap */
+  .rowTriage .title {
+    font-size: 0.78rem;
+    font-weight: 500;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  /* Countdown: right-aligned, compact; clean format (e.g. 7d 12h) */
+  .rowTriage .countdownPill {
+    font-size: 0.72rem;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
   /* Bubbles (Module / Assignment Type) aligned to the right of the card */
@@ -282,8 +395,8 @@
   }
   /* Urgency pills: 1–3d red, 4–7d amber, 8+ grey */
   .pill.normal   { color: #fff; background: #6B7280; }
-  .pill.urgent   { color: #1A1A1A; background: #F59E0B; }
-  .pill.critical { color: #fff; background: #E85555; }
+  .pill.urgent   { color: #fff; background: var(--zen-terracotta-muted, #C05A3E); }
+  .pill.critical { color: #fff; background: var(--zen-terracotta-muted, #C05A3E); }
 
   .meta {
     font-size: 0.68rem;
@@ -298,13 +411,14 @@
   }
 
   .countdown {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
   
-  .countdown.normal   { color: var(--primary); }
+  .countdown.normal   { color: var(--zen-sage, #8C9A86); }
   .countdown.urgent   { color: var(--warning-text); }
   .countdown.critical { color: var(--error-text); }
   
@@ -376,10 +490,10 @@
   .modalCard {
     width: min(440px, 92vw);
     background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 18px;
+    border: none;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
     animation: slideUp 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   
@@ -393,7 +507,7 @@
     align-items: flex-start;
     gap: 0.75rem;
     padding: 1.1rem 1.25rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(123, 103, 81, 0.08);
     position: relative;
   }
   
@@ -466,7 +580,7 @@
   
   .modalValue.urgent   { color: var(--warning-text); font-weight: 700; }
   .modalValue.critical { color: var(--error-text);   font-weight: 700; }
-  .modalValue.normal   { color: var(--primary);      font-weight: 700; }
+  .modalValue.normal   { color: var(--zen-sage, #8C9A86); font-weight: 700; }
 
   .moduleCodeLink {
     color: var(--primary);
