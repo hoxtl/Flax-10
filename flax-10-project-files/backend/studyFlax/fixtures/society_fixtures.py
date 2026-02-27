@@ -195,11 +195,17 @@ SOCIETY_DATA = [
     ('Jewish Society', 'Jewish life at KCL.', 'Cultural and religious events.', 'religious', ['Cultural', 'Social', 'Festival']),
     ('Hindu Society', 'Hindu traditions.', 'Festivals and gatherings.', 'religious', ['Cultural', 'Festival', 'Social']),
 
-    # Social (4)
+    # Social (10)
     ('Comedy Society', 'Laughs and good times.', 'Stand-up and improv.', 'social', ['Open Mic', 'Workshop', 'Social']),
     ('Wine Society', 'Fine wines.', 'Tastings and trips.', 'social', ['Tasting', 'Social', 'Trip']),
     ('Cooking Society', 'Culinary adventures.', 'Cook and eat together.', 'social', ['Workshop', 'Social', 'Tasting']),
     ('Coffee Society', 'Coffee appreciation.', 'Tastings and cafe trips.', 'social', ['Tasting', 'Social', 'Trip']),
+    ('Tea Society', 'Tea appreciation.', 'Tastings and ceremonies.', 'social', ['Tasting', 'Social', 'Workshop']),
+    ('Baking Society', 'Sweet treats.', 'Bake sales and workshops.', 'social', ['Workshop', 'Social', 'Bake Sale']),
+    ('Travel Society', 'Explore the world.', 'Trip planning and adventures.', 'social', ['Trip', 'Social', 'Planning']),
+    ('Book Club', 'Reading together.', 'Monthly book discussions.', 'social', ['Discussion', 'Social', 'Reading']),
+    ('Quiz Society', 'Test your knowledge.', 'Weekly pub quizzes.', 'social', ['Quiz', 'Social', 'Competition']),
+    ('Networking Society', 'Make connections.', 'Networking events.', 'social', ['Networking', 'Social', 'Workshop']),
 
     # Professional (2)
     ('Investment Society', 'Markets and trading.', 'Workshops and competitions.', 'professional', ['Workshop', 'Competition', 'Networking']),
