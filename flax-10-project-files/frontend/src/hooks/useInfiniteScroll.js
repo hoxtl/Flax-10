@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 const DEFAULT_PAGE_SIZE = 12;
+const SCROLL_THRESHOLD = 300;
 
 export function useInfiniteScroll(items, pageSize = DEFAULT_PAGE_SIZE) {
     const [visibleCount, setVisibleCount] = useState(pageSize);
-    const observerRef = useRef(null);
     const sentinelRef = useRef(null);
 
     const visibleItems = items.slice(0, visibleCount);
@@ -20,17 +20,19 @@ export function useInfiniteScroll(items, pageSize = DEFAULT_PAGE_SIZE) {
     useEffect(() => { reset(); }, [items.length, reset]);
 
     useEffect(() => {
-        if (!sentinelRef.current) return;
-        observerRef.current?.disconnect();
-
         const scrollContainer = findScrollableAncestor(sentinelRef.current);
-        observerRef.current = new IntersectionObserver(
-            entries => { if (entries[0]?.isIntersecting) loadMore(); },
-            { root: scrollContainer, rootMargin: "200px", threshold: 0 }
-        );
-        observerRef.current.observe(sentinelRef.current);
-        return () => observerRef.current?.disconnect();
-    }, [loadMore]);
+        if (!scrollContainer) return;
+
+        const handleScroll = () => {
+            if (visibleCount >= items.length) return;
+            const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+            if (distanceFromBottom < SCROLL_THRESHOLD) loadMore();
+        };
+
+        scrollContainer.addEventListener("scroll", handleScroll);
+        return () => scrollContainer.removeEventListener("scroll", handleScroll);
+    }, [loadMore, visibleCount, items.length]);
 
     return { visibleItems, hasMore, sentinelRef, reset };
 }
