@@ -74,6 +74,15 @@ export function getDeadlineUrgency(dateStr) {
     return 'normal';
 }
 
+/** For traffic-light dot: 'safe' (7+ days), 'caution' (3–7 days), 'critical' (< 3 days). */
+export function getDeadlineDotUrgency(dateStr) {
+    const days = Math.floor((new Date(dateStr) - new Date()) / 86_400_000);
+    if (days < 0) return 'critical';
+    if (days < 3) return 'critical';
+    if (days < 7) return 'caution';
+    return 'safe';
+}
+
 /** Monospace countdown "07d : 00h : 22m" or "14h : 22m : 05s" (consistent spacing). */
 export function getTimeRemainingMonospace(dateStr) {
     const diff = new Date(dateStr) - new Date();
@@ -89,6 +98,39 @@ export function getTimeRemainingMonospace(dateStr) {
         return `${pad(days)}d : ${pad(hours)}h : ${pad(mins)}m`;
     }
     return `${pad(hours)}h : ${pad(mins)}m : ${pad(secs)}s`;
+}
+
+/** Cleaner countdown for triage: "7d 12h" or "14h 22m" (no colons, compact). */
+export function getTimeRemainingClean(dateStr) {
+    const diff = new Date(dateStr) - new Date();
+    if (diff < 0) return 'Overdue';
+    const totalMins = Math.floor(diff / 60_000);
+    const days = Math.floor(totalMins / 1440);
+    const remainderMins = totalMins % 1440;
+    const hours = Math.floor(remainderMins / 60);
+    const mins = remainderMins % 60;
+    if (days > 0) {
+        return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+    }
+    if (hours > 0) {
+        return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+    }
+    return mins > 0 ? `${mins}m` : 'Soon';
+}
+
+/** Human-readable stamped countdown: { number, unit } for "8 Days left" (number in Mono, unit in Lexend). */
+export function getTimeRemainingStamped(dateStr) {
+    const diff = new Date(dateStr) - new Date();
+    if (diff < 0) return { number: null, unit: 'Overdue' };
+    const totalMins = Math.floor(diff / 60_000);
+    const days = Math.floor(totalMins / 1440);
+    const remainderMins = totalMins % 1440;
+    const hours = Math.floor(remainderMins / 60);
+    const mins = remainderMins % 60;
+    if (days > 0) return { number: days, unit: days === 1 ? 'Day' : 'Days' };
+    if (hours > 0) return { number: hours, unit: hours === 1 ? 'Hour' : 'Hours' };
+    if (mins > 0) return { number: mins, unit: mins === 1 ? 'Minute' : 'Minutes' };
+    return { number: null, unit: 'Due soon' };
 }
 
 /** True if deadline is within 24 hours (for soft coral countdown styling). */
