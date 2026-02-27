@@ -121,3 +121,9 @@ export function sortModules(modules, sort_by) {
     });
 
 }
+
+export function applyFiltersAndSort(modules, department, sort_by) {
+    const by_department = department === 'all' ? modules :
+    modules.filter(m=>getDepartment(m.module_code) === department);
+    return sortModules(by_department, sort_by);
+}
