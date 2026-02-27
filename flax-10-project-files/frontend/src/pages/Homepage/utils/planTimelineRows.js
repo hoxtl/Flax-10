@@ -7,6 +7,113 @@ import { extractModuleCode } from "./eventUtils";
 import { isRoutineEvent } from "./eventUtils";
 import { DAY_START_HOUR, DAY_END_HOUR, GAP_CARD_THRESHOLD_MINS, FIXED_ROW_GAP_PX } from "./timelineUtils";
 
+/* ── KCL campus transit intelligence ── */
+
+const KCL_CAMPUS_KEYWORDS = {
+  strand: ["strand", "somerset house", "bush house", "aldwych", "king's building", "kings building", "strand campus", "chancery lane", "king's college london"],
+  waterloo: ["waterloo", "fwb", "franklin-wilkins", "franklin wilkins", "stamford street", "coin street"],
+  guys: ["guy's", "guys campus", "london bridge", "st thomas street", "great maze pond"],
+  denmark: ["denmark hill", "camberwell"],
+  stthomasw: ["st thomas'", "st thomas ", "lambeth", "lambeth palace road", "westminster bridge"],
+  kingssport: ["king's sport", "kings sport", "ethelburga", "honor oak"],
+};
+
+/** One-way transit times between KCL campuses (in minutes). */
+const TRANSIT_MINS = {
+  "strand-waterloo": 12, "waterloo-strand": 12,
+  "strand-guys": 22,     "guys-strand": 22,
+  "strand-denmark": 38,  "denmark-strand": 38,
+  "strand-stthomasw": 12, "stthomasw-strand": 12,
+  "waterloo-guys": 15,   "guys-waterloo": 15,
+  "waterloo-denmark": 25, "denmark-waterloo": 25,
+  "waterloo-stthomasw": 8, "stthomasw-waterloo": 8,
+  "guys-denmark": 25,    "denmark-guys": 25,
+  "guys-stthomasw": 20,  "stthomasw-guys": 20,
+  "denmark-stthomasw": 30, "stthomasw-denmark": 30,
+};
+
+export const CAMPUS_DISPLAY = {
+  strand: "Strand",
+  waterloo: "Waterloo",
+  guys: "Guy's",
+  denmark: "Denmark Hill",
+  stthomasw: "St Thomas'",
+  kingssport: "King's Sport",
+};
+
+function getCampusKey(location) {
+  if (!location) return null;
+  const loc = location.toLowerCase();
+  for (const [key, keywords] of Object.entries(KCL_CAMPUS_KEYWORDS)) {
+    if (keywords.some((kw) => loc.includes(kw))) return key;
+  }
+  return null;
+}
+
+function getTransitMins(locA, locB) {
+  if (!locA || !locB) return 0;
+  const campA = getCampusKey(locA);
+  const campB = getCampusKey(locB);
+  if (!campA || !campB || campA === campB) return 0;
+  return TRANSIT_MINS[`${campA}-${campB}`] || 0;
+}
+
+/** Classify calendar event into a context category. */
+function getEventCategory(item) {
+  if (!item) return "neutral";
+  const t = (item.title || "").toLowerCase();
+  const tag = (item.tag_name ?? item.tag?.name ?? "").toString().toLowerCase();
+  if (/lecture|seminar|tutorial|lab\s*session|practical|workshop/i.test(t) || item.source === "timetable") return "lecture";
+  if (/study|revision|library|exam|coursework|essay|assignment|group project/i.test(t) || /academic|study/i.test(tag)) return "academic";
+  if (/breakfast|lunch|dinner|sleep|brunch|snack|meal/i.test(t) || tag === "routine") return "routine";
+  if (/gym|run|yoga|walk|sport|exercise|basketball|jog|stretch|medit|swim/i.test(t) || tag === "wellness") return "wellness";
+  if (/coffee|costa|pret|drinks|pub|cinema|birthday|facetime|call|phone|catch up|meet with|restaurant|bar/i.test(t) || tag === "social") return "social";
+  if (/shop|tesco|lidl|grocery|laundry|clean|tidy|parcel|delivery|haircut|barber|rent|bills|post office|dentist|doctor|gp|inpost/i.test(t) || tag === "admin") return "admin";
+  return "neutral";
+}
+
+/**
+ * Compute context for a free gap row.
+ * Returns { type, transitMins?, prevCampus?, nextCampus?, freeAfterTransit? }
+ */
+function computeGapContext(prevItem, nextItem, gapStartMins, gapMins) {
+  const transitMins = getTransitMins(prevItem?.location, nextItem?.location);
+
+  if (transitMins > 0) {
+    const buffer = transitMins + 10; // 10 min buffer for walking to stop etc
+    if (gapMins <= buffer) {
+      return {
+        type: "transit",
+        transitMins,
+        prevCampus: getCampusKey(prevItem?.location),
+        nextCampus: getCampusKey(nextItem?.location),
+      };
+    }
+    return {
+      type: "transit-partial",
+      transitMins,
+      freeAfterTransit: gapMins - transitMins,
+      prevCampus: getCampusKey(prevItem?.location),
+      nextCampus: getCampusKey(nextItem?.location),
+    };
+  }
+
+  // Gaps starting at or after 18:00 (720 min from DAY_START_HOUR=6)
+  if (gapStartMins >= (18 - DAY_START_HOUR) * 60) {
+    return { type: "evening" };
+  }
+
+  // Both surrounding events are personal/leisure → don't push study
+  const prevCat = getEventCategory(prevItem);
+  const nextCat = getEventCategory(nextItem);
+  const personalCats = new Set(["social", "routine", "admin", "wellness"]);
+  if (personalCats.has(prevCat) && personalCats.has(nextCat)) {
+    return { type: "personal" };
+  }
+
+  return { type: "study" };
+}
+
 function filterEventsInWindow(sortedEvents, dayStart, dayEnd) {
   return (sortedEvents || []).filter((e) => {
     const s = new Date(e.start_time).getTime();
@@ -15,12 +122,13 @@ function filterEventsInWindow(sortedEvents, dayStart, dayEnd) {
   });
 }
 
-function addGapOrTinyGap(entries, lastEndMins, startMins, i) {
+function addGapOrTinyGap(entries, lastEndMins, startMins, i, prevItem = null, nextItem = null) {
   const gapMins = startMins - lastEndMins;
   if (gapMins > 0 && gapMins < GAP_CARD_THRESHOLD_MINS) {
     entries.push({ type: "tinyGap", id: `tiny-${i}`, startMins: lastEndMins, endMins: startMins, minutes: gapMins });
   } else if (gapMins >= GAP_CARD_THRESHOLD_MINS) {
-    entries.push({ type: "free", id: `free-${i}`, startMins: lastEndMins, endMins: startMins, minutes: gapMins, gapStartMins: lastEndMins });
+    const gapContext = computeGapContext(prevItem, nextItem, lastEndMins, gapMins);
+    entries.push({ type: "free", id: `free-${i}`, startMins: lastEndMins, endMins: startMins, minutes: gapMins, gapStartMins: lastEndMins, gapContext });
   }
 }
 
@@ -78,54 +186,77 @@ function insertNowMarker(sorted, nowMins) {
   sorted.splice(insertIndex, 0, { type: "now", id: "now-marker", nowMins });
 }
 
-function addSpacingAndOverlapIndex(sorted) {
-  let overlapGroupIndex = 0;
-
+function addSpacing(sorted) {
   for (let i = 0; i < sorted.length; i++) {
-    const r = sorted[i];
-    r.spacingBeforePx = i === 0 ? 0 : FIXED_ROW_GAP_PX;
-    if (r.type === "event") {
-      const prev = sorted[i - 1];
-      const overlapsPrev = prev && prev.type === "event" && prev.endMins > r.startMins && r.endMins > prev.startMins;
-      overlapGroupIndex = overlapsPrev ? overlapGroupIndex + 1 : 0;
-      r.overlapGroupIndex = overlapGroupIndex;
-    }
+    sorted[i].spacingBeforePx = i === 0 ? 0 : FIXED_ROW_GAP_PX;
   }
 }
 
-function injectHourMarksAndGroupOverlaps(sorted) {
+/** Merge consecutive overlapping event rows into eventGroup rows. */
+function groupOverlappingEvents(sorted) {
+  const result = [];
+  let i = 0;
+  while (i < sorted.length) {
+    const r = sorted[i];
+    if (r.type !== "event") {
+      result.push(r);
+      i++;
+      continue;
+    }
+    // Greedily collect all events that overlap the growing group window
+    const group = [r];
+    let groupEndMins = r.endMins;
+    let j = i + 1;
+    while (j < sorted.length && sorted[j].type === "event" && sorted[j].startMins < groupEndMins) {
+      groupEndMins = Math.max(groupEndMins, sorted[j].endMins);
+      group.push(sorted[j]);
+      j++;
+    }
+    if (group.length > 1) {
+      result.push({
+        type: "eventGroup",
+        id: `group-${r.id}`,
+        items: group,
+        startMins: r.startMins,
+        endMins: groupEndMins,
+        spacingBeforePx: r.spacingBeforePx,
+      });
+    } else {
+      result.push(r);
+    }
+    i = j;
+  }
+  return result;
+}
+
+function injectHourMarks(sorted) {
   const finalRows = [];
   let lastInjectedHour = -1;
+  let prevEventEndMins = null; // track last event end to detect adjacent events
 
   for (let i = 0; i < sorted.length; i++) {
     const r = sorted[i];
     const rStartMins = r.type !== "now" ? (r.startMins ?? r.gapStartMins ?? null) : null;
+
     if (rStartMins != null) {
       const rowHour = DAY_START_HOUR + Math.floor(rStartMins / 60);
-      if (rowHour !== lastInjectedHour) {
+      // Don't inject an hour mark between two directly adjacent events (no gap between them).
+      // e.g. Lunch ends 13:15 and next event starts 13:15 — the 13:00 mark would appear
+      // as a visual bar even though there is zero gap.
+      const adjacentToPrev = prevEventEndMins != null && prevEventEndMins >= rStartMins;
+      if (rowHour !== lastInjectedHour && !adjacentToPrev) {
         finalRows.push({ type: "hourMark", id: `hour-${rowHour}`, hour: rowHour });
         lastInjectedHour = rowHour;
       }
     }
 
-    if (r.type === "event" && r.isOverlap && r.overlapGroupIndex === 0) {
-      const group = [r];
-      for (let j = i + 1; j < sorted.length && sorted[j].type === "event" && sorted[j].overlapGroupIndex > 0; j++) {
-        group.push(sorted[j]);
-      }
-      finalRows.push({
-        type: "eventGroup",
-        id: `conflict-${r.id}`,
-        items: group,
-        spacingBeforePx: r.spacingBeforePx,
-        startMins: r.startMins,
-        endMins: Math.max(...group.map((x) => x.endMins)),
-      });
-      i += group.length - 1;
-    } else if (r.type === "event") {
-      finalRows.push(r);
-    } else {
-      finalRows.push(r);
+    finalRows.push(r);
+
+    // Update adjacency tracker — now-markers don't break adjacency, gap rows do.
+    if (r.type === "event") {
+      prevEventEndMins = r.endMins;
+    } else if (r.type !== "now") {
+      prevEventEndMins = null;
     }
   }
   return finalRows;
@@ -136,6 +267,7 @@ export function computePlanTimelineRows(sortedEvents, selectedDate, dayStart, da
   const inWindow = filterEventsInWindow(sortedEvents, dayStart, dayEnd);
   const entries = [];
   let lastEndMins = null;
+  let lastItem = null;
 
   for (let i = 0; i < inWindow.length; i++) {
     const item = inWindow[i];
@@ -145,11 +277,12 @@ export function computePlanTimelineRows(sortedEvents, selectedDate, dayStart, da
     const endMins = Math.min((DAY_END_HOUR - DAY_START_HOUR) * 60, (end.getHours() - DAY_START_HOUR) * 60 + end.getMinutes());
 
     if (lastEndMins != null) {
-      addGapOrTinyGap(entries, lastEndMins, startMins, i);
+      addGapOrTinyGap(entries, lastEndMins, startMins, i, lastItem, item);
     }
 
     entries.push(buildEventEntry(item, inWindow, i, dayStart, dayEnd, now, dayTasks, tasksDueToday));
     lastEndMins = Math.max(lastEndMins ?? 0, endMins);
+    lastItem = item;
   }
 
   const sorted = [...entries].sort((a, b) => (a.startMins ?? 0) - (b.startMins ?? 0));
@@ -159,6 +292,7 @@ export function computePlanTimelineRows(sortedEvents, selectedDate, dayStart, da
     insertNowMarker(sorted, nowMins);
   }
 
-  addSpacingAndOverlapIndex(sorted);
-  return injectHourMarksAndGroupOverlaps(sorted);
+  addSpacing(sorted);
+  const grouped = groupOverlappingEvents(sorted);
+  return injectHourMarks(grouped);
 }

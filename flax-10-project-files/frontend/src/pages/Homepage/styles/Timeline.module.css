@@ -238,12 +238,11 @@
     display: flex;
     flex-direction: column;
     gap: 0;
-    border-radius: var(--home-card-radius);
     overflow-x: hidden;
     min-height: 0;
-    background: #FAF9F6;
-    border: 1px solid rgba(210, 180, 140, 0.28);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
   /* High-impact status bar: headline of the day — flax-gold, centered, pulsing ⚡ */
   .planTimelineStatusBar {
@@ -471,13 +470,13 @@
   }
   /* Live Compass: hairline 1px Flax-Gold line, tight glow; NOW = 6pt monospace left of spine */
   .planTimelineNowLine {
-    height: 1px;
+    height: 1.5px;
     width: 100%;
-    background: var(--restoration-flax, #EEDC82);
+    background: #84A98C;
     flex: 1;
     min-width: 24px;
-    border-radius: 0;
-    box-shadow: 0 0 0 1px rgba(238, 220, 130, 0.25), 0 0 6px 1px rgba(238, 220, 130, 0.15);
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(132, 169, 140, 0.18), 0 0 6px 1px rgba(132, 169, 140, 0.12);
   }
   .planTimelineNowWrap {
     display: flex;
@@ -490,20 +489,25 @@
   }
   .planTimelineNowWrap::before {
     content: "";
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--restoration-flax, #EEDC82);
+    background: #84A98C;
     flex-shrink: 0;
-    box-shadow: 0 0 0 1px rgba(249, 248, 246, 0.95), 0 0 4px rgba(238, 220, 130, 0.2);
+    box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 3px rgba(132, 169, 140, 0.35);
+    animation: nowDotPulse 2s ease-in-out infinite;
+  }
+  @keyframes nowDotPulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 3px rgba(132, 169, 140, 0.35); }
+    50%       { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 5px rgba(132, 169, 140, 0.15); }
   }
   .planTimelineNowTag {
     font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
     font-size: 8px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--restoration-earth, #6B5344);
+    color: #5a8a65;
     flex-shrink: 0;
   }
   .planTimelineCard {
@@ -1454,7 +1458,7 @@
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.75rem;
     font-weight: var(--font-weight-title);
-    color: var(--flax-charcoal-heading, #1e261e);
+    color: #2D2D2D;
     letter-spacing: 0.05rem;
     text-transform: uppercase;
   }
@@ -2320,6 +2324,139 @@
     border-color: var(--primary);
   }
 
+  /* ── Conflict pair: side-by-side overlapping events ── */
+  .planTimelineConflictPairWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(192, 113, 78, 0.3);
+    background: rgba(192, 113, 78, 0.04);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .planTimelineConflictPairCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px;
+  }
+
+  .planTimelineConflictPairCard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(192, 113, 78, 0.2);
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .planTimelineConflictPairCard:hover {
+    border-color: rgba(192, 113, 78, 0.4);
+    box-shadow: 0 1px 4px rgba(192, 113, 78, 0.08);
+  }
+
+  .planTimelineConflictPairCardAccent {
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--card-accent, #C0714E);
+    opacity: 0.85;
+  }
+
+  .planTimelineConflictPairCardTime {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #C0714E;
+  }
+
+  .planTimelineConflictPairCardTitle {
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2d2d2d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Inline action bar */
+  .planTimelineConflictPairActions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-top: 2px;
+  }
+
+  .planTimelineConflictPairIcon {
+    color: #C0714E;
+    flex-shrink: 0;
+  }
+
+  .planTimelineConflictPairLabel {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: #C0714E;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .planTimelineConflictPairBtns {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+
+  .planTimelineConflictPairBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    border: 1px solid rgba(192, 113, 78, 0.35);
+    background: rgba(192, 113, 78, 0.07);
+    color: #8B4E35;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .planTimelineConflictPairBtn:hover:not(:disabled) {
+    background: rgba(192, 113, 78, 0.15);
+    border-color: rgba(192, 113, 78, 0.5);
+  }
+  .planTimelineConflictPairBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .planTimelineConflictPairBtnEdit {
+    border-color: rgba(107, 83, 68, 0.25);
+    background: rgba(107, 83, 68, 0.05);
+    color: #5D4037;
+  }
+  .planTimelineConflictPairBtnEdit:hover {
+    background: rgba(107, 83, 68, 0.1);
+    border-color: rgba(107, 83, 68, 0.4);
+  }
+
   /* ── Design A: Minimal Editorial Timeline ── */
 
   /* Coloured left-border accent on event cards (uses --card-accent CSS var) */
@@ -2379,12 +2516,15 @@
   }
 
   .planTimelineGapBestWindowLabel {
-    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-    font-size: 0.65rem;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #5a8a65;
+    color: #3d6645;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .planTimelineGapBestWindowDur {
@@ -2393,6 +2533,8 @@
     font-weight: 500;
     color: #84A98C;
     opacity: 0.85;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   /* ── Gap: Short Window (30–59 min) ── */
@@ -2518,5 +2660,145 @@
   }
   .planTimelineGapStartBtnSm:hover {
     background: rgba(132, 169, 140, 0.18);
+  }
+
+  /* ── Gap: Transit (terracotta) ── */
+  .planTimelineNodeTransit {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    background: #C0714E;
+    font-size: 0;
+    box-shadow: 0 0 0 2px rgba(250, 249, 246, 1), 0 0 0 3px rgba(192, 113, 78, 0.3);
+    border: none;
+  }
+
+  .planTimelineGapTransit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(192, 113, 78, 0.3);
+    background: rgba(192, 113, 78, 0.06);
+    flex: 1;
+  }
+
+  .planTimelineGapTransitIcon {
+    font-style: normal;
+    font-size: 0.85rem;
+    color: #C0714E;
+    flex-shrink: 0;
+  }
+
+  .planTimelineGapTransitBody {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .planTimelineGapTransitLabel {
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8B4E35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .planTimelineGapTransitMeta {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: #C0714E;
+    opacity: 0.8;
+  }
+
+  /* ── Gap: Transit-partial (transit note + remaining tasks) ── */
+  .planTimelineGapTransitPartial {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(192, 113, 78, 0.28);
+    background: rgba(192, 113, 78, 0.05);
+    flex: 1;
+  }
+
+  .planTimelineGapTransitPartialTop {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .planTimelineGapTransitPartialFree {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: #84A98C;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ── Gap: Personal (warm brown, restful) ── */
+  .planTimelineGapPersonal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px dashed rgba(107, 83, 68, 0.25);
+    background: rgba(107, 83, 68, 0.04);
+  }
+
+  .planTimelineGapPersonalDur {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7B6751;
+    flex-shrink: 0;
+  }
+
+  .planTimelineGapPersonalText {
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.75rem;
+    color: #9c8573;
+    font-style: italic;
+  }
+
+  /* ── Gap: Evening (warm amber, wind-down) ── */
+  .planTimelineGapEvening {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px dashed rgba(180, 150, 100, 0.3);
+    background: rgba(180, 150, 100, 0.05);
+  }
+
+  .planTimelineGapEveningDur {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #B8956A;
+    flex-shrink: 0;
+  }
+
+  .planTimelineGapEveningText {
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.75rem;
+    color: #B8956A;
+    font-style: italic;
+    opacity: 0.85;
   }
 
