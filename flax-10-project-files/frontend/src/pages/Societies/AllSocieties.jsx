@@ -7,7 +7,7 @@ import SearchBar from "../../components/common/SearchBar";
 import Pagination from "../../components/common/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 48;
 
 export default function AllSocieties({ onBack, onSelect, societies = [] }) {
     const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
@@ -105,10 +105,6 @@ function SocietyGrid({ items, onSelect }) {
             {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
         </div>
     );
-}
-
-function LoadMoreSentinel({ sentinelRef }) {
-    return <div ref={sentinelRef} className={styles.loadingIndicator}>Scroll for more...</div>;
 }
 
 function EmptyState() {
