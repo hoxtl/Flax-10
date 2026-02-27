@@ -20,7 +20,7 @@ export default function CalendarTab(props) {
     );
 }
 
-function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember, onEditAnnouncement, announcements }) {
+function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember, onEditAnnouncement, announcements, societyName }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
@@ -32,7 +32,7 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     return (
         <div className={styles.calendarTab}>
             {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
-            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} />
+            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} societyName={societyName} />
             <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
             <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
                 readOnly={!editMode}
@@ -77,12 +77,12 @@ function handlePopupDelete(event, handlers, closePopup) {
     closePopup();
 }
 
-function CalendarHeader({ date, setDate, societyId, isMember }) {
+function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
     return (
         <div className={styles.calendarHeader}>
             <NavButtons date={date} setDate={setDate} />
             <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
-            {isMember && <SyncButton societyId={societyId} />}
+            {isMember && <SyncButton societyId={societyId} societyName={societyName} />}
         </div>
     );
 }

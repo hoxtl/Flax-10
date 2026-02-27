@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import styles from "./ImageGalleryModal.module.css";
-import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from "../hooks/useCarouselNavigation";
+import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from "../../hooks/useCarouselNavigation";
 
 export default function ImageGalleryModal({ images, onClose, initialIndex = 0 }) {
     const overlayRef = useRef(null);
