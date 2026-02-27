@@ -80,7 +80,6 @@ class Command(BaseCommand):
         self.create_society_images()
         #self.create_tasks()
         self.create_study_sessions()
-        self.stdout.write(self.style.SUCCESS('Seeding complete!'))
         self.print_stats()  
         
 
