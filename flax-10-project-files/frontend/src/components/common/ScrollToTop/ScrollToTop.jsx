@@ -7,12 +7,7 @@ export default function ScrollToTop({ threshold = 200 }) {
     const buttonRef = useRef(null);
 
     useEffect(() => {
-        const findContainer = () => {
-            if (!buttonRef.current) return null;
-            return findScrollableAncestor(buttonRef.current);
-        };
-
-        const container = findContainer();
+        const container = buttonRef.current ? findScrollableAncestor(buttonRef.current) : null;
         containerRef.current = container;
         if (!container) return;
 

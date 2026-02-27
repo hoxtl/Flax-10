@@ -22,13 +22,26 @@ export function useInfiniteScroll(items, pageSize = DEFAULT_PAGE_SIZE) {
     useEffect(() => {
         if (!sentinelRef.current) return;
         observerRef.current?.disconnect();
+
+        const scrollContainer = findScrollableAncestor(sentinelRef.current);
         observerRef.current = new IntersectionObserver(
             entries => { if (entries[0]?.isIntersecting) loadMore(); },
-            { rootMargin: "100px", threshold: 0 }
+            { root: scrollContainer, rootMargin: "200px", threshold: 0 }
         );
         observerRef.current.observe(sentinelRef.current);
         return () => observerRef.current?.disconnect();
     }, [loadMore]);
 
     return { visibleItems, hasMore, sentinelRef, reset };
+}
+
+function findScrollableAncestor(element) {
+    let parent = element?.parentElement;
+    while (parent) {
+        const style = window.getComputedStyle(parent);
+        const hasOverflow = style.overflow === "auto" || style.overflowY === "auto";
+        if (hasOverflow) return parent;
+        parent = parent.parentElement;
+    }
+    return null;
 }
