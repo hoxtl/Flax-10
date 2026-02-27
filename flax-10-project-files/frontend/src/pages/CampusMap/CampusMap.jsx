@@ -519,6 +519,12 @@ export default function CampusMap() {
             </div>
           )}
 
+          <div className={styles.lastUpdated}>
+            Updated: {new Date().toLocaleTimeString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
         </section>
 
         <section className={styles.section}>
