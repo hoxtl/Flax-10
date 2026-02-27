@@ -51,7 +51,6 @@ import { formatScheduleCountdown } from "./utils/dateFormatUtils";
 import { useHomeData } from "./hooks/useHomeData";
 import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
 import { MiniTimeline } from "./components";
-import { DailyNavigator } from "./components/DailyNavigator";
 import { ActionHubSlot } from "./components/ActionHubSlot";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 
@@ -114,7 +113,6 @@ export default function Homepage({ onNavigate }) {
   const [showAllActionHubTasks, setShowAllActionHubTasks] = useState(false);
   const actionHubRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
-  const nowCardRef = useRef(null);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -122,10 +120,6 @@ export default function Homepage({ onNavigate }) {
     today.setHours(0, 0, 0, 0);
     dispatch({ type: "SET_SELECTED_DATE", payload: today });
   }, [dispatch]);
-
-  useEffect(() => {
-    nowCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
   useEffect(() => {
     const read = () => { try { setActiveTimerTaskId(sessionStorage.getItem("timerTaskId")); } catch (_) {} };
     read();
@@ -982,53 +976,6 @@ export default function Homepage({ onNavigate }) {
   )}
 
       <div>
-      <div className={styles.dailyNavigatorWrap}>
-        <DailyNavigator
-          styles={styles}
-          navigatorContext={navigatorContext}
-          scheduleCountdownSecs={scheduleCountdownSecs}
-          isToday={isToday(selectedDate)}
-          hasTimerSession={hasTimerSession}
-          timerMode={timerMode}
-          timerTask={timerTask}
-          timeLeft={timeLeft}
-          timerProgress={timerProgress}
-          timerActive={timerActive}
-          workTime={workTime}
-          breakTime={breakTime}
-          replanLoading={replanLoading}
-          goalsOnlyProgress={goalsOnlyProgress}
-          nowHeroFocusBtnHovered={nowHeroFocusBtnHovered}
-          showXPSparks={showXPSparks}
-          nowCardRef={nowCardRef}
-          onResetTimer={() => {
-            resetTimer();
-            setTimerTask("");
-            setActiveTaskId?.(null);
-          }}
-          onReplanDay={handleReplanDay}
-          onStartFocus={startFocusInWidget}
-          onSetSelectedDateTomorrow={() => {
-            const tom = new Date();
-            tom.setDate(tom.getDate() + 1);
-            tom.setHours(0, 0, 0, 0);
-            dispatch({ type: "SET_SELECTED_DATE", payload: tom });
-            navigate("/calendar");
-            onNavigate?.("calendar");
-          }}
-          onSetTimerActive={setTimerActive}
-          onRestartTimer={() => {
-            setTimerActive(false);
-            setTimeLeft(timerMode === "work" ? (workTime || 25) * 60 : (breakTime || 5) * 60);
-          }}
-          onNavigate={(path, opts) => {
-            navigate(path, opts);
-            onNavigate?.("timer");
-          }}
-          onSetNowHeroFocusBtnHovered={setNowHeroFocusBtnHovered}
-        />
-      </div>
-
       {/* Intelligence Row — Monochrome Bento with real time-management data */}
       <div className={styles.intelligenceRowWrap}>
       <IntelligenceRow
