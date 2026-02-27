@@ -243,12 +243,19 @@ def build_society_seed_data():
     return result
 
 
+# Map old categories to consolidated ones
+CATEGORY_MAPPING = {
+    'gaming': 'social', 'music': 'arts', 'dance': 'arts', 'professional': 'academic'
+}
+
+
 def build_society_dict(name, bio, about, category, tags):
     """Build a single society dictionary."""
     image = get_random_category_image(category)
+    mapped_category = CATEGORY_MAPPING.get(category, category)
     return {
         'name': name, 'bio': bio, 'about': about,
-        'category': category, 'tags': tags,
+        'categories': [mapped_category], 'tags': tags,
         'events': get_events_for_category(category),
         'image': f'http://localhost:8000/static/seed_images/societies/{image}',
     }
@@ -256,7 +263,14 @@ def build_society_dict(name, bio, about, category, tags):
 
 def get_random_category_image(category):
     """Get a random image filename for a category."""
-    images = CATEGORY_IMAGES.get(category, CATEGORY_IMAGES['social'])
+    mapped = CATEGORY_MAPPING.get(category, category)
+    images = CATEGORY_IMAGES.get(mapped, CATEGORY_IMAGES['social'])
+    # Prefer original category images if they exist in the merged list
+    original_prefix = f'{category}' if category != mapped else None
+    if original_prefix:
+        original_images = [img for img in images if img.startswith(original_prefix)]
+        if original_images:
+            return random.choice(original_images)
     return random.choice(images)
 
 
