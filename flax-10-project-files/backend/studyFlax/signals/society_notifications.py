@@ -1,10 +1,7 @@
-from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
+from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 from studyFlax.models.society import Society, SocietyEvent, SocietyAnnouncement, SocietyMembership
 from studyFlax.models.notifications.notificationModel import Notification
-
-# Track societies being deleted to suppress child notifications
-_deleting_societies = set()
 
 
 @receiver(pre_save, sender=SocietyEvent)
@@ -56,17 +53,28 @@ def handle_event_delete(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=Society)
 def handle_society_delete(sender, instance, **kwargs):
-    _deleting_societies.add(instance.id)
+    """Fallback handler for deletions outside the API (e.g., Django admin)."""
     if getattr(instance, '_skip_notification', False):
         return
-    members = SocietyMembership.objects.filter(society=instance).select_related('user')
-    notifications = [build_society_delete_notification(m.user, instance) for m in members]
+    notify_society_deleted(instance)
+    delete_children_silently(instance)
+
+
+def notify_society_deleted(society):
+    """Send deletion notification to all society members."""
+    members = SocietyMembership.objects.filter(society=society).select_related('user')
+    notifications = [build_society_delete_notification(m.user, society) for m in members]
     Notification.objects.bulk_create(notifications)
 
 
-@receiver(post_delete, sender=Society)
-def cleanup_society_delete(sender, instance, **kwargs):
-    _deleting_societies.discard(instance.id)
+def delete_children_silently(society):
+    """Delete all events and announcements without notifications."""
+    for event in list(society.events.all()):
+        event._skip_notification = True
+        event.delete()
+    for announcement in list(society.announcements.all()):
+        announcement._skip_notification = True
+        announcement.delete()
 
 
 def build_society_delete_notification(user, society):
@@ -80,9 +88,7 @@ def build_society_delete_notification(user, society):
 
 def should_skip_notification(instance):
     """Check if notification should be skipped for this instance."""
-    if getattr(instance, '_skip_notification', False):
-        return True
-    return instance.society_id in _deleting_societies
+    return getattr(instance, '_skip_notification', False)
 
 
 def notify_society_members(society, notification_data):

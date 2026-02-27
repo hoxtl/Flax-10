@@ -51,5 +51,16 @@ def update_society(request, society):
 def delete_society(request, society):
     if not is_society_admin(request.user, society):
         return permission_denied_response()
-    society.delete()
+    delete_society_with_notification(society)
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def delete_society_with_notification(society):
+    """Delete society with only one notification (no event/announcement spam)."""
+    from studyFlax.signals.society_notifications import (
+        notify_society_deleted, delete_children_silently
+    )
+    notify_society_deleted(society)
+    delete_children_silently(society)
+    society._skip_notification = True
+    society.delete()
