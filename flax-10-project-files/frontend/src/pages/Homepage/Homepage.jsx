@@ -26,7 +26,7 @@ import { getSeedsPerDayThisWeek } from "../../lib/weeklySeedCount";
 import { playZenChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 
-import ZenGardenEmptyState from "../../components/ZenGardenEmptyState";
+import EmptyStateCard from "../../components/EmptyStateCard";
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
@@ -1005,14 +1005,14 @@ export default function Homepage({ onNavigate }) {
         slot2Health={
           actionHubSpineCompletedPct === 100 && actionHubItemsOnly.length > 0 ? (
             /* All done — seedling celebration */
-            <ZenGardenEmptyState
+            <EmptyStateCard
               illustrationVariant="seedling"
               message="Every task planted. Day complete."
               sub={`${actionHubCompletedCount} done today. Take a moment — you earned it.`}
             />
           ) : actionHubSpineCompletedPct === 0 ? (
             /* Nothing done yet — brown cat */
-            <ZenGardenEmptyState
+            <EmptyStateCard
               illustrationVariant="brownCat"
               message={
                 actionHubItemsOnly.length === 0
@@ -1336,21 +1336,6 @@ export default function Homepage({ onNavigate }) {
 
       <div className={styles.bentoSpine} id="timeline-section">
           <div className={styles.timelineBox}>
-            {isToday(selectedDate) && planTimelineFocusWindowMinutes > 0 && (
-              <div className={styles.planTimelineStatusBar}>
-                <span>
-                  You have {planTimelineFocusWindowMinutes < 60
-                    ? `${planTimelineFocusWindowMinutes} min`
-                    : planTimelineFocusWindowMinutes % 60 === 0
-                      ? `${planTimelineFocusWindowMinutes / 60} ${planTimelineFocusWindowMinutes / 60 === 1 ? "hour" : "hours"}`
-                      : `${Math.floor(planTimelineFocusWindowMinutes / 60)}h ${planTimelineFocusWindowMinutes % 60}m`} of focus windows today.
-                  {planTimelinePredictedFinish?.predictedFinishTime && (
-                    <> With your current list, you could be done by {planTimelinePredictedFinish.predictedFinishTime}. </>
-                  )}
-                </span>
-                <span className={styles.planTimelineStatusBarEmoji} aria-hidden>⚡</span>
-              </div>
-            )}
             <div className={styles.timelineHeader}>
               <div className={styles.timelineHeaderLeft}>
                 <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
@@ -1377,13 +1362,6 @@ export default function Homepage({ onNavigate }) {
               </div>
             </div>
             <div className={styles.timelineTrack}>
-              <div
-                className={styles.timelineTrackLine}
-                aria-hidden
-                style={{
-                  opacity: 1,
-                }}
-              />
               <motion.div
                 className={styles.timelineTrackContent}
                 layout

@@ -5,7 +5,7 @@
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import ZenGardenEmptyState from "../../../components/ZenGardenEmptyState";
+import EmptyStateCard from "../../../components/EmptyStateCard";
 
 const VISIBLE_COUNT = 4;
 
@@ -159,7 +159,7 @@ export function ActionHubSlot({
           </div>
         </>
       ) : (
-        <ZenGardenEmptyState
+        <EmptyStateCard
           displayName={displayName}
           sub={null}
           message="All caught up for today."

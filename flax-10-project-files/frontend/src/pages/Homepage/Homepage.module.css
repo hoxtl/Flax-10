@@ -1,11 +1,11 @@
 /* Homepage module — composed from logical partials */
-@import './styles/variables.module.css';
-@import './styles/bento.module.css';
-@import './styles/navigator.module.css';
-@import './styles/actionHub.module.css';
-@import './styles/analytics.module.css';
-@import './styles/growthTank.module.css';
-@import './styles/dailyNarrative.module.css';
-@import './styles/timer.module.css';
-@import './styles/timeline.module.css';
-@import './styles/overlays.module.css';
+@import './styles/Variables.module.css';
+@import './styles/Bento.module.css';
+@import './styles/Navigator.module.css';
+@import './styles/ActionHub.module.css';
+@import './styles/Analytics.module.css';
+@import './styles/GrowthTank.module.css';
+@import './styles/DailyNarrative.module.css';
+@import './styles/Timer.module.css';
+@import './styles/Timeline.module.css';
+@import './styles/Overlays.module.css';
