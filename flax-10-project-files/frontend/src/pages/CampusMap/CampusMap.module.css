@@ -712,3 +712,9 @@
   color: var(--c-grey);
   opacity: 0.70;
 }
+
+.disruptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
