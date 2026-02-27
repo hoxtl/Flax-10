@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
 export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode }) {
+    const categories = society.categories || (society.category ? [society.category] : []);
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
-            <CategorySection category={society.category} editMode={editMode} onSave={(category) => onUpdateSociety?.({ category })} />
+            <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
             <Stats society={society} />
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
@@ -17,6 +18,7 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
 function BioSection({ text, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
     const [value, setValue] = useState(text || "");
+    useEffect(() => setValue(text || ""), [text]);
 
     if (editing) return <BioEditor value={value} setValue={setValue} onSave={() => { onSave(value); setEditing(false); }} />;
     return <BioDisplay text={text} editMode={editMode} onEdit={() => setEditing(true)} />;
@@ -48,18 +50,19 @@ function BioEditor({ value, setValue, onSave }) {
     );
 }
 
-function CategorySection({ category, editMode, onSave }) {
+function CategorySection({ categories, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
-    const [value, setValue] = useState(category || "");
+    const [value, setValue] = useState(categories || []);
+    useEffect(() => setValue(categories || []), [categories]);
 
     if (editing) return <CategoryEditor value={value} setValue={setValue} onSave={() => { onSave(value); setEditing(false); }} />;
-    return <CategoryDisplay category={category} editMode={editMode} onEdit={() => setEditing(true)} />;
+    return <CategoryDisplay category={categories} editMode={editMode} onEdit={() => setEditing(true)} />;
 }
 
 function CategoryEditor({ value, setValue, onSave }) {
     return (
         <div className={styles.categoryEditor}>
-            <CategorySelector value={value} onChange={setValue} label="" />
+            <CategorySelector value={value} onChange={setValue} label="" multiple />
             <button className={styles.saveBtn} onClick={onSave}>Save</button>
         </div>
     );
