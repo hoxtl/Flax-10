@@ -79,7 +79,7 @@ function PersonaCard({ persona, peakHour }) {
     ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? 'pm' : 'am'} peak`
     : null;
   return (
-    <div className={styles.personaCard}>
+    <div className={`${styles.glassCard} ${styles.personaCard}`}>
       <div className={styles.personaLeft}>
         <span className={styles.personaEmoji} role="img" aria-label={persona.label}>
           {persona.emoji}
@@ -119,7 +119,7 @@ function StudyDNA({ heatmap }) {
   ].filter(s => s.pct > 0.01);
 
   return (
-    <div className={styles.dnaCard}>
+    <div className={`${styles.glassCard} ${styles.dnaCard}`}>
       <div className={styles.cardLabel}>STUDY DNA</div>
       <div className={styles.dnaBar}>
         {segments.map((s, i) => (
@@ -177,7 +177,7 @@ function MiniHeatmap({ heatmap, onNavigate }) {
 
   return (
     <div
-      className={styles.heatmapCard}
+      className={`${styles.glassCard} ${styles.heatmapCard}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -278,7 +278,7 @@ function ThisWeek({ weekly, streaks, onGoalSave }) {
   };
 
   return (
-    <div className={styles.weekCard}>
+    <div className={`${styles.glassCard} ${styles.weekCard}`}>
       <div className={styles.weekCardTop}>
         <div className={styles.cardLabel}>THIS WEEK</div>
       </div>
@@ -413,7 +413,7 @@ function Badge({ badge }) {
 function BadgesSection({ badges, onOpen }) {
   const earned = badges?.length || 0;
   return (
-    <div className={styles.badgesBox} onClick={onOpen} role="button" tabIndex={0}
+    <div className={`${styles.glassCard} ${styles.badgesBox}`} onClick={onOpen} role="button" tabIndex={0}
       onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onOpen()}
       style={{ cursor: 'pointer' }}
     >
