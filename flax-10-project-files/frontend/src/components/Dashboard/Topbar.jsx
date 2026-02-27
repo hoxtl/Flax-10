@@ -8,6 +8,7 @@ import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
+import SearchBar from "../common/SearchBar";
 import { Bell, Plus } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
 
@@ -37,12 +38,7 @@ function TopBarGreeting({ user }) {
     </div>);}
 
 function SearchInput() {
-  return (
-    <div className={styles.search}>
-      <span className={styles.searchIcon}>🔍</span>
-      <input className={styles.searchInput} placeholder="Search…" />
-    </div>
-  );
+    return <SearchBar placeholder="Search…" className={styles.searchCompact} />;
 }
 
 function QuickTabs({ onAddClick }) {
