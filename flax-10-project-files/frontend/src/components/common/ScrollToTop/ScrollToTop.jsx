@@ -1,30 +1,39 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import styles from "./ScrollToTop.module.css";
 
-export default function ScrollToTop({ pageBreaks = [0], threshold = 200 }) {
+export default function ScrollToTop({ threshold = 200 }) {
     const [visible, setVisible] = useState(false);
+    const scrollContainerRef = useRef(null);
 
     useEffect(() => {
-        const handler = () => setVisible(window.scrollY > threshold);
-        window.addEventListener("scroll", handler);
-        return () => window.removeEventListener("scroll", handler);
+        const container = findScrollableParent();
+        scrollContainerRef.current = container;
+        if (!container) return;
+
+        const handler = () => setVisible(getScrollTop(container) > threshold);
+        container.addEventListener("scroll", handler);
+        return () => container.removeEventListener("scroll", handler);
     }, [threshold]);
 
     const handleClick = useCallback(() => {
-        const target = findPreviousPageBreak(pageBreaks, window.scrollY);
-        window.scrollTo({ top: target, behavior: "smooth" });
-    }, [pageBreaks]);
+        scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
 
     if (!visible) return null;
-    return <button className={styles.scrollBtn} onClick={handleClick} aria-label="Scroll up">↑</button>;
+    return <button className={styles.scrollBtn} onClick={handleClick} aria-label="Scroll to top">↑</button>;
 }
 
-function findPreviousPageBreak(pageBreaks, currentScroll) {
-    const positions = getPageBreakPositions(pageBreaks);
-    const previous = positions.filter(pos => pos < currentScroll - 50);
-    return previous.length > 0 ? previous[previous.length - 1] : 0;
+function findScrollableParent() {
+    const content = document.querySelector('[class*="content"]');
+    if (content && isScrollable(content)) return content;
+    return document.documentElement;
 }
 
-function getPageBreakPositions(pageBreaks) {
-    return pageBreaks.map((_, idx) => idx * window.innerHeight * 0.8);
+function isScrollable(element) {
+    const style = window.getComputedStyle(element);
+    return style.overflow === "auto" || style.overflowY === "auto" || style.overflow === "scroll";
+}
+
+function getScrollTop(element) {
+    return element === document.documentElement ? window.scrollY : element.scrollTop;
 }
