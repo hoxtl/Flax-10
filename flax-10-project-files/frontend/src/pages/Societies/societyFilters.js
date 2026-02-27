@@ -33,17 +33,19 @@ export function getCategoryLabel(categoryId) {
     return category?.label || categoryId;
 }
 
+function getSocietyCategories(society) {
+    if (Array.isArray(society.categories)) return society.categories;
+    return society.category ? [society.category] : [];
+}
+
 export function matchesCategory(society, filterId) {
     if (filterId === "all") return true;
     const filter = SOCIETY_CATEGORIES.find(c => c.id === filterId);
-    if (!filter) return society.category === filterId;
-    const validCategories = filter.includes || [filter.id];
-    return validCategories.includes(society.category);
+    const validCategories = filter?.includes || [filterId];
+    const societyCategories = getSocietyCategories(society);
+    return societyCategories.some(cat => validCategories.includes(cat));
 }
 
 export function countByCategory(societies, filterId) {
-    const filter = SOCIETY_CATEGORIES.find(c => c.id === filterId);
-    if (!filter) return societies.filter(s => s.category === filterId).length;
-    const validCategories = filter.includes || [filter.id];
-    return societies.filter(s => validCategories.includes(s.category)).length;
+    return societies.filter(s => matchesCategory(s, filterId)).length;
 }
