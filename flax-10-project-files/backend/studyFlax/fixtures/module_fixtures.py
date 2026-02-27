@@ -1,3 +1,11 @@
+"""
+KCL module catalogue fixtures.
+
+Each entry is a (module_code, module_name, description) triple covering
+the full range of subject areas offered at King's College London.
+Used by the seed command to populate the Module table.
+"""
+
 # Format: (module_code, module_name, description)
 module_fixtures = (
     # Computer Science

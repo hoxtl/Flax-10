@@ -1,3 +1,13 @@
+"""
+Assessment deadline fixtures for KCL modules.
+
+``deadline_fixtures`` is a generic fallback used when a module code prefix
+has no dedicated entry.  ``module_deadline_fixtures`` maps two-letter module
+prefixes (e.g. ``"CS"``, ``"MA"``) to a list of (deadline_type, title,
+description) triples that reflect the real assessment style for each
+subject area.
+"""
+
 # Format: (deadline_type, title, description)
 # Generic fallback used when a module prefix has no specific entry below.
 deadline_fixtures = (

@@ -1,3 +1,11 @@
+"""
+User-level lookup tables and course configuration fixtures.
+
+Provides default categories, event tags, recurrence rule templates, the
+KCL course catalogue, a mapping from course name to module-code prefixes,
+and a mapping from module-code prefix to faculty department.
+"""
+
 # Format: (name, color, is_default)
 category_fixtures = (
     ('Work', '#FF5733', True),

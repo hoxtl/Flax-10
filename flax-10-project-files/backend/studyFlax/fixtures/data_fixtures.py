@@ -1,3 +1,10 @@
+"""
+Backwards-compatible re-export of all fixture data.
+
+Imports from the individual fixture modules and re-exports them under their
+original names so that existing import sites do not need to change.
+"""
+
 from .user_fixtures import (
     category_fixtures,
     tag_fixtures,

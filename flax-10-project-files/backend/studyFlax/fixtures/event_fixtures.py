@@ -1,3 +1,12 @@
+"""
+Calendar event content fixtures.
+
+Provides realistic titles for personal events, meal descriptions for
+breakfast, lunch and dinner, event descriptions, real KCL campus and
+transport hub locations (with full postcodes), and lecture theatre
+addresses used when seeding calendar events.
+"""
+
 event_title_fixtures = (
     "Lidl Run", "Tesco Express at Midnight", "Meal Prep Sunday",
     "Coffee with Mum at Costa", "Dinner at Grandma's",
