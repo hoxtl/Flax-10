@@ -22,7 +22,7 @@ class TaskSerialiser(serializers.ModelSerializer):
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code',
-            'title', 'description', 'priority', 'due_date',
+            'title', 'description', 'priority', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
             'estimated_blocks', 'completed_blocks',
             'created_at', 'updated_at'

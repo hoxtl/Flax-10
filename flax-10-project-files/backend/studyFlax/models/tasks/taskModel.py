@@ -32,6 +32,13 @@ class Task(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    energy_level = models.CharField(
+        max_length=10,
+        choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],
+        default='medium',
+        blank=True,
+        help_text='Cognitive load: Low/Medium/High for burnout prevention',
+    )
     due_date = models.DateTimeField(null=True, blank=True)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True, help_text='When the task was marked complete; used for Seeds Grown Today.')
