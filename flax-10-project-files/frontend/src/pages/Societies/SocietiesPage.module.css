@@ -6,14 +6,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
     padding-bottom: 8px;
 }
 
 .miniAddBtn {
-    background: var(--primary-color, #9E7E5D);
-    color: white;
+    background: var(--primary);
+    color: var(--c-white);
     border: none;
     width: 36px;
     height: 36px;
@@ -35,25 +35,26 @@
 
 .miniAddBtn:hover {
     transform: scale(1.1);
-    background: var(--primary-dark, #8a6d4f);
+    background: var(--primary-strong);
 }
 
 .miniEmptyState {
     padding: 30px;
     text-align: center;
-    background: #fafafa;
-    border: 2px dashed #e0e0e0;
+    background: var(--surface);
+    border: 2px dashed var(--border);
     border-radius: 12px;
 }
 
 .actionBtn {
     margin-top: 10px;
     padding: 8px 20px;
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
+    color: var(--text);
 }
 
 .container {
@@ -72,7 +73,7 @@
 .emptyText {
     margin-bottom: 20px;
     font-size: 1.2rem;
-    color: #666;
+    color: var(--muted);
 }
 
 
@@ -87,8 +88,10 @@
     flex: 1;
     padding: 12px 16px;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     font-size: 1rem;
+    background: var(--card-bg);
+    color: var(--text);
 }
 
 
@@ -115,7 +118,7 @@
     border: none;
     cursor: pointer;
     font-weight: bold;
-    color: var(--primary-color, #9E7E5D);
+    color: var(--primary);
     font-size: 1rem;
 }
 
@@ -139,37 +142,38 @@
     align-items: center;
     justify-content: center;
     padding: 7px 16px;
-    border: 1px solid #ff4d4f;
-    color: #ff4d4f;
+    border: 1px solid var(--danger);
+    color: var(--danger);
     border-radius: 22px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    background: white;
+    background: var(--card-bg);
     white-space: nowrap;
     margin-bottom: 8px;
     transition: all 0.2s;
 }
 
 .clearPill:hover {
-    background-color: #fff1f0;
+    background-color: var(--danger-bg);
     outline: none;
-    border-color: #ff4d4f;
+    border-color: var(--danger);
 }
 
 .sortDropdown {
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.9rem;
-    background: white;
+    background: var(--card-bg);
+    color: var(--text);
     cursor: pointer;
     min-width: 100px;
 }
 
 .sortDropdown:focus {
     outline: none;
-    border-color: var(--primary-color, #9E7E5D);
+    border-color: var(--primary);
 }
 
 .loadingIndicator {
