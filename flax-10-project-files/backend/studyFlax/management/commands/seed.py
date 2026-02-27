@@ -12,7 +12,7 @@ from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
     module_fixtures, location_fixtures
 )
-from studyFlax.fixtures.society_fixtures import build_society_seed_data
+from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
@@ -297,7 +297,6 @@ class Command(BaseCommand):
             self._create_event_from_template(society, event_template, tags)
 
     def _create_event_from_template(self, society, template, tags):
-        from .seed_helpers import build_event_datetime
         title, desc, hour, duration, recurrence, day = template
         start, end = build_event_datetime(hour, duration, day)
         SocietyEvent.objects.get_or_create(
