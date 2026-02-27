@@ -33,7 +33,7 @@ export function MiniTimeline({
   onConflictAutoMove,
   onDelete,
   onReschedule,
-  getTag,
+  getTag = null,
   completedEventIds = new Set(),
   onToggleComplete,
   hasTimerSession,
@@ -147,11 +147,12 @@ export function MiniTimeline({
           completedEventIds={completedEventIds}
           selectedDate={selectedDate}
           isToday={isToday}
+          getTag={getTag}
           styles={styles}
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, onQuickStart, onEdit, onCardClick, onHarvestToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, styles]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, onQuickStart, onEdit, onCardClick, onHarvestToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, isToday, styles]
   );
 
   return (

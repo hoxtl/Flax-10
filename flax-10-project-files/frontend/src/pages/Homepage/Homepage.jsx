@@ -26,6 +26,7 @@ import { getSeedsPerDayThisWeek } from "../../lib/weeklySeedCount";
 import { playZenChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 
+import ZenGardenEmptyState from "../../components/ZenGardenEmptyState";
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
@@ -1002,31 +1003,49 @@ export default function Homepage({ onNavigate }) {
           />
         }
         slot2Health={
-          <div className={styles.intRowProgressWrap}>
-            <div className={styles.intRowProgressStats}>
-              <span className={styles.intRowProgressBig}>{Math.round(actionHubSpineCompletedPct)}%</span>
-              <span className={styles.intRowProgressLabel}>done today</span>
-              {dayProgressStatus && (
-                <span className={`${styles.intRowProgressStatusBadge} ${
-                  dayProgressStatus === "ahead"
-                    ? styles.intRowProgressStatusAhead
-                    : dayProgressStatus === "ontrack"
-                      ? styles.intRowProgressStatusOntrack
-                      : styles.intRowProgressStatusBehind
-                }`}>
-                  {dayProgressStatus === "ahead" ? "Ahead" : dayProgressStatus === "ontrack" ? "On track" : "Behind"}
-                </span>
-              )}
+          actionHubSpineCompletedPct === 100 && actionHubItemsOnly.length > 0 ? (
+            /* All done — seedling celebration */
+            <ZenGardenEmptyState
+              illustrationVariant="seedling"
+              message="Every task planted. Day complete."
+              sub={`${actionHubCompletedCount} done today. Take a moment — you earned it.`}
+            />
+          ) : actionHubSpineCompletedPct === 0 ? (
+            /* Nothing done yet — cat empty state */
+            <ZenGardenEmptyState
+              message={
+                actionHubItemsOnly.length === 0
+                  ? "Your slate is clean."
+                  : `${actionHubItemsOnly.length} task${actionHubItemsOnly.length !== 1 ? "s" : ""} waiting.`
+              }
+              sub={actionHubItemsOnly.length === 0 ? "Add something worth doing today." : "First one's always the hardest — just start."}
+            />
+          ) : (
+            /* In progress — normal progress display */
+            <div className={styles.intRowProgressWrap}>
+              <div className={styles.intRowProgressStats}>
+                <span className={styles.intRowProgressBig}>{Math.round(actionHubSpineCompletedPct)}%</span>
+                <span className={styles.intRowProgressLabel}>done today</span>
+                {dayProgressStatus && (
+                  <span className={`${styles.intRowProgressStatusBadge} ${
+                    dayProgressStatus === "ahead"
+                      ? styles.intRowProgressStatusAhead
+                      : dayProgressStatus === "ontrack"
+                        ? styles.intRowProgressStatusOntrack
+                        : styles.intRowProgressStatusBehind
+                  }`}>
+                    {dayProgressStatus === "ahead" ? "Ahead" : dayProgressStatus === "ontrack" ? "On track" : "Behind"}
+                  </span>
+                )}
+              </div>
+              <div className={styles.intRowProgressBarTrack}>
+                <div className={styles.intRowProgressBarFill} style={{ width: `${actionHubSpineCompletedPct}%` }} />
+              </div>
+              <p className={styles.intRowProgressSub}>
+                {`${actionHubRemainingCount} TASK${actionHubRemainingCount !== 1 ? "S" : ""} REMAINING`}
+              </p>
             </div>
-            <div className={styles.intRowProgressBarTrack}>
-              <div className={styles.intRowProgressBarFill} style={{ width: `${actionHubSpineCompletedPct}%` }} />
-            </div>
-            <p className={styles.intRowProgressSub}>
-              {actionHubRemainingCount === 0
-                ? "ALL TASKS COMPLETE"
-                : `${actionHubRemainingCount} TASK${actionHubRemainingCount !== 1 ? "S" : ""} REMAINING`}
-            </p>
-          </div>
+          )
         }
         slot3Urgent={
           <div className={styles.intRowSlotContent}>
