@@ -2,8 +2,7 @@ import { useState, useRef, useEffect} from 'react';
 import {ChevronDown, Check} from 'lucide-react';
 import styles from './ModuleDropdown.module.css';
 
-export default function ModuleDropdown({value, onChange, options}) {
-    const [is_open, setIsOpen] = useState(false);
+function useDropdown() {
     const ref = useRef(null);
 
     useEffect(() => {
@@ -13,7 +12,11 @@ export default function ModuleDropdown({value, onChange, options}) {
         document.addEventListener('mousedown', handleClickOutside);
         return() => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+    return {is_open, setIsOpen, ref};
+}
 
+export default function ModuleDropdown({value, onChange, options}) {
+    const [is_open, setIsOpen, ref] = useDropdown();
     const selected = options.find(opt => opt.value === value);
     return (
         <div className={styles.wrapper} ref={ref}>
@@ -27,10 +30,7 @@ export default function ModuleDropdown({value, onChange, options}) {
                         <button key ={opt.value} className={styles.option} onClick={() => {onChange(opt.value); setIsOpen(false);}}>
                             <span>{opt.label}</span>
                                 {value === opt.value && <Check size={13} className={styles.check} />}
-                        </button>
-                    ))}
+                        </button> ))}
                 </div>
-            )}
-        </div>
-    );
+            )}</div> );
 }
