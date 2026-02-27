@@ -659,7 +659,8 @@
 
 .tflLegTime {
   font-size: 0.68rem;
-  color: rgba(43, 30, 20, 0.45);
+  color: var(--c-grey);
+  opacity: 0.45;
   font-style: italic;
 }
 
