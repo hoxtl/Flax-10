@@ -1,0 +1,36 @@
+import { useState, useRef, useEffect} from 'react';
+import {ChevronDown, Check} from 'lucide-react';
+import styles from './ModuleDropdown.module.css';
+
+export default function ModuleDropdown({value, onChange, options}) {
+    const [is_open, setIsOpen] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return() => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const selected = options.find(opt => opt.value === value);
+    return (
+        <div className={styles.wrapper} ref={ref}>
+            <button className={styles.trigger} onClick={()=> setIsOpen(!is_open)}>
+                <span>{selected?.label}</span>
+                <ChevronDown size={14} className={`${styles.chevron} ${is_open ? styles.chevronOpen: ''}`} />
+            </button>
+            {is_open && (
+                <div className={styles.menu}>
+                    {options.map(opt => (
+                        <button key ={opt.value} className={styles.option} onClick={() => {onChange(opt.value); setIsOpen(false);}}>
+                            <span>{opt.label}</span>
+                                {value === opt.value && <Check size={13} className={styles.check} />}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
