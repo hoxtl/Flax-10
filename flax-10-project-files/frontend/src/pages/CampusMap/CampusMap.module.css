@@ -718,3 +718,14 @@
   flex-direction: column;
   gap: 8px;
 }
+
+.disruptionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--c-brown);
+  opacity: 0.06;
+  border: 1px solid rgba(var(--c-brown), 0.35);
+  border-radius: 8px;
+}
