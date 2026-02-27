@@ -207,9 +207,15 @@ SOCIETY_DATA = [
     ('Quiz Society', 'Test your knowledge.', 'Weekly pub quizzes.', 'social', ['Quiz', 'Social', 'Competition']),
     ('Networking Society', 'Make connections.', 'Networking events.', 'social', ['Networking', 'Social', 'Workshop']),
 
-    # Professional (2)
+    # Professional (8)
     ('Investment Society', 'Markets and trading.', 'Workshops and competitions.', 'professional', ['Workshop', 'Competition', 'Networking']),
     ('Law Society', 'For future lawyers.', 'Mooting and networking.', 'professional', ['Mooting', 'Networking', 'Workshop']),
+    ('Consulting Society', 'Business strategy.', 'Case competitions and talks.', 'professional', ['Competition', 'Workshop', 'Networking']),
+    ('Entrepreneurship Society', 'Start something new.', 'Pitch events and mentorship.', 'professional', ['Pitch', 'Workshop', 'Networking']),
+    ('Marketing Society', 'Brand and promote.', 'Marketing workshops and events.', 'professional', ['Workshop', 'Competition', 'Networking']),
+    ('Finance Society', 'Money matters.', 'Industry talks and workshops.', 'professional', ['Workshop', 'Networking', 'Competition']),
+    ('Data Science Society', 'Insights from data.', 'Workshops and projects.', 'professional', ['Workshop', 'Project', 'Networking']),
+    ('Product Management Society', 'Building products.', 'PM workshops and case studies.', 'professional', ['Workshop', 'Case Study', 'Networking']),
 
     # Volunteering (3)
     ('Volunteering Society', 'Give back.', 'Regular volunteering.', 'volunteering', ['Volunteering', 'Social', 'Community']),
