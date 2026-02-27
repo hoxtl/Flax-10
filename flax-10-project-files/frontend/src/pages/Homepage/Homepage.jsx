@@ -964,6 +964,11 @@ export default function Homepage({ onNavigate }) {
     [refetchTasks, showHarvestToast]
   );
 
+  const fmtTimerSecs = (s) => {
+    const t = Math.max(0, s);
+    return `${Math.floor(t / 60).toString().padStart(2, "0")}:${(t % 60).toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className={`${styles.page} ${hasTimerSession ? styles.focusModeActive : ""}`}>
       {toast && (
@@ -977,6 +982,24 @@ export default function Homepage({ onNavigate }) {
   )}
 
       <div>
+      {/* Active focus session banner */}
+      {hasTimerSession && (
+        <div className={styles.focusBanner}>
+          <div className={styles.focusBannerLeft}>
+            <span className={`${styles.focusBannerBadge} ${timerMode === "break" ? styles.focusBannerBadgeBreak : ""}`}>
+              {timerMode === "break" ? "BREAK" : "FOCUS"}
+            </span>
+            {timerTask && <span className={styles.focusBannerTask}>{timerTask}</span>}
+          </div>
+          <div className={styles.focusBannerRight}>
+            <span className={styles.focusBannerTime}>{fmtTimerSecs(timeLeft)}</span>
+            <button type="button" className={styles.focusBannerBtn} onClick={() => navigate("/timer")}>
+              Open timer →
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Intelligence Row — Monochrome Bento with real time-management data */}
       <div className={styles.intelligenceRowWrap}>
       <IntelligenceRow
@@ -1000,6 +1023,8 @@ export default function Homepage({ onNavigate }) {
             getTaskCategoryPill={getTaskCategoryPill}
             handleActionHubComplete={handleActionHubComplete}
             actionHubRef={actionHubRef}
+            hasTimerSession={hasTimerSession}
+            onStartFocus={() => navigate("/timer")}
           />
         }
         slot2Health={
@@ -1170,6 +1195,36 @@ export default function Homepage({ onNavigate }) {
             const cStr = scheduleCountdownSecs != null && isToday(selectedDate)
               ? formatScheduleCountdown(scheduleCountdownSecs)
               : null;
+
+            // Active focus session overrides schedule view
+            if (hasTimerSession) {
+              const isBreak = timerMode === "break";
+              const totalSecs = (isBreak ? (breakTime || 5) : (workTime || 25)) * 60;
+              const pct = Math.max(0, Math.min(100, ((totalSecs - Math.max(0, timeLeft)) / totalSecs) * 100));
+              return (
+                <div className={styles.intRowNowSection}>
+                  <div className={styles.intRowNowItem}>
+                    <span className={`${styles.intRowNowBadge} ${isBreak ? styles.intRowNowBadgeFree : styles.intRowNowBadgeNow}`}>
+                      {isBreak ? "BREAK" : "FOCUS"}
+                    </span>
+                    <div className={styles.intRowNowItemBody}>
+                      <span className={styles.intRowNowItemTitle}>
+                        {timerTask || (isBreak ? "Break time" : "Focus session")}
+                      </span>
+                      <span className={styles.intRowNowItemTime}>
+                        {fmtTimerSecs(Math.max(0, timeLeft))} remaining
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.intRowNowTimerTrack}>
+                    <div className={styles.intRowNowTimerFill} style={{ width: `${pct}%` }} />
+                  </div>
+                  <button type="button" className={styles.intRowNowTimerBtn} onClick={() => navigate("/timer")}>
+                    Open timer →
+                  </button>
+                </div>
+              );
+            }
 
             if (nav.state === "task" && nav.currentBlock?.title) {
               const startLabel = nav.currentBlock.start_time

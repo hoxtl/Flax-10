@@ -23,6 +23,8 @@ export function ActionHubSlot({
   getTaskCategoryPill,
   handleActionHubComplete,
   actionHubRef,
+  hasTimerSession,
+  onStartFocus,
 }) {
   const visibleList = showAllActionHubTasks
     ? actionHubList
@@ -34,7 +36,7 @@ export function ActionHubSlot({
   ).length;
 
   return (
-    <div ref={actionHubRef}>
+    <div ref={actionHubRef} className={styles.actionHubSlotRoot}>
       {/* Summary chips */}
       {isToday && (actionHubOverdueCount > 0 || dueTodayCount > 0) && (
         <div className={styles.actionHubSummaryRow}>
@@ -137,6 +139,12 @@ export function ActionHubSlot({
               onClick={() => setShowAllActionHubTasks((v) => !v)}
             >
               {showAllActionHubTasks ? "Show less" : `+ ${hiddenCount} more`}
+            </button>
+          )}
+
+          {!hasTimerSession && onStartFocus && (
+            <button type="button" className={styles.actionHubFocusCta} onClick={onStartFocus}>
+              ▶ Start a focus session
             </button>
           )}
 
