@@ -182,7 +182,7 @@ lecture_theatre_fixtures = (
     "K0.16 Lecture Theatre, King's Building, Strand, London WC2R 2LS",
     "Nash Lecture Theatre, Strand Building, Strand, London WC2R 2LS",
     "Great Hall, Strand Campus, London WC2R 2LS",
-    "IET Kelvin Lecture Theatre, 2 Savoy Pl, London WC2R 0BL
+    "IET Kelvin Lecture Theatre, 2 Savoy Pl, London WC2R 0BL",
 
     # Waterloo Campus
     "FWB B5 Lecture Theatre, Franklin-Wilkins Building, London SE1 9NH",
