@@ -472,4 +472,10 @@
     font-weight: 700;
     color: white;
   }
+
+  .mobileSubtext {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 5px;
+  }
 }
