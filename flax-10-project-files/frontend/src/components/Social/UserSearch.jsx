@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { searchUsers } from '../../api/userService';
-import FollowButton from './FollowButton';
+import ShareButton from './ShareButton';
 import styles from './Social.module.css';
 
 async function fetchSearchResults(query, setResults, setLoading) {
@@ -61,7 +61,7 @@ function UserResultItem({ user, onSelect }) {
                 </div>
             </div>
             <div onClick={(e) => e.stopPropagation()}>
-                <FollowButton userId={user.id} initialIsFollowing={user.is_following ?? false} />
+                <ShareButton userId={user.id} initialIsSharing={user.is_sharing ?? false} />
             </div>
         </div>
     );

@@ -8,7 +8,8 @@ import { ProfileCalendar } from "./ProfileCalendar";
 import { useProfileSummary } from "./hooks/useProfileSummary";
 import analyticsService from "../../api/analyticsService";
 import { fetchApi } from "../../api/client";
-import FollowButton from "../../components/Social/FollowButton";
+import { format } from 'date-fns';
+import ShareButton from '../Social/ShareButton';
 
 // ---------------------------------------------------------------------------
 // Header
@@ -43,8 +44,10 @@ function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSel
           <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
         </>
       )}
-      <StatItem value={profileData?.follower_count || 0} label="followers" onClick={onFollowersClick} />
-      <StatItem value={profileData?.following_count || 0} label="following" onClick={onFollowingClick} />
+      <StatItem value={profileData?.shared_by_count || 0} label="shared by" onClick={onFollowersClick} />
+      {isSelf && (
+        <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onFollowingClick} />
+      )}
     </div>
   );
 }
@@ -69,9 +72,9 @@ function ProfileHeaderTop({ user, onEditProfile, isSelf }) {
         <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
       ) : (
         <div className={styles.followAction}>
-          <FollowButton
+          <ShareButton
             userId={user?.id}
-            initialIsFollowing={user?.is_following}
+            initialIsSharing={user?.is_sharing}
             onToggle={(newState) => {
               user?.setOptimisticFollow?.(newState);
               user?.reload?.();
@@ -615,14 +618,13 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       />
       <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
 
-      {!isMutualOrSelf ? (
-        <div className={styles.privateMessage}>
-          🔒 Become mutuals to see each other's calendar and plan meetings smoothly
-        </div>
+      <div className={styles.privateMessage}>
+        🔒 This user has not shared their calendar with you.
+      </div>
       ) : (
-        <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-          <ProfileCalendar events={filteredEvents} />
-        </div>
+      <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+        <ProfileCalendar events={filteredEvents} />
+      </div>
       )}
       <ProfileHome onNavigate={onNavigate} />
     </div>
@@ -633,14 +635,14 @@ function ProfileBody({ user, state, onNavigate }) {
   const { filteredEvents, modules } = useProfileBodyData(state);
   const profileData = state.profileData;
   const isSelf = profileData?.username === user?.username || !profileData;
-  const isMutualOrSelf = isSelf || profileData?.is_mutual_following;
+  const isSharedOrSelf = isSelf || profileData?.is_shared_with_me;
 
   return (
     <div className={styles.container}>
       <ProfileContent
         user={user}
         state={state}
-        isMutualOrSelf={isMutualOrSelf}
+        isMutualOrSelf={isSharedOrSelf}
         isSelf={isSelf}
         onNavigate={onNavigate}
       />
@@ -649,7 +651,7 @@ function ProfileBody({ user, state, onNavigate }) {
         state={state}
         modules={modules}
         filteredEvents={filteredEvents}
-        isMutualOrSelf={isMutualOrSelf}
+        isMutualOrSelf={isSharedOrSelf}
         onNavChange={state.onNavChange}
       />
     </div>
