@@ -97,31 +97,6 @@
     background: var(--hover);
     color: var(--text);
 }
-.filterSelect {
-    padding: 0.625rem 1rem;
-    margin-left: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 180px;
-    font-weight: 500;
-}
-.filterSelect:hover {
-    border-color: var(--primary);
-}
-.filterSelect:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
-}
-.filterSelect option {
-    background: var(--panel);
-    color: var(--text);
-}
 .loading {
     display: flex;
     flex-direction: column;
