@@ -84,10 +84,10 @@ class UserSerialiser(serializers.ModelSerializer):
         return request.build_absolute_uri(obj.profile_photo.url) if request else None
 
     def get_shared_by_count(self, obj):
-        return obj.followers.count()
+        return obj.following.count()
 
     def get_shared_with_count(self, obj):
-        return obj.following.count()
+        return obj.followers.count()
 
     def get_is_shared_with_me(self, obj):
         # Has obj shared their calendar with request.user?

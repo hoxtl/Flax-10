@@ -6,13 +6,20 @@ User = get_user_model()
 
 class FollowUserSerializer(serializers.ModelSerializer):
     """Serializer for displaying simple user info in follow lists."""
-    is_following = serializers.SerializerMethodField()
+    is_sharing = serializers.SerializerMethodField()
+    is_shared_with_me = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'is_following')
+        fields = ('id', 'username', 'first_name', 'last_name', 'is_sharing', 'is_shared_with_me')
 
-    def get_is_following(self, obj):
+    def get_is_sharing(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.following.filter(followed=request.user).exists()
+        return False
+
+    def get_is_shared_with_me(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.followers.filter(follower=request.user).exists()

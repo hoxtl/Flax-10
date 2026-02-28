@@ -39,18 +39,18 @@ function useProfileData(userId) {
 
   const reload = () => tryLoadProfile(setProfileData, setLoading, userId);
 
-  const setOptimisticFollow = (isFollowing) => {
+  const setOptimisticShare = (isSharing) => {
     setProfileData(prev => {
       if (!prev) return prev;
       return {
         ...prev,
-        is_following: isFollowing,
-        follower_count: Math.max(0, prev.follower_count + (isFollowing ? 1 : -1))
+        is_sharing: isSharing,
+        shared_by_count: Math.max(0, (prev.shared_by_count || 0) + (isSharing ? 1 : -1))
       };
     });
   };
 
-  return { profileData, loading, reload, setOptimisticFollow };
+  return { profileData, loading, reload, setOptimisticShare };
 }
 
 function useEventsData(userId) {
@@ -78,13 +78,13 @@ function useModalState() {
 }
 
 export function useProfileState(userId) {
-  const { profileData, loading, reload, setOptimisticFollow } = useProfileData(userId);
+  const { profileData, loading, reload, setOptimisticShare } = useProfileData(userId);
   const eventsState = useEventsData(userId);
   const modalState = useModalState();
   const handleSaveProfile = async () => {
     await reload();
   };
-  return { profileData, loading, handleSaveProfile, reload, setOptimisticFollow, ...eventsState, ...modalState };
+  return { profileData, loading, handleSaveProfile, reload, setOptimisticShare, ...eventsState, ...modalState };
 }
 
 export function useProfileBodyData(state) {
@@ -96,10 +96,10 @@ export function useProfileBodyData(state) {
 }
 
 export function useProfileContent(state) {
-  const { profileData, reload, setOptimisticFollow, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowFollowers, setShowFollowing } = state;
+  const { profileData, reload, setOptimisticShare, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowFollowers, setShowFollowing } = state;
   const handlers = {
     reload,
-    setOptimisticFollow,
+    setOptimisticShare,
     onModulesClick: () => setShowModules(true),
     onTasksClick: () => setShowTasks(true),
     onEventsClick: () => setShowEvents(true),

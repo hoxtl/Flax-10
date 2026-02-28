@@ -159,7 +159,7 @@ function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
       <SocialDataModal
         isOpen={state.showFollowers}
         onClose={() => state.setShowFollowers(false)}
-        title="Followers"
+        title="Shared With"
         fetchFn={getFollowers}
         userId={(profileData || user)?.id}
         onNavChange={onNavChange}
@@ -167,7 +167,7 @@ function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
       <SocialDataModal
         isOpen={state.showFollowing}
         onClose={() => state.setShowFollowing(false)}
-        title="Following"
+        title="Shared By"
         fetchFn={getFollowing}
         userId={(profileData || user)?.id}
         onNavChange={onNavChange}
