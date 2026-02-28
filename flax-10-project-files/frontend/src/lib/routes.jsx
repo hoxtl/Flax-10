@@ -11,7 +11,7 @@ import AttendancePage from "../pages/Attendance/AttendancePage";
 export const APP_ROUTES = [
     { id: "home", label: "Home", icon: "🏠", path: "/", element: <Home /> },
     { id: "calendar", label: "Calendar", icon: "🗓️", path: "/calendar", element: <CalendarPage /> },
-    { id: "attendance", label: "Attendance", icon: "✅", path: "/attendance", element: <AttendancePage /> },
+    { id: "attendance", label: "Attendance", icon: "📋", path: "/attendance", element: <AttendancePage /> },
     { id: "timer", label: "Timer", icon: "⏲️", path: "/timer", element: <TimerPage /> },
     { id: "societies", label: "Societies", icon: "👨‍👨‍👧‍👧", path: "/societies", element: <SocietiesPage /> },
     { id: "modules", label: "Modules", icon: "📚", path: "/modules", element: <ModulesPage /> },
