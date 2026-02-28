@@ -211,12 +211,33 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 }
 
 function DashboardContent({ activeNav, setActiveNav, user }) {
-  if (activeNav === "settings") return <Settings user={user} onBack={() => setActiveNav("home")} />;
-  if (activeNav === "profile") return <Profile user={user} onBack={() => setActiveNav("home")} onNavChange={setActiveNav} />;
+  if (activeNav === "settings") {
+    return <Settings user={user} onBack={() => setActiveNav("home")} />;
+  }
+
+  if (activeNav === "profile") {
+    return (
+      <Profile
+        user={user}
+        onBack={() => setActiveNav("home")}
+        onNavigate={setActiveNav}
+      />
+    );
+  }
+
   if (activeNav.startsWith("profile_")) {
     const viewedUserId = activeNav.split("_")[1];
-    return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} onNavChange={setActiveNav} />;
+
+    return (
+      <Profile
+        user={user}
+        viewedUserId={viewedUserId}
+        onBack={() => setActiveNav("home")}
+        onNavigate={setActiveNav}
+      />
+    );
   }
+
   return resolveRouteContent(activeNav, user, setActiveNav);
 }
 

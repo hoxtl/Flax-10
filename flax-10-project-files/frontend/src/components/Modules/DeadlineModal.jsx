@@ -20,7 +20,7 @@ export default function DeadlineModal({ module, onClose }) {
 function ModalHeader({ module, onClose }) {
     return (
         <div className={styles.header}>
-            <h3 className={styles.title}>📋 {module.module_code} — Deadlines</h3>
+            <h3 className={styles.title}> {module.module_code} — Deadlines</h3>
             <button className={styles.closeBtn} onClick={onClose}>×</button>
         </div>
     );
