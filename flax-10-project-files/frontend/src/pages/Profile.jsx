@@ -132,6 +132,22 @@ function ProfileHeader({ user, profileData, onEditProfile, stats }) {
           Edit profile
         </button>
       </div>
+
+      <div className={styles.mobileSummaryCard}>
+        <h3 className={styles.summaryTitle}>My Profile Summary</h3>
+        <div className={styles.summaryLine}>
+          <span>Level:</span>
+          <strong>{profileData?.year || "No Year"}</strong>
+        </div>
+        <div className={styles.summaryLine}>
+          <span>Major:</span>
+          <strong>{profileData?.major || "No Major"}</strong>
+        </div>
+        <div className={styles.summaryLine}>
+          <span>Account:</span>
+          <strong>{user?.username || "noUsername"}</strong>
+        </div>
+      </div>
     </div>
   );
 }
