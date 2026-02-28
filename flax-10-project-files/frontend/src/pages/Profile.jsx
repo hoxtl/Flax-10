@@ -126,6 +126,12 @@ function ProfileHeader({ user, profileData, onEditProfile, stats }) {
           <span className={styles.statLabel}>Events</span>
         </div>
       </div>
+
+      <div className={styles.actionArea}>
+        <button className={styles.mobileEditBtn} onClick={onEditProfile}>
+          Edit profile
+        </button>
+      </div>
     </div>
   );
 }
