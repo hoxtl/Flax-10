@@ -495,4 +495,16 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     border: 1px solid #eee;
   }
+
+  .statNumber {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+
+  .statLabel {
+    font-size: 12px;
+    color: #666;
+  }
 }
