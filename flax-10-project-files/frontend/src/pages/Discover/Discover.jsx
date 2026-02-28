@@ -1,25 +1,19 @@
 import { useState, useEffect } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
-import FollowButton from "../../components/Social/FollowButton";
+import ShareButton from "../../components/Social/ShareButton";
 
 function UserCard({ user, onNavChange }) {
     return (
-        <div className={styles.userCard} onClick={() => onNavChange(`profile_${user.id}`)}>
-            <div className={styles.avatar}>
-                {user.first_name?.[0] || user.username[0]}
-            </div>
-            <div className={styles.userInfo}>
-                <div className={styles.name}>{user.first_name} {user.last_name}</div>
-                <div className={styles.username}>@{user.username}</div>
-                <div className={styles.courseInfo}>
-                    {user.year && <span>{user.year}</span>}
-                    {user.major && <span> • {user.major}</span>}
+        <div className={styles.userCard}>
+            <div className={styles.userInfo} onClick={() => onNavChange?.("user_" + user.id)}>
+                <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
+                <div className={styles.userNameDetails}>
+                    <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
+                    <span className={styles.userHandle}>@{user.username}</span>
                 </div>
             </div>
-            <div className={styles.actions}>
-                <FollowButton userId={user.id} initialIsFollowing={user.is_following} />
-            </div>
+            <ShareButton userId={user.id} initialIsSharing={user.is_sharing ?? false} />
         </div>
     );
 }
