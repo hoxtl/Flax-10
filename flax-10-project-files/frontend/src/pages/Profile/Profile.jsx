@@ -119,17 +119,16 @@ function ModulesGrid({ modules, onNavigate, isSelf }) {
   return (
     <div className={styles.modulesGrid}>
       {modules.map((code, i) => {
-        const Wrapper = isSelf ? 'button' : 'div';
         return (
-          <Wrapper
+          <button
             key={i}
             className={styles.moduleCard}
-            onClick={() => isSelf && onNavigate?.(`modules_${code}`)}
-            style={{ cursor: isSelf ? 'pointer' : 'default' }}
+            onClick={() => onNavigate?.(`modules_${code}`)}
+            style={{ cursor: 'pointer' }}
           >
             <span className={styles.moduleIcon}>📚</span>
             <span className={styles.moduleCode}>{code}</span>
-          </Wrapper>
+          </button>
         );
       })}
     </div>
