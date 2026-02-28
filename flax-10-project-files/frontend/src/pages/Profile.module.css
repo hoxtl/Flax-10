@@ -432,3 +432,13 @@
 .rangeSelector button {
   padding: 10px 20px;
 }
+
+@media (max-width: 768px) {
+
+  .headerContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg);
+    min-height: 100vh;
+  }
+}
