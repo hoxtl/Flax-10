@@ -91,26 +91,25 @@ function ProfileBio({ user, profileData }) {
   );
 }
 
-function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEventsClick, onEditProfile, upcomingEventCount }) {
-  const fullName = user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "Guest";
-  const username = user?.username || "guest";
-  const year = profileData?.year || user?.year || "Year 2";
-  const major = profileData?.major || user?.major || "Computer Science";
-
-  const moduleCount = profileData?.module_count || 0;
-  const taskCount = profileData?.task_count || 0;
-  const eventCount = profileData?.event_count || 0;
+function ProfileHeader({ user, profileData, onEditProfile, stats }) {
+  const initials = user?.name ? getInitials(user.name) : "JD";
 
   return (
-    <div className={styles.header}>
-      <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
-      <div className={styles.headerInfo}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.username}>{user?.username || "guest"}</h1>
-          <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
+    <div className={styles.headerContainer}>
+      <div className={styles.mobileHero}>
+        <div className={styles.avatarWrapper}>
+          <div className={styles.mainAvatar}>
+            {profileData?.profile_photo_url ? (
+              <img src={profileData.profile_photo_url} alt="Profile" />
+            ) : (
+              initials
+            )}
+          </div>
         </div>
-        <ProfileStats profileData={profileData} upcomingEventCount={upcomingEventCount} onModulesClick={onModulesClick} onTasksClick={onTasksClick} onEventsClick={onEventsClick} />
-        <ProfileBio user={user} profileData={profileData} />
+        <h1 className={styles.mobileName}>{user?.name || "Default Name"}</h1>
+        <p className={styles.mobileSubtext}>
+          {profileData?.year || "Year _"} · {profileData?.major || "Placeholder"}
+        </p>
       </div>
     </div>
   );
