@@ -26,6 +26,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (location.state?.activeTab) {
             window.history.replaceState({}, document.title);
         }
