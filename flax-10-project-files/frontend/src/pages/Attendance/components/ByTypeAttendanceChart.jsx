@@ -2,7 +2,7 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import styles from "../AttendancePage.module.css";
 
 /** Single responsibility: render by-type pie chart. */
-export default function ByTypeAttendanceChart({ data }) {
+export default function ByTypeAttendanceChart({ data, onSegmentClick }) {
   if (!data.length) {
     return <p className={styles.noData}>No data by type yet.</p>;
   }
@@ -36,6 +36,15 @@ export default function ByTypeAttendanceChart({ data }) {
         margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
         slotProps={{ legend: { hidden: true } }}
         sx={{ "& .MuiChartsLegend-label": { fill: "var(--text) !important" } }}
+        onItemClick={
+          onSegmentClick
+            ? (ev, identifier, item) => {
+                const label =
+                  item?.label ?? data[identifier?.dataIndex]?.label;
+                if (label) onSegmentClick("byType", label);
+              }
+            : undefined
+        }
       />
       <div className={styles.legend}>
         {data.map(({ label, value }) => (
