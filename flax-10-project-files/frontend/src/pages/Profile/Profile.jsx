@@ -32,7 +32,7 @@ function StatItem({ value, label, onClick }) {
   );
 }
 
-function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSelf }) {
+function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
   const { onModulesClick, onTasksClick, onEventsClick, onFollowersClick, onFollowingClick } = handlers;
   return (
     <div className={styles.stats}>
@@ -43,9 +43,8 @@ function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSel
           <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
         </>
       )}
-      <StatItem value={profileData?.shared_by_count || 0} label="shared by" onClick={onFollowersClick} />
       {isSelf && (
-        <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onFollowingClick} />
+        <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onFollowersClick} />
       )}
     </div>
   );
@@ -75,7 +74,7 @@ function ProfileHeaderTop({ user, onEditProfile, isSelf }) {
             userId={user?.id}
             initialIsSharing={user?.is_sharing}
             onToggle={(newState) => {
-              user?.setOptimisticFollow?.(newState);
+              user?.setOptimisticShare?.(newState);
               user?.reload?.();
             }}
           />
@@ -94,6 +93,7 @@ function ProfileHeaderInfo({ user, profileData, upcomingEventCount, handlers, is
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}
         isMutualOrSelf={isMutualOrSelf}
+        isSelf={isSelf}
       />
       <ProfileBio user={user} profileData={profileData} />
     </div>
@@ -105,7 +105,7 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
     <div className={styles.header}>
       <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
       <ProfileHeaderInfo
-        user={{ ...user, reload: handlers.reload, setOptimisticFollow: handlers.setOptimisticFollow }}
+        user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }}
         profileData={profileData}
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}
