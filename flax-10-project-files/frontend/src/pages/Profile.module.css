@@ -441,4 +441,13 @@
     background-color: var(--bg);
     min-height: 100vh;
   }
+
+  .mobileHero {
+    background: linear-gradient(180deg, #4b3621 0%, #2d1e12 100%);
+    padding: 50px 20px 60px;
+    text-align: center;
+    color: white;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+  }
 }
