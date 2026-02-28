@@ -29,8 +29,13 @@ from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
 from studyFlax.views.calendar.timetable_views import timetable_import
+<<<<<<< HEAD
 
 # Modules
+=======
+from studyFlax.views.calendar.attendance_views import record_attendance, attendance_stats, attendance_records
+from studyFlax.views.hello import hello
+>>>>>>> 6e85fccd (Wire attendance URLs (record, stats, records))
 from studyFlax.views.modules.module_views import module_list, module_detail
 from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
 
@@ -116,6 +121,11 @@ urlpatterns = [
     path("tasks/<int:task_id>/log-time/", log_task_time, name="task-log-time"),
     path("tasks/lists/", task_list_list, name="task-list-list"),
     path("tasks/lists/<int:list_id>/", task_list_detail, name="task-list-detail"),
+
+    # Attendance
+    path("attendance/record/", record_attendance, name="attendance-record"),
+    path("attendance/stats/", attendance_stats, name="attendance-stats"),
+    path("attendance/records/", attendance_records, name="attendance-records"),
 
     # Notifications
     path("notifications/", notification_list, name="notification-list"),
