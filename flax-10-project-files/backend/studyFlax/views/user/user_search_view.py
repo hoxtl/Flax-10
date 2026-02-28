@@ -17,8 +17,9 @@ def user_search(request):
         users = users.filter(
             Q(username__icontains=query) |
             Q(first_name__icontains=query) |
-            Q(last_name__icontains=query)
-        )
+            Q(last_name__icontains=query) |
+            Q(enrollments__module__module_code__icontains=query)
+        ).distinct()
         
     users = users[:20]  # Limit results
     serializer = UserSerialiser(users, many=True, context={'request': request})
