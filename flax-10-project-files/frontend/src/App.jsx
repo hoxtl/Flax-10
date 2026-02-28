@@ -11,6 +11,7 @@ import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationToast } from "./components/Notifications";
+import AttendancePrompt from "./components/Attendance/AttendancePrompt";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -158,6 +159,7 @@ function AppProviders({ children }) {
           <TimerProvider>
             {children}
             <NotificationToast />
+            <AttendancePrompt />
           </TimerProvider>
         </TagProvider>
       </CalendarProvider>
