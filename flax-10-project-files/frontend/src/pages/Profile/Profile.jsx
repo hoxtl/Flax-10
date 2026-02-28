@@ -114,15 +114,24 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
   );
 }
 
-function ModulesGrid({ modules }) {
+function ModulesGrid({ modules, onNavigate, isSelf }) {
+  if (!modules?.length) return null;
   return (
     <div className={styles.modulesGrid}>
-      {modules.slice(0, 6).map((code, i) => (
-        <div key={i} className={styles.moduleCard}>
-          <div className={styles.moduleIcon}>📚</div>
-          <div className={styles.moduleCode}>{code}</div>
-        </div>
-      ))}
+      {modules.map((code, i) => {
+        const Wrapper = isSelf ? 'button' : 'div';
+        return (
+          <Wrapper
+            key={i}
+            className={styles.moduleCard}
+            onClick={() => isSelf && onNavigate?.(`modules_${code}`)}
+            style={{ cursor: isSelf ? 'pointer' : 'default' }}
+          >
+            <span className={styles.moduleIcon}>📚</span>
+            <span className={styles.moduleCode}>{code}</span>
+          </Wrapper>
+        );
+      })}
     </div>
   );
 }
@@ -605,7 +614,7 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
         isMutualOrSelf={isMutualOrSelf}
         isSelf={isSelf}
       />
-      <ModulesGrid modules={modules} />
+      <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
 
       {!isMutualOrSelf ? (
         <div className={styles.privateMessage}>
@@ -648,11 +657,12 @@ function ProfileBody({ user, state, onNavigate }) {
   );
 }
 
-export default function Profile({ user, viewedUserId, onBack, onNavChange }) {
+export default function Profile({ user, viewedUserId, onBack, onNavigate, onNavChange }) {
+  const navFn = onNavigate || onNavChange;
   const state = useProfileState(viewedUserId);
-  state.onNavChange = onNavChange;
+  state.onNavChange = navFn;
 
   if (state.loading) return <div className={styles.container}>Loading...</div>;
   if (!state.profileData) return <div className={styles.container}>User not found.</div>;
-  return <ProfileBody user={user} state={state} onNavigate={onNavChange} />;
+  return <ProfileBody user={user} state={state} onNavigate={navFn} />;
 }

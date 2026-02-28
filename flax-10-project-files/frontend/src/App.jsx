@@ -64,11 +64,18 @@ function resolveScreen(authed, user, showWelcome) {
 }
 
 function resolveRouteContent(activeNav, user, setActiveNav) {
-  const route = APP_ROUTES.find((r) => r.id === activeNav) || APP_ROUTES[0];
+  const baseNav = activeNav.split('_')[0];
+  const navParam = activeNav.split('_').slice(1).join('_');
+
+  const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
-    // Inject user and setActiveNav into the component's props
-    return { ...el, props: { ...el.props, user, onNavChange: setActiveNav } };
+    const extraProps = { user, onNavChange: setActiveNav };
+    // Pass the search param to modules view if provided
+    if (baseNav === 'modules' && navParam) {
+      extraProps.initialSearch = navParam;
+    }
+    return { ...el, props: { ...el.props, ...extraProps } };
   }
   return el;
 }

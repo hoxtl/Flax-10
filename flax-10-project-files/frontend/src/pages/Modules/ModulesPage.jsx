@@ -8,10 +8,10 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 
-function useModulesPage() {
+function useModulesPage(initialSearch = '') {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
-    const [search_query, setSearchQuery] = useState('');
+    const [search_query, setSearchQuery] = useState(initialSearch);
     const [filter_mode, setFilterMode] = useState('all');
     const [show_form, setShowForm] = useState(false);
     const [editing_module, setEditingModule] = useState(null);
@@ -21,8 +21,8 @@ function useModulesPage() {
     return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }
 
-export default function ModulesPage() {
-    const state = useModulesPage();
+export default function ModulesPage({ initialSearch = '' }) {
+    const state = useModulesPage(initialSearch);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
     if (hook.loading) return <LoadingView />;
     if (show_form) return <FormView state={state} />;
@@ -75,14 +75,15 @@ function MainView({ state }) {
             <PageHeader is_teacher={is_teacher} onCreateModule={() => { setEditingModule(null); setShowForm(true); }} />
             <Toolbar search_query={search_query} filter_mode={filter_mode} onSearchChange={setSearchQuery} onFilterChange={setFilterMode} />
             {filtered_modules.length === 0
-                ? <EmptyState search_query={search_query} />: <ModuleGrid
+                ? <EmptyState search_query={search_query} /> : <ModuleGrid
                     modules={filtered_modules} enrollments={hook.enrollments} isTeacher={is_teacher}
                     onViewModule={setViewingModule} onEnrollmentToggle={hook.toggleEnrollment}
                     onEdit={(m) => { setEditingModule(m); setShowForm(true); }}
                     onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
                     onManageDeadlines={setDeadlineModule}
-                  />
-            }</div>);}
+                />
+            }</div>);
+}
 
 function LoadingView() {
     return (
