@@ -31,12 +31,12 @@ function UserInfo({ user }) {
     );
 }
 
-function UserItem({ user, currentUser, onUserClick }) {
+function UserItem({ user, currentUser, onUserClick, onUserUpdate }) {
     const isSelf = isCurrentUser(user, currentUser);
     return (
         <div className={styles.userItem} onClick={() => onUserClick?.(user)}>
             <UserInfo user={user} />
-            {!isSelf && <ShareButton userId={user.id} initialIsSharing={user.is_sharing} />}
+            {!isSelf && <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />}
         </div>
     );
 }
@@ -50,16 +50,16 @@ function ModalHeader({ title, onClose }) {
     );
 }
 
-function UserList({ users, currentUser, onUserClick }) {
+function UserList({ users, currentUser, onUserClick, onUserUpdate }) {
     if (users.length === 0) return <p className={styles.emptyText}>No users found.</p>;
     return (
         <div className={styles.userList}>
-            {users.map((u, i) => <UserItem key={u.id || u.username || i} user={u} currentUser={currentUser} onUserClick={onUserClick} />)}
+            {users.map((u, i) => <UserItem key={u.id || u.username || i} user={u} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />)}
         </div>
     );
 }
 
-export default function UserListModal({ title, users, onClose, onUserClick }) {
+export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
     if (!users) return null;
     const currentUser = getCurrentUser();
     const sortedUsers = sortUsers(users, currentUser);
@@ -67,7 +67,7 @@ export default function UserListModal({ title, users, onClose, onUserClick }) {
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <ModalHeader title={title} onClose={onClose} />
-                <UserList users={sortedUsers} currentUser={currentUser} onUserClick={onUserClick} />
+                <UserList users={sortedUsers} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />
             </div>
         </div>
     );

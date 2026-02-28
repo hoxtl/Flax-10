@@ -108,7 +108,7 @@ function TasksModal({ isOpen, onClose }) {
   );
 }
 
-function SocialDataModal({ isOpen, onClose, title, fetchFn, userId, onNavChange }) {
+function SocialDataModal({ isOpen, onClose, title, fetchFn, userId, onNavChange, onUserUpdate }) {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -132,6 +132,7 @@ function SocialDataModal({ isOpen, onClose, title, fetchFn, userId, onNavChange 
         onClose(); // close the modal first
         if (onNavChange) onNavChange(`profile_${u.id}`);
       }}
+      onUserUpdate={onUserUpdate}
     />
   );
 }
@@ -163,6 +164,7 @@ function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
         fetchFn={getFollowers}
         userId={(profileData || user)?.id}
         onNavChange={onNavChange}
+        onUserUpdate={state.reload}
       />
       <SocialDataModal
         isOpen={state.showFollowing}
@@ -171,6 +173,7 @@ function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
         fetchFn={getFollowing}
         userId={(profileData || user)?.id}
         onNavChange={onNavChange}
+        onUserUpdate={state.reload}
       />
     </>
   );
