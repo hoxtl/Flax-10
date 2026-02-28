@@ -13,10 +13,34 @@ export function buildOverallChartData(overall) {
 function normalizeTypeLabel(name) {
   if (!name || typeof name !== "string") return "Other";
   const lower = name.toLowerCase().trim();
+  if (lower.includes("lecture") || lower.includes("lgt")) return "Lecture";
   if (lower.includes("small group") || lower === "smg") return "Small group";
-  if (lower.includes("lecture")) return "Lecture";
   if (lower.includes("practical") || lower.includes("lab")) return "Practical/lab";
   return "Other";
+}
+
+/** Infer type from title/description only (LGT=lecture, SmG=small group, Briefing=other). Returns null if unclear. */
+function inferTypeFromTitleAndDesc(event) {
+  const text = [event?.title, event?.description].filter(Boolean).join(" ");
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  if (lower.includes("briefing")) return "Other";
+  if (lower.includes("lecture") || lower.includes("lgt")) return "Lecture";
+  if (lower.includes("smg") || lower.includes("small group")) return "Small group";
+  if (lower.includes("practical") || lower.includes("lab")) return "Practical/lab";
+  return null;
+}
+
+/** Single responsibility: get normalized type label from an event (title/desc first, then tag). */
+export function getEventTypeLabel(event) {
+  const fromTitle = inferTypeFromTitleAndDesc(event);
+  if (fromTitle != null) return fromTitle;
+  const name =
+    event?.tag_name ??
+    event?.tag_details?.name ??
+    event?.tag?.name ??
+    (typeof event?.tag === "string" ? event.tag : "");
+  return normalizeTypeLabel(name);
 }
 
 const TYPE_COLOR_MAP = {

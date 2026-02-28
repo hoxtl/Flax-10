@@ -8,6 +8,48 @@ from rest_framework.response import Response
 from studyFlax.models import CalendarEvent
 
 
+def _normalize_event_type(name):
+    """Map tag name to display type: Small group, Lecture, Practical/lab, Other."""
+    if not name or not isinstance(name, str):
+        return "Other"
+    lower = name.lower().strip()
+    if "lecture" in lower or "lgt" in lower:
+        return "Lecture"
+    if "small group" in lower or lower == "smg":
+        return "Small group"
+    if "practical" in lower or "lab" in lower:
+        return "Practical/lab"
+    return "Other"
+
+
+def _infer_type_from_title_and_desc(event):
+    """Infer type from title/description only (Briefing=other, then LGT=lecture, SmG=small group)."""
+    title = (getattr(event, "title", None) or "") or ""
+    desc = (getattr(event, "description", None) or "") or ""
+    combined = f"{title} {desc}".lower()
+    if "briefing" in combined:
+        return "Other"
+    if "lecture" in combined or "lgt" in combined:
+        return "Lecture"
+    if "smg" in combined or "small group" in combined:
+        return "Small group"
+    if "practical" in combined or "lab" in combined:
+        return "Practical/lab"
+    return None
+
+
+def _event_type_from_record(record):
+    """Derive display type: title/description first, then tag."""
+    event = getattr(record, "event", None)
+    if not event:
+        return "Other"
+    from_title = _infer_type_from_title_and_desc(event)
+    if from_title is not None:
+        return from_title
+    tag_name = getattr(getattr(event, "tag", None), "name", None) or ""
+    return _normalize_event_type(tag_name)
+
+
 def _validate_event_for_attendance(user, event_id):
     """Return (event, None) on success or (None, detail_string) on failure."""
     if event_id is None:
@@ -36,8 +78,7 @@ def build_attendance_stats(records):
     missed_total = 0
     by_type = defaultdict(lambda: {"attended": 0, "missed": 0})
     for r in records:
-        name = getattr(getattr(r.event, "tag", None), "name", None) if getattr(r, "event", None) else None
-        event_type = (name or "Other").strip()
+        event_type = _event_type_from_record(r)
         if r.attended:
             attended_total += 1
             by_type[event_type]["attended"] += 1
