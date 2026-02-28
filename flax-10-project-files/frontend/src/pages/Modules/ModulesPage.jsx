@@ -88,29 +88,29 @@ function MainView({ state }) {
     return (
         <div className={styles.container}>
             <PageHeader is_teacher={is_teacher} onCreateModule={() => { setEditingModule(null); setShowForm(true); }} />
-            <Toolbar search={search} sorting={sorting} departments={departments}/>
-            <ModuleResults sorting={sorting} hook={hook} is_teacher={is_teacher} setViewingModule={setViewingModule}
-            setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
+            <Toolbar search={search} sorting={sorting} departments={departments} />
+            <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
+                setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
         </div>
     );
 }
 
-function ModuleResults({sorting, hook, is_teacher, setViewingModule, setEditingModule, setShowForm , setDeadlineModule}) {
-    if (sorting.results.length === 0) return <EmptyState />
+function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule }) {
+    if (sorting.results.length === 0) return <EmptyState />;
     return (
         <div>
-            <Pagination current_page={sorting.current_page} total_pages={sorting.total_pages}
-            onPageChange={sorting.setCurrentPage} />
+            <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
             <ModuleGrid
-                modules={sorting.page_modules} enrollments={hook.enrollments} isTeacher={is_teacher}
+                modules={sorting.pageModules} enrollments={hook.enrollments} isTeacher={isTeacher}
                 onViewModule={setViewingModule} onEnrollmentToggle={hook.toggleEnrollment}
-                onEdit={(m) => { setEditingModule(m); setShowForm(true); }} onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
+                onEdit={(m) => { setEditingModule(m); setShowForm(true); }}
+                onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
                 onManageDeadlines={setDeadlineModule}
             />
-            <Pagination current_page = {sorting.current_page} total_pages={sorting.total_pages} onPageChange={sorting.setCurrentPage} />
-            <BackToTop/>
+            <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
+            <BackToTop />
         </div>
-    )
+    );
 }
 
 function LoadingView() {
@@ -146,16 +146,16 @@ function Toolbar({ search, sorting, departments }) {
         {value: 'all', 'label':'All Departments'},
         ...departments.map(d=> ({value:d, label:d})),
     ];
-    const sort_options = [
-        {value:'name', label: 'Sort by Name'},
-        {value: 'deadlines', label: 'Sort by Deadlines'},
+    const sortOptions = [
+        { value: 'name', label: 'Sort by Name' },
+        { value: 'deadlines', label: 'Sort by Deadlines' },
     ];
     return (
         <div className={styles.toolbar}>
             <SearchInput value={search.query} onChange={search.onQueryChange} />
             <ModuleDropdown value={search.filter} onChange={search.onFilterChange} options={filter_options} />
             <ModuleDropdown value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-            <ModuleDropdown value={sorting.sort_by} onChange={sorting.handleNewSort} options={sort_options} />
+            <ModuleDropdown value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
         </div>
     );
 }
