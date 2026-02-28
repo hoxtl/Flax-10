@@ -35,6 +35,17 @@ export default function UserSearch({ onUserSelect }) {
         }
     }, [query, results]);
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handler = (e) => {
+            if (containerRef.current && !containerRef.current.contains(e.target)) {
+                setQuery('');
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
     return (
         <div className={styles.searchContainer} ref={containerRef}>
             <span className={styles.searchIcon}>🔍</span>
