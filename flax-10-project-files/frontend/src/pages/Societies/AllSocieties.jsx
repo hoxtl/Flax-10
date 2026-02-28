@@ -2,9 +2,8 @@ import { useState, useMemo } from "react";
 import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import BasePill from "../../components/Tags/BasePill";
-import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
 import SearchBar from "../../components/common/SearchBar";
-import Pagination from "../../components/common/Pagination/Pagination";
+import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 
 const PAGE_SIZE = 48;
@@ -20,7 +19,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [] }) {
             <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
             <SocietyGrid items={items} onSelect={onSelect} />
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-            <ScrollToTop />
+            <BackToTop />
         </div>
     );
 }
