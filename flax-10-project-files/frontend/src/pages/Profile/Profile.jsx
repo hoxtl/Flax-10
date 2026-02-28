@@ -8,8 +8,7 @@ import { ProfileCalendar } from "./ProfileCalendar";
 import { useProfileSummary } from "./hooks/useProfileSummary";
 import analyticsService from "../../api/analyticsService";
 import { fetchApi } from "../../api/client";
-import { format } from 'date-fns';
-import ShareButton from '../Social/ShareButton';
+import ShareButton from '../../components/Social/ShareButton';
 
 // ---------------------------------------------------------------------------
 // Header
@@ -618,13 +617,14 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       />
       <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
 
-      <div className={styles.privateMessage}>
-        🔒 This user has not shared their calendar with you.
-      </div>
+      {!isMutualOrSelf ? (
+        <div className={styles.privateMessage}>
+          🔒 This user has not shared their calendar with you.
+        </div>
       ) : (
-      <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        <ProfileCalendar events={filteredEvents} />
-      </div>
+        <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+          <ProfileCalendar events={filteredEvents} />
+        </div>
       )}
       <ProfileHome onNavigate={onNavigate} />
     </div>
