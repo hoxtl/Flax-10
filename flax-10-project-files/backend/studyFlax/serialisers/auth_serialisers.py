@@ -43,10 +43,10 @@ class UserSerialiser(serializers.ModelSerializer):
     major = serializers.SerializerMethodField()
     bio = serializers.CharField(read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
-    follower_count = serializers.SerializerMethodField()
-    following_count = serializers.SerializerMethodField()
-    is_following = serializers.SerializerMethodField()
-    is_mutual_following = serializers.SerializerMethodField()
+    shared_by_count = serializers.SerializerMethodField()
+    shared_with_count = serializers.SerializerMethodField()
+    is_shared_with_me = serializers.SerializerMethodField()
+    is_sharing = serializers.SerializerMethodField()
     modules = serializers.SerializerMethodField()
     study_hours_this_week = serializers.SerializerMethodField()
     study_streak = serializers.SerializerMethodField()
@@ -57,7 +57,7 @@ class UserSerialiser(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
-            'follower_count', 'following_count', 'is_following', 'is_mutual_following',
+            'shared_by_count', 'shared_with_count', 'is_shared_with_me', 'is_sharing',
             'modules', 'study_hours_this_week', 'study_streak',
             'role',
             'is_superuser',
@@ -83,19 +83,21 @@ class UserSerialiser(serializers.ModelSerializer):
         request = self.context.get('request')
         return request.build_absolute_uri(obj.profile_photo.url) if request else None
 
-    def get_follower_count(self, obj):
+    def get_shared_by_count(self, obj):
         return obj.followers.count()
 
-    def get_following_count(self, obj):
+    def get_shared_with_count(self, obj):
         return obj.following.count()
 
-    def get_is_following(self, obj):
+    def get_is_shared_with_me(self, obj):
+        # Has obj shared their calendar with request.user?
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.followers.filter(follower=request.user).exists()
         return False
 
-    def get_is_mutual_following(self, obj):
+    def get_is_sharing(self, obj):
+        # Has request.user shared their calendar with obj?
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
@@ -103,9 +105,7 @@ class UserSerialiser(serializers.ModelSerializer):
         if request.user == obj:
             return True
             
-        user_follows_obj = obj.followers.filter(follower=request.user).exists()
-        obj_follows_user = request.user.followers.filter(follower=obj).exists()
-        return user_follows_obj and obj_follows_user
+        return request.user.followers.filter(follower=obj).exists()
 
     def get_modules(self, obj):
         settings = getattr(obj, 'settings', None)
