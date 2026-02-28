@@ -507,4 +507,20 @@
     font-size: 12px;
     color: #666;
   }
+
+  .actionArea {
+    padding: 20px;
+  }
+
+  .mobileEditBtn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    background-color: #3d2b1f;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+  }
 }
