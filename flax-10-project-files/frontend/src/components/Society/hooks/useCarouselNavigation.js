@@ -8,28 +8,7 @@ export function useCarouselNavigation(length, initialIndex = 0) {
 }
 
 export function useCarouselGestures(ref, { prev, next }) {
-    useWheelScroll(ref, prev, next);
     useTouchSwipe(ref, prev, next);
-}
-
-function useWheelScroll(ref, prev, next) {
-    const lastNav = useRef(0);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const onWheel = (e) => handleWheel(e, prev, next, lastNav);
-        el.addEventListener("wheel", onWheel, { passive: false });
-        return () => el.removeEventListener("wheel", onWheel);
-    }, [ref, prev, next]);
-}
-
-function handleWheel(e, prev, next, lastNav) {
-    if (Math.abs(e.deltaX) < 10 && Math.abs(e.deltaY) < 10) return;
-    if (Date.now() - lastNav.current < 300) return;
-    e.preventDefault();
-    lastNav.current = Date.now();
-    const isNext = e.deltaX > 0 || e.deltaY > 0;
-    isNext ? next() : prev();
 }
 
 function useTouchSwipe(ref, prev, next) {
