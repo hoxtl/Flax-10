@@ -111,6 +111,21 @@ function ProfileHeader({ user, profileData, onEditProfile, stats }) {
           {profileData?.year || "Year _"} · {profileData?.major || "Placeholder"}
         </p>
       </div>
+
+      <div className={styles.mobileStatsGrid}>
+        <div className={styles.mobileStatCard}>
+          <span className={styles.statNumber}>{profileData?.module_count || 0}</span>
+          <span className={styles.statLabel}>Modules</span>
+        </div>
+        <div className={styles.mobileStatCard}>
+          <span className={styles.statNumber}>{profileData?.task_count || 0}</span>
+          <span className={styles.statLabel}>Tasks</span>
+        </div>
+        <div className={styles.mobileStatCard}>
+          <span className={styles.statNumber}>{stats?.upcomingEventCount || 0}</span>
+          <span className={styles.statLabel}>Events</span>
+        </div>
+      </div>
     </div>
   );
 }
