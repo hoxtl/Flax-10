@@ -6,7 +6,7 @@ import SearchBar from "../../components/common/SearchBar";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 
-const PAGE_SIZE = 48;
+const PAGE_SIZE = 20;
 
 export default function AllSocieties({ onBack, onSelect, societies = [] }) {
     const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
