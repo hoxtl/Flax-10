@@ -221,7 +221,7 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 
 function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings") return <Settings user={user} onBack={() => setActiveNav("home")} />;
-  if (activeNav === "profile") return <Profile user={user} onBack={() => setActiveNav("home")} />;
+  if (activeNav === "profile") return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
   return resolveRouteContent(activeNav, user);
 }
 

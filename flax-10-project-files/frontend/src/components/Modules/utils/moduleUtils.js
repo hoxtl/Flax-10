@@ -108,3 +108,22 @@ function checkFilter(module, enrollments, filter_mode) {
     if (filter_mode === 'all') return true;
     return isEnrolledIn(module.id, enrollments);
 }
+
+export function getDepartments(modules) {
+    const depts = modules.map(m => getDepartment(m.module_code));
+    return Array.from(new Set(depts)).sort();
+}
+
+export function sortModules(modules, sort_by) {
+    return [...modules].sort((a,b) => {
+        if (sort_by === 'deadlines') return (b.deadlines?.length || 0) - (a.deadlines?.length || 0);
+        return a.module_name.localeCompare(b.module_name);
+    });
+
+}
+
+export function applyFiltersAndSort(modules, department, sort_by) {
+    const by_department = department === 'all' ? modules :
+    modules.filter(m=>getDepartment(m.module_code) === department);
+    return sortModules(by_department, sort_by);
+}
