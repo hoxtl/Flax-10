@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
-import useModuleSorting  from '../../components/Modules/hooks/useModuleSorting.js';
-import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
-import { ArrowUp } from 'lucide-react';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
 import ModuleForm from '../../components/Modules/ModuleForm.jsx';
 import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
+import useModuleSorting  from '../../components/Modules/hooks/useModuleSorting.js';
+import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
+import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
 function useModulesPage() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -99,8 +99,8 @@ function ModuleResults({sorting, hook, is_teacher, setViewingModule, setEditingM
     if (sorting.results.length === 0) return <EmptyState />
     return (
         <div>
-            {sorting.current_page > 1 && <Pagination current_page={sorting.current_page} total_pages={sorting.total_pages}
-            onPageChange={sorting.setCurrentPage} />}
+            <Pagination current_page={sorting.current_page} total_pages={sorting.total_pages}
+            onPageChange={sorting.setCurrentPage} />
             <ModuleGrid
                 modules={sorting.page_modules} enrollments={hook.enrollments} isTeacher={is_teacher}
                 onViewModule={setViewingModule} onEnrollmentToggle={hook.toggleEnrollment}
@@ -169,39 +169,11 @@ function SearchInput({ value, onChange }) {
     );
 }
 
-function EmptyState({ search_query }) {
+function EmptyState({ }) {
     return (
         <div className={styles.emptyState}>
             <span className={styles.emptyIcon}>📚</span>
             <p>No modules found... </p>
         </div>
-    );
-}
-
-function Pagination({current_page, total_pages, onPageChange}) {
-    if (total_pages <= 1) return null;
-    return (
-        <div className={styles.pagination}>
-            <button className={styles.pageButton} onClick={() => onPageChange(current_page - 1)} disabled={current_page === 1}>← Previous</button>
-            <span className={styles.pageIndicator}>Page {current_page} of {total_pages}</span>
-            <button className={styles.pageButton} onClick={() => onPageChange(current_page + 1)} disabled={current_page === total_pages}>Next →</button>
-        </div>
-    );
-}
-
-function BackToTop() {
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const container = document.querySelector('[class*="content"]');
-        if (!container) return;
-        const onScroll = () => setVisible(container.scrollTop > 100);
-        container.addEventListener('scroll', onScroll);
-        return () => container.removeEventListener('scroll', onScroll);
-    }, []);
-    if (!visible) return null;
-    return (
-        <button className={styles.backToTop} onClick ={() => document.querySelector('[class*="content"]')?.scrollTo({top: 0, behavior: 'smooth'})}>
-            <ArrowUp size={16} />
-        </button>
     );
 }
