@@ -6,7 +6,7 @@ import ShareButton from "../../components/Social/ShareButton";
 function UserCard({ user, onNavChange }) {
     return (
         <div className={styles.userCard}>
-            <div className={styles.userInfo} onClick={() => onNavChange?.("user_" + user.id)}>
+            <div className={styles.userInfo} onClick={() => onNavChange?.("profile_" + user.id)}>
                 <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
                 <div className={styles.userNameDetails}>
                     <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
