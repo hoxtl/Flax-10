@@ -108,6 +108,7 @@ function ModuleResults({sorting, hook, is_teacher, setViewingModule, setEditingM
                 onManageDeadlines={setDeadlineModule}
             />
             <Pagination current_page = {sorting.current_page} total_pages={sorting.total_pages} onPageChange={sorting.setCurrentPage} />
+            <BackToTop/>
         </div>
     )
 }
@@ -188,3 +189,19 @@ function Pagination({current_page, total_pages, onPageChange}) {
     );
 }
 
+function BackToTop() {
+    const [visible, setVisible] = useState(false);
+    useEffect(() => {
+        const container = document.querySelector('[class*="content"]');
+        if (!container) return;
+        const onScroll = () => setVisible(container.scrollTop > 100);
+        container.addEventListener('scroll', onScroll);
+        return () => container.removeEventListener('scroll', onScroll);
+    }, []);
+    if (!visible) return null;
+    return (
+        <button className={styles.backToTop} onClick ={() => document.querySelector('[class*="content"]')?.scrollTo({top: 0, behavior: 'smooth'})}>
+            <ArrowUp size={16} />
+        </button>
+    );
+}
