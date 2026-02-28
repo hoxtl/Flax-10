@@ -540,4 +540,19 @@
     border-bottom: 1px solid #e1e0e9;
     padding-bottom: 10px;
   }
+
+  .summaryLine {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .summaryLine span {
+    color: #666;
+  }
+
+  .summaryLine strong {
+    color: #333;
+  }
 }
