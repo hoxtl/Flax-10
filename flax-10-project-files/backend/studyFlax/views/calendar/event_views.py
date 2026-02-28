@@ -36,12 +36,10 @@ def get_events(request):
         except User.DoesNotExist:
             return Response([])
             
-        # Check mutual following
+        # Check if target_user has shared their calendar with request.user
         if target_user != request.user:
-            user_follows_target = target_user.followers.filter(follower=request.user).exists()
-            target_follows_user = request.user.followers.filter(follower=target_user).exists()
-            
-            if not (user_follows_target and target_follows_user):
+            is_shared_with_me = target_user.followers.filter(follower=request.user).exists()
+            if not is_shared_with_me:
                 return Response([]) # Gracefully deny access
     else:
         target_user = request.user
