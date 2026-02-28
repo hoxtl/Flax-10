@@ -3,6 +3,7 @@ import {ChevronDown, Check} from 'lucide-react';
 import styles from './ModuleDropdown.module.css';
 
 function useDropdown() {
+    const [is_open, setIsOpen] = useState(false);
     const ref = useRef(null);
 
     useEffect(() => {
@@ -16,7 +17,7 @@ function useDropdown() {
 }
 
 export default function ModuleDropdown({value, onChange, options}) {
-    const [is_open, setIsOpen, ref] = useDropdown();
+    const {is_open, setIsOpen, ref} = useDropdown();
     const selected = options.find(opt => opt.value === value);
     return (
         <div className={styles.wrapper} ref={ref}>
