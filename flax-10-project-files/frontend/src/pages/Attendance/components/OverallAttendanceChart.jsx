@@ -2,7 +2,7 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import styles from "../AttendancePage.module.css";
 
 /** Single responsibility: render overall attended vs missed pie chart and percentage. */
-export default function OverallAttendanceChart({ data, attended, missed }) {
+export default function OverallAttendanceChart({ data, attended, missed, onSegmentClick }) {
   const total = attended + missed;
   const percentAttended = total > 0 ? Math.round((attended / total) * 100) : 0;
 
@@ -44,6 +44,15 @@ export default function OverallAttendanceChart({ data, attended, missed }) {
         margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
         slotProps={{ legend: { hidden: true } }}
         sx={{ "& .MuiChartsLegend-label": { fill: "var(--text) !important" } }}
+        onItemClick={
+          onSegmentClick
+            ? (ev, identifier, item) => {
+                const label =
+                  item?.label ?? data[identifier?.dataIndex]?.label;
+                if (label) onSegmentClick("overall", label);
+              }
+            : undefined
+        }
       />
       <div className={styles.legend}>
         <span>Attended: {attended}</span>
