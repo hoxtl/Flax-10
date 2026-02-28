@@ -52,16 +52,11 @@ function useSearchEffect(query, setResults, setLoading) {
 
 function UserResultItem({ user, onSelect }) {
     return (
-        <div className={styles.userItem}>
-            <div className={styles.userInfo} onClick={onSelect} style={{ cursor: 'pointer', flex: 1 }}>
-                <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
-                <div className={styles.userNameDetails}>
-                    <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
-                    <span className={styles.userHandle}>@{user.username}</span>
-                </div>
-            </div>
-            <div onClick={(e) => e.stopPropagation()}>
-                <ShareButton userId={user.id} initialIsSharing={user.is_sharing ?? false} />
+        <div className={styles.userItem} onClick={onSelect} style={{ cursor: 'pointer', justifyContent: 'flex-start', gap: '12px' }}>
+            <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
+            <div className={styles.userNameDetails}>
+                <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
+                <span className={styles.userHandle}>@{user.username}</span>
             </div>
         </div>
     );
