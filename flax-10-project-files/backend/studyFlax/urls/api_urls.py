@@ -28,6 +28,7 @@ from studyFlax.views.society import (
     request_ratification, approve_ratification, reject_ratification, pending_ratifications
 )
 from studyFlax.views.user.profile_view import profile_view, another_user_profile_view
+from studyFlax.views.user.profile_summary_view import profile_summary_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.user.user_search_view import user_search
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
@@ -79,6 +80,7 @@ urlpatterns = [
     path("admin/societies/pending-ratifications/", pending_ratifications, name="pending-ratifications"),
     path("profile/", profile_view, name='user-profile'),
     path("users/<int:user_id>/profile/", another_user_profile_view, name='another-user-profile'),
+    path('profile/summary/', profile_summary_view, name='profile-summary'),
     path("check-username/", check_username, name='check-username'),
     path("users/search/", user_search, name='user-search'),
     path("auth/password-reset/request/", reset_password_view, name='password-reset-request'),

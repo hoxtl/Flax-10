@@ -67,6 +67,8 @@ def apply_profile_patch(user, data, files):
     error = update_username(user, data)
     if error:
         return error
+    if 'weekly_goal_hours' in data:
+        user.weekly_goal_hours = int(data['weekly_goal_hours'])
     if 'bio' in data:
         user.bio = data['bio']
     update_photo(user, data, files)

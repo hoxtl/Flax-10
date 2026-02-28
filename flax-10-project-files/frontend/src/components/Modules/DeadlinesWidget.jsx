@@ -24,12 +24,15 @@ function useUpcomingDeadlines() {
 
 function DeadlineRow({ deadline }) {
     const urgency = getDeadlineUrgency(deadline.start_due_date);
-    const countdown = getDeadlineCountdown(deadline.start_due_date );
+    const countdown = getDeadlineCountdown(deadline.start_due_date);
     return (
         <div className={`${styles.row} ${styles[urgency]}`}>
             <span className={styles.icon}>⏳</span>
             <DeadlineRowBody deadline={deadline} />
-            <span className={`${styles.countdown} ${styles[urgency]}`}>{countdown}</span>
+            <div className={styles.timeColumn}>
+                <span className={styles.date}>{formatDeadlineDateTime(deadline.start_due_date)}</span>
+                <span className={`${styles.countdown} ${styles[urgency]}`}>{countdown}</span>
+            </div>
         </div>
     );
 }
@@ -41,7 +44,9 @@ function DeadlineRowBody({ deadline }) {
                 <span className={styles.type}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
                 <span className={styles.title}>{deadline.title}</span>
             </div>
-            <span className={styles.date}>{formatDeadlineDateTime(deadline.start_due_date)}</span>
+            <span className={styles.moduleLabel}>
+                {deadline.module_code} — {deadline.module_name}
+            </span>
         </div>
     );
 }

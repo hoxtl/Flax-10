@@ -50,17 +50,32 @@ def get_events(request):
     start = parse_date_param(request.query_params.get('start'))
     end = parse_date_param(request.query_params.get('end'))
     
-    personal = get_personal_events(target_user, request.query_params, start, end)
+    personal = get_personal_events(target_user, request.query_params, start, end, is_viewer=target_user != request.user)
     society = get_synced_society_events(target_user, start, end)
     
     return Response(personal + society)
 
 
-def get_personal_events(user, query_params, start, end):
+def get_personal_events(user, query_params, start, end, is_viewer=False):
     base_events = CalendarEvent.objects.filter(user=user)
     filtered = filter_events_by_date_range(base_events, query_params)
     expanded = expand_recurring_events(filtered, start, end)
-    return CalendarEventSerialiser(expanded, many=True).data
+    events_data = CalendarEventSerialiser(expanded, many=True).data
+    if is_viewer:
+        events_data = [mask_private_event(e) if e.get('is_private') else e for e in events_data]
+    return events_data
+
+
+def mask_private_event(event):
+    return {
+        **event,
+        'title': 'Private event',
+        'description': '',
+        'location': None,
+        'tag': None,
+        'tag_name': None,
+        'tag_details': None,
+    }
 
 
 def safe_sync_timetable(user):
