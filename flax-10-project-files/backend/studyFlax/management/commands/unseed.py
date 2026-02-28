@@ -1,3 +1,15 @@
+"""
+Django management command for clearing the database.
+
+Run with::
+
+    python manage.py unseed
+
+Truncates all application tables using TRUNCATE … RESTART IDENTITY CASCADE,
+then re-creates any superuser accounts that existed before the wipe.
+Requires explicit confirmation from the operator before proceeding.
+"""
+
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.contrib.auth import get_user_model
@@ -26,6 +38,11 @@ EXCLUDE_FIELDS = {'id', 'password', 'last_login', 'date_joined'}
 
 
 def get_superuser_data():
+    """Return serialised superuser records, excluding auth-only and audit fields.
+
+    The returned dicts are suitable for passing directly to
+    User.objects.create_superuser after the wipe.
+    """
     return [
         {k: v for k, v in u.items() if k not in EXCLUDE_FIELDS}
         for u in User.objects.filter(is_superuser=True).values()
@@ -33,12 +50,14 @@ def get_superuser_data():
 
 
 def truncate_tables(cursor, tables, stdout):
+    """TRUNCATE each table in *tables* with RESTART IDENTITY CASCADE."""
     for table in tables:
         cursor.execute(f'TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;')
         stdout.write(f"  ✓  {table}")
 
 
 def restore_superusers(superusers_data, stdout):
+    """Re-create each superuser from the serialised data saved before the wipe."""
     if not superusers_data:
         return
     for data in superusers_data:
@@ -46,6 +65,7 @@ def restore_superusers(superusers_data, stdout):
 
 
 def confirm_truncate(stdout):
+    """Print a confirmation prompt and return True only if the operator types 'yes'."""
     div = "─" * 40
     stdout.write("")
     stdout.write(div)
@@ -61,9 +81,16 @@ def confirm_truncate(stdout):
 
 
 class Command(BaseCommand):
+    """Clears all application data and resets database sequences.
+
+    Superusers are snapshotted before the wipe and restored afterwards so
+    that the development environment remains accessible after an unseed.
+    """
+
     help = 'Cleans the database using PostgreSQL TRUNCATE CASCADE, preserving superusers.'
 
     def handle(self, *args, **options):
+        """Snapshot superusers, confirm intent, truncate tables, and restore superusers."""
         superusers_data = get_superuser_data()
         if not superusers_data:
             self.stdout.write(self.style.WARNING("  No superusers found — database will be completely emptied."))
