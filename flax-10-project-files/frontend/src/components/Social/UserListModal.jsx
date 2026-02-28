@@ -1,4 +1,4 @@
-import FollowButton from './FollowButton';
+import ShareButton from './ShareButton';
 import styles from './Social.module.css';
 
 function getCurrentUser() {
@@ -13,8 +13,8 @@ function sortUsers(users, currentUser) {
     return [...users].sort((a, b) => {
         if (isCurrentUser(a, currentUser)) return -1;
         if (isCurrentUser(b, currentUser)) return 1;
-        if (a.is_following && !b.is_following) return -1;
-        if (!a.is_following && b.is_following) return 1;
+        if (a.is_sharing && !b.is_sharing) return -1;
+        if (!a.is_sharing && b.is_sharing) return 1;
         return 0;
     });
 }
@@ -36,7 +36,7 @@ function UserItem({ user, currentUser, onUserClick }) {
     return (
         <div className={styles.userItem} onClick={() => onUserClick?.(user)}>
             <UserInfo user={user} />
-            {!isSelf && <FollowButton userId={user.id} initialIsFollowing={user.is_following} />}
+            {!isSelf && <ShareButton userId={user.id} initialIsSharing={user.is_sharing} />}
         </div>
     );
 }
