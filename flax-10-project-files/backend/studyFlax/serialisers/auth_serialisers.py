@@ -112,13 +112,17 @@ class UserSerialiser(serializers.ModelSerializer):
         return getattr(settings, 'modules', []) if settings else []
 
     def get_study_hours_this_week(self, obj):
-        if not self.get_is_mutual_following(obj):
+        request = self.context.get('request')
+        is_self = request and request.user.is_authenticated and request.user == obj
+        if not (is_self or self.get_is_shared_with_me(obj)):
             return None
         # Placeholder for exact implementation, needs StudySession logic
         return 0
 
     def get_study_streak(self, obj):
-        if not self.get_is_mutual_following(obj):
+        request = self.context.get('request')
+        is_self = request and request.user.is_authenticated and request.user == obj
+        if not (is_self or self.get_is_shared_with_me(obj)):
             return None
         # Placeholder for exact implementation, needs StudySession logic
         return 0
