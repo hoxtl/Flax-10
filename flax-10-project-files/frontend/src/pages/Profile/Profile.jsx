@@ -617,14 +617,16 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       />
       <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
 
-      {!isMutualOrSelf ? (
-        <div className={styles.privateMessage}>
-          🔒 This user has not shared their calendar with you.
-        </div>
-      ) : (
-        <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-          <ProfileCalendar events={filteredEvents} />
-        </div>
+      {!isSelf && (
+        !isMutualOrSelf ? (
+          <div className={styles.privateMessage}>
+            🔒 This user has not shared their calendar with you.
+          </div>
+        ) : (
+          <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+            <ProfileCalendar events={filteredEvents} />
+          </div>
+        )
       )}
       <ProfileHome onNavigate={onNavigate} />
     </div>
