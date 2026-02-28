@@ -26,7 +26,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
+        scrollContentToTop();
         if (location.state?.activeTab) {
             window.history.replaceState({}, document.title);
         }
@@ -199,4 +199,20 @@ function MainContent({ activeTab, setActiveTab, society, editMode, handlers, foc
                 onAddAnnouncement={handlers.addAnnouncement} onUpdateAnnouncement={handlers.updateAnnouncement} onAddEvent={handlers.addEvent} />
         </div>
     );
+}
+
+function scrollContentToTop() {
+    const scrollable = findScrollableParent(document.body);
+    if (scrollable) scrollable.scrollTop = 0;
+    window.scrollTo(0, 0);
+}
+
+function findScrollableParent(element) {
+    const containers = document.querySelectorAll('*');
+    for (const el of containers) {
+        const style = window.getComputedStyle(el);
+        const isScrollable = style.overflow === 'auto' || style.overflowY === 'auto';
+        if (isScrollable && el.scrollHeight > el.clientHeight) return el;
+    }
+    return null;
 }
