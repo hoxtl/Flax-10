@@ -80,7 +80,8 @@ function NavItem({ item, isActive, open, onClick }) {
       <span className={styles.icon}>{item.icon}</span>
       <AnimatePresence>{open && <NavLabel label={item.label} />}</AnimatePresence>
       {isActive && <ActivePill />}
-    </motion.button>);}
+    </motion.button>);
+}
 
 function getRoutes(user) {
   return APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
@@ -108,5 +109,6 @@ export default function Sidebar({ active, onChange, user }) {
       onMouseLeave={() => setOpen(false)}
     >
       <SidebarHeader open={open} />
-      <SidebarNav active={active} onChange={onChange} open={open} user={user}/>
-    </motion.aside>);}
+      <SidebarNav active={active} onChange={onChange} open={open} user={user} />
+    </motion.aside>);
+}
