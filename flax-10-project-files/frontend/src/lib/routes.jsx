@@ -8,16 +8,18 @@ import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
 import AdminPage from "../pages/AdminPage";
 import TasksPage from "../pages/Tasks/TasksPage";
 import Discover from "../pages/Discover/Discover";
+import AttendancePage from "../pages/Attendance/AttendancePage";
 
 export const APP_ROUTES = [
-    { id: "home",      label: "Home",      icon: "🏠",         path: "/",          element: <Homepage /> },
-    { id: "calendar",  label: "Calendar",  icon: "🗓️",         path: "/calendar",  element: <CalendarPage /> },
-    { id: "timer",     label: "Timer",     icon: "⏲️",         path: "/timer",     element: <TimerPage /> },
-    { id: "tasks",     label: "Tasks",     icon: "✅",         path: "/tasks",     element: <TasksPage /> },
-    { id: "users",     label: "Users",     icon: "🔍",         path: "/users",     element: <Discover /> },
-    { id: "societies", label: "Societies", icon: "👥",         path: "/societies", element: <SocietiesPage /> },
-    { id: "modules",   label: "Modules",   icon: "📚",         path: "/modules",   element: <ModulesPage /> },
-    { id: "map",       label: "UniMap",    icon: "🗺️",         path: "/map",       element: <CampusMap /> },
-    { id: "analytics", label: "Analytics", icon: "📊",         path: "/analytics", element: <AnalyticsPage /> },
-    { id: "admin",     label: "Admin",     icon: "🛡️",         path: "/admin",     element: <AdminPage />, isAdminOnly: true },
+    { id: "home",      label: "Home",      icon: "🏠", path: "/",          element: <Homepage /> },
+    { id: "calendar",  label: "Calendar",  icon: "🗓️", path: "/calendar",  element: <CalendarPage /> },
+    { id: "attendance",label: "Attendance",icon: "✅", path: "/attendance",element: <AttendancePage /> },
+    { id: "timer",     label: "Timer",     icon: "⏲️", path: "/timer",     element: <TimerPage /> },
+    { id: "tasks",     label: "Tasks",     icon: "✅", path: "/tasks",     element: <TasksPage /> },
+    { id: "users",     label: "Users",     icon: "🔍", path: "/users",     element: <Discover /> },
+    { id: "societies", label: "Societies", icon: "👥", path: "/societies", element: <SocietiesPage /> },
+    { id: "modules",   label: "Modules",   icon: "📚", path: "/modules",   element: <ModulesPage /> },
+    { id: "map",       label: "UniMap",    icon: "🗺️", path: "/map",       element: <CampusMap /> },
+    { id: "analytics", label: "Analytics", icon: "📊", path: "/analytics", element: <AnalyticsPage /> },
+    { id: "admin",     label: "Admin",     icon: "🛡️", path: "/admin",     element: <AdminPage />, isAdminOnly: true },
 ];
