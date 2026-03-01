@@ -96,6 +96,23 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
 
   return (
     <div className={styles.headerWrapper}>
+      {/* --- MOBILE VIEW --- */}
+      <div className={styles.mobileOnly}>
+        <div className={styles.mobileHero}>
+          <div className={styles.avatarWrapper}>
+            <div className={styles.mainAvatar}>
+              {profileData?.profile_photo_url ? (
+                <img src={profileData.profile_photo_url} alt="Profile" />
+              ) : initials}
+            </div>
+          </div>
+          <h1 className={styles.mobileName}>{user?.name || "John Doe"}</h1>
+          <p className={styles.mobileSubtext}>
+            {profileData?.year || "Year 1"} · {profileData?.major || "Computer Science"}
+          </p>
+        </div>
+      </div>
+
       <div className={styles.desktopOnly}>
         <header className={styles.header}>
           <div className={styles.avatar}>{initials}</div>
