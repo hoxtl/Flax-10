@@ -276,7 +276,7 @@ const useFilterState = (allModules, allSocieties, query, isSearchFocused, contai
     const togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
 
     useUserSearchEffects(query, selectedModules, selectedSocieties, setUserResults, setLoading);
-    const active = (isSearchFocused || isFilterOpen) && (query.trim() || selectedModules.length > 0 || selectedSocieties.length > 0);
+    const active = isSearchFocused && (query.trim() || selectedModules.length > 0 || selectedSocieties.length > 0);
     useDropdownPosition(containerRef, query, '', userResults, setDropdownPos, active);
 
     return {
