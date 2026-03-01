@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from datetime import timedelta
-from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
-from studyFlax.models import Enrollment, CalendarEvent
+from studyFlax.views.modules.enrollment_logic import enroll_user_in_module
+from studyFlax.models import Enrollment, CalendarEvent, Module
 from studyFlax.serialisers import EnrollmentSerialiser
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
 
@@ -26,17 +26,11 @@ def create_enrollments(request):
     serialiser = EnrollmentSerialiser(data=request.data, context={'request': request})
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    enrollment = serialiser.save()
-    module = enrollment.module
-    CalendarEvent.objects.create(
-            user=request.user,module=module,
-            title=f"Lecture: {module.module_name}",
-            start_time=module.start_time,end_time=module.end_time,
-            recurrence_rule = module.recurrence_rule,
-            location=module.location,
-            priority='high',
-            source="module_enrollment")
-    create_enrollment_deadline_events(request.user, module)
+    
+    # Helper handles enrollment and event creation for consistency
+    module = serialiser.validated_data['module']
+    enrollment, _ = enroll_user_in_module(request.user, module)
+    
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'DELETE'])

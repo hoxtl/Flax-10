@@ -109,7 +109,9 @@ def create_instance(base, start, dur, idx):
             self.recurrence_rule = base.recurrence_rule
             self.reminder_minutes = base.reminder_minutes
             self.module = base.module
-            self.is_private = base.is_private
+            self.is_private = getattr(base, 'is_private', False)
+            self.source = getattr(base, 'source', None)
+            self.external_id = getattr(base, 'external_id', None)
     return Evt()
 
 def check_event_overlap(user, data):

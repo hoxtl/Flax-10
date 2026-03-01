@@ -1,7 +1,6 @@
 import { findOverlappingEvents } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
-
-
+import { validateDateRange } from './dateValidation';
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event, options);
@@ -17,7 +16,7 @@ function getFormFromEvent(event, options = {}) {
         recurrence: getRecurrenceFromEvent(event),
         reminder: Array.isArray(event.reminder_minutes) ? event.reminder_minutes : [],
         tag: event.tag || event.tag_details?.id || options.initialTag || null,
-        location: event.locution || event.location || '',
+        location: event.location || '',
         all_day: isAllDay(event),
         is_private: event.is_private ?? false,
     };
@@ -77,9 +76,8 @@ function hasOverlaps(data, event, allEvents, setOverlapWarning) {
 }
 
 function validateForm(form) {
-    if (new Date(form.start_time) >= new Date(form.end_time)) return 'Start must be before end';
     if (!form.title.trim()) return 'Title is required';
-    return null;
+    return validateDateRange(form.start_time, form.end_time);
 }
 
 async function submitEvent(event, data, actions, onClose, setError) {
@@ -97,25 +95,19 @@ async function saveEvent(event, data, actions) {
     } else if (hasRecurrence(event)) {
         await handleRecurringEdit(event, data, actions);
     } else {
-        await actions.editEvent(extractBaseEventId(event.id), data);
+        await actions.editEvent(extractBaseEventId(event.id, event), data);
     }
 }
 
 async function handleRecurringEdit(event, data, actions) {
-    const choice = confirmRecurringEdit();
-    const baseId = extractBaseEventId(event.id);
+    const choice = window.confirm('This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence');
+    const baseId = extractBaseEventId(event.id, event);
 
     if (choice) {
         await actions.editEvent(baseId, data);
     } else {
         await editSingleOccurrence(event, data, actions, baseId);
     }
-}
-
-function confirmRecurringEdit() {
-    return window.confirm(
-        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
-    );
 }
 
 async function editSingleOccurrence(event, data, actions, baseId) {
@@ -126,37 +118,29 @@ async function editSingleOccurrence(event, data, actions, baseId) {
     await actions.addEvent(singleEventData);
 }
 
-export async function confirmDelete(event, actions, onClose) {
-    if (hasRecurrence(event)) {
-        await handleRecurringDelete(event, actions, onClose);
-    } else {
-        await handleSingleDelete(event, actions, onClose);
-    }
+export async function executeDelete(event, actions) {
+    const baseId = extractBaseEventId(event.id, event);
+    await actions.removeEvent(baseId);
 }
 
-async function handleRecurringDelete(event, actions, onClose) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Delete ALL occurrences\nCancel = Delete only this occurrence'
-    );
-    const baseId = extractBaseEventId(event.id);
-    if (choice) {
-        await actions.removeEvent(baseId);
-    } else {
-        const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
-        await actions.addException(baseId, dateStr);
-    }
-    onClose();
+export async function deleteRecurrenceOccurrence(event, actions) {
+    const baseId = extractBaseEventId(event.id, event);
+    const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
+    await actions.addException(baseId, dateStr);
 }
 
-async function handleSingleDelete(event, actions, onClose) {
-    if (!confirm('Delete this event?')) return;
-    await actions.removeEvent(extractBaseEventId(event.id));
-    onClose();
+export function isRecurringEvent(event) {
+    return hasRecurrence(event);
 }
 
 function buildEventData(form) {
     const data = buildBaseEventData(form);
-    addRecurrenceIfNeeded(data, form);
+    const { frequency, interval, end_date } = form.recurrence || {};
+    if (frequency && frequency !== 'none') {
+        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
+    } else {
+        data.recurrence_rule = null;
+    }
     return data;
 }
 
@@ -174,19 +158,9 @@ function buildBaseEventData(form) {
     };
 }
 
-function addRecurrenceIfNeeded(data, form) {
-    const { frequency, interval, end_date } = form.recurrence || {};
-    if (frequency && frequency !== 'none') {
-        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
-    } else {
-        data.recurrence_rule = null;
-    }
-}
-
 function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16); // Fallback
+    if (!d) return new Date().toISOString().slice(0, 16);
     const date = typeof d === 'string' ? new Date(d) : d;
-    // Adjust for timezone to ensure the input shows local time
     const offset = date.getTimezoneOffset() * 60000;
     const localDate = new Date(date.getTime() - offset);
     return localDate.toISOString().slice(0, 16);

@@ -8,7 +8,7 @@ function EmptyState() {
 function CardList({ items, onDelete, onEdit, date }) {
   return (
     <div className={styles.grid}>
-      {items.map((e) => <DayCard key={e.id} e={e} onDelete={onDelete} onClick={() => onEdit?.(e)} date={date} />)}
+      {items.map((e) => <DayCard key={e.id} e={e} onDelete={onDelete} onClick={(ev) => onEdit?.(e, ev)} date={date} />)}
     </div>
   );
 }

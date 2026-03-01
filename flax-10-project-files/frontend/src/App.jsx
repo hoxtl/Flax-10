@@ -23,6 +23,7 @@ import Profile from "./pages/Profile/Profile";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
+const ACTIVE_NAV_KEY = "flax_active_nav";
 
 const ROOT_STYLE = { position: "relative", width: "100vw", height: "100vh", overflow: "hidden" };
 const DASH_WRAP_STYLE = { position: "relative", height: "100%" };
@@ -90,6 +91,7 @@ function onBackToAuth() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   localStorage.removeItem(WELCOME_SEEN_KEY);
+  localStorage.removeItem(ACTIVE_NAV_KEY);
   window.dispatchEvent(new Event("auth-changed"));
 }
 
@@ -129,13 +131,23 @@ function useThemeState(authed) {
   return { initialTheme, isLoadingTheme };
 }
 
+function readActiveNav() {
+  return localStorage.getItem(ACTIVE_NAV_KEY) || "home";
+}
+
 function useAppState() {
-  const [activeNav, setActiveNav] = useState("home");
+  const [activeNav, setActiveNavState] = useState(readActiveNav);
   const [user, setUser] = useState(() => readUser());
   const [authed, setAuthed] = useState(() => isAuthenticated());
   const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
   useSyncAuth(setAuthed, setUser, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
+
+  const setActiveNav = (nav) => {
+    localStorage.setItem(ACTIVE_NAV_KEY, nav);
+    setActiveNavState(nav);
+  };
+
   return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
 }
 
