@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { searchUsers } from '../../api/userService';
 import { getModules } from '../../api/moduleApi';
 import { fetchSocieties } from '../../api/societyApi';
-import styles from './Social.module.css';
+import socialStyles from './Social.module.css';
+import searchStyles from './UserSearch.module.css';
+const styles = { ...socialStyles, ...searchStyles };
 
 async function fetchUserResults(query, moduleFilter, societyFilter, setResults, setLoading) {
     if (!query.trim() && !moduleFilter.trim() && !societyFilter.trim()) { setResults([]); return; }
