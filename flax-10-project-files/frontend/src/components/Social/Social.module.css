@@ -99,26 +99,28 @@
 .shareButton {
     padding: 0.5rem 1rem;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: white;
+    border: 1px solid var(--primary);
+    background: var(--primary);
     font-size: 0.9rem;
-    color: var(--text);
+    color: white;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .shareButton.sharing {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    color: var(--text);
+    border-color: var(--border);
 }
 
 .shareButton:hover {
     opacity: 0.9;
+    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.25);
 }
 
 .shareButton.sharing:hover {
-    background: var(--hover);
-    border-color: var(--hover);
-    color: white;
+    background: rgba(255, 255, 255, 0.6);
+    border-color: var(--primary);
+    color: var(--primary);
 }
