@@ -272,4 +272,12 @@
   .formActions {
     justify-content: stretch;
   }
+
+  .btnPrimary {
+    width: 100%;
+  }
+
+  .themeIcon {
+    font-size: 24px;
+  }
 }
