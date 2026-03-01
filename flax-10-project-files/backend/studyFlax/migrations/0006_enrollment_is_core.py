@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0003_follow'),
+        ('studyFlax', '0005_usersettings_modules'),
     ]
 
     operations = [
