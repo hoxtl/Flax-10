@@ -157,163 +157,87 @@ const dropdownBaseStyle = {
     maxHeight: '400px', overflowY: 'auto'
 };
 
-function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults, selectedModules, toggleModule, societyResults, selectedSocieties, toggleSociety }) {
+const FilterTabs = ({ activeTab, setTab }) => (
+    <div className={styles.filterTabs}>
+        {['modules', 'societies'].map(tab => (
+            <button key={tab} onClick={(e) => { e.preventDefault(); setTab(tab); }}
+                className={`${styles.filterTab} ${activeTab === tab ? styles.filterTabActive : ''}`}>
+                {tab}
+            </button>
+        ))}
+    </div>
+);
+
+const SearchInput = ({ query, setQuery, tab }) => (
+    <input type="text" placeholder={`Search ${tab}...`} value={query}
+        onChange={(e) => setQuery(e.target.value)} className={styles.filterSearchInput} />
+);
+
+const ExpandBtn = ({ count, isExpanded, sectionKey, toggle }) => (
+    count > 5 && (
+        <button onClick={() => toggle(sectionKey)}
+            className={`${styles.expandButton} ${isExpanded ? styles.collapseButton : ''}`}>
+            {isExpanded ? 'Show less' : `+ ${count - 5} more`}
+        </button>
+    )
+);
+
+const GroupList = ({ items, isExpanded, renderItem, toggle, sectionKey }) => {
+    const list = isExpanded ? items : items.slice(0, 5);
+    return (
+        <div className={styles.userList} style={{ gap: 0 }}>
+            {list.map(renderItem)}
+            <ExpandBtn count={items.length} isExpanded={isExpanded} sectionKey={sectionKey} toggle={toggle} />
+        </div>
+    );
+};
+
+const GroupedSection = ({ title, items, expanded, renderItem, toggle, sectionKey, capitalize }) => {
+    if (items.length === 0) return null;
+    const titleClass = `${styles.groupHeading} ${capitalize ? styles.groupHeadingCapitalize : ''}`;
+    return (
+        <div key={title}>
+            <h4 className={titleClass}>{title}</h4>
+            <GroupList items={items} isExpanded={expanded[sectionKey]} renderItem={renderItem} toggle={toggle} sectionKey={sectionKey} />
+        </div>
+    );
+};
+
+const matchMod = (m, dept) => m.module_code?.toUpperCase().startsWith(dept);
+const ModuleList = ({ modules, filterQuery, querySelected, onToggle, deps, expanded, toggleSection }) => {
+    if (modules.length === 0) return <EmptySearchText text="No modules found." />;
+    const rItem = (m, i) => <ModuleResultItem key={m.id || i} module={m} isChecked={querySelected(m.module_code)} onToggle={onToggle} />;
+    if (filterQuery) return <div className={styles.userList} style={{ gap: 0 }}>{modules.slice(0, 15).map(rItem)}</div>;
+    return (
+        <div className={styles.groupContainer}>
+            {deps.map(d => <GroupedSection key={d} title={d} items={modules.filter(m => matchMod(m, d))} expanded={expanded} renderItem={rItem} toggle={toggleSection} sectionKey={`mod_${d}`} />)}
+        </div>
+    );
+};
+
+const matchCat = (s, cat) => cat === 'other' ? (!s.categories || !s.categories.length) : (s.categories?.[0]?.toLowerCase() === cat);
+const SocietyList = ({ societies, filterQuery, querySelected, onToggle, cats, expanded, toggleSection }) => {
+    if (societies.length === 0) return <EmptySearchText text="No societies found." />;
+    const rItem = s => <SocietyResultItem key={s.id} society={s} isChecked={querySelected(s.id)} onToggle={onToggle} />;
+    if (filterQuery) return <div className={styles.userList} style={{ gap: 0 }}>{societies.map(rItem)}</div>;
+    return (
+        <div className={styles.groupContainer}>
+            {cats.map(c => <GroupedSection key={c} title={c} items={societies.filter(s => matchCat(s, c))} expanded={expanded} renderItem={rItem} toggle={toggleSection} sectionKey={`soc_${c}`} capitalize />)}
+        </div>
+    );
+};
+
+function FilterDropdown({ activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults, selectedModules, toggleModule, societyResults, selectedSocieties, toggleSociety }) {
     const [expandedSections, setExpandedSections] = useState({});
-
-    const departments = getDepartmentsForModules(moduleResults);
-
-    const toggleSection = (sectionKey) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [sectionKey]: !prev[sectionKey]
-        }));
-    };
-
+    const deps = getDepartmentsForModules(moduleResults), cats = getSocietyCategories(societyResults);
+    const toggleSection = (key) => setExpandedSections(p => ({ ...p, [key]: !p[key] }));
     return (
         <div className={styles.filterDropdown} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.filterTabs}>
-                {['modules', 'societies'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={(e) => { e.preventDefault(); setActiveFilterTab(tab); }}
-                        className={`${styles.filterTab} ${activeFilterTab === tab ? styles.filterTabActive : ''}`}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </div>
-
-            <input
-                type="text"
-                placeholder={`Search ${activeFilterTab}...`}
-                value={filterQuery}
-                onChange={(e) => setFilterQuery(e.target.value)}
-                className={styles.filterSearchInput}
-            />
-
+            <FilterTabs activeTab={activeFilterTab} setTab={setActiveFilterTab} />
+            <SearchInput query={filterQuery} setQuery={setFilterQuery} tab={activeFilterTab} />
             <div className={styles.filterListContainer}>
-                {activeFilterTab === 'modules' && (
-                    <>
-                        {moduleResults.length === 0 ? (
-                            <p className={styles.emptyText}>No modules found.</p>
-                        ) : filterQuery ? (
-                            <div className={styles.userList} style={{ gap: 0 }}>
-                                {moduleResults.slice(0, 15).map((m, i) => (
-                                    <ModuleResultItem
-                                        key={m.id || i}
-                                        module={m}
-                                        isChecked={selectedModules.includes(m.module_code)}
-                                        onToggle={toggleModule}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            // List by department if no search query
-                            <div className={styles.groupContainer}>
-                                {departments.map(dept => {
-                                    const deptModules = moduleResults.filter(m => m.module_code?.toUpperCase().startsWith(dept));
-                                    const isExpanded = expandedSections[`mod_${dept}`];
-                                    const displayedModules = isExpanded ? deptModules : deptModules.slice(0, 5);
-
-                                    return (
-                                        <div key={dept}>
-                                            <h4 className={styles.groupHeading}>{dept}</h4>
-                                            <div className={styles.userList} style={{ gap: 0 }}>
-                                                {displayedModules.map((m, i) => (
-                                                    <ModuleResultItem
-                                                        key={m.id || i}
-                                                        module={m}
-                                                        isChecked={selectedModules.includes(m.module_code)}
-                                                        onToggle={toggleModule}
-                                                    />
-                                                ))}
-                                                {!isExpanded && deptModules.length > 5 && (
-                                                    <button
-                                                        onClick={() => toggleSection(`mod_${dept}`)}
-                                                        className={styles.expandButton}
-                                                    >
-                                                        + {deptModules.length - 5} more
-                                                    </button>
-                                                )}
-                                                {isExpanded && deptModules.length > 5 && (
-                                                    <button
-                                                        onClick={() => toggleSection(`mod_${dept}`)}
-                                                        className={`${styles.expandButton} ${styles.collapseButton}`}
-                                                    >
-                                                        Show less
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </>
-                )}
-
-                {activeFilterTab === 'societies' && (
-                    <>
-                        {societyResults.length === 0 ? (
-                            <p className={styles.emptyText}>No societies found.</p>
-                        ) : filterQuery ? (
-                            <div className={styles.userList} style={{ gap: 0 }}>
-                                {societyResults.map(s => (
-                                    <SocietyResultItem
-                                        key={s.id}
-                                        society={s}
-                                        isChecked={selectedSocieties.includes(s.id)}
-                                        onToggle={toggleSociety}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            // List by category if no search query
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                {getSocietyCategories(societyResults).map(cat => {
-                                    const catSocieties = societyResults.filter(s => {
-                                        if (cat === 'other') return !s.categories || s.categories.length === 0;
-                                        return s.categories && s.categories.length > 0 && s.categories[0].toLowerCase() === cat;
-                                    });
-                                    const isExpanded = expandedSections[`soc_${cat}`];
-                                    const displayedSocieties = isExpanded ? catSocieties : catSocieties.slice(0, 5);
-
-                                    return (
-                                        <div key={cat}>
-                                            <h4 className={`${styles.groupHeading} ${styles.groupHeadingCapitalize}`}>{cat}</h4>
-                                            <div className={styles.userList} style={{ gap: 0 }}>
-                                                {displayedSocieties.map(s => (
-                                                    <SocietyResultItem
-                                                        key={s.id}
-                                                        society={s}
-                                                        isChecked={selectedSocieties.includes(s.id)}
-                                                        onToggle={toggleSociety}
-                                                    />
-                                                ))}
-                                                {!isExpanded && catSocieties.length > 5 && (
-                                                    <button
-                                                        onClick={() => toggleSection(`soc_${cat}`)}
-                                                        className={styles.expandButton}
-                                                    >
-                                                        + {catSocieties.length - 5} more
-                                                    </button>
-                                                )}
-                                                {isExpanded && catSocieties.length > 5 && (
-                                                    <button
-                                                        onClick={() => toggleSection(`soc_${cat}`)}
-                                                        className={`${styles.expandButton} ${styles.collapseButton}`}
-                                                    >
-                                                        Show less
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </>
-                )}
+                {activeFilterTab === 'modules' && <ModuleList modules={moduleResults} filterQuery={filterQuery} querySelected={c => selectedModules.includes(c)} onToggle={toggleModule} deps={deps} expanded={expandedSections} toggleSection={toggleSection} />}
+                {activeFilterTab === 'societies' && <SocietyList societies={societyResults} filterQuery={filterQuery} querySelected={id => selectedSocieties.includes(id)} onToggle={toggleSociety} cats={cats} expanded={expandedSections} toggleSection={toggleSection} />}
             </div>
         </div>
     );
