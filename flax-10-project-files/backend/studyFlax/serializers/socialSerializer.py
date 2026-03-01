@@ -16,15 +16,15 @@ class CalendarShareUserSerializer(serializers.ModelSerializer):
     def get_is_sharing(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            # Does obj share with me?
-            return obj.sharing_with.filter(shared_with=request.user).exists()
+            # Does request.user share with obj?
+            return request.user.sharing_with.filter(shared_with=obj).exists()
         return False
 
     def get_is_shared_with_me(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            # Does request.user share with obj?
-            return request.user.sharing_with.filter(shared_with=obj).exists()
+            # Does obj share with request.user?
+            return obj.sharing_with.filter(shared_with=request.user).exists()
         return False
 
 
