@@ -26,6 +26,7 @@ export function MiniTimeline({
   dayTasks,
   tasksDueToday = [],
   suggestableTasks = [],
+  deadlineSuggestions = [],
   taskLists = [],
   onQuickStart,
   onHarvestToggle,
@@ -48,6 +49,7 @@ export function MiniTimeline({
   const conflictPopoverRef = useRef(null);
   const slotPopoverRef = useRef(null);
   const timelineScrollRef = useRef(null);
+  const nowRowRef = useRef(null);
 
   useEffect(() => {
     if (!conflictPopoverRowId) return;
@@ -68,6 +70,15 @@ export function MiniTimeline({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [slotPopoverRowId]);
+
+  // Auto-scroll the NOW line into view on mount / when date changes to today
+  useEffect(() => {
+    if (!nowRowRef.current || !isToday(selectedDate)) return;
+    const id = requestAnimationFrame(() => {
+      nowRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [selectedDate]);
 
   const dayStart = useMemo(() => {
     const d = new Date(selectedDate);
@@ -95,13 +106,14 @@ export function MiniTimeline({
     (row) => {
       if (row.type === "hourMark") return <HourMarkRow key={row.id} row={row} styles={styles} />;
       if (row.type === "tinyGap") return <TinyGapRow key={row.id} row={row} styles={styles} />;
-      if (row.type === "now") return <NowRow key={row.id} row={row} styles={styles} />;
+      if (row.type === "now") return <NowRow key={row.id} row={row} styles={styles} nowRowRef={nowRowRef} />;
       if (row.type === "free") {
         return (
           <PlanFreeRow
             key={row.id}
             row={row}
             suggestableTasks={suggestableTasks}
+            deadlineSuggestions={deadlineSuggestions}
             onQuickStart={onQuickStart}
             selectedDate={selectedDate}
             taskLists={taskLists}
@@ -149,7 +161,7 @@ export function MiniTimeline({
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, onQuickStart, onEdit, onCardClick, onHarvestToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, isToday, styles]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onHarvestToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef]
   );
 
   return (
