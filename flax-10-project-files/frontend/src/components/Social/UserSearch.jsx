@@ -75,20 +75,19 @@ function UserResultItem({ user, onSelect }) {
 function ModuleResultItem({ module, isChecked, onToggle }) {
     return (
         <div
-            className={styles.userItem}
+            className={`${styles.userItem} ${styles.filterItem}`}
             onClick={() => onToggle(module.module_code)}
-            style={{ cursor: 'pointer', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', margin: 0 }}
         >
             <input
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => onToggle(module.module_code)}
-                style={{ cursor: 'pointer', accentColor: 'var(--primary)', marginTop: '4px' }}
+                className={styles.filterItemCheckbox}
                 onClick={(e) => e.stopPropagation()}
             />
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-                <span style={{ fontWeight: 600, color: 'var(--text)' }}>{module.module_code}</span>
-                <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{module.module_name}</span>
+            <div className={styles.filterItemText}>
+                <span className={styles.filterItemTitle}>{module.module_code}</span>
+                <span className={styles.filterItemSubtitle}>{module.module_name}</span>
             </div>
         </div>
     );
@@ -97,21 +96,20 @@ function ModuleResultItem({ module, isChecked, onToggle }) {
 function SocietyResultItem({ society, isChecked, onToggle }) {
     return (
         <div
-            className={styles.userItem}
+            className={`${styles.userItem} ${styles.filterItem}`}
             onClick={() => onToggle(society.id)}
-            style={{ cursor: 'pointer', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', margin: 0 }}
         >
             <input
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => onToggle(society.id)}
-                style={{ cursor: 'pointer', accentColor: 'var(--primary)', marginTop: '4px' }}
+                className={styles.filterItemCheckbox}
                 onClick={(e) => e.stopPropagation()}
             />
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-                <span style={{ fontWeight: 600, color: 'var(--text)' }}>{society.name}</span>
+            <div className={styles.filterItemText}>
+                <span className={styles.filterItemTitle}>{society.name}</span>
                 {society.categories && society.categories.length > 0 && (
-                    <span style={{ fontSize: '0.85rem', color: 'var(--muted)', textTransform: 'capitalize' }}>{society.categories[0]} society</span>
+                    <span className={styles.filterItemCategory}>{society.categories[0]} society</span>
                 )}
             </div>
         </div>
@@ -164,13 +162,6 @@ function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, userResu
 function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults, selectedModules, toggleModule, societyResults, selectedSocieties, toggleSociety }) {
     const [expandedSections, setExpandedSections] = useState({});
 
-    const dropdownStyle = {
-        position: 'absolute', top: '100%', marginTop: '8px', right: 0, width: '350px', zIndex: 9999,
-        display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
-        background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: '8px',
-        boxShadow: '0 4px 12px var(--shadow-color)', maxHeight: '400px', overflowY: 'auto'
-    };
-
     const departments = getDepartmentsForModules(moduleResults);
 
     const toggleSection = (sectionKey) => {
@@ -181,18 +172,13 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
     };
 
     return (
-        <div style={dropdownStyle} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+        <div className={styles.filterDropdown} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.filterTabs}>
                 {['modules', 'societies'].map(tab => (
                     <button
                         key={tab}
                         onClick={(e) => { e.preventDefault(); setActiveFilterTab(tab); }}
-                        style={{
-                            background: activeFilterTab === tab ? 'var(--primary)' : 'transparent',
-                            color: activeFilterTab === tab ? 'white' : 'var(--text)',
-                            border: 'none', padding: '6px 16px', borderRadius: '16px',
-                            cursor: 'pointer', fontSize: '0.85rem', textTransform: 'capitalize', fontWeight: 600
-                        }}
+                        className={`${styles.filterTab} ${activeFilterTab === tab ? styles.filterTabActive : ''}`}
                     >
                         {tab}
                     </button>
@@ -204,14 +190,10 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                 placeholder={`Search ${activeFilterTab}...`}
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                style={{
-                    width: '100%', padding: '8px 12px', boxSizing: 'border-box',
-                    border: '1px solid var(--border)', borderRadius: '8px',
-                    background: 'var(--search-bg)', color: 'var(--text)'
-                }}
+                className={styles.filterSearchInput}
             />
 
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div className={styles.filterListContainer}>
                 {activeFilterTab === 'modules' && (
                     <>
                         {moduleResults.length === 0 ? (
@@ -229,7 +211,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                             </div>
                         ) : (
                             // List by department if no search query
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div className={styles.groupContainer}>
                                 {departments.map(dept => {
                                     const deptModules = moduleResults.filter(m => m.module_code?.toUpperCase().startsWith(dept));
                                     const isExpanded = expandedSections[`mod_${dept}`];
@@ -237,7 +219,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
 
                                     return (
                                         <div key={dept}>
-                                            <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600 }}>{dept}</h4>
+                                            <h4 className={styles.groupHeading}>{dept}</h4>
                                             <div className={styles.userList} style={{ gap: 0 }}>
                                                 {displayedModules.map((m, i) => (
                                                     <ModuleResultItem
@@ -250,11 +232,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                                 {!isExpanded && deptModules.length > 5 && (
                                                     <button
                                                         onClick={() => toggleSection(`mod_${dept}`)}
-                                                        style={{
-                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--primary)',
-                                                            textAlign: 'center', background: 'none', border: 'none',
-                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
-                                                        }}
+                                                        className={styles.expandButton}
                                                     >
                                                         + {deptModules.length - 5} more
                                                     </button>
@@ -262,11 +240,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                                 {isExpanded && deptModules.length > 5 && (
                                                     <button
                                                         onClick={() => toggleSection(`mod_${dept}`)}
-                                                        style={{
-                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--muted)',
-                                                            textAlign: 'center', background: 'none', border: 'none',
-                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
-                                                        }}
+                                                        className={`${styles.expandButton} ${styles.collapseButton}`}
                                                     >
                                                         Show less
                                                     </button>
@@ -308,7 +282,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
 
                                     return (
                                         <div key={cat}>
-                                            <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600, textTransform: 'capitalize' }}>{cat}</h4>
+                                            <h4 className={`${styles.groupHeading} ${styles.groupHeadingCapitalize}`}>{cat}</h4>
                                             <div className={styles.userList} style={{ gap: 0 }}>
                                                 {displayedSocieties.map(s => (
                                                     <SocietyResultItem
@@ -321,11 +295,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                                 {!isExpanded && catSocieties.length > 5 && (
                                                     <button
                                                         onClick={() => toggleSection(`soc_${cat}`)}
-                                                        style={{
-                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--primary)',
-                                                            textAlign: 'center', background: 'none', border: 'none',
-                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
-                                                        }}
+                                                        className={styles.expandButton}
                                                     >
                                                         + {catSocieties.length - 5} more
                                                     </button>
@@ -333,11 +303,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                                 {isExpanded && catSocieties.length > 5 && (
                                                     <button
                                                         onClick={() => toggleSection(`soc_${cat}`)}
-                                                        style={{
-                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--muted)',
-                                                            textAlign: 'center', background: 'none', border: 'none',
-                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
-                                                        }}
+                                                        className={`${styles.expandButton} ${styles.collapseButton}`}
                                                     >
                                                         Show less
                                                     </button>
