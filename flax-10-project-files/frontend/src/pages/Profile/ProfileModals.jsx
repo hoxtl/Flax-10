@@ -78,9 +78,16 @@ function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
   );
 }
 
-function ModuleItem({ code }) {
+function ModuleItem({ code, onNavigate, onClose }) {
   return (
-    <div className={styles.listItem}>
+    <div
+      className={styles.listItem}
+      style={{ cursor: 'pointer' }}
+      role="button"
+      tabIndex={0}
+      onClick={() => { onClose?.(); onNavigate?.(`modules_${code}`); }}
+      onKeyDown={(e) => e.key === 'Enter' && (onClose?.(), onNavigate?.(`modules_${code}`))}
+    >
       <div className={styles.listAvatar}>📚</div>
       <div className={styles.listInfo}>
         <div className={styles.listName}>{code}</div>
@@ -90,11 +97,11 @@ function ModuleItem({ code }) {
   );
 }
 
-function ModulesModal({ isOpen, onClose, modules }) {
+function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Modules">
       {modules.length > 0
-        ? modules.map((code, i) => <ModuleItem key={i} code={code} />)
+        ? modules.map((code, i) => <ModuleItem key={i} code={code} onNavigate={onNavigate} onClose={onClose} />)
         : <p className={styles.emptyMessage}>No modules found</p>}
     </Modal>
   );
@@ -154,7 +161,7 @@ function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
   return (
     <>
       {isMutualOrSelf && <EditProfileSection state={state} />}
-      <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} />
+      <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} onNavigate={onNavChange} />
       {isMutualOrSelf && <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />}
 
       <SocialDataModal
