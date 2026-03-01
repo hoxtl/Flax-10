@@ -433,7 +433,14 @@
   padding: 10px 20px;
 }
 
+/* --- Visibility Toggles --- */
+.mobileOnly { display: none; }
+.desktopOnly { display: block; }
+
+/* Mobile Styles */
 @media (max-width: 768px) {
+  .mobileOnly { display: block; }
+  .desktopOnly { display: none; }
 
   .headerContainer {
     display: flex;
