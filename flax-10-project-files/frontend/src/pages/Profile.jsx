@@ -91,62 +91,36 @@ function ProfileBio({ user, profileData }) {
   );
 }
 
-function ProfileHeader({ user, profileData, onEditProfile, stats }) {
+function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEventsClick, onEditProfile, upcomingEventCount }) {
   const initials = user?.name ? getInitials(user.name) : "JD";
 
   return (
-    <div className={styles.headerContainer}>
-      <div className={styles.mobileHero}>
-        <div className={styles.avatarWrapper}>
-          <div className={styles.mainAvatar}>
-            {profileData?.profile_photo_url ? (
-              <img src={profileData.profile_photo_url} alt="Profile" />
-            ) : (
-              initials
-            )}
+    <div className={styles.headerWrapper}>
+      <div className={styles.desktopOnly}>
+        <header className={styles.header}>
+          <div className={styles.avatar}>{initials}</div>
+          <div className={styles.headerInfo}>
+            <div className={styles.headerTop}>
+              <h1 className={styles.username}>{user?.username}</h1>
+              <button className={styles.btnEdit} onClick={onEditProfile}>Edit Profile</button>
+            </div>
+            <div className={styles.stats}>
+              <div className={styles.statItem} onClick={onModulesClick}>
+                <strong>{profileData?.modules?.length || 0}</strong> modules
+              </div>
+              <div className={styles.statItem} onClick={onTasksClick}>
+                <strong>0</strong> tasks
+              </div>
+              <div className={styles.statItem} onClick={onEventsClick}>
+                <strong>{upcomingEventCount}</strong> events this month
+              </div>
+            </div>
+            <div className={styles.bio}>
+              <div className={styles.name}>{user?.name}</div>
+              <div className={styles.major}>{profileData?.year} · {profileData?.major}</div>
+            </div>
           </div>
-        </div>
-        <h1 className={styles.mobileName}>{user?.name || "Default Name"}</h1>
-        <p className={styles.mobileSubtext}>
-          {profileData?.year || "Year _"} · {profileData?.major || "Placeholder"}
-        </p>
-      </div>
-
-      <div className={styles.mobileStatsGrid}>
-        <div className={styles.mobileStatCard}>
-          <span className={styles.statNumber}>{profileData?.module_count || 0}</span>
-          <span className={styles.statLabel}>Modules</span>
-        </div>
-        <div className={styles.mobileStatCard}>
-          <span className={styles.statNumber}>{profileData?.task_count || 0}</span>
-          <span className={styles.statLabel}>Tasks</span>
-        </div>
-        <div className={styles.mobileStatCard}>
-          <span className={styles.statNumber}>{stats?.upcomingEventCount || 0}</span>
-          <span className={styles.statLabel}>Events</span>
-        </div>
-      </div>
-
-      <div className={styles.actionArea}>
-        <button className={styles.mobileEditBtn} onClick={onEditProfile}>
-          Edit profile
-        </button>
-      </div>
-
-      <div className={styles.mobileSummaryCard}>
-        <h3 className={styles.summaryTitle}>My Profile Summary</h3>
-        <div className={styles.summaryLine}>
-          <span>Level:</span>
-          <strong>{profileData?.year || "No Year"}</strong>
-        </div>
-        <div className={styles.summaryLine}>
-          <span>Major:</span>
-          <strong>{profileData?.major || "No Major"}</strong>
-        </div>
-        <div className={styles.summaryLine}>
-          <span>Account:</span>
-          <strong>{user?.username || "noUsername"}</strong>
-        </div>
+        </header>
       </div>
     </div>
   );
