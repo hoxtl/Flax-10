@@ -452,8 +452,16 @@
   }
 
   .mobileHero {
-    background-color: #4A3421; /* Cocoa Brown */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%235c4033' fill-opacity='0.4'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h20v20H40V0zM0 40h20v20H0V40zm20 0h20v20H20V40zM40 20h20v20H40V20z'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: var(--c-cocoa);
+
+    background-image:
+      linear-gradient(135deg, rgba(31, 21, 14, 0.25) 25%, transparent 25%),
+      linear-gradient(225deg, rgba(31, 21, 14, 0.25) 25%, transparent 25%),
+      linear-gradient(45deg, rgba(31, 21, 14, 0.25) 25%, transparent 25%),
+      linear-gradient(315deg, rgba(31, 21, 14, 0.25) 25%, transparent 25%);
+    background-size: 60px 60px;
+    background-position: 30px 0, 30px 0, 0 0, 0 0;
+
     padding: 60px 20px 70px;
     text-align: center;
     color: white;
