@@ -162,6 +162,8 @@ function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, userResu
 }
 
 function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults, selectedModules, toggleModule, societyResults, selectedSocieties, toggleSociety }) {
+    const [expandedSections, setExpandedSections] = useState({});
+
     const dropdownStyle = {
         position: 'absolute', top: '100%', marginTop: '8px', right: 0, width: '350px', zIndex: 9999,
         display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
@@ -170,6 +172,13 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
     };
 
     const departments = getDepartmentsForModules(moduleResults);
+
+    const toggleSection = (sectionKey) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [sectionKey]: !prev[sectionKey]
+        }));
+    };
 
     return (
         <div style={dropdownStyle} onClick={(e) => e.stopPropagation()}>
@@ -223,12 +232,14 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 {departments.map(dept => {
                                     const deptModules = moduleResults.filter(m => m.module_code?.toUpperCase().startsWith(dept));
-                                    if (deptModules.length === 0) return null;
+                                    const isExpanded = expandedSections[`mod_${dept}`];
+                                    const displayedModules = isExpanded ? deptModules : deptModules.slice(0, 5);
+
                                     return (
                                         <div key={dept}>
                                             <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600 }}>{dept}</h4>
                                             <div className={styles.userList} style={{ gap: 0 }}>
-                                                {deptModules.slice(0, 5).map((m, i) => (
+                                                {displayedModules.map((m, i) => (
                                                     <ModuleResultItem
                                                         key={m.id || i}
                                                         module={m}
@@ -236,10 +247,29 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                                         onToggle={toggleModule}
                                                     />
                                                 ))}
-                                                {deptModules.length > 5 && (
-                                                    <div style={{ padding: '8px', fontSize: '0.85rem', color: 'var(--muted)', textAlign: 'center' }}>
+                                                {!isExpanded && deptModules.length > 5 && (
+                                                    <button
+                                                        onClick={() => toggleSection(`mod_${dept}`)}
+                                                        style={{
+                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--primary)',
+                                                            textAlign: 'center', background: 'none', border: 'none',
+                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
+                                                        }}
+                                                    >
                                                         + {deptModules.length - 5} more
-                                                    </div>
+                                                    </button>
+                                                )}
+                                                {isExpanded && deptModules.length > 5 && (
+                                                    <button
+                                                        onClick={() => toggleSection(`mod_${dept}`)}
+                                                        style={{
+                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--muted)',
+                                                            textAlign: 'center', background: 'none', border: 'none',
+                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
+                                                        }}
+                                                    >
+                                                        Show less
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
@@ -273,12 +303,14 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                         if (cat === 'other') return !s.categories || s.categories.length === 0;
                                         return s.categories && s.categories.length > 0 && s.categories[0].toLowerCase() === cat;
                                     });
-                                    if (catSocieties.length === 0) return null;
+                                    const isExpanded = expandedSections[`soc_${cat}`];
+                                    const displayedSocieties = isExpanded ? catSocieties : catSocieties.slice(0, 5);
+
                                     return (
                                         <div key={cat}>
                                             <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600, textTransform: 'capitalize' }}>{cat}</h4>
                                             <div className={styles.userList} style={{ gap: 0 }}>
-                                                {catSocieties.slice(0, 5).map(s => (
+                                                {displayedSocieties.map(s => (
                                                     <SocietyResultItem
                                                         key={s.id}
                                                         society={s}
@@ -286,10 +318,29 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                                         onToggle={toggleSociety}
                                                     />
                                                 ))}
-                                                {catSocieties.length > 5 && (
-                                                    <div style={{ padding: '8px', fontSize: '0.85rem', color: 'var(--muted)', textAlign: 'center' }}>
+                                                {!isExpanded && catSocieties.length > 5 && (
+                                                    <button
+                                                        onClick={() => toggleSection(`soc_${cat}`)}
+                                                        style={{
+                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--primary)',
+                                                            textAlign: 'center', background: 'none', border: 'none',
+                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
+                                                        }}
+                                                    >
                                                         + {catSocieties.length - 5} more
-                                                    </div>
+                                                    </button>
+                                                )}
+                                                {isExpanded && catSocieties.length > 5 && (
+                                                    <button
+                                                        onClick={() => toggleSection(`soc_${cat}`)}
+                                                        style={{
+                                                            padding: '8px', fontSize: '0.85rem', color: 'var(--muted)',
+                                                            textAlign: 'center', background: 'none', border: 'none',
+                                                            cursor: 'pointer', fontWeight: 500, width: '100%'
+                                                        }}
+                                                    >
+                                                        Show less
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
