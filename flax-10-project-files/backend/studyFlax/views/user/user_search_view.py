@@ -10,6 +10,7 @@ from django.db.models import Q
 @permission_classes([IsAuthenticated])
 def user_search(request):
     query = request.query_params.get('q', '').strip()
+    module_param = request.query_params.get('module', '').strip()
     
     users = User.objects.exclude(id=request.user.id)
     
@@ -17,8 +18,13 @@ def user_search(request):
         users = users.filter(
             Q(username__icontains=query) |
             Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(enrollments__module__module_code__icontains=query)
+            Q(last_name__icontains=query)
+        ).distinct()
+        
+    if module_param:
+        users = users.filter(
+            Q(enrollments__module__module_code__icontains=module_param) |
+            Q(enrollments__module__module_name__icontains=module_param)
         ).distinct()
         
     users = users[:20]  # Limit results
