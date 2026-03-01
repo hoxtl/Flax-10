@@ -263,7 +263,7 @@ const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     </div>
 );
 
-const useFilterState = (allModules, allSocieties, query) => {
+const useFilterState = (allModules, allSocieties, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activeFilterTab, setActiveFilterTab] = useState('modules');
     const [selectedModules, setSelectedModules] = useState([]);
@@ -275,9 +275,12 @@ const useFilterState = (allModules, allSocieties, query) => {
     const togMod = (c) => setSelectedModules(p => toggleArr(p, c));
     const togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
 
+    useUserSearchEffects(query, selectedModules, selectedSocieties, setUserResults, setLoading);
+    const active = (isSearchFocused || isFilterOpen) && (query.trim() || selectedModules.length > 0 || selectedSocieties.length > 0);
+    useDropdownPosition(containerRef, query, '', userResults, setDropdownPos, active);
+
     return {
-        isFilterOpen, setIsFilterOpen, selectedModules, selectedSocieties,
-        props: {
+        isFilterOpen, setIsFilterOpen, active, props: {
             activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery,
             moduleResults: fMods, selectedModules, toggleModule: togMod,
             societyResults: fSocs, selectedSocieties, toggleSociety: togSoc
@@ -289,23 +292,13 @@ export default function UserSearch({ onUserSelect }) {
     const { query, setQuery, userResults, setUserResults, allModules, allSocieties, loading, setLoading, dropdownPos, setDropdownPos, containerRef } = useSearchState();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const filterRef = useRef(null);
-    const { isFilterOpen, setIsFilterOpen, selectedModules, selectedSocieties, props } = useFilterState(allModules, allSocieties, query);
-
-    useUserSearchEffects(query, selectedModules, selectedSocieties, setUserResults, setLoading);
-    useDropdownPosition(containerRef, query, '', userResults, setDropdownPos, isSearchFocused && query.trim());
+    const { isFilterOpen, setIsFilterOpen, active, props } = useFilterState(allModules, allSocieties, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading);
     useClickOutside(containerRef, () => setIsSearchFocused(false));
     useClickOutside(filterRef, () => setIsFilterOpen(false));
-
-    const handleSelect = (user) => { if (onUserSelect) onUserSelect(user); setIsSearchFocused(false); setQuery(''); };
-    const focusSearch = () => { setIsSearchFocused(true); setIsFilterOpen(false); };
-    const togFilter = () => { setIsFilterOpen(!isFilterOpen); setIsSearchFocused(false); };
-
     return (
         <div className={styles.userSearchWrapper}>
-            <SearchBar query={query} setQuery={setQuery} setFocus={focusSearch} containerRef={containerRef}
-                showDpdwn={isSearchFocused && query.trim()} dpdwnPos={dropdownPos} loading={loading}
-                userResults={userResults} handleSel={handleSelect} />
-            <FilterSection fRef={filterRef} isOpen={isFilterOpen} setOpen={togFilter} props={props} />
+            <SearchBar query={query} setQuery={setQuery} setFocus={() => { setIsSearchFocused(true); setIsFilterOpen(false); }} containerRef={containerRef} showDpdwn={active} dpdwnPos={dropdownPos} loading={loading} userResults={userResults} handleSel={(user) => { if (onUserSelect) onUserSelect(user); setIsSearchFocused(false); setQuery(''); }} />
+            <FilterSection fRef={filterRef} isOpen={isFilterOpen} setOpen={() => { setIsFilterOpen(!isFilterOpen); setIsSearchFocused(false); }} props={props} />
         </div>
     );
 }
