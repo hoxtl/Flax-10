@@ -77,7 +77,7 @@ function ModuleResultItem({ module, isChecked, onToggle }) {
         <div
             className={styles.userItem}
             onClick={() => onToggle(module.module_code)}
-            style={{ cursor: 'pointer', flexDirection: 'row', alignItems: 'center', gap: '12px' }}
+            style={{ cursor: 'pointer', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', margin: 0 }}
         >
             <input
                 type="checkbox"
@@ -89,6 +89,30 @@ function ModuleResultItem({ module, isChecked, onToggle }) {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
                 <span style={{ fontWeight: 600, color: 'var(--text)' }}>{module.module_code}</span>
                 <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{module.module_name}</span>
+            </div>
+        </div>
+    );
+}
+
+function SocietyResultItem({ society, isChecked, onToggle }) {
+    return (
+        <div
+            className={styles.userItem}
+            onClick={() => onToggle(society.id)}
+            style={{ cursor: 'pointer', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', margin: 0 }}
+        >
+            <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onToggle(society.id)}
+                style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                onClick={(e) => e.stopPropagation()}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                <span style={{ fontWeight: 600, color: 'var(--text)' }}>{society.name}</span>
+                {society.categories && society.categories.length > 0 && (
+                    <span style={{ fontSize: '0.85rem', color: 'var(--muted)', textTransform: 'capitalize' }}>{society.categories[0]} society</span>
+                )}
             </div>
         </div>
     );
