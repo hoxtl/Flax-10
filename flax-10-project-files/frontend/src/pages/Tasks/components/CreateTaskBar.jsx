@@ -1,6 +1,8 @@
 /**
- * Quick Capture bar: task name only (optional duration/list/module).
- * For full planning (calendar, module, travel time) use the "Full Planning" button.
+ * Quick Capture bar: two rows.
+ *   Row 1: task name input + Add button (primary action)
+ *   Row 2: Est. time chips + Module chip + List selector (secondary options)
+ * For full planning (calendar, deadline, travel time) use the "Full Planning" button.
  */
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 
@@ -10,8 +12,9 @@ import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import styles from "./CreateTaskBar.module.css";
 
 const DURATION_OPTIONS = [
-  { value: 1, label: "25m", ariaLabel: "25 minutes" },
-  { value: 2, label: "50m", ariaLabel: "50 minutes" },
+  { value: 0, label: "5m", ariaLabel: "5 minutes (quick task)" },
+  { value: 1, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
+  { value: 2, label: "50m", ariaLabel: "50 minutes (2 Pomodoro blocks)" },
 ];
 
 export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDate, onAddTask }) {
@@ -142,17 +145,30 @@ const [taskListId, setTaskListId] = useState(
 
   return (
     <form className={styles.card} onSubmit={handleSubmit}>
-      <input
-        type="text"
-        className={styles.input}
-        placeholder="Add a task…"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        aria-label="Add a task — task name"
-      />
-      <div className={styles.actions}>
-        <span className={styles.actionLabel} aria-hidden>Duration</span>
-        <div className={styles.durationGroup} role="group" aria-label="Duration">
+      {/* Row 1: primary — task name + Add */}
+      <div className={styles.inputRow}>
+        <input
+          type="text"
+          className={styles.input}
+          placeholder="Add a task…"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          aria-label="Task name"
+        />
+        <button
+          type="submit"
+          className={styles.addBtn}
+          disabled={saving || !title.trim()}
+          aria-label="Add task"
+        >
+          {saving ? "…" : "Add"}
+        </button>
+      </div>
+
+      {/* Row 2: secondary options — est. time, module, list */}
+      <div className={styles.optionsRow}>
+        <span className={styles.optionsRowLabel}>Est. time</span>
+        <div className={styles.durationGroup} role="group" aria-label="Estimated duration">
           {DURATION_OPTIONS.map(({ value, label, ariaLabel }) => (
             <button
               key={value}
@@ -166,6 +182,9 @@ const [taskListId, setTaskListId] = useState(
             </button>
           ))}
         </div>
+
+        <span className={styles.optionsRowDivider} aria-hidden />
+
         <div className={styles.moduleWrap} ref={popoverRef}>
           <button
             ref={moduleTriggerRef}
@@ -192,10 +211,12 @@ const [taskListId, setTaskListId] = useState(
                   : undefined
               }
             >
-              <div className={styles.modulePopoverBubbles}>
+              <div className={styles.moduleDropdownList} role="listbox" aria-label="Module">
                 <button
                   type="button"
-                  className={`${styles.moduleBubble} ${!moduleId ? styles.moduleBubbleActive : ""}`}
+                  role="option"
+                  aria-selected={!moduleId}
+                  className={`${styles.moduleDropdownItem} ${!moduleId ? styles.moduleDropdownItemActive : ""}`}
                   onClick={() => {
                     setModuleId(null);
                     setModulePopoverOpen(false);
@@ -207,13 +228,18 @@ const [taskListId, setTaskListId] = useState(
                   <button
                     key={m.id}
                     type="button"
-                    className={`${styles.moduleBubble} ${String(moduleId) === String(m.id) ? styles.moduleBubbleActive : ""}`}
+                    role="option"
+                    aria-selected={String(moduleId) === String(m.id)}
+                    className={`${styles.moduleDropdownItem} ${String(moduleId) === String(m.id) ? styles.moduleDropdownItemActive : ""}`}
                     onClick={() => {
                       setModuleId(m.id);
                       setModulePopoverOpen(false);
                     }}
                   >
-                    {m.module_code}
+                    <span className={styles.moduleDropdownCode}>{m.module_code}</span>
+                    {m.module_name && (
+                      <span className={styles.moduleDropdownName}>{m.module_name}</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -223,65 +249,81 @@ const [taskListId, setTaskListId] = useState(
             </div>
           )}
         </div>
-        <span className={styles.actionLabel} aria-hidden>List</span>
+
+        <span className={styles.optionsRowDivider} aria-hidden />
+        <span className={styles.optionsRowLabel}>List</span>
+
         <div className={styles.listDropdownWrap} ref={listDropdownRef}>
-          <button
-            ref={listTriggerRef}
-            type="button"
-            className={styles.listDropdownTrigger}
-            onClick={() => setListDropdownOpen((o) => !o)}
-            aria-label="Select list"
-            aria-expanded={listDropdownOpen}
-            aria-haspopup="listbox"
-          >
-            <span className={styles.listDropdownValue}>
-              {sortedLists.find((l) => String(l.id) === String(taskListId))?.name || "Select list"}
-            </span>
-            <span className={styles.listDropdownChevron} aria-hidden>▾</span>
-          </button>
-          {listDropdownOpen && (
-            <div
-              className={styles.listDropdownPopover}
-              role="listbox"
-              aria-label="List"
-              style={
-                listPopoverRect
-                  ? {
-                      position: "fixed",
-                      top: listPopoverRect.top,
-                      left: listPopoverRect.left,
-                      minWidth: listPopoverRect.width,
-                    }
-                  : undefined
-              }
-            >
-              {sortedLists.map((l) => (
+          {(() => {
+            const activeList = sortedLists.find((l) => String(l.id) === String(taskListId));
+            return (
+              <>
                 <button
-                  key={l.id}
+                  ref={listTriggerRef}
                   type="button"
-                  role="option"
-                  aria-selected={String(taskListId) === String(l.id)}
-                  className={`${styles.listDropdownOption} ${String(taskListId) === String(l.id) ? styles.listDropdownOptionActive : ""}`}
-                  onClick={() => {
-                    setTaskListId(l.id);
-                    setListDropdownOpen(false);
-                  }}
+                  className={styles.listDropdownTrigger}
+                  onClick={() => setListDropdownOpen((o) => !o)}
+                  aria-label="Select list"
+                  aria-expanded={listDropdownOpen}
+                  aria-haspopup="listbox"
                 >
-                  {l.name}
+                  {activeList?.color && (
+                    <span
+                      className={styles.listDot}
+                      style={{ background: activeList.color }}
+                      aria-hidden
+                    />
+                  )}
+                  <span className={styles.listDropdownValue}>
+                    {activeList?.name || "Select list"}
+                  </span>
+                  <span className={styles.listDropdownChevron} aria-hidden>▾</span>
                 </button>
-              ))}
-            </div>
-          )}
+                {listDropdownOpen && (
+                  <div
+                    className={styles.listDropdownPopover}
+                    role="listbox"
+                    aria-label="List"
+                    style={
+                      listPopoverRect
+                        ? {
+                            position: "fixed",
+                            top: listPopoverRect.top,
+                            left: listPopoverRect.left,
+                            minWidth: listPopoverRect.width,
+                          }
+                        : undefined
+                    }
+                  >
+                    {sortedLists.map((l) => (
+                      <button
+                        key={l.id}
+                        type="button"
+                        role="option"
+                        aria-selected={String(taskListId) === String(l.id)}
+                        className={`${styles.listDropdownOption} ${String(taskListId) === String(l.id) ? styles.listDropdownOptionActive : ""}`}
+                        onClick={() => {
+                          setTaskListId(l.id);
+                          setListDropdownOpen(false);
+                        }}
+                      >
+                        {l.color && (
+                          <span
+                            className={styles.listDot}
+                            style={{ background: l.color }}
+                            aria-hidden
+                          />
+                        )}
+                        {l.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       </div>
-      <button
-        type="submit"
-        className={styles.addBtn}
-        disabled={saving || !title.trim()}
-        aria-label="Add a task — add task"
-      >
-        {saving ? "…" : "Add"}
-      </button>
     </form>
   );
 }
