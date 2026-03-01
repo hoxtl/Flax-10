@@ -98,7 +98,7 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
     <div className={styles.headerWrapper}>
 
       <div className={styles.mobileOnly}>
-        
+
         <div className={styles.mobileHero}>
           <div className={styles.avatarWrapper}>
             <div className={styles.mainAvatar}>
@@ -126,6 +126,10 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
             <span className={styles.statNumber}>{upcomingEventCount || 0}</span>
             <span className={styles.statLabel}>Events</span>
           </div>
+        </div>
+
+        <div className={styles.actionArea}>
+          <button className={styles.mobileEditBtn} onClick={onEditProfile}>Edit profile</button>
         </div>
 
       </div>
