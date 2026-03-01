@@ -184,4 +184,11 @@
     height: 40px;
     font-size: 1.2rem;
   }
+
+  :global(.SocietyCard_card) {
+    width: 100% !important;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border);
+  }
 }
