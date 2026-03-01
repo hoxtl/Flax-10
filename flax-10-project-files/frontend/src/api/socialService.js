@@ -1,17 +1,17 @@
 import { fetchApi } from './client';
 
-export const followUser = async (userId) => {
-    return await fetchApi(`/social/${userId}/follow/`, { method: 'POST' });
+export const shareCalendar = async (userId) => {
+    return await fetchApi(`/social/${userId}/share/`, { method: 'POST' });
 };
 
-export const unfollowUser = async (userId) => {
-    return await fetchApi(`/social/${userId}/unfollow/`, { method: 'POST' });
+export const unshareCalendar = async (userId) => {
+    return await fetchApi(`/social/${userId}/unshare/`, { method: 'POST' });
 };
 
-export const getFollowers = async (userId) => {
-    return await fetchApi(`/social/${userId}/followers/`);
+export const getSharedWithMe = async (userId) => {
+    return await fetchApi(`/social/${userId}/shared-with-me/`);
 };
 
-export const getFollowing = async (userId) => {
-    return await fetchApi(`/social/${userId}/following/`);
+export const getSharingWith = async (userId) => {
+    return await fetchApi(`/social/${userId}/sharing-with/`);
 };

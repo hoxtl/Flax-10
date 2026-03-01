@@ -96,30 +96,29 @@
     color: var(--muted);
 }
 
-.followButton {
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: none;
-    font-weight: 500;
-    cursor: pointer;
-    background-color: var(--primary);
-    color: var(--c-white);
-    transition: all 0.2s;
-}
-
-.followButton.following {
-    background-color: var(--pill-bg);
-    color: var(--text);
+.shareButton {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
     border: 1px solid var(--border);
+    background: white;
+    font-size: 0.9rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.followButton:hover {
+.shareButton.sharing {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.shareButton:hover {
     opacity: 0.9;
 }
 
-.followButton.following:hover {
-    background-color: var(--danger-bg);
-    color: var(--danger);
-    border-color: var(--danger-border);
+.shareButton.sharing:hover {
+    background: var(--hover);
+    border-color: var(--hover);
+    color: white;
 }
-

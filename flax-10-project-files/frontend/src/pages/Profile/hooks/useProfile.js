@@ -65,15 +65,15 @@ function useModalState() {
   const [showTasks, setShowTasks] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
+  const [showSharedWith, setShowSharedWith] = useState(false);
+  const [showSharedBy, setShowSharedBy] = useState(false);
   return {
     showModules, setShowModules,
     showTasks, setShowTasks,
     showEvents, setShowEvents,
     showEditProfile, setShowEditProfile,
-    showFollowers, setShowFollowers,
-    showFollowing, setShowFollowing,
+    showSharedWith, setShowSharedWith,
+    showSharedBy, setShowSharedBy,
   };
 }
 
@@ -96,7 +96,7 @@ export function useProfileBodyData(state) {
 }
 
 export function useProfileContent(state) {
-  const { profileData, reload, setOptimisticShare, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowFollowers, setShowFollowing } = state;
+  const { profileData, reload, setOptimisticShare, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowSharedWith, setShowSharedBy } = state;
   const handlers = {
     reload,
     setOptimisticShare,
@@ -104,8 +104,8 @@ export function useProfileContent(state) {
     onTasksClick: () => setShowTasks(true),
     onEventsClick: () => setShowEvents(true),
     onEditProfile: () => setShowEditProfile(true),
-    onFollowersClick: () => setShowFollowers(true),
-    onFollowingClick: () => setShowFollowing(true),
+    onSharedWithClick: () => setShowSharedWith(true),
+    onSharedByClick: () => setShowSharedBy(true),
   };
   return { profileData, handlers };
 }

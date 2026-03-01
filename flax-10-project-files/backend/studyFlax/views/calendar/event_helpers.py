@@ -1,5 +1,5 @@
 from django.db.models import Q
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import calendar
 
 def filter_events_by_date_range(queryset, params):

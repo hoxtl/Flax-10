@@ -84,16 +84,18 @@ class UserSerialiser(serializers.ModelSerializer):
         return request.build_absolute_uri(obj.profile_photo.url) if request else None
 
     def get_shared_by_count(self, obj):
-        return obj.following.count()
+        # People who have shared their calendar with obj
+        return obj.shared_with_me.count()
 
     def get_shared_with_count(self, obj):
-        return obj.followers.count()
+        # People obj has shared their calendar with
+        return obj.sharing_with.count()
 
     def get_is_shared_with_me(self, obj):
         # Has obj shared their calendar with request.user?
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            return obj.followers.filter(follower=request.user).exists()
+            return obj.sharing_with.filter(shared_with=request.user).exists()
         return False
 
     def get_is_sharing(self, obj):
@@ -105,7 +107,7 @@ class UserSerialiser(serializers.ModelSerializer):
         if request.user == obj:
             return True
             
-        return request.user.followers.filter(follower=obj).exists()
+        return request.user.sharing_with.filter(shared_with=obj).exists()
 
     def get_modules(self, obj):
         settings = getattr(obj, 'settings', None)

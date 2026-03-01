@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { followUser as shareCalendar, unfollowUser as unshareCalendar } from '../../api/socialService';
+import { shareCalendar, unshareCalendar } from '../../api/socialService';
 import styles from './Social.module.css';
 
 function getLabel(loading, isSharing) {
@@ -31,6 +31,6 @@ export default function ShareButton({ userId, initialIsSharing, onToggle }) {
         if (!loading) toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle);
     };
 
-    const cls = `${styles.followButton} ${isSharing ? styles.following : ''}`;
+    const cls = `${styles.shareButton} ${isSharing ? styles.sharing : ''}`;
     return <button className={cls} onClick={handleClick} disabled={loading}>{getLabel(loading, isSharing)}</button>;
 }
