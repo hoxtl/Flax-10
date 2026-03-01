@@ -13,10 +13,8 @@
   @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
   
   .modal {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: var(--glass-border);
+    background: var(--panel, #FFFCFA);
+    border: 1px solid rgba(74, 52, 33, 0.1);
     border-radius: 12px;
     width: 90%;
     max-width: 400px;

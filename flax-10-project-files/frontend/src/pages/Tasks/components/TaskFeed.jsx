@@ -144,11 +144,12 @@ export default function TaskFeed({
     }, [pending, search]);
 
     const now      = new Date();
+    const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
     const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
-    const overdue  = filtered.filter(t => t.due_date && new Date(t.due_date) < now && !t.completed && !isRoutineOrEventTask(t));
-    const today    = filtered.filter(t => t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd);
+    const overdue  = filtered.filter(t => t.due_date && new Date(t.due_date) < dayStart && !t.completed && !isRoutineOrEventTask(t));
+    const today    = filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
     const thisWeek = filtered.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); return d > todayEnd && d <= weekEnd; });
     const later    = filtered.filter(t => !t.due_date || new Date(t.due_date) > weekEnd);
 
@@ -197,9 +198,8 @@ export default function TaskFeed({
             <header className={styles.listHeader} key={activeListId ?? "all"}>
                 <div className={styles.listHeaderTitleWrap}>
                     <h1 className={styles.listHeaderTitle} title={headerTitle}>{headerTitle}</h1>
-                    <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>
                 </div>
-                <div className={styles.listHeaderZen} aria-hidden />
+                <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>
                 <div className={styles.listHeaderDivider} aria-hidden />
             </header>
 
@@ -207,7 +207,6 @@ export default function TaskFeed({
             <div className={styles.subHeader}>
                 {onAddTask ? (
                     <div className={styles.createBarWrap}>
-                        <span className={styles.quickCaptureLabel}>Quick Capture</span>
                         <CreateTaskBar
                             lists={lists}
                             defaultListId={activeListId}

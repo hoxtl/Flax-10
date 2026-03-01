@@ -1,8 +1,8 @@
 .page {
-    height: 100%;
+    min-height: 100%;
     display: flex;
+    align-items: stretch;
     overflow-x: hidden;
-    overflow-y: auto;
     gap: 0;
     font-family: var(--font-body);
 }
@@ -52,3 +52,7 @@
     font-size: 0.75rem;
 }
 .toastClose:hover { opacity: 1; }
+
+.toastDelete {
+    background: #4A3421;
+}
