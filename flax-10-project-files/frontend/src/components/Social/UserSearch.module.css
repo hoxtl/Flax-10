@@ -190,6 +190,7 @@
 }
 
 .filterItem {
+    display: flex;
     cursor: pointer;
     flex-direction: row;
     align-items: center;
@@ -201,7 +202,7 @@
 .filterItemCheckbox {
     cursor: pointer;
     accent-color: var(--primary);
-    margin-top: 4px;
+    margin: 0;
 }
 
 .filterItemText {
