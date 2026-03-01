@@ -37,14 +37,10 @@ function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSel
   return (
     <div className={styles.stats}>
       <StatItem value={profileData?.module_count || 0} label="modules" onClick={onModulesClick} />
-      {isMutualOrSelf && (
-        <>
-          <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
-          <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
-        </>
-      )}
       {isSelf && (
-        <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onSharedWithClick} />
+        <>
+          <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onSharedWithClick} />
+        </>
       )}
     </div>
   );
@@ -540,14 +536,17 @@ function Skeleton() {
 // ProfileHome
 // ---------------------------------------------------------------------------
 
-function ProfileHome({ onNavigate }) {
-  const { summary, loading, refetch } = useProfileSummary();
+function ProfileHome({ onNavigate, isSelf, viewedUserId }) {
+  const { summary, loading, refetch } = useProfileSummary(viewedUserId);
   const [analyticsData, setAnalyticsData] = useState(null);
   const [showAchievements, setShowAchievements] = useState(false);
 
   useEffect(() => {
-    analyticsService.getSummary(90).then(setAnalyticsData).catch(() => { });
-  }, []);
+    // Only fetch analytics if viewing self
+    if (isSelf) {
+      analyticsService.getSummary(90).then(setAnalyticsData).catch(() => { });
+    }
+  }, [isSelf]);
 
   const handleGoalSave = async (newGoal) => {
     try {
@@ -576,17 +575,25 @@ function ProfileHome({ onNavigate }) {
 
   return (
     <div className={styles.profileHome}>
-      <PersonaCard persona={summary?.persona} peakHour={peakHour} />
-      <div className={styles.twoCol}>
-        <div className={styles.leftCol}>
-          <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={handleGoalSave} />
-          <StudyDNA heatmap={analyticsData?.heatmap} />
-          <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
-        </div>
-        <div className={styles.rightCol}>
+      {isSelf ? (
+        <>
+          <PersonaCard persona={summary?.persona} peakHour={peakHour} />
+          <div className={styles.twoCol}>
+            <div className={styles.leftCol}>
+              <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={handleGoalSave} />
+              <StudyDNA heatmap={analyticsData?.heatmap} />
+              <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
+            </div>
+            <div className={styles.rightCol}>
+              <BadgesSection badges={summary?.badges} onOpen={() => setShowAchievements(true)} />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className={styles.badgesWrapper} style={{ marginTop: '2rem' }}>
           <BadgesSection badges={summary?.badges} onOpen={() => setShowAchievements(true)} />
         </div>
-      </div>
+      )}
       {showAchievements && (
         <AchievementsModal
           badges={summary?.badges}
@@ -617,18 +624,7 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       />
       <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
 
-      {!isSelf && (
-        !isMutualOrSelf ? (
-          <div className={styles.privateMessage}>
-            🔒 This user has not shared their calendar with you.
-          </div>
-        ) : (
-          <div className={styles.calendarSection} style={{ marginTop: "2rem", overflow: "hidden", borderRadius: "12px", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-            <ProfileCalendar events={filteredEvents} />
-          </div>
-        )
-      )}
-      <ProfileHome onNavigate={onNavigate} />
+      <ProfileHome onNavigate={onNavigate} isSelf={isSelf} viewedUserId={state.userId} />
     </div>
   );
 }

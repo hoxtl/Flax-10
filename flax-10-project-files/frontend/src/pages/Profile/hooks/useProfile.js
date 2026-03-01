@@ -84,7 +84,7 @@ export function useProfileState(userId) {
   const handleSaveProfile = async () => {
     await reload();
   };
-  return { profileData, loading, handleSaveProfile, reload, setOptimisticShare, ...eventsState, ...modalState };
+  return { userId, profileData, loading, handleSaveProfile, reload, setOptimisticShare, ...eventsState, ...modalState };
 }
 
 export function useProfileBodyData(state) {
