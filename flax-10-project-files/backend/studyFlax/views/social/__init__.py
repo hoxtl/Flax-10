@@ -1,1 +1,1 @@
-from .follow_views import FollowViewSet
+from .share_views import CalendarShareViewSet

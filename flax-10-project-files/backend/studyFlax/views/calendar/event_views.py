@@ -38,7 +38,7 @@ def get_events(request):
             
         # Check if target_user has shared their calendar with request.user
         if target_user != request.user:
-            is_shared_with_me = target_user.followers.filter(follower=request.user).exists()
+            is_shared_with_me = target_user.sharing_with.filter(shared_with=request.user).exists()
             if not is_shared_with_me:
                 return Response([]) # Gracefully deny access
     else:

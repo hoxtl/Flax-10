@@ -33,7 +33,7 @@ function StatItem({ value, label, onClick }) {
 }
 
 function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
-  const { onModulesClick, onTasksClick, onEventsClick, onFollowersClick, onFollowingClick } = handlers;
+  const { onModulesClick, onTasksClick, onEventsClick, onSharedWithClick, onSharedByClick } = handlers;
   return (
     <div className={styles.stats}>
       <StatItem value={profileData?.module_count || 0} label="modules" onClick={onModulesClick} />
@@ -44,7 +44,7 @@ function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSel
         </>
       )}
       {isSelf && (
-        <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onFollowersClick} />
+        <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onSharedWithClick} />
       )}
     </div>
   );
@@ -69,7 +69,7 @@ function ProfileHeaderTop({ user, onEditProfile, isSelf }) {
       {isSelf ? (
         <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
       ) : (
-        <div className={styles.followAction}>
+        <div className={styles.shareAction}>
           <ShareButton
             userId={user?.id}
             initialIsSharing={user?.is_sharing}

@@ -2,7 +2,7 @@ import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
 import { useState, useEffect } from "react";
-import { getFollowers, getFollowing } from "../../api/socialService";
+import { getSharingWith, getSharedWithMe } from "../../api/socialService";
 import UserListModal from "../../components/Social/UserListModal";
 
 function Modal({ isOpen, onClose, title, children }) {
@@ -165,19 +165,19 @@ function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
       {isMutualOrSelf && <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />}
 
       <SocialDataModal
-        isOpen={state.showFollowers}
-        onClose={() => state.setShowFollowers(false)}
-        title="Shared With"
-        fetchFn={getFollowers}
+        isOpen={state.showSharedWith}
+        onClose={() => state.setShowSharedWith(false)}
+        title="Sharing With"
+        fetchFn={getSharingWith}
         userId={(profileData || user)?.id}
         onNavChange={onNavChange}
         onUserUpdate={state.reload}
       />
       <SocialDataModal
-        isOpen={state.showFollowing}
-        onClose={() => state.setShowFollowing(false)}
+        isOpen={state.showSharedBy}
+        onClose={() => state.setShowSharedBy(false)}
         title="Shared By"
-        fetchFn={getFollowing}
+        fetchFn={getSharedWithMe}
         userId={(profileData || user)?.id}
         onNavChange={onNavChange}
         onUserUpdate={state.reload}

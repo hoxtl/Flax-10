@@ -269,11 +269,7 @@ const useFilterState = (allModules, allSocieties, query, isSearchFocused, contai
     const [selectedModules, setSelectedModules] = useState([]);
     const [selectedSocieties, setSelectedSocieties] = useState([]);
     const [filterQuery, setFilterQuery] = useState('');
-
-    const fMods = filterObj(allModules, filterQuery, ['module_code', 'module_name']);
-    const fSocs = filterObj(allSocieties, filterQuery, ['name']);
-    const togMod = (c) => setSelectedModules(p => toggleArr(p, c));
-    const togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
+    const togMod = (c) => setSelectedModules(p => toggleArr(p, c)), togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
 
     useUserSearchEffects(query, selectedModules, selectedSocieties, setUserResults, setLoading);
     const active = isSearchFocused && (query.trim() || selectedModules.length > 0 || selectedSocieties.length > 0);
@@ -282,8 +278,8 @@ const useFilterState = (allModules, allSocieties, query, isSearchFocused, contai
     return {
         isFilterOpen, setIsFilterOpen, active, props: {
             activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery,
-            moduleResults: fMods, selectedModules, toggleModule: togMod,
-            societyResults: fSocs, selectedSocieties, toggleSociety: togSoc
+            moduleResults: filterObj(allModules, filterQuery, ['module_code', 'module_name']), selectedModules, toggleModule: togMod,
+            societyResults: filterObj(allSocieties, filterQuery, ['name']), selectedSocieties, toggleSociety: togSoc
         }
     };
 };

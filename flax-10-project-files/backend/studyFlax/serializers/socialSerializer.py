@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from studyFlax.models.social.followModel import Follow
+from studyFlax.models.social.shareModel import CalendarShare
 
 User = get_user_model()
 
-class FollowUserSerializer(serializers.ModelSerializer):
-    """Serializer for displaying simple user info in follow lists."""
+class CalendarShareUserSerializer(serializers.ModelSerializer):
+    """Serializer for displaying simple user info in calendar share lists."""
     is_sharing = serializers.SerializerMethodField()
     is_shared_with_me = serializers.SerializerMethodField()
 
@@ -16,32 +16,34 @@ class FollowUserSerializer(serializers.ModelSerializer):
     def get_is_sharing(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            return obj.following.filter(followed=request.user).exists()
+            # Does obj share with me?
+            return obj.sharing_with.filter(shared_with=request.user).exists()
         return False
 
     def get_is_shared_with_me(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            return obj.followers.filter(follower=request.user).exists()
+            # Does request.user share with obj?
+            return request.user.sharing_with.filter(shared_with=obj).exists()
         return False
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    """Serializer purely representing the Follow relationship."""
+class CalendarShareSerializer(serializers.ModelSerializer):
+    """Serializer purely representing the CalendarShare relationship."""
     class Meta:
-        model = Follow
-        fields = ('id', 'follower', 'followed', 'created_at')
-        read_only_fields = ('follower',)
+        model = CalendarShare
+        fields = ('id', 'owner', 'shared_with', 'created_at')
+        read_only_fields = ('owner',)
 
     def validate(self, data):
-        """Ensure a user cannot follow themselves."""
+        """Ensure a user cannot share with themselves."""
         request = self.context.get('request')
-        if request and request.user == data.get('followed'):
-            raise serializers.ValidationError("You cannot follow yourself.")
+        if request and request.user == data.get('shared_with'):
+            raise serializers.ValidationError("You cannot share your calendar with yourself.")
         return data
 
     def create(self, validated_data):
-        """Automatically set the follower to the current user."""
+        """Automatically set the owner to the current user."""
         request = self.context.get('request')
-        validated_data['follower'] = request.user
+        validated_data['owner'] = request.user
         return super().create(validated_data)
