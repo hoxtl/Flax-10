@@ -1,163 +1,204 @@
-/* Create Task bar: horizontal, professional. 12px radius, glass, 8px grid */
+/* Create Task bar: two-row layout — primary input row + secondary options row */
 
 .card {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: var(--glass-border);
-  border-radius: 12px;
-  box-shadow: var(--card-shadow);
-  flex-wrap: wrap;
-  width: 100%;
-  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  background: var(--panel, #FFFCFA);
+  border: 1px solid rgba(74, 52, 33, 0.1);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-sm);
   box-sizing: border-box;
+  width: 100%;
+}
+
+/* ── Row 1: input + Add ── */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .input {
   flex: 1;
-  min-width: 160px;
-  padding: 10px 14px;
-  font-size: 0.9rem;
+  min-width: 80px;
+  padding: var(--input-padding, 8px 12px);
+  font-size: var(--text-base, 0.875rem);
   font-weight: 500;
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--bg, #F8F5F2);
+  border: var(--input-border, 1px solid var(--border));
+  border-radius: var(--input-radius, var(--radius-md, 8px));
   outline: none;
-  transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
+  transition: box-shadow 0.15s, border-color 0.15s;
 }
-.input::placeholder {
-  color: var(--muted);
-}
+.input::placeholder { color: var(--muted); }
 .input:focus {
-  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
+  box-shadow: var(--input-focus-ring, 0 0 0 2px rgba(123, 103, 81, 0.15));
   border-color: var(--primary);
 }
 
-.actions {
+.addBtn {
+  padding: var(--btn-padding, 8px 16px);
+  font-size: var(--btn-font-size, var(--text-sm, 0.8rem));
+  font-weight: var(--btn-font-weight, 600);
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--btn-radius, var(--radius-md, 8px));
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.addBtn:hover:not(:disabled) { opacity: 0.88; }
+.addBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Row 2: secondary options ── */
+.optionsRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 6px;
+  flex-wrap: nowrap;
   min-width: 0;
-  flex-wrap: wrap;
 }
 
-.actionLabel {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: #94a3b8;
+.optionsRowLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: #9a8778;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
+.optionsRowDivider {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: rgba(74, 52, 33, 0.12);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* ── Duration chips ── */
 .durationGroup {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 4px;
 }
 
 .durationBtn {
-  padding: 8px 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: 4px 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--muted);
-  background: var(--bg);
+  background: var(--bg, #F8F5F2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
 }
-.durationBtn:hover {
-  background: var(--hover);
-  color: var(--text);
-}
+.durationBtn:hover { background: var(--hover); color: var(--text); }
 .durationBtnActive {
-  background: color-mix(in srgb, var(--primary) 12%, var(--bg));
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg));
   color: var(--primary);
   border-color: var(--primary);
+  font-weight: 700;
 }
 
-/* Module trigger + popover */
+/* ── Module trigger + popover ── */
 .moduleWrap {
   position: relative;
   flex-shrink: 0;
 }
 
 .moduleBtn {
-  padding: 8px 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--muted);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  padding: 4px 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #52796f;
+  background: rgba(132, 169, 140, 0.1);
+  border: 1px solid rgba(132, 169, 140, 0.3);
+  border-radius: 8px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  transition: background 0.15s, color 0.15s;
+  gap: 5px;
+  white-space: nowrap;
+  transition: background 0.15s;
 }
-.moduleBtn:hover {
-  background: var(--hover);
-  color: var(--text);
-}
+.moduleBtn:hover { background: rgba(132, 169, 140, 0.2); }
 .moduleBtnActive {
-  background: rgba(132, 169, 140, 0.2);
-  color: #52796f;
-  border-color: var(--primary);
+  background: rgba(132, 169, 140, 0.25);
+  border-color: #84A98C;
+  color: #3d5c54;
 }
 
 .modulePopover {
   position: absolute;
   left: 0;
   top: 100%;
-  margin-top: 8px;
-  padding: 8px;
-  background: rgba(251, 249, 245, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(210, 180, 140, 0.45);
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(74, 52, 33, 0.14), 0 2px 8px rgba(107, 83, 68, 0.08);
+  margin-top: var(--space-2, 8px);
+  padding: var(--dropdown-padding, var(--space-1, 4px));
+  background: var(--dropdown-bg, var(--panel, #FFFCFA));
+  border: var(--dropdown-border, 1px solid rgba(210, 180, 140, 0.45));
+  border-radius: var(--dropdown-radius, var(--radius-lg, 12px));
+  box-shadow: var(--dropdown-shadow, var(--shadow-lg));
   z-index: 1050;
-  min-width: 160px;
-  max-height: 220px;
+  min-width: 180px;
+  max-height: 240px;
   overflow-y: auto;
 }
 
-.modulePopoverBubbles {
+.moduleDropdownList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.moduleBubble {
-  padding: 0.3rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #52796f;
-  background: rgba(132, 169, 140, 0.25);
+.moduleDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
   border: none;
-  border-radius: 9999px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  text-align: left;
+  transition: background 0.12s;
 }
-.moduleBubble:hover {
-  background: rgba(132, 169, 140, 0.4);
+.moduleDropdownItem:hover { background: rgba(210, 180, 140, 0.2); }
+.moduleDropdownItemActive {
+  background: rgba(132, 169, 140, 0.15);
   color: #3d5c54;
+  font-weight: 600;
 }
-.moduleBubbleActive {
-  background: #84A98C;
-  color: #fff;
+
+.moduleDropdownCode {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #52796f;
+  flex-shrink: 0;
 }
-.moduleBubbleActive:hover {
-  background: #729d76;
-  color: #fff;
+
+.moduleDropdownName {
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .modulePopoverEmpty {
@@ -167,39 +208,32 @@
   color: #94a3b8;
 }
 
-/* List dropdown — Matte Glass popover, above task cards */
+/* ── List dropdown ── */
 .listDropdownWrap {
   position: relative;
   flex-shrink: 0;
   min-width: 0;
-  max-width: 100%;
+  max-width: 160px;
 }
 .listDropdownTrigger {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 10px 8px 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  gap: 5px;
+  padding: 4px 7px 4px 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg, #F8F5F2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   outline: none;
   min-width: 0;
-  max-width: 180px;
-  width: 100%;
-  box-sizing: border-box;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  max-width: 160px;
+  white-space: nowrap;
+  transition: border-color 0.15s;
 }
-.listDropdownTrigger:hover {
-  border-color: rgba(107, 83, 68, 0.35);
-}
-.listDropdownTrigger:focus {
-  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.15);
-  border-color: var(--restoration-earth, #6B5344);
-}
+.listDropdownTrigger:hover { border-color: rgba(107, 83, 68, 0.35); }
 .listDropdownValue {
   flex: 1;
   min-width: 0;
@@ -223,21 +257,29 @@
   max-height: 280px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 6px;
-  background: rgba(251, 249, 245, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(210, 180, 140, 0.45);
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(74, 52, 33, 0.14), 0 2px 8px rgba(107, 83, 68, 0.08);
+  padding: var(--dropdown-padding, var(--space-1, 4px));
+  background: var(--dropdown-bg, var(--panel, #FFFCFA));
+  border: var(--dropdown-border, 1px solid rgba(210, 180, 140, 0.45));
+  border-radius: var(--dropdown-radius, var(--radius-lg, 12px));
+  box-shadow: var(--dropdown-shadow, var(--shadow-lg));
   z-index: 1050;
 }
+/* Colored dot for list pills and dropdown options */
+.listDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .listDropdownOption {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 12px;
-  font-size: 0.85rem;
+  padding: 9px 12px;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--text);
   background: none;
@@ -249,57 +291,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
 }
-.listDropdownOption:hover {
-  background: rgba(210, 180, 140, 0.2);
-  color: var(--restoration-earth, #6B5344);
-}
+.listDropdownOption:hover { background: rgba(210, 180, 140, 0.2); }
 .listDropdownOptionActive {
   background: rgba(210, 180, 140, 0.2);
-  color: var(--restoration-earth, #6B5344);
+  color: var(--primary);
   font-weight: 600;
-}
-.listDropdownOptionActive:hover {
-  background: rgba(210, 180, 140, 0.3);
-  color: var(--restoration-earth, #6B5344);
-}
-
-.select {
-  padding: 8px 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  outline: none;
-  min-width: 0;
-  max-width: 140px;
-  transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
-}
-.select:focus {
-  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
-  border-color: var(--primary);
-}
-
-.addBtn {
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--primary);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: opacity 0.15s, filter 0.15s;
-}
-.addBtn:hover:not(:disabled) {
-  filter: brightness(1.05);
-}
-.addBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
