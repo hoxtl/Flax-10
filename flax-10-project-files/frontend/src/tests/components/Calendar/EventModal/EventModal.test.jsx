@@ -39,12 +39,11 @@ vi.mock('../../../../context/CalendarContext', async (importOriginal) => {
     };
 });
 
+const tagsState = { tags: [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }], loading: false };
+
 vi.mock('../../../../context/TagContext', () => ({
     TagProvider: ({ children }) => children,
-    useTags: () => ({
-        tags: [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }],
-        loading: false,
-    }),
+    useTags: () => ({ ...tagsState }),
 }));
 
 describe('EventModal', () => {
@@ -60,10 +59,11 @@ describe('EventModal', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        // Reset mock state default
         mockFormLogic.isEditing = false;
         mockFormLogic.error = null;
         mockFormLogic.form = { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] };
+        tagsState.loading = false;
+        tagsState.tags = [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }];
     });
 
     it('should render new event title', () => {
@@ -122,5 +122,21 @@ describe('EventModal', () => {
         expect(screen.getByText('Delete')).toBeInTheDocument();
         fireEvent.click(screen.getByText('Delete'));
         expect(mockFormLogic.handleDelete).toHaveBeenCalled();
+    });
+
+    it('returns null while tags are loading', () => {
+        tagsState.loading = true;
+        const { container } = renderModal();
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('uses initialType as default tag when provided', () => {
+        renderModal({ initialType: 'work' });
+        expect(screen.getByText('New Event')).toBeInTheDocument();
+    });
+
+    it('uses null default tag when customTags provided and no initialType', () => {
+        renderModal({ customTags: [{ id: 3, label: 'Custom', color: '#f00' }] });
+        expect(screen.getByText('New Event')).toBeInTheDocument();
     });
 });

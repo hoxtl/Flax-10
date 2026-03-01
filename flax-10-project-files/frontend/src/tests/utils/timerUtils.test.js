@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { getProgress, useCompletionCheck } from '../../hooks/timerUtils';
+import { getProgress, useCompletionCheck } from '../../components/Timer/utils/timerUtils';
 
 const testProgressBreak = () => {
     expect(getProgress({ mode: 'break' })).toBe(100);

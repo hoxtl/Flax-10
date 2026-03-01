@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TopBar from '../../components/Topbar';
+import TopBar from '../../components/Dashboard/Topbar';
 
-vi.mock('../../components/ProfileDropdown', () => ({
+vi.mock('../../components/Dashboard/ProfileDropdown', () => ({
   default: ({ onSettingsClick, onLogoutClick, onProfileClick }) => (
     <div>
       <button onClick={onSettingsClick}>settings</button>
@@ -12,7 +12,7 @@ vi.mock('../../components/ProfileDropdown', () => ({
   ),
 }));
 
-vi.mock('../../components/ExpandableTabs', () => ({
+vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
   ExpandableTabs: ({ onChange }) => (
     <div>
       <button onClick={() => onChange(0)}>add-tab</button>
@@ -22,7 +22,7 @@ vi.mock('../../components/ExpandableTabs', () => ({
   ),
 }));
 
-vi.mock('../../components/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../components/Dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
 
 describe('TopBar', () => {
   it('renders greeting and date', () => {

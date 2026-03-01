@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Home from '../../pages/Home';
+import Home from '../../pages/Home/Home';
 
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
@@ -19,12 +19,12 @@ vi.mock('../../context/CalendarContext', () => ({
   useEventModal: () => ({ openModal: mockOpenModal }),
 }));
 
-vi.mock('../../hooks/useCalendarEvents', () => ({
+vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
   useEventActions: () => ({ removeEvent: mockRemoveEvent }),
 }));
 
-vi.mock('../../components/PillFilters', () => ({
+vi.mock('../../components/Tags/PillFilters', () => ({
   default: ({ active, onChange, items }) => (
     <div>
       <span data-testid="active-filter">{active}</span>
@@ -34,7 +34,7 @@ vi.mock('../../components/PillFilters', () => ({
   ),
 }));
 
-vi.mock('../../components/DateNavigator', () => ({
+vi.mock('../../components/Home/DateNavigator', () => ({
   default: ({ date, onChange, scheduleTitle }) => (
     <div>
       <span data-testid="schedule-title">{scheduleTitle}</span>
@@ -43,7 +43,7 @@ vi.mock('../../components/DateNavigator', () => ({
   ),
 }));
 
-vi.mock('../../components/CardGrid', () => ({
+vi.mock('../../components/Home/CardGrid', () => ({
   default: ({ items, onDelete, onEdit }) => (
     <div>
       <span data-testid="card-count">{items.length}</span>
@@ -51,6 +51,10 @@ vi.mock('../../components/CardGrid', () => ({
       <button onClick={() => onEdit({ id: 'e1', tag: 'lecture' })}>edit</button>
     </div>
   ),
+}));
+
+vi.mock('../../components/Modules/DeadlinesWidget', () => ({
+  default: () => <div data-testid="deadlines-widget" />,
 }));
 
 beforeEach(() => {

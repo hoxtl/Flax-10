@@ -46,7 +46,7 @@ vi.mock('../../../components/Calendar/hooks/useHoverSummary', () => ({
     })
 }));
 
-vi.mock('../../../hooks/useReminderNotifications', () => ({
+vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 

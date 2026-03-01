@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Sidebar from '../../components/Sidebar';
+import Sidebar from '../../components/Dashboard/Sidebar';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -14,17 +14,11 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../lib/routes', () => ({
-  APP_ROUTES: [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'calendar', label: 'Calendar', icon: '📅' },
-  ],
-}), { virtual: true });
-
 vi.mock('../../lib/routes', () => ({
   APP_ROUTES: [
     { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'calendar', label: 'Calendar', icon: '📅' },
+    { id: 'admin', label: 'Admin', icon: '🔧', isAdminOnly: true },
   ],
 }));
 
@@ -61,5 +55,15 @@ describe('Sidebar', () => {
       render(<Sidebar active="home" />);
       fireEvent.click(screen.getAllByRole('button')[0]);
     }).not.toThrow();
+  });
+
+  it('hides admin-only routes for non-admin users', () => {
+    render(<Sidebar active="home" onChange={() => {}} user={{ isAdmin: false }} />);
+    expect(screen.queryByText('🔧')).toBeNull();
+  });
+
+  it('shows admin-only routes for admin users', () => {
+    render(<Sidebar active="home" onChange={() => {}} user={{ isAdmin: true }} />);
+    expect(screen.getByText('🔧')).toBeTruthy();
   });
 });

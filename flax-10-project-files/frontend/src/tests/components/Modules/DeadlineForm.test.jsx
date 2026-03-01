@@ -13,7 +13,7 @@ vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     TYPES_WITH_LOCATION: ['exam', 'presentation'],
 }));
 
-vi.mock('../DeadlineForm.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/DeadlineForm.module.css', () => ({ default: {} }));
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {
@@ -68,5 +68,49 @@ describe('DeadlineForm', () => {
         const { container } = render(<DeadlineForm onSubmit={onSubmit} onCancel={vi.fn()} />);
         fireEvent.submit(container.querySelector('form'));
         expect(onSubmit).toHaveBeenCalled();
+    });
+
+    it('should call onChange when title input changes', () => {
+        const { container } = render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        const titleInput = container.querySelector('input[type="text"]');
+        fireEvent.change(titleInput, { target: { value: 'My Title' } });
+        expect(titleInput.value).toBe('My Title');
+    });
+
+    it('should call onChange when type select changes', () => {
+        const { container } = render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        const select = screen.getByRole('combobox');
+        fireEvent.change(select, { target: { value: 'quiz' } });
+        expect(select.value).toBe('quiz');
+    });
+
+    it('should call onChange when start date input changes', () => {
+        const { container } = render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        const dateInput = container.querySelector('input[type="datetime-local"]');
+        fireEvent.change(dateInput, { target: { value: '2026-03-01T10:00' } });
+        expect(dateInput.value).toBe('2026-03-01T10:00');
+    });
+
+    it('should call onChange when end date input changes (exam type)', () => {
+        const { container } = render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'exam' } });
+        const dateInputs = container.querySelectorAll('input[type="datetime-local"]');
+        fireEvent.change(dateInputs[1], { target: { value: '2026-03-01T12:00' } });
+        expect(dateInputs[1].value).toBe('2026-03-01T12:00');
+    });
+
+    it('should call onChange when location input changes (exam type)', () => {
+        const { container } = render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'exam' } });
+        const textInputs = container.querySelectorAll('input[type="text"]');
+        fireEvent.change(textInputs[1], { target: { value: 'Room 101' } });
+        expect(textInputs[1].value).toBe('Room 101');
+    });
+
+    it('should call onChange when description textarea changes', () => {
+        const { container } = render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        const textarea = container.querySelector('textarea');
+        fireEvent.change(textarea, { target: { value: 'Some notes' } });
+        expect(textarea.value).toBe('Some notes');
     });
 });

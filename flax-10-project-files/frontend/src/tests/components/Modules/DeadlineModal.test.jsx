@@ -18,11 +18,11 @@ vi.mock('../../../components/Modules/hooks/useDeadlineModal', () => ({
     useDeadlineModal: () => mockModal,
 }));
 
-vi.mock('../DeadlineForm', () => ({
+vi.mock('../../../components/Modules/DeadlineForm', () => ({
     default: ({ onCancel }) => <div><button onClick={onCancel}>Cancel</button></div>,
 }));
 
-vi.mock('../DeadlineCard', () => ({
+vi.mock('../../../components/Modules/DeadlineCard', () => ({
     default: ({ deadline, onEdit, onDelete }) => (
         <div>
             <span>{deadline.title}</span>
@@ -32,7 +32,7 @@ vi.mock('../DeadlineCard', () => ({
     ),
 }));
 
-vi.mock('../DeadlineModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/DeadlineModal.module.css', () => ({ default: {} }));
 
 const module = { id: 1, module_code: '5CCS2SEG' };
 
@@ -83,5 +83,33 @@ describe('DeadlineModal', () => {
         render(<DeadlineModal module={module} onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('Cancel'));
         expect(mockModal.close).toHaveBeenCalled();
+    });
+
+    it('should call onClose when overlay is clicked', () => {
+        const onClose = vi.fn();
+        const { container } = render(<DeadlineModal module={module} onClose={onClose} />);
+        fireEvent.click(container.firstChild);
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    it('should NOT call onClose when content area is clicked (stopPropagation)', () => {
+        const onClose = vi.fn();
+        render(<DeadlineModal module={module} onClose={onClose} />);
+        fireEvent.click(screen.getByText(/5CCS2SEG/));
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('should call openEdit when edit button on a card is clicked', () => {
+        mockModal.deadlines = [{ id: 1, title: 'Assignment 1', deadline_type: 'coursework', start_due_date: '2026-03-01' }];
+        render(<DeadlineModal module={module} onClose={vi.fn()} />);
+        fireEvent.click(screen.getByText('Edit'));
+        expect(mockModal.openEdit).toHaveBeenCalledWith(mockModal.deadlines[0]);
+    });
+
+    it('should call handleDelete when delete button on a card is clicked', () => {
+        mockModal.deadlines = [{ id: 1, title: 'Assignment 1', deadline_type: 'coursework', start_due_date: '2026-03-01' }];
+        render(<DeadlineModal module={module} onClose={vi.fn()} />);
+        fireEvent.click(screen.getByText('Delete'));
+        expect(mockModal.handleDelete).toHaveBeenCalledWith(1);
     });
 });

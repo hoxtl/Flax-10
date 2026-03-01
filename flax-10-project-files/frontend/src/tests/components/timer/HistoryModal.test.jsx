@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryModal from '../../../components/Timer/HistoryModal';
-import * as historyUtils from '../../../utils/historyUtils';
+import * as historyUtils from '../../../components/Timer/utils/historyUtils';
 import {
     mockHistoryData, expectBlock1Summary, expectBlock2Summary,
     expectLegacyBlockSummary, expectDatesPresent, expectSessionCounts

@@ -56,6 +56,24 @@ describe('fetchApi', () => {
         await expect(fetchApi('/test')).rejects.toThrow('Validation failed');
     });
 
+    it('should throw error using message when detail is absent', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ message: 'Something went wrong' }),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow('Something went wrong');
+    });
+
+    it('should throw first non_field_errors entry when present', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ non_field_errors: ['Invalid credentials'] }),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow('Invalid credentials');
+    });
+
     it('should throw default error on non-ok response without detail', async () => {
         global.fetch.mockResolvedValue({
             ok: false,
@@ -72,7 +90,11 @@ describe('fetchApi', () => {
 
     it('does not set Authorization header when no token', async () => {
         localStorage.removeItem('token');
-        await expect(fetchApi('/test')).resolves.not.toThrow?.();
+        global.fetch.mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+        await fetchApi('/test');
+        expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
+            headers: expect.not.objectContaining({ Authorization: expect.anything() }),
+        }));
     });
 
     it('does not add Authorization header when no token in localStorage', async () => {

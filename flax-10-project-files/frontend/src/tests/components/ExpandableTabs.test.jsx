@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ExpandableTabs } from '../../components/ExpandableTabs';
+import { ExpandableTabs } from '../../components/Dashboard/ExpandableTabs';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -67,9 +67,27 @@ describe('ExpandableTabs', () => {
   it('does not deselect when clicking inside the container', () => {
     const onChange = vi.fn();
     const { container } = render(<ExpandableTabs tabs={tabs} onChange={onChange} />);
-    fireEvent.click(screen.getAllByRole('button')[0]); 
+    fireEvent.click(screen.getAllByRole('button')[0]);
     onChange.mockClear();
-    fireEvent.mouseDown(container.firstChild); 
-    expect(onChange).not.toHaveBeenCalled(); 
+    fireEvent.mouseDown(container.firstChild);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('renders badge when count is positive', () => {
+    const tabsWithBadge = [{ title: 'Alpha', icon: IconA, badge: 5 }];
+    render(<ExpandableTabs tabs={tabsWithBadge} />);
+    expect(screen.getByText('5')).toBeTruthy();
+  });
+
+  it('renders 99+ badge when count exceeds 99', () => {
+    const tabsWithBadge = [{ title: 'Alpha', icon: IconA, badge: 100 }];
+    render(<ExpandableTabs tabs={tabsWithBadge} />);
+    expect(screen.getByText('99+')).toBeTruthy();
+  });
+
+  it('renders no badge when count is zero', () => {
+    const tabsWithBadge = [{ title: 'Alpha', icon: IconA, badge: 0 }];
+    const { container } = render(<ExpandableTabs tabs={tabsWithBadge} />);
+    expect(container.querySelector('[class*="badge"]')).toBeNull();
   });
 });
