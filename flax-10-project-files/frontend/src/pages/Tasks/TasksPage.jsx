@@ -14,6 +14,7 @@ import styles from "./TasksPage.module.css";
 function useFilteredTasks(tasks, activeListId, activeFilter) {
     return useMemo(() => {
         const now      = new Date();
+        const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
         const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
@@ -22,9 +23,9 @@ function useFilteredTasks(tasks, activeListId, activeFilter) {
             : tasks;
 
         if (activeFilter === "overdue")
-            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now);
+            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < dayStart);
         if (activeFilter === "today")
-            return filtered.filter(t => t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd);
+            return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
         if (activeFilter === "week")
             return filtered.filter(t => t.due_date && new Date(t.due_date) <= weekEnd);
         return filtered;
@@ -47,6 +48,7 @@ export default function TasksPage() {
     const [showTaskModal,   setShowTaskModal]   = useState(false);
     const [showListModal,   setShowListModal]   = useState(false);
     const [toastUndo,       setToastUndo]      = useState(null);
+    const [toastDelete,     setToastDelete]    = useState(false);
 
     useEffect(() => {
         const listParam = searchParams.get("list");
@@ -62,6 +64,12 @@ export default function TasksPage() {
         if (!toastUndo) return;
         removeTask(toastUndo.taskId);
         setToastUndo(null);
+    };
+
+    const handleDeleteTask = (taskId) => {
+        removeTask(taskId);
+        setToastDelete(true);
+        setTimeout(() => setToastDelete(false), 3500);
     };
 
     const handleDeleteList = (listId) => {
@@ -105,7 +113,7 @@ export default function TasksPage() {
                 activeModuleCode={activeModuleCode}
                 defaultDueDateForNewTask={defaultDueDateForNewTask}
                 onToggleComplete={toggleComplete}
-                onDeleteTask={removeTask}
+                onDeleteTask={handleDeleteTask}
                 onEditTask={editTask}
                 onCreateTask={() => setShowTaskModal(true)}
                 onAddTask={async (data) => {
@@ -135,6 +143,12 @@ export default function TasksPage() {
                     <span>Task added.</span>
                     <button type="button" className={styles.toastUndoBtn} onClick={handleUndoAddTask}>Undo</button>
                     <button type="button" className={styles.toastClose} onClick={() => setToastUndo(null)}>✕</button>
+                </div>
+            )}
+            {toastDelete && (
+                <div className={`${styles.toast} ${styles.toastDelete}`}>
+                    <span>🗑 Task deleted.</span>
+                    <button type="button" className={styles.toastClose} onClick={() => setToastDelete(false)}>✕</button>
                 </div>
             )}
             {showListModal && (
