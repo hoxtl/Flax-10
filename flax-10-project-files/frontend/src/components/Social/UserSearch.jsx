@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { searchUsers } from '../../api/userService';
 import { getModules } from '../../api/moduleApi';
+import { fetchSocieties } from '../../api/societyApi';
 import styles from './Social.module.css';
 
-async function fetchUserResults(query, moduleFilter, setResults, setLoading) {
-    if (!query.trim() && !moduleFilter.trim()) { setResults([]); return; }
+async function fetchUserResults(query, moduleFilter, societyFilter, setResults, setLoading) {
+    if (!query.trim() && !moduleFilter.trim() && !societyFilter.trim()) { setResults([]); return; }
     setLoading(true);
     try {
-        const data = await searchUsers(query, moduleFilter);
+        const data = await searchUsers(query, moduleFilter, societyFilter);
         setResults(data.results || data);
     } catch (err) {
         console.error('Search failed', err);
@@ -30,18 +31,20 @@ function useSearchState() {
     const [query, setQuery] = useState('');
     const [userResults, setUserResults] = useState([]);
     const [allModules, setAllModules] = useState([]);
+    const [allSocieties, setAllSocieties] = useState([]);
     const [loading, setLoading] = useState(false);
     const [dropdownPos, setDropdownPos] = useState(null);
     const containerRef = useRef(null);
 
-    // Initial load for modules
+    // Initial load for modules and societies
     useEffect(() => {
         getModules().then(setAllModules).catch(e => console.error("Failed to load modules", e));
+        fetchSocieties().then(res => setAllSocieties(res.results || res)).catch(e => console.error("Failed to load societies", e));
     }, []);
 
     return {
         query, setQuery,
-        userResults, setUserResults, allModules, loading, setLoading,
+        userResults, setUserResults, allModules, allSocieties, loading, setLoading,
         dropdownPos, setDropdownPos, containerRef
     };
 }
@@ -69,11 +72,24 @@ function UserResultItem({ user, onSelect }) {
     );
 }
 
-function ModuleResultItem({ module, onSelect }) {
+function ModuleResultItem({ module, isChecked, onToggle }) {
     return (
-        <div className={styles.userItem} onClick={onSelect} style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-            <span style={{ fontWeight: 600, color: 'var(--text)' }}>{module.module_code}</span>
-            <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{module.module_name}</span>
+        <div
+            className={styles.userItem}
+            onClick={() => onToggle(module.module_code)}
+            style={{ cursor: 'pointer', flexDirection: 'row', alignItems: 'center', gap: '12px' }}
+        >
+            <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onToggle(module.module_code)}
+                style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                onClick={(e) => e.stopPropagation()}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                <span style={{ fontWeight: 600, color: 'var(--text)' }}>{module.module_code}</span>
+                <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{module.module_name}</span>
+            </div>
         </div>
     );
 }
@@ -109,7 +125,7 @@ function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, userResu
     );
 }
 
-function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults }) {
+function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults, selectedModules, toggleModule, societyResults, selectedSocieties, toggleSociety }) {
     const dropdownStyle = {
         position: 'absolute', top: '100%', marginTop: '8px', right: 0, width: '350px', zIndex: 9999,
         display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
@@ -158,7 +174,12 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                         ) : filterQuery ? (
                             <div className={styles.userList} style={{ gap: 0 }}>
                                 {moduleResults.slice(0, 15).map((m, i) => (
-                                    <ModuleResultItem key={m.id || i} module={m} onSelect={() => { window.location.href = `/modules?search=${m.module_code}`; }} />
+                                    <ModuleResultItem
+                                        key={m.id || i}
+                                        module={m}
+                                        isChecked={selectedModules.includes(m.module_code)}
+                                        onToggle={toggleModule}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -172,7 +193,12 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                             <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600 }}>{dept}</h4>
                                             <div className={styles.userList} style={{ gap: 0 }}>
                                                 {deptModules.slice(0, 5).map((m, i) => (
-                                                    <ModuleResultItem key={m.id || i} module={m} onSelect={() => { window.location.href = `/modules?search=${m.module_code}`; }} />
+                                                    <ModuleResultItem
+                                                        key={m.id || i}
+                                                        module={m}
+                                                        isChecked={selectedModules.includes(m.module_code)}
+                                                        onToggle={toggleModule}
+                                                    />
                                                 ))}
                                                 {deptModules.length > 5 && (
                                                     <div style={{ padding: '8px', fontSize: '0.85rem', color: 'var(--muted)', textAlign: 'center' }}>
@@ -189,7 +215,22 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                 )}
 
                 {activeFilterTab === 'societies' && (
-                    <p className={styles.emptyText}>Societies data not yet linked.</p>
+                    <>
+                        {societyResults.length === 0 ? (
+                            <p className={styles.emptyText}>No societies found.</p>
+                        ) : (
+                            <div className={styles.userList} style={{ gap: 0 }}>
+                                {societyResults.map(s => (
+                                    <SocietyResultItem
+                                        key={s.id}
+                                        society={s}
+                                        isChecked={selectedSocieties.includes(s.id)}
+                                        onToggle={toggleSociety}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
@@ -199,21 +240,23 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
 export default function UserSearch({ onUserSelect }) {
     const {
         query, setQuery, activeTab,
-        userResults, setUserResults, allModules, loading, setLoading,
+        userResults, setUserResults, allModules, allSocieties, loading, setLoading,
         dropdownPos, setDropdownPos, containerRef
     } = useSearchState();
 
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activeFilterTab, setActiveFilterTab] = useState('modules');
+    const [selectedModules, setSelectedModules] = useState([]);
+    const [selectedSocieties, setSelectedSocieties] = useState([]);
     const [filterQuery, setFilterQuery] = useState('');
     const filterRef = useRef(null);
 
     // User search effect
     useEffect(() => {
-        const timer = setTimeout(() => fetchUserResults(query, '', setUserResults, setLoading), 300);
+        const timer = setTimeout(() => fetchUserResults(query, selectedModules.join(','), selectedSocieties.join(','), setUserResults, setLoading), 300);
         return () => clearTimeout(timer);
-    }, [query]);
+    }, [query, selectedModules, selectedSocieties]);
 
     const showSearchDropdown = isSearchFocused && query.trim();
 
@@ -237,6 +280,29 @@ export default function UserSearch({ onUserSelect }) {
         const q = filterQuery.toLowerCase();
         return (m.module_code || '').toLowerCase().includes(q) || (m.module_name || '').toLowerCase().includes(q);
     });
+
+    // Filter societies client-side
+    const filteredSocieties = allSocieties.filter(s => {
+        if (!filterQuery) return true;
+        const q = filterQuery.toLowerCase();
+        return (s.name || '').toLowerCase().includes(q);
+    });
+
+    const toggleModule = (code) => {
+        if (selectedModules.includes(code)) {
+            setSelectedModules(prev => prev.filter(c => c !== code));
+        } else {
+            setSelectedModules(prev => [...prev, code]);
+        }
+    };
+
+    const toggleSociety = (id) => {
+        if (selectedSocieties.includes(id)) {
+            setSelectedSocieties(prev => prev.filter(sId => sId !== id));
+        } else {
+            setSelectedSocieties(prev => [...prev, id]);
+        }
+    };
 
     return (
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', position: 'relative' }}>
@@ -282,6 +348,11 @@ export default function UserSearch({ onUserSelect }) {
                         filterQuery={filterQuery}
                         setFilterQuery={setFilterQuery}
                         moduleResults={filteredModules}
+                        selectedModules={selectedModules}
+                        toggleModule={toggleModule}
+                        societyResults={filteredSocieties}
+                        selectedSocieties={selectedSocieties}
+                        toggleSociety={toggleSociety}
                     />
                 )}
             </div>
