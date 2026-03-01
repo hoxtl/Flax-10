@@ -132,6 +132,13 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
           <button className={styles.mobileEditBtn} onClick={onEditProfile}>Edit profile</button>
         </div>
 
+        <div className={styles.mobileSummaryCard}>
+          <h3 className={styles.cardHeader}>My Profile Summary</h3>
+          <div className={styles.summaryLine}><span>Level:</span> <strong>{profileData?.year || "Year 1"}</strong></div>
+          <div className={styles.summaryLine}><span>Major:</span> <strong>{profileData?.major || "Computer Science"}</strong></div>
+          <div className={styles.summaryLine}><span>Account:</span> <strong>{user?.username}</strong></div>
+        </div>
+
       </div>
 
       <div className={styles.desktopOnly}>
