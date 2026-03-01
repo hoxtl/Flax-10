@@ -6,7 +6,7 @@ export function hasRecurrence(event) {
     return event?.recurrence_details || event?.recurrence_rule;
 }
 
-export function isReadOnlyEvent(event) {
+function isReadOnlyEvent(event) {
     return getEventType(event) !== 'personal';
 }
 

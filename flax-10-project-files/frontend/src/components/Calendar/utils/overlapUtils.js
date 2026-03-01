@@ -1,4 +1,4 @@
-export function eventsOverlap(event1, event2) {
+function eventsOverlap(event1, event2) {
     if (event1.id === event2.id) return false;
     const start1 = new Date(event1.start_time);
     const end1 = new Date(event1.end_time);

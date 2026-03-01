@@ -1,6 +1,6 @@
 import { isSameDay } from "../../Calendar/utils/dateUtils";
 
-export function getCardTheme(type) {
+function getCardTheme(type) {
   return THEMES[type] || THEMES.other;
 }
 
@@ -57,7 +57,7 @@ const THEMES = {
 };
 
 //Functions to represent deadline event as a widget
-export function isDeadlineEvent(e) {
+function isDeadlineEvent(e) {
   return e.source === 'module_deadline';
 }
 
