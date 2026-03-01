@@ -144,4 +144,9 @@
   .container {
     padding: 16px;
   }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
 }
