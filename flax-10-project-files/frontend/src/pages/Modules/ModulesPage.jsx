@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
@@ -20,6 +20,16 @@ function useModulesPage(initialSearch = '') {
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
+
+    // Auto-open the specific module detail when navigated from a profile card
+    useEffect(() => {
+        if (!initialSearch || hook.loading || hook.modules.length === 0) return;
+        const match = hook.modules.find(
+            m => m.module_code?.toLowerCase() === initialSearch.toLowerCase()
+        );
+        if (match) setViewingModule(match);
+    }, [initialSearch, hook.loading, hook.modules]);
+
     return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }
 
@@ -36,8 +46,8 @@ function useMainView(state) {
     return { sorting, search, departments: getDepartments(hook.modules) };
 }
 
-export default function ModulesPage() {
-    const state = useModulesPage();
+export default function ModulesPage({ initialSearch = '' }) {
+    const state = useModulesPage(initialSearch);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
     if (hook.loading) return <LoadingView />;
     if (show_form) return <FormView state={state} />;
