@@ -239,3 +239,24 @@
     align-items: center;
     gap: 6px;
 }
+
+.userResultItem {
+    cursor: pointer;
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+.userListNoGap {
+    gap: 0;
+}
+
+.relativeContainer {
+    position: relative;
+}
+
+.userSearchWrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+}

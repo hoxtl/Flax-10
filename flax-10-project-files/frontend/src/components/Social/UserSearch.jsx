@@ -65,7 +65,7 @@ function useDropdownPosition(containerRef, query, moduleFilter, userResults, set
 
 function UserResultItem({ user, onSelect }) {
     return (
-        <div className={styles.userItem} onClick={onSelect} style={{ cursor: 'pointer', justifyContent: 'flex-start', gap: '12px' }}>
+        <div className={`${styles.userItem} ${styles.userResultItem}`} onClick={onSelect}>
             <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
             <div className={styles.userNameDetails}>
                 <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
@@ -195,7 +195,7 @@ const matchMod = (m, dept) => m.module_code?.toUpperCase().startsWith(dept);
 const ModuleList = ({ modules, filterQuery, querySelected, onToggle, deps, expanded, toggleSection }) => {
     if (modules.length === 0) return <EmptySearchText text="No modules found." />;
     const rItem = (m, i) => <ModuleResultItem key={m.id || i} module={m} isChecked={querySelected(m.module_code)} onToggle={onToggle} />;
-    if (filterQuery) return <div className={styles.userList} style={{ gap: 0 }}>{modules.slice(0, 15).map(rItem)}</div>;
+    if (filterQuery) return <div className={`${styles.userList} ${styles.userListNoGap}`}>{modules.slice(0, 15).map(rItem)}</div>;
     return (
         <div className={styles.groupContainer}>
             {deps.map(d => <GroupedSection key={d} title={d} items={modules.filter(m => matchMod(m, d))} expanded={expanded} renderItem={rItem} toggle={toggleSection} sectionKey={`mod_${d}`} />)}
@@ -207,7 +207,7 @@ const matchCat = (s, cat) => cat === 'other' ? (!s.categories || !s.categories.l
 const SocietyList = ({ societies, filterQuery, querySelected, onToggle, cats, expanded, toggleSection }) => {
     if (societies.length === 0) return <EmptySearchText text="No societies found." />;
     const rItem = s => <SocietyResultItem key={s.id} society={s} isChecked={querySelected(s.id)} onToggle={onToggle} />;
-    if (filterQuery) return <div className={styles.userList} style={{ gap: 0 }}>{societies.map(rItem)}</div>;
+    if (filterQuery) return <div className={`${styles.userList} ${styles.userListNoGap}`}>{societies.map(rItem)}</div>;
     return (
         <div className={styles.groupContainer}>
             {cats.map(c => <GroupedSection key={c} title={c} items={societies.filter(s => matchCat(s, c))} expanded={expanded} renderItem={rItem} toggle={toggleSection} sectionKey={`soc_${c}`} capitalize />)}
@@ -246,7 +246,7 @@ const FilterBtn = ({ isOpen, setOpen }) => (
 );
 
 const SearchBar = ({ query, setQuery, setFocus, containerRef, showDpdwn, dpdwnPos, loading, userResults, handleSel }) => (
-    <div className={styles.searchContainer} ref={containerRef} style={{ position: 'relative' }}>
+    <div className={`${styles.searchContainer} ${styles.relativeContainer}`} ref={containerRef}>
         <span className={styles.searchIcon}>🔍</span>
         <input type="text" className={styles.searchInput} placeholder="Search users..."
             value={query} onChange={(e) => setQuery(e.target.value)} onFocus={setFocus} />
@@ -262,7 +262,7 @@ const useUserSearchEffects = (query, selectedModules, selectedSocieties, setUser
 };
 
 const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
-    <div ref={fRef} style={{ position: 'relative' }}>
+    <div ref={fRef} className={styles.relativeContainer}>
         <FilterBtn isOpen={isOpen} setOpen={setOpen} />
         {isOpen && <FilterDropdown {...props} />}
     </div>
@@ -306,7 +306,7 @@ export default function UserSearch({ onUserSelect }) {
     const togFilter = () => { setIsFilterOpen(!isFilterOpen); setIsSearchFocused(false); };
 
     return (
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', position: 'relative' }}>
+        <div className={styles.userSearchWrapper}>
             <SearchBar query={query} setQuery={setQuery} setFocus={focusSearch} containerRef={containerRef}
                 showDpdwn={isSearchFocused && query.trim()} dpdwnPos={dropdownPos} loading={loading}
                 userResults={userResults} handleSel={handleSelect} />
