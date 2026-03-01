@@ -225,6 +225,23 @@
     overflow-y: auto;
 }
 
+.searchDropdownContainer {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 .filterTabs {
     display: flex;
     gap: 8px;
