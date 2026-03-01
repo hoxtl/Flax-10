@@ -116,48 +116,46 @@ function SocietyResultItem({ society, isChecked, onToggle }) {
     );
 }
 
-function getDepartmentsForModules(modules) {
-    const deps = new Set();
-    modules.forEach(m => {
-        const match = m.module_code?.match(/^[A-Za-z]+/);
-        if (match) deps.add(match[0].toUpperCase());
-    });
-    return Array.from(deps).sort();
-}
+const getModCode = m => m.module_code?.match(/^[A-Za-z]+/)?.[0].toUpperCase();
+const safeModCode = m => getModCode(m) || '';
+const getDepartmentsForModules = (modules) => {
+    const deps = modules.map(safeModCode).filter(Boolean);
+    return Array.from(new Set(deps)).sort();
+};
 
-function getSocietyCategories(societies) {
-    const cats = new Set();
-    societies.forEach(s => {
-        if (s.categories && s.categories.length > 0) {
-            cats.add(s.categories[0].toLowerCase());
-        } else {
-            cats.add('other');
-        }
-    });
-    return Array.from(cats).sort();
-}
+const getCatName = s => s.categories?.[0]?.toLowerCase() || 'other';
+const getSocietyCategories = (societies) => {
+    const cats = societies.map(getCatName);
+    return Array.from(new Set(cats)).sort();
+};
 
-function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, userResults, moduleResults, onUserSelect }) {
-    const dropdownStyle = {
-        position: 'absolute', top: '100%', marginTop: '8px', left: 0, width: pos.width, zIndex: 9999,
-        display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
-        background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: '8px',
-        boxShadow: '0 4px 12px var(--shadow-color)', maxHeight: '400px', overflowY: 'auto'
-    };
+const EmptySearchText = ({ text }) => <p className={styles.emptyText}>{text}</p>;
 
+const SearchResultsList = ({ results, onSelect }) => (
+    <div className={styles.userList}>
+        {results.map((u, i) => <UserResultItem key={u.id || i} user={u} onSelect={() => onSelect(u)} />)}
+    </div>
+);
+
+function SearchDropdown({ pos, loading, query, userResults, onUserSelect }) {
+    const showEmpty = !loading && userResults.length === 0;
     return (
-        <div style={dropdownStyle}>
-            {loading && <p className={styles.emptyText}>Searching...</p>}
-            {!loading && userResults.length === 0 && query && <p className={styles.emptyText}>No users found.</p>}
-            {!loading && userResults.length === 0 && !query && <p className={styles.emptyText}>Start typing to search users.</p>}
-            {!loading && userResults.length > 0 && (
-                <div className={styles.userList}>
-                    {userResults.map((u, i) => <UserResultItem key={u.id || i} user={u} onSelect={() => onUserSelect(u)} />)}
-                </div>
-            )}
+        <div style={{ ...dropdownBaseStyle, width: pos.width }}>
+            {loading && <EmptySearchText text="Searching..." />}
+            {showEmpty && query && <EmptySearchText text="No users found." />}
+            {showEmpty && !query && <EmptySearchText text="Start typing..." />}
+            {!loading && userResults.length > 0 && <SearchResultsList results={userResults} onSelect={onUserSelect} />}
         </div>
     );
 }
+
+const dropdownBaseStyle = {
+    position: 'absolute', top: '100%', marginTop: '8px', zIndex: 9999,
+    display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
+    background: 'var(--panel)', border: '1px solid var(--border)',
+    borderRadius: '8px', boxShadow: '0 4px 12px var(--shadow-color)',
+    maxHeight: '400px', overflowY: 'auto'
+};
 
 function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults, selectedModules, toggleModule, societyResults, selectedSocieties, toggleSociety }) {
     const [expandedSections, setExpandedSections] = useState({});
