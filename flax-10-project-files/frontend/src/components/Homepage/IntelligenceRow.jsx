@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CheckSquare, TrendingUp, AlertCircle, Zap, Clock } from "lucide-react";
+import { CheckSquare, AlertCircle, Zap, Clock, Train, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 
@@ -22,8 +22,10 @@ export default function IntelligenceRow({
   displayName,
   taskCount = 0,
   statusStrip,
+  scheduleInsight,
+  tflContext,
   slot1ActionHub,
-  slot2Health,
+  daySummary,
   slot3Urgent,
   slot4Energy,
   slot5Commute,
@@ -65,11 +67,33 @@ export default function IntelligenceRow({
         <div className={styles.headerLeft}>
           <span className={styles.headerLabel}>{getTodayLabel()}</span>
           <h2 className={styles.headerTitle}>{getGreeting(displayName)}</h2>
-          {statusStrip && (
-            <div className={`${styles.statusStrip} ${styles[`statusStrip${statusStrip.variant}`]}`}>
-              <span className={styles.statusStripDot} aria-hidden />
-              <span className={styles.statusStripText}>{statusStrip.text}</span>
+          {daySummary && (
+            <div className={styles.headerDayProgress}>
+              <div className={styles.headerDayProgressTrack}>
+                <div
+                  className={styles.headerDayProgressFill}
+                  style={{ width: `${Math.min(daySummary.pct, 100)}%` }}
+                />
+              </div>
+              <div className={styles.headerDayProgressMeta}>
+                <span className={styles.headerDayProgressCount}>
+                  {daySummary.done}/{daySummary.total} done · {daySummary.pct}%
+                </span>
+                {daySummary.overdue > 0 && (
+                  <span className={styles.headerDayProgressOverdue}>
+                    ⚠ {daySummary.overdue} overdue
+                  </span>
+                )}
+                {daySummary.streak > 0 && (
+                  <span className={styles.headerDayProgressStreak}>
+                    🔥 {daySummary.streak}d streak
+                  </span>
+                )}
+              </div>
             </div>
+          )}
+          {scheduleInsight && (
+            <p className={styles.scheduleInsight}>{scheduleInsight}</p>
           )}
         </div>
         <div className={styles.headerRight}>
@@ -91,23 +115,11 @@ export default function IntelligenceRow({
         </BentoSlot>
 
         <BentoSlot
-          span={styles.span2}
-          title="Day Progress"
-          meta="Completion"
-          icon={TrendingUp}
-          index={1}
-          isVisible={sectionVisible}
-          centeredBody
-        >
-          {slot2Health}
-        </BentoSlot>
-
-        <BentoSlot
           span={styles.span3}
           title="Deadlines"
           meta="Upcoming"
           icon={AlertCircle}
-          index={2}
+          index={1}
           isVisible={sectionVisible}
         >
           {slot3Urgent}
@@ -118,7 +130,7 @@ export default function IntelligenceRow({
           title="Focus Windows"
           meta="Today"
           icon={Zap}
-          index={3}
+          index={2}
           isVisible={sectionVisible}
         >
           {slot4Energy}
@@ -129,10 +141,21 @@ export default function IntelligenceRow({
           title="Right Now"
           meta="Schedule"
           icon={Clock}
-          index={4}
+          index={3}
           isVisible={sectionVisible}
         >
-          {slot5Commute}
+          <>
+            <div className={styles.rightNowPillsRow}>
+              {statusStrip && (
+                <div className={`${styles.statusStrip} ${styles[`statusStrip${statusStrip.variant}`]}`}>
+                  <span className={styles.statusStripDot} aria-hidden />
+                  <span className={styles.statusStripText}>{statusStrip.text}</span>
+                </div>
+              )}
+              <TravelAlertPill tflContext={tflContext} />
+            </div>
+            {slot5Commute}
+          </>
         </BentoSlot>
       </div>
     </section>
@@ -191,3 +214,33 @@ function BentoSlot({
     </article>
   );
 }
+
+// TODO: Replace MOCK_TFL_ALERT with real data from Dian's tfl/delays branch
+const MOCK_TFL_ALERT = {
+  line: "Northern Line",
+  status: "Minor delays",
+  suggestion: "Leave 10 min early for your 09:00 lecture",
+};
+
+// TODO: Replace MOCK_TFL_ALERT with real data from Dian's tfl/delays branch
+function TravelAlertPill({ tflContext }) {
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed) return null;
+  const message = tflContext
+    ? `${MOCK_TFL_ALERT.line}: ${MOCK_TFL_ALERT.status} — leave by ${tflContext.leaveStr} for ${tflContext.eventTitle}`
+    : `${MOCK_TFL_ALERT.line} · ${MOCK_TFL_ALERT.status}`;
+  return (
+    <div className={`${styles.statusStrip} ${styles.statusStripTfl}`} role="status">
+      <Train size={11} strokeWidth={2} aria-hidden />
+      <span className={styles.statusStripText}>{message}</span>
+      <button
+        className={styles.statusStripPillDismiss}
+        onClick={() => setDismissed(true)}
+        aria-label="Dismiss travel alert"
+      >
+        <X size={10} strokeWidth={2.5} aria-hidden />
+      </button>
+    </div>
+  );
+}
+
