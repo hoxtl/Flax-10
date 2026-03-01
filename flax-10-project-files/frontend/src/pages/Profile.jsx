@@ -114,7 +114,7 @@ function ProfileHeader({ user, profileData, onNavChange, onModulesClick, onTasks
               <div className={styles.actionIcon}>📚</div>
               <span>Start a Module</span>
             </button>
-            <button onClick={onTasksClick} className={styles.quickActionBtn}>
+            <button onClick={() => onNavChange('tasks')} className={styles.quickActionBtn}>
               <div className={styles.actionIcon}>📅</div>
               <span>View My Tasks</span>
             </button>
