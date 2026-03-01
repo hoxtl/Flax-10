@@ -23,21 +23,27 @@ vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
 }));
 
 vi.mock('../../components/Dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../components/Timer/MiniTimer', () => ({ default: () => null }));
+vi.mock('../../components/Notifications/NotificationPanel', () => ({ NotificationPanel: () => null }));
+vi.mock('../../context/NotificationContext', () => ({
+  useNotifications: () => ({ togglePanel: vi.fn(), notifications: [] }),
+}));
 
 describe('TopBar', () => {
-  it('renders greeting and date', () => {
+  it('renders static branding', () => {
     render(<TopBar user={{ first_name: 'Kausar' }} />);
-    expect(screen.getByText('Kausar')).toBeTruthy();
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
+    expect(screen.getByText('Built for calm study')).toBeTruthy();
   });
 
-  it('renders without user (no name shown)', () => {
-    const { container } = render(<TopBar />);
-    expect(container.querySelector('h1')).toBeNull();
+  it('renders without user prop', () => {
+    render(<TopBar />);
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
-  it('renders user with only username', () => {
+  it('renders regardless of user object shape', () => {
     render(<TopBar user={{ username: 'kausar' }} />);
-    expect(screen.getByText('kausar')).toBeTruthy();
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
   it('calls onAddClick when add tab selected', () => {
