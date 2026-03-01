@@ -20,28 +20,46 @@
 .modulesGrid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 24px;
 }
 
 .moduleCard {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 7px;
-  padding: 7px 14px;
+  justify-content: center;
+  gap: 8px;
+  width: 100px;
+  height: 100px;
+  padding: 12px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 100px;
+  border-radius: 16px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
+  text-align: center;
+  cursor: pointer;
   transition: background 0.18s, border-color 0.18s, transform 0.15s;
 }
 
 .moduleCard:hover {
   background: var(--hover);
   border-color: var(--primary);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.moduleIcon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.moduleCode {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-word;
 }
 
 
