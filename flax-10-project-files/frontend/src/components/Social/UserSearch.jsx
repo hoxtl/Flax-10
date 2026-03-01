@@ -28,8 +28,6 @@ function useClickOutside(ref, onOutside) {
 
 function useSearchState() {
     const [query, setQuery] = useState('');
-    const [moduleFilter, setModuleFilter] = useState('');
-    const [activeTab, setActiveTab] = useState('users');
     const [userResults, setUserResults] = useState([]);
     const [allModules, setAllModules] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -42,7 +40,7 @@ function useSearchState() {
     }, []);
 
     return {
-        query, setQuery, moduleFilter, setModuleFilter, activeTab, setActiveTab,
+        query, setQuery,
         userResults, setUserResults, allModules, loading, setLoading,
         dropdownPos, setDropdownPos, containerRef
     };
@@ -80,25 +78,59 @@ function ModuleResultItem({ module, onSelect }) {
     );
 }
 
-function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, moduleFilter, setModuleFilter, userResults, moduleResults, onUserSelect }) {
+function getDepartmentsForModules(modules) {
+    const deps = new Set();
+    modules.forEach(m => {
+        const match = m.module_code?.match(/^[A-Za-z]+/);
+        if (match) deps.add(match[0].toUpperCase());
+    });
+    return Array.from(deps).sort();
+}
+
+function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, userResults, moduleResults, onUserSelect }) {
     const dropdownStyle = {
-        position: 'fixed', top: pos.top, left: pos.left, width: pos.width, zIndex: 9999,
-        display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px'
+        position: 'absolute', top: '100%', marginTop: '8px', left: 0, width: pos.width, zIndex: 9999,
+        display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
+        background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: '8px',
+        boxShadow: '0 4px 12px var(--shadow-color)', maxHeight: '400px', overflowY: 'auto'
     };
 
     return (
-        <div className={styles.searchResults} style={dropdownStyle}>
-            {/* Tabs */}
+        <div style={dropdownStyle}>
+            {loading && <p className={styles.emptyText}>Searching...</p>}
+            {!loading && userResults.length === 0 && query && <p className={styles.emptyText}>No users found.</p>}
+            {!loading && userResults.length === 0 && !query && <p className={styles.emptyText}>Start typing to search users.</p>}
+            {!loading && userResults.length > 0 && (
+                <div className={styles.userList}>
+                    {userResults.map((u, i) => <UserResultItem key={u.id || i} user={u} onSelect={() => onUserSelect(u)} />)}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults }) {
+    const dropdownStyle = {
+        position: 'absolute', top: '100%', marginTop: '8px', right: 0, width: '350px', zIndex: 9999,
+        display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
+        background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: '8px',
+        boxShadow: '0 4px 12px var(--shadow-color)', maxHeight: '400px', overflowY: 'auto'
+    };
+
+    const departments = getDepartmentsForModules(moduleResults);
+
+    return (
+        <div style={dropdownStyle} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
-                {['users', 'modules', 'societies'].map(tab => (
+                {['modules', 'societies'].map(tab => (
                     <button
                         key={tab}
-                        onClick={() => setActiveTab(tab)}
+                        onClick={(e) => { e.preventDefault(); setActiveFilterTab(tab); }}
                         style={{
-                            background: activeTab === tab ? 'var(--primary)' : 'transparent',
-                            color: activeTab === tab ? 'white' : 'var(--text)',
-                            border: 'none', padding: '6px 12px', borderRadius: '16px',
-                            cursor: 'pointer', fontSize: '0.85rem', textTransform: 'capitalize'
+                            background: activeFilterTab === tab ? 'var(--primary)' : 'transparent',
+                            color: activeFilterTab === tab ? 'white' : 'var(--text)',
+                            border: 'none', padding: '6px 16px', borderRadius: '16px',
+                            cursor: 'pointer', fontSize: '0.85rem', textTransform: 'capitalize', fontWeight: 600
                         }}
                     >
                         {tab}
@@ -106,45 +138,58 @@ function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, moduleFi
                 ))}
             </div>
 
-            {/* Content area */}
-            <div style={{ minHeight: '150px' }}>
-                {activeTab === 'users' && (
-                    <>
-                        <input
-                            type="text"
-                            className={styles.searchInput}
-                            placeholder="Filter by course code (e.g. 5CUS)"
-                            value={moduleFilter}
-                            onChange={(e) => setModuleFilter(e.target.value)}
-                            style={{ width: '100%', paddingLeft: '12px', marginBottom: '12px', padding: '8px 12px' }}
-                        />
-                        {loading && <p className={styles.emptyText}>Searching...</p>}
-                        {!loading && userResults.length === 0 && (query || moduleFilter) && <p className={styles.emptyText}>No users found.</p>}
-                        {!loading && userResults.length === 0 && !query && !moduleFilter && <p className={styles.emptyText}>Start typing to search.</p>}
-                        {!loading && userResults.length > 0 && (
-                            <div className={styles.userList}>
-                                {userResults.map((u, i) => <UserResultItem key={u.id || i} user={u} onSelect={() => onUserSelect(u)} />)}
-                            </div>
-                        )}
-                    </>
-                )}
+            <input
+                type="text"
+                placeholder={`Search ${activeFilterTab}...`}
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+                style={{
+                    width: '100%', padding: '8px 12px', boxSizing: 'border-box',
+                    border: '1px solid var(--border)', borderRadius: '8px',
+                    background: 'var(--search-bg)', color: 'var(--text)'
+                }}
+            />
 
-                {activeTab === 'modules' && (
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+                {activeFilterTab === 'modules' && (
                     <>
                         {moduleResults.length === 0 ? (
-                            <p className={styles.emptyText}>{query ? "No modules found." : "Start typing to search modules."}</p>
-                        ) : (
-                            <div className={styles.userList}>
-                                {moduleResults.slice(0, 10).map((m, i) => (
-                                    <ModuleResultItem key={m.id || i} module={m} onSelect={() => {/* Could navigate to module page */ }} />
+                            <p className={styles.emptyText}>No modules found.</p>
+                        ) : filterQuery ? (
+                            <div className={styles.userList} style={{ gap: 0 }}>
+                                {moduleResults.slice(0, 15).map((m, i) => (
+                                    <ModuleResultItem key={m.id || i} module={m} onSelect={() => { window.location.href = `/modules?search=${m.module_code}`; }} />
                                 ))}
+                            </div>
+                        ) : (
+                            // List by department if no search query
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {departments.map(dept => {
+                                    const deptModules = moduleResults.filter(m => m.module_code?.toUpperCase().startsWith(dept));
+                                    if (deptModules.length === 0) return null;
+                                    return (
+                                        <div key={dept}>
+                                            <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600 }}>{dept}</h4>
+                                            <div className={styles.userList} style={{ gap: 0 }}>
+                                                {deptModules.slice(0, 5).map((m, i) => (
+                                                    <ModuleResultItem key={m.id || i} module={m} onSelect={() => { window.location.href = `/modules?search=${m.module_code}`; }} />
+                                                ))}
+                                                {deptModules.length > 5 && (
+                                                    <div style={{ padding: '8px', fontSize: '0.85rem', color: 'var(--muted)', textAlign: 'center' }}>
+                                                        + {deptModules.length - 5} more
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </>
                 )}
 
-                {activeTab === 'societies' && (
-                    <p className={styles.emptyText}>Societies search coming soon!</p>
+                {activeFilterTab === 'societies' && (
+                    <p className={styles.emptyText}>Societies data not yet linked.</p>
                 )}
             </div>
         </div>
@@ -153,65 +198,93 @@ function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, moduleFi
 
 export default function UserSearch({ onUserSelect }) {
     const {
-        query, setQuery, moduleFilter, setModuleFilter, activeTab, setActiveTab,
+        query, setQuery, activeTab,
         userResults, setUserResults, allModules, loading, setLoading,
         dropdownPos, setDropdownPos, containerRef
     } = useSearchState();
 
-    const [isFocused, setIsFocused] = useState(false);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [activeFilterTab, setActiveFilterTab] = useState('modules');
+    const [filterQuery, setFilterQuery] = useState('');
+    const filterRef = useRef(null);
 
     // User search effect
     useEffect(() => {
-        if (activeTab === 'users') {
-            const timer = setTimeout(() => fetchUserResults(query, moduleFilter, setUserResults, setLoading), 300);
-            return () => clearTimeout(timer);
-        }
-    }, [query, moduleFilter, activeTab]);
+        const timer = setTimeout(() => fetchUserResults(query, '', setUserResults, setLoading), 300);
+        return () => clearTimeout(timer);
+    }, [query]);
 
-    const showDropdown = isFocused && (query.trim() || moduleFilter.trim() || activeTab !== 'users');
+    const showSearchDropdown = isSearchFocused && query.trim();
 
-    useDropdownPosition(containerRef, query, moduleFilter, userResults, setDropdownPos, showDropdown);
-    useClickOutside(containerRef, () => setIsFocused(false));
+    useDropdownPosition(containerRef, query, '', userResults, setDropdownPos, showSearchDropdown);
+    useClickOutside(containerRef, () => {
+        setIsSearchFocused(false);
+    });
+    useClickOutside(filterRef, () => {
+        setIsFilterOpen(false);
+    });
 
     const handleSelect = (user) => {
         if (onUserSelect) onUserSelect(user);
-        setIsFocused(false);
+        setIsSearchFocused(false);
         setQuery('');
-        setModuleFilter('');
     };
 
-    // Filter modules client-side
+    // Filter modules client-side for the filter dropdown
     const filteredModules = allModules.filter(m => {
-        if (!query) return true;
-        const q = query.toLowerCase();
+        if (!filterQuery) return true;
+        const q = filterQuery.toLowerCase();
         return (m.module_code || '').toLowerCase().includes(q) || (m.module_name || '').toLowerCase().includes(q);
     });
 
     return (
-        <div className={styles.searchContainer} ref={containerRef}>
-            <span className={styles.searchIcon}>🔍</span>
-            <input
-                type="text"
-                className={styles.searchInput}
-                placeholder={`Search ${activeTab}...`}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-            />
-            {showDropdown && dropdownPos && (
-                <SearchDropdown
-                    pos={dropdownPos}
-                    loading={loading}
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    query={query}
-                    moduleFilter={moduleFilter}
-                    setModuleFilter={setModuleFilter}
-                    userResults={userResults}
-                    moduleResults={filteredModules}
-                    onUserSelect={handleSelect}
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', position: 'relative' }}>
+            <div className={styles.searchContainer} ref={containerRef} style={{ position: 'relative' }}>
+                <span className={styles.searchIcon}>🔍</span>
+                <input
+                    type="text"
+                    className={styles.searchInput}
+                    placeholder="Search users..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => { setIsSearchFocused(true); setIsFilterOpen(false); }}
                 />
-            )}
+                {showSearchDropdown && dropdownPos && (
+                    <SearchDropdown
+                        pos={dropdownPos}
+                        loading={loading}
+                        query={query}
+                        userResults={userResults}
+                        onUserSelect={handleSelect}
+                    />
+                )}
+            </div>
+
+            <div ref={filterRef} style={{ position: 'relative' }}>
+                <button
+                    onClick={() => { setIsFilterOpen(!isFilterOpen); setIsSearchFocused(false); }}
+                    style={{
+                        padding: '8px 16px', background: isFilterOpen ? 'var(--hover)' : 'transparent',
+                        border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)',
+                        cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px'
+                    }}
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Filter
+                </button>
+                {isFilterOpen && (
+                    <FilterDropdown
+                        activeFilterTab={activeFilterTab}
+                        setActiveFilterTab={setActiveFilterTab}
+                        filterQuery={filterQuery}
+                        setFilterQuery={setFilterQuery}
+                        moduleResults={filteredModules}
+                    />
+                )}
+            </div>
         </div>
     );
 }
