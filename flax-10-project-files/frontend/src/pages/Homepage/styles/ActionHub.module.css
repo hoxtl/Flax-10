@@ -1296,6 +1296,11 @@
     flex-direction: column;
     flex: 1 1 auto;
     align-self: stretch;
+    /* Match IntelligenceRow's intelligenceRowWrap + section max-width */
+    padding: 0 18px 24px;
+    max-width: calc(1200px + 36px);
+    margin: 0 auto;
+    width: 100%;
   }
   .zoomParallaxWrap {
     width: 100%;
@@ -1893,6 +1898,218 @@
   color: #4A3421;
 }
 
+/* Up Next mini-list inside Right Now card */
+.intRowNowUpNext {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid rgba(123, 103, 81, 0.1);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.intRowNowUpNextRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.intRowNowUpNextTime {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #9a8778;
+  flex-shrink: 0;
+}
+
+.intRowNowUpNextTitle {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(45, 53, 45, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowNowScheduleLink {
+  display: block;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(123, 103, 81, 0.7);
+  text-decoration: none;
+  margin-top: 6px;
+  transition: color 0.15s;
+}
+
+.intRowNowScheduleLink:hover {
+  color: #4A3421;
+}
+
+/* Conflict warning strip — full-width banner at top of Right Now card */
+.intRowNowConflictChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(192, 113, 78, 0.08);
+  border: 1px solid rgba(192, 113, 78, 0.25);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #9B3A2A;
+  box-sizing: border-box;
+}
+
+/* TFL chip — styled transit alert inside Right Now card */
+.intRowNowTflChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(192, 75, 55, 0.06);
+  border: 1px solid rgba(192, 75, 55, 0.18);
+}
+.intRowNowTflChipIcon {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.intRowNowTflChipBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.intRowNowTflChipLeave {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #9B3A2A;
+  letter-spacing: 0.02em;
+}
+.intRowNowTflChipFor {
+  font-family: var(--font-sans, "Lexend", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(155, 58, 42, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* TFL delay row inside Right Now card (legacy — kept for safety) */
+.intRowNowTflRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(192, 75, 55, 0.06);
+  border: 1px solid rgba(192, 75, 55, 0.18);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: #9B3A2A;
+  letter-spacing: 0.01em;
+}
+.intRowNowTflRow strong {
+  font-weight: 700;
+}
+
+/* Smart nudge hint — shown inside Right Now gap state */
+.intRowNowNudge {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(123, 103, 81, 0.06);
+  border-left: 2px solid rgba(123, 103, 81, 0.3);
+  font-family: var(--font-sans, "Lexend", sans-serif);
+  font-size: 0.73rem;
+  font-weight: 500;
+  font-style: italic;
+  color: #6b5040;
+  line-height: 1.45;
+}
+.intRowNowNudgeTask {
+  font-style: normal;
+  font-weight: 700;
+  color: #4A3421;
+}
+
+/* Day recap stat row — endOfDay state */
+.intRowNowDayRecap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.03em;
+}
+.intRowNowDayRecapDot {
+  color: rgba(154, 135, 120, 0.5);
+}
+
+/* Today vs yesterday comparison — endOfDay state */
+.intRowNowVsYesterday {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #9a8778;
+}
+.intRowNowVsYesterdayUp   { color: #5a8a65; }
+.intRowNowVsYesterdayDown { color: #C0714E; }
+.intRowNowVsYesterdayFlat { color: #9a8778; }
+
+/* Tomorrow preview block — endOfDay state */
+.intRowNowTomorrowPreview {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(123, 103, 81, 0.05);
+  border: 1px solid rgba(123, 103, 81, 0.12);
+}
+.intRowNowTomorrowLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7B6751;
+  flex-shrink: 0;
+}
+.intRowNowTomorrowEvent {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2d352d;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intRowNowTomorrowTime {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #9a8778;
+  flex-shrink: 0;
+}
+
 .actionHubProgressTrackSlim {
   height: 3px;
   border-radius: 99px;
@@ -1948,7 +2165,7 @@
 .intRowNowSection {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
 }
 
@@ -2161,6 +2378,77 @@
 
 /* ─── Focus Windows smart redesign ───────────────────────────────────────── */
 
+/* Outer wrapper for enhanced Focus Windows card */
+.intRowFocusWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+/* Summary stat line: "2 windows · 1h 20m free" */
+.intRowFocusSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.intRowFocusSummaryNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2d352d;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.intRowFocusSummaryLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+}
+.intRowFocusSummaryDot {
+  color: rgba(154, 135, 120, 0.5);
+  font-size: 0.7rem;
+  margin: 0 2px;
+}
+
+/* 7-day chart label */
+.intRowFocusChartLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a8778;
+  margin-bottom: 4px;
+}
+
+/* 7-day chart wrapper */
+.intRowFocusSparkline {
+  margin-top: auto;
+  flex: 1;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+/* Analytics CTA link below chart */
+.intRowFocusAnalyticsCta {
+  display: block;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: #9a8778;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+.intRowFocusAnalyticsCta:hover {
+  color: #4A3421;
+}
+
 .intRowFocusWindowsTitle {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.62rem;
@@ -2240,4 +2528,276 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   display: block;
+}
+
+/* ─── Day Progress — breakdown + time alloc + nudge ─────────────────────── */
+
+.intRowProgressBreakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.02em;
+}
+
+.intRowProgressBreakdownDot {
+  opacity: 0.45;
+}
+
+.intRowProgressBreakdownOverdue {
+  color: #C0714E;
+  font-weight: 700;
+}
+
+.intRowTimeAlloc {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.intRowTimeAllocBar {
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.08);
+  overflow: hidden;
+  display: flex;
+}
+
+.intRowTimeAllocSegStudy {
+  height: 100%;
+  background: #7B9BAD;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocSegPersonal {
+  height: 100%;
+  background: #84A98C;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocSegOther {
+  height: 100%;
+  background: #A08B72;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.intRowTimeAllocLegendItem {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.intRowTimeAllocLegendItem::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.intRowTimeAllocLegendStudy { color: #7B9BAD; }
+.intRowTimeAllocLegendStudy::before { background: #7B9BAD; }
+
+.intRowTimeAllocLegendPersonal { color: #5a8a65; }
+.intRowTimeAllocLegendPersonal::before { background: #84A98C; }
+
+.intRowTimeAllocLegendOther { color: #9a8778; }
+.intRowTimeAllocLegendOther::before { background: #A08B72; }
+
+.intRowProgressNudge {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.68rem;
+  font-style: italic;
+  color: #9a8778;
+  margin: 0;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.intRowProgressNudgeAhead {
+  color: #5a8a65;
+}
+
+/* Streak badge — shown next to status badge when streak >= 2 */
+.intRowProgressStreak {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(192, 113, 78, 0.1);
+  border: 1px solid rgba(192, 113, 78, 0.25);
+  color: #C0714E;
+  white-space: nowrap;
+}
+
+/* vs last week comparison line */
+.intRowProgressVsWeek {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: #9a8778;
+}
+.intRowProgressVsWeekUp   { color: #5a8a65; }
+.intRowProgressVsWeekDown { color: #C0714E; }
+.intRowProgressVsWeekFlat { color: #9a8778; }
+
+/* ── Smart Nudge (slot4) ─────────────────────────────────────────────────── */
+
+.intRowNudgeWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.intRowNudgeMessage {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(45, 53, 45, 0.85);
+}
+
+.intRowNudgeTaskName {
+  font-weight: 700;
+  color: #2d352d;
+}
+
+.intRowNudgeDue {
+  font-weight: 700;
+  color: #C0714E;
+}
+
+.intRowNudgeWin {
+  font-weight: 700;
+  color: #4A7A57;
+}
+
+.intRowNudgeAction {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 10px;
+  background: rgba(74, 52, 33, 0.08);
+  border: 1px solid rgba(74, 52, 33, 0.15);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #4A3421;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+  align-self: flex-start;
+}
+
+.intRowNudgeAction:hover {
+  background: rgba(74, 52, 33, 0.14);
+  border-color: rgba(74, 52, 33, 0.25);
+}
+
+.intRowNudgeFallback {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  font-style: italic;
+  color: #9a8778;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Smart Nudge — peak hours fallback */
+.intRowNudgePeakWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.intRowNudgePeakLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7B6751;
+}
+.intRowNudgePeakHours {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.intRowNudgePeakHour {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(132, 169, 140, 0.1);
+  border: 1px solid rgba(132, 169, 140, 0.3);
+  color: #5a8a65;
+}
+
+/* This Week card wrapper */
+.intRowWeekWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+.intRowWeekStat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.intRowWeekStatNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #2d352d;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.intRowWeekStatLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+}
+.intRowWeekStatDot {
+  color: rgba(154, 135, 120, 0.5);
+  font-size: 0.7rem;
+  margin: 0 2px;
+}
+
+/* Productivity Snapshot card wrapper */
+.intRowProductivityWrap {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  height: 100%;
 }
