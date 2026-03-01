@@ -98,7 +98,6 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
     <div className={styles.headerWrapper}>
 
       <div className={styles.mobileOnly}>
-
         <div className={styles.mobileHero}>
           <div className={styles.avatarWrapper}>
             <div className={styles.mainAvatar}>
@@ -139,6 +138,23 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
           <div className={styles.summaryLine}><span>Account:</span> <strong>{user?.username}</strong></div>
         </div>
 
+        <div className={styles.mobileSummaryCard}>
+          <h3 className={styles.cardHeader}>Quick Actions</h3>
+          <div className={styles.quickActionsGrid}>
+            <button onClick={onModulesClick} className={styles.quickActionBtn}>
+              <div className={styles.actionIcon}>📚</div>
+              <span>Start a Module</span>
+            </button>
+            <button onClick={onTasksClick} className={styles.quickActionBtn}>
+              <div className={styles.actionIcon}>📅</div>
+              <span>View My Tasks</span>
+            </button>
+            <button onClick={onEventsClick} className={styles.quickActionBtn}>
+              <div className={styles.actionIcon}>✅</div>
+              <span>Check for Events</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className={styles.desktopOnly}>
