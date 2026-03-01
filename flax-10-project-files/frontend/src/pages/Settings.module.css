@@ -82,7 +82,7 @@
   .tab {
     background: none;
     border: none;
-    padding: 16px 24px;
+    padding: 16px 20px;
     font-size: 15px;
     font-weight: 500;
     color: var(--muted);
@@ -90,6 +90,7 @@
     border-bottom: 2px solid transparent;
     transition: all 0.2s;
     margin-bottom: -1px;
+    white-space: nowrap;
   }
   
   .tab:hover {
