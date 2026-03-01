@@ -159,3 +159,9 @@
 .editIcon:hover {
     color: var(--primary);
 }
+
+.categoryEditor {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}

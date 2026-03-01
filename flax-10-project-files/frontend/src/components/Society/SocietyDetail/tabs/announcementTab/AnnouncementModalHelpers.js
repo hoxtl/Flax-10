@@ -1,3 +1,5 @@
+import { validateEventTimes } from '../../../../Calendar/utils/dateValidation';
+
 export const MAX_IMAGES = 5;
 
 export function getInitialForm(announcement) {
@@ -10,33 +12,30 @@ export function getInitialForm(announcement) {
 }
 
 function mapAnnouncementToForm(base, announcement) {
-    const images = (announcement.images || [])
-        .map(img => (typeof img === 'object' && img.url) ? img.url : img)
-        .filter(Boolean);
-
+    const images = extractImageUrls(announcement.images);
     return {
         ...base,
         title: announcement.title || "",
         content: announcement.content || "",
-        tag: announcement.tagId || null,
-        images: images,
+        tag: announcement.tag || announcement.tagId || null,
+        images,
         pinned: announcement.pinned || false,
-        id: announcement.id
+        id: announcement.id,
+        event_id: announcement.event_id || null,
+        addAsEvent: !!announcement.event_id,
     };
+}
+
+function extractImageUrls(images) {
+    return (images || [])
+        .map(img => (typeof img === 'object' && img.url) ? img.url : img)
+        .filter(Boolean);
 }
 
 export function validateForm(form) {
     if (!form.title?.trim()) return "Title is required";
     if (!form.addAsEvent) return null;
-    return validateEventFields(form);
-}
-
-function validateEventFields(form) {
-    if (!form.start_time) return "Start time is required for event";
-    if (form.end_time && form.end_time < form.start_time) {
-        return "End time must be after start time";
-    }
-    return null;
+    return validateEventTimes(form);
 }
 
 export function handleFileSelect(file, onAdd, fileRef) {

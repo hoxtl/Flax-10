@@ -12,19 +12,20 @@ seeded database will not produce duplicates.
 """
 
 import random
+from datetime import timedelta
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from django.utils import timezone
-from datetime import timedelta
-
 from studyFlax.models import (
-    Category, Tag, RecurrenceRule, CalendarEvent,
-    UserSettings, Module, Enrollment, Deadline
+    Category, Tag, RecurrenceRule, CalendarEvent, 
+    UserSettings, Module, Enrollment, Deadline,
+    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
 )
-
 from studyFlax.fixtures.data_fixtures import (
-    category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
+    category_fixtures, tag_fixtures, recurrence_fixtures,
+    module_fixtures, location_fixtures
 )
+from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_module_event, get_user_modules,
@@ -32,14 +33,10 @@ from .seed_helpers import (
     create_deadline_calendar_event, build_study_sessions_for_user, 
     build_theme_sessions_for_user,
 )
-
-
 from studyFlax.models.timer.sessionModel import StudySession
-
 from studyFlax.models.timer.themeSessionModel import ThemeSession
 
 User = get_user_model()
-
 
 class Command(BaseCommand):
     """Seeds the database with a structured, realistic dataset.
@@ -98,9 +95,14 @@ class Command(BaseCommand):
         self.modules = list(Module.objects.all())
         self.create_deadlines()
         self.create_enrollments()
+        self.create_societies()
+        self.create_society_memberships()
+        self.create_society_events()
+        self.create_society_images()
         #self.create_tasks()
         self.create_study_sessions()
-        self.print_stats()
+        self.print_stats()  
+        
 
     def create_admin_user(self):
         """Create the johndoe superuser if one does not already exist."""
@@ -296,39 +298,117 @@ class Command(BaseCommand):
 
         self.stdout.write(f"  Created {total_study} study sessions, {total_theme} theme sessions.")
 
+    def create_societies(self):
+        self.stdout.write("Seeding societies...")
+        for data in build_society_seed_data():
+            society = self._create_society_from_config(data)
+            self._seed_society_tags_from_config(society, data.get('tags', []))
+
+    def _create_society_from_config(self, data):
+        status = random.choice(['approved', 'pending', 'rejected', 'none'])
+        defaults = {
+            'bio': data['bio'], 'about': data['about'],
+            'categories': data.get('categories', []),
+            'ratification_status': status, 'is_ratified': (status == 'approved')
+        }
+        if data.get('image'):
+            defaults['image'] = data['image']
+        society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
+        return society
+
+    def _seed_society_tags_from_config(self, society, tag_labels):
+        from faker import Faker
+        f = Faker('en_GB')
+        for label in tag_labels:
+            SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
+
+    def _get_society_config(self, society):
+        return next((s for s in build_society_seed_data() if s['name'] == society.name), None)
+
+    def _seed_events_for_society(self, society):
+        config = self._get_society_config(society)
+        if not config:
+            return
+        tags = list(society.tags.all())
+        for event_template in config.get('events', []):
+            self._create_event_from_template(society, event_template, tags)
+
+    def _create_event_from_template(self, society, template, tags):
+        title, desc, hour, duration, recurrence, day = template
+        start, end = build_event_datetime(hour, duration, day)
+        SocietyEvent.objects.get_or_create(
+            society=society, title=title,
+            defaults=self._build_event_defaults(desc, start, end, recurrence, tags)
+        )
+
+    def _build_event_defaults(self, desc, start, end, recurrence, tags):
+        return {
+            'description': desc, 'location': random.choice(location_fixtures),
+            'start_time': start, 'end_time': end,
+            'recurrence': recurrence or 'none',
+            'recurrence_end_date': (start + timedelta(days=90)).date() if recurrence else None,
+            'tag': random.choice(tags) if tags else None
+        }
+
+    def _seed_images_for_society(self, society):
+        self._set_cover_image(society)
+        self._add_extra_images(society)
+
+    def _set_cover_image(self, society):
+        if not society.image:
+            return
+        SocietyImage.objects.filter(society=society, is_cover=True).delete()
+        SocietyImage.objects.create(society=society, is_cover=True, url=society.image)
+
+    def _add_extra_images(self, society):
+        current_count = society.images.count()
+        for i in range(5 - current_count):
+            SocietyImage.objects.create(
+                society=society, url=f"https://picsum.photos/seed/{society.name}{i}/800/600", is_cover=False
+            )
+
+    def create_society_memberships(self):
+        self.stdout.write("Seeding society memberships...")
+        for society in Society.objects.all():
+            self._seed_society_members(society)
+
+    def _seed_society_members(self, society):
+        admin = random.choice(self.users)
+        SocietyMembership.objects.get_or_create(
+            user=admin, society=society, defaults={'role': 'admin'}
+        )
+        society.admin_emails = admin.email
+        society.save()
+        members = random.sample(self.users, random.randint(5, 15))
+        for member in members:
+            SocietyMembership.objects.get_or_create(
+                user=member, society=society, defaults={'role': 'member'}
+            )
+
+    def create_society_events(self):
+        self.stdout.write("Seeding society events...")
+        for society in Society.objects.all():
+            self._seed_events_for_society(society)
+
+    def create_society_images(self):
+        self.stdout.write("Seeding society images...")
+        for society in Society.objects.all():
+            self._seed_images_for_society(society)
+
     def print_stats(self):
         """Print a summary of all fixture users and database record counts."""
         div = "─" * 40
-        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write(self.style.SUCCESS("  ✅  Seeding complete"))
+        self.stdout.write(self.style.SUCCESS("  Seeding complete"))
         self.stdout.write(self.style.SUCCESS(div))
-
-        self.stdout.write("")
-        self.stdout.write("  Fixture users  (password: 1234)")
-        self.stdout.write(f"  {'johndoe':<12}  superuser / admin")
-        self.stdout.write(f"  {'janedoe':<12}  student")
-        self.stdout.write(f"  {'charlie':<12}  student")
-        self.stdout.write(f"  {'amiller':<12}  teacher")
-        self.stdout.write(f"  {'srahwan':<12}  teacher")
-        self.stdout.write(f"  {'hpatel':<12}  teacher")
-        self.stdout.write(f"  {'echen':<12}  teacher")
-        self.stdout.write(f"  {'jmurphy':<12}  teacher")
-
-        self.stdout.write("")
+        self.stdout.write("  Fixture users (password: 1234)")
+        for user, role in [('johndoe', 'admin'), ('janedoe', 'student'), ('charlie', 'student')]:
+            self.stdout.write(f"  {user:<12}  {role}")
         self.stdout.write("  Database")
         stats = [
-            ("Users",       User.objects.count()),
-            ("Modules",     Module.objects.count()),
-            ("Enrollments", Enrollment.objects.count()),
-            ("Deadlines",   Deadline.objects.count()),
-            #("Tasks",       Task.objects.count()),
-            ("Categories",  Category.objects.count()),
-            ("Tags",        Tag.objects.count()),
-            ("Events",      CalendarEvent.objects.count()),
+            ("Users", User.objects.count()), ("Modules", Module.objects.count()),
+            ("Societies", Society.objects.count()), ("Events", CalendarEvent.objects.count()),
         ]
         for label, count in stats:
             self.stdout.write(f"  {label:<14}  {count}")
-        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write("")
