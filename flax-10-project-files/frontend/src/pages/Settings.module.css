@@ -263,4 +263,13 @@
   .panel {
     padding: 24px 16px;
   }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .formActions {
+    justify-content: stretch;
+  }
 }
