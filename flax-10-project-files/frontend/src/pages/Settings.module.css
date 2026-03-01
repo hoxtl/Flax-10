@@ -185,7 +185,7 @@
   
   .btnPrimary {
     background: var(--primary);
-    color: var(--c-white);
+    color: #ffffff;
     border: none;
     padding: 12px 24px;
     border-radius: 8px;
@@ -193,6 +193,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: opacity 0.2s;
+    width: auto;
   }
   
   .btnPrimary:hover:not(:disabled) {
