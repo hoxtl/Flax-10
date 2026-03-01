@@ -1,7 +1,56 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, Search } from "lucide-react";
 import styles from "./OnboardingModal.module.css";
+
+function SearchInput({ query, setQuery }) {
+  const ref = useRef(null);
+  useEffect(() => { ref.current?.focus(); }, []);
+  return (
+    <div className={styles.searchWrapper}>
+      <Search size={14} className={styles.searchIcon} />
+      <input
+        ref={ref}
+        className={styles.searchInput}
+        placeholder="Search courses..."
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        onClick={e => e.stopPropagation()}
+      />
+    </div>
+  );
+}
+
+function EmptyState({ query }) {
+  return (
+    <motion.div
+      className={styles.emptyState}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.22 }}
+    >
+      <motion.div
+        animate={{ rotate: [0, -12, 12, -8, 8, 0] }}
+        transition={{ duration: 0.6, delay: 0.1, ease: "easeInOut" }}
+        className={styles.emptyIcon}
+      >
+        <Search size={20} strokeWidth={1.5} />
+      </motion.div>
+      <span className={styles.emptyTitle}>No courses found</span>
+      {query && (
+        <span className={styles.emptyQuery}>Try a different spelling for &ldquo;{query}&rdquo;</span>
+      )}
+    </motion.div>
+  );
+}
+
+function filterGrouped(options, query) {
+  if (!query.trim()) return options;
+  const q = query.toLowerCase();
+  return options
+    .map(group => ({ ...group, options: group.options.filter(o => o.label.toLowerCase().includes(q)) }))
+    .filter(group => group.options.length > 0);
+}
 
 function CheckMark() {
   return (
@@ -60,18 +109,25 @@ function DropdownButton({ selectedLabel, value, isOpen, onClick }) {
   );
 }
 
-function DropdownMenu({ isOpen, grouped, options, value, onSelect }) {
+function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, query, setQuery }) {
+  const filteredOptions = (searchable && grouped) ? filterGrouped(options, query) : options;
+  const isEmpty = searchable && grouped && filteredOptions.length === 0;
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }} className={styles.dropdownMenu}>
-          {grouped
-            ? <GroupedOptions options={options} value={value} onSelect={onSelect} />
-            : <FlatOptions options={options} value={value} onSelect={onSelect} />}
+          {searchable && <SearchInput query={query} setQuery={setQuery} />}
+          {isEmpty
+            ? <EmptyState query={query} />
+            : grouped
+              ? <GroupedOptions options={filteredOptions} value={value} onSelect={onSelect} />
+              : <FlatOptions options={options} value={value} onSelect={onSelect} />}
         </motion.div>
       )}
-    </AnimatePresence>);}
+    </AnimatePresence>
+  );
+}
 
 function useDropdownOptions(options, grouped) {
   const allOptions = grouped
@@ -80,15 +136,18 @@ function useDropdownOptions(options, grouped) {
   return allOptions;
 }
 
-export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped }) {
+export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped, searchable }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const allOptions = useDropdownOptions(options, grouped);
   const selectedLabel = allOptions.find(o => o.value === value)?.label || placeholder;
-  const handleSelect = (val) => { onChange(val); setIsOpen(false); };
+  const handleSelect = (val) => { onChange(val); setIsOpen(false); setQuery(""); };
+  const handleToggle = () => { setIsOpen(o => !o); setQuery(""); };
   return (
     <div style={{ position: 'relative', width: '100%' }}>
-      <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
-      <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect} />
+      <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} />
+      <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
+        searchable={searchable} query={query} setQuery={setQuery} />
     </div>
   );
 }

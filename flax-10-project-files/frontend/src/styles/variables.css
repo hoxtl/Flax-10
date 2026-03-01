@@ -1,4 +1,12 @@
 :root {
+  /* Typography */
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+  --font-weight-title: 700;
+  --font-weight-task: 500;
+  --font-weight-caption: 400;
+
   --c-white: #ffffff;
   --c-greige: #B4A490;
   --c-taupe: #AA9A94;

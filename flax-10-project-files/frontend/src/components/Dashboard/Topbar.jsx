@@ -1,40 +1,20 @@
 import styles from "./Topbar.module.css";
-import { DAYS, MONTHS } from "../../lib/uiConstants";
-import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
 import { NotificationPanel } from "../Notifications/NotificationPanel";
-import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus } from "lucide-react";
-import { TypingAnimation } from "./TypingAnimation";
 
-function getFirstName(user) {
-  const displayName = (getDisplayName(user) || "").trim();
-  return displayName ? displayName.split(" ")[0] : "";
-}
-
-function getCurrentDateString() {
-  const now = new Date();
-  return `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
-}
-
-function TopBarGreeting({ user }) {
-  const firstName = getFirstName(user);
+function TopBarGreeting() {
   return (
     <div className={styles.greeting}>
-      <span className={styles.subGreeting}>{getGreeting()}!</span>
-      <div className={styles.nameRow}>
-        {!!firstName && (
-          <h1 className={styles.name}>
-            <TypingAnimation text={firstName} duration={180} />
-          </h1>
-        )}
-        <span className={styles.date}>{getCurrentDateString()}</span>
-      </div>
-    </div>);}
+      <span className={styles.bigTime}>StudyFlax</span>
+      <span className={styles.dateSub}>Built for calm study</span>
+    </div>
+  );
+}
 
 function SearchInput() {
   return (
@@ -89,7 +69,7 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
 export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
-      <TopBarGreeting user={user} />
+      <TopBarGreeting />
       <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <TopBarActions
         onAddClick={onAddClick}

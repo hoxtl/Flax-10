@@ -15,11 +15,21 @@
 
 .greeting {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
-.subGreeting {
-  font-size: 13px;
+.bigTime {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.dateSub {
+  font-size: 0.8rem;
   color: var(--muted);
   font-weight: 500;
 }
