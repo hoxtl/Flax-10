@@ -78,6 +78,88 @@
   }
 }
 
+/* Row that holds statusStrip pill + TFL pill side by side */
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Schedule insight — italic one-liner below pills */
+.scheduleInsight {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.73rem;
+  font-weight: 500;
+  font-style: italic;
+  color: #9a8778;
+  margin: 2px 0 0;
+  line-height: 1.4;
+}
+
+/* Compact Day Progress in greeting header */
+.headerDayProgress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.headerDayProgressTrack {
+  height: 4px;
+  background: rgba(123, 103, 81, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 200px;
+  max-width: 100%;
+}
+
+.headerDayProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #7B6751 0%, #4A3421 100%);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.headerDayProgressMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.headerDayProgressCount {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #7B6751;
+}
+
+.headerDayProgressOverdue {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #C0714E;
+  letter-spacing: 0.02em;
+}
+
+.headerDayProgressStreak {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.63rem;
+  font-weight: 600;
+  color: #9a8778;
+  letter-spacing: 0.02em;
+}
+
+/* Pills row at the top of the Right Now bento card */
+.rightNowPillsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
 /* Status strip — dynamic schedule state below greeting */
 .statusStrip {
   display: inline-flex;
@@ -128,6 +210,29 @@
   }
 }
 
+/* TFL travel alert pill variant */
+.statusStripTfl {
+  border-color: rgba(192, 75, 55, 0.28);
+  background: rgba(192, 75, 55, 0.07);
+  gap: 6px;
+}
+.statusStripTfl .statusStripText { color: #9B3A2A; }
+
+/* Dismiss button inside a pill */
+.statusStripPillDismiss {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 2px;
+  cursor: pointer;
+  color: rgba(122, 85, 32, 0.4);
+  transition: color 0.15s;
+  line-height: 1;
+}
+.statusStripPillDismiss:hover { color: #7A5520; }
+
 /* Gap variant — sage green */
 .statusStripGap {
   border-color: rgba(132, 169, 140, 0.3);
@@ -165,29 +270,28 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
-  grid-auto-rows: minmax(120px, auto);
+  align-items: start;
 }
 
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(12, 1fr);
   }
 }
 
+/* Mobile: full width */
 .span1 { grid-column: 1 / -1; }
-.span2 { grid-column: 1 / -1; }
 .span3 { grid-column: 1 / -1; }
 .span4 { grid-column: 1 / -1; }
 .span5 { grid-column: 1 / -1; }
 
 @media (min-width: 768px) {
-  /* Row 1: Today's Tasks (4 cols) + Day Progress (2 cols) */
-  .span1 { grid-column: span 4; }
-  .span2 { grid-column: span 2; }
-  /* Row 2: Deadlines + Focus Windows + Right Now (2 cols each) */
-  .span3 { grid-column: span 2; }
-  .span4 { grid-column: span 2; }
-  .span5 { grid-column: span 2; }
+  /* Row 1: Right Now (left, cols 1–4) | Today's Tasks (right, cols 5–12) */
+  .span5 { grid-column: 1 / span 4; grid-row: 1; }
+  .span1 { grid-column: 5 / span 8; grid-row: 1; }
+  /* Row 2: Deadlines (left) | Focus Windows (right) */
+  .span3 { grid-column: 1 / span 6; grid-row: 2; }
+  .span4 { grid-column: 7 / span 6; grid-row: 2; }
 }
 
 .bentoSlot {
@@ -200,7 +304,7 @@
   border: 1px solid rgba(123, 103, 81, 0.12);
   background: #FFFCFA;
   padding: 20px;
-  min-height: 120px;
+  min-height: 0;
   opacity: 0;
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
 }
@@ -359,4 +463,166 @@
   text-align: center;
   color: #7B6751;
   opacity: 0.85;
+}
+
+/* ── Today at a Glance strip ─────────────────────────────────────────────── */
+
+.glanceStrip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 640px) {
+  .glanceStrip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.glanceStat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: #FFFCFA;
+  border: 1px solid rgba(123, 103, 81, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glanceStat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.glanceStatIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(123, 103, 81, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #7B6751;
+  transition: background 0.2s;
+}
+
+.glanceStatBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.glanceStatNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #2d352d;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.glanceStatLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a8778;
+  white-space: nowrap;
+}
+
+/* ── TFL Travel Alert Banner ─────────────────────────────────────────────── */
+
+.travelAlert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: rgba(185, 130, 55, 0.07);
+  border: 1px solid rgba(185, 130, 55, 0.2);
+}
+
+.travelAlertLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.travelAlertIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(185, 130, 55, 0.12);
+  color: #9A6E2A;
+}
+
+.travelAlertBody {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.travelAlertLine {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7A5520;
+}
+
+.travelAlertDot,
+.travelAlertSep {
+  font-size: 0.65rem;
+  color: rgba(154, 110, 42, 0.5);
+}
+
+.travelAlertStatus {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: #9A6E2A;
+}
+
+.travelAlertSuggestion {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(74, 52, 33, 0.8);
+}
+
+.travelAlertDismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(154, 110, 42, 0.6);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  padding: 0;
+}
+
+.travelAlertDismiss:hover {
+  background: rgba(185, 130, 55, 0.12);
+  color: #7A5520;
 }
