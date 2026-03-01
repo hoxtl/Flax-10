@@ -8,10 +8,11 @@ import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import SearchBar from "../common/SearchBar";
-import { Bell, Plus } from "lucide-react";
+import { Bell, Plus, ChevronDown } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
-import UserSearch from "../Social/UserSearch";
+import { APP_ROUTES } from "../../lib/routes";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
 
 function getFirstName(user) {
   const displayName = (getDisplayName(user) || "").trim();
@@ -36,13 +37,104 @@ function TopBarGreeting({ user }) {
         )}
         <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
-    </div>);
+    </div>
+  );
 }
 
-function SearchInput({ onNavChange }) {
-  return <UserSearch onUserSelect={(u) => {
-    onNavChange?.(`profile_${u.id}`);
-  }} />;
+function BrandLogo() {
+  return (
+    <div className={styles.brandContainer}>
+      <motion.div
+        className={styles.logoMark}
+        whileHover={{ rotate: 8, scale: 1.08 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      />
+      <span className={styles.brandName}>StudyFlax</span>
+    </div>
+  );
+}
+
+function NavDropdown({ title, routes, activeNav, onNavChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const hasActiveItem = routes.some(r => r.id === activeNav);
+
+  return (
+    <div className={styles.navGroup} ref={dropdownRef}>
+      <button
+        className={`${styles.navGroupTrigger} ${hasActiveItem ? styles.navGroupTriggerActive : ""}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {title}
+        <ChevronDown size={14} className={isOpen ? styles.chevronOpen : styles.chevronClosed} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className={styles.dropdownMenu}
+            initial={{ opacity: 0, y: -5, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -5, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+          >
+            {routes.map((n) => {
+              const isActive = activeNav === n.id;
+              return (
+                <button
+                  key={n.id}
+                  onClick={() => {
+                    onNavChange?.(n.id);
+                    setIsOpen(false);
+                  }}
+                  className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ""}`}
+                >
+                  <span className={styles.dropdownIcon}>{n.icon}</span>
+                  <span className={styles.dropdownLabel}>{n.label}</span>
+                  {isActive && (
+                    <motion.div
+                      className={styles.dropdownActivePill}
+                      layoutId="topbarDropdownPill"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function TopBarNav({ activeNav, onNavChange, user }) {
+  const routes = APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
+
+  const studyRoutes = routes.filter(r => ["home", "calendar", "timer", "modules"].includes(r.id));
+  const campusRoutes = routes.filter(r => ["map", "analytics"].includes(r.id));
+  const socialRoutes = routes.filter(r => ["discover", "societies"].includes(r.id));
+  const adminRoutes = routes.filter(r => ["admin"].includes(r.id));
+
+  return (
+    <nav className={styles.navContainer}>
+      {studyRoutes.length > 0 && <NavDropdown title="Study" routes={studyRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+      {campusRoutes.length > 0 && <NavDropdown title="Campus" routes={campusRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+      {socialRoutes.length > 0 && <NavDropdown title="Social" routes={socialRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+      {adminRoutes.length > 0 && <NavDropdown title="Admin" routes={adminRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+    </nav>
+  );
 }
 
 function QuickTabs({ onAddClick }) {
@@ -71,10 +163,10 @@ function ActionPill({ onAddClick }) {
   );
 }
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange }) {
+function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <div className={styles.actions}>
-      <SearchInput onNavChange={onNavChange} />
+      <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <ActionPill onAddClick={onAddClick} />
       <ProfileDropdown
         user={user}
@@ -89,16 +181,23 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
 export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
-      <TopBarGreeting user={user} />
-      <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
-      <TopBarActions
-        onAddClick={onAddClick}
-        user={user}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-        onProfileClick={onProfileClick}
-        onNavChange={onNavChange}
-      />
+      <div className={styles.leftSection}>
+        <BrandLogo />
+        <TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} />
+      </div>
+
+      <div className={styles.rightSection}>
+        <TopBarGreeting user={user} />
+        <TopBarActions
+          onAddClick={onAddClick}
+          user={user}
+          onSettingsClick={onSettingsClick}
+          onLogoutClick={onLogoutClick}
+          onProfileClick={onProfileClick}
+          onNavChange={onNavChange}
+          activeNav={activeNav}
+        />
+      </div>
     </header>
   );
 }
