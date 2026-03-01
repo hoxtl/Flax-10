@@ -12,6 +12,7 @@ from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
 from studyFlax.views.calendar.timetable_views import timetable_import
+from studyFlax.views.calendar.schedule_views import *
 from studyFlax.views.hello import hello
 from studyFlax.views.modules.module_views import module_list, module_detail
 from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
@@ -62,6 +63,7 @@ urlpatterns = [
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
     path("notifications/clear-all/", clear_all, name="notification-clear-all"),
     path("settings/", user_settings_view, name='user-settings'),
+    path("schedules/", schedule_list, name='schedules'),
     path("societies/", society_list, name="society-list"),
     path("societies/<int:society_id>/", society_detail, name="society-detail"),
     path("societies/<int:society_id>/members/", membership_list, name="society-members"),
