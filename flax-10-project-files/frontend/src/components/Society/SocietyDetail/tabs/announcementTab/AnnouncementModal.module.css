@@ -170,11 +170,32 @@
 
 .footer {
     display: flex;
-    justify-content: flex-end;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
+}
+
+.footerRight {
+    display: flex;
+    gap: 12px;
+}
+
+.deleteBtn {
+    padding: 10px 20px;
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #ef4444;
+    color: white;
 }
 
 .cancelBtn {

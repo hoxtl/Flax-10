@@ -8,6 +8,7 @@ from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.modules.enrollmentModel import Enrollment
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
+from studyFlax.views.modules.enrollment_logic import enroll_user_in_module
 
 
 def get_or_create_settings(user):
@@ -32,12 +33,6 @@ def user_settings_view(request):
     apply_settings_updates(settings, request.data)
     return Response({'theme': settings.theme, 'timezone': settings.timezone})
 
-def get_lecture_tag():
-    try:
-        from studyFlax.models.calendar.tagModel import Tag
-        return Tag.objects.filter(name='Lecture').first()
-    except Exception:
-        return None
 
 def get_modules_for_major(major):
     prefixes = course_to_module_prefixes.get(major, [])
@@ -46,28 +41,8 @@ def get_modules_for_major(major):
     pattern = r'^(' + '|'.join(prefixes) + ')'
     return list(Module.objects.filter(module_code__regex=pattern))
 
-def create_lecture_events(user, module, lecture_tag):
-    for week in range(10):
-        start = module.start_time + timedelta(weeks=week)
-        end = module.end_time + timedelta(weeks=week)
-        CalendarEvent.objects.get_or_create(
-            user=user, title=f"Lecture: {module.module_name}", start_time=start,
-            defaults={'end_time': end, 'location': module.location,
-                      'description': module.module_name, 'tag': lecture_tag,
-                      'priority': 'high', 'source': 'module_enrollment'}
-        )
-
-
-def enroll_user_in_module(user, module, lecture_tag):
-    _, created = Enrollment.objects.get_or_create(student=user, module=module)
-    if created:
-        create_lecture_events(user, module, lecture_tag)
-    return created
-
-
 def enroll_user_in_modules(user, modules):
-    lecture_tag = get_lecture_tag()
-    return sum(1 for m in modules if enroll_user_in_module(user, m, lecture_tag))
+    return sum(1 for m in modules if enroll_user_in_module(user, m)[1])
 
 
 @api_view(['POST'])
