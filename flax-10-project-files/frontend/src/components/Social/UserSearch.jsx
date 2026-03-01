@@ -236,14 +236,7 @@ const filterObj = (objs, q, keys) => objs.filter(o =>
 );
 const toggleArr = (arr, val) => arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val];
 
-const FilterBtn = ({ isOpen, setOpen }) => (
-    <button onClick={setOpen} className={styles.filterBtn}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-        </svg>
-        Filter
-    </button>
-);
+
 
 const SearchBar = ({ query, setQuery, setFocus, containerRef, showDpdwn, dpdwnPos, loading, userResults, handleSel }) => (
     <div className={`${styles.searchContainer} ${styles.relativeContainer}`} ref={containerRef}>
@@ -263,7 +256,9 @@ const useUserSearchEffects = (query, selectedModules, selectedSocieties, setUser
 
 const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     <div ref={fRef} className={styles.relativeContainer}>
-        <FilterBtn isOpen={isOpen} setOpen={setOpen} />
+        <button onClick={setOpen} className={styles.filterBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter
+        </button>
         {isOpen && <FilterDropdown {...props} />}
     </div>
 );
