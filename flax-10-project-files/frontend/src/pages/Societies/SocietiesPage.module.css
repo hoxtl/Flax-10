@@ -153,10 +153,23 @@
   .searchBar {
     width: 100%;
     height: 48px;
-    font-size: 16px; /* Prevents iOS zoom on focus */
+    font-size: 16px;
     border: 2px solid var(--border);
     background: var(--panel);
     border-radius: 12px;
     padding: 0 16px;
+  }
+
+  .pillContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pillContainer::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for a cleaner look */
   }
 }
