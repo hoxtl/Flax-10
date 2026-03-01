@@ -618,6 +618,17 @@
     opacity: 0.35;
     filter: grayscale(0.8);
   }
+
+  /* Row-level past fade — dims gutter time, dot AND card together */
+  .planTimelineRowPast {
+    opacity: 0.38;
+    filter: grayscale(0.75);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+  .planTimelineRowPast:hover {
+    opacity: 0.6;
+    filter: grayscale(0.3);
+  }
   .planTimelineCardOverlap {
     border-color: #E5E4E2;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
@@ -1432,6 +1443,22 @@
 
   .timelineHeaderLeft {
     min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .timelineHeaderIconWrap {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(123, 103, 81, 0.2);
+    background: #F8F5F2;
+    color: #7B6751;
   }
 
   .timelineHeaderRight {
@@ -1455,11 +1482,11 @@
 
   .timelineTitle {
     margin: 0;
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.75rem;
-    font-weight: var(--font-weight-title);
-    color: #2D2D2D;
-    letter-spacing: 0.05rem;
+    font-family: "Lexend", system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2d352d;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
 
@@ -2618,6 +2645,76 @@
     font-style: italic;
   }
 
+  /* ── Deadline revision suggestion ── */
+  .planTimelineGapDeadlineRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 11px;
+    border-radius: 10px;
+    background: rgba(192, 113, 78, 0.05);
+    border: 1px solid rgba(192, 113, 78, 0.2);
+    border-left: 3px solid #C0714E;
+  }
+  .planTimelineGapDeadlineInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+  .planTimelineGapDeadlineChip {
+    display: inline-block;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #C0714E;
+    background: rgba(192, 113, 78, 0.1);
+    padding: 1px 6px;
+    border-radius: 99px;
+    width: fit-content;
+  }
+  .planTimelineGapDeadlineTitle {
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #3d2e1e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .planTimelineGapDeadlineMeta {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.57rem;
+    color: rgba(192, 113, 78, 0.65);
+    letter-spacing: 0.02em;
+  }
+  .planTimelineGapDeadlineBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    border: 1px solid rgba(192, 113, 78, 0.35);
+    background: rgba(192, 113, 78, 0.07);
+    color: #9B4A2A;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .planTimelineGapDeadlineBtn:hover {
+    background: rgba(192, 113, 78, 0.15);
+    border-color: rgba(192, 113, 78, 0.55);
+  }
+
   /* ── Start buttons ── */
   .planTimelineGapStartBtn {
     display: inline-flex;
@@ -2801,4 +2898,57 @@
     font-style: italic;
     opacity: 0.85;
   }
+
+/* ── Now / Timer Strip (MiniTimeline top bar) ─────────────────────────────── */
+.planTimelineNowStrip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  margin: 0 12px 8px;
+  border-radius: 8px;
+  background: rgba(132, 169, 140, 0.1);
+  border: 1px solid rgba(132, 169, 140, 0.22);
+  overflow: hidden;
+}
+
+.planTimelineNowStripDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #84A98C;
+  flex-shrink: 0;
+  animation: nowDotPulse 2s ease-in-out infinite;
+}
+
+.planTimelineNowStripLabel {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5a8a65;
+  flex-shrink: 0;
+}
+
+.planTimelineNowStripTask {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2d352d;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planTimelineNowStripTimer {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #7B6751;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
 

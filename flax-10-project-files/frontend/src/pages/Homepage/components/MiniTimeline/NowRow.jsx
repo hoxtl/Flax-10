@@ -4,9 +4,9 @@
 
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 
-export function NowRow({ row, styles }) {
+export function NowRow({ row, styles, nowRowRef }) {
   return (
-    <div key={row.id} className={styles.planTimelineRow} style={{ marginTop: row.spacingBeforePx || 0, minHeight: 28 }}>
+    <div ref={nowRowRef} key={row.id} className={styles.planTimelineRow} style={{ marginTop: row.spacingBeforePx || 0, minHeight: 28 }}>
       <div className={styles.planTimelineGutter}>
         <span className={styles.planTimelineTime}>
           {String(Math.floor(DAY_START_HOUR + row.nowMins / 60)).padStart(2, "0")}:{String(row.nowMins % 60).padStart(2, "0")}

@@ -96,7 +96,7 @@ export function PlanEventRow({
 
   return (
     <div
-      className={styles.planTimelineRow}
+      className={`${styles.planTimelineRow} ${isPast && !active ? styles.planTimelineRowPast : ""}`}
       style={{ marginTop: row.spacingBeforePx || 0, minHeight: propMinHeight }}
     >
       <div className={styles.planTimelineGutter}>

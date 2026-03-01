@@ -56,9 +56,18 @@ function buildStudyHeader(suggestedTask, durLabel) {
   return `${durLabel} free`;
 }
 
+function deadlineDueLabel(deadline) {
+  if (!deadline?.start_due_date) return null;
+  const ms = new Date(deadline.start_due_date) - Date.now();
+  if (ms <= 0) return "overdue";
+  const d = Math.ceil(ms / 86400000);
+  return d === 1 ? "due tomorrow" : `due in ${d}d`;
+}
+
 export function PlanFreeRow({
   row,
   suggestableTasks,
+  deadlineSuggestions = [],
   onQuickStart,
   selectedDate,
   taskLists,
@@ -202,6 +211,8 @@ export function PlanFreeRow({
   if (isBestWindow) {
     const top2 = top3Tasks.slice(0, 2);
     const header = buildStudyHeader(suggestedTask, durLabel);
+    const topDeadline = deadlineSuggestions[0] ?? null;
+    const revisionBlockMins = Math.min(Math.ceil(row.minutes / 25) * 25, 90);
     return (
       <div
         className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
@@ -221,6 +232,32 @@ export function PlanFreeRow({
             <span className={styles.planTimelineGapBestWindowLabel}>{header}</span>
             <span className={styles.planTimelineGapBestWindowDur}>{durLabel} free</span>
           </div>
+          {/* Deadline revision suggestion — pinned above regular tasks */}
+          {topDeadline && (
+            <div className={styles.planTimelineGapDeadlineRow}>
+              <div className={styles.planTimelineGapDeadlineInfo}>
+                <span className={styles.planTimelineGapDeadlineChip}>
+                  {deadlineDueLabel(topDeadline)}
+                </span>
+                <span className={styles.planTimelineGapDeadlineTitle}>
+                  {topDeadline.assessment_title || topDeadline.title}
+                  {topDeadline.module_code ? ` · ${topDeadline.module_code}` : ""}
+                </span>
+                <span className={styles.planTimelineGapDeadlineMeta}>no revision scheduled</span>
+              </div>
+              <button
+                type="button"
+                className={styles.planTimelineGapDeadlineBtn}
+                onClick={() => startTask({
+                  title: `Revision: ${topDeadline.assessment_title || topDeadline.title}`,
+                  estimated_blocks: Math.round(revisionBlockMins / 25),
+                })}
+                aria-label={`Schedule revision for ${topDeadline.assessment_title || topDeadline.title}`}
+              >
+                Schedule {revisionBlockMins}m →
+              </button>
+            </div>
+          )}
           {top2.length > 0 ? (
             <div className={styles.planTimelineGapTaskList}>
               {top2.map((task) => {
@@ -259,6 +296,7 @@ export function PlanFreeRow({
   }
 
   /* ── 30–59 min: Short study window ── */
+  const topDeadlineShort = deadlineSuggestions[0] ?? null;
   return (
     <div
       className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
@@ -272,7 +310,29 @@ export function PlanFreeRow({
       </div>
       <div className={styles.planTimelineGapShortWindow}>
         <span className={styles.planTimelineGapShortDur}>{durLabel} window</span>
-        {suggestedTask ? (
+        {topDeadlineShort && !suggestedTask ? (
+          <div className={styles.planTimelineGapShortTaskRow}>
+            <div className={styles.planTimelineGapDeadlineInfo}>
+              <span className={styles.planTimelineGapDeadlineChip}>
+                {deadlineDueLabel(topDeadlineShort)}
+              </span>
+              <span className={styles.planTimelineGapTaskTitle}>
+                {topDeadlineShort.assessment_title || topDeadlineShort.title}
+              </span>
+            </div>
+            <button
+              type="button"
+              className={styles.planTimelineGapStartBtnSm}
+              onClick={() => startTask({
+                title: `Revision: ${topDeadlineShort.assessment_title || topDeadlineShort.title}`,
+                estimated_blocks: Math.max(1, Math.round(row.minutes / 25)),
+              })}
+              aria-label={`Schedule revision for ${topDeadlineShort.assessment_title || topDeadlineShort.title}`}
+            >
+              Schedule →
+            </button>
+          </div>
+        ) : suggestedTask ? (
           <div className={styles.planTimelineGapShortTaskRow}>
             <span
               className={styles.planTimelineGapTaskTitle}

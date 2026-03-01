@@ -35,6 +35,25 @@ export function ActionHubSlot({
     (i) => !i.completed && i.actionHubStatus !== "overdue"
   ).length;
 
+  const allTasksDone =
+    actionHubItemsOnly.length > 0 &&
+    actionHubItemsOnly.every((t) => t.completed);
+
+  if (allTasksDone) {
+    return (
+      <EmptyStateCard
+        illustrationVariant="seedling"
+        message="Every task done. Day complete!"
+        sub={`${actionHubItemsOnly.length} task${actionHubItemsOnly.length !== 1 ? "s" : ""} completed today. Take a moment — you earned it.`}
+        action={
+          <Link to="/tasks" className={styles.actionHubLink}>
+            Plan tomorrow →
+          </Link>
+        }
+      />
+    );
+  }
+
   return (
     <div ref={actionHubRef} className={styles.actionHubSlotRoot}>
       {/* Summary chips */}
