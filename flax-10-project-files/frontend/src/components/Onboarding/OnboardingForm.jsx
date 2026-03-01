@@ -1,4 +1,4 @@
-import AnimatedDropdown from "./AnimatedDropdown";
+import AnimatedDropdown from "../ui/AnimatedDropdown";
 import WarningBox from "./WarningBox";
 import styles from "./OnboardingModal.module.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,12 +32,21 @@ function WarningSection({ year, major, confirmed, setConfirmed }) {
 export default function OnboardingForm({ year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, handleSubmit, courseOptions }) {
   return (
     <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-      <h2 className={styles.title}>Welcome to StudyFlax 👋</h2>
-      <p className={styles.subtitle}>Tell us about yourself so we can set up your modules.</p>
+      <h2 className={styles.title}>
+        You&rsquo;re in the right place{" "}
+        <motion.span
+          style={{ display: "inline-block", color: "var(--primary, #9E7E5D)" }}
+          animate={{ rotate: [0, 20, -20, 12, -12, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
+        >
+          ✦
+        </motion.span>
+      </h2>
+      <p className={styles.subtitle}>Two quick things and we'll have your modules ready to go.</p>
       <YearCourseFields year={year} setYear={setYear} major={major} handleMajorChange={handleMajorChange} courseOptions={courseOptions} />
       <WarningSection year={year} major={major} confirmed={confirmed} setConfirmed={setConfirmed} />
       <button className={styles.btn} onClick={handleSubmit} disabled={!year || !major || !confirmed || loading}>
-        {loading ? "Setting up your modules..." : "Get Started"}
+        {loading ? "Setting up your modules..." : "Set up my modules"}
       </button>
     </motion.div>
   );
