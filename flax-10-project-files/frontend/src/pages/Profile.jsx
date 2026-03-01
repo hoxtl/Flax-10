@@ -96,8 +96,9 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
 
   return (
     <div className={styles.headerWrapper}>
-      {/* --- MOBILE VIEW --- */}
+
       <div className={styles.mobileOnly}>
+        
         <div className={styles.mobileHero}>
           <div className={styles.avatarWrapper}>
             <div className={styles.mainAvatar}>
@@ -111,6 +112,22 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
             {profileData?.year || "Year 1"} · {profileData?.major || "Computer Science"}
           </p>
         </div>
+
+        <div className={styles.mobileStatsGrid}>
+          <div className={styles.mobileStatCard}>
+            <span className={styles.statNumber}>{profileData?.modules?.length || 0}</span>
+            <span className={styles.statLabel}>Modules</span>
+          </div>
+          <div className={styles.mobileStatCard}>
+            <span className={styles.statNumber}>0</span>
+            <span className={styles.statLabel}>Tasks</span>
+          </div>
+          <div className={styles.mobileStatCard}>
+            <span className={styles.statNumber}>{upcomingEventCount || 0}</span>
+            <span className={styles.statLabel}>Events</span>
+          </div>
+        </div>
+
       </div>
 
       <div className={styles.desktopOnly}>
@@ -139,6 +156,7 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
           </div>
         </header>
       </div>
+
     </div>
   );
 }
