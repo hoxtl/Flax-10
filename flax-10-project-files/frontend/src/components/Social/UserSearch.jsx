@@ -19,17 +19,17 @@ async function fetchUserResults(query, moduleFilter, societyFilter, setResults, 
     }
 }
 
-function useClickOutside(ref, onOutside) {
+export function useClickOutside(ref, onOutside) {
     useEffect(() => {
         const handler = (e) => {
             if (ref.current && !ref.current.contains(e.target)) onOutside();
         };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
-    }, []);
+    }, [ref, onOutside]);
 }
 
-const useSearchInit = () => {
+export const useSearchInit = () => {
     const [allModules, setAllModules] = useState([]);
     const [allSocieties, setAllSocieties] = useState([]);
     useEffect(() => {
@@ -254,7 +254,7 @@ const useUserSearchEffects = (query, selectedModules, selectedSocieties, setUser
     }, [query, selectedModules, selectedSocieties]);
 };
 
-const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
+export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     <div ref={fRef} className={styles.relativeContainer}>
         <button onClick={setOpen} className={styles.filterBtn}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter
@@ -263,7 +263,7 @@ const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     </div>
 );
 
-const useFilterState = (allModules, allSocieties, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading) => {
+export const useFilterState = (allModules, allSocieties, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activeFilterTab, setActiveFilterTab] = useState('modules');
     const [selectedModules, setSelectedModules] = useState([]);
