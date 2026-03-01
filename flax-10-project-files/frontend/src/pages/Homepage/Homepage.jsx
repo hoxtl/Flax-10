@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { useCountUp } from "../../hooks/useCountUp";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -27,6 +29,7 @@ import { playZenChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 
 import EmptyStateCard from "../../components/EmptyStateCard";
+import HomeStudyTimeChart from "../../components/Analytics/HomeStudyTimeChart";
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
@@ -58,14 +61,14 @@ import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 /* HOME PAGE */
 export default function Homepage({ onNavigate }) {
   const navigate         = useNavigate();
-  const { selectedDate } = useCalendar();
+  const { selectedDate, events: allCalEvents } = useCalendar();
   const dispatch         = useCalendarDispatch();
   const { loadEvents }   = useCalendarEvents();
   const { removeEvent, addEvent, editEvent } = useEventActions();
   const { openModal }    = useEventModal();
   const { getTag, tags }       = useTags();
   const { setActiveTaskId, isActive: timerActive, timeLeft, task: timerTask, progress: timerProgress, setIsActive: setTimerActive, mode: timerMode, setMode: setTimerMode, setTimeLeft, workTime, breakTime, resetTimer, setTask: setTimerTask } = useTimerContext();
-  const hasTimerSession = timerActive || (timerTask && timeLeft > 0);
+  const hasTimerSession = timerActive;
 
   const startFocusInWidget = useCallback(() => {
     setTimerMode("work");
@@ -228,6 +231,46 @@ export default function Homepage({ onNavigate }) {
     [upcomingDeadlines, analyticsProgress]
   );
   const isUrgentOrange = urgencyLevel === "urgent";
+
+  /** Tomorrow's first scheduled event — used in endOfDay Right Now state */
+  const tomorrowFirstEvent = useMemo(() => {
+    const tomorrow = new Date(selectedDate);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const events = (allCalEvents || [])
+      .filter(e => e.start_time && overlapsDay(new Date(e.start_time), new Date(e.end_time || e.start_time), tomorrow))
+      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    return events[0] ?? null;
+  }, [allCalEvents, selectedDate]);
+
+  /** Today vs yesterday scheduled hours — used in endOfDay Right Now state */
+  const todayVsYesterday = useMemo(() => {
+    const dp = analyticsProgress?.daily_progress;
+    if (!dp?.length) return null;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const yestStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const todayEntry = dp.find(d => d.date === todayStr);
+    const yestEntry = dp.find(d => d.date === yestStr);
+    if (!todayEntry || !yestEntry) return null;
+    const diff = Math.round((todayEntry.actual_hours - yestEntry.actual_hours) * 10) / 10;
+    if (Math.abs(diff) < 0.1) return { label: "≈ same hours as yesterday", dir: "flat" };
+    if (diff > 0) return { label: `↑ ${diff}h more than yesterday`, dir: "up" };
+    return { label: `↓ ${Math.abs(diff)}h less than yesterday`, dir: "down" };
+  }, [analyticsProgress]);
+
+  /** vs last week: compare today's actual_hours vs same weekday 7 days ago */
+  const vsLastWeek = useMemo(() => {
+    const dp = analyticsProgress?.daily_progress;
+    if (!dp?.length) return null;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const lastWeekStr = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    const todayEntry = dp.find((d) => d.date === todayStr);
+    const lastWeekEntry = dp.find((d) => d.date === lastWeekStr);
+    if (!todayEntry || !lastWeekEntry) return null;
+    const diff = Math.round((todayEntry.actual_hours - lastWeekEntry.actual_hours) * 10) / 10;
+    if (Math.abs(diff) < 0.1) return { label: "≈ same as last week", dir: "flat" };
+    if (diff > 0) return { label: `↑ ${diff}h vs last week`, dir: "up" };
+    return { label: `↓ ${Math.abs(diff)}h vs last week`, dir: "down" };
+  }, [analyticsProgress]);
 
   const getTaskCategoryPillMeta = useCallback((task) => {
     const listId = task.task_list != null ? String(task.task_list) : null;
@@ -563,28 +606,6 @@ export default function Homepage({ onNavigate }) {
     [now, selectedDate, sortedEvents, isToday]
   );
 
-  /** Status strip for IntelligenceRow header — derived from navigatorContext */
-  const navStatusStrip = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const nav = navigatorContext;
-    if (nav.state === "conflict") {
-      const timeStr = nav.conflictAt
-        ? new Date(nav.conflictAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
-        : null;
-      return { variant: "Conflict", text: `Warning: Schedule overlap${timeStr ? ` at ${timeStr}` : ""}` };
-    }
-    if (nav.state === "gap" && (nav.gapMins ?? 0) >= 15) {
-      return { variant: "Gap", text: `Free window · ${nav.gapMins}m until ${nav.nextItem?.title || "next item"}` };
-    }
-    if (nav.state === "task" && nav.currentBlock?.title) {
-      return { variant: "Task", text: `Now: ${nav.currentBlock.title}` };
-    }
-    if (nav.state === "endOfDay") {
-      return { variant: "", text: "All clear — great work today" };
-    }
-    return null;
-  }, [navigatorContext, selectedDate, isToday]);
-
   const mostUrgentDeadline = useMemo(() => {
     const list = (upcomingDeadlines || []).filter((d) => d.start_due_date);
     if (list.length === 0) return null;
@@ -598,6 +619,35 @@ export default function Homepage({ onNavigate }) {
       (d) => d.start_due_date && (new Date(d.start_due_date) - nowMs) <= oneDayMs && (new Date(d.start_due_date) - nowMs) >= 0
     );
   }, [upcomingDeadlines]);
+
+  const upcomingDeadlinesCount = useMemo(
+    () => (upcomingDeadlines || []).filter(
+      (d) => d.start_due_date && (new Date(d.start_due_date) - Date.now()) <= 21 * 24 * 60 * 60 * 1000
+    ).length,
+    [upcomingDeadlines]
+  );
+
+  /** Deadlines within 14 days that have no matching revision/study event already in the calendar. */
+  const deadlineSuggestions = useMemo(() => {
+    if (!isToday(selectedDate)) return [];
+    const nowMs = Date.now();
+    const fourteenDays = 14 * 24 * 60 * 60 * 1000;
+    const scheduledTitles = (sortedEvents || []).map(e => (e.title || "").toLowerCase());
+    return (upcomingDeadlines || [])
+      .filter(d => {
+        if (!d.start_due_date) return false;
+        const ms = new Date(d.start_due_date) - nowMs;
+        if (ms <= 0 || ms > fourteenDays) return false;
+        // Skip if a calendar event already mentions this deadline's title or module code
+        const dTitle = (d.assessment_title || d.title || "").toLowerCase();
+        const dCode  = (d.module_code || "").toLowerCase();
+        return !scheduledTitles.some(t =>
+          (dTitle && t.includes(dTitle.slice(0, 8))) ||
+          (dCode  && t.includes(dCode))
+        );
+      })
+      .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
+  }, [selectedDate, upcomingDeadlines, sortedEvents]);
 
   const seedsCountFromTasks = useMemo(() => {
     if (!isToday(selectedDate)) return 0;
@@ -739,6 +789,8 @@ export default function Homepage({ onNavigate }) {
     return "behind";
   }, [selectedDate, now, actionHubItemsOnly.length, actionHubSpineCompletedPct]);
 
+  const dayProgressCountRef = useCountUp(Math.round(actionHubSpineCompletedPct));
+
   /** Today's free windows from schedule (>= 20 min, chronological). */
   const todayFreeWindows = useMemo(() => {
     if (!isToday(selectedDate)) return [];
@@ -746,6 +798,16 @@ export default function Homepage({ onNavigate }) {
       .filter((w) => w.minutes >= 20)
       .sort((a, b) => a.start - b.start);
   }, [selectedDate, sortedEvents]);
+
+  /** Focus Windows summary: total free time + count for today */
+  const focusSummary = useMemo(() => {
+    if (!isToday(selectedDate) || !todayFreeWindows.length) return null;
+    const totalMins = todayFreeWindows.reduce((s, w) => s + w.minutes, 0);
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    const durLabel = h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ""}` : `${m}m`;
+    return { count: todayFreeWindows.length, durLabel };
+  }, [selectedDate, todayFreeWindows]);
 
   /** Most urgent incomplete task for focus suggestion. */
   const topActionTask = useMemo(() => {
@@ -757,6 +819,101 @@ export default function Homepage({ onNavigate }) {
       null
     );
   }, [actionHubItemsOnly]);
+
+  /** Smart nudge: pairs the nearest urgent deadline (≤ 24h) with the next free window. */
+  const smartNudge = useMemo(() => {
+    if (!isToday(selectedDate)) return null;
+    const nowMs = now.getTime();
+    const nextWindow = todayFreeWindows.find((w) => w.end.getTime() > nowMs);
+    if (!nextWindow) return null;
+
+    const windowMins = nextWindow.minutes;
+    const winLabel =
+      windowMins >= 60
+        ? `${Math.floor(windowMins / 60)}h${windowMins % 60 > 0 ? ` ${windowMins % 60}m` : ""}`
+        : `${windowMins}m`;
+    const winStart = formatTime(nextWindow.start.toISOString());
+
+    // Priority 1: deadline due within 24h
+    const urgentDeadline = [...(upcomingDeadlines || [])]
+      .filter((d) => {
+        if (!d.start_due_date) return false;
+        const ms = new Date(d.start_due_date) - nowMs;
+        return ms > 0 && ms <= 24 * 3600000;
+      })
+      .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date))[0];
+
+    if (urgentDeadline) {
+      const msUntilDue = new Date(urgentDeadline.start_due_date) - nowMs;
+      const h = Math.floor(msUntilDue / 3600000);
+      const m = Math.floor((msUntilDue % 3600000) / 60000);
+      const dueIn = h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ""}` : `${m}m`;
+      return {
+        type: "deadline",
+        taskTitle: urgentDeadline.title || urgentDeadline.name || "Deadline",
+        dueIn,
+        winLabel,
+        winStart,
+      };
+    }
+
+    // Priority 2: top incomplete task + free window
+    if (topActionTask) {
+      return { type: "task", taskTitle: topActionTask.title, winLabel, winStart };
+    }
+
+    return null;
+  }, [selectedDate, isToday, now, todayFreeWindows, upcomingDeadlines, topActionTask]);
+
+  /** TFL context: next upcoming event so the delay pill can say "leave by 18:50 for Dinner with Mum". */
+  const tflContext = useMemo(() => {
+    if (!isToday(selectedDate) || !sortedEvents?.length) return null;
+    const nowMs = now.getTime();
+    const DELAY_MINS = 10; // matches MOCK_TFL_ALERT suggestion offset
+    const nextEvent = [...sortedEvents]
+      .filter(e => e.start_time && new Date(e.start_time).getTime() > nowMs)
+      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0];
+    if (!nextEvent) return null;
+    const leaveByMs = new Date(nextEvent.start_time).getTime() - DELAY_MINS * 60000;
+    const leaveStr = new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    return { eventTitle: nextEvent.title || "next event", leaveStr };
+  }, [selectedDate, isToday, now, sortedEvents]);
+
+  /** Schedule-aware one-liner shown below the status pills in the greeting header. */
+  const scheduleInsight = useMemo(() => {
+    if (!isToday(selectedDate) || !sortedEvents?.length) return null;
+    const todayEvs = sortedEvents.filter(e => e.start_time && e.end_time);
+    const lectureCount = todayEvs.filter(e =>
+      /lecture|seminar|tutorial|lab/i.test(e.title || "")
+    ).length;
+    const totalMins = todayEvs.reduce((acc, e) => {
+      const m = Math.round((new Date(e.end_time) - new Date(e.start_time)) / 60000);
+      return acc + Math.max(0, m);
+    }, 0);
+    const sorted = [...todayEvs].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    let hasBackToBack = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = (new Date(sorted[i].start_time) - new Date(sorted[i - 1].end_time)) / 60000;
+      if (gap >= 0 && gap < 10) { hasBackToBack = true; break; }
+    }
+    const hour = now.getHours();
+    if (lectureCount >= 2 && hasBackToBack) {
+      return `${lectureCount} lectures today with back-to-back sessions — remember to take breaks`;
+    }
+    if (lectureCount >= 1) {
+      return `${lectureCount} lecture${lectureCount > 1 ? "s" : ""} today · ${todayFreeWindows.length} free window${todayFreeWindows.length !== 1 ? "s" : ""} to study`;
+    }
+    if (totalMins >= 360) {
+      return `Packed day — ${(totalMins / 60).toFixed(1)}h scheduled · guard your energy`;
+    }
+    if (hour >= 21 && actionHubRemainingCount > 0) {
+      return `It's late — ${actionHubRemainingCount} task${actionHubRemainingCount !== 1 ? "s" : ""} remaining. Prioritise sleep if needed`;
+    }
+    if (todayFreeWindows.length >= 3) {
+      return `Light schedule today — ${todayFreeWindows.length} windows to make real progress`;
+    }
+    return null;
+  }, [selectedDate, isToday, sortedEvents, todayFreeWindows, now, actionHubRemainingCount]);
 
   /** Focus hours: task-based (estimated work for hub tasks only). */
   const actionHubFocusHours = useMemo(() => {
@@ -771,6 +928,87 @@ export default function Homepage({ onNavigate }) {
     () => actionHubItemsOnly.filter((i) => !i.completed && i.actionHubStatus === "overdue").length,
     [actionHubItemsOnly]
   );
+
+  /** Status strip for IntelligenceRow header — smart schedule + task awareness */
+  const navStatusStrip = useMemo(() => {
+    if (!isToday(selectedDate)) return null;
+    const nav = navigatorContext;
+
+    // 1. Schedule conflict — always top priority
+    if (nav.state === "conflict") {
+      const timeStr = nav.conflictAt
+        ? new Date(nav.conflictAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+        : null;
+      return { variant: "Conflict", text: `Warning: Schedule overlap${timeStr ? ` at ${timeStr}` : ""}` };
+    }
+
+    // 2. Overdue tasks — urgent, warm red
+    if (actionHubOverdueCount > 0) {
+      if (actionHubOverdueCount === 1 && topActionTask) {
+        return { variant: "Conflict", text: `⚠ Running behind — focus on ${topActionTask.title}` };
+      }
+      return { variant: "Conflict", text: `⚠ ${actionHubOverdueCount} tasks overdue` };
+    }
+
+    // 3. Currently in a scheduled event/task
+    if (nav.state === "task" && nav.currentBlock?.title) {
+      return { variant: "Task", text: `Now: ${nav.currentBlock.title}` };
+    }
+
+    // 4. Free gap — show it
+    if (nav.state === "gap" && (nav.gapMins ?? 0) >= 15) {
+      return { variant: "Gap", text: `Free window · ${nav.gapMins}m until ${nav.nextItem?.title || "next item"}` };
+    }
+
+    // 5. Morning — day hasn't started yet
+    if (nav.state === "beforeDay") {
+      const firstEvent = sortedEvents?.[0];
+      if (firstEvent?.title && firstEvent.start_time) {
+        const timeStr = new Date(firstEvent.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+        return { variant: "Gap", text: `Your day starts with ${firstEvent.title} at ${timeStr}` };
+      }
+      return null;
+    }
+
+    // 6. All events done but tasks still remain
+    const allEventsDone =
+      (sortedEvents?.length ?? 0) > 0 &&
+      sortedEvents.every(e => !e.end_time || new Date(e.end_time).getTime() < now.getTime());
+    if (allEventsDone && actionHubRemainingCount > 0) {
+      return {
+        variant: "Gap",
+        text: `Events done for today · ${actionHubRemainingCount} task${actionHubRemainingCount !== 1 ? "s" : ""} still need attention`,
+      };
+    }
+
+    // 7. Everything done / end of day
+    if (nav.state === "endOfDay" || (allEventsDone && actionHubRemainingCount === 0)) {
+      return { variant: "", text: "All clear — great work today ✓" };
+    }
+
+    return null;
+  }, [navigatorContext, selectedDate, isToday, actionHubOverdueCount, topActionTask, actionHubRemainingCount, sortedEvents, now]);
+
+  /** Time allocation by category for today's events (Day Progress bar chart). */
+  const dayTimeAllocation = useMemo(() => {
+    if (!isToday(selectedDate) || !sortedEvents?.length) return null;
+    const buckets = { study: 0, personal: 0, other: 0 };
+    sortedEvents.forEach((e) => {
+      if (!e.start_time || !e.end_time) return;
+      const mins = Math.round((new Date(e.end_time) - new Date(e.start_time)) / 60000);
+      if (mins <= 0) return;
+      const t = (e.title || "").toLowerCase();
+      if (/lecture|study|library|revision|seminar|tutorial|lab|coursework/.test(t)) {
+        buckets.study += mins;
+      } else if (/gym|yoga|run|breakfast|lunch|dinner|wellness|walk/.test(t)) {
+        buckets.personal += mins;
+      } else {
+        buckets.other += mins;
+      }
+    });
+    const total = buckets.study + buckets.personal + buckets.other;
+    return total > 0 ? { ...buckets, total } : null;
+  }, [selectedDate, sortedEvents]);
 
   /** Dynamic status line text. */
   const actionHubStatusLine = useMemo(() => {
@@ -1007,6 +1245,8 @@ export default function Homepage({ onNavigate }) {
         taskCount={actionHubRemainingCount}
         hasOverdue={actionHubOverdueCount > 0}
         statusStrip={navStatusStrip}
+        scheduleInsight={scheduleInsight}
+        tflContext={tflContext}
         slot1ActionHub={
           <ActionHubSlot
             styles={styles}
@@ -1024,55 +1264,18 @@ export default function Homepage({ onNavigate }) {
             handleActionHubComplete={handleActionHubComplete}
             actionHubRef={actionHubRef}
             hasTimerSession={hasTimerSession}
-            onStartFocus={() => navigate("/timer")}
+            onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
           />
         }
-        slot2Health={
-          actionHubSpineCompletedPct === 100 && actionHubItemsOnly.length > 0 ? (
-            /* All done — seedling celebration */
-            <EmptyStateCard
-              illustrationVariant="seedling"
-              message="Every task planted. Day complete."
-              sub={`${actionHubCompletedCount} done today. Take a moment — you earned it.`}
-            />
-          ) : actionHubSpineCompletedPct === 0 ? (
-            /* Nothing done yet — brown cat */
-            <EmptyStateCard
-              illustrationVariant="brownCat"
-              message={
-                actionHubItemsOnly.length === 0
-                  ? "Your slate is clean."
-                  : `${actionHubItemsOnly.length} task${actionHubItemsOnly.length !== 1 ? "s" : ""} waiting.`
-              }
-              sub={actionHubItemsOnly.length === 0 ? "Add something worth doing today." : "First one's always the hardest — just start."}
-            />
-          ) : (
-            /* In progress — normal progress display */
-            <div className={styles.intRowProgressWrap}>
-              <div className={styles.intRowProgressStats}>
-                <span className={styles.intRowProgressBig}>{Math.round(actionHubSpineCompletedPct)}%</span>
-                <span className={styles.intRowProgressLabel}>done today</span>
-                {dayProgressStatus && (
-                  <span className={`${styles.intRowProgressStatusBadge} ${
-                    dayProgressStatus === "ahead"
-                      ? styles.intRowProgressStatusAhead
-                      : dayProgressStatus === "ontrack"
-                        ? styles.intRowProgressStatusOntrack
-                        : styles.intRowProgressStatusBehind
-                  }`}>
-                    {dayProgressStatus === "ahead" ? "Ahead" : dayProgressStatus === "ontrack" ? "On track" : "Behind"}
-                  </span>
-                )}
-              </div>
-              <div className={styles.intRowProgressBarTrack}>
-                <div className={styles.intRowProgressBarFill} style={{ width: `${actionHubSpineCompletedPct}%` }} />
-              </div>
-              <p className={styles.intRowProgressSub}>
-                {`${actionHubRemainingCount} TASK${actionHubRemainingCount !== 1 ? "S" : ""} REMAINING`}
-              </p>
-            </div>
-          )
-        }
+        daySummary={isToday(selectedDate) ? {
+          pct: actionHubSpineCompletedPct,
+          done: actionHubCompletedCount,
+          total: actionHubItemsOnly.length,
+          remaining: actionHubRemainingCount,
+          overdue: actionHubOverdueCount,
+          status: dayProgressStatus,
+          streak: analyticsSummary?.summary?.current_streak_days ?? 0,
+        } : null}
         slot3Urgent={
           <div className={styles.intRowSlotContent}>
             <div className={styles.intRowDeadlineList}>
@@ -1140,53 +1343,64 @@ export default function Homepage({ onNavigate }) {
           </div>
         }
         slot4Energy={
-          <div className={styles.intRowSlotContent}>
-            {isToday(selectedDate) && todayFreeWindows.length > 0 ? (
-              <>
-                <p className={styles.intRowFocusWindowsTitle}>
-                  {todayFreeWindows.length} study window{todayFreeWindows.length !== 1 ? "s" : ""} today
-                </p>
-                <div className={styles.intRowFocusWindowList}>
-                  {todayFreeWindows.slice(0, 2).map((w, i) => {
-                    const startStr = formatTime(w.start.toISOString());
-                    const endStr = formatTime(w.end.toISOString());
-                    const isPast = w.end < now;
-                    const isCurrent = w.start <= now && w.end > now;
-                    const minsLeft = isCurrent ? Math.round((w.end - now) / 60000) : w.minutes;
-                    const durLabel =
-                      minsLeft >= 60
-                        ? `${Math.floor(minsLeft / 60)}h ${minsLeft % 60 > 0 ? `${minsLeft % 60}m` : ""}`.trim()
-                        : `${minsLeft}m`;
-                    return (
-                      <div
-                        key={i}
-                        className={`${styles.intRowFocusWindow} ${
-                          isCurrent ? styles.intRowFocusWindowCurrent : isPast ? styles.intRowFocusWindowPast : ""
-                        }`}
-                      >
-                        <span className={styles.intRowFocusWindowTime}>{startStr} – {endStr}</span>
-                        <span className={styles.intRowFocusWindowDur}>
-                          {isCurrent ? `${durLabel} left` : durLabel}
-                        </span>
-                      </div>
-                    );
-                  })}
+          !isToday(selectedDate) ? (
+            <p className={styles.intRowSlotText}>Select today to see study windows</p>
+          ) : todayFreeWindows.length > 0 ? (
+            <div className={styles.intRowFocusWrap}>
+              {focusSummary && (
+                <div className={styles.intRowFocusSummary}>
+                  <span className={styles.intRowFocusSummaryNum}>{focusSummary.count}</span>
+                  <span className={styles.intRowFocusSummaryLabel}>
+                    {focusSummary.count !== 1 ? "windows" : "window"}
+                  </span>
+                  <span className={styles.intRowFocusSummaryDot}>·</span>
+                  <span className={styles.intRowFocusSummaryNum}>{focusSummary.durLabel}</span>
+                  <span className={styles.intRowFocusSummaryLabel}>free</span>
                 </div>
-                {topActionTask && (
-                  <div className={styles.intRowFocusSuggest}>
-                    <span className={styles.intRowFocusSuggestLabel}>tackle next</span>
-                    <span className={styles.intRowFocusSuggestTask}>{topActionTask.title}</span>
+              )}
+              <div className={styles.intRowFocusWindowList}>
+                {todayFreeWindows.slice(0, 2).map((w, i) => {
+                  const isWindowPast = w.end < now;
+                  const isCurrent = w.start <= now && w.end > now;
+                  const minsLeft = isCurrent ? Math.round((w.end - now) / 60000) : w.minutes;
+                  const durLabel =
+                    minsLeft >= 60
+                      ? `${Math.floor(minsLeft / 60)}h${minsLeft % 60 > 0 ? ` ${minsLeft % 60}m` : ""}`
+                      : `${minsLeft}m`;
+                  return (
+                    <div
+                      key={i}
+                      className={`${styles.intRowFocusWindow} ${
+                        isCurrent ? styles.intRowFocusWindowCurrent : isWindowPast ? styles.intRowFocusWindowPast : ""
+                      }`}
+                    >
+                      <span className={styles.intRowFocusWindowTime}>
+                        {formatTime(w.start.toISOString())} – {formatTime(w.end.toISOString())}
+                      </span>
+                      <span className={styles.intRowFocusWindowDur}>
+                        {isCurrent ? `${durLabel} left` : durLabel}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {analyticsProgress?.daily_progress && (
+                <>
+                  <span className={styles.intRowFocusChartLabel}>7-day study pattern</span>
+                  <div className={styles.intRowFocusSparkline}>
+                    <HomeStudyTimeChart data={analyticsProgress.daily_progress} />
                   </div>
-                )}
-              </>
-            ) : isToday(selectedDate) ? (
-              <p className={styles.intRowSlotText}>
-                {sortedEvents.length > 0 ? "Day fully scheduled — no gaps" : "No events yet today"}
-              </p>
-            ) : (
-              <p className={styles.intRowSlotText}>Select today to see study windows</p>
-            )}
-          </div>
+                  <Link to="/analytics" className={styles.intRowFocusAnalyticsCta}>
+                    Want to know more about yourself? → Analytics
+                  </Link>
+                </>
+              )}
+            </div>
+          ) : (
+            <p className={styles.intRowNudgeFallback}>
+              {sortedEvents.length > 0 ? "Day fully scheduled — no gaps" : "No events yet today"}
+            </p>
+          )
         }
         slot5Commute={
           (() => {
@@ -1195,6 +1409,17 @@ export default function Homepage({ onNavigate }) {
             const cStr = scheduleCountdownSecs != null && isToday(selectedDate)
               ? formatScheduleCountdown(scheduleCountdownSecs)
               : null;
+            const nowMs = now.getTime();
+            // Next 2 events after nav.nextItem (already shown as NEXT badge)
+            const upNextEvents = (() => {
+              if (!isToday(selectedDate) || !sortedEvents?.length) return [];
+              const future = sortedEvents
+                .filter(e => e.start_time && new Date(e.start_time).getTime() > nowMs)
+                .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+              return nav.nextItem?.start_time
+                ? future.filter(e => new Date(e.start_time).getTime() > new Date(nav.nextItem.start_time).getTime()).slice(0, 2)
+                : future.slice(0, 2);
+            })();
 
             // Active focus session overrides schedule view
             if (hasTimerSession) {
@@ -1226,34 +1451,85 @@ export default function Homepage({ onNavigate }) {
               );
             }
 
-            if (nav.state === "task" && nav.currentBlock?.title) {
-              const startLabel = nav.currentBlock.start_time
-                ? formatTime(nav.currentBlock.start_time)
+            if (nav.state === "task" || nav.state === "conflict") {
+              const cb = nav.currentBlock;
+              const evStart = cb?.start_time ? new Date(cb.start_time).getTime() : null;
+              const evEnd   = cb?.end_time   ? new Date(cb.end_time).getTime()   : null;
+              const eventPct = evStart && evEnd && evEnd > evStart
+                ? Math.min(100, Math.max(0, ((nowMs - evStart) / (evEnd - evStart)) * 100))
                 : null;
-              const endLabel = nav.currentBlock.end_time
-                ? formatTime(nav.currentBlock.end_time)
+              const startLabel = cb?.start_time ? formatTime(cb.start_time) : null;
+              const endLabel   = cb?.end_time   ? formatTime(cb.end_time)   : null;
+              const conflictTimeStr = nav.conflictAt
+                ? new Date(nav.conflictAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
                 : null;
+              const hasNow  = !!cb?.title;
+              const hasNext = !!nav.nextItem?.title;
               return (
                 <div className={styles.intRowNowSection}>
+                  {/* NOW — always shown, placeholder if no current event */}
                   <div className={styles.intRowNowItem}>
                     <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNow}`}>NOW</span>
                     <div className={styles.intRowNowItemBody}>
-                      <span className={styles.intRowNowItemTitle}>{nav.currentBlock.title}</span>
-                      <span className={styles.intRowNowItemTime}>
-                        {startLabel && endLabel ? `${startLabel} – ${endLabel}` : ""}
-                        {cStr ? ` · ends ${cStr}` : ""}
-                      </span>
+                      {hasNow ? (
+                        <>
+                          <span className={styles.intRowNowItemTitle}>{cb.title}</span>
+                          <span className={styles.intRowNowItemTime}>
+                            {startLabel && endLabel ? `${startLabel} – ${endLabel}` : ""}
+                            {cStr ? ` · ends ${cStr}` : ""}
+                          </span>
+                        </>
+                      ) : (
+                        <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic" }}>
+                          Nothing on right now
+                        </span>
+                      )}
                     </div>
                   </div>
-                  {nav.nextItem?.title && (
-                    <div className={styles.intRowNowItem}>
-                      <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNext}`}>NEXT</span>
-                      <div className={styles.intRowNowItemBody}>
-                        <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
-                        {nav.nextItem.start_time && (
-                          <span className={styles.intRowNowItemTime}>at {formatTime(nav.nextItem.start_time)}</span>
-                        )}
-                      </div>
+                  {/* Progress bar if event is active */}
+                  {hasNow && eventPct !== null && (
+                    <div className={styles.intRowNowTimerTrack}>
+                      <div className={styles.intRowNowTimerFill} style={{ width: `${eventPct}%` }} />
+                    </div>
+                  )}
+                  {/* NEXT — always shown, placeholder if nothing upcoming */}
+                  <div className={styles.intRowNowItem}>
+                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNext}`}>NEXT</span>
+                    <div className={styles.intRowNowItemBody}>
+                      {hasNext ? (
+                        <>
+                          <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
+                          {nav.nextItem.start_time && (
+                            <span className={styles.intRowNowItemTime}>
+                              {`at ${formatTime(nav.nextItem.start_time)}`}
+                              {(() => {
+                                const msUntil = new Date(nav.nextItem.start_time).getTime() - nowMs;
+                                if (msUntil > 0) {
+                                  const h = Math.floor(msUntil / 3600000);
+                                  const m = Math.floor((msUntil % 3600000) / 60000);
+                                  return ` · in ${h > 0 ? `${h}h ` : ""}${m}m`;
+                                }
+                                return "";
+                              })()}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic" }}>
+                          {hasNow ? "Nothing scheduled after this" : "Nothing coming up today"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {/* Up-next mini list — only if there's a NEXT item to anchor it */}
+                  {hasNext && upNextEvents.length > 0 && (
+                    <div className={styles.intRowNowUpNext}>
+                      {upNextEvents.map((e, i) => (
+                        <div key={i} className={styles.intRowNowUpNextRow}>
+                          <span className={styles.intRowNowUpNextTime}>{formatTime(e.start_time)}</span>
+                          <span className={styles.intRowNowUpNextTitle}>{e.title}</span>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1272,7 +1548,6 @@ export default function Homepage({ onNavigate }) {
                           ? `${Math.floor(mins / 60)}h ${mins % 60 > 0 ? `${mins % 60}m` : ""}`.trim()
                           : `${mins}m`} window
                       </span>
-                      <span className={styles.intRowNowItemTime}>use it well</span>
                     </div>
                   </div>
                   {nav.nextItem?.title && (
@@ -1287,27 +1562,22 @@ export default function Homepage({ onNavigate }) {
                       </div>
                     </div>
                   )}
-                </div>
-              );
-            }
-
-            if (nav.state === "conflict") {
-              return (
-                <div className={styles.intRowNowSection}>
-                  <div className={styles.intRowNowItem}>
-                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeConflict}`}>!</span>
-                    <div className={styles.intRowNowItemBody}>
-                      <span className={styles.intRowNowItemTitle}>Schedule overlap</span>
-                      <span className={styles.intRowNowItemTime}>check your plan</span>
+                  {upNextEvents.length > 0 && (
+                    <div className={styles.intRowNowUpNext}>
+                      {upNextEvents.map((e, i) => (
+                        <div key={i} className={styles.intRowNowUpNextRow}>
+                          <span className={styles.intRowNowUpNextTime}>{formatTime(e.start_time)}</span>
+                          <span className={styles.intRowNowUpNextTitle}>{e.title}</span>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  {nav.nextItem?.title && (
-                    <div className={styles.intRowNowItem}>
-                      <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNext}`}>NEXT</span>
-                      <div className={styles.intRowNowItemBody}>
-                        <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
-                        {cStr && <span className={styles.intRowNowItemTime}>in {cStr}</span>}
-                      </div>
+                  )}
+                  {smartNudge && (
+                    <div className={styles.intRowNowNudge}>
+                      {smartNudge.type === "deadline"
+                        ? <><span className={styles.intRowNowNudgeTask}>{smartNudge.taskTitle}</span> due in {smartNudge.dueIn} — use this window</>
+                        : <>Tackle <span className={styles.intRowNowNudgeTask}>{smartNudge.taskTitle}</span> now</>
+                      }
                     </div>
                   )}
                 </div>
@@ -1315,6 +1585,14 @@ export default function Homepage({ onNavigate }) {
             }
 
             if (nav.state === "endOfDay") {
+              const completedCount = actionHubItemsOnly.filter(t => t.completed).length;
+              const totalCount = actionHubItemsOnly.length;
+              const eventsToday = (sortedEvents || []).filter(
+                e => e.start_time && new Date(e.start_time).getTime() < nowMs
+              ).length;
+              const tomorrowTime = tomorrowFirstEvent?.start_time
+                ? formatTime(tomorrowFirstEvent.start_time)
+                : null;
               return (
                 <div className={styles.intRowNowSection}>
                   <div className={styles.intRowNowItem}>
@@ -1324,6 +1602,75 @@ export default function Homepage({ onNavigate }) {
                       <span className={styles.intRowNowItemTime}>great work today</span>
                     </div>
                   </div>
+                  {(completedCount > 0 || eventsToday > 0) && (
+                    <div className={styles.intRowNowDayRecap}>
+                      {completedCount > 0 && (
+                        <span>{completedCount}{totalCount > 0 ? `/${totalCount}` : ""} tasks done</span>
+                      )}
+                      {completedCount > 0 && eventsToday > 0 && (
+                        <span className={styles.intRowNowDayRecapDot}>·</span>
+                      )}
+                      {eventsToday > 0 && (
+                        <span>{eventsToday} event{eventsToday !== 1 ? "s" : ""} attended</span>
+                      )}
+                    </div>
+                  )}
+                  {todayVsYesterday && (
+                    <div className={`${styles.intRowNowVsYesterday} ${styles[`intRowNowVsYesterday${todayVsYesterday.dir.charAt(0).toUpperCase() + todayVsYesterday.dir.slice(1)}`]}`}>
+                      {todayVsYesterday.label}
+                    </div>
+                  )}
+                  {tomorrowFirstEvent && (
+                    <div className={styles.intRowNowTomorrowPreview}>
+                      <span className={styles.intRowNowTomorrowLabel}>TOMORROW</span>
+                      <span className={styles.intRowNowTomorrowEvent}>{tomorrowFirstEvent.title}</span>
+                      {tomorrowTime && (
+                        <span className={styles.intRowNowTomorrowTime}>at {tomorrowTime}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // Non-today date — show selected day overview
+            if (!isToday(selectedDate)) {
+              const firstEv = sortedEvents[0];
+              if (!firstEv) return <p className={styles.intRowSlotText}>No events for this day.</p>;
+              const firstTime = firstEv.start_time ? formatTime(firstEv.start_time) : null;
+              const upNext = sortedEvents.slice(1, 3);
+              return (
+                <div className={styles.intRowNowSection}>
+                  <div className={styles.intRowNowItem}>
+                    <span className={styles.intRowNowBadge}>DAY</span>
+                    <div className={styles.intRowNowItemBody}>
+                      <span className={styles.intRowNowItemTitle}>
+                        {sortedEvents.length} event{sortedEvents.length !== 1 ? "s" : ""} planned
+                      </span>
+                      {firstTime && (
+                        <span className={styles.intRowNowItemTime}>starts at {firstTime}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className={styles.intRowNowItem}>
+                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNext}`}>1ST</span>
+                    <div className={styles.intRowNowItemBody}>
+                      <span className={styles.intRowNowItemTitle}>{firstEv.title}</span>
+                      {firstTime && <span className={styles.intRowNowItemTime}>at {firstTime}</span>}
+                    </div>
+                  </div>
+                  {upNext.length > 0 && (
+                    <div className={styles.intRowNowUpNext}>
+                      {upNext.map((e, i) => (
+                        <div key={i} className={styles.intRowNowUpNextRow}>
+                          <span className={styles.intRowNowUpNextTime}>
+                            {e.start_time ? formatTime(e.start_time) : ""}
+                          </span>
+                          <span className={styles.intRowNowUpNextTitle}>{e.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             }
@@ -1393,8 +1740,13 @@ export default function Homepage({ onNavigate }) {
           <div className={styles.timelineBox}>
             <div className={styles.timelineHeader}>
               <div className={styles.timelineHeaderLeft}>
-                <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
-                {!isToday(selectedDate) && <span className={styles.timelineSub}>Preview & adjust.</span>}
+                <div className={styles.timelineHeaderIconWrap} aria-hidden>
+                  <CalendarIcon size={20} strokeWidth={1.5} />
+                </div>
+                <div>
+                  <h3 className={styles.timelineTitle}>Your Plan for the Day</h3>
+                  {!isToday(selectedDate) && <span className={styles.timelineSub}>Preview & adjust.</span>}
+                </div>
               </div>
               <div className={styles.timelineHeaderRight}>
                 <Link to="/calendar" className={styles.timelineHeaderCta}>
@@ -1430,6 +1782,7 @@ export default function Homepage({ onNavigate }) {
                   dayTasks={dayTasks}
                   tasksDueToday={filteredTasksDueToday}
                   suggestableTasks={suggestableTasks}
+                  deadlineSuggestions={deadlineSuggestions}
                   taskLists={taskLists}
                   onQuickStart={handleQuickStartGap}
                   onHarvestToggle={handleHarvestToggle}
