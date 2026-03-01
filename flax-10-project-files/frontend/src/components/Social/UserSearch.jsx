@@ -83,7 +83,7 @@ function ModuleResultItem({ module, isChecked, onToggle }) {
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => onToggle(module.module_code)}
-                style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                style={{ cursor: 'pointer', accentColor: 'var(--primary)', marginTop: '4px' }}
                 onClick={(e) => e.stopPropagation()}
             />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
@@ -105,7 +105,7 @@ function SocietyResultItem({ society, isChecked, onToggle }) {
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => onToggle(society.id)}
-                style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                style={{ cursor: 'pointer', accentColor: 'var(--primary)', marginTop: '4px' }}
                 onClick={(e) => e.stopPropagation()}
             />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
@@ -125,6 +125,18 @@ function getDepartmentsForModules(modules) {
         if (match) deps.add(match[0].toUpperCase());
     });
     return Array.from(deps).sort();
+}
+
+function getSocietyCategories(societies) {
+    const cats = new Set();
+    societies.forEach(s => {
+        if (s.categories && s.categories.length > 0) {
+            cats.add(s.categories[0].toLowerCase());
+        } else {
+            cats.add('other');
+        }
+    });
+    return Array.from(cats).sort();
 }
 
 function SearchDropdown({ pos, loading, activeTab, setActiveTab, query, userResults, moduleResults, onUserSelect }) {
@@ -242,7 +254,7 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                     <>
                         {societyResults.length === 0 ? (
                             <p className={styles.emptyText}>No societies found.</p>
-                        ) : (
+                        ) : filterQuery ? (
                             <div className={styles.userList} style={{ gap: 0 }}>
                                 {societyResults.map(s => (
                                     <SocietyResultItem
@@ -252,6 +264,37 @@ function FilterDropdown({ pos, activeFilterTab, setActiveFilterTab, filterQuery,
                                         onToggle={toggleSociety}
                                     />
                                 ))}
+                            </div>
+                        ) : (
+                            // List by category if no search query
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {getSocietyCategories(societyResults).map(cat => {
+                                    const catSocieties = societyResults.filter(s => {
+                                        if (cat === 'other') return !s.categories || s.categories.length === 0;
+                                        return s.categories && s.categories.length > 0 && s.categories[0].toLowerCase() === cat;
+                                    });
+                                    if (catSocieties.length === 0) return null;
+                                    return (
+                                        <div key={cat}>
+                                            <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.9rem', color: 'var(--muted)', fontWeight: 600, textTransform: 'capitalize' }}>{cat}</h4>
+                                            <div className={styles.userList} style={{ gap: 0 }}>
+                                                {catSocieties.slice(0, 5).map(s => (
+                                                    <SocietyResultItem
+                                                        key={s.id}
+                                                        society={s}
+                                                        isChecked={selectedSocieties.includes(s.id)}
+                                                        onToggle={toggleSociety}
+                                                    />
+                                                ))}
+                                                {catSocieties.length > 5 && (
+                                                    <div style={{ padding: '8px', fontSize: '0.85rem', color: 'var(--muted)', textAlign: 'center' }}>
+                                                        + {catSocieties.length - 5} more
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </>
