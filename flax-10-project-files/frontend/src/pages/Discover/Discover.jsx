@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
 import ShareButton from "../../components/Social/ShareButton";
+import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 
 function UserCard({ user, onNavChange }) {
     return (
@@ -25,14 +26,35 @@ export default function Discover({ onNavChange }) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [moduleFilter, setModuleFilter] = useState("");
+
+    // Unified Filter State
+    const { allModules, allSocieties } = useSearchInit();
+    const [userResults, setUserResults] = useState([]); // for searchUsers internal
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [dropdownPos, setDropdownPos] = useState(null);
+    const containerRef = useRef(null);
+    const filterRef = useRef(null);
+
+    const { isFilterOpen, setIsFilterOpen, props } = useFilterState(
+        allModules, allSocieties, searchQuery, true, containerRef,
+        userResults, setDropdownPos, setUserResults, setSearchLoading
+    );
+
+    const { selectedModules, selectedSocieties } = props;
+
+    // Handle clicks outside
+    useClickOutside(filterRef, () => setIsFilterOpen(false));
 
     // Fetch users whenever search query changes
     useEffect(() => {
         const fetchDiscoverUsers = async () => {
             setLoading(true);
             try {
-                const data = await searchUsers(searchQuery);
+                const data = await searchUsers(
+                    searchQuery,
+                    selectedModules.join(','),
+                    selectedSocieties.join(',')
+                );
                 setUsers(data.results || data);
             } catch (err) {
                 console.error("Failed to fetch users", err);
@@ -46,17 +68,13 @@ export default function Discover({ onNavChange }) {
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, selectedModules, selectedSocieties]);
 
-    // Derived state for client-side module filtering
+    // Derived state for client-side module filtering (no longer needed as we filter on backend)
     const currentUser = JSON.parse(localStorage.getItem("user")) || {};
     const filteredUsers = users.filter(u => {
         if (u.id === currentUser.id || u.username === currentUser.username) return false;
-        if (!moduleFilter) return true;
-
-        // Ensure graceful fallback if modules isn't returned
-        const userModules = u.modules || [];
-        return userModules.some(m => m.toLowerCase().includes(moduleFilter.toLowerCase()));
+        return true;
     });
 
     return (
@@ -67,7 +85,7 @@ export default function Discover({ onNavChange }) {
             </div>
 
             <div className={styles.filterBar}>
-                <div className={styles.searchWrap}>
+                <div className={styles.searchWrap} ref={containerRef}>
                     <span className={styles.searchIcon}>🔍</span>
                     <input
                         type="text"
@@ -78,15 +96,12 @@ export default function Discover({ onNavChange }) {
                     />
                 </div>
 
-                <div className={styles.moduleWrap}>
-                    <input
-                        type="text"
-                        className={styles.moduleInput}
-                        placeholder="Filter by module (e.g. 5CUS2SEG)"
-                        value={moduleFilter}
-                        onChange={(e) => setModuleFilter(e.target.value)}
-                    />
-                </div>
+                <FilterSection
+                    fRef={filterRef}
+                    isOpen={isFilterOpen}
+                    setOpen={() => setIsFilterOpen(!isFilterOpen)}
+                    props={props}
+                />
             </div>
 
             {loading && users.length === 0 ? (
