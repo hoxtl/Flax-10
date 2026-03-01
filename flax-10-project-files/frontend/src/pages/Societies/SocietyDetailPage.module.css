@@ -95,4 +95,14 @@
   .tabSection {
     width: 100%;
   }
+
+  :global(.SocietySidebar_sidebar) {
+    width: 100% !important;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    background: var(--panel);
+    border-radius: 20px 20px 0 0;
+    margin-top: 20px;
+  }
 }
