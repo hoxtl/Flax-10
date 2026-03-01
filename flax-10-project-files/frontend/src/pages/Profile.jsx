@@ -59,39 +59,8 @@ function useProfileState() {
   return { showModules, setShowModules, showTasks, setShowTasks, showEvents, setShowEvents, showEditProfile, setShowEditProfile, profileData, allEvents, eventRange, setEventRange, loading, handleSaveProfile };
 }
 
-function ProfileAvatar({ user, profilePhotoUrl }) {
-  const initials = user?.name ? getInitials(user.name) : (user?.first_name && user?.last_name ? `${user.first_name[0]}${user.last_name[0]}` : "?");
-  return (
-    <div className={styles.avatar}>
-      {profilePhotoUrl ? <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} /> : initials}
-    </div>
-  );
-}
 
-function ProfileStats({ profileData, upcomingEventCount, onModulesClick, onTasksClick, onEventsClick }) {
-  return (
-    <div className={styles.stats}>
-      <StatItem value={profileData?.module_count || 0} label="modules" onClick={onModulesClick} />
-      <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
-      <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
-    </div>
-  );
-}
-
-function ProfileBio({ user, profileData }) {
-  const fullName = user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "Guest";
-  const year = profileData?.year || user?.year || "";
-  const major = profileData?.major || user?.major || "";
-  return (
-    <div className={styles.bio}>
-      <div className={styles.fullName}>{fullName}</div>
-      <div className={styles.description}>{year} · {major}</div>
-      {profileData?.bio && <div className={styles.reminder}>{profileData.bio}</div>}
-    </div>
-  );
-}
-
-function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEventsClick, onEditProfile, upcomingEventCount }) {
+function ProfileHeader({ user, profileData, onNavChange, onModulesClick, onTasksClick, onEventsClick, onEditProfile, upcomingEventCount }) {
   const initials = user?.name ? getInitials(user.name) : "JD";
 
   return (
@@ -141,7 +110,7 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
         <div className={styles.mobileSummaryCard}>
           <h3 className={styles.cardHeader}>Quick Actions</h3>
           <div className={styles.quickActionsGrid}>
-            <button onClick={onModulesClick} className={styles.quickActionBtn}>
+            <button onClick={() => onNavChange('modules')} className={styles.quickActionBtn}>
               <div className={styles.actionIcon}>📚</div>
               <span>Start a Module</span>
             </button>
@@ -149,7 +118,7 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
               <div className={styles.actionIcon}>📅</div>
               <span>View My Tasks</span>
             </button>
-            <button onClick={onEventsClick} className={styles.quickActionBtn}>
+            <button onClick={() => onNavChange('calendar')} className={styles.quickActionBtn}>
               <div className={styles.actionIcon}>✅</div>
               <span>Check for Events</span>
             </button>
@@ -188,40 +157,6 @@ function ProfileHeader({ user, profileData, onModulesClick, onTasksClick, onEven
   );
 }
 
-function StatItem({ value, label, onClick }) {
-  return (
-    <button className={styles.statButton} onClick={onClick}>
-      <span className={styles.statValue}>{value}</span> {label}
-    </button>
-  );
-}
-
-function ModuleItem({ code }) {
-  return (
-    <div className={styles.listItem}>
-      <div className={styles.listAvatar}>📚</div>
-      <div className={styles.listInfo}>
-        <div className={styles.listName}>{code}</div>
-        <div className={styles.listMeta}>Module</div>
-      </div>
-    </div>
-  );
-}
-
-function EventItem({ title, startTime, location }) {
-  const date = new Date(startTime);
-  const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-  return (
-    <div className={styles.listItem}>
-      <div className={styles.listAvatar}>📅</div>
-      <div className={styles.listInfo}>
-        <div className={styles.listName}>{title}</div>
-        <div className={styles.listMeta}>{dateStr} at {timeStr} {location ? `• ${location}` : ''}</div>
-      </div>
-    </div>
-  );
-}
 
 function ModalInner({ onClose, title, children }) {
   return (
@@ -235,72 +170,6 @@ function ModalInner({ onClose, title, children }) {
   );
 }
 
-function Modal({ isOpen, onClose, title, children }) {
-  if (!isOpen) return null;
-  return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <ModalInner onClose={onClose} title={title}>{children}</ModalInner>
-    </div>
-  );
-}
-
-function RangeButtons({ range, onRangeChange }) {
-  const ranges = [['today', 'Today'], ['week', 'This Week'], ['month', 'This Month']];
-  return (
-    <div className={styles.rangeSelector}>
-      {ranges.map(([key, label]) => (
-        <button key={key} className={range === key ? styles.rangeActive : ''} onClick={() => onRangeChange(key)}>{label}</button>
-      ))}
-    </div>
-  );
-}
-
-function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
-  const rangeLabels = {
-    'today': 'Today',
-    'week': 'This Week',
-    'month': 'This Month'
-  };
-
-  const title = `Events - ${rangeLabels[range]} (${events.length})`;
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className={styles.rangeSelector}>
-        <button
-          className={range === 'today' ? styles.rangeActive : ''}
-          onClick={() => onRangeChange('today')}
-        >
-          Today
-        </button>
-        <button
-          className={range === 'week' ? styles.rangeActive : ''}
-          onClick={() => onRangeChange('week')}
-        >
-          This Week
-        </button>
-        <button
-          className={range === 'month' ? styles.rangeActive : ''}
-          onClick={() => onRangeChange('month')}
-        >
-          This Month
-        </button>
-      </div>
-      {events.length > 0 ? (
-        events.map((event, i) => (
-          <EventItem
-            key={i}
-            title={event.title}
-            startTime={event.start_time}
-            location={event.location}
-          />
-        ))
-      ) : (
-        <p className={styles.emptyMessage}>No events found for this period</p>
-      )}
-    </Modal>
-  );
-}
 
 function ModulesGrid({ modules }) {
   return (
@@ -315,25 +184,18 @@ function ModulesGrid({ modules }) {
   );
 }
 
-function ProfileModals({ state, user, profileData, modules, filteredEvents }) {
-  const { showModules, setShowModules, showTasks, setShowTasks, showEvents, setShowEvents, showEditProfile, setShowEditProfile, eventRange, setEventRange, handleSaveProfile } = state;
+function ProfileModals({ state, user, profileData}) {
+  const { showEditProfile, setShowEditProfile, handleSaveProfile } = state;
   return (
     <>
       <EditProfileModal user={profileData || user} isOpen={showEditProfile} onClose={() => setShowEditProfile(false)} onSave={handleSaveProfile} />
-      <Modal isOpen={showModules} onClose={() => setShowModules(false)} title="Modules">
-        {modules.length > 0 ? modules.map((code, i) => <ModuleItem key={i} code={code} />) : <p className={styles.emptyMessage}>No modules found</p>}
-      </Modal>
-      <Modal isOpen={showTasks} onClose={() => setShowTasks(false)} title="Tasks">
-        <p className={styles.emptyMessage}>Tasks feature coming soon...</p>
-      </Modal>
-      <EventsModal isOpen={showEvents} onClose={() => setShowEvents(false)} events={filteredEvents} range={eventRange} onRangeChange={setEventRange} />
     </>
   );
 }
 
-export default function Profile({ user }) {
+export default function Profile({ user, onNavChange }) {
   const state = useProfileState();
-  const { showModules: _sm, profileData, allEvents, eventRange, loading, setShowModules, setShowTasks, setShowEvents, setShowEditProfile } = state;
+  const { showModules: _sm, profileData, allEvents, eventRange, loading, setShowEditProfile } = state;
   if (loading) return <div className={styles.container}>Loading...</div>;
   const modules = profileData?.modules || [];
   const filteredEvents = getFilteredEvents(allEvents, eventRange);
@@ -341,8 +203,13 @@ export default function Profile({ user }) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <ProfileHeader user={profileData || user} profileData={profileData} onModulesClick={() => setShowModules(true)} onTasksClick={() => setShowTasks(true)} onEventsClick={() => setShowEvents(true)} onEditProfile={() => setShowEditProfile(true)} upcomingEventCount={upcomingEventCount} />
-        <ModulesGrid modules={modules} />
+        <ProfileHeader 
+          user={profileData || user} 
+          onNavChange={onNavChange} 
+          profileData={profileData} 
+          onEditProfile={() => setShowEditProfile(true)} 
+          upcomingEventCount={upcomingEventCount} 
+        />
       </div>
       <ProfileModals state={state} user={user} profileData={profileData} modules={modules} filteredEvents={filteredEvents} />
     </div>);
