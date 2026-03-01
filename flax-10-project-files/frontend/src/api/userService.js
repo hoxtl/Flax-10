@@ -32,8 +32,9 @@ export function updateUserProfile(formData) {
   return apiFetch('/profile/', { method: 'PATCH', headers: { 'Authorization': `Token ${token}` }, body: formData });
 }
 
-export function searchUsers(query, moduleFilter = '') {
+export function searchUsers(query, moduleFilter = '', societyFilter = '') {
   let url = `/users/search/?q=${encodeURIComponent(query)}`;
   if (moduleFilter) url += `&module=${encodeURIComponent(moduleFilter)}`;
+  if (societyFilter) url += `&society=${encodeURIComponent(societyFilter)}`;
   return apiFetch(url, { headers: authHeaders() });
 }

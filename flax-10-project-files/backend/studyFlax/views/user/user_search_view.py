@@ -11,6 +11,7 @@ from django.db.models import Q
 def user_search(request):
     query = request.query_params.get('q', '').strip()
     module_param = request.query_params.get('module', '').strip()
+    society_param = request.query_params.get('society', '').strip()
     
     users = User.objects.exclude(id=request.user.id)
     
@@ -22,11 +23,15 @@ def user_search(request):
         ).distinct()
         
     if module_param:
-        users = users.filter(
-            Q(enrollments__module__module_code__icontains=module_param) |
-            Q(enrollments__module__module_name__icontains=module_param)
-        ).distinct()
-        
+        module_codes = [m.strip() for m in module_param.split(',') if m.strip()]
+        if module_codes:
+            users = users.filter(enrollments__module__module_code__in=module_codes).distinct()
+            
+    if society_param:
+        society_ids = [s.strip() for s in society_param.split(',') if s.strip()]
+        if society_ids:
+            users = users.filter(society_memberships__society_id__in=society_ids).distinct()
+            
     users = users[:20]  # Limit results
     serializer = UserSerialiser(users, many=True, context={'request': request})
     
