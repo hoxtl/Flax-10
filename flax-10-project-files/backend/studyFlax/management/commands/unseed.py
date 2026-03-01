@@ -17,14 +17,19 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 TABLES = [
+    'studyFlax_calendarevent', 'studyFlax_tag', 'studyFlax_category',
+    'studyFlax_recurrencerule', 'studyFlax_usersettings', 'studyFlax_notification',
+    'studyFlax_timetablesource', 'studyFlax_user',
+    'studyFlax_society', 'studyFlax_societymembership', 'studyFlax_societytag',
+    'studyFlax_societyevent', 'studyFlax_societyimage',
     'studyFlax_deadline',
     'studyFlax_enrollment',
     'studyFlax_module',
     'studyFlax_calendarevent',
     'studyFlax_tag',
     'studyFlax_category',
-    'studyFlax_task',
-    'studyFlax_tasklist',
+    #'studyFlax_task',
+    #'studyFlax_tasklist',
     'studyFlax_recurrencerule',
     'studyFlax_usersettings',
     'studyFlax_notification',

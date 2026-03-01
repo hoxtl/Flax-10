@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.models.society import SocietyMembership
+from studyFlax.models.society import SocietyMembership, SocietyCalendarSync
 from studyFlax.models.auth.userModel import User
 from studyFlax.serialisers import SocietyMembershipSerialiser
 from .helpers import (
@@ -80,6 +80,10 @@ def leave_or_remove(request, society, user_id):
     membership = get_membership_by_user_id(society, user_id)
     if not membership:
         return Response({'error': 'Not a member'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Auto-unsync when leaving
+    SocietyCalendarSync.objects.filter(user_id=user_id, society=society).delete()
+    
     membership.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 

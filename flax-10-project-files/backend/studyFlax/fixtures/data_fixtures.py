@@ -17,6 +17,7 @@ from .event_fixtures import (
 )
 from .module_fixtures import module_fixtures
 from .deadline_fixtures import deadline_fixtures, module_deadline_fixtures
+from .society_fixtures import SOCIETY_DATA
 
 __all__ = [
     "category_fixtures",
@@ -35,4 +36,5 @@ __all__ = [
     "module_fixtures",
     "deadline_fixtures",
     "module_deadline_fixtures",
+    "SOCIETY_DATA",
 ]

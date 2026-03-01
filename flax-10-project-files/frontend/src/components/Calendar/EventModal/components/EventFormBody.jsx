@@ -18,7 +18,7 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
             <TimeRow form={form} update={update} setForm={setForm} />
             <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
             {showReminder && <ReminderField value={form.reminder} onChange={setReminder} />}
-            <ActionButtons isEditing={isEditing} onDelete={onDelete} />
+            <ActionButtons onDelete={onDelete} />
         </form>
     );
 }
