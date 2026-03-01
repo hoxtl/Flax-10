@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 
 import { useNotifications } from "../../context/NotificationContext";
@@ -9,39 +8,11 @@ import ThemeToggle from "./ThemeToggle";
 
 import styles from "./TopBar.module.css";
 
-function useCurrentTime() {
-  const [time, setTime] = useState(() =>
-    new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: true })
-  );
-  useEffect(() => {
-    const t = setInterval(() => {
-      setTime(new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: true }));
-    }, 60000);
-    return () => clearInterval(t);
-  }, []);
-  return time;
-}
-
-function useCurrentDate() {
-  const [dateStr, setDateStr] = useState(() =>
-    new Date().toLocaleDateString("en-GB", { weekday: "long", month: "long", day: "numeric" })
-  );
-  useEffect(() => {
-    const t = setInterval(() => {
-      setDateStr(new Date().toLocaleDateString("en-GB", { weekday: "long", month: "long", day: "numeric" }));
-    }, 60000);
-    return () => clearInterval(t);
-  }, []);
-  return dateStr;
-}
-
 function TopBarGreeting() {
-  const time = useCurrentTime();
-  const dateStr = useCurrentDate();
   return (
     <div className={styles.greeting}>
-      <span className={styles.bigTime}>{time}</span>
-      <span className={styles.dateSub}>{dateStr}</span>
+      <span className={styles.bigTime}>StudyFlax</span>
+      <span className={styles.dateSub}>Built for calm study</span>
     </div>
   );
 }
