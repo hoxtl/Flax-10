@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DashboardLayout.module.css";
-import Sidebar from "../components/Dashboard/Sidebar";
 import TopBar from "../components/Dashboard/Topbar";
 import WeekBar from "../components/Dashboard/WeekBar";
 import QuickAddModal from "../components/Dashboard/QuickAddModal";
@@ -39,21 +38,6 @@ function getUser() {
 async function handleLogoutClick() {
   try { await authService.logout(); } catch (_) { }
   finally { clearUserData(); }
-}
-
-function DesktopSidebar({ isMobile, user, activeNav, onNavChange }) {
-  if (isMobile) return null;
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} />;
-}
-
-function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
-  if (!isMobile || !open) return null;
-  return (
-    <>
-      <div className={styles.backdrop} onClick={onClose} />
-      <div className={styles.drawer}><Sidebar user={user} active={activeNav} onChange={onPick} /></div>
-    </>
-  );
 }
 
 function PageContent({ activeNav, children }) {
@@ -102,16 +86,6 @@ function useDashboardState(activeNav, onNavChange) {
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar, modal, onPickNav, onSelectType };
 }
 
-function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNavChange, onPickNav, setMobileSidebarOpen }) {
-  return (
-    <>
-      <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} />
-      <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user}
-        activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-    </>
-  );
-}
-
 function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal }) {
   return (
     <>
@@ -141,9 +115,6 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav } = state;
   return (
     <div className={styles.root}>
-      <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
-        user={user} activeNav={activeNav} onNavChange={onNavChange}
-        onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
       <DashboardMain state={{ ...state, activeNav }} onNavChange={onNavChange}>{children}</DashboardMain>
     </div>
   );
