@@ -91,7 +91,6 @@
 				python -m coverage report -m
 
 				python -m coverage html
-				open htmlcov/index.html
 				
 				cd "$FRONTEND_DIR"
 				npm run build
@@ -101,7 +100,6 @@
 				echo "Generating frontend coverage report..."
 				npm run test -- --run
 				npm run coverage
-				open coverage/index.html
 				
 				echo "\n"
 				echo "Python: $(python --version)"
