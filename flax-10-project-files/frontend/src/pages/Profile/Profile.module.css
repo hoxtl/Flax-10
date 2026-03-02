@@ -926,3 +926,16 @@
   overflow: hidden;
 }
 
+.mobileUsername {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+}
+
+.mobileBio {
+  font-size: 13px;
+  opacity: 0.9;
+  margin: 0 0 16px;
+  font-weight: 500;
+}
