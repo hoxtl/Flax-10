@@ -153,7 +153,9 @@ function NavItem({ item, isActive, open, onClick }) {
 }
 
 function getRoutes(user) {
-  return APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
+  return APP_ROUTES.filter((route) =>
+    route.isAdminOnly ? user?.isAdmin : true,
+  );
 }
 
 function SidebarNav({ active, onChange, open, user }) {
