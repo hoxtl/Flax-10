@@ -4,7 +4,6 @@ import { MonthView } from '../../../components/Calendar/MonthView/MonthView';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
 
-<<<<<<< HEAD
 // Mock TagContext to avoid network calls
 vi.mock('../../../context/TagContext', async () => {
     return {
@@ -17,8 +16,6 @@ vi.mock('../../../context/TagContext', async () => {
 });
 
 // Mock hooks
-=======
->>>>>>> main
 const mockUseDrag = vi.fn(() => ({ dragProps: {}, isDragging: false }));
 const mockUseMonthDayDrop = vi.fn(() => ({ dropProps: {}, isOver: false }));
 const mockOpenModal = vi.fn();

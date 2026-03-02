@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from '../../pages/TimerPage.module.css';
+import styles from "../../pages/Timer/TimerPage.module.css";
 import { noiseGenerator } from './utils/noiseUtils';
 
 /** Formats seconds to MM:SS */

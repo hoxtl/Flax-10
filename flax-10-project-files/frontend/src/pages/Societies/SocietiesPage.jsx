@@ -33,10 +33,8 @@ function useSocietiesPage() {
         setShowCreateModal(false);
         setSelectedSocietyId(newSociety.id);
     };
-
     const selectSociety = (society) => setSelectedSocietyId(society.id);
     const clearSelection = () => { setSelectedSocietyId(null); refresh(); };
-
     return { view, setView, selectedSocietyId, selectSociety, clearSelection, showCreateModal, setShowCreateModal, societies, loading, onCreate };
 }
 

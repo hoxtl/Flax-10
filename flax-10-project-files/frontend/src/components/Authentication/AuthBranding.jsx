@@ -44,25 +44,17 @@ const baseFooterStyle = {
 
 export function AuthBrand() {
   const [isTallEnough, setIsTallEnough] = useState(window.innerHeight >= 860);
-
   useEffect(() => {
     const handleResize = () => {
-      setIsTallEnough(window.innerHeight >= 860);
-    };
-
+      setIsTallEnough(window.innerHeight >= 860);};
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+    return () => window.removeEventListener("resize", handleResize);}, []);
   if (!isTallEnough) return null;
-
   return (
     <div style={brandWrapStyle}>
       <div style={brandNameStyle}>STUDYFLAX</div>
       <div style={brandTagStyle}>Built for calm study.</div>
-    </div>
-  );
-}
+    </div>);}
 
 export function AuthFooter({ absolute = false }) {
   const style = absolute
