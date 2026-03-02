@@ -80,6 +80,8 @@ export default function useSettingsHandlers() {
     setSuccessMessage("");
 
     try {
+      const coords = await geocodeAddress(address);
+
       if (!coords) {
       setHomeAddressError("Address not found, please try again...")
       setIsSaving(false);
@@ -92,7 +94,7 @@ export default function useSettingsHandlers() {
 
       setSuccessMessage("Home address has been saved!");
       setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (eror) {
+    } catch (error) {
       setHomeAddressError("Home address could not be saved, please try again...");
     } finally { setIsSaving(false); }
   };
