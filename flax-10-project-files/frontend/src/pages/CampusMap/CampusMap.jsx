@@ -285,7 +285,10 @@ export default function CampusMap() {
       homePointer.current.remove();
       homePointer.current = null;
     }
-
+    if (homePopup.current) {
+      homePopup.current.remove();
+      homePopup.current = null;
+    }
 
   })
 
