@@ -282,3 +282,10 @@
   outline: none;
   border-color: var(--primary);
 }
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 8px;
+  display: block;
+}
