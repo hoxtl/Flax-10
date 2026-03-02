@@ -71,6 +71,18 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers }) {
           <ProfileBio user={profileData || user} profileData={profileData} />
         </div>
       </div>
+
+      <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
+        <div className={styles.mobileHero}>
+          <div className={styles.mobileAvatar}>
+            {profileData?.profile_photo_url
+              ? <img src={profileData.profile_photo_url} alt="Profile" className={styles.avatarImage} />
+              : buildInitials(user)}
+          </div>
+          <h1 className={styles.mobileUsername}>{username}</h1>
+          <p className={styles.mobileBio}>{year} {year && major ? '·' : ''} {major}</p>              
+        </div>
+      </div>
     </>
   );
 }
