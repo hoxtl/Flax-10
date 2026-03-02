@@ -241,3 +241,10 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
