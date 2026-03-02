@@ -869,7 +869,7 @@ export default function Homepage({ onNavigate }) {
   const tflContext = useMemo(() => {
     if (!isToday(selectedDate) || !sortedEvents?.length) return null;
     const nowMs = now.getTime();
-    const DELAY_MINS = 10; // matches MOCK_TFL_ALERT suggestion offset
+    const DELAY_MINS = 10; // conservative buffer applied when any TFL delay is active
     const nextEvent = [...sortedEvents]
       .filter(e => e.start_time && new Date(e.start_time).getTime() > nowMs)
       .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0];
@@ -904,7 +904,7 @@ export default function Homepage({ onNavigate }) {
       return `${lectureCount} lecture${lectureCount > 1 ? "s" : ""} today · ${todayFreeWindows.length} free window${todayFreeWindows.length !== 1 ? "s" : ""} to study`;
     }
     if (totalMins >= 360) {
-      return `Packed day — ${(totalMins / 60).toFixed(1)}h scheduled · guard your energy`;
+      return `Packed day — ${Math.round(totalMins / 60)}h scheduled · guard your energy`;
     }
     if (hour >= 21 && actionHubRemainingCount > 0) {
       return `It's late — ${actionHubRemainingCount} task${actionHubRemainingCount !== 1 ? "s" : ""} remaining. Prioritise sleep if needed`;
@@ -1467,9 +1467,9 @@ export default function Homepage({ onNavigate }) {
               const hasNext = !!nav.nextItem?.title;
               return (
                 <div className={styles.intRowNowSection}>
-                  {/* NOW — always shown, placeholder if no current event */}
+                  {/* Now */}
                   <div className={styles.intRowNowItem}>
-                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNow}`}>NOW</span>
+                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNow}`}>Now</span>
                     <div className={styles.intRowNowItemBody}>
                       {hasNow ? (
                         <>
@@ -1492,46 +1492,37 @@ export default function Homepage({ onNavigate }) {
                       <div className={styles.intRowNowTimerFill} style={{ width: `${eventPct}%` }} />
                     </div>
                   )}
-                  {/* NEXT — always shown, placeholder if nothing upcoming */}
-                  <div className={styles.intRowNowItem}>
-                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNext}`}>NEXT</span>
-                    <div className={styles.intRowNowItemBody}>
-                      {hasNext ? (
-                        <>
-                          <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
-                          {nav.nextItem.start_time && (
-                            <span className={styles.intRowNowItemTime}>
-                              {`at ${formatTime(nav.nextItem.start_time)}`}
-                              {(() => {
-                                const msUntil = new Date(nav.nextItem.start_time).getTime() - nowMs;
-                                if (msUntil > 0) {
-                                  const h = Math.floor(msUntil / 3600000);
-                                  const m = Math.floor((msUntil % 3600000) / 60000);
-                                  return ` · in ${h > 0 ? `${h}h ` : ""}${m}m`;
-                                }
-                                return "";
-                              })()}
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic" }}>
-                          {hasNow ? "Nothing scheduled after this" : "Nothing coming up today"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {/* Up-next mini list — only if there's a NEXT item to anchor it */}
-                  {hasNext && upNextEvents.length > 0 && (
-                    <div className={styles.intRowNowUpNext}>
-                      {upNextEvents.map((e, i) => (
-                        <div key={i} className={styles.intRowNowUpNextRow}>
-                          <span className={styles.intRowNowUpNextTime}>{formatTime(e.start_time)}</span>
-                          <span className={styles.intRowNowUpNextTitle}>{e.title}</span>
+                  {/* Upcoming — next event + following events in one section */}
+                  <div className={styles.intRowNowUpcoming}>
+                    <span className={styles.intRowNowUpcomingLabel}>Upcoming</span>
+                    {hasNext ? (
+                      <>
+                        <div className={styles.intRowNowItem}>
+                          <div className={styles.intRowNowItemBody}>
+                            <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
+                            {nav.nextItem.start_time && (
+                              <span className={styles.intRowNowItemTime}>
+                                {`at ${formatTime(nav.nextItem.start_time)}`}
+                                {(() => {
+                                  const msUntil = new Date(nav.nextItem.start_time).getTime() - nowMs;
+                                  if (msUntil > 0) {
+                                    const h = Math.floor(msUntil / 3600000);
+                                    const m = Math.floor((msUntil % 3600000) / 60000);
+                                    return ` · in ${h > 0 ? `${h}h ` : ""}${m}m`;
+                                  }
+                                  return "";
+                                })()}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </>
+                    ) : (
+                      <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic", fontSize: "0.78rem" }}>
+                        {hasNow ? "Nothing after this" : "Nothing coming up today"}
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             }
@@ -1541,7 +1532,7 @@ export default function Homepage({ onNavigate }) {
               return (
                 <div className={styles.intRowNowSection}>
                   <div className={styles.intRowNowItem}>
-                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeFree}`}>FREE</span>
+                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeFree}`}>Now</span>
                     <div className={styles.intRowNowItemBody}>
                       <span className={styles.intRowNowItemTitle}>
                         {mins >= 60
@@ -1550,28 +1541,24 @@ export default function Homepage({ onNavigate }) {
                       </span>
                     </div>
                   </div>
-                  {nav.nextItem?.title && (
-                    <div className={styles.intRowNowItem}>
-                      <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNext}`}>NEXT</span>
-                      <div className={styles.intRowNowItemBody}>
-                        <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
-                        <span className={styles.intRowNowItemTime}>
-                          {nav.nextItem.start_time ? `at ${formatTime(nav.nextItem.start_time)}` : ""}
-                          {cStr ? ` · in ${cStr}` : ""}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  {upNextEvents.length > 0 && (
-                    <div className={styles.intRowNowUpNext}>
-                      {upNextEvents.map((e, i) => (
-                        <div key={i} className={styles.intRowNowUpNextRow}>
-                          <span className={styles.intRowNowUpNextTime}>{formatTime(e.start_time)}</span>
-                          <span className={styles.intRowNowUpNextTitle}>{e.title}</span>
+                  <div className={styles.intRowNowUpcoming}>
+                    <span className={styles.intRowNowUpcomingLabel}>Upcoming</span>
+                    {nav.nextItem?.title ? (
+                      <div className={styles.intRowNowItem}>
+                        <div className={styles.intRowNowItemBody}>
+                          <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
+                          <span className={styles.intRowNowItemTime}>
+                            {nav.nextItem.start_time ? `at ${formatTime(nav.nextItem.start_time)}` : ""}
+                            {cStr ? ` · in ${cStr}` : ""}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ) : (
+                      <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic", fontSize: "0.78rem" }}>
+                        Nothing coming up today
+                      </span>
+                    )}
+                  </div>
                   {smartNudge && (
                     <div className={styles.intRowNowNudge}>
                       {smartNudge.type === "deadline"

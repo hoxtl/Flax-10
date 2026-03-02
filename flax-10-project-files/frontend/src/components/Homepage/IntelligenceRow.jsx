@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { CheckSquare, AlertCircle, Zap, Clock, Train, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
+import { tflService } from "../../api/tflService";
 
 /** Dynamic greeting by time of day */
 function getGreeting(name) {
@@ -77,7 +78,7 @@ export default function IntelligenceRow({
               </div>
               <div className={styles.headerDayProgressMeta}>
                 <span className={styles.headerDayProgressCount}>
-                  {daySummary.done}/{daySummary.total} done · {daySummary.pct}%
+                  {daySummary.done}/{daySummary.total} done · {Math.round(daySummary.pct)}%
                 </span>
                 {daySummary.overdue > 0 && (
                   <span className={styles.headerDayProgressOverdue}>
@@ -152,7 +153,7 @@ export default function IntelligenceRow({
                   <span className={styles.statusStripText}>{statusStrip.text}</span>
                 </div>
               )}
-              <TravelAlertPill tflContext={tflContext} />
+              <TravelAlertPills tflContext={tflContext} />
             </div>
             {slot5Commute}
           </>
@@ -215,32 +216,73 @@ function BentoSlot({
   );
 }
 
-// TODO: Replace MOCK_TFL_ALERT with real data from Dian's tfl/delays branch
-const MOCK_TFL_ALERT = {
-  line: "Northern Line",
-  status: "Minor delays",
-  suggestion: "Leave 10 min early for your 09:00 lecture",
-};
+function useTflDelays() {
+  const [delays, setDelays] = useState(undefined); // undefined = loading
+  useEffect(() => {
+    tflService.getTfLDelays()
+      .then(data => setDelays(Array.isArray(data) ? data : []))
+      .catch(() => setDelays([]));
+  }, []);
+  return delays;
+}
 
-// TODO: Replace MOCK_TFL_ALERT with real data from Dian's tfl/delays branch
-function TravelAlertPill({ tflContext }) {
-  const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
-  const message = tflContext
-    ? `${MOCK_TFL_ALERT.line}: ${MOCK_TFL_ALERT.status} — leave by ${tflContext.leaveStr} for ${tflContext.eventTitle}`
-    : `${MOCK_TFL_ALERT.line} · ${MOCK_TFL_ALERT.status}`;
+function TravelAlertPills({ tflContext }) {
+  const delays = useTflDelays();
+  const [dismissed, setDismissed] = useState(new Set());
+
+  if (!delays || delays.length === 0) return null;
+
+  const visible = delays.filter(d => !dismissed.has(d.lineName));
+  if (visible.length === 0) return null;
+
+  const shown = visible.slice(0, 2);
+  const overflow = visible.length - shown.length;
+
+  const dismiss = (lineName) =>
+    setDismissed(prev => new Set([...prev, lineName]));
+
   return (
-    <div className={`${styles.statusStrip} ${styles.statusStripTfl}`} role="status">
-      <Train size={11} strokeWidth={2} aria-hidden />
-      <span className={styles.statusStripText}>{message}</span>
-      <button
-        className={styles.statusStripPillDismiss}
-        onClick={() => setDismissed(true)}
-        aria-label="Dismiss travel alert"
-      >
-        <X size={10} strokeWidth={2.5} aria-hidden />
-      </button>
-    </div>
+    <>
+      {shown.map((delay) => {
+        const isSevere = delay.severity < 5;
+        return (
+          <div
+            key={delay.lineName}
+            className={`${styles.tflCard} ${isSevere ? styles.tflCardSevere : ""}`}
+            role="status"
+          >
+            <span
+              className={styles.tflCardAccent}
+              style={{ background: delay.color }}
+              aria-hidden
+            />
+            <div className={styles.tflCardBody}>
+              <div className={styles.tflCardTop}>
+                <span className={styles.tflCardLine}>{delay.lineName}</span>
+                <span className={styles.tflCardStatus}>{delay.severityDescription}</span>
+              </div>
+              {tflContext && (
+                <span className={styles.tflCardLeave}>
+                  Leave by {tflContext.leaveStr} for {tflContext.eventTitle}
+                </span>
+              )}
+            </div>
+            <button
+              className={styles.tflCardDismiss}
+              onClick={() => dismiss(delay.lineName)}
+              aria-label={`Dismiss ${delay.lineName} alert`}
+            >
+              <X size={10} strokeWidth={2.5} aria-hidden />
+            </button>
+          </div>
+        );
+      })}
+      {overflow > 0 && (
+        <span className={styles.tflOverflow}>
+          +{overflow} more line{overflow > 1 ? "s" : ""} affected
+        </span>
+      )}
+    </>
   );
 }
 

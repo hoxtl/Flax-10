@@ -2178,25 +2178,42 @@
 .intRowNowBadge {
   flex-shrink: 0;
   font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.58rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 99px;
-  margin-top: 1px;
-}
-
-.intRowNowBadgeNow {
-  background: #4A3421;
-  color: #F7F6F3;
+  padding: 2px 0;
+  margin-top: 2px;
+  background: none;
   border: none;
 }
 
+.intRowNowBadgeNow {
+  color: #7B6751;
+}
+
 .intRowNowBadgeNext {
-  background: transparent;
   color: #84A98C;
-  border: 1px solid rgba(132, 169, 140, 0.5);
+}
+
+/* "Upcoming" section container */
+.intRowNowUpcoming {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid rgba(123, 103, 81, 0.1);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.intRowNowUpcomingLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #84A98C;
+  margin-bottom: 2px;
 }
 
 .intRowNowBadgeFree {

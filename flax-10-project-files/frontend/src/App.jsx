@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
@@ -145,10 +145,10 @@ function useAppState() {
   useSyncAuth(setAuthed, setUser, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
 
-  const setActiveNav = (nav) => {
+  const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
-  };
+  }, []);
 
   return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
 }
