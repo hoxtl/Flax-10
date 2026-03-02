@@ -1,10 +1,11 @@
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 import json
 
 
-@login_required
 @require_http_methods(["GET", "POST"])
 def home_address_view(request):
     """
