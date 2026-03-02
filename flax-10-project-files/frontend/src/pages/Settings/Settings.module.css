@@ -302,3 +302,7 @@
   transition: opacity 0.2s;
   margin-top: 8px;
 }
+
+.submitButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
