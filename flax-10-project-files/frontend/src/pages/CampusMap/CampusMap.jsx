@@ -314,7 +314,22 @@ export default function CampusMap() {
         .addTo(map.current);
       
       homePointer.current.togglePopup();
-  })
+
+      setTimeout(() => {
+        const btn = document.getElementById('setHomeAsStart');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            setStartLocation({lng: userHome.lng, lat: userHome.lat});
+            map.current?.flyTo({
+              center: [userHome.lng, userHome.lat],
+              zoom: 15,
+              pitch: 55,
+              duration: 1200
+            });
+          });
+        }
+      }, 100);
+  }, [userHome, mapLoaded]);
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
