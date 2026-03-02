@@ -35,7 +35,7 @@ from studyFlax.views.analytics.analytics_views import get_analytics_summary, get
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
-from studyFlax.views.authentication import home_address_view
+from studyFlax.views.authentication.home_address_view import home_address_view
 
 urlpatterns = [
     path("", include(router.urls)),

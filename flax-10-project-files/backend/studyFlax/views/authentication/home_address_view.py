@@ -6,7 +6,7 @@ import json
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def home_address(request):
+def home_address_view(request):
     """
     Method to retrieve/save user's home address with coordinates
     """
