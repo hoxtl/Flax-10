@@ -22,9 +22,11 @@ from studyFlax.views.society import (
     society_tag_list, society_tag_detail, announcement_list, announcement_detail,
     event_list as society_event_list, event_detail as society_event_detail,
     sync_status, sync_calendar, unsync_calendar,
-    request_ratification, approve_ratification, reject_ratification, pending_ratifications
+    request_ratification, approve_ratification, reject_ratification, pending_ratifications,
+    add_society_event_exception, publish_changes
 )
 from studyFlax.views.user.profile_view import profile_view
+from studyFlax.views.user.profile_summary_view import profile_summary_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.user.user_search_view import user_search
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
@@ -32,6 +34,7 @@ from studyFlax.views.authentication.confirm_password_reset_view import confirm_p
 from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 from studyFlax.views.user.settings_views import onboarding_view
+from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -66,14 +69,17 @@ urlpatterns = [
     path("societies/<int:society_id>/announcements/<int:announcement_id>/", announcement_detail, name="society-announcement-detail"),
     path("societies/<int:society_id>/events/", society_event_list, name="society-events"),
     path("societies/<int:society_id>/events/<int:event_id>/", society_event_detail, name="society-event-detail"),
+    path("societies/<int:society_id>/events/<int:event_id>/exception/", add_society_event_exception, name="society-event-exception"),
     path("societies/<int:society_id>/calendar-sync/", sync_calendar, name="society-calendar-sync"),
     path("societies/<int:society_id>/calendar-unsync/", unsync_calendar, name="society-calendar-unsync"),
     path("societies/<int:society_id>/calendar-sync-status/", sync_status, name="society-calendar-sync-status"),
+    path("societies/<int:society_id>/publish/", publish_changes, name="society-publish-changes"),
     path("societies/<int:society_id>/ratification/request/", request_ratification, name="society-ratification-request"),
     path("societies/<int:society_id>/ratification/approve/", approve_ratification, name="society-ratification-approve"),
     path("societies/<int:society_id>/ratification/reject/", reject_ratification, name="society-ratification-reject"),
     path("admin/societies/pending-ratifications/", pending_ratifications, name="pending-ratifications"),
     path("profile/", profile_view, name='user-profile'),
+    path('profile/summary/', profile_summary_view, name='profile-summary'),
     path("check-username/", check_username, name='check-username'),
     path("users/search/", user_search, name='user-search'),
     path("auth/password-reset/request/", reset_password_view, name='password-reset-request'),
@@ -85,4 +91,7 @@ urlpatterns = [
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
     path('onboarding/', onboarding_view, name='onboarding'),
+    path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline_list"),
+    path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
+    path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
 ]

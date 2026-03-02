@@ -16,14 +16,11 @@ vi.mock('../../../context/CalendarContext', async () => {
     };
 });
 
-<<<<<<< HEAD
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 
 // Mock TagContext to ensure useTags works without real provider issues
-=======
->>>>>>> main
 vi.mock('../../../context/TagContext', async () => {
     return {
         TagProvider: ({ children }) => <div>{children}</div>,

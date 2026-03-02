@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { fetchTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
+import { getTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
 
 const TagContext = createContext(null);
 const DEFAULT_ICON = '🏷️';
@@ -23,7 +23,7 @@ function useTagLoader() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchTags()
+        getTags()
             .then(data => setTags(data.map(mapBackendTag)))
             .catch(err => console.error('Failed to fetch tags:', err))
             .finally(() => setLoading(false));

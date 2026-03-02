@@ -4,8 +4,7 @@ import styles from "./EmojiPicker.module.css";
 export default function EmojiPicker({ onSelect, onClose }) {
   const handleEmojiSelect = (emoji) => {
     onSelect?.(emoji.emoji);
-    onClose?.();
-  };
+    onClose?.();};
 
   return (
     <div className={styles.wrapper}>

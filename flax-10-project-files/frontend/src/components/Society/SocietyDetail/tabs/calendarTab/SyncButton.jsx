@@ -1,8 +1,8 @@
 import { useSocietyCalendarSync } from "../../../hooks/useSocietyCalendarSync";
 import styles from "./SyncButton.module.css";
 
-export default function SyncButton({ societyId }) {
-    const { isSynced, loading, toggleSync } = useSocietyCalendarSync(societyId);
+export default function SyncButton({ societyId, societyName }) {
+    const { isSynced, loading, toggleSync } = useSocietyCalendarSync(societyId, societyName);
     const label = getButtonLabel(isSynced, loading);
     const className = getButtonClass(isSynced, loading);
 

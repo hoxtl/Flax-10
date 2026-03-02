@@ -21,7 +21,9 @@ def _compute_streaks(sessions):
             longest = max(longest, temp)
         else:
             temp = 1
-    current = temp if dates[-1] == timezone.now().date() else 0
+    # Allow streak if last session was today OR yesterday
+    today = timezone.now().date()
+    current = temp if dates[-1] >= today - timedelta(days=1) else 0
     return current, longest
 
 
@@ -63,7 +65,8 @@ def get_analytics_summary(request):
     for session in sessions:
         heatmap_data[session.end_time.weekday()][session.end_time.hour] += session.duration
 
-    current_streak, longest_streak = _compute_streaks(sessions)
+    current_streak, longest_streak = _compute_streaks(list(sessions))
+    active_days = len(set(s.end_time.date() for s in sessions))
 
     return Response({
         'summary': {
@@ -76,6 +79,7 @@ def get_analytics_summary(request):
             'longest_streak_days': longest_streak,
             'overtime_sessions': overtime_sessions,
             'work_break_ratio': work_break_ratio,
+            'active_days': active_days,
         },
         'daily_breakdown': daily_breakdown,
         'heatmap': {

@@ -1,4 +1,4 @@
-import styles from '../../pages/TimerPage.module.css';
+import styles from "../../pages/Timer/TimerPage.module.css";
 import { formatTime } from './TimerComponents';
 
 /** Reusable content for overtime state (used in OvertimePopup) */

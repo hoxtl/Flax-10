@@ -3,25 +3,29 @@ import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
 import styles from './ModulesCard.module.css';
 
-export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete }) {
+export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines }) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
         <article className={GetCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
             <CardBody module={module} enrolled={enrolled} isTeacher={isTeacher}
-                onEdit={(e) => stop(e, onEdit)} onDelete={(e) => stop(e, onDelete)} onToggle={(e) => stop(e, onEnrollmentToggle)} />
+                onEdit={(e) => stop(e, onEdit)}
+                onDelete={(e) => stop(e, onDelete)}
+                onToggle={(e) => stop(e, onEnrollmentToggle)}
+                onManageDeadlines={(e) => stop(e, onManageDeadlines)} />
         </article>
     );
 }
 
-function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle }) {
+function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.content}>
-            <CardHeader module={module} enrolled={enrolled} />
+            {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} />}
             <h3 className={styles.moduleTitle}>{module.module_name}</h3>
             {module.description && <Description text={module.description} />}
             <ScheduleMeta module={module} />
-            <CardActions isTeacher={isTeacher} enrolled={enrolled} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} />
+            <CardActions isTeacher={isTeacher} enrolled={enrolled}
+                onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
         </div>
     );
 }
@@ -72,17 +76,20 @@ function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
 
-function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle }) {
+function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.actions}>
-            {isTeacher ? <TeacherActions onEdit={onEdit} onDelete={onDelete} /> : <StudentAction enrolled={enrolled} onToggle={onToggle} />}
+            {isTeacher
+                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
+                : <StudentAction enrolled={enrolled} onToggle={onToggle} />}
         </div>
     );
 }
 
-function TeacherActions({ onEdit, onDelete }) {
+function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
     return (
         <>
+            <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
         </>

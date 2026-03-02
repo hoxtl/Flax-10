@@ -1,11 +1,7 @@
-/*
-    This file is used to handle the form logic for the event modal.
-*/
-
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
 import { useEventActions } from '../hooks/useCalendarEvents';
-import { getInitialForm, validateAndSubmit, confirmDelete } from '../utils/formUtils';
+import { getInitialForm, validateAndSubmit } from '../utils/formUtils';
 
 export function useEventForm(event, onClose, options = {}) {
     const calendarContext = useCalendar();
@@ -16,12 +12,17 @@ export function useEventForm(event, onClose, options = {}) {
 
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
 
-    const handleSubmit = options.customSubmit ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError) : (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], false);
+    const handleSubmit = options.customSubmit
+        ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError)
+        : (e) => validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], false);
+
     const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], true);
     const handleCancelSave = () => setOverlapWarning(null);
-    const handleDelete = options.customSubmit ? () => { options.customSubmit({ ...form, _delete: true }); onClose(); } : () => confirmDelete(event, actions, onClose);
 
-    return { form, setForm, error, overlapWarning, isEditing: !!event?.id, handleSubmit, handleConfirmSave, handleCancelSave, handleDelete };
+    return {
+        form, setForm, error, overlapWarning, isEditing: !!event?.id,
+        handleSubmit, handleConfirmSave, handleCancelSave, event
+    };
 }
 
 function createCustomSubmitHandler(form, customSubmit, onClose, setError) {

@@ -37,7 +37,7 @@ class SocietyListSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = Society
-        fields = ['id', 'name', 'bio', 'image', 'cover_image', 'is_ratified', 'member_count']
+        fields = ['id', 'name', 'bio', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails']
 
     def get_cover_image(self, obj):
         if obj.image:
@@ -50,19 +50,45 @@ class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
     event_id = serializers.SerializerMethodField()
+
+    def create(self, validated_data):
+        instance = SocietyAnnouncement(**validated_data)
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        return super().update(instance, validated_data)
+
+    def get_event_id(self, obj):
+        event = obj.events.first()
+        return event.id if event else None
+
     class Meta:
         model = SocietyAnnouncement
         fields = [
             'id', 'title', 'content', 'tag', 'tag_data',
             'pinned', 'images', 'created_at', 'updated_at', 'event_id'
         ]
-    def get_event_id(self, obj):
-        event = obj.events.first()
-        return event.id if event else None
 
 
 class SocietyEventSerialiser(serializers.ModelSerializer):
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
+
+    def create(self, validated_data):
+        instance = SocietyEvent(**validated_data)
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -74,7 +100,8 @@ class SocietyEventSerialiser(serializers.ModelSerializer):
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
-            'all_day', 'tag', 'tag_data', 'recurrence', 'recurrence_end_date', 'announcement', 'created_at'
+            'all_day', 'tag', 'tag_data', 'recurrence', 'recurrence_end_date',
+            'exception_dates', 'announcement', 'created_at'
         ]
 
 
@@ -88,7 +115,7 @@ class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
-            'society', 'society_name', 'society_color', 'source', 'announcement'
+            'society', 'society_name', 'society_color', 'source', 'announcement', 'exception_dates'
         ]
 
     def get_society_color(self, obj):
@@ -118,6 +145,6 @@ class SocietyDetailSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Society
         fields = [
-            'id', 'name', 'bio', 'about', 'image', 'is_ratified', 'ratification_status',
-            'date_created', 'member_count', 'tags', 'images', 'announcements', 'events'
+            'id', 'name', 'bio', 'about', 'image', 'categories', 'is_ratified', 'ratification_status',
+            'date_created', 'member_count', 'tags', 'images', 'announcements', 'events', 'admin_emails'
         ]
