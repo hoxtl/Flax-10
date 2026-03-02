@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
 import { tflService } from "../../api/tflService";
+import { getHomeAddress } from "../../api/userService";
 
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -100,8 +101,12 @@ export default function CampusMap() {
   const [tflRouteInfo, setTflRouteInfo] = useState(null);
   const [loadingTflRoute, setLoadingTflRoute] = useState(false);
   const [tflRouteError, setTflRouteError] = useState('');
-  const[disruptions, setDisruptions] = useState([]);
-  const[loadingDisruptions, setLoadingDisruptions] = useState(false);
+  const [disruptions, setDisruptions] = useState([]);
+  const [loadingDisruptions, setLoadingDisruptions] = useState(false);
+
+  const [userHome, setUserHome] = useState(null);
+  const homePointer = userRef(null);
+  const homePopup = useRef(null);
 
   useEffect(() => {
     if (map.current) return;
