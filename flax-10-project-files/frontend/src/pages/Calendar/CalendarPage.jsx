@@ -68,13 +68,8 @@ function getPersonalActions(event, { openModal, removeEvent, closePopup }) {
     ];
 }
 
-function getModuleActions(event, { closePopup, loadEvents }) {
-    const handleLeave = async () => {
-        closePopup();
-        await disenrolByModuleId(event.module);
-        loadEvents();
-    };
-    return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
+function getModuleActions(_event, _handlers) {
+    return [];
 }
 
 function getSocietyActions(event, { closePopup, loadEvents }) {

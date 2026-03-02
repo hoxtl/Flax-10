@@ -1,5 +1,7 @@
 // Grid configuration - change these to adjust the calendar layout
-export const SLOT_HEIGHT = 60;  // Height of one hour slot in pixels
+export const SLOT_HEIGHT = 60; // Height of one hour in pixels
+export const SLOT_INTERVAL_MINUTES = 30; // Visual grid row size
+export const SLOT_PIXEL_HEIGHT = SLOT_HEIGHT * (SLOT_INTERVAL_MINUTES / 60);
 export const SNAP_INTERVAL = 15; // Minutes to snap to (15 = quarter hours)
 export const MIN_EVENT_DURATION = 15; // Minimum event length in minutes
 
@@ -28,8 +30,9 @@ export function minutesToPixels(minutes) {
  * Gets the minute offset within a slot from a mouse Y position.
  * Returns 0-59 based on where in the slot you clicked.
  */
-export function getMinuteOffset(mouseY, slotTop) {
+export function getMinuteOffset(mouseY, slotTop, slotDuration = 60) {
     const offsetInSlot = mouseY - slotTop;
-    const minuteOffset = (offsetInSlot / SLOT_HEIGHT) * 60;
+    const slotHeight = minutesToPixels(slotDuration);
+    const minuteOffset = (offsetInSlot / slotHeight) * slotDuration;
     return Math.floor(minuteOffset / SNAP_INTERVAL) * SNAP_INTERVAL;
 }

@@ -3,14 +3,14 @@
     flex-direction: column;
     background: var(--calendar-bg);
     border-radius: 8px;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
+    overflow: visible;
+    flex: 0 0 auto;
+    min-height: 100%;
 }
 
 .sticky-header {
     position: sticky;
-    top: 0;
+    top: var(--calendar-top-offset, 0px);
     z-index: 20;
     background: var(--calendar-bg);
 }
@@ -27,7 +27,7 @@
 }
 
 .time-label-row {
-    height: 60px;
+    height: 30px;
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
@@ -53,7 +53,7 @@
 }
 
 .time-slot {
-    height: 60px;
+    height: 30px;
     border-bottom: 1px solid var(--calendar-grid-major);
     box-sizing: border-box;
     position: relative;
@@ -74,7 +74,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    height: 25%;
+    height: var(--segment-height, 25%);
     background-color: var(--active);
     border: 2px solid var(--primary);
     box-sizing: border-box;

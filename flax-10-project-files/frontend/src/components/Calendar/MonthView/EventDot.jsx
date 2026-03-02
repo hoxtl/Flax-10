@@ -43,8 +43,12 @@ function useEventDotLogic(event, onEventClick, customTags, eventType) {
     };
 }
 
+const TIMETABLE_COLOR = '#6B8CAE';  // muted blue for module/timetable lectures
+
 function getEventColor(event, customTags, globalTags) {
-    if (event.source === 'society') return event.society_color || '#9E7E5D';
+    const type = getEventType(event);
+    if (type === 'society') return event.society_color || '#9E7E5D';
+    if (type === 'module' || type === 'timetable') return TIMETABLE_COLOR;
     if (event.tag_color) return event.tag_color;
     if (customTags) return customTags.find(t => t.id === event.tagId)?.color || '#9E7E5D';
     return globalTags.getTag(event.tag)?.color || '#9E7E5D';

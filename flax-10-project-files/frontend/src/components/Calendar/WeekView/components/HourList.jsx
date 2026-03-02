@@ -1,12 +1,13 @@
 import { HourCell } from './HourCell';
-import { getHoursOfDay } from '../../DayView/dayViewHelpers';
+import { getSlotsOfDay } from '../../DayView/dayViewHelpers';
+import { SLOT_INTERVAL_MINUTES } from '../../calendarConstants';
 
 export function HourList({ date, readOnly }) {
-    const hours = getHoursOfDay();
+    const slots = getSlotsOfDay(SLOT_INTERVAL_MINUTES);
     return (
         <>
-            {hours.map(hour => (
-                <HourCell key={hour} hour={hour} date={date} readOnly={readOnly} />
+            {slots.map(slotStartMinutes => (
+                <HourCell key={slotStartMinutes} slotStartMinutes={slotStartMinutes} date={date} readOnly={readOnly} />
             ))}
         </>
     );

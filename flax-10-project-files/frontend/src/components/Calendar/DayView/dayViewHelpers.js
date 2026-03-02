@@ -4,11 +4,22 @@ export function getHoursOfDay() {
     return Array.from({ length: 24 }, (_, i) => i);
 }
 
+export function getSlotsOfDay(slotIntervalMinutes = 30) {
+    const slotCount = (24 * 60) / slotIntervalMinutes;
+    return Array.from({ length: slotCount }, (_, i) => i * slotIntervalMinutes);
+}
+
 export function formatHour(hour) {
     if (hour === 0) return '12 AM';
     if (hour === 12) return '12 PM';
     if (hour < 12) return `${hour} AM`;
     return `${hour - 12} PM`;
+}
+
+export function formatSlotLabel(slotStartMinutes) {
+    const hour = Math.floor(slotStartMinutes / 60);
+    if (slotStartMinutes % 60 !== 0) return '';
+    return formatHour(hour);
 }
 
 export function calculateEventStyle(event, slotHeight, allEvents, currentDate = null) {

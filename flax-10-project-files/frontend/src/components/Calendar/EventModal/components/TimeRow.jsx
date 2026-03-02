@@ -1,5 +1,5 @@
-import { FormField } from './FormField';
-import { getType, handleDateChange, getDisplayValue, handleToggle } from './timeRowHelpers';
+import { handleToggle } from './timeRowHelpers';
+import DateTimePicker from './DateTimePicker';
 import './TimeRow.css';
 
 export function TimeRow({ form, update, setForm }) {
@@ -29,28 +29,58 @@ function AllDayToggle({ form, setForm }) {
 
 function TimeFields({ form, update }) {
     const isAllDay = form.all_day || false;
-    const type = getType(isAllDay);
-    const fields = [
-        { label: 'Start', value: form.start_time, field: 'start_time' },
-        { label: 'End', value: form.end_time, field: 'end_time' }
-    ];
+
+    if (isAllDay) {
+        return (
+            <div className="form-row">
+                <AllDayDateInput label="Start" value={form.start_time} field="start_time" update={update} />
+                <AllDayDateInput label="End" value={form.end_time} field="end_time" update={update} />
+            </div>
+        );
+    }
+
     return (
         <div className="form-row">
-            {fields.map(f => (
-                <TimeInput key={f.field} {...f} update={update} type={type} isAllDay={isAllDay} />
-            ))}
+            <DateTimeInput label="Start" value={form.start_time} field="start_time" update={update} />
+            <DateTimeInput label="End" value={form.end_time} field="end_time" update={update} />
         </div>
     );
 }
 
-function TimeInput({ label, value, field, update, type, isAllDay }) {
+function DateTimeInput({ label, value, field, update }) {
+    const isoValue = value
+        ? (() => {
+              const d = new Date(value);
+              const pad = n => String(n).padStart(2, '0');
+              return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          })()
+        : '';
+
     return (
-        <FormField
-            label={label}
-            type={type}
-            value={getDisplayValue(value, isAllDay, field) || ''}
-            onChange={handleDateChange(field, isAllDay, update)}
-            required
-        />
+        <div className="form-field">
+            <label>{label}</label>
+            <DateTimePicker
+                value={isoValue}
+                onChange={iso => update(field)({ target: { value: iso } })}
+                placeholder={`Pick ${label.toLowerCase()} date & time`}
+            />
+        </div>
+    );
+}
+
+function AllDayDateInput({ label, value, field, update }) {
+    const dateValue = value ? value.split('T')[0] : '';
+    return (
+        <div className="form-field">
+            <label>{label}</label>
+            <input
+                type="date"
+                value={dateValue}
+                onChange={e => {
+                    const val = e.target.value ? e.target.value + 'T00:00' : '';
+                    update(field)({ target: { value: val } });
+                }}
+            />
+        </div>
     );
 }

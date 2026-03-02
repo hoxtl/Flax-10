@@ -2,34 +2,35 @@ import { useState, useCallback } from "react";
 import { useDrop } from './useDragDrop';
 import { useCalendar, useEventModal } from "../../../context/CalendarContext";
 import { useEventActions } from "./useCalendarEvents";
-import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
+import { getMinuteOffset, SLOT_INTERVAL_MINUTES, SLOT_PIXEL_HEIGHT, SNAP_INTERVAL } from "../calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
 import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
 
-export function useTimeSlotDrop(hour, date) {
+export function useTimeSlotDrop(slotStartMinutes, date) {
     const { events } = useCalendar();
     const { openModal } = useEventModal();
     const actions = useEventActions();
-    const [highlightQuarter, setHi] = useState(null);
-    const onDrop = useCallback((p, e) => onDropAction(p, e, hour, date, actions, events, setHi), [hour, date, actions, events]);
-    const onClick = useCallback((e) => onClickAction(e, hour, date, openModal), [hour, date, openModal]);
+    const [highlightSegment, setHi] = useState(null);
+    const onDrop = useCallback((p, e) => onDropAction(p, e, slotStartMinutes, date, actions, events, setHi), [slotStartMinutes, date, actions, events]);
+    const onClick = useCallback((e) => onClickAction(e, slotStartMinutes, date, openModal), [slotStartMinutes, date, openModal]);
     const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: onDrop });
-    return { mergedProps: buildMergedProps(dropProps, isOver, setHi, onClick), isOver, highlightQuarter: highlightQuarter };
+    return { mergedProps: buildMergedProps(dropProps, setHi, onClick), isOver, highlightSegment };
 }
 
-async function onDropAction(payload, e, hour, date, actions, events, setHighlight) {
+async function onDropAction(payload, e, slotStartMinutes, date, actions, events, setHighlight) {
     setHighlight(null);
-    await dispatchDrop(payload, date, getDropMinutes(hour, e), actions.addEvent, actions.editEvent, actions.addException, events);
+    const minutes = getSlotMinutes(slotStartMinutes, e);
+    await dispatchDrop(payload, date, minutes, actions.addEvent, actions.editEvent, actions.addException, events);
 }
 
-function onClickAction(e, hour, date, openModal) {
-    openEventModalAtTime(date, getClickMinutes(hour, e), openModal);
+function onClickAction(e, slotStartMinutes, date, openModal) {
+    openEventModalAtTime(date, getSlotMinutes(slotStartMinutes, e), openModal);
 }
 
-function getDropMinutes(hour, e) {
+function getSlotMinutes(slotStartMinutes, e) {
     const rect = e.currentTarget.getBoundingClientRect();
-    const minuteOffset = getMinuteOffset(e.clientY, rect.top);
-    return hour * 60 + minuteOffset;
+    const minuteOffset = getMinuteOffset(e.clientY, rect.top, SLOT_INTERVAL_MINUTES);
+    return slotStartMinutes + minuteOffset;
 }
 
 async function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, allEvents) {
@@ -40,35 +41,31 @@ async function dispatchDrop(payload, date, minutes, addEvent, editEvent, addExce
     }
 }
 
-function buildMergedProps(dropProps, isOver, setHighlightQuarter, handleClick) {
+function buildMergedProps(dropProps, setHighlightSegment, handleClick) {
     return {
         ...dropProps,
         onClick: handleClick,
-        onDragOver: createDragOverHandler(dropProps, setHighlightQuarter),
-        onDragLeave: createDragLeaveHandler(dropProps, setHighlightQuarter)
+        onDragOver: createDragOverHandler(dropProps, setHighlightSegment),
+        onDragLeave: createDragLeaveHandler(dropProps, setHighlightSegment)
     };
 }
 
-function createDragOverHandler(dropProps, setHighlightQuarter) {
+function createDragOverHandler(dropProps, setHighlightSegment) {
     return (e) => {
         if (dropProps.onDragOver) dropProps.onDragOver(e);
         const rect = e.currentTarget.getBoundingClientRect();
-        const quarter = Math.floor((e.clientY - rect.top) / (SLOT_HEIGHT / 4));
-        setHighlightQuarter(Math.min(3, Math.max(0, quarter)));
+        const segmentsPerSlot = SLOT_INTERVAL_MINUTES / SNAP_INTERVAL;
+        const segmentHeight = SLOT_PIXEL_HEIGHT / segmentsPerSlot;
+        const segment = Math.floor((e.clientY - rect.top) / segmentHeight);
+        setHighlightSegment(Math.min(segmentsPerSlot - 1, Math.max(0, segment)));
     };
 }
 
-function createDragLeaveHandler(dropProps, setHighlightQuarter) {
+function createDragLeaveHandler(dropProps, setHighlightSegment) {
     return (e) => {
         if (dropProps.onDragLeave) dropProps.onDragLeave(e);
-        setHighlightQuarter(null);
+        setHighlightSegment(null);
     };
-}
-
-function getClickMinutes(hour, e) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const minuteOffset = getMinuteOffset(e.clientY, rect.top);
-    return hour * 60 + minuteOffset;
 }
 
 function openEventModalAtTime(date, startMinutes, openModal) {

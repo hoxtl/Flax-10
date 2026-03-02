@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
 import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
 import { createResizeSession } from '../utils/resizeUtils';
-import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from '../calendarConstants';
+import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SLOT_INTERVAL_MINUTES, SNAP_INTERVAL } from '../calendarConstants';
 import { checkOverlapWithConfirm } from '../utils/overlapUtils';
 import { extractBaseEventId, hasRecurrence } from '../utils/eventUtils';
 
@@ -52,9 +52,9 @@ function updateHighlight(event, newHeight, setResizeHighlight) {
     const startMins = start.getHours() * 60 + start.getMinutes();
     const endMins = startMins + (newHeight / SLOT_HEIGHT) * 60;
     const snappedEndMins = Math.round(endMins / SNAP_INTERVAL) * SNAP_INTERVAL;
-    const hour = Math.floor(snappedEndMins / 60);
-    const quarter = Math.floor((snappedEndMins % 60) / SNAP_INTERVAL);
-    setResizeHighlight({ date: start, hour, quarter });
+    const slotStartMinutes = Math.floor(snappedEndMins / SLOT_INTERVAL_MINUTES) * SLOT_INTERVAL_MINUTES;
+    const segment = Math.floor((snappedEndMins - slotStartMinutes) / SNAP_INTERVAL);
+    setResizeHighlight({ date: start, slotStartMinutes, segment });
 }
 
 

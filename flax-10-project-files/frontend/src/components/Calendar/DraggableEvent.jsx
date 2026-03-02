@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Circle } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
@@ -8,16 +9,15 @@ import { getEventType } from './utils/eventUtils';
 import { useTags } from '../../context/TagContext';
 import './DraggableEvent.css';
 
-export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
+export function DraggableEvent({ event, style, readOnly }) {
     const eventType = getEventType(event);
-    if (readOnly || eventType !== 'personal') return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
-    return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
+    if (readOnly || eventType !== 'personal') return <ReadOnlyEvent event={event} style={style} />;
+    return <EditableEvent event={event} style={style} />;
 }
 
-function ReadOnlyEvent({ event, style, minWidth }) {
+function ReadOnlyEvent({ event, style }) {
     const { openPopup } = useEventPopup();
     const height = parseFloat(style?.height) || 0;
-    const width = parseWidthPercent(style?.width);
     const eventStyle = buildReadOnlyStyle(style, event);
     const className = getReadOnlyClassName(event);
 
@@ -28,7 +28,7 @@ function ReadOnlyEvent({ event, style, minWidth }) {
 
     return (
         <div className={className} style={eventStyle} onClick={handleClick}>
-            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+            <EventContent event={event} height={height} />
         </div>
     );
 }
@@ -40,7 +40,7 @@ function getReadOnlyClassName(event) {
     return 'draggable-event';
 }
 
-function EditableEvent({ event, style, minWidthForDetails }) {
+function EditableEvent({ event, style }) {
   const { openPopup } = useEventPopup();
   const { editEvent } = useEventActions();
     const theme = useTags().getTag(event.tag);
@@ -53,7 +53,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
   return (
     <EventCard event={event} style={style} theme={theme} refs={refs}
       resize={resize} isDragging={isDragging} dragProps={dragProps}
-      onClick={onClick} onContextMenu={onContextMenu} minWidth={minWidthForDetails} />
+      onClick={onClick} onContextMenu={onContextMenu} />
   );
 }
 
@@ -80,45 +80,52 @@ function createPopupContextHandler(refs, isDragging, isResizing, openPopup, even
   };
 }
 
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, onContextMenu, minWidth }) {
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, onContextMenu }) {
   const height = resize.resizePreview || parseFloat(style?.height) || 0;
-  const width = parseWidthPercent(style?.width);
   const className = buildClassName(isDragging, resize.isResizing);
   const renderStyle = buildStyle(style, resize.resizePreview, theme);
 
   return (
     <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} {...dragProps}>
-      <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+      <EventContent event={event} height={height} />
       <ResizeHandle onStart={resize.handleResizeStart} />
     </div>
   );
 }
 
-function parseWidthPercent(width) {
-    if (!width) return 100;
-    const match = width.match(/(\d+(?:\.\d+)?)/);
-    return match ? parseFloat(match[1]) : 100;
-}
 
 function ResizeHandle({ onStart }) {
     const onMouseDown = (e) => { e.stopPropagation(); e.preventDefault(); onStart(e); };
     return <div className="resize-handle" draggable={false} onMouseDown={onMouseDown} />;
 }
 
-function EventContent({ event, height, width, minWidth }) {
-    const showTime = height >= 30 && width >= minWidth;
-    const showDesc = height >= 60 && width >= minWidth;
+function EventContent({ event, height }) {
+    const isCompact = height < 36;
+    const showTime = !isCompact && height >= 20;
+    const showDesc = height >= 50;
     const isSociety = event.source === 'society';
+
+    if (isCompact) {
+        const startTime = formatTime(new Date(event.start_time));
+        return (
+            <div className="event-content">
+                <div className="event-title">
+                    {isSociety && <Circle size={5} style={{ flexShrink: 0 }} />}
+                    <span className="event-title-text">{event.title} · {startTime}</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="event-content">
             <div className="event-title">
-                {isSociety && <span className="society-badge">●</span>}
-                {event.title}
+                {isSociety && <Circle size={6} style={{ flexShrink: 0 }} />}
+                <span className="event-title-text">{event.title}</span>
             </div>
             {isSociety && showTime && <div className="society-name">{event.society_name}</div>}
             {showTime && <TimeDisplay event={event} />}
-            {showDesc && event.description && <div className="event-description">{event.description}</div>}
+            {showDesc && event.description && !event.title.includes(event.description) && <div className="event-description">{event.description}</div>}
         </div>
     );
 }

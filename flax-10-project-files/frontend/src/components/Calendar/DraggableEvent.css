@@ -38,10 +38,17 @@
 }
 
 .event-title {
+    display: flex;
+    align-items: center;
+    gap: 3px;
     font-weight: 600;
     color: var(--calendar-event-title);
     font-size: 0.625rem;
     line-height: 1.2;
+    overflow: hidden;
+}
+
+.event-title-text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

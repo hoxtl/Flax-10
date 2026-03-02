@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { Plus, CalendarPlus, Upload } from 'lucide-react';
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
+import { useEventModal } from "../../context/CalendarContext";
 import { addDays, formatDate, formatMonthYear } from './utils/dateUtils';
 import { getEvents } from "../../api/eventApi";
 import { importTimetable } from "../../api/timetableApi";
@@ -10,6 +12,43 @@ import TimetableImportModal from '../TimetableImportModal';
 import PillFilters from '../Tags/PillFilters';
 import './CalendarHeader.css';
 
+function ExpandableActions({ onCreateEvent, onImport }) {
+  const [expanded, setExpanded] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const h = e => { if (!ref.current?.contains(e.target)) setExpanded(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [expanded]);
+
+  return (
+    <div className="action-menu" ref={ref}>
+      <button
+        className={`icon-circle-btn${expanded ? ' action-menu-open' : ''}`}
+        onClick={() => setExpanded(p => !p)}
+        aria-label="Actions"
+        title="Actions"
+      >
+        <Plus size={18} strokeWidth={2.5} />
+      </button>
+      {expanded && (
+        <div className="action-menu-items">
+          <button className="action-menu-btn" title="New event" aria-label="New event"
+            onClick={() => { onCreateEvent(); setExpanded(false); }}>
+            <CalendarPlus size={16} strokeWidth={2} />
+          </button>
+          <button className="action-menu-btn" title="Import timetable" aria-label="Import timetable"
+            onClick={() => { onImport(); setExpanded(false); }}>
+            <Upload size={16} strokeWidth={2} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 async function handleImport(url, dispatch, selectedDate, viewMode) {
   await importTimetable(url);
   await reloadEvents(dispatch, selectedDate, viewMode);
@@ -17,31 +56,31 @@ async function handleImport(url, dispatch, selectedDate, viewMode) {
 
 function useCalendarHeader() {
   const { selectedDate, viewMode, filter, allEvents } = useCalendar();
+  const { openModal } = useEventModal();
   const dispatch = useCalendarDispatch();
   const [showImportModal, setShowImportModal] = useState(false);
   const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
   const jumpToDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
   const onImport = (url) => handleImport(url, dispatch, selectedDate, viewMode);
   const onFilterChange = (key) => dispatch({ type: 'SET_FILTER', payload: key });
-  return { selectedDate, viewMode, dispatch, filter, allEvents, showImportModal, setShowImportModal, navigate, jumpToDate, onImport, onFilterChange };
+  const onCreateEvent = () => openModal(getDefaultStart(selectedDate), null, selectedDate);
+  return { selectedDate, viewMode, dispatch, filter, allEvents, showImportModal, setShowImportModal, navigate, jumpToDate, onImport, onFilterChange, onCreateEvent };
 }
 
 export function CalendarHeader() {
-  const { selectedDate, viewMode, dispatch, filter, allEvents, showImportModal, setShowImportModal, navigate, jumpToDate, onImport, onFilterChange } = useCalendarHeader();
+  const { selectedDate, viewMode, dispatch, filter, allEvents, showImportModal, setShowImportModal, navigate, jumpToDate, onImport, onFilterChange, onCreateEvent } = useCalendarHeader();
   return (
     <>
       <div className="calendar-header">
-        <div className="calendar-toolbar">
+        <div className="calendar-toolbar-main">
           <div className="toolbar-left">
             <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
-            <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
-          </div>
-          <div className="toolbar-middle">
-            <PillFilters active={filter} onChange={onFilterChange} items={allEvents} compact={true} />
+            <ExpandableActions onCreateEvent={onCreateEvent} onImport={() => setShowImportModal(true)} />
           </div>
           <div className="toolbar-right">
             <ViewModeToggle viewMode={viewMode} dispatch={dispatch} />
-            <ImportButton onImport={() => setShowImportModal(true)} />
+            <PillFilters active={filter} onChange={onFilterChange} items={allEvents} compact={true} />
+            <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
           </div>
         </div>
       </div>
@@ -50,13 +89,10 @@ export function CalendarHeader() {
   );
 }
 
-function ImportButton({ onImport }) {
-  return (
-    <div className="btn-import-wrapper">
-      <button className="btn-import" onClick={onImport}>Import timetable</button>
-      <span className="btn-import-tooltip">Import your timetable using the shareable link</span>
-    </div>
-  );
+function getDefaultStart(selectedDate) {
+  const start = new Date(selectedDate);
+  start.setHours(9, 0, 0, 0);
+  return { start_time: start, end_time: new Date(start.getTime() + 60 * 60 * 1000) };
 }
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
