@@ -798,3 +798,15 @@
   max-width: 200px;
   line-height: 1.3;
 }
+
+:global(.homePopupButton) {
+  padding: 6px 12px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
