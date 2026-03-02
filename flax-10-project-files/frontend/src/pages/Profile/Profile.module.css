@@ -885,3 +885,9 @@
 }
 
 .section { display: flex; flex-direction: column; gap: 8px; }
+
+/* Mobile Styles */
+
+.desktopOnly { display: flex; }
+.mobileOnly { display: none; }
+.mobileHeaderWrap { flex-direction: column; margin-bottom: 24px; }
