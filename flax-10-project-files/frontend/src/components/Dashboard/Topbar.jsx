@@ -8,7 +8,7 @@ import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, Plus, ChevronDown } from "lucide-react";
+import { Bell, Plus, ChevronDown, Calendar, Timer } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,9 +41,13 @@ function TopBarGreeting({ user }) {
   );
 }
 
-function BrandLogo() {
+function BrandLogo({ onNavChange }) {
   return (
-    <div className={styles.brandContainer}>
+    <div
+      className={styles.brandContainer}
+      onClick={() => onNavChange?.("home")}
+      style={{ cursor: "pointer" }}
+    >
       <motion.div
         className={styles.logoMark}
         whileHover={{ rotate: 8, scale: 1.08 }}
@@ -122,14 +126,16 @@ function NavDropdown({ title, routes, activeNav, onNavChange }) {
 function TopBarNav({ activeNav, onNavChange, user }) {
   const routes = APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
 
-  const studyRoutes = routes.filter(r => ["home", "calendar", "timer", "modules"].includes(r.id));
-  const campusRoutes = routes.filter(r => ["map", "analytics"].includes(r.id));
+  const academicRoutes = routes.filter(r => ["modules"].includes(r.id));
+  const planningRoutes = routes.filter(r => ["analytics"].includes(r.id));
+  const campusRoutes = routes.filter(r => ["map"].includes(r.id));
   const socialRoutes = routes.filter(r => ["discover", "societies"].includes(r.id));
   const adminRoutes = routes.filter(r => ["admin"].includes(r.id));
 
   return (
     <nav className={styles.navContainer}>
-      {studyRoutes.length > 0 && <NavDropdown title="Study" routes={studyRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+      {planningRoutes.length > 0 && <NavDropdown title="Planning" routes={planningRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+      {academicRoutes.length > 0 && <NavDropdown title="Academic" routes={academicRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
       {campusRoutes.length > 0 && <NavDropdown title="Campus" routes={campusRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
       {socialRoutes.length > 0 && <NavDropdown title="Social" routes={socialRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
       {adminRoutes.length > 0 && <NavDropdown title="Admin" routes={adminRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
@@ -163,9 +169,23 @@ function ActionPill({ onAddClick }) {
   );
 }
 
+function TopBarTool({ icon: Icon, onClick, isActive, title }) {
+  return (
+    <button
+      className={`${styles.toolBtn} ${isActive ? styles.toolBtnActive : ""}`}
+      onClick={onClick}
+      title={title}
+    >
+      <Icon size={18} />
+    </button>
+  );
+}
+
 function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <div className={styles.actions}>
+      <TopBarTool icon={Calendar} onClick={() => onNavChange?.('calendar')} isActive={activeNav === 'calendar'} title="Calendar" />
+      <TopBarTool icon={Timer} onClick={() => onNavChange?.('timer')} isActive={activeNav === 'timer'} title="Timer" />
       <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <ActionPill onAddClick={onAddClick} />
       <ProfileDropdown
@@ -182,7 +202,7 @@ export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClic
   return (
     <header className={styles.container}>
       <div className={styles.leftSection}>
-        <BrandLogo />
+        <BrandLogo onNavChange={onNavChange} />
         <TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} />
       </div>
 

@@ -253,6 +253,32 @@
   gap: 12px;
 }
 
+.toolBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolBtn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.toolBtnActive {
+  background: var(--primary-light, rgba(158, 126, 93, 0.1));
+  color: var(--primary);
+  border-color: var(--primary-light, rgba(158, 126, 93, 0.1));
+}
+
 .addBtn {
   width: 36px;
   height: 36px;
@@ -329,6 +355,16 @@
   background: rgba(26, 19, 16, 0.80);
   border-bottom: 1px solid rgba(180, 164, 144, 0.10);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .toolBtn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="dark"] .toolBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
 }
 
 :root[data-theme="dark"] .activePill {
