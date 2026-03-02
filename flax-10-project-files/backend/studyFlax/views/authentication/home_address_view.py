@@ -6,21 +6,22 @@ from rest_framework.response import Response
 import json
 
 
-@require_http_methods(["GET", "POST"])
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def home_address_view(request):
     """
     Method to retrieve/save user's home address with coordinates
     """
     if request.method == "GET":
         user = request.user
-        return JsonResponse({
+        return Response({
             "home_address": user.home_address or "",
             "home_latitude": user.home_latitude,
             "home_longitude": user.home_longitude,
         })
     elif request.method == "POST":
         try:
-            data = json.loads(request.body)
+            data = request.data
             user = request.user
 
             user.home_address = data.get("home_address", "")
@@ -28,9 +29,9 @@ def home_address_view(request):
             user.home_longitude = data.get("home_longitude")
             user.save()
 
-            return JsonResponse({
+            return Response({
                 "success": True,
                 "home_address": user.home_address,
             })
         except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)}, status=400)
+            return Response({"success": False, "error": str(e)}, status=400)
