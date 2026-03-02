@@ -25,4 +25,34 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
         e.preventDefault();
         onSave(homeAddress);
     };
+
+    if (loading) {
+        return <div className={styles.loading}>Loading...</div>;
+    }
+
+    return (
+        <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Home Address</h2>
+                <p className={styles.sectionDescription}>
+                    View your home address on UniMap to plan your journey in advance!
+                </p>
+            </div>
+
+            <div className={styles.formGroup}>
+                <label htmlFor="homeAddress" className={styles.label}>
+                    Address
+                </label>
+                <input
+                  id="homeAddress"
+                  type="text"
+                  className={styles.input}
+                  value={homeAddress}
+                  onChange={e => setHomeAddress(e.target.value)}
+                  placeholder="e.g., 123 Example Street, London E1 B23"
+                  />
+                  {error && <p className={styles.error}>{error}</p>}
+            </div>
+        </form>
+    )
 }
