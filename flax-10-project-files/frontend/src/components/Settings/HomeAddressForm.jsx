@@ -53,6 +53,10 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
                   />
                   {error && <p className={styles.error}>{error}</p>}
             </div>
+
+            <button type="submit" className={styles.submitButton} disabled={isSaving}>
+                {isSaving ? "Saving address...": "Save Home Address"}
+            </button>
         </form>
-    )
+    );
 }
