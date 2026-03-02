@@ -4,6 +4,7 @@ import { SettingsTabs, SuccessBanner } from "../../components/Settings/SettingsU
 import AccountForm from "../../components/Settings/AccountForm";
 import SecurityForm from "../../components/Settings/SecurityForm";
 import PreferencesPanel from "../../components/Settings/PreferencesPanel";
+import HomeAddressForm from "../../components/Settings/HomeAddressForm";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
 
 function SettingsHeader({ onBack }) {
@@ -16,12 +17,13 @@ function SettingsHeader({ onBack }) {
 }
 
 function SettingsPanel({ activeTab, handlers, user }) {
-  const { isSaving, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave } = handlers;
+  const { isSaving, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, homeAddressError } = handlers;
   return (
     <div className={styles.panel}>
       {activeTab === "account" && <AccountForm user={user} onSave={handleAccountSave} isSaving={isSaving} />}
       {activeTab === "security" && <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />}
       {activeTab === "preferences" && <PreferencesPanel onSave={handlePreferencesSave} isSaving={isSaving} />}
+      {activeTab === "home" && <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />}
     </div>
   );
 }
