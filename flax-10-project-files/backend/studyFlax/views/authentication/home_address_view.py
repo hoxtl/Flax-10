@@ -18,3 +18,19 @@ def home_address(request):
             "home_latitude": user.home_latitude,
             "home_longitude": user.home_longitude,
         })
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user = request.user
+
+            user.home_address = data.get("home_address", "")
+            user.home_latitude = data.get("home_latitude")
+            user.home_longitude = data.get("home_longitude")
+            user.save()
+
+            return JsonResponse({
+                "success": True,
+                "home_address": user.home_address,
+            })
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
