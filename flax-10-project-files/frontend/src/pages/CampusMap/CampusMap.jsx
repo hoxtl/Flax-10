@@ -278,7 +278,11 @@ export default function CampusMap() {
   }, []);
 
   // Display user's home pointer on the map
-  
+  useEffect(() => {
+    if (!mapLoaded || !userHome) return;
+
+    
+  })
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
