@@ -2189,11 +2189,11 @@
 }
 
 .intRowNowBadgeNow {
-  color: #7B6751;
+  color: #5c4d3e;
 }
 
 .intRowNowBadgeNext {
-  color: #84A98C;
+  color: #7B6751;
 }
 
 /* "Upcoming" section container */
@@ -2212,7 +2212,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #84A98C;
+  color: #9a8778;
   margin-bottom: 2px;
 }
 

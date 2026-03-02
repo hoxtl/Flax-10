@@ -218,14 +218,15 @@
   gap: 10px;
   padding: 8px 10px 8px 0;
   border-radius: 10px;
-  background: rgba(192, 75, 55, 0.06);
-  border: 1px solid rgba(192, 75, 55, 0.15);
+  /* Neutral warm background — works with any TFL line colour */
+  background: rgba(123, 103, 81, 0.06);
+  border: 1px solid rgba(123, 103, 81, 0.15);
   overflow: hidden;
 }
 
 .tflCardSevere {
-  background: rgba(192, 30, 30, 0.08);
-  border-color: rgba(192, 30, 30, 0.25);
+  background: rgba(123, 103, 81, 0.09);
+  border-color: rgba(123, 103, 81, 0.22);
 }
 
 /* Left colour accent strip — colour set via inline style */
@@ -263,7 +264,7 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.65rem;
   font-weight: 500;
-  color: #9B3A2A;
+  color: #8a7060;
 }
 
 .tflCardLeave {
