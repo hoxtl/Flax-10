@@ -54,18 +54,24 @@ function ProfileBio({ user, profileData }) {
 }
 
 function ProfileHeader({ user, profileData, upcomingEventCount, handlers }) {
+  const year = profileData?.year || user?.year || "";
+  const major = profileData?.major || user?.major || "";
+  const username = (profileData || user)?.username || "guest";
+
   return (
-    <div className={styles.header}>
-      <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
-      <div className={styles.headerInfo}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.username}>{(profileData || user)?.username || "guest"}</h1>
-          <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button>
+    <>
+      <div className={`${styles.header} ${styles.desktopOnly}`}>
+        <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
+        <div className={styles.headerInfo}>
+          <div className={styles.headerTop}>
+            <h1 className={styles.username}>{username}</h1>
+            <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button>
+          </div>
+          <ProfileStats profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} />
+          <ProfileBio user={profileData || user} profileData={profileData} />
         </div>
-        <ProfileStats profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} />
-        <ProfileBio user={profileData || user} profileData={profileData} />
       </div>
-    </div>
+    </>
   );
 }
 
