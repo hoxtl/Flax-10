@@ -815,3 +815,7 @@
   background: var(--primary-strong);
   transform: translateY(-1px);
 }
+
+:global(.homePopupButton:active) {
+  transform: translateY(0);
+}
