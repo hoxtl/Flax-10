@@ -308,7 +308,12 @@ export default function CampusMap() {
         </button>
       </div>`);
 
+      homePointer.current = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([userHome.lng, userHome.lat])
+        .setPopup(homePopup.current)
+        .addTo(map.current);
       
+      homePointer.current.togglePopup();
   })
 
   // Update the marker on the map when user's start location changes
