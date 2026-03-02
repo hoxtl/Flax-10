@@ -12,6 +12,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=False)
 
     home_address = models.CharField(max_length=255, blank=True, null=True)
+    home_latitude = models.FloatField(blank=True, null=True)
 
     bio = models.TextField(blank=True, default="")
     profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
