@@ -20,4 +20,9 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
         };
         loadHomeAddress();
     }, []);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(homeAddress);
+    };
 }
