@@ -252,3 +252,9 @@
 .section {
   margin-bottom: 24px;
 }
+
+.sectionDescription {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
