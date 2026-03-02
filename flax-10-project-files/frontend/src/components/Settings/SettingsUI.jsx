@@ -13,6 +13,7 @@ export function SettingsTabs({ activeTab, onChange }) {
     { id: "account", label: "Account" },
     { id: "security", label: "Security" },
     { id: "preferences", label: "Preferences" },
+    { id: "home", label: "Home Address"},
   ];
   return (
     <div className={styles.tabs}>
