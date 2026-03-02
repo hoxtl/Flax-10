@@ -68,34 +68,6 @@ export default function IntelligenceRow({
         <div className={styles.headerLeft}>
           <span className={styles.headerLabel}>{getTodayLabel()}</span>
           <h2 className={styles.headerTitle}>{getGreeting(displayName)}</h2>
-          {daySummary && (
-            <div className={styles.headerDayProgress}>
-              <div className={styles.headerDayProgressTrack}>
-                <div
-                  className={styles.headerDayProgressFill}
-                  style={{ width: `${Math.min(daySummary.pct, 100)}%` }}
-                />
-              </div>
-              <div className={styles.headerDayProgressMeta}>
-                <span className={styles.headerDayProgressCount}>
-                  {daySummary.done}/{daySummary.total} done · {Math.round(daySummary.pct)}%
-                </span>
-                {daySummary.overdue > 0 && (
-                  <span className={styles.headerDayProgressOverdue}>
-                    ⚠ {daySummary.overdue} overdue
-                  </span>
-                )}
-                {daySummary.streak > 0 && (
-                  <span className={styles.headerDayProgressStreak}>
-                    🔥 {daySummary.streak}d streak
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-          {scheduleInsight && (
-            <p className={styles.scheduleInsight}>{scheduleInsight}</p>
-          )}
         </div>
         <div className={styles.headerRight}>
           <p className={styles.headerSubtitle}>{dailyPulse}</p>
