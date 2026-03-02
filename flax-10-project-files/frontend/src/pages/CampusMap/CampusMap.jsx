@@ -290,6 +290,13 @@ export default function CampusMap() {
       homePopup.current = null;
     }
 
+    const el = document.createElement('div');
+    el.className = styles.homeMarker;
+    el.innerHTML = '🏠';
+    el.title = 'User Home';
+
+    
+
   })
 
   // Update the marker on the map when user's start location changes
