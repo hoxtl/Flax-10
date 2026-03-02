@@ -87,6 +87,21 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers }) {
             </button>
           </div>
         </div>
+
+        <div className={styles.mobileStatsGrid}>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onModulesClick}>
+            <span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Modules</span>
+          </div>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onTasksClick}>
+            <span className={styles.mobileStatValue}>{profileData?.task_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Tasks</span>
+          </div>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onEventsClick}>
+            <span className={styles.mobileStatValue}>{upcomingEventCount || 0}</span>
+            <span className={styles.mobileStatLabel}>Events</span>
+          </div>
+        </div>
       </div>
     </>
   );
