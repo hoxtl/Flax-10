@@ -77,6 +77,32 @@
 					npm ci
 				fi
 				
+				cd "$BACKEND_DIR"
+				python manage.py makemigrations --noinput
+				python manage.py migrate --noinput
+				python manage.py seed
+				
+				echo "Database migration and seeding accomplished. Starting dev server...\n"
+				python manage.py runserver &
+				
+				echo "Generating backend coverage test report..."
+				python -m coverage erase
+				python -m coverage run manage.py test
+				python -m coverage report -m
+
+				python -m coverage html
+				open htmlcov/index.html
+				
+				cd "$FRONTEND_DIR"
+				npm run build
+				echo "Starting vite dev server..."
+				npm run dev &
+				
+				echo "Generating frontend coverage report..."
+				npm run test -- --run
+				npm run coverage
+				open coverage/index.html
+				
 				echo "\n"
 				echo "Python: $(python --version)"
 				echo "NodeJS: $(node --version)"
