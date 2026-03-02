@@ -7,8 +7,8 @@ export default function BasePill({ label, count, isActive, onClick, color }) {
     return (
         <button type="button" className={className} style={activeStyle} onClick={onClick}>
             {color && !isActive && <span className={styles.colorDot} style={{ backgroundColor: color }} />}
-            {count !== undefined && <span className={styles.count}>{count}</span>}
-            {label}
+            <span>{label}</span>
+            {count !== undefined && <span className={styles.countBadge}>{count}</span>}
         </button>
     );
 }

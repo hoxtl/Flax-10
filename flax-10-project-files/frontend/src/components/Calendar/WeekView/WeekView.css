@@ -96,28 +96,16 @@
 .day-column {
     display: flex;
     flex-direction: column;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--calendar-grid-major);
     position: relative;
     flex: 1;
 }
 
 .hour-cell {
-    border-bottom: 1px solid var(--border) !important;
+    border-bottom: 1px solid var(--calendar-grid-major) !important;
     box-sizing: border-box;
     position: relative;
-    background-image: linear-gradient(to bottom,
-            transparent 24%,
-            var(--hover) 25%,
-            var(--hover) 26%,
-            transparent 27%,
-            transparent 49%,
-            var(--active) 50%,
-            var(--active) 51%,
-            transparent 52%,
-            transparent 74%,
-            var(--hover) 75%,
-            var(--hover) 76%,
-            transparent 77%);
+    background-image: none;
     flex-shrink: 0;
 }
 
@@ -129,7 +117,7 @@
 }
 
 .hour-cell:hover {
-    background-color: var(--hover);
+    background-color: var(--calendar-cell-hover);
 }
 
 .hour-cell:nth-last-child(1) {

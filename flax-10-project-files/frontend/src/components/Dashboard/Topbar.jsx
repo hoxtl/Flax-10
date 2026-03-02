@@ -5,7 +5,7 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, Plus } from "lucide-react";
+import { Bell } from "lucide-react";
 
 function TopBarGreeting() {
   return (
@@ -25,37 +25,33 @@ function SearchInput() {
   );
 }
 
-function QuickTabs({ onAddClick }) {
-  const { togglePanel, notifications } = useNotifications();
+function NotificationTab() {
+  const { togglePanel, closePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
-  const tabs = [
-    { title: "Add", icon: Plus, autoCollapse: true },
-    { type: "separator" },
-    { title: "Notifications", icon: Bell, badge: unreadCount },
-  ];
+  const tabs = [{ title: "Notifications", icon: Bell, badge: unreadCount }];
   const handleChange = (index) => {
-    if (index === 0) onAddClick?.();
-    if (index === 2) togglePanel();
+    if (index === 0) togglePanel();
+    if (index === null) closePanel();
   };
   return <ExpandableTabs tabs={tabs} onChange={handleChange} />;
 }
 
-function ActionPill({ onAddClick }) {
+function ActionPill() {
   return (
     <div className={styles.actionPill}>
       <ThemeToggle />
       <div className={styles.pillDivider} />
-      <QuickTabs onAddClick={onAddClick} />
+      <NotificationTab />
       <NotificationPanel />
     </div>
   );
 }
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick }) {
+function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <div className={styles.actions}>
       <SearchInput />
-      <ActionPill onAddClick={onAddClick} />
+      <ActionPill />
       <ProfileDropdown
         user={user}
         onSettingsClick={onSettingsClick}
@@ -66,13 +62,12 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
   );
 }
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting />
       <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <TopBarActions
-        onAddClick={onAddClick}
         user={user}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}

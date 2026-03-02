@@ -2,14 +2,19 @@ export function ViewModeToggle({ viewMode, dispatch }) {
     const modes = ['day', 'week', 'month', 'year'];
 
     return (
-        <div className="view-toggle">
-            <select
-                value={viewMode}
-                onChange={(e) => dispatch({ type: 'SET_VIEW_MODE', payload: e.target.value })}
-                className="view-select"
-            >
-                {modes.map(m => <option key={m} value={m}>{capitalize(m)}</option>)}
-            </select>
+        <div className="view-toggle" role="tablist" aria-label="Calendar view mode">
+            {modes.map((mode) => (
+                <button
+                    key={mode}
+                    type="button"
+                    role="tab"
+                    aria-selected={viewMode === mode}
+                    className={`view-chip ${viewMode === mode ? 'active' : ''}`}
+                    onClick={() => dispatch({ type: 'SET_VIEW_MODE', payload: mode })}
+                >
+                    {capitalize(mode)}
+                </button>
+            ))}
         </div>
     );
 }

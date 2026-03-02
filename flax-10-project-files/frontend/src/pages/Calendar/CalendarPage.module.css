@@ -4,8 +4,3 @@
     flex-direction: column;
     overflow: hidden;
 }
-
-.filters {
-    padding: 12px 32px 0;
-    flex-shrink: 0;
-}

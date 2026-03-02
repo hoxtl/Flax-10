@@ -31,7 +31,7 @@ vi.mock('../../context/NotificationContext', () => ({
 
 describe('TopBar', () => {
   it('renders static branding', () => {
-    render(<TopBar user={{ first_name: 'Kausar' }} />);
+    render(<TopBar user={{ first_name: 'Jane' }} />);
     expect(screen.getByText('StudyFlax')).toBeTruthy();
     expect(screen.getByText('Built for calm study')).toBeTruthy();
   });
@@ -42,7 +42,7 @@ describe('TopBar', () => {
   });
 
   it('renders regardless of user object shape', () => {
-    render(<TopBar user={{ username: 'kausar' }} />);
+    render(<TopBar user={{ username: 'jane' }} />);
     expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 

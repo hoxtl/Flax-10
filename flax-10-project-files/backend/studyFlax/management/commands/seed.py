@@ -155,19 +155,20 @@ class Command(BaseCommand):
             )
 
     def create_tags(self):
-        """Seed Tag instances from fixtures, associating each with a random user or category."""
+        """Seed shared default Tag instances from fixtures for all users."""
         self.stdout.write("Seeding tags...")
         from faker import Faker
         f = Faker('en_GB')
+        Tag.objects.get_or_create(
+            name='Other',
+            user=None,
+            defaults={'is_default': True, 'default_duration': 60, 'color': '#9E7E5D', 'icon': '🏷️'},
+        )
         for name, duration in tag_fixtures:
-            category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-            user = (
-                category.user if category and category.user
-                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
-            )
             Tag.objects.get_or_create(
-                name=name, user=user,
-                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
+                name=name,
+                user=None,
+                defaults={'category': None, 'is_default': True, 'default_duration': duration, 'color': f.hex_color()},
             )
 
     def create_events_for_users(self):

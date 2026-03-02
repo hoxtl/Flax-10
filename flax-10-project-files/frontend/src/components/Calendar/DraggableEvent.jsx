@@ -6,7 +6,6 @@ import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
 import { getEventType } from './utils/eventUtils';
 import { useTags } from '../../context/TagContext';
-import { EventMenuButton } from './EventMenu';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
@@ -42,21 +41,20 @@ function getReadOnlyClassName(event) {
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
-    const { openModal } = useEventModal();
-    const { openPopup, closePopup } = useEventPopup();
-    const { removeEvent, editEvent } = useEventActions();
+  const { openPopup } = useEventPopup();
+  const { editEvent } = useEventActions();
     const theme = useTags().getTag(event.tag);
-    const refs = useEventRefs();
-    const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
-    const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
-    const onClick = createPopupClickHandler(refs, isDragging, resize.isResizing, openPopup, event);
+  const refs = useEventRefs();
+  const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
+  const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
+  const onClick = createPopupClickHandler(refs, isDragging, resize.isResizing, openPopup, event);
+  const onContextMenu = createPopupContextHandler(refs, isDragging, resize.isResizing, openPopup, event);
 
-    return (
-        <EventCard event={event} style={style} theme={theme} refs={refs}
-            resize={resize} isDragging={isDragging} dragProps={dragProps}
-            onClick={onClick} minWidth={minWidthForDetails}
-            onEdit={() => { closePopup(); openModal(event); }} onDelete={() => { closePopup(); removeEvent(event.id); }} />
-    );
+  return (
+    <EventCard event={event} style={style} theme={theme} refs={refs}
+      resize={resize} isDragging={isDragging} dragProps={dragProps}
+      onClick={onClick} onContextMenu={onContextMenu} minWidth={minWidthForDetails} />
+  );
 }
 
 function useEventRefs() {
@@ -64,27 +62,36 @@ function useEventRefs() {
 }
 
 function createPopupClickHandler(refs, isDragging, isResizing, openPopup, event) {
-    return (e) => {
-        if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
-        if (isDragging || isResizing) return;
-        const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect);
-    };
+  return (e) => {
+    if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
+    if (isDragging || isResizing) return;
+    const rect = refs.event.current?.getBoundingClientRect();
+    openPopup(event, rect);
+  };
 }
 
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onEdit, onDelete }) {
-    const height = resize.resizePreview || parseFloat(style?.height) || 0;
-    const width = parseWidthPercent(style?.width);
-    const className = buildClassName(isDragging, resize.isResizing);
-    const renderStyle = buildStyle(style, resize.resizePreview, theme);
+function createPopupContextHandler(refs, isDragging, isResizing, openPopup, event) {
+  return (e) => {
+    e.preventDefault();
+    if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
+    if (isDragging || isResizing) return;
+    const rect = refs.event.current?.getBoundingClientRect();
+    openPopup(event, rect);
+  };
+}
 
-    return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
-            {onEdit && onDelete && <EventMenuButton onEdit={onEdit} onDelete={onDelete} />}
-            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
-            <ResizeHandle onStart={resize.handleResizeStart} />
-        </div>
-    );
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, onContextMenu, minWidth }) {
+  const height = resize.resizePreview || parseFloat(style?.height) || 0;
+  const width = parseWidthPercent(style?.width);
+  const className = buildClassName(isDragging, resize.isResizing);
+  const renderStyle = buildStyle(style, resize.resizePreview, theme);
+
+  return (
+    <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} {...dragProps}>
+      <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+      <ResizeHandle onStart={resize.handleResizeStart} />
+    </div>
+  );
 }
 
 function parseWidthPercent(width) {

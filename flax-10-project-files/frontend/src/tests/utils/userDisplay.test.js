@@ -7,15 +7,15 @@ describe('getDisplayName', () => {
   });
 
   it('returns first_name when present', () => {
-    expect(getDisplayName({ first_name: 'Kausar', username: 'kk' })).toBe('Kausar');
+    expect(getDisplayName({ first_name: 'Jane', username: 'jd' })).toBe('Jane');
   });
 
   it('returns username when first_name is empty', () => {
-    expect(getDisplayName({ first_name: '', username: 'kk' })).toBe('kk');
+    expect(getDisplayName({ first_name: '', username: 'jd' })).toBe('jd');
   });
 
   it('returns username when first_name is whitespace', () => {
-    expect(getDisplayName({ first_name: '   ', username: 'kk' })).toBe('kk');
+    expect(getDisplayName({ first_name: '   ', username: 'jd' })).toBe('jd');
   });
 
   it('returns empty string when both are empty', () => {
@@ -29,15 +29,15 @@ describe('getDisplayName', () => {
 
 describe('getPreferredFirstName', () => {
   it('returns first_name when present', () => {
-    expect(getPreferredFirstName({ first_name: 'Kausar' })).toBe('Kausar');
+    expect(getPreferredFirstName({ first_name: 'Jane' })).toBe('Jane');
   });
 
   it('returns username when first_name is empty', () => {
-    expect(getPreferredFirstName({ first_name: '', username: 'kk' })).toBe('kk');
+    expect(getPreferredFirstName({ first_name: '', username: 'jd' })).toBe('jd');
   });
 
   it('returns username when first_name is whitespace', () => {
-    expect(getPreferredFirstName({ first_name: '  ', username: 'kk' })).toBe('kk');
+    expect(getPreferredFirstName({ first_name: '  ', username: 'jd' })).toBe('jd');
   });
 
   it('returns empty string when both missing', () => {

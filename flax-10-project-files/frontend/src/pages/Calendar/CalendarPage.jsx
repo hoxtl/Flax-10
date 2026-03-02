@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Calendar } from '../../components/Calendar/Calendar';
-import PillFilters from '../../components/Tags/PillFilters';
-import { useCalendar, useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
+import { useEventModal, useEventPopup } from '../../context/CalendarContext';
 import styles from './CalendarPage.module.css';
 import { EventModal } from '../../components/Calendar/EventModal/EventModal';
 import { EventDetailPopup } from '../../components/Calendar/EventDetailPopup';
@@ -12,16 +11,8 @@ import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
 
 export default function CalendarPage() {
-    const { filter, allEvents } = useCalendar();
-    const dispatch = useCalendarDispatch();
-    const handleFilterChange = (key) => {
-        dispatch({ type: 'SET_FILTER', payload: key });
-    };
     return (
         <div className={styles.page}>
-            <div className={styles.filters}>
-                <PillFilters active={filter} onChange={handleFilterChange} items={allEvents} />
-            </div>
             <Calendar />
             <EventModalContainer />
             <EventPopupContainer />

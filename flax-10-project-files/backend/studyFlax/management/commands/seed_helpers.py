@@ -111,7 +111,9 @@ def build_event(user, title, tags, day_offset, hour):
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
     user_tags = [t for t in tags if t.user == user or t.user is None]
-    tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
+    tag = _match_tag_for_title(title, user_tags) if user_tags else None
+    if not tag and user_tags and random.random() > 0.35:
+        tag = random.choice(user_tags)
     return CalendarEvent(
         user=user,
         title=title,
@@ -123,6 +125,22 @@ def build_event(user, title, tags, day_offset, hour):
         priority=random.choice(['low', 'medium', 'high', 'urgent']),
         recurrence_rule=None,
     )
+
+
+def _match_tag_for_title(title, user_tags):
+    lower = title.lower()
+    lookup = {tag.name.lower(): tag for tag in user_tags}
+    patterns = [
+        ("lecture", "lecture"), ("seminar", "lecture"), ("lab", "practical"), ("practical", "practical"),
+        ("study", "study session"), ("revision", "study session"), ("mock exam", "study session"),
+        ("meeting", "meeting"), ("gym", "gym"), ("run", "gym"), ("yoga", "gym"),
+        ("lidl", "grocery shopping"), ("tesco", "grocery shopping"), ("shop", "grocery shopping"),
+        ("deadline", "assignment deadline"), ("submission", "assignment deadline"),
+    ]
+    for needle, tag_name in patterns:
+        if needle in lower and tag_name in lookup:
+            return lookup[tag_name]
+    return None
 
 
 def _fresh_week_titles():

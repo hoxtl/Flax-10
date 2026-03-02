@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models import Tag, Category
+from studyFlax.fixtures.data_fixtures import tag_fixtures
 from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
@@ -16,9 +17,24 @@ def tag_list(request):
 
 
 def get_tags(request):
+    ensure_default_tags_exist()
     tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True))
     serialiser = TagSerialiser(tags, many=True)
     return Response(serialiser.data)
+
+
+def ensure_default_tags_exist():
+    Tag.objects.get_or_create(
+        name='Other',
+        user=None,
+        defaults={'is_default': True, 'default_duration': 60, 'color': '#9E7E5D', 'icon': '🏷️'},
+    )
+    for name, duration in tag_fixtures:
+        Tag.objects.get_or_create(
+            name=name,
+            user=None,
+            defaults={'is_default': True, 'default_duration': duration},
+        )
 
 
 def create_tag(request):

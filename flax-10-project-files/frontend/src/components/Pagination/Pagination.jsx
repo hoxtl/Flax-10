@@ -23,9 +23,5 @@ export function BackToTop() {
         return () => container.removeEventListener('scroll', onScroll);
     }, []);
     if (!visible) return null;
-    return (
-        <button className={styles.backToTop} onClick ={() => document.querySelector('[class*="content"]')?.scrollTo({top: 0, behavior: 'smooth'})}>
-            <ArrowUp size={16} />
-        </button>
-    );
+    return <button className={styles.backToTop} onClick={() => document.querySelector('[class*="content"]')?.scrollTo({top: 0, behavior: 'smooth'})}><ArrowUp size={16} /></button>;
 }

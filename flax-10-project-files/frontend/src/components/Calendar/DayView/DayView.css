@@ -23,7 +23,7 @@
 .time-labels-column {
     width: 60px;
     flex-shrink: 0;
-    border-right: 1px solid var(--border);
+    border-right: 1px solid var(--calendar-grid-major);
 }
 
 .time-label-row {
@@ -54,26 +54,14 @@
 
 .time-slot {
     height: 60px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--calendar-grid-major);
     box-sizing: border-box;
     position: relative;
-    background-image: linear-gradient(to bottom,
-            transparent 24%,
-            var(--hover) 25%,
-            var(--hover) 26%,
-            transparent 27%,
-            transparent 49%,
-            var(--active) 50%,
-            var(--active) 51%,
-            transparent 52%,
-            transparent 74%,
-            var(--hover) 75%,
-            var(--hover) 76%,
-            transparent 77%);
+    background-image: none;
 }
 
 .time-slot:hover {
-    background-color: var(--hover);
+    background-color: var(--calendar-cell-hover);
 }
 
 .time-slot.drop-target {

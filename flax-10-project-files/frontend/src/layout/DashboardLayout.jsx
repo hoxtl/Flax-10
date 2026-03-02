@@ -8,7 +8,6 @@ import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
-import { useLocation } from "react-router-dom";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -88,14 +87,13 @@ function EventModalGate({ modal }) {
 }
 
 function useDashboardState(activeNav, onNavChange) {
-  const location = useLocation();
   const isMobile = useIsMobile(900);
   const user = useMemo(() => getUser(), []);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
+  const showWeekBar = false;
   const modal = useEventModal();
   const onPickNav = (id) => { onNavChange?.(id); setMobileSidebarOpen(false); };
   const onSelectType = (type) => { setShowQuickAdd(false); modal.openModal(null, type, selectedDate); };

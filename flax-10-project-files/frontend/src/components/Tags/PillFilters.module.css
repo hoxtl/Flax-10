@@ -8,16 +8,53 @@
   scrollbar-width: none;
 }
 
+.rowCompact {
+  padding: 0;
+}
+
+.compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compactSelect {
+  min-width: 190px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--pill-bg);
+  color: var(--text);
+  padding: 0 34px 0 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.compactSelect:hover {
+  background: var(--pill-hover);
+}
+
+.compactSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(158, 126, 93, 0.22);
+}
+
+.manageBtn {
+  white-space: nowrap;
+  height: 36px;
+}
+
 .row::-webkit-scrollbar {
   display: none;
 }
 
 /* Base pill style */
 .pill {
-  margin-bottom: 8px;
-  border: none;
+  margin-bottom: 0;
+  border: 1px solid var(--border);
   border-radius: 22px;
-  padding: 7px 17px;
+  padding: 7px 12px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -35,7 +72,7 @@
 /* Inactive */
 .inactive {
   background: var(--pill-bg);
-  color: var(--muted);
+  color: var(--text);
   box-shadow: none;
 }
 
@@ -45,11 +82,31 @@
   box-shadow: 0 6px 18px rgba(158, 126, 93, 0.18);
   color: #fff;
   font-weight: 700;
+  border-color: transparent;
 }
 
 /* Count inside */
 .count {
   font-weight: 800;
+}
+
+.countBadge {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  background: rgba(74, 52, 33, 0.1);
+  color: inherit;
+}
+
+.active .countBadge {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Color dot for custom tags */

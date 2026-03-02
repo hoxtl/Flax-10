@@ -5,14 +5,16 @@ import { useTags } from "../../context/TagContext";
 import TagManagerModal from "./TagManagerModal";
 import BasePill from "./BasePill";
 
-export default function PillFilters({ active, onChange, items }) {
+export default function PillFilters({ active, onChange, items, compact = false }) {
   const { tags } = useTags();
   const [showManager, setShowManager] = useState(false);
   const counts = countByType(items);
-  const pills = getAllPills(tags);
+  const pills = getAllPills(tags, counts);
+  if (compact) return <CompactFilters active={active} onChange={onChange} pills={pills} counts={counts} onManage={() => setShowManager(true)} showManager={showManager} closeManager={() => setShowManager(false)} />;
+  const rowClass = styles.row;
   return (
     <>
-      <div className={styles.row}>
+      <div className={rowClass}>
         {pills.map((p) => (
           <PillItem
             key={p.key} pill={p} active={active}
@@ -26,11 +28,50 @@ export default function PillFilters({ active, onChange, items }) {
   );
 }
 
+function CompactFilters({ active, onChange, pills, counts, onManage, showManager, closeManager }) {
+  const options = pills.filter((pill) => pill.key === "all" || counts[pill.key] > 0 || checkActive(active, pill.key));
+  const selected = getSelectedKey(active, options);
+  return (
+    <>
+      <div className={styles.compact}>
+        <select className={styles.compactSelect} value={selected} onChange={(e) => onChange(e.target.value)} aria-label="Filter calendar events by tag">
+          {options.map((pill) => <option key={pill.key} value={pill.key}>{pill.label} ({counts[pill.key] || 0})</option>)}
+        </select>
+        <button className={`${styles.pill} ${styles.inactive} ${styles.manageBtn}`} onClick={onManage} aria-label="Manage tags">Manage tags</button>
+      </div>
+      {showManager && <TagManagerModal onClose={closeManager} />}
+    </>
+  );
+}
+
+function getSelectedKey(active, options) {
+  const keys = Array.isArray(active) ? active : [active];
+  return keys.find((key) => options.some((option) => option.key === key)) || "all";
+}
+
 /**
  * Combines the static 'All' option with dynamic tags from context.
  */
-function getAllPills(tags) {
-  return [{ key: "all", label: "All" }, ...tags.map(t => ({ key: t.label.toLowerCase(), label: t.label }))];
+function getAllPills(tags, counts) {
+  const seen = new Set();
+  const unique = [];
+  for (const tag of tags) {
+    const key = tag.label.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push({ key, label: tag.label });
+  }
+  for (const key of Object.keys(counts)) {
+    if (key === "all" || key === "ratified" || key === "unratified" || seen.has(key)) continue;
+    seen.add(key);
+    unique.push({ key, label: toLabel(key) });
+  }
+  return [{ key: "all", label: "All" }, ...unique];
+}
+
+function toLabel(key) {
+  if (key === "other") return "Untagged";
+  return key.replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
 /**
@@ -58,7 +99,7 @@ function checkActive(active, key) {
 }
 
 function ManagerButton({ onClick }) {
-  return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage Tags">✎</button>;
+  return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage tags">Manage tags</button>;
 }
 
 function PillRow({ pills, active, counts, onChange, onManage }) {
