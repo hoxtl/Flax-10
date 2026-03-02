@@ -81,6 +81,11 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers }) {
           </div>
           <h1 className={styles.mobileUsername}>{username}</h1>
           <p className={styles.mobileBio}>{year} {year && major ? '·' : ''} {major}</p>              
+          <div className={styles.mobileActions}>
+            <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>
+              Edit Profile
+            </button>
+          </div>
         </div>
       </div>
     </>
