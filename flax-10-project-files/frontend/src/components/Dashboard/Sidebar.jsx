@@ -33,11 +33,10 @@ function BrandName() {
   );
 }
 
-function SidebarHeader({ open }) {
+function SidebarHeader() {
   return (
     <div className={styles.header}>
       <LogoMark />
-      <AnimatePresence>{open && <BrandName />}</AnimatePresence>
     </div>
   );
 }
@@ -107,6 +106,6 @@ export default function Sidebar({ active, onChange, user }) {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <SidebarHeader open={open} />
+      <SidebarHeader />
       <SidebarNav active={active} onChange={onChange} open={open} user={user}/>
     </motion.aside>);}

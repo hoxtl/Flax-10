@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
@@ -70,6 +70,20 @@ function resolveRouteContent(activeNav, user) {
   return el;
 }
 
+function getActiveNavFromPath(pathname) {
+  if (pathname === "/settings") return "settings";
+  if (pathname === "/profile") return "profile";
+  const route = APP_ROUTES.find((r) => r.path === pathname);
+  return route ? route.id : "home";
+}
+
+function getPathFromActiveNav(activeNav) {
+  if (activeNav === "settings") return "/settings";
+  if (activeNav === "profile") return "/profile";
+  const route = APP_ROUTES.find((r) => r.id === activeNav);
+  return route ? route.path : "/";
+}
+
 function onExplore(setShowWelcome, setActiveNav) {
   localStorage.setItem(WELCOME_SEEN_KEY, "1");
   setShowWelcome(false);
@@ -120,13 +134,12 @@ function useThemeState(authed) {
 }
 
 function useAppState() {
-  const [activeNav, setActiveNav] = useState("home");
   const [user, setUser] = useState(() => readUser());
   const [authed, setAuthed] = useState(() => isAuthenticated());
   const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
   useSyncAuth(setAuthed, setUser, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
-  return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
+  return { initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
 }
 
 function useOnboardingCheck() {
@@ -216,11 +229,7 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
   return (
     <div style={DASH_WRAP_STYLE}>
-      <AnimatePresence>
-        <motion.div key={activeNav} {...DASH_MOTION}>
-          <DashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
-        </motion.div>
-      </AnimatePresence>
+      <DashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
     </div>
   );
 }
@@ -254,14 +263,23 @@ function renderScreen(screen, state) {
 
 // Root
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const state = useAppState();
-  if (state.isLoadingTheme) return null;
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
+  const activeNav = getActiveNavFromPath(location.pathname);
+  const setActiveNav = (nextNav) => {
+    const targetPath = getPathFromActiveNav(nextNav);
+    if (location.pathname !== targetPath) navigate(targetPath);
+  };
+
+  if (state.isLoadingTheme) return null;
+
   return (
     <ThemeProvider initialTheme={state.initialTheme}>
       <div style={ROOT_STYLE}>
         <AnimatePresence>
-          {renderScreen(screen, state)}
+          {renderScreen(screen, { ...state, activeNav, setActiveNav })}
         </AnimatePresence>
       </div>
     </ThemeProvider>

@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Settings2 } from "lucide-react";
 import styles from "./PillFilters.module.css";
 import { countByType } from "./utils/pillUtils";
 import { useTags } from "../../context/TagContext";
 import TagManagerModal from "./TagManagerModal";
 import BasePill from "./BasePill";
+import AnimatedDropdown from "../ui/AnimatedDropdown";
 
 export default function PillFilters({ active, onChange, items, compact = false }) {
   const { tags } = useTags();
@@ -30,14 +32,22 @@ export default function PillFilters({ active, onChange, items, compact = false }
 
 function CompactFilters({ active, onChange, pills, counts, onManage, showManager, closeManager }) {
   const options = pills.filter((pill) => pill.key === "all" || counts[pill.key] > 0 || checkActive(active, pill.key));
-  const selected = getSelectedKey(active, options);
+  const selectedKey = getSelectedKey(active, options);
+  const selectedDisplay = toDropdownValue(getPillLabel(selectedKey, options), counts[selectedKey] || 0);
+  const dropdownOptions = options.map((pill) => toDropdownValue(pill.label, counts[pill.key] || 0));
+  const optionMap = Object.fromEntries(options.map((pill) => [toDropdownValue(pill.label, counts[pill.key] || 0), pill.key]));
   return (
     <>
       <div className={styles.compact}>
-        <select className={styles.compactSelect} value={selected} onChange={(e) => onChange(e.target.value)} aria-label="Filter calendar events by tag">
-          {options.map((pill) => <option key={pill.key} value={pill.key}>{pill.label} ({counts[pill.key] || 0})</option>)}
-        </select>
-        <button className={`${styles.pill} ${styles.inactive} ${styles.manageBtn}`} onClick={onManage} aria-label="Manage tags">Manage tags</button>
+        <div className={styles.compactDropdown}>
+          <AnimatedDropdown
+            value={selectedDisplay}
+            onChange={(displayValue) => onChange(optionMap[displayValue] || "all")}
+            placeholder="Filter by tag"
+            options={dropdownOptions}
+          />
+        </div>
+        <button className={styles.manageIconBtn} onClick={onManage} title="Manage tags" aria-label="Manage tags"><Settings2 size={15} /></button>
       </div>
       {showManager && <TagManagerModal onClose={closeManager} />}
     </>
@@ -47,6 +57,14 @@ function CompactFilters({ active, onChange, pills, counts, onManage, showManager
 function getSelectedKey(active, options) {
   const keys = Array.isArray(active) ? active : [active];
   return keys.find((key) => options.some((option) => option.key === key)) || "all";
+}
+
+function getPillLabel(key, options) {
+  return options.find((pill) => pill.key === key)?.label || "All";
+}
+
+function toDropdownValue(label, count) {
+  return `${label} (${count})`;
 }
 
 /**

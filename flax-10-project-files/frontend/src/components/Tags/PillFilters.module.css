@@ -18,6 +18,25 @@
   gap: 8px;
 }
 
+.compactDropdown {
+  width: 190px;
+}
+
+.compactDropdown :global(.dropdownBtn) {
+  height: 40px;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0 12px;
+}
+
+.compactDropdown :global(.dropdownMenu) {
+  border-radius: 12px;
+  z-index: 120;
+}
+
 .compactSelect {
   min-width: 190px;
   height: 36px;
@@ -42,7 +61,28 @@
 
 .manageBtn {
   white-space: nowrap;
-  height: 36px;
+  height: 40px;
+}
+
+.manageIconBtn {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.manageIconBtn:hover {
+  background: var(--pill-hover);
+  color: var(--text);
 }
 
 .row::-webkit-scrollbar {

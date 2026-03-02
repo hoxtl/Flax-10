@@ -12,190 +12,238 @@
 .modal {
     background: var(--panel);
     width: 90%;
-    max-width: 400px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    max-width: 360px;
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
     max-height: 80vh;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #eee;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
 }
 
 .header h3 {
     margin: 0;
-    font-size: 1.1rem;
-    color: #333;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
 }
 
 .close {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
-    color: #666;
+    color: var(--muted);
     padding: 0;
     line-height: 1;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.15s;
+}
+
+.close:hover {
+    background: var(--pill-hover);
+    color: var(--text);
 }
 
 .content {
-    padding: 20px;
-    overflow: visible;
+    padding: 12px 16px 16px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
 }
 
 .item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
-    background: #f8fafc;
+    padding: 8px 10px;
+    background: var(--bg);
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
 }
 
 .preview {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    font-size: 0.875rem;
     font-weight: 500;
-    color: #333;
 }
 
 .preview span:first-child {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    width: 22px;
+    text-align: center;
 }
 
 .preview span:last-child {
     color: var(--color);
 }
 
+.colorSwatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
 .actions {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 }
 
 .actions button {
-    background: var(--panel);
-    border: 1px solid #ddd;
-    padding: 6px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 8px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: all 0.15s;
 }
 
 .actions button:hover {
-    background: #f1f5f9;
+    background: var(--pill-hover);
+    color: var(--text);
 }
 
 .actions .delete:hover {
-    background: #fee2e2;
+    background: rgba(220, 38, 38, 0.08);
     color: #dc2626;
-    border-color: #fca5a5;
+    border-color: rgba(220, 38, 38, 0.3);
 }
 
 .addBtn {
     width: 100%;
-    margin-top: 16px;
-    padding: 12px;
-    background: #2563eb;
+    margin-top: 10px;
+    padding: 9px;
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: 600;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: opacity 0.15s;
 }
 
 .addBtn:hover {
-    background: #1d4ed8;
+    opacity: 0.9;
 }
 
 /* Form Styles */
 .form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .form label {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #475569;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
 }
 
 .form input[type="text"] {
-    padding: 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 1rem;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(158, 126, 93, 0.15);
 }
 
 .colorRow {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .colorRow input[type="color"] {
-    width: 50px;
-    height: 40px;
-    border: none;
-    background: none;
+    width: 40px;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
     cursor: pointer;
+    padding: 2px;
 }
-
-
 
 .error {
     color: #dc2626;
-    font-size: 0.9rem;
-    padding: 8px;
-    background: #fee2e2;
+    font-size: 0.82rem;
+    padding: 6px 8px;
+    background: rgba(220, 38, 38, 0.08);
     border-radius: 6px;
-    margin-top: 8px;
     text-align: center;
 }
 
 .formActions {
     display: flex;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 8px;
+    margin-top: 4px;
 }
 
 .formActions button {
     flex: 1;
-    padding: 12px;
+    padding: 9px;
     border-radius: 8px;
     font-weight: 600;
+    font-size: 0.875rem;
     cursor: pointer;
     border: none;
 }
 
 .cancelBtn {
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--pill-bg);
+    color: var(--muted);
+    border: 1px solid var(--border) !important;
+}
+
+.cancelBtn:hover {
+    background: var(--pill-hover);
+    color: var(--text);
 }
 
 .saveBtn {
-    background: #2563eb;
+    background: var(--primary);
     color: white;
+}
+
+.saveBtn:hover {
+    opacity: 0.9;
 }
 
 .saveBtn:disabled {
@@ -211,30 +259,30 @@
 .emojiInputRow {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .emojiPreviewBtn {
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-    border: 1px solid var(--border, #cbd5e1);
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: var(--bg, #fff);
+    background: var(--bg);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .emojiPreviewBtn:hover {
-    border-color: var(--primary-color, #2563eb);
-    background: var(--hover, #f8fafc);
+    border-color: var(--primary);
+    background: var(--pill-hover);
 }
 
 .emojiHint {
-    font-size: 0.85rem;
-    color: var(--muted, #64748b);
+    font-size: 0.82rem;
+    color: var(--muted);
     font-weight: 400;
 }

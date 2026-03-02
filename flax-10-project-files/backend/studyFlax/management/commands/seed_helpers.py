@@ -112,8 +112,8 @@ def build_event(user, title, tags, day_offset, hour):
     duration = random.choice([60, 90, 120])
     user_tags = [t for t in tags if t.user == user or t.user is None]
     tag = _match_tag_for_title(title, user_tags) if user_tags else None
-    if not tag and user_tags and random.random() > 0.35:
-        tag = random.choice(user_tags)
+    if not tag and user_tags:
+        tag = next((t for t in user_tags if t.name.lower() == 'other'), user_tags[0])
     return CalendarEvent(
         user=user,
         title=title,
@@ -187,7 +187,9 @@ def build_meal_events(user, tags):
     Title is the meal label; description is the specific food item so the
     timeline card shows a clear heading and a readable subtitle.
     """
-    meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
+    meal_tag = next((t for t in tags if t.name == 'Meal'), None)
+    if not meal_tag:
+        meal_tag = next((t for t in tags if t.name == 'Other'), tags[0] if tags else None)
     events   = []
 
     for day_offset in range(SEED_DAYS):

@@ -87,6 +87,7 @@ class Command(BaseCommand):
         self.create_admin_user()
         self.create_fixture_users()
         self.create_random_users()
+        self.create_fixture_user_settings()
         self.users = list(User.objects.filter(is_staff=False))
         self.create_recurrence_rules()
         self.create_categories()
@@ -128,15 +129,39 @@ class Command(BaseCommand):
             role = self.ROLE_LABELS.get(data['username'], '')
             self.stdout.write(f"  {data['username']:<12} {role}")
 
+    # Preset course/year for fixture users so they skip onboarding
+    FIXTURE_USER_SETTINGS = {
+        'janedoe': ('Year 2', 'Computer Science with a year in industry'),
+        'charlie': ('Year 3', 'Medicine'),
+        'amiller': ('Year 1', 'Physics'),
+        'srahwan': ('Year 2', 'Mathematics'),
+        'hpatel':  ('Year 3', 'Biomedical Science'),
+        'echen':   ('Year 1', 'Electronic Engineering'),
+        'jmurphy': ('Year 2', 'Law'),
+    }
+
+    def create_fixture_user_settings(self):
+        """Ensure fixture users always have UserSettings with major and year set."""
+        for username, (year, major) in self.FIXTURE_USER_SETTINGS.items():
+            try:
+                user = User.objects.get(username=username)
+                UserSettings.objects.update_or_create(
+                    user=user,
+                    defaults={'major': major, 'year': year, 'timezone': 'Europe/London'},
+                )
+            except User.DoesNotExist:
+                pass
+
     def create_random_users(self):
         """Top up the user table to USER_COUNT with randomly generated KCL students."""
         needed = self.USER_COUNT - User.objects.count()
         if needed <= 0:
             self.stdout.write("Enough users already exist.")
-            return
-        self.stdout.write(f"Seeding {needed} random users...")
-        User.objects.bulk_create(build_users_list(needed), ignore_conflicts=True)
-        UserSettings.objects.bulk_create(build_settings_for_new_users())
+        else:
+            self.stdout.write(f"Seeding {needed} random users...")
+            User.objects.bulk_create(build_users_list(needed), ignore_conflicts=True)
+        # Always ensure all users (including fixture users) have settings
+        UserSettings.objects.bulk_create(build_settings_for_new_users(), ignore_conflicts=True)
 
     def create_recurrence_rules(self):
         """Seed the standard set of RecurrenceRule instances from fixtures."""
@@ -154,21 +179,34 @@ class Command(BaseCommand):
                 defaults={'color': color, 'is_default': is_default},
             )
 
+    # Warm earth-tone palette that matches the Flax theme
+    _TAG_COLORS = {
+        'Meal':                 '#C4956A',  # warm sand
+        'Lecture':              '#8B6B45',  # deep oak
+        'Practical':            '#7A9B8A',  # muted sage
+        'Study Session':        '#9E7E5D',  # Flax primary
+        'Meeting':              '#B87848',  # warm amber
+        'Gym':                  '#6B7A52',  # earthy olive
+        'Grocery Shopping':     '#C08060',  # clay terracotta
+        'Assignment Deadline':  '#A85040',  # muted terracotta red
+    }
+
     def create_tags(self):
         """Seed shared default Tag instances from fixtures for all users."""
         self.stdout.write("Seeding tags...")
-        from faker import Faker
-        f = Faker('en_GB')
-        Tag.objects.get_or_create(
+        Tag.objects.update_or_create(
             name='Other',
             user=None,
             defaults={'is_default': True, 'default_duration': 60, 'color': '#9E7E5D', 'icon': '🏷️'},
         )
+        # Fix any existing per-user "Other" tags that have the old grey fallback color
+        Tag.objects.filter(name='Other', user__isnull=False, color='#808080').update(color='#9E7E5D')
         for name, duration in tag_fixtures:
-            Tag.objects.get_or_create(
+            color = self._TAG_COLORS.get(name, '#9E7E5D')
+            Tag.objects.update_or_create(
                 name=name,
                 user=None,
-                defaults={'category': None, 'is_default': True, 'default_duration': duration, 'color': f.hex_color()},
+                defaults={'category': None, 'is_default': True, 'default_duration': duration, 'color': color, 'icon': '🏷️'},
             )
 
     def create_events_for_users(self):

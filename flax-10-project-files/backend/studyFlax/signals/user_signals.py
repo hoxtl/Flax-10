@@ -11,7 +11,7 @@ def create_default_tags(sender, instance, created, **kwargs):
         Tag.objects.create(
             user=instance,
             name='Other',
-            color='#808080',
+            color='#9E7E5D',
             icon='🏷️',
             default_duration=60,
             is_default=False  # It's a user-specific tag, but treated as "system default" for them

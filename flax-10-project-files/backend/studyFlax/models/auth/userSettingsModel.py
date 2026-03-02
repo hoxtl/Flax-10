@@ -8,3 +8,5 @@ class UserSettings(models.Model):
     timezone = models.CharField(max_length=100)
     year = models.CharField(max_length=50, blank=True, default='')
     major = models.CharField(max_length=100, blank=True, default='')
+    sleep_time = models.TimeField(null=True, blank=True)
+    wake_time = models.TimeField(null=True, blank=True)

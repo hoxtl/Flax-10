@@ -18,6 +18,7 @@ category_fixtures = (
 
 # Format: (name, default_duration_minutes)
 tag_fixtures = (
+    ('Meal', 45),
     ('Lecture', 120),
     ('Practical', 90),
     ('Study Session', 120),

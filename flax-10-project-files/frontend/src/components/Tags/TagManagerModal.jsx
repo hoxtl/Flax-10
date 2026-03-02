@@ -70,11 +70,22 @@ function validateTagForm(form, isDefault) {
   return '';
 }
 
+function deduplicateTags(tags) {
+  const seen = new Set();
+  return tags.filter(tag => {
+    const key = tag.label?.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function TagList({ tags, onEdit, onDelete, onAdd }) {
+  const uniqueTags = deduplicateTags(tags);
   return (
     <div className={styles.content}>
       <div className={styles.list}>
-        {tags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
+        {uniqueTags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
       </div>
       <button className={styles.addBtn} onClick={onAdd}>+ Add New Tag</button>
     </div>
