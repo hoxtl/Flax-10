@@ -909,3 +909,20 @@
   text-align: center;
   box-shadow: 0 8px 32px rgba(115, 81, 58, 0.25);
 }
+
+.mobileAvatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.2);
+  background: var(--c-greige, #b4a494);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  overflow: hidden;
+}
+
