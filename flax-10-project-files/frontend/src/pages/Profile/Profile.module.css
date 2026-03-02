@@ -994,3 +994,8 @@
   font-weight: 700;
   letter-spacing: 0.05em;
 }
+
+@media (max-width: 768px) {
+  .desktopOnly { display: none !important; }
+  .mobileOnly { display: flex; }
+}
