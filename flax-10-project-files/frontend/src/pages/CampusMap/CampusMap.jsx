@@ -105,7 +105,7 @@ export default function CampusMap() {
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
 
   const [userHome, setUserHome] = useState(null);
-  const homePointer = userRef(null);
+  const homePointer = useRef(null);
   const homePopup = useRef(null);
 
   useEffect(() => {
