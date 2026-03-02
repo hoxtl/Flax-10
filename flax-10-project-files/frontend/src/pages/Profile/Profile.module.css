@@ -939,3 +939,24 @@
   margin: 0 0 16px;
   font-weight: 500;
 }
+
+.mobileActions {
+  display: flex;
+  gap: 10px;
+}
+
+.mobileBtnEdit {
+  padding: 8px 18px;
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+
+.mobileBtnEdit:active { background: rgba(255,255,255,0.35); }
