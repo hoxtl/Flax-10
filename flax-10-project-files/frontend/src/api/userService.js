@@ -31,3 +31,15 @@ export function updateUserProfile(formData) {
 export function getHomeAddress() {
   return apiFetch('/user/home-address/', { headers: authHeaders() });
 }
+
+export function saveHomeAddress(address, latitude, longitude) {
+  return apiFetch('/user/home-address/', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      home_address: address,
+      home_latitude: latitude,
+      home_longitude: longitude,
+    }),
+  });
+}
