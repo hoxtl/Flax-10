@@ -1,6 +1,7 @@
 import styles from "./DayCard.module.css";
 import { formatTimeRange } from "./utils/cardUtils";
 import { useTags } from "../../context/TagContext";
+import { isReadOnlyEvent } from "../Calendar/utils/eventUtils";
 
 function Header({ e }) {
   return (
@@ -49,12 +50,14 @@ export default function DayCard({ e, onDelete, onClick, date }) {
   const { getTag } = useTags();
   const theme = getTag(e.tag);
   const t = theme || { color: "#94A3B8", icon: "⭐" };
+  const readOnly = isReadOnlyEvent(e);
+
   return (
-    <article className={styles.card} style={{ "--accent": t.color }} onClick={onClick}>
+    <article className={styles.card} style={{ "--accent": t.color }} onClick={(ev) => onClick?.(ev)}>
       <div className={styles.row}>
         <div className={styles.iconWrap}>{t.icon}</div>
         <CardBody e={e} date={date} />
-        <DeleteButton id={e.id} onDelete={onDelete} />
+        {!readOnly && <DeleteButton id={e.id} onDelete={onDelete} />}
       </div>
     </article>
   );

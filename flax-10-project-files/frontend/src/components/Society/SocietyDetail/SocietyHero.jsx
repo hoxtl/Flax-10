@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useState, useRef, useMemo } from "react";
 import styles from "./SocietyHero.module.css";
+import { useCarouselNavigation, useCarouselGestures } from "../hooks/useCarouselNavigation";
 
 export default function SocietyHero({ society, onImageClick, editMode, onEditImages, onUpdateName }) {
     const [hovered, setHovered] = useState(false);
-    const [idx, setIdx] = useState(0);
-    const images = getImages(society);
-    const currentImage = images[idx] || images[0];
+    const heroRef = useRef(null);
+    const images = useMemo(() => getImages(society), [society.images, society.image]);
+    const { index, prev, next } = useCarouselNavigation(images.length);
+    useCarouselGestures(heroRef, { prev, next });
+
+    const currentImage = images[index] || images[0];
+    const handleClick = !editMode ? onImageClick : undefined;
 
     return (
-        <div className={styles.hero} style={{ backgroundImage: `url(${currentImage})` }}
+        <div className={styles.hero} style={{ backgroundImage: `url("${currentImage}")` }}
+            ref={heroRef}
             onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-            onClick={!editMode ? onImageClick : undefined}>
+            onClick={handleClick}>
             <div className={styles.overlay}>
-                {!editMode && hovered && <HeroArrows idx={idx} total={images.length} setIdx={setIdx} />}
+                {!editMode && hovered && <HeroArrows index={index} total={images.length} prev={prev} next={next} />}
                 {editMode && hovered && <EditLayer onClick={onEditImages} />}
                 <HeroContent society={society} imageCount={images.length} editMode={editMode} onUpdateName={onUpdateName} />
             </div>
@@ -21,20 +27,27 @@ export default function SocietyHero({ society, onImageClick, editMode, onEditIma
 }
 
 function getImages(society) {
-    const urls = (society.images || []).map(i => i.url || i);
-    if (society.image && !urls.includes(society.image)) {
-        urls.unshift(society.image);
+    const rawUrls = (society.images || []).map(i => i.url || i);
+    const unique = new Set(rawUrls.map(u => u.trim()));
+
+    if (society.image) {
+        unique.add(society.image.trim());
     }
-    return urls.length > 0 ? urls : [];
+
+    return Array.from(unique);
 }
 
-function HeroArrows({ idx, total, setIdx }) {
-    const stopOption = (e, fn) => { e.stopPropagation(); fn(); };
+function HeroArrows({ index, total, prev, next }) {
     if (total <= 1) return null;
+    const stop = (e, fn) => { e.stopPropagation(); fn(); };
     return (
         <>
-            {idx > 0 && <button className={`${styles.arrowBtn} ${styles.leftArrow}`} onClick={(e) => stopOption(e, () => setIdx(idx - 1))}><Chevron dir="left" /></button>}
-            {idx < total - 1 && <button className={`${styles.arrowBtn} ${styles.rightArrow}`} onClick={(e) => stopOption(e, () => setIdx(idx + 1))}><Chevron dir="right" /></button>}
+            <button className={`${styles.arrowBtn} ${styles.leftArrow}`} onClick={(e) => stop(e, prev)}>
+                <Chevron dir="left" />
+            </button>
+            <button className={`${styles.arrowBtn} ${styles.rightArrow}`} onClick={(e) => stop(e, next)}>
+                <Chevron dir="right" />
+            </button>
         </>
     );
 }

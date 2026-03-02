@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
 import { tflService } from "../../api/tflService";
 
+
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 
@@ -99,6 +100,8 @@ export default function CampusMap() {
   const [tflRouteInfo, setTflRouteInfo] = useState(null);
   const [loadingTflRoute, setLoadingTflRoute] = useState(false);
   const [tflRouteError, setTflRouteError] = useState('');
+  const[disruptions, setDisruptions] = useState([]);
+  const[loadingDisruptions, setLoadingDisruptions] = useState(false);
 
   useEffect(() => {
     if (map.current) return;
@@ -278,6 +281,28 @@ export default function CampusMap() {
         .addTo(map.current);
   }, [startLocation, mapLoaded]);
 
+
+  // Fetch TfL service disruptions
+  useEffect(() => {
+    const fetchDisruptions = async () => {
+      setLoadingDisruptions(true);
+      try {
+        const disruptions = await tflService.getTfLDelays();
+        setDisruptions(disruptions);
+      } catch (error) {
+        console.error('TfL disruption fetch error: ', error);
+      } finally {
+        setLoadingDisruptions(false);
+      }
+    };
+
+    fetchDisruptions();
+
+    const refreshInterval = setInterval(fetchDisruptions, 2 * 60 * 1000);
+
+    return () => clearInterval(refreshInterval);
+  }, []);
+
   useEffect(() => {
     if (!mapLoaded) return;
 
@@ -450,6 +475,57 @@ export default function CampusMap() {
           </div>
           <p className={styles.sidebarSubtitle}>Never be late, plan your journeys!</p>
         </div>
+
+        {/* TfL Service Status */}
+        <section className={styles.section}>
+          <div className={styles.sectionLabel}>
+            <span className={styles.statusIcon}>⚠️</span>
+            TfL Line Status
+          </div>
+
+          {loadingDisruptions ? (
+            <div className={styles.loadingDisruptions}>
+              <span className={styles.spinner} />
+              <span>Checking TfL Line status...</span>
+            </div>
+          ) : disruptions.length === 0 ? (
+            <div className={styles.goodService}>
+              <span className={styles.goodServiceIcon}>✅</span>
+              <div className={styles.goodServiceText}>
+                <strong>Good Service!</strong>
+                <span>All TfL lines are running normally</span>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.disruptionsList}>
+              {disruptions.map((disruption, i) => (
+                <div key={i} className={styles.disruptionCard}>
+                  <div
+                    className={styles.disruptionBadge}
+                    style={{ backgroundColor: disruptions.color }}
+                  >
+                    - {disruption.lineName}
+                </div>
+                <div className={styles.disruptionContent}>
+                  <div className={styles.disruptionSeverity}>
+                    {disruption.severityDescription}
+                  </div>
+                  <div className={styles.disruptionReason}>
+                    {disruption.reason}
+                  </div>
+                </div>
+              </div>
+              ))}
+            </div>
+          )}
+
+          <div className={styles.lastUpdated}>
+            Last Updated: {new Date().toLocaleTimeString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        </section>
 
         <section className={styles.section}>
           <div className={styles.sectionLabel}>

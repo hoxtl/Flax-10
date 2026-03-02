@@ -5,6 +5,7 @@ import ProfileDropdown from "./ProfileDropdown";
 import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
+import SearchBar from "../common/SearchBar";
 
 import styles from "./TopBar.module.css";
 
@@ -18,12 +19,7 @@ function TopBarGreeting() {
 }
 
 function SearchInput() {
-  return (
-    <div className={styles.search}>
-      <span className={styles.searchIcon}>🔍</span>
-      <input className={styles.searchInput} placeholder="Search…" />
-    </div>
-  );
+    return <SearchBar placeholder="Search…" className={styles.searchCompact} />;
 }
 
 function QuickTabs() {

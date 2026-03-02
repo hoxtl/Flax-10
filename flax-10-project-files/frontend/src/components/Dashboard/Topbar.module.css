@@ -42,8 +42,9 @@
   gap: 1rem;
 }
 
-.search {
-  position: relative;
+.searchCompact {
+    flex: none;
+    width: 200px;
 }
 
 .searchIcon {
@@ -77,6 +78,14 @@
 
 .searchInput::placeholder {
   color: var(--muted);
+}
+
+.searchCompact input {
+    height: 36px;
+    padding: 8px 14px 8px 36px;
+    font-size: 13px;
+    border-radius: 9px;
+    background: var(--search-bg);
 }
 
 .addBtn {
@@ -145,5 +154,15 @@
 }
 
 :root[data-theme="dark"] .container {
-  box-shadow: none;
+  background: rgba(26, 19, 16, 0.80);
+  border-bottom: 1px solid rgba(180, 164, 144, 0.10);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .searchCompact input {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="dark"] .searchCompact input:focus {
+    background: rgba(255, 255, 255, 0.08);
 }

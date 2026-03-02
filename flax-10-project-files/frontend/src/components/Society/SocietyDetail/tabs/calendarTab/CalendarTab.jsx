@@ -4,6 +4,7 @@ import { MonthView } from "../../../../Calendar/MonthView/MonthView";
 import { DatePickerButton } from "../../../../Calendar/header/DatePickerButton";
 import { addMonths, formatMonthYear } from "../../../../Calendar/utils/dateUtils";
 import { expandRecurringEvents } from "../../../../Calendar/utils/recurrenceUtils";
+import { hasRecurrence, extractBaseEventId } from "../../../../Calendar/utils/eventUtils";
 import { CalendarProvider, useEventModal } from "../../../../../context/CalendarContext";
 import { EventModal } from "../../../../Calendar/EventModal/EventModal";
 import TagFilterBar from "../../tags/TagFilterBar";
@@ -19,11 +20,11 @@ export default function CalendarTab(props) {
     );
 }
 
-function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember, onEditAnnouncement, announcements }) {
+function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember, onEditAnnouncement, announcements, societyName }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
-    const { openModal } = useEventModal(); // Moved hook to top level
+    const { openModal } = useEventModal();
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
     const closePopup = () => setPopupState({ event: null, rect: null });
@@ -31,7 +32,7 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     return (
         <div className={styles.calendarTab}>
             {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
-            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} />
+            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} societyName={societyName} />
             <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
             <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
                 readOnly={!editMode}
@@ -51,17 +52,37 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
             {popupState.event && <EventDetailPopup event={popupState.event} anchorRect={popupState.rect}
                 tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
-                actions={getPopupActions(popupState.event, onViewAnnouncement)} />}
+                actions={getPopupActions(popupState.event, onViewAnnouncement, editMode, {
+                    onEdit: () => openModal(popupState.event, 'society', popupState.event.start_time),
+                    onDelete: (e) => handlePopupDelete(e, eventHandlers, closePopup)
+                })} />}
         </div>
     );
 }
 
-function CalendarHeader({ date, setDate, societyId, isMember }) {
+function handlePopupDelete(event, handlers, closePopup) {
+    try {
+        const isRecurring = hasRecurrence(event);
+        const choice = isRecurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
+        const baseId = extractBaseEventId(event.id, event);
+
+        if (choice) handlers?.onDelete?.(baseId, event.title);
+        else {
+            const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
+            handlers?.onAddException?.(baseId, dateStr);
+        }
+    } catch (err) {
+        console.error('Deletion failed:', err);
+    }
+    closePopup();
+}
+
+function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
     return (
         <div className={styles.calendarHeader}>
             <NavButtons date={date} setDate={setDate} />
             <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
-            {isMember && <SyncButton societyId={societyId} />}
+            {isMember && <SyncButton societyId={societyId} societyName={societyName} />}
         </div>
     );
 }
@@ -81,16 +102,17 @@ function NavButtons({ date, setDate }) {
 function SocietyEventModal({ eventHandlers, tags, editMode }) {
     const { isModalOpen, closeModal, modalEvent, modalInitialDate } = useEventModal();
     if (!isModalOpen || !editMode) return null;
+    const handleDelete = () => handlePopupDelete(modalEvent, eventHandlers, closeModal);
     return (
         <EventModal event={modalEvent} initialDate={modalInitialDate} onClose={closeModal}
-            showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)} />
+            showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)}
+            onDelete={modalEvent?.id ? handleDelete : null} />
     );
 }
 
 function handleModalSubmit(data, modalEvent, eventHandlers, closeModal) {
     const eventId = modalEvent?._baseId || modalEvent?.id;
-    if (data._delete && eventId) eventHandlers?.onDelete?.(eventId);
-    else if (eventId) eventHandlers?.onUpdate?.(eventId, data);
+    if (eventId) eventHandlers?.onUpdate?.(eventId, data);
     else eventHandlers?.onAdd?.(data);
     closeModal();
 }
@@ -104,10 +126,16 @@ function filterEvents(events, tagFilters) {
     return events.filter(e => tagFilters.includes(e.tag));
 }
 
-function getPopupActions(event, onViewAnnouncement) {
-    if (event?.announcement && onViewAnnouncement) {
-        return [{ label: 'View Announcement', onClick: () => onViewAnnouncement(event.announcement) }];
+function getPopupActions(event, onViewAnnouncement, editMode, handlers) {
+    const actions = [];
+    if (editMode) {
+        actions.push({ label: 'Edit', onClick: handlers.onEdit });
+        actions.push({ label: 'Delete', variant: 'danger', onClick: () => handlers.onDelete(event) });
     }
-    if (!event?.announcementId || !onViewAnnouncement) return null;
-    return [{ label: 'View Announcement', onClick: onViewAnnouncement }];
+    if (event?.announcement && onViewAnnouncement) {
+        actions.push({ label: 'View Announcement', onClick: () => onViewAnnouncement(event.announcement) });
+    } else if (event?.announcementId && onViewAnnouncement) {
+        actions.push({ label: 'View Announcement', onClick: onViewAnnouncement });
+    }
+    return actions.length > 0 ? actions : null;
 }

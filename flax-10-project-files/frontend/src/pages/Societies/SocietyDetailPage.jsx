@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./SocietyDetailPage.module.css";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
+import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
 import SocietyHero from "../../components/Society/SocietyDetail/SocietyHero";
 import SocietyInfo from "../../components/Society/SocietyDetail/SocietyInfo";
 import SocietyTabs from "../../components/Society/SocietyDetail/tabs/SocietyTabs";
@@ -13,7 +14,8 @@ import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/annou
 
 export default function SocietyDetailPage({ societyId, onBack }) {
     const hookData = useSocietyDetail(societyId);
-    const { society, loading, error, updateSociety, members } = hookData;
+    const { society, loading, error, updateSociety, members, publishChanges } = hookData;
+    const changeTracker = useChangeTracker();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || "calendar");
     const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
@@ -24,6 +26,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
+        scrollContentToTop();
         if (location.state?.activeTab) {
             window.history.replaceState({}, document.title);
         }
@@ -34,8 +37,12 @@ export default function SocietyDetailPage({ societyId, onBack }) {
         setFocusAnnouncementId(announcementId);
     };
 
-    const handleAnnouncementSave = (data, conflictingAnnouncement) => {
-        const { updateAnnouncement, addAnnouncement } = buildHandlers(hookData);
+    const handleToggleEditMode = async () => {
+        if (editMode && changeTracker.hasChanges()) {
+            await publishChanges(changeTracker.getChangeSummary());
+            changeTracker.resetChanges();
+        }
+        setEditMode(!editMode);
     };
 
     if (loading) return <div className={styles.page}>Loading...</div>;
@@ -43,7 +50,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
 
     const canEdit = society.is_admin;
     const availablePhotos = getAvailablePhotos(society);
-    const handlers = buildHandlers(hookData);
+    const handlers = buildHandlers(hookData, editMode, changeTracker);
     const updateImages = (imgs) => updateSociety({ images: imgs, image: imgs[0] || null });
     const handleDelete = async () => { await handlers.deleteSociety(); onBack(); };
 
@@ -56,7 +63,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onEditImages={() => setShowCoverModal(true)} />
             <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
                 onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
-                canEdit={canEdit} onToggleEditMode={() => setEditMode(!editMode)} />
+                canEdit={canEdit} onToggleEditMode={handleToggleEditMode} />
             <MainContent activeTab={activeTab} setActiveTab={handleTabChange} society={society}
                 editMode={editMode} handlers={handlers} focusAnnouncementId={focusAnnouncementId}
                 onEditAnnouncement={setEditingAnnouncement} />
@@ -70,6 +77,7 @@ export default function SocietyDetailPage({ societyId, onBack }) {
                 onRequestRatification={handlers.requestRatification} />}
             {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={society.tags}
                 onClose={() => setEditingAnnouncement(null)}
+                onDelete={(id) => { handlers.deleteAnnouncement(id, editingAnnouncement.title); setEditingAnnouncement(null); }}
                 onSubmit={(data, conflict) => {
                     if (conflict) handlers.updateAnnouncement(conflict.id, { ...conflict, pinned: false });
                     if (data.id) handlers.updateAnnouncement(data.id, data);
@@ -81,16 +89,68 @@ export default function SocietyDetailPage({ societyId, onBack }) {
     );
 }
 
-function buildHandlers(hookData) {
+function buildHandlers(hookData, editMode, changeTracker) {
     const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
+        addEvent, updateEvent, deleteEvent, addException, addTag, deleteTag, joinSociety, leaveSociety,
         deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
         requestRatification } = hookData;
+    const { trackEvent, trackAnnouncement } = changeTracker;
     return {
-        updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
-        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
-        requestRatification
+        updateSociety, addTag, deleteTag, joinSociety, leaveSociety, deleteSociety,
+        fetchMembers, updateMemberRole, removeMember, addCollaborator, requestRatification,
+        addEvent: wrapAddEvent(addEvent, editMode, trackEvent),
+        updateEvent: wrapUpdateEvent(updateEvent, editMode, trackEvent),
+        deleteEvent: wrapDeleteEvent(deleteEvent, editMode, trackEvent),
+        addException: (eventId, date) => addException(eventId, date, editMode),
+        addAnnouncement: wrapAddAnnouncement(addAnnouncement, editMode, trackAnnouncement),
+        updateAnnouncement: wrapUpdateAnnouncement(updateAnnouncement, editMode, trackAnnouncement),
+        deleteAnnouncement: wrapDeleteAnnouncement(deleteAnnouncement, editMode, trackAnnouncement)
+    };
+}
+
+function wrapAddEvent(addEvent, silent, track) {
+    return async (data) => {
+        const result = await addEvent(data, silent);
+        if (silent) track('Added', data.title);
+        return result;
+    };
+}
+
+function wrapUpdateEvent(updateEvent, silent, track) {
+    return async (eventId, data) => {
+        const result = await updateEvent(eventId, data, silent);
+        if (silent) track('Updated', data.title);
+        return result;
+    };
+}
+
+function wrapDeleteEvent(deleteEvent, silent, track) {
+    return async (eventId, title = 'Event') => {
+        await deleteEvent(eventId, silent);
+        if (silent) track('Deleted', title);
+    };
+}
+
+function wrapAddAnnouncement(addAnnouncement, silent, track) {
+    return async (data) => {
+        const result = await addAnnouncement(data, silent);
+        if (silent) track('Added', data.title);
+        return result;
+    };
+}
+
+function wrapUpdateAnnouncement(updateAnnouncement, silent, track) {
+    return async (announcementId, data) => {
+        const result = await updateAnnouncement(announcementId, data, silent);
+        if (silent) track('Updated', data.title);
+        return result;
+    };
+}
+
+function wrapDeleteAnnouncement(deleteAnnouncement, silent, track) {
+    return async (announcementId, title = 'Announcement') => {
+        await deleteAnnouncement(announcementId, silent);
+        if (silent) track('Deleted', title);
     };
 }
 
@@ -125,7 +185,7 @@ function NotFound({ onBack }) {
 function MainContent({ activeTab, setActiveTab, society, editMode, handlers, focusAnnouncementId, onEditAnnouncement }) {
     const tags = society.tags || [];
     const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
-    const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
+    const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent, onAddException: handlers.addException };
     const announcementHandlers = { onAdd: handlers.addAnnouncement, onUpdate: handlers.updateAnnouncement, onDelete: handlers.deleteAnnouncement };
     return (
         <div className={styles.mainContent}>
@@ -139,4 +199,20 @@ function MainContent({ activeTab, setActiveTab, society, editMode, handlers, foc
                 onAddAnnouncement={handlers.addAnnouncement} onUpdateAnnouncement={handlers.updateAnnouncement} onAddEvent={handlers.addEvent} />
         </div>
     );
+}
+
+function scrollContentToTop() {
+    const scrollable = findScrollableParent(document.body);
+    if (scrollable) scrollable.scrollTop = 0;
+    window.scrollTo(0, 0);
+}
+
+function findScrollableParent(element) {
+    const containers = document.querySelectorAll('*');
+    for (const el of containers) {
+        const style = window.getComputedStyle(el);
+        const isScrollable = style.overflow === 'auto' || style.overflowY === 'auto';
+        if (isScrollable && el.scrollHeight > el.clientHeight) return el;
+    }
+    return null;
 }

@@ -1,21 +1,34 @@
+"""
+Django management command for seeding the database.
+
+Run with::
+
+    python manage.py seed
+
+Creates fixture users, random users, categories, tags, recurrence rules,
+calendar events, modules, deadlines, enrollments, study sessions and theme
+sessions. All operations are idempotent — running the command on an already-
+seeded database will not produce duplicates.
+"""
+
 import random
+from datetime import timedelta
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from django.utils import timezone
-from datetime import timedelta
-
 from studyFlax.models import (
-    Category, Tag, RecurrenceRule, CalendarEvent,
-    UserSettings, Module, Enrollment, Deadline
+    Category, Tag, RecurrenceRule, CalendarEvent, 
+    UserSettings, Module, Enrollment, Deadline,
+    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
 
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
     module_task_templates, personal_task_fixtures, task_list_fixtures,
-    MODULE_PILL_COLORS,
+    MODULE_PILL_COLORS, location_fixtures,
 )
-
+from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
@@ -28,8 +41,14 @@ from studyFlax.models.timer.themeSessionModel import ThemeSession
 
 User = get_user_model()
 
-
 class Command(BaseCommand):
+    """Seeds the database with a structured, realistic dataset.
+
+    Orchestrates the full seeding pipeline: users → categories/tags →
+    events → modules → deadlines → enrollments → study sessions.
+    All steps are idempotent.
+    """
+
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
     USER_COUNT       = 25
@@ -63,6 +82,7 @@ class Command(BaseCommand):
         self.modules    = list(Module.objects.all())
 
     def handle(self, *args, **options):
+        """Execute the full seeding pipeline in dependency order."""
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
         self.create_admin_user()
         self.create_fixture_users()
@@ -79,10 +99,16 @@ class Command(BaseCommand):
         self.create_deadlines()
         self.create_enrollments()
         self.create_tasks()
+        self.create_societies()
+        self.create_society_memberships()
+        self.create_society_events()
+        self.create_society_images()
         self.create_study_sessions()
-        self.print_stats()
+        self.print_stats()  
+        
 
     def create_admin_user(self):
+        """Create the johndoe superuser if one does not already exist."""
         if User.objects.filter(username='johndoe').exists():
             return
         User.objects.create_superuser(
@@ -92,6 +118,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  {'johndoe':<12} admin")
 
     def create_fixture_users(self):
+        """Create the named fixture users defined in FIXTURE_USERS, skipping duplicates."""
         self.stdout.write("Creating fixture users...")
         for data in self.FIXTURE_USERS:
             if User.objects.filter(username=data['username']).exists():
@@ -107,6 +134,7 @@ class Command(BaseCommand):
             self.stdout.write(f"  {data['username']:<12} {role}")
 
     def create_random_users(self):
+        """Top up the user table to USER_COUNT with randomly generated KCL students."""
         needed = self.USER_COUNT - User.objects.count()
         if needed <= 0:
             self.stdout.write("Enough users already exist.")
@@ -116,11 +144,13 @@ class Command(BaseCommand):
         UserSettings.objects.bulk_create(build_settings_for_new_users())
 
     def create_recurrence_rules(self):
+        """Seed the standard set of RecurrenceRule instances from fixtures."""
         self.stdout.write("Seeding recurrence rules...")
         for freq, interval in recurrence_fixtures:
             RecurrenceRule.objects.get_or_create(frequency=freq, interval=interval)
 
     def create_categories(self):
+        """Seed default and randomly user-owned Category instances from fixtures."""
         self.stdout.write("Seeding categories...")
         for name, color, is_default in category_fixtures:
             user = random.choice(self.users) if not is_default and self.users and random.random() > 0.7 else None
@@ -130,6 +160,7 @@ class Command(BaseCommand):
             )
 
     def create_tags(self):
+        """Seed Tag instances from fixtures, associating each with a random user or category."""
         self.stdout.write("Seeding tags...")
         from faker import Faker
         f = Faker('en_GB')
@@ -155,6 +186,7 @@ class Command(BaseCommand):
             )
 
     def create_events_for_users(self):
+        """Seed personal and meal CalendarEvents for every non-staff user."""
         self.stdout.write("Seeding events for users...")
         total = 0
         for i, user in enumerate(self.users):
@@ -173,6 +205,7 @@ class Command(BaseCommand):
             Module.objects.create(**build_module_event(code, name, description, teacher, weekly_rule))
 
     def create_modules(self):
+        """Seed the KCL module catalogue, distributing modules across teacher accounts."""
         self.stdout.write("Seeding modules...")
         teachers = list(User.objects.filter(role='teacher'))
         if not teachers:
@@ -183,6 +216,7 @@ class Command(BaseCommand):
             self._create_module(code, name, description, teacher, weekly_rule)
 
     def create_deadlines(self):
+        """Seed assessment deadlines for every module in the database."""
         self.stdout.write("Seeding deadlines...")
         deadlines_to_create = []
         for module in self.modules:
@@ -212,6 +246,7 @@ class Command(BaseCommand):
             self._process_module(user, module, lecture_tag, enrollments)
 
     def create_enrollments(self):
+        """Enroll every user in their major's core modules plus one elective, and seed lecture events."""
         self.stdout.write("Seeding enrollments and lecture events...")
         lecture_tag = next((t for t in self.tags if t.name == 'Lecture'), None)
         enrollments = []
@@ -306,6 +341,13 @@ class Command(BaseCommand):
         self.stdout.write(f"  Created {total} tasks.")
 
     def create_study_sessions(self):
+        """Seed StudySession and ThemeSession records for named fixture users.
+
+        Each fixture user is assigned a profile ('balanced', 'night_owl', or
+        'consistent') that controls session timing and volume across the past
+        90 days. Sessions that already exist are skipped to keep the command
+        idempotent.
+        """
         self.stdout.write("Seeding study sessions and theme sessions...")
 
         # map username → (study_profile, theme_profile)
@@ -350,25 +392,112 @@ class Command(BaseCommand):
 
         self.stdout.write(f"  Created {total_study} study sessions, {total_theme} theme sessions.")
 
+    def create_societies(self):
+        self.stdout.write("Seeding societies...")
+        for data in build_society_seed_data():
+            society = self._create_society_from_config(data)
+            self._seed_society_tags_from_config(society, data.get('tags', []))
+
+    def _create_society_from_config(self, data):
+        status = random.choice(['approved', 'pending', 'rejected', 'none'])
+        defaults = {
+            'bio': data['bio'], 'about': data['about'],
+            'categories': data.get('categories', []),
+            'ratification_status': status, 'is_ratified': (status == 'approved')
+        }
+        if data.get('image'):
+            defaults['image'] = data['image']
+        society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
+        return society
+
+    def _seed_society_tags_from_config(self, society, tag_labels):
+        from faker import Faker
+        f = Faker('en_GB')
+        for label in tag_labels:
+            SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
+
+    def _get_society_config(self, society):
+        return next((s for s in build_society_seed_data() if s['name'] == society.name), None)
+
+    def _seed_events_for_society(self, society):
+        config = self._get_society_config(society)
+        if not config:
+            return
+        tags = list(society.tags.all())
+        for event_template in config.get('events', []):
+            self._create_event_from_template(society, event_template, tags)
+
+    def _create_event_from_template(self, society, template, tags):
+        title, desc, hour, duration, recurrence, day = template
+        start, end = build_event_datetime(hour, duration, day)
+        SocietyEvent.objects.get_or_create(
+            society=society, title=title,
+            defaults=self._build_event_defaults(desc, start, end, recurrence, tags)
+        )
+
+    def _build_event_defaults(self, desc, start, end, recurrence, tags):
+        return {
+            'description': desc, 'location': random.choice(location_fixtures),
+            'start_time': start, 'end_time': end,
+            'recurrence': recurrence or 'none',
+            'recurrence_end_date': (start + timedelta(days=90)).date() if recurrence else None,
+            'tag': random.choice(tags) if tags else None
+        }
+
+    def _seed_images_for_society(self, society):
+        self._set_cover_image(society)
+        self._add_extra_images(society)
+
+    def _set_cover_image(self, society):
+        if not society.image:
+            return
+        SocietyImage.objects.filter(society=society, is_cover=True).delete()
+        SocietyImage.objects.create(society=society, is_cover=True, url=society.image)
+
+    def _add_extra_images(self, society):
+        current_count = society.images.count()
+        for i in range(5 - current_count):
+            SocietyImage.objects.create(
+                society=society, url=f"https://picsum.photos/seed/{society.name}{i}/800/600", is_cover=False
+            )
+
+    def create_society_memberships(self):
+        self.stdout.write("Seeding society memberships...")
+        for society in Society.objects.all():
+            self._seed_society_members(society)
+
+    def _seed_society_members(self, society):
+        admin = random.choice(self.users)
+        SocietyMembership.objects.get_or_create(
+            user=admin, society=society, defaults={'role': 'admin'}
+        )
+        society.admin_emails = admin.email
+        society.save()
+        members = random.sample(self.users, random.randint(5, 15))
+        for member in members:
+            SocietyMembership.objects.get_or_create(
+                user=member, society=society, defaults={'role': 'member'}
+            )
+
+    def create_society_events(self):
+        self.stdout.write("Seeding society events...")
+        for society in Society.objects.all():
+            self._seed_events_for_society(society)
+
+    def create_society_images(self):
+        self.stdout.write("Seeding society images...")
+        for society in Society.objects.all():
+            self._seed_images_for_society(society)
+
     def print_stats(self):
+        """Print a summary of all fixture users and database record counts."""
         div = "─" * 40
-        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write(self.style.SUCCESS("  ✅  Seeding complete"))
+        self.stdout.write(self.style.SUCCESS("  Seeding complete"))
         self.stdout.write(self.style.SUCCESS(div))
-
-        self.stdout.write("")
-        self.stdout.write("  Fixture users  (password: 1234)")
-        self.stdout.write(f"  {'johndoe':<12}  superuser / admin")
-        self.stdout.write(f"  {'janedoe':<12}  student")
-        self.stdout.write(f"  {'charlie':<12}  student")
-        self.stdout.write(f"  {'amiller':<12}  teacher")
-        self.stdout.write(f"  {'srahwan':<12}  teacher")
-        self.stdout.write(f"  {'hpatel':<12}  teacher")
-        self.stdout.write(f"  {'echen':<12}  teacher")
-        self.stdout.write(f"  {'jmurphy':<12}  teacher")
-
-        self.stdout.write("")
+        self.stdout.write("  Fixture users (password: 1234)")
+        for user, role in [('johndoe', 'admin'), ('janedoe', 'student'), ('charlie', 'student')]:
+            self.stdout.write(f"  {user:<12}  {role}")
         self.stdout.write("  Database")
         stats = [
             ("Users",       User.objects.count()),
@@ -379,9 +508,8 @@ class Command(BaseCommand):
             ("Categories",  Category.objects.count()),
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),
+            ("Societies",   Society.objects.count()),
         ]
         for label, count in stats:
             self.stdout.write(f"  {label:<14}  {count}")
-        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write("")
