@@ -277,3 +277,8 @@
   color: var(--text);
   transition: border-color 0.2s;
 }
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
