@@ -281,7 +281,12 @@ export default function CampusMap() {
   useEffect(() => {
     if (!mapLoaded || !userHome) return;
 
-    
+    if (homePointer.current) {
+      homePointer.current.remove();
+      homePointer.current = null;
+    }
+
+
   })
 
   // Update the marker on the map when user's start location changes
