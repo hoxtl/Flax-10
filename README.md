@@ -132,6 +132,7 @@ For docker users, you will need to run the ```docker run...``` command mentioned
 | @types/react-dom            | 19.2.3  | TypeScript typings for React DOM   |
 | canvas-confetti             | 1.9.4   | Confetti visual fx support in html5  |
 | framer-motion               | 12.34.0 | Web animation library  |
+| dotenv           | 0.9.9   | Environment variable support package |
 
 **Backend Packages**
 
@@ -148,3 +149,5 @@ For docker users, you will need to run the ```docker run...``` command mentioned
 | distlib             | 0.4.0   | Dependency utility library (virtualenv backend) |
 | filelock            | 3.20.1  | Cross-platform file locking                     |
 | platformdirs        | 4.5.0   | OS-specific directory resolution                |
+| python-dotenv            | 1.2.1  | Environment variable support package(python compatible)                     |
+| openai     | 2.21.0   | LLM related functionalities                |
