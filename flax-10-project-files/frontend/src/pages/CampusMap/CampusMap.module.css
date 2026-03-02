@@ -778,3 +778,8 @@
 :global(.homePointer:hover) {
   transform: scale(1.15);
 }
+
+:global(.homePopupContent) {
+  padding: 8px;
+  text-align: center;
+}
