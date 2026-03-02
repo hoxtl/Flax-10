@@ -27,3 +27,7 @@ export function updateUserProfile(formData) {
   const token = localStorage.getItem('token');
   return apiFetch('/profile/', { method: 'PATCH', headers: { 'Authorization': `Token ${token}` }, body: formData });
 }
+
+export function getHomeAddress() {
+  return apiFetch('/user/home-address/', { headers: authHeaders() });
+}
