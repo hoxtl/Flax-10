@@ -810,3 +810,8 @@
   cursor: pointer;
   transition: all 150ms ease;
 }
+
+:global(.homePopupButton:hover) {
+  background: var(--primary-strong);
+  transform: translateY(-1px);
+}
