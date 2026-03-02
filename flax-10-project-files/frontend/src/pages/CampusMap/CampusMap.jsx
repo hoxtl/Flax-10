@@ -252,6 +252,34 @@ export default function CampusMap() {
     };
   }, []);
 
+  // Load user's home address on the map
+  useEffect(() => {
+    const loadHomeAddress = async() => {
+      try {
+        const data = await getHomeAddress();
+        if (data.home_latitude && data.home_longitude) {
+          setUserHome({
+            address: data.home_address,
+            lat: data.home_latitude,
+            lng: data.home_longitude,
+          });
+        }
+      } catch (error) {
+        console.error('User home could not be loaded: ', error);
+      }
+    };
+
+    loadHomeAddress();
+
+    const handleHomeUpdate = () => loadHomeAddress();
+    window.addEventListener('home-address-updated', handleHomeUpdate);
+
+    return () => window.removeEventListener('home-address-updated', handleHomeUpdate);
+  }, []);
+
+  // Display user's home pointer on the map
+  
+
   // Update the marker on the map when user's start location changes
   useEffect(() => {
     if (!mapLoaded || !startLocation) return;
