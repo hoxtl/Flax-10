@@ -790,3 +790,11 @@
   color: var(--text);
   margin-bottom: 4px;
 }
+
+:global(.homePopupAddress) {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  max-width: 200px;
+  line-height: 1.3;
+}
