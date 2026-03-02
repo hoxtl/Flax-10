@@ -295,8 +295,20 @@ export default function CampusMap() {
     el.innerHTML = '🏠';
     el.title = 'User Home';
 
-    
+    homePopup.current = new mapboxgl.Popup({
+      offset: 25,
+      closeButton: false,
+      closeOnClick: false,
+    }).setHTML(`
+      <div class="HomePopupContent">
+        <div class="HomePopupTitle">🏠User Home</div>
+        <div class="HomePopupAddress">${userHome.address}</div>
+        <button id="setHomeAsStart" class="HomePopupButton">
+          Set Home as Start
+        </button>
+      </div>`);
 
+      
   })
 
   // Update the marker on the map when user's start location changes
