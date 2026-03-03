@@ -10,3 +10,8 @@ from .society_serialisers import (
     SocietyEventCalendarSerialiser, get_society_color
 )
 from .deadline_serialisers import DeadlineSerialiser
+from .schedule_serialiser import (
+    ScheduleSerialiser,
+    AutoScheduleRequestSerialiser,
+    ScheduleEventAllocationSerialiser,
+)
