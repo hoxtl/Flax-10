@@ -305,11 +305,12 @@ class Command(BaseCommand):
             self._seed_society_tags_from_config(society, data.get('tags', []))
 
     def _create_society_from_config(self, data):
-        status = random.choice(['approved', 'pending', 'rejected', 'none'])
+        is_ratified = random.choice([True, False])
+        status = 'approved' if is_ratified else 'none'
         defaults = {
             'bio': data['bio'], 'about': data['about'],
             'categories': data.get('categories', []),
-            'ratification_status': status, 'is_ratified': (status == 'approved')
+            'ratification_status': status, 'is_ratified': is_ratified
         }
         if data.get('image'):
             defaults['image'] = data['image']
