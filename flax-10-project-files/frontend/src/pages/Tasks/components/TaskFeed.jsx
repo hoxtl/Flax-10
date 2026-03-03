@@ -1,28 +1,17 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { ChevronDown, Search, X, Plus } from "lucide-react";
 
 import TaskCard from "./TaskCard";
 import CreateTaskBar from "./CreateTaskBar";
-import EmptyStateCard from "../../../components/EmptyStateCard";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import MultiSelectDropdown from "../../../components/ui/MultiSelectDropdown";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
+import AllTasksCompleteCard from "../../../components/AllTasksCompleteCard";
+import { getClearMessage, getClearCtaLabel } from "../../../lib/allTasksCompleteMessages";
 
 import styles from "./TaskFeed.module.css";
 
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
-
-/** Subtitle by list type for dynamic header. */
-function getListSubtitle(listName, listCategory, isEmpty) {
-  if (isEmpty) return "This garden is currently empty. Ready to plant some goals?";
-  const name = (listName || "").toLowerCase();
-  const cat = (listCategory || "").toLowerCase();
-  if (/internship|placement/i.test(name)) return "Progress stacks quietly. Treat each internship task as proof of your momentum.";
-  if (/finance|budget|money/i.test(name)) return "Small money moves compound. Keep the system simple and consistent.";
-  if (/health|wellness|fitness/i.test(name)) return "Protect your energy first. A steady body makes focused work easier.";
-  if (cat === "uni" || /university|academic|reading list/i.test(name)) return "Academic excellence is a marathon, not a sprint. Focus on your core objectives.";
-  if (cat === "personal" || /personal|health|wellness|finance|home/i.test(name)) return "Nurturing the gardener is as important as tending the garden. Balance is key.";
-  if (cat === "society" || /internship|work|project|admin/i.test(name)) return "Brick by brick, system by system. Building the future one task at a time.";
-  return "A clear mind leads to a clear path. What is the next right move for today?";
-}
 
 /** Routine/event tasks (meals, lectures, etc.) auto-pass when time has passed — exclude from Overdue. */
 function isRoutineOrEventTask(task) {
@@ -62,7 +51,6 @@ function sortTasks(tasks, sortBy, listMap) {
       if (ab !== bb) return ab - bb;
       return (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4);
     }
-    // default: priority
     const pd = (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4);
     if (pd !== 0) return pd;
     return new Date(a.due_date || 0) - new Date(b.due_date || 0);
@@ -101,39 +89,38 @@ function Section({
   const visibleTasks = applyLimit && !showAll ? sorted.slice(0, SECTION_SHOW_LIMIT) : sorted;
   const hiddenCount = applyLimit ? Math.max(0, sorted.length - SECTION_SHOW_LIMIT) : 0;
 
-  // Show all-done celebration when all tasks in this date bucket are completed
-  if (tasks.length === 0 && completedCount > 0) {
-    return (
-      <div className={styles.sectionAllDoneWrap}>
-        <span className={styles.sectionAllDoneText}>
-          ✨ All {completedCount} {completedCount === 1 ? "task" : "tasks"} done for {title.toLowerCase()}!
-        </span>
-      </div>
-    );
-  }
+  if (tasks.length === 0 && completedCount > 0) return null;
 
   if (tasks.length === 0) return null;
 
-  const accentCls = isOverdueSection ? styles.sectionAccentDanger
-    : sectionType === "today" ? styles.sectionAccentToday
-    : sectionType === "week" ? styles.sectionAccentWeek
-    : "";
+  const accentCls = isOverdueSection ? styles.sectionAccentDanger : "";
 
   return (
-    <div className={`${styles.section} ${isOverdueSection ? styles.sectionOverdue : ""}`}>
+    <div className={`${styles.section} ${accentCls} ${isOverdueSection ? styles.sectionOverdue : ""}`}>
       <button
-        className={`${styles.sectionHeader} ${isOverdueSection ? styles.sectionHeaderDanger : ""} ${accentCls}`}
+        className={`${styles.sectionHeader} ${isOverdueSection ? styles.sectionHeaderDanger : ""}`}
         onClick={() => setCollapsed(c => !c)}
       >
-        <span className={styles.sectionEmoji}>{emoji}</span>
+        <span className={styles.sectionIcon}>{emoji}</span>
         <span className={styles.sectionTitle}>{title}</span>
         <span className={styles.sectionCountWrap}>
-          <span className={styles.sectionCountCircle} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
+          {totalInGroup > 0 && (
+            <svg className={styles.sectionRing} width="22" height="22" viewBox="0 0 22 22" aria-hidden>
+              <circle cx="11" cy="11" r="9" fill="none" stroke="rgba(123,103,81,0.1)" strokeWidth="2.5" />
+              <circle cx="11" cy="11" r="9" fill="none"
+                className={`${styles.sectionRingFill} ${isOverdueSection ? styles.sectionRingDanger : ""}`}
+                strokeWidth="2.5" strokeLinecap="round"
+                strokeDasharray={`${(2 * Math.PI * 9 * progressPct) / 100} ${2 * Math.PI * 9}`}
+                transform="rotate(-90 11 11)"
+              />
+            </svg>
+          )}
+          <span className={styles.sectionCountPill} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
           {completedCount > 0 && (
             <span className={styles.sectionCountDone}>· {completedCount} done</span>
           )}
         </span>
-        <span className={`${styles.sectionChevron} ${collapsed ? styles.sectionChevronCollapsed : ""}`}>▼</span>
+        <ChevronDown size={14} className={`${styles.sectionChevron} ${collapsed ? styles.sectionChevronCollapsed : ""}`} />
       </button>
 
       {totalInGroup > 0 && (
@@ -145,7 +132,7 @@ function Section({
         </div>
       )}
 
-      {!collapsed && (
+      <div className={`${styles.sectionCollapse} ${collapsed ? styles.sectionCollapseHidden : ""}`}>
         <div className={styles.sectionBody}>
           {visibleTasks.map(task => {
             const list = listMap[String(task.task_list)];
@@ -180,7 +167,7 @@ function Section({
             </button>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -198,10 +185,13 @@ export default function TaskFeed({
   onEditTask,
   onCreateTask,
   onAddTask,
+  filterListIds = [],
+  onFilterByList,
 }) {
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("priority");
+  const [sortBy, setSortBy] = useState("due");
   const [showDone, setShowDone] = useState(true);
+  const [filterModuleCodes, setFilterModuleCodes] = useState([]);
   const searchInputRef = useRef(null);
 
   // Build list lookup map: id → { name, color, idx }
@@ -213,18 +203,58 @@ export default function TaskFeed({
     return map;
   }, [lists]);
 
-  const pending = tasks.filter(t => !t.completed);
-  const completed = tasks.filter(t => t.completed);
+  // Apply module filter to tasks
+  const tasksByModule = useMemo(() => {
+    if (!filterModuleCodes || filterModuleCodes.length === 0) return tasks;
+    const set = new Set(filterModuleCodes.map(String));
+    return tasks.filter((t) => set.has(String(t.module_code || "")));
+  }, [tasks, filterModuleCodes]);
+
+  const pending = tasksByModule.filter(t => !t.completed);
+  const completed = tasksByModule.filter(t => t.completed);
+
+  const moduleOptions = useMemo(() => {
+    const codes = [...new Set((tasks || []).map(t => t.module_code).filter(Boolean))].sort();
+    return [{ value: "", label: "All modules" }, ...codes.map(c => ({ value: c, label: c }))];
+  }, [tasks]);
+
+  const listFilterOptions = useMemo(
+    () => [
+      { value: "", label: "All lists" },
+      ...(lists || []).map((l) => ({ value: String(l.id), label: l.name || "List" })),
+    ],
+    [lists]
+  );
 
   const filtered = useMemo(() => {
     if (!search.trim()) return pending;
     const q = search.toLowerCase();
-    return pending.filter(t =>
-      t.title.toLowerCase().includes(q) ||
-      (t.description || "").toLowerCase().includes(q) ||
-      (t.module_code || "").toLowerCase().includes(q)
-    );
-  }, [pending, search]);
+    return pending.filter(t => {
+      const listName = listMap[String(t.task_list)]?.name || "";
+      return (
+        t.title.toLowerCase().includes(q) ||
+        (t.description || "").toLowerCase().includes(q) ||
+        (t.module_code || "").toLowerCase().includes(q) ||
+        (t.module_name || "").toLowerCase().includes(q) ||
+        listName.toLowerCase().includes(q)
+      );
+    });
+  }, [pending, search, listMap]);
+
+  const filteredCompleted = useMemo(() => {
+    if (!search.trim()) return completed;
+    const q = search.toLowerCase();
+    return completed.filter(t => {
+      const listName = listMap[String(t.task_list)]?.name || "";
+      return (
+        t.title.toLowerCase().includes(q) ||
+        (t.description || "").toLowerCase().includes(q) ||
+        (t.module_code || "").toLowerCase().includes(q) ||
+        (t.module_name || "").toLowerCase().includes(q) ||
+        listName.toLowerCase().includes(q)
+      );
+    });
+  }, [completed, search, listMap]);
 
   const now = new Date();
   const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
@@ -236,7 +266,6 @@ export default function TaskFeed({
   const thisWeek = filtered.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); return d > todayEnd && d <= weekEnd; });
   const later = filtered.filter(t => !t.due_date || new Date(t.due_date) > weekEnd);
 
-  // Per-section completed counts for progress bars and all-done celebrations
   const completedTodayCount = useMemo(() =>
     completed.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd).length,
     [completed]
@@ -250,14 +279,14 @@ export default function TaskFeed({
     [completed]
   );
 
-  const hasAny = filtered.length > 0;
-  const isZenEmpty = tasks.length === 0 || pending.length === 0;
+  const hasAny = filtered.length > 0 || (search.trim() && filteredCompleted.length > 0);
+  const isClearEmpty = tasks.length === 0 || pending.length === 0;
   const allCompleted = tasks.length > 0 && pending.length === 0;
-  const showZenEmptyState = !hasAny && isZenEmpty;
-  const showSearchEmptyState = !hasAny && !isZenEmpty;
+  const showClearEmptyState = !search.trim() && !hasAny && isClearEmpty;
+  const showSearchEmptyState = search.trim() && filtered.length === 0 && filteredCompleted.length === 0;
 
-  const zenMessage = allCompleted ? "The slate is clean. You've mastered your momentum for now. ✨" : null;
-  const zenCtaLabel = allCompleted ? "Plan a new session" : "Add a new seed";
+  const clearMessage = useMemo(() => (allCompleted ? getClearMessage() : null), [allCompleted]);
+  const clearCtaLabel = useMemo(() => (allCompleted ? getClearCtaLabel() : "Add your first task"), [allCompleted]);
 
   const displayName = useMemo(() => {
     try {
@@ -278,10 +307,6 @@ export default function TaskFeed({
   const headerTitle = activeList
     ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
     : (activeModuleCode || "All tasks");
-  const headerSubtitle = activeList
-    ? getListSubtitle(activeList?.name, activeList?.category, tasks.length === 0)
-    : null;
-
   const sectionProps = {
     sortBy, listMap, lists,
     onToggleComplete, onTaskCompleted, onDeleteTask, onEditTask,
@@ -317,27 +342,33 @@ export default function TaskFeed({
         <div className={styles.listHeaderTitleWrap}>
           <h1 className={styles.listHeaderTitle} title={headerTitle}>{headerTitle}</h1>
         </div>
-        {headerSubtitle && <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>}
         <div className={styles.listHeaderDivider} aria-hidden />
       </header>
 
       {/* Quick capture + toolbar */}
       <div className={styles.subHeader}>
-        {onAddTask ? (
-          <div className={styles.createBarWrap}>
-            <CreateTaskBar
-              lists={lists}
-              defaultListId={activeListId}
-              defaultDueDate={defaultDueDateForNewTask}
-              onAddTask={onAddTask}
-            />
-          </div>
-        ) : (
-          <div className={styles.subHeaderSpacer} aria-hidden />
-        )}
+        <div className={styles.createRow}>
+          {onAddTask ? (
+            <div className={styles.createBarWrap}>
+              <CreateTaskBar
+                lists={lists}
+                defaultListId={activeListId}
+                defaultDueDate={defaultDueDateForNewTask}
+                onAddTask={onAddTask}
+              />
+            </div>
+          ) : (
+            <div className={styles.subHeaderSpacer} aria-hidden />
+          )}
+          {onCreateTask && (
+            <button type="button" className={styles.addBtn} onClick={onCreateTask}>
+              <Plus size={13} /> Full Planning
+            </button>
+          )}
+        </div>
         <div className={styles.toolbar}>
           <div className={styles.searchWrap}>
-            <span className={styles.searchIcon} aria-hidden>🔍</span>
+            <Search size={13} className={styles.searchIcon} aria-hidden />
             <input
               ref={searchInputRef}
               className={styles.searchInput}
@@ -347,7 +378,7 @@ export default function TaskFeed({
               onKeyDown={e => { if (e.key === "Escape") { setSearch(""); e.target.blur(); } }}
             />
             {search && (
-              <button className={styles.searchClear} onClick={() => setSearch("")} aria-label="Clear search">✕</button>
+              <button className={styles.searchClear} onClick={() => setSearch("")} aria-label="Clear search"><X size={12} /></button>
             )}
           </div>
           <div className={styles.sortWrap}>
@@ -356,49 +387,62 @@ export default function TaskFeed({
               value={sortBy}
               onChange={setSortBy}
               options={[
-                { value: "priority",   label: "Priority"       },
-                { value: "due",        label: "Due date"       },
-                { value: "alpha",      label: "A → Z"          },
-                { value: "list",       label: "List"           },
-                { value: "date_added", label: "Date added"     },
+                { value: "priority",   label: "Urgency"       },
+                { value: "due",        label: "Due date"      },
+                { value: "alpha",      label: "A → Z"        },
+                { value: "date_added", label: "Date added"    },
                 { value: "est_time",   label: "Estimated time" },
               ]}
               className={styles.sortDropdown}
             />
           </div>
-          {onCreateTask && (
-            <button type="button" className={styles.addBtn} onClick={onCreateTask}>
-              + Full Planning
-            </button>
+          {typeof onFilterByList === "function" && (
+            <div className={styles.filterWrap}>
+              <label className={styles.sortLabel}>FILTER BY LIST</label>
+              <MultiSelectDropdown
+                value={filterListIds}
+                onChange={onFilterByList}
+                options={listFilterOptions}
+                placeholder="All lists"
+                countLabel="lists"
+                className={styles.sortDropdown}
+                displayAsPills
+              />
+            </div>
           )}
+          <div className={styles.filterWrap}>
+            <label className={styles.sortLabel}>FILTER BY MODULE</label>
+            <MultiSelectDropdown
+              value={filterModuleCodes}
+              onChange={setFilterModuleCodes}
+              options={moduleOptions}
+              placeholder="All modules"
+              countLabel="modules"
+              className={styles.sortDropdown}
+              displayAsPills
+            />
+          </div>
         </div>
       </div>
 
       {/* Sections */}
       <div className={styles.sectionsWrap}>
-        <div className={styles.sections}>
-          {showZenEmptyState && (
-            <div className={styles.emptyState}>
-              <EmptyStateCard
-                displayName={displayName}
-                sub={null}
-                message={zenMessage}
-                action={
-                  onCreateTask ? (
-                    <button type="button" className={styles.emptyStateAddBtn} onClick={onCreateTask}>
-                      {zenCtaLabel}
-                    </button>
-                  ) : null
-                }
-              />
-            </div>
+        <div className={styles.sections} key={`sections-${activeListId ?? "all"}`}>
+          {showClearEmptyState && (
+            <AllTasksCompleteCard
+              emoji={allCompleted ? "🎉" : "📝"}
+              message={allCompleted ? clearMessage : `No tasks yet. Let's get started, ${displayName || "friend"}.`}
+              ctaLabel={onCreateTask ? clearCtaLabel : undefined}
+              onCtaClick={onCreateTask}
+            />
           )}
 
           {showSearchEmptyState && (
-            <div className={styles.emptyState}>
-              <span className={styles.emptyStateIcon} aria-hidden>🔍</span>
-              <p className={styles.emptyStateText}>No tasks match &ldquo;{search}&rdquo;</p>
-              <button type="button" className={styles.addBtn} onClick={() => setSearch("")}>
+            <div className={styles.searchEmptyCard}>
+              <span className={styles.searchEmptyEmoji}>🔍</span>
+              <p className={styles.searchEmptyMessage}>No tasks match &ldquo;{search}&rdquo;</p>
+              <p className={styles.searchEmptyHint}>Try a different keyword or check your spelling</p>
+              <button type="button" className={styles.searchEmptyBtn} onClick={() => setSearch("")}>
                 Clear search
               </button>
             </div>
@@ -431,17 +475,19 @@ export default function TaskFeed({
             {...sectionProps}
           />
 
-          {completed.length > 0 && (
-            <div className={styles.completedSection}>
-              <button className={styles.completedToggle} onClick={() => setShowDone(s => !s)}>
-                <span>🌱 Recently Harvested</span>
-                <span className={styles.completedSub}>Completed</span>
-                <span className={styles.sectionCountCircle} aria-label={`${completed.length} tasks`}>{completed.length}</span>
-                <span className={`${styles.sectionChevron} ${!showDone ? styles.sectionChevronCollapsed : ""}`}>▼</span>
+          {filteredCompleted.length > 0 && (
+            <div className={`${styles.completedSection} ${styles.sectionAccentDone}`}>
+              <button className={styles.sectionHeader} onClick={() => setShowDone(s => !s)}>
+                <span className={styles.sectionIcon}>🎯</span>
+                <span className={styles.sectionTitle}>Completed</span>
+                <span className={styles.sectionCountWrap}>
+                  <span className={styles.sectionCountPill} aria-label={`${filteredCompleted.length} tasks`}>{filteredCompleted.length}</span>
+                </span>
+                <ChevronDown size={14} className={`${styles.sectionChevron} ${!showDone ? styles.sectionChevronCollapsed : ""}`} />
               </button>
-              {showDone && (
+              <div className={`${styles.sectionCollapse} ${!showDone ? styles.sectionCollapseHidden : ""}`}>
                 <div className={styles.completedCards}>
-                  {sortTasks(completed, sortBy, listMap).map(task => {
+                  {sortTasks(filteredCompleted, sortBy, listMap).map(task => {
                     const list = listMap[String(task.task_list)];
                     return (
                       <TaskCard
@@ -457,7 +503,7 @@ export default function TaskFeed({
                     );
                   })}
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>
