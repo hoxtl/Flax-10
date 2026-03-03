@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DashboardLayout.module.css";
-import Sidebar from "../components/Dashboard/Sidebar";
 import TopBar from "../components/Dashboard/Topbar";
+import Sidebar from "../components/Dashboard/Sidebar";
 import WeekBar from "../components/Dashboard/WeekBar";
 import QuickAddModal from "../components/Dashboard/QuickAddModal";
 import { EventModal } from "../components/Calendar/EventModal/EventModal";
@@ -80,6 +80,7 @@ function MainArea({
 }) {
   return (
     <div className={styles.main}>
+      {/* Topbar shown on desktop only */}
       {!isMobile && (
         <TopBar
           user={user}
@@ -159,6 +160,8 @@ function DashboardSidebars({
   onLogout,
   onProfile,
 }) {
+  // Sidebar shown on mobile only
+  if (!isMobile) return null;
   return (
     <Sidebar
       user={user}
@@ -174,12 +177,7 @@ function DashboardSidebars({
   );
 }
 
-function DashboardModals({
-  showQuickAdd,
-  setShowQuickAdd,
-  onSelectType,
-  modal,
-}) {
+function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal }) {
   return (
     <>
       <QuickAddGate
@@ -236,6 +234,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
     state;
   return (
     <div className={styles.root}>
+      {/* Sidebar — mobile only */}
       <DashboardSidebars
         {...state}
         activeNav={activeNav}
@@ -243,6 +242,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         onLogout={handleLogoutClick}
         onProfile={() => onNavChange("profile")}
       />
+      {/* Main area — Topbar shown inside on desktop */}
       <DashboardMain
         state={{ ...state, activeNav, isMobile }}
         onNavChange={onNavChange}

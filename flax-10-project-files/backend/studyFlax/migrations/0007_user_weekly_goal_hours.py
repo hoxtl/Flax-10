@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0006_enrollment_is_core'),
+        ('studyFlax', '0006_add_is_private_to_calendar_event'),
     ]
 
     operations = [

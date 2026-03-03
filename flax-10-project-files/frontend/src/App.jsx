@@ -80,11 +80,20 @@ function resolveScreen(authed, user, showWelcome) {
   return "app";
 }
 
-function resolveRouteContent(activeNav, user) {
-  const route = APP_ROUTES.find((r) => r.id === activeNav) || APP_ROUTES[0];
+function resolveRouteContent(activeNav, user, setActiveNav) {
+  const baseNav = activeNav.split('_')[0];
+  const navParam = activeNav.split('_').slice(1).join('_');
+
+  const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
-  if (el && typeof el === "object")
-    return { ...el, props: { ...el.props, user } };
+  if (el && typeof el === "object") {
+    const extraProps = { user, onNavChange: setActiveNav };
+    // Pass the search param to modules view if provided
+    if (baseNav === 'modules' && navParam) {
+      extraProps.initialSearch = navParam;
+    }
+    return { ...el, props: { ...el.props, ...extraProps } };
+  }
   return el;
 }
 
@@ -123,7 +132,7 @@ function checkOnboarding(setShowOnboarding) {
     .then((data) => {
       if (!data?.major || data.major === "") setShowOnboarding(true);
     })
-    .catch(() => {});
+    .catch(() => { });
 }
 
 // Custom hooks
@@ -166,6 +175,12 @@ function useAppState() {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
   };
+
+  useEffect(() => {
+    const handleNavigate = (e) => setActiveNav(e.detail);
+    window.addEventListener('navigate', handleNavigate);
+    return () => window.removeEventListener('navigate', handleNavigate);
+  }, []);
 
   return {
     activeNav,
@@ -268,6 +283,7 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
+
   if (activeNav === "profile")
     return (
       <Profile
@@ -276,7 +292,20 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
         onNavigate={setActiveNav}
       />
     );
-  return resolveRouteContent(activeNav, user);
+
+  if (activeNav.startsWith("profile_")) {
+    const viewedUserId = activeNav.split("_")[1];
+    return (
+      <Profile
+        user={user}
+        viewedUserId={viewedUserId}
+        onBack={() => setActiveNav("home")}
+        onNavigate={setActiveNav}
+      />
+    );
+  }
+
+  return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {

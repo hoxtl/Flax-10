@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import { authService } from "../../api/authService";
-import { clearUserData } from "../../utils/authHelpers";
+import { clearUserData } from "../../components/Authentication/utils/authHelpers";
 
-vi.mock("../../components/Sidebar", () => ({
+vi.mock("../../components/Dashboard/Sidebar", () => ({
   default: ({ user, active, onChange }) => (
     <div data-testid="sidebar">
       <span>User: {user.name}</span>
@@ -13,7 +13,7 @@ vi.mock("../../components/Sidebar", () => ({
   ),
 }));
 
-vi.mock("../../components/Topbar", () => ({
+vi.mock("../../components/Dashboard/Topbar", () => ({
   default: ({ onAddClick, onLogoutClick }) => (
     <div data-testid="topbar">
       <button onClick={onAddClick}>Quick Add</button>
@@ -22,10 +22,10 @@ vi.mock("../../components/Topbar", () => ({
   ),
 }));
 
-vi.mock("../../components/WeekBar", () => ({
+vi.mock("../../components/Dashboard/WeekBar", () => ({
   default: () => <div data-testid="weekbar" />,
 }));
-vi.mock("../../components/QuickAddModal", () => ({
+vi.mock("../../components/Dashboard/QuickAddModal", () => ({
   default: ({ onClose }) => (
     <div data-testid="quick-add">
       Modal <button onClick={onClose}>Close</button>
@@ -39,11 +39,18 @@ vi.mock("../../context/CalendarContext", () => ({
 }));
 
 vi.mock("../../api/authService", () => ({ authService: { logout: vi.fn() } }));
-vi.mock("../../utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
 
 vi.mock("react-router-dom", () => ({
   useLocation: () => ({ pathname: "/" }),
 }));
+
+const mockStore = {};
+global.localStorage = {
+  setItem: (key, val) => { mockStore[key] = val.toString(); },
+  getItem: (key) => mockStore[key] || null,
+  removeItem: (key) => { delete mockStore[key]; },
+};
 
 describe("DashboardLayout", () => {
   const mockUser = {
@@ -81,7 +88,9 @@ describe("DashboardLayout", () => {
     render(<DashboardLayout activeNav="home">Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Logout"));
     expect(authService.logout).toHaveBeenCalled();
-    expect(clearUserData).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(clearUserData).toHaveBeenCalled();
+    });
   });
 
   it("shows mobile drawer when toggled on small screens", () => {
