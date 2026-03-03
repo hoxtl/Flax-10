@@ -53,6 +53,18 @@ function getEventClassName(eventType, isDragging) {
     return className;
 }
 
-export function MoreEvents({ count }) {
-    return <span className="more-events">+{count} more</span>;
+export function MoreEvents({ count, onClick }) {
+    return (
+        <span
+            className="more-events"
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick?.();
+            }}
+            role="button"
+            style={{ cursor: 'pointer' }}
+        >
+            +{count} more
+        </span>
+    );
 }
