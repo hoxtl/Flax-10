@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import TaskCard from "./TaskCard";
 import CreateTaskBar from "./CreateTaskBar";
 import EmptyStateCard from "../../../components/EmptyStateCard";
+import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 import styles from "./TaskFeed.module.css";
@@ -234,15 +235,16 @@ export default function TaskFeed({
                     </div>
                     <div className={styles.sortWrap}>
                         <label className={styles.sortLabel}>SORT</label>
-                        <select
-                            className={styles.sortSelect}
+                        <AnimatedDropdown
                             value={sortBy}
-                            onChange={e => setSortBy(e.target.value)}
-                        >
-                            <option value="priority">Priority</option>
-                            <option value="due">Due date</option>
-                            <option value="alpha">A → Z</option>
-                        </select>
+                            onChange={setSortBy}
+                            options={[
+                                { value: "priority", label: "Priority" },
+                                { value: "due",      label: "Due date" },
+                                { value: "alpha",    label: "A → Z"    },
+                            ]}
+                            className={styles.sortDropdown}
+                        />
                     </div>
                     {onCreateTask && (
                         <button

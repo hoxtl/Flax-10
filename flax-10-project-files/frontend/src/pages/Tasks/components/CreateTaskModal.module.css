@@ -142,8 +142,7 @@
 }
 
 .titleInput:focus,
-.desc:focus,
-.select:focus {
+.desc:focus {
   outline: none;
   border-color: var(--restoration-earth, #6B5344);
   box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.15);
@@ -488,34 +487,6 @@
   cursor: not-allowed;
 }
 
-.select {
-  flex: 1;
-  min-width: 0;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--restoration-earth, #6B5344);
-  background: #fff;
-  color: #1a1a1a;
-  font-size: 1rem;
-  font-family: var(--font-body);
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-  cursor: pointer;
-  appearance: none;
-  background-image: var(--select-chevron);
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 12px;
-  padding-right: 32px;
-}
-
-.select option {
-  font-family: var(--font-body);
-  padding: 8px;
-  background: #FBF9F5;
-  color: #4A4A4A;
-}
 
 @media (max-width: 420px) {
   .row,

@@ -7,6 +7,7 @@ import { useHarvestCelebration } from "../../../context/HarvestCelebrationContex
 import { getHarvestMessage, isRoutineHarvestTask } from "../../../lib/harvestMessages";
 import DateTimePicker from "./DateTimePicker";
 import { SeedBurst } from "../../../components/HarvestCelebration/SeedBurst";
+import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 
 import styles from "./TaskCard.module.css";
 
@@ -101,29 +102,30 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
                     <div className={styles.editGrid}>
                         <div className={styles.editField}>
                             <label className={styles.editLabel}>Priority</label>
-                            <select
-                                className={styles.editSelect}
+                            <AnimatedDropdown
                                 value={form.priority}
-                                onChange={e => set("priority", e.target.value)}
-                            >
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
+                                onChange={val => set("priority", val)}
+                                placeholder="Select priority"
+                                options={[
+                                    { value: "low",    label: "Low"    },
+                                    { value: "medium", label: "Medium" },
+                                    { value: "high",   label: "High"   },
+                                    { value: "urgent", label: "Urgent" },
+                                ]}
+                            />
                         </div>
                         <div className={styles.editField}>
                             <label className={styles.editLabel}>Energy</label>
-                            <select
-                                className={styles.editSelect}
+                            <AnimatedDropdown
                                 value={form.energy_level}
-                                onChange={e => set("energy_level", e.target.value)}
-                                title="Cognitive load: avoid two High back-to-back"
-                            >
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                            </select>
+                                onChange={val => set("energy_level", val)}
+                                placeholder="Select energy"
+                                options={[
+                                    { value: "low",    label: "Low"    },
+                                    { value: "medium", label: "Medium" },
+                                    { value: "high",   label: "High"   },
+                                ]}
+                            />
                         </div>
                         <div className={styles.editField}>
                             <label className={styles.editLabel}>Due date</label>

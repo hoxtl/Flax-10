@@ -183,22 +183,9 @@
     white-space: nowrap;
 }
 
-.sortSelect {
-    padding: var(--btn-padding, 8px 16px);
-    background: var(--bg);
-    border: var(--input-border, 1px solid var(--border));
-    border-radius: var(--radius-lg, 12px);
-    font-size: var(--text-sm, 0.8rem);
-    font-weight: 500;
-    color: var(--text);
-    outline: none;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
-}
-.sortSelect:focus {
-    box-shadow: var(--input-focus-ring, 0 0 0 2px rgba(148, 163, 184, 0.25));
-    border-color: var(--primary);
+.sortDropdown {
+    width: 110px;
+    flex: 0 0 110px;
 }
 
 .addBtn {

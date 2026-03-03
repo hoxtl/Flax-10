@@ -10,6 +10,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { Flag } from "lucide-react";
 
 import DateTimePicker from "./DateTimePicker";
+import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 import styles from "./CreateTaskModal.module.css";
@@ -354,17 +355,18 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
             <div className={styles.row}>
               <div className={styles.listWrap} style={{ width: "100%" }}>
                 <span className={styles.listWrapLabel}>Link to module</span>
-                <select
-                  value={form.module}
-                  onChange={(e) => set("module", e.target.value)}
-                  className={styles.select}
-                  aria-label="Link to Module"
-                >
-                  <option value="">No module</option>
-                  {sortedModules.map((m) => (
-                    <option key={m.id} value={m.id}>{m.module_code} – {m.module_name || m.title || ""}</option>
-                  ))}
-                </select>
+                <AnimatedDropdown
+                  value={form.module ? String(form.module) : ""}
+                  onChange={(val) => set("module", val)}
+                  placeholder="No module"
+                  options={[
+                    { value: "", label: "No module" },
+                    ...sortedModules.map((m) => ({
+                      value: String(m.id),
+                      label: `${m.module_code} – ${m.module_name || m.title || ""}`,
+                    })),
+                  ]}
+                />
               </div>
             </div>
           )}
