@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
@@ -23,18 +23,26 @@ function UserCard({ user, onNavChange }) {
 function useDiscoverFetch(searchQuery, filterState) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
+    const [hasMore, setHasMore] = useState(false);
+    const filters = { mods: filterState.props.selectedModules, socs: filterState.props.selectedSocieties };
     useEffect(() => {
         const run = async () => {
             setLoading(true);
-            const { selectedModules, selectedSocieties } = filterState.props;
-            const data = await searchUsers(searchQuery, selectedModules.join(','), selectedSocieties.join(',')).catch(() => []);
-            setUsers(data.results || data);
+            const data = await searchUsers(searchQuery, filters.mods.join(','), filters.socs.join(','), 0, 20).catch(() => ({ results: [] }));
+            setUsers(data.results || []);
+            setHasMore(data.has_more || false);
             setLoading(false);
         };
         const timer = setTimeout(run, 300);
         return () => clearTimeout(timer);
-    }, [searchQuery, filterState.props.selectedModules, filterState.props.selectedSocieties]);
-    return { loading, users };
+    }, [searchQuery, filters.mods, filters.socs]);
+    const fetchMore = async () => {
+        if (loading || !hasMore) return;
+        const data = await searchUsers(searchQuery, filters.mods.join(','), filters.socs.join(','), users.length, 20).catch(() => ({ results: [] }));
+        setUsers(prev => [...prev, ...(data.results || [])]);
+        setHasMore(data.has_more || false);
+    };
+    return { loading, users, hasMore, fetchMore };
 }
 
 function useDiscoverUIState(searchQuery) {
@@ -52,8 +60,8 @@ function useDiscoverUIState(searchQuery) {
 function useDiscoverSearch() {
     const [searchQuery, setSearchQuery] = useState("");
     const ui = useDiscoverUIState(searchQuery);
-    const { loading, users } = useDiscoverFetch(searchQuery, ui.filterState);
-    return { loading, users, searchQuery, setSearchQuery, ...ui };
+    const { loading, users, hasMore, fetchMore } = useDiscoverFetch(searchQuery, ui.filterState);
+    return { loading, users, hasMore, fetchMore, searchQuery, setSearchQuery, ...ui };
 }
 
 function DiscoverHeader() {
@@ -79,25 +87,42 @@ function SearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filte
     );
 }
 
-function UsersGrid({ users, onNavChange }) {
-    const currentUser = JSON.parse(localStorage.getItem("user")) || {};
-    const filtered = users.filter(u => u.id !== currentUser.id && u.username !== currentUser.username);
-    if (filtered.length === 0) return <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>;
+function useScrollObserver(loading, hasMore, fetchMore) {
+    const observer = useRef();
+    return useCallback(node => {
+        if (loading) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) fetchMore();
+        });
+        if (node) observer.current.observe(node);
+    }, [loading, hasMore, fetchMore]);
+}
+
+function UsersGrid({ users, onNavChange, hasMore, fetchMore, loading }) {
+    const self = JSON.parse(localStorage.getItem("user")) || {};
+    const filtered = users.filter(u => u.id !== self.id && u.username !== self.username);
+    const lastRef = useScrollObserver(loading, hasMore, fetchMore);
+    if (!loading && filtered.length === 0) return <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>;
     return (
         <div className={styles.grid}>
-            {filtered.map(u => <UserCard key={u.id} user={u} onNavChange={onNavChange} />)}
+            {filtered.map((u, i) => (
+                <div key={u.id} ref={i === filtered.length - 1 ? lastRef : null}>
+                    <UserCard user={u} onNavChange={onNavChange} />
+                </div>
+            ))}
         </div>
     );
 }
 
 export default function Discover({ onNavChange }) {
-    const { loading, users, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
+    const { loading, users, hasMore, fetchMore, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
     const showLoader = loading && users.length === 0;
     return (
         <div className={styles.container}>
             <DiscoverHeader />
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />
-            {showLoader ? <div className={styles.loadingState}>Loading users...</div> : <UsersGrid users={users} onNavChange={onNavChange} />}
+            {showLoader ? <div className={styles.loadingState}>Loading users...</div> : <UsersGrid users={users} onNavChange={onNavChange} hasMore={hasMore} fetchMore={fetchMore} loading={loading} />}
         </div>
     );
 }
