@@ -681,13 +681,13 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
         isSelf={isSelf}
       />
       <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
+      <ProfileHome onNavigate={onNavigate} isSelf={isSelf} viewedUserId={state.viewedUserId} />
       {!isSelf && isMutualOrSelf && (
         <div className={styles.calendarSection}>
           <div className={styles.cardLabel}>SHARED CALENDAR</div>
           <ProfileCalendar events={filteredEvents} />
         </div>
       )}
-      <ProfileHome onNavigate={onNavigate} isSelf={isSelf} viewedUserId={state.viewedUserId} />
     </div>
   );
 }
