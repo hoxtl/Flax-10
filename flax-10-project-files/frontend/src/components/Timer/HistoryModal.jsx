@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './HistoryModal.module.css';
 import { getHistory, clearHistory } from './utils/historyUtils';
-import { groupHistoryByBlock, formatDate, formatTimeRange } from './utils/historyFormatter';
+import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
 
 const HistoryHeader = ({ onClose }) => (
     <div className={styles.header}>
@@ -13,8 +13,8 @@ const HistoryHeader = ({ onClose }) => (
 const StatsRow = ({ block }) => (
     <div className={styles.statsRow}>
         <div className={`${styles.statPill} ${styles.sessionPill}`}>✅ {block.sessions.length} Sessions</div>
-        <div className={`${styles.statPill} ${styles.focusPill}`}>🔥 {block.totalDuration}m Focus</div>
-        {block.totalBreak > 0 && <div className={`${styles.statPill} ${styles.breakPill}`}>☕ {block.totalBreak}m Break</div>}
+        <div className={`${styles.statPill} ${styles.focusPill}`}>🔥 {formatDuration(block.totalDuration)} Focus</div>
+        {block.totalBreak > 0 && <div className={`${styles.statPill} ${styles.breakPill}`}>☕ {formatDuration(block.totalBreak)} Break</div>}
     </div>
 );
 

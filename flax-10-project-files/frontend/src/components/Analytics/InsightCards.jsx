@@ -4,9 +4,9 @@ import styles from './InsightCards.module.css';
 export function ConsistencyScore({ data }) {
   if (!data?.summary) return null;
   const { summary } = data;
-  const streak = summary.currentStreakDays || 0;
-  const totalDays = summary.activeDays ?? (data.dailyBreakdown?.filter(d => d.sessions > 0).length || 0);
-  const maxDays = Math.max(data.periodDays || 30, 1);
+  const streak = summary.current_streak_days || 0;
+  const totalDays = summary.active_days ?? (data.daily_breakdown?.filter(d => d.sessions > 0).length || 0);
+  const maxDays = Math.max(data.period_days || 30, 1);
 
   // Transparent formula: 70% = days studied / period, 30% = streak bonus
   const coverage = totalDays / maxDays;

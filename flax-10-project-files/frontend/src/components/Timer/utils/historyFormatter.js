@@ -11,36 +11,47 @@ export const formatDate = (dateString) => {
     });
 };
 
-/** Use current time if date/start/end are missing (legacy data support) */
+export const formatDuration = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    const parts = [];
+    if (hrs > 0) parts.push(hrs.toString().padStart(2, '0'));
+    parts.push(mins.toString().padStart(2, '0'));
+    parts.push(`${secs.toString().padStart(2, '0')}s`);
+    return parts.join(':');
+};
+
 const normalizeSession = (s) => {
     let {
         start_time, startTime,
         end_time, endTime,
-        date, duration,
+        date, duration: durInSeconds,
         break_duration, breakDuration,
         study_block_id, studyBlockId
     } = s;
 
     const now = new Date().toISOString();
 
-    // Normalize properties (API uses snake_case, frontend uses camelCase)
     const normalizedStartTime = startTime || start_time;
     const normalizedEndTime = endTime || end_time || date || now;
     const normalizedBreakDuration = breakDuration !== undefined ? breakDuration : (break_duration || 0);
     const normalizedBlockId = studyBlockId || study_block_id;
 
+    let finalStartTime;
     if (!normalizedStartTime) {
         const endTs = new Date(normalizedEndTime).getTime();
-        startTime = !isNaN(endTs) ? new Date(endTs - (duration || 0) * 60000).toISOString() : now;
+        finalStartTime = !isNaN(endTs) ? new Date(endTs - (durInSeconds || 0) * 1000).toISOString() : now;
     } else {
-        startTime = normalizedStartTime;
+        finalStartTime = normalizedStartTime;
     }
 
     return {
         ...s,
-        startTime,
+        startTime: finalStartTime,
         endTime: normalizedEndTime,
         date: date || normalizedEndTime,
+        duration: durInSeconds || 0,
         breakDuration: normalizedBreakDuration,
         studyBlockId: normalizedBlockId
     };

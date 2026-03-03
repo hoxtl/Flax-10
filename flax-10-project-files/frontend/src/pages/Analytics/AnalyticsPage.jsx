@@ -151,17 +151,17 @@ export default function AnalyticsPage() {
               {[
                 {
                   title: 'Study Hours',
-                  el: <StudyHoursChart data={data.dailyBreakdown} />,
+                  el: <StudyHoursChart data={data.daily_breakdown} />,
                   i: 2,
                 },
                 {
                   title: 'Daily Breakdown',
-                  el: <DailyBreakdownChart data={data.dailyBreakdown} />,
+                  el: <DailyBreakdownChart data={data.daily_breakdown} />,
                   i: 3,
                 },
                 progressData && {
                   title: 'Planned vs Actual',
-                  el: <PlannedVsActualChart data={progressData.dailyProgress} />,
+                  el: <PlannedVsActualChart data={progressData.daily_progress} />,
                   i: 4,
                   wide: true,
                 },

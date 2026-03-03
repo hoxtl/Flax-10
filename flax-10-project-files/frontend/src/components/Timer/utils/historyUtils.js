@@ -9,12 +9,15 @@ export const getHistory = async () => {
 };
 
 const createSessionPayload = (work, brk, count, blockId, task, pause) => ({
-    start_time: new Date(Date.now() - work * 60000).toISOString(),
+    start_time: new Date(Date.now() - work * 1000).toISOString(),
     end_time: new Date().toISOString(),
-    duration: work, break_duration: brk,
+    duration: work,
+    break_duration: brk,
     pause_duration: pause,
-    session_count: count, study_block_id: blockId,
-    task: task, status: 'Completed'
+    session_count: count,
+    study_block_id: blockId,
+    task: task,
+    status: 'Completed'
 });
 
 export const saveSession = async (work, brk, count, blockId, task = '', pause = 0) => {

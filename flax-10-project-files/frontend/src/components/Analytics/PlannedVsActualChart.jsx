@@ -5,8 +5,8 @@ const PlannedVsActualChart = ({ data }) => {
   const { theme } = useTheme();
   const last14 = data.slice(-14);
   const dates = last14.map(d => new Date(d.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }));
-  const plannedHours = last14.map(d => parseFloat(d.plannedHours));
-  const actualHours = last14.map(d => parseFloat(d.actualHours));
+  const plannedHours = last14.map(d => parseFloat(d.planned_hours));
+  const actualHours = last14.map(d => parseFloat(d.actual_hours));
 
   const textColor = theme === 'dark' ? 'rgba(200,184,164,0.85)' : 'rgba(43,30,20,0.55)';
   const gridColor = theme === 'dark' ? 'rgba(180,164,144,0.2)' : 'rgba(74,52,33,0.15)';

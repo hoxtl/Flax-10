@@ -7,9 +7,12 @@ export function useTimerFlow(t, notify) {
     const studyBlockId = useRef(Date.now());
 
     const startNext = useCallback(() => {
-        saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current, t.task, t.totalPaused);
+        saveSession(t.totalWork, t.totalBreak, t.completedSessions + 1, studyBlockId.current, t.task, t.totalPaused);
         const next = t.completedSessions + 1;
         t.setCompletedSessions(next);
+
+        // Reset counters for next session
+        t.updateSettings({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
 
         if (next >= t.targetSessions) {
             studyBlockId.current = Date.now();
@@ -18,7 +21,7 @@ export function useTimerFlow(t, notify) {
         t.setMode('work');
         t.setTimeLeft(t.workTime * 60);
         t.setIsActive(modal !== 'break');
-    }, [t.workTime, t.breakTime, t.completedSessions, t.task, t.totalPaused, t.targetSessions, modal, t.setCompletedSessions, t.setMode, t.setTimeLeft, t.setIsActive]);
+    }, [t.totalWork, t.totalBreak, t.completedSessions, t.task, t.totalPaused, t.targetSessions, modal, t.setCompletedSessions, t.updateSettings, t.setMode, t.setTimeLeft, t.setIsActive]);
 
     useCompletionCheck(t, startNext, notify);
     return {
