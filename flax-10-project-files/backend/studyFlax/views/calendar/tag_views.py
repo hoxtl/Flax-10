@@ -43,10 +43,12 @@ def get_tags(user):
 def ensure_user_system_tags(user):
     from studyFlax.views.calendar.system_tags import get_lecture_tag, get_deadline_tag
     from studyFlax.views.calendar.system_tags import get_exam_tag, get_societies_tag
+    from studyFlax.views.calendar.system_tags import fix_untagged_deadline_events
     if has_module_enrollments(user):
         get_lecture_tag()
         get_deadline_tag()
         get_exam_tag()
+        fix_untagged_deadline_events()
     if has_society_syncs(user):
         get_societies_tag()
 

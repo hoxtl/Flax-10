@@ -1,10 +1,10 @@
 from studyFlax.models import Tag, CalendarEvent
 
 SYSTEM_TAG_CONFIG = {
-    'Lecture': {'color': '#4A90D9', 'duration': 120},
-    'Deadline': {'color': '#E74C3C', 'duration': 60},
-    'Exam': {'color': '#9B59B6', 'duration': 180},
-    'Societies': {'color': '#27AE60', 'duration': 120},
+    'Lecture': {'color': '#4A90D9', 'duration': 120, 'icon': '📚'},
+    'Deadline': {'color': '#E74C3C', 'duration': 60, 'icon': '📝'},
+    'Exam': {'color': '#9B59B6', 'duration': 180, 'icon': '📋'},
+    'Societies': {'color': '#27AE60', 'duration': 120, 'icon': '👨‍👨‍👧‍👧'},
 }
 
 
@@ -18,8 +18,15 @@ def get_system_tag(name):
 def find_or_create_system_tag(name, config):
     tag = Tag.objects.filter(name=name, is_default=True).first()
     if tag:
-        return tag
+        return update_existing_system_tag(tag, config)
     return ensure_system_tag(name, config)
+
+
+def update_existing_system_tag(tag, config):
+    changed = update_tag_fields(tag, config)
+    if changed:
+        tag.save()
+    return tag
 
 
 def ensure_system_tag(name, config):
@@ -39,7 +46,8 @@ def consolidate_tags(existing_tags, config):
 def create_system_tag(name, config):
     return Tag.objects.create(
         name=name, is_default=True, user=None,
-        color=config['color'], default_duration=config['duration']
+        color=config['color'], default_duration=config['duration'],
+        icon=config.get('icon', '🏷️')
     )
 
 
@@ -50,12 +58,20 @@ def merge_duplicate_tags(primary, duplicates):
 
 
 def make_tag_system(tag, config):
-    if tag.is_default and tag.user is None:
-        return
-    tag.is_default = True
-    tag.user = None
-    tag.color = config['color']
-    tag.save()
+    changed = update_tag_fields(tag, config)
+    if changed:
+        tag.save()
+
+
+def update_tag_fields(tag, config):
+    changed = False
+    if not tag.is_default:
+        tag.is_default, changed = True, True
+    if tag.user is not None:
+        tag.user, changed = None, True
+    if tag.icon != config.get('icon', '🏷️'):
+        tag.icon, changed = config.get('icon', '🏷️'), True
+    return changed
 
 
 def get_lecture_tag():
@@ -72,3 +88,22 @@ def get_exam_tag():
 
 def get_societies_tag():
     return get_system_tag('Societies')
+
+
+def fix_untagged_deadline_events():
+    deadline_tag = get_deadline_tag()
+    exam_tag = get_exam_tag()
+    fix_deadline_events(deadline_tag)
+    fix_exam_events(exam_tag)
+
+
+def fix_deadline_events(deadline_tag):
+    CalendarEvent.objects.filter(
+        source='module_deadline', tag__isnull=True
+    ).exclude(title__istartswith='Exam:').update(tag=deadline_tag)
+
+
+def fix_exam_events(exam_tag):
+    CalendarEvent.objects.filter(
+        source='module_deadline', tag__isnull=True, title__istartswith='Exam:'
+    ).update(tag=exam_tag)

@@ -46,15 +46,15 @@ function EventPopupContainer() {
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
     const { disenrollFromModule } = useModuleDisenrollment();
-    const tags = useTags();
+    const { getTag, refreshTags } = useTags();
     const navigate = useNavigate();
     const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
 
     if (deleteEventState) return <DeleteConfirmModal event={deleteEventState} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
     if (isModalOpen || !popupEvent) return null;
 
-    const tag = getEventTag(popupEvent, tags);
-    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule };
+    const tag = getEventTag(popupEvent, getTag);
+    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags };
     const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
@@ -63,9 +63,9 @@ function DeleteConfirmModal({ event, onConfirm, onCancel }) {
     return <ConfirmModal title="Delete Event" message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
-function getEventTag(event, tags) {
+function getEventTag(event, getTag) {
     const societyTag = { label: event.tag_name, color: event.tag_color || event.society_color || '#9E7E5D' };
-    return (event.source === 'society' && event.tag_name) ? societyTag : tags.getTag(event.tag);
+    return (event.source === 'society' && event.tag_name) ? societyTag : getTag(event.tag);
 }
 
 function getCalendarPopupActions(event, handlers) {
@@ -91,10 +91,11 @@ function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }
     return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
 }
 
-function getSocietyActions(event, { closePopup, loadEvents }) {
+function getSocietyActions(event, { closePopup, loadEvents, refreshTags }) {
     const handleUnsync = async () => {
         closePopup();
         await unsyncCalendar(event.society_id);
+        await refreshTags();
         loadEvents();
     };
     return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];

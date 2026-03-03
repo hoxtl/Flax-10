@@ -38,6 +38,7 @@ function filterEventsByTag(events, filter) {
 }
 
 function getEffectiveTagName(event) {
+    if (event.source === 'society') return 'societies';
     if (!event.tag_name && !event.tag) return 'other';
     return event.tag_name?.toLowerCase() || 'other';
 }

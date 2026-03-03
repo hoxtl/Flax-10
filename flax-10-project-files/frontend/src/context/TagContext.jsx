@@ -5,11 +5,11 @@ const TagContext = createContext(null);
 const NONE_TAG = { id: 'none', label: 'None', icon: '🏷️', color: '#94A3B8' };
 
 export function TagProvider({ children }) {
-    const { tags, setTags, loading } = useTagLoader();
+    const { tags, setTags, loading, refreshTags } = useTagLoader();
     const actions = useTagActions(setTags);
     const getters = useTagGetters(tags);
 
-    const value = { tags, loading, ...actions, ...getters };
+    const value = { tags, loading, refreshTags, ...actions, ...getters };
 
     return (
         <TagContext.Provider value={value}>
@@ -22,14 +22,29 @@ function useTagLoader() {
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const refreshTags = async () => {
+        try {
+            const data = await getTags();
+            setTags(data.map(mapBackendTag));
+        } catch (err) {
+            console.error('Failed to fetch tags:', err);
+        }
+    };
+
     useEffect(() => {
-        getTags()
-            .then(data => setTags(data.map(mapBackendTag)))
-            .catch(err => console.error('Failed to fetch tags:', err))
-            .finally(() => setLoading(false));
+        loadInitialTags(setTags, setLoading);
     }, []);
 
-    return { tags, setTags, loading };
+    return { tags, setTags, loading, refreshTags };
+}
+
+async function loadInitialTags(setTags, setLoading) {
+    try {
+        const data = await getTags();
+        setTags(data.map(mapBackendTag));
+    } finally {
+        setLoading(false);
+    }
 }
 
 function useTagActions(setTags) {
@@ -89,7 +104,7 @@ function mapBackendTag(tag) {
 export function useTags() {
     const context = useContext(TagContext);
     if (!context) {
-        return { tags: [], loading: false, getTag: () => null, addTag: () => { }, deleteTag: () => { }, updateTag: () => { } };
+        return { tags: [], loading: false, getTag: () => null, addTag: () => {}, deleteTag: () => {}, updateTag: () => {}, refreshTags: () => {} };
     }
     return context;
 }
