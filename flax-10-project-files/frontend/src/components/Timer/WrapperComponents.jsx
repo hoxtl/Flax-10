@@ -5,21 +5,31 @@ import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
 /** Header component with title and history toggle */
-const TimerHeader = ({ onOpenHistory }) => (
+const TimerHeader = ({ onOpenHistory, isMobile }) => (
     <div className={styles.header}>
         <div className={styles.title}>Study Timer</div>
-        <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
-            History 📜
-        </button>
+        {!isMobile && (
+            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
+                History 📜
+            </button>
+        )}
     </div>
 );
 
 /** Main timer UI layout including visuals, controls, and settings */
-export const MainSection = ({ t, onOpenHistory }) => (
+export const MainSection = ({ t, onOpenHistory, isMobile }) => (
     <>
-        <TimerHeader onOpenHistory={onOpenHistory} />
+        <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />
         <TaskInput value={t.task} onChange={t.setTask} />
+
+        {isMobile && (
+            <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>
+                View History 📜
+            </button>
+        )}
+
         <TreeAnimation progress={t.progress} mode={t.mode} />
+
         <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
         <SessionStatus current={t.completedSessions} total={t.targetSessions} />
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />

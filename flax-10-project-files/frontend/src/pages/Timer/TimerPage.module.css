@@ -394,3 +394,47 @@
     color: #9ca3af;
     font-style: italic;
 }
+
+@media (max-width: 900px) {
+    .historyButton {
+        display: none !important;
+    }
+}
+
+.mobileHistoryBtn {
+    background: var(--pill-bg, #f3f4f6);
+    border: 1px solid #e5e7eb;
+    color: var(--text, #374151);
+    padding: 0.4rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0.5rem 0 1rem 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.mobileHistoryBtn:active {
+    background: #e5e7eb;
+    transform: scale(0.98);
+}
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 2rem;
+        margin-top: 1rem;
+    }
+    
+    .header {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .taskInput input::placeholder {
+        color: transparent;
+    }
+}

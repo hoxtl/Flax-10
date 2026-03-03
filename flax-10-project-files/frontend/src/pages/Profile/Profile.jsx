@@ -54,18 +54,56 @@ function ProfileBio({ user, profileData }) {
 }
 
 function ProfileHeader({ user, profileData, upcomingEventCount, handlers }) {
+  const year = profileData?.year || user?.year || "";
+  const major = profileData?.major || user?.major || "";
+  const username = (profileData || user)?.username || "guest";
+
   return (
-    <div className={styles.header}>
-      <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
-      <div className={styles.headerInfo}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.username}>{(profileData || user)?.username || "guest"}</h1>
-          <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button>
+    <>
+      <div className={`${styles.header} ${styles.desktopOnly}`}>
+        <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
+        <div className={styles.headerInfo}>
+          <div className={styles.headerTop}>
+            <h1 className={styles.username}>{username}</h1>
+            <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button>
+          </div>
+          <ProfileStats profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} />
+          <ProfileBio user={profileData || user} profileData={profileData} />
         </div>
-        <ProfileStats profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} />
-        <ProfileBio user={profileData || user} profileData={profileData} />
       </div>
-    </div>
+
+      <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
+        <div className={styles.mobileHero}>
+          <div className={styles.mobileAvatar}>
+            {profileData?.profile_photo_url
+              ? <img src={profileData.profile_photo_url} alt="Profile" className={styles.avatarImage} />
+              : buildInitials(user)}
+          </div>
+          <h1 className={styles.mobileUsername}>{username}</h1>
+          <p className={styles.mobileBio}>{year} {year && major ? '·' : ''} {major}</p>              
+          <div className={styles.mobileActions}>
+            <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>
+              Edit Profile
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.mobileStatsGrid}>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onModulesClick}>
+            <span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Modules</span>
+          </div>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onTasksClick}>
+            <span className={styles.mobileStatValue}>{profileData?.task_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Tasks</span>
+          </div>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onEventsClick}>
+            <span className={styles.mobileStatValue}>{upcomingEventCount || 0}</span>
+            <span className={styles.mobileStatLabel}>Events</span>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
