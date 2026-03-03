@@ -8,7 +8,7 @@ import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, Plus, ChevronDown, Calendar, Timer } from "lucide-react";
+import { Bell, Plus, ChevronDown } from "lucide-react";
 import { TypingAnimation } from "./TypingAnimation";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -127,7 +127,7 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   const routes = APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
 
   const academicRoutes = routes.filter(r => ["modules"].includes(r.id));
-  const planningRoutes = routes.filter(r => ["analytics"].includes(r.id));
+  const planningRoutes = routes.filter(r => ["calendar", "timer", "analytics"].includes(r.id));
   const campusRoutes = routes.filter(r => ["map"].includes(r.id));
   const socialRoutes = routes.filter(r => ["discover", "societies"].includes(r.id));
   const adminRoutes = routes.filter(r => ["admin"].includes(r.id));
@@ -169,23 +169,47 @@ function ActionPill({ onAddClick }) {
   );
 }
 
-function TopBarTool({ icon: Icon, onClick, isActive, title }) {
+const CalendarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={styles.toolIcon}>
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <path d="M16 2v4M8 2v4M3 10h18" />
+  </svg>
+);
+
+const TimerIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={styles.toolIcon}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 3" />
+  </svg>
+);
+
+function ToolsPill({ onNavChange, activeNav }) {
+  const calActive = activeNav === 'calendar';
+  const timerActive = activeNav === 'timer';
   return (
-    <button
-      className={`${styles.toolBtn} ${isActive ? styles.toolBtnActive : ""}`}
-      onClick={onClick}
-      title={title}
-    >
-      <Icon size={18} />
-    </button>
+    <div className={styles.actionPill}>
+      <button
+        className={`${styles.toolBtn} ${calActive ? styles.toolBtnActive : ""}`}
+        onClick={() => onNavChange?.('calendar')}
+        title="Calendar"
+      >
+        <CalendarIcon />
+      </button>
+      <button
+        className={`${styles.toolBtn} ${timerActive ? styles.toolBtnActive : ""}`}
+        onClick={() => onNavChange?.('timer')}
+        title="Timer"
+      >
+        <TimerIcon />
+      </button>
+    </div>
   );
 }
 
 function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <div className={styles.actions}>
-      <TopBarTool icon={Calendar} onClick={() => onNavChange?.('calendar')} isActive={activeNav === 'calendar'} title="Calendar" />
-      <TopBarTool icon={Timer} onClick={() => onNavChange?.('timer')} isActive={activeNav === 'timer'} title="Timer" />
+      <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
       <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <ActionPill onAddClick={onAddClick} />
       <ProfileDropdown

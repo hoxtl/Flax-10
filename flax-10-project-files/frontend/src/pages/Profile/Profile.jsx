@@ -624,7 +624,7 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       />
       <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
 
-      <ProfileHome onNavigate={onNavigate} isSelf={isSelf} viewedUserId={state.userId} />
+      <ProfileHome onNavigate={onNavigate} isSelf={isSelf} viewedUserId={state.viewedUserId} />
     </div>
   );
 }
