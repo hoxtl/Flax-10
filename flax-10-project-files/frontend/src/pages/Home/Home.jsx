@@ -3,6 +3,7 @@ import styles from "./Home.module.css";
 import PillFilters from "../../components/Tags/PillFilters";
 import DateNavigator from "../../components/Home/DateNavigator";
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
+import { getEffectiveTagName } from "../../components/Calendar/utils/eventUtils";
 import { useCalendar, useCalendarDispatch, useEventModal, useEventPopup } from "../../context/CalendarContext";
 import { useCalendarEvents, useEventActions } from "../../components/Calendar/hooks/useCalendarEvents";
 import { isReadOnlyEvent } from "../../components/Calendar/utils/eventUtils";
@@ -16,7 +17,7 @@ function getScheduleTitle(selectedDate) {
 
 function filterEvents(active, items) {
   if (active === "all") return items;
-  return items.filter((e) => e.tag_name?.toLowerCase() === active);
+  return items.filter((e) => getEffectiveTagName(e) === active);
 }
 
 function eventsForDate(events, date) {

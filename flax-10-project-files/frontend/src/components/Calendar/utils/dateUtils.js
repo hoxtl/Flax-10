@@ -158,10 +158,3 @@ export function formatDayLabel(date, today = new Date()) {
         year: "numeric",
     });
 }
-
-export function isAllDayEvent(event) {
-    const start = new Date(event.start_time);
-    const end = new Date(event.end_time);
-    const duration = (end - start) / (1000 * 60 * 60);
-    return duration >= 24;
-}

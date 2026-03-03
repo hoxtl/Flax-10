@@ -1,3 +1,5 @@
+import { getEffectiveTagName } from "../../Calendar/utils/eventUtils";
+
 export function countByType(items = []) {
   const counts = { all: items.length };
   for (const it of items) {
@@ -13,11 +15,6 @@ function countRatificationStatus(item, counts) {
 }
 
 function countByTagOrSource(item, counts) {
-  const key = getCountKey(item);
+  const key = getEffectiveTagName(item);
   if (key) counts[key] = (counts[key] || 0) + 1;
-}
-
-function getCountKey(item) {
-  if (item.source === 'society') return 'societies';
-  return item.tag_name?.toLowerCase() || null;
 }

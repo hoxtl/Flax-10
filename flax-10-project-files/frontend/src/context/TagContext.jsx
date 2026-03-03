@@ -57,7 +57,8 @@ function useTagActions(setTags) {
 
 function useTagGetters(tags) {
     const getTag = (id) => findTag(id, tags);
-    return { getTag };
+    const getTagByName = (name) => findTagByName(name, tags);
+    return { getTag, getTagByName };
 }
 
 async function createTagAction(tag, setTags) {
@@ -90,9 +91,19 @@ async function updateTagAction(id, updates, setTags) {
 }
 
 function findTag(id, tags) {
-    if (!id) return NONE_TAG;
+    if (id === undefined || id === null) return NONE_TAG;
     const numId = typeof id === 'string' ? parseInt(id, 10) : id;
-    return tags.find((t) => t.id === numId) || tags.find((t) => t.label === 'Other') || NONE_TAG;
+    return tags.find((t) => t.id === numId) || findOtherTag(tags);
+}
+
+function findTagByName(name, tags) {
+    if (!name) return NONE_TAG;
+    const lower = name.toLowerCase();
+    return tags.find(t => t.label.toLowerCase() === lower) || findOtherTag(tags);
+}
+
+function findOtherTag(tags) {
+    return tags.find(t => t.label.toLowerCase() === 'other') || NONE_TAG;
 }
 
 function mapBackendTag(tag) {
@@ -104,7 +115,7 @@ function mapBackendTag(tag) {
 export function useTags() {
     const context = useContext(TagContext);
     if (!context) {
-        return { tags: [], loading: false, getTag: () => null, addTag: () => {}, deleteTag: () => {}, updateTag: () => {}, refreshTags: () => {} };
+        return { tags: [], loading: false, getTag: () => null, addTag: () => { }, deleteTag: () => { }, updateTag: () => { }, refreshTags: () => { } };
     }
     return context;
 }

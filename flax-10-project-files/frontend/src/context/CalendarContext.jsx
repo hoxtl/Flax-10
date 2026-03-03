@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
 import { useReminderNotifications } from "../components/Notifications/hooks/useReminderNotifications";
+import { getEffectiveTagName } from "../components/Calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
@@ -35,12 +36,6 @@ function getFilteredContext(context) {
 function filterEventsByTag(events, filter) {
     if (filter.includes('all')) return events;
     return events.filter(e => filter.includes(getEffectiveTagName(e)));
-}
-
-function getEffectiveTagName(event) {
-    if (event.source === 'society') return 'societies';
-    if (!event.tag_name && !event.tag) return 'other';
-    return event.tag_name?.toLowerCase() || 'other';
 }
 
 export function useCalendarData(props = {}) {

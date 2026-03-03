@@ -13,7 +13,6 @@ export function EventDot({ e, onEventClick, customTags }) {
         <div className={className} title={getTitle(e)} onClick={onClick}
             style={{ backgroundColor: color, color: 'white', borderLeft: 'none' }}
             {...(isReadOnly ? {} : dragProps)}>
-            {eventType === 'society' && <span className="society-indicator">●</span>}
             {e.title}
         </div>
     );

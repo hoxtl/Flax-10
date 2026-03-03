@@ -98,7 +98,6 @@ function EventContent({ event, theme, height, width, minWidth }) {
     return (
         <div className="event-content">
             <div className="event-title">
-                {isSociety && <span className="society-badge">●</span>}
                 {event.title}
             </div>
             {isSociety && showTime && <div className="society-name">{event.society_name}</div>}
