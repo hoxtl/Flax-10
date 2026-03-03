@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
 import { getSharingWith, getSharedWithMe } from "../../api/socialService";

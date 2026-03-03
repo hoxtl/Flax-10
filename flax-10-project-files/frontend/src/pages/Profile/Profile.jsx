@@ -668,7 +668,7 @@ function ProfileHome({ onNavigate, isSelf, viewedUserId }) {
 
 function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
   const { profileData, handlers } = useProfileContent(state);
-  const { modules, upcomingEventCount, filteredEvents } = useProfileBodyData(state);
+  const { modules, upcomingEventCount, filteredEvents, allEvents } = useProfileBodyData(state);
 
   return (
     <div className={styles.content}>
