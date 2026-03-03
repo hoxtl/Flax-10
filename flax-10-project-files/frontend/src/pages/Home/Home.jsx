@@ -9,6 +9,7 @@ import { isReadOnlyEvent } from "../../components/Calendar/utils/eventUtils";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import CardGrid from "../../components/Home/CardGrid";
 import DeadlinesWidget from "../../components/Modules/DeadlinesWidget";
+import SleepBanner from "./SleepBanner";
 
 function getScheduleTitle(selectedDate) {
   return isToday(selectedDate) ? "Today's schedule" : "Schedule";
@@ -61,6 +62,7 @@ export default function Home() {
   const { setSelectedDate, removeEvent, handleEdit } = actions;
   return (
     <div className={styles.page}>
+      <SleepBanner />
       <FiltersBar activeFilter={activeFilter} onChange={setActiveFilter} dayItems={dayItems} />
       <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
       <div className={styles.content}>
