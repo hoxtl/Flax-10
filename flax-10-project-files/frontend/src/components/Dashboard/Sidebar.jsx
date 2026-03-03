@@ -12,12 +12,6 @@ const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
 const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
 const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
 
-const EXPANDED_W = 224;
-const COLLAPSED_W = 72;
-const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
-const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
-const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
-
 const PRESSURE_ROUTE_IDS = ["tasks", "home"];
 const MS_48H = 48 * 60 * 60 * 1000;
 
