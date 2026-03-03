@@ -3,10 +3,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models import Tag, Category, Enrollment
+from studyFlax.models.society import SocietyCalendarSync
 from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
-PROTECTED_TAGS = {'other', 'lecture'}
+PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies'}
 
 
 @api_view(['GET', 'POST'])
@@ -34,18 +35,49 @@ def category_list(request):
 
 
 def get_tags(user):
-    has_enrollments = Enrollment.objects.filter(student=user).exists()
-    if has_enrollments:
-        ensure_default_lecture_tag()
-    tags = Tag.objects.filter(Q(user=user) | Q(is_default=True))
-    if not has_enrollments:
-        tags = tags.exclude(name='Lecture')
+    ensure_user_system_tags(user)
+    tags = get_filtered_tags(user)
     return Response(TagSerialiser(tags, many=True).data)
 
 
-def ensure_default_lecture_tag():
-    from studyFlax.views.modules.enrollment_logic import get_lecture_tag
-    get_lecture_tag()
+def ensure_user_system_tags(user):
+    from studyFlax.views.calendar.system_tags import get_lecture_tag, get_deadline_tag
+    from studyFlax.views.calendar.system_tags import get_exam_tag, get_societies_tag
+    if has_module_enrollments(user):
+        get_lecture_tag()
+        get_deadline_tag()
+        get_exam_tag()
+    if has_society_syncs(user):
+        get_societies_tag()
+
+
+def has_module_enrollments(user):
+    return Enrollment.objects.filter(student=user).exists()
+
+
+def has_society_syncs(user):
+    return SocietyCalendarSync.objects.filter(user=user).exists()
+
+
+def get_filtered_tags(user):
+    tags = Tag.objects.filter(Q(user=user) | Q(is_default=True))
+    return filter_conditional_tags(tags, user)
+
+
+def filter_conditional_tags(tags, user):
+    excludes = get_tags_to_exclude(user)
+    if excludes:
+        tags = tags.exclude(name__in=excludes)
+    return tags
+
+
+def get_tags_to_exclude(user):
+    excludes = []
+    if not has_module_enrollments(user):
+        excludes.extend(['Lecture', 'Deadline', 'Exam'])
+    if not has_society_syncs(user):
+        excludes.append('Societies')
+    return excludes
 
 
 def get_user_tag(pk, user):
