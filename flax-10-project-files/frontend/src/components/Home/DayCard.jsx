@@ -2,6 +2,7 @@ import styles from "./DayCard.module.css";
 import { formatTimeRange } from "./utils/cardUtils";
 import { useTags } from "../../context/TagContext";
 import { isReadOnlyEvent } from "../Calendar/utils/eventUtils";
+import { getEventTheme } from "../Calendar/utils/eventStyleUtils";
 
 function Header({ e }) {
   return (
@@ -47,9 +48,8 @@ function CardBody({ e, date }) {
 }
 
 export default function DayCard({ e, onDelete, onClick, date }) {
-  const { getTag } = useTags();
-  const theme = getTag(e.tag);
-  const t = theme || { color: "#94A3B8", icon: "⭐" };
+  const tags = useTags();
+  const t = getEventTheme(e, tags);
   const readOnly = isReadOnlyEvent(e);
 
   return (
