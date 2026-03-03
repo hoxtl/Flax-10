@@ -113,38 +113,36 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
   );
 }
 
-function ModulesGrid({ modules, onNavigate, isSelf }) {
+function useModuleNameMap() {
   const [nameMap, setNameMap] = useState({});
-
   useEffect(() => {
-    getModules().then(data => {
-      const map = {};
-      (Array.isArray(data) ? data : data?.results || []).forEach(m => {
-        if (m.module_code && m.module_name) map[m.module_code] = m.module_name;
-      });
-      setNameMap(map);
-    }).catch(() => { });
+    getModules()
+      .then(data => {
+        const list = Array.isArray(data) ? data : data?.results || [];
+        const entries = list.filter(m => m.module_code).map(m => [m.module_code, m.module_name]);
+        setNameMap(Object.fromEntries(entries));
+      })
+      .catch(() => { });
   }, []);
+  return nameMap;
+}
 
+function ModuleCard({ code, name, onNavigate }) {
+  return (
+    <button className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
+      <span className={styles.moduleIcon}>📚</span>
+      <span className={styles.moduleCode}>{code}</span>
+      {name && <span className={styles.moduleName}>{name}</span>}
+    </button>
+  );
+}
+
+function ModulesGrid({ modules, onNavigate }) {
+  const nameMap = useModuleNameMap();
   if (!modules?.length) return null;
   return (
     <div className={styles.modulesGrid}>
-      {modules.map((code, i) => {
-        return (
-          <button
-            key={i}
-            className={styles.moduleCard}
-            onClick={() => onNavigate?.(`modules_${code}`)}
-            style={{ cursor: 'pointer' }}
-          >
-            <span className={styles.moduleIcon}>📚</span>
-            <span className={styles.moduleCode}>{code}</span>
-            {nameMap[code] && (
-              <span className={styles.moduleName}>{nameMap[code]}</span>
-            )}
-          </button>
-        );
-      })}
+      {modules.map((code, i) => <ModuleCard key={i} code={code} name={nameMap[code]} onNavigate={onNavigate} />)}
     </div>
   );
 }
