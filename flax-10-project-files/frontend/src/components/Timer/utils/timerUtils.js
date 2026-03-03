@@ -39,10 +39,7 @@ function handleCompletion(timer, startNext, notify) {
 function handleWorkCompletion(timer, startNext, notify) {
     if (notify) notify("Time's Up!", "Work session complete.");
 
-    // If no break time OR this is the last session, finish immediately
-    const isLastSession = (timer.completedSessions + 1) >= timer.targetSessions;
-
-    if (timer.breakTime === 0 || isLastSession) {
+    if (timer.breakTime === 0) {
         timer.setIsActive(false);
         startNext();
     }

@@ -50,9 +50,9 @@ export const MainSection = ({ t, onOpenHistory, isMobile }) => (
 export const PopupSection = ({ t, showHistory, onCloseHistory }) => (
     <>
         {showHistory && <HistoryModal onClose={onCloseHistory} />}
-        {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} />}
+        {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} />}
         {t.isBreakOvertime && <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} />}
-        {t.modal === 'break' && <BreakModal onAction={t.handlers.break} />}
-        {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.totalWork} breakTime={t.totalBreak} onAction={t.handlers.goal} />}
+        {t.modal === 'break' && <BreakModal onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} />}
+        {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} />}
     </>
 );

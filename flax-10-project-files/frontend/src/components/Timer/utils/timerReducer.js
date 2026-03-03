@@ -1,6 +1,7 @@
 export const initialState = (work = 25, breakTime = 5, sessions = 4) => ({
     workTime: work, breakTime, targetSessions: sessions, completedSessions: 0,
     timeLeft: work * 60, totalWork: 0, totalBreak: 0, totalPaused: 0,
+    blockTotalWork: 0, blockTotalBreak: 0,
     isActive: false, isPaused: false, mode: 'work'
 });
 
@@ -10,7 +11,9 @@ const tickState = (state) => {
     return {
         ...state, timeLeft: state.timeLeft - 1,
         totalWork: isWork ? state.totalWork + 1 : state.totalWork,
-        totalBreak: !isWork ? state.totalBreak + 1 : state.totalBreak
+        totalBreak: !isWork ? state.totalBreak + 1 : state.totalBreak,
+        blockTotalWork: isWork ? (state.blockTotalWork || 0) + 1 : (state.blockTotalWork || 0),
+        blockTotalBreak: !isWork ? (state.blockTotalBreak || 0) + 1 : (state.blockTotalBreak || 0)
     };
 };
 
