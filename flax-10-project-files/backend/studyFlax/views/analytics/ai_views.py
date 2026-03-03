@@ -131,7 +131,7 @@ Student data:
             max_tokens=800,
             temperature=0.7,
         )
-        return Response({'insights': response.choices[0].message.content, 'contextUsed': user_context})
+        return Response({'insights': response.choices[0].message.content, 'context_used': user_context})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
