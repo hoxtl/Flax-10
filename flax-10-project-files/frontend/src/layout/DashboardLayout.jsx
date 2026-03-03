@@ -219,6 +219,8 @@ function DashboardMain({ state, onNavChange, children }) {
     modal,
     onSelectType,
     isMobile,
+    t,
+    setPendingNav
   } = state;
   return (
     <>
@@ -254,7 +256,7 @@ function DashboardMain({ state, onNavChange, children }) {
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
-  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav, handleNavChange, pendingNav, setPendingNav, t } =
+  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav, handleNavChange, pendingNav, setPendingNav, t, setShowQuickAdd } =
     state;
   return (
     <div className={styles.root}>
