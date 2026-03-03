@@ -125,13 +125,13 @@ function QuickTabs({ onAddClick }) {
   return <ExpandableTabs tabs={tabs} onChange={change} />;
 }
 
-function ActionPill({ onAddClick }) {
+function ActionPill({ onAddClick, onNavChange }) {
   return (
     <div className={styles.actionPill}>
       <ThemeToggle />
       <div className={styles.pillDivider} />
       <QuickTabs onAddClick={onAddClick} />
-      <NotificationPanel />
+      <NotificationPanel onNavChange={onNavChange} />
     </div>
   );
 }
@@ -158,7 +158,7 @@ function ToolsPill({ onNavChange, activeNav }) {
 function TopBarActions({ onAddClick, user: u, onSettingsClick: sC, onLogoutClick: lC, onProfileClick: pC, onNavChange: nC, activeNav: aN }) {
   return (
     <div className={styles.actions}>
-      <ToolsPill onNavChange={nC} activeNav={aN} /><MiniTimer onNavigate={nC} activeNav={aN} /><ActionPill onAddClick={onAddClick} />
+      <ToolsPill onNavChange={nC} activeNav={aN} /><MiniTimer onNavigate={nC} activeNav={aN} /><ActionPill onAddClick={onAddClick} onNavChange={nC} />
       <ProfileDropdown user={u} onSettingsClick={sC} onLogoutClick={lC} onProfileClick={pC} />
     </div>
   );

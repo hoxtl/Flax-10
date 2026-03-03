@@ -224,7 +224,13 @@ function DashboardMain({ state, onNavChange, children }) {
     <>
       <MainArea
         user={user}
-        onQuickAdd={() => setShowQuickAdd(true)}
+        onQuickAdd={() => {
+          if (activeNav === "timer" && t.isActive) {
+            setPendingNav("QUICK_ADD");
+          } else {
+            setShowQuickAdd(true);
+          }
+        }}
         onSettingsClick={() => onNavChange?.("settings")}
         onLogoutClick={handleLogoutClick}
         onProfileClick={() => onNavChange?.("profile")}
@@ -279,7 +285,11 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
           onExit={() => {
             t.setIsActive(false);
             t.resetTimer();
-            onNavChange(pendingNav);
+            if (pendingNav === "QUICK_ADD") {
+              setShowQuickAdd(true);
+            } else {
+              onNavChange(pendingNav);
+            }
             setPendingNav(null);
           }}
         />
