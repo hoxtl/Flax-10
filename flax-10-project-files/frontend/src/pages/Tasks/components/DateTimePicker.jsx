@@ -18,6 +18,8 @@
  */
 import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
+import { Clock } from "lucide-react";
+import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import styles from "./DateTimePicker.module.css";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -26,6 +28,9 @@ const MONTHS = ["January","February","March","April","May","June",
 const DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 function pad(n) { return String(n).padStart(2, "0"); }
+
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => ({ value: String(i), label: pad(i) }));
+const MINUTE_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => ({ value: String(m), label: pad(m) }));
 
 function formatDisplay(date) {
   if (!date) return "";
@@ -190,26 +195,26 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
 
           {/* Time pickers */}
           <div className={styles.timePicker}>
-            <span className={styles.timeIcon}>🕐</span>
-            <select
-              className={styles.timeSelect}
-              value={hour}
-              onChange={e => changeHour(Number(e.target.value))}
-            >
-              {Array.from({length:24}, (_,i) => (
-                <option key={i} value={i}>{pad(i)}</option>
-              ))}
-            </select>
+            <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
+            <div className={styles.timeDropdown}>
+              <AnimatedDropdown
+                value={String(hour)}
+                onChange={v => changeHour(Number(v))}
+                options={HOUR_OPTIONS}
+                placeholder="HH"
+                className={styles.timeAnimatedDd}
+              />
+            </div>
             <span className={styles.timeSep}>:</span>
-            <select
-              className={styles.timeSelect}
-              value={minute}
-              onChange={e => changeMinute(Number(e.target.value))}
-            >
-              {[0,5,10,15,20,25,30,35,40,45,50,55].map(m => (
-                <option key={m} value={m}>{pad(m)}</option>
-              ))}
-            </select>
+            <div className={styles.timeDropdown}>
+              <AnimatedDropdown
+                value={String(minute)}
+                onChange={v => changeMinute(Number(v))}
+                options={MINUTE_OPTIONS}
+                placeholder="MM"
+                className={styles.timeAnimatedDd}
+              />
+            </div>
             <button
               type="button"
               className={styles.doneBtn}

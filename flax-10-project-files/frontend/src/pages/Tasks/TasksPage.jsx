@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import useTasks from "./hooks/useTasks";
@@ -12,16 +12,20 @@ import { BackToTop } from "../../components/Pagination/Pagination";
 
 import styles from "./TasksPage.module.css";
 
-function useFilteredTasks(tasks, activeListId, activeFilter) {
+function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = []) {
     return useMemo(() => {
         const now      = new Date();
         const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
         const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
-        let filtered = activeListId
-            ? tasks.filter(t => String(t.task_list) === String(activeListId))
-            : tasks;
+        let filtered = tasks;
+        if (filterListIds && filterListIds.length > 0) {
+            const set = new Set(filterListIds.map(String));
+            filtered = tasks.filter(t => set.has(String(t.task_list)));
+        } else if (activeListId) {
+            filtered = tasks.filter(t => String(t.task_list) === String(activeListId));
+        }
 
         if (activeFilter === "overdue")
             return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < dayStart);
@@ -30,7 +34,7 @@ function useFilteredTasks(tasks, activeListId, activeFilter) {
         if (activeFilter === "week")
             return filtered.filter(t => t.due_date && new Date(t.due_date) <= weekEnd);
         return filtered;
-    }, [tasks, activeListId, activeFilter]);
+    }, [tasks, activeListId, activeFilter, filterListIds]);
 }
 
 /** End of today as ISO string so new tasks from Today view show in Today (due_date >= now && <= todayEnd). */
@@ -41,31 +45,40 @@ function getTodayEndISO() {
 }
 
 export default function TasksPage() {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
     const { tasks, initialLoading: tasksInitialLoading, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
     const [activeListId,    setActiveListId]    = useState(null);
+    const [filterListIds,   setFilterListIds]   = useState([]);
     const [activeFilter,   setActiveFilter]    = useState("all");
     const [showTaskModal,   setShowTaskModal]   = useState(false);
     const [showListModal,   setShowListModal]   = useState(false);
+    const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
+    const [lastCreatedListId, setLastCreatedListId] = useState(null);
     const [toastUndo,       setToastUndo]      = useState(null);
     const [toastDelete,     setToastDelete]    = useState(false);
-    const [completionToast, setCompletionToast] = useState(null);
+    const openedFullPlanningFromUrl = useRef(false);
 
     useEffect(() => {
         const listParam = searchParams.get("list");
         if (listParam != null && listParam !== "") setActiveListId(listParam);
     }, [searchParams]);
 
+    /* Open Full Planning modal from URL (e.g. homepage "Plan tomorrow" link) */
+    const openParam = searchParams.get("open");
     useEffect(() => {
-        if (!completionToast) return;
-        const t = setTimeout(() => setCompletionToast(null), 3000);
-        return () => clearTimeout(t);
-    }, [completionToast]);
+        if (openParam !== "fullPlanning" || openedFullPlanningFromUrl.current) return;
+        openedFullPlanningFromUrl.current = true;
+        setShowTaskModal(true);
+        const next = new URLSearchParams(searchParams);
+        next.delete("open");
+        next.delete("due");
+        setSearchParams(next, { replace: true });
+    }, [openParam, searchParams, setSearchParams]);
 
     const activeModuleCode = searchParams.get("module") || null;
 
-    const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter);
+    const filteredTasks = useFilteredTasks(tasks, activeListId, activeFilter, filterListIds);
     const defaultDueDateForNewTask = activeFilter === "today" ? getTodayEndISO() : null;
 
     const handleUndoAddTask = () => {
@@ -111,7 +124,7 @@ export default function TasksPage() {
                 tasks={tasks}
                 activeListId={activeListId}
                 activeFilter={activeFilter}
-                onSelectList={setActiveListId}
+                onSelectList={(id) => { setActiveListId(id); setFilterListIds([]); }}
                 onSelectFilter={setActiveFilter}
                 onNewList={() => setShowListModal(true)}
                 onDeleteList={handleDeleteList}
@@ -127,10 +140,8 @@ export default function TasksPage() {
                 activeListId={activeListId}
                 activeModuleCode={activeModuleCode}
                 defaultDueDateForNewTask={defaultDueDateForNewTask}
+                filterListIds={filterListIds}
                 onToggleComplete={toggleComplete}
-                onTaskCompleted={(task) => {
-                    setCompletionToast({ taskId: task.id, completed: true });
-                }}
                 onDeleteTask={handleDeleteTask}
                 onEditTask={editTask}
                 onCreateTask={() => setShowTaskModal(true)}
@@ -141,19 +152,21 @@ export default function TasksPage() {
                         setTimeout(() => setToastUndo(null), 5000);
                     }
                 }}
+                onFilterByList={setFilterListIds}
             />
             {showTaskModal && (
                 <CreateTaskModal
                     lists={lists}
                     defaultListId={activeListId}
                     defaultDueDate={defaultDueDateForNewTask}
-                    onCreateList={addList}
+                    onOpenCreateList={() => setShowCreateListFromTask(true)}
+                    newListIdCreated={lastCreatedListId}
                     onSave={async (data) => {
                         const created = await addTask(data);
                         setToastUndo(created ? { taskId: created.id, title: created.title } : null);
                         if (created) setTimeout(() => setToastUndo(null), 5000);
                     }}
-                    onClose={() => setShowTaskModal(false)}
+                    onClose={() => { setShowTaskModal(false); setLastCreatedListId(null); }}
                 />
             )}
             {toastUndo && (
@@ -161,13 +174,6 @@ export default function TasksPage() {
                     <span>Task added.</span>
                     <button type="button" className={styles.toastUndoBtn} onClick={handleUndoAddTask}>Undo</button>
                     <button type="button" className={styles.toastClose} onClick={() => setToastUndo(null)}>✕</button>
-                </div>
-            )}
-            {completionToast && (
-                <div className={styles.toastCompletion}>
-                    <span>Task completed ✓</span>
-                    <button type="button" className={styles.toastUndoBtn} onClick={() => { toggleComplete(completionToast.taskId, true); setCompletionToast(null); }}>Undo</button>
-                    <button type="button" className={styles.toastClose} onClick={() => setCompletionToast(null)}>✕</button>
                 </div>
             )}
             {toastDelete && (
@@ -180,6 +186,16 @@ export default function TasksPage() {
                 <CreateListModal
                     onSave={addList}
                     onClose={() => setShowListModal(false)}
+                />
+            )}
+            {showCreateListFromTask && (
+                <CreateListModal
+                    onSave={async (data) => {
+                        const created = await addList(data);
+                        if (created?.id) setLastCreatedListId(created.id);
+                        setShowCreateListFromTask(false);
+                    }}
+                    onClose={() => setShowCreateListFromTask(false)}
                 />
             )}
             <BackToTop />

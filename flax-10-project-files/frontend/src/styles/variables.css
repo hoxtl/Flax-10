@@ -15,7 +15,7 @@
   --font-weight-task: 500;
   --font-weight-caption: 400;
 
-  /* Semantic text colors for typography — Zen-Classy: Flax Brown for primary headers */
+  /* Semantic text colors for typography — Warm-Classy: Flax Brown for primary headers */
   --text-charcoal: #7B6751;
   --text-muted-sage: #5a635a;
 
@@ -39,7 +39,7 @@
   --c-green: #2A7A3A;
   --c-grey: #2B1E14;
 
-  /* Semantic colors for task/schedule accents — Zen-Classy status */
+  /* Semantic colors for task/schedule accents — Warm-Classy status */
   --urgent: #C05A3E;
   --study: #52796f;
   --personal: #8B5CF6;
@@ -87,7 +87,7 @@
   --card-bg: #FFFCFA;
   --bento-card-bg: #FFFCFA;
   --surface: #F8F5F2;
-  /* Zen-Classy: Soft Paper for every widget/card */
+  /* Warm-Classy: Soft Paper for every widget/card */
   --soft-paper: #FFFCFA;
   /* Day-strip / date navigator dots (semantic) */
   --dot-lecture: var(--study);
@@ -97,8 +97,8 @@
   --dot-personal: var(--personal);
 
   /* Status: Sage Green success, Muted Terracotta warnings/conflicts */
-  --zen-sage: #8C9A86;
-  --zen-terracotta-muted: #C05A3E;
+  --status-sage: #8C9A86;
+  --status-terracotta: #C05A3E;
   --success-bg: rgba(140, 154, 134, 0.18);
   --success-text: #8C9A86;
   --error-bg: rgba(192, 90, 62, 0.12);
@@ -112,7 +112,7 @@
   --deadline-urgent-bg: rgba(192, 90, 62, 0.1);
   --deadline-urgent-border: #C05A3E;
 
-  /* Daily Harvest widget */
+  /* Daily Progress widget */
   --color-terracotta: #C05A3E;
   --color-brown-light: #c4a35a;
   --color-error-light: rgba(192, 90, 62, 0.15);
@@ -135,12 +135,12 @@
   --heatmap-high: var(--color-sage-primary);
   --heatmap-full: var(--color-sage-dark);
 
-  /* Topbar (light): Zen-Classy — tint from warm Almond */
+  /* Topbar (light): Warm-Classy — tint from warm Almond */
   --topbar-bg: rgba(248, 245, 242, 0.85);
   --topbar-border: rgba(255, 255, 255, 0.18);
   --search-glass: rgba(255, 255, 255, 0.55);
 
-  /* Unified frame (sidebar + topbar): Zen-Classy Almond tint */
+  /* Unified frame (sidebar + topbar): Warm-Classy Almond tint */
   --frame-bg: rgba(248, 245, 242, 0.88);
   --frame-border: rgba(0, 0, 0, 0.06);
   --frame-blur: 20px;
@@ -152,7 +152,7 @@
   --bg-home: var(--bg);
   --bg-home-night: var(--bg);
 
-  /* Master Restoration: Zen-Classy stationary theme — warm Almond */
+  /* Master Restoration: Warm-Classy stationary theme — warm Almond */
   --restoration-bg: #F8F5F2;
   --restoration-sage: #8C9A86;
   --restoration-flax: #EEDC82;
@@ -165,7 +165,7 @@
   --restoration-gold-soft: rgba(238, 220, 130, 0.35);
   --restoration-coral-border: 1px solid rgba(192, 90, 62, 0.5);
   --restoration-coral-glow: 0 0 12px rgba(192, 90, 62, 0.2);
-  /* Body text: Zen-Classy — Flax Brown for primary headers & key accents */
+  /* Body text: Warm-Classy — Flax Brown for primary headers & key accents */
   --restoration-charcoal: #7B6751;
 
   --divider: #ddd;
@@ -176,8 +176,8 @@
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
 }
 
-/* Victorious Harvest: burst of green particles from checkbox (0.5s) */
-@keyframes harvestBurst {
+/* Completion Burst: burst of green particles from checkbox (0.5s) */
+@keyframes completionBurst {
   0% {
     opacity: 1;
     transform: translate(0, 0) scale(0.6);
@@ -281,7 +281,7 @@
   --scroll-btn-bg: #818cf8;
   --scroll-btn-hover: #6366f1;
 
-  /* Daily Harvest widget (dark) */
+  /* Daily Progress widget (dark) */
   --color-terracotta: #d97a65;
   --color-error-light: rgba(192, 90, 62, 0.25);
   --color-sage-dark: #5a7a6a;

@@ -10,34 +10,34 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 12px 14px;
-  background: #fff;
-  border: 1px solid var(--restoration-earth, #6B5344);
+  gap: 0.4rem;
+  padding: 10px 14px;
+  background: var(--bg, #F8F5F2);
+  border: 1.5px solid rgba(74, 52, 33, 0.12);
   border-radius: 10px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 500;
   font-family: var(--font-body);
   color: var(--text);
   text-align: left;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   outline: none;
 }
 
 .trigger:hover,
 .triggerOpen {
-  border-color: var(--restoration-earth, #6B5344);
-  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.25);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.08);
 }
 
 .triggerEmpty { color: var(--muted); }
 
-.triggerIcon { font-size: 0.9rem; flex-shrink: 0; }
+.triggerIcon { font-size: 0.82rem; flex-shrink: 0; }
 
 .triggerValueMono {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
 }
   
@@ -147,23 +147,21 @@
     border-top: 1px solid var(--border);
     padding-top: 0.6rem;
   }
-  .timeIcon { font-size: 0.85rem; }
-  .timeSep  { font-weight: 700; color: var(--muted); }
-  .timeSelect {
-    padding: 0.35rem 0.5rem;
-    border: 1px solid var(--restoration-earth, #6B5344);
-    border-radius: 8px;
-    background: #fff;
-    color: var(--text);
-    font-size: 0.9rem;
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-    cursor: pointer;
-    outline: none;
+  .timeIcon {
+    color: var(--muted, #9a8778);
+    flex-shrink: 0;
   }
-  .timeSelect:focus {
-    border-color: var(--restoration-earth, #6B5344);
-    box-shadow: 0 0 0 2px rgba(196, 163, 90, 0.2);
+  .timeSep {
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .timeDropdown {
+    flex: 1;
+    min-width: 0;
+  }
+  .timeAnimatedDd {
+    font-variant-numeric: tabular-nums;
   }
   .doneBtn {
     margin-left: auto;
@@ -175,6 +173,7 @@
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
+    flex-shrink: 0;
     transition: opacity 0.1s;
   }
   .doneBtn:hover { opacity: 0.85; }

@@ -153,7 +153,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
           ref={externalInputRef ?? inputRef}
           type="text"
           className={styles.input}
-          placeholder="What needs to be done?"
+          placeholder="Quick add: what needs to be done?"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onFocus={() => setInputFocused(true)}
@@ -164,7 +164,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
               if (!insideForm && !modulePopoverOpen && !listDropdownOpen) setInputFocused(false);
             }, 0);
           }}
-          aria-label="Task name"
+          aria-label="Quick add task"
         />
         {title.trim() && (
           <button

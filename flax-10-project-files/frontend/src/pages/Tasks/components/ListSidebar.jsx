@@ -1,6 +1,7 @@
 // list side bar for the tasks page
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import styles from "./ListSidebar.module.css";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
@@ -55,11 +56,11 @@ function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
     return (
         <div ref={ref} className={styles.ctxMenu} style={{ top: y, left: x }}>
             <button className={styles.ctxItem} onClick={() => { onRename(); onClose(); }}>
-                ✏️ Rename
+                <Pencil size={14} strokeWidth={2} /> Rename
             </button>
             <div className={styles.ctxDivider} />
             <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}>
-                🗑️ Delete list
+                <Trash2 size={14} strokeWidth={2} /> Delete list
             </button>
         </div>
     );
@@ -142,7 +143,7 @@ export default function ListSidebar({
                             className={`${styles.listItem} ${active ? styles.listActive : ""}`}
                             style={{ "--list-color": color }}
                             onContextMenu={e => handleCtxMenu(e, list.id)}
-                            title="Right-click for options"
+                            
                         >
                             {renamingId === list.id ? (
                                 <RenameInput
