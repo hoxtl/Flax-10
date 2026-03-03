@@ -38,16 +38,16 @@ const ClearButton = ({ onClear }) => {
 };
 
 const ClearConfirmModal = ({ onConfirm, onCancel }) => {
-    const icon = <div style={{ minWidth: '40px', height: '40px', borderRadius: '50%', border: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#374151' }}><AlertCircle size={20} /></div>;
-    const title = <h3 style={{ margin: '0 0 0.5rem 0', color: '#111827', fontSize: '1.25rem', fontWeight: 600 }}>Are you sure?</h3>;
-    const msg = <p style={{ margin: 0, color: '#6b7280', lineHeight: 1.5 }}>Are you sure you want to delete your history?<br />All your data will be removed.</p>;
-    const textCol = <div style={{ flex: 1, textAlign: 'left' }}>{title}{msg}</div>;
-    const topRow = <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>{icon}{textCol}</div>;
-    const cancelBtn = <button style={{ padding: '0.6rem 1.25rem', borderRadius: '8px', border: '1px solid #e5e7eb', background: 'white', color: '#111827', fontWeight: 500, cursor: 'pointer' }} onClick={onCancel}>Cancel</button>;
-    const confirmBtn = <button style={{ padding: '0.6rem 1.25rem', borderRadius: '8px', border: 'none', background: '#111827', color: 'white', fontWeight: 500, cursor: 'pointer' }} onClick={(e) => onConfirm(e)}>Confirm</button>;
-    const btns = <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>{cancelBtn}{confirmBtn}</div>;
-    const content = <div className={styles.modal} style={{ maxWidth: '450px', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>{topRow}{btns}</div>;
-    return <div className={styles.overlay} style={{ zIndex: 1001 }} onClick={onCancel}>{content}</div>;
+    const icon = <div className={styles.confirmIcon}><AlertCircle size={20} /></div>;
+    const title = <h3 className={styles.confirmTitle}>Are you sure?</h3>;
+    const msg = <p className={styles.confirmMessage}>Are you sure you want to delete your history?<br />All your data will be removed.</p>;
+    const textCol = <div className={styles.confirmTextCol}>{title}{msg}</div>;
+    const topRow = <div className={styles.confirmTopRow}>{icon}{textCol}</div>;
+    const cancelBtn = <button className={styles.confirmCancelBtn} onClick={onCancel}>Cancel</button>;
+    const confirmBtn = <button className={styles.confirmSubmitBtn} onClick={(e) => onConfirm(e)}>Confirm</button>;
+    const btns = <div className={styles.confirmBtnsRow}>{cancelBtn}{confirmBtn}</div>;
+    const content = <div className={`${styles.modal} ${styles.confirmModal}`} onClick={e => e.stopPropagation()}>{topRow}{btns}</div>;
+    return <div className={`${styles.overlay} ${styles.confirmOverlay}`} onClick={onCancel}>{content}</div>;
 };
 
 const useHistoryData = () => {
