@@ -43,29 +43,24 @@ function useHomeData() {
 
 function useHomeActions() {
   const dispatch = useCalendarDispatch();
-  const { removeEvent } = useEventActions();
-  const { openModal } = useEventModal();
   const { openPopup } = useEventPopup();
   const setSelectedDate = (d) => dispatch({ type: "SET_SELECTED_DATE", payload: d });
-  const handleEdit = (event, ev) => {
-    if (isReadOnlyEvent(event)) openPopup(event, ev.currentTarget.getBoundingClientRect());
-    else openModal(event, event.tag);
-  };
-  return { setSelectedDate, removeEvent, handleEdit };
+  const handleEdit = (event, ev) => openPopup(event, ev.currentTarget.getBoundingClientRect());
+  return { setSelectedDate, handleEdit };
 }
 
 export default function Home() {
   const data = useHomeData();
   const actions = useHomeActions();
   const { selectedDate, activeFilter, setActiveFilter, dayItems, filtered, scheduleTitle } = data;
-  const { setSelectedDate, removeEvent, handleEdit } = actions;
+  const { setSelectedDate, handleEdit } = actions;
   return (
     <div className={styles.page}>
       <FiltersBar activeFilter={activeFilter} onChange={setActiveFilter} dayItems={dayItems} />
       <DateNavigator date={selectedDate} onChange={setSelectedDate} scheduleTitle={scheduleTitle} />
       <div className={styles.content}>
         {isToday(selectedDate) && <DeadlinesWidget />}
-        <CardGrid items={filtered} onDelete={removeEvent} onEdit={handleEdit} date={selectedDate} />
+        <CardGrid items={filtered} onEdit={handleEdit} date={selectedDate} />
       </div>
       <EventPopups />
     </div>

@@ -10,12 +10,35 @@ function isIconValid(icon) {
 }
 
 function useTagModal() {
-  const { tags, addTag, updateTag, deleteTag } = useTags();
   const [editingId, setEditingId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const resetState = () => { setEditingId(null); setIsAdding(false); };
-  const handleSave = (data) => { if (editingId) updateTag(editingId, data); else addTag(data); resetState(); };
-  return { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
+  const { tags, addTag, updateTag, deleteTag } = useTags();
+
+  const resetState = () => { setEditingId(null); setIsAdding(false); setDuplicateWarning(null); };
+
+  const handleSave = (data) => checkDuplicate(data, tags, editingId, setDuplicateWarning, () => commitSave(data, editingId, updateTag, addTag, resetState));
+
+  const handleReplace = () => {
+    if (duplicateWarning) updateTag(duplicateWarning.existingId, duplicateWarning.data);
+    resetState();
+  };
+
+  const commit = () => commitSave(duplicateWarning.data, editingId, updateTag, addTag, resetState);
+
+  return { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState, duplicateWarning, commit, handleReplace, setDuplicateWarning };
+}
+
+function checkDuplicate(data, tags, editingId, setWarning, onSafe) {
+  const existing = tags.find(t => t.label.toLowerCase() === data.label.toLowerCase());
+  if (existing && existing.id !== editingId) setWarning({ data, existingId: existing.id });
+  else onSafe();
+}
+
+function commitSave(data, editingId, updateTag, addTag, resetState) {
+  if (editingId) updateTag(editingId, data);
+  else addTag(data);
+  resetState();
 }
 
 function ModalHeader({ onClose }) {
@@ -154,14 +177,33 @@ function FormActions({ onSave, onCancel }) {
   );
 }
 
+function DuplicateWarning({ onAdd, onReplace, onCancel }) {
+  return (
+    <div className={styles.warningOverlay}>
+      <div className={styles.warningModal}>
+        <h4>Duplicate Tag Name</h4>
+        <p>A tag with this name already exists. What would you like to do?</p>
+        <div className={styles.warningActions}>
+          <button onClick={onAdd}>Add Anyway</button>
+          <button onClick={onReplace}>Replace Existing</button>
+          <button onClick={onCancel}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TagManagerModal({ onClose }) {
-  const { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState } = useTagModal();
+  const logic = useTagModal();
+  const { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState, duplicateWarning, commit, handleReplace, setDuplicateWarning } = logic;
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <ModalHeader onClose={onClose} />
         <ModalContent tags={tags} editingId={editingId} isAdding={isAdding} setEditingId={setEditingId}
           setIsAdding={setIsAdding} onSave={handleSave} onDelete={deleteTag} onCancel={resetState} />
+        {duplicateWarning && <DuplicateWarning onAdd={commit} onReplace={handleReplace} onCancel={() => setDuplicateWarning(null)} />}
       </div>
     </div>
   );
