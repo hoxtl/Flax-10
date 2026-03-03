@@ -47,7 +47,7 @@ export default function Discover({ onNavChange }) {
 
     // Fetch users whenever search query changes
     useEffect(() => {
-        const fetchDiscoverUsers = async () => {
+        const fetchUsers = async () => {
             setLoading(true);
             try {
                 const data = await searchUsers(
@@ -64,7 +64,7 @@ export default function Discover({ onNavChange }) {
         };
 
         const timer = setTimeout(() => {
-            fetchDiscoverUsers();
+            fetchUsers();
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timer);
@@ -80,7 +80,7 @@ export default function Discover({ onNavChange }) {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1>Discover</h1>
+                <h1>Users</h1>
                 <p>Find course mates and study partners</p>
             </div>
 
@@ -105,7 +105,7 @@ export default function Discover({ onNavChange }) {
             </div>
 
             {loading && users.length === 0 ? (
-                <div className={styles.loadingState}>Loading discover...</div>
+                <div className={styles.loadingState}>Loading users...</div>
             ) : (
                 <div className={styles.grid}>
                     {filteredUsers.length > 0 ? (

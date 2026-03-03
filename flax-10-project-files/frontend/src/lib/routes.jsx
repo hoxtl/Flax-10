@@ -12,7 +12,7 @@ export const APP_ROUTES = [
     { id: "home", label: "Home", icon: "🏠", path: "/", element: <Home /> },
     { id: "calendar", label: "Calendar", icon: "🗓️", path: "/calendar", element: <CalendarPage /> },
     { id: "timer", label: "Timer", icon: "⏲️", path: "/timer", element: <TimerPage /> },
-    { id: "discover", label: "Discover", icon: "🔍", path: "/discover", element: <Discover /> },
+    { id: "users", label: "Users", icon: "🔍", path: "/users", element: <Discover /> },
     { id: "societies", label: "Societies", icon: "👨‍👨‍👧‍👧", path: "/societies", element: <SocietiesPage /> },
     { id: "modules", label: "Modules", icon: "📚", path: "/modules", element: <ModulesPage /> },
     { id: "map", label: "UniMap", icon: "🗺️", path: "/map", element: <CampusMap /> },

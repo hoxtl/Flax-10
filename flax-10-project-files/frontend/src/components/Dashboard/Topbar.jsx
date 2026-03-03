@@ -129,7 +129,7 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   const academicRoutes = routes.filter(r => ["modules"].includes(r.id));
   const planningRoutes = routes.filter(r => ["calendar", "timer", "analytics"].includes(r.id));
   const campusRoutes = routes.filter(r => ["map"].includes(r.id));
-  const socialRoutes = routes.filter(r => ["discover", "societies"].includes(r.id));
+  const socialRoutes = routes.filter(r => ["users", "societies"].includes(r.id));
   const adminRoutes = routes.filter(r => ["admin"].includes(r.id));
 
   return (
