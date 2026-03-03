@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft } from "lucide-react";
+import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft, Flag, Zap, List, BookOpen, MousePointer2 } from "lucide-react";
 
 import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
@@ -168,6 +168,84 @@ function ContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }
     return createPortal(menu, document.body);
 }
 
+const ENERGY_LABELS = {
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+};
+
+/** Read-only task details modal — classy, warm design. Shown when user clicks the task card. */
+function TaskInfoModal({ task, listName, listColor, onClose }) {
+    const due = formatDueDate(task.due_date);
+    const dueFormatted = task.due_date
+        ? new Date(task.due_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+        : null;
+
+    const modal = (
+        <div className={styles.modalBackdrop} onMouseDown={onClose}>
+            <div
+                className={styles.infoModal}
+                style={{ "--info-accent": listColor || "#84A98C" }}
+                onMouseDown={e => e.stopPropagation()}
+            >
+                <div className={styles.infoModalAccent} aria-hidden />
+                <div className={styles.infoModalHeader}>
+                    <span className={styles.infoModalIcon} aria-hidden>📋</span>
+                    <div className={styles.infoModalHeaderText}>
+                        <h3 className={styles.infoModalTitle}>Task details</h3>
+                        <p className={styles.infoModalSub}>Quick glance</p>
+                    </div>
+                    <button className={styles.infoModalClose} onClick={onClose} aria-label="Close">✕</button>
+                </div>
+                <div className={styles.infoModalBody}>
+                    <div className={styles.infoHero}>
+                        <p className={styles.infoHeroTitle}>{task.title || "—"}</p>
+                        {(task.description || "").trim() && (
+                            <p className={styles.infoHeroDesc}>{task.description}</p>
+                        )}
+                    </div>
+                    <div className={styles.infoGrid}>
+                        <div className={styles.infoRow}>
+                            <span className={styles.infoLabel}><Flag size={12} strokeWidth={2} /> Priority</span>
+                            <span className={styles.infoVal}>{PRIORITY_LABELS[task.priority] || task.priority || "—"}</span>
+                        </div>
+                        <div className={styles.infoRow}>
+                            <span className={styles.infoLabel}><Zap size={12} strokeWidth={2} /> Energy</span>
+                            <span className={styles.infoVal}>{ENERGY_LABELS[task.energy_level || task.energyLevel] || "—"}</span>
+                        </div>
+                        <div className={styles.infoRowFull}>
+                            <span className={styles.infoLabel}><Clock size={12} strokeWidth={2} /> Due date</span>
+                            <span className={styles.infoVal}>{dueFormatted || due?.label || "—"}</span>
+                        </div>
+                        {listName && (
+                            <div className={styles.infoRowFull}>
+                                <span className={styles.infoLabel}><List size={12} strokeWidth={2} /> List</span>
+                                <span className={styles.infoVal}>
+                                    <span className={styles.infoListDot} style={{ background: listColor || "var(--muted)" }} />
+                                    {listName}
+                                </span>
+                            </div>
+                        )}
+                        {task.module_code && (
+                            <div className={styles.infoRowFull}>
+                                <span className={styles.infoLabel}><BookOpen size={12} strokeWidth={2} /> Module</span>
+                                <span className={styles.infoVal}>{task.module_code}{task.module_name ? ` — ${task.module_name}` : ""}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className={styles.infoModalFooter}>
+                    <span className={styles.infoHint}>
+                        <MousePointer2 size={12} strokeWidth={2} /> Right-click the task to edit or delete
+                    </span>
+                    <button type="button" className={styles.infoCloseBtn} onClick={onClose}>Close</button>
+                </div>
+            </div>
+        </div>
+    );
+    return createPortal(modal, document.body);
+}
+
 export function EditTaskModal({ task, onSave, onDelete, onClose }) {
     const [form, setForm] = useState({
         title:       task.title,
@@ -272,6 +350,7 @@ export default function TaskCard({
     hideDueBadge = false, hideListBadge = false, isOverdue = false,
     searchQuery = "",
 }) {
+    const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [ctxMenu, setCtxMenu] = useState(null);
     const [burstPop, setBurstPop] = useState(false);
@@ -342,8 +421,8 @@ export default function TaskCard({
                     className={styles.content}
                     role="button"
                     tabIndex={0}
-                    onClick={(e) => { if (!task.completed && !e.target.closest?.("button") && !e.target.closest?.("a")) setShowEdit(true); }}
-                    onKeyDown={(e) => { if (e.key === "Enter" && !task.completed) setShowEdit(true); }}
+                    onClick={(e) => { if (!e.target.closest?.("button") && !e.target.closest?.("a")) setShowInfo(true); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") setShowInfo(true); }}
                 >
                     <div className={styles.titleRow}>
                         <span className={`${styles.title} ${styles.titleClickable} ${task.completed ? styles.titleDone : ""}`}>
@@ -423,6 +502,15 @@ export default function TaskCard({
                     lists={lists}
                     pos={ctxMenu}
                     onClose={() => setCtxMenu(null)}
+                />
+            )}
+
+            {showInfo && (
+                <TaskInfoModal
+                    task={task}
+                    listName={listName}
+                    listColor={listColor}
+                    onClose={() => setShowInfo(false)}
                 />
             )}
 
