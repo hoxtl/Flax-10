@@ -1,17 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import { authService } from "../api/authService";
+import styles from "./DashboardLayout.module.css";
+import TopBar from "../components/Dashboard/Topbar";
+import Sidebar from "../components/Dashboard/Sidebar";
+import WeekBar from "../components/Dashboard/WeekBar";
+import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
+import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import { BackToTop } from "../components/Pagination/Pagination";
 
-import Sidebar from "../components/Dashboard/Sidebar";
-import TopBar from "../components/Dashboard/TopBar";
-import WeekBar from "../components/Dashboard/WeekBar";
-import { EventModal } from "../components/Calendar/EventModal/EventModal";
-
-import styles from "./DashboardLayout.module.css";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -24,40 +23,37 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function parseStoredUser(user) {
-  const name = user.first_name && user.last_name
-    ? `${user.first_name} ${user.last_name}` : user.username;
+  const name =
+    user.first_name && user.last_name
+      ? `${user.first_name} ${user.last_name}`
+      : user.username;
   return {
-    name, year: user.year ? `Year ${user.year}` : "Year: ",
-    major: user.major || "Major: ", email: user.email,
-    username: user.username, isAdmin: !!user.is_superuser
+    name,
+    year: user.year ? `Year ${user.year}` : "Year: ",
+    major: user.major || "Major: ",
+    email: user.email,
+    username: user.username,
+    isAdmin: !!user.is_superuser,
   };
 }
 
 function getUser() {
   const s = localStorage.getItem("user");
   if (!s) return undefined;
-  try { return parseStoredUser(JSON.parse(s)); }
-  catch (err) { console.error("Error parsing user data:", err); }
+  try {
+    return parseStoredUser(JSON.parse(s));
+  } catch (err) {
+    console.error("Error parsing user data:", err);
+  }
 }
 
 async function handleLogoutClick() {
-  try { await authService.logout(); } catch (_) { }
-  finally { clearUserData(); }
-}
-
-function DesktopSidebar({ isMobile, user, activeNav, onNavChange }) {
-  if (isMobile) return null;
-  return <Sidebar user={user} active={activeNav} onChange={onNavChange} />;
-}
-
-function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
-  if (!isMobile || !open) return null;
-  return (
-    <>
-      <div className={styles.backdrop} onClick={onClose} />
-      <div className={styles.drawer}><Sidebar user={user} active={activeNav} onChange={onPick} /></div>
-    </>
-  );
+  try {
+    await authService.logout();
+  } catch (_) {
+  } finally {
+    clearUserData();
+  }
 }
 
 function PageContent({ activeNav, children }) {
@@ -90,8 +86,14 @@ function MainArea({ user, onSettingsClick, onLogoutClick, onProfileClick, select
 
 function EventModalGate({ modal }) {
   if (!modal.isModalOpen) return null;
-  return <EventModal event={modal.modalEvent} initialType={modal.modalType}
-    initialDate={modal.modalInitialDate} onClose={modal.closeModal} />;
+  return (
+    <EventModal
+      event={modal.modalEvent}
+      initialType={modal.modalType}
+      initialDate={modal.modalInitialDate}
+      onClose={modal.closeModal}
+    />
+  );
 }
 
 function useDashboardState(activeNav, onNavChange) {
@@ -101,38 +103,66 @@ function useDashboardState(activeNav, onNavChange) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
+  const showWeekBar =
+    activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
   const onPickNav = (id) => { onNavChange?.(id); setMobileSidebarOpen(false); };
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav };
 }
 
-function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNavChange, onPickNav, setMobileSidebarOpen }) {
+function DashboardSidebars({
+  isMobile,
+  mobileSidebarOpen,
+  user,
+  activeNav,
+  onPickNav,
+  setMobileSidebarOpen,
+  onSettings,
+  onLogout,
+  onProfile,
+}) {
+  // Sidebar shown on mobile only
+  if (!isMobile) return null;
   return (
-    <>
-      <DesktopSidebar isMobile={isMobile} user={user} activeNav={activeNav} onNavChange={onNavChange} />
-      <MobileSidebar isMobile={isMobile} open={mobileSidebarOpen} user={user}
-        activeNav={activeNav} onPick={onPickNav} onClose={() => setMobileSidebarOpen(false)} />
-    </>
+    <Sidebar
+      user={user}
+      active={activeNav}
+      onChange={onPickNav}
+      isMobile={isMobile}
+      isOpen={mobileSidebarOpen}
+      onToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+      onSettingsClick={onSettings}
+      onLogoutClick={onLogout}
+      onProfileClick={onProfile}
+    />
   );
 }
-
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav } = state;
 
   return (
     <div className={styles.root}>
-      <DashboardSidebars isMobile={isMobile} mobileSidebarOpen={mobileSidebarOpen}
-        user={user} activeNav={activeNav} onNavChange={onNavChange}
-        onPickNav={onPickNav} setMobileSidebarOpen={setMobileSidebarOpen} />
-      <MainArea user={user}
+      <DashboardSidebars
+        isMobile={isMobile}
+        mobileSidebarOpen={mobileSidebarOpen}
+        user={user}
+        activeNav={activeNav}
+        onPickNav={onPickNav}
+        setMobileSidebarOpen={setMobileSidebarOpen}
+        onSettings={() => onNavChange?.("settings")}
+        onLogout={handleLogoutClick}
+        onProfile={() => onNavChange?.("profile")}
+      />
+      <MainArea
+        user={user}
         onSettingsClick={() => onNavChange?.("settings")}
         onLogoutClick={handleLogoutClick}
         onProfileClick={() => onNavChange?.("profile")}
         selectedDate={selectedDate}
         showWeekBar={showWeekBar}
-        activeNav={activeNav}>
+        activeNav={activeNav}
+      >
         {children}
       </MainArea>
       <EventModalGate modal={modal} />

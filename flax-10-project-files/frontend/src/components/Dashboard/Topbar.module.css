@@ -42,9 +42,18 @@
   gap: 1rem;
 }
 
-.searchCompact {
-    flex: none;
-    width: 200px;
+.toolBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .searchIcon {
@@ -159,10 +168,26 @@
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-:root[data-theme="dark"] .searchCompact input {
-    background: rgba(255, 255, 255, 0.05);
+:root[data-theme="dark"] .toolBtn {
+  background: rgba(255, 255, 255, 0.05);
 }
 
-:root[data-theme="dark"] .searchCompact input:focus {
-    background: rgba(255, 255, 255, 0.08);
+:root[data-theme="dark"] .toolBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .activePill {
+  background: rgba(158, 126, 93, 0.2);
+}
+
+:root[data-theme="dark"] .dropdownMenu {
+  background: rgba(30, 24, 20, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .dropdownActivePill,
+:root[data-theme="dark"] .navGroupTriggerActive {
+  background: rgba(158, 126, 93, 0.2);
 }

@@ -18,6 +18,7 @@ function getFormFromEvent(event, options = {}) {
         tag: event.tag || event.tag_details?.id || options.initialTag || null,
         location: event.location || '',
         all_day: isAllDay(event),
+        is_private: event.is_private ?? false,
     };
 }
 
@@ -48,6 +49,7 @@ function getDefaultForm(options) {
         reminder: [],
         tag: options.initialTag || null,
         location: '', all_day: false,
+        is_private: false,
     };
 }
 
@@ -155,6 +157,7 @@ function buildBaseEventData(form) {
         tag,
         reminder_minutes: form.reminder,
         all_day: form.all_day,
+        is_private: form.is_private ?? false,
     };
 }
 

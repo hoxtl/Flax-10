@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
@@ -7,15 +8,15 @@ import ModuleForm from '../../components/Modules/ModuleForm.jsx';
 import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
-import useModuleSorting  from '../../components/Modules/hooks/useModuleSorting.js';
+import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
 import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
-function useModulesPage() {
+function useModulesPage(initialSearch = '') {
     const [searchParams, setSearchParams] = useSearchParams();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
-    const [search_query, setSearchQuery] = useState('');
+    const [search_query, setSearchQuery] = useState(initialSearch || '');
     const filterFromUrl = searchParams.get('filter');
     const [filter_mode, setFilterMode] = useState(filterFromUrl === 'enrolled' ? 'enrolled' : 'all');
     const [show_form, setShowForm] = useState(false);
@@ -26,6 +27,13 @@ function useModulesPage() {
 
     const codeFromUrl = searchParams.get('code');
     const moduleIdFromUrl = searchParams.get('moduleId');
+
+    useEffect(() => {
+        if (initialSearch && !codeFromUrl && !moduleIdFromUrl && hook.modules?.length > 0) {
+            const match = hook.modules.find(m => m.module_code?.toLowerCase() === initialSearch.toLowerCase());
+            if (match) setViewingModule(match);
+        }
+    }, [initialSearch, hook.modules]);
 
     useEffect(() => {
         if (!codeFromUrl && !moduleIdFromUrl) return;
@@ -59,20 +67,20 @@ function useModulesPage() {
 }
 
 function useMainView(state) {
-    const {hook , search_query, filter_mode, setSearchQuery, setFilterMode} = state;
+    const { hook, search_query, filter_mode, setSearchQuery, setFilterMode } = state;
     const filtered = filterModules(hook.modules, hook.enrollments, search_query, filter_mode);
     const sorting = useModuleSorting(filtered);
     const search = {
         query: search_query,
-        filter:filter_mode,
-        onQueryChange: (q) => {setSearchQuery(q); sorting.setCurrentPage(1);},
-        onFilterChange: (f) => {setFilterMode(f); sorting.setCurrentPage(1);},   
+        filter: filter_mode,
+        onQueryChange: (q) => { setSearchQuery(q); sorting.setCurrentPage(1); },
+        onFilterChange: (f) => { setFilterMode(f); sorting.setCurrentPage(1); },
     };
-    return {sorting, search, departments: getDepartments(hook.modules)};
+    return { sorting, search, departments: getDepartments(hook.modules) };
 }
 
-export default function ModulesPage() {
-    const state = useModulesPage();
+export default function ModulesPage({ initialSearch = '' }) {
+    const state = useModulesPage(initialSearch);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
     if (hook.loading) return <LoadingView />;
     if (show_form) return <FormView state={state} />;
@@ -119,7 +127,7 @@ function DetailsView({ state }) {
 
 function MainView({ state }) {
     const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule } = state;
-    const {sorting, search, departments} = useMainView(state);
+    const { sorting, search, departments } = useMainView(state);
     return (
         <div className={styles.container}>
             <PageHeader is_teacher={is_teacher} onCreateModule={() => { setEditingModule(null); setShowForm(true); }} />
@@ -174,12 +182,12 @@ function PageHeader({ is_teacher, onCreateModule }) {
 
 function Toolbar({ search, sorting, departments }) {
     const filter_options = [
-        {value:'all', label: 'All Modules'},
-        {value: 'enrolled', label: 'My Enrollments'},
+        { value: 'all', label: 'All Modules' },
+        { value: 'enrolled', label: 'My Enrollments' },
     ];
     const dept_options = [
-        {value: 'all', 'label':'All Departments'},
-        ...departments.map(d=> ({value:d, label:d})),
+        { value: 'all', 'label': 'All Departments' },
+        ...departments.map(d => ({ value: d, label: d })),
     ];
     const sortOptions = [
         { value: 'name', label: 'Sort by Name' },

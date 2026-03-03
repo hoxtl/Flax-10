@@ -8,17 +8,19 @@ import HistoryModal from './HistoryModal';
 import styles from "../../pages/Timer/TimerPage.module.css";
 
 /** Header component with title and history toggle */
-const TimerHeader = ({ onOpenHistory }) => (
+const TimerHeader = ({ onOpenHistory, isMobile }) => (
     <div className={styles.header}>
         <div className={styles.title}>Study Timer</div>
-        <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
-            History 📜
-        </button>
+        {!isMobile && (
+            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
+                History 📜
+            </button>
+        )}
     </div>
 );
 
 /** Main timer UI layout including visuals, controls, and settings */
-export const MainSection = ({ t, onOpenHistory }) => {
+export const MainSection = ({ t, onOpenHistory, isMobile }) => {
     const handleTaskSelect = useCallback((task) => {
         t.setTask(task.title);
         const mins = (task.estimated_blocks || 1) * 25;
@@ -41,8 +43,13 @@ export const MainSection = ({ t, onOpenHistory }) => {
 
     return (
         <>
-            <TimerHeader onOpenHistory={onOpenHistory} />
+            <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />
             <TaskInput value={t.task} onChange={t.setTask} onTaskSelect={handleTaskSelect} />
+            {isMobile && (
+                <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>
+                    View History 📜
+                </button>
+            )}
             <TreeAnimation progress={t.progress} mode={t.mode} />
             <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} isActive={t.isActive} timeLeft={t.timeLeft} workTime={t.workTime} />
             <SessionStatus current={t.completedSessions} total={t.targetSessions} />

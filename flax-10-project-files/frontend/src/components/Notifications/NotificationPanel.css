@@ -115,6 +115,10 @@
     transition: background 0.2s;
 }
 
+.notification-item.clickable {
+    cursor: pointer;
+}
+
 .notification-item:hover {
     background: var(--hover);
 }

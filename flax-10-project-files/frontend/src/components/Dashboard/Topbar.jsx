@@ -7,7 +7,7 @@ import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import SearchBar from "../common/SearchBar";
 
-import styles from "./TopBar.module.css";
+import styles from "./Topbar.module.css";
 
 function TopBarGreeting() {
   return (
@@ -16,10 +16,6 @@ function TopBarGreeting() {
       <span className={styles.dateSub}>Built for calm study</span>
     </div>
   );
-}
-
-function SearchInput() {
-    return <SearchBar placeholder="Search…" className={styles.searchCompact} />;
 }
 
 function QuickTabs() {
@@ -48,7 +44,7 @@ function ActionPill() {
 function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <div className={styles.actions}>
-      <SearchInput />
+      <SearchBar />
       <ActionPill />
       <ProfileDropdown
         user={user}
@@ -60,7 +56,7 @@ function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick })
   );
 }
 
-export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
   return (
     <header className={styles.container}>
       <TopBarGreeting />

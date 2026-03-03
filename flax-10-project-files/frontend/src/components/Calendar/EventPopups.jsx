@@ -42,7 +42,7 @@ function useEventDeletion(closePopup) {
 }
 
 function EventPopupContainer() {
-    const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();
+    const { popupEvent, popupAnchorRect, closePopup, readOnly } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
     const tags = useTags();
@@ -54,7 +54,7 @@ function EventPopupContainer() {
 
     const tag = getEventTag(popupEvent, tags);
     const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate };
-    const actions = getCalendarPopupActions(popupEvent, handlers);
+    const actions = readOnly ? null : getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
 

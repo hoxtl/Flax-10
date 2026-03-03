@@ -4,9 +4,12 @@ import styles from "./Profile.module.css";
 import { buildInitials, buildFullName } from "./utils/profileHelpers";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
 import ProfileModals from "./ProfileModals";
+import { ProfileCalendar } from "./ProfileCalendar";
 import { useProfileSummary } from "./hooks/useProfileSummary";
 import analyticsService from "../../api/analyticsService";
 import { fetchApi } from "../../api/client";
+import ShareButton from '../../components/Social/ShareButton';
+import { getModules } from "../../api/moduleApi";
 
 // ---------------------------------------------------------------------------
 // Header
@@ -30,13 +33,18 @@ function StatItem({ value, label, onClick }) {
   );
 }
 
-function ProfileStats({ profileData, upcomingEventCount, handlers }) {
-  const { onModulesClick, onTasksClick, onEventsClick } = handlers;
+function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
+  const { onModulesClick, onTasksClick, onEventsClick, onSharedWithClick, onSharedByClick } = handlers;
   return (
     <div className={styles.stats}>
       <StatItem value={profileData?.module_count || 0} label="modules" onClick={onModulesClick} />
-      <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
-      <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
+      {isSelf && (
+        <>
+          <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
+          <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
+          <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onSharedWithClick} />
+        </>
+      )}
     </div>
   );
 }
@@ -53,18 +61,132 @@ function ProfileBio({ user, profileData }) {
   );
 }
 
-function ProfileHeader({ user, profileData, upcomingEventCount, handlers }) {
+function ProfileHeaderTop({ user, onEditProfile, isSelf }) {
   return (
-    <div className={styles.header}>
-      <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
-      <div className={styles.headerInfo}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.username}>{(profileData || user)?.username || "guest"}</h1>
-          <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button>
+    <div className={styles.headerTop}>
+      <h1 className={styles.username}>{user?.username || "guest"}</h1>
+      {isSelf ? (
+        <button className={styles.btnEdit} onClick={onEditProfile}>Edit profile</button>
+      ) : (
+        <div className={styles.shareAction}>
+          <ShareButton
+            userId={user?.id}
+            initialIsSharing={user?.is_sharing}
+            onToggle={(newState) => {
+              user?.setOptimisticShare?.(newState);
+              user?.reload?.();
+            }}
+          />
         </div>
-        <ProfileStats profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} />
-        <ProfileBio user={profileData || user} profileData={profileData} />
+      )}
+    </div>
+  );
+}
+
+function ProfileHeaderInfo({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
+  return (
+    <div className={styles.headerInfo}>
+      <ProfileHeaderTop user={user} onEditProfile={isSelf ? handlers.onEditProfile : undefined} isSelf={isSelf} />
+      <ProfileStats
+        profileData={profileData}
+        upcomingEventCount={upcomingEventCount}
+        handlers={handlers}
+        isMutualOrSelf={isMutualOrSelf}
+        isSelf={isSelf}
+      />
+      <ProfileBio user={user} profileData={profileData} />
+    </div>
+  );
+}
+
+function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
+  const year = profileData?.year || user?.year || "";
+  const major = profileData?.major || user?.major || "";
+  const username = (profileData || user)?.username || "guest";
+  return (
+    <>
+      {/* Desktop header */}
+      <div className={`${styles.header} ${styles.desktopOnly}`}>
+        <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
+        <ProfileHeaderInfo
+          user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }}
+          profileData={profileData}
+          upcomingEventCount={upcomingEventCount}
+          handlers={handlers}
+          isMutualOrSelf={isMutualOrSelf}
+          isSelf={isSelf}
+        />
       </div>
+
+      {/* Mobile hero header */}
+      <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
+        <div className={styles.mobileHero}>
+          <div className={styles.mobileAvatar}>
+            {profileData?.profile_photo_url
+              ? <img src={profileData.profile_photo_url} alt="Profile" className={styles.avatarImage} />
+              : buildInitials(user)}
+          </div>
+          <h1 className={styles.mobileUsername}>{username}</h1>
+          <p className={styles.mobileBio}>{year} {year && major ? '·' : ''} {major}</p>
+          <div className={styles.mobileActions}>
+            {isSelf
+              ? <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>Edit Profile</button>
+              : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}
+          </div>
+        </div>
+        <div className={styles.mobileStatsGrid}>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onModulesClick}>
+            <span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Modules</span>
+          </div>
+          {isSelf && (
+            <>
+              <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onTasksClick}>
+                <span className={styles.mobileStatValue}>{profileData?.task_count || 0}</span>
+                <span className={styles.mobileStatLabel}>Tasks</span>
+              </div>
+              <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onEventsClick}>
+                <span className={styles.mobileStatValue}>{upcomingEventCount || 0}</span>
+                <span className={styles.mobileStatLabel}>Events</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function useModuleNameMap() {
+  const [nameMap, setNameMap] = useState({});
+  useEffect(() => {
+    getModules()
+      .then(data => {
+        const list = Array.isArray(data) ? data : data?.results || [];
+        const entries = list.filter(m => m.module_code).map(m => [m.module_code, m.module_name]);
+        setNameMap(Object.fromEntries(entries));
+      })
+      .catch(() => { });
+  }, []);
+  return nameMap;
+}
+
+function ModuleCard({ code, name, onNavigate }) {
+  return (
+    <button className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
+      <span className={styles.moduleIcon}>📚</span>
+      <span className={styles.moduleCode}>{code}</span>
+      {name && <span className={styles.moduleName}>{name}</span>}
+    </button>
+  );
+}
+
+function ModulesGrid({ modules, onNavigate }) {
+  const nameMap = useModuleNameMap();
+  if (!modules?.length) return null;
+  return (
+    <div className={styles.modulesGrid}>
+      {modules.map((code, i) => <ModuleCard key={i} code={code} name={nameMap[code]} onNavigate={onNavigate} />)}
     </div>
   );
 }
@@ -103,19 +225,19 @@ function StudyDNA({ heatmap }) {
   let morning = 0, afternoon = 0, evening = 0, night = 0;
   grid.forEach(row => {
     row.forEach((mins, h) => {
-      if      (h >= 5  && h < 12) morning   += mins;
+      if (h >= 5 && h < 12) morning += mins;
       else if (h >= 12 && h < 17) afternoon += mins;
-      else if (h >= 17 && h < 21) evening   += mins;
-      else                         night     += mins;
+      else if (h >= 17 && h < 21) evening += mins;
+      else night += mins;
     });
   });
 
   const total = morning + afternoon + evening + night || 1;
   const segments = [
-    { label: "Morning",   pct: morning   / total, color: "#F59E0B" },
+    { label: "Morning", pct: morning / total, color: "#F59E0B" },
     { label: "Afternoon", pct: afternoon / total, color: "#D97706" },
-    { label: "Evening",   pct: evening   / total, color: "#7C3AED" },
-    { label: "Night",     pct: night     / total, color: "#1E3A5F"  },
+    { label: "Evening", pct: evening / total, color: "#7C3AED" },
+    { label: "Night", pct: night / total, color: "#1E3A5F" },
   ].filter(s => s.pct > 0.01);
 
   return (
@@ -132,8 +254,8 @@ function StudyDNA({ heatmap }) {
               borderRadius: i === 0
                 ? '5px 0 0 5px'
                 : i === segments.length - 1
-                ? '0 5px 5px 0'
-                : '0',
+                  ? '0 5px 5px 0'
+                  : '0',
             }}
             title={`${s.label}: ${Math.round(s.pct * 100)}%`}
           />
@@ -189,7 +311,7 @@ function MiniHeatmap({ heatmap, onNavigate }) {
         <div className={styles.heatmapLinkBtn}>
           View full analytics
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       </div>
@@ -266,7 +388,7 @@ function ThisWeek({ weekly, streaks, onGoalSave }) {
   const circumference = 2 * Math.PI * radius;
   const capped = Math.min(percentage, 100);
   const dash = (capped / 100) * circumference;
-  const gap  = circumference - dash;
+  const gap = circumference - dash;
   const done = percentage >= 100;
   const remaining = Math.max(0, goalHours - hoursStudied).toFixed(1);
   const currentStreak = streaks?.current ?? 0;
@@ -390,10 +512,10 @@ function ThisWeek({ weekly, streaks, onGoalSave }) {
 // ---------------------------------------------------------------------------
 
 const TIER_ORDER = ['gold', 'silver', 'bronze'];
-const TIER_META  = {
-  gold:   { label: 'Gold',   color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',   border: 'rgba(245,158,11,0.3)'   },
-  silver: { label: 'Silver', color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)',  border: 'rgba(156,163,175,0.3)'  },
-  bronze: { label: 'Bronze', color: '#92400E', bg: 'rgba(146,64,14,0.1)',    border: 'rgba(146,64,14,0.25)'   },
+const TIER_META = {
+  gold: { label: 'Gold', color: '#F59E0B', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
+  silver: { label: 'Silver', color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
+  bronze: { label: 'Bronze', color: '#92400E', bg: 'rgba(146,64,14,0.1)', border: 'rgba(146,64,14,0.25)' },
 };
 
 function Badge({ badge }) {
@@ -472,14 +594,17 @@ function Skeleton() {
 // ProfileHome
 // ---------------------------------------------------------------------------
 
-function ProfileHome({ onNavigate }) {
-  const { summary, loading, refetch } = useProfileSummary();
+function ProfileHome({ onNavigate, isSelf, viewedUserId }) {
+  const { summary, loading, refetch } = useProfileSummary(viewedUserId);
   const [analyticsData, setAnalyticsData] = useState(null);
   const [showAchievements, setShowAchievements] = useState(false);
 
   useEffect(() => {
-    analyticsService.getSummary(90).then(setAnalyticsData).catch(() => {});
-  }, []);
+    // Only fetch analytics if viewing self
+    if (isSelf) {
+      analyticsService.getSummary(90).then(setAnalyticsData).catch(() => { });
+    }
+  }, [isSelf]);
 
   const handleGoalSave = async (newGoal) => {
     try {
@@ -508,17 +633,25 @@ function ProfileHome({ onNavigate }) {
 
   return (
     <div className={styles.profileHome}>
-      <PersonaCard persona={summary?.persona} peakHour={peakHour} />
-      <div className={styles.twoCol}>
-        <div className={styles.leftCol}>
-          <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={handleGoalSave} />
-          <StudyDNA heatmap={analyticsData?.heatmap} />
-          <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
-        </div>
-        <div className={styles.rightCol}>
+      {isSelf ? (
+        <>
+          <PersonaCard persona={summary?.persona} peakHour={peakHour} />
+          <div className={styles.twoCol}>
+            <div className={styles.leftCol}>
+              <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={handleGoalSave} />
+              <StudyDNA heatmap={analyticsData?.heatmap} />
+              <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
+            </div>
+            <div className={styles.rightCol}>
+              <BadgesSection badges={summary?.badges} onOpen={() => setShowAchievements(true)} />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className={styles.badgesWrapper} style={{ marginTop: '2rem' }}>
           <BadgesSection badges={summary?.badges} onOpen={() => setShowAchievements(true)} />
         </div>
-      </div>
+      )}
       {showAchievements && (
         <AchievementsModal
           badges={summary?.badges}
@@ -533,9 +666,10 @@ function ProfileHome({ onNavigate }) {
 // Page layout
 // ---------------------------------------------------------------------------
 
-function ProfileContent({ user, state, onNavigate }) {
+function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
   const { profileData, handlers } = useProfileContent(state);
-  const { upcomingEventCount } = useProfileBodyData(state);
+  const { modules, upcomingEventCount, filteredEvents } = useProfileBodyData(state);
+
   return (
     <div className={styles.content}>
       <ProfileHeader
@@ -543,29 +677,54 @@ function ProfileContent({ user, state, onNavigate }) {
         profileData={profileData}
         upcomingEventCount={upcomingEventCount}
         handlers={handlers}
+        isMutualOrSelf={isMutualOrSelf}
+        isSelf={isSelf}
       />
-      <ProfileHome onNavigate={onNavigate} />
+      <ModulesGrid modules={modules} onNavigate={onNavigate} isSelf={isSelf} />
+      <ProfileHome onNavigate={onNavigate} isSelf={isSelf} viewedUserId={state.viewedUserId} />
+      {!isSelf && isMutualOrSelf && (
+        <div className={styles.calendarSection}>
+          <div className={styles.cardLabel}>SHARED CALENDAR</div>
+          <ProfileCalendar events={filteredEvents} />
+        </div>
+      )}
     </div>
   );
 }
 
 function ProfileBody({ user, state, onNavigate }) {
   const { filteredEvents, modules } = useProfileBodyData(state);
+  const profileData = state.profileData;
+  const isSelf = profileData?.username === user?.username || !profileData;
+  const isSharedOrSelf = isSelf || profileData?.is_shared_with_me;
+
   return (
     <div className={styles.container}>
-      <ProfileContent user={user} state={state} onNavigate={onNavigate} />
+      <ProfileContent
+        user={user}
+        state={state}
+        isMutualOrSelf={isSharedOrSelf}
+        isSelf={isSelf}
+        onNavigate={onNavigate}
+      />
       <ProfileModals
         user={user}
         state={state}
         modules={modules}
         filteredEvents={filteredEvents}
+        isMutualOrSelf={isSharedOrSelf}
+        onNavChange={state.onNavChange}
       />
     </div>
   );
 }
 
-export default function Profile({ user, onNavigate }) {
-  const state = useProfileState();
+export default function Profile({ user, viewedUserId, onBack, onNavigate, onNavChange }) {
+  const navFn = onNavigate || onNavChange;
+  const state = useProfileState(viewedUserId);
+  state.onNavChange = navFn;
+
   if (state.loading) return <div className={styles.container}>Loading...</div>;
-  return <ProfileBody user={user} state={state} onNavigate={onNavigate} />;
+  if (!state.profileData) return <div className={styles.container}>User not found.</div>;
+  return <ProfileBody user={user} state={state} onNavigate={navFn} />;
 }

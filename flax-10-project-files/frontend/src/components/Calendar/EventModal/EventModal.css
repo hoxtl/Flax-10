@@ -290,3 +290,39 @@
     flex-shrink: 0;
     background: var(--muted, #9ca3af);
 }
+
+/* Privacy toggle */
+.privacy-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.privacy-btn {
+    flex: 1;
+    padding: 0.45rem 0.75rem;
+    border: none;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.privacy-btn:first-child {
+    border-right: 1px solid var(--border);
+}
+
+.privacy-btn.active {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.privacy-btn:hover:not(.active) {
+    background: var(--hover);
+    color: var(--text);
+}

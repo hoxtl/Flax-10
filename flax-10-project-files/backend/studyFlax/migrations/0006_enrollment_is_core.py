@@ -4,8 +4,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('studyFlax', '0005_tasklist_task'),
-        ('studyFlax', '0005_deadline'),
+        ('studyFlax', '0005_usersettings_modules'),
     ]
     operations = [
         migrations.AddField(

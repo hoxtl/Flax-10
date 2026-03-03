@@ -8,12 +8,14 @@ class EventSyncTests(TestCase):
     @patch('studyFlax.views.calendar.event_views.sync_timetable_if_needed')
     def test_safe_sync_success(self, mock_sync):
         """Test safe_sync_timetable when sync succeeds."""
-        safe_sync_timetable()
-        mock_sync.assert_called_once()
+        user = "mock_user"
+        safe_sync_timetable(user)
+        mock_sync.assert_called_once_with(user)
 
     @patch('studyFlax.views.calendar.event_views.sync_timetable_if_needed')
     def test_safe_sync_exception(self, mock_sync):
         """Test safe_sync_timetable handles exceptions silently."""
         mock_sync.side_effect = Exception("Sync failed")
-        safe_sync_timetable()
-        mock_sync.assert_called_once()
+        user = "mock_user"
+        safe_sync_timetable(user)
+        mock_sync.assert_called_once_with(user)

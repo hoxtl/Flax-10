@@ -4,7 +4,7 @@
   background: var(--bg);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible !important;
   z-index: 10;
   flex-shrink: 0;
   margin: 0;
@@ -141,7 +141,9 @@
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0.65rem 0;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  position: relative;
   gap: 0.25rem;
 }
 
@@ -162,17 +164,17 @@
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .avatarImage {
@@ -187,9 +189,9 @@
 }
 
 .userName {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--user-details-text);
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -197,4 +199,139 @@
   font-size: 11px;
   color: var(--user-details-text);
   white-space: nowrap;
+}
+
+.userRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  gap: 12px;
+}
+
+.userRow:hover {
+  background: var(--hover);
+}
+
+.userRowCollapsed {
+  justify-content: center;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  text-align: left;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* The Popup Menu */
+.userMenu {
+  position: absolute;
+  bottom: 100%;
+  left: 8px;
+  right: 8px;
+  background: var(--sidebar);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+}
+
+.userMenu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.userMenu button:hover {
+  background: var(--hover);
+}
+
+.logoutBtn {
+  color: #ef4444 !important;
+}
+
+/* ── Hamburger Icon ──────────────────────────────────────────────────────── */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hamburgerLine {
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+/* ── Mobile Overrides ────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .header {
+    justify-content: center;
+    padding: 18px 0;
+    gap: 12px;
+  }
+
+  :global(.sidebar[style*="width: 100vw"]) .header {
+    justify-content: flex-start;
+    padding: 18px 24px;
+  }
+
+  .navItem {
+    padding: 12px 0;
+    padding-left: 10px;
+  }
+
+  :global(.sidebar[style*="width: 100vw"]) .navItem {
+    padding: 12px 24px;
+    justify-content: flex-start !important;
+  }
+
+  .sidebarClosed .navItem {
+    padding-left: 0;
+  }
+
+  .sidebarClosed .userMenu {
+    position: fixed;
+    left: 12px;
+    bottom: 80px;
+
+    width: max-content;
+    min-width: 140px;
+    right: auto;
+
+    z-index: 9999;
+  }
 }

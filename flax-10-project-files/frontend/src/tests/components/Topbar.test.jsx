@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TopBar from '../../components/Dashboard/TopBar';
+import TopBar from '../../components/Dashboard/Topbar';
 
-vi.mock('../../components/ProfileDropdown', () => ({
+vi.mock('../../components/Dashboard/ProfileDropdown', () => ({
   default: ({ onSettingsClick, onLogoutClick, onProfileClick }) => (
     <div>
       <button onClick={onSettingsClick}>settings</button>
@@ -12,7 +12,7 @@ vi.mock('../../components/ProfileDropdown', () => ({
   ),
 }));
 
-vi.mock('../../components/ExpandableTabs', () => ({
+vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
   ExpandableTabs: ({ onChange }) => (
     <div>
       <button onClick={() => onChange(0)}>add-tab</button>
@@ -22,54 +22,36 @@ vi.mock('../../components/ExpandableTabs', () => ({
   ),
 }));
 
-vi.mock('../../components/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../components/Dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../components/Timer/MiniTimer', () => ({ default: () => <div>timer</div> }));
+vi.mock('../../context/NotificationContext', () => ({
+  useNotifications: () => ({ togglePanel: vi.fn(), notifications: [] })
+}));
+vi.mock('../../components/Notifications/NotificationPanel', () => ({
+  NotificationPanel: () => <div>notifications</div>
+}));
 
 describe('TopBar', () => {
-  it('renders greeting and date', () => {
-    render(<TopBar user={{ first_name: 'Kausar' }} />);
-    expect(screen.getByText('Kausar')).toBeTruthy();
+  it('renders greeting', () => {
+    render(<TopBar user={{ name: 'Kausar' }} />);
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
+    expect(screen.getByText('Built for calm study')).toBeTruthy();
   });
 
-  it('renders without user (no name shown)', () => {
+  it('renders without user', () => {
     const { container } = render(<TopBar />);
-    expect(container.querySelector('h1')).toBeNull();
-  });
-
-  it('renders user with only username', () => {
-    render(<TopBar user={{ username: 'kausar' }} />);
-    expect(screen.getByText('kausar')).toBeTruthy();
-  });
-
-  it('calls onAddClick when add tab selected', () => {
-    const onAdd = vi.fn();
-    render(<TopBar onAddClick={onAdd} />);
-    fireEvent.click(screen.getByText('add-tab'));
-    expect(onAdd).toHaveBeenCalled();
-  });
-
-  it('does not call onAddClick for non-0 tab index', () => {
-    const onAdd = vi.fn();
-    render(<TopBar onAddClick={onAdd} />);
-    fireEvent.click(screen.getByText('notif-tab'));
-    expect(onAdd).not.toHaveBeenCalled();
-  });
-
-  it('handles null tab index without crash', () => {
-    expect(() => {
-      render(<TopBar onAddClick={vi.fn()} />);
-      fireEvent.click(screen.getByText('deselect'));
-    }).not.toThrow();
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
   it('calls onSettingsClick', () => {
     const fn = vi.fn();
-    render(<TopBar onSettingsClick={fn} />);
+    render(<TopBar user={{}} onSettingsClick={fn} />);
     fireEvent.click(screen.getByText('settings'));
     expect(fn).toHaveBeenCalled();
   });
 
   it('renders search input', () => {
     render(<TopBar />);
-    expect(screen.getByPlaceholderText('Search…')).toBeTruthy();
+    expect(screen.getByPlaceholderText('Search...')).toBeTruthy();
   });
 });

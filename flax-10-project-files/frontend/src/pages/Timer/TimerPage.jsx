@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
-import { useNotificationPermission } from '../../components/Timer/utils/timerUtils';
-import { useTimerContext } from '../../context/TimerContext';
-import { MainSection, PopupSection } from '../../components/Timer/WrapperComponents';
+import { useNotificationPermission } from "../../components/Timer/utils/timerUtils";
+import { useTimerContext } from "../../context/TimerContext";
+import { MainSection, PopupSection } from "../../components/Timer/WrapperComponents";
 
 import styles from './TimerPage.module.css';
 
 function NotificationPrompt({ permission, request }) {
-  if (permission !== 'default') return null;
-  return <button onClick={request} className={styles.notificationBtn}>Enable Notifications</button>;
+  if (permission !== "default") return null;
+  return (
+    <button onClick={request} className={styles.notificationBtn}>
+      Enable Notifications
+    </button>
+  );
 }
 
 const ZOOM_IN_DURATION = 0.5;
@@ -59,7 +63,14 @@ export default function TimerPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [showFocusTransition, setShowFocusTransition] = useState(() => !!location.state?.fromTaskPlay);
   const [animateTimerIn, setAnimateTimerIn] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
   const { permission, request } = useNotificationPermission();
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleFocusTransitionComplete = () => {
     setShowFocusTransition(false);
@@ -85,7 +96,7 @@ export default function TimerPage() {
           }}
           onAnimationComplete={() => setAnimateTimerIn(false)}
         >
-          <MainSection t={timerData} onOpenHistory={() => setShowHistory(true)} />
+          <MainSection t={timerData} onOpenHistory={() => setShowHistory(true)} isMobile={isMobile} />
           <PopupSection t={timerData} showHistory={showHistory} onCloseHistory={() => setShowHistory(false)} />
         </motion.div>
       )}
