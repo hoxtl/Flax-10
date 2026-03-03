@@ -68,7 +68,7 @@ def get_personal_events(user, query_params, start, end, is_viewer=False):
 def mask_private_event(event):
     return {
         **event,
-        'title': 'Private event',
+        'title': 'Busy',
         'description': '',
         'location': None,
         'tag': None,
