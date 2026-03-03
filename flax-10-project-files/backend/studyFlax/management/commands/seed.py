@@ -172,6 +172,15 @@ class Command(BaseCommand):
             name=name, user=None,
             defaults={'default_duration': duration, 'color': '#4A90D9', 'is_default': True},
         )
+        self._create_system_tags()
+
+    def _create_system_tags(self):
+        from studyFlax.views.calendar.system_tags import SYSTEM_TAG_CONFIG
+        for name, config in SYSTEM_TAG_CONFIG.items():
+            Tag.objects.get_or_create(
+                name=name, user=None,
+                defaults={'default_duration': config['duration'], 'color': config['color'], 'is_default': True},
+            )
 
     def _create_regular_tag(self, name, duration, faker):
         category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None

@@ -324,12 +324,15 @@ def build_deadlines_for_module(module):
     return deadlines
 
 
-def create_deadline_calendar_event(user, deadline):
-    """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar.
+def get_tag_for_deadline_type(deadline_type):
+    from studyFlax.views.calendar.system_tags import get_deadline_tag, get_exam_tag
+    if deadline_type.lower() == 'exam':
+        return get_exam_tag()
+    return get_deadline_tag()
 
-    Uses get_or_create keyed on (user, title, start_time) so that
-    re-running the seed never duplicates deadline events.
-    """
+
+def create_deadline_calendar_event(user, deadline):
+    """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""
     CalendarEvent.objects.get_or_create(
         user=user,
         title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
@@ -338,12 +341,13 @@ def create_deadline_calendar_event(user, deadline):
             'end_time': deadline.end_due_date or deadline.start_due_date,
             'location': deadline.location,
             'description': deadline.description,
+            'tag': get_tag_for_deadline_type(deadline.deadline_type),
             'priority': 'high',
             'module': deadline.module,
             'source': 'module_deadline',
             'external_id': str(deadline.id),
         },
-     )
+    )
 
 # ---------------------------------------------------------------------------
 # Study session & theme session seeding
