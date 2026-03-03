@@ -15,14 +15,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 7px 12px;
   background: var(--bg, #F8F5F2);
   border: 1px solid var(--border, rgba(107, 83, 68, 0.2));
   border-radius: 8px;
   font-family: var(--font-body, inherit);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text, #2c2420);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2c2420;
   cursor: pointer;
   text-align: left;
   transition: border-color 0.15s, box-shadow 0.15s;

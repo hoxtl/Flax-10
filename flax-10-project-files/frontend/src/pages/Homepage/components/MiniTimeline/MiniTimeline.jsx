@@ -29,7 +29,7 @@ export function MiniTimeline({
   deadlineSuggestions = [],
   taskLists = [],
   onQuickStart,
-  onHarvestToggle,
+  onTaskToggle,
   onCardClick,
   onEdit,
   onConflictAutoMove,
@@ -150,7 +150,7 @@ export function MiniTimeline({
           onConflictAutoMove={onConflictAutoMove}
           onEdit={onEdit}
           onCardClick={onCardClick}
-          onHarvestToggle={onHarvestToggle}
+          onTaskToggle={onTaskToggle}
           onToggleComplete={onToggleComplete}
           onReschedule={onReschedule}
           completedEventIds={completedEventIds}
@@ -161,7 +161,7 @@ export function MiniTimeline({
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onHarvestToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef]
   );
 
   return (

@@ -21,15 +21,16 @@ import { getModules, getEnrollments } from "../../api/moduleApi";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
-import { useHarvestCelebration } from "../../context/HarvestCelebrationContext";
-import { getHarvestMessage, isRoutineHarvestTask } from "../../lib/harvestMessages";
+import { useTaskCompletion } from "../../context/TaskCompletionContext";
+import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
 import { getLevelUpThresholdCrossed, getLevelUpMessageForThreshold, getSaplingCelebrationCrossed, getSaplingCelebrationMessage } from "../../lib/gardenStatus";
 import { getSeedsPerDayThisWeek } from "../../lib/weeklySeedCount";
-import { playZenChime } from "../../lib/sounds";
+import { playCompletionChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 
 import EmptyStateCard from "../../components/EmptyStateCard";
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
+import CreateListModal from "../Tasks/components/CreateListModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
 import styles from "./Homepage.module.css";
@@ -75,7 +76,7 @@ export default function Homepage({ onNavigate }) {
     setTimerTask("Focus");
     setTimerActive(true);
   }, [setTimerMode, setTimeLeft, workTime, setTimerTask, setTimerActive]);
-  const { showHarvestToast, showLevelUpToast } = useHarvestCelebration();
+  const { showCompletionToast, showLevelUpToast } = useTaskCompletion();
 
   const displayName = useMemo(() => {
     try {
@@ -99,6 +100,8 @@ export default function Homepage({ onNavigate }) {
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
   const [moduleFilterId, setModuleFilterId] = useState(null);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
+  const [lastCreatedListId, setLastCreatedListId] = useState(null);
   const [rescheduleTask, setRescheduleTask] = useState(null);
   const [planTimelineReadItem, setPlanTimelineReadItem] = useState(null);
   const [celebratingTaskId, setCelebratingTaskId] = useState(null);
@@ -154,7 +157,7 @@ export default function Homepage({ onNavigate }) {
   /* When work timer hits 0 in the NOW widget: soft chime + subtle +1 XP sparks */
   useEffect(() => {
     if (hasTimerSession && timerMode === "work" && prevTimeLeftRef.current > 0 && timeLeft === 0) {
-      playZenChime(0.35);
+      playCompletionChime(0.35);
       setShowXPSparks(true);
       const t = setTimeout(() => setShowXPSparks(false), 1400);
       return () => clearTimeout(t);
@@ -315,8 +318,8 @@ export default function Homepage({ onNavigate }) {
       refetchTasks();
       if (newCompleted) {
         const xp = getActionHubXp(t);
-        const isRoutine = isRoutineHarvestTask(t);
-        showHarvestToast(getHarvestMessage(t), { isRoutine });
+        const isRoutine = isRoutineTask(t);
+        showCompletionToast(getCompletionMessage(t), { isRoutine });
         if (!isRoutine) {
           setFloatingSeedXp(xp);
           setFloatingSeedTaskId(numericId);
@@ -339,7 +342,7 @@ export default function Homepage({ onNavigate }) {
     } catch {
       setToast("Couldn't update task.");
     }
-  }, [showHarvestToast, refetchTasks]);
+  }, [showCompletionToast, refetchTasks]);
 
   // Show toast for 3 seconds
   const showToast = useCallback((msg) => {
@@ -668,7 +671,7 @@ export default function Homepage({ onNavigate }) {
     }).length;
   }, [selectedDate, allTasks]);
 
-  /* Seeds harvested per day this week (Mon–Sun) — uses shared lib for Analytics bridge */
+  /* Tasks completed per day this week (Mon–Sun) — uses shared lib for Analytics bridge */
   const seedsPerDayThisWeek = useMemo(
     () => getSeedsPerDayThisWeek(allTasks, (t) => isRoutineOrEventTask(t, getTag)),
     [allTasks, getTag]
@@ -1187,13 +1190,13 @@ export default function Homepage({ onNavigate }) {
     }
   }, [seedsCountFromTasks, selectedDate, showLevelUpToast]);
 
-  const handleHarvestToggle = useCallback(
+  const handleTaskToggle = useCallback(
     async (task, completed) => {
       const markingComplete = completed === true;
-      const isRoutine = isRoutineHarvestTask(task);
+      const isRoutine = isRoutineTask(task);
       if (markingComplete) {
         if (!isRoutine) setCelebratingTaskId(task.id);
-        showHarvestToast(getHarvestMessage(task), { isRoutine });
+        showCompletionToast(getCompletionMessage(task), { isRoutine });
         if (!isRoutine) setTimeout(() => setCelebratingTaskId(null), 500);
       }
       try {
@@ -1201,7 +1204,7 @@ export default function Homepage({ onNavigate }) {
         refetchTasks();
       } catch (_) {}
     },
-    [refetchTasks, showHarvestToast]
+    [refetchTasks, showCompletionToast]
   );
 
   const fmtTimerSecs = (s) => {
@@ -1846,7 +1849,7 @@ export default function Homepage({ onNavigate }) {
                   deadlineSuggestions={deadlineSuggestions}
                   taskLists={taskLists}
                   onQuickStart={handleQuickStartGap}
-                  onHarvestToggle={handleHarvestToggle}
+                  onTaskToggle={handleTaskToggle}
                   onCardClick={(ev, matchTask) => setPlanTimelineReadItem({ event: ev, task: matchTask ?? null })}
                   onEdit={(ev) => openModal(ev, ev.tag)}
                   onConflictAutoMove={handleConflictAutoMove}
@@ -1875,12 +1878,8 @@ export default function Homepage({ onNavigate }) {
         <CreateTaskModal
           lists={taskLists}
           modules={enrolledModules}
-          onCreateList={async (data) => {
-            const created = await createTaskList(data);
-            const list = await fetchTaskLists();
-            setTaskLists(Array.isArray(list) ? list : []);
-            return created;
-          }}
+          onOpenCreateList={() => setShowCreateListFromTask(true)}
+          newListIdCreated={lastCreatedListId}
           onSave={async (data, opts) => {
             try {
               const dataToSend = { ...data };
@@ -1909,9 +1908,22 @@ export default function Homepage({ onNavigate }) {
             }
             setShowCreateTaskModal(false);
           }}
-          onClose={() => setShowCreateTaskModal(false)}
+          onClose={() => { setShowCreateTaskModal(false); setLastCreatedListId(null); }}
           showAddToScheduleToggle={isToday(selectedDate)}
           addToScheduleLabel="Add to today's schedule"
+        />
+      )}
+
+      {showCreateListFromTask && (
+        <CreateListModal
+          onSave={async (data) => {
+            const created = await createTaskList(data);
+            const list = await fetchTaskLists();
+            setTaskLists(Array.isArray(list) ? list : []);
+            if (created?.id) setLastCreatedListId(created.id);
+            setShowCreateListFromTask(false);
+          }}
+          onClose={() => setShowCreateListFromTask(false)}
         />
       )}
 

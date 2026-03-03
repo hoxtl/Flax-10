@@ -40,7 +40,7 @@ export function getGreetingCopy({ sessionsDone, narrative, now, selectedDate }) 
       }
     }
   }
-  return "Focus paused. Ready to harvest more progress?";
+  return "Focus paused. Ready to build more progress?";
 }
 
 /** Context-aware motivation header for Plan for the Day. */

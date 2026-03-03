@@ -2214,7 +2214,7 @@
     padding-top: var(--home-space-sm);
   }
 
-  /* Empty day — Zen state */
+  /* Empty day — Empty state */
   .empty {
     display: flex;
     flex-direction: column;

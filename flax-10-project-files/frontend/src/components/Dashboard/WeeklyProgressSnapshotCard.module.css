@@ -332,8 +332,8 @@
   font-weight: 600;
 }
 
-/* ── Harvest chart: matte glass container, flax border ── */
-.harvestChartContainer {
+/* ── Weekly chart: matte glass container, flax border ── */
+.weeklyChartContainer {
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
@@ -341,7 +341,7 @@
   min-width: 0;
 }
 
-.harvestChartMain {
+.weeklyChartMain {
   flex: 1;
   min-width: 0;
   background: rgba(255, 255, 255, 0.5);
@@ -352,21 +352,21 @@
   padding: 0.75rem 1rem 1rem;
 }
 
-.harvestLegendRow {
+.weeklyLegendRow {
   margin-bottom: 0.5rem;
 }
 
-.harvestLegendRow .growthByCategory {
+.weeklyLegendRow .growthByCategory {
   margin-top: 0;
   padding-top: 0;
   border-top: none;
 }
 
-.harvestLegendRow .growthByCategoryTitle {
+.weeklyLegendRow .growthByCategoryTitle {
   margin-bottom: 0.35rem;
 }
 
-.harvestChartInner {
+.weeklyChartInner {
   position: relative;
   height: 200px;
   display: flex;
@@ -374,7 +374,7 @@
   padding: 0 0 0.5rem;
 }
 
-.harvestGoalLine {
+.weeklyGoalLine {
   position: absolute;
   left: 0;
   right: 0;
@@ -384,7 +384,7 @@
   z-index: 1;
 }
 
-.harvestGoalLabel {
+.weeklyGoalLabel {
   position: absolute;
   left: 4px;
   font-size: 0.6rem;
@@ -395,7 +395,7 @@
   z-index: 1;
 }
 
-.harvestBars {
+.weeklyBars {
   display: flex;
   align-items: flex-end;
   gap: 6px;
@@ -405,7 +405,7 @@
   z-index: 0;
 }
 
-.harvestBarGroup {
+.weeklyBarGroup {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -414,7 +414,7 @@
   min-width: 0;
 }
 
-.harvestBar {
+.weeklyBar {
   width: 100%;
   max-width: 28px;
   min-height: 6px;
@@ -423,11 +423,11 @@
   transition: height 0.35s ease, box-shadow 0.25s ease;
 }
 
-.harvestBarGlow {
+.weeklyBarGlow {
   box-shadow: 0 0 12px rgba(196, 163, 90, 0.45), 0 0 20px rgba(238, 220, 130, 0.25);
 }
 
-.harvestBarLabel {
+.weeklyBarLabel {
   font-size: 0.6rem;
   font-weight: 600;
   color: var(--restoration-charcoal, #2d352d);
@@ -435,7 +435,7 @@
   letter-spacing: 0.03em;
 }
 
-.harvestSidebar {
+.weeklySidebar {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -471,7 +471,7 @@
   opacity: 0.75;
 }
 
-.harvestFooter {
+.weeklyFooter {
   display: flex;
   justify-content: flex-end;
   margin-top: 0.25rem;

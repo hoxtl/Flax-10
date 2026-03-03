@@ -12,7 +12,7 @@
  *   grouped      – true when options is the grouped format
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";
 import styles from "./AnimatedDropdown.module.css";
@@ -99,6 +99,16 @@ export default function AnimatedDropdown({
   className = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleMouseDown = (e) => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [isOpen]);
 
   const allOptions = getAllOptions(options, grouped);
   const selectedLabel =
@@ -110,7 +120,7 @@ export default function AnimatedDropdown({
   };
 
   return (
-    <div className={`${styles.root} ${isOpen ? styles.rootOpen : ""} ${className}`}>
+    <div ref={rootRef} className={`${styles.root} ${isOpen ? styles.rootOpen : ""} ${className}`}>
       <motion.button
         type="button"
         whileTap={{ scale: 0.99 }}

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import { noiseGenerator } from './utils/noiseUtils';
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
+import AnimatedDropdown from '../ui/AnimatedDropdown';
+import MultiSelectDropdown from '../ui/MultiSelectDropdown';
 
 import styles from "../../pages/Timer/TimerPage.module.css";
 
@@ -192,17 +194,31 @@ const handleTaskKey = (e) => {
     if (e.key === 'Enter') e.target.blur();
 };
 
-/** Task input with optional pick-from-tasks list (sort by urgency or time, auto-start on select) */
+/** Task input with optional pick-from-tasks list (sort by urgency/due/time, filter by list/module) */
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 const SORT_URGENCY = 'urgency';
 const SORT_TIME = 'time';
+const SORT_DUE = 'due';
+const SORT_ALPHA = 'alpha';
+const SORT_DATE_ADDED = 'date_added';
+
+const SORT_OPTIONS = [
+    { value: SORT_URGENCY,   label: 'Urgency' },
+    { value: SORT_DUE,       label: 'Due date' },
+    { value: SORT_ALPHA,     label: 'A → Z' },
+    { value: SORT_DATE_ADDED, label: 'Date added' },
+    { value: SORT_TIME,      label: 'Estimated time' },
+];
 
 export const TaskInput = ({ value, onChange, onTaskSelect }) => {
     const [open, setOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
+    const [lists, setLists] = useState([]);
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState(SORT_URGENCY);
     const [search, setSearch] = useState('');
+    const [filterListIds, setFilterListIds] = useState([]);
+    const [filterModuleCodes, setFilterModuleCodes] = useState([]);
     const ref = useRef(null);
 
     const loadTasks = useCallback((sort = sortBy) => {
@@ -213,22 +229,35 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
         ])
             .then(([tasksData, listsData]) => {
                 const listMap = {};
-                (listsData || []).forEach((list, idx) => {
+                const listArr = listsData || [];
+                listArr.forEach((list, idx) => {
                     listMap[String(list.id)] = {
                         name: list.name || 'Other',
                         color: list.color || FOCUS_BLOCK_COLOURS_HEX[idx % FOCUS_BLOCK_COLOURS_HEX.length],
                     };
                 });
+                setLists(listArr);
                 let list = (tasksData || []).filter((t) => !t.completed).map((t) => {
                     const listInfo = listMap[String(t.task_list)] || { name: 'Other', color: '#94a3b8' };
                     return { ...t, list_name: listInfo.name, list_color: listInfo.color };
                 });
                 if (sort === SORT_TIME) {
                     list.sort((a, b) => ((a.estimated_blocks || 1) - (b.estimated_blocks || 1)) || ((PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)));
+                } else if (sort === SORT_DUE) {
+                    list.sort((a, b) => {
+                        if (!a.due_date && !b.due_date) return 0;
+                        if (!a.due_date) return 1;
+                        if (!b.due_date) return -1;
+                        return new Date(a.due_date) - new Date(b.due_date);
+                    });
+                } else if (sort === SORT_ALPHA) {
+                    list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                } else if (sort === SORT_DATE_ADDED) {
+                    list.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
                 } else {
                     list.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4));
                 }
-                setTasks(list.slice(0, 50));
+                setTasks(list.slice(0, 100));
             })
             .catch(() => setTasks([]))
             .finally(() => setLoading(false));
@@ -253,9 +282,26 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
     };
 
     const searchLower = (search || '').toLowerCase().trim();
-    const filteredTasks = searchLower
-        ? tasks.filter((t) => (t.title || '').toLowerCase().includes(searchLower) || (t.list_name || '').toLowerCase().includes(searchLower))
+    const listOptions = useMemo(() => [
+        { value: '', label: 'All lists' },
+        ...(lists || []).map((l) => ({ value: String(l.id), label: l.name || 'Other' })),
+    ], [lists]);
+    const moduleOptions = useMemo(() => {
+        const codes = [...new Set((tasks || []).map((t) => t.module_code).filter(Boolean))].sort();
+        return [{ value: '', label: 'All modules' }, ...codes.map((c) => ({ value: c, label: c }))];
+    }, [tasks]);
+
+    let filteredTasks = searchLower
+        ? tasks.filter((t) => (t.title || '').toLowerCase().includes(searchLower) || (t.list_name || '').toLowerCase().includes(searchLower) || ((t.module_code || '').toLowerCase().includes(searchLower)))
         : tasks;
+    if (filterListIds && filterListIds.length > 0) {
+        const set = new Set(filterListIds.map(String));
+        filteredTasks = filteredTasks.filter((t) => set.has(String(t.task_list)));
+    }
+    if (filterModuleCodes && filterModuleCodes.length > 0) {
+        const set = new Set(filterModuleCodes.map(String));
+        filteredTasks = filteredTasks.filter((t) => set.has(String(t.module_code || '')));
+    }
 
     return (
         <div className={styles.taskInputWrap}>
@@ -298,20 +344,35 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                             />
                         </div>
                         <div className={styles.taskPickSortRow}>
-                            <label htmlFor="task-pick-sort" className={styles.taskPickSortLabel}>Sort</label>
-                            <select
-                                id="task-pick-sort"
-                                className={styles.taskPickSortSelect}
+                            <label className={styles.taskPickSortLabel}>SORT</label>
+                            <AnimatedDropdown
                                 value={sortBy}
-                                onChange={(e) => {
-                                    const v = e.target.value;
-                                    setSortBy(v);
-                                    loadTasks(v);
-                                }}
-                            >
-                                <option value={SORT_URGENCY}>Urgency</option>
-                                <option value={SORT_TIME}>Time</option>
-                            </select>
+                                onChange={(v) => { setSortBy(v); loadTasks(v); }}
+                                options={SORT_OPTIONS}
+                                className={styles.taskPickSortDropdown}
+                            />
+                        </div>
+                        <div className={styles.taskPickSortRow}>
+                            <label className={styles.taskPickSortLabel}>FILTER BY LIST</label>
+                            <MultiSelectDropdown
+                                value={filterListIds}
+                                onChange={setFilterListIds}
+                                options={listOptions}
+                                placeholder="All lists"
+                                countLabel="lists"
+                                className={styles.taskPickSortDropdown}
+                            />
+                        </div>
+                        <div className={styles.taskPickSortRow}>
+                            <label className={styles.taskPickSortLabel}>FILTER BY MODULE</label>
+                            <MultiSelectDropdown
+                                value={filterModuleCodes}
+                                onChange={setFilterModuleCodes}
+                                options={moduleOptions}
+                                placeholder="All modules"
+                                countLabel="modules"
+                                className={styles.taskPickSortDropdown}
+                            />
                         </div>
                         {loading ? (
                             <div className={styles.taskPickEmpty}>Loading…</div>

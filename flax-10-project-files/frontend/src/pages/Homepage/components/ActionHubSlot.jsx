@@ -5,7 +5,10 @@
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
 import EmptyStateCard from "../../../components/EmptyStateCard";
+import AllTasksCompleteCard from "../../../components/AllTasksCompleteCard";
+import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 
 const VISIBLE_COUNT = 5;
 
@@ -41,18 +44,18 @@ export function ActionHubSlot({
     actionHubItemsOnly.length > 0 &&
     actionHubItemsOnly.every((t) => t.completed);
 
+  const clearMessage = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
+
   if (allTasksDone) {
     return (
-      <EmptyStateCard
-        illustrationVariant="seedling"
-        message="Every task done. Day complete!"
+      <AllTasksCompleteCard
+        message={clearMessage}
         sub={`${actionHubItemsOnly.length} task${actionHubItemsOnly.length !== 1 ? "s" : ""} completed today. Take a moment — you earned it.`}
-        action={
-          <Link to="/tasks" className={styles.actionHubLink}>
-            Plan tomorrow →
-          </Link>
-        }
-      />
+      >
+        <Link to="/tasks?open=fullPlanning" className={styles.actionHubLink}>
+          Plan tomorrow →
+        </Link>
+      </AllTasksCompleteCard>
     );
   }
 
@@ -167,7 +170,6 @@ export function ActionHubSlot({
           displayName={displayName}
           sub={null}
           message="All caught up for today."
-          illustrationVariant="seedling"
           action={
             <Link to="/tasks" className={styles.actionHubLink}>
               Add a task →

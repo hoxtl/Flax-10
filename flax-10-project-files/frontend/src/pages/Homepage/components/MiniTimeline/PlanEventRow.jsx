@@ -50,7 +50,7 @@ export function PlanEventRow({
   onConflictAutoMove,
   onEdit,
   onCardClick,
-  onHarvestToggle,
+  onTaskToggle,
   onToggleComplete,
   onReschedule,
   completedEventIds,
@@ -203,13 +203,13 @@ export function PlanEventRow({
               {fmtDurationShort(durationMins)}
             </span>
           )}
-          {matchTask && onHarvestToggle && (
+          {matchTask && onTaskToggle && (
             <button
               type="button"
               className={styles.planTimelineCardCheck}
               onClick={(e) => {
                 e.stopPropagation();
-                onHarvestToggle(matchTask, !matchTask.completed);
+                onTaskToggle(matchTask, !matchTask.completed);
               }}
               aria-label={matchTask.completed ? "Mark incomplete" : "Mark done"}
               aria-pressed={matchTask.completed}

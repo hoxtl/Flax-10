@@ -104,13 +104,13 @@
   .row:hover       { background: rgba(0, 0, 0, 0.03); }
 
   .row.critical {
-    border-left-color: var(--zen-terracotta-muted, #C05A3E);
+    border-left-color: var(--status-terracotta, #C05A3E);
   }
   .row.urgent {
-    border-left-color: var(--zen-terracotta-muted, #C05A3E);
+    border-left-color: var(--status-terracotta, #C05A3E);
   }
   .row.normal {
-    border-left-color: var(--zen-sage, #8C9A86);
+    border-left-color: var(--status-sage, #8C9A86);
   }
 
   /* ── Urgency dot (traffic light): far left of each row ── */
@@ -254,7 +254,7 @@
     letter-spacing: 0.02em;
   }
   .countdownCoral {
-    color: var(--zen-terracotta-muted, #C05A3E);
+    color: var(--status-terracotta, #C05A3E);
   }
   .countdownCharcoal {
     color: var(--restoration-charcoal, #2d352d);
@@ -395,8 +395,8 @@
   }
   /* Urgency pills: 1–3d red, 4–7d amber, 8+ grey */
   .pill.normal   { color: #fff; background: #6B7280; }
-  .pill.urgent   { color: #fff; background: var(--zen-terracotta-muted, #C05A3E); }
-  .pill.critical { color: #fff; background: var(--zen-terracotta-muted, #C05A3E); }
+  .pill.urgent   { color: #fff; background: var(--status-terracotta, #C05A3E); }
+  .pill.critical { color: #fff; background: var(--status-terracotta, #C05A3E); }
 
   .meta {
     font-size: 0.68rem;
@@ -418,7 +418,7 @@
     white-space: nowrap;
   }
   
-  .countdown.normal   { color: var(--zen-sage, #8C9A86); }
+  .countdown.normal   { color: var(--status-sage, #8C9A86); }
   .countdown.urgent   { color: var(--warning-text); }
   .countdown.critical { color: var(--error-text); }
   
@@ -580,7 +580,7 @@
   
   .modalValue.urgent   { color: var(--warning-text); font-weight: 700; }
   .modalValue.critical { color: var(--error-text);   font-weight: 700; }
-  .modalValue.normal   { color: var(--zen-sage, #8C9A86); font-weight: 700; }
+  .modalValue.normal   { color: var(--status-sage, #8C9A86); font-weight: 700; }
 
   .moduleCodeLink {
     color: var(--primary);

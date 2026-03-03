@@ -1,5 +1,5 @@
 /**
- * Empty day — Zen state when no tasks scheduled.
+ * Empty day — Empty state when no tasks scheduled.
  */
 
 import styles from "../Homepage.module.css";
