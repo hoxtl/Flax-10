@@ -25,16 +25,12 @@ function getCurrentDateString() {
 }
 
 function TopBarGreeting({ user }) {
-  const firstName = getFirstName(user);
+  const name = getFirstName(user);
   return (
     <div className={styles.greeting}>
       <span className={styles.subGreeting}>{getGreeting()}!</span>
       <div className={styles.nameRow}>
-        {!!firstName && (
-          <h1 className={styles.name}>
-            <TypingAnimation text={firstName} duration={180} />
-          </h1>
-        )}
+        {!!name && <h1 className={styles.name}><TypingAnimation text={name} duration={180} /></h1>}
         <span className={styles.date}>{getCurrentDateString()}</span>
       </div>
     </div>
@@ -43,102 +39,82 @@ function TopBarGreeting({ user }) {
 
 function BrandLogo({ onNavChange }) {
   return (
-    <div
-      className={styles.brandContainer}
-      onClick={() => onNavChange?.("home")}
-      style={{ cursor: "pointer" }}
-    >
-      <motion.div
-        className={styles.logoMark}
-        whileHover={{ rotate: 8, scale: 1.08 }}
-        transition={{ type: "spring", stiffness: 400, damping: 20 }}
-      />
+    <div className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
+      <motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
       <span className={styles.brandName}>StudyFlax</span>
     </div>
   );
 }
 
+function useClickOutside(ref, handler) {
+  useEffect(() => {
+    const listener = (event) => {
+      if (!ref.current || ref.current.contains(event.target)) return;
+      handler(event);
+    };
+    document.addEventListener("mousedown", listener);
+    return () => document.removeEventListener("mousedown", listener);
+  }, [ref, handler]);
+}
+
+function DropdownItem({ item, isActive, onClick }) {
+  const cls = `${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ""}`;
+  return (
+    <button onClick={onClick} className={cls}>
+      <span className={styles.dropdownIcon}>{item.icon}</span>
+      <span className={styles.dropdownLabel}>{item.label}</span>
+      {isActive && <motion.div className={styles.dropdownActivePill} layoutId="topbarDropdownPill" transition={{ type: "spring", stiffness: 380, damping: 30 }} />}
+    </button>
+  );
+}
+
+function NavDropdownTrigger({ title, isOpen, hasActive, onClick }) {
+  const triggerCls = `${styles.navGroupTrigger} ${hasActive ? styles.navGroupTriggerActive : ""}`;
+  return (
+    <button className={triggerCls} onClick={onClick}>
+      {title}
+      <ChevronDown size={14} className={isOpen ? styles.chevronOpen : styles.chevronClosed} />
+    </button>
+  );
+}
+
+function NavDropdownMenu({ routes, activeNav, onNavChange, setIsOpen }) {
+  return (
+    <motion.div className={styles.dropdownMenu} initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}>
+      {routes.map(r => <DropdownItem key={r.id} item={r} isActive={activeNav === r.id} onClick={() => { onNavChange?.(r.id); setIsOpen(false); }} />)}
+    </motion.div>
+  );
+}
+
 function NavDropdown({ title, routes, activeNav, onNavChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const hasActiveItem = routes.some(r => r.id === activeNav);
-
+  const ref = useRef(null);
+  useClickOutside(ref, () => setIsOpen(false));
+  const hasActive = routes.some(r => r.id === activeNav);
   return (
-    <div className={styles.navGroup} ref={dropdownRef}>
-      <button
-        className={`${styles.navGroupTrigger} ${hasActiveItem ? styles.navGroupTriggerActive : ""}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {title}
-        <ChevronDown size={14} className={isOpen ? styles.chevronOpen : styles.chevronClosed} />
-      </button>
-
+    <div className={styles.navGroup} ref={ref}>
+      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={() => setIsOpen(!isOpen)} />
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className={styles.dropdownMenu}
-            initial={{ opacity: 0, y: -5, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -5, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-          >
-            {routes.map((n) => {
-              const isActive = activeNav === n.id;
-              return (
-                <button
-                  key={n.id}
-                  onClick={() => {
-                    onNavChange?.(n.id);
-                    setIsOpen(false);
-                  }}
-                  className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ""}`}
-                >
-                  <span className={styles.dropdownIcon}>{n.icon}</span>
-                  <span className={styles.dropdownLabel}>{n.label}</span>
-                  {isActive && (
-                    <motion.div
-                      className={styles.dropdownActivePill}
-                      layoutId="topbarDropdownPill"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </motion.div>
-        )}
+        {isOpen && <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />}
       </AnimatePresence>
     </div>
   );
 }
 
+const NAV_SECTIONS = [
+  { title: "Planning", ids: ["calendar", "timer", "analytics"] },
+  { title: "Academic", ids: ["modules"] },
+  { title: "Campus", ids: ["map"] },
+  { title: "Social", ids: ["users", "societies"] },
+  { title: "Admin", ids: ["admin"] }
+];
+
 function TopBarNav({ activeNav, onNavChange, user }) {
-  const routes = APP_ROUTES.filter(route => route.isAdminOnly ? user?.isAdmin : true);
-
-  const academicRoutes = routes.filter(r => ["modules"].includes(r.id));
-  const planningRoutes = routes.filter(r => ["calendar", "timer", "analytics"].includes(r.id));
-  const campusRoutes = routes.filter(r => ["map"].includes(r.id));
-  const socialRoutes = routes.filter(r => ["users", "societies"].includes(r.id));
-  const adminRoutes = routes.filter(r => ["admin"].includes(r.id));
-
+  const routes = APP_ROUTES.filter(r => r.isAdminOnly ? user?.isAdmin : true);
+  const getSub = (ids) => routes.filter(r => ids.includes(r.id));
   return (
     <nav className={styles.navContainer}>
-      {planningRoutes.length > 0 && <NavDropdown title="Planning" routes={planningRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
-      {academicRoutes.length > 0 && <NavDropdown title="Academic" routes={academicRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
-      {campusRoutes.length > 0 && <NavDropdown title="Campus" routes={campusRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
-      {socialRoutes.length > 0 && <NavDropdown title="Social" routes={socialRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
-      {adminRoutes.length > 0 && <NavDropdown title="Admin" routes={adminRoutes} activeNav={activeNav} onNavChange={onNavChange} />}
+      {NAV_SECTIONS.map(s => getSub(s.ids).length > 0 && <NavDropdown key={s.title} title={s.title} routes={getSub(s.ids)} activeNav={activeNav} onNavChange={onNavChange} />)}
     </nav>
   );
 }
@@ -146,16 +122,9 @@ function TopBarNav({ activeNav, onNavChange, user }) {
 function QuickTabs({ onAddClick }) {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
-  const tabs = [
-    { title: "Add", icon: Plus, autoCollapse: true },
-    { type: "separator" },
-    { title: "Notifications", icon: Bell, badge: unreadCount },
-  ];
-  const handleChange = (index) => {
-    if (index === 0) onAddClick?.();
-    if (index === 2) togglePanel();
-  };
-  return <ExpandableTabs tabs={tabs} onChange={handleChange} />;
+  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }, { type: "separator" }, { title: "Notifications", icon: Bell, badge: unreadCount }];
+  const change = (i) => i === 0 ? onAddClick?.() : i === 2 && togglePanel();
+  return <ExpandableTabs tabs={tabs} onChange={change} />;
 }
 
 function ActionPill({ onAddClick }) {
@@ -169,39 +138,21 @@ function ActionPill({ onAddClick }) {
   );
 }
 
-const CalendarIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={styles.toolIcon}>
-    <rect x="3" y="4" width="18" height="18" rx="2" />
-    <path d="M16 2v4M8 2v4M3 10h18" />
-  </svg>
-);
-
-const TimerIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={18} height={18} viewBox="0 0 24 24" fill="none" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={styles.toolIcon}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 3" />
+const NavIcon = ({ d, styles }) => (
+  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={styles.toolIcon}>
+    {d}
   </svg>
 );
 
 function ToolsPill({ onNavChange, activeNav }) {
   const calActive = activeNav === 'calendar';
-  const timerActive = activeNav === 'timer';
+  const tmActive = activeNav === 'timer';
+  const calD = <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>;
+  const tmD = <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></>;
   return (
     <div className={styles.actionPill}>
-      <button
-        className={`${styles.toolBtn} ${calActive ? styles.toolBtnActive : ""}`}
-        onClick={() => onNavChange?.('calendar')}
-        title="Calendar"
-      >
-        <CalendarIcon />
-      </button>
-      <button
-        className={`${styles.toolBtn} ${timerActive ? styles.toolBtnActive : ""}`}
-        onClick={() => onNavChange?.('timer')}
-        title="Timer"
-      >
-        <TimerIcon />
-      </button>
+      <button className={`${styles.toolBtn} ${calActive ? styles.toolBtnActive : ""}`} onClick={() => onNavChange?.('calendar')} title="Calendar"><NavIcon d={calD} styles={styles} /></button>
+      <button className={`${styles.toolBtn} ${tmActive ? styles.toolBtnActive : ""}`} onClick={() => onNavChange?.('timer')} title="Timer"><NavIcon d={tmD} styles={styles} /></button>
     </div>
   );
 }
@@ -212,12 +163,7 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
       <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
       <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
       <ActionPill onAddClick={onAddClick} />
-      <ProfileDropdown
-        user={user}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-        onProfileClick={onProfileClick}
-      />
+      <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
     </div>
   );
 }
@@ -229,18 +175,9 @@ export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClic
         <BrandLogo onNavChange={onNavChange} />
         <TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} />
       </div>
-
       <div className={styles.rightSection}>
         <TopBarGreeting user={user} />
-        <TopBarActions
-          onAddClick={onAddClick}
-          user={user}
-          onSettingsClick={onSettingsClick}
-          onLogoutClick={onLogoutClick}
-          onProfileClick={onProfileClick}
-          onNavChange={onNavChange}
-          activeNav={activeNav}
-        />
+        <TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} />
       </div>
     </header>
   );
