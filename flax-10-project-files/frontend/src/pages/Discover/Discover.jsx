@@ -1,15 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
-import ShareButton from "../../components/Social/ShareButton";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 
 function UserCard({ user, onNavChange }) {
+    const initials = user.first_name?.[0] || user.username[0];
     return (
         <div className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
-            <div className={styles.avatar}>
-                {user.first_name?.[0] || user.username[0]}
-            </div>
+            <div className={styles.avatar}>{initials}</div>
             <div className={styles.userInfo}>
                 <div className={styles.name}>{user.first_name} {user.last_name}</div>
                 <div className={styles.username}>@{user.username}</div>
@@ -22,103 +20,84 @@ function UserCard({ user, onNavChange }) {
     );
 }
 
-export default function Discover({ onNavChange }) {
+function useDiscoverFetch(searchQuery, filterState) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    useEffect(() => {
+        const run = async () => {
+            setLoading(true);
+            const { selectedModules, selectedSocieties } = filterState.props;
+            const data = await searchUsers(searchQuery, selectedModules.join(','), selectedSocieties.join(',')).catch(() => []);
+            setUsers(data.results || data);
+            setLoading(false);
+        };
+        const timer = setTimeout(run, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, filterState.props.selectedModules, filterState.props.selectedSocieties]);
+    return { loading, users };
+}
 
-    // Unified Filter State
-    const { allModules, allSocieties } = useSearchInit();
-    const [userResults, setUserResults] = useState([]); // for searchUsers internal
+function useDiscoverUIState(searchQuery) {
+    const [userResults, setUserResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
     const [dropdownPos, setDropdownPos] = useState(null);
     const containerRef = useRef(null);
     const filterRef = useRef(null);
+    const { allModules, allSocieties } = useSearchInit();
+    const filterState = useFilterState(allModules, allSocieties, searchQuery, true, containerRef, userResults, setDropdownPos, setUserResults, setSearchLoading);
+    useClickOutside(filterRef, () => filterState.setIsFilterOpen(false));
+    return { containerRef, filterRef, filterState };
+}
 
-    const { isFilterOpen, setIsFilterOpen, props } = useFilterState(
-        allModules, allSocieties, searchQuery, true, containerRef,
-        userResults, setDropdownPos, setUserResults, setSearchLoading
+function useDiscoverSearch() {
+    const [searchQuery, setSearchQuery] = useState("");
+    const ui = useDiscoverUIState(searchQuery);
+    const { loading, users } = useDiscoverFetch(searchQuery, ui.filterState);
+    return { loading, users, searchQuery, setSearchQuery, ...ui };
+}
+
+function DiscoverHeader() {
+    return (
+        <div className={styles.header}>
+            <div>
+                <h1 className={styles.pageTitle}>Users</h1>
+                <p className={styles.subtitle}>Find course mates and study partners</p>
+            </div>
+        </div>
     );
+}
 
-    const { selectedModules, selectedSocieties } = props;
+function SearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState }) {
+    return (
+        <div className={styles.filterBar}>
+            <div className={styles.searchWrap} ref={containerRef}>
+                <span className={styles.searchIcon}>🔍</span>
+                <input type="text" className={styles.searchInput} placeholder="Search by name or username..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            </div>
+            <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={() => filterState.setIsFilterOpen(!filterState.isFilterOpen)} props={filterState.props} />
+        </div>
+    );
+}
 
-    // Handle clicks outside
-    useClickOutside(filterRef, () => setIsFilterOpen(false));
-
-    // Fetch users whenever search query changes
-    useEffect(() => {
-        const fetchUsers = async () => {
-            setLoading(true);
-            try {
-                const data = await searchUsers(
-                    searchQuery,
-                    selectedModules.join(','),
-                    selectedSocieties.join(',')
-                );
-                setUsers(data.results || data);
-            } catch (err) {
-                console.error("Failed to fetch users", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const timer = setTimeout(() => {
-            fetchUsers();
-        }, 300); // 300ms debounce
-
-        return () => clearTimeout(timer);
-    }, [searchQuery, selectedModules, selectedSocieties]);
-
-    // Derived state for client-side module filtering (no longer needed as we filter on backend)
+function UsersGrid({ users, onNavChange }) {
     const currentUser = JSON.parse(localStorage.getItem("user")) || {};
-    const filteredUsers = users.filter(u => {
-        if (u.id === currentUser.id || u.username === currentUser.username) return false;
-        return true;
-    });
+    const filtered = users.filter(u => u.id !== currentUser.id && u.username !== currentUser.username);
+    if (filtered.length === 0) return <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>;
+    return (
+        <div className={styles.grid}>
+            {filtered.map(u => <UserCard key={u.id} user={u} onNavChange={onNavChange} />)}
+        </div>
+    );
+}
 
+export default function Discover({ onNavChange }) {
+    const { loading, users, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
+    const showLoader = loading && users.length === 0;
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <div>
-                    <h1 className={styles.pageTitle}>Users</h1>
-                    <p className={styles.subtitle}>Find course mates and study partners</p>
-                </div>
-            </div>
-
-            <div className={styles.filterBar}>
-                <div className={styles.searchWrap} ref={containerRef}>
-                    <span className={styles.searchIcon}>🔍</span>
-                    <input
-                        type="text"
-                        className={styles.searchInput}
-                        placeholder="Search by name or username..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-
-                <FilterSection
-                    fRef={filterRef}
-                    isOpen={isFilterOpen}
-                    setOpen={() => setIsFilterOpen(!isFilterOpen)}
-                    props={props}
-                />
-            </div>
-
-            {loading && users.length === 0 ? (
-                <div className={styles.loadingState}>Loading users...</div>
-            ) : (
-                <div className={styles.grid}>
-                    {filteredUsers.length > 0 ? (
-                        filteredUsers.map(u => (
-                            <UserCard key={u.id} user={u} onNavChange={onNavChange} />
-                        ))
-                    ) : (
-                        <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>
-                    )}
-                </div>
-            )}
+            <DiscoverHeader />
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />
+            {showLoader ? <div className={styles.loadingState}>Loading users...</div> : <UsersGrid users={users} onNavChange={onNavChange} />}
         </div>
     );
 }

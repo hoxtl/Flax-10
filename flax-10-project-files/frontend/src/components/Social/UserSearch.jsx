@@ -6,17 +6,12 @@ import socialStyles from './Social.module.css';
 import searchStyles from './UserSearch.module.css';
 const styles = { ...socialStyles, ...searchStyles };
 
-async function fetchUserResults(query, moduleFilter, societyFilter, setResults, setLoading) {
-    if (!query.trim() && !moduleFilter.trim() && !societyFilter.trim()) { setResults([]); return; }
-    setLoading(true);
-    try {
-        const data = await searchUsers(query, moduleFilter, societyFilter);
-        setResults(data.results || data);
-    } catch (err) {
-        console.error('Search failed', err);
-    } finally {
-        setLoading(false);
-    }
+async function fetchUserResults(query, mods, socs, setRes, setL) {
+    if (!query.trim() && !mods.trim() && !socs.trim()) return setRes([]);
+    setL(true);
+    const data = await searchUsers(query, mods, socs).catch(() => []);
+    setRes(data.results || data);
+    setL(false);
 }
 
 export function useClickOutside(ref, onOutside) {
@@ -33,8 +28,8 @@ export const useSearchInit = () => {
     const [allModules, setAllModules] = useState([]);
     const [allSocieties, setAllSocieties] = useState([]);
     useEffect(() => {
-        getModules().then(setAllModules).catch(e => console.error("Err modules", e));
-        fetchSocieties().then(res => setAllSocieties(res.results || res)).catch(e => console.error("Err societies", e));
+        getModules().then(setAllModules).catch(e => console.error("Modules error", e));
+        fetchSocieties().then(res => setAllSocieties(res.results || res)).catch(e => console.error("Societies error", e));
     }, []);
     return { allModules, allSocieties };
 };
@@ -46,24 +41,18 @@ function useSearchState() {
     const [dropdownPos, setDropdownPos] = useState(null);
     const containerRef = useRef(null);
     const { allModules, allSocieties } = useSearchInit();
-
-    return {
-        query, setQuery, userResults, setUserResults, allModules, allSocieties, loading, setLoading, dropdownPos, setDropdownPos, containerRef
-    };
+    return { query, setQuery, userResults, setUserResults, allModules, allSocieties, loading, setLoading, dropdownPos, setDropdownPos, containerRef };
 }
 
-function useDropdownPosition(containerRef, query, moduleFilter, userResults, setDropdownPos, showDropdown) {
+function useDropdownPosition(containerRef, userResults, setDropdownPos, showDropdown) {
     useEffect(() => {
-        if (!showDropdown || !containerRef.current) {
-            setDropdownPos(null);
-            return;
-        }
+        if (!showDropdown || !containerRef.current) return setDropdownPos(null);
         const rect = containerRef.current.getBoundingClientRect();
         setDropdownPos({ top: rect.bottom + 8, left: rect.left, width: Math.max(rect.width, 350) });
     }, [showDropdown, userResults]);
 }
 
-function UserResultItem({ user, onSelect }) {
+export function UserResultItem({ user, onSelect }) {
     return (
         <div className={`${styles.userItem} ${styles.userResultItem}`} onClick={onSelect}>
             <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
@@ -76,8 +65,7 @@ function UserResultItem({ user, onSelect }) {
 }
 
 const FilterCheckbox = ({ isChecked, onToggle, id }) => (
-    <input type="checkbox" checked={isChecked} onChange={() => onToggle(id)}
-        className={styles.filterItemCheckbox} onClick={(e) => e.stopPropagation()} />
+    <input type="checkbox" checked={isChecked} onChange={() => onToggle(id)} className={styles.filterItemCheckbox} onClick={(e) => e.stopPropagation()} />
 );
 
 const MText = ({ m }) => (
@@ -87,7 +75,7 @@ const MText = ({ m }) => (
     </div>
 );
 
-function ModuleResultItem({ module, isChecked, onToggle }) {
+export function ModuleResultItem({ module, isChecked, onToggle }) {
     return (
         <div className={`${styles.userItem} ${styles.filterItem}`} onClick={() => onToggle(module.module_code)}>
             <FilterCheckbox isChecked={isChecked} onToggle={onToggle} id={module.module_code} />
@@ -103,7 +91,7 @@ const SText = ({ s }) => (
     </div>
 );
 
-function SocietyResultItem({ society, isChecked, onToggle }) {
+export function SocietyResultItem({ society, isChecked, onToggle }) {
     return (
         <div className={`${styles.userItem} ${styles.filterItem}`} onClick={() => onToggle(society.id)}>
             <FilterCheckbox isChecked={isChecked} onToggle={onToggle} id={society.id} />
@@ -113,17 +101,8 @@ function SocietyResultItem({ society, isChecked, onToggle }) {
 }
 
 const getModCode = m => m.module_code?.match(/^[A-Za-z]+/)?.[0].toUpperCase();
-const safeModCode = m => getModCode(m) || '';
-const getDepartmentsForModules = (modules) => {
-    const deps = modules.map(safeModCode).filter(Boolean);
-    return Array.from(new Set(deps)).sort();
-};
-
-const getCatName = s => s.categories?.[0]?.toLowerCase() || 'other';
-const getSocietyCategories = (societies) => {
-    const cats = societies.map(getCatName);
-    return Array.from(new Set(cats)).sort();
-};
+const getDepartmentsForModules = (modules) => Array.from(new Set(modules.map(m => getModCode(m) || '').filter(Boolean))).sort();
+const getSocietyCategories = (societies) => Array.from(new Set(societies.map(s => s.categories?.[0]?.toLowerCase() || 'other'))).sort();
 
 const EmptySearchText = ({ text }) => <p className={styles.emptyText}>{text}</p>;
 
@@ -148,37 +127,27 @@ function SearchDropdown({ pos, loading, query, userResults, onUserSelect }) {
 const FilterTabs = ({ activeTab, setTab }) => (
     <div className={styles.filterTabs}>
         {['modules', 'societies'].map(tab => (
-            <button key={tab} onClick={(e) => { e.preventDefault(); setTab(tab); }}
-                className={`${styles.filterTab} ${activeTab === tab ? styles.filterTabActive : ''}`}>
-                {tab}
-            </button>
+            <button key={tab} onClick={(e) => { e.preventDefault(); setTab(tab); }} className={`${styles.filterTab} ${activeTab === tab ? styles.filterTabActive : ''}`}>{tab}</button>
         ))}
     </div>
 );
 
-const SearchInput = ({ query, setQuery, tab }) => (
-    <input type="text" placeholder={`Search ${tab}...`} value={query}
-        onChange={(e) => setQuery(e.target.value)} className={styles.filterSearchInput} />
+const FilterSearchInput = ({ query, setQuery, tab }) => (
+    <input type="text" placeholder={`Search ${tab}...`} value={query} onChange={(e) => setQuery(e.target.value)} className={styles.filterSearchInput} />
 );
 
 const ExpandBtn = ({ count, isExpanded, sectionKey, toggle }) => (
     count > 5 && (
-        <button onClick={() => toggle(sectionKey)}
-            className={`${styles.expandButton} ${isExpanded ? styles.collapseButton : ''}`}>
-            {isExpanded ? 'Show less' : `+ ${count - 5} more`}
-        </button>
+        <button onClick={() => toggle(sectionKey)} className={`${styles.expandButton} ${isExpanded ? styles.collapseButton : ''}`}>{isExpanded ? 'Show less' : `+ ${count - 5} more`}</button>
     )
 );
 
-const GroupList = ({ items, isExpanded, renderItem, toggle, sectionKey }) => {
-    const list = isExpanded ? items : items.slice(0, 5);
-    return (
-        <div className={styles.userList} style={{ gap: 0 }}>
-            {list.map(renderItem)}
-            <ExpandBtn count={items.length} isExpanded={isExpanded} sectionKey={sectionKey} toggle={toggle} />
-        </div>
-    );
-};
+const GroupList = ({ items, isExpanded, renderItem, toggle, sectionKey }) => (
+    <div className={styles.userList} style={{ gap: 0 }}>
+        {(isExpanded ? items : items.slice(0, 5)).map(renderItem)}
+        <ExpandBtn count={items.length} isExpanded={isExpanded} sectionKey={sectionKey} toggle={toggle} />
+    </div>
+);
 
 const GroupedSection = ({ title, items, expanded, renderItem, toggle, sectionKey, capitalize }) => {
     if (items.length === 0) return null;
@@ -222,7 +191,7 @@ function FilterDropdown({ activeFilterTab, setActiveFilterTab, filterQuery, setF
     return (
         <div className={styles.filterDropdown} onClick={(e) => e.stopPropagation()}>
             <FilterTabs activeTab={activeFilterTab} setTab={setActiveFilterTab} />
-            <SearchInput query={filterQuery} setQuery={setFilterQuery} tab={activeFilterTab} />
+            <FilterSearchInput query={filterQuery} setQuery={setFilterQuery} tab={activeFilterTab} />
             <div className={styles.filterListContainer}>
                 {activeFilterTab === 'modules' && <ModuleList modules={moduleResults} filterQuery={filterQuery} querySelected={c => selectedModules.includes(c)} onToggle={toggleModule} deps={deps} expanded={expandedSections} toggleSection={toggleSection} />}
                 {activeFilterTab === 'societies' && <SocietyList societies={societyResults} filterQuery={filterQuery} querySelected={id => selectedSocieties.includes(id)} onToggle={toggleSociety} cats={cats} expanded={expandedSections} toggleSection={toggleSection} />}
@@ -231,21 +200,18 @@ function FilterDropdown({ activeFilterTab, setActiveFilterTab, filterQuery, setF
     );
 }
 
-const filterObj = (objs, q, keys) => objs.filter(o =>
-    !q ? true : keys.some(k => (o[k] || '').toLowerCase().includes(q.toLowerCase()))
-);
+const filterObj = (objs, q, keys) => objs.filter(o => !q ? true : keys.some(k => (o[k] || '').toLowerCase().includes(q.toLowerCase())));
 const toggleArr = (arr, val) => arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val];
 
-
-
-const SearchBar = ({ query, setQuery, setFocus, containerRef, showDpdwn, dpdwnPos, loading, userResults, handleSel }) => (
-    <div className={`${styles.searchContainer} ${styles.relativeContainer}`} ref={containerRef}>
-        <span className={styles.searchIcon}>🔍</span>
-        <input type="text" className={styles.searchInput} placeholder="Search users..."
-            value={query} onChange={(e) => setQuery(e.target.value)} onFocus={setFocus} />
-        {showDpdwn && dpdwnPos && <SearchDropdown pos={dpdwnPos} loading={loading} query={query} userResults={userResults} onUserSelect={handleSel} />}
-    </div>
-);
+function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDpdwn, dpdwnPos, loading, userResults, handleSel }) {
+    return (
+        <div className={`${styles.searchContainer} ${styles.relativeContainer}`} ref={containerRef}>
+            <span className={styles.searchIcon}>🔍</span>
+            <input type="text" className={styles.searchInput} placeholder="Search users..." value={query} onChange={(e) => setQuery(e.target.value)} onFocus={setFocus} />
+            {showDpdwn && dpdwnPos && <SearchDropdown pos={dpdwnPos} loading={loading} query={query} userResults={userResults} onUserSelect={handleSel} />}
+        </div>
+    );
+}
 
 const useUserSearchEffects = (query, selectedModules, selectedSocieties, setUserResults, setLoading) => {
     useEffect(() => {
@@ -256,9 +222,7 @@ const useUserSearchEffects = (query, selectedModules, selectedSocieties, setUser
 
 export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     <div ref={fRef} className={styles.relativeContainer}>
-        <button onClick={setOpen} className={styles.filterBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter
-        </button>
+        <button onClick={setOpen} className={styles.filterBtn}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter</button>
         {isOpen && <FilterDropdown {...props} />}
     </div>
 );
@@ -270,11 +234,9 @@ export const useFilterState = (allModules, allSocieties, query, isSearchFocused,
     const [selectedSocieties, setSelectedSocieties] = useState([]);
     const [filterQuery, setFilterQuery] = useState('');
     const togMod = (c) => setSelectedModules(p => toggleArr(p, c)), togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
-
     useUserSearchEffects(query, selectedModules, selectedSocieties, setUserResults, setLoading);
     const active = isSearchFocused && (query.trim() || selectedModules.length > 0 || selectedSocieties.length > 0);
-    useDropdownPosition(containerRef, query, '', userResults, setDropdownPos, active);
-
+    useDropdownPosition(containerRef, userResults, setDropdownPos, active);
     return {
         isFilterOpen, setIsFilterOpen, active, props: {
             activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery,
@@ -291,9 +253,10 @@ export default function UserSearch({ onUserSelect }) {
     const { isFilterOpen, setIsFilterOpen, active, props } = useFilterState(allModules, allSocieties, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading);
     useClickOutside(containerRef, () => setIsSearchFocused(false));
     useClickOutside(filterRef, () => setIsFilterOpen(false));
+    const handleS = (u) => { onUserSelect?.(u); setIsSearchFocused(false); setQuery(''); };
     return (
         <div className={styles.userSearchWrapper}>
-            <SearchBar query={query} setQuery={setQuery} setFocus={() => { setIsSearchFocused(true); setIsFilterOpen(false); }} containerRef={containerRef} showDpdwn={active} dpdwnPos={dropdownPos} loading={loading} userResults={userResults} handleSel={(user) => { if (onUserSelect) onUserSelect(user); setIsSearchFocused(false); setQuery(''); }} />
+            <GlobalSearchBar query={query} setQuery={setQuery} setFocus={() => { setIsSearchFocused(true); setIsFilterOpen(false); }} containerRef={containerRef} showDpdwn={active} dpdwnPos={dropdownPos} loading={loading} userResults={userResults} handleSel={handleS} />
             <FilterSection fRef={filterRef} isOpen={isFilterOpen} setOpen={() => { setIsFilterOpen(!isFilterOpen); setIsSearchFocused(false); }} props={props} />
         </div>
     );
