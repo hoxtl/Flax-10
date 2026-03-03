@@ -35,7 +35,8 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
                 user=target_user,
                 title="Calendar Shared",
                 message=f"{request.user.first_name} {request.user.last_name} (@{request.user.username}) has shared their calendar with you.",
-                notification_type='general'
+                notification_type='general',
+                action_url=f"/profile_{request.user.id}"
             )
             serializer = self.get_serializer(share_obj)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

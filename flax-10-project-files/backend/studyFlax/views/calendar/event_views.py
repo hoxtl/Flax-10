@@ -38,7 +38,8 @@ def get_events(request):
             
         # Check if target_user has shared their calendar with request.user
         if target_user != request.user:
-            is_shared_with_me = target_user.sharing_with.filter(shared_with=request.user).exists()
+            from studyFlax.models.social.shareModel import CalendarShare
+            is_shared_with_me = CalendarShare.objects.filter(owner=target_user, shared_with=request.user).exists()
             if not is_shared_with_me:
                 return Response([]) # Gracefully deny access
     else:

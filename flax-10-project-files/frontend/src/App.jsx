@@ -176,6 +176,12 @@ function useAppState() {
     setActiveNavState(nav);
   };
 
+  useEffect(() => {
+    const handleNavigate = (e) => setActiveNav(e.detail);
+    window.addEventListener('navigate', handleNavigate);
+    return () => window.removeEventListener('navigate', handleNavigate);
+  }, []);
+
   return {
     activeNav,
     setActiveNav,
