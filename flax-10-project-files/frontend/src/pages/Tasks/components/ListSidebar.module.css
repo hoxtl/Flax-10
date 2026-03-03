@@ -94,14 +94,19 @@
     border-radius: 12px;
     cursor: pointer;
     text-align: left;
-    transition: background 0.1s;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
     color: var(--text);
 }
-.navItem:hover { background: var(--hover); }
+.navItem:hover {
+    background: var(--hover);
+    transform: translateX(2px);
+}
+.navItem:active { transform: scale(0.98); }
 
 .navActive {
     background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
     color: var(--primary);
+    transform: translateX(2px);
 }
 .navActive .navLabel { color: var(--primary); font-weight: 700; }
 .navActive .navEmoji { filter: none; }
@@ -148,18 +153,22 @@
     display: flex;
     align-items: center;
     min-width: 0;
-    border-radius: 6px;
-    transition: background 0.1s;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease;
 }
-.listItem:hover { background: rgba(74, 55, 40, 0.04); }
+.listItem:hover {
+    background: rgba(74, 55, 40, 0.04);
+    transform: translateX(2px);
+}
 .listItem:hover .listDelete { opacity: 1; }
 
 .listActive {
     background: rgba(74, 55, 40, 0.06) !important;
     font-weight: 600;
-    border-left: 3px solid #4a3728;
-    border-radius: 6px;
+    border-left-color: #4a3728;
     padding-left: 9px;
+    transform: translateX(2px);
 }
 .listActive .listName { color: var(--text); font-weight: 600; }
 
@@ -271,42 +280,50 @@
 /* ── Context menu ── */
 .ctxMenu {
     position: fixed;
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background: var(--panel, #FFFCFA);
+    border: 1px solid rgba(74, 52, 33, 0.1);
     border-radius: 12px;
-    box-shadow: var(--card-shadow);
+    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
     z-index: 500;
-    min-width: 150px;
+    min-width: 160px;
     overflow: hidden;
-    animation: ctxPop 0.1s ease;
+    padding: 3px;
+    animation: ctxPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes ctxPop {
-    from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .ctxItem {
     width: 100%;
-    padding: 8px 16px;
+    padding: 6px 10px;
     background: none;
     border: none;
+    border-radius: 8px;
     text-align: left;
-    font-size: 0.82rem;
-    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: #3d3228;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: background 0.1s;
+    gap: 7px;
+    transition: background 0.12s, color 0.12s;
 }
-.ctxItem:hover { background: var(--hover); }
-.ctxDelete { color: #ef4444; }
-.ctxDelete:hover { background: #fee2e2; }
+.ctxItem svg { color: #9a8b7a; flex-shrink: 0; transition: color 0.12s; }
+.ctxItem:hover { background: rgba(123, 103, 81, 0.07); }
+.ctxItem:hover svg { color: #6b5a49; }
+.ctxDelete { color: #c53030; }
+.ctxDelete svg { color: #c53030; opacity: 0.7; }
+.ctxDelete:hover { background: rgba(197, 48, 48, 0.06); }
+.ctxDelete:hover svg { color: #c53030; opacity: 1; }
 
 .ctxDivider {
     height: 1px;
-    background: var(--border);
-    margin: 0.2rem 0;
+    background: rgba(74, 52, 33, 0.07);
+    margin: 2px 6px;
 }
 
 /* ── Archive section ── */

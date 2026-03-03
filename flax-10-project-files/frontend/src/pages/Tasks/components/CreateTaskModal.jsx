@@ -3,10 +3,11 @@
  *
  * Modal for creating a new task. Provides a lightweight, canvas-style form with
  * borderless inputs, priority and study-block chips, and optional due date.
- * Supports creating a new list directly from the List dropdown when onCreateList is provided.
+ * When onOpenCreateList is provided, the Category dropdown shows "+ New List" and
+ * opens the same Create List modal used in the list sidebar.
  */
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Flag } from "lucide-react";
 
 import DateTimePicker from "./DateTimePicker";
@@ -59,11 +60,11 @@ function getListColor(list, idx) {
 
 /**
  * Create Task modal. Public props: lists, defaultListId, onSave, onClose.
- * Optional: onCreateList — when provided, the List dropdown shows "+ Create new list" and can create a list inline.
- * Optional: showAddToScheduleToggle, addToScheduleLabel — when set, shows a toggle and passes { addToSchedule } as second arg to onSave.
- * Optional: modules — when set, shows "Link to Module" dropdown; each item { id, module_code, module_name or title }.
+ * Optional: onOpenCreateList — when provided, Category dropdown shows "+ New List" and opens the Create List modal (same as sidebar).
+ * Optional: newListIdCreated — when set (after creating a list from that modal), form category is set to this list.
+ * Optional: showAddToScheduleToggle, addToScheduleLabel, modules.
  */
-export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, onSave, onClose, onCreateList, showAddToScheduleToggle = false, addToScheduleLabel = "Add to today's schedule", modules = [] }) {
+export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, onSave, onClose, onOpenCreateList, newListIdCreated, showAddToScheduleToggle = false, addToScheduleLabel = "Add to today's schedule", modules = [] }) {
   const sortedLists = useMemo(
     () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
     [lists]
@@ -84,31 +85,18 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
   });
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [listDropdownOpen, setListDropdownOpen] = useState(false);
-  const [showCreateListInput, setShowCreateListInput] = useState(false);
-  const [newListName, setNewListName] = useState("");
-  const [creatingList, setCreatingList] = useState(false);
-  const listDropdownRef = useRef(null);
-  const newListInputRef = useRef(null);
+
+  const categoryOptions = useMemo(
+    () => [
+      ...sortedLists.map((l) => ({ value: String(l.id), label: l.name })),
+      ...(onOpenCreateList ? [{ value: "__new_list__", label: "+ New List" }] : []),
+    ],
+    [sortedLists, onOpenCreateList]
+  );
 
   useEffect(() => {
-    if (showCreateListInput && newListInputRef.current) {
-      newListInputRef.current.focus();
-    }
-  }, [showCreateListInput]);
-
-  useEffect(() => {
-    if (!listDropdownOpen) return;
-    const handleClickOutside = (e) => {
-      if (listDropdownRef.current && !listDropdownRef.current.contains(e.target)) {
-        setListDropdownOpen(false);
-        setShowCreateListInput(false);
-        setNewListName("");
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [listDropdownOpen]);
+    if (newListIdCreated) setForm((p) => ({ ...p, task_list: String(newListIdCreated) }));
+  }, [newListIdCreated]);
 
   const selectedList = useMemo(
     () => sortedLists.find((l) => String(l.id) === String(form.task_list)),
@@ -148,23 +136,6 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
 
   const handleKey = (e) => {
     if (e.key === "Escape") onClose();
-  };
-
-  const handleCreateList = async () => {
-    const name = newListName.trim();
-    if (!name || !onCreateList) return;
-    setCreatingList(true);
-    try {
-      const created = await onCreateList({ name, color: FALLBACK_COLOURS[0] });
-      if (created?.id) {
-        setForm((p) => ({ ...p, task_list: String(created.id) }));
-        setShowCreateListInput(false);
-        setNewListName("");
-        setListDropdownOpen(false);
-      }
-    } finally {
-      setCreatingList(false);
-    }
   };
 
   return (
@@ -240,86 +211,27 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
               {selectedListColor && (
                 <span className={styles.listDot} style={{ background: selectedListColor }} />
               )}
-              <div className={styles.listSelectWrap} ref={listDropdownRef}>
-                <button
-                  type="button"
-                  className={styles.listSelectTrigger}
-                  onClick={() => setListDropdownOpen((o) => !o)}
-                  aria-haspopup="listbox"
-                  aria-expanded={listDropdownOpen}
-                  aria-label="List"
-                >
-                  <span className={styles.listSelectValue}>
-                    {selectedList ? selectedList.name : "Select list"}
-                  </span>
-                  <span className={styles.listSelectChevron} aria-hidden>▾</span>
-                </button>
-                {listDropdownOpen && (
-                  <div className={styles.listDropdown} role="listbox">
-                    {sortedLists.map((l) => (
-                      <button
-                        key={l.id}
-                        type="button"
-                        role="option"
-                        aria-selected={String(form.task_list) === String(l.id)}
-                        className={`${styles.listDropdownOption} ${String(form.task_list) === String(l.id) ? styles.listDropdownOptionActive : ""}`}
-                        onClick={() => {
-                          setForm((p) => ({ ...p, task_list: String(l.id) }));
-                          setListDropdownOpen(false);
-                        }}
-                      >
-                        <span className={styles.listOptionDot} style={{ background: getListColor(l, sortedLists.indexOf(l)) }} />
-                        {l.name}
-                      </button>
-                    ))}
-                    {typeof onCreateList === "function" && (
-                      <>
-                        <div className={styles.listDropdownDivider} />
-                        <button
-                          type="button"
-                          className={styles.listDropdownCreate}
-                          onClick={() => setShowCreateListInput((v) => !v)}
-                        >
-                          {showCreateListInput ? "− Hide new list" : "+ New List"}
-                        </button>
-                        <div
-                          className={styles.listCreateSlide}
-                          style={{ maxHeight: showCreateListInput ? 160 : 0 }}
-                        >
-                          <div className={styles.listCreateSlideInner}>
-                            <div className={styles.listCreateInline}>
-                              <input
-                                type="text"
-                                ref={newListInputRef}
-                                className={styles.listCreateInput}
-                                placeholder="List name…"
-                                value={newListName}
-                                onChange={(e) => setNewListName(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleCreateList()}
-                                aria-label="New list name"
-                              />
-                              <button
-                                type="button"
-                                className={styles.listCreateBtn}
-                                onClick={handleCreateList}
-                                disabled={creatingList || !newListName.trim()}
-                              >
-                                {creatingList ? "Creating…" : "Create"}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
+              <div className={styles.listDropdownTriggerWrap}>
+                <AnimatedDropdown
+                  value={form.task_list ? String(form.task_list) : ""}
+                  onChange={(v) => {
+                    if (v === "__new_list__") {
+                      onOpenCreateList?.();
+                      return;
+                    }
+                    setForm((p) => ({ ...p, task_list: v }));
+                  }}
+                  placeholder="Select list"
+                  options={categoryOptions}
+                  className={styles.listAnimatedDropdown}
+                />
               </div>
             </div>
             <div className={styles.rowBlock}>
               <span className={styles.rowLabel}>Priority</span>
               <div className={styles.iconGroup}>
                 <Flag className={styles.icon} size={16} aria-hidden />
-                <div className={styles.chipGroup}>
+                <div className={`${styles.chipGroup} ${styles.chipGroupSingleRow}`}>
                   {PRIORITY_OPTIONS.map(({ value, label }) => (
                     <button
                       key={value}

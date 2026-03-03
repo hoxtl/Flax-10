@@ -26,7 +26,7 @@ export default function CreateListModal({ onSave, onClose }) {
         </div>
 
         <div className={styles.body}>
-          <p className={styles.subtitle}>Give your list a name and colour</p>
+          <p className={styles.subtitle}>Choose a name and accent colour for your list.</p>
 
           {/* Name */}
           <input
