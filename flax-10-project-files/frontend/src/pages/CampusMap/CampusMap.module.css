@@ -802,20 +802,10 @@
 :global(.homePopupButton) {
   padding: 6px 12px;
   background: var(--primary);
-  color: white;
+  color: var(--c-white);
   border: none;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 150ms ease;
-}
-
-:global(.homePopupButton:hover) {
-  background: var(--primary-strong);
-  transform: translateY(-1px);
-}
-
-:global(.homePopupButton:active) {
-  transform: translateY(0);
 }
