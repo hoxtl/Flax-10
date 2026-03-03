@@ -302,7 +302,6 @@ export default function CampusMap() {
     }).setHTML(`
       <div class="HomePopupContent">
         <div class="HomePopupTitle">🏠User Home</div>
-        <div class="HomePopupAddress">${userHome.address}</div>
         <button id="setHomeAsStart" class="HomePopupButton">
           Set Home as Start
         </button>
