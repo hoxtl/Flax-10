@@ -3,7 +3,7 @@ import { useCompletionCheck } from '../utils/timerUtils';
 import { saveSession } from '../utils/historyUtils';
 
 const getStartNextHandler = (t, studyBlockId, modal, setModal) => () => {
-    saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current, t.task);
+    saveSession(t.workTime, t.breakTime, t.completedSessions + 1, studyBlockId.current, t.task, t.totalPaused);
     const next = t.completedSessions + 1;
     t.setCompletedSessions(next);
 

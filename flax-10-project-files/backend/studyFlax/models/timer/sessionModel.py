@@ -6,6 +6,7 @@ class StudySession(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     duration = models.IntegerField(help_text="Duration in minutes")
+    pause_duration = models.IntegerField(default=0, help_text="Total pause duration in seconds")
     break_duration = models.IntegerField(default=0, help_text="Break duration in minutes")
     session_count = models.IntegerField(default=0)
     study_block_id = models.BigIntegerField(help_text="Timestamp ID for grouping sessions")
