@@ -238,45 +238,24 @@
   
   /* ── Colour grid ─────────────────────────────────────────── */
   .colorGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
+    display: grid;
+    grid-template-columns: repeat(5, 28px);
+    gap: 8px;
+    width: fit-content;
   }
   .colorSwatch {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 2.5px solid transparent;
+    border: none;
     cursor: pointer;
-    transition: transform 0.1s, border-color 0.1s;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
     flex-shrink: 0;
   }
-  .colorSwatch:hover { transform: scale(1.18); }
-  .colorSwatchActive { border-color: var(--text); transform: scale(1.18); }
-
-  .customColorRow {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-top: 0.5rem;
-  }
-  .customColorLabel {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    color: var(--text);
-    cursor: pointer;
-  }
-  .customColorLabel input { accent-color: var(--primary); }
-  .customColorInput {
-    width: 36px;
-    height: 28px;
-    padding: 0;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    cursor: pointer;
-    background: var(--bg);
+  .colorSwatch:hover { transform: scale(1.06); }
+  .colorSwatchActive {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #2c2420;
+    transform: scale(1.06);
   }
   
   /* ── Preview ─────────────────────────────────────────────── */

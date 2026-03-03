@@ -3,7 +3,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 8px);
+  gap: 0;
   padding: var(--space-3, 12px) var(--space-4, 16px);
   background: var(--panel, #FFFCFA);
   border: 1px solid rgba(74, 52, 33, 0.1);
@@ -62,6 +62,21 @@
   gap: 6px;
   flex-wrap: nowrap;
   min-width: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: max-height 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.optionsRowOpen {
+  max-height: 220px;
+  opacity: 1;
+  pointer-events: auto;
+  overflow: visible;
+  transform: translateY(0);
+  margin-top: 8px;
 }
 
 .optionsRowLabel {

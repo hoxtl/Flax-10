@@ -6,17 +6,12 @@ import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
 export default function CreateListModal({ onSave, onClose }) {
   const [name,       setName]       = useState("");
   const [color,      setColor]      = useState(FOCUS_BLOCK_PALETTE[0].hex);
-  const [customColor, setCustomColor] = useState("");
-  const [useCustom,   setUseCustom]  = useState(false);
   const [saving,     setSaving]     = useState(false);
-
-  const effectiveColor = useCustom && customColor ? customColor : color;
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    const finalColor = useCustom && customColor ? customColor : color;
     setSaving(true);
-    await onSave({ name: name.trim(), color: finalColor });
+    await onSave({ name: name.trim(), color });
     setSaving(false);
     onClose();
   };
@@ -51,37 +46,18 @@ export default function CreateListModal({ onSave, onClose }) {
                 <button
                   key={c.hex}
                   type="button"
-                  className={`${styles.colorSwatch} ${!useCustom && color === c.hex ? styles.colorSwatchActive : ""}`}
+                  className={`${styles.colorSwatch} ${color === c.hex ? styles.colorSwatchActive : ""}`}
                   style={{ background: c.hex }}
-                  onClick={() => { setColor(c.hex); setUseCustom(false); }}
+                  onClick={() => setColor(c.hex)}
                   title={c.label}
                 />
               ))}
             </div>
-            <div className={styles.customColorRow}>
-              <label className={styles.customColorLabel}>
-                <input
-                  type="checkbox"
-                  checked={useCustom}
-                  onChange={e => setUseCustom(e.target.checked)}
-                />
-                <span>Custom colour</span>
-              </label>
-              {useCustom && (
-                <input
-                  type="color"
-                  className={styles.customColorInput}
-                  value={customColor || color}
-                  onChange={e => setCustomColor(e.target.value)}
-                  title="Pick a custom colour"
-                />
-              )}
-            </div>
           </div>
 
           {/* Preview */}
-          <div className={styles.preview} style={{ "--list-color": effectiveColor }}>
-            <span className={styles.previewDot} style={{ background: effectiveColor }} />
+          <div className={styles.preview} style={{ "--list-color": color }}>
+            <span className={styles.previewDot} style={{ background: color }} />
             <span className={styles.previewName}>{name || "List name"}</span>
           </div>
 

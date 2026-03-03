@@ -2,7 +2,7 @@
    TaskCard — redesigned
    ════════════════════════════════════════════════ */
 
-   .card {
+.card {
     position: relative;
     display: flex;
     align-items: center;
@@ -12,6 +12,7 @@
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: var(--glass-border);
+    border-left: 3px solid var(--list-color, #a89890);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
     transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
@@ -30,11 +31,9 @@
 }
 
 .cardOverdue {
-    border-left: 4px solid #fb923c;
     background: rgba(255, 237, 213, 0.4);
 }
 .cardOverdue:hover {
-    border-left-color: #fb923c;
     background: color-mix(in srgb, var(--danger) 10%, var(--bg));
 }
 
@@ -48,27 +47,17 @@
     50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent); }
 }
 
-/* Left accent stripe = priority (no separate label needed) */
-.stripe {
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--accent, var(--primary));
-    border-radius: 12px 0 0 12px;
-    opacity: 0.9;
-}
-
-/* Priority badge: muted pill — left stripe shows priority color */
+/* Priority badge shown only for high/urgent tasks */
 .priorityBadge {
-    font-size: 0.62rem;
+    font-size: 11px;
     font-weight: var(--font-weight-task);
-    padding: 0.15rem 0.45rem;
+    padding: 0;
     border-radius: 9999px;
     border: none;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
     white-space: nowrap;
-    color: var(--text-charcoal);
-    background: #f1f5f9;
+    color: #8a7d76;
+    background: transparent;
 }
 
 /* ── Checkbox ── */
@@ -87,12 +76,12 @@
 }
 
 .check:hover {
-    border-color: var(--accent, var(--primary));
+    border-color: var(--list-color, var(--primary));
 }
 
 .checkDone {
-    background: var(--accent, var(--primary));
-    border-color: var(--accent, var(--primary));
+    background: var(--list-color, var(--primary));
+    border-color: var(--list-color, var(--primary));
 }
 
 .checkMark {
@@ -189,81 +178,48 @@
     align-items: center;
     gap: 0.35rem 0.5rem;
     flex-wrap: wrap;
+    font-size: 11px;
+    color: #8a7d76;
 }
 
-/* Flax bubble: Module (elegant pill) */
-.bubble {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 0.25rem 0.55rem;
-    border-radius: 9999px;
-    white-space: nowrap;
-    text-decoration: none;
-    transition: filter 0.15s ease;
-    letter-spacing: 0.02em;
-}
-.bubble:hover {
-    filter: brightness(0.95);
-}
-.bubbleModule {
-    background: color-mix(in srgb, var(--sage, #52796f) 14%, #fff);
-    color: var(--color-sage-dark, #2D4F32);
-}
-.bubbleModule:hover {
-    background: color-mix(in srgb, var(--sage, #52796f) 18%, #fff);
-    color: var(--color-sage-dark, #2D4F32);
-}
-
-.bubbleExam {
-    background: #FEE2E2;
-    color: #991B1B;
-}
-.bubbleCoursework {
-    background: #FEF3C7;
-    color: #92400E;
-}
-.bubbleOther {
-    background: #F3F4F6;
-    color: #4B5563;
-}
-
-/* List badge: muted pill */
 .listBadge {
     display: inline-flex;
     align-items: center;
     gap: 0.28rem;
-    font-size: 0.62rem;
-    font-weight: 600;
-    padding: 0.15rem 0.45rem;
-    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 0;
+    border-radius: 0;
     border: none;
     white-space: nowrap;
-    color: #334155;
-    background: #f1f5f9;
+    color: #8a7d76;
+    background: transparent;
 }
 
 .listBadgeDot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
-.dueBadge {
-    font-size: 0.62rem;
-    font-weight: 600;
-    white-space: nowrap;
+.moduleCode {
     font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
+    font-size: 10px;
+    color: #b0a59e;
+    line-height: 1;
 }
 
-/* Unified urgency colors: today = soft red, this week = amber, else = sage */
-.dueBadge.overdue { color: #c85a54; }
-.dueBadge.today   { color: #c85a54; }
-.dueBadge.thisWeek { color: #b45309; }
-.dueBadge.later   { color: #84A98C; }
+.dueBadge {
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    color: #8a7d76;
+}
+
+.dueBadge.overdue { color: #c4574b; }
+.dueBadge.today { color: #4a3728; }
+.dueBadge.tomorrow { color: #c49a4b; }
 
 /* ════════════════════════════════════════════════
    EDIT MODAL
@@ -273,7 +229,7 @@
     inset: 0;
     background: rgba(0,0,0,0.32);
     backdrop-filter: blur(4px);
-    z-index: 400;
+    z-index: 1400;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -14,6 +14,9 @@ function getListSubtitle(listName, listCategory, isEmpty) {
   if (isEmpty) return "This garden is currently empty. Ready to plant some goals?";
   const name = (listName || "").toLowerCase();
   const cat = (listCategory || "").toLowerCase();
+  if (/internship|placement/i.test(name)) return "Progress stacks quietly. Treat each internship task as proof of your momentum.";
+  if (/finance|budget|money/i.test(name)) return "Small money moves compound. Keep the system simple and consistent.";
+  if (/health|wellness|fitness/i.test(name)) return "Protect your energy first. A steady body makes focused work easier.";
   if (cat === "uni" || /university|academic|reading list/i.test(name)) return "Academic excellence is a marathon, not a sprint. Focus on your core objectives.";
   if (cat === "personal" || /personal|health|wellness|finance|home/i.test(name)) return "Nurturing the gardener is as important as tending the garden. Balance is key.";
   if (cat === "society" || /internship|work|project|admin/i.test(name)) return "Brick by brick, system by system. Building the future one task at a time.";
@@ -62,7 +65,7 @@ function getListColor(list) {
     return FOCUS_BLOCK_COLOURS_HEX[(list?.idx ?? 0) % FOCUS_BLOCK_COLOURS_HEX.length];
 }
 
-function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, defaultCollapsed = false, hideDueBadge = false, isOverdueSection = false }) {
+function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, defaultCollapsed = false, hideDueBadge = false, isOverdueSection = false, hideListBadge = false }) {
     const [collapsed, setCollapsed] = useState(defaultCollapsed);
     const sorted = useMemo(() => sortTasks(tasks, sortBy), [tasks, sortBy]);
 
@@ -94,6 +97,7 @@ function Section({ title, emoji, tasks, sortBy, listMap, onToggleComplete, onDel
                                 onDelete={() => onDeleteTask(task.id)}
                                 onEdit={data => onEditTask(task.id, data)}
                                 hideDueBadge={hideDueBadge}
+                                hideListBadge={hideListBadge}
                                 isOverdue={isOverdueSection}
                             />
                         );
@@ -184,13 +188,11 @@ export default function TaskFeed({
     const headerTitle = activeList
         ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
         : (activeModuleCode || "All tasks");
-    const headerSubtitle = getListSubtitle(
-      activeList?.name,
-      activeList?.category,
-      tasks.length === 0
-    );
+    const headerSubtitle = activeList
+      ? getListSubtitle(activeList?.name, activeList?.category, tasks.length === 0)
+      : null;
 
-    const sectionProps = { sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask };
+    const sectionProps = { sortBy, listMap, onToggleComplete, onDeleteTask, onEditTask, hideListBadge: !!activeListId };
 
     return (
         <div className={styles.feed}>
@@ -199,7 +201,7 @@ export default function TaskFeed({
                 <div className={styles.listHeaderTitleWrap}>
                     <h1 className={styles.listHeaderTitle} title={headerTitle}>{headerTitle}</h1>
                 </div>
-                <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>
+                {headerSubtitle && <p className={styles.listHeaderSubtitle}>{headerSubtitle}</p>}
                 <div className={styles.listHeaderDivider} aria-hidden />
             </header>
 

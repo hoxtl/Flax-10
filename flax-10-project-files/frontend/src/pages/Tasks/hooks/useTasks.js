@@ -4,13 +4,17 @@ import { fetchTasks, createTask, updateTask, deleteTask } from "../../../api/tas
 export default function useTasks(filters = {}) {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true);
 
     const load = useCallback(() => {
         setLoading(true);
         fetchTasks(filters)
             .then(setTasks)
             .catch(() => {})
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+                setInitialLoading(false);
+            });
     }, [JSON.stringify(filters)]);
 
     useEffect(() => { load(); }, [load]);
@@ -35,5 +39,5 @@ export default function useTasks(filters = {}) {
 
     const toggleComplete = (id, current) => editTask(id, { completed: !current });
 
-    return { tasks, loading, addTask, editTask, removeTask, toggleComplete, reload: load };
+    return { tasks, loading, initialLoading, addTask, editTask, removeTask, toggleComplete, reload: load };
 }

@@ -31,6 +31,7 @@ const [taskListId, setTaskListId] = useState(
   const [saving, setSaving] = useState(false);
   const [modulePopoverOpen, setModulePopoverOpen] = useState(false);
   const [listDropdownOpen, setListDropdownOpen] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const [enrolledModules, setEnrolledModules] = useState([]);
   const popoverRef = useRef(null);
   const listDropdownRef = useRef(null);
@@ -142,6 +143,7 @@ const [taskListId, setTaskListId] = useState(
     () => enrolledModules.find((m) => String(m.id) === String(moduleId)),
     [enrolledModules, moduleId]
   );
+  const showOptions = inputFocused || modulePopoverOpen || listDropdownOpen;
 
   return (
     <form className={styles.card} onSubmit={handleSubmit}>
@@ -153,6 +155,14 @@ const [taskListId, setTaskListId] = useState(
           placeholder="Add a task…"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => {
+            setTimeout(() => {
+              const activeEl = document.activeElement;
+              const insideForm = activeEl && activeEl.closest && activeEl.closest(`.${styles.card}`);
+              if (!insideForm && !modulePopoverOpen && !listDropdownOpen) setInputFocused(false);
+            }, 0);
+          }}
           aria-label="Task name"
         />
         <button
@@ -166,7 +176,7 @@ const [taskListId, setTaskListId] = useState(
       </div>
 
       {/* Row 2: secondary options — est. time, module, list */}
-      <div className={styles.optionsRow}>
+      <div className={`${styles.optionsRow} ${showOptions ? styles.optionsRowOpen : ""}`}>
         <span className={styles.optionsRowLabel}>Est. time</span>
         <div className={styles.durationGroup} role="group" aria-label="Estimated duration">
           {DURATION_OPTIONS.map(({ value, label, ariaLabel }) => (

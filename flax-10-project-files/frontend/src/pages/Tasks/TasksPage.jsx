@@ -8,6 +8,7 @@ import TaskFeed from "./components/TaskFeed";
 import ListSidebar from "./components/ListSidebar";
 import CreateTaskModal from "./components/CreateTaskModal";
 import CreateListModal from "./components/CreateListModal";
+import { BackToTop } from "../../components/Pagination/Pagination";
 
 import styles from "./TasksPage.module.css";
 
@@ -42,7 +43,7 @@ function getTodayEndISO() {
 export default function TasksPage() {
     const [searchParams] = useSearchParams();
     const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
-    const { tasks, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
+    const { tasks, initialLoading: tasksInitialLoading, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
     const [activeListId,    setActiveListId]    = useState(null);
     const [activeFilter,   setActiveFilter]    = useState("all");
     const [showTaskModal,   setShowTaskModal]   = useState(false);
@@ -87,7 +88,14 @@ export default function TasksPage() {
         await permanentlyDeleteList(listId);
     };
 
-    if (listsLoading) return <div className={styles.loading}>Loading…</div>;
+    if (listsLoading || tasksInitialLoading) {
+        return (
+            <div className={styles.loading}>
+                <div className={styles.loadingSpinner} aria-hidden />
+                <p className={styles.loadingText}>Loading tasks...</p>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.page}>
@@ -157,6 +165,7 @@ export default function TasksPage() {
                     onClose={() => setShowListModal(false)}
                 />
             )}
+            <BackToTop />
         </div>
     );
 }

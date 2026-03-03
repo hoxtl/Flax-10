@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 import { useTimerContext } from "../../../context/TimerContext";
 import { useHarvestCelebration } from "../../../context/HarvestCelebrationContext";
@@ -20,14 +21,6 @@ function useActiveTimerTaskId() {
     }, []);
     return id;
 }
-
-/* Semantic left-border accents */
-const PRIORITY_COLOURS = {
-    urgent: "var(--urgent)",
-    high:   "var(--study)",
-    medium: "var(--personal)",
-    low:    "var(--neutral)",
-};
 
 const PRIORITY_LABELS = {
     urgent: "Urgent",
@@ -55,14 +48,10 @@ function formatDueDate(dueDate) {
     const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
     const diffDays = Math.round((dueDay - today) / 86400000);
 
-    if (diffDays < 0)  return { label: "Overdue",    status: "overdue" };
-    if (diffDays === 0) return { label: "Today",     status: "today" };
-    if (diffDays === 1) return { label: "Tomorrow", status: "thisWeek" };
-    if (diffDays <= 7) return { label: `${diffDays} days`, status: "thisWeek" };
-    return {
-        label: due.toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
-        status: "later",
-    };
+    if (diffDays < 0) return { label: "Overdue", status: "overdue" };
+    if (diffDays === 0) return { label: "Today", status: "today" };
+    if (diffDays === 1) return { label: "Tomorrow", status: "tomorrow" };
+    return null;
 }
 
 export function EditTaskModal({ task, onSave, onDelete, onClose }) {
@@ -88,7 +77,7 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
         onClose();
     };
 
-    return (
+    const modal = (
         <div className={styles.modalBackdrop} onMouseDown={onClose}>
             <div className={styles.editModal} onMouseDown={e => e.stopPropagation()}>
                 <div className={styles.editHeader}>
@@ -160,9 +149,10 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
             </div>
         </div>
     );
+    return createPortal(modal, document.body);
 }
 
-export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, listColor, hideDueBadge = false, isOverdue = false }) {
+export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, listColor, hideDueBadge = false, hideListBadge = false, isOverdue = false }) {
     const [showEdit, setShowEdit] = useState(false);
     const [seedPop, setSeedPop] = useState(false);
     const seedPopTimeoutRef = useRef(null);
@@ -173,8 +163,7 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
     const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
 
     const due   = formatDueDate(task.due_date);
-    const color = PRIORITY_COLOURS[task.priority] || "var(--neutral)";
-    const accent = isOverdue ? "var(--urgent)" : color;
+    const showPriority = task.priority === "urgent" || task.priority === "high";
 
     const handleCheckClick = () => {
         const wasIncomplete = !task.completed;
@@ -200,11 +189,8 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
         <>
             <div
                 className={`${styles.card} ${task.completed ? styles.cardDone : ""} ${isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""}`}
-                style={{ "--accent": accent }}
+                style={{ "--list-color": listColor || "#a89890" }}
             >
-                {/* Left accent stripe */}
-                <div className={styles.stripe} />
-
                 {/* Checkbox with seed burst */}
                 <SeedBurst active={seedPop}>
                 <button
@@ -231,10 +217,12 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                     </div>
 
                     <div className={styles.meta}>
-                        <span className={styles.priorityBadge}>
-                            {PRIORITY_LABELS[task.priority]}
-                        </span>
-                        {listName && (
+                        {showPriority && (
+                            <span className={styles.priorityBadge}>
+                                {PRIORITY_LABELS[task.priority]}
+                            </span>
+                        )}
+                        {listName && !hideListBadge && (
                             <span className={styles.listBadge}>
                                 <span
                                     className={styles.listBadgeDot}
@@ -244,28 +232,15 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                             </span>
                         )}
 
-                        {(task.module_code || task.moduleId != null || task.module_id != null) && (
-                            <Link
-                                to={task.moduleId != null || task.module_id != null
-                                    ? `/modules?moduleId=${task.moduleId ?? task.module_id}`
-                                    : `/modules?code=${encodeURIComponent(task.module_code)}`}
-                                className={`${styles.bubble} ${styles.bubbleModule}`}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {task.module_code || `Module ${task.moduleId ?? task.module_id}`}
-                            </Link>
+                        {task.module_code && (
+                            <span className={styles.moduleCode}>
+                                {task.module_code}
+                            </span>
                         )}
-
-                        {(task.assignment_type || task.deadline_type) && (() => {
-                            const t = (task.assignment_type || task.deadline_type || "").toLowerCase();
-                            const label = t === "exam" ? "Exam" : t === "coursework" ? "Coursework" : t === "lab" ? "Lab" : task.assignment_type || task.deadline_type;
-                            const cls = t === "exam" ? styles.bubbleExam : t === "coursework" ? styles.bubbleCoursework : styles.bubbleOther;
-                            return <span className={`${styles.bubble} ${cls}`}>{label}</span>;
-                        })()}
 
                         {due && !hideDueBadge && (
                             <span className={`${styles.dueBadge} ${styles[due.status]}`}>
-                                {due.status === "overdue" ? "⚠️" : "📅"} {due.label}
+                                {due.label}
                             </span>
                         )}
                     </div>

@@ -48,11 +48,13 @@
     grid-column: 1;
     grid-row: 2;
     font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 500;
-    color: #64748b;
-    margin: 8px 0 0;
-    line-height: 1.45;
+    font-size: 11px;
+    font-weight: 400;
+    font-style: italic;
+    color: #c4b8b0;
+    margin: 6px 0 0;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
 }
 
 .listHeaderDivider {
@@ -200,20 +202,23 @@
 }
 
 .addBtn {
-    padding: 8px 16px;
-    background: var(--primary);
+    padding: 4px 0;
+    background: transparent;
     border: none;
-    border-radius: 12px;
-    color: white;
+    color: #b0a59e;
     font-family: var(--font-body);
-    font-size: 0.82rem;
-    font-weight: var(--font-weight-title);
+    font-size: 11px;
+    font-weight: 500;
     cursor: pointer;
     flex-shrink: 0;
-    transition: opacity 0.15s, background 0.15s;
+    transition: color 0.15s;
     white-space: nowrap;
+    text-decoration: none;
 }
-.addBtn:hover { opacity: 0.92; background: color-mix(in srgb, var(--primary) 90%, #1e293b); }
+.addBtn:hover {
+    color: #4a3728;
+    text-decoration: underline;
+}
 
 /* ── Sections area — no internal scroll, page scrolls instead ── */
 .sectionsWrap {
