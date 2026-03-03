@@ -89,33 +89,16 @@ function NavDropdownMenu({ routes, activeNav, onNavChange, setIsOpen }) {
 
 function NavDropdown({ title, routes, activeNav, onNavChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
-  const timeoutRef = useRef(null);
-
+  const ref = useRef(null), timeout = useRef(null);
   useClickOutside(ref, () => setIsOpen(false));
   const hasActive = routes.some(r => r.id === activeNav);
-  const toggle = () => setIsOpen(!isOpen);
-
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setIsOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setIsOpen(false);
-    }, 150); // Small delay to prevent flickering
-  };
-
+  const enter = () => { clearTimeout(timeout.current); setIsOpen(true); };
+  const leave = () => { timeout.current = setTimeout(() => setIsOpen(false), 150); };
+  const menu = <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />;
   return (
-    <div
-      className={styles.navGroup}
-      ref={ref}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={toggle} />
-      <AnimatePresence>{isOpen && <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />}</AnimatePresence>
+    <div className={styles.navGroup} ref={ref} onMouseEnter={enter} onMouseLeave={leave}>
+      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={() => setIsOpen(!isOpen)} />
+      <AnimatePresence>{isOpen && menu}</AnimatePresence>
     </div>
   );
 }
