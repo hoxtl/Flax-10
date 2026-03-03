@@ -292,6 +292,32 @@
     line-height: 1.5;
 }
 
+.leaveModalOverlay {
+    z-index: 2000;
+}
+
+.leaveModalMessage {
+    margin-bottom: 1.5rem;
+}
+
+.leaveModalButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.leaveBtnExit {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: none;
+}
+
+.leaveBtnCancel {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: none;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
