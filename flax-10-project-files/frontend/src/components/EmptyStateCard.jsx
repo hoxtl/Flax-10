@@ -3,7 +3,7 @@ import styles from "./EmptyStateCard.module.css";
 /**
  * Original tuxedo cat — kept for non-homepage uses.
  */
-function ZenGardenIllustration({ className }) {
+function ClassicIllustration({ className }) {
   return (
     <svg
       className={className}
@@ -130,47 +130,6 @@ function BrownCatIllustration({ className }) {
   );
 }
 
-/**
- * Animated seedling — grows in and gently sways.
- * Used for the Day Progress "100% complete" state.
- */
-function SeedlingIllustration({ className, animated = false }) {
-  return (
-    <svg
-      className={`${className}${animated ? ` ${styles.illustrationAnimated}` : ""}`}
-      width="80"
-      height="64"
-      viewBox="0 0 80 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      {/* Pot — static */}
-      <path
-        d="M24 32 L28 56 L52 56 L56 32 Z"
-        fill="#e8e0d5"
-        stroke="#6B5344"
-        strokeWidth="1"
-        strokeOpacity="0.4"
-      />
-      <line x1="28" y1="44" x2="52" y2="44" stroke="#6B5344" strokeWidth="0.8" strokeOpacity="0.3" />
-      {/* Soil */}
-      <ellipse cx="40" cy="32" rx="14" ry="4" fill="#8B7355" fillOpacity="0.6" />
-      {/* Plant group — animated */}
-      <g className={animated ? styles.plantGroup : undefined}>
-        {/* Stem */}
-        <path d="M40 28 Q40 16 38 8" stroke="#5a6c3d" strokeWidth="2" strokeLinecap="round" fill="none" />
-        {/* Left leaf */}
-        <path d="M38 18 Q30 14 28 20 Q36 22 38 18" fill="#84A98C" stroke="#5a6c3d" strokeWidth="0.6" />
-        {/* Right leaf */}
-        <path d="M42 18 Q50 12 52 20 Q44 22 42 18" fill="#84A98C" stroke="#5a6c3d" strokeWidth="0.6" />
-        {/* Top leaf */}
-        <path d="M40 10 Q36 4 40 2 Q44 4 40 10" fill="#84A98C" stroke="#5a6c3d" strokeWidth="0.5" />
-      </g>
-    </svg>
-  );
-}
-
 export default function EmptyStateCard({
   displayName,
   sub = "No overdue or due-soon tasks.",
@@ -182,12 +141,10 @@ export default function EmptyStateCard({
   const message = messageOverride ?? `The garden is at peace. You've earned your rest, ${name}.`;
 
   let IllustrationEl;
-  if (illustrationVariant === "seedling") {
-    IllustrationEl = <SeedlingIllustration className={styles.illustration} animated />;
-  } else if (illustrationVariant === "brownCat") {
+  if (illustrationVariant === "brownCat") {
     IllustrationEl = <BrownCatIllustration className={styles.illustration} />;
   } else {
-    IllustrationEl = <ZenGardenIllustration className={styles.illustration} />;
+    IllustrationEl = <ClassicIllustration className={styles.illustration} />;
   }
 
   return (

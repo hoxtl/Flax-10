@@ -23,32 +23,6 @@
   color: var(--text-charcoal);
 }
 
-/* Seedling SVG: grow-in once on mount */
-.illustrationAnimated {
-  animation: seedlingGrow 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transform-origin: center bottom;
-}
-
-@keyframes seedlingGrow {
-  0%   { transform: scaleY(0.2) translateY(12px); opacity: 0; }
-  60%  { opacity: 1; }
-  100% { transform: scaleY(1) translateY(0); opacity: 1; }
-}
-
-/* Plant group (stem + leaves) — gentle continuous sway after growing in */
-.plantGroup {
-  transform-origin: 40px 28px;
-  animation: plantSway 3.2s ease-in-out 0.7s infinite;
-}
-
-@keyframes plantSway {
-  0%   { transform: rotate(0deg); }
-  20%  { transform: rotate(2.5deg); }
-  50%  { transform: rotate(-2deg); }
-  80%  { transform: rotate(1.5deg); }
-  100% { transform: rotate(0deg); }
-}
-
 .message {
   margin: 0;
   font-family: var(--font-body);
