@@ -282,6 +282,11 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
           onCancel={() => setPendingNav(null)}
           onPause={() => {
             if (!t.isPaused) t.togglePause();
+            if (pendingNav === "QUICK_ADD") {
+              setShowQuickAdd(true);
+            } else {
+              onNavChange(pendingNav);
+            }
             setPendingNav(null);
           }}
           onExit={() => {

@@ -4,7 +4,7 @@ import { formatTime } from './TimerComponents';
 import { useTimerContext } from '../../context/TimerContext';
 
 export default function MiniTimer({ onNavigate, activeNav }) {
-  const { isActive, isPaused, timeLeft, mode, isOvertime, isBreakOvertime } = useTimerContext();
+  const { isActive, isPaused, timeLeft, totalPaused, mode, isOvertime, isBreakOvertime } = useTimerContext();
   const [hovered, setHovered] = useState(false);
 
   if (!isActive || activeNav === 'timer') return null;
@@ -21,7 +21,7 @@ export default function MiniTimer({ onNavigate, activeNav }) {
     >
       <button className={styles.miniTimer} onClick={() => onNavigate?.('timer')}>
         <span className={`${styles.dot} ${isPaused ? styles.paused : ''}`} />
-        <span className={styles.time}>{formatTime(timeLeft)}</span>
+        <span className={styles.time}>{isPaused ? formatTime(totalPaused) : formatTime(timeLeft)}</span>
       </button>
 
       <div className={`${styles.tooltip} ${hovered ? styles.visible : ''}`}>
