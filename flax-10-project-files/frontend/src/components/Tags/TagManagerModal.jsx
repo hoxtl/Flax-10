@@ -24,9 +24,7 @@ function useTagModal() {
     resetState();
   };
 
-  const commit = () => commitSave(duplicateWarning.data, editingId, updateTag, addTag, resetState);
-
-  return { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState, duplicateWarning, commit, handleReplace, setDuplicateWarning };
+  return { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState, duplicateWarning, handleReplace, setDuplicateWarning };
 }
 
 function checkDuplicate(data, tags, editingId, setWarning, onSafe) {
@@ -177,14 +175,13 @@ function FormActions({ onSave, onCancel }) {
   );
 }
 
-function DuplicateWarning({ onAdd, onReplace, onCancel }) {
+function DuplicateWarning({ onReplace, onCancel }) {
   return (
     <div className={styles.warningOverlay}>
       <div className={styles.warningModal}>
         <h4>Duplicate Tag Name</h4>
         <p>A tag with this name already exists. What would you like to do?</p>
         <div className={styles.warningActions}>
-          <button onClick={onAdd}>Add Anyway</button>
           <button onClick={onReplace}>Replace Existing</button>
           <button onClick={onCancel}>Cancel</button>
         </div>
@@ -195,7 +192,7 @@ function DuplicateWarning({ onAdd, onReplace, onCancel }) {
 
 export default function TagManagerModal({ onClose }) {
   const logic = useTagModal();
-  const { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState, duplicateWarning, commit, handleReplace, setDuplicateWarning } = logic;
+  const { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState, duplicateWarning, handleReplace, setDuplicateWarning } = logic;
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -203,7 +200,7 @@ export default function TagManagerModal({ onClose }) {
         <ModalHeader onClose={onClose} />
         <ModalContent tags={tags} editingId={editingId} isAdding={isAdding} setEditingId={setEditingId}
           setIsAdding={setIsAdding} onSave={handleSave} onDelete={deleteTag} onCancel={resetState} />
-        {duplicateWarning && <DuplicateWarning onAdd={commit} onReplace={handleReplace} onCancel={() => setDuplicateWarning(null)} />}
+        {duplicateWarning && <DuplicateWarning onReplace={handleReplace} onCancel={() => setDuplicateWarning(null)} />}
       </div>
     </div>
   );
