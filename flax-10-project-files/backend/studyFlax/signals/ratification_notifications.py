@@ -21,6 +21,8 @@ def cache_old_ratification_status(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Society)
 def notify_on_ratification_change(sender, instance, created, **kwargs):
+    if getattr(instance, '_skip_notification', False):
+        return
     old_status = getattr(instance, '_old_ratification_status', None)
     new_status = instance.ratification_status
     if old_status == new_status:

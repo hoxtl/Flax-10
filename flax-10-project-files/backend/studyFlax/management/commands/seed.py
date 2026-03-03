@@ -314,7 +314,16 @@ class Command(BaseCommand):
         }
         if data.get('image'):
             defaults['image'] = data['image']
-        society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
+        existing = Society.objects.filter(name=data['name']).first()
+        if existing:
+            for key, value in defaults.items():
+                setattr(existing, key, value)
+            existing._skip_notification = True
+            existing.save()
+            return existing
+        society = Society(name=data['name'], **defaults)
+        society._skip_notification = True
+        society.save()
         return society
 
     def _seed_society_tags_from_config(self, society, tag_labels):
@@ -337,10 +346,11 @@ class Command(BaseCommand):
     def _create_event_from_template(self, society, template, tags):
         title, desc, hour, duration, recurrence, day = template
         start, end = build_event_datetime(hour, duration, day)
-        SocietyEvent.objects.get_or_create(
-            society=society, title=title,
-            defaults=self._build_event_defaults(desc, start, end, recurrence, tags)
-        )
+        if SocietyEvent.objects.filter(society=society, title=title).exists():
+            return
+        event = SocietyEvent(society=society, title=title, **self._build_event_defaults(desc, start, end, recurrence, tags))
+        event._skip_notification = True
+        event.save()
 
     def _build_event_defaults(self, desc, start, end, recurrence, tags):
         return {
