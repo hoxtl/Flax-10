@@ -83,8 +83,38 @@
 
 .controls {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.pauseIndicator {
+    font-size: 0.9rem;
+    color: #ef4444;
+    font-weight: 600;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .button {
@@ -338,7 +368,9 @@
 
 .notificationBtn:hover {
     background: #0056b3;
-}.soundSelectorContainer {
+}
+
+.soundSelectorContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -427,7 +459,7 @@
         font-size: 2rem;
         margin-top: 1rem;
     }
-    
+
     .header {
         margin-bottom: 0.5rem;
     }

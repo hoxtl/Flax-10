@@ -31,10 +31,15 @@ export const SessionStatus = ({ current, total }) => (
 );
 
 /** Action buttons for timer */
-export const TimerControls = ({ isActive, onToggle, onReset }) => (
+export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, totalPaused }) => (
     <div className={styles.controls}>
-        <button className={`${styles.button} ${styles.primary}`} onClick={onToggle}>{isActive ? 'Pause' : 'Start'}</button>
-        <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>
+        {isPaused && totalPaused > 0 && <div className={styles.pauseIndicator}>Paused: {formatTime(totalPaused)}</div>}
+        <div className={styles.buttonGroup}>
+            <button className={`${styles.button} ${styles.primary}`} onClick={!isActive ? onToggle : onPause}>
+                {!isActive ? 'Start' : (isPaused ? 'Resume' : 'Pause')}
+            </button>
+            <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>
+        </div>
     </div>
 );
 
