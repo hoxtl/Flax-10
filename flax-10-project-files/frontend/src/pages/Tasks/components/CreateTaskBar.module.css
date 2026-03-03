@@ -35,8 +35,8 @@
 }
 .input::placeholder { color: var(--muted); }
 .input:focus {
-  box-shadow: var(--input-focus-ring, 0 0 0 2px rgba(123, 103, 81, 0.15));
-  border-color: var(--primary);
+  border-color: #4a3728;
+  box-shadow: 0 0 0 3px rgba(74, 55, 40, 0.08);
 }
 
 .addBtn {
@@ -55,7 +55,7 @@
 .addBtn:hover:not(:disabled) { opacity: 0.88; }
 .addBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Row 2: secondary options ── */
+/* ── Row 2: secondary options — hidden by default, slide down on focus ── */
 .optionsRow {
   display: flex;
   align-items: center;

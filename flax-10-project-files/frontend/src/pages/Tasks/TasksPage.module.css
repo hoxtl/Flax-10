@@ -78,3 +78,28 @@
 .toastDelete {
     background: #4A3421;
 }
+
+.toastCompletion {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #2c2420;
+    color: white;
+    border-radius: 8px;
+    font-size: 13px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+.toastCompletion .toastUndoBtn {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    font-size: 12px;
+}
+.toastCompletion .toastClose {
+    opacity: 0.9;
+}

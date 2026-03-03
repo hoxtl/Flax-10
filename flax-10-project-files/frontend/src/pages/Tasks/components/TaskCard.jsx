@@ -298,6 +298,15 @@ export default function TaskCard({
 
     useEffect(() => () => { if (seedPopTimeoutRef.current) clearTimeout(seedPopTimeoutRef.current); }, []);
 
+    useEffect(() => {
+        if (!showCtxMenu) return;
+        const close = (e) => {
+            if (dotBtnRef.current && !dotBtnRef.current.contains(e.target)) setShowCtxMenu(false);
+        };
+        document.addEventListener("mousedown", close);
+        return () => document.removeEventListener("mousedown", close);
+    }, [showCtxMenu]);
+
     return (
         <>
             <div

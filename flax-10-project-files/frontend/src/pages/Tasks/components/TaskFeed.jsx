@@ -89,6 +89,7 @@ function Section({
   isOverdueSection = false, hideListBadge = false,
   completedCount = 0, sectionType = "default",
   applyLimit = false, searchQuery = "",
+  onTaskCompleted,
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [showAll, setShowAll] = useState(false);
@@ -155,7 +156,11 @@ function Section({
                 listName={list?.name}
                 listColor={getListColor(list)}
                 lists={lists}
-                onToggle={() => onToggleComplete(task.id, task.completed)}
+                onToggle={() => {
+                  const wasIncomplete = !task.completed;
+                  onToggleComplete(task.id, task.completed);
+                  if (wasIncomplete && onTaskCompleted) onTaskCompleted(task);
+                }}
                 onDelete={() => onDeleteTask(task.id)}
                 onEdit={data => onEditTask(task.id, data)}
                 hideDueBadge={hideDueBadge}
@@ -188,6 +193,7 @@ export default function TaskFeed({
   activeModuleCode,
   defaultDueDateForNewTask,
   onToggleComplete,
+  onTaskCompleted,
   onDeleteTask,
   onEditTask,
   onCreateTask,
@@ -278,7 +284,7 @@ export default function TaskFeed({
 
   const sectionProps = {
     sortBy, listMap, lists,
-    onToggleComplete, onDeleteTask, onEditTask,
+    onToggleComplete, onTaskCompleted, onDeleteTask, onEditTask,
     hideListBadge: !!activeListId,
     searchQuery: search,
   };

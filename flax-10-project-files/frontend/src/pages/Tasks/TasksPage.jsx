@@ -50,11 +50,18 @@ export default function TasksPage() {
     const [showListModal,   setShowListModal]   = useState(false);
     const [toastUndo,       setToastUndo]      = useState(null);
     const [toastDelete,     setToastDelete]    = useState(false);
+    const [completionToast, setCompletionToast] = useState(null);
 
     useEffect(() => {
         const listParam = searchParams.get("list");
         if (listParam != null && listParam !== "") setActiveListId(listParam);
     }, [searchParams]);
+
+    useEffect(() => {
+        if (!completionToast) return;
+        const t = setTimeout(() => setCompletionToast(null), 3000);
+        return () => clearTimeout(t);
+    }, [completionToast]);
 
     const activeModuleCode = searchParams.get("module") || null;
 
@@ -121,6 +128,9 @@ export default function TasksPage() {
                 activeModuleCode={activeModuleCode}
                 defaultDueDateForNewTask={defaultDueDateForNewTask}
                 onToggleComplete={toggleComplete}
+                onTaskCompleted={(task) => {
+                    setCompletionToast({ taskId: task.id, completed: true });
+                }}
                 onDeleteTask={handleDeleteTask}
                 onEditTask={editTask}
                 onCreateTask={() => setShowTaskModal(true)}
@@ -151,6 +161,13 @@ export default function TasksPage() {
                     <span>Task added.</span>
                     <button type="button" className={styles.toastUndoBtn} onClick={handleUndoAddTask}>Undo</button>
                     <button type="button" className={styles.toastClose} onClick={() => setToastUndo(null)}>✕</button>
+                </div>
+            )}
+            {completionToast && (
+                <div className={styles.toastCompletion}>
+                    <span>Task completed ✓</span>
+                    <button type="button" className={styles.toastUndoBtn} onClick={() => { toggleComplete(completionToast.taskId, true); setCompletionToast(null); }}>Undo</button>
+                    <button type="button" className={styles.toastClose} onClick={() => setCompletionToast(null)}>✕</button>
                 </div>
             )}
             {toastDelete && (

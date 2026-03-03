@@ -17,14 +17,14 @@ const DURATION_OPTIONS = [
   { value: 2, label: "50m", ariaLabel: "50 minutes (2 Pomodoro blocks)" },
 ];
 
-export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDate, onAddTask }) {
+export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDate, onAddTask, inputRef: externalInputRef }) {
   const sortedLists = useMemo(
     () => [...lists].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
     [lists]
   );
   const [title, setTitle] = useState("");
   const [estimatedBlocks, setEstimatedBlocks] = useState(1);
-const [taskListId, setTaskListId] = useState(
+  const [taskListId, setTaskListId] = useState(
       () => (defaultListId || sortedLists[0]?.id) ?? ""
     );
   const [moduleId, setModuleId] = useState(null);
@@ -37,6 +37,7 @@ const [taskListId, setTaskListId] = useState(
   const listDropdownRef = useRef(null);
   const listTriggerRef = useRef(null);
   const moduleTriggerRef = useRef(null);
+  const inputRef = useRef(null);
   const [listPopoverRect, setListPopoverRect] = useState(null);
   const [modulePopoverRect, setModulePopoverRect] = useState(null);
 
@@ -147,12 +148,12 @@ const [taskListId, setTaskListId] = useState(
 
   return (
     <form className={styles.card} onSubmit={handleSubmit}>
-      {/* Row 1: primary — task name + Add */}
       <div className={styles.inputRow}>
         <input
+          ref={externalInputRef ?? inputRef}
           type="text"
           className={styles.input}
-          placeholder="Add a task…"
+          placeholder="What needs to be done?"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onFocus={() => setInputFocused(true)}
@@ -165,14 +166,16 @@ const [taskListId, setTaskListId] = useState(
           }}
           aria-label="Task name"
         />
-        <button
-          type="submit"
-          className={styles.addBtn}
-          disabled={saving || !title.trim()}
-          aria-label="Add task"
-        >
-          {saving ? "…" : "Add"}
-        </button>
+        {title.trim() && (
+          <button
+            type="submit"
+            className={styles.addBtn}
+            disabled={saving || !title.trim()}
+            aria-label="Add task"
+          >
+            {saving ? "…" : "Add"}
+          </button>
+        )}
       </div>
 
       {/* Row 2: secondary options — est. time, module, list */}

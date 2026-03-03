@@ -148,16 +148,20 @@
     display: flex;
     align-items: center;
     min-width: 0;
-    border-radius: 12px;
+    border-radius: 6px;
     transition: background 0.1s;
 }
-.listItem:hover { background: var(--hover); }
+.listItem:hover { background: rgba(74, 55, 40, 0.04); }
 .listItem:hover .listDelete { opacity: 1; }
 
 .listActive {
-    background: color-mix(in srgb, var(--list-color, var(--primary)) 10%, transparent) !important;
+    background: rgba(74, 55, 40, 0.06) !important;
+    font-weight: 600;
+    border-left: 3px solid #4a3728;
+    border-radius: 6px;
+    padding-left: 9px;
 }
-.listActive .listName { color: var(--list-color, var(--primary)); font-weight: 700; }
+.listActive .listName { color: var(--text); font-weight: 600; }
 
 .listBtn {
     flex: 1;
@@ -198,12 +202,12 @@
 }
 
 .listCount {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--muted);
-    background: var(--border);
-    border-radius: 9999px;
-    padding: 0.05rem 0.38rem;
+    font-size: 11px;
+    font-weight: 500;
+    color: #8a7d76;
+    background: #f5f0ed;
+    border-radius: 8px;
+    padding: 1px 6px;
     min-width: 18px;
     text-align: center;
     flex-shrink: 0;
@@ -236,9 +240,9 @@
     margin-top: 8px;
     padding: 8px 12px;
     background: none;
-    border: 1.5px dashed var(--border);
-    border-radius: 12px;
-    color: var(--muted);
+    border: 1.5px dashed #b0a59e;
+    border-radius: 6px;
+    color: #b0a59e;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
@@ -246,9 +250,9 @@
     transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .createListBtn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 5%, transparent);
+    color: #4a3728;
+    border-color: #4a3728;
+    background: rgba(74, 55, 40, 0.04);
 }
 
 /* ── Rename input ── */
