@@ -1,0 +1,304 @@
+/* ── Sidebar shell ───────────────────────────────────────────────────────── */
+.sidebar {
+  height: 100vh;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important;
+  z-index: 10;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.header {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  overflow: hidden;
+}
+
+.logoMark {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px 12px 6px 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.nav {
+  flex: 1;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: none;
+  cursor: pointer;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  padding: 9px 13px;
+  width: 100%;
+  overflow: hidden;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.navItem:hover {
+  background: var(--hover);
+  box-shadow: 0 0 12px rgba(158, 126, 93, 0.15);
+}
+
+.navItemActive {
+  background: var(--active);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 16px rgba(158, 126, 93, 0.18);
+}
+
+.navItemActive:hover {
+  background: var(--active);
+}
+
+.activePill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+
+.icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.sidebarFooter {
+  margin-top: auto;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  position: relative;
+}
+
+/* ── User row ────────────────────────────────────────────────────────────── */
+.user {
+  padding: 14px 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}
+
+.userExpanded {
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.userCollapsed {
+  justify-content: center;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.userText {
+  overflow: hidden;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.userMeta {
+  font-size: 11px;
+  color: var(--user-details-text);
+  white-space: nowrap;
+}
+
+.userRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  gap: 12px;
+}
+
+.userRow:hover {
+  background: var(--hover);
+}
+
+.userRowCollapsed {
+  justify-content: center;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  text-align: left;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* The Popup Menu */
+.userMenu {
+  position: absolute;
+  bottom: 100%;
+  left: 8px;
+  right: 8px;
+  background: var(--sidebar);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+}
+
+.userMenu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.userMenu button:hover {
+  background: var(--hover);
+}
+
+.logoutBtn {
+  color: #ef4444 !important;
+}
+
+/* ── Hamburger Icon ──────────────────────────────────────────────────────── */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hamburgerLine {
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+/* ── Mobile Overrides ────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .header {
+    justify-content: center;
+    padding: 18px 0;
+    gap: 12px;
+  }
+
+  :global(.sidebar[style*="width: 100vw"]) .header {
+    justify-content: flex-start;
+    padding: 18px 24px;
+  }
+
+  .navItem {
+    padding: 12px 0;
+    padding-left: 10px;
+  }
+
+  :global(.sidebar[style*="width: 100vw"]) .navItem {
+    padding: 12px 24px;
+    justify-content: flex-start !important;
+  }
+
+  .sidebarClosed .navItem {
+    padding-left: 0;
+  }
+
+  .sidebarClosed .userMenu {
+    position: fixed;
+    left: 12px;
+    bottom: 80px;
+
+    width: max-content;
+    min-width: 140px;
+    right: auto;
+
+    z-index: 9999;
+  }
+}

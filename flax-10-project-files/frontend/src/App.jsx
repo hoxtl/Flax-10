@@ -25,7 +25,12 @@ import Profile from "./pages/Profile/Profile";
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 const ACTIVE_NAV_KEY = "flax_active_nav";
 
-const ROOT_STYLE = { position: "relative", width: "100vw", height: "100vh", overflow: "hidden" };
+const ROOT_STYLE = {
+  position: "relative",
+  width: "100vw",
+  height: "100vh",
+  overflow: "hidden",
+};
 const DASH_WRAP_STYLE = { position: "relative", height: "100%" };
 const AUTH_WRAP_STYLE = { position: "relative", height: "100vh" };
 const MOTION_ABSOLUTE = { position: "absolute", inset: 0 };
@@ -37,21 +42,32 @@ const fadeAnim = {
 };
 
 const DASH_MOTION = {
-  variants: fadeAnim, initial: "initial", animate: "animate",
-  exit: "exit", transition: { duration: 0.18 }, style: MOTION_ABSOLUTE,
+  variants: fadeAnim,
+  initial: "initial",
+  animate: "animate",
+  exit: "exit",
+  transition: { duration: 0.18 },
+  style: MOTION_ABSOLUTE,
 };
 
 const AUTH_MOTION = {
-  variants: fadeAnim, initial: "initial", animate: "animate",
-  exit: "exit", transition: { duration: 0.22 }, style: MOTION_ABSOLUTE,
+  variants: fadeAnim,
+  initial: "initial",
+  animate: "animate",
+  exit: "exit",
+  transition: { duration: 0.22 },
+  style: MOTION_ABSOLUTE,
 };
 
 // Pure helpers
 function readUser() {
   const s = localStorage.getItem("user");
   if (!s) return null;
-  try { return JSON.parse(s); }
-  catch { return null; }
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
 }
 
 function isAuthenticated() {
@@ -97,17 +113,25 @@ function onBackToAuth() {
 
 // Async helpers
 async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
-  if (!authed) { setIsLoadingTheme(false); return; }
+  if (!authed) {
+    setIsLoadingTheme(false);
+    return;
+  }
   try {
     const s = await getUserSettings();
     setInitialTheme(s.theme || "light");
-  } catch { setInitialTheme("light"); }
-  finally { setIsLoadingTheme(false); }
+  } catch {
+    setInitialTheme("light");
+  } finally {
+    setIsLoadingTheme(false);
+  }
 }
 
 function checkOnboarding(setShowOnboarding) {
   getUserProfile()
-    .then(data => { if (!data?.major || data.major === "") setShowOnboarding(true); })
+    .then((data) => {
+      if (!data?.major || data.major === "") setShowOnboarding(true);
+    })
     .catch(() => { });
 }
 
@@ -127,7 +151,9 @@ function useSyncAuth(setAuthed, setUser, setShowWelcome) {
 function useThemeState(authed) {
   const [initialTheme, setInitialTheme] = useState("light");
   const [isLoadingTheme, setIsLoadingTheme] = useState(true);
-  useEffect(() => { loadTheme(authed, setInitialTheme, setIsLoadingTheme); }, [authed]);
+  useEffect(() => {
+    loadTheme(authed, setInitialTheme, setIsLoadingTheme);
+  }, [authed]);
   return { initialTheme, isLoadingTheme };
 }
 
@@ -139,7 +165,9 @@ function useAppState() {
   const [activeNav, setActiveNavState] = useState(readActiveNav);
   const [user, setUser] = useState(() => readUser());
   const [authed, setAuthed] = useState(() => isAuthenticated());
-  const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
+  const [showWelcome, setShowWelcome] = useState(
+    () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
+  );
   useSyncAuth(setAuthed, setUser, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
 
@@ -148,12 +176,23 @@ function useAppState() {
     setActiveNavState(nav);
   };
 
-  return { activeNav, setActiveNav, initialTheme, isLoadingTheme, user, authed, showWelcome, setShowWelcome };
+  return {
+    activeNav,
+    setActiveNav,
+    initialTheme,
+    isLoadingTheme,
+    user,
+    authed,
+    showWelcome,
+    setShowWelcome,
+  };
 }
 
 function useOnboardingCheck() {
   const [showOnboarding, setShowOnboarding] = useState(false);
-  useEffect(() => { checkOnboarding(setShowOnboarding); }, []);
+  useEffect(() => {
+    checkOnboarding(setShowOnboarding);
+  }, []);
   return [showOnboarding, setShowOnboarding];
 }
 
@@ -163,7 +202,9 @@ function ScreenWrap({ animKey, children }) {
     <motion.div
       key={animKey}
       variants={fadeAnim}
-      initial="initial" animate="animate" exit="exit"
+      initial="initial"
+      animate="animate"
+      exit="exit"
       transition={{ duration: 0.25 }}
       style={ROOT_STYLE}
     >
@@ -224,17 +265,20 @@ function AuthScreen() {
 function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
   return (
     <ScreenWrap animKey="welcome">
-      <WelcomeLanding user={user} onExplore={() => onExplore(setShowWelcome, setActiveNav)} onBackToAuth={onBackToAuth} />
+      <WelcomeLanding
+        user={user}
+        onExplore={() => onExplore(setShowWelcome, setActiveNav)}
+        onBackToAuth={onBackToAuth}
+      />
     </ScreenWrap>
   );
 }
 
 function DashboardContent({ activeNav, setActiveNav, user }) {
-  if (activeNav === "settings") {
+  if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
-  }
 
-  if (activeNav === "profile") {
+  if (activeNav === "profile")
     return (
       <Profile
         user={user}
@@ -242,11 +286,9 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
         onNavigate={setActiveNav}
       />
     );
-  }
 
   if (activeNav.startsWith("profile_")) {
     const viewedUserId = activeNav.split("_")[1];
-
     return (
       <Profile
         user={user}
@@ -265,7 +307,11 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
     <div style={DASH_WRAP_STYLE}>
       <AnimatePresence>
         <motion.div key={activeNav} {...DASH_MOTION}>
-          <DashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
+          <DashboardContent
+            activeNav={activeNav}
+            setActiveNav={setActiveNav}
+            user={user}
+          />
         </motion.div>
       </AnimatePresence>
     </div>
@@ -274,16 +320,29 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
 
 function OnboardingWrapper({ onComplete }) {
   const [showOnboarding, setShowOnboarding] = useOnboardingCheck();
-  const handleComplete = () => { setShowOnboarding(false); window.location.reload(); };
-  return <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />;
+  const handleComplete = () => {
+    setShowOnboarding(false);
+    window.location.reload();
+  };
+  return (
+    <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />
+  );
 }
 
 function AppScreen({ activeNav, setActiveNav, user }) {
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
-        <DashboardLayout activeNav={activeNav} onNavChange={setActiveNav} user={user}>
-          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
+        <DashboardLayout
+          activeNav={activeNav}
+          onNavChange={setActiveNav}
+          user={user}
+        >
+          <AnimatedDashboardContent
+            activeNav={activeNav}
+            setActiveNav={setActiveNav}
+            user={user}
+          />
         </DashboardLayout>
         <OnboardingWrapper />
       </AppProviders>
@@ -293,10 +352,26 @@ function AppScreen({ activeNav, setActiveNav, user }) {
 
 // Screen render
 function renderScreen(screen, state) {
-  const { user, authed, showWelcome, setShowWelcome, activeNav, setActiveNav } = state;
+  const { user, authed, showWelcome, setShowWelcome, activeNav, setActiveNav } =
+    state;
   if (screen === "auth") return <AuthScreen key="auth" />;
-  if (screen === "welcome") return <WelcomeScreen key="welcome" user={user} setShowWelcome={setShowWelcome} setActiveNav={setActiveNav} />;
-  return <AppScreen key="app" activeNav={activeNav} setActiveNav={setActiveNav} user={user} />;
+  if (screen === "welcome")
+    return (
+      <WelcomeScreen
+        key="welcome"
+        user={user}
+        setShowWelcome={setShowWelcome}
+        setActiveNav={setActiveNav}
+      />
+    );
+  return (
+    <AppScreen
+      key="app"
+      activeNav={activeNav}
+      setActiveNav={setActiveNav}
+      user={user}
+    />
+  );
 }
 
 // Root
@@ -307,9 +382,7 @@ export default function App() {
   return (
     <ThemeProvider initialTheme={state.initialTheme}>
       <div style={ROOT_STYLE}>
-        <AnimatePresence>
-          {renderScreen(screen, state)}
-        </AnimatePresence>
+        <AnimatePresence>{renderScreen(screen, state)}</AnimatePresence>
       </div>
     </ThemeProvider>
   );
