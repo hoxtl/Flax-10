@@ -16,6 +16,8 @@ export function useTimerFlow(t, notify) {
 
         if (next >= t.targetSessions) {
             studyBlockId.current = Date.now();
+            t.setIsActive(false);
+            t.setTimeLeft(t.workTime * 60);
             return setModal('goal');
         }
         t.setMode('work');
