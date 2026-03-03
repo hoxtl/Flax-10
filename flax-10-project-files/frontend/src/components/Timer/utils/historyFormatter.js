@@ -28,6 +28,7 @@ const normalizeSession = (s) => {
         end_time, endTime,
         date, duration: durInSeconds,
         break_duration, breakDuration,
+        pause_duration, pauseDuration,
         study_block_id, studyBlockId
     } = s;
 
@@ -36,6 +37,7 @@ const normalizeSession = (s) => {
     const normalizedStartTime = startTime || start_time;
     const normalizedEndTime = endTime || end_time || date || now;
     const normalizedBreakDuration = breakDuration !== undefined ? breakDuration : (break_duration || 0);
+    const normalizedPauseDuration = pauseDuration !== undefined ? pauseDuration : (pause_duration || 0);
     const normalizedBlockId = studyBlockId || study_block_id;
 
     let finalStartTime;
@@ -53,6 +55,7 @@ const normalizeSession = (s) => {
         date: date || normalizedEndTime,
         duration: durInSeconds || 0,
         breakDuration: normalizedBreakDuration,
+        pauseDuration: normalizedPauseDuration,
         studyBlockId: normalizedBlockId
     };
 };
@@ -61,6 +64,7 @@ const normalizeSession = (s) => {
 const createBlock = (id, s) => ({
     id, sessions: [s], totalDuration: s.duration,
     totalBreak: s.breakDuration || 0,
+    totalPause: s.pauseDuration || 0,
     startTime: s.startTime, endTime: s.endTime, date: s.date,
     task: s.task // Capture the task from the session
 });
@@ -70,6 +74,7 @@ const updateBlock = (b, s) => {
     b.sessions.push(s);
     b.totalDuration += s.duration;
     b.totalBreak += (s.breakDuration || 0);
+    b.totalPause += (s.pauseDuration || 0);
     const startTs = new Date(s.startTime).getTime();
     if (!isNaN(startTs) && startTs < new Date(b.startTime).getTime()) b.startTime = s.startTime;
     const endTs = new Date(s.endTime).getTime();

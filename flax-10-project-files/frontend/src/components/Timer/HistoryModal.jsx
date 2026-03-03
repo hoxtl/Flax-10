@@ -15,6 +15,7 @@ const StatsRow = ({ block }) => (
         <div className={`${styles.statPill} ${styles.sessionPill}`}>✅ {block.sessions.length} Sessions</div>
         <div className={`${styles.statPill} ${styles.focusPill}`}>🔥 {formatDuration(block.totalDuration)} Focus</div>
         {block.totalBreak > 0 && <div className={`${styles.statPill} ${styles.breakPill}`}>☕ {formatDuration(block.totalBreak)} Break</div>}
+        {block.totalPause > 0 && <div className={`${styles.statPill} ${styles.pausePill}`}>⏸️ {formatDuration(block.totalPause)} Pause</div>}
     </div>
 );
 
