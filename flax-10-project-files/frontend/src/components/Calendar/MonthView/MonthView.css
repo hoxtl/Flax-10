@@ -1,7 +1,6 @@
 .month-view {
     background: var(--calendar-bg);
     border-radius: 8px;
-    overflow: hidden;
 }
 
 .weekday-header {

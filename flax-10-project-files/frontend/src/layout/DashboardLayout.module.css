@@ -17,19 +17,3 @@
   flex: 1;
   overflow: auto;
 }
-
-/* Mobile overlay behind sidebar drawer */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 50;
-}
-
-.drawer {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 60;
-}

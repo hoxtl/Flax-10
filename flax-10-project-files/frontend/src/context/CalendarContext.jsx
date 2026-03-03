@@ -77,11 +77,11 @@ export function useEventPopup() {
     const dispatch = useContext(CalendarDispatchContext);
 
     if (!context || !dispatch) {
-        return { popupEvent: null, popupAnchorRect: null, openPopup: () => {}, closePopup: () => {} };
+        return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect } = context;
+    const { popupEvent, popupAnchorRect, readOnly } = context;
     const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly, openPopup, closePopup };
 }

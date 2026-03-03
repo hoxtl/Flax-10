@@ -240,7 +240,8 @@ class ExceptionDateViewTests(BaseEventTestCase):
         url = f"{self.url}{event_id}/exception/"
         response = self.client.post(url, exception_data, format='json')
         self.assert_event_response(response, status.HTTP_200_OK)
-        self.assertIn('2026-02-15', response.data['exception_dates'])
+        event = CalendarEvent.objects.get(id=event_id)
+        self.assertIn('2026-02-15', event.recurrence_rule.exception_dates)
     
     def test_add_exception_to_non_recurring(self):
         """Test adding exception to non-recurring event fails."""

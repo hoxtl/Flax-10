@@ -11,8 +11,8 @@ class NotificationViewTests(BaseTestCase):
         super().setUp()
         self.list_url = "/api/notifications/"
         self.mark_read_url = "/api/notifications/mark-all-read/"
-        self.n1 = Notification.objects.create(title="N1", message="M1")
-        self.n2 = Notification.objects.create(title="N2", message="M2")
+        self.n1 = Notification.objects.create(user=self.user, title="N1", message="M1")
+        self.n2 = Notification.objects.create(user=self.user, title="N2", message="M2")
 
     def test_list_notifications(self):
         """Test listing notifications."""

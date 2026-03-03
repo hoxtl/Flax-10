@@ -42,7 +42,7 @@ function useEventDeletion(closePopup) {
 }
 
 function EventPopupContainer() {
-    const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();
+    const { popupEvent, popupAnchorRect, closePopup, readOnly } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
     const { disenrollFromModule } = useModuleDisenrollment();
