@@ -788,7 +788,7 @@
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 :global(.homePopupAddress) {
