@@ -4,6 +4,7 @@ import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context
 import { EventModal } from './EventModal/EventModal';
 import { EventDetailPopup } from './EventDetailPopup';
 import { useTags } from '../../context/TagContext';
+import { useNotify } from '../Notifications/hooks/useNotify';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
 import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
@@ -47,6 +48,7 @@ function EventPopupContainer() {
     const { loadEvents } = useCalendarEvents();
     const { disenrollFromModule } = useModuleDisenrollment();
     const { getTag, refreshTags } = useTags();
+    const notify = useNotify();
     const navigate = useNavigate();
     const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
 
@@ -54,7 +56,7 @@ function EventPopupContainer() {
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, getTag);
-    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags };
+    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags, notify };
     const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
@@ -91,12 +93,13 @@ function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }
     return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
 }
 
-function getSocietyActions(event, { closePopup, loadEvents, refreshTags }) {
+function getSocietyActions(event, { closePopup, loadEvents, refreshTags, notify }) {
     const handleUnsync = async () => {
         closePopup();
         await unsyncCalendar(event.society_id);
         await refreshTags();
         loadEvents();
+        notify('Unsync Successful', `Calendar for ${event.society_name || 'this society'} is now unsynced.`);
     };
     return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }
