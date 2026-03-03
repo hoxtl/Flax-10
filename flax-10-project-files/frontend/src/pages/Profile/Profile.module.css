@@ -29,10 +29,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   width: 100px;
-  height: 100px;
-  padding: 12px;
+  min-height: 110px;
+  padding: 12px 8px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -57,11 +57,24 @@
 
 .moduleCode {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
   word-break: break-word;
 }
 
+.moduleName {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--muted);
+  word-break: break-word;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 
 
 /* ---------------------------------------------------------------------------
