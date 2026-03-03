@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useTimerContext } from "../../context/TimerContext";
 import { useNavigate } from "react-router-dom";
-import { playZenChime } from "../../lib/sounds";
+import { playCompletionChime } from "../../lib/sounds";
 import styles from "./PomodoroWidget.module.css";
 
 function formatTimeLeft(seconds) {
@@ -14,7 +14,7 @@ function formatTimeLeft(seconds) {
 /**
  * Pomodoro Widget:
  * Focus: Sage glow, bold timer. Break: Gold/Flax glow, breathing pulse, swaying sprout.
- * Ghost buttons: +5m, Pause, Skip. On 0:00: Zen bowl chime + Seed Pop animation.
+ * Ghost buttons: +5m, Pause, Skip. On 0:00: completion chime + Seed Pop animation.
  */
 export function PomodoroWidget({ onOpenTimer, nextItem }) {
   const navigate = useNavigate();
@@ -50,10 +50,10 @@ export function PomodoroWidget({ onOpenTimer, nextItem }) {
     return () => clearInterval(id);
   }, [hasSession]);
 
-  /* On 0:00 play zen chime and trigger Seed Pop */
+  /* On 0:00 play completion chime and trigger Seed Pop */
   useEffect(() => {
     if (prevTimeLeftRef.current > 0 && timeLeft === 0 && isActive) {
-      playZenChime();
+      playCompletionChime();
       setSeedPop(true);
       const t = setTimeout(() => setSeedPop(false), 700);
       return () => clearTimeout(t);

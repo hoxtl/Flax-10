@@ -38,7 +38,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Zen-Classy stationary theme: warm Almond (#F8F5F2) via var(--bg) */
+  /* Warm stationary theme: warm Almond (#F8F5F2) via var(--bg) */
   background: var(--bg);
   color: var(--text);
   display: block;
@@ -123,13 +123,13 @@ button:focus-visible {
   fill: var(--muted) !important;
 }
 
-/* Viewport Zen Shield: when timer is active, global glow (Zen-Classy) */
-body.zenShieldActive {
+/* Viewport Focus Shield: when timer is active, global glow */
+body.focusShieldActive {
   transition: box-shadow 0.4s ease;
 }
-body.zenShieldActive.zenShieldSage {
+body.focusShieldActive.focusShieldSage {
   box-shadow: inset 0 0 120px 20px rgba(140, 154, 134, 0.16), inset 0 0 60px 10px rgba(140, 154, 134, 0.1);
 }
-body.zenShieldActive.zenShieldTerracotta {
+body.focusShieldActive.focusShieldTerracotta {
   box-shadow: inset 0 0 120px 20px rgba(192, 90, 62, 0.12), inset 0 0 60px 10px rgba(192, 90, 62, 0.06);
 }

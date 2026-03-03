@@ -9,7 +9,7 @@ import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import { HarvestCelebrationProvider } from "./context/HarvestCelebrationContext";
+import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { NotificationToast } from "./components/Notifications";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
@@ -180,10 +180,10 @@ function AppProviders({ children }) {
       <CalendarProvider>
         <TagProvider>
           <TimerProvider>
-            <HarvestCelebrationProvider>
+            <TaskCompletionProvider>
               {children}
               <NotificationToast />
-            </HarvestCelebrationProvider>
+            </TaskCompletionProvider>
           </TimerProvider>
         </TagProvider>
       </CalendarProvider>
