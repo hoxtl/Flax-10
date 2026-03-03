@@ -162,15 +162,31 @@ class Command(BaseCommand):
         from faker import Faker
         f = Faker('en_GB')
         for name, duration in tag_fixtures:
-            category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-            user = (
-                category.user if category and category.user
-                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
-            )
-            Tag.objects.get_or_create(
-                name=name, user=user,
-                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
-            )
+            if name == 'Lecture':
+                self._create_lecture_tag(name, duration)
+            else:
+                self._create_regular_tag(name, duration, f)
+
+    def _create_lecture_tag(self, name, duration):
+        Tag.objects.get_or_create(
+            name=name, user=None,
+            defaults={'default_duration': duration, 'color': '#4A90D9', 'is_default': True},
+        )
+
+    def _create_regular_tag(self, name, duration, faker):
+        category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
+        user = self._get_tag_user(category)
+        Tag.objects.get_or_create(
+            name=name, user=user,
+            defaults={'category': category, 'default_duration': duration, 'color': faker.hex_color()},
+        )
+
+    def _get_tag_user(self, category):
+        if category and category.user:
+            return category.user
+        if self.users and random.random() > 0.7:
+            return random.choice(self.users)
+        return None
 
     def create_events_for_users(self):
         """Seed personal and meal CalendarEvents for every non-staff user."""

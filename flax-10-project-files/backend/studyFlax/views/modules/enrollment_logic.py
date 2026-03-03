@@ -37,6 +37,44 @@ def create_lecture_event(user, module):
 
 def get_lecture_tag():
     """
-    Returns the 'Lecture' tag if it exists.
+    Returns the default 'Lecture' tag, ensuring it exists as a default tag.
     """
-    return Tag.objects.filter(name='Lecture').first()
+    tag = Tag.objects.filter(name='Lecture', is_default=True).first()
+    if tag:
+        return tag
+    return ensure_default_lecture_tag()
+
+
+def ensure_default_lecture_tag():
+    """
+    Creates or converts a Lecture tag to be a default tag.
+    Merges multiple Lecture tags if they exist.
+    """
+    lecture_tags = list(Tag.objects.filter(name='Lecture'))
+    if not lecture_tags:
+        return create_default_lecture_tag()
+    primary_tag = lecture_tags[0]
+    merge_duplicate_lecture_tags(primary_tag, lecture_tags[1:])
+    make_tag_default(primary_tag)
+    return primary_tag
+
+
+def create_default_lecture_tag():
+    return Tag.objects.create(
+        name='Lecture', is_default=True, user=None,
+        color='#4A90D9', default_duration=120
+    )
+
+
+def merge_duplicate_lecture_tags(primary_tag, duplicates):
+    for dup in duplicates:
+        CalendarEvent.objects.filter(tag=dup).update(tag=primary_tag)
+        dup.delete()
+
+
+def make_tag_default(tag):
+    if tag.is_default and tag.user is None:
+        return
+    tag.is_default = True
+    tag.user = None
+    tag.save()

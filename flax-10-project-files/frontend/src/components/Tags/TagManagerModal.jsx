@@ -3,6 +3,12 @@ import { useTags } from '../../context/TagContext';
 import EmojiPicker from './EmojiPicker';
 import styles from './TagManagerModal.module.css';
 
+const PROTECTED_TAGS = ['other', 'lecture'];
+
+function isProtectedTag(tagLabel) {
+  return PROTECTED_TAGS.includes(tagLabel?.toLowerCase());
+}
+
 function isIconValid(icon) {
   if (!icon) return false;
   const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
@@ -52,13 +58,12 @@ function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, on
   if (editingId || isAdding) {
     const tag = editingId ? tags.find(t => t.id === editingId) : null;
     const initialData = tag || { label: '', color: '#000000', icon: '' };
-    const isDefault = tag?.label?.toLowerCase() === 'other';
-    return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isDefault={isDefault} />;
+    return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isProtected={isProtectedTag(tag?.label)} />;
   }
   return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
 }
 
-function TagForm({ initialData, onSave, onCancel, isDefault = false }) {
+function TagForm({ initialData, onSave, onCancel, isProtected = false }) {
   const [form, setForm] = useState(initialData);
   const [error, setError] = useState('');
 
@@ -68,15 +73,15 @@ function TagForm({ initialData, onSave, onCancel, isDefault = false }) {
   };
 
   const handleSaveClick = () => {
-    const err = validateTagForm(form, isDefault);
+    const err = validateTagForm(form, isProtected);
     if (err) return setError(err);
     onSave(form);
   };
 
   return (
     <div className={`${styles.content} ${styles.form}`}>
-      <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isDefault} />
-      {!isDefault && <ColorInput value={form.color} onChange={v => handleChange('color', v)} />}
+      <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isProtected} />
+      <ColorInput value={form.color} onChange={v => handleChange('color', v)} />
       <EmojiInput value={form.icon} onChange={v => handleChange('icon', v)} />
       {error && <div className={styles.error}>{error}</div>}
       <FormActions onSave={handleSaveClick} onCancel={onCancel} />
@@ -84,8 +89,8 @@ function TagForm({ initialData, onSave, onCancel, isDefault = false }) {
   );
 }
 
-function validateTagForm(form, isDefault) {
-  if (!isDefault && !form.label.trim()) return "Name is required.";
+function validateTagForm(form, isProtected) {
+  if (!isProtected && !form.label.trim()) return "Name is required.";
   if (!form.icon) return "Icon is required.";
   if (!isIconValid(form.icon)) return "Only emojis allowed.";
   return '';
@@ -103,11 +108,10 @@ function TagList({ tags, onEdit, onDelete, onAdd }) {
 }
 
 function TagItem({ tag, onEdit, onDelete }) {
-  const isOther = tag.label?.toLowerCase() === 'other';
   return (
     <div className={styles.item}>
       <TagPreview tag={tag} />
-      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isOther} />
+      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isProtectedTag(tag.label)} />
     </div>
   );
 }
