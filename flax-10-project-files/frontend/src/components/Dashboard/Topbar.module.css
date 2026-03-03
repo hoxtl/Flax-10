@@ -257,26 +257,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.4);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
   color: var(--muted);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .toolBtn:hover {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--hover);
   color: var(--text);
-  border-color: var(--border);
 }
 
 .toolBtnActive {
   background: var(--primary-light, rgba(158, 126, 93, 0.1));
   color: var(--primary);
   border-color: var(--primary-light, rgba(158, 126, 93, 0.1));
+}
+
+.toolIcon {
+  display: block;
+  overflow: visible;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
 .addBtn {
