@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 
@@ -30,13 +30,7 @@ const PRIORITY_LABELS = {
     low:    "Low",
 };
 
-/* Monochromatic icons for action bar */
-const IconPencil = () => (
-    <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
-);
-const IconTrash = () => (
-    <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
-);
+/* Monochromatic icons */
 const IconPlay = () => (
     <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
 );
@@ -48,11 +42,117 @@ function formatDueDate(dueDate) {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
     const diffDays = Math.round((dueDay - today) / 86400000);
-
     if (diffDays < 0) return { label: "Overdue", status: "overdue" };
     if (diffDays === 0) return { label: "Today", status: "today" };
     if (diffDays === 1) return { label: "Tomorrow", status: "tomorrow" };
     return null;
+}
+
+/** Highlight search query matches inside a text string. */
+function HighlightText({ text, query }) {
+    if (!query || !text) return <>{text}</>;
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return <>{text}</>;
+    return (
+        <>
+            {text.slice(0, idx)}
+            <mark className={styles.searchHighlight}>{text.slice(idx, idx + query.length)}</mark>
+            {text.slice(idx + query.length)}
+        </>
+    );
+}
+
+/**
+ * "..." context menu — Edit, Move to list, Set due date, Delete.
+ * Renders as a portal so it's never clipped by parent overflow.
+ */
+function ContextMenu({ task, onEditOpen, onDelete, onEdit, lists, triggerRef, onClose }) {
+    const menuRef = useRef(null);
+    const [view, setView] = useState("main"); // "main" | "move" | "due"
+    const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
+    const [pos, setPos] = useState({ top: 0, left: 0 });
+
+    useEffect(() => {
+        if (!triggerRef.current) return;
+        const rect = triggerRef.current.getBoundingClientRect();
+        const menuWidth = 180;
+        let left = rect.right - menuWidth;
+        if (left < 8) left = 8;
+        setPos({ top: rect.bottom + 4, left });
+    }, [triggerRef]);
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target) && !triggerRef.current?.contains(e.target)) {
+                onClose();
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, [onClose, triggerRef]);
+
+    const menu = (
+        <div
+            ref={menuRef}
+            className={styles.ctxMenu}
+            style={{ top: pos.top, left: pos.left }}
+            onMouseDown={e => e.stopPropagation()}
+        >
+            {view === "main" && (
+                <>
+                    <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}>
+                        ✏️ Edit
+                    </button>
+                    {(lists?.length > 0) && (
+                        <button className={styles.ctxItem} onClick={() => setView("move")}>
+                            📂 Move to list →
+                        </button>
+                    )}
+                    <button className={styles.ctxItem} onClick={() => setView("due")}>
+                        📅 Set due date
+                    </button>
+                    <div className={styles.ctxDivider} />
+                    <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onDelete(); onClose(); }}>
+                        🗑️ Delete
+                    </button>
+                </>
+            )}
+            {view === "move" && (
+                <>
+                    <button className={styles.ctxBack} onClick={() => setView("main")}>← Back</button>
+                    <div className={styles.ctxDivider} />
+                    {(lists || []).map(l => (
+                        <button
+                            key={l.id}
+                            className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`}
+                            onClick={() => { onEdit({ task_list: l.id }); onClose(); }}
+                        >
+                            <span className={styles.ctxListDot} style={{ background: l.color }} />
+                            {l.name}
+                        </button>
+                    ))}
+                </>
+            )}
+            {view === "due" && (
+                <>
+                    <button className={styles.ctxBack} onClick={() => setView("main")}>← Back</button>
+                    <div className={styles.ctxDivider} />
+                    <div className={styles.ctxDateWrap}>
+                        <DateTimePicker
+                            value={dueValue}
+                            onChange={val => {
+                                setDueValue(val);
+                                onEdit({ due_date: val || null });
+                                onClose();
+                            }}
+                            placeholder="Pick date & time"
+                        />
+                    </div>
+                </>
+            )}
+        </div>
+    );
+    return createPortal(menu, document.body);
 }
 
 export function EditTaskModal({ task, onSave, onDelete, onClose }) {
@@ -127,7 +227,7 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
                                 ]}
                             />
                         </div>
-                        <div className={styles.editField}>
+                        <div className={styles.editField} style={{ gridColumn: "1 / -1" }}>
                             <label className={styles.editLabel}>Due date</label>
                             <DateTimePicker
                                 value={form.due_date}
@@ -154,24 +254,35 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
     return createPortal(modal, document.body);
 }
 
-export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, listColor, hideDueBadge = false, hideListBadge = false, isOverdue = false }) {
+export default function TaskCard({
+    task, onToggle, onDelete, onEdit, listName, listColor, lists,
+    hideDueBadge = false, hideListBadge = false, isOverdue = false,
+    searchQuery = "",
+}) {
     const [showEdit, setShowEdit] = useState(false);
+    const [showCtxMenu, setShowCtxMenu] = useState(false);
     const [seedPop, setSeedPop] = useState(false);
+    const [checkBounce, setCheckBounce] = useState(false);
     const seedPopTimeoutRef = useRef(null);
+    const dotBtnRef = useRef(null);
     const nav = useNavigate();
     const { setActiveTaskId } = useTimerContext();
     const { showHarvestToast } = useHarvestCelebration();
     const activeTimerTaskId = useActiveTimerTaskId();
     const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
 
-    const due   = formatDueDate(task.due_date);
+    const due = formatDueDate(task.due_date);
     const showPriority = task.priority === "urgent" || task.priority === "high";
 
     const handleCheckClick = () => {
         const wasIncomplete = !task.completed;
         const isRoutine = isRoutineHarvestTask(task);
         if (wasIncomplete) {
-            if (!isRoutine) setSeedPop(true);
+            if (!isRoutine) {
+                setSeedPop(true);
+                setCheckBounce(true);
+                setTimeout(() => setCheckBounce(false), 400);
+            }
             const messageContext = { isOverdue, dueStatus: due?.status };
             showHarvestToast(getHarvestMessage(task, messageContext), { isRoutine });
             if (!isRoutine && seedPopTimeoutRef.current) clearTimeout(seedPopTimeoutRef.current);
@@ -195,16 +306,16 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
             >
                 {/* Checkbox with seed burst */}
                 <SeedBurst active={seedPop}>
-                <button
-                    className={`${styles.check} ${task.completed ? styles.checkDone : ""}`}
-                    onClick={handleCheckClick}
-                    title={task.completed ? "Mark incomplete" : "Mark complete"}
-                >
-                    {task.completed && <span className={styles.checkMark}>✓</span>}
-                </button>
+                    <button
+                        className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${checkBounce ? styles.checkBounce : ""}`}
+                        onClick={handleCheckClick}
+                        title={task.completed ? "Mark incomplete" : "Mark complete"}
+                    >
+                        {task.completed && <span className={styles.checkMark}>✓</span>}
+                    </button>
                 </SeedBurst>
 
-                {/* Main content — whole area opens edit (description in modal) */}
+                {/* Main content */}
                 <div
                     className={styles.content}
                     role="button"
@@ -214,7 +325,7 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                 >
                     <div className={styles.titleRow}>
                         <span className={`${styles.title} ${styles.titleClickable} ${task.completed ? styles.titleDone : ""}`}>
-                            {task.title}
+                            <HighlightText text={task.title} query={searchQuery} />
                         </span>
                     </div>
 
@@ -226,29 +337,20 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                         )}
                         {listName && !hideListBadge && (
                             <span className={styles.listBadge}>
-                                <span
-                                    className={styles.listBadgeDot}
-                                    style={{ background: listColor || "var(--muted)" }}
-                                />
+                                <span className={styles.listBadgeDot} style={{ background: listColor || "var(--muted)" }} />
                                 {listName}
                             </span>
                         )}
-
                         {task.module_code && (
-                            <span className={styles.moduleCode}>
-                                {task.module_code}
-                            </span>
+                            <span className={styles.moduleCode}>{task.module_code}</span>
                         )}
-
                         {due && !hideDueBadge && (
-                            <span className={`${styles.dueBadge} ${styles[due.status]}`}>
-                                {due.label}
-                            </span>
+                            <span className={`${styles.dueBadge} ${styles[due.status]}`}>{due.label}</span>
                         )}
                     </div>
                 </div>
 
-                {/* Icon-only action bar: visible on hover, far right */}
+                {/* Right-side controls: play (always visible on hover) + "..." menu */}
                 <div className={styles.actionBar}>
                     {!task.completed && (
                         <button
@@ -265,25 +367,30 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit, listName, l
                         </button>
                     )}
                     <button
+                        ref={dotBtnRef}
                         type="button"
-                        className={styles.actionBarBtn}
-                        title="Edit"
-                        onClick={() => setShowEdit(true)}
-                        aria-label="Edit task"
+                        className={`${styles.actionBarBtn} ${styles.dotMenuBtn}`}
+                        title="More options"
+                        onClick={() => setShowCtxMenu(o => !o)}
+                        aria-label="More options"
+                        aria-expanded={showCtxMenu}
                     >
-                        <IconPencil />
-                    </button>
-                    <button
-                        type="button"
-                        className={`${styles.actionBarBtn} ${styles.actionBarBtnDanger}`}
-                        title="Delete"
-                        onClick={onDelete}
-                        aria-label="Delete task"
-                    >
-                        <IconTrash />
+                        ···
                     </button>
                 </div>
             </div>
+
+            {showCtxMenu && (
+                <ContextMenu
+                    task={task}
+                    onEditOpen={() => setShowEdit(true)}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
+                    lists={lists}
+                    triggerRef={dotBtnRef}
+                    onClose={() => setShowCtxMenu(false)}
+                />
+            )}
 
             {showEdit && (
                 <EditTaskModal

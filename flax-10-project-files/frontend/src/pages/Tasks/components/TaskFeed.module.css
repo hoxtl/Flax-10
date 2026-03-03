@@ -338,12 +338,24 @@
     padding: 8px 12px;
     background: none;
     border: none;
-    border-radius: 12px;
+    border-left: 3px solid transparent;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
     text-align: left;
-    transition: background 0.1s;
+    transition: background 0.1s, border-color 0.15s;
 }
 .sectionHeader:hover { background: var(--hover); }
+
+/* Accent lines per section type */
+.sectionAccentToday {
+    border-left-color: #4a3728;
+}
+.sectionAccentWeek {
+    border-left-color: #8a7d76;
+}
+.sectionAccentDanger {
+    border-left-color: #c4574b;
+}
 
 .sectionHeaderDanger {
     color: #b91c1c;
@@ -358,13 +370,16 @@
 
 .sectionTitle {
     font-family: var(--font-body);
-    font-size: 0.8rem;
-    font-weight: var(--font-weight-title);
-    text-transform: lowercase;
-    letter-spacing: 0.08em;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--text-charcoal);
     flex: 1;
 }
+
+.sectionAccentToday .sectionTitle { color: #4a3728; }
+.sectionAccentWeek .sectionTitle  { color: #8a7d76; }
 
 .sectionCountCircle {
     display: inline-flex;
@@ -386,18 +401,73 @@
     gap: 0.25rem;
 }
 
-.sectionCountLabel {
+.sectionCountDone {
     font-size: 0.62rem;
-    font-weight: 600;
-    color: #334155;
-    opacity: 0.85;
+    font-weight: 500;
+    color: #6b8f71;
 }
 
 .sectionChevron {
     font-size: 0.6rem;
     color: var(--muted);
     flex-shrink: 0;
+    transition: transform 0.2s ease;
+    display: inline-block;
 }
+
+.sectionChevronCollapsed {
+    transform: rotate(-90deg);
+}
+
+/* Progress bar under section header */
+.sectionProgressBar {
+    height: 2px;
+    background: #e8ddd8;
+    border-radius: 1px;
+    margin: 0 12px 4px;
+    overflow: hidden;
+}
+
+.sectionProgressFill {
+    height: 100%;
+    background: #6b8f71;
+    border-radius: 1px;
+    transition: width 0.4s ease;
+}
+
+.sectionProgressFillToday { background: #4a3728; }
+.sectionProgressFillDanger { background: #c4574b; }
+
+/* All-done celebration */
+.sectionAllDoneWrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.sectionAllDoneText {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b8f71;
+    text-align: center;
+}
+
+/* Show more / show less button */
+.showMoreBtn {
+    align-self: flex-start;
+    margin-left: 4px;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a7d76;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+.showMoreBtn:hover { color: #4a3728; text-decoration: underline; }
 
 .sectionBody {
     display: flex;
