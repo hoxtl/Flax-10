@@ -16,7 +16,8 @@
     padding: 2rem;
     border-radius: 16px;
     width: 90%;
-    max-width: 500px;
+    max-width: 555px;
+    /* Increased from 400px to make it wider */
     max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
