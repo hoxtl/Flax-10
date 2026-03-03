@@ -15,7 +15,7 @@ function getFormFromEvent(event, options = {}) {
         end_time: formatForInput(event.end_time),
         recurrence: getRecurrenceFromEvent(event),
         reminder: Array.isArray(event.reminder_minutes) ? event.reminder_minutes : [],
-        tag: event.tag || event.tag_details?.id || options.initialTag || null,
+        tag: event.tag ?? event.tag_details?.id ?? null,
         location: event.location || '',
         all_day: isAllDay(event),
     };
