@@ -38,10 +38,10 @@ function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSel
   return (
     <div className={styles.stats}>
       <StatItem value={profileData?.module_count || 0} label="modules" onClick={onModulesClick} />
-      <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
-      <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
       {isSelf && (
         <>
+          <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
+          <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
           <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onSharedWithClick} />
         </>
       )}
@@ -139,14 +139,18 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
             <span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span>
             <span className={styles.mobileStatLabel}>Modules</span>
           </div>
-          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onTasksClick}>
-            <span className={styles.mobileStatValue}>{profileData?.task_count || 0}</span>
-            <span className={styles.mobileStatLabel}>Tasks</span>
-          </div>
-          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onEventsClick}>
-            <span className={styles.mobileStatValue}>{upcomingEventCount || 0}</span>
-            <span className={styles.mobileStatLabel}>Events</span>
-          </div>
+          {isSelf && (
+            <>
+              <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onTasksClick}>
+                <span className={styles.mobileStatValue}>{profileData?.task_count || 0}</span>
+                <span className={styles.mobileStatLabel}>Tasks</span>
+              </div>
+              <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onEventsClick}>
+                <span className={styles.mobileStatValue}>{upcomingEventCount || 0}</span>
+                <span className={styles.mobileStatLabel}>Events</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
