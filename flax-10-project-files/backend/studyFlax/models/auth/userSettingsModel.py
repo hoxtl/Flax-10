@@ -8,3 +8,4 @@ class UserSettings(models.Model):
     timezone = models.CharField(max_length=100)
     year = models.CharField(max_length=50, blank=True, default='')
     major = models.CharField(max_length=100, blank=True, default='')
+    modules = models.JSONField(default=list, blank=True)

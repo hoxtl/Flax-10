@@ -1,6 +1,9 @@
 import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
+import { useState, useEffect } from "react";
+import { getSharingWith, getSharedWithMe } from "../../api/socialService";
+import UserListModal from "../../components/Social/UserListModal";
 
 function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
@@ -75,9 +78,16 @@ function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
   );
 }
 
-function ModuleItem({ code }) {
+function ModuleItem({ code, onNavigate, onClose }) {
   return (
-    <div className={styles.listItem}>
+    <div
+      className={styles.listItem}
+      style={{ cursor: 'pointer' }}
+      role="button"
+      tabIndex={0}
+      onClick={() => { onClose?.(); onNavigate?.(`modules_${code}`); }}
+      onKeyDown={(e) => e.key === 'Enter' && (onClose?.(), onNavigate?.(`modules_${code}`))}
+    >
       <div className={styles.listAvatar}>📚</div>
       <div className={styles.listInfo}>
         <div className={styles.listName}>{code}</div>
@@ -87,11 +97,11 @@ function ModuleItem({ code }) {
   );
 }
 
-function ModulesModal({ isOpen, onClose, modules }) {
+function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Modules">
       {modules.length > 0
-        ? modules.map((code, i) => <ModuleItem key={i} code={code} />)
+        ? modules.map((code, i) => <ModuleItem key={i} code={code} onNavigate={onNavigate} onClose={onClose} />)
         : <p className={styles.emptyMessage}>No modules found</p>}
     </Modal>
   );
@@ -102,6 +112,35 @@ function TasksModal({ isOpen, onClose }) {
     <Modal isOpen={isOpen} onClose={onClose} title="Tasks">
       <p className={styles.emptyMessage}>Tasks feature coming soon...</p>
     </Modal>
+  );
+}
+
+function SocialDataModal({ isOpen, onClose, title, fetchFn, userId, onNavChange, onUserUpdate }) {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    if (isOpen && userId) {
+      fetchFn(userId)
+        .then(data => setUsers(data.results || data))
+        .catch(err => console.error("Failed to fetch users", err));
+    } else {
+      setUsers([]);
+    }
+  }, [isOpen, userId, fetchFn]);
+
+  if (!isOpen) return null;
+
+  return (
+    <UserListModal
+      title={title}
+      users={users}
+      onClose={onClose}
+      onUserClick={(u) => {
+        onClose(); // close the modal first
+        if (onNavChange) onNavChange(`profile_${u.id}`);
+      }}
+      onUserUpdate={onUserUpdate}
+    />
   );
 }
 
@@ -117,19 +156,40 @@ function EditProfileSection({ state }) {
   );
 }
 
-function EditModals({ user, state, modules }) {
-  const { showModules, setShowModules, showTasks, setShowTasks } = state;
+function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
+  const { showModules, setShowModules, showTasks, setShowTasks, profileData } = state;
   return (
     <>
-      <EditProfileSection state={state} />
-      <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} />
-      <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />
+      {isMutualOrSelf && <EditProfileSection state={state} />}
+      <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} onNavigate={onNavChange} />
+      {isMutualOrSelf && <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />}
+
+      <SocialDataModal
+        isOpen={state.showSharedWith}
+        onClose={() => state.setShowSharedWith(false)}
+        title="Sharing With"
+        fetchFn={getSharingWith}
+        userId={(profileData || user)?.id}
+        onNavChange={onNavChange}
+        onUserUpdate={state.reload}
+      />
+      <SocialDataModal
+        isOpen={state.showSharedBy}
+        onClose={() => state.setShowSharedBy(false)}
+        title="Shared By"
+        fetchFn={getSharedWithMe}
+        userId={(profileData || user)?.id}
+        onNavChange={onNavChange}
+        onUserUpdate={state.reload}
+      />
     </>
   );
 }
 
-function EventsModalContainer({ state, filteredEvents }) {
+function EventsModalContainer({ state, filteredEvents, isMutualOrSelf }) {
   const { showEvents, setShowEvents, eventRange, setEventRange } = state;
+  if (!isMutualOrSelf) return null;
+
   return (
     <EventsModal
       isOpen={showEvents}
@@ -141,11 +201,11 @@ function EventsModalContainer({ state, filteredEvents }) {
   );
 }
 
-export default function ProfileModals({ user, state, modules, filteredEvents }) {
+export default function ProfileModals({ user, state, modules, filteredEvents, isMutualOrSelf, onNavChange }) {
   return (
     <>
-      <EditModals user={user} state={state} modules={modules} />
-      <EventsModalContainer state={state} filteredEvents={filteredEvents} />
+      <EditModals user={user} state={state} modules={modules} isMutualOrSelf={isMutualOrSelf} onNavChange={onNavChange} />
+      <EventsModalContainer state={state} filteredEvents={filteredEvents} isMutualOrSelf={isMutualOrSelf} />
     </>
   );
 }

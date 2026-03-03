@@ -5,6 +5,9 @@ router = DefaultRouter()
 from studyFlax.views.timerViews import StudySessionViewSet
 router.register(r'timer/history', StudySessionViewSet, basename='study-session')
 
+from studyFlax.views.social.share_views import CalendarShareViewSet
+router.register(r'social', CalendarShareViewSet, basename='social')
+
 from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
@@ -25,7 +28,7 @@ from studyFlax.views.society import (
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
     add_society_event_exception, publish_changes
 )
-from studyFlax.views.user.profile_view import profile_view
+from studyFlax.views.user.profile_view import profile_view, another_user_profile_view
 from studyFlax.views.user.profile_summary_view import profile_summary_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.user.user_search_view import user_search
@@ -80,6 +83,7 @@ urlpatterns = [
     path("societies/<int:society_id>/ratification/reject/", reject_ratification, name="society-ratification-reject"),
     path("admin/societies/pending-ratifications/", pending_ratifications, name="pending-ratifications"),
     path("profile/", profile_view, name='user-profile'),
+    path("users/<int:user_id>/profile/", another_user_profile_view, name='another-user-profile'),
     path('profile/summary/', profile_summary_view, name='profile-summary'),
     path("check-username/", check_username, name='check-username'),
     path("users/search/", user_search, name='user-search'),

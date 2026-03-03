@@ -69,13 +69,20 @@
   .tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
-    padding: 0 24px;
+    padding: 0 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
   }
   
   .tab {
     background: none;
     border: none;
-    padding: 16px 24px;
+    padding: 16px 20px;
     font-size: 15px;
     font-weight: 500;
     color: var(--muted);
@@ -83,6 +90,7 @@
     border-bottom: 2px solid transparent;
     transition: all 0.2s;
     margin-bottom: -1px;
+    white-space: nowrap;
   }
   
   .tab:hover {
@@ -177,7 +185,7 @@
   
   .btnPrimary {
     background: var(--primary);
-    color: var(--c-white);
+    color: #ffffff;
     border: none;
     padding: 12px 24px;
     border-radius: 8px;
@@ -185,6 +193,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: opacity 0.2s;
+    width: auto;
   }
   
   .btnPrimary:hover:not(:disabled) {
@@ -310,4 +319,35 @@
 .submitButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .panel {
+    padding: 24px 16px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .formActions {
+    justify-content: stretch;
+  }
+
+  .btnPrimary {
+    width: 100%;
+  }
+
+  .themeIcon {
+    font-size: 24px;
+  }
 }

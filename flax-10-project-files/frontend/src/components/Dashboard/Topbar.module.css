@@ -2,26 +2,227 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 32px;
-  background: rgba(246, 244, 241, 0.75);
+  padding: 10px 24px;
+  background: rgba(246, 244, 241, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 1px 0 rgba(74, 52, 33, 0.06);
+  box-shadow: 0 1px 0 rgba(74, 52, 33, 0.04);
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 500;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brandContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 12px;
+}
+
+.logoMark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: 0 4px 12px rgba(112, 79, 56, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.logoMark::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.brandName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navGroup {
+  position: relative;
+}
+
+.navGroupTrigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: #111111;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navGroupTrigger:hover {
+  background-color: var(--hover);
+}
+
+.navGroupTriggerActive {
+  background: var(--primary-light, rgba(158, 126, 93, 0.1));
+  color: var(--primary);
+}
+
+.chevronClosed {
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  z-index: 510;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdownItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #111111;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropdownItem:hover {
+  color: var(--text);
+  background-color: var(--hover);
+}
+
+.dropdownItemActive {
+  color: var(--primary);
+}
+
+.dropdownIcon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.dropdownLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.dropdownActivePill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-light, rgba(158, 126, 93, 0.1));
+  border-radius: 8px;
+  z-index: 0;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.navItem:hover {
+  color: var(--text);
+  background-color: var(--hover);
+}
+
+.navItemActive {
+  color: var(--primary);
+}
+
+.navIcon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.navLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.activePill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-light, rgba(158, 126, 93, 0.1));
+  border-radius: 8px;
+  z-index: 0;
 }
 
 .greeting {
   display: flex;
   flex-direction: column;
+  margin-right: 8px;
+  text-align: right;
+  align-items: flex-end;
 }
 
 .subGreeting {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--muted);
   font-weight: 500;
+  line-height: 1;
 }
 
 .nameRow {
@@ -32,14 +233,15 @@
 
 .name {
   margin: 0;
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
 }
 
 .date {
-  font-size: 14px;
+  font-size: 11px;
   color: var(--muted);
   font-weight: 500;
 }
@@ -47,20 +249,39 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-.searchCompact {
-    flex: none;
-    width: 200px;
+.toolBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.searchCompact input {
-    height: 36px;
-    padding: 8px 14px 8px 36px;
-    font-size: 13px;
-    border-radius: 9px;
-    background: var(--search-bg);
+.toolBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.toolBtnActive {
+  background: var(--primary-light, rgba(158, 126, 93, 0.1));
+  color: var(--primary);
+  border-color: var(--primary-light, rgba(158, 126, 93, 0.1));
+}
+
+.toolIcon {
+  display: block;
+  overflow: visible;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
 .addBtn {
@@ -141,10 +362,26 @@
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-:root[data-theme="dark"] .searchCompact input {
-    background: rgba(255, 255, 255, 0.05);
+:root[data-theme="dark"] .toolBtn {
+  background: rgba(255, 255, 255, 0.05);
 }
 
-:root[data-theme="dark"] .searchCompact input:focus {
-    background: rgba(255, 255, 255, 0.08);
+:root[data-theme="dark"] .toolBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .activePill {
+  background: rgba(158, 126, 93, 0.2);
+}
+
+:root[data-theme="dark"] .dropdownMenu {
+  background: rgba(30, 24, 20, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .dropdownActivePill,
+:root[data-theme="dark"] .navGroupTriggerActive {
+  background: rgba(158, 126, 93, 0.2);
 }
