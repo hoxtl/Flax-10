@@ -20,48 +20,46 @@ function UserCard({ user, onNavChange }) {
     );
 }
 
-function useDiscoverFetch(searchQuery, filterState) {
+async function loadUsers(query, filters, offset, setU, setM, setL, appending) {
+    if (!appending) setL(true);
+    const d = await searchUsers(query, filters.mods.join(','), filters.socs.join(','), offset, 20).catch(() => ({ results: [] }));
+    const res = d.results || [];
+    if (appending) setU(p => [...p, ...res]);
+    if (!appending) setU(res);
+    setM(d.has_more || false);
+    setL(false);
+}
+
+function useDiscoverFetch(query, filterState) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [hasMore, setHasMore] = useState(false);
     const filters = { mods: filterState.props.selectedModules, socs: filterState.props.selectedSocieties };
     useEffect(() => {
-        const run = async () => {
-            setLoading(true);
-            const data = await searchUsers(searchQuery, filters.mods.join(','), filters.socs.join(','), 0, 20).catch(() => ({ results: [] }));
-            setUsers(data.results || []);
-            setHasMore(data.has_more || false);
-            setLoading(false);
-        };
-        const timer = setTimeout(run, 300);
+        const timer = setTimeout(() => loadUsers(query, filters, 0, setUsers, setHasMore, setLoading, false), 300);
         return () => clearTimeout(timer);
-    }, [searchQuery, filters.mods, filters.socs]);
-    const fetchMore = async () => {
-        if (loading || !hasMore) return;
-        const data = await searchUsers(searchQuery, filters.mods.join(','), filters.socs.join(','), users.length, 20).catch(() => ({ results: [] }));
-        setUsers(prev => [...prev, ...(data.results || [])]);
-        setHasMore(data.has_more || false);
-    };
+    }, [query, filters.mods, filters.socs]);
+    const fetchMore = () => !loading && hasMore && loadUsers(query, filters, users.length, setUsers, setHasMore, setLoading, true);
     return { loading, users, hasMore, fetchMore };
 }
 
-function useDiscoverUIState(searchQuery) {
-    const [userResults, setUserResults] = useState([]);
-    const [searchLoading, setSearchLoading] = useState(false);
-    const [dropdownPos, setDropdownPos] = useState(null);
-    const containerRef = useRef(null);
-    const filterRef = useRef(null);
+function useDiscoverUIState(query) {
+    const [res, setRes] = useState([]);
+    const [sL, setSL] = useState(false);
+    const [pos, setPos] = useState(null);
+    const cRef = useRef(null);
+    const fRef = useRef(null);
     const { allModules, allSocieties } = useSearchInit();
-    const filterState = useFilterState(allModules, allSocieties, searchQuery, true, containerRef, userResults, setDropdownPos, setUserResults, setSearchLoading);
-    useClickOutside(filterRef, () => filterState.setIsFilterOpen(false));
-    return { containerRef, filterRef, filterState };
+    const fS = useFilterState(allModules, allSocieties, query, true, cRef, res, setPos, setRes, setSL);
+    useClickOutside(fRef, () => fS.setIsFilterOpen(false));
+    return { containerRef: cRef, filterRef: fRef, filterState: fS };
 }
 
 function useDiscoverSearch() {
     const [searchQuery, setSearchQuery] = useState("");
     const ui = useDiscoverUIState(searchQuery);
-    const { loading, users, hasMore, fetchMore } = useDiscoverFetch(searchQuery, ui.filterState);
-    return { loading, users, hasMore, fetchMore, searchQuery, setSearchQuery, ...ui };
+    const fetch = useDiscoverFetch(searchQuery, ui.filterState);
+    return { ...fetch, searchQuery, setSearchQuery, ...ui };
 }
 
 function DiscoverHeader() {
@@ -76,26 +74,26 @@ function DiscoverHeader() {
 }
 
 function SearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState }) {
+    const toggle = () => filterState.setIsFilterOpen(!filterState.isFilterOpen);
     return (
         <div className={styles.filterBar}>
             <div className={styles.searchWrap} ref={containerRef}>
                 <span className={styles.searchIcon}>🔍</span>
                 <input type="text" className={styles.searchInput} placeholder="Search by name or username..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             </div>
-            <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={() => filterState.setIsFilterOpen(!filterState.isFilterOpen)} props={filterState.props} />
+            <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={toggle} props={filterState.props} />
         </div>
     );
 }
 
+const onIntersect = (entries, hasMore, fetchMore) => entries[0].isIntersecting && hasMore && fetchMore();
 function useScrollObserver(loading, hasMore, fetchMore) {
-    const observer = useRef();
+    const obs = useRef();
     return useCallback(node => {
-        if (loading) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) fetchMore();
-        });
-        if (node) observer.current.observe(node);
+        if (loading || !node) return;
+        if (obs.current) obs.current.disconnect();
+        obs.current = new IntersectionObserver(ents => onIntersect(ents, hasMore, fetchMore));
+        obs.current.observe(node);
     }, [loading, hasMore, fetchMore]);
 }
 

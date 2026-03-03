@@ -15,8 +15,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
 function getFirstName(user) {
-  const displayName = (getDisplayName(user) || "").trim();
-  return displayName ? displayName.split(" ")[0] : "";
+  const display = (getDisplayName(user) || "").trim();
+  return display ? display.split(" ")[0] : "";
 }
 
 function getCurrentDateString() {
@@ -38,6 +38,7 @@ function TopBarGreeting({ user }) {
 }
 
 function BrandLogo({ onNavChange }) {
+  const nav = () => onNavChange?.("home");
   return (
     <div className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
       <motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
@@ -48,10 +49,7 @@ function BrandLogo({ onNavChange }) {
 
 function useClickOutside(ref, handler) {
   useEffect(() => {
-    const listener = (event) => {
-      if (!ref.current || ref.current.contains(event.target)) return;
-      handler(event);
-    };
+    const listener = (event) => ref.current && !ref.current.contains(event.target) && handler(event);
     document.addEventListener("mousedown", listener);
     return () => document.removeEventListener("mousedown", listener);
   }, [ref, handler]);
@@ -59,29 +57,32 @@ function useClickOutside(ref, handler) {
 
 function DropdownItem({ item, isActive, onClick }) {
   const cls = `${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ""}`;
+  const pill = <motion.div className={styles.dropdownActivePill} layoutId="topbarDropdownPill" transition={{ type: "spring", stiffness: 380, damping: 30 }} />;
   return (
     <button onClick={onClick} className={cls}>
       <span className={styles.dropdownIcon}>{item.icon}</span>
       <span className={styles.dropdownLabel}>{item.label}</span>
-      {isActive && <motion.div className={styles.dropdownActivePill} layoutId="topbarDropdownPill" transition={{ type: "spring", stiffness: 380, damping: 30 }} />}
+      {isActive && pill}
     </button>
   );
 }
 
 function NavDropdownTrigger({ title, isOpen, hasActive, onClick }) {
-  const triggerCls = `${styles.navGroupTrigger} ${hasActive ? styles.navGroupTriggerActive : ""}`;
+  const cls = `${styles.navGroupTrigger} ${hasActive ? styles.navGroupTriggerActive : ""}`;
+  const iconCls = isOpen ? styles.chevronOpen : styles.chevronClosed;
   return (
-    <button className={triggerCls} onClick={onClick}>
+    <button className={cls} onClick={onClick}>
       {title}
-      <ChevronDown size={14} className={isOpen ? styles.chevronOpen : styles.chevronClosed} />
+      <ChevronDown size={14} className={iconCls} />
     </button>
   );
 }
 
 function NavDropdownMenu({ routes, activeNav, onNavChange, setIsOpen }) {
+  const click = (id) => { onNavChange?.(id); setIsOpen(false); };
   return (
     <motion.div className={styles.dropdownMenu} initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}>
-      {routes.map(r => <DropdownItem key={r.id} item={r} isActive={activeNav === r.id} onClick={() => { onNavChange?.(r.id); setIsOpen(false); }} />)}
+      {routes.map(r => <DropdownItem key={r.id} item={r} isActive={activeNav === r.id} onClick={() => click(r.id)} />)}
     </motion.div>
   );
 }
@@ -91,22 +92,19 @@ function NavDropdown({ title, routes, activeNav, onNavChange }) {
   const ref = useRef(null);
   useClickOutside(ref, () => setIsOpen(false));
   const hasActive = routes.some(r => r.id === activeNav);
+  const toggle = () => setIsOpen(!isOpen);
   return (
     <div className={styles.navGroup} ref={ref}>
-      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={() => setIsOpen(!isOpen)} />
-      <AnimatePresence>
-        {isOpen && <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />}
-      </AnimatePresence>
+      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={toggle} />
+      <AnimatePresence>{isOpen && <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />}</AnimatePresence>
     </div>
   );
 }
 
 const NAV_SECTIONS = [
   { title: "Planning", ids: ["calendar", "timer", "analytics"] },
-  { title: "Academic", ids: ["modules"] },
-  { title: "Campus", ids: ["map"] },
-  { title: "Social", ids: ["users", "societies"] },
-  { title: "Admin", ids: ["admin"] }
+  { title: "Academic", ids: ["modules"] }, { title: "Campus", ids: ["map"] },
+  { title: "Social", ids: ["users", "societies"] }, { title: "Admin", ids: ["admin"] }
 ];
 
 function TopBarNav({ activeNav, onNavChange, user }) {
@@ -145,25 +143,23 @@ const NavIcon = ({ d, styles }) => (
 );
 
 function ToolsPill({ onNavChange, activeNav }) {
-  const calActive = activeNav === 'calendar';
-  const tmActive = activeNav === 'timer';
-  const calD = <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>;
-  const tmD = <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></>;
+  const [cA, tA] = [activeNav === 'calendar', activeNav === 'timer'];
+  const cD = <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>;
+  const tD = <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></>;
+  const click = (id) => onNavChange?.(id);
   return (
     <div className={styles.actionPill}>
-      <button className={`${styles.toolBtn} ${calActive ? styles.toolBtnActive : ""}`} onClick={() => onNavChange?.('calendar')} title="Calendar"><NavIcon d={calD} styles={styles} /></button>
-      <button className={`${styles.toolBtn} ${tmActive ? styles.toolBtnActive : ""}`} onClick={() => onNavChange?.('timer')} title="Timer"><NavIcon d={tmD} styles={styles} /></button>
+      <button className={`${styles.toolBtn} ${cA ? styles.toolBtnActive : ""}`} onClick={() => click('calendar')} title="Calendar"><NavIcon d={cD} styles={styles} /></button>
+      <button className={`${styles.toolBtn} ${tA ? styles.toolBtnActive : ""}`} onClick={() => click('timer')} title="Timer"><NavIcon d={tD} styles={styles} /></button>
     </div>
   );
 }
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+function TopBarActions({ onAddClick, user: u, onSettingsClick: sC, onLogoutClick: lC, onProfileClick: pC, onNavChange: nC, activeNav: aN }) {
   return (
     <div className={styles.actions}>
-      <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
-      <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
-      <ActionPill onAddClick={onAddClick} />
-      <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />
+      <ToolsPill onNavChange={nC} activeNav={aN} /><MiniTimer onNavigate={nC} activeNav={aN} /><ActionPill onAddClick={onAddClick} />
+      <ProfileDropdown user={u} onSettingsClick={sC} onLogoutClick={lC} onProfileClick={pC} />
     </div>
   );
 }
@@ -171,14 +167,8 @@ function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onPro
 export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   return (
     <header className={styles.container}>
-      <div className={styles.leftSection}>
-        <BrandLogo onNavChange={onNavChange} />
-        <TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} />
-      </div>
-      <div className={styles.rightSection}>
-        <TopBarGreeting user={user} />
-        <TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} />
-      </div>
+      <div className={styles.leftSection}><BrandLogo onNavChange={onNavChange} /><TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} /></div>
+      <div className={styles.rightSection}><TopBarGreeting user={user} /><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>
     </header>
   );
 }
