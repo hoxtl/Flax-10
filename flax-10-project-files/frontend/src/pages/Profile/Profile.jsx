@@ -38,6 +38,8 @@ function ProfileStats({ profileData, upcomingEventCount, handlers, isMutualOrSel
   return (
     <div className={styles.stats}>
       <StatItem value={profileData?.module_count || 0} label="modules" onClick={onModulesClick} />
+      <StatItem value={profileData?.task_count || 0} label="tasks" onClick={onTasksClick} />
+      <StatItem value={upcomingEventCount || 0} label="events" onClick={onEventsClick} />
       {isSelf && (
         <>
           <StatItem value={profileData?.shared_with_count || 0} label="shared with" onClick={onSharedWithClick} />
