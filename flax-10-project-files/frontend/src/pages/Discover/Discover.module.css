@@ -1,24 +1,33 @@
 .container {
-    padding: 32px;
-    max-width: 1200px;
+    padding: 1.5rem 2rem;
+    max-width: 1400px;
     margin: 0 auto;
     min-height: 100vh;
 }
 
 .header {
-    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+    gap: 2rem;
 }
 
-.header h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 8px;
+.pageTitle {
+    margin: 0 0 0.5rem 0;
+    font-weight: 800;
+    font-size: 32px;
     color: var(--text);
+    white-space: nowrap;
+    letter-spacing: -0.02em;
 }
 
-.header p {
+.subtitle {
+    margin: 0;
+    font-size: 0.95rem;
     color: var(--muted);
-    font-size: 1.1rem;
+    font-weight: 400;
 }
 
 .filterBar {
