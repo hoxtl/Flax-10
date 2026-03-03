@@ -1,15 +1,54 @@
 from django.db import models
 from .calendarEventModel import CalendarEvent
-from models.deadlineModel import Deadline
+from ..modules.deadlineModel import Deadline
+from ..auth.userModel import User
 #from models.taskModel import Task
+
+WORKTIME_PREFERENCE_CHOICES = [
+    ('day', 'Day'),
+    ('night', 'Night'),
+    ('both', 'Both'),
+]
+
+WEEK_PREFERENCE_CHOICES = [
+    ('weekdays', 'Weekdays'),
+    ('weekends', 'Weekends'),
+    ('both', 'Both'),
+]
 
 # A wrapper class for all time-management relate instances manifested through calendar.
 
 class Schedule(models.Model):
     title = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    event = models.ManyToManyField(CalendarEvent, related_name="schedules")
-    deadline = models.ManyToManyField(Deadline, related_name="schedules")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='schedules')
+    event = models.ManyToManyField(CalendarEvent, related_name="schedules", through='ScheduleEventAllocation', blank=True)
+    deadline = models.ManyToManyField(Deadline, related_name="schedules", blank=True)
+    preferred_start_time = models.TimeField(null=True, blank=True)
+    preferred_end_time = models.TimeField(null=True, blank=True)
+    worktime_preference = models.CharField(max_length=10, choices=WORKTIME_PREFERENCE_CHOICES, default='both')
+    week_preference = models.CharField(max_length=10, choices=WEEK_PREFERENCE_CHOICES, default='both')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"{self.user.email}'s schedule {self.title}"
+        
+    def delete(self, *args, **kwargs):
+        generated_events = CalendarEvent.objects.filter(schedule_allocations__schedule=self).distinct()
+        super().delete(*args, **kwargs)
+        generated_events.delete()
+
+#
+
+class ScheduleEventAllocation(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='event_allocations')
+    event = models.ForeignKey(CalendarEvent, on_delete=models.CASCADE, related_name='schedule_allocations')
+    deadline = models.ForeignKey(Deadline, on_delete=models.CASCADE, related_name='event_allocations')
+    allocated_minutes = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('schedule', 'event')
+    
+    def __str__(self):
+        return f"{self.shcedule_id}:{self.deadline_id}:{self.event_id}"
+        

@@ -9,6 +9,7 @@ from .calendar.categoryModel import *
 from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
 from .calendar.timetableSourceModel import *
+from .calendar.scheduleModel import *
 
 # Module
 from .modules.moduleModel import *
