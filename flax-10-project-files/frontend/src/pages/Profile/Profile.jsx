@@ -9,6 +9,7 @@ import { useProfileSummary } from "./hooks/useProfileSummary";
 import analyticsService from "../../api/analyticsService";
 import { fetchApi } from "../../api/client";
 import ShareButton from '../../components/Social/ShareButton';
+import { getModules } from "../../api/moduleApi";
 
 // ---------------------------------------------------------------------------
 // Header
@@ -113,6 +114,18 @@ function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutu
 }
 
 function ModulesGrid({ modules, onNavigate, isSelf }) {
+  const [nameMap, setNameMap] = useState({});
+
+  useEffect(() => {
+    getModules().then(data => {
+      const map = {};
+      (Array.isArray(data) ? data : data?.results || []).forEach(m => {
+        if (m.module_code && m.module_name) map[m.module_code] = m.module_name;
+      });
+      setNameMap(map);
+    }).catch(() => { });
+  }, []);
+
   if (!modules?.length) return null;
   return (
     <div className={styles.modulesGrid}>
@@ -126,6 +139,9 @@ function ModulesGrid({ modules, onNavigate, isSelf }) {
           >
             <span className={styles.moduleIcon}>📚</span>
             <span className={styles.moduleCode}>{code}</span>
+            {nameMap[code] && (
+              <span className={styles.moduleName}>{nameMap[code]}</span>
+            )}
           </button>
         );
       })}
