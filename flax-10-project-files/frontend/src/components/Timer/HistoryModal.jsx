@@ -62,6 +62,7 @@ const useHistoryData = () => {
         await clearHistory();
         setHistory([]);
         setShowConfirm(false);
+        window.dispatchEvent(new Event('historyCleared'));
     };
     return { history, blocks, showConfirm, triggerClear, cancelClear, confirmClear };
 };

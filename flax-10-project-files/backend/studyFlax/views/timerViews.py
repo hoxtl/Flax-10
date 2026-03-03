@@ -26,5 +26,5 @@ class StudySessionViewSet(viewsets.ModelViewSet):
         deleted_count, _ = self.get_queryset().delete()
         return Response(
             {"message": f"Successfully deleted {deleted_count} sessions."},
-            status=status.HTTP_204_NO_CONTENT
+            status=status.HTTP_200_OK
         )
