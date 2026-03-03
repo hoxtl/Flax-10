@@ -32,7 +32,15 @@ def user_search(request):
         if society_ids:
             users = users.filter(society_memberships__society_id__in=society_ids).distinct()
             
-    users = users[:20]  # Limit results
+    offset = int(request.query_params.get('offset', 0))
+    limit = int(request.query_params.get('limit', 20))
+    
+    total_count = users.count()
+    users = users[offset:offset+limit]
     serializer = UserSerialiser(users, many=True, context={'request': request})
     
-    return Response({'results': serializer.data})
+    return Response({
+        'results': serializer.data,
+        'total_count': total_count,
+        'has_more': offset + limit < total_count
+    })
