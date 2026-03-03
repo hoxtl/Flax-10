@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./EventsSummaryModal.module.css";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/Profile/utils/profileHelpers";
 
 export function EventsSummaryModal({ isOpen, onClose, allEvents, baseDate, isMutualOrSelf }) {
     const [range, setRange] = useState('today');
+
+    useEffect(() => {
+        if (isOpen) setRange('today');
+    }, [isOpen]);
+
     if (!isOpen || !isMutualOrSelf) return null;
 
     const filteredEvents = getFilteredEvents(allEvents, range, baseDate);
