@@ -29,5 +29,5 @@ export const saveSession = async (work, brk, count, blockId, task = '', pause = 
 };
 
 export const clearHistory = async () => {
-    await fetchApi('/timer/history/', { method: 'DELETE' });
+    await fetchApi('/timer/history/clear_history/', { method: 'DELETE' });
 };
