@@ -1,13 +1,18 @@
 /**
  * Action Hub slot content — Today's tasks (overdue + due today).
- * Clean card layout: summary chips → task rows → progress bar CTA.
+ * Compact row layout: checkbox + title + tag pill, no card borders.
  */
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import EmptyStateCard from "../../../components/EmptyStateCard";
 
-const VISIBLE_COUNT = 4;
+const VISIBLE_COUNT = 5;
+
+function getTagStyle(colorVariant) {
+  if (colorVariant === "sage") return { bg: "#e8f4f0", color: "#2d5f50" };
+  return { bg: "#f5f2ef", color: "#6b5f57" };
+}
 
 export function ActionHubSlot({
   styles,
@@ -21,6 +26,7 @@ export function ActionHubSlot({
   setShowAllActionHubTasks,
   floatingSeedTaskId,
   getTaskCategoryPill,
+  getTaskCategoryColor,
   handleActionHubComplete,
   actionHubRef,
   hasTimerSession,
@@ -30,10 +36,6 @@ export function ActionHubSlot({
     ? actionHubList
     : actionHubList.slice(0, VISIBLE_COUNT);
   const hiddenCount = Math.max(0, actionHubList.length - VISIBLE_COUNT);
-
-  const dueTodayCount = actionHubItemsOnly.filter(
-    (i) => !i.completed && i.actionHubStatus !== "overdue"
-  ).length;
 
   const allTasksDone =
     actionHubItemsOnly.length > 0 &&
@@ -56,42 +58,21 @@ export function ActionHubSlot({
 
   return (
     <div ref={actionHubRef} className={styles.actionHubSlotRoot}>
-      {/* Summary chips */}
-      {isToday && (actionHubOverdueCount > 0 || dueTodayCount > 0) && (
-        <div className={styles.actionHubSummaryRow}>
-          {actionHubOverdueCount > 0 && (
-            <span className={styles.actionHubSummaryOverdue}>
-              {actionHubOverdueCount} overdue
-            </span>
-          )}
-          {dueTodayCount > 0 && (
-            <span className={styles.actionHubSummaryDue}>
-              {dueTodayCount} due today
-            </span>
-          )}
-        </div>
-      )}
-
       {actionHubItemsOnly.length > 0 ? (
         <>
-          <motion.ul className={styles.actionHubCardList} layout>
+          <motion.ul className={styles.actionHubTaskList} layout>
             {visibleList.map((t) => {
               const isOverdue = t.actionHubStatus === "overdue";
               const isNow = t.actionHubStatus === "now";
               const moduleLabel = getTaskCategoryPill ? getTaskCategoryPill(t) : null;
-              const borderClass = isOverdue
-                ? styles.actionHubCardOverdue
-                : isNow
-                  ? styles.actionHubCardNow
-                  : t.completed
-                    ? styles.actionHubCardCompleted
-                    : styles.actionHubCardBorderFlax;
+              const colorVariant = getTaskCategoryColor ? getTaskCategoryColor(t) : "flax";
+              const tagStyle = moduleLabel ? getTagStyle(colorVariant) : null;
 
               return (
                 <motion.li
                   key={t.id}
                   layout
-                  className={`${styles.actionHubCard} ${borderClass}`}
+                  className={`${styles.actionHubTaskRow} ${isOverdue ? styles.actionHubTaskRowOverdue : ""} ${t.completed ? styles.actionHubTaskRowDone : ""}`}
                 >
                   <button
                     type="button"
@@ -103,8 +84,8 @@ export function ActionHubSlot({
                     aria-label={t.completed ? "Mark incomplete" : `Complete ${t.title}`}
                   >
                     <span
-                      className={`${styles.actionHubCheckboxBoxRound} ${
-                        t.completed ? styles.actionHubCheckboxChecked : ""
+                      className={`${styles.actionHubCheckboxCircle} ${
+                        t.completed ? styles.actionHubCheckboxCircleChecked : ""
                       }`}
                       aria-hidden
                     >
@@ -123,28 +104,30 @@ export function ActionHubSlot({
                     )}
                   </button>
 
-                  <div className={styles.actionHubCardMeta}>
-                    {(moduleLabel || (isNow && !t.completed) || (isOverdue && !t.completed)) && (
-                      <div className={styles.actionHubCardTags}>
-                        {moduleLabel && (
-                          <span className={styles.actionHubModulePill}>{moduleLabel}</span>
-                        )}
-                        {isNow && !t.completed && (
-                          <span className={styles.actionHubTagNow}>NEXT</span>
-                        )}
-                        {isOverdue && !t.completed && (
-                          <span className={styles.actionHubOverdueTag}>LATE</span>
-                        )}
-                      </div>
+                  <span
+                    className={`${styles.actionHubTaskTitle} ${
+                      t.completed ? styles.actionHubTaskTitleDone : ""
+                    }`}
+                    title={t.title}
+                  >
+                    {t.title}
+                  </span>
+
+                  <div className={styles.actionHubTaskRight}>
+                    {moduleLabel && tagStyle && (
+                      <span
+                        className={styles.actionHubTaskTag}
+                        style={{ background: tagStyle.bg, color: tagStyle.color }}
+                      >
+                        {moduleLabel}
+                      </span>
                     )}
-                    <span
-                      className={`${styles.actionHubCardTitle} ${
-                        t.completed ? styles.actionHubCardTitleCompleted : ""
-                      }`}
-                      title={t.title}
-                    >
-                      {t.title}
-                    </span>
+                    {isNow && !t.completed && (
+                      <span className={styles.actionHubTaskTagNext}>NEXT</span>
+                    )}
+                    {isOverdue && !t.completed && (
+                      <span className={styles.actionHubTaskTagLate}>LATE</span>
+                    )}
                   </div>
                 </motion.li>
               );
@@ -154,20 +137,14 @@ export function ActionHubSlot({
           {hiddenCount > 0 && (
             <button
               type="button"
-              className={styles.actionHubSeeAllBtn}
+              className={styles.actionHubMoreText}
               onClick={() => setShowAllActionHubTasks((v) => !v)}
             >
               {showAllActionHubTasks ? "Show less" : `+ ${hiddenCount} more`}
             </button>
           )}
 
-          {!hasTimerSession && onStartFocus && (
-            <button type="button" className={styles.actionHubFocusCta} onClick={onStartFocus}>
-              ▶ Start a focus session
-            </button>
-          )}
-
-          {/* Bottom bar: slim progress + CTA */}
+          {/* Footer: slim progress bar + done% + manage link */}
           <div className={styles.actionHubBottomBar}>
             <div className={styles.actionHubProgressTrackSlim}>
               <div

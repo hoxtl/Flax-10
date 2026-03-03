@@ -26,6 +26,7 @@ export default function IntelligenceRow({
   scheduleInsight,
   tflContext,
   slot1ActionHub,
+  slot1Meta,
   daySummary,
   slot3Urgent,
   slot4Energy,
@@ -52,13 +53,6 @@ export default function IntelligenceRow({
     return () => observer.disconnect();
   }, []);
 
-  const dailyPulse =
-    taskCount === 0
-      ? "All clear. Ready to wrap up?"
-      : taskCount === 1
-        ? "1 task remaining today."
-        : `${taskCount} tasks remaining today.`;
-
   return (
     <section
       ref={sectionRef}
@@ -69,16 +63,13 @@ export default function IntelligenceRow({
           <span className={styles.headerLabel}>{getTodayLabel()}</span>
           <h2 className={styles.headerTitle}>{getGreeting(displayName)}</h2>
         </div>
-        <div className={styles.headerRight}>
-          <p className={styles.headerSubtitle}>{dailyPulse}</p>
-        </div>
       </header>
 
       <div className={styles.grid}>
         <BentoSlot
           span={styles.span1}
           title="Today's Tasks"
-          meta="Action Hub"
+          meta={slot1Meta}
           icon={CheckSquare}
           iconPulse={hasOverdue}
           index={0}
@@ -90,7 +81,7 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span3}
           title="Deadlines"
-          meta="Upcoming"
+          meta={null}
           icon={AlertCircle}
           index={1}
           isVisible={sectionVisible}
@@ -101,7 +92,7 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span4}
           title="Focus Windows"
-          meta="Today"
+          meta={null}
           icon={Zap}
           index={2}
           isVisible={sectionVisible}
@@ -112,20 +103,20 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span5}
           title="Right Now"
-          meta="Schedule"
+          meta={null}
           icon={Clock}
           index={3}
           isVisible={sectionVisible}
         >
           <>
-            <div className={styles.rightNowPillsRow}>
+            <div className={styles.intRowAlertsContainer}>
               {statusStrip && (
-                <div className={`${styles.statusStrip} ${styles[`statusStrip${statusStrip.variant}`]}`}>
-                  <span className={styles.statusStripDot} aria-hidden />
-                  <span className={styles.statusStripText}>{statusStrip.text}</span>
+                <div className={styles.intRowAlertRow}>
+                  <span className={styles.intRowAlertDot} aria-hidden />
+                  <span className={styles.intRowAlertText}>{statusStrip.text}</span>
                 </div>
               )}
-              <TravelAlertPills tflContext={tflContext} />
+              <TravelAlertPills tflContext={tflContext} compact />
             </div>
             {slot5Commute}
           </>
@@ -198,7 +189,7 @@ function useTflDelays() {
   return delays;
 }
 
-function TravelAlertPills({ tflContext }) {
+function TravelAlertPills({ tflContext, compact }) {
   const delays = useTflDelays();
   const [dismissed, setDismissed] = useState(new Set());
 
@@ -212,6 +203,37 @@ function TravelAlertPills({ tflContext }) {
 
   const dismiss = (lineName) =>
     setDismissed(prev => new Set([...prev, lineName]));
+
+  if (compact) {
+    return (
+      <>
+        {shown.map((delay) => (
+          <div key={delay.lineName} className={styles.intRowAlertRow} role="status">
+            <span
+              className={styles.intRowAlertDot}
+              style={{ background: delay.color }}
+              aria-hidden
+            />
+            <span className={styles.intRowAlertText}>
+              {delay.lineName} · {delay.severityDescription}
+            </span>
+            <button
+              className={styles.intRowAlertDismiss}
+              onClick={() => dismiss(delay.lineName)}
+              aria-label={`Dismiss ${delay.lineName} alert`}
+            >
+              <X size={9} strokeWidth={2.5} aria-hidden />
+            </button>
+          </div>
+        ))}
+        {overflow > 0 && (
+          <span className={styles.intRowAlertOverflow}>
+            +{overflow} more line{overflow > 1 ? "s" : ""} affected
+          </span>
+        )}
+      </>
+    );
+  }
 
   return (
     <>

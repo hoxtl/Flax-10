@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { ChevronUp } from "lucide-react";
 
 import { authService } from "../api/authService";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
+import { BackToTop } from "../components/Pagination/Pagination";
 
 import Sidebar from "../components/Dashboard/Sidebar";
 import TopBar from "../components/Dashboard/TopBar";
@@ -63,9 +62,16 @@ function MobileSidebar({ isMobile, open, user, activeNav, onPick, onClose }) {
 
 function PageContent({ activeNav, children }) {
   const isMapPage = activeNav === "map";
+  const isTasksPage = activeNav === "tasks";
   const mapStyle = { padding: 0, overflow: "hidden", height: "100%" };
+  const tasksStyle = { padding: 0 };
   return (
-    <div className={styles.content} style={isMapPage ? mapStyle : undefined}>{children}</div>
+    <div
+      className={styles.content}
+      style={isMapPage ? mapStyle : (isTasksPage ? tasksStyle : undefined)}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -111,29 +117,9 @@ function DashboardSidebars({ isMobile, mobileSidebarOpen, user, activeNav, onNav
   );
 }
 
-function ScrollToTopFab({ activeNav, onScrollToTop }) {
-  const isHome = activeNav === "home";
-  if (!isHome) return null;
-  return createPortal(
-    <button
-      type="button"
-      className={styles.scrollToTop}
-      onClick={onScrollToTop}
-      aria-label="Scroll to top"
-    >
-      <ChevronUp size={24} strokeWidth={2.5} />
-    </button>,
-    document.body
-  );
-}
-
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav } = state;
-  const scrollToTop = useCallback(() => {
-    const el = document.querySelector("[data-dashboard-main]");
-    if (el) el.scrollTop = 0;
-  }, []);
 
   return (
     <div className={styles.root}>
@@ -150,7 +136,9 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         {children}
       </MainArea>
       <EventModalGate modal={modal} />
-      <ScrollToTopFab activeNav={activeNav} onScrollToTop={scrollToTop} />
+      {activeNav !== "map" && activeNav !== "modules" && activeNav !== "tasks" && (
+        <BackToTop containerSelector="[data-dashboard-main]" />
+      )}
     </div>
   );
 }

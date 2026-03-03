@@ -41,18 +41,26 @@ function getPageNumbers(current, total) {
     return [1, "...", current - 1, current, current + 1, "...", total];
 }
 
-export function BackToTop() {
-    const [visible, setVisible] = useState(false);
+export function BackToTop({ alwaysVisible = false, containerSelector = '[class*="content"]' }) {
+    const [visible, setVisible] = useState(alwaysVisible);
     useEffect(() => {
-        const container = document.querySelector('[class*="content"]');
-        if (!container) return;
+        if (alwaysVisible) {
+            setVisible(true);
+            return;
+        }
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            setVisible(false);
+            return;
+        }
         const onScroll = () => setVisible(container.scrollTop > 100);
+        onScroll();
         container.addEventListener('scroll', onScroll);
         return () => container.removeEventListener('scroll', onScroll);
-    }, []);
+    }, [alwaysVisible, containerSelector]);
     if (!visible) return null;
     return (
-        <button className={styles.backToTop} onClick={() => document.querySelector('[class*="content"]')?.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <button className={styles.backToTop} onClick={() => document.querySelector(containerSelector)?.scrollTo({ top: 0, behavior: 'smooth' })}>
             <ArrowUp size={20} color="white" strokeWidth={2.5} />
         </button>
     );

@@ -29,7 +29,6 @@ import { playZenChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 
 import EmptyStateCard from "../../components/EmptyStateCard";
-import HomeStudyTimeChart from "../../components/Analytics/HomeStudyTimeChart";
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
@@ -774,6 +773,9 @@ export default function Homepage({ onNavigate }) {
   const actionHubSpineCompletedPct =
     actionHubItemsOnly.length > 0 ? (actionHubCompletedCount / actionHubItemsOnly.length) * 100 : 0;
   const actionHubRemainingCount = actionHubItemsOnly.filter((i) => !i.completed).length;
+  const slot1Meta = isToday(selectedDate) && actionHubItemsOnly.length > 0
+    ? `${actionHubRemainingCount} due · ${Math.round(actionHubSpineCompletedPct)}% done`
+    : null;
 
   /** On-track / ahead / behind based on % done vs % of workday elapsed. */
   const dayProgressStatus = useMemo(() => {
@@ -1247,6 +1249,7 @@ export default function Homepage({ onNavigate }) {
         statusStrip={navStatusStrip}
         scheduleInsight={scheduleInsight}
         tflContext={tflContext}
+        slot1Meta={slot1Meta}
         slot1ActionHub={
           <ActionHubSlot
             styles={styles}
@@ -1261,6 +1264,7 @@ export default function Homepage({ onNavigate }) {
             setShowAllActionHubTasks={setShowAllActionHubTasks}
             floatingSeedTaskId={floatingSeedTaskId}
             getTaskCategoryPill={getTaskCategoryPill}
+            getTaskCategoryColor={getTaskCategoryColor}
             handleActionHubComplete={handleActionHubComplete}
             actionHubRef={actionHubRef}
             hasTimerSession={hasTimerSession}
@@ -1277,124 +1281,220 @@ export default function Homepage({ onNavigate }) {
           streak: analyticsSummary?.summary?.current_streak_days ?? 0,
         } : null}
         slot3Urgent={
-          <div className={styles.intRowSlotContent}>
-            <div className={styles.intRowDeadlineList}>
-              {((upcomingDeadlines || []).filter(
-                (d) => d.start_due_date && (new Date(d.start_due_date) - Date.now()) <= 21 * 24 * 60 * 60 * 1000
-              ).slice(0, 3)).map((d) => {
-                const msLeft = new Date(d.start_due_date) - Date.now();
-                const hoursLeft = Math.ceil(msLeft / 3600000);
-                const daysLeft = Math.ceil(msLeft / 86400000);
-                const urgentLabel =
-                  msLeft <= 0
-                    ? "Due today"
-                    : hoursLeft < 24
-                      ? `${hoursLeft}h`
-                      : `${daysLeft}d`;
-                const daysClass =
-                  msLeft <= 0 || daysLeft <= 2
-                    ? styles.intRowDeadlineDaysUrgent
-                    : daysLeft <= 7
-                      ? styles.intRowDeadlineDaysMed
-                      : styles.intRowDeadlineDays;
-                const typeLabel = d.deadline_type
-                  ? d.deadline_type.charAt(0).toUpperCase() + d.deadline_type.slice(1)
-                  : null;
-                const moduleId = d.module_id ?? d.module;
-                return (
-                  <div key={d.id} className={styles.intRowDeadlineCard}>
-                    <div className={styles.intRowDeadlinePills}>
-                      {d.module_code && (
-                        <Link
-                          to={moduleId ? `/modules?moduleId=${moduleId}` : "/modules"}
-                          className={`${styles.intRowDeadlinePill} ${styles.intRowDeadlinePillLink}`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {d.module_code}
-                        </Link>
-                      )}
-                      {typeLabel && (
-                        <button
-                          type="button"
-                          className={`${styles.intRowDeadlinePill} ${styles.intRowDeadlinePillType} ${styles.intRowDeadlinePillBtn}`}
-                          onClick={() => setSelectedDeadline(d)}
-                          title="View deadline details"
-                        >
-                          {typeLabel}
-                        </button>
+          (() => {
+            const nowMs = Date.now();
+            const deadlines = (upcomingDeadlines || [])
+              .filter(d => d.start_due_date)
+              .map(d => {
+                const ms = new Date(d.start_due_date) - nowMs;
+                const daysLeft = Math.ceil(ms / 86400000);
+                const urgency = ms <= 0 || daysLeft <= 3 ? "Red"
+                  : daysLeft <= 7 ? "Amber"
+                  : daysLeft <= 14 ? "Green"
+                  : "Grey";
+                return { ...d, daysLeft, urgency };
+              })
+              .sort((a, b) => a.daysLeft - b.daysLeft)
+              .slice(0, 4);
+
+            if (deadlines.length === 0) {
+              return (
+                <div className={styles.intRowSlotContent}>
+                  <p className={styles.intRowSlotText}>No upcoming deadlines</p>
+                  <Link to="/modules?filter=enrolled" className={styles.intRowSlotLink}>View my modules →</Link>
+                </div>
+              );
+            }
+
+            return (
+              <div className={styles.intRowDeadlineList2}>
+                {deadlines.map(d => {
+                  const moduleId = d.module_id ?? d.module;
+                  const related = (allTasks || []).filter(t =>
+                    !isRoutineOrEventTask(t, getTag) && (
+                      (moduleId && (String(t.module_id) === String(moduleId) || String(t.module) === String(moduleId))) ||
+                      (d.module_code && (t.module_code || "").toUpperCase() === (d.module_code || "").toUpperCase())
+                    )
+                  );
+                  const totalTasks = related.length;
+                  const doneTasks = related.filter(t => t.completed).length;
+                  const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+                  const daysLabel = d.daysLeft <= 0 ? "Due today"
+                    : d.daysLeft === 1 ? "1 day"
+                    : `${d.daysLeft} days`;
+                  const typeKey = (d.deadline_type || "").toLowerCase();
+                  const isExam = typeKey === "exam";
+                  const typeLabel = d.deadline_type
+                    ? d.deadline_type.charAt(0).toUpperCase() + d.deadline_type.slice(1)
+                    : null;
+
+                  return (
+                    <div
+                      key={d.id}
+                      className={`${styles.intRowDeadlineRow2} ${styles[`intRowDeadlineRow2${d.urgency}`]}`}
+                    >
+                      <div className={styles.intRowDeadline2Line1}>
+                        <div className={styles.intRowDeadline2Pills}>
+                          {d.module_code && (
+                            <span className={styles.intRowDeadline2ModuleCode}>{d.module_code}</span>
+                          )}
+                          {typeLabel && (
+                            <button
+                              type="button"
+                              className={`${styles.intRowDeadline2TypePill} ${isExam ? styles.intRowDeadline2TypePillExam : styles.intRowDeadline2TypePillCw}`}
+                              onClick={() => setSelectedDeadline(d)}
+                            >
+                              {typeLabel}
+                            </button>
+                          )}
+                        </div>
+                        <span className={`${styles.intRowDeadline2Days} ${styles[`intRowDeadline2Days${d.urgency}`]}`}>
+                          {daysLabel}
+                        </span>
+                      </div>
+
+                      <p className={styles.intRowDeadline2Title}>
+                        {d.assessment_title || d.title || "Assignment"}
+                      </p>
+
+                      {totalTasks > 0 ? (
+                        <div className={styles.intRowDeadline2BarRow}>
+                          <div className={styles.intRowDeadline2BarTrack}>
+                            <div
+                              className={`${styles.intRowDeadline2BarFill} ${styles[`intRowDeadline2BarFill${d.urgency}`]}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className={styles.intRowDeadline2TaskCount}>{doneTasks}/{totalTasks} tasks</span>
+                        </div>
+                      ) : (
+                        <span className={styles.intRowDeadline2NotStarted}>No tasks added yet</span>
                       )}
                     </div>
-                    <div className={styles.intRowDeadlineBottom}>
-                      <p className={styles.intRowDeadlineName}>{d.assessment_title || d.title || "Assignment"}</p>
-                      <span className={`${styles.intRowDeadlineDays} ${daysClass}`}>
-                        {urgentLabel}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-              {(upcomingDeadlines || []).filter(
-                (d) => d.start_due_date && (new Date(d.start_due_date) - Date.now()) <= 21 * 24 * 60 * 60 * 1000
-              ).length === 0 && (
-                <p className={styles.intRowSlotText}>No deadlines in the next 3 weeks</p>
-              )}
-            </div>
-            <Link to="/modules?filter=enrolled" className={styles.intRowSlotLink}>View my modules →</Link>
-          </div>
+                  );
+                })}
+                <Link to="/modules?filter=enrolled" className={styles.intRowSlotLink}>View my modules →</Link>
+              </div>
+            );
+          })()
         }
         slot4Energy={
           !isToday(selectedDate) ? (
             <p className={styles.intRowSlotText}>Select today to see study windows</p>
           ) : todayFreeWindows.length > 0 ? (
             <div className={styles.intRowFocusWrap}>
+              {/* Summary line: "X windows · Xh Xm free today" */}
               {focusSummary && (
-                <div className={styles.intRowFocusSummary}>
-                  <span className={styles.intRowFocusSummaryNum}>{focusSummary.count}</span>
-                  <span className={styles.intRowFocusSummaryLabel}>
+                <div className={styles.intRowFocusSummaryLine}>
+                  <span className={styles.intRowFocusSummaryBig}>{focusSummary.count}</span>
+                  <span className={styles.intRowFocusSummaryWord}>
                     {focusSummary.count !== 1 ? "windows" : "window"}
                   </span>
                   <span className={styles.intRowFocusSummaryDot}>·</span>
-                  <span className={styles.intRowFocusSummaryNum}>{focusSummary.durLabel}</span>
-                  <span className={styles.intRowFocusSummaryLabel}>free</span>
+                  <span className={styles.intRowFocusSummaryBig}>{focusSummary.durLabel}</span>
+                  <span className={styles.intRowFocusSummaryWord}>free today</span>
                 </div>
               )}
+
+              {/* Window cards */}
               <div className={styles.intRowFocusWindowList}>
                 {todayFreeWindows.slice(0, 2).map((w, i) => {
-                  const isWindowPast = w.end < now;
                   const isCurrent = w.start <= now && w.end > now;
+                  const isWindowPast = w.end < now;
                   const minsLeft = isCurrent ? Math.round((w.end - now) / 60000) : w.minutes;
-                  const durLabel =
-                    minsLeft >= 60
-                      ? `${Math.floor(minsLeft / 60)}h${minsLeft % 60 > 0 ? ` ${minsLeft % 60}m` : ""}`
-                      : `${minsLeft}m`;
+                  const durLabel = minsLeft >= 60
+                    ? `${Math.floor(minsLeft / 60)}h${minsLeft % 60 > 0 ? ` ${minsLeft % 60}m` : ""}`
+                    : `${minsLeft}m`;
+                  const prevEvent = sortedEvents
+                    .filter(e => e.end_time && new Date(e.end_time).getTime() <= w.start.getTime())
+                    .sort((a, b) => new Date(b.end_time) - new Date(a.end_time))[0];
+                  const contextLine = prevEvent?.title
+                    ? `After ${prevEvent.title} · No conflicts`
+                    : "No conflicts";
                   return (
                     <div
                       key={i}
-                      className={`${styles.intRowFocusWindow} ${
-                        isCurrent ? styles.intRowFocusWindowCurrent : isWindowPast ? styles.intRowFocusWindowPast : ""
-                      }`}
+                      className={`${styles.intRowFocusWindowCard} ${
+                        isCurrent ? styles.intRowFocusWindowCardCurrent : ""
+                      } ${isWindowPast ? styles.intRowFocusWindowCardPast : ""}`}
                     >
-                      <span className={styles.intRowFocusWindowTime}>
-                        {formatTime(w.start.toISOString())} – {formatTime(w.end.toISOString())}
-                      </span>
-                      <span className={styles.intRowFocusWindowDur}>
-                        {isCurrent ? `${durLabel} left` : durLabel}
-                      </span>
+                      <div className={styles.intRowFocusWindowCardLeft}>
+                        {isCurrent && <span className={styles.intRowFocusWindowNowDot} aria-hidden />}
+                        <div className={styles.intRowFocusWindowCardTimes}>
+                          <span className={styles.intRowFocusWindowCardTime}>
+                            {formatTime(w.start.toISOString())} – {formatTime(w.end.toISOString())}
+                          </span>
+                          <span className={styles.intRowFocusWindowCardCtx}>{contextLine}</span>
+                        </div>
+                      </div>
+                      <div className={styles.intRowFocusWindowCardRight}>
+                        <span className={styles.intRowFocusWindowCardDur}>
+                          {isCurrent ? `${durLabel} left` : durLabel}
+                        </span>
+                        <button
+                          type="button"
+                          className={styles.intRowFocusWindowStartBtn}
+                          onClick={() => navigate("/timer")}
+                        >
+                          ▶ Start
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              {analyticsProgress?.daily_progress && (
-                <>
-                  <span className={styles.intRowFocusChartLabel}>7-day study pattern</span>
-                  <div className={styles.intRowFocusSparkline}>
-                    <HomeStudyTimeChart data={analyticsProgress.daily_progress} />
-                  </div>
-                  <Link to="/analytics" className={styles.intRowFocusAnalyticsCta}>
-                    Want to know more about yourself? → Analytics
-                  </Link>
-                </>
+
+              {todayFreeWindows.length > 2 && (
+                <span className={styles.intRowFocusMore}>
+                  +{todayFreeWindows.length - 2} more window{todayFreeWindows.length - 2 !== 1 ? "s" : ""}
+                </span>
               )}
+
+              {/* Micro-stats: single inline line */}
+              {(() => {
+                const streak = analyticsSummary?.summary?.current_streak_days ?? 0;
+                const peakLabel = peakHours?.length
+                  ? (() => {
+                      const h = peakHours[0].hour;
+                      return h === 0 ? "12am" : h < 12 ? `${h}am` : h === 12 ? "12pm" : `${h - 12}pm`;
+                    })()
+                  : null;
+                const statParts = [
+                  streak > 0 && { text: `🔥 ${streak}d streak`, dir: null },
+                  peakLabel && { text: `⚡ Peak at ${peakLabel}`, dir: null },
+                  todayVsYesterday && {
+                    text: `${todayVsYesterday.dir === "up" ? "↑" : todayVsYesterday.dir === "down" ? "↓" : "≈"} ${
+                      todayVsYesterday.dir === "flat"
+                        ? "same as yesterday"
+                        : (todayVsYesterday.label.match(/[\d.]+/)?.[0] || "") + "h vs yesterday"
+                    }`,
+                    dir: todayVsYesterday.dir,
+                  },
+                ].filter(Boolean);
+                if (!statParts.length) return null;
+                return (
+                  <p className={styles.intRowFocusMicroStats}>
+                    {statParts.map((p, i) => (
+                      <span
+                        key={i}
+                        className={p.dir === "up" ? styles.intRowFocusMicroStatsUp : p.dir === "down" ? styles.intRowFocusMicroStatsDown : ""}
+                      >
+                        {p.text}
+                        {i < statParts.length - 1 && <span className={styles.intRowFocusMicroStatsSep}> · </span>}
+                      </span>
+                    ))}
+                  </p>
+                );
+              })()}
+
+              {/* Footer analytics link */}
+              <button
+                type="button"
+                className={styles.intRowFocusFooterLink}
+                onClick={() => onNavigate?.("analytics")}
+              >
+                View full analytics →
+              </button>
             </div>
           ) : (
             <p className={styles.intRowNudgeFallback}>
@@ -1460,65 +1560,48 @@ export default function Homepage({ onNavigate }) {
                 : null;
               const startLabel = cb?.start_time ? formatTime(cb.start_time) : null;
               const endLabel   = cb?.end_time   ? formatTime(cb.end_time)   : null;
-              const conflictTimeStr = nav.conflictAt
-                ? new Date(nav.conflictAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
-                : null;
               const hasNow  = !!cb?.title;
               const hasNext = !!nav.nextItem?.title;
               return (
                 <div className={styles.intRowNowSection}>
-                  {/* Now */}
-                  <div className={styles.intRowNowItem}>
-                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeNow}`}>Now</span>
+                  {hasNow ? (
                     <div className={styles.intRowNowItemBody}>
-                      {hasNow ? (
-                        <>
-                          <span className={styles.intRowNowItemTitle}>{cb.title}</span>
-                          <span className={styles.intRowNowItemTime}>
-                            {startLabel && endLabel ? `${startLabel} – ${endLabel}` : ""}
-                            {cStr ? ` · ends ${cStr}` : ""}
-                          </span>
-                        </>
-                      ) : (
-                        <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic" }}>
-                          Nothing on right now
-                        </span>
-                      )}
+                      <span className={styles.intRowNowItemTitle}>{cb.title}</span>
+                      <span className={styles.intRowNowItemTime}>
+                        {startLabel && endLabel ? `${startLabel} – ${endLabel}` : ""}
+                        {cStr ? ` · ends ${cStr}` : ""}
+                      </span>
                     </div>
-                  </div>
-                  {/* Progress bar if event is active */}
+                  ) : (
+                    <span className={styles.intRowNowEmptyText}>Nothing on right now</span>
+                  )}
                   {hasNow && eventPct !== null && (
                     <div className={styles.intRowNowTimerTrack}>
                       <div className={styles.intRowNowTimerFill} style={{ width: `${eventPct}%` }} />
                     </div>
                   )}
-                  {/* Upcoming — next event + following events in one section */}
                   <div className={styles.intRowNowUpcoming}>
-                    <span className={styles.intRowNowUpcomingLabel}>Upcoming</span>
+                    <span className={styles.intRowNowUpcomingLabel}>NEXT UP</span>
                     {hasNext ? (
-                      <>
-                        <div className={styles.intRowNowItem}>
-                          <div className={styles.intRowNowItemBody}>
-                            <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
-                            {nav.nextItem.start_time && (
-                              <span className={styles.intRowNowItemTime}>
-                                {`at ${formatTime(nav.nextItem.start_time)}`}
-                                {(() => {
-                                  const msUntil = new Date(nav.nextItem.start_time).getTime() - nowMs;
-                                  if (msUntil > 0) {
-                                    const h = Math.floor(msUntil / 3600000);
-                                    const m = Math.floor((msUntil % 3600000) / 60000);
-                                    return ` · in ${h > 0 ? `${h}h ` : ""}${m}m`;
-                                  }
-                                  return "";
-                                })()}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </>
+                      <div className={styles.intRowNowNextCard}>
+                        <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
+                        {nav.nextItem.start_time && (
+                          <span className={styles.intRowNowItemTime}>
+                            {`at ${formatTime(nav.nextItem.start_time)}`}
+                            {(() => {
+                              const msUntil = new Date(nav.nextItem.start_time).getTime() - nowMs;
+                              if (msUntil > 0) {
+                                const h = Math.floor(msUntil / 3600000);
+                                const m = Math.floor((msUntil % 3600000) / 60000);
+                                return ` · in ${h > 0 ? `${h}h ` : ""}${m}m`;
+                              }
+                              return "";
+                            })()}
+                          </span>
+                        )}
+                      </div>
                     ) : (
-                      <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic", fontSize: "0.78rem" }}>
+                      <span className={styles.intRowNowEmptyText}>
                         {hasNow ? "Nothing after this" : "Nothing coming up today"}
                       </span>
                     )}
@@ -1529,44 +1612,35 @@ export default function Homepage({ onNavigate }) {
 
             if (nav.state === "gap") {
               const mins = nav.gapMins ?? 0;
+              const gapLabel = mins >= 60
+                ? `${Math.floor(mins / 60)}h${mins % 60 > 0 ? ` ${mins % 60}m` : ""}`
+                : `${mins}m`;
               return (
                 <div className={styles.intRowNowSection}>
-                  <div className={styles.intRowNowItem}>
-                    <span className={`${styles.intRowNowBadge} ${styles.intRowNowBadgeFree}`}>Now</span>
-                    <div className={styles.intRowNowItemBody}>
-                      <span className={styles.intRowNowItemTitle}>
-                        {mins >= 60
-                          ? `${Math.floor(mins / 60)}h ${mins % 60 > 0 ? `${mins % 60}m` : ""}`.trim()
-                          : `${mins}m`} window
-                      </span>
-                    </div>
-                  </div>
-                  <div className={styles.intRowNowUpcoming}>
-                    <span className={styles.intRowNowUpcomingLabel}>Upcoming</span>
-                    {nav.nextItem?.title ? (
-                      <div className={styles.intRowNowItem}>
-                        <div className={styles.intRowNowItemBody}>
-                          <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
-                          <span className={styles.intRowNowItemTime}>
-                            {nav.nextItem.start_time ? `at ${formatTime(nav.nextItem.start_time)}` : ""}
-                            {cStr ? ` · in ${cStr}` : ""}
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <span className={styles.intRowNowItemTitle} style={{ color: "#9a8778", fontStyle: "italic", fontSize: "0.78rem" }}>
-                        Nothing coming up today
+                  <div className={styles.intRowNowItemBody}>
+                    <span className={styles.intRowNowItemTitle}>{gapLabel} free window</span>
+                    {smartNudge && (
+                      <span className={styles.intRowNowItemTime}>
+                        {smartNudge.type === "deadline"
+                          ? `${smartNudge.taskTitle} due in ${smartNudge.dueIn}`
+                          : `Tackle ${smartNudge.taskTitle}`}
                       </span>
                     )}
                   </div>
-                  {smartNudge && (
-                    <div className={styles.intRowNowNudge}>
-                      {smartNudge.type === "deadline"
-                        ? <><span className={styles.intRowNowNudgeTask}>{smartNudge.taskTitle}</span> due in {smartNudge.dueIn} — use this window</>
-                        : <>Tackle <span className={styles.intRowNowNudgeTask}>{smartNudge.taskTitle}</span> now</>
-                      }
-                    </div>
-                  )}
+                  <div className={styles.intRowNowUpcoming}>
+                    <span className={styles.intRowNowUpcomingLabel}>NEXT UP</span>
+                    {nav.nextItem?.title ? (
+                      <div className={styles.intRowNowNextCard}>
+                        <span className={styles.intRowNowItemTitle}>{nav.nextItem.title}</span>
+                        <span className={styles.intRowNowItemTime}>
+                          {nav.nextItem.start_time ? `at ${formatTime(nav.nextItem.start_time)}` : ""}
+                          {cStr ? ` · in ${cStr}` : ""}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className={styles.intRowNowEmptyText}>Nothing coming up today</span>
+                    )}
+                  </div>
                 </div>
               );
             }

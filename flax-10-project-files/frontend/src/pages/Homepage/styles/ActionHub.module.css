@@ -2165,7 +2165,7 @@
 .intRowNowSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
 }
 
@@ -2201,19 +2201,16 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  border-top: 1px solid rgba(123, 103, 81, 0.1);
-  padding-top: 8px;
-  margin-top: 2px;
 }
 
 .intRowNowUpcomingLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  color: #9a8778;
-  margin-bottom: 2px;
+  color: #b0a59e;
+  margin-bottom: 4px;
 }
 
 .intRowNowBadgeFree {
@@ -2244,9 +2241,9 @@
 
 .intRowNowItemTitle {
   font-family: var(--font-body, "Quicksand", sans-serif);
-  font-size: 0.82rem;
+  font-size: 13px;
   font-weight: 600;
-  color: #2d352d;
+  color: #2c2420;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2254,10 +2251,28 @@
 }
 
 .intRowNowItemTime {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.65rem;
-  color: #9a8778;
-  letter-spacing: 0.02em;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 12px;
+  color: #8a7d76;
+  letter-spacing: 0;
+}
+
+.intRowNowNextCard {
+  background: #ffffff;
+  border: 1px solid #e8ddd8;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intRowNowEmptyText {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 13px;
+  font-style: italic;
+  color: #b0a59e;
+  font-weight: 400;
 }
 
 /* ─── Deadline detail overlay ────────────────────────────────────────────── */
@@ -2545,6 +2560,525 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   display: block;
+}
+
+/* ─── Focus Windows: stat chips row ─────────────────────────────────────── */
+
+.intRowFocusStats {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(123, 103, 81, 0.1);
+  flex-wrap: wrap;
+}
+
+.intRowFocusChip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: rgba(123, 103, 81, 0.06);
+  border: 1px solid rgba(123, 103, 81, 0.13);
+  flex: 1;
+  min-width: 0;
+}
+
+.intRowFocusChipUp {
+  background: rgba(132, 169, 140, 0.08);
+  border-color: rgba(132, 169, 140, 0.22);
+}
+
+.intRowFocusChipDown {
+  background: rgba(192, 113, 78, 0.07);
+  border-color: rgba(192, 113, 78, 0.18);
+}
+
+.intRowFocusChipIcon {
+  font-size: 0.72rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.intRowFocusChipValue {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #4A3421;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.intRowFocusChipUp .intRowFocusChipValue {
+  color: #4a7a57;
+}
+
+.intRowFocusChipDown .intRowFocusChipValue {
+  color: #9B4A30;
+}
+
+.intRowFocusChipLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Focus Windows v2: summary line + window cards + micro-stats ─────── */
+
+.intRowFocusSummaryLine {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.intRowFocusSummaryBig {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c2420;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.intRowFocusSummaryWord {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.81rem;
+  font-weight: 400;
+  color: #8a7d76;
+}
+
+.intRowFocusWindowCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #e8ddd8;
+  transition: box-shadow 0.15s;
+  position: relative;
+}
+
+.intRowFocusWindowCard:hover {
+  box-shadow: 0 2px 10px rgba(74, 52, 33, 0.08);
+}
+
+.intRowFocusWindowCardCurrent {
+  border-color: rgba(74, 178, 120, 0.35);
+  background: rgba(74, 178, 120, 0.03);
+}
+
+.intRowFocusWindowCardPast {
+  opacity: 0.4;
+}
+
+.intRowFocusWindowCardLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.intRowFocusWindowNowDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ab278;
+  flex-shrink: 0;
+  margin-top: 4px;
+  animation: focusWindowNowPulse 2s ease-in-out infinite;
+}
+
+@keyframes focusWindowNowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 178, 120, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(74, 178, 120, 0); }
+}
+
+.intRowFocusWindowCardTimes {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.intRowFocusWindowCardTime {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2c2420;
+  white-space: nowrap;
+}
+
+.intRowFocusWindowCardCtx {
+  font-size: 0.69rem;
+  color: #b0a59e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.intRowFocusWindowCardRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.intRowFocusWindowCardDur {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3d5f42;
+  background: #ecf7ec;
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.intRowFocusWindowStartBtn {
+  display: none;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.69rem;
+  font-weight: 500;
+  color: #7B6751;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+
+.intRowFocusWindowStartBtn:hover {
+  color: #4a3728;
+}
+
+.intRowFocusWindowCard:hover .intRowFocusWindowStartBtn {
+  display: block;
+}
+
+.intRowFocusMore {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  padding: 2px 0;
+}
+
+.intRowFocusMicroStats {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.intRowFocusMicroStatsUp {
+  color: #4a7a57;
+}
+
+.intRowFocusMicroStatsDown {
+  color: #9B4A30;
+}
+
+.intRowFocusMicroStatsSep {
+  color: #c4b8b0;
+}
+
+.intRowFocusFooterLink {
+  display: block;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #4a3728;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: auto;
+  text-align: left;
+  transition: text-decoration 0.12s;
+}
+
+.intRowFocusFooterLink:hover {
+  text-decoration: underline;
+}
+
+/* ─── Deadlines v2: compact urgency rows ────────────────────────────────── */
+
+.intRowDeadlineList2 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.intRowDeadlineRow2 {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px 7px 13px;
+  border-left: 3px solid #d4c9c2;
+  border-radius: 0 6px 6px 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+.intRowDeadlineRow2:hover {
+  background: rgba(74, 55, 40, 0.04);
+}
+
+.intRowDeadlineRow2Red   { border-left-color: #c4574b; }
+.intRowDeadlineRow2Amber { border-left-color: #c49a4b; }
+.intRowDeadlineRow2Green { border-left-color: #6b8f71; }
+.intRowDeadlineRow2Grey  { border-left-color: #d4c9c2; }
+
+.intRowDeadline2Line1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.intRowDeadline2Pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.intRowDeadline2ModuleCode {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #5a4a3a;
+  background: rgba(74, 55, 40, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intRowDeadline2TypePill {
+  font-size: 0.575rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.intRowDeadline2TypePill:hover { opacity: 0.75; }
+
+.intRowDeadline2TypePillExam { background: #fdf0ee; color: #c4574b; }
+.intRowDeadline2TypePillCw   { background: #e8f4f0; color: #2d5f50; }
+
+.intRowDeadline2Days {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.625rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  color: #8a7d76;
+}
+.intRowDeadline2DaysRed   { color: #c4574b; }
+.intRowDeadline2DaysAmber { color: #c49a4b; }
+.intRowDeadline2DaysGreen { color: #6b8f71; }
+.intRowDeadline2DaysGrey  { color: #8a7d76; }
+
+.intRowDeadline2Title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #2c2420;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.intRowDeadline2BarRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.intRowDeadline2BarTrack {
+  width: 60px;
+  height: 3px;
+  background: rgba(74, 55, 40, 0.1);
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.intRowDeadline2BarFill {
+  height: 100%;
+  border-radius: 2px;
+  background: #8a7d76;
+  transition: width 0.4s ease;
+}
+.intRowDeadline2BarFillRed   { background: #c4574b; }
+.intRowDeadline2BarFillAmber { background: #c49a4b; }
+.intRowDeadline2BarFillGreen { background: #6b8f71; }
+.intRowDeadline2BarFillGrey  { background: #8a7d76; }
+
+.intRowDeadline2TaskCount {
+  font-size: 0.625rem;
+  color: #8a7d76;
+  white-space: nowrap;
+}
+
+.intRowDeadline2NotStarted {
+  font-size: 0.625rem;
+  color: #c4b8b0;
+  font-style: italic;
+  margin-top: 1px;
+}
+
+/* ─── Today's Tasks v2: compact row layout ──────────────────────────────── */
+
+.actionHubTaskList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.actionHubTaskRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 4px;
+  min-height: 36px;
+  border-bottom: 1px solid rgba(74, 55, 40, 0.06);
+  border-radius: 0;
+  transition: background 0.12s;
+  cursor: default;
+}
+
+.actionHubTaskRow:last-child {
+  border-bottom: none;
+}
+
+.actionHubTaskRow:hover {
+  background: rgba(74, 55, 40, 0.03);
+  border-radius: 6px;
+}
+
+.actionHubTaskRowOverdue .actionHubTaskTitle {
+  color: #C0714E;
+}
+
+.actionHubTaskRowDone {
+  opacity: 0.55;
+}
+
+.actionHubCheckboxCircle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid #c4b8b0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.actionHubCheckbox:hover .actionHubCheckboxCircle {
+  border-color: #4a3728;
+}
+
+.actionHubCheckboxCircleChecked {
+  background: rgba(132, 169, 140, 0.25) !important;
+  border-color: rgba(132, 169, 140, 0.7) !important;
+  color: #4a7a57;
+}
+
+.actionHubTaskTitle {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #2c2420;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actionHubTaskTitleDone {
+  text-decoration: line-through;
+}
+
+.actionHubTaskRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.actionHubTaskTag {
+  font-size: 0.625rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.actionHubTaskTagNext {
+  font-size: 0.5625rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #4a3728;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.actionHubTaskTagLate {
+  font-size: 0.5625rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(192, 113, 78, 0.12);
+  color: #C0714E;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid rgba(192, 113, 78, 0.25);
+  white-space: nowrap;
+}
+
+.actionHubMoreText {
+  background: none;
+  border: none;
+  padding: 4px 4px;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.12s;
+}
+
+.actionHubMoreText:hover {
+  color: #4a3728;
 }
 
 /* ─── Day Progress — breakdown + time alloc + nudge ─────────────────────── */
