@@ -21,8 +21,8 @@ const ProductivityCards = ({ data, progressData }) => {
   const progressSummary = progressData?.summary;
   if (!summary) return null;
 
-  const ratio = summary.work_break_ratio;
-  const adherence = progressSummary?.adherence_percentage;
+  const ratio = summary.workBreakRatio;
+  const adherence = progressSummary?.adherencePercentage;
 
   return (
     <div className={styles.grid} style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>

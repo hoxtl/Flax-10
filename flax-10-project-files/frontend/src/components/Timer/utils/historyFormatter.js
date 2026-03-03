@@ -13,15 +13,37 @@ export const formatDate = (dateString) => {
 
 /** Use current time if date/start/end are missing (legacy data support) */
 const normalizeSession = (s) => {
-    let { startTime, endTime, date, duration } = s;
+    let {
+        start_time, startTime,
+        end_time, endTime,
+        date, duration,
+        break_duration, breakDuration,
+        study_block_id, studyBlockId
+    } = s;
+
     const now = new Date().toISOString();
-    if (!date) date = now;
-    if (!endTime) endTime = date;
-    if (!startTime) {
-        const endTs = new Date(endTime).getTime();
+
+    // Normalize properties (API uses snake_case, frontend uses camelCase)
+    const normalizedStartTime = startTime || start_time;
+    const normalizedEndTime = endTime || end_time || date || now;
+    const normalizedBreakDuration = breakDuration !== undefined ? breakDuration : (break_duration || 0);
+    const normalizedBlockId = studyBlockId || study_block_id;
+
+    if (!normalizedStartTime) {
+        const endTs = new Date(normalizedEndTime).getTime();
         startTime = !isNaN(endTs) ? new Date(endTs - (duration || 0) * 60000).toISOString() : now;
+    } else {
+        startTime = normalizedStartTime;
     }
-    return { ...s, startTime, endTime, date };
+
+    return {
+        ...s,
+        startTime,
+        endTime: normalizedEndTime,
+        date: date || normalizedEndTime,
+        breakDuration: normalizedBreakDuration,
+        studyBlockId: normalizedBlockId
+    };
 };
 
 /** Initialize a new study block from a session */

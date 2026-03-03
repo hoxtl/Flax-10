@@ -43,6 +43,7 @@ def get_analytics_summary(request):
     total_sessions = sessions.count()
     total_study_minutes = sessions.aggregate(Sum('duration'))['duration__sum'] or 0
     total_break_minutes = sessions.aggregate(Sum('break_duration'))['break_duration__sum'] or 0
+    total_pause_seconds = sessions.aggregate(Sum('pause_duration'))['pause_duration__sum'] or 0
     avg_session_duration = sessions.aggregate(Avg('duration'))['duration__avg'] or 0
     longest_session = sessions.aggregate(Max('duration'))['duration__max'] or 0
     overtime_sessions = sessions.filter(status='Overtime').count()
@@ -70,24 +71,25 @@ def get_analytics_summary(request):
 
     return Response({
         'summary': {
-            'total_sessions': total_sessions,
-            'total_study_hours': round(total_study_minutes / 60, 1),
-            'total_break_hours': round(total_break_minutes / 60, 1),
-            'avg_session_minutes': round(avg_session_duration, 1),
-            'longest_session_minutes': longest_session,
-            'current_streak_days': current_streak,
-            'longest_streak_days': longest_streak,
-            'overtime_sessions': overtime_sessions,
-            'work_break_ratio': work_break_ratio,
-            'active_days': active_days,
+            'totalSessions': total_sessions,
+            'totalStudyHours': round(total_study_minutes / 60, 1),
+            'totalBreakHours': round(total_break_minutes / 60, 1),
+            'totalPauseDuration': total_pause_seconds,
+            'avgSessionMinutes': round(avg_session_duration, 1),
+            'longestSessionMinutes': longest_session,
+            'currentStreakDays': current_streak,
+            'longestStreakDays': longest_streak,
+            'overtimeSessions': overtime_sessions,
+            'workBreakRatio': work_break_ratio,
+            'activeDays': active_days,
         },
-        'daily_breakdown': daily_breakdown,
+        'dailyBreakdown': daily_breakdown,
         'heatmap': {
             'data': heatmap_data,
             'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             'hours': list(range(24)),
         },
-        'period_days': days,
+        'periodDays': days,
     })
 
 
