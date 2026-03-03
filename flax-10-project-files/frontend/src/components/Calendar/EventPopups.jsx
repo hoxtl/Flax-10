@@ -5,9 +5,9 @@ import { EventModal } from './EventModal/EventModal';
 import { EventDetailPopup } from './EventDetailPopup';
 import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
+import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
-import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
 import ConfirmModal from '../common/ConfirmModal';
 
@@ -45,6 +45,7 @@ function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
+    const { disenrollFromModule } = useModuleDisenrollment();
     const tags = useTags();
     const navigate = useNavigate();
     const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
@@ -53,7 +54,7 @@ function EventPopupContainer() {
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, tags);
-    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate };
+    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule };
     const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
@@ -82,11 +83,10 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
     ];
 }
 
-function getModuleActions(event, { closePopup, loadEvents }) {
-    const handleLeave = async () => {
+function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }) {
+    const handleLeave = () => {
         closePopup();
-        await disenrolByModuleId(event.module);
-        loadEvents();
+        disenrollFromModule(event.module, loadEvents);
     };
     return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
 }

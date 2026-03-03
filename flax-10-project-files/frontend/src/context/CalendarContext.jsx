@@ -34,7 +34,12 @@ function getFilteredContext(context) {
 
 function filterEventsByTag(events, filter) {
     if (filter.includes('all')) return events;
-    return events.filter(e => filter.includes(e.tag_name?.toLowerCase()));
+    return events.filter(e => filter.includes(getEffectiveTagName(e)));
+}
+
+function getEffectiveTagName(event) {
+    if (!event.tag_name && !event.tag) return 'other';
+    return event.tag_name?.toLowerCase() || 'other';
 }
 
 export function useCalendarData(props = {}) {

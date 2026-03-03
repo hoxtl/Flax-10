@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
 import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
+import { createNotify } from '../utils/notifyHelper.js';
 
 function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify) {
   return {
@@ -77,11 +78,7 @@ export default function useModules() {
   const [loading, setLoading] = useState(true);
   const [enrollments, setEnrollments] = useState([]);
   const { addNotification } = useNotifications();
-
-  const notify = (message, type) => addNotification({ 
-    title: type === 'error' ? '⚠️ Action failed' : '✓ Done', 
-    message   
-  });
+  const notify = createNotify(addNotification);
 
   useEffect(() => { loadData(setLoading, setModules, setEnrollments, notify); }, []);
   return useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify);
