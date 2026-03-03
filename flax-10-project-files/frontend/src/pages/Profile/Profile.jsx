@@ -98,18 +98,56 @@ function ProfileHeaderInfo({ user, profileData, upcomingEventCount, handlers, is
 }
 
 function ProfileHeader({ user, profileData, upcomingEventCount, handlers, isMutualOrSelf, isSelf }) {
+  const year = profileData?.year || user?.year || "";
+  const major = profileData?.major || user?.major || "";
+  const username = (profileData || user)?.username || "guest";
   return (
-    <div className={styles.header}>
-      <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
-      <ProfileHeaderInfo
-        user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }}
-        profileData={profileData}
-        upcomingEventCount={upcomingEventCount}
-        handlers={handlers}
-        isMutualOrSelf={isMutualOrSelf}
-        isSelf={isSelf}
-      />
-    </div>
+    <>
+      {/* Desktop header */}
+      <div className={`${styles.header} ${styles.desktopOnly}`}>
+        <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
+        <ProfileHeaderInfo
+          user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }}
+          profileData={profileData}
+          upcomingEventCount={upcomingEventCount}
+          handlers={handlers}
+          isMutualOrSelf={isMutualOrSelf}
+          isSelf={isSelf}
+        />
+      </div>
+
+      {/* Mobile hero header */}
+      <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
+        <div className={styles.mobileHero}>
+          <div className={styles.mobileAvatar}>
+            {profileData?.profile_photo_url
+              ? <img src={profileData.profile_photo_url} alt="Profile" className={styles.avatarImage} />
+              : buildInitials(user)}
+          </div>
+          <h1 className={styles.mobileUsername}>{username}</h1>
+          <p className={styles.mobileBio}>{year} {year && major ? '·' : ''} {major}</p>
+          <div className={styles.mobileActions}>
+            {isSelf
+              ? <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>Edit Profile</button>
+              : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}
+          </div>
+        </div>
+        <div className={styles.mobileStatsGrid}>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onModulesClick}>
+            <span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Modules</span>
+          </div>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onTasksClick}>
+            <span className={styles.mobileStatValue}>{profileData?.task_count || 0}</span>
+            <span className={styles.mobileStatLabel}>Tasks</span>
+          </div>
+          <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onEventsClick}>
+            <span className={styles.mobileStatValue}>{upcomingEventCount || 0}</span>
+            <span className={styles.mobileStatLabel}>Events</span>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 

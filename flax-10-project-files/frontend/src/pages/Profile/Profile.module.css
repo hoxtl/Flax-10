@@ -1191,3 +1191,132 @@
   flex-direction: column;
   gap: 8px;
 }
+
+/* Mobile Styles */
+
+.desktopOnly {
+  display: flex;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+.mobileHeaderWrap {
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.mobileHero {
+  position: relative;
+  background-color: var(--c-cocoa, #73513a);
+  background-image:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+    linear-gradient(135deg, var(--c-cocoa, #73513a) 0%, var(--primary, #c4a882) 100%);
+  background-size: 20px 20px, 20px 20px, 100% 100%;
+  border-radius: 20px;
+  padding: 32px 20px 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(115, 81, 58, 0.25);
+}
+
+.mobileAvatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.787);
+  background: var(--c-greige, #b4a494);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  overflow: hidden;
+}
+
+.mobileUsername {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.777);
+}
+
+.mobileBio {
+  font-size: 13px;
+  opacity: 0.9;
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+
+.mobileActions {
+  display: flex;
+  gap: 10px;
+}
+
+.mobileBtnEdit {
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+
+.mobileBtnEdit:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.mobileStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: -30px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.mobileStatCard {
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.mobileStatValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.mobileStatLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (max-width: 768px) {
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .mobileOnly {
+    display: flex;
+  }
+}
