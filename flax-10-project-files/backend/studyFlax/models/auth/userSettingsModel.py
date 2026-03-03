@@ -9,3 +9,4 @@ class UserSettings(models.Model):
     major = models.CharField(max_length=100, blank=True, default='')
     sleep_time = models.TimeField(default='23:00')
     wake_time = models.TimeField(default='07:00')
+    modules = models.JSONField(default=list, blank=True)

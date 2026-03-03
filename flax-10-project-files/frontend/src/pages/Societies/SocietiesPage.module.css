@@ -1,5 +1,5 @@
 .section {
-    margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 .sectionHeader {
@@ -58,16 +58,16 @@
 }
 
 .container {
-    padding: 12px 24px 24px 24px;
+  padding: 12px 24px 24px 24px;
 }
 
 .emptyContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
 }
 
 .emptyText {
@@ -76,15 +76,12 @@
     color: var(--muted);
 }
 
-
 .header {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 32px;
-    align-items: center;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  align-items: center;
 }
-
-
 
 .grid {
     display: grid;
@@ -181,4 +178,48 @@
     font-size: 0.95rem;
     border-top: 1px solid var(--border);
     margin-top: 24px;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .pillContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pillContainer::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sectionHeader h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .miniAddBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  :global(.SocietyCard_card) {
+    width: 100% !important;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border);
+  }
 }

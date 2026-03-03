@@ -15,6 +15,7 @@ export const initialState = {
     filter: ['all'],
     popupEvent: null,
     popupAnchorRect: null,
+    readOnly: false,
 };
 
 /*
@@ -34,6 +35,7 @@ const handlers = {
     SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
     OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect }),
     CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null }),
+    SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
 };
 
 /**

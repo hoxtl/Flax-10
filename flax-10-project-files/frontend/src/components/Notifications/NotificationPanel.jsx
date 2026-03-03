@@ -87,10 +87,24 @@ function NotificationList({ notifications, onDismiss }) {
 }
 
 function NotificationItem({ notification, onDismiss }) {
-    const { id, title, message, read, created_at } = notification;
+    const { id, title, message, read, created_at, action_url } = notification;
+
+    const handleClick = (e) => {
+        // Prevent click if they clicked the dismiss button
+        if (e.target.closest('.dismiss-btn')) return;
+        if (action_url) {
+            // Trigger a custom event that App.jsx can listen to for navigation, 
+            // since NotificationPanel might not have access to standard router context 
+            // if it's placed outside Routes, OR use standard window event:
+            window.location.hash = `#${action_url}`; // For HashRouter
+            // But since this app uses standard path routing via activeNav state:
+            const event = new CustomEvent('navigate', { detail: action_url.replace(/^\//, '') });
+            window.dispatchEvent(event);
+        }
+    };
 
     return (
-        <li className={`notification-item ${read ? '' : 'unread'}`}>
+        <li className={`notification-item ${read ? '' : 'unread'} ${action_url ? 'clickable' : ''}`} onClick={handleClick}>
             <div className="notification-content">
                 <span className="notification-title">{title}</span>
                 <span className="notification-message">{message}</span>

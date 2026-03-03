@@ -1,5 +1,5 @@
 from django.db.models import Q
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import calendar
 
 def filter_events_by_date_range(queryset, params):
@@ -109,8 +109,9 @@ def create_instance(base, start, dur, idx):
             self.recurrence_rule = base.recurrence_rule
             self.reminder_minutes = base.reminder_minutes
             self.module = base.module
-            self.source = base.source
-            self.external_id = base.external_id
+            self.is_private = getattr(base, 'is_private', False)
+            self.source = getattr(base, 'source', None)
+            self.external_id = getattr(base, 'external_id', None)
     return Evt()
 
 def check_event_overlap(user, data):
