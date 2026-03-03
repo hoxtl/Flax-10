@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { AlertCircle } from 'lucide-react';
 import styles from './HistoryModal.module.css';
 import { getHistory, clearHistory } from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
@@ -36,16 +37,33 @@ const ClearButton = ({ onClear }) => {
     return <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>{btn}</div>;
 };
 
+const ClearConfirmModal = ({ onConfirm, onCancel }) => {
+    const icon = <div style={{ minWidth: '40px', height: '40px', borderRadius: '50%', border: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#374151' }}><AlertCircle size={20} /></div>;
+    const title = <h3 style={{ margin: '0 0 0.5rem 0', color: '#111827', fontSize: '1.25rem', fontWeight: 600 }}>Are you sure?</h3>;
+    const msg = <p style={{ margin: 0, color: '#6b7280', lineHeight: 1.5 }}>Are you sure you want to delete your history?<br />All your data will be removed.</p>;
+    const textCol = <div style={{ flex: 1, textAlign: 'left' }}>{title}{msg}</div>;
+    const topRow = <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>{icon}{textCol}</div>;
+    const cancelBtn = <button style={{ padding: '0.6rem 1.25rem', borderRadius: '8px', border: '1px solid #e5e7eb', background: 'white', color: '#111827', fontWeight: 500, cursor: 'pointer' }} onClick={onCancel}>Cancel</button>;
+    const confirmBtn = <button style={{ padding: '0.6rem 1.25rem', borderRadius: '8px', border: 'none', background: '#111827', color: 'white', fontWeight: 500, cursor: 'pointer' }} onClick={(e) => onConfirm(e)}>Confirm</button>;
+    const btns = <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>{cancelBtn}{confirmBtn}</div>;
+    const content = <div className={styles.modal} style={{ maxWidth: '450px', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>{topRow}{btns}</div>;
+    return <div className={styles.overlay} style={{ zIndex: 1001 }} onClick={onCancel}>{content}</div>;
+};
+
 const useHistoryData = () => {
     const [history, setHistory] = useState([]);
+    const [showConfirm, setShowConfirm] = useState(false);
     useEffect(() => { getHistory().then(setHistory); }, []);
     const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
-    const clear = async () => {
-        if (!confirm('Clear all study history?')) return;
+    const triggerClear = () => setShowConfirm(true);
+    const cancelClear = () => setShowConfirm(false);
+    const confirmClear = async (e) => {
+        if (e) e.stopPropagation();
         await clearHistory();
         setHistory([]);
+        setShowConfirm(false);
     };
-    return { history, blocks, clear };
+    return { history, blocks, showConfirm, triggerClear, cancelClear, confirmClear };
 };
 
 const ModalContent = ({ history, blocks }) => {
@@ -55,10 +73,11 @@ const ModalContent = ({ history, blocks }) => {
 };
 
 export default function HistoryModal({ onClose }) {
-    const { history, blocks, clear } = useHistoryData();
+    const { history, blocks, showConfirm, triggerClear, cancelClear, confirmClear } = useHistoryData();
     const hdr = <HistoryHeader onClose={onClose} />;
     const content = <ModalContent history={history} blocks={blocks} />;
-    const cBtn = history.length > 0 ? <ClearButton onClear={clear} /> : null;
+    const cBtn = history.length > 0 ? <ClearButton onClear={triggerClear} /> : null;
     const inner = <div className={styles.modal} onClick={e => e.stopPropagation()}>{hdr}{content}{cBtn}</div>;
-    return <div className={styles.overlay} onClick={onClose}>{inner}</div>;
+    const confirmPopup = showConfirm ? <ClearConfirmModal onConfirm={confirmClear} onCancel={cancelClear} /> : null;
+    return <><div className={styles.overlay} onClick={onClose}>{inner}</div>{confirmPopup}</>;
 }
