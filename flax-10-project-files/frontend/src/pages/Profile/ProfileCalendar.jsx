@@ -5,6 +5,8 @@ import { NavigationButtons } from "../../components/Calendar/header/NavigationBu
 import { MonthView } from '../../components/Calendar/MonthView/MonthView';
 import { EventPopups } from '../../components/Calendar/EventPopups';
 import { ResizeHighlightProvider } from '../../context/ResizeHighlightContext';
+import { EventsSummaryModal } from "../../components/Calendar/EventsSummaryModal/EventsSummaryModal";
+import { useState } from "react";
 import "../../components/Calendar/CalendarHeader.css";
 import "../../components/Calendar/Calendar.css";
 
@@ -30,29 +32,37 @@ function ProfileCalendarHeader() {
     );
 }
 
-function ProfileCalendarInner({ events }) {
+function ProfileCalendarInner({ allEvents }) {
+    const [summaryDate, setSummaryDate] = useState(null);
     const dispatch = useCalendarDispatch();
 
     useEffect(() => {
         if (dispatch) {
-            dispatch({ type: 'SET_EVENTS', payload: events });
+            dispatch({ type: 'SET_EVENTS', payload: allEvents });
         }
-    }, [dispatch, events]);
+    }, [dispatch, allEvents]);
 
     return (
         <div className="calendar-container profile-calendar">
             <ProfileCalendarHeader />
-            <MonthView events={events} readOnly={true} />
+            <MonthView events={allEvents} readOnly={true} onMoreClick={setSummaryDate} />
             <EventPopups />
+            <EventsSummaryModal
+                isOpen={!!summaryDate}
+                onClose={() => setSummaryDate(null)}
+                allEvents={allEvents}
+                baseDate={summaryDate}
+                isMutualOrSelf={true}
+            />
         </div>
     );
 }
 
-export function ProfileCalendar({ events }) {
+export function ProfileCalendar({ allEvents }) {
     return (
         <CalendarProvider>
             <ResizeHighlightProvider>
-                <ProfileCalendarInner events={events} />
+                <ProfileCalendarInner allEvents={allEvents} />
             </ResizeHighlightProvider>
         </CalendarProvider>
     );

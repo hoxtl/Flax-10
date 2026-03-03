@@ -24,7 +24,6 @@ tag_fixtures = (
     ('Meeting', 30),
     ('Gym', 60),
     ('Grocery Shopping', 45),
-    ('Assignment Deadline', 0),
 )
 
 # Format: (frequency, interval)

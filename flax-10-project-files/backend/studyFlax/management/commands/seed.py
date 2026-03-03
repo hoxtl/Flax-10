@@ -162,15 +162,40 @@ class Command(BaseCommand):
         from faker import Faker
         f = Faker('en_GB')
         for name, duration in tag_fixtures:
-            category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-            user = (
-                category.user if category and category.user
-                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
-            )
+            if name == 'Lecture':
+                self._create_lecture_tag(name, duration)
+            else:
+                self._create_regular_tag(name, duration, f)
+
+    def _create_lecture_tag(self, name, duration):
+        Tag.objects.get_or_create(
+            name=name, user=None,
+            defaults={'default_duration': duration, 'color': '#4A90D9', 'is_default': True},
+        )
+        self._create_system_tags()
+
+    def _create_system_tags(self):
+        from studyFlax.views.calendar.system_tags import SYSTEM_TAG_CONFIG
+        for name, config in SYSTEM_TAG_CONFIG.items():
             Tag.objects.get_or_create(
-                name=name, user=user,
-                defaults={'category': category, 'default_duration': duration, 'color': f.hex_color()},
+                name=name, user=None,
+                defaults={'default_duration': config['duration'], 'color': config['color'], 'is_default': True},
             )
+
+    def _create_regular_tag(self, name, duration, faker):
+        category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
+        user = self._get_tag_user(category)
+        Tag.objects.get_or_create(
+            name=name, user=user,
+            defaults={'category': category, 'default_duration': duration, 'color': faker.hex_color()},
+        )
+
+    def _get_tag_user(self, category):
+        if category and category.user:
+            return category.user
+        if self.users and random.random() > 0.7:
+            return random.choice(self.users)
+        return None
 
     def create_events_for_users(self):
         """Seed personal and meal CalendarEvents for every non-staff user."""
@@ -305,15 +330,25 @@ class Command(BaseCommand):
             self._seed_society_tags_from_config(society, data.get('tags', []))
 
     def _create_society_from_config(self, data):
-        status = random.choice(['approved', 'pending', 'rejected', 'none'])
+        is_ratified = random.choice([True, False])
+        status = 'approved' if is_ratified else 'none'
         defaults = {
             'bio': data['bio'], 'about': data['about'],
             'categories': data.get('categories', []),
-            'ratification_status': status, 'is_ratified': (status == 'approved')
+            'ratification_status': status, 'is_ratified': is_ratified
         }
         if data.get('image'):
             defaults['image'] = data['image']
-        society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
+        existing = Society.objects.filter(name=data['name']).first()
+        if existing:
+            for key, value in defaults.items():
+                setattr(existing, key, value)
+            existing._skip_notification = True
+            existing.save()
+            return existing
+        society = Society(name=data['name'], **defaults)
+        society._skip_notification = True
+        society.save()
         return society
 
     def _seed_society_tags_from_config(self, society, tag_labels):
@@ -336,10 +371,11 @@ class Command(BaseCommand):
     def _create_event_from_template(self, society, template, tags):
         title, desc, hour, duration, recurrence, day = template
         start, end = build_event_datetime(hour, duration, day)
-        SocietyEvent.objects.get_or_create(
-            society=society, title=title,
-            defaults=self._build_event_defaults(desc, start, end, recurrence, tags)
-        )
+        if SocietyEvent.objects.filter(society=society, title=title).exists():
+            return
+        event = SocietyEvent(society=society, title=title, **self._build_event_defaults(desc, start, end, recurrence, tags))
+        event._skip_notification = True
+        event.save()
 
     def _build_event_defaults(self, desc, start, end, recurrence, tags):
         return {

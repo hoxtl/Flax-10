@@ -2,6 +2,7 @@ import styles from "./DayCard.module.css";
 import { formatTimeRange } from "./utils/cardUtils";
 import { useTags } from "../../context/TagContext";
 import { isReadOnlyEvent } from "../Calendar/utils/eventUtils";
+import { getEventTheme } from "../Calendar/utils/eventStyleUtils";
 
 function Header({ e }) {
   return (
@@ -30,10 +31,6 @@ function Footer({ e }) {
   return <div className={styles.warning}>⚠️ {e.warning}</div>;
 }
 
-function DeleteButton({ id, onDelete }) {
-  const handleClick = (ev) => { ev.stopPropagation(); onDelete?.(id); };
-  return <button className={styles.delete} onClick={handleClick} aria-label="Delete">×</button>;
-}
 
 function CardBody({ e, date }) {
   return (
@@ -46,18 +43,15 @@ function CardBody({ e, date }) {
   );
 }
 
-export default function DayCard({ e, onDelete, onClick, date }) {
-  const { getTag } = useTags();
-  const theme = getTag(e.tag);
-  const t = theme || { color: "#94A3B8", icon: "⭐" };
-  const readOnly = isReadOnlyEvent(e);
+export default function DayCard({ e, onClick, date }) {
+  const tags = useTags();
+  const t = getEventTheme(e, tags);
 
   return (
     <article className={styles.card} style={{ "--accent": t.color }} onClick={(ev) => onClick?.(ev)}>
       <div className={styles.row}>
         <div className={styles.iconWrap}>{t.icon}</div>
         <CardBody e={e} date={date} />
-        {!readOnly && <DeleteButton id={e.id} onDelete={onDelete} />}
       </div>
     </article>
   );
