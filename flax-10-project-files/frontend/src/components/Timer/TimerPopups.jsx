@@ -61,3 +61,25 @@ export const BreakModal = ({ onAction }) => (
         </div>
     </div>
 );
+
+export const LeaveTimerModal = ({ onCancel, onPause, onExit }) => (
+    <div className={styles.modalOverlay} style={{ zIndex: 2000 }}>
+        <div className={styles.modalContent}>
+            <div className={styles.modalTitle}>Leave focus time?</div>
+            <div className={styles.modalMessage} style={{ marginBottom: '1.5rem' }}>
+                Your timer is still running.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <button className={`${styles.button} ${styles.primary}`} onClick={onPause}>
+                    Pause Timer
+                </button>
+                <button className={styles.button} style={{ backgroundColor: '#fee2e2', color: '#dc2626', border: 'none' }} onClick={onExit}>
+                    Exit
+                </button>
+                <button className={styles.button} style={{ backgroundColor: '#f3f4f6', color: '#4b5563', border: 'none' }} onClick={onCancel}>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+);

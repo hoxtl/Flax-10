@@ -10,6 +10,8 @@ import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingChat from "../components/FloatingChat";
 import { useLocation } from "react-router-dom";
+import { useTimerContext } from "../context/TimerContext";
+import { LeaveTimerModal } from "../components/Timer/TimerPopups";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -126,8 +128,20 @@ function useDashboardState(activeNav, onNavChange) {
   const showWeekBar =
     activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
+
+  const t = useTimerContext();
+  const [pendingNav, setPendingNav] = useState(null);
+
+  const handleNavChange = (nav) => {
+    if (activeNav === "timer" && t.isActive && nav !== "timer") {
+      setPendingNav(nav);
+    } else {
+      onNavChange?.(nav);
+    }
+  };
+
   const onPickNav = (id) => {
-    onNavChange?.(id);
+    handleNavChange(id);
     setMobileSidebarOpen(false);
   };
   const onSelectType = (type) => {
@@ -146,6 +160,10 @@ function useDashboardState(activeNav, onNavChange) {
     modal,
     onPickNav,
     onSelectType,
+    handleNavChange,
+    pendingNav,
+    setPendingNav,
+    t,
   };
 }
 
@@ -230,7 +248,7 @@ function DashboardMain({ state, onNavChange, children }) {
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
-  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav } =
+  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav, handleNavChange, pendingNav, setPendingNav, t } =
     state;
   return (
     <div className={styles.root}>
@@ -238,18 +256,34 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
       <DashboardSidebars
         {...state}
         activeNav={activeNav}
-        onSettings={() => onNavChange("settings")}
+        onSettings={() => handleNavChange("settings")}
         onLogout={handleLogoutClick}
-        onProfile={() => onNavChange("profile")}
+        onProfile={() => handleNavChange("profile")}
       />
       {/* Main area — Topbar shown inside on desktop */}
       <DashboardMain
         state={{ ...state, activeNav, isMobile }}
-        onNavChange={onNavChange}
+        onNavChange={handleNavChange}
       >
         {children}
       </DashboardMain>
       <FloatingChat />
+
+      {pendingNav && (
+        <LeaveTimerModal
+          onCancel={() => setPendingNav(null)}
+          onPause={() => {
+            if (!t.isPaused) t.togglePause();
+            setPendingNav(null);
+          }}
+          onExit={() => {
+            t.setIsActive(false);
+            t.resetTimer();
+            onNavChange(pendingNav);
+            setPendingNav(null);
+          }}
+        />
+      )}
     </div>
   );
 }
