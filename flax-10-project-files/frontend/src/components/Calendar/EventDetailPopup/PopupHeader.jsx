@@ -1,11 +1,12 @@
 import styles from "./EventDetailPopup.module.css";
 
 export function PopupHeader({ event, tag, onClose }) {
+    const isNoneTag = tag?.id === 'none';
     return (
         <div className={styles.header}>
             <div className={styles.titleRow}>
                 <h3 className={styles.title}>{event.title}</h3>
-                {tag && <TagBadge tag={tag} />}
+                {tag && !isNoneTag && <TagBadge tag={tag} />}
                 {event.source === 'society' && <SocietyBadge name={event.society_name} />}
             </div>
             <button className={styles.closeBtn} onClick={onClose}>&times;</button>
