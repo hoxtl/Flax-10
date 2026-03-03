@@ -80,8 +80,10 @@ export default function Discover({ onNavChange }) {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1>Users</h1>
-                <p>Find course mates and study partners</p>
+                <div>
+                    <h1 className={styles.pageTitle}>Users</h1>
+                    <p className={styles.subtitle}>Find course mates and study partners</p>
+                </div>
             </div>
 
             <div className={styles.filterBar}>
