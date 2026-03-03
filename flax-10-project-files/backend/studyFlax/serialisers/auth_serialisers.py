@@ -43,6 +43,13 @@ class UserSerialiser(serializers.ModelSerializer):
     major = serializers.SerializerMethodField()
     bio = serializers.CharField(read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
+    shared_by_count = serializers.SerializerMethodField()
+    shared_with_count = serializers.SerializerMethodField()
+    is_shared_with_me = serializers.SerializerMethodField()
+    is_sharing = serializers.SerializerMethodField()
+    modules = serializers.SerializerMethodField()
+    study_hours_this_week = serializers.SerializerMethodField()
+    study_streak = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -50,6 +57,8 @@ class UserSerialiser(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
+            'shared_by_count', 'shared_with_count', 'is_shared_with_me', 'is_sharing',
+            'modules', 'study_hours_this_week', 'study_streak',
             'role',
             'is_superuser',
         ]
@@ -73,6 +82,52 @@ class UserSerialiser(serializers.ModelSerializer):
             return None
         request = self.context.get('request')
         return request.build_absolute_uri(obj.profile_photo.url) if request else None
+
+    def get_shared_by_count(self, obj):
+        # People who have shared their calendar with obj
+        return obj.shared_with_me.count()
+
+    def get_shared_with_count(self, obj):
+        # People obj has shared their calendar with
+        return obj.sharing_with.count()
+
+    def get_is_shared_with_me(self, obj):
+        # Has obj shared their calendar with request.user?
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.sharing_with.filter(shared_with=request.user).exists()
+        return False
+
+    def get_is_sharing(self, obj):
+        # Has request.user shared their calendar with obj?
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+            
+        if request.user == obj:
+            return True
+            
+        return request.user.sharing_with.filter(shared_with=obj).exists()
+
+    def get_modules(self, obj):
+        settings = getattr(obj, 'settings', None)
+        return getattr(settings, 'modules', []) if settings else []
+
+    def get_study_hours_this_week(self, obj):
+        request = self.context.get('request')
+        is_self = request and request.user.is_authenticated and request.user == obj
+        if not (is_self or self.get_is_shared_with_me(obj)):
+            return None
+        # Placeholder for exact implementation, needs StudySession logic
+        return 0
+
+    def get_study_streak(self, obj):
+        request = self.context.get('request')
+        is_self = request and request.user.is_authenticated and request.user == obj
+        if not (is_self or self.get_is_shared_with_me(obj)):
+            return None
+        # Placeholder for exact implementation, needs StudySession logic
+        return 0
 
 
 class LoggedUserSerialiser(serializers.Serializer):

@@ -20,7 +20,7 @@ describe('AuthFooter', () => {
     const { container } = render(<AuthFooter />);
     expect(container.firstChild.style.position).toBe('');
   });
-  
+
   it('applies absolute style when absolute is true', () => {
     const { container } = render(<AuthFooter absolute={true} />);
     expect(container.firstChild.style.position).toBe('absolute');

@@ -245,7 +245,13 @@ def get_weekly_study_hours(sessions_all):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_summary_view(request):
-    user = request.user
+    user_id = request.query_params.get('user_id')
+    if user_id:
+        from django.shortcuts import get_object_or_404
+        from studyFlax.models import User
+        user = get_object_or_404(User, id=user_id)
+    else:
+        user = request.user
 
     # All-time sessions for accurate badge computation
     sessions_all = list(StudySession.objects.filter(user=user))
