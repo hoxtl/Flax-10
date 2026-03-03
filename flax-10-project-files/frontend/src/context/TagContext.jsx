@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
 
 const TagContext = createContext(null);
-const DEFAULT_ICON = '🏷️';
+const NONE_TAG = { id: 'none', label: 'None', icon: '🏷️', color: '#94A3B8' };
 
 export function TagProvider({ children }) {
     const { tags, setTags, loading } = useTagLoader();
@@ -47,7 +47,7 @@ function useTagGetters(tags) {
 
 async function createTagAction(tag, setTags) {
     try {
-        const data = { name: tag.label, color: tag.color, icon: tag.icon || DEFAULT_ICON };
+        const data = { name: tag.label, color: tag.color, icon: tag.icon || '🏷️' };
         const created = await apiCreateTag(data);
         setTags((prev) => [...prev, mapBackendTag(created)]);
     } catch (err) {
@@ -75,18 +75,21 @@ async function updateTagAction(id, updates, setTags) {
 }
 
 function findTag(id, tags) {
+    if (!id) return NONE_TAG;
     const numId = typeof id === 'string' ? parseInt(id, 10) : id;
-    return tags.find((t) => t.id === numId) || tags.find((t) => t.label === 'Other');
+    return tags.find((t) => t.id === numId) || tags.find((t) => t.label === 'Other') || NONE_TAG;
 }
 
 function mapBackendTag(tag) {
-    return { id: tag.id, label: tag.name, icon: tag.icon || DEFAULT_ICON, color: tag.color };
+    let icon = tag.icon || '🏷️';
+    if (tag.name === 'Other' && icon === '🏷️') icon = '⭐';
+    return { id: tag.id, label: tag.name, icon, color: tag.color };
 }
 
 export function useTags() {
     const context = useContext(TagContext);
     if (!context) {
-        return { tags: [], loading: false, getTag: () => null, addTag: () => {}, deleteTag: () => {}, updateTag: () => {} };
+        return { tags: [], loading: false, getTag: () => null, addTag: () => { }, deleteTag: () => { }, updateTag: () => { } };
     }
     return context;
 }
