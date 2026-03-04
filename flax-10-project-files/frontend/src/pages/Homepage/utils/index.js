@@ -1,4 +1,5 @@
 export { formatTime } from "./dateFormatUtils";
+import { overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 
 export function isNow(startTime, endTime, now = new Date()) {
   const t = now.getTime();
@@ -15,11 +16,92 @@ export function isRoutineEvent(event) {
   return !!(event?.recurrence_rule || event?.tag?.name === "Routine");
 }
 
-export function getNavigatorContext(sortedEvents, now) {
-  const list = Array.isArray(sortedEvents) ? sortedEvents : [];
-  const current = list.find((e) => isNow(e.start_time, e.end_time, now));
-  const next = list.find((e) => new Date(e.start_time).getTime() > now.getTime());
-  return { current, next };
+/**
+ * Daily navigator context used by RIGHT NOW + header status strip.
+ * Returns:
+ * - state: "conflict" | "task" | "gap" | "beforeDay" | "endOfDay" | null
+ * - currentBlock: event happening now (if any)
+ * - nextItem: next upcoming event (if any)
+ * - gapMins: minutes until nextItem when in a gap
+ * - overlaps: array of { a, b, at } for overlapping events on the selected day
+ * - conflictAt: earliest overlap time (ms)
+ */
+export function getNavigatorContext(now, selectedDate, events, isTodayFn) {
+  const list = Array.isArray(events) ? events : [];
+  const day = new Date(selectedDate);
+  const isTodayFlag = typeof isTodayFn === "function" ? isTodayFn(selectedDate) : !!isTodayFn;
+
+  const dayEvents = list.filter((e) =>
+    e.start_time &&
+    overlapsDay(
+      new Date(e.start_time),
+      new Date(e.end_time || e.start_time),
+      day
+    )
+  );
+
+  const withTimes = dayEvents.map((e) => {
+    const start = new Date(e.start_time).getTime();
+    const end = new Date(e.end_time || e.start_time).getTime() || start;
+    return { ...e, _start: start, _end: end };
+  });
+
+  const nowMs = now.getTime();
+  const currentBlock = withTimes.find((e) => nowMs >= e._start && nowMs < e._end) || null;
+  const future = withTimes
+    .filter((e) => e._start > nowMs)
+    .sort((a, b) => a._start - b._start);
+  const nextItem = future[0] || null;
+
+  // Overlap detection for the day
+  const overlaps = [];
+  for (let i = 0; i < withTimes.length; i += 1) {
+    for (let j = i + 1; j < withTimes.length; j += 1) {
+      const a = withTimes[i];
+      const b = withTimes[j];
+      if (a._start < b._end && b._start < a._end) {
+        overlaps.push({ a, b, at: Math.max(a._start, b._start) });
+      }
+    }
+  }
+  const conflictAt = overlaps.length ? Math.min(...overlaps.map((o) => o.at)) : null;
+
+  let state = null;
+  let gapMins = null;
+
+  if (isTodayFlag) {
+    if (overlaps.length) {
+      state = "conflict";
+    } else if (currentBlock) {
+      state = "task";
+    } else {
+      const allDone =
+        withTimes.length > 0 &&
+        withTimes.every((e) => !Number.isNaN(e._end) && e._end < nowMs);
+      if (allDone) {
+        state = "endOfDay";
+      } else if (future.length > 0) {
+        const firstStart = future[0]._start;
+        const morningStart = new Date(selectedDate);
+        morningStart.setHours(6, 0, 0, 0);
+        if (nowMs < morningStart.getTime()) {
+          state = "beforeDay";
+        } else {
+          state = "gap";
+          gapMins = Math.max(0, Math.round((firstStart - nowMs) / 60000));
+        }
+      }
+    }
+  }
+
+  return {
+    state,
+    currentBlock,
+    nextItem,
+    gapMins,
+    overlaps,
+    conflictAt,
+  };
 }
 
 export function getMotivationMessage() {

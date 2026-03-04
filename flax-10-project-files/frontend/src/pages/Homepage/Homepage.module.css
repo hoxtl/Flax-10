@@ -1,5 +1,5 @@
 /* Minimal placeholder so build passes after cherry-pick; restore full file from branch if needed */
-.page { padding: 1rem; max-width: 1200px; margin: 0 auto; }
+.page { padding: 1rem; max-width: 1200px; margin: 0 auto; padding-bottom: 3rem; }
 .focusModeActive { }
 .alertToast { position: fixed; top: 1rem; right: 1rem; z-index: 1000; }
 .alertContent { display: flex; align-items: center; gap: 0.5rem; }
@@ -17,49 +17,368 @@
 .intelligenceRowWrap { margin-bottom: 1.5rem; }
 .intRowSlotContent { }
 .intRowSlotText { font-size: 0.875rem; color: #6b5f57; margin: 0; }
-.intRowSlotLink { font-size: 0.75rem; color: #9a8778; }
+.intRowSlotLink { font-size: 0.75rem; font-weight: 500; color: #a8a29e; }
+.intRowSlotLink:hover { color: #57534e; }
+
+/* ─── DEADLINES widget (refined list — no thick borders, plain text meta) ─── */
+.deadlineWidgetWrap {
+  margin-top: 1rem; /* mb-4 below card title */
+  font-family: var(--font-body);
+}
+.deadlineList {
+  display: flex;
+  flex-direction: column;
+}
+.deadlineRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem;
+  margin: 0 -0.5rem;
+  border: none;
+  border-bottom: 1px solid #f5f5f4;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: calc(100% + 1rem);
+  transition: background-color 0.15s;
+  border-radius: 0.5rem;
+}
+.deadlineRow:hover {
+  background: #fafaf9;
+}
+.deadlineRowLast {
+  border-bottom: none;
+}
+.deadlineDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+}
+.deadlineDotRed { background: #f87171; }
+.deadlineDotAmber { background: #fbbf24; }
+.deadlineDotGreen { background: #4ade80; }
+.deadlineBody {
+  flex: 1;
+  min-width: 0;
+}
+.deadlineLine1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 2px;
+}
+.deadlineName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #44403c;
+  line-height: 1.35;
+}
+.deadlineDays {
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.deadlineDaysRed { color: #ef4444; }
+.deadlineDaysAmber { color: #f59e0b; }
+.deadlineDaysGreen { color: #a8a29e; }
+.deadlineMeta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #a8a29e;
+  line-height: 1.4;
+}
+.deadlineProgress {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.deadlineProgressLabel {
+  font-size: 10px;
+  color: #d6d3d1;
+}
+.deadlineProgressTrack {
+  height: 4px;
+  width: 96px;
+  border-radius: 9999px;
+  background: #f5f5f4;
+  overflow: hidden;
+}
+.deadlineProgressFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: #a8a29e;
+  transition: width 0.2s ease;
+}
+.deadlineEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+.deadlineEmptyIcon {
+  width: 24px;
+  height: 24px;
+  color: #d6d3d1;
+  flex-shrink: 0;
+}
+.deadlineEmptyText {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #a8a29e;
+}
+.deadlineFooterLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f5f5f4;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.deadlineFooterLink:hover {
+  color: #57534e;
+}
+
 .intRowDeadlineList2 { display: flex; flex-direction: column; gap: 0.5rem; }
-.intRowDeadline2TypePillExam { }
-.intRowDeadline2TypePillPresentation { }
-.intRowDeadline2TypePillCw { }
-.intRowDeadline2TypePillQuiz { }
-.intRowDeadlineRow2 { padding: 0.5rem 0; }
-.intRowDeadlineRow2Red { }
-.intRowDeadlineRow2Amber { }
-.intRowDeadlineRow2Green { }
-.intRowDeadline2Line1 { }
-.intRowDeadline2Pills { display: flex; gap: 0.35rem; flex-wrap: wrap; }
-.intRowDeadline2ModuleCode { font-size: 0.7rem; padding: 0.2rem 0.4rem; border-radius: 4px; }
-.intRowDeadline2TypePill { font-size: 0.65rem; padding: 0.2rem 0.4rem; border-radius: 4px; }
-.intRowDeadline2Days { font-size: 0.75rem; font-weight: 600; }
-.intRowDeadline2DaysRed { color: #b91c1c; }
-.intRowDeadline2DaysAmber { color: #b45309; }
-.intRowDeadline2DaysGreen { color: #15803d; }
-.intRowDeadline2Title { margin: 0; font-size: 0.875rem; font-weight: 500; }
-.intRowFocusWrapSimple { }
+/* Deadline row: 3px left border by urgency, pl-3 so text doesn’t touch border */
+.intRowDeadlineRow2 {
+  padding: 0.4rem 0 0.4rem 0.75rem; /* pl-3 */
+  border-left: 3px solid transparent;
+}
+.intRowDeadlineRow2Red { border-left-color: #dc2626; }
+.intRowDeadlineRow2Amber { border-left-color: #ea580c; }
+.intRowDeadlineRow2Green { border-left-color: #4ade80; } /* border-green-400 */
+.intRowDeadline2Line1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 2px;
+  min-width: 0;
+}
+.intRowDeadline2Pills {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.intRowDeadline2ModuleCode {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 500;
+  background: #f5f5f4;
+  color: #57534e;
+}
+.intRowDeadline2ModuleCodeLink {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 500;
+  background: rgba(123, 103, 81, 0.12);
+  color: #5c4d3e;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.intRowDeadline2ModuleCodeLink:hover {
+  background: rgba(123, 103, 81, 0.2);
+  color: #4A3421;
+}
+.intRowDeadline2TypePill {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: transparent;
+}
+.intRowDeadline2TypePillExam { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.intRowDeadline2TypePillPresentation { background: #faf5ff; color: #9333ea; border-color: #e9d5ff; }
+.intRowDeadline2TypePillCw { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.intRowDeadline2TypePillQuiz { background: #e0e7ff; color: #4338ca; }
+.intRowDeadline2Days {
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.intRowDeadline2DaysRed { color: #dc2626; }
+.intRowDeadline2DaysAmber { color: #ea580c; }
+.intRowDeadline2DaysGreen { color: #16a34a; } /* text-green-600 */
+.intRowDeadline2Title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #44403c; /* text-stone-700 */
+  line-height: 1.35;
+}
+.intRowFocusWrapSimple {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+  min-height: 0;
+}
+.intRowFocusBestWindowLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a8a29e;
+  margin-bottom: 2px;
+}
 .intRowFocusHeadline { display: flex; align-items: baseline; gap: 0.25rem; flex-wrap: wrap; }
-.intRowFocusHeadlineNum { font-weight: 600; }
-.intRowFocusHeadlineWord { font-size: 0.8rem; color: #6b5f57; }
+.intRowFocusHeadlineNum { font-weight: 700; }
+.intRowFocusHeadlineWord { font-size: 0.8rem; color: #6b5f57; font-weight: 400; }
 .intRowFocusHeadlineDot { color: #9a8778; }
-.intRowFocusBestWindow { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; }
-.intRowFocusBestWindowLeft { display: flex; flex-direction: column; gap: 0.15rem; }
-.intRowFocusBestWindowLabel { font-size: 0.7rem; text-transform: uppercase; color: #9a8778; }
-.intRowFocusBestWindowTime { font-size: 0.875rem; font-weight: 500; }
-.intRowFocusBestWindowDur { font-size: 0.75rem; color: #6b5f57; }
-.intRowFocusFooterLink { font-size: 0.75rem; color: #9a8778; }
+.intRowFocusLongShort { margin: 0 0 0.5rem; font-size: 0.75rem; color: #a8a29e; }
+.intRowFocusBestWindow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+}
+.intRowFocusBestWindowTime { font-size: 0.875rem; font-weight: 500; color: #44403c; }
+.intRowFocusBestWindowPill {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #f5f5f4;
+  color: #57534e;
+  flex-shrink: 0;
+}
+.intRowFocusNextAfter { margin-top: 0.25rem; }
+.intRowFocusNextAfterLine { margin: 0; font-size: 0.75rem; color: #a8a29e; }
+.intRowFocusDayBar {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+}
+.intRowFocusDayBarFree { background: #22c55e; min-width: 2px; }
+.intRowFocusDayBarBusy { background: #e7e5e4; min-width: 2px; }
+.intRowFocusFooterLink { font-size: 0.75rem; font-weight: 500; color: #a8a29e; background: none; border: none; cursor: pointer; padding: 0; margin-top: auto; }
+.intRowFocusFooterLink:hover { color: #57534e; }
 .intRowNudgeFallback { margin: 0; font-size: 0.875rem; color: #6b5f57; }
-.deadlineDetailOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 200; }
-.deadlineDetailCard { background: #fff; border-radius: 16px; max-width: 420px; width: 90%; padding: 1.5rem; }
-.deadlineDetailHeader { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-.deadlineDetailPills { display: flex; gap: 0.35rem; flex-wrap: wrap; }
-.intRowDeadlinePill { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; }
-.intRowDeadlinePillType { }
-.deadlineDetailClose { background: none; border: none; cursor: pointer; font-size: 1.25rem; color: #9a8778; }
-.deadlineDetailTitle { margin: 0 0 0.5rem; font-size: 1.1rem; font-weight: 600; }
-.deadlineDetailDate { margin: 0; font-size: 0.875rem; color: #6b5f57; }
-.deadlineDetailDesc { margin: 0.5rem 0; font-size: 0.875rem; line-height: 1.5; }
-.deadlineDetailMeta { margin: 0; font-size: 0.8rem; color: #9a8778; }
-.deadlineDetailLink { font-size: 0.875rem; color: #6B5344; }
+.deadlineDetailOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(45, 53, 45, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.deadlineDetailCard {
+  font-family: var(--font-body);
+  background: #FFFCFA;
+  border-radius: 16px;
+  border: 1px solid rgba(123, 103, 81, 0.22);
+  box-shadow: 0 12px 40px rgba(74, 52, 33, 0.12);
+  max-width: 420px;
+  width: 90%;
+  padding: 1.5rem 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.deadlineDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.deadlineDetailPills {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.deadlineDetailCard .intRowDeadlinePill {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: rgba(123, 103, 81, 0.12);
+  color: #5c4d3e;
+}
+.deadlineDetailCard .intRowDeadlinePillType {
+  background: rgba(123, 103, 81, 0.18);
+  color: #4A3421;
+}
+.deadlineDetailClose {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(123, 103, 81, 0.2);
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #7B6751;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.deadlineDetailClose:hover {
+  background: rgba(123, 103, 81, 0.1);
+  color: #4A3421;
+}
+.deadlineDetailTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d352d;
+  line-height: 1.35;
+}
+.deadlineDetailDate {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #7B6751;
+  letter-spacing: 0.02em;
+}
+.deadlineDetailDesc {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #5c4d3e;
+}
+.deadlineDetailMeta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #7B6751;
+}
+.deadlineDetailLink {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6B5344;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.deadlineDetailLink:hover {
+  color: #4A3421;
+  text-decoration: underline;
+}
 .bentoSpine { }
 .timelineBox { }
 .timelineHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }

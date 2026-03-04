@@ -55,7 +55,8 @@ import { formatScheduleCountdown } from "./utils/dateFormatUtils";
 import { useHomeData } from "./hooks/useHomeData";
 import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
 import { ActionHubSlot } from "./components/ActionHubSlot";
-import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
+import { DeadlinesWidget } from "./components/DeadlinesWidget";
+import { FocusWindowsWidget } from "./components/FocusWindowsWidget";
 
 /** Module code → pill color (same hash as TaskCard for consistency). */
 const MODULE_COLORS = [
@@ -121,10 +122,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
   const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
   const [lastCreatedListId, setLastCreatedListId] = useState(null);
   const [rescheduleTask, setRescheduleTask] = useState(null);
-  const [planTimelineReadItem, setPlanTimelineReadItem] = useState(null);
   const [celebratingTaskId, setCelebratingTaskId] = useState(null);
-  const [floatingSeedTaskId, setFloatingSeedTaskId] = useState(null);
-  const [floatingSeedXp, setFloatingSeedXp] = useState(0);
   const [nowHeroFocusBtnHovered, setNowHeroFocusBtnHovered] = useState(false);
   const [showXPSparks, setShowXPSparks] = useState(false);
   const prevTimeLeftRef = useRef(null);
@@ -320,14 +318,6 @@ export default function Homepage({ onNavigate, onNavChange }) {
     return "flax";
   }, [getTag]);
 
-  const getActionHubXp = (task) => {
-    const p = task?.priority;
-    if (p === "urgent") return 15;
-    if (p === "high") return 12;
-    if (p === "medium") return 10;
-    return 8;
-  };
-
   const handleActionHubComplete = useCallback(async (t) => {
     const newCompleted = !t.completed;
     const numericId = typeof t.id === "string" && t.id.startsWith("task-") ? Number(t.id.replace("task-", "")) : t.id;
@@ -335,27 +325,8 @@ export default function Homepage({ onNavigate, onNavChange }) {
       await updateTask(numericId, { completed: newCompleted });
       refetchTasks();
       if (newCompleted) {
-        const xp = getActionHubXp(t);
         const isRoutine = isRoutineTask(t);
         showCompletionToast(getCompletionMessage(t), { isRoutine });
-        if (!isRoutine) {
-          setFloatingSeedXp(xp);
-          setFloatingSeedTaskId(numericId);
-          setTimeout(() => { setFloatingSeedTaskId(null); setFloatingSeedXp(0); }, 1400);
-          try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.setValueAtTime(520, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(680, ctx.currentTime + 0.06);
-            gain.gain.setValueAtTime(0.08, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.15);
-          } catch (_) {}
-        }
       }
     } catch {
       setToast("Couldn't update task.");
@@ -765,7 +736,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
       const statusOrder = { overdue: 0, now: 1, upcoming: 2, completed: 3 };
       return (statusOrder[a.actionHubStatus] ?? 2) - (statusOrder[b.actionHubStatus] ?? 2);
     };
-    return [...tasks].sort(order);
+    return [...tasks].sort(order).slice(0, 5);
   }, [selectedDate, allTasks, getTag]);
 
   /** Task-only: no events. */
@@ -1102,78 +1073,6 @@ export default function Homepage({ onNavigate, onNavChange }) {
     }
   }, [missedItems, overdueTasksForNow, sortedEvents, selectedDate, editEvent, addEvent, loadEvents, showToast, refetchTasks]);
 
-  /** Plan timeline: total focus window minutes (gaps >= 30 min between events today) for daily summary. */
-  const planTimelineFocusWindowMinutes = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return 0;
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(DAY_START_HOUR, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(DAY_END_HOUR, 0, 0, 0);
-    const inWindow = sortedEvents.filter((e) => {
-      const s = new Date(e.start_time).getTime();
-      const eEnd = new Date(e.end_time || e.start_time).getTime();
-      return eEnd > dayStart.getTime() && s < dayEnd.getTime();
-    }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    let total = 0;
-    let lastEnd = dayStart.getTime();
-    for (const ev of inWindow) {
-      const start = new Date(ev.start_time).getTime();
-      const end = new Date(ev.end_time || ev.start_time).getTime();
-      const gapMins = (start - lastEnd) / 60000;
-      if (gapMins >= 30) total += Math.round(gapMins);
-      if (end > lastEnd) lastEnd = end;
-    }
-    const tailMins = (dayEnd.getTime() - lastEnd) / 60000;
-    if (tailMins >= 30) total += Math.round(tailMins);
-    return total;
-  }, [selectedDate, sortedEvents]);
-
-  /** Remaining focus window minutes (future gaps only) and predicted finish time for today. */
-  const planTimelinePredictedFinish = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return { remainingMins: 0, predictedFinishTime: null };
-    const now = new Date();
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(DAY_START_HOUR, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(DAY_END_HOUR, 0, 0, 0);
-    if (now >= dayEnd) return { remainingMins: 0, predictedFinishTime: null };
-    const inWindow = sortedEvents.filter((e) => {
-      const s = new Date(e.start_time).getTime();
-      const eEnd = new Date(e.end_time || e.start_time).getTime();
-      return eEnd > dayStart.getTime() && s < dayEnd.getTime();
-    }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    let remaining = 0;
-    let lastEnd = dayStart.getTime();
-    for (const ev of inWindow) {
-      const start = new Date(ev.start_time).getTime();
-      const end = new Date(ev.end_time || ev.start_time).getTime();
-      const gapMins = (start - lastEnd) / 60000;
-      const gapEnd = lastEnd + gapMins * 60000;
-      if (gapMins >= 30 && gapEnd > now.getTime()) {
-        const startInGap = Math.max(lastEnd, now.getTime());
-        remaining += Math.round((gapEnd - startInGap) / 60000);
-      }
-      if (end > lastEnd) lastEnd = end;
-    }
-    const tailMins = (dayEnd.getTime() - lastEnd) / 60000;
-    const tailEnd = lastEnd + tailMins * 60000;
-    if (tailMins >= 30 && tailEnd > now.getTime()) {
-      const startInTail = Math.max(lastEnd, now.getTime());
-      remaining += Math.round((tailEnd - startInTail) / 60000);
-    }
-    const predictedFinishTime = remaining > 0
-      ? (() => {
-          const finish = new Date(now.getTime() + remaining * 60000);
-          return `${String(finish.getHours()).padStart(2, "0")}:${String(finish.getMinutes()).padStart(2, "0")}`;
-        })()
-      : null;
-    return { remainingMins: remaining, predictedFinishTime };
-  }, [selectedDate, sortedEvents]);
-
-  /** Aliases for legacy/cached references (actionHubFocusWindowMinutes, actionHubReadItem). */
-  const actionHubFocusWindowMinutes = actionHubFocusHours * 60;
-  const actionHubReadItem = planTimelineReadItem;
-
   const prevSeedsCountRef = useRef(seedsCountFromTasks);
   const [seedsBounce, setSeedsBounce] = useState(false);
   useEffect(() => {
@@ -1276,7 +1175,6 @@ export default function Homepage({ onNavigate, onNavChange }) {
             actionHubList={actionHubList}
             showAllActionHubTasks={showAllActionHubTasks}
             setShowAllActionHubTasks={setShowAllActionHubTasks}
-            floatingSeedTaskId={floatingSeedTaskId}
             getTaskCategoryPill={getTaskCategoryPill}
             getTaskCategoryColor={getTaskCategoryColor}
             handleActionHubComplete={handleActionHubComplete}
@@ -1295,147 +1193,21 @@ export default function Homepage({ onNavigate, onNavChange }) {
           streak: analyticsSummary?.summary?.current_streak_days ?? 0,
         } : null}
         slot3Urgent={
-          (() => {
-            const nowMs = Date.now();
-            const deadlines = (upcomingDeadlines || [])
-              .filter(d => d.start_due_date)
-              .map(d => {
-                const ms = new Date(d.start_due_date) - nowMs;
-                const daysLeft = Math.ceil(ms / 86400000);
-                const urgency = ms <= 0 || daysLeft < 3 ? "Red"
-                  : daysLeft < 7 ? "Amber"
-                  : "Green";
-                return { ...d, daysLeft, urgency };
-              })
-              .sort((a, b) => a.daysLeft - b.daysLeft)
-              .slice(0, 3);
-
-            if (deadlines.length === 0) {
-              return (
-                <div className={styles.intRowSlotContent}>
-                  <p className={styles.intRowSlotText}>No upcoming deadlines</p>
-                  <Link to="/modules?filter=enrolled" className={styles.intRowSlotLink}>View my modules →</Link>
-                </div>
-              );
-            }
-
-            return (
-              <div className={styles.intRowDeadlineList2}>
-                {deadlines.map(d => {
-                  const moduleColor = getModuleColor(d.module_code);
-                  const daysLabel = d.daysLeft <= 0 ? "Due today"
-                    : d.daysLeft === 1 ? "1 day"
-                    : `${d.daysLeft} days`;
-                  const typeKey = (d.deadline_type || "").toLowerCase();
-                  const isExam = typeKey === "exam";
-                  const isPresentation = typeKey === "presentation";
-                  const isCoursework = typeKey === "coursework";
-                  const isQuiz = typeKey === "quiz";
-                  const typePillClass = isExam
-                    ? styles.intRowDeadline2TypePillExam
-                    : isPresentation
-                    ? styles.intRowDeadline2TypePillPresentation
-                    : isCoursework
-                    ? styles.intRowDeadline2TypePillCw
-                    : isQuiz
-                    ? styles.intRowDeadline2TypePillQuiz
-                    : styles.intRowDeadline2TypePillCw;
-                  const typeLabel = d.deadline_type
-                    ? d.deadline_type.charAt(0).toUpperCase() + d.deadline_type.slice(1)
-                    : null;
-
-                  return (
-                    <div
-                      key={d.id}
-                      className={`${styles.intRowDeadlineRow2} ${styles[`intRowDeadlineRow2${d.urgency}`]}`}
-                    >
-                      <div className={styles.intRowDeadline2Line1}>
-                        <div className={styles.intRowDeadline2Pills}>
-                          {d.module_code && (
-                            <span
-                              className={styles.intRowDeadline2ModuleCode}
-                              style={{ background: moduleColor.bg, color: moduleColor.text }}
-                            >
-                              {d.module_code}
-                            </span>
-                          )}
-                          {typeLabel && (
-                            <button
-                              type="button"
-                              className={`${styles.intRowDeadline2TypePill} ${typePillClass}`}
-                              onClick={() => setSelectedDeadline(d)}
-                            >
-                              {typeLabel}
-                            </button>
-                          )}
-                        </div>
-                        <span className={`${styles.intRowDeadline2Days} ${styles[`intRowDeadline2Days${d.urgency}`]}`}>
-                          {daysLabel}
-                        </span>
-                      </div>
-
-                      <p className={styles.intRowDeadline2Title}>
-                        {d.assessment_title || d.title || "Assignment"}
-                      </p>
-                    </div>
-                  );
-                })}
-                <Link to="/modules?filter=enrolled" className={styles.intRowSlotLink}>View my modules →</Link>
-              </div>
-            );
-          })()
+          <DeadlinesWidget
+            deadlines={upcomingDeadlines || []}
+            onSelectDeadline={setSelectedDeadline}
+          />
         }
         slot4Energy={
           !isToday(selectedDate) ? (
             <p className={styles.intRowSlotText}>Select today to see study windows</p>
-          ) : todayFreeWindows.length > 0 ? (
-            <div className={styles.intRowFocusWrapSimple}>
-              {/* Headline: "5 windows · 16h 20m free today" */}
-              {focusSummary && (
-                <div className={styles.intRowFocusHeadline}>
-                  <span className={styles.intRowFocusHeadlineNum}>{focusSummary.count}</span>
-                  <span className={styles.intRowFocusHeadlineWord}>
-                    {focusSummary.count !== 1 ? "windows" : "window"}
-                  </span>
-                  <span className={styles.intRowFocusHeadlineDot}>·</span>
-                  <span className={styles.intRowFocusHeadlineNum}>{focusSummary.durLabel}</span>
-                  <span className={styles.intRowFocusHeadlineWord}>free today</span>
-                </div>
-              )}
-
-              {/* One "Best window" card — longest free window */}
-              {(() => {
-                const best = [...todayFreeWindows].sort((a, b) => b.minutes - a.minutes)[0];
-                if (!best) return null;
-                const mins = Math.round(best.minutes);
-                const durLabel = mins >= 60
-                  ? `${Math.floor(mins / 60)}h${mins % 60 > 0 ? ` ${mins % 60}m` : ""}`
-                  : `${mins}m`;
-                return (
-                  <div className={styles.intRowFocusBestWindow}>
-                    <div className={styles.intRowFocusBestWindowLeft}>
-                      <span className={styles.intRowFocusBestWindowLabel}>Best window</span>
-                      <span className={styles.intRowFocusBestWindowTime}>
-                        {formatTime(best.start.toISOString())} – {formatTime(best.end.toISOString())}
-                      </span>
-                    </div>
-                    <span className={styles.intRowFocusBestWindowDur}>{durLabel}</span>
-                  </div>
-                );
-              })()}
-
-              <button
-                type="button"
-                className={styles.intRowFocusFooterLink}
-                onClick={() => goToNav?.("analytics")}
-              >
-                View full analytics →
-              </button>
-            </div>
           ) : (
-            <p className={styles.intRowNudgeFallback}>
-              {sortedEvents.length > 0 ? "Day fully scheduled — no gaps" : "No events yet today"}
-            </p>
+            <FocusWindowsWidget
+              windows={todayFreeWindows}
+              now={now}
+              onViewAnalytics={() => goToNav?.("analytics")}
+              onStartFocus={() => navigate("/timer")}
+            />
           )
         }
         slot5Data={{
@@ -1501,6 +1273,15 @@ export default function Homepage({ onNavigate, onNavChange }) {
             {(selectedDeadline.module_id ?? selectedDeadline.module) && (
               <Link
                 to={`/modules?moduleId=${selectedDeadline.module_id ?? selectedDeadline.module}`}
+                className={styles.deadlineDetailLink}
+                onClick={() => setSelectedDeadline(null)}
+              >
+                Go to module →
+              </Link>
+            )}
+            {!(selectedDeadline.module_id ?? selectedDeadline.module) && selectedDeadline.module_code && (
+              <Link
+                to={`/modules?code=${encodeURIComponent(selectedDeadline.module_code)}`}
                 className={styles.deadlineDetailLink}
                 onClick={() => setSelectedDeadline(null)}
               >
@@ -1583,28 +1364,6 @@ export default function Homepage({ onNavigate, onNavChange }) {
             } catch (_) {}
           }}
           onClose={() => setRescheduleTask(null)}
-        />
-      )}
-
-      {planTimelineReadItem && (
-        <PlanReadDetailModal
-          item={planTimelineReadItem}
-          styles={styles}
-          onClose={() => setPlanTimelineReadItem(null)}
-          onEditTask={(task) => {
-            setRescheduleTask(task);
-          }}
-          onDeleteTask={async (task) => {
-            await deleteTask(task.id);
-            refetchTasks();
-          }}
-          onEditEvent={(ev) => {
-            openModal({ ...ev, id: extractBaseEventId(ev.id) }, ev.tag);
-          }}
-          onDeleteEvent={async (ev) => {
-            await removeEvent(extractBaseEventId(ev.id));
-            await loadEvents();
-          }}
         />
       )}
     </div>

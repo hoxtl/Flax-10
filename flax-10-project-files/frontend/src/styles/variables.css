@@ -5,10 +5,13 @@
   --card-radius: 24px;
   --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 
-  /* Typography: Lexend for headers/task titles; JetBrains Mono for numbers/timestamps */
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Typography: single font for all UI text (greeting, tasks, pills, dates, titles) */
+  --font-body: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-heading: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+
+  /* Primary font applied globally so all text (including form elements via inherit) uses it */
+  font-family: var(--font-body);
 
   /* Weight rules: titles 700, task names/pills 500, subtext/captions 400 */
   --font-weight-title: 700;

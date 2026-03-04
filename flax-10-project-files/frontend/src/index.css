@@ -5,7 +5,7 @@ body,
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.5;
   font-weight: 400;
 
@@ -17,6 +17,17 @@ body,
 
 * {
   box-sizing: border-box;
+}
+
+/* Form elements inherit app primary font (Lexend from variables.css) */
+input,
+select,
+textarea,
+button,
+optgroup,
+[role="combobox"],
+[role="listbox"] {
+  font-family: inherit;
 }
 
 a {

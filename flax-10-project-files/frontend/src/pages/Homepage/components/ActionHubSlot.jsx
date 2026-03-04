@@ -12,11 +12,6 @@ import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 
 const VISIBLE_COUNT = 5;
 
-function getTagStyle(colorVariant) {
-  if (colorVariant === "sage") return { bg: "#e8f4f0", color: "#2d5f50" };
-  return { bg: "#f5f2ef", color: "#6b5f57" };
-}
-
 export function ActionHubSlot({
   styles,
   displayName,
@@ -27,7 +22,6 @@ export function ActionHubSlot({
   actionHubList,
   showAllActionHubTasks,
   setShowAllActionHubTasks,
-  floatingSeedTaskId,
   getTaskCategoryPill,
   getTaskCategoryColor,
   handleActionHubComplete,
@@ -91,8 +85,6 @@ export function ActionHubSlot({
               const isOverdue = t.actionHubStatus === "overdue";
               const isNow = t.actionHubStatus === "now";
               const moduleLabel = getTaskCategoryPill ? getTaskCategoryPill(t) : null;
-              const colorVariant = getTaskCategoryColor ? getTaskCategoryColor(t) : "flax";
-              const tagStyle = moduleLabel ? getTagStyle(colorVariant) : null;
 
               return (
                 <motion.li
@@ -117,17 +109,6 @@ export function ActionHubSlot({
                     >
                       {t.completed && "✓"}
                     </span>
-                    {floatingSeedTaskId === t.id && (
-                      <motion.span
-                        className={styles.actionHubFloatingXp}
-                        initial={{ opacity: 1, y: 0 }}
-                        animate={{ opacity: 0, y: -24 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        aria-hidden
-                      >
-                        +50 XP
-                      </motion.span>
-                    )}
                   </button>
 
                   <span
@@ -140,11 +121,8 @@ export function ActionHubSlot({
                   </span>
 
                   <div className={styles.actionHubTaskRight}>
-                    {moduleLabel && tagStyle && (
-                      <span
-                        className={styles.actionHubTaskTag}
-                        style={{ background: tagStyle.bg, color: tagStyle.color }}
-                      >
+                    {moduleLabel && (
+                      <span className={styles.actionHubTaskTag}>
                         {moduleLabel}
                       </span>
                     )}

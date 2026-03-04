@@ -14,8 +14,19 @@ import styles from "./TasksPage.module.css";
 
 function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = []) {
     return useMemo(() => {
+        const now = new Date();
         const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
+
+        function isRoutineOrEventTask(t) {
+            if (!t) return false;
+            const title = (t.title || "").toLowerCase();
+            const tag = (t.tag || "").toString().toLowerCase();
+            if (tag === "routine" || tag === "event") return true;
+            if (/breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title)) return true;
+            if (/lecture|seminar|tutorial|lab\s*session/i.test(title)) return true;
+            return false;
+        }
 
         let filtered = tasks;
         if (filterListIds && filterListIds.length > 0) {
@@ -26,7 +37,7 @@ function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = [])
         }
 
         if (activeFilter === "overdue")
-            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < dayStart);
+            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now && !isRoutineOrEventTask(t));
         if (activeFilter === "today")
             return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
         return filtered;
