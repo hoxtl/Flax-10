@@ -11,7 +11,6 @@ import TagFilterBar from "../../tags/TagFilterBar";
 import TagManager from "../../tags/TagManager";
 import { EventDetailPopup } from "../../../../Calendar/EventDetailPopup";
 import SyncButton from "./SyncButton";
-import { EventsSummaryModal } from "../../../../Calendar/EventsSummaryModal/EventsSummaryModal";
 
 export default function CalendarTab(props) {
     return (
@@ -25,7 +24,6 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
-    const [summaryDate, setSummaryDate] = useState(null);
     const { openModal } = useEventModal();
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
@@ -50,7 +48,6 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
                         setPopupState({ event: e, rect: r });
                     }
                 }}
-                onMoreClick={setSummaryDate}
                 customTags={tags} />
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
             {popupState.event && <EventDetailPopup event={popupState.event} anchorRect={popupState.rect}
@@ -59,13 +56,6 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
                     onEdit: () => openModal(popupState.event, 'society', popupState.event.start_time),
                     onDelete: (e) => handlePopupDelete(e, eventHandlers, closePopup)
                 })} />}
-            <EventsSummaryModal
-                isOpen={!!summaryDate}
-                onClose={() => setSummaryDate(null)}
-                allEvents={events}
-                baseDate={summaryDate}
-                isMutualOrSelf={true}
-            />
         </div>
     );
 }

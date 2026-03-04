@@ -1,7 +1,6 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { useTags } from '../../../context/TagContext';
 import { isSameDay } from '../utils/dateUtils';
-import { getEventTheme } from '../utils/eventStyleUtils';
 
 export function HoverSummary({ events, date }) {
     if (!events || events.length === 0) return <EmptySummary />;
@@ -60,11 +59,12 @@ function calculateRelativeStyle(parentRect) {
 }
 
 function SummaryItem({ event, date }) {
-    const tags = useTags();
-    const theme = getEventTheme(event, tags);
+    const { getTag } = useTags();
+    const tag = getTag(event.tag);
+    const color = tag?.color || '#3b82f6';
     return (
         <div className="summary-event">
-            <div className="event-dot" style={{ backgroundColor: theme.color }} />
+            <div className="event-dot" style={{ backgroundColor: color }} />
             <span className="event-title">{event.title}</span>
             <span className="event-time">{getTimeString(event, date)}</span>
         </div>

@@ -161,7 +161,11 @@ export default function AnalyticsPage() {
                 },
                 progressData && {
                   title: 'Planned vs Actual',
-                  el: <PlannedVsActualChart data={progressData.daily_progress} />,
+                  el: (
+                    <div className={styles.chartContainerMin}>
+                      <PlannedVsActualChart data={progressData.daily_progress} />
+                    </div>
+                  ),
                   i: 4,
                   wide: true,
                 },

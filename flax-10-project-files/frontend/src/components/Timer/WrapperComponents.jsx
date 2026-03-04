@@ -1,8 +1,11 @@
-import styles from "../../pages/Timer/TimerPage.module.css";
+import { useCallback, useEffect } from "react";
+
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
 import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
+
+import styles from "../../pages/Timer/TimerPage.module.css";
 
 /** Header component with title and history toggle */
 const TimerHeader = ({ onOpenHistory, isMobile }) => (
@@ -17,27 +20,46 @@ const TimerHeader = ({ onOpenHistory, isMobile }) => (
 );
 
 /** Main timer UI layout including visuals, controls, and settings */
-export const MainSection = ({ t, onOpenHistory, isMobile }) => (
-    <>
-        <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />
-        <TaskInput value={t.task} onChange={t.setTask} />
+export const MainSection = ({ t, onOpenHistory, isMobile }) => {
+    const handleTaskSelect = useCallback((task) => {
+        t.setTask(task.title);
+        const mins = (task.estimated_blocks || 1) * 25;
+        t.updateTime('work', mins);
+        t.setTimeLeft(mins * 60);
+        t.setIsActive(true);
+        if (task.list_color != null) t.setSelectedTaskColor(task.list_color);
+        try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
+    }, [t]);
 
-        {isMobile && (
-            <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>
-                View History 📜
-            </button>
-        )}
+    useEffect(() => {
+        try {
+            const suggested = sessionStorage.getItem('timerSuggestedTask');
+            if (suggested && typeof t.setTask === 'function') {
+                t.setTask(suggested);
+                sessionStorage.removeItem('timerSuggestedTask');
+            }
+        } catch (_) {}
+    }, [t]);
 
-        <TreeAnimation progress={t.progress} mode={t.mode} />
-
-        <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
-        <SessionStatus current={t.completedSessions} total={t.targetSessions} />
-        <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
-        <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} />
-        <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
-        <SoundSelector />
-    </>
-);
+    return (
+        <>
+            <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />
+            <TaskInput value={t.task} onChange={t.setTask} onTaskSelect={handleTaskSelect} />
+            {isMobile && (
+                <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>
+                    View History 📜
+                </button>
+            )}
+            <TreeAnimation progress={t.progress} mode={t.mode} />
+            <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} isActive={t.isActive} timeLeft={t.timeLeft} workTime={t.workTime} />
+            <SessionStatus current={t.completedSessions} total={t.targetSessions} />
+            <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
+            <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} timeLeft={t.timeLeft} task={t.task} workTime={t.workTime} />
+            <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
+            <SoundSelector />
+        </>
+    );
+};
 
 /** Container for all timerrelated modals and popups */
 export const PopupSection = ({ t, showHistory, onCloseHistory }) => (

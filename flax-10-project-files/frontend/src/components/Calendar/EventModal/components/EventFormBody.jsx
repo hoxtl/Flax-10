@@ -35,6 +35,15 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
     const setRecurrence = (r) => setForm(f => ({ ...f, recurrence: r }));
     const setReminder = (r) => setForm(f => ({ ...f, reminder: r }));
     const setPrivacy = (val) => setForm(f => ({ ...f, is_private: val }));
+    const setTravelLinesStr = (e) => setForm(f => ({
+        ...f,
+        travelLines: e.target.value.split(',').map(s => s.trim()).filter(Boolean),
+    }));
+    const setCommuteMins = (e) => {
+        const v = e.target.value.trim();
+        setForm(f => ({ ...f, commuteTimeMinutes: v === '' ? null : parseInt(v, 10) }));
+    };
+    const travelLinesStr = Array.isArray(form.travelLines) ? form.travelLines.join(', ') : '';
     return (
         <form onSubmit={onSubmit}>
             <FormField label="Title" value={form.title} onChange={update('title')} required />
@@ -42,6 +51,8 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
             <TagField value={form.tag} onChange={update('tag')} customTags={tags} />
             <PrivacyToggle value={form.is_private} onChange={setPrivacy} />
             <FormField label="Location" value={form.location} onChange={update('location')} placeholder="e.g. Room 214" />
+            <FormField label="Travel lines" value={travelLinesStr} onChange={setTravelLinesStr} placeholder="e.g. Northern, District" />
+            <FormField label="Commute (minutes)" type="number" min={0} value={form.commuteTimeMinutes ?? ''} onChange={setCommuteMins} placeholder="e.g. 25" />
             <TimeRow form={form} update={update} setForm={setForm} />
             <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
             {showReminder && <ReminderField value={form.reminder} onChange={setReminder} />}

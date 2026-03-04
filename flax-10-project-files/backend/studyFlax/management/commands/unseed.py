@@ -39,7 +39,7 @@ TABLES = [
     'studyFlax_themesession',
 ]
 
-EXCLUDE_FIELDS = {'id', 'password', 'last_login', 'date_joined'}
+SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'role'}
 
 
 def get_superuser_data():
@@ -49,7 +49,7 @@ def get_superuser_data():
     User.objects.create_superuser after the wipe.
     """
     return [
-        {k: v for k, v in u.items() if k not in EXCLUDE_FIELDS}
+        {k: v for k, v in u.items() if k in SUPERUSER_RESTORE_FIELDS}
         for u in User.objects.filter(is_superuser=True).values()
     ]
 

@@ -32,41 +32,6 @@ export function updateUserProfile(formData) {
   return apiFetch('/profile/', { method: 'PATCH', headers: { 'Authorization': `Token ${token}` }, body: formData });
 }
 
-export function getHomeAddress() {
-  return apiFetch('/user/home-address/', { headers: authHeaders() });
-}
-
-export function saveHomeAddress(address, latitude, longitude) {
-  return apiFetch('/user/home-address/', {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({
-      home_address: address,
-      home_latitude: latitude,
-      home_longitude: longitude,
-    }),
-  });
-}
-
-export async function geocodeAddress(address) {
-  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxToken}&limit=1&country=GB`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error('User home geocoding has failed...');
-  }
-
-  const data = await response.json();
-
-  if (data.features && data.features.length > 0) {
-    const [lng, lat] = data.features[0].center;
-    return { latitude: lat, longitude: lng };
-  }
-  return null;
-}
-
 export function searchUsers(query, moduleFilter = '', societyFilter = '', offset = 0, limit = 20) {
   let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
   if (moduleFilter) url += `&module=${encodeURIComponent(moduleFilter)}`;

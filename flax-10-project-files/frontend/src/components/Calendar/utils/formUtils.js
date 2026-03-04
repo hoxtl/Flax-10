@@ -15,8 +15,10 @@ function getFormFromEvent(event, options = {}) {
         end_time: formatForInput(event.end_time),
         recurrence: getRecurrenceFromEvent(event),
         reminder: Array.isArray(event.reminder_minutes) ? event.reminder_minutes : [],
-        tag: event.tag ?? event.tag_details?.id ?? null,
+        tag: event.tag || event.tag_details?.id || options.initialTag || null,
         location: event.location || '',
+        travelLines: Array.isArray(event.travel_lines) ? event.travel_lines : (Array.isArray(event.travelLines) ? event.travelLines : []),
+        commuteTimeMinutes: event.commute_time_minutes ?? event.commuteTimeMinutes ?? null,
         all_day: isAllDay(event),
         is_private: event.is_private ?? false,
     };
@@ -48,7 +50,7 @@ function getDefaultForm(options) {
         recurrence: { frequency: 'none', interval: 1, end_date: null },
         reminder: [],
         tag: options.initialTag || null,
-        location: '', all_day: false,
+        location: '', travelLines: [], commuteTimeMinutes: null, all_day: false,
         is_private: false,
     };
 }
@@ -145,17 +147,28 @@ function buildEventData(form) {
 }
 
 function buildBaseEventData(form) {
-    return {
+    const title = (form.title || "").trim();
+    const isRoutineTitle = /^(breakfast|lunch|dinner|sleep|brunch|coffee|meal\s*prep)$/i.test(title);
+    const tag = form.tag != null && form.tag !== "" ? form.tag : (isRoutineTitle ? "Routine" : null);
+    const data = {
         title: form.title,
         description: form.description,
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
-        location: form.location || '',
-        tag: form.tag || null,
+        location: form.location || "",
+        tag,
         reminder_minutes: form.reminder,
         all_day: form.all_day,
         is_private: form.is_private ?? false,
     };
+    if (Array.isArray(form.travelLines) && form.travelLines.length > 0) {
+        data.travel_lines = form.travelLines;
+    }
+    if (form.commuteTimeMinutes != null && form.commuteTimeMinutes !== "") {
+        const mins = parseInt(form.commuteTimeMinutes, 10);
+        if (!Number.isNaN(mins) && mins >= 0) data.commute_time_minutes = mins;
+    }
+    return data;
 }
 
 function formatForInput(d) {

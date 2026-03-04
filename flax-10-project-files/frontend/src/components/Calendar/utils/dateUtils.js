@@ -83,28 +83,9 @@ export function formatDateWithYear(date) {
     return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 }
 
-export function formatDateRange(startTime, endTime, allDay) {
-    const start = new Date(startTime);
-    let end = new Date(endTime);
-    const isMidnight = (d) => d.getHours() === 0 && d.getMinutes() === 0;
-
-    if (allDay || (isMidnight(start) && isMidnight(end))) {
-        end = new Date(end.getTime() - 1);
-    }
-
-    if (isSameDay(start, end)) {
-        return formatDateWithYear(start);
-    }
-
-    return `${formatShortDate(start)} – ${formatDateWithYear(end)}`;
-}
-
 export function formatTimeRange(startTime, endTime, allDay) {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    const isMidnight = (d) => d.getHours() === 0 && d.getMinutes() === 0;
-    if (allDay || (isMidnight(start) && isMidnight(end))) return "All day";
-    return `${formatTime(start)} to ${formatTime(end)}`;
+    if (allDay) return "All day";
+    return `${formatTime(new Date(startTime))} to ${formatTime(new Date(endTime))}`;
 }
 
 export function addHourToTime(time) {
@@ -157,4 +138,11 @@ export function formatDayLabel(date, today = new Date()) {
         day: "2-digit",
         year: "numeric",
     });
+}
+
+export function isAllDayEvent(event) {
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    const duration = (end - start) / (1000 * 60 * 60);
+    return duration >= 24;
 }

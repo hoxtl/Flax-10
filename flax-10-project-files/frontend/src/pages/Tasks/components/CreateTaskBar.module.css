@@ -1,0 +1,354 @@
+/* Create Task bar: two-row layout — primary input row + secondary options row */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 0 6px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ── Row 1: input + Add ── */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--panel, #FFFCFA);
+  border: 1px solid var(--border, rgba(74, 52, 33, 0.12));
+  border-radius: 10px;
+  outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.input::placeholder {
+  color: #a8a29e;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+.input:focus {
+  border-color: var(--primary, #7B6751);
+  box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.08);
+}
+
+.addBtn {
+  padding: var(--btn-padding, 8px 16px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--btn-radius, var(--radius-md, 8px));
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+.addBtn:hover:not(:disabled) { opacity: 0.88; }
+.addBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Row 2: secondary options — hidden by default, slide down on focus ── */
+.optionsRowWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.optionsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  min-width: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: max-height 0.25s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.optionsRowOpen {
+  max-height: 220px;
+  opacity: 1;
+  pointer-events: auto;
+  overflow: visible;
+  transform: translateY(0);
+  margin-top: 10px;
+}
+
+/* Labels: text-xs font-medium uppercase tracking-wide text-stone-400 */
+.optionsRowLabel {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #a8a29e;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.optionsRowDivider {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: rgba(74, 52, 33, 0.12);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* Wrapper for shared AnimatedDropdown (Module + List) — same UI as onboarding */
+.dropdownWrap {
+  position: relative;
+  flex-shrink: 0;
+  min-width: 140px;
+  max-width: 200px;
+}
+.dropdownWrap :global([class*="trigger"]) {
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+}
+.moduleListDropdown {
+  width: 100%;
+}
+
+.estTimeBanner {
+  width: 100%;
+}
+
+/* ── Duration chips ── */
+.durationGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.durationBtn {
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #78716c;
+  background: transparent;
+  border: 1.5px solid #d6d3d1;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.durationBtn:hover { background: #f5f5f4; color: #57534e; border-color: #a8a29e; }
+.durationBtnActive {
+  background: var(--primary, #7B6751);
+  color: #fff;
+  border-color: var(--primary, #7B6751);
+  font-weight: 600;
+}
+
+/* ── Module trigger + popover ── */
+.moduleWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.moduleBtn {
+  padding: 4px 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #52796f;
+  background: rgba(132, 169, 140, 0.1);
+  border: 1px solid rgba(132, 169, 140, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.moduleBtn:hover { background: rgba(132, 169, 140, 0.2); }
+.moduleBtnActive {
+  background: rgba(132, 169, 140, 0.25);
+  border-color: #84A98C;
+  color: #3d5c54;
+}
+
+.modulePopover {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: var(--space-2, 8px);
+  padding: var(--dropdown-padding, var(--space-1, 4px));
+  background: var(--dropdown-bg, var(--panel, #FFFCFA));
+  border: var(--dropdown-border, 1px solid rgba(210, 180, 140, 0.45));
+  border-radius: var(--dropdown-radius, var(--radius-lg, 12px));
+  box-shadow: var(--dropdown-shadow, var(--shadow-lg));
+  z-index: 1050;
+  min-width: 180px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.moduleDropdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.moduleDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+.moduleDropdownItem:hover { background: rgba(210, 180, 140, 0.2); }
+.moduleDropdownItemActive {
+  background: rgba(132, 169, 140, 0.15);
+  color: #3d5c54;
+  font-weight: 600;
+}
+
+.moduleDropdownCode {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #52796f;
+  flex-shrink: 0;
+}
+
+.moduleDropdownName {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modulePopoverEmpty {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ── List dropdown ── */
+.listDropdownWrap {
+  position: relative;
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 160px;
+}
+.listDropdownTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px 4px 9px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg, #F8F5F2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
+  max-width: 160px;
+  white-space: nowrap;
+  transition: border-color 0.15s;
+}
+.listDropdownTrigger:hover { border-color: rgba(107, 83, 68, 0.35); }
+.listDropdownValue {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+.listDropdownChevron {
+  font-size: 0.6rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.listDropdownPopover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  min-width: 160px;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 24px));
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--dropdown-padding, var(--space-1, 4px));
+  background: var(--dropdown-bg, var(--panel, #FFFCFA));
+  border: var(--dropdown-border, 1px solid rgba(210, 180, 140, 0.45));
+  border-radius: var(--dropdown-radius, var(--radius-lg, 12px));
+  box-shadow: var(--dropdown-shadow, var(--shadow-lg));
+  z-index: 1050;
+}
+/* Colored dot for list pills and dropdown options */
+.listDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.listDropdownOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.listDropdownOption:hover { background: rgba(210, 180, 140, 0.2); }
+.listDropdownOptionActive {
+  background: rgba(210, 180, 140, 0.2);
+  color: var(--primary);
+  font-weight: 600;
+}

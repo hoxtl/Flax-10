@@ -2,13 +2,10 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ('studyFlax', '0005_usersettings_modules'),
     ]
-
     operations = [
         migrations.AddField(
             model_name='enrollment',

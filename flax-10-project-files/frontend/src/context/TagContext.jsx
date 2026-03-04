@@ -2,14 +2,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
 
 const TagContext = createContext(null);
-const NONE_TAG = { id: 'none', label: 'None', icon: '🏷️', color: '#94A3B8' };
+const DEFAULT_ICON = '🏷️';
 
 export function TagProvider({ children }) {
-    const { tags, setTags, loading, refreshTags } = useTagLoader();
+    const { tags, setTags, loading } = useTagLoader();
     const actions = useTagActions(setTags);
     const getters = useTagGetters(tags);
 
-    const value = { tags, loading, refreshTags, ...actions, ...getters };
+    const value = { tags, loading, ...actions, ...getters };
 
     return (
         <TagContext.Provider value={value}>
@@ -22,29 +22,14 @@ function useTagLoader() {
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const refreshTags = async () => {
-        try {
-            const data = await getTags();
-            setTags(data.map(mapBackendTag));
-        } catch (err) {
-            console.error('Failed to fetch tags:', err);
-        }
-    };
-
     useEffect(() => {
-        loadInitialTags(setTags, setLoading);
+        getTags()
+            .then(data => setTags(data.map(mapBackendTag)))
+            .catch(err => console.error('Failed to fetch tags:', err))
+            .finally(() => setLoading(false));
     }, []);
 
-    return { tags, setTags, loading, refreshTags };
-}
-
-async function loadInitialTags(setTags, setLoading) {
-    try {
-        const data = await getTags();
-        setTags(data.map(mapBackendTag));
-    } finally {
-        setLoading(false);
-    }
+    return { tags, setTags, loading };
 }
 
 function useTagActions(setTags) {
@@ -57,13 +42,12 @@ function useTagActions(setTags) {
 
 function useTagGetters(tags) {
     const getTag = (id) => findTag(id, tags);
-    const getTagByName = (name) => findTagByName(name, tags);
-    return { getTag, getTagByName };
+    return { getTag };
 }
 
 async function createTagAction(tag, setTags) {
     try {
-        const data = { name: tag.label, color: tag.color, icon: tag.icon || '🏷️' };
+        const data = { name: tag.label, color: tag.color, icon: tag.icon || DEFAULT_ICON };
         const created = await apiCreateTag(data);
         setTags((prev) => [...prev, mapBackendTag(created)]);
     } catch (err) {
@@ -91,31 +75,21 @@ async function updateTagAction(id, updates, setTags) {
 }
 
 function findTag(id, tags) {
-    if (id === undefined || id === null) return NONE_TAG;
     const numId = typeof id === 'string' ? parseInt(id, 10) : id;
-    return tags.find((t) => t.id === numId) || findOtherTag(tags);
-}
-
-function findTagByName(name, tags) {
-    if (!name) return NONE_TAG;
-    const lower = name.toLowerCase();
-    return tags.find(t => t.label.toLowerCase() === lower) || findOtherTag(tags);
-}
-
-function findOtherTag(tags) {
-    return tags.find(t => t.label.toLowerCase() === 'other') || NONE_TAG;
+    return tags.find((t) => t.id === numId) || tags.find((t) => t.label === 'Other');
 }
 
 function mapBackendTag(tag) {
-    let icon = tag.icon || '🏷️';
-    if (tag.name === 'Other' && icon === '🏷️') icon = '⭐';
-    return { id: tag.id, label: tag.name, icon, color: tag.color };
+    const label = tag.name || tag.label || '';
+    const neutralColor = '#94a3b8'; // light slate — Routine/Wellness stay neutral so Academic (Sage) and Personal stand out
+    const color = (label === 'Routine' || label === 'Wellness') ? neutralColor : (tag.color || '#9E7E5D');
+    return { id: tag.id, label: tag.name, icon: tag.icon || DEFAULT_ICON, color };
 }
 
 export function useTags() {
     const context = useContext(TagContext);
     if (!context) {
-        return { tags: [], loading: false, getTag: () => null, addTag: () => { }, deleteTag: () => { }, updateTag: () => { }, refreshTags: () => { } };
+        return { tags: [], loading: false, getTag: () => null, addTag: () => {}, deleteTag: () => {}, updateTag: () => {} };
     }
     return context;
 }

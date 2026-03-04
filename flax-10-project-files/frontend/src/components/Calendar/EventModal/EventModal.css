@@ -14,9 +14,9 @@
 .modal-content {
     background: var(--panel);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 2rem;
     width: 100%;
-    max-width: 550px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -69,15 +69,17 @@
 }
 
 .form-field {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
 }
 
 .form-field label {
     display: block;
-    margin-bottom: 0.25rem;
-    font-weight: 500;
-    color: var(--text);
-    font-size: 0.875rem;
+    margin-bottom: 0.35rem;
+    font-weight: 400;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted, #6b7280);
 }
 
 .form-field input,
@@ -85,26 +87,32 @@
 .form-field select {
     width: 100%;
     max-width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    padding: 0.6rem 0.85rem;
+    border: none;
+    border-radius: 12px;
     font-size: 0.875rem;
     box-sizing: border-box;
-    background: var(--bg);
+    background: #F3F4F6;
     color: var(--text);
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: #9ca3af;
 }
 
 .form-field input[type="datetime-local"] {
-    padding: 0.4rem 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
 }
 
 .form-field input:focus,
 .form-field textarea:focus,
 .form-field select:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.15);
+    background: #EEF0F2;
+    box-shadow: 0 0 0 2px rgba(141, 110, 99, 0.2);
 }
 
 .form-field textarea {
@@ -119,42 +127,94 @@
 }
 
 .submit-btn {
-    width: 100%;
-    padding: 0.75rem;
+    padding: 0.65rem 1.5rem;
     background: var(--primary);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 9999px;
     font-weight: 600;
+    font-size: 0.9rem;
     cursor: pointer;
-    margin-top: 0.5rem;
+    transition: opacity 0.15s, background 0.15s;
 }
 
 .submit-btn:hover {
-    opacity: 0.9;
+    opacity: 0.95;
 }
 
 .delete-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--bg);
-    color: #c0392b;
-    border: 1px solid #c0392b;
-    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    color: #b91c1c;
+    border: 1px solid transparent;
+    border-radius: 8px;
     font-weight: 500;
+    font-size: 0.85rem;
     cursor: pointer;
-    margin-top: 0.75rem;
+    transition: background 0.15s, color 0.15s;
 }
 
 .delete-btn:hover {
-    background: #c0392b;
-    color: white;
+    background: #FEF2F2;
+    color: #991b1b;
 }
 
 .modal-actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.modal-actions .submit-btn {
+    margin-top: 0;
+}
+.modal-actions .delete-btn {
+    margin-top: 0;
+}
+
+.btn-secondary,
+.btn-primary {
+    min-width: 110px;
+    padding: 0.5rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-secondary {
+    background: var(--bg);
+    color: var(--muted);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.overlap-warning .modal-body {
+    padding: 0.75rem 0 0;
+}
+
+.overlap-warning .overlap-list {
+    margin: 0.5rem 0 0.75rem;
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
 }
 
 .select-with-color {
@@ -175,6 +235,60 @@
 
 .select-with-color select {
     padding-left: 28px;
+}
+
+/* Type field: horizontal pills with color dots */
+.type-pills-wrap {
+    margin-bottom: 1.25rem;
+}
+
+.type-pills-wrap .type-pills-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 400;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted, #6b7280);
+}
+
+.type-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background: #F3F4F6;
+    color: var(--text, #374151);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.type-pill:hover {
+    background: #E5E7EB;
+}
+
+.type-pill.selected {
+    background: color-mix(in srgb, var(--primary) 12%, #fff);
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+    color: var(--text);
+}
+
+.type-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--muted, #9ca3af);
 }
 
 /* Privacy toggle */

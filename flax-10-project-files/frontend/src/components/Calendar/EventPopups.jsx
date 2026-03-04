@@ -4,11 +4,10 @@ import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context
 import { EventModal } from './EventModal/EventModal';
 import { EventDetailPopup } from './EventDetailPopup';
 import { useTags } from '../../context/TagContext';
-import { useNotify } from '../Notifications/hooks/useNotify';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
-import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
+import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
 import ConfirmModal from '../common/ConfirmModal';
 
@@ -46,18 +45,16 @@ function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup, readOnly } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
-    const { disenrollFromModule } = useModuleDisenrollment();
-    const { getTag, refreshTags } = useTags();
-    const notify = useNotify();
+    const tags = useTags();
     const navigate = useNavigate();
     const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
 
     if (deleteEventState) return <DeleteConfirmModal event={deleteEventState} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
     if (isModalOpen || !popupEvent) return null;
 
-    const tag = getEventTag(popupEvent, getTag);
-    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags, notify };
-    const actions = getCalendarPopupActions(popupEvent, handlers);
+    const tag = getEventTag(popupEvent, tags);
+    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate };
+    const actions = readOnly ? null : getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
 
@@ -65,9 +62,9 @@ function DeleteConfirmModal({ event, onConfirm, onCancel }) {
     return <ConfirmModal title="Delete Event" message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
-function getEventTag(event, getTag) {
+function getEventTag(event, tags) {
     const societyTag = { label: event.tag_name, color: event.tag_color || event.society_color || '#9E7E5D' };
-    return (event.source === 'society' && event.tag_name) ? societyTag : getTag(event.tag);
+    return (event.source === 'society' && event.tag_name) ? societyTag : tags.getTag(event.tag);
 }
 
 function getCalendarPopupActions(event, handlers) {
@@ -85,21 +82,20 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
     ];
 }
 
-function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }) {
-    const handleLeave = () => {
+function getModuleActions(event, { closePopup, loadEvents }) {
+    const handleLeave = async () => {
         closePopup();
-        disenrollFromModule(event.module, loadEvents);
+        await disenrolByModuleId(event.module);
+        loadEvents();
     };
     return [{ label: 'Leave Module', variant: 'danger', onClick: handleLeave }];
 }
 
-function getSocietyActions(event, { closePopup, loadEvents, refreshTags, notify }) {
+function getSocietyActions(event, { closePopup, loadEvents }) {
     const handleUnsync = async () => {
         closePopup();
         await unsyncCalendar(event.society_id);
-        await refreshTags();
         loadEvents();
-        notify('Unsync Successful', `Calendar for ${event.society_name || 'this society'} is now unsynced.`);
     };
     return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }

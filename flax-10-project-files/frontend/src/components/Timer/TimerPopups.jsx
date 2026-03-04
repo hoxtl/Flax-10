@@ -54,7 +54,7 @@ export const GoalModal = ({ sessions, workTime, breakTime, onAction }) => (
 export const BreakModal = ({ onAction }) => (
     <div className={styles.modalOverlay}>
         <div className={styles.modalContent}>
-            <div className={styles.modalTitle}>Focus Session Complete!</div>
+            <div className={styles.modalTitle}>Time for a break</div>
             <div className={styles.modalMessage}>Great job! Time to take a well-deserved break.</div>
             <button className={`${styles.button} ${styles.primary}`} onClick={onAction}>
                 Start Break

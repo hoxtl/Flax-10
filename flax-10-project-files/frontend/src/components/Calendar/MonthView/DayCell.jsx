@@ -3,23 +3,23 @@ import { useEventModal } from '../../../context/CalendarContext';
 import { isSameDay } from '../utils/dateUtils';
 import { DayEvents } from './DayEvents';
 
-export function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
-    if (readOnly) return <ReadOnlyDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />;
-    return <EditableDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />;
+export function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, customTags }) {
+    if (readOnly) return <ReadOnlyDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} customTags={customTags} />;
+    return <EditableDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} customTags={customTags} />;
 }
 
-function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, onMoreClick, customTags }) {
+function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, customTags }) {
     const isToday = isSameDay(day, new Date());
     const className = buildCellClass(isCur, isToday, false);
     return (
         <div className={className} onClick={() => onDateSelect?.(day)}>
             <span className="day-number">{day.getDate()}</span>
-            <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} />
+            <DayEvents events={events} onEventClick={onEventClick} customTags={customTags} />
         </div>
     );
 }
 
-function EditableDayCell({ day, events, isCur, onDateSelect, onEventClick, onMoreClick, customTags }) {
+function EditableDayCell({ day, events, isCur, onDateSelect, onEventClick, customTags }) {
     const isToday = isSameDay(day, new Date());
     const { dropProps, isOver } = useMonthDayDrop(day);
     const cellProps = buildCellProps(dropProps, onDateSelect, day);
@@ -29,7 +29,7 @@ function EditableDayCell({ day, events, isCur, onDateSelect, onEventClick, onMor
         <div className={className} {...cellProps}>
             <span className="day-number">{day.getDate()}</span>
             <AddEventBtn day={day} />
-            <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} />
+            <DayEvents events={events} onEventClick={onEventClick} customTags={customTags} />
         </div>
     );
 }

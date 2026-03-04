@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
@@ -11,24 +13,55 @@ import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
 function useModulesPage(initialSearch = '') {
+    const [searchParams, setSearchParams] = useSearchParams();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
-    const [search_query, setSearchQuery] = useState(initialSearch);
-    const [filter_mode, setFilterMode] = useState('all');
+    const [search_query, setSearchQuery] = useState(initialSearch || '');
+    const filterFromUrl = searchParams.get('filter');
+    const [filter_mode, setFilterMode] = useState(filterFromUrl === 'enrolled' ? 'enrolled' : 'all');
     const [show_form, setShowForm] = useState(false);
     const [editing_module, setEditingModule] = useState(null);
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
 
-    // Auto-open the specific module detail when navigated from a profile card
+    const codeFromUrl = searchParams.get('code');
+    const moduleIdFromUrl = searchParams.get('moduleId');
+
     useEffect(() => {
-        if (!initialSearch || hook.loading || hook.modules.length === 0) return;
-        const match = hook.modules.find(
-            m => m.module_code?.toLowerCase() === initialSearch.toLowerCase()
-        );
-        if (match) setViewingModule(match);
-    }, [initialSearch, hook.loading, hook.modules]);
+        if (initialSearch && !codeFromUrl && !moduleIdFromUrl && hook.modules?.length > 0) {
+            const match = hook.modules.find(m => m.module_code?.toLowerCase() === initialSearch.toLowerCase());
+            if (match) setViewingModule(match);
+        }
+    }, [initialSearch, hook.modules]);
+
+    useEffect(() => {
+        if (!codeFromUrl && !moduleIdFromUrl) return;
+        if (hook.loading) return;
+        if (moduleIdFromUrl && hook.modules) {
+            const id = Number(moduleIdFromUrl);
+            const match = hook.modules.find((m) => m.id === id);
+            if (match) {
+                setViewingModule(match);
+                const next = new URLSearchParams(searchParams);
+                next.delete('moduleId');
+                setSearchParams(next.toString(), { replace: true });
+                return;
+            }
+        }
+        if (codeFromUrl && hook.modules) {
+            const norm = (s) => (s || '').toUpperCase().replace(/\s/g, '');
+            const code = norm(codeFromUrl);
+            const match = hook.modules?.find((m) => norm(m.module_code) === code);
+            if (match) {
+                setViewingModule(match);
+                setSearchParams({}, { replace: true });
+            } else {
+                setSearchQuery(codeFromUrl.trim());
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [codeFromUrl, moduleIdFromUrl, hook.loading, hook.modules, searchParams, setSearchParams]);
 
     return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }

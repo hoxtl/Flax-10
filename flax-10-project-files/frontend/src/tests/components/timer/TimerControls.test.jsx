@@ -5,16 +5,16 @@ import { TimerControls } from '../../../components/Timer/TimerComponents';
 const testButtons = () => {
     const onToggle = vi.fn();
     const onReset = vi.fn();
-    render(<TimerControls isActive={false} onToggle={onToggle} onReset={onReset} />);
-    fireEvent.click(screen.getByText('Start'));
+    render(<TimerControls isActive={false} onToggle={onToggle} onReset={onReset} timeLeft={60} task="Focus" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Resume' }));
     expect(onToggle).toHaveBeenCalled();
-    fireEvent.click(screen.getByText('Reset'));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
     expect(onReset).toHaveBeenCalled();
 };
 
 const testPause = () => {
     render(<TimerControls isActive={true} onToggle={() => { }} onReset={() => { }} />);
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
 };
 
 describe('TimerControls', () => {

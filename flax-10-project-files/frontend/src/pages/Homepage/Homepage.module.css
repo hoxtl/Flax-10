@@ -1,0 +1,10 @@
+/* Homepage module — composed from logical partials */
+@import './styles/Variables.module.css';
+@import './styles/Bento.module.css';
+@import './styles/Navigator.module.css';
+@import './styles/ActionHub.module.css';
+@import './styles/Analytics.module.css';
+@import './styles/DailyNarrative.module.css';
+@import './styles/Timer.module.css';
+@import './styles/Timeline.module.css';
+@import './styles/Overlays.module.css';
