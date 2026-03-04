@@ -41,11 +41,13 @@ const PrimaryTimerBtn = ({ isActive, isPaused, onToggle, onPause }) => {
     return <button className={`${styles.button} ${styles.primary}`} onClick={action}>{label}</button>;
 };
 
-export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, totalPaused }) => {
+export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, onEndEarly, totalPaused }) => {
     const pInd = <PauseIndicator isPaused={isPaused} totalPaused={totalPaused} />;
     const pBtn = <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />;
     const rBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>;
-    return <div className={styles.controls}>{pInd}<div className={styles.buttonGroup}>{pBtn}{rBtn}</div></div>;
+    const eBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onEndEarly}>End Early</button>;
+    const actns = isActive || isPaused ? <>{pBtn}{eBtn}</> : <>{pBtn}{rBtn}</>;
+    return <div className={styles.controls}>{pInd}<div className={styles.buttonGroup}>{actns}</div></div>;
 };
 
 // Helpers for useBufferedInput

@@ -56,3 +56,13 @@ export const LeaveTimerModal = ({ onCancel, onPause, onExit }) => {
     const content = <div className={styles.modalContent}>{title}{msg}{btns}</div>;
     return <div className={`${styles.modalOverlay} ${styles.leaveModalOverlay}`}>{content}</div>;
 };
+
+export const EndEarlyModal = ({ onConfirm, onCancel }) => {
+    const title = <div className={styles.modalTitle}>End Session Early?</div>;
+    const msg = <div className={`${styles.modalMessage} ${styles.leaveModalMessage}`}>Are you sure? If you end session early it won't count as a completed session.</div>;
+    const cBtn = <button className={`${styles.button} ${styles.leaveBtnCancel}`} onClick={onCancel}>Cancel</button>;
+    const eBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onConfirm}>End Session</button>;
+    const btns = <div className={styles.leaveModalButtons}>{cBtn}{eBtn}</div>;
+    const content = <div className={styles.modalContent}>{title}{msg}{btns}</div>;
+    return <div className={`${styles.modalOverlay} ${styles.leaveModalOverlay}`}>{content}</div>;
+};

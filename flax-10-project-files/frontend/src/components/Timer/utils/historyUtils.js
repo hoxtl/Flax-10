@@ -8,7 +8,7 @@ export const getHistory = async () => {
     }
 };
 
-const createSessionPayload = (work, brk, count, blockId, task, pause) => ({
+const createSessionPayload = (work, brk, count, blockId, task, pause, status) => ({
     start_time: new Date(Date.now() - work * 1000).toISOString(),
     end_time: new Date().toISOString(),
     duration: work,
@@ -17,11 +17,11 @@ const createSessionPayload = (work, brk, count, blockId, task, pause) => ({
     session_count: count,
     study_block_id: blockId,
     task: task,
-    status: 'Completed'
+    status: status
 });
 
-export const saveSession = async (work, brk, count, blockId, task = '', pause = 0) => {
-    const payload = createSessionPayload(work, brk, count, blockId, task, pause);
+export const saveSession = async (work, brk, count, blockId, task = '', pause = 0, status = 'Completed') => {
+    const payload = createSessionPayload(work, brk, count, blockId, task, pause, status);
     await fetchApi('/timer/history/', {
         method: 'POST',
         body: JSON.stringify(payload)

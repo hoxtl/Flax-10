@@ -9,9 +9,11 @@ export function useTimerLogic() {
   const t = useTimer();
   const [task, setTask] = useState('');
   const notify = useNotify();
-  const { modal, setModal, startNext, resetBlockId } = useTimerFlow({ ...t, task }, notify);
-  const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId);
+  const { modal, setModal, startNext, resetBlockId, endEarly } = useTimerFlow({ ...t, task }, notify);
+  const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly);
   const ot = t.timeLeft <= 0;
   return {
     ...t, task, setTask, modal, handlers, progress: getProgress(t),
-    isOvertime: t.mode === 'work' && ot, isBreakOvertime: t.mode === 'break' && ot};}
+    isOvertime: t.mode === 'work' && ot, isBreakOvertime: t.mode === 'break' && ot
+  };
+}

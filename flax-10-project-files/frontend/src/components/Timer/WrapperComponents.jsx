@@ -1,7 +1,7 @@
 import styles from "../../pages/Timer/TimerPage.module.css";
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
-import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
+import { OvertimePopup, GoalModal, BreakModal, EndEarlyModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
 const TimerHeader = ({ onOpenHistory, isMobile }) => {
@@ -27,7 +27,7 @@ const TimerInfoSection = ({ t }) => {
 };
 
 const TimerBottomSection = ({ t }) => {
-    const controls = <TimerControls isActive={t.isActive} isPaused={t.isPaused} onToggle={() => t.setIsActive(true)} onPause={t.togglePause} onReset={t.resetTimer} totalPaused={t.totalPaused} />;
+    const controls = <TimerControls isActive={t.isActive} isPaused={t.isPaused} onToggle={() => t.setIsActive(true)} onPause={t.togglePause} onReset={t.resetTimer} totalPaused={t.totalPaused} onEndEarly={() => t.setModal('endEarly')} />;
     const settings = <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />;
     const sound = <SoundSelector />;
     return <>{controls}{settings}{sound}</>;
@@ -46,5 +46,6 @@ export const PopupSection = ({ t, showHistory, onCloseHistory }) => {
     const oBreak = t.isBreakOvertime ? <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} /> : null;
     const bModal = t.modal === 'break' ? <BreakModal onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} /> : null;
     const gModal = t.modal === 'goal' ? <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} /> : null;
-    return <>{h}{oWork}{oBreak}{bModal}{gModal}</>;
+    const eModal = t.modal === 'endEarly' ? <EndEarlyModal onConfirm={t.handlers.endEarly} onCancel={() => t.setModal(null)} /> : null;
+    return <>{h}{oWork}{oBreak}{bModal}{gModal}{eModal}</>;
 };

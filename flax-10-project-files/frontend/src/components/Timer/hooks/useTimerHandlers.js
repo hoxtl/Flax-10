@@ -1,4 +1,4 @@
-export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId) {
+export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly) {
     return {
         break: () => {
             t.setIsActive(false); setModal(null);
@@ -9,6 +9,7 @@ export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId) {
             t.setMode('break'); t.setTimeLeft(t.breakTime * 60); t.setIsActive(true);
         },
         goal: () => { t.resetTimer(); setModal(null); resetBlockId(); },
-        overtimeBreak: () => { t.setIsActive(false); startNext(); }
+        overtimeBreak: () => { t.setIsActive(false); startNext(); },
+        endEarly: () => { endEarly(); }
     };
 }
