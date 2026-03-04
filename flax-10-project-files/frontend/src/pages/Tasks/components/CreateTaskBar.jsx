@@ -4,10 +4,11 @@
  *   Row 2: Est. time chips + Module chip + List selector (secondary options)
  * For full planning (calendar, deadline, travel time) use the "Full Planning" button.
  */
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
+import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 
 import styles from "./CreateTaskBar.module.css";
 
@@ -29,68 +30,9 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
     );
   const [moduleId, setModuleId] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [modulePopoverOpen, setModulePopoverOpen] = useState(false);
-  const [listDropdownOpen, setListDropdownOpen] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [enrolledModules, setEnrolledModules] = useState([]);
-  const popoverRef = useRef(null);
-  const listDropdownRef = useRef(null);
-  const listTriggerRef = useRef(null);
-  const moduleTriggerRef = useRef(null);
   const inputRef = useRef(null);
-  const [listPopoverRect, setListPopoverRect] = useState(null);
-  const [modulePopoverRect, setModulePopoverRect] = useState(null);
-
-  const updateListPopoverRect = useCallback(() => {
-    if (!listTriggerRef.current) return;
-    const r = listTriggerRef.current.getBoundingClientRect();
-    setListPopoverRect({ top: r.bottom + 6, left: r.left, width: Math.max(r.width, 160) });
-  }, []);
-  const updateModulePopoverRect = useCallback(() => {
-    if (!moduleTriggerRef.current) return;
-    const r = moduleTriggerRef.current.getBoundingClientRect();
-    setModulePopoverRect({ top: r.bottom + 8, left: r.left, width: Math.max(r.width, 160) });
-  }, []);
-
-  useEffect(() => {
-    if (listDropdownOpen) {
-      updateListPopoverRect();
-      const onResize = () => updateListPopoverRect();
-      window.addEventListener("scroll", updateListPopoverRect, true);
-      window.addEventListener("resize", onResize);
-      return () => {
-        window.removeEventListener("scroll", updateListPopoverRect, true);
-        window.removeEventListener("resize", onResize);
-      };
-    } else {
-      setListPopoverRect(null);
-    }
-  }, [listDropdownOpen, updateListPopoverRect]);
-
-  useEffect(() => {
-    if (modulePopoverOpen) {
-      updateModulePopoverRect();
-      const onResize = () => updateModulePopoverRect();
-      window.addEventListener("scroll", updateModulePopoverRect, true);
-      window.addEventListener("resize", onResize);
-      return () => {
-        window.removeEventListener("scroll", updateModulePopoverRect, true);
-        window.removeEventListener("resize", onResize);
-      };
-    } else {
-      setModulePopoverRect(null);
-    }
-  }, [modulePopoverOpen, updateModulePopoverRect]);
-
-  useEffect(() => {
-    if (!listDropdownOpen) return;
-    const close = (e) => {
-      if (listDropdownRef.current && !listDropdownRef.current.contains(e.target))
-        setListDropdownOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, [listDropdownOpen]);
 
   useEffect(() => {
     Promise.all([getModules(), getEnrollments()])
@@ -107,16 +49,6 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
     if (!next) return;
     setTaskListId((prev) => (prev === next ? prev : next));
   }, [defaultListId, sortedLists.length, sortedLists[0]?.id]);
-
-  useEffect(() => {
-    if (!modulePopoverOpen) return;
-    const close = (e) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target))
-        setModulePopoverOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, [modulePopoverOpen]);
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
@@ -140,11 +72,22 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
     }
   };
 
-  const selectedModule = useMemo(
-    () => enrolledModules.find((m) => String(m.id) === String(moduleId)),
-    [enrolledModules, moduleId]
+  const showOptions = inputFocused;
+
+  const moduleOptions = useMemo(
+    () => [
+      { value: "", label: "None" },
+      ...enrolledModules.map((m) => ({
+        value: String(m.id),
+        label: (m.module_code || "") + (m.module_name ? ` — ${m.module_name}` : ""),
+      })),
+    ],
+    [enrolledModules]
   );
-  const showOptions = inputFocused || modulePopoverOpen || listDropdownOpen;
+  const listOptions = useMemo(
+    () => sortedLists.map((l) => ({ value: String(l.id), label: l.name || "Unnamed list" })),
+    [sortedLists]
+  );
 
   return (
     <form className={styles.card} onSubmit={handleSubmit}>
@@ -161,7 +104,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
             setTimeout(() => {
               const activeEl = document.activeElement;
               const insideForm = activeEl && activeEl.closest && activeEl.closest(`.${styles.card}`);
-              if (!insideForm && !modulePopoverOpen && !listDropdownOpen) setInputFocused(false);
+              if (!insideForm) setInputFocused(false);
             }, 0);
           }}
           aria-label="Quick add task"
@@ -179,7 +122,8 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
       </div>
 
       {/* Row 2: secondary options — est. time, module, list */}
-      <div className={`${styles.optionsRow} ${showOptions ? styles.optionsRowOpen : ""}`}>
+      <div className={styles.optionsRowWrapper}>
+        <div className={`${styles.optionsRow} ${showOptions ? styles.optionsRowOpen : ""}`}>
         <span className={styles.optionsRowLabel}>Est. time</span>
         <div className={styles.durationGroup} role="group" aria-label="Estimated duration">
           {DURATION_OPTIONS.map(({ value, label, ariaLabel }) => (
@@ -198,143 +142,29 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
 
         <span className={styles.optionsRowDivider} aria-hidden />
 
-        <div className={styles.moduleWrap} ref={popoverRef}>
-          <button
-            ref={moduleTriggerRef}
-            type="button"
-            className={`${styles.moduleBtn} ${moduleId ? styles.moduleBtnActive : ""}`}
-            onClick={() => setModulePopoverOpen((o) => !o)}
-            aria-label="Link to module"
-            aria-expanded={modulePopoverOpen}
-            aria-haspopup="true"
-          >
-            📚 {selectedModule ? selectedModule.module_code : "Module"}
-          </button>
-          {modulePopoverOpen && (
-            <div
-              className={styles.modulePopover}
-              style={
-                modulePopoverRect
-                  ? {
-                      position: "fixed",
-                      top: modulePopoverRect.top,
-                      left: modulePopoverRect.left,
-                      minWidth: modulePopoverRect.width,
-                    }
-                  : undefined
-              }
-            >
-              <div className={styles.moduleDropdownList} role="listbox" aria-label="Module">
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={!moduleId}
-                  className={`${styles.moduleDropdownItem} ${!moduleId ? styles.moduleDropdownItemActive : ""}`}
-                  onClick={() => {
-                    setModuleId(null);
-                    setModulePopoverOpen(false);
-                  }}
-                >
-                  None
-                </button>
-                {enrolledModules.map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    role="option"
-                    aria-selected={String(moduleId) === String(m.id)}
-                    className={`${styles.moduleDropdownItem} ${String(moduleId) === String(m.id) ? styles.moduleDropdownItemActive : ""}`}
-                    onClick={() => {
-                      setModuleId(m.id);
-                      setModulePopoverOpen(false);
-                    }}
-                  >
-                    <span className={styles.moduleDropdownCode}>{m.module_code}</span>
-                    {m.module_name && (
-                      <span className={styles.moduleDropdownName}>{m.module_name}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-              {enrolledModules.length === 0 && (
-                <p className={styles.modulePopoverEmpty}>No enrolled modules</p>
-              )}
-            </div>
-          )}
+        <span className={styles.optionsRowLabel}>Module</span>
+        <div className={styles.dropdownWrap}>
+          <AnimatedDropdown
+            value={moduleId ?? ""}
+            onChange={(v) => setModuleId(v === "" ? null : v)}
+            placeholder="Module"
+            options={moduleOptions}
+            className={styles.moduleListDropdown}
+          />
         </div>
 
         <span className={styles.optionsRowDivider} aria-hidden />
         <span className={styles.optionsRowLabel}>List</span>
 
-        <div className={styles.listDropdownWrap} ref={listDropdownRef}>
-          {(() => {
-            const activeList = sortedLists.find((l) => String(l.id) === String(taskListId));
-            return (
-              <>
-                <button
-                  ref={listTriggerRef}
-                  type="button"
-                  className={styles.listDropdownTrigger}
-                  onClick={() => setListDropdownOpen((o) => !o)}
-                  aria-label="Select list"
-                  aria-expanded={listDropdownOpen}
-                  aria-haspopup="listbox"
-                >
-                  {activeList?.color && (
-                    <span
-                      className={styles.listDot}
-                      style={{ background: activeList.color }}
-                      aria-hidden
-                    />
-                  )}
-                  <span className={styles.listDropdownValue}>
-                    {activeList?.name || "Select list"}
-                  </span>
-                  <span className={styles.listDropdownChevron} aria-hidden>▾</span>
-                </button>
-                {listDropdownOpen && (
-                  <div
-                    className={styles.listDropdownPopover}
-                    role="listbox"
-                    aria-label="List"
-                    style={
-                      listPopoverRect
-                        ? {
-                            position: "fixed",
-                            top: listPopoverRect.top,
-                            left: listPopoverRect.left,
-                            minWidth: listPopoverRect.width,
-                          }
-                        : undefined
-                    }
-                  >
-                    {sortedLists.map((l) => (
-                      <button
-                        key={l.id}
-                        type="button"
-                        role="option"
-                        aria-selected={String(taskListId) === String(l.id)}
-                        className={`${styles.listDropdownOption} ${String(taskListId) === String(l.id) ? styles.listDropdownOptionActive : ""}`}
-                        onClick={() => {
-                          setTaskListId(l.id);
-                          setListDropdownOpen(false);
-                        }}
-                      >
-                        {l.color && (
-                          <span
-                            className={styles.listDot}
-                            style={{ background: l.color }}
-                            aria-hidden
-                          />
-                        )}
-                        {l.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            );
-          })()}
+        <div className={styles.dropdownWrap}>
+          <AnimatedDropdown
+            value={taskListId || ""}
+            onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))}
+            placeholder="Select list"
+            options={listOptions}
+            className={styles.moduleListDropdown}
+          />
+        </div>
         </div>
       </div>
     </form>

@@ -86,11 +86,9 @@ export default function ListSidebar({
 
     const now      = new Date();
     const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
-    const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
     const overdueCount = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now && !isRoutineOrEventTask(t)).length;
     const todayCount   = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd).length;
-    const weekCount    = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) > todayEnd && new Date(t.due_date) <= weekEnd).length;
     const allCount     = tasks.filter(t => !t.completed).length;
 
     const listCounts = lists.reduce((acc, l) => {
@@ -101,7 +99,6 @@ export default function ListSidebar({
     const smartFilters = [
         { id: "all",   label: "All tasks", emoji: "📋", count: allCount },
         { id: "today", label: "Today",     emoji: "📅", count: todayCount },
-        { id: "week",  label: "This week", emoji: "📆", count: weekCount },
         ...(overdueCount > 0 ? [{ id: "overdue", label: "Overdue", emoji: "⚠️", count: overdueCount, danger: true }] : []),
     ];
 

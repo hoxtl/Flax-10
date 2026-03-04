@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
+
 import styles from "./DashboardLayout.module.css";
 import TopBar from "../components/Dashboard/Topbar";
 import Sidebar from "../components/Dashboard/Sidebar";
@@ -9,7 +11,7 @@ import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingChat from "../components/FloatingChat";
-import { useLocation } from "react-router-dom";
+import { BackToTop } from "../components/Pagination/Pagination";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -57,9 +59,14 @@ async function handleLogoutClick() {
 
 function PageContent({ activeNav, children }) {
   const isMapPage = activeNav === "map";
+  const isTasksPage = activeNav === "tasks";
   const mapStyle = { padding: 0, overflow: "hidden", height: "100%" };
+  const tasksStyle = { padding: 0 };
   return (
-    <div className={styles.content} style={isMapPage ? mapStyle : undefined}>
+    <div
+      className={styles.content}
+      style={isMapPage ? mapStyle : isTasksPage ? tasksStyle : undefined}
+    >
       {children}
     </div>
   );
@@ -79,21 +86,22 @@ function MainArea({
   children,
 }) {
   return (
-    <div className={styles.main}>
-      {/* Topbar shown on desktop only */}
-      {!isMobile && (
-        <TopBar
-          user={user}
-          onAddClick={onQuickAdd}
-          onSettingsClick={onSettingsClick}
-          onLogoutClick={onLogoutClick}
-          onProfileClick={onProfileClick}
-          onNavChange={onNavChange}
-          activeNav={activeNav}
-        />
-      )}
-      {showWeekBar && <WeekBar date={selectedDate} />}
-      <PageContent activeNav={activeNav}>{children}</PageContent>
+    <div className={styles.main} data-dashboard-main>
+      <div className={styles.mainContent} data-dashboard-main-content>
+        {/* Topbar shown on desktop only */}
+        {!isMobile && (
+          <TopBar
+            user={user}
+            onSettingsClick={onSettingsClick}
+            onLogoutClick={onLogoutClick}
+            onProfileClick={onProfileClick}
+            onNavChange={onNavChange}
+            activeNav={activeNav}
+          />
+        )}
+        {showWeekBar && <WeekBar date={selectedDate} />}
+        <PageContent activeNav={activeNav}>{children}</PageContent>
+      </div>
     </div>
   );
 }
@@ -160,7 +168,6 @@ function DashboardSidebars({
   onLogout,
   onProfile,
 }) {
-  // Sidebar shown on mobile only
   if (!isMobile) return null;
   return (
     <Sidebar
@@ -234,15 +241,13 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
     state;
   return (
     <div className={styles.root}>
-      {/* Sidebar — mobile only */}
       <DashboardSidebars
         {...state}
         activeNav={activeNav}
-        onSettings={() => onNavChange("settings")}
+        onSettings={() => onNavChange?.("settings")}
         onLogout={handleLogoutClick}
-        onProfile={() => onNavChange("profile")}
+        onProfile={() => onNavChange?.("profile")}
       />
-      {/* Main area — Topbar shown inside on desktop */}
       <DashboardMain
         state={{ ...state, activeNav, isMobile }}
         onNavChange={onNavChange}
@@ -250,6 +255,11 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         {children}
       </DashboardMain>
       <FloatingChat />
+      {activeNav !== "map" &&
+        activeNav !== "modules" &&
+        activeNav !== "tasks" && (
+          <BackToTop containerSelector="[data-dashboard-main]" />
+        )}
     </div>
   );
 }

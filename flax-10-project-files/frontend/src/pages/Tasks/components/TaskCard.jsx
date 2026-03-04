@@ -67,6 +67,19 @@ function formatDueDate(dueDate) {
     return { label: due.toLocaleDateString(undefined, { month: "short", day: "numeric" }), status: "future" };
 }
 
+/** For completed tasks in Completed section: "Completed today" / "Completed yesterday" / "Completed [date]" */
+function getCompletedDueLabel(dueDate) {
+    if (!dueDate) return "Completed";
+    const due = new Date(dueDate);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+    const diffDays = Math.round((dueDay - today) / 86400000);
+    if (diffDays === 0) return "Completed today";
+    if (diffDays === -1) return "Completed yesterday";
+    return `Completed ${due.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+}
+
 /** Highlight search query matches inside a text string. */
 function HighlightText({ text, query }) {
     if (!query || !text) return <>{text}</>;
@@ -348,7 +361,7 @@ export function EditTaskModal({ task, onSave, onDelete, onClose }) {
 export default function TaskCard({
     task, onToggle, onDelete, onEdit, listName, listColor, lists,
     hideDueBadge = false, hideListBadge = false, isOverdue = false,
-    searchQuery = "",
+    searchQuery = "", isCompletedSection = false,
 }) {
     const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
@@ -396,24 +409,31 @@ export default function TaskCard({
 
     const accentCls = !task.completed && task.priority === "urgent"
         ? styles.cardAccentUrgent
-        : !task.completed && task.priority === "high" && due?.status === "tomorrow"
-        ? styles.cardAccentHighSoon
+        : !task.completed && task.priority === "high"
+        ? styles.cardAccentHigh
+        : !task.completed && task.priority === "medium"
+        ? styles.cardAccentMedium
+        : !task.completed && (task.priority === "low" || !task.priority)
+        ? styles.cardAccentLow
         : "";
 
     return (
         <>
             <div
-                className={`${styles.card} ${task.completed ? styles.cardDone : ""} ${isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`}
+                className={`${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`}
                 style={{ "--list-color": listColor || "#a89890" }}
                 onContextMenu={handleContextMenu}
                 title="Right-click for more options"
             >
                 <CheckBurst active={burstPop}>
                     <button
-                        className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${checkBounce ? styles.checkBounce : ""}`}
+                        className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`}
                         onClick={handleCheckClick}
+                        aria-label={task.completed ? "Mark incomplete" : "Mark complete"}
                     >
-                        {task.completed && <span className={styles.checkMark}>✓</span>}
+                        {task.completed && (
+                          <span className={styles.checkMark}>✓</span>
+                        )}
                     </button>
                 </CheckBurst>
 
@@ -429,9 +449,9 @@ export default function TaskCard({
                             <HighlightText text={task.title} query={searchQuery} />
                         </span>
                         {due && !hideDueBadge && (
-                            <span className={`${styles.dueLabel} ${styles[`due_${due.status}`]}`}>
-                                {(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && <Clock size={11} className={styles.duePillIcon} />}
-                                {due.label}
+                            <span className={`${styles.dueLabel} ${task.completed && isCompletedSection ? styles.dueLabelCompleted : ""} ${styles[`due_${due.status}`]}`}>
+                                {(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}
+                                {task.completed && isCompletedSection ? getCompletedDueLabel(task.due_date) : due.label}
                             </span>
                         )}
                     </div>
