@@ -49,6 +49,15 @@
     color: white;
 }
 
+.moduleBadge {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: #4A90D9;
+    color: white;
+}
+
 .closeBtn {
     background: none;
     border: none;

@@ -1,5 +1,4 @@
 from django.db import models
-
 from .userModel import User
 
 class UserSettings(models.Model):
@@ -8,4 +7,6 @@ class UserSettings(models.Model):
     timezone = models.CharField(max_length=100)
     year = models.CharField(max_length=50, blank=True, default='')
     major = models.CharField(max_length=100, blank=True, default='')
+    sleep_time = models.TimeField(default='23:00')
+    wake_time = models.TimeField(default='07:00')
     modules = models.JSONField(default=list, blank=True)

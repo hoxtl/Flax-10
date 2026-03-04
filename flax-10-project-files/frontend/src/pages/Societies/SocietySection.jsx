@@ -31,8 +31,8 @@ function SectionContent({ items, isMember, onAction, allSocieties, onSelect }) {
 
     return (
         <div className={styles.grid}>
-            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
             {isMember && <BrowseCard onClick={onAction} societies={allSocieties} />}
+            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
         </div>
     );
 }

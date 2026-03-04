@@ -238,3 +238,85 @@
     color: var(--muted, #64748b);
     font-weight: 400;
 }
+
+/* Warning Modal */
+.warningOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.warningModal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    max-width: 280px;
+}
+
+.warningModal h4 {
+    margin: 0;
+    color: #dc2626;
+    font-size: 1.1rem;
+}
+
+.warningModal p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.warningActions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.warningActions button {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.warningActions button:nth-child(2) {
+    background: #2563eb;
+    color: white;
+    border: none;
+}
+
+.warningActions button:last-child {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+}
+
+.warningActions button:hover {
+    filter: brightness(0.95);
+}

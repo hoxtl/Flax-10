@@ -7,7 +7,6 @@ function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);
   setTimeout(() => setter(""), duration);
 }
-
 function isPasswordTooShort(password) { return password.length < 8; }
 function passwordsDoNotMatch(a, b) { return a !== b; }
 
@@ -43,6 +42,16 @@ async function tryUpdateSettings(data) {
 async function savePreferences(data, setSuccessMessage, setIsSaving) {
   const response = await tryUpdateSettings(data).catch(() => null);
   const msg = response ? "Preferences saved successfully!" : "Failed to save preferences";
+  showTemporaryMessage(setSuccessMessage, msg);
+  setIsSaving(false);
+}
+
+async function saveSleep(data, setSuccessMessage, setIsSaving) {
+  if (!hasToken()) return;
+  setIsSaving(true);
+  const { ok } = await patchSettings({ sleep_time: data.sleep_time, wake_time: data.wake_time })
+    .catch(() => ({ ok: false }));
+  const msg = ok ? "Sleep schedule saved!" : "Failed to save sleep schedule";
   showTemporaryMessage(setSuccessMessage, msg);
   setIsSaving(false);
 }
@@ -98,5 +107,10 @@ export default function useSettingsHandlers() {
       setHomeAddressError("Home address could not be saved, please try again...");
     } finally { setIsSaving(false); }
   };
+
+  const handleSleepSave = async (data) => {
+    await saveSleep(data, setSuccessMessage, setIsSaving);
+  };
   
-  return { isSaving, successMessage, passwordError, homeAddressError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, };}
+  return { isSaving, successMessage, passwordError, homeAddressError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, handleSleepSave };
+}
