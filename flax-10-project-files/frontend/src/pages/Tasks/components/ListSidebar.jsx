@@ -1,7 +1,7 @@
-// list side bar for the tasks page
+// list side bar for the task page
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Archive } from "lucide-react";
 import styles from "./ListSidebar.module.css";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
@@ -45,7 +45,7 @@ function RenameInput({ value, onSave, onCancel}) {
     );
 }
 
-function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
+function ListContextMenu({ x, y, onRename, onArchive, onDelete, onClose }) {
     const ref = useRef(null);
     useEffect(() => {
         const handler = e => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
@@ -58,9 +58,14 @@ function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
             <button className={styles.ctxItem} onClick={() => { onRename(); onClose(); }}>
                 <Pencil size={14} strokeWidth={2} /> Rename
             </button>
+            {onArchive && (
+                <button className={styles.ctxItem} onClick={() => { onArchive(); onClose(); }}>
+                    <Archive size={14} strokeWidth={2} /> Archive list
+                </button>
+            )}
             <div className={styles.ctxDivider} />
             <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}>
-                <Trash2 size={14} strokeWidth={2} /> Delete list
+                <Trash2 size={14} strokeWidth={2} /> Delete permanently
             </button>
         </div>
     );
@@ -75,6 +80,7 @@ export default function ListSidebar({
     onSelectFilter,
     onNewList,
     onDeleteList,
+    onArchiveList,
     onRenameList,
     onUnarchiveList,
     onPermanentlyDeleteList,
@@ -95,6 +101,9 @@ export default function ListSidebar({
         acc[l.id] = tasks.filter(t => !t.completed && String(t.task_list) === String(l.id)).length;
         return acc;
     }, {});
+
+    /* Exclude "All Tasks" from LISTS since VIEWS already has "All tasks" */
+    const listsWithoutAllTasks = lists.filter((l) => (l.name || "").trim() !== "All Tasks");
 
     const smartFilters = [
         { id: "all",   label: "All tasks", emoji: "📋", count: allCount },
@@ -130,7 +139,7 @@ export default function ListSidebar({
             {/* ── Lists ── */}
             <div className={styles.sectionLabel}>LISTS</div>
             <nav className={styles.nav}>
-                {lists.map((list, idx) => {
+                {listsWithoutAllTasks.map((list, idx) => {
                     const color  = listColour(list, idx);
                     const count  = listCounts[list.id] || 0;
                     const active = activeListId === list.id;
@@ -161,7 +170,7 @@ export default function ListSidebar({
                         </div>
                     );
                 })}
-                {lists.length === 0 && <p className={styles.emptyLists}>No lists yet</p>}
+                {listsWithoutAllTasks.length === 0 && <p className={styles.emptyLists}>No lists yet</p>}
             </nav>
 
             {/* ── Explicit create button ── */}
@@ -215,6 +224,7 @@ export default function ListSidebar({
                     x={ctxMenu.x}
                     y={ctxMenu.y}
                     onRename={() => setRenamingId(ctxMenu.listId)}
+                    onArchive={onArchiveList ? () => onArchiveList(ctxMenu.listId) : undefined}
                     onDelete={() => onDeleteList(ctxMenu.listId)}
                     onClose={() => setCtxMenu(null)}
                 />

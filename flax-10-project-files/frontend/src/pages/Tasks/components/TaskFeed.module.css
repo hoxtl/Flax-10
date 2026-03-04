@@ -67,12 +67,12 @@
 .listHeaderTitleWrap { min-width: 0; }
 .listHeaderTitle {
     font-family: var(--font-body);
-    font-size: 1.5rem;
+    font-size: 2.25rem;
     font-weight: 700;
     color: #292524;
     margin: 0;
     letter-spacing: -0.02em;
-    line-height: 1.3;
+    line-height: 1.25;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -599,6 +599,14 @@
     font-size: 2rem;
     line-height: 1;
     flex-shrink: 0;
+    display: inline-block;
+    animation: sectionEmptyIconCelebrate 2s ease-in-out infinite;
+}
+@keyframes sectionEmptyIconCelebrate {
+    0%, 100% { transform: translateY(0) scale(1) rotate(-5deg); }
+    25%      { transform: translateY(-6px) scale(1.08) rotate(2deg); }
+    50%      { transform: translateY(-2px) scale(1.05) rotate(5deg); }
+    75%      { transform: translateY(-8px) scale(1.1) rotate(-2deg); }
 }
 .sectionEmptyMessage {
     margin: 0;

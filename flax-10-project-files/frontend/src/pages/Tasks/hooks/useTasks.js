@@ -56,10 +56,11 @@ export default function useTasks() {
     deleteTask(id).catch(() => {});
   }, []);
 
-  const toggleComplete = useCallback(async (id, completed) => {
+  const toggleComplete = useCallback(async (id, currentCompleted) => {
+    const newCompleted = !currentCompleted;
     try {
-      await updateTask(id, { completed });
-      setTasks((prev) => prev.map((t) => (String(t.id) === String(id) ? { ...t, completed } : t)));
+      await updateTask(id, { completed: newCompleted });
+      setTasks((prev) => prev.map((t) => (String(t.id) === String(id) ? { ...t, completed: newCompleted } : t)));
     } catch (_) {}
   }, []);
 

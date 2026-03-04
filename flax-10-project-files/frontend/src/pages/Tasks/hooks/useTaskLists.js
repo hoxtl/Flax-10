@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { fetchTaskLists, createTaskList } from "../../../api/taskService";
+import { fetchTaskLists, createTaskList, updateTaskList, deleteTaskList } from "../../../api/taskService";
 
 export default function useTaskLists() {
   const [lists, setLists] = useState([]);
@@ -42,13 +42,32 @@ export default function useTaskLists() {
     setLists((prev) => prev.map((l) => (String(l.id) === String(listId) ? { ...l, name } : l)));
   }, []);
 
+  const archiveList = useCallback(async (listId) => {
+    try {
+      await updateTaskList(listId, { archived: true });
+      await load();
+    } catch (_) {
+      await load();
+    }
+  }, [load]);
+
   const restoreList = useCallback(async (listId) => {
-    setArchivedLists((prev) => prev.filter((l) => String(l.id) !== String(listId)));
-    await load();
+    try {
+      await updateTaskList(listId, { archived: false });
+      await load();
+    } catch (_) {
+      await load();
+    }
   }, [load]);
 
   const permanentlyDeleteList = useCallback(async (listId) => {
-    setArchivedLists((prev) => prev.filter((l) => String(l.id) !== String(listId)));
+    try {
+      await deleteTaskList(listId);
+      setArchivedLists((prev) => prev.filter((l) => String(l.id) !== String(listId)));
+      await load();
+    } catch (_) {
+      await load();
+    }
   }, []);
 
   return {
@@ -58,6 +77,7 @@ export default function useTaskLists() {
     addList,
     removeList,
     renameList,
+    archiveList,
     restoreList,
     permanentlyDeleteList,
   };
