@@ -1446,14 +1446,14 @@
 .intRowSlotLink {
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.78rem;
-  font-weight: 600;
-  color: #7B6751;
+  font-weight: 500;
+  color: rgba(123, 103, 81, 0.7);
   text-decoration: none;
   margin-top: auto;
   padding-top: 4px;
   transition: color 0.15s;
 }
-.intRowSlotLink:hover { color: #4A3421; text-decoration: underline; }
+.intRowSlotLink:hover { color: #5c4d3e; text-decoration: underline; }
 
 /* ─── Day Progress slot ──────────────────────────────────────────────────── */
 
@@ -1750,11 +1750,83 @@
   color: #4A3421;
 }
 
-.actionHubSlotRoot {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
+  .actionHubSlotRoot {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* All tasks done: keep subtle green tint (celebratory) */
+  .actionHubSlotAllDoneWrap {
+    background: linear-gradient(to bottom right, #f7fdf9, #f0fdf4);
+    border-radius: 16px;
+    padding: 1rem;
+    margin: -4px 0 0;
+    min-height: 0;
+  }
+
+  /* Plan tomorrow → pill button */
+  .actionHubPlanTomorrowPill {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    background: #292524;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .actionHubPlanTomorrowPill:hover {
+    background: #44403c;
+    color: #fff;
+  }
+
+  /* Mini progress donut + count when tasks remaining */
+  .actionHubDonutRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .actionHubDonutWrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+  .actionHubDonutSvg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .actionHubDonutBg {
+    fill: none;
+    stroke: rgba(74, 55, 40, 0.12);
+    stroke-width: 4;
+  }
+  .actionHubDonutFill {
+    fill: none;
+    stroke: #16a34a; /* soft green-600 — success/done */
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+  }
+  .actionHubDonutCount {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2c2420;
+    letter-spacing: 0.02em;
+  }
+  .actionHubDonutCount span {
+    color: #8a7d76;
+    font-weight: 500;
+  }
+
+  .actionHubManageFooter {
+    margin-top: 10px;
+  }
 
 .actionHubBottomBar {
   margin-top: 12px;
@@ -1772,20 +1844,20 @@
   margin-top: 10px;
   padding: 8px 0;
   background: none;
-  border: 1px dashed rgba(132, 169, 140, 0.5);
+  border: 1px dashed rgba(120, 113, 108, 0.4);
   border-radius: 8px;
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
   font-weight: 500;
-  color: #5a8a65;
+  color: #57534e;
   cursor: pointer;
   text-align: center;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .actionHubFocusCta:hover {
-  background: rgba(132, 169, 140, 0.08);
-  border-color: rgba(132, 169, 140, 0.7);
-  color: #3d6b47;
+  background: rgba(120, 113, 108, 0.06);
+  border-color: rgba(120, 113, 108, 0.6);
+  color: #44403c;
 }
 
 /* ── Focus banner (top of page when timer is running) ── */
@@ -2267,6 +2339,21 @@
   gap: 2px;
 }
 
+.intRowNowCountdownPill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #b45309;
+}
+
 .intRowNowEmptyText {
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 13px;
@@ -2410,7 +2497,83 @@
 
 /* ─── Focus Windows smart redesign ───────────────────────────────────────── */
 
-/* Outer wrapper for enhanced Focus Windows card */
+/* Simplified Focus Windows: no gradient, same card base */
+.intRowFocusWrapSimple {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: -4px 0 0;
+}
+.intRowFocusHeadline {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.intRowFocusHeadlineNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2d352d;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.intRowFocusHeadlineWord {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #5c4d3e;
+}
+.intRowFocusHeadlineDot {
+  color: rgba(92, 77, 62, 0.4);
+  font-size: 0.8rem;
+  margin: 0 2px;
+}
+.intRowFocusBestWindow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px 10px 12px;
+  border-radius: 12px;
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  border-left: 4px solid #a8a29e;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.intRowFocusBestWindowLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #57534e;
+  margin-bottom: 2px;
+}
+.intRowFocusBestWindowTime {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c2420;
+}
+.intRowFocusBestWindowDur {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #57534e;
+  flex-shrink: 0;
+}
+.intRowFocusBestWindowLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+/* Outer wrapper for enhanced Focus Windows card (legacy) */
 .intRowFocusWrap {
   display: flex;
   flex-direction: column;
@@ -2835,10 +2998,32 @@
   background: rgba(74, 55, 40, 0.04);
 }
 
-.intRowDeadlineRow2Red   { border-left-color: #c4574b; }
-.intRowDeadlineRow2Amber { border-left-color: #c49a4b; }
-.intRowDeadlineRow2Green { border-left-color: #6b8f71; }
-.intRowDeadlineRow2Grey  { border-left-color: #d4c9c2; }
+/* Urgency: <3 days red, 3–7 days orange, 7+ green — border + subtle bg */
+.intRowDeadlineRow2Red {
+  border-left-color: #f87171;
+  background: #fef2f2;
+}
+.intRowDeadlineRow2Red:hover {
+  background: #fef2f2;
+}
+.intRowDeadlineRow2Amber {
+  border-left-color: #fb923c;
+  background: #fff7ed;
+}
+.intRowDeadlineRow2Amber:hover {
+  background: #fff7ed;
+}
+.intRowDeadlineRow2Green {
+  border-left-color: #34d399;
+  background: #f0fdf4;
+}
+.intRowDeadlineRow2Green:hover {
+  background: #f0fdf4;
+}
+.intRowDeadlineRow2Grey  {
+  border-left-color: #d4c9c2;
+  background: transparent;
+}
 
 .intRowDeadline2Line1 {
   display: flex;
@@ -2878,19 +3063,21 @@
 }
 .intRowDeadline2TypePill:hover { opacity: 0.75; }
 
-.intRowDeadline2TypePillExam { background: #fdf0ee; color: #c4574b; }
-.intRowDeadline2TypePillCw   { background: #e8f4f0; color: #2d5f50; }
+.intRowDeadline2TypePillExam { background: #fee2e2; color: #b91c1c; }
+.intRowDeadline2TypePillCw   { background: #dbeafe; color: #1d4ed8; }
+.intRowDeadline2TypePillPresentation { background: #f3e8ff; color: #7e22ce; }
+.intRowDeadline2TypePillQuiz { background: #e8f4f0; color: #2d5f50; }
 
 .intRowDeadline2Days {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.625rem;
-  font-weight: 600;
+  font-weight: 700;
   flex-shrink: 0;
   color: #8a7d76;
 }
-.intRowDeadline2DaysRed   { color: #c4574b; }
-.intRowDeadline2DaysAmber { color: #c49a4b; }
-.intRowDeadline2DaysGreen { color: #6b8f71; }
+.intRowDeadline2DaysRed   { color: #dc2626; }
+.intRowDeadline2DaysAmber { color: #ea580c; }
+.intRowDeadline2DaysGreen { color: #16a34a; }
 .intRowDeadline2DaysGrey  { color: #8a7d76; }
 
 .intRowDeadline2Title {

@@ -14,10 +14,8 @@ import styles from "./TasksPage.module.css";
 
 function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = []) {
     return useMemo(() => {
-        const now      = new Date();
         const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
-        const weekEnd  = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
         let filtered = tasks;
         if (filterListIds && filterListIds.length > 0) {
@@ -31,8 +29,6 @@ function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = [])
             return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < dayStart);
         if (activeFilter === "today")
             return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
-        if (activeFilter === "week")
-            return filtered.filter(t => t.due_date && new Date(t.due_date) <= weekEnd);
         return filtered;
     }, [tasks, activeListId, activeFilter, filterListIds]);
 }

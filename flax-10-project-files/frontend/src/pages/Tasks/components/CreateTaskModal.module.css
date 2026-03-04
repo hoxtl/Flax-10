@@ -1,9 +1,8 @@
 /**
  * CreateTaskModal.module.css
  *
- * Unified typography and UI for the New Task (+ Full Planning) modal:
- * Inter/Geist for labels and body, JetBrains Mono for time; Sage/Flax borders;
- * off-white modal, Flax focus glow, ghost Cancel, solid Flax Brown Save.
+ * Single font family for the entire modal: all text uses var(--font-body).
+ * Hierarchy is by size, weight, and color only — no font switching.
  */
 
 .overlay {
@@ -39,6 +38,14 @@
   max-height: none;
 }
 
+/* Force one font on every element in the modal (inputs/buttons often don't inherit when modal is portaled) */
+.modal input,
+.modal select,
+.modal textarea,
+.modal button {
+  font-family: var(--font-body);
+}
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -53,10 +60,10 @@
 }
 
 .title {
-  font-family: var(--font-heading, "Lexend", system-ui, sans-serif);
-  font-size: 1rem;
+  font-family: var(--font-body);
+  font-size: 1.5rem;
   font-weight: 700;
-  color: var(--restoration-earth, #6B5344);
+  color: var(--text);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -64,7 +71,8 @@
 .closeBtn {
   background: none;
   border: none;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
+  font-family: inherit;
   color: var(--muted);
   cursor: pointer;
   width: 32px;
@@ -91,17 +99,17 @@
 
 .label {
   font-family: var(--font-body);
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #44403c;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   display: block;
   margin-bottom: 5px;
 }
 
 .labelRequired {
-  color: var(--restoration-earth, #6B5344);
+  color: var(--primary);
 }
 
 .canvas {
@@ -124,8 +132,8 @@
   border-radius: 10px;
   background: var(--bg, #F8F5F2);
   color: var(--text);
-  font-size: 0.85rem;
-  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-family: inherit;
   box-sizing: border-box;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -138,7 +146,8 @@
 .titleInput::placeholder,
 .desc::placeholder {
   font-weight: 400;
-  color: var(--muted);
+  color: #a8a29e;
+  font-size: 0.875rem;
 }
 
 .titleInput:focus,
@@ -176,11 +185,11 @@
 .gridLabel,
 .listWrapLabel {
   font-family: var(--font-body);
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #44403c;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   margin-bottom: 5px;
   display: block;
 }
@@ -193,8 +202,8 @@
 }
 
 .durationLabel {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
   margin-top: 0;
@@ -210,6 +219,13 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 0;
+}
+
+.durationRow .estTimeBannerModal {
+  width: 100%;
+  flex: 0 0 100%;
+  margin-bottom: 2px;
+  padding: 6px 12px;
 }
 
 .durationRow .durationLabel {
@@ -228,7 +244,7 @@
 
 .icon {
   flex-shrink: 0;
-  color: #9a8b7a;
+  color: var(--muted);
 }
 
 .chipGroup {
@@ -251,10 +267,10 @@
   border-radius: 9999px;
   border: 1.5px solid rgba(74, 52, 33, 0.15);
   background: var(--bg, #F8F5F2);
-  color: #44403c;
-  font-size: 0.76rem;
-  font-weight: 600;
-  font-family: var(--font-body);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
@@ -265,9 +281,10 @@
 }
 
 .chipActive {
-  background: var(--restoration-earth, #6B5344);
-  border-color: var(--restoration-earth, #6B5344);
-  color: #fff;
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--text);
+  font-weight: 600;
 }
 
 .dateTimeWrap {
@@ -285,8 +302,8 @@
   border: 1.5px solid rgba(74, 52, 33, 0.12);
   background: var(--bg, #F8F5F2);
   color: var(--muted);
-  font-size: 0.85rem;
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.875rem;
+  font-family: var(--font-body);
   font-variant-numeric: tabular-nums;
   box-sizing: border-box;
 }
@@ -312,11 +329,11 @@
 
 .listWrapLabel {
   font-family: var(--font-body);
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #44403c;
+  letter-spacing: 0.05em;
+  color: #a8a29e;
   flex-shrink: 0;
 }
 
@@ -344,8 +361,8 @@
   border: 1.5px solid rgba(74, 52, 33, 0.12);
   background: var(--bg, #F8F5F2);
   color: var(--text);
-  font-size: 0.82rem;
-  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-family: inherit;
   text-align: left;
   cursor: pointer;
   outline: none;
@@ -371,7 +388,7 @@
 
 .listSelectChevron {
   font-size: 0.7rem;
-  color: #6B7280;
+  color: var(--muted);
   flex-shrink: 0;
 }
 
@@ -441,14 +458,14 @@
   font-size: 0.85rem;
   font-family: var(--font-body);
   font-weight: 600;
-  color: var(--restoration-earth, #6B5344);
+  color: var(--primary);
   text-align: left;
   cursor: pointer;
   transition: background 0.12s;
 }
 
 .listDropdownCreate:hover {
-  background: rgba(111, 78, 55, 0.08);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .listCreateSlide {
@@ -494,9 +511,9 @@
   padding: 8px 14px;
   border: none;
   border-radius: 8px;
-  background: var(--restoration-earth, #6B5344);
+  background: var(--primary);
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
@@ -537,10 +554,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  font-family: var(--font-body);
-  color: #44403c;
+  font-family: inherit;
+  color: var(--text);
   cursor: pointer;
   user-select: none;
 }
@@ -548,7 +565,7 @@
 .scheduleCheckbox {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--restoration-earth, #6B5344);
+  accent-color: var(--primary);
   cursor: pointer;
 }
 
@@ -562,14 +579,14 @@
 }
 
 .cancelBtn {
-  font-family: var(--font-body);
+  font-family: inherit;
   background: transparent;
-  color: var(--text-muted-sage, #5a635a);
+  color: var(--muted);
   border: 1.5px solid rgba(74, 52, 33, 0.12);
   padding: 8px 18px;
   border-radius: 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.1s, border-color 0.15s;
 }
@@ -577,17 +594,18 @@
 .cancelBtn:hover {
   background: var(--hover);
   border-color: rgba(74, 52, 33, 0.2);
+  color: var(--text);
 }
 
 .saveBtn {
-  font-family: var(--font-body);
-  background: var(--restoration-earth, #6B5344);
+  font-family: inherit;
+  background: var(--primary);
   color: white;
   border: none;
   padding: 8px 24px;
   border-radius: 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, box-shadow 0.15s;
   box-shadow: 0 2px 8px rgba(107, 83, 68, 0.2);
@@ -600,7 +618,7 @@
 }
 
 .saveBtn:hover:not(:disabled) {
-  background: var(--flax-brown-strong, #5c4d3e);
+  background: var(--primary-strong, #5c4d3e);
   box-shadow: 0 4px 16px rgba(107, 83, 68, 0.25);
 }
 

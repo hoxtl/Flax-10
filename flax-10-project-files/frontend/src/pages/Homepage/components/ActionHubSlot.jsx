@@ -40,6 +40,8 @@ export function ActionHubSlot({
     : actionHubList.slice(0, VISIBLE_COUNT);
   const hiddenCount = Math.max(0, actionHubList.length - VISIBLE_COUNT);
 
+  const actionHubCompletedCount = actionHubItemsOnly.filter((i) => i.completed).length;
+
   const allTasksDone =
     actionHubItemsOnly.length > 0 &&
     actionHubItemsOnly.every((t) => t.completed);
@@ -48,14 +50,16 @@ export function ActionHubSlot({
 
   if (allTasksDone) {
     return (
-      <AllTasksCompleteCard
-        message={clearMessage}
-        sub={`${actionHubItemsOnly.length} task${actionHubItemsOnly.length !== 1 ? "s" : ""} completed today. Take a moment — you earned it.`}
-      >
-        <Link to="/tasks?open=fullPlanning" className={styles.actionHubLink}>
-          Plan tomorrow →
-        </Link>
-      </AllTasksCompleteCard>
+      <div className={styles.actionHubSlotAllDoneWrap}>
+        <AllTasksCompleteCard
+          message={clearMessage}
+          sub={`${actionHubItemsOnly.length} task${actionHubItemsOnly.length !== 1 ? "s" : ""} completed today. Take a moment — you earned it.`}
+        >
+          <Link to="/tasks?open=fullPlanning" className={styles.actionHubPlanTomorrowPill}>
+            Plan tomorrow →
+          </Link>
+        </AllTasksCompleteCard>
+      </div>
     );
   }
 
@@ -63,6 +67,25 @@ export function ActionHubSlot({
     <div ref={actionHubRef} className={styles.actionHubSlotRoot}>
       {actionHubItemsOnly.length > 0 ? (
         <>
+          {/* Mini progress donut + count */}
+          <div className={styles.actionHubDonutRow}>
+            <div className={styles.actionHubDonutWrap}>
+              <svg className={styles.actionHubDonutSvg} viewBox="0 0 36 36" aria-hidden>
+                <circle className={styles.actionHubDonutBg} cx="18" cy="18" r="14" />
+                <circle
+                  className={styles.actionHubDonutFill}
+                  cx="18"
+                  cy="18"
+                  r="14"
+                  strokeDasharray={`${(actionHubCompletedCount / actionHubItemsOnly.length) * 87.96} 87.96`}
+                />
+              </svg>
+            </div>
+            <span className={styles.actionHubDonutCount}>
+              {actionHubCompletedCount}<span>/{actionHubItemsOnly.length} done</span>
+            </span>
+          </div>
+
           <motion.ul className={styles.actionHubTaskList} layout>
             {visibleList.map((t) => {
               const isOverdue = t.actionHubStatus === "overdue";
@@ -147,22 +170,11 @@ export function ActionHubSlot({
             </button>
           )}
 
-          {/* Footer: slim progress bar + done% + manage link */}
-          <div className={styles.actionHubBottomBar}>
-            <div className={styles.actionHubProgressTrackSlim}>
-              <div
-                className={styles.actionHubProgressFillSlim}
-                style={{ width: `${actionHubSpineCompletedPct}%` }}
-              />
-            </div>
-            <div className={styles.actionHubBottomRow}>
-              <span className={styles.actionHubBottomPct}>
-                {Math.round(actionHubSpineCompletedPct)}% done
-              </span>
-              <Link to="/tasks" className={styles.actionHubHeaderLink}>
-                Manage all →
-              </Link>
-            </div>
+          <div className={`${styles.actionHubBottomRow} ${styles.actionHubManageFooter}`}>
+            <span className={styles.actionHubBottomPct} />
+            <Link to="/tasks" className={styles.actionHubHeaderLink}>
+              Manage all →
+            </Link>
           </div>
         </>
       ) : (

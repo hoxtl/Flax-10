@@ -5,6 +5,14 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+def drop_follow_table_if_exists(apps, schema_editor):
+    """Drop studyFlax_follow only if it exists (safe for DBs that never had Follow)."""
+    with schema_editor.connection.cursor() as cursor:
+        cursor.execute(
+            "DROP TABLE IF EXISTS studyFlax_follow CASCADE;"
+        )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,8 +29,13 @@ class Migration(migrations.Migration):
                 ('shared_with', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shared_with_me', to=settings.AUTH_USER_MODEL)),
             ],
         ),
-        migrations.DeleteModel(
-            name='Follow',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunPython(drop_follow_table_if_exists, migrations.RunPython.noop),
+            ],
+            state_operations=[
+                migrations.DeleteModel(name='Follow'),
+            ],
         ),
         migrations.AddIndex(
             model_name='calendarshare',

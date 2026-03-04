@@ -12,6 +12,7 @@ import { Flag } from "lucide-react";
 
 import DateTimePicker from "./DateTimePicker";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 
 import styles from "./CreateTaskModal.module.css";
@@ -191,6 +192,11 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
             </div>
           </div>
           <div className={styles.durationRow}>
+            <EstTimeHelpBanner
+              message="Not sure what estimated time to put? Ask Flax for a suggestion."
+              ctaLabel="Ask Flax"
+              className={styles.estTimeBannerModal}
+            />
             <div className={styles.chipGroup}>
               {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
                 <button

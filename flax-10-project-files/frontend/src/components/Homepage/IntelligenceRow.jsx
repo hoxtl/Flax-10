@@ -1,8 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CheckSquare, AlertCircle, Zap, Clock, Train, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { CheckSquare, AlertCircle, Zap, Clock, Calendar, Train, X, AlertTriangle, Check } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../api/tflService";
+import { RightNowWidget } from "../../pages/Homepage/components/RightNowWidget";
 
 /** Dynamic greeting by time of day */
 function getGreeting(name) {
@@ -11,11 +12,11 @@ function getGreeting(name) {
   return `Good ${timeOfDay}${name ? `, ${name}` : ""}.`;
 }
 
-/** Today's date label e.g. "Friday · 27 Feb" */
+/** Today's date label e.g. "WEDNESDAY · 4 MAR" */
 function getTodayLabel() {
   const now = new Date();
-  const day = now.toLocaleDateString("en-GB", { weekday: "long" });
-  const date = now.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  const day = now.toLocaleDateString("en-GB", { weekday: "long" }).toUpperCase();
+  const date = now.toLocaleDateString("en-GB", { day: "numeric", month: "short" }).toUpperCase();
   return `${day} · ${date}`;
 }
 
@@ -31,10 +32,13 @@ export default function IntelligenceRow({
   slot3Urgent,
   slot4Energy,
   slot5Commute,
+  slot5Data,
   hasOverdue = false,
 }) {
   const sectionRef = useRef(null);
   const [sectionVisible, setSectionVisible] = useState(false);
+  const tflDelays = useTflDelays();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!sectionRef.current || typeof window === "undefined") return;
@@ -60,19 +64,52 @@ export default function IntelligenceRow({
     >
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <span className={styles.headerLabel}>{getTodayLabel()}</span>
+          <span className={styles.headerDateRow}>
+            <Calendar className={styles.headerDateIcon} size={14} strokeWidth={2} aria-hidden />
+            <span className={styles.headerLabel}>{getTodayLabel()}</span>
+          </span>
           <h2 className={styles.headerTitle}>{getGreeting(displayName)}</h2>
         </div>
       </header>
 
       <div className={styles.grid}>
         <BentoSlot
+          span={styles.span5}
+          slotVariant="rightNow"
+          title="Right Now"
+          meta={null}
+          icon={Clock}
+          index={0}
+          isVisible={sectionVisible}
+        >
+          {slot5Data ? (
+            <RightNowWidget
+              {...slot5Data}
+              tflDelays={tflDelays}
+              onOpenTimer={() => navigate("/timer")}
+            />
+          ) : (
+            <>
+              {statusStrip?.variant === "Conflict" && statusStrip?.text?.includes("Schedule overlap") && (
+                <div className={styles.rightNowScheduleWarning} role="alert">
+                  <AlertTriangle size={16} strokeWidth={2} aria-hidden />
+                  <span>{statusStrip.text}</span>
+                </div>
+              )}
+              {slot5Commute}
+              <TravelAlertsSection tflContext={tflContext} />
+            </>
+          )}
+        </BentoSlot>
+
+        <BentoSlot
           span={styles.span1}
+          slotVariant="tasks"
           title="Today's Tasks"
           meta={slot1Meta}
           icon={CheckSquare}
           iconPulse={hasOverdue}
-          index={0}
+          index={1}
           isVisible={sectionVisible}
         >
           {slot1ActionHub}
@@ -80,10 +117,11 @@ export default function IntelligenceRow({
 
         <BentoSlot
           span={styles.span3}
+          slotVariant="deadlines"
           title="Deadlines"
           meta={null}
           icon={AlertCircle}
-          index={1}
+          index={2}
           isVisible={sectionVisible}
         >
           {slot3Urgent}
@@ -91,35 +129,14 @@ export default function IntelligenceRow({
 
         <BentoSlot
           span={styles.span4}
+          slotVariant="focus"
           title="Focus Windows"
           meta={null}
           icon={Zap}
-          index={2}
-          isVisible={sectionVisible}
-        >
-          {slot4Energy}
-        </BentoSlot>
-
-        <BentoSlot
-          span={styles.span5}
-          title="Right Now"
-          meta={null}
-          icon={Clock}
           index={3}
           isVisible={sectionVisible}
         >
-          <>
-            <div className={styles.intRowAlertsContainer}>
-              {statusStrip && (
-                <div className={styles.intRowAlertRow}>
-                  <span className={styles.intRowAlertDot} aria-hidden />
-                  <span className={styles.intRowAlertText}>{statusStrip.text}</span>
-                </div>
-              )}
-              <TravelAlertPills tflContext={tflContext} compact />
-            </div>
-            {slot5Commute}
-          </>
+          {slot4Energy}
         </BentoSlot>
       </div>
     </section>
@@ -128,6 +145,7 @@ export default function IntelligenceRow({
 
 function BentoSlot({
   span,
+  slotVariant,
   title,
   meta,
   icon: Icon,
@@ -150,10 +168,12 @@ function BentoSlot({
 
   const handleMouseLeave = () => setMousePos({ x: "50%", y: "50%" });
 
+  const variantClass = slotVariant ? styles[`bentoSlotVariant${slotVariant.charAt(0).toUpperCase()}${slotVariant.slice(1)}`] : null;
+
   return (
     <article
       ref={cardRef}
-      className={`${styles.bentoSlot} ${span} ${isVisible ? styles.bentoVisible : ""} ${iconPulse ? styles.iconPulse : ""}`}
+      className={`${styles.bentoSlot} ${span} ${variantClass || ""} ${isVisible ? styles.bentoVisible : ""} ${iconPulse ? styles.iconPulse : ""}`}
       style={{ animationDelay: `${index * 0.12}s` }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -189,94 +209,73 @@ function useTflDelays() {
   return delays;
 }
 
-function TravelAlertPills({ tflContext, compact }) {
+/** Right Now: TFL Travel Alerts section — always visible, header + all-clear or line disruptions */
+function TravelAlertsSection({ tflContext }) {
   const delays = useTflDelays();
   const [dismissed, setDismissed] = useState(new Set());
+  const [expanded, setExpanded] = useState(false);
 
-  if (!delays || delays.length === 0) return null;
+  const visible = delays && delays.length > 0 ? delays.filter(d => !dismissed.has(d.lineName)) : [];
+  const INITIAL_SHOW = 3;
+  const showCollapseToggle = visible.length > INITIAL_SHOW;
+  const displayed = showCollapseToggle && !expanded ? visible.slice(0, INITIAL_SHOW) : visible;
+  const hiddenCount = visible.length - displayed.length;
 
-  const visible = delays.filter(d => !dismissed.has(d.lineName));
-  if (visible.length === 0) return null;
-
-  const shown = visible.slice(0, 2);
-  const overflow = visible.length - shown.length;
-
-  const dismiss = (lineName) =>
-    setDismissed(prev => new Set([...prev, lineName]));
-
-  if (compact) {
-    return (
-      <>
-        {shown.map((delay) => (
-          <div key={delay.lineName} className={styles.intRowAlertRow} role="status">
-            <span
-              className={styles.intRowAlertDot}
-              style={{ background: delay.color }}
-              aria-hidden
-            />
-            <span className={styles.intRowAlertText}>
-              {delay.lineName} · {delay.severityDescription}
-            </span>
-            <button
-              className={styles.intRowAlertDismiss}
-              onClick={() => dismiss(delay.lineName)}
-              aria-label={`Dismiss ${delay.lineName} alert`}
-            >
-              <X size={9} strokeWidth={2.5} aria-hidden />
-            </button>
-          </div>
-        ))}
-        {overflow > 0 && (
-          <span className={styles.intRowAlertOverflow}>
-            +{overflow} more line{overflow > 1 ? "s" : ""} affected
-          </span>
-        )}
-      </>
-    );
-  }
+  const dismiss = (lineName) => setDismissed(prev => new Set([...prev, lineName]));
 
   return (
-    <>
-      {shown.map((delay) => {
-        const isSevere = delay.severity < 5;
-        return (
-          <div
-            key={delay.lineName}
-            className={`${styles.tflCard} ${isSevere ? styles.tflCardSevere : ""}`}
-            role="status"
-          >
-            <span
-              className={styles.tflCardAccent}
-              style={{ background: delay.color }}
-              aria-hidden
-            />
-            <div className={styles.tflCardBody}>
-              <div className={styles.tflCardTop}>
-                <span className={styles.tflCardLine}>{delay.lineName}</span>
-                <span className={styles.tflCardStatus}>{delay.severityDescription}</span>
-              </div>
-              {tflContext && (
-                <span className={styles.tflCardLeave}>
-                  Leave by {tflContext.leaveStr} for {tflContext.eventTitle}
-                </span>
-              )}
-            </div>
-            <button
-              className={styles.tflCardDismiss}
-              onClick={() => dismiss(delay.lineName)}
-              aria-label={`Dismiss ${delay.lineName} alert`}
-            >
-              <X size={10} strokeWidth={2.5} aria-hidden />
-            </button>
-          </div>
-        );
-      })}
-      {overflow > 0 && (
-        <span className={styles.tflOverflow}>
-          +{overflow} more line{overflow > 1 ? "s" : ""} affected
-        </span>
+    <div className={styles.rightNowTflSection}>
+      <div className={styles.rightNowTflHeader}>
+        <div className={styles.rightNowTflRoundel} aria-hidden>
+          <Train size={14} strokeWidth={2.5} />
+        </div>
+        <span className={styles.rightNowTflTitle}>Travel alerts</span>
+      </div>
+      {delays === undefined && (
+        <p className={styles.rightNowTflLoading}>Checking…</p>
       )}
-    </>
+      {delays && delays.length === 0 && (
+        <div className={styles.rightNowTflAllGood}>
+          <Check size={16} strokeWidth={2.5} aria-hidden />
+          <span>All lines running normally</span>
+        </div>
+      )}
+      {visible.length > 0 && (
+        <>
+          <div className={styles.rightNowTflList} role="list">
+            {displayed.map((delay) => (
+              <div key={delay.lineName} className={styles.rightNowTflLineRow} role="listitem">
+                <span
+                  className={styles.rightNowTflLineDot}
+                  style={{ background: delay.color }}
+                  aria-hidden
+                />
+                <span className={styles.rightNowTflLineName}>{delay.lineName}</span>
+                <span className={styles.rightNowTflLineSep}>·</span>
+                <span className={styles.rightNowTflLineStatus}>{delay.severityDescription}</span>
+                <button
+                  type="button"
+                  className={styles.rightNowTflLineDismiss}
+                  onClick={() => dismiss(delay.lineName)}
+                  aria-label={`Dismiss ${delay.lineName} alert`}
+                >
+                  <X size={12} strokeWidth={2.5} aria-hidden />
+                </button>
+              </div>
+            ))}
+          </div>
+          {showCollapseToggle && (
+            <button
+              type="button"
+              className={styles.rightNowTflCollapseToggle}
+              onClick={() => setExpanded(e => !e)}
+            >
+              {expanded ? "Show less" : `Show ${hiddenCount} more alert${hiddenCount !== 1 ? "s" : ""}`}
+            </button>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 

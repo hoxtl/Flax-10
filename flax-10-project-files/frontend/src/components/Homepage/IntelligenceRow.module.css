@@ -1,12 +1,20 @@
 /* Intelligence Row — Monochrome Bento adapted for Flax/Almond time management theme */
 
+/* ─── Dashboard color palette (muted/pastel — Notion/Linear premium planner) ───
+   Warm base: stone neutrals
+   Soft green: success / done / tasks
+   Soft red/orange: urgency / deadlines / overdue
+   Soft blue: academic
+   Soft purple: focus / analytics
+   All tints kept classy — no harsh colors. */
+
 .section {
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
   opacity: 0;
-  background: #F8F5F2;
+  background: transparent;
 }
 
 .section.sectionVisible {
@@ -43,19 +51,30 @@
 
 .headerLabel {
   font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.35em;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500;
+  letter-spacing: 0.1em; /* tracking-widest */
   text-transform: uppercase;
-  color: #7B6751;
+  color: #a8a29e; /* text-stone-400 */
+}
+
+.headerDateRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.headerDateIcon {
+  color: #a8a29e; /* match stone-400 */
+  flex-shrink: 0;
 }
 
 .headerTitle {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  color: #2d352d;
+  color: #44403c;
   margin: 0;
 }
 
@@ -174,6 +193,172 @@
   padding: 8px 12px;
 }
 
+/* ── Right Now: schedule overlap warning (amber row above TFL) ── */
+.rightNowScheduleWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #b45309;
+}
+.rightNowScheduleWarning svg {
+  flex-shrink: 0;
+  color: #d97706;
+}
+
+/* ── Right Now: TFL Travel Alerts section (always visible) ── */
+.rightNowTflSection {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(123, 103, 81, 0.12);
+}
+
+.rightNowTflHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.rightNowTflRoundel {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #E32017;
+  color: #fff;
+}
+.rightNowTflRoundel svg {
+  width: 14px;
+  height: 14px;
+}
+
+.rightNowTflTitle {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #78716c;
+}
+
+.rightNowTflAllGood {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #15803d;
+}
+.rightNowTflAllGood svg {
+  flex-shrink: 0;
+  color: #16a34a;
+}
+
+.rightNowTflLoading {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: #a8a29e;
+  padding: 6px 0;
+}
+
+.rightNowTflList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rightNowTflLineRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 8px;
+  border-radius: 8px;
+  background: rgba(123, 103, 81, 0.05);
+  border: 1px solid rgba(123, 103, 81, 0.12);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #44403c;
+}
+
+.rightNowTflLineDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rightNowTflLineName {
+  font-weight: 600;
+  color: #292524;
+  min-width: 0;
+}
+
+.rightNowTflLineSep {
+  color: #a8a29e;
+  margin: 0 2px;
+}
+
+.rightNowTflLineStatus {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #57534e;
+}
+
+.rightNowTflLineDismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  color: #a8a29e;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.rightNowTflLineDismiss:hover {
+  color: #57534e;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.rightNowTflCollapseToggle {
+  margin-top: 6px;
+  padding: 4px 0;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #78716c;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.rightNowTflCollapseToggle:hover {
+  color: #57534e;
+}
+
 .intRowAlertRow {
   display: flex;
   align-items: center;
@@ -250,23 +435,23 @@
 
 /* Conflict variant — terracotta with glow pulse */
 .statusStripConflict {
-  border-color: rgba(192, 113, 78, 0.3);
-  background: rgba(192, 113, 78, 0.08);
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(254, 226, 226, 0.6);
 }
 .statusStripConflict .statusStripDot {
-  background: #C0714E;
+  background: #dc2626;
   animation: stripConflictGlow 1.6s ease-in-out infinite;
 }
-.statusStripConflict .statusStripText { color: #C0714E; }
+.statusStripConflict .statusStripText { color: #dc2626; }
 
 @keyframes stripConflictGlow {
   0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgba(192, 113, 78, 0.7);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
   }
   50% {
     opacity: 0.9;
-    box-shadow: 0 0 0 5px rgba(192, 113, 78, 0);
+    box-shadow: 0 0 0 5px rgba(220, 38, 38, 0);
   }
 }
 
@@ -379,26 +564,31 @@
 
 /* Gap variant — sage green */
 .statusStripGap {
-  border-color: rgba(132, 169, 140, 0.3);
-  background: rgba(132, 169, 140, 0.08);
+  border-color: rgba(22, 163, 74, 0.25);
+  background: rgba(220, 252, 231, 0.6);
 }
-.statusStripGap .statusStripDot { background: #84A98C; }
-.statusStripGap .statusStripText { color: #5a8a65; }
+.statusStripGap .statusStripDot { background: #16a34a; }
+.statusStripGap .statusStripText { color: #16a34a; }
 
 /* Active task variant — warm brown */
 .statusStripTask {
-  border-color: rgba(74, 52, 33, 0.2);
-  background: rgba(74, 52, 33, 0.06);
+  border-color: rgba(120, 113, 108, 0.2);
+  background: rgba(250, 250, 249, 0.8);
 }
 .statusStripTask .statusStripDot {
-  background: #4A3421;
+  background: #78716c;
   animation: stripPulse 2s ease-in-out infinite;
 }
-.statusStripTask .statusStripText { color: #4A3421; }
+.statusStripTask .statusStripText { color: #44403c; }
 
 @keyframes stripPulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes intRowPulseTerracotta {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 
 .headerSubtitle {
@@ -413,29 +603,28 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
-  align-items: start;
+  gap: 24px;
+  align-items: stretch;
 }
 
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Mobile: full width */
-.span1 { grid-column: 1 / -1; }
-.span3 { grid-column: 1 / -1; }
-.span4 { grid-column: 1 / -1; }
-.span5 { grid-column: 1 / -1; padding: 14px 18px; }
+/* Row 1: Right Now (left) | Today's Tasks (right) — equal height */
+.span5 { grid-column: 1; grid-row: 1; }
+.span1 { grid-column: 2; grid-row: 1; }
+/* Row 2: Deadlines (left) | Focus Windows (right) — equal height */
+.span3 { grid-column: 1; grid-row: 2; }
+.span4 { grid-column: 2; grid-row: 2; }
 
-@media (min-width: 768px) {
-  /* Row 1: Right Now (left, cols 1–4) | Today's Tasks (right, cols 5–12) */
-  .span5 { grid-column: 1 / span 4; grid-row: 1; }
-  .span1 { grid-column: 5 / span 8; grid-row: 1; }
-  /* Row 2: Deadlines (left) | Focus Windows (right) */
-  .span3 { grid-column: 1 / span 6; grid-row: 2; }
-  .span4 { grid-column: 7 / span 6; grid-row: 2; }
+@media (max-width: 767px) {
+  .span5 { grid-column: 1 / -1; grid-row: 1; }
+  .span1 { grid-column: 1 / -1; grid-row: 2; }
+  .span3 { grid-column: 1 / -1; grid-row: 3; }
+  .span4 { grid-column: 1 / -1; grid-row: 4; }
 }
 
 .bentoSlot {
@@ -444,18 +633,47 @@
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid rgba(123, 103, 81, 0.12);
-  background: #FFFCFA;
-  padding: 20px;
-  min-height: 0;
+  border-radius: 1rem;
+  border: 1px solid #f5f5f4;
+  background: #ffffff;
+  padding: 1.5rem;
+  min-height: 200px;
   opacity: 0;
-  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: box-shadow 0.2s ease-out;
 }
 
 .bentoSlot:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+}
+
+/* Widget cards: same base style for all — no colored tints */
+.bentoSlotVariantRightNow {
+  background: #ffffff;
+}
+.bentoSlotVariantRightNow .bentoIcon {
+  color: #a8a29e;
+}
+
+.bentoSlotVariantTasks {
+  background: #ffffff;
+}
+.bentoSlotVariantTasks .bentoIcon {
+  color: #a8a29e;
+}
+
+.bentoSlotVariantDeadlines {
+  background: #ffffff;
+}
+.bentoSlotVariantDeadlines .bentoIcon {
+  color: #a8a29e;
+}
+
+.bentoSlotVariantFocus {
+  background: #ffffff;
+}
+.bentoSlotVariantFocus .bentoIcon {
+  color: #a8a29e;
 }
 
 .bentoSlot.bentoVisible {
@@ -468,6 +686,7 @@
 }
 
 .bentoSlot.iconPulse .bentoIcon {
+  color: #dc2626; /* soft red-600 for overdue pulse */
   animation: intRowPulseTerracotta 2s ease-in-out infinite;
 }
 
@@ -480,7 +699,7 @@
   pointer-events: none;
   position: absolute;
   inset: 0;
-  border-radius: 24px;
+  border-radius: 1rem;
   opacity: 0;
   transition: opacity 0.3s;
   mask-image: radial-gradient(
@@ -503,8 +722,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 24px;
-  border: 1px solid rgba(123, 103, 81, 0.15);
+  border-radius: 1rem;
+  border: 1px solid rgba(123, 103, 81, 0.1);
 }
 
 .bentoContent {
@@ -532,13 +751,13 @@
 }
 
 .bentoIconWrap.bentoIconOverdue .bentoIcon {
-  color: #C05A3E;
+  color: #dc2626; /* soft red — urgency */
 }
 
 .bentoIcon {
   width: 16px;
   height: 16px;
-  color: #7B6751;
+  color: #a8a29e;
 }
 
 .bentoHeader {
@@ -550,12 +769,12 @@
 }
 
 .bentoTitle {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #2d352d;
+  color: #44403c;
   margin: 0;
 }
 
@@ -566,8 +785,8 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #7B6751;
-  opacity: 0.8;
+  color: #78716c; /* stone-500 — muted, not brown */
+  opacity: 0.9;
 }
 
 .bentoBody {

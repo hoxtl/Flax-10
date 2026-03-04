@@ -1,0 +1,262 @@
+/* RIGHT NOW widget — compact, 4-section layout. Warm stone/amber palette. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-family: var(--font-body);
+}
+
+.section {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(120, 113, 108, 0.15);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+/* Section 1 — NOW */
+.nowLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #78716c;
+  flex-shrink: 0;
+}
+
+.nowText {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #44403c;
+}
+
+.nowEmpty {
+  font-size: 0.85rem;
+  color: #a8a29e;
+  font-weight: 500;
+}
+
+.nowBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #78716c;
+  flex-shrink: 0;
+}
+
+.progressTrack {
+  height: 4px;
+  background: rgba(120, 113, 108, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 2px 0 6px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary, #7B6751);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+
+.timerBtn {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 2px;
+}
+
+.timerBtn:hover {
+  text-decoration: underline;
+}
+
+/* Section 2 — NEXT UP */
+.sectionNext {
+  padding-top: 8px;
+}
+
+.nextLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  width: 100%;
+}
+
+.nextLine2 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #78716c;
+  margin-top: 2px;
+}
+
+.nextLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #78716c;
+  flex-shrink: 0;
+}
+
+.nextTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #44403c;
+}
+
+.nextMeta {
+  font-size: 0.8rem;
+  color: #78716c;
+}
+
+.nextEmpty {
+  font-size: 0.82rem;
+  color: #a8a29e;
+}
+
+.nextIcon {
+  flex-shrink: 0;
+  color: #a8a29e;
+}
+
+/* Countdown pill — amber default, red + pulse when <30m */
+.countdownPill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #fef3c7;
+  color: #b45309;
+  margin-top: 4px;
+}
+
+.countdownPillUrgent {
+  background: #fee2e2;
+  color: #b91c1c;
+  animation: rightNowPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rightNowPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Section 3 — SMART TRAVEL ALERT */
+.tflLoading {
+  font-size: 0.8rem;
+  color: #a8a29e;
+}
+
+.travelBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 6px;
+  border-bottom: none;
+}
+
+.travelBannerSevere {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.travelIcon {
+  flex-shrink: 0;
+  color: #b45309;
+}
+
+.travelBannerSevere .travelIcon {
+  color: #b91c1c;
+}
+
+.travelContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.travelMessage {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #44403c;
+  line-height: 1.4;
+}
+
+.tflLineList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tflLineRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #57534e;
+}
+
+.tflDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tflLineName {
+  font-weight: 600;
+  color: #44403c;
+}
+
+.tflSep {
+  color: #a8a29e;
+}
+
+.tflStatus {
+  color: #78716c;
+}
+
+.travelClear {
+  padding: 6px 0;
+}
+
+.travelClearIcon {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.travelClear span {
+  font-size: 0.8rem;
+  color: #78716c;
+}
+
+/* Section 4 — SCHEDULE CONFLICTS */
+.conflictRow {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #92400e;
+}
+
+.conflictIcon {
+  flex-shrink: 0;
+  color: #b45309;
+}

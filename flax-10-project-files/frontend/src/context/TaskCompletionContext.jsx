@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
+import { PartyPopper } from "lucide-react";
 import styles from "../components/TaskCelebration/CompletionToast.module.css";
 
 const TaskCompletionContext = createContext(null);
@@ -71,7 +72,8 @@ export function TaskCompletionProvider({ children }) {
       {children}
       {toast.show && (
         <div key={toast.id} className={styles.toast} role="status" aria-live="polite">
-          {toast.message}
+          <PartyPopper size={20} className={styles.toastPartyPopper} aria-hidden />
+          <span className={styles.toastMessage}>{toast.message}</span>
         </div>
       )}
       {levelUpOverlay && (

@@ -36,8 +36,8 @@
 .triggerIcon { font-size: 0.82rem; flex-shrink: 0; }
 
 .triggerValueMono {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
 }
   
@@ -45,7 +45,8 @@
     margin-left: auto;
     background: none;
     border: none;
-    font-size: 0.6rem;
+    font-size: 0.75rem;
+    font-family: inherit;
     color: var(--muted);
     cursor: pointer;
     padding: 0.15rem 0.3rem;
@@ -81,7 +82,8 @@
     margin-bottom: 0.55rem;
   }
   .monthLabel {
-    font-size: 0.85rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
     font-weight: 700;
     color: var(--text);
   }
@@ -89,6 +91,7 @@
     background: none;
     border: none;
     font-size: 1rem;
+    font-family: inherit;
     color: var(--muted);
     cursor: pointer;
     width: 26px;
@@ -108,8 +111,9 @@
     margin-bottom: 0.6rem;
   }
   .dayHeader {
-    font-size: 0.62rem;
-    font-weight: 700;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
     text-align: center;
     color: var(--muted);
     padding-bottom: 0.2rem;
@@ -119,7 +123,8 @@
     border: none;
     background: none;
     border-radius: 6px;
-    font-size: 0.78rem;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
     cursor: pointer;
     color: var(--text);
     transition: background 0.1s;
@@ -170,8 +175,9 @@
     border: none;
     padding: 0.3rem 0.75rem;
     border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
     flex-shrink: 0;
     transition: opacity 0.1s;

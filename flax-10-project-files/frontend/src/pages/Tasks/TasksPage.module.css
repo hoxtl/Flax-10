@@ -7,6 +7,14 @@
     font-family: var(--font-body);
 }
 
+/* Enforce single font everywhere: form elements inherit on task page */
+.page input,
+.page select,
+.page textarea,
+.page button {
+    font-family: inherit;
+}
+
 .loading {
     display: flex;
     flex-direction: column;

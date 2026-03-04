@@ -38,16 +38,17 @@
 
 .message {
   margin: 0;
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.05rem;
   font-weight: 600;
-  color: #3d3228;
+  color: #292524;
   line-height: 1.5;
   max-width: 22rem;
 }
 
 .sub {
   margin: 0.5rem 0 0;
+  font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 500;
   color: #6b5f57;
@@ -64,9 +65,9 @@
   border: 1.5px solid rgba(123, 103, 81, 0.25);
   border-radius: 100px;
   color: var(--primary, #7B6751);
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s, transform 0.15s;
 }
@@ -78,7 +79,8 @@
 }
 
 .ctaLink {
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
   font-weight: 500;
   color: #5D4037;
   text-decoration: none;

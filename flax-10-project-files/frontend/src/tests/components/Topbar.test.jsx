@@ -32,14 +32,13 @@ vi.mock('../../components/Notifications/NotificationPanel', () => ({
 }));
 
 describe('TopBar', () => {
-  it('renders greeting', () => {
-    render(<TopBar user={{ name: 'Kausar' }} />);
+  it('renders brand', () => {
+    render(<TopBar user={{ first_name: 'Kausar', username: 'kk' }} />);
     expect(screen.getByText('StudyFlax')).toBeTruthy();
-    expect(screen.getByText('Built for calm study')).toBeTruthy();
   });
 
   it('renders without user', () => {
-    const { container } = render(<TopBar />);
+    render(<TopBar />);
     expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
@@ -50,8 +49,9 @@ describe('TopBar', () => {
     expect(fn).toHaveBeenCalled();
   });
 
-  it('renders search input', () => {
+  it('renders theme toggle and timer', () => {
     render(<TopBar />);
-    expect(screen.getByPlaceholderText('Search...')).toBeTruthy();
+    expect(screen.getByText('theme')).toBeTruthy();
+    expect(screen.getByText('timer')).toBeTruthy();
   });
 });

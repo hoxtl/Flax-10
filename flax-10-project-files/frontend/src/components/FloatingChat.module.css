@@ -39,6 +39,7 @@
   flex-direction: column;
   overflow: hidden;
   transform-origin: bottom right;
+  font-family: var(--font-body);
 
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(24px) saturate(180%);
@@ -127,7 +128,8 @@
 
 .emptyText {
   font-size: 0.82rem;
-  color: var(--muted);
+  color: var(--text);
+  font-weight: 500;
   max-width: 240px;
 }
 
@@ -236,13 +238,15 @@
   resize: none;
   border-radius: 12px;
   padding: 0.5rem 0.75rem;
+  font-family: var(--font-body);
   font-size: 0.83rem;
   border: 1px solid rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.07);
   color: var(--text);
   outline: none;
   line-height: 1.4;
-  max-height: 100px;
+  min-height: 80px;
+  max-height: 140px;
   overflow-y: auto;
 }
 

@@ -20,9 +20,9 @@
   border: 1px solid var(--border, rgba(107, 83, 68, 0.2));
   border-radius: 8px;
   font-family: var(--font-body, inherit);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #2c2420;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #292524;
   cursor: pointer;
   text-align: left;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -50,7 +50,10 @@
   top: calc(100% + 4px);
   left: 0;
   right: 0;
+  width: 100%;
   min-width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: var(--panel, #FFFCFA);
   border: 1px solid var(--border, rgba(107, 83, 68, 0.18));
   border-radius: 10px;
@@ -58,16 +61,18 @@
   z-index: 200;
   max-height: 260px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 4px;
 }
 
 .groupLabel {
   padding: 6px 10px 3px;
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-family: var(--font-body, inherit);
+  font-size: 0.75rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted, #9a8778);
+  letter-spacing: 0.05em;
+  color: #a8a29e;
 }
 
 .item {
@@ -83,7 +88,7 @@
   font-family: var(--font-body, inherit);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text, #2c2420);
+  color: var(--text, #292524);
   cursor: pointer;
   text-align: left;
   transition: background 0.1s;
@@ -94,7 +99,7 @@
 }
 
 .itemActive {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--primary, #6B5344);
   background: color-mix(in srgb, var(--primary, #6B5344) 8%, transparent);
 }
