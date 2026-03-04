@@ -133,8 +133,8 @@ function ToolsPill({ onNavChange, activeNav }) {
 
 const TopbarTools = ({ onNavChange, activeNav }) => (
   <div className={styles.toolsWrapper}>
-    <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
     <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
+    <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
   </div>
 );
 
