@@ -6,6 +6,7 @@ import { RecurrenceField } from "../../../../Calendar/EventModal/components/Recu
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
 import ConfirmModal from "../../../../common/ConfirmModal";
+import StandardModal from "../../../../common/StandardModal/StandardModal";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 
@@ -23,13 +24,13 @@ export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = 
 
     return (
         <>
-            <div className={styles.backdrop} onMouseDown={onClose}>
+            <StandardModal title={announcement ? "Edit Announcement" : "Add Announcement"} onClose={onClose}>
                 <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
                     error={error} setError={setError} onClose={onClose}
                     onSubmit={(f, conflict) => handleSubmit(f, setError, onSubmit, announcements, conflict)}
                     isEdit={!!announcement} setForm={setForm}
                     onDeleteClick={() => setShowDeleteConfirm(true)} />
-            </div>
+            </StandardModal>
             {showDeleteConfirm && <DeleteConfirmModal hasEvent={hasEvent} onConfirm={handleDelete} onCancel={() => setShowDeleteConfirm(false)} />}
         </>
     );
@@ -69,26 +70,18 @@ function handleSubmit(form, setError, onSubmit, announcements, conflict) {
             );
             if (!confirmReplace) return;
             return onSubmit(form, currentPinned);
-        }}
-    onSubmit(form);}
+        }
+    }
+    onSubmit(form);
+}
 
 function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, onSubmit, isEdit, onDeleteClick }) {
     return (
-        <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-            <ModalHeader onClose={onClose} isEdit={isEdit} />
+        <>
             {error && <div className={styles.error}>{error}</div>}
             <FormFields form={form} update={update} setForm={setForm} fileRef={fileRef} tags={tags} />
             <ModalFooter onClose={onClose} onSubmit={() => onSubmit(form)} isEdit={isEdit} onDelete={onDeleteClick} />
-        </div>
-    );
-}
-
-function ModalHeader({ onClose, isEdit }) {
-    return (
-        <div className={styles.header}>
-            <h3 className={styles.title}>{isEdit ? "Edit Announcement" : "Add Announcement"}</h3>
-            <button className={styles.close} onClick={onClose}>&times;</button>
-        </div>
+        </>
     );
 }
 

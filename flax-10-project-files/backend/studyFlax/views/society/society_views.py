@@ -81,8 +81,10 @@ def build_change_message(changes):
     parts = []
     parts.extend(format_change_list(changes.get('events_added', []), 'New event'))
     parts.extend(format_change_list(changes.get('events_updated', []), 'Updated event'))
+    parts.extend(format_change_list(changes.get('events_deleted', []), 'Deleted event'))
     parts.extend(format_change_list(changes.get('announcements_added', []), 'New announcement'))
     parts.extend(format_change_list(changes.get('announcements_updated', []), 'Updated announcement'))
+    parts.extend(format_change_list(changes.get('announcements_deleted', []), 'Deleted announcement'))
     return ' | '.join(parts) if parts else None
 
 
