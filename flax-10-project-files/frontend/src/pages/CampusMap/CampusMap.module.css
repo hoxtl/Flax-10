@@ -812,4 +812,13 @@
     margin: 10px auto 0;
     flex-shrink: 0;
   }
+
+  .sidebarHeader {
+    padding-top: 5px;
+  }
+  
+  .campusQuickNav {
+    bottom: 80px;
+    transition: bottom 0.3s ease;
+  }
 }
