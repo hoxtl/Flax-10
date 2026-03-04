@@ -291,7 +291,7 @@ export default function CampusMap() {
     }
 
     const el = document.createElement('div');
-    el.className = styles.homeMarker;
+    el.className = styles.homePointer;
     el.innerHTML = '🏠';
     el.title = 'User Home';
 
@@ -314,11 +314,11 @@ export default function CampusMap() {
         .addTo(map.current);
       
       const isHomeStartingLoc = startLocation && 
-        Math.abs(startLocation.lat - homeLocation.lat) < 0.0001 &&
-        Math.abs(startLocation.lng - homeLocation.lng) < 0.0001;
+        Math.abs(startLocation.lat - userHome.lat) < 0.0001 &&
+        Math.abs(startLocation.lng - userHome.lng) < 0.0001;
       
       if (!isHomeStartingLoc) {
-        homeMarker.current.togglePopup();
+        homePointer.current.togglePopup();
       }
 
       setTimeout(() => {
@@ -326,8 +326,8 @@ export default function CampusMap() {
         if (btn) {
           btn.addEventListener('click', () => {
             setStartLocation({lng: userHome.lng, lat: userHome.lat});
-            if (homeMarker.current && homeMarker.current.getPopup().isOpen()) {
-              homeMarker.current.togglePopup();
+            if (homePointer.current && homePointer.current.getPopup().isOpen()) {
+              homePointer.current.togglePopup();
             }
             map.current?.flyTo({
               center: [userHome.lng, userHome.lat],
