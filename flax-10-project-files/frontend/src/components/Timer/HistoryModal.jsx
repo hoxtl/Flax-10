@@ -11,7 +11,9 @@ const HistoryHeader = ({ onClose }) => {
 };
 
 const StatsRow = ({ block }) => {
-    const sPill = <div className={`${styles.statPill} ${styles.sessionPill}`}>✅ {block.sessions.length} Sessions</div>;
+    const completedCount = block.sessions.filter(s => s.status !== 'Incomplete').length;
+    const sText = completedCount > 0 ? `✅ ${completedCount} Session${completedCount !== 1 ? 's' : ''}` : '❌ Uncompleted';
+    const sPill = <div className={`${styles.statPill} ${styles.sessionPill}`}>{sText}</div>;
     const fPill = <div className={`${styles.statPill} ${styles.focusPill}`}>🔥 {formatDuration(block.totalDuration)} Focus</div>;
     const bPill = block.totalBreak > 0 ? <div className={`${styles.statPill} ${styles.breakPill}`}>☕ {formatDuration(block.totalBreak)} Break</div> : null;
     const pPill = block.totalPause > 0 ? <div className={`${styles.statPill} ${styles.pausePill}`}>⏸️ {formatDuration(block.totalPause)} Pause</div> : null;
