@@ -1,3 +1,9 @@
 export { PlanReadDetailModal } from "./PlanReadDetailModal";
 export { DeadlinesWidget } from "./DeadlinesWidget";
 export { FocusWindowsWidget } from "./FocusWindowsWidget";
+export { MiniTimeline } from "./MiniTimeline";
+export { TimelineRow } from "./TimelineRow";
+export { OverlapCluster } from "./OverlapCluster";
+export { QuickWinGap } from "./QuickWinGap";
+export { FreeGap } from "./FreeGap";
+export { FreeWindowRow } from "./FreeWindowRow";
