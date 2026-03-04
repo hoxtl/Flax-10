@@ -154,6 +154,19 @@
     background: #fecaca;
 }
 
+.button.danger.outline {
+    background: transparent;
+    color: #dc2626;
+    border: 2px solid #fecaca;
+    padding: 0.45rem 2rem;
+    /* Adjusted for border width */
+}
+
+.button.danger.outline:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
 .settings {
     display: flex;
     gap: 1.5rem;

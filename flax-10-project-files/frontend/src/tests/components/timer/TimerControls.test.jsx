@@ -5,11 +5,21 @@ import { TimerControls } from '../../../components/Timer/TimerComponents';
 const testButtons = () => {
     const onToggle = vi.fn();
     const onReset = vi.fn();
-    render(<TimerControls isActive={false} onToggle={onToggle} onReset={onReset} />);
+    const onEndEarly = vi.fn();
+
+    // Test inactive state
+    const { rerender } = render(<TimerControls isActive={false} isPaused={false} onToggle={onToggle} onReset={onReset} onEndEarly={onEndEarly} />);
     fireEvent.click(screen.getByText('Start'));
     expect(onToggle).toHaveBeenCalled();
+    expect(screen.queryByText('Reset')).not.toBeInTheDocument();
+    expect(screen.queryByText('End Early')).not.toBeInTheDocument();
+
+    // Test active state
+    rerender(<TimerControls isActive={true} isPaused={false} onToggle={onToggle} onReset={onReset} onEndEarly={onEndEarly} />);
     fireEvent.click(screen.getByText('Reset'));
     expect(onReset).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('End Early'));
+    expect(onEndEarly).toHaveBeenCalled();
 };
 
 const testPause = () => {

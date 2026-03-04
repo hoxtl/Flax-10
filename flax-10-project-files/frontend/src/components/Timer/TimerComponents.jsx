@@ -45,8 +45,8 @@ export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, 
     const pInd = <PauseIndicator isPaused={isPaused} totalPaused={totalPaused} />;
     const pBtn = <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />;
     const rBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>;
-    const eBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onEndEarly}>End Early</button>;
-    const actns = isActive || isPaused ? <>{pBtn}{eBtn}</> : <>{pBtn}{rBtn}</>;
+    const eBtn = <button className={`${styles.button} ${styles.danger} ${styles.outline}`} onClick={onEndEarly}>End Early</button>;
+    const actns = isActive || isPaused ? <>{pBtn}{rBtn}{eBtn}</> : <>{pBtn}</>;
     return <div className={styles.controls}>{pInd}<div className={styles.buttonGroup}>{actns}</div></div>;
 };
 
