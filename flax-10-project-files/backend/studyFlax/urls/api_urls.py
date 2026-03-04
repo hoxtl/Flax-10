@@ -38,6 +38,7 @@ from studyFlax.views.analytics.analytics_views import get_analytics_summary, get
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
+from studyFlax.views.authentication.home_address_view import home_address_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -98,4 +99,5 @@ urlpatterns = [
     path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline_list"),
     path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
     path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
+    path("user/home-address/", home_address_view, name='home_address'),
 ]
