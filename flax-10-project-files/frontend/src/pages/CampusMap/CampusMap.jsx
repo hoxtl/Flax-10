@@ -299,6 +299,7 @@ export default function CampusMap() {
       offset: 25,
       closeButton: false,
       closeOnClick: false,
+      className: styles.homePopupContainer,
     }).setHTML(`
       <div class="HomePopupContent">
         <div class="HomePopupTitle">🏠User Home</div>
