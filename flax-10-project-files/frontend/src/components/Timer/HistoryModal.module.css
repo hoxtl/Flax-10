@@ -103,16 +103,14 @@
     display: flex;
     gap: 0.5rem;
     flex-wrap: nowrap;
+    justify-content: center;
     overflow-x: auto;
     scrollbar-width: none;
-    /* Hide scrollbar for Firefox */
     -ms-overflow-style: none;
-    /* Hide scrollbar for IE/Edge */
 }
 
 .statsRow::-webkit-scrollbar {
     display: none;
-    /* Hide scrollbar for Chrome/Safari */
 }
 
 .statPill {
