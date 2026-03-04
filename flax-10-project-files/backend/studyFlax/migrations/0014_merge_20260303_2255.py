@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0005_tasklist_task'),
-        ('studyFlax', '0011_merge_20260303_2112'),
         ('studyFlax', '0013_notification_action_url'),
+        ('studyFlax', '0006_enrollment_is_core'),
     ]
 
     operations = [
