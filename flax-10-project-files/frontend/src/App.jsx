@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, cloneElement } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
@@ -162,7 +162,7 @@ function readActiveNav() {
   return localStorage.getItem(ACTIVE_NAV_KEY) || "home";
 }
 
-function useAppState() {
+function useAppState(navigate) {
   const [activeNav, setActiveNavState] = useState(readActiveNav);
   const [user, setUser] = useState(() => readUser());
   const [authed, setAuthed] = useState(() => isAuthenticated());
@@ -175,6 +175,12 @@ function useAppState() {
   const setActiveNav = (nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
+    // Keep URL in sync so reload restores the correct page (e.g. stay on homepage when reloading there)
+    const baseNav = nav.split("_")[0];
+    const route = APP_ROUTES.find((r) => r.id === baseNav);
+    if (route?.path != null && navigate) {
+      navigate(route.path, { replace: true });
+    }
   };
 
   useEffect(() => {
@@ -387,7 +393,8 @@ function renderScreen(screen, state) {
 
 // Root
 export default function App() {
-  const state = useAppState();
+  const navigate = useNavigate();
+  const state = useAppState(navigate);
   const location = useLocation();
 
   // Sync URL pathname to activeNav so that navigate("/timer", { state }) shows the Timer page.

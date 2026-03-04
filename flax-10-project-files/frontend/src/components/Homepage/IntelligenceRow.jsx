@@ -76,11 +76,12 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span5}
           slotVariant="rightNow"
-          title="Right Now"
+          title="RIGHT NOW"
           meta={null}
           icon={Clock}
           index={0}
           isVisible={sectionVisible}
+          noHeader
         >
           {slot5Data ? (
             <RightNowWidget
@@ -105,7 +106,7 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span1}
           slotVariant="tasks"
-          title="Today's Tasks"
+          title="TODAY'S TASKS"
           meta={slot1Meta}
           icon={CheckSquare}
           iconPulse={hasOverdue}
@@ -118,11 +119,12 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span3}
           slotVariant="deadlines"
-          title="Deadlines"
+          title="DEADLINES"
           meta={null}
           icon={AlertCircle}
           index={2}
           isVisible={sectionVisible}
+          noHeader
         >
           {slot3Urgent}
         </BentoSlot>
@@ -130,11 +132,12 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span4}
           slotVariant="focus"
-          title="Focus Windows"
+          title="FOCUS WINDOWS"
           meta={null}
           icon={Zap}
           index={3}
           isVisible={sectionVisible}
+          noHeader
         >
           {slot4Energy}
         </BentoSlot>
@@ -152,6 +155,7 @@ function BentoSlot({
   iconPulse = false,
   index,
   isVisible,
+  noHeader = false,
   centeredBody = false,
   children,
 }) {
@@ -178,12 +182,12 @@ function BentoSlot({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <div
-        className={styles.bentoGlow}
+      <div className={styles.bentoGlow}
         style={{ ["--x"]: mousePos.x, ["--y"]: mousePos.y }}
         aria-hidden
       />
       <div className={styles.bentoContent}>
+        {!noHeader && (
         <div className={styles.bentoTop}>
           <div className={`${styles.bentoIconWrap} ${iconPulse ? styles.bentoIconOverdue : ""}`}>
             <Icon className={styles.bentoIcon} strokeWidth={1.5} aria-hidden />
@@ -193,7 +197,8 @@ function BentoSlot({
             {meta && <span className={styles.bentoMeta}>{meta}</span>}
           </div>
         </div>
-        <div className={`${styles.bentoBody} ${centeredBody ? styles.bentoCenteredBody : ""}`}>{children}</div>
+        )}
+        <div className={`${styles.bentoBody} ${centeredBody ? styles.bentoCenteredBody : ""} ${noHeader ? styles.bentoBodyNoHeader : ""}`}>{children}</div>
       </div>
     </article>
   );

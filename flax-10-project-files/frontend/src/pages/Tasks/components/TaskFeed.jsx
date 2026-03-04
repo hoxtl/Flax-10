@@ -294,7 +294,8 @@ export default function TaskFeed({
   const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
   const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
-  const overdue = filtered.filter(t => t.due_date && new Date(t.due_date) < dayStart && !t.completed && !isRoutineOrEventTask(t));
+  /** Overdue = due date/time has passed (same as sidebar). Exclude routine/event. */
+  const overdue = filtered.filter(t => t.due_date && new Date(t.due_date) < now && !t.completed && !isRoutineOrEventTask(t));
   const today = filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
   const thisWeek = filtered.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); return d > todayEnd && d <= weekEnd; });
   const later = filtered.filter(t => !t.due_date || new Date(t.due_date) > weekEnd);
@@ -352,7 +353,9 @@ export default function TaskFeed({
 
   const headerTitle = activeList
     ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
-    : (activeModuleCode || "All tasks");
+    : activeFilter === "overdue"
+      ? "Overdue"
+      : (activeModuleCode || "All tasks");
   const sectionProps = {
     sortBy, listMap, lists,
     onToggleComplete, onTaskCompleted, onDeleteTask, onEditTask,
@@ -503,7 +506,19 @@ export default function TaskFeed({
               {...sectionProps}
             />
           )}
-          {activeFilter === "today" ? (
+          {activeFilter === "overdue" ? (
+            <Section
+              title="Overdue"
+              emoji="⚠️"
+              tasks={overdue}
+              hideDueBadge
+              isOverdueSection
+              sectionType="overdue"
+              completedCount={0}
+              emptyMessage="No overdue tasks. Add one above or use Full Planning."
+              {...sectionProps}
+            />
+          ) : activeFilter === "today" ? (
             <Section
               title="Today" emoji="📅" tasks={today} hideDueBadge
               sectionType="today" completedCount={completedTodayCount}
