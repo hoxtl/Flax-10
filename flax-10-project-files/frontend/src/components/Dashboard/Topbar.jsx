@@ -1,41 +1,15 @@
 import styles from "./Topbar.module.css";
-import { DAYS, MONTHS } from "../../lib/uiConstants";
-import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
 import { NotificationPanel } from "../Notifications/NotificationPanel";
-import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus, ChevronDown } from "lucide-react";
-import { TypingAnimation } from "./TypingAnimation";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
-function getFirstName(user) {
-  const display = (getDisplayName(user) || "").trim();
-  return display ? display.split(" ")[0] : "";
-}
-
-function getCurrentDateString() {
-  const now = new Date();
-  return `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
-}
-
-function TopBarGreeting({ user }) {
-  const name = getFirstName(user);
-  return (
-    <div className={styles.greeting}>
-      <span className={styles.subGreeting}>{getGreeting()}!</span>
-      <div className={styles.nameRow}>
-        {!!name && <h1 className={styles.name}><TypingAnimation text={name} duration={180} /></h1>}
-        <span className={styles.date}>{getCurrentDateString()}</span>
-      </div>
-    </div>
-  );
-}
 
 function BrandLogo({ onNavChange }) {
   const nav = () => onNavChange?.("home");
@@ -170,7 +144,7 @@ export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClic
   return (
     <header className={styles.container}>
       <div className={styles.leftSection}><BrandLogo onNavChange={onNavChange} /><TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} /></div>
-      <div className={styles.rightSection}><TopBarGreeting user={user} /><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>
+      <div className={styles.rightSection}><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>
     </header>
   );
 }
