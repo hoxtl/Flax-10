@@ -768,9 +768,16 @@
   font-style: italic;
 }
 
-/* Desktop override to hide the drag handle */
+/* Hide the drag handle on desktop*/
 @media (min-width: 901px) {
   .dragHandle {
     display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    position: relative;
+    flex-direction: column;
   }
 }
