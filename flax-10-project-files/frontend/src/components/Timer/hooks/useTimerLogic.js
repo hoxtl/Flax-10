@@ -13,7 +13,7 @@ export function useTimerLogic() {
   const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly);
   const ot = t.timeLeft <= 0;
   return {
-    ...t, task, setTask, modal, handlers, progress: getProgress(t),
+    ...t, task, setTask, modal, setModal, handlers, progress: getProgress(t),
     isOvertime: t.mode === 'work' && ot, isBreakOvertime: t.mode === 'break' && ot
   };
 }
