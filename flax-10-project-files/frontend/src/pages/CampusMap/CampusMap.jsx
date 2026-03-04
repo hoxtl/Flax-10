@@ -326,6 +326,9 @@ export default function CampusMap() {
         if (btn) {
           btn.addEventListener('click', () => {
             setStartLocation({lng: userHome.lng, lat: userHome.lat});
+            if (homeMarker.current && homeMarker.current.getPopup().isOpen()) {
+              homeMarker.current.togglePopup();
+            }
             map.current?.flyTo({
               center: [userHome.lng, userHome.lat],
               zoom: 15,
@@ -335,7 +338,7 @@ export default function CampusMap() {
           });
         }
       }, 100);
-  }, [userHome, mapLoaded]);
+  }, [userHome, mapLoaded, startLocation]);
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
