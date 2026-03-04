@@ -77,8 +77,9 @@ function getModuleColor(code) {
 }
 
 /* HOME PAGE */
-export default function Homepage({ onNavigate }) {
-  const navigate         = useNavigate();
+export default function Homepage({ onNavigate, onNavChange }) {
+  const goToNav = onNavigate ?? onNavChange;
+  const navigate = useNavigate();
   const { selectedDate, events: allCalEvents } = useCalendar();
   const dispatch         = useCalendarDispatch();
   const { loadEvents }   = useCalendarEvents();
@@ -371,7 +372,7 @@ export default function Homepage({ onNavigate }) {
 
 
   const sortedEvents = useMemo(
-    () => [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
+    () => (Array.isArray(dayEvents) ? [...dayEvents] : []).sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
     [dayEvents]
   );
 
@@ -1433,7 +1434,7 @@ export default function Homepage({ onNavigate }) {
               <button
                 type="button"
                 className={styles.intRowFocusFooterLink}
-                onClick={() => onNavigate?.("analytics")}
+                onClick={() => goToNav?.("analytics")}
               >
                 View full analytics →
               </button>
