@@ -88,8 +88,10 @@ function resolveRouteContent(activeNav, user, setActiveNav) {
   const el = route.element;
   if (el && typeof el === "object") {
     const extraProps = { user, onNavChange: setActiveNav };
-    // Pass the search param to modules view if provided
-    if (baseNav === 'modules' && navParam) {
+    // Pass the search param or create flag to modules view if provided
+    if (baseNav === 'modules' && navParam === 'create') {
+      extraProps.initialCreate = true;
+    } else if (baseNav === 'modules' && navParam) {
       extraProps.initialSearch = navParam;
     }
     return { ...el, props: { ...el.props, ...extraProps } };

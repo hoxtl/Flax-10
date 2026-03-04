@@ -10,12 +10,12 @@ import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js
 import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
-function useModulesPage(initialSearch = '') {
+function useModulesPage(initialSearch = '', initialCreate = false) {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
     const [search_query, setSearchQuery] = useState(initialSearch);
     const [filter_mode, setFilterMode] = useState('all');
-    const [show_form, setShowForm] = useState(false);
+    const [show_form, setShowForm] = useState(!!initialCreate);
     const [editing_module, setEditingModule] = useState(null);
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
@@ -46,8 +46,8 @@ function useMainView(state) {
     return { sorting, search, departments: getDepartments(hook.modules) };
 }
 
-export default function ModulesPage({ initialSearch = '' }) {
-    const state = useModulesPage(initialSearch);
+export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
+    const state = useModulesPage(initialSearch, initialCreate);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
     if (hook.loading) return <LoadingView />;
     if (show_form) return <FormView state={state} />;
