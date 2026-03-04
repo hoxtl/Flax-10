@@ -313,7 +313,13 @@ export default function CampusMap() {
         .setPopup(homePopup.current)
         .addTo(map.current);
       
-      homePointer.current.togglePopup();
+      const isHomeStartingLoc = startLocation && 
+        Math.abs(startLocation.lat - homeLocation.lat) < 0.0001 &&
+        Math.abs(startLocation.lng - homeLocation.lng) < 0.0001;
+      
+      if (!isHomeStartingLoc) {
+        homeMarker.current.togglePopup();
+      }
 
       setTimeout(() => {
         const btn = document.getElementById('setHomeAsStart');
