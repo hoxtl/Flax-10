@@ -668,7 +668,7 @@ function ProfileHome({ onNavigate, isSelf, viewedUserId }) {
 
 function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
   const { profileData, handlers } = useProfileContent(state);
-  const { modules, upcomingEventCount, filteredEvents } = useProfileBodyData(state);
+  const { modules, upcomingEventCount, filteredEvents, allEvents } = useProfileBodyData(state);
 
   return (
     <div className={styles.content}>
@@ -685,7 +685,7 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       {!isSelf && isMutualOrSelf && (
         <div className={styles.calendarSection}>
           <div className={styles.cardLabel}>SHARED CALENDAR</div>
-          <ProfileCalendar events={filteredEvents} />
+          <ProfileCalendar allEvents={allEvents} />
         </div>
       )}
     </div>
@@ -711,7 +711,7 @@ function ProfileBody({ user, state, onNavigate }) {
         user={user}
         state={state}
         modules={modules}
-        filteredEvents={filteredEvents}
+        allEvents={state.allEvents}
         isMutualOrSelf={isSharedOrSelf}
         onNavChange={state.onNavChange}
       />

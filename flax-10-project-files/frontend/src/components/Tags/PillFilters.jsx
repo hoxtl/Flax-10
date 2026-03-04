@@ -53,7 +53,7 @@ function PillItem({ pill, active, counts, onChange }) {
  * Handles both string (single) and array (multi) active states.
  */
 function checkActive(active, key) {
-  if (Array.isArray(active)) return active === key || active.includes(key);
+  if (Array.isArray(active)) return active.includes(key);
   return active === key;
 }
 

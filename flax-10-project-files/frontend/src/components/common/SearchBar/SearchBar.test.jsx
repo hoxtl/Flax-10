@@ -31,8 +31,6 @@ describe('SearchBar Component', () => {
     it('applies custom className correctly', () => {
         const customClass = 'my-custom-class';
         const { container } = render(<SearchBar className={customClass} />);
-
-        // Find the div by checking its classes since we know it uses the styles.container
         const rootDiv = container.firstChild;
         expect(rootDiv.className).toContain(styles.container);
         expect(rootDiv.className).toContain(customClass);
