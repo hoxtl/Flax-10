@@ -5,6 +5,7 @@ import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft, Flag, Za
 
 import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
+import { useAppNav } from "../../../context/AppNavContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import DateTimePicker from "./DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
@@ -370,6 +371,7 @@ export default function TaskCard({
     const [checkBounce, setCheckBounce] = useState(false);
     const burstTimeoutRef = useRef(null);
     const nav = useNavigate();
+    const { setActiveNav } = useAppNav() || {};
     const { setActiveTaskId } = useTimerContext();
     const { showCompletionToast } = useTaskCompletion();
     const activeTimerTaskId = useActiveTimerTaskId();
@@ -503,7 +505,8 @@ export default function TaskCard({
                             className={`${styles.actionBarBtn} ${styles.actionBarBtnPlay}`}
                             onClick={() => {
                                 setActiveTaskId(task.id, { title: task.title, categoryColor: listColor || undefined });
-                                nav("/timer", { state: { fromTaskPlay: true } });
+                                setActiveNav?.("timer");
+                                nav("/timer", { state: { fromTaskPlay: true, taskId: task.id, taskTitle: task.title } });
                             }}
                             aria-label="Study now"
                         >

@@ -1,4 +1,4 @@
-import { useState, useEffect, cloneElement } from "react";
+import { useState, useEffect, useLayoutEffect, cloneElement } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
@@ -9,7 +9,9 @@ import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
+import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { AppNavProvider } from "./context/AppNavContext";
 import { NotificationToast } from "./components/Notifications";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
@@ -224,8 +226,10 @@ function AppProviders({ children }) {
       <CalendarProvider>
         <TagProvider>
           <TimerProvider>
-            {children}
-            <NotificationToast />
+            <TaskCompletionProvider>
+              {children}
+              <NotificationToast />
+            </TaskCompletionProvider>
           </TimerProvider>
         </TagProvider>
       </CalendarProvider>
@@ -338,17 +342,19 @@ function AppScreen({ activeNav, setActiveNav, user }) {
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
-        <DashboardLayout
-          activeNav={activeNav}
-          onNavChange={setActiveNav}
-          user={user}
-        >
-          <AnimatedDashboardContent
+        <AppNavProvider setActiveNav={setActiveNav}>
+          <DashboardLayout
             activeNav={activeNav}
-            setActiveNav={setActiveNav}
+            onNavChange={setActiveNav}
             user={user}
-          />
-        </DashboardLayout>
+          >
+            <AnimatedDashboardContent
+              activeNav={activeNav}
+              setActiveNav={setActiveNav}
+              user={user}
+            />
+          </DashboardLayout>
+        </AppNavProvider>
         <OnboardingWrapper />
       </AppProviders>
     </ScreenWrap>
@@ -382,6 +388,21 @@ function renderScreen(screen, state) {
 // Root
 export default function App() {
   const state = useAppState();
+  const location = useLocation();
+
+  // Sync URL pathname to activeNav so that navigate("/timer", { state }) shows the Timer page.
+  // useLayoutEffect runs before paint so the switch feels instant when URL changes.
+  useLayoutEffect(() => {
+    if (resolveScreen(state.authed, state.user, state.showWelcome) !== "app") return;
+    const pathname = location.pathname || "";
+    const route = APP_ROUTES.find(
+      (r) => r.path === pathname || (pathname.startsWith(r.path + "/") && r.path !== "/")
+    );
+    if (route && state.activeNav !== route.id) {
+      state.setActiveNav(route.id);
+    }
+  }, [location.pathname]);
+
   if (state.isLoadingTheme) return null;
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
   return (

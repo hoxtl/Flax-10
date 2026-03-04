@@ -42,7 +42,7 @@ function getTodayEndISO() {
 
 export default function TasksPage() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
+    const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, archiveList, restoreList, permanentlyDeleteList } = useTaskLists();
     const { tasks, initialLoading: tasksInitialLoading, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
     const [activeListId,    setActiveListId]    = useState(null);
     const [filterListIds,   setFilterListIds]   = useState([]);
@@ -90,8 +90,15 @@ export default function TasksPage() {
     };
 
     const handleDeleteList = (listId) => {
-        removeList(listId);
+        if (!window.confirm("Permanently delete this list? You won't be able to restore it.")) return;
+        permanentlyDeleteList(listId);
         if (activeListId === listId) { setActiveListId(null); setActiveFilter("all"); }
+    };
+
+    const handleArchiveList = async (listId) => {
+        await archiveList(listId);
+        if (activeListId === listId) { setActiveListId(null); setActiveFilter("all"); }
+        reloadTasks();
     };
 
     const handleUnarchiveList = async (listId) => {
@@ -124,6 +131,7 @@ export default function TasksPage() {
                 onSelectFilter={setActiveFilter}
                 onNewList={() => setShowListModal(true)}
                 onDeleteList={handleDeleteList}
+                onArchiveList={handleArchiveList}
                 onRenameList={renameList}
                 onUnarchiveList={handleUnarchiveList}
                 onPermanentlyDeleteList={handlePermanentlyDeleteList}

@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { useCountUp } from "../../hooks/useCountUp";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -34,6 +33,7 @@ import CreateListModal from "../Tasks/components/CreateListModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
 import styles from "./Homepage.module.css";
+import actionHubStyles from "./styles/ActionHub.module.css";
 
 import {
   formatTime,
@@ -54,7 +54,6 @@ import { DAY_START_HOUR, DAY_END_HOUR } from "./utils/timelineUtils";
 import { formatScheduleCountdown } from "./utils/dateFormatUtils";
 import { useHomeData } from "./hooks/useHomeData";
 import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
-import { MiniTimeline } from "./components";
 import { ActionHubSlot } from "./components/ActionHubSlot";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 
@@ -720,7 +719,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
   }, [filteredTasksDueToday, getTag]);
 
-  /** Today's Action Hub: task-only. Only tasks due today or tomorrow—no entire week, no later dates. */
+  /** Today's Action Hub: task-only. Only tasks due today — nothing else. */
   const actionHubList = useMemo(() => {
     if (!isToday(selectedDate)) return [];
     const now = new Date();
@@ -728,24 +727,16 @@ export default function Homepage({ onNavigate, onNavChange }) {
     dayStart.setHours(0, 0, 0, 0);
     const dayEnd = new Date(selectedDate);
     dayEnd.setHours(23, 59, 59, 999);
-    const tomorrowStart = new Date(dayStart);
-    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-    const tomorrowEnd = new Date(tomorrowStart);
-    tomorrowEnd.setHours(23, 59, 59, 999);
     const isDueToday = (t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
       return d && d >= dayStart && d <= dayEnd;
-    };
-    const isDueTomorrow = (t) => {
-      const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= tomorrowStart && d <= tomorrowEnd;
     };
 
     const tasks = (allTasks || [])
       .filter(
         (t) =>
           !isRoutineOrEventTask(t, getTag) &&
-          (isDueToday(t) || isDueTomorrow(t))
+          isDueToday(t)
       )
       .map((t) => {
         const due = t.due_date ? new Date(t.due_date) : null;
@@ -828,7 +819,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
     if (!isToday(selectedDate) || !todayFreeWindows.length) return null;
     const totalMins = todayFreeWindows.reduce((s, w) => s + w.minutes, 0);
     const h = Math.floor(totalMins / 60);
-    const m = totalMins % 60;
+    const m = Math.round(totalMins % 60);
     const durLabel = h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ""}` : `${m}m`;
     return { count: todayFreeWindows.length, durLabel };
   }, [selectedDate, todayFreeWindows]);
@@ -852,10 +843,11 @@ export default function Homepage({ onNavigate, onNavChange }) {
     if (!nextWindow) return null;
 
     const windowMins = nextWindow.minutes;
+    const minsRounded = Math.round(windowMins);
     const winLabel =
-      windowMins >= 60
-        ? `${Math.floor(windowMins / 60)}h${windowMins % 60 > 0 ? ` ${windowMins % 60}m` : ""}`
-        : `${windowMins}m`;
+      minsRounded >= 60
+        ? `${Math.floor(minsRounded / 60)}h${minsRounded % 60 > 0 ? ` ${minsRounded % 60}m` : ""}`
+        : `${minsRounded}m`;
     const winStart = formatTime(nextWindow.start.toISOString());
 
     // Priority 1: deadline due within 24h
@@ -1274,7 +1266,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
         slot1Meta={slot1Meta}
         slot1ActionHub={
           <ActionHubSlot
-            styles={styles}
+            styles={actionHubStyles}
             displayName={displayName}
             isToday={isToday(selectedDate)}
             actionHubOverdueCount={actionHubOverdueCount}
@@ -1415,9 +1407,10 @@ export default function Homepage({ onNavigate, onNavChange }) {
               {(() => {
                 const best = [...todayFreeWindows].sort((a, b) => b.minutes - a.minutes)[0];
                 if (!best) return null;
-                const durLabel = best.minutes >= 60
-                  ? `${Math.floor(best.minutes / 60)}h${best.minutes % 60 > 0 ? ` ${best.minutes % 60}m` : ""}`
-                  : `${best.minutes}m`;
+                const mins = Math.round(best.minutes);
+                const durLabel = mins >= 60
+                  ? `${Math.floor(mins / 60)}h${mins % 60 > 0 ? ` ${mins % 60}m` : ""}`
+                  : `${mins}m`;
                 return (
                   <div className={styles.intRowFocusBestWindow}>
                     <div className={styles.intRowFocusBestWindowLeft}>
@@ -1517,80 +1510,6 @@ export default function Homepage({ onNavigate, onNavChange }) {
           </div>
         </div>
       )}
-      </div>
-
-      <div className={styles.bentoSpine} id="timeline-section">
-          <div className={styles.timelineBox}>
-            <div className={styles.timelineHeader}>
-              <div className={styles.timelineHeaderLeft}>
-                <div className={styles.timelineHeaderIconWrap} aria-hidden>
-                  <CalendarIcon size={20} strokeWidth={1.5} />
-                </div>
-                <div>
-                  <h3 className={styles.timelineTitle}>Your Plan for the Day</h3>
-                  {!isToday(selectedDate) && <span className={styles.timelineSub}>Preview & adjust.</span>}
-                </div>
-              </div>
-              <div className={styles.timelineHeaderRight}>
-                <Link to="/calendar" className={styles.timelineHeaderCta}>
-                  View Detailed Planner →
-                </Link>
-                {isToday(selectedDate) && (missedItems?.length > 0 || (overdueTasksForNow?.length ?? 0) > 0) && (
-                  <motion.button
-                    type="button"
-                    className={styles.replanBtn}
-                    onClick={handleReplanDay}
-                    disabled={replanLoading}
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25 }}
-                    aria-label="Re-plan overdue and missed items into free windows"
-                  >
-                    {replanLoading ? "Re-planning…" : "✨ Re-plan"}
-                  </motion.button>
-                )}
-              </div>
-            </div>
-            <div className={styles.timelineTrack}>
-              <motion.div
-                className={styles.timelineTrackContent}
-                layout
-                initial={false}
-                transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              >
-                <MiniTimeline
-                  sortedEvents={sortedEvents}
-                  selectedDate={selectedDate}
-                  now={now}
-                  dayTasks={dayTasks}
-                  tasksDueToday={filteredTasksDueToday}
-                  suggestableTasks={suggestableTasks}
-                  deadlineSuggestions={deadlineSuggestions}
-                  taskLists={taskLists}
-                  onQuickStart={handleQuickStartGap}
-                  onTaskToggle={handleTaskToggle}
-                  onCardClick={(ev, matchTask) => setPlanTimelineReadItem({ event: ev, task: matchTask ?? null })}
-                  onEdit={(ev) => openModal(ev, ev.tag)}
-                  onConflictAutoMove={handleConflictAutoMove}
-                  onDelete={removeEvent}
-                  onReschedule={handleReschedule}
-                  getTag={getTag}
-                  completedEventIds={completedEventIds}
-                  onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(eventId)) next.delete(eventId);
-                    else next.add(eventId);
-                    return next;
-                  })}
-                  hasTimerSession={hasTimerSession}
-                  timerTask={timerTask}
-                  timeLeft={timeLeft}
-                  timerMode={timerMode}
-                  styles={styles}
-                />
-              </motion.div>
-            </div>
-          </div>
       </div>
 
       {showCreateTaskModal && (

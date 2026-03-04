@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
@@ -11,9 +12,12 @@ import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
 function useModulesPage(initialSearch = '') {
+    const [searchParams] = useSearchParams();
+    const urlModuleId = searchParams.get('moduleId');
+    const urlCode = searchParams.get('code');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const is_teacher = user.role === 'teacher';
-    const [search_query, setSearchQuery] = useState(initialSearch);
+    const [search_query, setSearchQuery] = useState(initialSearch || urlCode || '');
     const [filter_mode, setFilterMode] = useState('all');
     const [show_form, setShowForm] = useState(false);
     const [editing_module, setEditingModule] = useState(null);
@@ -21,14 +25,32 @@ function useModulesPage(initialSearch = '') {
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
 
-    // Auto-open the specific module detail when navigated from a profile card
+    // Open module card when URL has moduleId or code (e.g. from task pill click)
     useEffect(() => {
-        if (!initialSearch || hook.loading || hook.modules.length === 0) return;
-        const match = hook.modules.find(
-            m => m.module_code?.toLowerCase() === initialSearch.toLowerCase()
-        );
-        if (match) setViewingModule(match);
-    }, [initialSearch, hook.loading, hook.modules]);
+        if (hook.loading || hook.modules.length === 0) return;
+        if (urlModuleId) {
+            const match = hook.modules.find(m => String(m.id) === String(urlModuleId));
+            if (match) setViewingModule(match);
+            return;
+        }
+        if (urlCode) {
+            const match = hook.modules.find(
+                m => m.module_code?.toLowerCase() === urlCode.toLowerCase()
+            );
+            if (match) setViewingModule(match);
+            setSearchQuery(urlCode);
+        }
+    }, [urlModuleId, urlCode, hook.loading, hook.modules]);
+
+    // Legacy: auto-open when initialSearch (e.g. from profile) is provided and no URL params
+    useEffect(() => {
+        if (initialSearch && !urlModuleId && !urlCode && !hook.loading && hook.modules.length > 0) {
+            const match = hook.modules.find(
+                m => m.module_code?.toLowerCase() === initialSearch.toLowerCase()
+            );
+            if (match) setViewingModule(match);
+        }
+    }, [initialSearch, urlModuleId, urlCode, hook.loading, hook.modules]);
 
     return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }

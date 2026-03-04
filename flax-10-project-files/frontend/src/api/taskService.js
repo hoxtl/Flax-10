@@ -33,3 +33,14 @@ export async function createTaskList(data) {
     body: JSON.stringify(data),
   });
 }
+
+export async function updateTaskList(id, data) {
+  return fetchApi(`/task-lists/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTaskList(id) {
+  return fetchApi(`/task-lists/${id}/`, { method: "DELETE" });
+}
