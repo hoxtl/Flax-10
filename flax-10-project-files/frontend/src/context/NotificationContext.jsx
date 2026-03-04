@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import * as api from '../api/notificationApi';
 import { requestPermission, sendBrowserNotification } from '../components/Notifications/utils/browserNotification';
 import { playNotificationSound } from '../components/Notifications/utils/notificationSound';
+import { parseNotificationAction } from '../components/Notifications/utils/notificationAction';
 
 const NotificationContext = createContext(null);
 const POLL_INTERVAL = 30000;
@@ -65,7 +66,8 @@ async function pollNotifications(knownIds, setNotifications) {
 }
 
 function notifyUser(notification) {
-    sendBrowserNotification(notification.title, notification.message);
+    const action = parseNotificationAction(notification);
+    sendBrowserNotification(notification.title, notification.message, null, action);
     playNotificationSound();
 }
 
