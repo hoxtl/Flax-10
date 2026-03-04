@@ -11,18 +11,6 @@ const COMPLETION_MESSAGES = [
   "Focus rewarded. Nice work.",
 ];
 
-function playVictorySound(volume = 0.4) {
-  try {
-    const audio = new Audio("/completion-pop.mp3");
-    audio.volume = volume;
-    audio.play().catch(() => {
-      const fallback = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
-      fallback.volume = volume;
-      fallback.play().catch(() => {});
-    });
-  } catch (_) {}
-}
-
 const EVOLUTION_SAPLING_SEEN_KEY = "evolution_sapling_seen";
 
 export function TaskCompletionProvider({ children }) {
@@ -32,8 +20,6 @@ export function TaskCompletionProvider({ children }) {
 
   const showCompletionToast = useCallback((message, options = {}) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    const { isRoutine } = options;
-    if (!isRoutine) playVictorySound(0.4);
     setToast((prev) => ({
       show: true,
       message: message ?? DEFAULT_MESSAGE,

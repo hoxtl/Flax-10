@@ -1,262 +1,441 @@
-/* RIGHT NOW widget — compact, 4-section layout. Warm stone/amber palette. */
+/* RIGHT NOW widget — revamped card with header, current event, up next, travel, overlap. */
 
 .root {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 0.85rem;
   font-family: var(--font-body);
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border-left: 3px solid transparent;
+  transition: border-color 0.25s ease, background 0.25s ease;
 }
 
-.section {
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(120, 113, 108, 0.15);
+.rootHasActive {
+  border-left-color: var(--accent);
+}
+
+/* ——— Header: pulsing dot + "Right Now" + live clock ——— */
+.widgetHeader {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
-.section:last-child {
-  border-bottom: none;
+.headerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9ca3af;
+  flex-shrink: 0;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Section 1 — NOW */
-.nowLabel {
-  font-size: 0.8rem;
+.headerDotActive {
+  background: #22c55e;
+  animation: headerDotPulse 2s ease-in-out infinite;
+}
+
+@keyframes headerDotPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+  }
+}
+
+.headerLabel {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #78716c;
-  flex-shrink: 0;
-}
-
-.nowText {
-  font-size: 0.85rem;
-  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: #44403c;
+  flex: 1;
 }
 
-.nowEmpty {
-  font-size: 0.85rem;
-  color: #a8a29e;
+:root[data-theme="dark"] .headerLabel {
+  color: var(--text-primary);
+}
+
+.headerClock {
+  font-size: 0.875rem;
   font-weight: 500;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
 }
 
-.nowBadge {
-  font-size: 0.7rem;
+/* ——— Sections ——— */
+.section {
+  padding: 0;
+}
+
+.sectionFirst {
+  padding-top: 0;
+}
+
+.sectionDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+  opacity: 0.6;
+}
+
+/* ——— Current event ——— */
+.sectionCurrent {
+  /* no extra padding */
+}
+
+.currentEventRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.currentEventMain {
+  min-width: 0;
+  flex: 1;
+}
+
+.currentEventTitle {
+  font-size: 1.0625rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #78716c;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+  line-height: 1.3;
+}
+
+.currentEventLocation {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.currentEventTime {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.currentEventBadge {
   flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--card-bg);
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .progressTrack {
   height: 4px;
-  background: rgba(120, 113, 108, 0.12);
-  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-pill);
   overflow: hidden;
-  margin: 2px 0 6px;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--primary, #7B6751);
-  border-radius: 2px;
-  transition: width 0.2s ease;
-}
-
-.timerBtn {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--primary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 0;
-  margin-top: 2px;
-}
-
-.timerBtn:hover {
-  text-decoration: underline;
-}
-
-/* Section 2 — NEXT UP */
-.sectionNext {
-  padding-top: 8px;
-}
-
-.nextLine {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px;
+  margin-top: 0.5rem;
   width: 100%;
 }
 
-.nextLine2 {
+:root .progressTrack { background: rgba(123, 103, 81, 0.12); }
+:root[data-theme="dark"] .progressTrack { background: rgba(255, 255, 255, 0.1); }
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  transition: width 0.25s ease;
+}
+
+/* ——— Empty state (nothing on now) ——— */
+.nowEmptyRow {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.78rem;
-  color: #78716c;
-  margin-top: 2px;
+  gap: 0.5rem;
 }
 
-.nextLabel {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #78716c;
+.nowEmptyIcon {
+  font-size: 1.125rem;
+  line-height: 1;
   flex-shrink: 0;
 }
 
-.nextTitle {
-  font-size: 0.85rem;
+.nowEmpty {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ——— Empty day state ——— */
+.emptyDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  gap: 0.35rem;
+}
+
+.emptyDayTitle {
+  font-size: 1rem;
   font-weight: 600;
-  color: #44403c;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.nextMeta {
-  font-size: 0.8rem;
-  color: #78716c;
+.emptyDaySubtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
-.nextEmpty {
-  font-size: 0.82rem;
-  color: #a8a29e;
+/* ——— Up next ——— */
+.upNextCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
-.nextIcon {
-  flex-shrink: 0;
-  color: #a8a29e;
+.upNextCardLeft {
+  min-width: 0;
+  flex: 1;
 }
 
-/* Countdown pill — amber default, red + pulse when <30m */
-.countdownPill {
-  display: inline-block;
+.upNextLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.upNextTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.15rem;
+}
+
+.upNextDetails {
   font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Countdown pills: >15min normal, 5–15 yellow, <5 red */
+.countdownPill {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--pill-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.countdownPillWarning {
+  composes: countdownPill;
+  background: #fef9c3;
+  border-color: #fde047;
+  color: #a16207;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  background: #fef3c7;
-  color: #b45309;
-  margin-top: 4px;
 }
 
 .countdownPillUrgent {
-  background: #fee2e2;
+  composes: countdownPill;
+  background: #fecaca;
+  border-color: #f87171;
   color: #b91c1c;
-  animation: rightNowPulse 1.5s ease-in-out infinite;
+  font-weight: 700;
+  animation: countdownPulse 1.2s ease-in-out infinite;
 }
 
-@keyframes rightNowPulse {
+@keyframes countdownPulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
+  50% { opacity: 0.88; }
 }
 
-/* Section 3 — SMART TRAVEL ALERT */
-.tflLoading {
-  font-size: 0.8rem;
-  color: #a8a29e;
+/* Dark: urgency badges */
+:root[data-theme="dark"] .countdownPillWarning {
+  background: #78350f;
+  border-color: #b45309;
+  color: #fcd34d;
 }
 
+:root[data-theme="dark"] .countdownPillUrgent {
+  background: #7f1d1d;
+  border-color: #b91c1c;
+  color: #fecaca;
+}
+
+.noMoreEvents {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ——— Travel row (simplified) ——— */
+.sectionTravel {
+  padding-top: 0.1rem;
+}
+
+.travelRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.travelText {
+  color: var(--text-secondary);
+}
+
+/* Travel banner (TFL delays) — refined yellow */
 .travelBanner {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: 12px;
-  padding: 12px;
-  margin-top: 6px;
-  border-bottom: none;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.travelBannerSevere {
+.travelBannerSuspension {
   background: #fef2f2;
   border-color: #fecaca;
 }
 
-.travelIcon {
-  flex-shrink: 0;
-  color: #b45309;
-}
-
-.travelBannerSevere .travelIcon {
-  color: #b91c1c;
-}
-
-.travelContent {
+.travelBannerContent {
   flex: 1;
   min-width: 0;
 }
 
-.travelMessage {
-  margin: 0 0 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #44403c;
+.travelBannerMessage {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
 .tflLineList {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .tflLineRow {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.78rem;
-  color: #57534e;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }
 
 .tflDot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.tflLineName {
-  font-weight: 600;
-  color: #44403c;
-}
-
-.tflSep {
-  color: #a8a29e;
-}
-
 .tflStatus {
-  color: #78716c;
+  color: var(--text-secondary);
 }
 
-.travelClear {
-  padding: 6px 0;
+.otherLinesToggle {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0 0;
+  margin-top: 2px;
+  font-family: inherit;
+  transition: color 0.2s ease;
 }
 
-.travelClearIcon {
-  color: #16a34a;
-  flex-shrink: 0;
+.otherLinesToggle:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
 }
 
-.travelClear span {
-  font-size: 0.8rem;
-  color: #78716c;
-}
-
-/* Section 4 — SCHEDULE CONFLICTS */
+/* ——— Overlap warning (schedule conflicts) ——— */
 .conflictRow {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: 8px;
-  padding: 8px 10px;
-  margin-top: 4px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.conflictIcon {
-  flex-shrink: 0;
-  color: #b45309;
+.conflictText {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .conflictRow {
+  background: rgba(254, 252, 232, 0.15);
+  border-color: rgba(254, 240, 138, 0.4);
+}
+
+:root[data-theme="dark"] .travelBanner {
+  background: rgba(254, 252, 232, 0.12);
+  border-color: rgba(254, 240, 138, 0.35);
+}
+
+/* ——— Timer session block ——— */
+.timerBlock {
+  padding: 0;
+}
+
+.nowRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nowLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.timerBtn {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  margin-top: 0.35rem;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.timerBtn:hover {
+  text-decoration: underline;
+  color: var(--text-primary);
 }

@@ -10,9 +10,10 @@
 
 .section {
   position: relative;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 24px;
+  padding-bottom: 3rem; /* pb-12 at page bottom */
   opacity: 0;
   background: transparent;
 }
@@ -30,7 +31,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 32px; /* mb-8 — breathing room before grid */
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(123, 103, 81, 0.15);
 }
@@ -50,7 +51,7 @@
 }
 
 .headerLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.875rem; /* text-sm */
   font-weight: 500;
   letter-spacing: 0.1em; /* tracking-widest */
@@ -70,7 +71,7 @@
 }
 
 .headerTitle {
-  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
+  font-family: var(--font-body);
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -107,7 +108,7 @@
 
 /* Schedule insight — italic one-liner below pills */
 .scheduleInsight {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.73rem;
   font-weight: 500;
   font-style: italic;
@@ -148,7 +149,7 @@
 }
 
 .headerDayProgressCount {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -156,7 +157,7 @@
 }
 
 .headerDayProgressOverdue {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.63rem;
   font-weight: 700;
   color: #C0714E;
@@ -164,7 +165,7 @@
 }
 
 .headerDayProgressStreak {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.63rem;
   font-weight: 600;
   color: #9a8778;
@@ -374,7 +375,7 @@
 }
 
 .intRowAlertText {
-  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   color: #8a6d30;
   flex: 1;
@@ -426,7 +427,7 @@
 }
 
 .statusStripText {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -498,7 +499,7 @@
 }
 
 .tflCardLine {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.67rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -506,14 +507,14 @@
 }
 
 .tflCardStatus {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 500;
   color: #8a7060;
 }
 
 .tflCardLeave {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 400;
   color: rgba(74, 52, 33, 0.7);
@@ -539,7 +540,7 @@
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -592,7 +593,7 @@
 }
 
 .headerSubtitle {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   font-weight: 500;
   color: #7B6751;
@@ -602,21 +603,24 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  align-items: stretch;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px; /* gap-5 */
+  align-items: start; /* natural heights — no stretch with empty void */
+  max-width: 64rem; /* max-w-5xl */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
-/* Row 1: Right Now (left) | Today's Tasks (right) — equal height */
+/* Row 1: Right Now (left) | Today's Tasks (right) */
 .span5 { grid-column: 1; grid-row: 1; }
 .span1 { grid-column: 2; grid-row: 1; }
-/* Row 2: Deadlines (left) | Focus Windows (right) — equal height */
+/* Row 2: Deadlines (left) | Focus Windows (right) */
 .span3 { grid-column: 1; grid-row: 2; }
 .span4 { grid-column: 2; grid-row: 2; }
 
@@ -631,28 +635,61 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start; /* content at top — no blank stretch */
   overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid #f5f5f4;
+  border-radius: 1rem; /* rounded-2xl */
+  border: 1px solid rgba(231, 229, 227, 0.6); /* border-stone-200/60 */
   background: #ffffff;
-  padding: 1.5rem;
-  min-height: 200px;
+  padding: 1.5rem; /* p-6 */
+  min-height: 200px; /* natural heights with items-start, but not too stubby */
   opacity: 0;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: box-shadow 0.2s ease-out;
-}
-
-.bentoSlot:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+  /* No shadows, no colored backgrounds, no gradients */
 }
 
 /* Widget cards: same base style for all — no colored tints */
 .bentoSlotVariantRightNow {
-  background: #ffffff;
+  background: transparent;
+  padding: 0;
+  min-height: auto;
+  border: none;
+  box-shadow: none;
 }
 .bentoSlotVariantRightNow .bentoIcon {
   color: #a8a29e;
+}
+.bentoSlotVariantRightNow .bentoContent {
+  gap: 0;
+}
+.bentoSlotVariantRightNow .bentoBodyNoHeader {
+  padding: 0;
+}
+
+.bentoSlotVariantDeadlines {
+  background: transparent;
+  padding: 0;
+  min-height: auto;
+  border: none;
+  box-shadow: none;
+}
+.bentoSlotVariantDeadlines .bentoContent {
+  gap: 0;
+}
+.bentoSlotVariantDeadlines .bentoBodyNoHeader {
+  padding: 0;
+}
+
+.bentoSlotVariantFocus {
+  background: transparent;
+  padding: 0;
+  min-height: auto;
+  border: none;
+  box-shadow: none;
+}
+.bentoSlotVariantFocus .bentoContent {
+  gap: 0;
+}
+.bentoSlotVariantFocus .bentoBodyNoHeader {
+  padding: 0;
 }
 
 .bentoSlotVariantTasks {
@@ -702,28 +739,7 @@
   border-radius: 1rem;
   opacity: 0;
   transition: opacity 0.3s;
-  mask-image: radial-gradient(
-    220px 220px at var(--x, 50%) var(--y, 50%),
-    black,
-    transparent
-  );
-  -webkit-mask-image: radial-gradient(
-    220px 220px at var(--x, 50%) var(--y, 50%),
-    black,
-    transparent
-  );
-}
-
-.bentoSlot:hover .bentoGlow {
-  opacity: 1;
-}
-
-.bentoGlow::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 1rem;
-  border: 1px solid rgba(123, 103, 81, 0.1);
+  /* Disabled: no gradients on cards */
 }
 
 .bentoContent {
@@ -755,9 +771,9 @@
 }
 
 .bentoIcon {
-  width: 16px;
-  height: 16px;
-  color: #a8a29e;
+  width: 16px; /* w-4 */
+  height: 16px; /* h-4 */
+  color: #a8a29e; /* text-stone-400 */
 }
 
 .bentoHeader {
@@ -769,18 +785,18 @@
 }
 
 .bentoTitle {
-  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600; /* font-semibold */
+  letter-spacing: 0.05em; /* tracking-wider */
   text-transform: uppercase;
-  color: #44403c;
+  color: #44403c; /* text-stone-700 */
   margin: 0;
 }
 
 .bentoMeta {
   margin-left: auto;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -792,10 +808,17 @@
 .bentoBody {
   flex: 1;
   min-height: 0;
-  font-family: "Lexend", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* compact — content at top */
+  font-family: var(--font-body);
   font-size: 0.8rem;
   line-height: 1.5;
   color: rgba(45, 53, 45, 0.85);
+}
+
+.bentoBodyNoHeader {
+  /* Right Now widget is the full card; no extra padding */
 }
 
 .bentoCenteredBody {
@@ -810,7 +833,7 @@
   margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid rgba(123, 103, 81, 0.15);
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -872,7 +895,7 @@
 }
 
 .glanceStatNum {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.25rem;
   font-weight: 800;
   color: #2d352d;
@@ -881,7 +904,7 @@
 }
 
 .glanceStatLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.52rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -933,7 +956,7 @@
 }
 
 .travelAlertLine {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.67rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -948,14 +971,14 @@
 }
 
 .travelAlertStatus {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body);
   font-size: 0.67rem;
   font-weight: 600;
   color: #9A6E2A;
 }
 
 .travelAlertSuggestion {
-  font-family: "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 500;
   color: rgba(74, 52, 33, 0.8);
