@@ -450,3 +450,35 @@
 .replanBtn { padding: 0.4rem 0.75rem; border-radius: 8px; border: 1px solid rgba(107,83,68,0.3); background: transparent; cursor: pointer; font-size: 0.8rem; }
 .timelineTrack { }
 .timelineTrackContent { }
+
+/* OverlapCluster + ClusterCard */
+.clusterRow { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.5rem; }
+.clusterRow.nightSlot { opacity: 0.9; }
+.gutter { flex-shrink: 0; width: 3rem; font-size: 0.75rem; color: #78716c; }
+.gutterTime { }
+.clusterCards { position: relative; flex: 1; min-width: 0; }
+.clusterNowLine { position: absolute; left: 0; right: 0; height: 2px; background: var(--accent-primary, #6B5344); pointer-events: none; }
+.overlapHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
+.overlapBadge { font-size: 0.8rem; color: #78716c; }
+.overlapActions { display: flex; gap: 0.5rem; }
+.overlapResolveBtn { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #e7e5e4; background: #fff; cursor: pointer; }
+.overlapExpandBtn { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #e7e5e4; background: #fff; cursor: pointer; }
+.clusterCardsRow { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.clusterCard { border: 1px solid rgba(0,0,0,0.08); border-left-width: 3px; border-radius: 8px; padding: 0.5rem 0.75rem; background: #fff; min-width: 140px; }
+.clusterCardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem; }
+.clusterCardIcon { font-size: 1rem; }
+.clusterCardDuration { font-size: 0.75rem; color: #78716c; }
+.clusterCardTitle { font-size: 0.875rem; font-weight: 500; }
+.clusterCardActions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.clusterCardBtn { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #e7e5e4; background: #fff; cursor: pointer; }
+.resolvePanel { margin-top: 0.75rem; padding: 0.75rem; background: #fafaf9; border-radius: 8px; }
+.resolvePanelHeader { margin-bottom: 0.5rem; }
+.resolvePanelTitle { font-size: 0.875rem; font-weight: 600; display: block; }
+.resolvePanelSub { font-size: 0.8rem; color: #78716c; display: block; }
+.resolveSuggestion { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.35rem 0; }
+.resolveSuggestLeft { display: flex; flex-direction: column; gap: 0.15rem; }
+.resolveName { font-size: 0.875rem; }
+.resolveTime { font-size: 0.75rem; color: #78716c; }
+.resolveApplyBtn { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #6B5344; background: #6B5344; color: #fff; cursor: pointer; }
+.resolvePanelNote { font-size: 0.75rem; color: #78716c; margin: 0.5rem 0 0; }
+.nightSlot { }

@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useCountUp } from "../../hooks/useCountUp";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import {
@@ -58,6 +59,8 @@ import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { FocusWindowsWidget } from "./components/FocusWindowsWidget";
+import { MiniTimeline, PlanReadDetailModal } from "./components";
+import timelineStyles from "./styles/Timeline.module.css";
 
 /** Module code → pill color (same hash as TaskCard for consistency). */
 const MODULE_COLORS = [
@@ -137,6 +140,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
   const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
+  const [planTimelineReadItem, setPlanTimelineReadItem] = useState(null);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -1232,6 +1236,81 @@ export default function Homepage({ onNavigate, onNavChange }) {
       />
       </div>
 
+      {/* Your Plan for the Day — timeline */}
+      <div className={styles.bentoSpine} id="timeline-section">
+        <div className={styles.timelineBox}>
+          <div className={styles.timelineHeader}>
+            <div className={styles.timelineHeaderLeft}>
+              <div className={styles.timelineHeaderIconWrap} aria-hidden>
+                <CalendarIcon size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <h3 className={styles.timelineTitle}>Your Plan for the Day</h3>
+                {!isToday(selectedDate) && <span className={styles.timelineSub}>Preview & adjust.</span>}
+              </div>
+            </div>
+            <div className={styles.timelineHeaderRight}>
+              <Link to="/calendar" className={styles.timelineHeaderCta}>
+                View Detailed Planner →
+              </Link>
+              {isToday(selectedDate) && (missedItems?.length > 0 || (overdueTasksForNow?.length ?? 0) > 0) && (
+                <motion.button
+                  type="button"
+                  className={styles.replanBtn}
+                  onClick={handleReplanDay}
+                  disabled={replanLoading}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  aria-label="Re-plan overdue and missed items into free windows"
+                >
+                  {replanLoading ? "Re-planning…" : "✨ Re-plan"}
+                </motion.button>
+              )}
+            </div>
+          </div>
+          <div className={styles.timelineTrack}>
+            <motion.div
+              className={styles.timelineTrackContent}
+              layout
+              initial={false}
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            >
+              <MiniTimeline
+                sortedEvents={sortedEvents}
+                selectedDate={selectedDate}
+                now={now}
+                dayTasks={dayTasks}
+                tasksDueToday={filteredTasksDueToday}
+                suggestableTasks={suggestableTasks}
+                deadlineSuggestions={deadlineSuggestions}
+                taskLists={taskLists}
+                onQuickStart={handleQuickStartGap}
+                onTaskToggle={handleTaskToggle}
+                onCardClick={(ev, matchTask) => setPlanTimelineReadItem({ event: ev, task: matchTask ?? null })}
+                onEdit={(ev) => openModal(ev, ev.tag)}
+                onConflictAutoMove={handleConflictAutoMove}
+                onDelete={removeEvent}
+                onReschedule={handleReschedule}
+                getTag={getTag}
+                completedEventIds={completedEventIds}
+                onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(eventId)) next.delete(eventId);
+                  else next.add(eventId);
+                  return next;
+                })}
+                hasTimerSession={hasTimerSession}
+                timerTask={timerTask}
+                timeLeft={timeLeft}
+                timerMode={timerMode}
+                styles={timelineStyles}
+              />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
       {/* Deadline detail peek overlay */}
       {selectedDeadline && (
         <div className={styles.deadlineDetailOverlay} onClick={() => setSelectedDeadline(null)} role="dialog" aria-modal>
@@ -1290,6 +1369,28 @@ export default function Homepage({ onNavigate, onNavChange }) {
         </div>
       )}
       </div>
+
+      {planTimelineReadItem && (
+        <PlanReadDetailModal
+          item={planTimelineReadItem}
+          styles={styles}
+          onClose={() => setPlanTimelineReadItem(null)}
+          onEditTask={(task) => {
+            setRescheduleTask(task);
+          }}
+          onDeleteTask={async (task) => {
+            await deleteTask(task.id);
+            refetchTasks();
+          }}
+          onEditEvent={(ev) => {
+            openModal({ ...ev, id: extractBaseEventId(ev.id) }, ev.tag);
+          }}
+          onDeleteEvent={async (ev) => {
+            await removeEvent(extractBaseEventId(ev.id));
+            loadEvents();
+          }}
+        />
+      )}
 
       {showCreateTaskModal && (
         <CreateTaskModal
