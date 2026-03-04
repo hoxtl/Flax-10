@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
 import { tflService } from "../../api/tflService";
+import { motion } from 'framer-motion';
 
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -102,6 +103,22 @@ export default function CampusMap() {
   const [tflRouteError, setTflRouteError] = useState('');
   const[disruptions, setDisruptions] = useState([]);
   const[loadingDisruptions, setLoadingDisruptions] = useState(false);
+
+  // 1. Add a mobile detection hook (matches your DashboardLayout breakpoint)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 2. Variants for the bottom sheet states
+  const sheetVariants = {
+    closed: { y: "calc(85vh - 70px)" }, // Just the header visible
+    mid: { y: "calc(85vh - 300px)" },    // Half way
+    open: { y: 0 }                      // Fully open
+  };
 
   useEffect(() => {
     if (map.current) return;
@@ -466,15 +483,27 @@ export default function CampusMap() {
 
   return (
     <div className={styles.page}>
-      {/* Sidebar */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>
+      <motion.aside 
+        className={styles.sidebar}
+        initial={isMobile ? "closed" : false}
+        animate={isMobile ? undefined : { y: 0 }}
+        drag={isMobile ? "y" : false}
+        dragConstraints={{ top: 0, bottom: 500 }}
+        dragElastic={0.1}
+        onDragEnd={(e, info) => {
+          if (info.offset.y > 100) { /* this is where I'd put my snap logic */ }
+        }}
+      >
+
+        <div className={styles.dragHandle} />
+
+        <section className={styles.sidebarHeader}>
           <div className={styles.sidebarTitle}>
             <span className={styles.sidebarIcon}>🌎</span>
             StudyFlax Map
           </div>
           <p className={styles.sidebarSubtitle}>Never be late, plan your journeys!</p>
-        </div>
+        </section>
 
         {/* TfL Service Status */}
         <section className={styles.section}>
@@ -745,11 +774,11 @@ export default function CampusMap() {
         <div className={styles.sidebarFooter}>
           <p>💡 Right-click + drag to rotate</p>
         </div>
-      </aside>
+      </motion.aside>
 
       <div className={styles.mapWrapper}>
         <div ref={mapContainer} className={styles.mapContainer} />
-
+        
         {/* Floating campus quick-fly buttons */}
         <div className={styles.campusQuickNav}>
           {KCL_CAMPUSES.map((campus) => (
