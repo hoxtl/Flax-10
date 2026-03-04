@@ -11,6 +11,11 @@
   transition: background 0.2s ease;
 }
 
+:root[data-theme="dark"] .root {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
 /* ——— Header ——— */
 .header {
   display: flex;
@@ -36,7 +41,7 @@
 /* ——— Summary row ——— */
 .summary {
   font-size: var(--widget-body-size);
-  color: var(--widget-muted-color);
+  color: var(--text-secondary);
   margin: 0;
   line-height: 1.4;
 }
@@ -79,23 +84,24 @@
 
 /* ——— Best Window hero card (inner card) ——— */
 .bestCard {
-  background: #FAF6F0;
-  border: 1px solid #E2D5C5;
-  border-left: 3px solid #8B6F47;
+  background: var(--card-bg-inner, #FAF6F0);
+  border: 1px solid var(--border-color, #E2D5C5);
+  border-left: 3px solid var(--accent-primary);
   border-radius: var(--widget-inner-radius);
   padding: 0.75rem 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .bestCard:hover {
+  background: var(--card-bg-hover);
   transform: var(--widget-card-hover-transform);
   box-shadow: var(--widget-card-hover-shadow);
 }
 
 :root[data-theme="dark"] .bestCard {
-  background: var(--widget-inner-bg-dark, #2A241E);
-  border-color: var(--widget-border-dark, #3D342B);
-  border-left-color: var(--widget-accent-dark, #C4A265);
+  background: var(--card-bg-inner);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-primary);
 }
 
 .bestLabel {
@@ -104,7 +110,7 @@
   font-weight: var(--widget-label-weight);
   letter-spacing: var(--widget-label-spacing);
   text-transform: uppercase;
-  color: var(--widget-label-color);
+  color: var(--text-secondary);
   margin-bottom: 0.35rem;
 }
 
@@ -128,19 +134,15 @@
   gap: 0.35rem;
   font-size: var(--widget-muted-size);
   font-weight: 600;
-  color: var(--widget-success-dark, #5C6B4F);
+  color: var(--sage);
   margin-bottom: 0.1rem;
-}
-
-:root[data-theme="dark"] .bestNowBadge {
-  color: var(--widget-success-dark, #A3B18A);
 }
 
 .bestNowDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #A3B18A;
+  background: var(--sage);
   flex-shrink: 0;
   animation: focusPulse 1.5s ease-in-out infinite;
 }
@@ -154,13 +156,13 @@
   font-size: var(--widget-body-size);
   font-weight: var(--widget-badge-weight);
   font-variant-numeric: tabular-nums;
-  color: var(--widget-body-color);
+  color: var(--text-primary);
   line-height: 1.3;
 }
 
 .bestSuggestion {
   font-size: var(--widget-muted-size);
-  color: var(--widget-muted-color);
+  color: var(--text-muted);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -168,7 +170,7 @@
 
 .bestSuggestionIcon {
   flex-shrink: 0;
-  color: var(--widget-muted-color);
+  color: var(--text-muted);
 }
 
 .bestPill {
@@ -178,15 +180,15 @@
   font-variant-numeric: tabular-nums;
   padding: 0.25rem 0.65rem;
   border-radius: 8px;
-  background: #F0E8DC;
-  color: #8B6F47;
-  border: 1px solid #D4C4B0;
+  background: var(--card-bg-inner, #F0E8DC);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color, #D4C4B0);
 }
 
 :root[data-theme="dark"] .bestPill {
-  background: rgba(196, 162, 101, 0.08);
-  color: var(--widget-accent-dark, #C4A265);
-  border-color: rgba(196, 162, 101, 0.25);
+  background: var(--card-bg-inner);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
 }
 
 /* ——— Other windows list ——— */
@@ -204,7 +206,7 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #E2D5C5;
+  border-bottom: 1px solid var(--border-color);
   transition: background 0.2s ease;
 }
 
@@ -226,7 +228,7 @@
   font-weight: var(--widget-label-weight);
   letter-spacing: var(--widget-label-spacing);
   text-transform: uppercase;
-  color: var(--widget-label-color);
+  color: var(--text-muted);
 }
 
 .otherPill {
@@ -235,13 +237,16 @@
   font-variant-numeric: tabular-nums;
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  background: var(--pill-bg);
-  color: var(--widget-muted-color);
+  background: var(--card-bg-inner, var(--pill-bg));
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color, #E2D5C5);
   flex-shrink: 0;
 }
 
 :root[data-theme="dark"] .otherPill {
-  background: rgba(148, 163, 184, 0.2);
+  background: var(--card-bg-inner);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
 }
 
 .moreBtn {
@@ -257,8 +262,9 @@
 }
 
 .moreBtn:hover {
-  color: var(--widget-title-color);
-  background: var(--hover);
+  color: var(--accent-primary);
+  background: var(--card-bg-inner);
+  text-decoration: underline;
 }
 
 /* ——— Timeline bar ——— */
@@ -271,7 +277,7 @@
 
 .timelineLabel {
   font-size: var(--widget-label-size);
-  color: var(--widget-label-color);
+  color: var(--text-muted);
   flex-shrink: 0;
   width: 2.25rem;
 }
@@ -282,7 +288,7 @@
   height: 8px;
   border-radius: 4px;
   overflow: hidden;
-  background: #E2D5C5;
+  background: var(--border-color-subtle, #E8E0D8);
 }
 
 .timelineBarContainer {
@@ -293,7 +299,7 @@
 
 .timelineFree {
   min-width: 2px;
-  background: #A3B18A;
+  background: var(--sage);
   transition: opacity 0.2s ease;
   border-radius: 0;
 }
@@ -302,17 +308,9 @@
   opacity: 0.9;
 }
 
-:root[data-theme="dark"] .timelineFree {
-  background: var(--widget-success-dark, #A3B18A);
-}
-
 .timelineBusy {
   min-width: 2px;
-  background: #E2D5C5;
-}
-
-:root[data-theme="dark"] .timelineBusy {
-  background: var(--widget-border-dark, #3D342B);
+  background: var(--border-color, #E2D5C5);
 }
 
 .timelineNow {
@@ -322,14 +320,26 @@
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 10px solid #8B6F47;
+  border-top: 10px solid var(--accent-primary);
   transform: translate(-50%, -100%);
   pointer-events: none;
   z-index: 1;
 }
 
+:root[data-theme="dark"] .timelineBar {
+  background: var(--border-color-subtle);
+}
+
+:root[data-theme="dark"] .timelineFree {
+  background: var(--sage);
+}
+
+:root[data-theme="dark"] .timelineBusy {
+  background: var(--border-color);
+}
+
 :root[data-theme="dark"] .timelineNow {
-  border-top-color: var(--widget-accent-dark, #C4A265);
+  border-top-color: var(--accent-primary);
 }
 
 /* ——— Footer ——— */
@@ -340,7 +350,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid #E2D5C5;
+  border-top: 1px solid var(--border-color, #E2D5C5);
 }
 
 .footerBtnGhost {
@@ -350,28 +360,33 @@
   padding: 0.4rem 1rem;
   font-size: var(--widget-muted-size);
   font-weight: 500;
-  color: #8B6F47;
+  color: var(--accent-primary);
   background: transparent;
-  border: 1px solid #D4C4B0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .footerBtnGhost:hover {
-  color: var(--widget-title-color);
-  background: var(--hover);
-  border-color: var(--widget-muted-color);
+  color: var(--accent-secondary);
+  background: var(--card-bg-inner);
+  border-color: var(--accent-primary);
+}
+
+:root[data-theme="dark"] .footer {
+  border-top-color: var(--border-color);
 }
 
 :root[data-theme="dark"] .footerBtnGhost {
-  color: var(--widget-accent-dark, #C4A265);
-  border-color: var(--widget-border-dark, #3D342B);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
 }
 
 :root[data-theme="dark"] .footerBtnGhost:hover {
-  color: var(--widget-text-primary-dark, #E8DFD0);
-  background: rgba(196, 162, 101, 0.08);
+  color: var(--accent-secondary);
+  background: var(--card-bg-hover);
+  border-color: var(--accent-primary);
 }
 
 .footerBtnPrimary {
@@ -382,8 +397,8 @@
   padding: 0.4rem 1rem;
   font-size: var(--widget-muted-size);
   font-weight: 600;
-  color: #fff;
-  background: #8B6F47;
+  color: var(--text-on-accent);
+  background: var(--accent-primary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -391,14 +406,16 @@
 }
 
 .footerBtnPrimary:hover {
-  background: #6F5A3D;
+  background: var(--accent-secondary);
+  color: var(--text-on-accent);
 }
 
 :root[data-theme="dark"] .footerBtnPrimary {
-  background: var(--widget-accent-dark, #C4A265);
-  color: #fff;
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
 }
 
 :root[data-theme="dark"] .footerBtnPrimary:hover {
-  background: #D4B87A;
+  background: var(--accent-secondary);
+  color: var(--text-on-accent);
 }
