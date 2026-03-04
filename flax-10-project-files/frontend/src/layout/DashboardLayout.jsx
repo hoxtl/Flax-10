@@ -8,6 +8,8 @@ import WeekBar from "../components/Dashboard/WeekBar";
 import QuickAddModal from "../components/Dashboard/QuickAddModal";
 import { EventModal } from "../components/Calendar/EventModal/EventModal";
 import { useEventModal, useCalendar } from "../context/CalendarContext";
+import { ModuleModalProvider } from "../context/ModuleModalContext";
+import ModuleDetailModal from "../components/Modules/ModuleDetailModal";
 import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingChat from "../components/FloatingChat";
@@ -193,6 +195,7 @@ function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal })
         onSelectType={onSelectType}
       />
       <EventModalGate modal={modal} />
+      <ModuleDetailModal />
     </>
   );
 }
@@ -240,26 +243,28 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav } =
     state;
   return (
-    <div className={styles.root}>
-      <DashboardSidebars
-        {...state}
-        activeNav={activeNav}
-        onSettings={() => onNavChange?.("settings")}
-        onLogout={handleLogoutClick}
-        onProfile={() => onNavChange?.("profile")}
-      />
-      <DashboardMain
-        state={{ ...state, activeNav, isMobile }}
-        onNavChange={onNavChange}
-      >
-        {children}
-      </DashboardMain>
-      <FloatingChat />
-      {activeNav !== "map" &&
-        activeNav !== "modules" &&
-        activeNav !== "tasks" && (
-          <BackToTop containerSelector="[data-dashboard-main]" />
-        )}
-    </div>
+    <ModuleModalProvider>
+      <div className={styles.root}>
+        <DashboardSidebars
+          {...state}
+          activeNav={activeNav}
+          onSettings={() => onNavChange?.("settings")}
+          onLogout={handleLogoutClick}
+          onProfile={() => onNavChange?.("profile")}
+        />
+        <DashboardMain
+          state={{ ...state, activeNav, isMobile }}
+          onNavChange={onNavChange}
+        >
+          {children}
+        </DashboardMain>
+        <FloatingChat />
+        {activeNav !== "map" &&
+          activeNav !== "modules" &&
+          activeNav !== "tasks" && (
+            <BackToTop containerSelector="[data-dashboard-main]" />
+          )}
+      </div>
+    </ModuleModalProvider>
   );
 }

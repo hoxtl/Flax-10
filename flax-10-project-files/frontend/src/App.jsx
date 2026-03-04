@@ -162,7 +162,7 @@ function readActiveNav() {
   return localStorage.getItem(ACTIVE_NAV_KEY) || "home";
 }
 
-function useAppState(navigate) {
+function useAppState(navigate, location) {
   const [activeNav, setActiveNavState] = useState(readActiveNav);
   const [user, setUser] = useState(() => readUser());
   const [authed, setAuthed] = useState(() => isAuthenticated());
@@ -175,11 +175,13 @@ function useAppState(navigate) {
   const setActiveNav = (nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
-    // Keep URL in sync so reload restores the correct page (e.g. stay on homepage when reloading there)
+    // Keep URL in sync so reload restores the correct page; preserve search/hash so e.g. /modules?moduleId=37 opens the module card
     const baseNav = nav.split("_")[0];
     const route = APP_ROUTES.find((r) => r.id === baseNav);
     if (route?.path != null && navigate) {
-      navigate(route.path, { replace: true });
+      const search = (location && location.search) || "";
+      const hash = (location && location.hash) || "";
+      navigate({ pathname: route.path, search, hash }, { replace: true });
     }
   };
 
@@ -394,8 +396,8 @@ function renderScreen(screen, state) {
 // Root
 export default function App() {
   const navigate = useNavigate();
-  const state = useAppState(navigate);
   const location = useLocation();
+  const state = useAppState(navigate, location);
 
   // Sync URL pathname to activeNav so that navigate("/timer", { state }) shows the Timer page.
   // useLayoutEffect runs before paint so the switch feels instant when URL changes.

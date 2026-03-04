@@ -3,10 +3,12 @@ import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.j
 import styles from './ModuleDetails.module.css';
 
 // Detail view for a module - includes schedule, description and enrol button
-export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
+export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll, inModal }) {
     return (
         <div className={styles.container}>
-            <button className={styles.backButton} onClick={onBack}>← Back to all modules</button>
+            {!inModal && onBack && (
+                <button className={styles.backButton} onClick={onBack}>← Back to all modules</button>
+            )}
             <div className={styles.content}>
                 <DetailsHeader module={module} is_enrolled={is_enrolled} />
                 <hr className={styles.divider} />

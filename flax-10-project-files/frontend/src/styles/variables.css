@@ -33,7 +33,8 @@
   --widget-card-border: 1px solid #E2D5C5;
   --widget-card-radius: 14px;
   --widget-card-padding: 1.25rem;
-  --widget-card-hover-shadow: 0 2px 12px rgba(139, 111, 71, 0.08);
+  --widget-card-hover-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  --widget-card-hover-bg: var(--card-bg-hover);
   --widget-card-hover-transform: translateY(-1px);
   --widget-card-active-border: 3px solid #8B6F47;
   --widget-inner-bg: #FAF6F0;
@@ -88,6 +89,12 @@
   --sidebar: #EEEAE4;
   --border: rgba(74, 52, 33, 0.12);
   --border-default: var(--border-warm);
+  --border-color: var(--border-warm);
+  --border-color-subtle: rgba(74, 52, 33, 0.06);
+  --card-bg-inner: #FAF6F0;
+  --card-bg-hover: rgba(74, 52, 33, 0.04);
+  --bg-secondary: #F0EDE8;
+  --text-on-accent: #1A1510;
 
   /* Semantic text & surfaces (light) — align muted to warm grey-brown */
   --text: #1A1A1A;
@@ -102,11 +109,15 @@
   --accent: var(--accent-primary);
   --danger: var(--color-urgent);
   --danger-bg: rgba(193, 124, 94, 0.12);
+  --danger-muted: rgba(212, 151, 122, 0.12);
   --danger-border: rgba(193, 124, 94, 0.4);
 
   --hover: rgba(74, 52, 33, 0.06);
   --hover-light: rgba(166, 139, 91, 0.08);
   --active: rgba(139, 111, 71, 0.12);
+
+  --warning-muted: rgba(212, 184, 122, 0.12);
+  --sage-muted: rgba(139, 157, 123, 0.12);
 
   --pill-bg: #f0ede8;
   --pill-hover: #eadfd2;
@@ -243,10 +254,41 @@
 }
 
 :root[data-theme="dark"] {
+  /* Base dark mode variables — warm brown palette */
+  --bg-primary: #1A1510;
+  --bg-secondary: #221C15;
+  --card-bg: #252019;
+  --card-bg-hover: #2D271F;
+  --text-on-accent: #1A1510;
+  --card-bg-inner: #2D271F;
+  --border-color: #3D342B;
+  --border-color-subtle: #332B22;
+  --text-primary: #E8DFD0;
+  --text-secondary: #9C8B7A;
+  --text-muted: #7A6B5C;
+  --accent-primary: #C4A265;
+  --accent-secondary: #A68B5B;
+  --success: #A3B18A;
+  --success-muted: rgba(163, 177, 138, 0.15);
+  --warning: #D4B87A;
+  --warning-muted: rgba(212, 184, 122, 0.12);
+  --danger: #D4977A;
+  --danger-muted: rgba(212, 151, 122, 0.12);
+  --sage: #8B9D7B;
+  --sage-muted: rgba(139, 157, 123, 0.12);
+
   /* Global Design Language (dark): glass + inner glow */
   --glass-bg: rgba(15, 23, 42, 0.7);
   --glass-border: 1px solid rgba(255, 255, 255, 0.08);
   --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Page background — deep warm dark brown */
+  --bg: var(--bg-primary);
+  --panel: var(--bg-secondary);
+  --sidebar: var(--bg-secondary);
+  --bg-home: var(--bg-primary);
+  --bg-home-night: var(--bg-primary);
+  --restoration-bg: var(--bg-primary);
 
   --c-white: #f1f5f9;
   --c-greige: #8d7d6e;
@@ -255,146 +297,137 @@
   --c-olive: #6d6050;
   --c-cocoa: #2a1e15;
 
-  /* Solid black background across the app (no rhythm / no blue-grey) */
-  --bg: #0f172a;
-  --panel: #1e293b;
-  --sidebar: #1e293b;
-
-  --border: rgba(148, 163, 184, 0.2);
+  --border: var(--border-color);
 
   /* Semantic text (Dark) */
-  --text: #f1f5f9;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-dark: #f1f5f9;
-  --text-charcoal: #f1f5f9;
-  --text-muted-sage: #94a3b8;
-  --muted: #94a3b8;
+  --text: var(--text-primary);
+  --text-primary: #E8DFD0;
+  --text-secondary: #9C8B7A;
+  --text-dark: var(--text-primary);
+  --text-charcoal: var(--text-primary);
+  --text-muted-sage: var(--text-secondary);
+  --muted: var(--text-muted);
+  --text-muted: #7A6B5C;
 
-  --primary: #B89B7E;
+  --primary: var(--accent-primary);
   --primary-strong: #D4B896;
-  --sage: #a3b18a;
-  --accent: #B89B7E;
-  --danger: #d97a65;
-  --danger-bg: rgba(192, 90, 62, 0.2);
-  --danger-border: rgba(192, 90, 62, 0.5);
+  --sage: #8B9D7B;
+  --accent: var(--accent-primary);
+  --danger: var(--danger);
+  --danger-bg: var(--danger-muted);
+  --danger-border: rgba(212, 151, 122, 0.5);
 
-  --hover: rgba(148, 163, 184, 0.12);
-  --hover-light: rgba(148, 163, 184, 0.1);
-  --active: rgba(148, 163, 184, 0.18);
+  --hover: rgba(255, 255, 255, 0.06);
+  --hover-light: rgba(255, 255, 255, 0.04);
+  --active: var(--card-bg-inner);
 
-  --pill-bg: rgba(148, 163, 184, 0.15);
-  --pill-hover: rgba(148, 163, 184, 0.25);
+  --pill-bg: var(--card-bg-inner);
+  --pill-hover: var(--border-color);
 
-  --card-bg: #1e293b;
-  --bento-card-bg: var(--glass-bg);
-  --calendar-bg: #0f172a;
-  --weekbar-bg: #1e293b;
-  --search-bg: #141414;
+  --card-bg: #252019;
+  --bento-card-bg: var(--card-bg);
+  --calendar-bg: var(--bg-primary);
+  --weekbar-bg: var(--bg-secondary);
+  --search-bg: var(--bg-secondary);
   --btn-black: #262626;
   --btn-black-hover: #404040;
-  --event-card-bg: #1e293b;
+  --event-card-bg: var(--card-bg);
   --nav-btn-bg: #262626;
   --nav-btn-hover: #404040;
-  --sidebar-active: rgba(163, 177, 138, 0.2);
-  --user-details-text: #f1f5f9;
+  --sidebar-active: var(--sage-muted);
+  --user-details-text: var(--text-primary);
 
-  --surface: #1e293b;
+  --surface: var(--bg-secondary);
+
+  /* Widget card styling — ALL widgets same shade */
+  --widget-card-bg: var(--card-bg);
+  --widget-card-border: 1px solid var(--border-color);
+  --widget-title-color: var(--text-primary);
+  --widget-label-color: var(--text-muted);
+  --widget-body-color: var(--text-primary);
+  --widget-muted-color: var(--text-secondary);
+  --widget-inner-bg: var(--card-bg-inner);
+  --widget-inner-border: 1px solid var(--border-color);
+  --widget-accent-dark: var(--accent-primary);
+  --widget-success-dark: var(--success);
+  --widget-border-dark: var(--border-color);
+  --widget-text-primary-dark: var(--text-primary);
+  --widget-text-secondary-dark: var(--text-secondary);
 
   /* Topbar (dark) */
-  --topbar-bg: rgba(15, 23, 42, 0.95);
-  --topbar-border: rgba(148, 163, 184, 0.15);
+  --topbar-bg: rgba(26, 21, 16, 0.95);
+  --topbar-border: var(--border-color);
   --search-glass: rgba(255, 255, 255, 0.08);
 
-  /* Unified frame (sidebar + topbar): glassmorphism */
-  --frame-bg: rgba(30, 41, 59, 0.85);
-  --frame-border: rgba(148, 163, 184, 0.15);
+  /* Unified frame */
+  --frame-bg: rgba(34, 28, 21, 0.85);
+  --frame-border: var(--border-color);
   --frame-blur: 20px;
 
   --now-banner-bg: rgba(255, 255, 255, 0.08);
   --now-banner-bg-idle: rgba(255, 255, 255, 0.06);
 
-  /* Home: same slate, no time-based rhythm */
-  --bg-home: #0f172a;
-  --bg-home-night: #0f172a;
+  --success-bg: var(--success-muted);
+  --success-text: var(--success);
+  --error-bg: var(--danger-muted);
+  --error-text: var(--danger);
+  --error-border: rgba(212, 151, 122, 0.5);
+  --warning-bg: var(--warning-muted);
+  --warning-border: rgba(212, 184, 122, 0.35);
+  --warning-text: var(--warning);
 
-  --success-bg: rgba(140, 154, 134, 0.2);
-  --success-text: #a3b18a;
-  --error-bg: rgba(192, 90, 62, 0.2);
-  --error-text: #d97a65;
-  --error-border: rgba(192, 90, 62, 0.5);
-  --warning-bg: rgba(192, 90, 62, 0.15);
-  --warning-border: rgba(192, 90, 62, 0.4);
-  --warning-text: #d97a65;
+  --deadline-urgent-bg: var(--danger-muted);
+  --deadline-urgent-border: rgba(212, 151, 122, 0.5);
 
-  --deadline-urgent-bg: rgba(192, 90, 62, 0.15);
-  --deadline-urgent-border: rgba(192, 90, 62, 0.5);
-
-  --divider: rgba(180, 164, 144, 0.25);
-  --text-muted: rgba(200, 184, 164, 0.65);
+  --divider: var(--border-color-subtle);
   --scroll-btn-bg: #818cf8;
   --scroll-btn-hover: #6366f1;
 
   /* Daily Progress widget (dark) */
-  --color-terracotta: #d97a65;
-  --color-error-light: rgba(192, 90, 62, 0.25);
+  --color-terracotta: var(--danger);
+  --color-error-light: var(--danger-muted);
   --color-sage-dark: #5a7a6a;
   --color-orange-400: #fdba74;
-  --color-slate-400: #94a3b8;
-  --color-sage-primary: #8C9A86;
-  --color-sage-glow: rgba(140, 154, 134, 0.5);
-  --color-border-light: rgba(255, 255, 255, 0.12);
-  --glass-bg: rgba(30, 41, 59, 0.6);
+  --color-slate-400: var(--text-secondary);
+  --color-sage-primary: var(--sage);
+  --color-sage-glow: rgba(139, 157, 123, 0.5);
+  --color-border-light: var(--border-color);
   --growth-tank-deep: var(--color-sage-dark);
   --growth-tank-fill: var(--sage);
-  --timeline-now-line: #c4a35a;
-  --heatmap-empty: #1e293b;
-  --heatmap-low: #334155;
-  --heatmap-mid: #64748b;
+  --timeline-now-line: var(--accent-primary);
+  --heatmap-empty: var(--bg-secondary);
+  --heatmap-low: var(--border-color);
+  --heatmap-mid: var(--text-muted);
   --heatmap-high: var(--sage);
   --heatmap-full: var(--color-sage-dark);
 
-  /* Home page widgets: warm palette (same in dark for consistency) */
-  --home-sage: #8B9D7B;
-  --home-sage-light: #A3B18A;
+  /* Home page widgets: warm palette (dark) */
+  --home-sage: var(--sage);
+  --home-sage-light: var(--success);
   --home-sage-dark: #5C6B4F;
-  --home-gold: #C4A265;
+  --home-gold: var(--warning);
   --home-gold-light: #D4B87A;
-  --home-gold-dark: #A68B5B;
-  --home-terracotta: #C17C5E;
+  --home-gold-dark: var(--accent-secondary);
+  --home-terracotta: var(--danger);
   --home-terracotta-light: #D4977A;
-  --home-taupe: #9C8B7A;
-  --home-cream: #FAF6F0;
-  --home-cream-deep: #F5EDE3;
-  --home-flax: #F8F4EE;
-  --home-flax-mid: #F0E8DC;
-  --home-flax-deep: #E8DFD0;
-  --home-parchment-bg: #FBF5EB;
-  --home-parchment-border: #E2D5C5;
-  /* Canonical design palette (dark): same hex so widgets stay cohesive */
-  --accent-primary: #8B6F47;
-  --accent-secondary: #A68B5B;
-  --color-success: #8B9D7B;
-  --color-warning: #C4A265;
-  --color-urgent: #C17C5E;
-  --text-muted-warm: #8C7B6B;
-  --border-warm: #E2D5C5;
-  --card-bg-warm: #FFFDF9;
+  --home-taupe: var(--text-secondary);
+  --home-cream: var(--card-bg-inner);
+  --home-cream-deep: var(--card-bg-inner);
+  --home-flax: var(--card-bg-inner);
+  --home-flax-mid: var(--card-bg-inner);
+  --home-flax-deep: var(--border-color-subtle);
+  --home-parchment-bg: var(--card-bg-inner);
+  --home-parchment-border: var(--border-color);
 
-  /* Widget dark mode overrides (home page cards) */
-  --widget-card-bg: #1E1A16;
-  --widget-card-border: 1px solid #3D342B;
-  --widget-title-color: #E8DFD0;
-  --widget-label-color: #9C8B7A;
-  --widget-body-color: #E8DFD0;
-  --widget-muted-color: #9C8B7A;
-  --widget-inner-bg: #2A241E;
-  --widget-inner-border: 1px solid #3D342B;
-  --widget-accent-dark: #C4A265;
-  --widget-success-dark: #A3B18A;
-  --widget-text-primary-dark: #E8DFD0;
-  --widget-text-secondary-dark: #9C8B7A;
-  --widget-border-dark: #3D342B;
+  /* Canonical design palette (dark) */
+  --accent-primary: #C4A265;
+  --accent-secondary: #A68B5B;
+  --color-success: var(--sage);
+  --color-warning: var(--warning);
+  --color-urgent: var(--danger);
+  --text-muted-warm: var(--text-muted);
+  --border-warm: var(--border-color);
+  --card-bg-warm: var(--card-bg);
 }
 .MuiChartsAxis-tickLabel text,
 .MuiChartsLegend-label text {

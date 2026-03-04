@@ -14,11 +14,16 @@
 }
 
 .rootHasActive {
-  border-left-color: #8B6F47;
+  border-left-color: var(--accent-primary);
 }
 
 :root[data-theme="dark"] .rootHasActive {
-  border-left-color: var(--widget-accent-dark);
+  border-left-color: var(--accent-primary);
+}
+
+:root[data-theme="dark"] .root {
+  background: var(--card-bg);
+  border-color: var(--border-color);
 }
 
 /* ——— Header: pulsing dot + "Right Now" + live clock ——— */
@@ -33,14 +38,23 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #9ca3af;
+  background: var(--text-muted);
   flex-shrink: 0;
   transition: background 0.25s ease, box-shadow 0.25s ease;
 }
 
+:root[data-theme="dark"] .headerDot {
+  background: var(--text-muted);
+}
+
 .headerDotActive {
-  background: #8B9D7B;
+  background: var(--sage);
   animation: headerDotPulse 2s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .headerDotActive {
+  background: var(--sage);
+  box-shadow: 0 0 0 0 rgba(163, 177, 138, 0.4);
 }
 
 @keyframes headerDotPulse {
@@ -77,7 +91,7 @@
 
 .sectionDivider {
   height: 1px;
-  background: #E2D5C5;
+  background: var(--border-color);
   margin: 0;
   opacity: 0.6;
 }
@@ -134,28 +148,24 @@
   font-variant-numeric: tabular-nums;
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius-pill);
-  background: #F0E8DC;
-  color: #8B6F47;
-  border: 1px solid #E2D5C5;
+  background: var(--card-bg-inner);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
   transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
 }
 
 .progressTrack {
   height: 4px;
-  background: #F0E8DC;
+  background: var(--border-color);
   border-radius: var(--radius-pill);
   overflow: hidden;
   margin-top: 0.5rem;
   width: 100%;
 }
 
-:root[data-theme="dark"] .progressTrack {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .progressFill {
   height: 100%;
-  background: #8B6F47;
+  background: var(--accent-primary);
   border-radius: var(--radius-pill);
   transition: width 0.25s ease;
 }
@@ -260,10 +270,17 @@
   font-variant-numeric: tabular-nums;
   padding: 0.3rem 0.6rem;
   border-radius: var(--radius-pill);
-  background: #F0E8DC;
-  color: #8B6F47;
-  border: 1px solid #E2D5C5;
+  background: var(--card-bg-inner);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+:root[data-theme="dark"] .countdownPill {
+  background: var(--card-bg-inner);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
+  font-weight: 700;
 }
 
 .countdownIconUrgent {
@@ -300,15 +317,15 @@
 
 /* Dark: urgency badges */
 :root[data-theme="dark"] .countdownPillWarning {
-  background: rgba(166, 139, 91, 0.2);
-  border-color: var(--home-gold-dark);
-  color: var(--home-gold-light);
+  background: var(--warning-muted);
+  border-color: rgba(212, 184, 122, 0.35);
+  color: var(--warning);
 }
 
 :root[data-theme="dark"] .countdownPillUrgent {
-  background: rgba(193, 124, 94, 0.15);
-  border-color: var(--home-terracotta);
-  color: var(--home-terracotta-light);
+  background: var(--danger-muted);
+  border-color: rgba(212, 151, 122, 0.35);
+  color: var(--danger);
 }
 
 .noMoreEvents {
@@ -341,8 +358,16 @@
   color: var(--color-success);
 }
 
+:root[data-theme="dark"] .travelIconOk {
+  color: var(--sage);
+}
+
 .travelText {
   color: var(--widget-body-color);
+}
+
+:root[data-theme="dark"] .travelText {
+  color: var(--text-secondary);
 }
 
 /* Travel banner (TFL delays) — inner card style */
@@ -412,7 +437,7 @@
 }
 
 .otherLinesToggle:hover {
-  color: var(--widget-title-color);
+  color: var(--accent-primary);
   text-decoration: underline;
 }
 
@@ -423,30 +448,38 @@
   gap: 0.4rem;
   padding: 0.5rem 0.75rem;
   border-radius: var(--widget-inner-radius);
-  background: #FBF5EB;
-  border: 1px solid #E8D5B8;
+  background: var(--warning-muted);
+  border: 1px solid var(--danger-border);
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .conflictIcon {
   flex-shrink: 0;
-  color: #C17C5E;
+  color: var(--danger);
 }
 
 .conflictText {
   font-size: var(--widget-body-size);
   font-weight: 500;
-  color: var(--widget-body-color);
+  color: var(--danger);
 }
 
 :root[data-theme="dark"] .conflictRow {
-  background: rgba(251, 245, 235, 0.12);
-  border-color: rgba(232, 213, 184, 0.4);
+  background: rgba(212, 151, 122, 0.22);
+  border: 1px solid rgba(212, 151, 122, 0.4);
+}
+
+:root[data-theme="dark"] .conflictText {
+  color: #E8B4A0;
+}
+
+:root[data-theme="dark"] .conflictIcon {
+  color: #E8B4A0;
 }
 
 :root[data-theme="dark"] .travelBanner {
-  background: rgba(251, 245, 235, 0.12);
-  border-color: rgba(232, 213, 184, 0.35);
+  background: var(--card-bg-inner);
+  border-color: var(--border-color);
 }
 
 /* ——— Timer session block ——— */
@@ -481,5 +514,5 @@
 
 .timerBtn:hover {
   text-decoration: underline;
-  color: var(--widget-title-color);
+  color: var(--accent-primary);
 }

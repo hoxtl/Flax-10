@@ -56,7 +56,7 @@
   font-weight: 500;
   letter-spacing: 0.1em; /* tracking-widest */
   text-transform: uppercase;
-  color: #a8a29e; /* text-stone-400 */
+  color: var(--text-muted);
 }
 
 .headerDateRow {
@@ -66,7 +66,7 @@
 }
 
 .headerDateIcon {
-  color: #a8a29e; /* match stone-400 */
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
@@ -75,8 +75,20 @@
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #44403c;
+  color: var(--text-primary);
   margin: 0;
+}
+
+:root[data-theme="dark"] .headerTitle {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .headerLabel {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .headerDateIcon {
+  color: var(--text-muted);
 }
 
 @media (min-width: 768px) {
@@ -697,6 +709,17 @@
 }
 .bentoSlotVariantTasks .bentoIcon {
   color: #a8a29e;
+}
+
+:root[data-theme="dark"] .bentoSlot {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+:root[data-theme="dark"] .bentoSlotVariantTasks,
+:root[data-theme="dark"] .bentoSlotVariantDeadlines,
+:root[data-theme="dark"] .bentoSlotVariantFocus {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
 }
 
 .bentoSlotVariantDeadlines {
