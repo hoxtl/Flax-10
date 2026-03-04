@@ -17,9 +17,10 @@ from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from studyFlax.models import (
-    Category, Tag, RecurrenceRule, CalendarEvent, 
+    Category, Tag, RecurrenceRule, CalendarEvent,
     UserSettings, Module, Enrollment, Deadline,
-    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
+    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage,
+    TaskList, Task,
 )
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
@@ -99,7 +100,8 @@ class Command(BaseCommand):
         self.create_society_memberships()
         self.create_society_events()
         self.create_society_images()
-        #self.create_tasks()
+        self.create_task_lists()
+        self.create_tasks()
         self.create_study_sessions()
         self.print_stats()  
         
@@ -265,6 +267,176 @@ class Command(BaseCommand):
         Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
         self.stdout.write(f"  Created {len(enrollments)} enrollments.")
 
+    def create_task_lists(self):
+        """Create default task lists for each non-staff user (idempotent)."""
+        self.stdout.write("Seeding task lists...")
+        created = 0
+        # Lists relevant for a uni student: All Tasks (aggregate), then category lists
+        default_lists = [
+            ("All Tasks", None),
+            ("Personal", "#8C9A86"),
+            ("University", "#4A90D9"),
+            ("Reading list", "#0e7490"),
+            ("Internships", "#B45309"),
+            ("Finance", "#15803d"),
+            ("Budgeting", "#7e22ce"),
+        ]
+        for user in self.users:
+            for order, (name, color) in enumerate(default_lists):
+                existing = TaskList.objects.filter(user=user, name=name).first()
+                if not existing:
+                    TaskList.objects.create(user=user, name=name, color=color, order=order)
+                    created += 1
+        self.stdout.write(f"  Created {created} task lists.")
+
+    def create_tasks(self):
+        """Create ~5–6 sample tasks per list for fixture users (~30 total; idempotent: skip if user already has tasks)."""
+        self.stdout.write("Seeding tasks...")
+        from django.utils import timezone
+        from .seed_helpers import get_user_modules
+        now = timezone.now()
+        # ~5–6 tasks per list for ~30 total; (title, days_from_now, priority, description). University tasks get modules for pill display.
+        TASKS_BY_LIST = {
+            "Personal": [
+                ("Do the grocery shopping for the week", 0, "medium", "Get everything you need for meals and snacks."),
+                ("Go to the gym this evening", 1, "low", "Even a short session helps with focus and sleep."),
+                ("Call family at the weekend", 0, "medium", "Catch up and check in."),
+                ("Put on a load of laundry", 1, "low", "Stay on top of washing so you have clean clothes."),
+                ("Meal prep for Monday to Wednesday", 2, "medium", "Prep a few days of lunches or dinners to save time."),
+                ("Sort out the room and desk", 3, "low", "A tidy space helps you focus."),
+                ("Book a dentist check-up", 7, "low", "Get it in the diary before the term gets busy."),
+                ("Reply to urgent emails", 0, "high", "Clear the inbox so nothing slips."),
+                ("Plan what to do at the weekend", 5, "low", "Mix rest with one or two productive things."),
+                ("Update CV with latest project", 4, "medium", "Add recent work and skills so it's ready for applications."),
+                ("Buy a birthday gift for Mum", 10, "medium", "Order or pick something in good time."),
+                ("Organise the desk and cables", 2, "low", "Makes studying and working easier."),
+                ("Cancel the unused streaming subscription", 1, "low", "Trim recurring costs."),
+                ("Book a haircut for next week", 14, "low", "Schedule it before the week fills up."),
+                ("Review monthly goals and progress", 7, "medium", "See what's done and what to prioritise next."),
+            ],
+            "University": [
+                ("Review lecture notes from week 3", 0, "medium", "Consolidate the main concepts and note any gaps."),
+                ("Complete problem set 2 by Friday", 1, "high", "Work through each question and show your reasoning."),
+                ("Read chapter 2 and take notes", 2, "medium", "Focus on key definitions and examples."),
+                ("Prepare the group presentation slides", 1, "urgent", "Draft slides and assign sections; leave time for rehearsal."),
+                ("Submit the ethics assignment on KEATS", 0, "high", "Final read-through then submit before the deadline."),
+                ("Prep for the tutorial on Tuesday", 1, "medium", "Do the set questions and note anything to ask."),
+                ("Practice past papers for the January exam", 3, "low", "Timed conditions to get used to exam pressure."),
+                ("Draft the introduction and outline for the essay", 5, "high", "Get the structure and argument clear before writing the body."),
+                ("Write up the lab report for experiment 2", 2, "urgent", "Methods, results, and discussion; include figures and references."),
+                ("Make revision notes for the calculus module", 4, "medium", "Summarise theorems and worked examples."),
+                ("Finish the tutorial questions for week 4", 1, "high", "Complete all parts and check against solutions if available."),
+                ("Watch the week 5 lecture recording", 0, "medium", "Take notes and pause where you need to."),
+                ("Research literature for the dissertation proposal", 7, "medium", "Find key papers and start a short lit review."),
+                ("Compile the bibliography in APA style", 3, "low", "Use your reference manager and check formatting."),
+                ("Proofread chapter 2 of the essay", 1, "high", "Check flow, grammar, and that all sources are cited."),
+            ],
+            "Reading list": [
+                ("Finish the set reading for week 6", 2, "medium", "Complete the chapter and note discussion points."),
+                ("Read chapter 4 of the core textbook", 1, "high", "Focus on the main arguments and examples."),
+                ("Skim the recommended paper for the seminar", 0, "low", "Get the main idea and one or two takeaways."),
+                ("Take notes on the Rousseau extract", 3, "medium", "Summarise the argument and your own response."),
+                ("Read the case study before the tutorial", 1, "high", "Understand the scenario and possible approaches."),
+                ("Catch up on last week's reading", 0, "medium", "Prioritise the most relevant sections."),
+                ("Read the introduction to the new module", 5, "low", "Get an overview of themes and assessment."),
+                ("Summarise the key arguments from the paper", 2, "medium", "One paragraph per main point."),
+                ("Read the play before the theatre trip", 7, "low", "Familiarise yourself with the plot and characters."),
+                ("Go through the further reading list", 4, "low", "Pick one or two to add to your list."),
+                ("Read the chapter on probability theory", 3, "medium", "Work through the examples as you go."),
+                ("Finish the novel for the book club", 10, "low", "Leave time to note quotes and questions."),
+                ("Read the policy brief for the seminar", 1, "high", "Identify the recommendation and supporting evidence."),
+                ("Review the reading list for the essay", 5, "medium", "Tick off done and prioritise what to read next."),
+                ("Read the primary source for the source analysis", 2, "high", "Annotate and note context and bias."),
+            ],
+            "Internships": [
+                ("Update LinkedIn with the new project", 0, "medium", "Add a short description and any skills or outcomes."),
+                ("Apply to three graduate roles", 1, "high", "Tailor each application and cover letter."),
+                ("Prepare answers for the interview on Thursday", 2, "urgent", "Practice STAR examples and company research."),
+                ("Follow up with the recruiter by email", 3, "medium", "Thank them and confirm next steps."),
+                ("Draft a cover letter for the consulting role", 1, "high", "Match your experience to the job description."),
+                ("Research the company before the interview", 0, "medium", "Mission, recent news, and role requirements."),
+                ("Practice the case study for the assessment centre", 4, "medium", "Time yourself and structure your approach."),
+                ("Send a thank-you email after the interview", 0, "low", "Send within 24 hours."),
+                ("Update the portfolio with the latest work", 5, "medium", "Add projects and a short reflection."),
+                ("Prep for the networking event next week", 7, "low", "Prepare a short pitch and questions to ask."),
+                ("Review the job description and match skills", 0, "medium", "List evidence for each requirement."),
+                ("Prepare STAR examples for competency questions", 2, "high", "Have 3–4 strong examples ready."),
+                ("Schedule a mock interview with the careers service", 3, "medium", "Book a slot and prepare as for a real interview."),
+                ("Update CV for the finance role", 1, "high", "Emphasise relevant modules and experience."),
+                ("Check the status of the application", 2, "low", "Log in and note any next steps."),
+            ],
+            "Finance": [
+                ("Check the bank balance and pending payments", 0, "medium", "Make sure nothing unexpected is going out."),
+                ("Pay the rent before the due date", 0, "urgent", "Avoid late fees and mark as paid."),
+                ("Submit the expense claim for the trip", 1, "high", "Attach receipts and submit via the portal."),
+                ("Review subscriptions and cancel unused ones", 2, "low", "Trim monthly outgoings."),
+                ("Transfer £50 into the savings account", 0, "medium", "Keep the habit of saving a little each month."),
+                ("Sort receipts and log them for tax", 3, "low", "File digitally and note any tax-deductible items."),
+                ("Apply for student finance maintenance loan", 5, "high", "Complete the form and upload any documents."),
+                ("Claim the refund for the cancelled course", 7, "medium", "Follow the refund process and keep a record."),
+                ("Compare insurance quotes for next year", 4, "low", "Check cover and excess; renew or switch."),
+                ("Set up the standing order for the rent", 1, "medium", "Use the correct reference and date."),
+                ("Reconcile the bank statements", 2, "low", "Match transactions and flag anything odd."),
+                ("Research grants and bursaries to apply for", 10, "medium", "Note deadlines and requirements."),
+                ("Pay the utility bill before the weekend", 1, "high", "Avoid disconnection or late charges."),
+                ("Update tax details with the employer", 14, "low", "Submit the form so your code is correct."),
+                ("Review the budget for this term", 0, "medium", "Adjust categories and set a realistic target."),
+            ],
+            "Budgeting": [
+                ("Log this week's spending in the tracker", 0, "medium", "Record what you spent and which category."),
+                ("Plan the monthly budget for March", 1, "high", "Set limits per category and a small buffer."),
+                ("Cut discretionary spend for the next two weeks", 2, "medium", "Identify what to pause and stick to it."),
+                ("Set a savings goal for the summer", 0, "low", "Decide an amount and open or use a savings pot."),
+                ("Compare supermarket prices for the big shop", 1, "low", "Check deals and own-brand options."),
+                ("Meal plan to save on food this week", 3, "medium", "Plan meals and a short list to reduce waste."),
+                ("Cancel the unused gym membership", 1, "low", "Cancel in line with the contract."),
+                ("Track subscriptions and cancel one", 0, "medium", "Pick one you rarely use and cancel."),
+                ("Allocate leftover money to savings", 2, "low", "Move any surplus at the end of the month."),
+                ("Review last month's spending by category", 0, "medium", "See where the money went and adjust."),
+                ("Set a weekly spending limit", 0, "high", "Choose an amount and track daily."),
+                ("Find student discounts for the big purchase", 5, "low", "Check UNiDAYS, student beans, and direct offers."),
+                ("Plan the budget for the big purchase", 14, "medium", "Work out how much to set aside each week."),
+                ("Check the emergency fund balance", 7, "low", "Top up if needed."),
+                ("Reduce eating out to twice this week", 1, "medium", "Plan home meals for the rest."),
+            ],
+        }
+        fixture_usernames = [u["username"] for u in self.FIXTURE_USERS]
+        created = 0
+        for user in User.objects.filter(username__in=fixture_usernames):
+            if Task.objects.filter(user=user).exists():
+                continue
+            lists = list(TaskList.objects.filter(user=user).order_by("order", "id"))
+            if not lists:
+                continue
+            # Map list name -> list obj (exclude "All Tasks" for assigning tasks to a specific list)
+            list_by_name = {l.name: l for l in lists}
+            core_mods, extra_mods = get_user_modules(user, self.modules)
+            user_modules = list(core_mods) + list(extra_mods)
+            for list_name, task_specs in TASKS_BY_LIST.items():
+                task_list = list_by_name.get(list_name)
+                if not task_list:
+                    continue
+                # ~5–6 tasks per list (~30 total)
+                chosen = random.sample(task_specs, min(random.randint(5, 6), len(task_specs)))
+                for title, days_from_now, priority, description in chosen:
+                    due = (now + timedelta(days=days_from_now)).replace(hour=random.choice([9, 14, 18]), minute=0, second=0, microsecond=0) if days_from_now is not None else None
+                    if random.random() < 0.15:
+                        due = None
+                    module = random.choice(user_modules) if list_name == "University" and user_modules and random.random() < 0.85 else None
+                    Task.objects.create(
+                        user=user,
+                        task_list=task_list,
+                        module=module,
+                        title=title,
+                        description=description or "",
+                        completed=random.random() < 0.2,
+                        due_date=due,
+                        priority=priority,
+                        estimated_blocks=random.choice([1, 2, 3, 4]),
+                        time_spent_minutes=random.choice([0, 0, 0, 25, 50]) if random.random() < 0.3 else 0,
+                    )
+                    created += 1
+        self.stdout.write(f"  Created {created} tasks.")
 
     def create_study_sessions(self):
         """Seed StudySession and ThemeSession records for named fixture users.

@@ -10,3 +10,4 @@ from .society_serialisers import (
     SocietyEventCalendarSerialiser, get_society_color
 )
 from .deadline_serialisers import DeadlineSerialiser
+from .task_serialisers import TaskListSerialiser, TaskSerialiser

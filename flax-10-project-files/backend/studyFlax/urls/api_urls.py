@@ -3,7 +3,10 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 from studyFlax.views.timerViews import StudySessionViewSet
+from studyFlax.views.task_views import TaskListViewSet, TaskViewSet
 router.register(r'timer/history', StudySessionViewSet, basename='study-session')
+router.register(r'task-lists', TaskListViewSet, basename='task-list')
+router.register(r'tasks', TaskViewSet, basename='task')
 
 from studyFlax.views.social.share_views import CalendarShareViewSet
 router.register(r'social', CalendarShareViewSet, basename='social')

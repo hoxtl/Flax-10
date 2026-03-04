@@ -26,3 +26,6 @@ from .timer.themeSessionModel import ThemeSession
 
 # Social
 from .social import *
+
+# Tasks
+from .task import TaskList, Task
