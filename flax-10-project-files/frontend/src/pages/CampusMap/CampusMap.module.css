@@ -780,4 +780,27 @@
     position: relative;
     flex-direction: column;
   }
+
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    max-width: none;
+    height: 85vh;
+    z-index: 100;
+    border-radius: 20px 20px 0 0;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(0); 
+  }
+
+  .mapWrapper {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
