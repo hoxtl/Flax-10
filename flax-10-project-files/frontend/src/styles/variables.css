@@ -85,14 +85,15 @@
   --neutral: #6B7280;
 
   --bg: #F8F5F2;
+  --bg-primary: #F8F5F2;
   --panel: #FFFCFA;
   --sidebar: #EEEAE4;
   --border: rgba(74, 52, 33, 0.12);
   --border-default: var(--border-warm);
   --border-color: var(--border-warm);
-  --border-color-subtle: rgba(74, 52, 33, 0.06);
+  --border-color-subtle: #F0E8DC;
   --card-bg-inner: #FAF6F0;
-  --card-bg-hover: rgba(74, 52, 33, 0.04);
+  --card-bg-hover: #FAF6F0;
   --bg-secondary: #F0EDE8;
   --text-on-accent: #1A1510;
 
@@ -115,6 +116,7 @@
   --hover: rgba(74, 52, 33, 0.06);
   --hover-light: rgba(166, 139, 91, 0.08);
   --active: rgba(139, 111, 71, 0.12);
+  --bg-accent-subtle: #F0E8DC;
 
   --warning-muted: rgba(212, 184, 122, 0.12);
   --sage-muted: rgba(139, 157, 123, 0.12);
@@ -184,7 +186,6 @@
   --color-brown-light: var(--color-warning);
   --color-error-light: rgba(193, 124, 94, 0.15);
   --color-sage-dark: #3d5a52;
-  --color-orange-400: #fb923c;
   --color-slate-400: #94a3b8;
   --color-sage-primary: var(--color-success);
   --color-sage-glow: rgba(139, 157, 123, 0.5);
@@ -237,6 +238,9 @@
   --text-muted: #888;
   --scroll-btn-bg: #9E7E5D;
   --scroll-btn-hover: #8a6d4f;
+
+  /* Tasks page */
+  --tasks-title-color: #4A3728;
 
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
 }
@@ -320,6 +324,7 @@
   --hover: rgba(255, 255, 255, 0.06);
   --hover-light: rgba(255, 255, 255, 0.04);
   --active: var(--card-bg-inner);
+  --bg-accent-subtle: #2D271F;
 
   --pill-bg: var(--card-bg-inner);
   --pill-hover: var(--border-color);
@@ -383,11 +388,13 @@
   --scroll-btn-bg: #818cf8;
   --scroll-btn-hover: #6366f1;
 
+  /* Tasks page */
+  --tasks-title-color: var(--text-primary);
+
   /* Daily Progress widget (dark) */
   --color-terracotta: var(--danger);
   --color-error-light: var(--danger-muted);
   --color-sage-dark: #5a7a6a;
-  --color-orange-400: #fdba74;
   --color-slate-400: var(--text-secondary);
   --color-sage-primary: var(--sage);
   --color-sage-glow: rgba(139, 157, 123, 0.5);

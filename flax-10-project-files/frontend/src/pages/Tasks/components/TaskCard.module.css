@@ -8,31 +8,30 @@
     align-items: flex-start;
     gap: 10px;
     padding: 10px 12px;
-    background: transparent;
+    background: var(--card-bg);
     border: none;
     border-left: 3px solid transparent;
-    border-radius: 6px;
+    border-bottom: 1px solid var(--border-color-subtle);
+    border-radius: 0;
     transition: background 0.1s, border-color 0.2s, opacity 0.2s;
     overflow: hidden;
 }
 
 .card:hover {
-    background: rgba(123, 103, 81, 0.03);
+    background: var(--card-bg-hover);
 }
 
-/* Priority-based left accent borders (3px) */
-.cardAccentUrgent {
-    border-left-color: #f87171;
+/* Due-based left accent (warm palette) — no orange/priority accent */
+.cardDueOverdue {
+    border-left-color: var(--danger);
 }
-.cardAccentHigh {
-    border-left-color: #fb923c;
+.cardDueToday {
+    border-left-color: var(--accent-primary);
 }
-.cardAccentMedium {
-    border-left-color: #fcd34d;
+.cardDueTomorrow {
+    border-left-color: var(--accent-secondary);
 }
-.cardAccentLow {
-    border-left-color: #e7e5e4;
-}
+
 .cardDone {
     opacity: 1;
 }
@@ -45,10 +44,10 @@
 }
 
 .cardOverdue {
-    background: rgba(254, 242, 242, 0.5);
+    background: var(--card-bg);
 }
 .cardOverdue:hover {
-    background: rgba(254, 242, 242, 0.7);
+    background: var(--card-bg-hover);
 }
 
 .cardActiveTimer {
@@ -61,29 +60,39 @@
     50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent); }
 }
 
-/* Priority pill — text-xs font-medium */
+/* Priority pill — warm palette, no bright orange/red */
 .priorityPill {
     display: inline-flex;
     align-items: center;
     font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 12px;
     border: 1px solid transparent;
     letter-spacing: 0.01em;
     white-space: nowrap;
     line-height: 1.4;
 }
 .priority_urgent {
-    color: #b91c1c;
-    background: #fef2f2;
-    border-color: #fecaca;
+    color: var(--danger);
+    background: var(--danger-muted);
+    border-color: rgba(193, 124, 94, 0.2);
 }
 .priority_high {
-    color: #c2410c;
-    background: #fff7ed;
-    border-color: #fed7aa;
+    color: var(--warning);
+    background: var(--warning-muted);
+    border-color: rgba(196, 162, 101, 0.2);
+}
+.priority_medium {
+    color: var(--accent-primary);
+    background: rgba(139, 111, 71, 0.08);
+    border-color: rgba(139, 111, 71, 0.15);
+}
+.priority_low {
+    color: var(--sage);
+    background: var(--sage-muted);
+    border-color: rgba(139, 157, 123, 0.2);
 }
 
 /* ── Checkbox ── */
@@ -91,7 +100,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid var(--border);
+    border: 1.5px solid var(--border-color);
     background: transparent;
     flex-shrink: 0;
     margin-top: 2px;
@@ -102,13 +111,13 @@
 }
 
 .check:hover {
-    border-color: var(--list-color, var(--primary));
-    background: color-mix(in srgb, var(--list-color, var(--primary)) 8%, transparent);
+    border-color: var(--accent-secondary);
+    background: color-mix(in srgb, var(--accent-secondary) 8%, transparent);
 }
 
 .checkDone {
-    background: var(--list-color, var(--primary));
-    border-color: var(--list-color, var(--primary));
+    background: var(--sage);
+    border-color: var(--sage);
     animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .checkCircleDone {
@@ -116,8 +125,8 @@
     flex-shrink: 0;
 }
 .checkDoneCompleted {
-    background: #22c55e !important;
-    border-color: #22c55e !important;
+    background: var(--sage) !important;
+    border-color: var(--sage) !important;
 }
 .checkDoneCompleted .checkCircleDone {
     color: #fff;
@@ -233,8 +242,8 @@
 }
 
 .actionBarBtnDanger:hover {
-    background: color-mix(in srgb, #dc2626 12%, transparent);
-    color: #b91c1c;
+    background: var(--danger-muted);
+    color: var(--danger);
 }
 
 .actionIcon {
@@ -276,8 +285,8 @@
     gap: 8px;
 }
 .menuItem:hover { background: var(--hover); }
-.menuItemDanger { color: #b91c1c; }
-.menuItemDanger:hover { background: #fee2e2; }
+.menuItemDanger { color: var(--danger); }
+.menuItemDanger:hover { background: var(--danger-muted); }
 
 /* ── Title row: task name + date right-aligned ── */
 .titleRow {
@@ -286,19 +295,19 @@
     gap: 10px;
 }
 
-/* Task names: text-sm font-medium text-stone-800 */
+/* Task names: var(--text-primary) 0.9rem font-weight 500 */
 .title {
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 500;
-    color: #292524;
+    color: var(--text-primary);
     line-height: 1.4;
     word-break: break-word;
     flex: 1;
     min-width: 0;
 }
 
-/* Due date: text-xs text-stone-400 */
+/* Due date: icon + label, status colours */
 .dueLabel {
     display: inline-flex;
     align-items: center;
@@ -308,7 +317,7 @@
     font-weight: 400;
     white-space: nowrap;
     flex-shrink: 0;
-    color: #a8a29e;
+    color: var(--text-muted);
 }
 
 .titleClickable {
@@ -318,18 +327,23 @@
 
 .titleDone {
     text-decoration: line-through;
-    text-decoration-color: var(--c-greige, #B4A490);
-    color: var(--c-greige, #B4A490);
+    text-decoration-color: var(--text-muted);
+    color: var(--text-muted);
 }
 .titleDone.titleClickable:hover { text-decoration: line-through; }
 
 .dueLabelCompleted {
-    color: #78716c !important;
+    color: var(--text-muted) !important;
     font-weight: 500;
 }
 
+.duePillIcon {
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
 .searchHighlight {
-    background: rgba(196, 154, 75, 0.2);
+    background: rgba(139, 111, 71, 0.2);
     border-radius: 2px;
     padding: 0 1px;
 }
@@ -347,41 +361,65 @@
 }
 
 /* ── Due date status colours (applied to .dueLabel) ── */
-.duePillIcon {
-    flex-shrink: 0;
-}
 .due_overdue {
-    color: #b91c1c;
+    color: var(--danger);
     font-weight: 600;
 }
 .due_today {
-    color: #b91c1c;
+    color: var(--accent-primary);
     font-weight: 600;
 }
 .due_tomorrow {
-    color: #b45309;
-    font-weight: 600;
+    color: var(--text-secondary);
+    font-weight: 500;
 }
 .due_future {
-    color: #78716c;
+    color: var(--text-muted);
     font-weight: 400;
 }
 
-/* Module pill — same font as body, text-xs font-medium */
+/* List/category pill — card-bg-inner, muted dot, 0.7rem */
+.listIndicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    background: var(--card-bg-inner);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.15rem 0.55rem;
+}
+.listDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Module pill — same style as list pill, with BookOpen or accent-secondary dot */
 .modulePill {
     display: inline-flex;
     align-items: center;
+    gap: 5px;
     font-family: var(--font-body);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    border: 1px solid;
+    padding: 0.15rem 0.55rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
     white-space: nowrap;
     line-height: 1.4;
-    color: var(--c-greige, #B4A490);
-    background: rgba(123, 103, 81, 0.04);
+    color: var(--text-secondary);
+    background: var(--card-bg-inner);
     letter-spacing: 0.02em;
+}
+.modulePillIcon {
+    color: var(--accent-secondary);
+    flex-shrink: 0;
 }
 .modulePillLink {
     text-decoration: none;
@@ -394,27 +432,6 @@
 }
 .modulePillLink:active {
     opacity: 0.88;
-}
-
-/* List indicator pill — text-xs font-medium */
-.listIndicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    white-space: nowrap;
-    color: #44403c;
-    border: 1px solid;
-    border-radius: 999px;
-    padding: 2px 8px 2px 6px;
-}
-.listDot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
 }
 
 /* ════════════════════════════════════════════════
@@ -455,7 +472,7 @@
     top: 0;
     bottom: 0;
     width: 5px;
-    background: var(--info-accent, #84A98C);
+    background: var(--info-accent, var(--sage));
     opacity: 1;
 }
 
@@ -464,8 +481,8 @@
     align-items: center;
     gap: 10px;
     padding: 12px 16px 10px 20px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--info-accent, #84A98C) 12%, transparent) 0%, color-mix(in srgb, var(--info-accent, #84A98C) 6%, transparent) 100%);
-    border-bottom: 1px solid color-mix(in srgb, var(--info-accent, #84A98C) 25%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--info-accent, var(--sage)) 12%, transparent) 0%, color-mix(in srgb, var(--info-accent, var(--sage)) 6%, transparent) 100%);
+    border-bottom: 1px solid color-mix(in srgb, var(--info-accent, var(--sage)) 25%, transparent);
 }
 
 .infoModalIcon {
@@ -500,7 +517,7 @@
     width: 28px;
     height: 28px;
     border-radius: 8px;
-    background: color-mix(in srgb, var(--info-accent, #84A98C) 15%, transparent);
+    background: color-mix(in srgb, var(--info-accent, var(--sage)) 15%, transparent);
     border: none;
     color: var(--text);
     font-size: 0.875rem;
@@ -511,7 +528,7 @@
     transition: background 0.2s, color 0.2s;
 }
 .infoModalClose:hover {
-    background: color-mix(in srgb, var(--info-accent, #84A98C) 28%, transparent);
+    background: color-mix(in srgb, var(--info-accent, var(--sage)) 28%, transparent);
     color: var(--text);
 }
 
@@ -525,9 +542,9 @@
 .infoHero {
     margin-bottom: 12px;
     padding: 10px 12px;
-    background: color-mix(in srgb, var(--info-accent, #84A98C) 8%, #fff);
+    background: color-mix(in srgb, var(--info-accent, var(--sage)) 8%, #fff);
     border-radius: 10px;
-    border: 1px solid color-mix(in srgb, var(--info-accent, #84A98C) 20%, transparent);
+    border: 1px solid color-mix(in srgb, var(--info-accent, var(--sage)) 20%, transparent);
 }
 
 .infoHeroTitle {
@@ -561,9 +578,9 @@
     justify-content: space-between;
     gap: 8px;
     padding: 6px 10px;
-    background: color-mix(in srgb, var(--info-accent, #84A98C) 6%, rgba(255, 255, 255, 0.6));
+    background: color-mix(in srgb, var(--info-accent, var(--sage)) 6%, rgba(255, 255, 255, 0.6));
     border-radius: 8px;
-    border: 1px solid color-mix(in srgb, var(--info-accent, #84A98C) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--info-accent, var(--sage)) 12%, transparent);
 }
 
 .infoRowFull {
@@ -580,11 +597,11 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: color-mix(in srgb, var(--info-accent, #84A98C) 70%, var(--muted));
+    color: color-mix(in srgb, var(--info-accent, var(--sage)) 70%, var(--muted));
 }
 .infoLabel svg {
     opacity: 0.9;
-    color: var(--info-accent, #84A98C);
+    color: var(--info-accent, var(--sage));
 }
 
 .infoVal {
@@ -612,8 +629,8 @@
     justify-content: space-between;
     gap: 10px;
     padding: 10px 16px 12px 20px;
-    border-top: 1px solid color-mix(in srgb, var(--info-accent, #84A98C) 15%, transparent);
-    background: color-mix(in srgb, var(--info-accent, #84A98C) 5%, #faf8f5);
+    border-top: 1px solid color-mix(in srgb, var(--info-accent, var(--sage)) 15%, transparent);
+    background: color-mix(in srgb, var(--info-accent, var(--sage)) 5%, var(--card-bg-inner));
     flex-shrink: 0;
 }
 
@@ -723,7 +740,7 @@
 .editInput {
     padding: 8px 12px;
     background: #fff;
-    border: 1px solid var(--sage, #52796f);
+    border: 1px solid var(--sage);
     border-radius: 8px;
     font-family: inherit;
     font-size: 0.875rem;
@@ -733,12 +750,12 @@
     width: 100%;
     box-sizing: border-box;
 }
-.editInput:focus { border-color: var(--color-sage-dark, #3d5a52); }
+.editInput:focus { border-color: var(--color-sage-dark); }
 
 .editDesc {
     padding: 8px 12px;
     background: #fff;
-    border: 1px solid var(--sage, #52796f);
+    border: 1px solid var(--sage);
     border-radius: 8px;
     font-family: inherit;
     font-size: 0.875rem;
@@ -750,7 +767,7 @@
     transition: border-color 0.15s;
 }
 
-.editDesc:focus { border-color: var(--color-sage-dark, #3d5a52); }
+.editDesc:focus { border-color: var(--color-sage-dark); }
 
 .editFooter {
     display: flex;
@@ -764,7 +781,7 @@
 .editDeleteLink {
     font-size: 0.8rem;
     font-weight: 500;
-    color: #9f1239;
+    color: var(--danger);
     background: none;
     border: none;
     cursor: pointer;
@@ -774,7 +791,7 @@
     transition: color 0.15s;
 }
 .editDeleteLink:hover {
-    color: #b91c1c;
+    color: var(--danger);
 }
 
 .editFooterActions {
@@ -845,10 +862,10 @@
 .ctxItem svg { color: #9a8b7a; flex-shrink: 0; transition: color 0.12s; }
 .ctxItem:hover { background: rgba(123, 103, 81, 0.07); }
 .ctxItem:hover svg { color: #6b5a49; }
-.ctxItemDanger { color: #c53030; }
-.ctxItemDanger svg { color: #c53030; opacity: 0.7; }
-.ctxItemDanger:hover { background: rgba(197, 48, 48, 0.06); }
-.ctxItemDanger:hover svg { color: #c53030; opacity: 1; }
+.ctxItemDanger { color: var(--danger); }
+.ctxItemDanger svg { color: var(--danger); opacity: 0.7; }
+.ctxItemDanger:hover { background: var(--danger-muted); }
+.ctxItemDanger:hover svg { color: var(--danger); opacity: 1; }
 .ctxItemActive {
     background: rgba(123, 103, 81, 0.08);
     font-weight: 600;

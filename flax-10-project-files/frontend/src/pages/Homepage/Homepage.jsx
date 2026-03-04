@@ -1272,7 +1272,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
             {selectedDeadline.location && (
               <p className={styles.deadlineDetailMeta}>📍 {selectedDeadline.location}</p>
             )}
-            {(selectedDeadline.module_id ?? selectedDeadline.module || selectedDeadline.module_code) && (
+            {((selectedDeadline.module_id ?? selectedDeadline.module) || selectedDeadline.module_code) && (
               <button
                 type="button"
                 className={styles.deadlineDetailLink}

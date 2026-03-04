@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Lightbulb } from "lucide-react";
 import styles from "./EstTimeHelpBanner.module.css";
 
 const STORAGE_KEY = "flax-est-time-banner-dismissed-v2";
@@ -55,7 +56,9 @@ export default function EstTimeHelpBanner({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
     >
-      <span className={styles.icon} aria-hidden>💡</span>
+      <span className={styles.icon} aria-hidden>
+        <Lightbulb size={18} strokeWidth={2} />
+      </span>
       <p className={styles.text}>{message}</p>
       <div className={styles.actions}>
         <button

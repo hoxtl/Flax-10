@@ -1,9 +1,18 @@
 // list side bar for the task page
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Pencil, Trash2, Archive } from "lucide-react";
+import { Pencil, Trash2, Archive, CalendarDays, AlertTriangle, ListTodo } from "lucide-react";
 import styles from "./ListSidebar.module.css";
-import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
+
+/** Muted warm dot colors for lists (warm brown/flax language) */
+const TASKS_SIDEBAR_LIST_COLORS = [
+  "#9C8B7A",
+  "#8B9D7B",
+  "#A68B5B",
+  "#8B7D9C",
+  "#7B8F8B",
+  "#C4A265",
+];
 
 function isRoutineOrEventTask(task) {
   if (!task) return false;
@@ -23,7 +32,7 @@ function listColour(list, idx) {
             if (stored) return stored;
         }
     } catch (_) {}
-    return FOCUS_BLOCK_COLOURS_HEX[idx % FOCUS_BLOCK_COLOURS_HEX.length];
+    return TASKS_SIDEBAR_LIST_COLORS[idx % TASKS_SIDEBAR_LIST_COLORS.length];
 }
 
 function RenameInput({ value, onSave, onCancel}) {
@@ -106,9 +115,9 @@ export default function ListSidebar({
     const listsWithoutAllTasks = lists.filter((l) => (l.name || "").trim() !== "All Tasks");
 
     const smartFilters = [
-        { id: "all",   label: "All tasks", emoji: "📋", count: allCount },
-        { id: "today", label: "Today",     emoji: "📅", count: todayCount },
-        ...(overdueCount > 0 ? [{ id: "overdue", label: "Overdue", emoji: "⚠️", count: overdueCount, danger: true }] : []),
+        { id: "all",   label: "All tasks", icon: ListTodo, count: allCount },
+        { id: "today", label: "Today",     icon: CalendarDays, count: todayCount },
+        ...(overdueCount > 0 ? [{ id: "overdue", label: "Overdue", icon: AlertTriangle, count: overdueCount, danger: true }] : []),
     ];
 
     const handleCtxMenu = useCallback((e, listId) => {
@@ -121,19 +130,24 @@ export default function ListSidebar({
             {/* ── Views ── */}
             <div className={styles.sectionLabel}>VIEWS</div>
             <nav className={styles.nav}>
-                {smartFilters.map(f => (
-                    <button
-                        key={f.id}
-                        className={`${styles.navItem} ${!activeListId && activeFilter === f.id ? styles.navActive : ""} ${f.danger ? styles.navDanger : ""}`}
-                        onClick={() => { onSelectList(null); onSelectFilter(f.id); }}
-                    >
-                        <span className={styles.navEmoji}>{f.emoji}</span>
-                        <span className={styles.navLabel}>{f.label}</span>
-                        {f.count > 0 && (
-                            <span className={`${styles.navCount} ${f.danger ? styles.navCountDanger : ""}`}>{f.count}</span>
-                        )}
-                    </button>
-                ))}
+                {smartFilters.map(f => {
+                    const Icon = f.icon;
+                    return (
+                        <button
+                            key={f.id}
+                            className={`${styles.navItem} ${!activeListId && activeFilter === f.id ? styles.navActive : ""} ${f.danger ? styles.navDanger : ""}`}
+                            onClick={() => { onSelectList(null); onSelectFilter(f.id); }}
+                        >
+                            <span className={styles.navEmoji}>
+                                <Icon size={16} strokeWidth={2} style={{ color: f.danger ? "var(--danger)" : (!activeListId && activeFilter === f.id ? "var(--accent-primary)" : "inherit") }} />
+                            </span>
+                            <span className={styles.navLabel}>{f.label}</span>
+                            {f.count > 0 && (
+                                <span className={`${styles.navCount} ${f.danger ? styles.navCountDanger : ""}`}>{f.count}</span>
+                            )}
+                        </button>
+                    );
+                })}
             </nav>
 
             {/* ── Lists ── */}

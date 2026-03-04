@@ -94,7 +94,7 @@ function DeadlineRow({ deadline, onSelect, onOpenModule }) {
     ? deadline.deadline_type.charAt(0).toUpperCase() + deadline.deadline_type.slice(1)
     : "";
   const daysLabel = getDaysLabel(due);
-  const moduleIdOrCode = deadline.module_id ?? deadline.module ?? moduleCode || null;
+  const moduleIdOrCode = (deadline.module_id ?? deadline.module ?? moduleCode) || null;
 
   return (
     <div

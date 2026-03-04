@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════
-   ListSidebar
+   ListSidebar — warm brown/flax design language
    ════════════════════════════════════════════════ */
 
 .sidebar {
@@ -7,8 +7,8 @@
     min-width: 220px;
     max-width: 220px;
     flex-shrink: 0;
-    border-right: 1px solid var(--frame-border);
-    background: var(--panel);
+    border-right: 1px solid var(--border-color);
+    background: var(--bg-secondary);
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
@@ -17,65 +17,26 @@
     gap: 8px;
 }
 
-/* ── New task button ── */
-.newTaskBtn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 8px 16px;
-    background: var(--primary);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 12px;
-    transition: opacity 0.15s;
-}
-.newTaskBtn:hover { opacity: 0.88; }
-
-.newTaskPlus {
-    font-size: 1.1rem;
-    line-height: 1;
-    font-weight: 400;
-}
-
-/* ── Section labels ── */
+/* ── Section labels (VIEWS, LISTS) ── */
 .sectionLabel {
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #a8a29e;
+    color: var(--text-muted);
     padding: 8px 8px 4px;
     margin-top: 8px;
 }
 
-.newListBtn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1rem;
-    font-family: inherit;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    line-height: 1;
-    transition: background 0.1s, color 0.1s;
+.sectionLabel:first-child {
+    margin-top: 0;
 }
-.newListBtn:hover { background: var(--hover); color: var(--text); }
 
-/* ── Nav (smart filters) ── */
+/* ── Nav (smart filters: All tasks, Today, Overdue) ── */
 .nav {
     display: flex;
     flex-direction: column;
@@ -93,43 +54,52 @@
     background: none;
     border: none;
     border-radius: 12px;
+    border-left: 3px solid transparent;
     cursor: pointer;
     text-align: left;
     font-family: inherit;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-    color: var(--text);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
 }
+
 .navItem:hover {
     background: var(--hover);
-    transform: translateX(2px);
 }
-.navItem:active { transform: scale(0.98); }
 
 .navActive {
-    background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
-    color: var(--primary);
-    transform: translateX(2px);
+    background: var(--bg-accent-subtle) !important;
+    color: var(--accent-primary);
+    border-left-color: var(--accent-primary);
 }
-.navActive .navLabel { color: var(--primary); font-weight: 700; }
-.navActive .navEmoji { filter: none; }
 
-.navDanger .navLabel { color: #ef4444; }
-.navDanger .navEmoji { filter: none; }
+.navActive .navLabel {
+    color: var(--accent-primary);
+    font-weight: 500;
+}
+
+.navDanger .navLabel {
+    color: var(--danger);
+}
 
 .navEmoji {
     font-size: 0.82rem;
     flex-shrink: 0;
     width: 18px;
-    text-align: center;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .navLabel {
     flex: 1;
     min-width: 0;
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    color: var(--text);
+    color: inherit;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -137,18 +107,21 @@
 
 .navCount {
     font-family: var(--font-body);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
-    background: var(--border);
-    color: var(--muted);
-    border-radius: 9999px;
+    background: var(--card-bg-inner);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
     padding: 0.08rem 0.42rem;
     min-width: 18px;
     text-align: center;
 }
+
 .navCountDanger {
-    background: #fee2e2;
-    color: #ef4444;
+    background: var(--danger-muted);
+    color: var(--danger);
+    border-color: var(--danger-border, rgba(193, 124, 94, 0.25));
 }
 
 /* ── List items ── */
@@ -159,22 +132,24 @@
     min-width: 0;
     border-radius: 8px;
     border-left: 3px solid transparent;
-    transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease;
+    transition: background 0.2s ease, border-color 0.25s ease;
 }
+
 .listItem:hover {
-    background: rgba(74, 55, 40, 0.04);
-    transform: translateX(2px);
+    background: var(--hover);
 }
+
 .listItem:hover .listDelete { opacity: 1; }
 
 .listActive {
-    background: rgba(74, 55, 40, 0.06) !important;
-    font-weight: 600;
-    border-left-color: #4a3728;
-    padding-left: 9px;
-    transform: translateX(2px);
+    background: var(--bg-accent-subtle) !important;
+    border-left-color: var(--accent-primary);
 }
-.listActive .listName { color: var(--text); font-weight: 600; }
+
+.listActive .listName {
+    color: var(--text-primary);
+    font-weight: 600;
+}
 
 .listBtn {
     flex: 1;
@@ -197,20 +172,13 @@
     flex-shrink: 0;
 }
 
-.listIcon {
-    font-size: 0.82rem;
-    flex-shrink: 0;
-    width: 18px;
-    text-align: center;
-}
-
 .listName {
     flex: 1;
     min-width: 0;
     font-family: var(--font-body);
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -220,35 +188,14 @@
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    color: #8a7d76;
-    background: #f5f0ed;
-    border-radius: 8px;
+    color: var(--text-muted);
+    background: var(--card-bg-inner);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
     padding: 1px 6px;
     min-width: 18px;
     text-align: center;
     flex-shrink: 0;
-}
-
-.listDelete {
-    opacity: 0;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.6rem;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 12px;
-    transition: opacity 0.15s, background 0.1s, color 0.1s;
-    flex-shrink: 0;
-}
-.listDelete:hover { background: #fee2e2; color: #ef4444; }
-
-.emptyLists {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    color: var(--muted);
-    padding: 0.4rem 0.55rem;
-    margin: 0;
 }
 
 /* ── Create new list button ── */
@@ -257,9 +204,9 @@
     margin-top: 8px;
     padding: 8px 12px;
     background: none;
-    border: 1.5px dashed #b0a59e;
+    border: 1.5px dashed var(--border-color);
     border-radius: 6px;
-    color: #b0a59e;
+    color: var(--text-muted);
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 500;
@@ -267,17 +214,18 @@
     text-align: center;
     transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
+
 .createListBtn:hover {
-    color: #4a3728;
-    border-color: #4a3728;
-    background: rgba(74, 55, 40, 0.04);
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    background: var(--hover);
 }
 
 /* ── Rename input ── */
 .renameInput {
     flex: 1;
     padding: 8px 12px;
-    border: 1.5px solid var(--primary);
+    border: 1.5px solid var(--accent-primary);
     border-radius: 12px;
     background: var(--bg);
     color: var(--text);
@@ -290,16 +238,17 @@
 /* ── Context menu ── */
 .ctxMenu {
     position: fixed;
-    background: var(--panel, #FFFCFA);
-    border: 1px solid rgba(74, 52, 33, 0.1);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     z-index: 500;
     min-width: 160px;
     overflow: hidden;
     padding: 3px;
     animation: ctxPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 @keyframes ctxPop {
     from { opacity: 0; transform: translateY(-6px) scale(0.96); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -315,31 +264,50 @@
     font-family: var(--font-body);
     font-size: 0.76rem;
     font-weight: 500;
-    color: #3d3228;
+    color: var(--text-primary);
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 7px;
     transition: background 0.12s, color 0.12s;
 }
-.ctxItem svg { color: #9a8b7a; flex-shrink: 0; transition: color 0.12s; }
-.ctxItem:hover { background: rgba(123, 103, 81, 0.07); }
-.ctxItem:hover svg { color: #6b5a49; }
-.ctxDelete { color: #c53030; }
-.ctxDelete svg { color: #c53030; opacity: 0.7; }
-.ctxDelete:hover { background: rgba(197, 48, 48, 0.06); }
-.ctxDelete:hover svg { color: #c53030; opacity: 1; }
+
+.ctxItem svg {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.ctxItem:hover {
+    background: var(--hover);
+}
+
+.ctxItem:hover svg {
+    color: var(--accent-primary);
+}
+
+.ctxDelete {
+    color: var(--danger);
+}
+
+.ctxDelete svg {
+    color: var(--danger);
+    opacity: 0.8;
+}
+
+.ctxDelete:hover {
+    background: var(--danger-muted);
+}
 
 .ctxDivider {
     height: 1px;
-    background: rgba(74, 52, 33, 0.07);
+    background: var(--border-color);
     margin: 2px 6px;
 }
 
 /* ── Archive section ── */
 .archiveSection {
     margin-top: 0.75rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-color);
     padding-top: 0.6rem;
 }
 
@@ -354,12 +322,15 @@
     font-family: inherit;
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--text-muted);
     cursor: pointer;
     border-radius: 12px;
     transition: background 0.1s;
 }
-.archiveToggle:hover { background: var(--hover); }
+
+.archiveToggle:hover {
+    background: var(--hover);
+}
 
 .archiveList {
     display: flex;
@@ -374,7 +345,7 @@
     gap: 0.4rem;
     padding: 0.3rem 0.55rem;
     font-size: 0.78rem;
-    color: var(--muted);
+    color: var(--text-muted);
 }
 
 .archiveActions {
@@ -398,8 +369,8 @@
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--accent-primary);
+    background: var(--bg-accent-subtle);
     border: none;
     border-radius: 9999px;
     padding: 0.18rem 0.5rem;
@@ -407,18 +378,63 @@
     flex-shrink: 0;
     transition: background 0.1s;
 }
-.restoreBtn:hover { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+
+.restoreBtn:hover {
+    background: var(--hover-light);
+}
 
 .deletePermanentBtn {
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    color: #dc2626;
-    background: color-mix(in srgb, #dc2626 10%, transparent);
+    color: var(--danger);
+    background: var(--danger-muted);
     border: none;
     border-radius: 9999px;
     padding: 0.18rem 0.5rem;
     cursor: pointer;
     transition: background 0.1s;
 }
-.deletePermanentBtn:hover { background: color-mix(in srgb, #dc2626 20%, transparent); }
+
+.deletePermanentBtn:hover {
+    background: rgba(193, 124, 94, 0.2);
+}
+
+.emptyLists {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    padding: 0.4rem 0.55rem;
+    margin: 0;
+}
+
+.newTaskBtn,
+.newTaskPlus,
+.newListBtn {
+    /* legacy – kept for reference */
+}
+
+.listDelete {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.6rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    transition: opacity 0.15s, background 0.1s, color 0.1s;
+    flex-shrink: 0;
+}
+
+.listDelete:hover {
+    background: var(--danger-muted);
+    color: var(--danger);
+}
+
+.listIcon {
+    font-size: 0.82rem;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}

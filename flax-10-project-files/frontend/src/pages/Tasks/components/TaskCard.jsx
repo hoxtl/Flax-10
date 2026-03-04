@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft, Flag, Zap, List, BookOpen, MousePointer2 } from "lucide-react";
+import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft, Flag, Zap, List, BookOpen, MousePointer2, AlertCircle } from "lucide-react";
 
 import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { useAppNav } from "../../../context/AppNavContext";
+import { useModuleModal } from "../../../context/ModuleModalContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import DateTimePicker from "./DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
@@ -13,15 +14,18 @@ import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 
 import styles from "./TaskCard.module.css";
 
+/**
+ * Legacy module colors (e.g. for modals) — warm/muted variants only; pill uses CSS vars.
+ */
 const MODULE_COLORS = [
-    { text: "#9a3412", bg: "rgba(251, 146, 60, 0.18)", border: "rgba(234, 88, 12, 0.35)" },    // orange
-    { text: "#1d4ed8", bg: "rgba(96, 165, 250, 0.18)", border: "rgba(59, 130, 246, 0.35)" },    // blue
-    { text: "#15803d", bg: "rgba(74, 222, 128, 0.16)", border: "rgba(22, 163, 74, 0.32)" },     // green
-    { text: "#7e22ce", bg: "rgba(192, 132, 252, 0.16)", border: "rgba(147, 51, 234, 0.32)" },   // purple
-    { text: "#b45309", bg: "rgba(252, 211, 77, 0.20)", border: "rgba(245, 158, 11, 0.35)" },    // amber
-    { text: "#be123c", bg: "rgba(251, 113, 133, 0.16)", border: "rgba(225, 29, 72, 0.30)" },    // rose
-    { text: "#0e7490", bg: "rgba(34, 211, 238, 0.15)", border: "rgba(6, 182, 212, 0.32)" },     // cyan
-    { text: "#4338ca", bg: "rgba(165, 180, 252, 0.18)", border: "rgba(99, 102, 241, 0.32)" },   // indigo
+    { text: "#8B6F47", bg: "rgba(139, 111, 71, 0.12)", border: "rgba(139, 111, 71, 0.25)" },
+    { text: "#7B8F8B", bg: "rgba(123, 143, 139, 0.12)", border: "rgba(123, 143, 139, 0.25)" },
+    { text: "#8B9D7B", bg: "rgba(139, 157, 123, 0.12)", border: "rgba(139, 157, 123, 0.25)" },
+    { text: "#8B7D9C", bg: "rgba(139, 125, 156, 0.12)", border: "rgba(139, 125, 156, 0.25)" },
+    { text: "#A68B5B", bg: "rgba(166, 139, 91, 0.12)", border: "rgba(166, 139, 91, 0.25)" },
+    { text: "#C17C5E", bg: "rgba(193, 124, 94, 0.12)", border: "rgba(193, 124, 94, 0.25)" },
+    { text: "#5a7a6a", bg: "rgba(90, 122, 106, 0.12)", border: "rgba(90, 122, 106, 0.25)" },
+    { text: "#6B5344", bg: "rgba(107, 83, 68, 0.12)", border: "rgba(107, 83, 68, 0.25)" },
 ];
 
 function getModuleColor(code) {
@@ -199,7 +203,7 @@ function TaskInfoModal({ task, listName, listColor, onClose }) {
         <div className={styles.modalBackdrop} onMouseDown={onClose}>
             <div
                 className={styles.infoModal}
-                style={{ "--info-accent": listColor || "#84A98C" }}
+                style={{ "--info-accent": listColor || "var(--sage)" }}
                 onMouseDown={e => e.stopPropagation()}
             >
                 <div className={styles.infoModalAccent} aria-hidden />
@@ -372,13 +376,14 @@ export default function TaskCard({
     const burstTimeoutRef = useRef(null);
     const nav = useNavigate();
     const { setActiveNav } = useAppNav() || {};
+    const { openModuleModal } = useModuleModal();
     const { setActiveTaskId } = useTimerContext();
     const { showCompletionToast } = useTaskCompletion();
     const activeTimerTaskId = useActiveTimerTaskId();
     const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
 
     const due = formatDueDate(task.due_date);
-    const showPriority = task.priority === "urgent" || task.priority === "high";
+    const showPriority = task.priority && ["urgent", "high", "medium", "low"].includes(task.priority);
 
     const handleCheckClick = () => {
         const wasIncomplete = !task.completed;
@@ -409,21 +414,19 @@ export default function TaskCard({
         setCtxMenu({ x: e.clientX, y: e.clientY });
     }, []);
 
-    const accentCls = !task.completed && task.priority === "urgent"
-        ? styles.cardAccentUrgent
-        : !task.completed && task.priority === "high"
-        ? styles.cardAccentHigh
-        : !task.completed && task.priority === "medium"
-        ? styles.cardAccentMedium
-        : !task.completed && (task.priority === "low" || !task.priority)
-        ? styles.cardAccentLow
+    const accentCls = !task.completed && due?.status === "overdue"
+        ? styles.cardDueOverdue
+        : !task.completed && due?.status === "today"
+        ? styles.cardDueToday
+        : !task.completed && due?.status === "tomorrow"
+        ? styles.cardDueTomorrow
         : "";
 
     return (
         <>
             <div
                 className={`${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`}
-                style={{ "--list-color": listColor || "#a89890" }}
+                style={{ "--list-color": listColor || "var(--text-muted)" }}
                 onContextMenu={handleContextMenu}
                 title="Right-click for more options"
             >
@@ -452,7 +455,9 @@ export default function TaskCard({
                         </span>
                         {due && !hideDueBadge && (
                             <span className={`${styles.dueLabel} ${task.completed && isCompletedSection ? styles.dueLabelCompleted : ""} ${styles[`due_${due.status}`]}`}>
-                                {(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}
+                                {due.status === "overdue" && !(task.completed && isCompletedSection) && <AlertCircle size={12} className={styles.duePillIcon} aria-hidden />}
+                                {due.status === "today" && !(task.completed && isCompletedSection) && <Clock size={12} className={styles.duePillIcon} aria-hidden />}
+                                {due.status === "tomorrow" && !(task.completed && isCompletedSection) && <CalendarDays size={12} className={styles.duePillIcon} aria-hidden />}
                                 {task.completed && isCompletedSection ? getCompletedDueLabel(task.due_date) : due.label}
                             </span>
                         )}
@@ -467,32 +472,27 @@ export default function TaskCard({
                         {listName && !hideListBadge && (
                             <span
                                 className={styles.listIndicator}
-                                style={{
-                                    "--lc": listColor || "#a89890",
-                                    background: `color-mix(in srgb, ${listColor || "#a89890"} 12%, transparent)`,
-                                    borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 25%, transparent)`,
-                                }}
                             >
-                                <span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />
+                                <span className={styles.listDot} style={{ background: listColor || "var(--text-muted)" }} />
                                 {listName}
                             </span>
                         )}
                         {task.module_code && (() => {
-                            const mc = getModuleColor(task.module_code);
                             const moduleId = task.module_id ?? task.module ?? task.moduleId;
-                            const to = moduleId
-                                ? `/modules?moduleId=${moduleId}`
-                                : `/modules?code=${encodeURIComponent(task.module_code)}`;
+                            const moduleIdOrCode = moduleId ?? task.module_code;
                             return (
-                                <Link
-                                    to={to}
+                                <button
+                                    type="button"
                                     className={`${styles.modulePill} ${styles.modulePillLink}`}
-                                    style={{ color: mc.text, background: mc.bg, borderColor: mc.border }}
-                                    onClick={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        openModuleModal(moduleIdOrCode);
+                                    }}
                                     title={`Open ${task.module_code} module`}
                                 >
+                                    <BookOpen size={10} className={styles.modulePillIcon} aria-hidden />
                                     {task.module_code}
-                                </Link>
+                                </button>
                             );
                         })()}
                     </div>

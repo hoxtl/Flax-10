@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from "./CreateListModal.module.css";
 
-/** ~20 nice colours for list colour picker */
+/** Warm palette colours for list colour picker (no bright orange/red/green) */
 const LIST_COLOURS = [
-  "#8C9A86", "#4A90D9", "#B45309", "#15803d", "#7e22ce", "#0e7490",
-  "#be123c", "#4338ca", "#047857", "#b91c1c", "#1d4ed8", "#65a30d",
-  "#c2410c", "#4f46e5", "#0d9488", "#a16207", "#dc2626", "#2563eb",
-  "#16a34a", "#9333ea",
+  "#9C8B7A", "#8B9D7B", "#A68B5B", "#8B7D9C", "#7B8F8B", "#C4A265",
+  "#8B6F47", "#C17C5E", "#5C6B4F", "#6B5344", "#9E7E5D", "#7A6B5C",
+  "#5a7a6a", "#8C7B6B", "#B8936D", "#6d6050", "#3d5a52", "#D4B87A",
+  "#8B9D7B", "#A68B5B",
 ];
 
 export default function CreateListModal({ onSave, onClose }) {

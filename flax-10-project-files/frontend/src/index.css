@@ -36,9 +36,9 @@ a {
   text-decoration: inherit;
 }
 
-
 a:hover {
-  color: var(--primary-strong);
+  color: var(--accent-primary);
+  text-decoration: underline;
 }
 
 body {
@@ -111,13 +111,13 @@ button:focus-visible {
   color: var(--text);
 }
 
-/* Links in dark mode */
 [data-theme="dark"] a {
-  color: var(--primary-strong);
+  color: var(--accent-primary);
 }
 
 [data-theme="dark"] a:hover {
-  color: var(--primary);
+  color: var(--accent-secondary);
+  text-decoration: underline;
 }
 
 .MuiChartsLegend-label {
@@ -127,4 +127,28 @@ button:focus-visible {
 
 .MuiChartsAxis-tickLabel tspan {
   fill: var(--muted) !important;
+}
+
+/* Scrollbar: track and thumb use theme variables */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) var(--bg-secondary);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

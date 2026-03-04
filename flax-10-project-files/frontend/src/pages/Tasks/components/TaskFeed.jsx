@@ -6,8 +6,10 @@ import TaskCard from "./TaskCard";
 import CreateTaskBar from "./CreateTaskBar";
 import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
-import MultiSelectDropdown from "../../../components/ui/MultiSelectDropdown";
+import { TaskFilterDropdown } from "./TaskFilterDropdown";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
+/** Muted warm dot colors for list pills (match ListSidebar) */
+const TASKS_SIDEBAR_LIST_COLORS = ["#9C8B7A", "#8B9D7B", "#A68B5B", "#8B7D9C", "#7B8F8B", "#C4A265"];
 import AllTasksCompleteCard from "../../../components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 
@@ -68,6 +70,10 @@ function getListColor(list) {
     }
   } catch (_) {}
   return FOCUS_BLOCK_COLOURS_HEX[(list?.idx ?? 0) % FOCUS_BLOCK_COLOURS_HEX.length];
+}
+
+function getListColorMuted(list) {
+  return TASKS_SIDEBAR_LIST_COLORS[(list?.idx ?? 0) % TASKS_SIDEBAR_LIST_COLORS.length];
 }
 
 const SECTION_SHOW_LIMIT = 8;
@@ -170,7 +176,7 @@ function Section({
                     key={task.id}
                     task={task}
                     listName={list?.name}
-                    listColor={getListColor(list)}
+                    listColor={getListColorMuted(list)}
                     lists={lists}
                     onToggle={() => {
                       const wasIncomplete = !task.completed;
@@ -236,10 +242,11 @@ export default function TaskFeed({
     return map;
   }, [lists]);
 
-  // Apply module filter to tasks
+  // Apply module filter to tasks (exclude "" so "All modules" doesn't include tasks with no module)
   const tasksByModule = useMemo(() => {
-    if (!filterModuleCodes || filterModuleCodes.length === 0) return tasks;
-    const set = new Set(filterModuleCodes.map(String));
+    const codes = (filterModuleCodes || []).map(String).filter(Boolean);
+    if (codes.length === 0) return tasks;
+    const set = new Set(codes);
     return tasks.filter((t) => set.has(String(t.module_code || "")));
   }, [tasks, filterModuleCodes]);
 
@@ -454,32 +461,15 @@ export default function TaskFeed({
               className={styles.sortDropdown}
             />
           </div>
-          {typeof onFilterByList === "function" && (
-            <div className={styles.filterWrap}>
-              <label className={styles.sortLabel}>FILTER BY LIST</label>
-              <MultiSelectDropdown
-                value={filterListIds}
-                onChange={onFilterByList}
-                options={listFilterOptions}
-                placeholder="All lists"
-                countLabel="lists"
-                className={styles.sortDropdown}
-                displayAsPills
-              />
-            </div>
-          )}
-          <div className={styles.filterWrap}>
-            <label className={styles.sortLabel}>FILTER BY MODULE</label>
-            <MultiSelectDropdown
-              value={filterModuleCodes}
-              onChange={setFilterModuleCodes}
-              options={moduleOptions}
-              placeholder="All modules"
-              countLabel="modules"
-              className={styles.sortDropdown}
-              displayAsPills
-            />
-          </div>
+          <TaskFilterDropdown
+            listFilterOptions={listFilterOptions}
+            moduleOptions={moduleOptions}
+            filterListIds={filterListIds}
+            filterModuleCodes={filterModuleCodes}
+            onFilterByList={onFilterByList}
+            onFilterByModule={setFilterModuleCodes}
+            showListFilter={typeof onFilterByList === "function"}
+          />
         </div>
       </div>
       </div>
@@ -564,7 +554,7 @@ export default function TaskFeed({
                         key={task.id}
                         task={task}
                         listName={list?.name}
-                        listColor={getListColor(list)}
+                        listColor={getListColorMuted(list)}
                         lists={lists}
                         onToggle={() => onToggleComplete(task.id, task.completed)}
                         onDelete={() => onDeleteTask(task.id)}
