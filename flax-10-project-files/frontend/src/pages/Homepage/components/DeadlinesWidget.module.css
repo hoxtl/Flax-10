@@ -97,6 +97,7 @@
 }
 
 .row:hover {
+  background: var(--widget-card-hover-bg, var(--card-bg-hover));
   transform: var(--widget-card-hover-transform);
   box-shadow: var(--widget-card-hover-shadow);
 }
@@ -184,6 +185,22 @@
   border: 1px solid var(--border-color, #E2D5C5);
 }
 
+.rowPills a.pill,
+.rowPills button.pill {
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  border: none;
+  font: inherit;
+}
+
+.rowPills a.pill:hover,
+.rowPills button.pill:hover {
+  background: var(--card-bg-hover, rgba(74, 52, 33, 0.08));
+  border-color: var(--accent-primary, #8B6F47);
+  color: var(--accent-primary, #5C4A3A);
+}
+
 :root[data-theme="dark"] .pill {
   background: var(--card-bg-inner);
   color: var(--text-secondary);
@@ -215,16 +232,16 @@
   font-weight: 500;
   color: var(--widget-muted-color);
   background: none;
-  border: 1px dashed #E2D5C5;
+  border: 1px dashed var(--border-color);
   border-radius: 8px;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .showMoreBtn:hover {
-  color: var(--widget-title-color);
-  background: var(--hover);
-  border-color: var(--widget-muted-color);
+  color: var(--accent-primary);
+  background: var(--card-bg-inner);
+  border-color: var(--border-color);
 }
 
 /* ——— Empty state ——— */
@@ -268,7 +285,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #E2D5C5;
+  border-top: 1px solid var(--border-color);
 }
 
 .footerBtn {
@@ -287,9 +304,9 @@
 }
 
 .footerBtn:hover {
-  color: var(--accent-secondary, #5C4A3A);
-  background: var(--hover);
-  border-color: var(--accent-primary, #8B6F47);
+  color: var(--accent-secondary);
+  background: var(--card-bg-inner);
+  border-color: var(--accent-primary);
 }
 
 :root[data-theme="dark"] .footer {

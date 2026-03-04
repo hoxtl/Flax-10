@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
+import { getModuleDetails } from '../../api/moduleApi.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
 import ModuleForm from '../../components/Modules/ModuleForm.jsx';
 import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
@@ -25,15 +26,23 @@ function useModulesPage(initialSearch = '') {
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
 
-    // Open module card when URL has moduleId or code (e.g. from task pill click)
+    // Open module card when URL has moduleId or code (e.g. from deadline/task pill click)
     useEffect(() => {
-        if (hook.loading || hook.modules.length === 0) return;
         if (urlModuleId) {
             const match = hook.modules.find(m => String(m.id) === String(urlModuleId));
-            if (match) setViewingModule(match);
+            if (match) {
+                setViewingModule(match);
+                return;
+            }
+            if (!hook.loading) {
+                getModuleDetails(urlModuleId)
+                    .then((m) => setViewingModule(m))
+                    .catch(() => {});
+            }
             return;
         }
         if (urlCode) {
+            if (hook.loading || hook.modules.length === 0) return;
             const match = hook.modules.find(
                 m => m.module_code?.toLowerCase() === urlCode.toLowerCase()
             );

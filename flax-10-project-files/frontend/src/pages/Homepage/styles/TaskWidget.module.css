@@ -1776,7 +1776,7 @@
   }
   .taskWidgetSlotIcon {
     flex-shrink: 0;
-    color: #8B6F47;
+    color: var(--accent-primary);
   }
   .taskWidgetSlotTitleBlock {
     display: flex;
@@ -1787,14 +1787,14 @@
   .taskWidgetSlotTitle {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #4A3728;
+    color: var(--widget-title-color);
     margin: 0;
     line-height: 1.2;
   }
   .taskWidgetSlotMeta {
     font-size: 0.75rem;
     font-weight: 500;
-    color: #8C7B6B;
+    color: var(--text-secondary);
     line-height: 1.2;
   }
   .taskWidgetSlotHeaderRight {
@@ -1850,12 +1850,12 @@
   }
   .taskWidgetDonutBg {
     fill: none;
-    stroke: #F0E8DC;
+    stroke: var(--border-color);
     stroke-width: 3;
   }
   .taskWidgetDonutFill {
     fill: none;
-    stroke: #8B6F47;
+    stroke: var(--accent-primary);
     stroke-width: 3;
     stroke-linecap: round;
     transition: stroke-dasharray 0.5s ease;
@@ -1863,18 +1863,18 @@
   .taskWidgetDonutCount {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #4A3728;
+    color: var(--widget-title-color);
     letter-spacing: 0.02em;
   }
   .taskWidgetDonutCount span {
-    color: #8C7B6B;
+    color: var(--text-secondary);
     font-weight: 500;
   }
 
   .taskWidgetManageFooter {
     margin-top: 10px;
     padding-top: 0.75rem;
-    border-top: 1px solid #E2D5C5;
+    border-top: 1px solid var(--border-color);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1891,17 +1891,17 @@
     padding: 0.35rem 0.85rem;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #8B6F47;
+    color: var(--accent-primary);
     background: transparent;
-    border: 1px solid #D4C4B0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     text-decoration: none;
     transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   }
   .taskWidgetManageLink:hover {
-    color: #5C4A3A;
-    background: rgba(139, 111, 71, 0.06);
-    border-color: #8B6F47;
+    color: var(--accent-secondary);
+    background: var(--card-bg-inner);
+    border-color: var(--accent-primary);
   }
 
 .taskWidgetBottomBar {
@@ -3227,7 +3227,7 @@
   gap: 8px;
   padding: 0.6rem 0;
   min-height: 36px;
-  border-bottom: 1px solid #F0E8DC;
+  border-bottom: 1px solid var(--border-color);
   border-radius: 0;
   transition: background 0.12s;
   cursor: default;
@@ -3238,7 +3238,7 @@
 }
 
 .taskWidgetTaskRow:hover {
-  background: rgba(74, 55, 40, 0.03);
+  background: var(--card-bg-hover);
   border-radius: 6px;
 }
 
@@ -3254,7 +3254,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1.5px solid #D4C4B0;
+  border: 1.5px solid var(--border-color);
   background: transparent;
   display: flex;
   align-items: center;
@@ -3265,12 +3265,12 @@
 }
 
 .taskWidgetCheckbox:hover .taskWidgetCheckboxCircle {
-  border-color: #8B6F47;
+  border-color: var(--accent-primary);
 }
 
 .taskWidgetCheckboxCircleChecked {
-  background: #8B9D7B !important;
-  border-color: #8B9D7B !important;
+  background: var(--sage) !important;
+  border-color: var(--sage) !important;
   color: #fff;
 }
 
@@ -3280,7 +3280,7 @@
   font-family: var(--font-body);
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #2c2420;
+  color: var(--widget-body-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3300,7 +3300,7 @@
 .taskWidgetTaskTag {
   font-size: 0.65rem;
   font-weight: 500;
-  color: #8C7B6B;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   background: none;
@@ -3316,9 +3316,10 @@
   text-transform: uppercase;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  background: #F0E8DC;
-  color: #8B6F47;
+  background: var(--warning-muted);
+  color: var(--warning);
   white-space: nowrap;
+  border: 1px solid rgba(212, 184, 122, 0.2);
 }
 
 .taskWidgetTaskTagLate {
@@ -3328,9 +3329,85 @@
   text-transform: uppercase;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  background: #F5E0D5;
-  color: #C17C5E;
+  background: var(--danger-muted);
+  color: var(--danger);
   white-space: nowrap;
+  border: 1px solid rgba(212, 151, 122, 0.2);
+}
+
+/* Dark mode: Today's Tasks widget */
+:root[data-theme="dark"] .taskWidgetSlotTitle,
+:root[data-theme="dark"] .taskWidgetSlotIcon {
+  color: var(--text-primary);
+}
+:root[data-theme="dark"] .taskWidgetSlotMeta {
+  color: var(--text-secondary);
+}
+:root[data-theme="dark"] .taskWidgetDonutBg {
+  stroke: var(--border-color);
+}
+:root[data-theme="dark"] .taskWidgetDonutFill {
+  stroke: var(--accent-primary);
+}
+:root[data-theme="dark"] .taskWidgetDonutCount {
+  color: var(--text-primary);
+}
+:root[data-theme="dark"] .taskWidgetDonutCount span {
+  color: var(--text-secondary);
+}
+:root[data-theme="dark"] .taskWidgetSlotAllDoneWrap {
+  background: var(--card-bg-inner);
+}
+:root[data-theme="dark"] .taskWidgetManageFooter {
+  border-top-color: var(--border-color);
+}
+:root[data-theme="dark"] .taskWidgetManageLink {
+  color: var(--accent-primary);
+  border-color: var(--border-color);
+}
+:root[data-theme="dark"] .taskWidgetManageLink:hover {
+  color: var(--accent-secondary);
+  background: var(--card-bg-hover);
+  border-color: var(--accent-primary);
+}
+:root[data-theme="dark"] .taskWidgetTaskRow {
+  border-bottom-color: var(--border-color-subtle);
+}
+:root[data-theme="dark"] .taskWidgetTaskRow:hover {
+  background: var(--card-bg-hover);
+}
+:root[data-theme="dark"] .taskWidgetTaskTitle {
+  color: var(--text-primary);
+}
+:root[data-theme="dark"] .taskWidgetTaskTitleDone {
+  color: var(--text-muted);
+}
+:root[data-theme="dark"] .taskWidgetCheckboxCircle {
+  border-color: var(--border-color);
+}
+:root[data-theme="dark"] .taskWidgetCheckbox:hover .taskWidgetCheckboxCircle {
+  border-color: var(--accent-primary);
+}
+:root[data-theme="dark"] .taskWidgetCheckboxCircleChecked {
+  background: var(--sage) !important;
+  border-color: var(--sage) !important;
+  color: #fff;
+}
+:root[data-theme="dark"] .taskWidgetTaskTag {
+  color: var(--text-muted);
+}
+:root[data-theme="dark"] .taskWidgetTaskTagNext {
+  background: var(--warning-muted);
+  color: var(--warning);
+  border: 1px solid rgba(212, 184, 122, 0.2);
+}
+:root[data-theme="dark"] .taskWidgetTaskTagLate {
+  background: var(--danger-muted);
+  color: var(--danger);
+  border: 1px solid rgba(212, 151, 122, 0.2);
+}
+:root[data-theme="dark"] .taskWidgetMoreText {
+  color: var(--text-secondary);
 }
 
 .taskWidgetMoreText {
@@ -3339,14 +3416,15 @@
   padding: 4px 4px;
   font-family: var(--font-body);
   font-size: 0.75rem;
-  color: #a8a29e;
+  color: var(--text-secondary);
   cursor: pointer;
   text-align: left;
   transition: color 0.12s;
 }
 
 .taskWidgetMoreText:hover {
-  color: #57534e;
+  color: var(--accent-primary);
+  text-decoration: underline;
 }
 
 /* ─── Day Progress — breakdown + time alloc + nudge ─────────────────────── */

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useCountUp } from "../../hooks/useCountUp";
 import { motion } from "framer-motion";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
 import {
@@ -21,6 +21,7 @@ import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
+import { useModuleModal } from "../../context/ModuleModalContext";
 import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
 import { getLevelUpThresholdCrossed, getLevelUpMessageForThreshold, getSaplingCelebrationCrossed, getSaplingCelebrationMessage } from "../../lib/gardenStatus";
 import { getSeedsPerDayThisWeek } from "../../lib/weeklySeedCount";
@@ -96,6 +97,7 @@ export default function Homepage({ onNavigate, onNavChange }) {
     setTimerActive(true);
   }, [setTimerMode, setTimeLeft, workTime, setTimerTask, setTimerActive]);
   const { showCompletionToast, showLevelUpToast } = useTaskCompletion();
+  const { openModuleModal } = useModuleModal();
 
   const displayName = useMemo(() => {
     try {
@@ -1270,23 +1272,19 @@ export default function Homepage({ onNavigate, onNavChange }) {
             {selectedDeadline.location && (
               <p className={styles.deadlineDetailMeta}>📍 {selectedDeadline.location}</p>
             )}
-            {(selectedDeadline.module_id ?? selectedDeadline.module) && (
-              <Link
-                to={`/modules?moduleId=${selectedDeadline.module_id ?? selectedDeadline.module}`}
+            {(selectedDeadline.module_id ?? selectedDeadline.module || selectedDeadline.module_code) && (
+              <button
+                type="button"
                 className={styles.deadlineDetailLink}
-                onClick={() => setSelectedDeadline(null)}
+                onClick={() => {
+                  setSelectedDeadline(null);
+                  openModuleModal(
+                    selectedDeadline.module_id ?? selectedDeadline.module ?? selectedDeadline.module_code
+                  );
+                }}
               >
                 Go to module →
-              </Link>
-            )}
-            {!(selectedDeadline.module_id ?? selectedDeadline.module) && selectedDeadline.module_code && (
-              <Link
-                to={`/modules?code=${encodeURIComponent(selectedDeadline.module_code)}`}
-                className={styles.deadlineDetailLink}
-                onClick={() => setSelectedDeadline(null)}
-              >
-                Go to module →
-              </Link>
+              </button>
             )}
           </div>
         </div>

@@ -5,6 +5,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, CheckCircle } from "lucide-react";
+import { useModuleModal } from "../../../context/ModuleModalContext";
 import styles from "./DeadlinesWidget.module.css";
 
 /** Urgency: "critical" <3d, "urgent" 3-7d, "warning" 7-14d, "ok" >14d */
@@ -32,6 +33,7 @@ export function DeadlinesWidget({
   deadlines = [],
   onSelectDeadline,
 }) {
+  const { openModuleModal } = useModuleModal();
   const sorted = useMemo(() => {
     const list = [...deadlines].filter((d) => d.start_due_date);
     list.sort((a, b) => new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime());
@@ -68,6 +70,7 @@ export function DeadlinesWidget({
               key={d.id}
               deadline={d}
               onSelect={() => onSelectDeadline?.(d)}
+              onOpenModule={openModuleModal}
             />
           ))}
         </div>
@@ -82,7 +85,7 @@ export function DeadlinesWidget({
   );
 }
 
-function DeadlineRow({ deadline, onSelect }) {
+function DeadlineRow({ deadline, onSelect, onOpenModule }) {
   const due = deadline.start_due_date;
   const tier = getUrgencyTier(due);
   const title = deadline.assessment_title || deadline.title || "Assignment";
@@ -91,6 +94,7 @@ function DeadlineRow({ deadline, onSelect }) {
     ? deadline.deadline_type.charAt(0).toUpperCase() + deadline.deadline_type.slice(1)
     : "";
   const daysLabel = getDaysLabel(due);
+  const moduleIdOrCode = deadline.module_id ?? deadline.module ?? moduleCode || null;
 
   return (
     <div
@@ -108,7 +112,22 @@ function DeadlineRow({ deadline, onSelect }) {
       <div className={styles.rowBody}>
         <p className={styles.rowTitle}>{title}</p>
         <div className={styles.rowPills}>
-          {moduleCode && <span className={styles.pill}>{moduleCode}</span>}
+          {moduleCode &&
+            (moduleIdOrCode && onOpenModule ? (
+              <button
+                type="button"
+                className={styles.pill}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenModule(moduleIdOrCode);
+                }}
+                aria-label={`Open module ${moduleCode}`}
+              >
+                {moduleCode}
+              </button>
+            ) : (
+              <span className={styles.pill}>{moduleCode}</span>
+            ))}
           {typeLabel && <span className={styles.pill}>{typeLabel}</span>}
         </div>
       </div>
