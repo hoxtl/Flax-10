@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, cloneElement } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
@@ -86,13 +86,12 @@ function resolveRouteContent(activeNav, user, setActiveNav) {
 
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
-  if (el && typeof el === "object") {
+  if (el && typeof el === "object" && el.$$typeof) {
     const extraProps = { user, onNavChange: setActiveNav };
-    // Pass the search param to modules view if provided
     if (baseNav === 'modules' && navParam) {
       extraProps.initialSearch = navParam;
     }
-    return { ...el, props: { ...el.props, ...extraProps } };
+    return cloneElement(el, extraProps);
   }
   return el;
 }
