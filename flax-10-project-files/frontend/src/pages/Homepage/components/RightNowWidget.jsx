@@ -214,19 +214,19 @@ export function RightNowWidget({
           <span className={styles.nextTitle}>{nextEvent.title}</span>
           {timeStr && <span className={styles.nextMeta}> · {timeStr}</span>}
           {locStr && <span className={styles.nextMeta}> · {locStr}</span>}
+          {countdownPill && (
+            <span
+              className={`${styles.countdownPill} ${isUrgent ? styles.countdownPillUrgent : ""}`}
+            >
+              in {countdownPill}
+            </span>
+          )}
         </div>
         {locStr && (
           <div className={styles.nextLine2}>
             <MapPin className={styles.nextIcon} size={12} aria-hidden />
             <span>{locStr}</span>
           </div>
-        )}
-        {countdownPill && (
-          <span
-            className={`${styles.countdownPill} ${isUrgent ? styles.countdownPillUrgent : ""}`}
-          >
-            in {countdownPill}
-          </span>
         )}
       </div>
     );

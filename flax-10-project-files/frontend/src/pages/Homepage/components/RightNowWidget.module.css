@@ -8,7 +8,7 @@
 }
 
 .section {
-  padding: 6px 0;
+  padding: 3px 0;
   border-bottom: 1px solid rgba(120, 113, 108, 0.15);
   display: flex;
   flex-wrap: wrap;
@@ -80,14 +80,14 @@
 
 /* Section 2 — NEXT UP */
 .sectionNext {
-  padding-top: 8px;
+  padding-top: 4px;
 }
 
 .nextLine {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   width: 100%;
 }
 
@@ -128,16 +128,18 @@
   color: #a8a29e;
 }
 
-/* Countdown pill — amber default, red + pulse when <30m */
+/* Countdown pill — inline with Next line, amber default, red + pulse when <30m */
 .countdownPill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 9999px;
   background: #fef3c7;
   color: #b45309;
-  margin-top: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .countdownPillUrgent {
@@ -231,7 +233,7 @@
 }
 
 .travelClear {
-  padding: 6px 0;
+  padding: 4px 0;
 }
 
 .travelClearIcon {
@@ -240,18 +242,18 @@
 }
 
 .travelClear span {
-  font-size: 0.8rem;
-  color: #78716c;
+  font-size: 0.75rem;
+  color: #a8a29e;
 }
 
-/* Section 4 — SCHEDULE CONFLICTS */
+/* Section 4 — SCHEDULE CONFLICTS: compact */
 .conflictRow {
   background: #fffbeb;
   border: 1px solid #fde68a;
   border-radius: 8px;
-  padding: 8px 10px;
-  margin-top: 4px;
-  font-size: 0.82rem;
+  padding: 5px 8px;
+  margin-top: 2px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #92400e;
 }

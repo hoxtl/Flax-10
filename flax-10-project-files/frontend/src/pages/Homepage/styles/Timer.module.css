@@ -144,9 +144,10 @@
   }
   
   .taskWidgetTitle {
-    font-size: 20px;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: var(--restoration-charcoal, #2d352d);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #44403c;
   }
   

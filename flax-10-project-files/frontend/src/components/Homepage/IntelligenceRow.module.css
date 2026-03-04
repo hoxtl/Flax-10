@@ -12,7 +12,7 @@
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px;
   opacity: 0;
   background: transparent;
 }
@@ -30,7 +30,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(123, 103, 81, 0.15);
 }
@@ -603,13 +603,14 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 20px;
   align-items: stretch;
 }
 
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 }
 
@@ -634,17 +635,15 @@
   justify-content: space-between;
   overflow: hidden;
   border-radius: 1rem;
-  border: 1px solid #f5f5f4;
+  border: 1px solid rgba(120, 113, 108, 0.6);
   background: #ffffff;
   padding: 1.5rem;
   min-height: 200px;
   opacity: 0;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: box-shadow 0.2s ease-out;
 }
 
 .bentoSlot:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+  /* No shadow — clean white cards only */
 }
 
 /* Widget cards: same base style for all — no colored tints */
@@ -768,25 +767,24 @@
   min-width: 0;
 }
 
+/* All widget titles: text-sm font-semibold uppercase tracking-wider text-stone-700 */
 .bentoTitle {
   font-family: var(--font-body, "Lexend", system-ui, sans-serif);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #44403c;
   margin: 0;
 }
 
+/* Secondary stats: text-xs text-stone-400 font-medium */
 .bentoMeta {
   margin-left: auto;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #78716c; /* stone-500 — muted, not brown */
-  opacity: 0.9;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
 }
 
 .bentoBody {

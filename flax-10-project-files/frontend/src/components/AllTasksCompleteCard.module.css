@@ -1,4 +1,4 @@
-/* Shared "all tasks complete" / day complete card — matches TaskFeed clear card. */
+/* Shared "all tasks complete" / day complete card — white like other widgets */
 .card {
   display: flex;
   flex-direction: column;
@@ -7,10 +7,9 @@
   text-align: center;
   padding: 2.5rem 1.5rem 2rem;
   margin: 1rem 0;
-  background: linear-gradient(145deg, #fdf6ee 0%, #f5ede3 50%, #eee8df 100%);
-  border: 1px solid rgba(123, 103, 81, 0.1);
-  border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(123, 103, 81, 0.06);
+  background: #ffffff;
+  border: 1px solid rgba(120, 113, 108, 0.6);
+  border-radius: 1rem;
   animation: clearFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

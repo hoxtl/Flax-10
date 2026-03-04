@@ -50,7 +50,7 @@
     min-height: 0;
     overflow-y: visible;
     overflow-x: hidden;
-    padding-bottom: var(--home-space-2xl);
+    padding-bottom: 3rem;
     background: var(--home-bg);
   }
 

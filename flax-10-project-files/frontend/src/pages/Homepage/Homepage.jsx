@@ -370,10 +370,23 @@ export default function Homepage({ onNavigate }) {
 
 
 
-  const sortedEvents = useMemo(
-    () => [...dayEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
-    [dayEvents]
-  );
+  const sortedEvents = useMemo(() => {
+    const seen = new Set();
+    const mealTitles = ["breakfast", "lunch", "dinner"];
+    const deduped = dayEvents.filter((e) => {
+      const title = (e.title || "").trim().toLowerCase();
+      const start = e.start_time ? new Date(e.start_time) : null;
+      if (!start) return true;
+      const dayKey = start.toISOString().slice(0, 10);
+      if (mealTitles.includes(title)) {
+        const key = `${dayKey}:${title}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+      }
+      return true;
+    });
+    return [...deduped].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  }, [dayEvents]);
 
   const pastItems = useMemo(
     () => sortedEvents.filter((it) => {
@@ -1417,16 +1430,27 @@ export default function Homepage({ onNavigate }) {
                 const durLabel = best.minutes >= 60
                   ? `${Math.floor(best.minutes / 60)}h${best.minutes % 60 > 0 ? ` ${best.minutes % 60}m` : ""}`
                   : `${best.minutes}m`;
+                const sortedByDur = [...todayFreeWindows].sort((a, b) => b.minutes - a.minutes);
+                const longest = sortedByDur[0];
+                const shortest = sortedByDur[sortedByDur.length - 1];
+                const fmt = (m) => m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
                 return (
-                  <div className={styles.intRowFocusBestWindow}>
-                    <div className={styles.intRowFocusBestWindowLeft}>
-                      <span className={styles.intRowFocusBestWindowLabel}>Best window</span>
-                      <span className={styles.intRowFocusBestWindowTime}>
-                        {formatTime(best.start.toISOString())} – {formatTime(best.end.toISOString())}
-                      </span>
+                  <>
+                    <div className={styles.intRowFocusBestWindow}>
+                      <div className={styles.intRowFocusBestWindowLeft}>
+                        <span className={styles.intRowFocusBestWindowLabel}>Best window</span>
+                        <span className={styles.intRowFocusBestWindowTime}>
+                          {formatTime(best.start.toISOString())} – {formatTime(best.end.toISOString())}
+                        </span>
+                      </div>
+                      <span className={styles.intRowFocusBestWindowDur}>{durLabel}</span>
                     </div>
-                    <span className={styles.intRowFocusBestWindowDur}>{durLabel}</span>
-                  </div>
+                    {todayFreeWindows.length > 1 && longest && shortest && (
+                      <p className={styles.intRowFocusStatRow}>
+                        Longest: {fmt(longest.minutes)} · Shortest: {fmt(shortest.minutes)}
+                      </p>
+                    )}
+                  </>
                 );
               })()}
 

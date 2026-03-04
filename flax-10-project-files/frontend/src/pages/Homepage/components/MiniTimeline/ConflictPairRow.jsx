@@ -129,7 +129,7 @@ export function ConflictPairRow({
           <div className={styles.planTimelineConflictPairBtns}>
             <button
               type="button"
-              className={styles.planTimelineConflictPairBtn}
+              className={`${styles.planTimelineConflictPairBtn} ${styles.planTimelineConflictPairBtnPrimary}`}
               onClick={handleAutoMove}
               disabled={!freeRow}
               title={freeRow ? `Move "${movable?.item?.title}" to next free window` : "No free window found"}
@@ -138,16 +138,21 @@ export function ConflictPairRow({
               {freeRow ? "Auto-arrange" : "No free window"}
             </button>
             {items.map((r) => (
-              <button
+              <span
                 key={r.id}
-                type="button"
-                className={`${styles.planTimelineConflictPairBtn} ${styles.planTimelineConflictPairBtnEdit}`}
-                onClick={() => onEdit?.(r.item, r.item.tag)}
+                className={styles.planTimelineConflictPairLabel}
                 title={`Edit "${r.item.title}"`}
               >
-                <Pencil size={11} strokeWidth={2} aria-hidden />
-                {stripEmojiFromTitle(r.item.title).slice(0, 18)}
-              </button>
+                <button
+                  type="button"
+                  className={styles.planTimelineConflictPairLabelBtn}
+                  onClick={() => onEdit?.(r.item, r.item.tag)}
+                  aria-label={`Edit ${stripEmojiFromTitle(r.item.title)}`}
+                >
+                  <Pencil size={10} strokeWidth={2} aria-hidden />
+                  {stripEmojiFromTitle(r.item.title).slice(0, 18)}
+                </button>
+              </span>
             ))}
           </div>
         </div>
