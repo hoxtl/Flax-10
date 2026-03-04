@@ -4,19 +4,25 @@ import { searchUsers } from "../../api/userService";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
+function UserCardInfo({ user }) {
+    return (
+        <div className={styles.userInfo}>
+            <div className={styles.name}>{user.first_name} {user.last_name}</div>
+            <div className={styles.username}>@{user.username}</div>
+            <div className={styles.courseInfo}>
+                {user.year && <span>{user.year}</span>}
+                {user.major && <span> • {user.major}</span>}
+            </div>
+        </div>
+    );
+}
+
 function UserCard({ user, onNavChange }) {
     const initials = user.first_name?.[0] || user.username[0];
     return (
         <div className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
             <div className={styles.avatar}>{initials}</div>
-            <div className={styles.userInfo}>
-                <div className={styles.name}>{user.first_name} {user.last_name}</div>
-                <div className={styles.username}>@{user.username}</div>
-                <div className={styles.courseInfo}>
-                    {user.year && <span>{user.year}</span>}
-                    {user.major && <span> • {user.major}</span>}
-                </div>
-            </div>
+            <UserCardInfo user={user} />
         </div>
     );
 }
@@ -32,19 +38,21 @@ async function loadUsers(query, filters, page, setU, setTotalPages, setL) {
     setL(false);
 }
 
+function usePaginationReset(query, filterMods, filterSocs) {
+    const [currentPage, setCurrentPage] = useState(1);
+    useEffect(() => { setCurrentPage(1); }, [query, filterMods, filterSocs]);
+    return { currentPage, setCurrentPage };
+}
+
 function useDiscoverFetch(query, filterState) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
 
     const filterMods = filterState.props.selectedModules.join(',');
     const filterSocs = filterState.props.selectedSocieties.join(',');
 
-    // Reset page when filters or query change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [query, filterMods, filterSocs]);
+    const { currentPage, setCurrentPage } = usePaginationReset(query, filterMods, filterSocs);
 
     useEffect(() => {
         const filters = { mods: filterState.props.selectedModules, socs: filterState.props.selectedSocieties };
@@ -98,21 +106,12 @@ function SearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filte
     );
 }
 
-function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCurrentPage }) {
-    const self = JSON.parse(localStorage.getItem("user")) || {};
-    const filtered = users.filter(u => u.id !== self.id && u.username !== self.username);
-
-    if (!loading && filtered.length === 0) return <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>;
-
+function PaginatedGrid({ filtered, onNavChange, currentPage, totalPages, setCurrentPage }) {
     return (
         <div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
             <div className={styles.grid}>
-                {filtered.map(u => (
-                    <div key={u.id}>
-                        <UserCard user={u} onNavChange={onNavChange} />
-                    </div>
-                ))}
+                {filtered.map(u => <div key={u.id}><UserCard user={u} onNavChange={onNavChange} /></div>)}
             </div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
             <BackToTop />
@@ -120,26 +119,25 @@ function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCu
     );
 }
 
+function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCurrentPage }) {
+    const self = JSON.parse(localStorage.getItem("user")) || {};
+    const filtered = users.filter(u => u.id !== self.id && u.username !== self.username);
+    if (!loading && filtered.length === 0) return <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>;
+    return <PaginatedGrid filtered={filtered} onNavChange={onNavChange} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
+}
+
 export default function Discover({ onNavChange }) {
     const { loading, users, currentPage, setCurrentPage, totalPages, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
     const showLoader = loading && users.length === 0;
 
+    const srch = <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />;
+    const content = showLoader ? <div className={styles.loadingState}>Loading users...</div> : <UsersGrid users={users} onNavChange={onNavChange} loading={loading} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
+
     return (
         <div className={styles.container}>
             <DiscoverHeader />
-            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />
-            {showLoader ? (
-                <div className={styles.loadingState}>Loading users...</div>
-            ) : (
-                <UsersGrid
-                    users={users}
-                    onNavChange={onNavChange}
-                    loading={loading}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    setCurrentPage={setCurrentPage}
-                />
-            )}
+            {srch}
+            {content}
         </div>
     );
 }

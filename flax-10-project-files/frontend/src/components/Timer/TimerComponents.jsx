@@ -30,13 +30,22 @@ export const SessionStatus = ({ current, total }) => (
     <div className={styles.sessionStatus}>Session {current + 1} of {total}</div>
 );
 
-/** Action buttons for timer */
+const PauseIndicator = ({ isPaused, totalPaused }) => {
+    if (!isPaused || totalPaused <= 0) return null;
+    return <div className={styles.pauseIndicator}>Paused: {formatTime(totalPaused)}</div>;
+};
+
+const PrimaryTimerBtn = ({ isActive, isPaused, onToggle, onPause }) => {
+    const label = !isActive ? 'Start' : (isPaused ? 'Resume' : 'Pause');
+    const action = !isActive ? onToggle : onPause;
+    return <button className={`${styles.button} ${styles.primary}`} onClick={action}>{label}</button>;
+};
+
 export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, totalPaused }) => {
-    const pausedInd = isPaused && totalPaused > 0 ? <div className={styles.pauseIndicator}>Paused: {formatTime(totalPaused)}</div> : null;
-    const primaryBtn = <button className={`${styles.button} ${styles.primary}`} onClick={!isActive ? onToggle : onPause}>{!isActive ? 'Start' : (isPaused ? 'Resume' : 'Pause')}</button>;
-    const resetBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>;
-    const group = <div className={styles.buttonGroup}>{primaryBtn}{resetBtn}</div>;
-    return <div className={styles.controls}>{pausedInd}{group}</div>;
+    const pInd = <PauseIndicator isPaused={isPaused} totalPaused={totalPaused} />;
+    const pBtn = <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />;
+    const rBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>;
+    return <div className={styles.controls}>{pInd}<div className={styles.buttonGroup}>{pBtn}{rBtn}</div></div>;
 };
 
 // Helpers for useBufferedInput

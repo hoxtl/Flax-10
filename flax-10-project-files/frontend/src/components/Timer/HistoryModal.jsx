@@ -50,11 +50,8 @@ const ClearConfirmModal = ({ onConfirm, onCancel }) => {
     return <div className={`${styles.overlay} ${styles.confirmOverlay}`} onClick={onCancel}>{content}</div>;
 };
 
-const useHistoryData = () => {
-    const [history, setHistory] = useState([]);
+const useClearAction = (setHistory) => {
     const [showConfirm, setShowConfirm] = useState(false);
-    useEffect(() => { getHistory().then(setHistory); }, []);
-    const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
     const triggerClear = () => setShowConfirm(true);
     const cancelClear = () => setShowConfirm(false);
     const confirmClear = async (e) => {
@@ -64,7 +61,15 @@ const useHistoryData = () => {
         setShowConfirm(false);
         window.dispatchEvent(new Event('historyCleared'));
     };
-    return { history, blocks, showConfirm, triggerClear, cancelClear, confirmClear };
+    return { showConfirm, triggerClear, cancelClear, confirmClear };
+};
+
+const useHistoryData = () => {
+    const [history, setHistory] = useState([]);
+    useEffect(() => { getHistory().then(setHistory); }, []);
+    const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
+    const clearProps = useClearAction(setHistory);
+    return { history, blocks, ...clearProps };
 };
 
 const ModalContent = ({ history, blocks }) => {

@@ -131,20 +131,29 @@ function ToolsPill({ onNavChange, activeNav }) {
   );
 }
 
-function TopBarActions({ onAddClick, user: u, onSettingsClick: sC, onLogoutClick: lC, onProfileClick: pC, onNavChange: nC, activeNav: aN }) {
-  return (
-    <div className={styles.actions}>
-      <ToolsPill onNavChange={nC} activeNav={aN} /><MiniTimer onNavigate={nC} activeNav={aN} /><ActionPill onAddClick={onAddClick} onNavChange={nC} />
-      <ProfileDropdown user={u} onSettingsClick={sC} onLogoutClick={lC} onProfileClick={pC} />
-    </div>
-  );
+const TopbarTools = ({ onNavChange, activeNav }) => (
+  <div className={styles.toolsWrapper}>
+    <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
+    <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
+  </div>
+);
+
+function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+  const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} />;
+  const action = <ActionPill onAddClick={onAddClick} onNavChange={onNavChange} />;
+  const pDrop = <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />;
+  return <div className={styles.actions}>{tools}{action}{pDrop}</div>;
 }
 
+const TopBarLeftSection = ({ onNavChange, activeNav, user }) => (
+  <div className={styles.leftSection}>
+    <BrandLogo onNavChange={onNavChange} />
+    <TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} />
+  </div>
+);
+
 export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
-  return (
-    <header className={styles.container}>
-      <div className={styles.leftSection}><BrandLogo onNavChange={onNavChange} /><TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} /></div>
-      <div className={styles.rightSection}><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>
-    </header>
-  );
+  const left = <TopBarLeftSection onNavChange={onNavChange} activeNav={activeNav} user={user} />;
+  const right = <div className={styles.rightSection}><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>;
+  return <header className={styles.container}>{left}{right}</header>;
 }
