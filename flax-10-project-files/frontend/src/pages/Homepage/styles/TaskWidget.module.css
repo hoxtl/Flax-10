@@ -62,7 +62,7 @@
     max-height: 160px;
     overflow: hidden;
   }
-  .actionHub {
+  .taskWidget {
     position: relative;
     border-radius: 12px;
     border: 1px solid rgba(107, 83, 68, 0.2);
@@ -73,7 +73,7 @@
     min-height: 0;
     overflow: visible;
   }
-  .actionHubSpineWrap {
+  .taskWidgetSpineWrap {
     position: absolute;
     left: 10px;
     top: 38px;
@@ -83,7 +83,7 @@
     overflow: hidden;
     pointer-events: none;
   }
-  .actionHubSpineSolid {
+  .taskWidgetSpineSolid {
     position: absolute;
     left: 0;
     top: 0;
@@ -92,7 +92,7 @@
     background: rgba(132, 169, 140, 0.5);
     transition: height 0.35s ease;
   }
-  .actionHubSpineDashed {
+  .taskWidgetSpineDashed {
     position: absolute;
     left: 0;
     width: 100%;
@@ -108,7 +108,7 @@
     border-radius: 2px;
     transition: top 0.35s ease, height 0.35s ease;
   }
-  .actionHubTitle {
+  .taskWidgetTitle {
     font-size: 0.75rem;
     font-weight: var(--font-weight-title);
     font-family: var(--font-body);
@@ -117,50 +117,50 @@
     color: #2D2D2D;
     margin: 0;
   }
-  .actionHubHeaderRow {
+  .taskWidgetHeaderRow {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
     margin-bottom: 10px;
   }
-  .actionHubHeaderLink {
+  .taskWidgetHeaderLink {
     font-size: 0.75rem;
     font-weight: 500;
-    color: #a8a29e;
+    color: #8B6F47;
     text-decoration: none;
     flex-shrink: 0;
     transition: color 0.15s;
   }
-  .actionHubHeaderLink:hover {
-    color: #57534e;
+  .taskWidgetHeaderLink:hover {
+    color: #5C4A3A;
   }
-  .actionHubPerformanceHeader {
+  .taskWidgetPerformanceHeader {
     margin-bottom: 14px;
     padding-bottom: 0;
   }
-  .actionHubPerformanceHeader .actionHubStatusPill {
+  .taskWidgetPerformanceHeader .taskWidgetStatusPill {
     background: rgba(238, 220, 130, 0.22);
     border: 1px solid rgba(210, 180, 140, 0.45);
     color: #2D2D2D;
     margin-bottom: 0;
   }
-  .actionHubPerformanceHeader .actionHubProgressTrack {
+  .taskWidgetPerformanceHeader .taskWidgetProgressTrack {
     height: 4px;
     margin-top: 8px;
     margin-bottom: 6px;
     border-radius: 2px;
   }
-  .actionHubPerformanceHeader .actionHubProgressFill {
+  .taskWidgetPerformanceHeader .taskWidgetProgressFill {
     border-radius: 2px;
   }
-  .actionHubPerformanceHeader .actionHubProgressLabel {
+  .taskWidgetPerformanceHeader .taskWidgetProgressLabel {
     display: none;
   }
-  .actionHubStatusBar {
+  .taskWidgetStatusBar {
     margin-bottom: 12px;
   }
-  .actionHubProgressTrack {
+  .taskWidgetProgressTrack {
     height: 28px;
     margin-top: 0;
     margin-bottom: 6px;
@@ -171,7 +171,7 @@
     display: flex;
     align-items: center;
   }
-  .actionHubProgressFill {
+  .taskWidgetProgressFill {
     height: 100%;
     background: var(--restoration-sage, #84A98C);
     border-radius: 8px;
@@ -181,7 +181,7 @@
     top: 0;
     bottom: 0;
   }
-  .actionHubProgressLabel {
+  .taskWidgetProgressLabel {
     position: relative;
     z-index: 1;
     padding: 0 10px;
@@ -192,14 +192,14 @@
     text-align: center;
     pointer-events: none;
   }
-  .actionHubMomentumLabel {
+  .taskWidgetMomentumLabel {
     font-size: 0.68rem;
     font-weight: 500;
     color: var(--home-text-meta, #6b7280);
     margin: 0 0 8px;
     text-align: center;
   }
-  .actionHubStatusPill {
+  .taskWidgetStatusPill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -213,18 +213,18 @@
     font-weight: 500;
     color: #2D2D2D;
   }
-  .actionHubStatusStat {
+  .taskWidgetStatusStat {
     font-family: var(--font-body);
   }
-  .actionHubStatusStat strong {
+  .taskWidgetStatusStat strong {
     color: var(--restoration-earth, #6B5344);
     font-weight: 700;
   }
-  .actionHubStatusDivider {
+  .taskWidgetStatusDivider {
     color: rgba(107, 83, 68, 0.4);
     font-weight: 400;
   }
-  .actionHubDailyEnergy {
+  .taskWidgetDailyEnergy {
     font-size: 0.72rem;
     color: #2D2D2D;
     margin: 0 0 12px;
@@ -233,43 +233,48 @@
     border-radius: 8px;
     border: 1px solid rgba(210, 180, 140, 0.2);
   }
-  .actionHubDailyEnergy strong {
+  .taskWidgetDailyEnergy strong {
     color: #5D4037;
     font-weight: 700;
   }
-  .actionHubGapRow {
+  .taskWidgetGapRow {
     list-style: none;
     margin: 4px 0;
     padding: 0;
   }
-  .actionHubGapText {
+  .taskWidgetGapText {
     font-size: 0.7rem;
     color: #5D4037;
     font-style: italic;
     letter-spacing: 0.02em;
     font-family: var(--font-body);
   }
-  .actionHubZone {
+  .taskWidgetZone {
     margin-bottom: 10px;
   }
-  .actionHubZone:last-of-type {
+  .taskWidgetZone:last-of-type {
     margin-bottom: 6px;
   }
-  .actionHubDivider {
+  .taskWidgetDivider {
     height: 1px;
     background: rgba(107, 83, 68, 0.25);
     margin: 8px 0 10px;
     border: none;
   }
-  .actionHubZoneLabel {
+  .taskWidgetZoneLabel {
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.05em;
-    color: var(--restoration-charcoal, #2d352d);
-    display: block;
+    color: #8C7B6B;
+    display: inline-block;
     margin-bottom: 6px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    background: #F5EDE3;
+    border: 1px solid #E2D5C5;
+    text-transform: uppercase;
   }
-  .actionHubCardList {
+  .taskWidgetCardList {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -277,7 +282,7 @@
     flex-direction: column;
     gap: 12px;
   }
-  .actionHubCard {
+  .taskWidgetCard {
     position: relative;
     background: #F9F8F6;
     border-radius: 12px;
@@ -289,25 +294,25 @@
     transition: box-shadow 0.25s ease, border-color 0.2s ease, transform 0.25s ease;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   }
-  .actionHubCard:hover {
+  .taskWidgetCard:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 6px 0 -2px rgba(0, 0, 0, 0.04);
     border-color: rgba(107, 83, 68, 0.3);
   }
-  .actionHubCardBorderSage {
+  .taskWidgetCardBorderSage {
     border-left-color: rgba(132, 169, 140, 0.55);
   }
-  .actionHubCardBorderFlax {
+  .taskWidgetCardBorderFlax {
     border-left-color: rgba(180, 160, 120, 0.5);
   }
-  .actionHubCardOverdue {
+  .taskWidgetCardOverdue {
     border-left-color: rgba(232, 85, 85, 0.85);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(232, 120, 100, 0.2);
-    animation: actionHubOverdueGlow 2.2s ease-in-out infinite;
+    animation: taskWidgetOverdueGlow 2.2s ease-in-out infinite;
   }
-  .actionHubCardOverdue:hover {
+  .taskWidgetCardOverdue:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(232, 120, 100, 0.25);
   }
-  @keyframes actionHubOverdueGlow {
+  @keyframes taskWidgetOverdueGlow {
     0%, 100% {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(232, 120, 100, 0.2);
       border-left-color: rgba(232, 85, 85, 0.85);
@@ -317,29 +322,29 @@
       border-left-color: rgba(232, 85, 85, 0.95);
     }
   }
-  .actionHubCardNow {
+  .taskWidgetCardNow {
     background: #FFFFFF;
     border-left-width: 4px;
     border-left-color: rgba(93, 64, 55, 0.6);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
   }
-  .actionHubCardNow:hover {
+  .taskWidgetCardNow:hover {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
   }
-  .actionHubNowDot {
+  .taskWidgetNowDot {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: var(--restoration-sage, #84A98C);
     flex-shrink: 0;
-    animation: actionHubNowDotPulse 2s ease-in-out infinite;
+    animation: taskWidgetNowDotPulse 2s ease-in-out infinite;
   }
-  @keyframes actionHubNowDotPulse {
+  @keyframes taskWidgetNowDotPulse {
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(132, 169, 140, 0.5); }
     50% { opacity: 0.85; box-shadow: 0 0 0 4px rgba(132, 169, 140, 0); }
   }
-  .actionHubNowBadge {
+  .taskWidgetNowBadge {
     display: inline-block;
     font-size: 0.6rem;
     font-weight: 700;
@@ -352,7 +357,7 @@
     border: 1px solid rgba(93, 64, 55, 0.3);
     margin-left: 4px;
   }
-  .actionHubUrgentBadge {
+  .taskWidgetUrgentBadge {
     display: inline-block;
     font-size: 0.6rem;
     font-weight: 700;
@@ -365,40 +370,40 @@
     border: 1px solid rgba(232, 120, 100, 0.35);
     margin-left: 4px;
     flex-shrink: 0;
-    animation: actionHubUrgentPulse 2s ease-in-out infinite;
+    animation: taskWidgetUrgentPulse 2s ease-in-out infinite;
   }
-  @keyframes actionHubUrgentPulse {
+  @keyframes taskWidgetUrgentPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.88; }
   }
-  .actionHubCardUpcoming {
+  .taskWidgetCardUpcoming {
     border-left-color: rgba(180, 160, 120, 0.45);
   }
-  .actionHubCardCompleted {
+  .taskWidgetCardCompleted {
     opacity: 1;
     border-left-color: rgba(132, 169, 140, 0.6);
     transform: scale(0.98);
   }
-  .actionHubCardCompleted:hover {
+  .taskWidgetCardCompleted:hover {
     border-color: rgba(107, 83, 68, 0.2);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 0 -2px rgba(0, 0, 0, 0.03);
   }
-  .actionHubCardCompleted .actionHubCardTitle {
+  .taskWidgetCardCompleted .taskWidgetCardTitle {
     text-decoration: line-through;
     opacity: 0.4;
   }
-  .actionHubCardTime {
+  .taskWidgetCardTime {
     margin-top: 10px;
     padding-top: 8px;
     border-top: 1px solid rgba(0, 0, 0, 0.04);
   }
-  .actionHubCardTimeText {
+  .taskWidgetCardTimeText {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.72rem;
     font-variant-numeric: tabular-nums;
     color: #5D4037;
   }
-  .actionHubActiveBadge {
+  .taskWidgetActiveBadge {
     display: inline-block;
     font-size: 0.6rem;
     font-weight: 700;
@@ -411,14 +416,14 @@
     border: 1px solid rgba(135, 169, 107, 0.4);
     margin-right: 4px;
   }
-  .actionHubCountdown {
+  .taskWidgetCountdown {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.72rem;
     font-variant-numeric: tabular-nums;
     color: #5D4037;
     flex-shrink: 0;
   }
-  .actionHubCardDone {
+  .taskWidgetCardDone {
     flex-shrink: 0;
     width: 20px;
     height: 20px;
@@ -430,16 +435,16 @@
     font-weight: 700;
   }
   /* Event cards: glass, 12px radius */
-  .actionHubCardEvent {
+  .taskWidgetCardEvent {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-left-color: rgba(180, 160, 120, 0.5);
   }
-  .actionHubCardEvent .actionHubCardTitle {
+  .taskWidgetCardEvent .taskWidgetCardTitle {
     color: #2D2D2D;
   }
-  .actionHubEventLocation {
+  .taskWidgetEventLocation {
     font-size: 0.75rem;
     color: #6B7280;
     white-space: nowrap;
@@ -448,37 +453,37 @@
     max-width: 100px;
     flex-shrink: 0;
   }
-  .actionHubEventLink {
+  .taskWidgetEventLink {
     color: #6F4E37;
     text-decoration: none;
     font-weight: 600;
   }
-  .actionHubEventLink:hover {
+  .taskWidgetEventLink:hover {
     text-decoration: underline;
     color: #2D2D2D;
   }
-  .actionHubEventIcon {
+  .taskWidgetEventIcon {
     font-size: 0.9rem;
     opacity: 0.9;
     flex-shrink: 0;
   }
-  .actionHubLink {
+  .taskWidgetLink {
     font-size: 0.75rem;
     font-weight: 500;
     color: #5D4037;
     text-decoration: none;
     transition: color 0.15s, text-decoration 0.15s;
   }
-  .actionHubLink:hover {
+  .taskWidgetLink:hover {
     color: #2D2D2D;
     text-decoration: underline;
   }
-  .actionHubCardEventMeta {
+  .taskWidgetCardEventMeta {
     flex-shrink: 0;
     width: 22px;
   }
   /* Overdue: pulsating alert icon */
-  .actionHubIconOverdue {
+  .taskWidgetIconOverdue {
     flex-shrink: 0;
     width: 22px;
     height: 22px;
@@ -487,10 +492,10 @@
     justify-content: center;
     font-size: 0.9rem;
     color: rgba(232, 85, 85, 0.95);
-    animation: actionHubOverduePulse 2s ease-in-out infinite;
+    animation: taskWidgetOverduePulse 2s ease-in-out infinite;
   }
   /* Task: check-circle (round) checkbox */
-  .actionHubCheckboxBoxRound {
+  .taskWidgetCheckboxBoxRound {
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -499,13 +504,13 @@
     display: block;
     flex-shrink: 0;
   }
-  .actionHubCardCompleted .actionHubCheckboxBoxRound,
-  .actionHubCheckbox:focus .actionHubCheckboxBoxRound,
-  .actionHubCheckbox:hover .actionHubCheckboxBoxRound {
+  .taskWidgetCardCompleted .taskWidgetCheckboxBoxRound,
+  .taskWidgetCheckbox:focus .taskWidgetCheckboxBoxRound,
+  .taskWidgetCheckbox:hover .taskWidgetCheckboxBoxRound {
     border-color: rgba(132, 169, 140, 0.6);
     background: rgba(132, 169, 140, 0.12);
   }
-  .actionHubCardPillWrap {
+  .taskWidgetCardPillWrap {
     position: absolute;
     top: 50%;
     right: 16px;
@@ -516,7 +521,7 @@
     gap: 6px;
     justify-content: flex-end;
   }
-  .actionHubModulePill {
+  .taskWidgetModulePill {
     display: inline-block;
     font-size: 0.7rem;
     font-weight: 700;
@@ -532,29 +537,29 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-  .actionHubModulePillList {
+  .taskWidgetModulePillList {
     background: #4A3421;
     color: #FAF9F6;
     border: none;
   }
-  .actionHubPillLink {
+  .taskWidgetPillLink {
     text-decoration: none;
     color: inherit;
   }
-  .actionHubPillLink:hover {
+  .taskWidgetPillLink:hover {
     opacity: 0.92;
   }
-  .actionHubCardBody {
+  .taskWidgetCardBody {
     padding-right: 100px;
     min-width: 0;
   }
-  .actionHubCardRow {
+  .taskWidgetCardRow {
     display: flex;
     align-items: center;
     gap: 12px;
     min-width: 0;
   }
-  .actionHubCardTitle {
+  .taskWidgetCardTitle {
     flex: 1;
     min-width: 0;
     font-family: var(--font-body);
@@ -567,15 +572,15 @@
     text-overflow: ellipsis;
     transition: opacity 0.25s ease, text-decoration 0.25s ease;
   }
-  .actionHubCardTitleHigh {
+  .taskWidgetCardTitleHigh {
     color: var(--restoration-earth, #6B5344);
     font-weight: 700;
   }
-  .actionHubCardTitleLow {
+  .taskWidgetCardTitleLow {
     color: var(--home-text-meta, #9ca3af);
     font-weight: 500;
   }
-  .actionHubUrgentDot {
+  .taskWidgetUrgentDot {
     display: inline-block;
     width: 6px;
     height: 6px;
@@ -585,20 +590,20 @@
     align-self: center;
     margin-right: 6px;
     box-shadow: 0 0 8px 2px rgba(232, 120, 100, 0.5);
-    animation: actionHubUrgentDotGlow 2s ease-in-out infinite;
+    animation: taskWidgetUrgentDotGlow 2s ease-in-out infinite;
   }
-  @keyframes actionHubUrgentDotGlow {
+  @keyframes taskWidgetUrgentDotGlow {
     0%, 100% { box-shadow: 0 0 8px 2px rgba(232, 120, 100, 0.5); opacity: 1; }
     50% { box-shadow: 0 0 12px 4px rgba(232, 120, 100, 0.7); opacity: 0.9; }
   }
-  .actionHubCaughtUp {
+  .taskWidgetCaughtUp {
     margin: 0;
     padding: 10px 0;
     font-size: 0.8rem;
     color: var(--restoration-charcoal, #2d352d);
     opacity: 0.85;
   }
-  .actionHubFloatingXp {
+  .taskWidgetFloatingXp {
     position: absolute;
     left: 50%;
     bottom: 100%;
@@ -610,18 +615,18 @@
     pointer-events: none;
     white-space: nowrap;
     text-shadow: 0 0 6px rgba(135, 169, 107, 0.4);
-    animation: actionHubFloatingXpUp 1s ease-out forwards;
+    animation: taskWidgetFloatingXpUp 1s ease-out forwards;
   }
-  @keyframes actionHubFloatingXpUp {
+  @keyframes taskWidgetFloatingXpUp {
     0% { opacity: 1; transform: translateX(-50%) translateY(0); }
     100% { opacity: 0; transform: translateX(-50%) translateY(-28px); }
   }
-  .actionHubList {
+  .taskWidgetList {
     list-style: none;
     margin: 0;
     padding: 0;
   }
-  .actionHubItem {
+  .taskWidgetItem {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -632,7 +637,7 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     position: relative;
   }
-  .actionHubItem::before {
+  .taskWidgetItem::before {
     content: "";
     position: absolute;
     left: 0;
@@ -642,19 +647,19 @@
     border-radius: 2px;
     background: transparent;
   }
-  .actionHubItemOverdue::before {
+  .taskWidgetItemOverdue::before {
     background: var(--urgent, #E85555);
     opacity: 0.6;
-    animation: actionHubOverduePulse 2s ease-in-out infinite;
+    animation: taskWidgetOverduePulse 2s ease-in-out infinite;
   }
-  @keyframes actionHubOverduePulse {
+  @keyframes taskWidgetOverduePulse {
     0%, 100% { opacity: 0.45; }
     50% { opacity: 0.85; }
   }
-  .actionHubItem:last-child {
+  .taskWidgetItem:last-child {
     border-bottom: none;
   }
-  .actionHubItemXp {
+  .taskWidgetItemXp {
     position: absolute;
     top: 2px;
     right: 0;
@@ -664,7 +669,7 @@
     letter-spacing: 0.02em;
     flex-shrink: 0;
   }
-  .actionHubItemTitle {
+  .taskWidgetItemTitle {
     font-size: 0.8rem;
     font-weight: var(--font-weight-task);
     font-family: var(--font-body);
@@ -675,7 +680,7 @@
     flex: 1;
     min-width: 0;
   }
-  .actionHubCheckbox {
+  .taskWidgetCheckbox {
     flex-shrink: 0;
     width: 22px;
     height: 22px;
@@ -690,10 +695,10 @@
     transition: background 0.15s;
     position: relative;
   }
-  .actionHubCheckbox:hover {
+  .taskWidgetCheckbox:hover {
     background: rgba(135, 169, 107, 0.2);
   }
-  .actionHubCheckboxBox {
+  .taskWidgetCheckboxBox {
     width: 14px;
     height: 14px;
     border: 2px solid var(--restoration-sage);
@@ -701,11 +706,11 @@
     background: transparent;
     display: block;
   }
-  .actionHubCheckbox:focus .actionHubCheckboxBox,
-  .actionHubCheckbox:hover .actionHubCheckboxBox {
+  .taskWidgetCheckbox:focus .taskWidgetCheckboxBox,
+  .taskWidgetCheckbox:hover .taskWidgetCheckboxBox {
     background: rgba(135, 169, 107, 0.15);
   }
-  .actionHubCategoryPill {
+  .taskWidgetCategoryPill {
     flex-shrink: 0;
     font-size: 0.7rem;
     font-weight: 600;
@@ -715,7 +720,7 @@
     color: var(--restoration-charcoal, #2d352d);
     border: 1px solid rgba(135, 169, 107, 0.2);
   }
-  .actionHubFloatingSeed {
+  .taskWidgetFloatingSeed {
     position: absolute;
     left: 50%;
     bottom: 24px;
@@ -727,14 +732,14 @@
     z-index: 5;
     text-shadow: 0 0 8px rgba(196, 163, 90, 0.35);
   }
-  .actionHubItemTime {
+  .taskWidgetItemTime {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.7rem;
     font-variant-numeric: tabular-nums;
     color: #6B7280;
     flex-shrink: 0;
   }
-  .actionHubReschedule {
+  .taskWidgetReschedule {
     flex-shrink: 0;
     padding: 2px 6px;
     border: none;
@@ -744,28 +749,28 @@
     border-radius: 6px;
     transition: background 0.15s;
   }
-  .actionHubReschedule:hover {
+  .taskWidgetReschedule:hover {
     background: rgba(0, 0, 0, 0.06);
   }
-  .actionHubFooter {
+  .taskWidgetFooter {
     padding-top: 10px;
     margin-top: 6px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     display: flex;
     justify-content: flex-end;
   }
-  .actionHubLink {
+  .taskWidgetLink {
     font-size: 0.75rem;
     font-weight: 500;
     color: #5D4037;
     text-decoration: none;
     transition: color 0.15s, text-decoration 0.15s;
   }
-  .actionHubLink:hover {
+  .taskWidgetLink:hover {
     color: #2D2D2D;
     text-decoration: underline;
   }
-  .actionHubEmpty {
+  .taskWidgetEmpty {
     font-size: 0.8rem;
     color: var(--home-text-meta);
     margin: 0 0 8px;
@@ -1207,7 +1212,7 @@
   .heroSessionProgressFill {
     height: 100%;
     border-radius: 4px;
-    background: linear-gradient(90deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+    background: linear-gradient(90deg, var(--home-sage-light) 0%, var(--home-sage) 50%, var(--home-sage-dark) 100%);
     transition: width 0.4s ease;
   }
   .heroSessionActions {
@@ -1625,26 +1630,26 @@
 .intRowDeadlineTitle { font-size: 0.8rem; font-weight: 600; color: #2d352d; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .intRowDeadlineTime { font-family: var(--font-body); font-size: 0.68rem; color: #7B6751; }
 
-/* ─── ActionHub redesign: card is now a flex row (checkbox + meta) ─────────── */
+/* ─── Task widget redesign: card is now a flex row (checkbox + meta) ─────────── */
 
 /* Override: new card layout uses flex row */
-.actionHubCard {
+.taskWidgetCard {
   display: flex !important;
   align-items: flex-start;
   gap: 10px;
   padding: 10px 12px !important;
 }
 
-/* ─── ActionHub redesign: summary chips, card meta, bottom bar ─────────────── */
+/* ─── Task widget redesign: summary chips, card meta, bottom bar ─────────────── */
 
-.actionHubSummaryRow {
+.taskWidgetSummaryRow {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
 
-.actionHubSummaryOverdue {
+.taskWidgetSummaryOverdue {
   display: inline-flex;
   align-items: center;
   padding: 3px 9px;
@@ -1659,7 +1664,7 @@
   border: 1px solid rgba(192, 113, 78, 0.25);
 }
 
-.actionHubSummaryDue {
+.taskWidgetSummaryDue {
   display: inline-flex;
   align-items: center;
   padding: 3px 9px;
@@ -1674,7 +1679,7 @@
   border: 1px solid rgba(180, 134, 11, 0.2);
 }
 
-.actionHubCardMeta {
+.taskWidgetCardMeta {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1683,14 +1688,14 @@
   padding-right: 4px;
 }
 
-.actionHubCardTags {
+.taskWidgetCardTags {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
   align-items: center;
 }
 
-.actionHubTagNow {
+.taskWidgetTagNow {
   display: inline-block;
   font-family: var(--font-body);
   font-size: 0.58rem;
@@ -1704,7 +1709,7 @@
   border: 1px solid rgba(74, 52, 33, 0.2);
 }
 
-.actionHubOverdueTag {
+.taskWidgetOverdueTag {
   display: inline-block;
   font-family: var(--font-body);
   font-size: 0.58rem;
@@ -1718,7 +1723,7 @@
   border: 1px solid rgba(192, 113, 78, 0.25);
 }
 
-.actionHubCheckboxChecked {
+.taskWidgetCheckboxChecked {
   background: rgba(132, 169, 140, 0.25) !important;
   border-color: rgba(132, 169, 140, 0.7) !important;
   color: #4a7a57;
@@ -1728,7 +1733,7 @@
   justify-content: center;
 }
 
-.actionHubSeeAllBtn {
+.taskWidgetSeeAllBtn {
   display: block;
   width: 100%;
   margin-top: 8px;
@@ -1744,20 +1749,64 @@
   border-radius: 6px;
   transition: background 0.15s, color 0.15s;
 }
-.actionHubSeeAllBtn:hover {
+.taskWidgetSeeAllBtn:hover {
   background: rgba(123, 103, 81, 0.06);
   color: #4A3421;
 }
 
-  .actionHubSlotRoot {
+  .taskWidgetSlotRoot {
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
 
-  /* All tasks done: keep subtle green tint (celebratory) */
-  .actionHubSlotAllDoneWrap {
-    background: linear-gradient(to bottom right, #f7fdf9, #f0fdf4);
+  /* Today's Tasks widget header: title + meta (left), donut + count (right) */
+  .taskWidgetSlotHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .taskWidgetSlotHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .taskWidgetSlotIcon {
+    flex-shrink: 0;
+    color: #8B6F47;
+  }
+  .taskWidgetSlotTitleBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .taskWidgetSlotTitle {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #4A3728;
+    margin: 0;
+    line-height: 1.2;
+  }
+  .taskWidgetSlotMeta {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #8C7B6B;
+    line-height: 1.2;
+  }
+  .taskWidgetSlotHeaderRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* All tasks done: warm flax tint (celebratory) */
+  .taskWidgetSlotAllDoneWrap {
+    background: linear-gradient(to bottom right, var(--home-flax), var(--home-flax-mid));
     border-radius: 16px;
     padding: 1rem;
     margin: -4px 0 0;
@@ -1765,7 +1814,7 @@
   }
 
   /* Plan tomorrow → pill button */
-  .actionHubPlanTomorrowPill {
+  .taskWidgetPlanTomorrowPill {
     display: inline-block;
     font-size: 0.75rem;
     font-weight: 600;
@@ -1776,68 +1825,86 @@
     text-decoration: none;
     transition: background 0.2s;
   }
-  .actionHubPlanTomorrowPill:hover {
+  .taskWidgetPlanTomorrowPill:hover {
     background: #44403c;
     color: #fff;
   }
 
-  /* Mini progress donut + count when tasks remaining */
-  .actionHubDonutRow {
+  /* Mini progress donut inline in header — 40px, stroke 3 */
+  .taskWidgetDonutRow {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
   }
-  .actionHubDonutWrap {
+  .taskWidgetDonutWrap {
     position: relative;
     width: 40px;
     height: 40px;
     flex-shrink: 0;
   }
-  .actionHubDonutSvg {
+  .taskWidgetDonutSvg {
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
   }
-  .actionHubDonutBg {
+  .taskWidgetDonutBg {
     fill: none;
-    stroke: rgba(74, 55, 40, 0.12);
-    stroke-width: 4;
+    stroke: #F0E8DC;
+    stroke-width: 3;
   }
-  .actionHubDonutFill {
+  .taskWidgetDonutFill {
     fill: none;
-    stroke: #B45309; /* warm amber — app palette */
-    stroke-width: 4;
+    stroke: #8B6F47;
+    stroke-width: 3;
     stroke-linecap: round;
     transition: stroke-dasharray 0.5s ease;
   }
-  .actionHubDonutCount {
-    font-family: var(--font-body);
+  .taskWidgetDonutCount {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #2c2420;
+    color: #4A3728;
     letter-spacing: 0.02em;
   }
-  .actionHubDonutCount span {
-    color: #8a7d76;
+  .taskWidgetDonutCount span {
+    color: #8C7B6B;
     font-weight: 500;
   }
 
-  .actionHubManageFooter {
+  .taskWidgetManageFooter {
     margin-top: 10px;
+    padding-top: 0.75rem;
+    border-top: 1px solid #E2D5C5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
-  .actionHubManageFooter.actionHubBottomRow {
-    justify-content: flex-end;
+  .taskWidgetManageFooter.taskWidgetBottomRow {
+    justify-content: center;
   }
-  .actionHubManageFooter .actionHubHeaderLink {
+  .taskWidgetManageLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.85rem;
     font-size: 0.75rem;
-    color: #a8a29e;
+    font-weight: 500;
+    color: #8B6F47;
+    background: transparent;
+    border: 1px solid #D4C4B0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   }
-  .actionHubManageFooter .actionHubHeaderLink:hover {
-    color: #57534e;
+  .taskWidgetManageLink:hover {
+    color: #5C4A3A;
+    background: rgba(139, 111, 71, 0.06);
+    border-color: #8B6F47;
   }
 
-.actionHubBottomBar {
+.taskWidgetBottomBar {
   margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid rgba(123, 103, 81, 0.1);
@@ -1847,7 +1914,7 @@
 }
 
 /* ── Focus session CTA (shown when no timer is running) ── */
-.actionHubFocusCta {
+.taskWidgetFocusCta {
   display: block;
   width: 100%;
   margin-top: 10px;
@@ -1863,7 +1930,7 @@
   text-align: center;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.actionHubFocusCta:hover {
+.taskWidgetFocusCta:hover {
   background: rgba(120, 113, 108, 0.06);
   border-color: rgba(120, 113, 108, 0.6);
   color: #44403c;
@@ -2191,27 +2258,27 @@
   flex-shrink: 0;
 }
 
-.actionHubProgressTrackSlim {
+.taskWidgetProgressTrackSlim {
   height: 3px;
   border-radius: 99px;
   background: rgba(123, 103, 81, 0.12);
   overflow: hidden;
 }
 
-.actionHubProgressFillSlim {
+.taskWidgetProgressFillSlim {
   height: 100%;
   border-radius: 99px;
   background: #84A98C;
   transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.actionHubBottomRow {
+.taskWidgetBottomRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.actionHubBottomPct {
+.taskWidgetBottomPct {
   font-family: var(--font-body);
   font-size: 0.67rem;
   font-weight: 600;
@@ -3007,27 +3074,27 @@
   background: rgba(74, 55, 40, 0.04);
 }
 
-/* Urgency: red / amber / green — border-green-400 for >14 days */
+/* Urgency: terracotta / gold / sage — warm palette */
 .intRowDeadlineRow2Red {
-  border-left-color: #dc2626;
-  background: #fef2f2;
+  border-left-color: var(--home-terracotta);
+  background: var(--home-flax);
 }
 .intRowDeadlineRow2Red:hover {
-  background: #fef2f2;
+  background: var(--home-flax);
 }
 .intRowDeadlineRow2Amber {
-  border-left-color: #ea580c;
-  background: #fff7ed;
+  border-left-color: var(--home-gold);
+  background: var(--home-cream);
 }
 .intRowDeadlineRow2Amber:hover {
-  background: #fff7ed;
+  background: var(--home-cream);
 }
 .intRowDeadlineRow2Green {
-  border-left-color: #4ade80; /* border-green-400 */
-  background: #f0fdf4;
+  border-left-color: var(--home-sage);
+  background: var(--home-flax-mid);
 }
 .intRowDeadlineRow2Green:hover {
-  background: #f0fdf4;
+  background: var(--home-flax-mid);
 }
 .intRowDeadlineRow2Grey  {
   border-left-color: #d4c9c2;
@@ -3075,10 +3142,10 @@
 }
 .intRowDeadline2TypePill:hover { opacity: 0.75; }
 
-.intRowDeadline2TypePillExam { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
-.intRowDeadline2TypePillCw   { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.intRowDeadline2TypePillExam { background: var(--home-flax); color: var(--home-terracotta); border-color: var(--home-terracotta-light); }
+.intRowDeadline2TypePillCw   { background: var(--home-cream); color: var(--home-taupe); border-color: var(--home-parchment-border); }
 .intRowDeadline2TypePillPresentation { background: #faf5ff; color: #9333ea; border-color: #e9d5ff; }
-.intRowDeadline2TypePillQuiz { background: #e8f4f0; color: #2d5f50; }
+.intRowDeadline2TypePillQuiz { background: var(--home-flax-mid); color: var(--home-sage-dark); }
 
 .intRowDeadline2Days {
   font-family: var(--font-body);
@@ -3088,9 +3155,9 @@
   margin-left: auto;
   color: #8a7d76;
 }
-.intRowDeadline2DaysRed   { color: #dc2626; }
-.intRowDeadline2DaysAmber { color: #ea580c; }
-.intRowDeadline2DaysGreen { color: #16a34a; } /* text-green-600 */
+.intRowDeadline2DaysRed   { color: var(--home-terracotta); }
+.intRowDeadline2DaysAmber { color: var(--home-gold-dark); }
+.intRowDeadline2DaysGreen { color: var(--home-sage-dark); }
 .intRowDeadline2DaysGrey  { color: #8a7d76; }
 
 .intRowDeadline2Title {
@@ -3146,7 +3213,7 @@
 
 /* ─── Today's Tasks v2: compact row layout ──────────────────────────────── */
 
-.actionHubTaskList {
+.taskWidgetTaskList {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -3154,40 +3221,40 @@
   flex-direction: column;
 }
 
-.actionHubTaskRow {
+.taskWidgetTaskRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 4px;
+  padding: 0.6rem 0;
   min-height: 36px;
-  border-bottom: 1px solid rgba(74, 55, 40, 0.06);
+  border-bottom: 1px solid #F0E8DC;
   border-radius: 0;
   transition: background 0.12s;
   cursor: default;
 }
 
-.actionHubTaskRow:last-child {
+.taskWidgetTaskRow:last-child {
   border-bottom: none;
 }
 
-.actionHubTaskRow:hover {
+.taskWidgetTaskRow:hover {
   background: rgba(74, 55, 40, 0.03);
   border-radius: 6px;
 }
 
-.actionHubTaskRowOverdue .actionHubTaskTitle {
+.taskWidgetTaskRowOverdue .taskWidgetTaskTitle {
   color: #292524; /* keep task name stone-800, only LATE pill is red */
 }
 
-.actionHubTaskRowDone {
+.taskWidgetTaskRowDone {
   opacity: 0.55;
 }
 
-.actionHubCheckboxCircle {
-  width: 16px;
-  height: 16px;
+.taskWidgetCheckboxCircle {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  border: 1.5px solid #c4b8b0;
+  border: 1.5px solid #D4C4B0;
   background: transparent;
   display: flex;
   align-items: center;
@@ -3197,17 +3264,17 @@
   transition: border-color 0.15s, background 0.15s;
 }
 
-.actionHubCheckbox:hover .actionHubCheckboxCircle {
-  border-color: #4a3728;
+.taskWidgetCheckbox:hover .taskWidgetCheckboxCircle {
+  border-color: #8B6F47;
 }
 
-.actionHubCheckboxCircleChecked {
-  background: rgba(132, 169, 140, 0.25) !important;
-  border-color: rgba(132, 169, 140, 0.7) !important;
-  color: #4a7a57;
+.taskWidgetCheckboxCircleChecked {
+  background: #8B9D7B !important;
+  border-color: #8B9D7B !important;
+  color: #fff;
 }
 
-.actionHubTaskTitle {
+.taskWidgetTaskTitle {
   flex: 1;
   min-width: 0;
   font-family: var(--font-body);
@@ -3219,56 +3286,54 @@
   text-overflow: ellipsis;
 }
 
-.actionHubTaskTitleDone {
+.taskWidgetTaskTitleDone {
   text-decoration: line-through;
 }
 
-.actionHubTaskRight {
+.taskWidgetTaskRight {
   display: flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
 }
 
-.actionHubTaskTag {
-  font-size: 10px;
+.taskWidgetTaskTag {
+  font-size: 0.65rem;
   font-weight: 500;
+  color: #8C7B6B;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #a8a29e; /* text-stone-400 — plain text, no pill */
+  letter-spacing: 0.04em;
   background: none;
   border: none;
   padding: 0;
   white-space: nowrap;
 }
 
-.actionHubTaskTagNext {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 9999px;
-  background: #fef3c7;
-  color: #b45309;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+.taskWidgetTaskTagNext {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  white-space: nowrap;
-  border: none;
-}
-
-.actionHubTaskTagLate {
-  font-size: 10px;
-  padding: 2px 6px; /* py-0.5 px-1.5 */
-  border-radius: 9999px;
-  background: #fef2f2; /* bg-red-50 */
-  color: #dc2626; /* text-red-600 */
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  border: 1px solid #fecaca; /* border-red-200 */
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: #F0E8DC;
+  color: #8B6F47;
   white-space: nowrap;
 }
 
-.actionHubMoreText {
+.taskWidgetTaskTagLate {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: #F5E0D5;
+  color: #C17C5E;
+  white-space: nowrap;
+}
+
+.taskWidgetMoreText {
   background: none;
   border: none;
   padding: 4px 4px;
@@ -3280,7 +3345,7 @@
   transition: color 0.12s;
 }
 
-.actionHubMoreText:hover {
+.taskWidgetMoreText:hover {
   color: #57534e;
 }
 

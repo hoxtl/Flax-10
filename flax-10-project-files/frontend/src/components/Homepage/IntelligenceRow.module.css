@@ -211,7 +211,7 @@
 }
 .rightNowScheduleWarning svg {
   flex-shrink: 0;
-  color: #d97706;
+  color: var(--home-gold-dark);
 }
 
 /* ── Right Now: TFL Travel Alerts section (always visible) ── */
@@ -264,11 +264,11 @@
   font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 500;
-  color: #15803d;
+  color: var(--home-sage-dark);
 }
 .rightNowTflAllGood svg {
   flex-shrink: 0;
-  color: #16a34a;
+  color: var(--home-sage);
 }
 
 .rightNowTflLoading {
@@ -440,10 +440,10 @@
   background: rgba(254, 226, 226, 0.6);
 }
 .statusStripConflict .statusStripDot {
-  background: #dc2626;
+  background: var(--home-terracotta);
   animation: stripConflictGlow 1.6s ease-in-out infinite;
 }
-.statusStripConflict .statusStripText { color: #dc2626; }
+.statusStripConflict .statusStripText { color: var(--home-terracotta); }
 
 @keyframes stripConflictGlow {
   0%, 100% {
@@ -568,8 +568,8 @@
   border-color: rgba(22, 163, 74, 0.25);
   background: rgba(220, 252, 231, 0.6);
 }
-.statusStripGap .statusStripDot { background: #16a34a; }
-.statusStripGap .statusStripText { color: #16a34a; }
+.statusStripGap .statusStripDot { background: var(--home-sage); }
+.statusStripGap .statusStripText { color: var(--home-sage); }
 
 /* Active task variant — warm brown */
 .statusStripTask {
@@ -723,7 +723,7 @@
 }
 
 .bentoSlot.iconPulse .bentoIcon {
-  color: #dc2626; /* soft red-600 for overdue pulse */
+  color: var(--home-terracotta); /* soft red — urgency */
   animation: intRowPulseTerracotta 2s ease-in-out infinite;
 }
 
@@ -767,7 +767,7 @@
 }
 
 .bentoIconWrap.bentoIconOverdue .bentoIcon {
-  color: #dc2626; /* soft red — urgency */
+  color: var(--home-terracotta); /* soft red — urgency */
 }
 
 .bentoIcon {

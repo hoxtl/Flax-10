@@ -57,9 +57,9 @@
   flex-shrink: 0;
   margin-top: 0.35rem;
 }
-.deadlineDotRed { background: #f87171; }
-.deadlineDotAmber { background: #fbbf24; }
-.deadlineDotGreen { background: #4ade80; }
+.deadlineDotRed { background: var(--home-terracotta); }
+.deadlineDotAmber { background: var(--home-gold); }
+.deadlineDotGreen { background: var(--home-sage); }
 .deadlineBody {
   flex: 1;
   min-width: 0;
@@ -82,8 +82,8 @@
   font-weight: 600;
   flex-shrink: 0;
 }
-.deadlineDaysRed { color: #ef4444; }
-.deadlineDaysAmber { color: #f59e0b; }
+.deadlineDaysRed { color: var(--home-terracotta); }
+.deadlineDaysAmber { color: var(--home-gold-dark); }
 .deadlineDaysGreen { color: #a8a29e; }
 .deadlineMeta {
   margin: 0;
@@ -154,9 +154,9 @@
   padding: 0.4rem 0 0.4rem 0.75rem; /* pl-3 */
   border-left: 3px solid transparent;
 }
-.intRowDeadlineRow2Red { border-left-color: #dc2626; }
-.intRowDeadlineRow2Amber { border-left-color: #ea580c; }
-.intRowDeadlineRow2Green { border-left-color: #4ade80; } /* border-green-400 */
+.intRowDeadlineRow2Red { border-left-color: var(--home-terracotta); }
+.intRowDeadlineRow2Amber { border-left-color: var(--home-gold); }
+.intRowDeadlineRow2Green { border-left-color: var(--home-sage); }
 .intRowDeadline2Line1 {
   display: flex;
   align-items: center;
@@ -203,9 +203,9 @@
   cursor: pointer;
   background: transparent;
 }
-.intRowDeadline2TypePillExam { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.intRowDeadline2TypePillExam { background: var(--home-flax); color: var(--home-terracotta); border-color: var(--home-terracotta-light); }
 .intRowDeadline2TypePillPresentation { background: #faf5ff; color: #9333ea; border-color: #e9d5ff; }
-.intRowDeadline2TypePillCw { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.intRowDeadline2TypePillCw { background: var(--home-cream); color: var(--home-taupe); border-color: var(--home-parchment-border); }
 .intRowDeadline2TypePillQuiz { background: #e0e7ff; color: #4338ca; }
 .intRowDeadline2Days {
   font-size: 0.75rem;
@@ -213,9 +213,9 @@
   flex-shrink: 0;
   margin-left: auto;
 }
-.intRowDeadline2DaysRed { color: #dc2626; }
-.intRowDeadline2DaysAmber { color: #ea580c; }
-.intRowDeadline2DaysGreen { color: #16a34a; } /* text-green-600 */
+.intRowDeadline2DaysRed { color: var(--home-terracotta); }
+.intRowDeadline2DaysAmber { color: var(--home-gold-dark); }
+.intRowDeadline2DaysGreen { color: var(--home-sage-dark); }
 .intRowDeadline2Title {
   margin: 0;
   font-size: 0.875rem;
@@ -269,7 +269,7 @@
   overflow: hidden;
   margin-top: 0.75rem;
 }
-.intRowFocusDayBarFree { background: #22c55e; min-width: 2px; }
+.intRowFocusDayBarFree { background: var(--home-sage); min-width: 2px; }
 .intRowFocusDayBarBusy { background: #e7e5e4; min-width: 2px; }
 .intRowFocusFooterLink { font-size: 0.75rem; font-weight: 500; color: #a8a29e; background: none; border: none; cursor: pointer; padding: 0; margin-top: auto; }
 .intRowFocusFooterLink:hover { color: #57534e; }

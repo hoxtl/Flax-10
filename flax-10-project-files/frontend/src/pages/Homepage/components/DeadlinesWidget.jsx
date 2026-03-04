@@ -4,7 +4,7 @@
 
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, CheckCircle } from "lucide-react";
 import styles from "./DeadlinesWidget.module.css";
 
 /** Urgency: "critical" <3d, "urgent" 3-7d, "warning" 7-14d, "ok" >14d */
@@ -35,7 +35,7 @@ export function DeadlinesWidget({
   const sorted = useMemo(() => {
     const list = [...deadlines].filter((d) => d.start_due_date);
     list.sort((a, b) => new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime());
-    return list.slice(0, 5);
+    return list.slice(0, 3);
   }, [deadlines]);
 
   if (!Array.isArray(deadlines)) {
@@ -46,8 +46,8 @@ export function DeadlinesWidget({
     <div className={styles.root}>
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <ClipboardList className={styles.headerIcon} size={16} strokeWidth={1.5} aria-hidden />
-          <span className={styles.headerTitle}>Upcoming deadlines</span>
+          <ClipboardList className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
+          <span className={styles.headerTitle}>Upcoming Deadlines</span>
           {sorted.length > 0 && (
             <span className={styles.headerBadge}>{sorted.length}</span>
           )}
@@ -56,7 +56,9 @@ export function DeadlinesWidget({
 
       {sorted.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyTitle}>All caught up! 🎉</p>
+          <p className={styles.emptyTitle}>
+            <CheckCircle size={18} className={styles.emptyTitleIcon} aria-hidden /> All caught up!
+          </p>
           <p className={styles.emptySubtitle}>No upcoming deadlines</p>
         </div>
       ) : (

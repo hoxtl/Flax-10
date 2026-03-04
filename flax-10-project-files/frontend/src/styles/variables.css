@@ -5,6 +5,41 @@
   --card-radius: 24px;
   --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 
+  /* Canonical design palette — warm brown/flax (primary accent, secondary, success, warning, urgent, muted, border, card) */
+  --accent-primary: #8B6F47;       /* warm brown — active states, primary buttons, left borders on active cards */
+  --accent-secondary: #A68B5B;     /* golden brown — highlights, badges, hover states */
+  --color-success: #8B9D7B;        /* sage green — completed, free time, streaks */
+  --color-warning: #C4A265;        /* warm gold — approaching deadlines, caution */
+  --color-urgent: #C17C5E;         /* terracotta — overdue, critical, overlap warnings */
+  --text-muted-warm: #8C7B6B;      /* warm grey-brown — muted text */
+  --border-warm: #E2D5C5;          /* warm light border */
+  --card-bg-warm: #FFFDF9;         /* very subtle warm white — card background */
+
+  /* Widget typography (home page cards — inherit font from root) */
+  --widget-title-size: 1.05rem;
+  --widget-title-weight: 600;
+  --widget-title-color: #4A3728;
+  --widget-label-size: 0.65rem;
+  --widget-label-weight: 600;
+  --widget-label-spacing: 0.06em;
+  --widget-label-color: #8C7B6B;
+  --widget-body-size: 0.85rem;
+  --widget-body-color: #5C4A3A;
+  --widget-muted-size: 0.78rem;
+  --widget-muted-color: #8C7B6B;
+  --widget-badge-weight: 700;
+  /* Widget card styling */
+  --widget-card-bg: #FFFDF9;
+  --widget-card-border: 1px solid #E2D5C5;
+  --widget-card-radius: 14px;
+  --widget-card-padding: 1.25rem;
+  --widget-card-hover-shadow: 0 2px 12px rgba(139, 111, 71, 0.08);
+  --widget-card-hover-transform: translateY(-1px);
+  --widget-card-active-border: 3px solid #8B6F47;
+  --widget-inner-bg: #FAF6F0;
+  --widget-inner-border: 1px solid #E2D5C5;
+  --widget-inner-radius: 10px;
+
   /* Typography: single font for all UI text (greeting, tasks, pills, dates, titles) */
   --font-body: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-heading: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -42,8 +77,7 @@
   --c-green: #2A7A3A;
   --c-grey: #2B1E14;
 
-  /* Semantic colors for task/schedule accents — Warm-Classy status */
-  --urgent: #C05A3E;
+  --urgent: var(--color-urgent);
   --study: #52796f;
   --personal: #8B5CF6;
   --health: #22C897;
@@ -53,24 +87,25 @@
   --panel: #FFFCFA;
   --sidebar: #EEEAE4;
   --border: rgba(74, 52, 33, 0.12);
+  --border-default: var(--border-warm);
 
-  /* Semantic text & surfaces (light) */
+  /* Semantic text & surfaces (light) — align muted to warm grey-brown */
   --text: #1A1A1A;
   --text-primary: #7B6751;
-  --text-secondary: #64748b;
+  --text-secondary: var(--text-muted-warm);
   --text-dark: #1e1b2e;
-  --muted: #9CA3AF;
+  --muted: var(--text-muted-warm);
 
-  --primary: #7B6751;
+  --primary: var(--accent-primary);
   --primary-strong: #5c4d3e;
-  --sage: #8C9A86;
-  --accent: #7B6751;
-  --danger: #C05A3E;
-  --danger-bg: rgba(192, 90, 62, 0.12);
-  --danger-border: rgba(192, 90, 62, 0.4);
+  --sage: var(--color-success);
+  --accent: var(--accent-primary);
+  --danger: var(--color-urgent);
+  --danger-bg: rgba(193, 124, 94, 0.12);
+  --danger-border: rgba(193, 124, 94, 0.4);
 
   --hover: rgba(74, 52, 33, 0.06);
-  --hover-light: rgba(139, 115, 85, 0.05);
+  --hover-light: rgba(166, 139, 91, 0.08);
   --active: rgba(139, 111, 71, 0.12);
 
   --pill-bg: #f0ede8;
@@ -87,11 +122,11 @@
   --sidebar-active: rgba(139, 111, 71, 0.12);
   --user-details-text: #1e1b2e;
 
-  --card-bg: #FFFCFA;
-  --bento-card-bg: #FFFCFA;
+  --card-bg: var(--card-bg-warm);
+  --bento-card-bg: var(--card-bg-warm);
   --surface: #F8F5F2;
   /* Warm-Classy: Soft Paper for every widget/card */
-  --soft-paper: #FFFCFA;
+  --soft-paper: var(--card-bg-warm);
   /* Day-strip / date navigator dots (semantic) */
   --dot-lecture: var(--study);
   --dot-meal: var(--neutral);
@@ -99,32 +134,50 @@
   --dot-deadline: var(--urgent);
   --dot-personal: var(--personal);
 
-  /* Status: Sage Green success, Muted Terracotta warnings/conflicts */
-  --status-sage: #8C9A86;
-  --status-terracotta: #C05A3E;
-  --success-bg: rgba(140, 154, 134, 0.18);
-  --success-text: #8C9A86;
-  --error-bg: rgba(192, 90, 62, 0.12);
-  --error-text: #C05A3E;
-  --error-border: rgba(192, 90, 62, 0.4);
-  --warning-bg: rgba(192, 90, 62, 0.1);
-  --warning-border: rgba(192, 90, 62, 0.35);
-  --warning-text: #C05A3E;
-  --warning: #C05A3E;
+  /* Status: Success (sage), Warning (gold), Urgent (terracotta) */
+  --status-sage: var(--color-success);
+  --status-terracotta: var(--color-urgent);
+  --success-bg: rgba(139, 157, 123, 0.18);
+  --success-text: var(--color-success);
+  --error-bg: rgba(193, 124, 94, 0.12);
+  --error-text: var(--color-urgent);
+  --error-border: rgba(193, 124, 94, 0.4);
+  --warning-bg: rgba(196, 162, 101, 0.12);
+  --warning-border: rgba(196, 162, 101, 0.35);
+  --warning-text: var(--color-warning);
+  --warning: var(--color-warning);
 
-  --deadline-urgent-bg: rgba(192, 90, 62, 0.1);
-  --deadline-urgent-border: #C05A3E;
+  /* Home page widgets: align to canonical palette */
+  --home-sage: var(--color-success);
+  --home-sage-light: #A3B18A;
+  --home-sage-dark: #5C6B4F;
+  --home-gold: var(--color-warning);
+  --home-gold-light: #D4B87A;
+  --home-gold-dark: var(--accent-secondary);
+  --home-terracotta: var(--color-urgent);
+  --home-terracotta-light: #D4977A;
+  --home-taupe: #9C8B7A;
+  --home-cream: #FAF6F0;
+  --home-cream-deep: #F5EDE3;
+  --home-flax: #F8F4EE;
+  --home-flax-mid: #F0E8DC;
+  --home-flax-deep: #E8DFD0;
+  --home-parchment-bg: #FBF5EB;
+  --home-parchment-border: var(--border-warm);
+
+  --deadline-urgent-bg: rgba(193, 124, 94, 0.1);
+  --deadline-urgent-border: var(--color-urgent);
 
   /* Daily Progress widget */
-  --color-terracotta: #C05A3E;
-  --color-brown-light: #c4a35a;
-  --color-error-light: rgba(192, 90, 62, 0.15);
+  --color-terracotta: var(--color-urgent);
+  --color-brown-light: var(--color-warning);
+  --color-error-light: rgba(193, 124, 94, 0.15);
   --color-sage-dark: #3d5a52;
   --color-orange-400: #fb923c;
   --color-slate-400: #94a3b8;
-  --color-sage-primary: #8C9A86;
-  --color-sage-glow: rgba(140, 154, 134, 0.5);
-  --color-border-light: rgba(0, 0, 0, 0.08);
+  --color-sage-primary: var(--color-success);
+  --color-sage-glow: rgba(139, 157, 123, 0.5);
+  --color-border-light: var(--border-warm);
 
   /* Progress wave / growth tank (light) */
   --growth-tank-deep: var(--color-sage-dark);
@@ -155,21 +208,19 @@
   --bg-home: var(--bg);
   --bg-home-night: var(--bg);
 
-  /* Master Restoration: Warm-Classy stationary theme — warm Almond */
+  /* Master Restoration: Warm-Classy — align to canonical palette */
   --restoration-bg: #F8F5F2;
-  --restoration-sage: #8C9A86;
+  --restoration-sage: var(--color-success);
   --restoration-flax: #EEDC82;
-  --restoration-earth: #6B5344;
-  --restoration-terracotta: #C05A3E;
+  --restoration-earth: var(--accent-primary);
+  --restoration-terracotta: var(--color-urgent);
   --restoration-widget-radius: 24px;
   --restoration-widget-blur: 12px;
-  /* No black/grey borders — use none or very subtle tint only */
   --restoration-widget-border: none;
-  --restoration-gold-soft: rgba(238, 220, 130, 0.35);
-  --restoration-coral-border: 1px solid rgba(192, 90, 62, 0.5);
-  --restoration-coral-glow: 0 0 12px rgba(192, 90, 62, 0.2);
-  /* Body text: Warm-Classy — Flax Brown for primary headers & key accents */
-  --restoration-charcoal: #7B6751;
+  --restoration-gold-soft: rgba(196, 162, 101, 0.35);
+  --restoration-coral-border: 1px solid rgba(193, 124, 94, 0.5);
+  --restoration-coral-glow: 0 0 12px rgba(193, 124, 94, 0.2);
+  --restoration-charcoal: var(--accent-primary);
 
   --divider: #ddd;
   --text-muted: #888;
@@ -302,6 +353,48 @@
   --heatmap-mid: #64748b;
   --heatmap-high: var(--sage);
   --heatmap-full: var(--color-sage-dark);
+
+  /* Home page widgets: warm palette (same in dark for consistency) */
+  --home-sage: #8B9D7B;
+  --home-sage-light: #A3B18A;
+  --home-sage-dark: #5C6B4F;
+  --home-gold: #C4A265;
+  --home-gold-light: #D4B87A;
+  --home-gold-dark: #A68B5B;
+  --home-terracotta: #C17C5E;
+  --home-terracotta-light: #D4977A;
+  --home-taupe: #9C8B7A;
+  --home-cream: #FAF6F0;
+  --home-cream-deep: #F5EDE3;
+  --home-flax: #F8F4EE;
+  --home-flax-mid: #F0E8DC;
+  --home-flax-deep: #E8DFD0;
+  --home-parchment-bg: #FBF5EB;
+  --home-parchment-border: #E2D5C5;
+  /* Canonical design palette (dark): same hex so widgets stay cohesive */
+  --accent-primary: #8B6F47;
+  --accent-secondary: #A68B5B;
+  --color-success: #8B9D7B;
+  --color-warning: #C4A265;
+  --color-urgent: #C17C5E;
+  --text-muted-warm: #8C7B6B;
+  --border-warm: #E2D5C5;
+  --card-bg-warm: #FFFDF9;
+
+  /* Widget dark mode overrides (home page cards) */
+  --widget-card-bg: #1E1A16;
+  --widget-card-border: 1px solid #3D342B;
+  --widget-title-color: #E8DFD0;
+  --widget-label-color: #9C8B7A;
+  --widget-body-color: #E8DFD0;
+  --widget-muted-color: #9C8B7A;
+  --widget-inner-bg: #2A241E;
+  --widget-inner-border: 1px solid #3D342B;
+  --widget-accent-dark: #C4A265;
+  --widget-success-dark: #A3B18A;
+  --widget-text-primary-dark: #E8DFD0;
+  --widget-text-secondary-dark: #9C8B7A;
+  --widget-border-dark: #3D342B;
 }
 .MuiChartsAxis-tickLabel text,
 .MuiChartsLegend-label text {

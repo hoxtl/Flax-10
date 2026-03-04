@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo } from "react";
-import { Zap } from "lucide-react";
+import { Zap, Target, FileText, Timer, CalendarX } from "lucide-react";
 import { formatTime } from "../utils/dateFormatUtils";
 import styles from "./FocusWindowsWidget.module.css";
 
@@ -22,10 +22,10 @@ function formatDuration(mins) {
 }
 
 function getSuggestion(minutes) {
-  if (minutes >= 180) return "Perfect for deep work 🎯";
-  if (minutes >= 60) return "Good for a focused task block 📝";
-  if (minutes >= 30) return "Quick focus sprint ⚡";
-  return "Short burst ⏱";
+  if (minutes >= 180) return { text: "Perfect for deep work", Icon: Target };
+  if (minutes >= 60) return { text: "Good for a focused task block", Icon: FileText };
+  if (minutes >= 30) return { text: "Quick focus sprint", Icon: Zap };
+  return { text: "Short burst", Icon: Timer };
 }
 
 export function FocusWindowsWidget({
@@ -104,11 +104,13 @@ export function FocusWindowsWidget({
     return (
       <div className={styles.root}>
         <div className={styles.header}>
-          <Zap className={styles.headerIcon} size={16} strokeWidth={1.5} aria-hidden />
-          <span className={styles.headerTitle}>FOCUS WINDOWS</span>
+          <Zap className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
+          <span className={styles.headerTitle}>Focus Windows</span>
         </div>
         <div className={styles.emptyCard}>
-          <p className={styles.emptyTitle}>Fully booked today 😅</p>
+          <p className={styles.emptyTitle}>
+            <CalendarX size={18} className={styles.emptyTitleIcon} aria-hidden /> Fully booked today
+          </p>
           <p className={styles.emptySubtitle}>No free windows available — consider rescheduling something</p>
         </div>
         {onViewAnalytics && (
@@ -127,11 +129,13 @@ export function FocusWindowsWidget({
     return (
       <div className={styles.root}>
         <div className={styles.header}>
-          <Zap className={styles.headerIcon} size={16} strokeWidth={1.5} aria-hidden />
-          <span className={styles.headerTitle}>FOCUS WINDOWS</span>
+          <Zap className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
+          <span className={styles.headerTitle}>Focus Windows</span>
         </div>
         <div className={styles.emptyCard}>
-          <p className={styles.emptyTitle}>Fully booked today 😅</p>
+          <p className={styles.emptyTitle}>
+            <CalendarX size={18} className={styles.emptyTitleIcon} aria-hidden /> Fully booked today
+          </p>
           <p className={styles.emptySubtitle}>No free windows left — next free time is tomorrow</p>
         </div>
         {onViewAnalytics && (
@@ -149,8 +153,8 @@ export function FocusWindowsWidget({
     <div className={styles.root}>
       {/* Header */}
       <div className={styles.header}>
-        <Zap className={styles.headerIcon} size={16} strokeWidth={1.5} aria-hidden />
-        <span className={styles.headerTitle}>FOCUS WINDOWS</span>
+        <Zap className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
+        <span className={styles.headerTitle}>Focus Windows</span>
       </div>
 
       {/* Summary: "X windows · Longest: Xh · Shortest: Xm" */}
@@ -175,7 +179,17 @@ export function FocusWindowsWidget({
               <span className={styles.bestTimeRange}>
                 {formatTime24(bestWindow.start)} – {formatTime24(bestWindow.end)}
               </span>
-              <span className={styles.bestSuggestion}>{getSuggestion(bestWindow.minutes)}</span>
+              <span className={styles.bestSuggestion}>
+                {(() => {
+                  const { text, Icon } = getSuggestion(bestWindow.minutes);
+                  return (
+                    <>
+                      <Icon size={14} className={styles.bestSuggestionIcon} aria-hidden />
+                      {text}
+                    </>
+                  );
+                })()}
+              </span>
             </div>
             <span className={styles.bestPill}>{formatDuration(bestWindow.minutes)}</span>
           </div>

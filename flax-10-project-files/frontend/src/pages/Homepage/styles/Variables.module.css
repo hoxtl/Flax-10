@@ -1,27 +1,27 @@
 /* Homepage layout: unified time management dashboard — Master Restoration */
 
   .page {
-    /* Dashboard: warm notebook — one base, accents only for data */
-    --dash-base: #faf8f5;
-    --dash-green: #16a34a;
-    --dash-green-bg: #f0fdf4;
-    --dash-orange: #ea580c;
-    --dash-orange-bg: #fff7ed;
-    --dash-red: #dc2626;
-    --dash-red-bg: #fef2f2;
-    --dash-blue: #2563eb;
-    --dash-blue-bg: #eff6ff;
+    /* Dashboard: warm notebook — align to canonical palette */
+    --dash-base: var(--card-bg-warm);
+    --dash-green: var(--home-sage);
+    --dash-green-bg: var(--home-flax-mid);
+    --dash-orange: var(--home-gold-dark);
+    --dash-orange-bg: var(--home-cream);
+    --dash-red: var(--home-terracotta);
+    --dash-red-bg: var(--home-flax);
+    --dash-blue: var(--home-taupe);
+    --dash-blue-bg: var(--home-cream);
     --dash-violet: #7c3aed;
     --dash-violet-bg: #f5f3ff;
     --home-font-sans: var(--font-body);
     --home-bg: var(--restoration-bg, var(--dash-base));
-    --home-card-bg: rgba(255, 255, 255, 0.6);
+    --home-card-bg: var(--card-bg-warm);
     --home-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    --home-card-radius: 12px;
-    --home-now-bg: var(--restoration-earth, #6B5344);
-    /* Typography: Charcoal for titles, Muted Sage for captions */
+    --home-card-radius: 14px;
+    --home-now-bg: var(--accent-primary);
+    /* Typography: Charcoal for titles, warm grey-brown for captions */
     --home-text-primary: var(--text-charcoal);
-    --home-text-meta: var(--text-muted-sage);
+    --home-text-meta: var(--text-muted-warm);
     --home-font-header: 17px;
     --home-font-task: 13px;
     --home-font-meta: 10px;
@@ -33,7 +33,7 @@
     --flax-charcoal-heading: #1e261e;
     --home-text-label: var(--flax-sage-muted);
     --home-card-padding: 12px 18px;
-    --home-border-soft: rgba(0, 0, 0, 0.06);
+    --home-border-soft: var(--border-warm);
     /* Glassmorphism: all widgets */
     --home-border-card: 1px solid rgba(255, 255, 255, 0.2);
     --home-glass-blur: 12px;

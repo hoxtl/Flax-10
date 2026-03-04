@@ -26,7 +26,7 @@ export default function IntelligenceRow({
   statusStrip,
   scheduleInsight,
   tflContext,
-  slot1ActionHub,
+  slot1TaskWidget,
   slot1Meta,
   daySummary,
   slot3Urgent,
@@ -106,14 +106,15 @@ export default function IntelligenceRow({
         <BentoSlot
           span={styles.span1}
           slotVariant="tasks"
-          title="TODAY'S TASKS"
+          title="Today's Tasks"
           meta={slot1Meta}
           icon={CheckSquare}
           iconPulse={hasOverdue}
           index={1}
           isVisible={sectionVisible}
+          noHeader
         >
-          {slot1ActionHub}
+          {slot1TaskWidget}
         </BentoSlot>
 
         <BentoSlot

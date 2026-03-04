@@ -10,6 +10,7 @@ import {
   getTflLinesForLocation,
   isSevereDisruption,
 } from "../utils/kclTflMapping";
+import { Sun, AlertCircle, Clock, CheckCircle, MapPin, AlertTriangle, Car } from "lucide-react";
 import { formatTime, formatScheduleCountdown } from "../utils/dateFormatUtils";
 import { isNow } from "../utils";
 import styles from "./RightNowWidget.module.css";
@@ -79,7 +80,7 @@ export function RightNowWidget({
   onOpenTimer,
   tomorrowFirstEvent,
   todayVsYesterday,
-  actionHubItemsOnly = [],
+  taskWidgetItemsOnly = [],
 }) {
   const nav = navigatorContext || {};
   const nowMs = now.getTime();
@@ -119,7 +120,7 @@ export function RightNowWidget({
       <div className={styles.root}>
         <div className={styles.widgetHeader}>
           <span className={`${styles.headerDot} ${styles.headerDotActive}`} aria-hidden />
-          <span className={styles.headerLabel}>RIGHT NOW</span>
+          <span className={styles.headerLabel}>Right Now</span>
           <span className={styles.headerClock}>{liveClock}</span>
         </div>
         <div className={`${styles.section} ${styles.sectionFirst} ${styles.sectionLast} ${styles.timerBlock}`}>
@@ -147,7 +148,7 @@ export function RightNowWidget({
         <div className={styles.root}>
           <div className={styles.widgetHeader}>
             <span className={styles.headerDot} aria-hidden />
-            <span className={styles.headerLabel}>RIGHT NOW</span>
+            <span className={styles.headerLabel}>Right Now</span>
             <span className={styles.headerClock}>{liveClock}</span>
           </div>
           <div className={`${styles.section} ${styles.sectionFirst} ${styles.sectionLast}`}>
@@ -160,7 +161,7 @@ export function RightNowWidget({
       <div className={styles.root}>
         <div className={styles.widgetHeader}>
           <span className={styles.headerDot} aria-hidden />
-          <span className={styles.headerLabel}>RIGHT NOW</span>
+          <span className={styles.headerLabel}>Right Now</span>
           <span className={styles.headerClock}>{liveClock}</span>
         </div>
         <div className={`${styles.section} ${styles.sectionFirst} ${styles.sectionLast}`}>
@@ -173,8 +174,8 @@ export function RightNowWidget({
 
   // --- End of day ---
   if (nav.state === "endOfDay") {
-    const completedCount = actionHubItemsOnly.filter((t) => t.completed).length;
-    const totalCount = actionHubItemsOnly.length;
+    const completedCount = taskWidgetItemsOnly.filter((t) => t.completed).length;
+    const totalCount = taskWidgetItemsOnly.length;
     const eventsToday = (sortedEvents || []).filter(
       (e) => e.start_time && new Date(e.start_time).getTime() < nowMs
     ).length;
@@ -183,7 +184,7 @@ export function RightNowWidget({
       <div className={styles.root}>
         <div className={styles.widgetHeader}>
           <span className={styles.headerDot} aria-hidden />
-          <span className={styles.headerLabel}>RIGHT NOW</span>
+          <span className={styles.headerLabel}>Right Now</span>
           <span className={styles.headerClock}>{liveClock}</span>
         </div>
         <div className={`${styles.section} ${styles.sectionFirst}`}>
@@ -264,11 +265,13 @@ export function RightNowWidget({
       <div className={styles.root}>
         <div className={styles.widgetHeader}>
           <span className={styles.headerDot} aria-hidden />
-          <span className={styles.headerLabel}>RIGHT NOW</span>
+          <span className={styles.headerLabel}>Right Now</span>
           <span className={styles.headerClock}>{liveClock}</span>
         </div>
         <div className={styles.emptyDay}>
-          <p className={styles.emptyDayTitle}>Your day is clear 🎉</p>
+          <p className={styles.emptyDayTitle}>
+            <CheckCircle size={18} className={styles.emptyDayIcon} aria-hidden /> Your day is clear
+          </p>
           <p className={styles.emptyDaySubtitle}>No events scheduled</p>
         </div>
       </div>
@@ -283,7 +286,7 @@ export function RightNowWidget({
           className={`${styles.headerDot} ${hasActiveEvent ? styles.headerDotActive : ""}`}
           aria-hidden
         />
-        <span className={styles.headerLabel}>RIGHT NOW</span>
+        <span className={styles.headerLabel}>Right Now</span>
         <span className={styles.headerClock}>{liveClock}</span>
       </div>
 
@@ -296,7 +299,8 @@ export function RightNowWidget({
                 <p className={styles.currentEventTitle}>{currentBlock.title}</p>
                 {currentBlock.location?.trim() && (
                   <p className={styles.currentEventLocation}>
-                    <span aria-hidden>📍</span> {currentBlock.location.trim()}
+                    <MapPin size={14} className={styles.locationIcon} aria-hidden />
+                    {currentBlock.location.trim()}
                   </p>
                 )}
                 {timeRangeStr && (
@@ -318,7 +322,7 @@ export function RightNowWidget({
           </>
         ) : (
           <div className={styles.nowEmptyRow}>
-            <span className={styles.nowEmptyIcon} aria-hidden>☀️</span>
+            <Sun size={18} className={styles.nowEmptyIcon} aria-hidden />
             <p className={styles.nowEmpty}>Nothing on right now</p>
           </div>
         )}
@@ -346,8 +350,8 @@ export function RightNowWidget({
                       : styles.countdownPill
                 }
               >
-                {urgencyUnder5 && <span aria-hidden>🔴 </span>}
-                {urgency5To15 && !urgencyUnder5 && <span aria-hidden>🟡 </span>}
+                {urgencyUnder5 && <AlertCircle size={14} className={styles.countdownIconUrgent} aria-hidden />}
+                {urgency5To15 && !urgencyUnder5 && <Clock size={14} className={styles.countdownIconWarning} aria-hidden />}
                 in {rawCountdown}
               </span>
             )}
@@ -361,7 +365,7 @@ export function RightNowWidget({
       <div className={`${styles.section} ${styles.sectionTravel}`}>
         {tflDelays === undefined ? (
           <div className={styles.travelRow}>
-            <span aria-hidden>🚗</span>
+            <Car size={16} className={styles.travelIcon} aria-hidden />
             <span className={styles.travelText}>Checking travel…</span>
           </div>
         ) : hasRelevantDelays && nextEvent ? (
@@ -370,7 +374,7 @@ export function RightNowWidget({
               className={`${styles.travelBanner} ${anySuspension ? styles.travelBannerSuspension : ""}`}
               role="alert"
             >
-              <span aria-hidden>⚠️</span>
+              <AlertTriangle size={16} className={styles.travelBannerIcon} aria-hidden />
               <div className={styles.travelBannerContent}>
                 <p className={styles.travelBannerMessage}>
                   {bannerTitle} — {suggestText}
@@ -393,13 +397,13 @@ export function RightNowWidget({
           </>
         ) : !hasCampus && nextEvent ? (
           <div className={styles.travelRow}>
-            <span aria-hidden>🟢</span>
+            <CheckCircle size={14} className={styles.travelIconOk} aria-hidden />
             <span className={styles.travelText}>No campus commute coming up</span>
           </div>
         ) : hasAnyDelays && !hasRelevantDelays ? (
           <>
             <div className={styles.travelRow}>
-              <span aria-hidden>🟢</span>
+              <CheckCircle size={14} className={styles.travelIconOk} aria-hidden />
               <span className={styles.travelText}>Your commute looks clear</span>
             </div>
             {nonRelevantDelays.length > 0 && (
@@ -431,7 +435,7 @@ export function RightNowWidget({
           </>
         ) : (
           <div className={styles.travelRow}>
-            <span aria-hidden>🟢</span>
+            <CheckCircle size={14} className={styles.travelIconOk} aria-hidden />
             <span className={styles.travelText}>All lines running normally</span>
           </div>
         )}
@@ -448,7 +452,7 @@ export function RightNowWidget({
             const bTitle = c.b?.title || "Event B";
             return (
               <div key={idx} className={styles.conflictRow} role="alert">
-                <span aria-hidden>⚠️</span>
+                <AlertTriangle size={14} className={styles.conflictIcon} aria-hidden />
                 <span className={styles.conflictText}>
                   Overlap{atTime ? ` at ${atTime}` : ""} — {aTitle} & {bTitle}
                 </span>
