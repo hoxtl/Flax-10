@@ -230,7 +230,6 @@
     padding: 16px 16px 8px;
   }
 
-
   .date-strip-wrapper {
     display: block;
     overflow-x: auto;
@@ -253,6 +252,7 @@
   .view-select {
     font-size: 0.85rem;
     padding: 4px 10px;
+    background-image: none !important;
   }
 
   .week-indicator {
@@ -280,7 +280,8 @@
   }
 
   .date-card {
-    flex: 0 0 50px;
+    flex: 1 1 50px;
+    min-width: 50px;
     height: 50px;
     display: flex;
     flex-direction: column;
@@ -343,7 +344,6 @@
     font-size: 1rem;
     color: #5d4037;
   }
-
 
   .btn-calendar {
     display: none;
