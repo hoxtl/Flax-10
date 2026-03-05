@@ -1,13 +1,24 @@
-import { useState } from 'react';
-import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
-import { addDays, formatDate, getWeekDays, formatMonthYear } from './utils/dateUtils';
+import { useState } from "react";
+import {
+  useCalendar,
+  useCalendarDispatch,
+  useEventModal,
+} from "../../context/CalendarContext";
+import {
+  addDays,
+  formatDate,
+  getWeekDays,
+  formatMonthYear,
+  isSameDay,
+  getStartOfWeek,
+} from "./utils/dateUtils";
 import { getEvents } from "../../api/eventApi";
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { NavigationButtons } from "./header/NavigationButtons";
 import { ViewModeToggle } from "./header/ViewModeToggle";
-import TimetableImportModal from '../TimetableImportModal';
-import './CalendarHeader.css';
+import TimetableImportModal from "../TimetableImportModal";
+import "./CalendarHeader.css";
 
 async function handleImport(url, dispatch, selectedDate, viewMode) {
   await importTimetable(url);
