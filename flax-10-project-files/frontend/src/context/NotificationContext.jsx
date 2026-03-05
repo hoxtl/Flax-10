@@ -65,10 +65,15 @@ async function pollNotifications(knownIds, setNotifications) {
 }
 
 function notifyUser(notification) {
+    if (isReminderNotification(notification)) return;
     const action = parseNotificationAction(notification);
     const tag = `notification-${notification.id}`;
     sendBrowserNotification(notification.title, notification.message, tag, action);
     playNotificationSound();
+}
+
+function isReminderNotification(notification) {
+    return notification.notification_type === 'reminder';
 }
 
 function useNotificationActions(set, knownIds) {

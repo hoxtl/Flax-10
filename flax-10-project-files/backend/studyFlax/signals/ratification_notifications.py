@@ -58,7 +58,7 @@ def build_pending_notification(admin, society):
         message=f"Society '{society.name}' has requested ratification approval.",
         notification_type='ratification_request',
         society_id=society.id,
-        action_url=build_society_url(society.id),
+        action_url='admin',
     )
 
 

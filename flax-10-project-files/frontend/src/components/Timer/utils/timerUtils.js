@@ -36,11 +36,11 @@ export const useNotificationPermission = () => {
 
 function handleCompletion(timer, startNext, notify) {
     if (timer.mode === 'work') return handleWorkCompletion(timer, startNext, notify);
-    if (notify) notify("Break Over!", "Time to get back to work!");
+    if (notify) notify("Break Over!", "Time to get back to work!", { url: 'timer' });
 }
 
 function handleWorkCompletion(timer, startNext, notify) {
-    if (notify) notify("Time's Up!", "Work session complete. Take a break!");
+    if (notify) notify("Time's Up!", "Work session complete. Take a break!", { url: 'timer' });
     if (timer.breakTime === 0) {
         timer.setIsActive(false);
         startNext();

@@ -11,8 +11,18 @@ export function useNotify() {
         const action = createNotificationAction(options.url, options.scrollToId);
         sendBrowserNotification(title, message, options.tag, action);
         playNotificationSound();
-        addNotification({ title, message, action });
+        addNotification(buildNotificationPayload(title, message, options));
     }, [addNotification]);
 
     return notify;
+}
+
+function buildNotificationPayload(title, message, options) {
+    return {
+        title,
+        message,
+        action_url: options.url || null,
+        scroll_to_id: options.scrollToId || null,
+        notification_type: options.notificationType || 'general',
+    };
 }
