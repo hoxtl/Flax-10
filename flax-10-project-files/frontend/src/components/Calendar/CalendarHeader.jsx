@@ -75,12 +75,41 @@ export function CalendarHeader() {
 
   return (
     <>
-      <div className="calendar-header">
-        <NavigationButtons onNavigate={navigate} selectedDate={selectedDate} onDatePick={jumpToDate} />
-        <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
-        <HeaderActions openModal={openModal} viewMode={viewMode} selectedDate={selectedDate} onImportClick={() => setShowImportModal(true)} />
-      </div>
-      <TimetableImportModal isOpen={showImportModal} onClose={() => setShowImportModal(false)} onImport={onImport} />
+      <header className="mobile-calendar-header">
+        <div className="header-top-row">
+          <div className="header-spacer"></div>
+          <div className="week-indicator">Week {weekNumber} of 11</div>
+          <div className="date-pill">
+            {selectedDate.toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })}
+          </div>
+        </div>
+
+        <div className="calendar-header">
+          <NavigationButtons
+            onNavigate={navigate}
+            selectedDate={selectedDate}
+            onDatePick={jumpToDate}
+          />
+          <h2 className="calendar-title">{getTitle(selectedDate, viewMode)}</h2>
+          <HeaderActions
+            openModal={openModal}
+            viewMode={viewMode}
+            selectedDate={selectedDate}
+            onImportClick={() => setShowImportModal(true)}
+          />
+        </div>
+
+
+      </header>
+      <TimetableImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImport={onImport}
+      />
     </>
   );
 }
