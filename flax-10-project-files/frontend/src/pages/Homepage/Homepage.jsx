@@ -24,7 +24,6 @@ import { useTaskCompletion } from "../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
 import { playCompletionChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
-import { getUserSettings } from "../../api/userService";
 
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import CreateListModal from "../Tasks/components/CreateListModal";
@@ -97,7 +96,6 @@ export default function Homepage() {
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
-  const [savedRoutes, setSavedRoutes] = useState([]);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -126,11 +124,6 @@ export default function Homepage() {
     analyticsService.getProgress(14).then((data) => setAnalyticsProgress(data)).catch(() => setAnalyticsProgress(null));
   }, []);
 
-  useEffect(() => {
-    getUserSettings()
-      .then((s) => setSavedRoutes(Array.isArray(s?.savedRoutes) ? s.savedRoutes : []))
-      .catch(() => setSavedRoutes([]));
-  }, []);
 
   /* When work timer hits 0 in the NOW widget: soft chime */
   useEffect(() => {
@@ -224,7 +217,9 @@ export default function Homepage() {
         showCompletionToast(getCompletionMessage(t), { isRoutine });
         if (!isRoutine) {
           try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const w = /** @type {any} */ (window);
+            const AudioCtx = w.AudioContext || w.webkitAudioContext;
+            const ctx = new AudioCtx();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.connect(gain);
@@ -585,19 +580,6 @@ export default function Homepage() {
   }, [taskWidgetItemsOnly]);
 
 
-  /** TFL context: next upcoming event so the delay pill can say "leave by 18:50 for Dinner with Mum". */
-  const tflContext = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return null;
-    const nowMs = now.getTime();
-    const DELAY_MINS = 10; // conservative buffer applied when any TFL delay is active
-    const nextEvent = [...sortedEvents]
-      .filter(e => e.start_time && new Date(e.start_time).getTime() > nowMs)
-      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0];
-    if (!nextEvent) return null;
-    const leaveByMs = new Date(nextEvent.start_time).getTime() - DELAY_MINS * 60000;
-    const leaveStr = new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-    return { eventTitle: nextEvent.title || "next event", leaveStr };
-  }, [selectedDate, isToday, now, sortedEvents]);
 
 
   /** Overdue count (incomplete tasks past due). */
@@ -796,7 +778,7 @@ export default function Homepage() {
       <IntelligenceRow
         displayName={displayName}
         statusStrip={navStatusStrip}
-        tflContext={tflContext}
+
         slot1TodayTasks={
           // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
           <TaskWidgetSlot
@@ -847,7 +829,6 @@ export default function Homepage() {
           tomorrowFirstEvent,
           todayVsYesterday,
           taskWidgetItemsOnly,
-          savedRoutes,
         }}
       />
       </div>

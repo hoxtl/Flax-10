@@ -33,7 +33,6 @@ function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = [])
     }, [tasks, activeListId, activeFilter, filterListIds]);
 }
 
-/** End of today as ISO string so new tasks from Today view show in Today (due_date >= now && <= todayEnd). */
 function getTodayEndISO() {
     const d = new Date();
     d.setHours(23, 59, 59, 999);

@@ -26,7 +26,6 @@ function DoneIcon({ className }) {
 }
 
 export default function EmptyStateCard({
-  displayName,
   sub = "No overdue or due-soon tasks.",
   message: messageOverride,
   action,

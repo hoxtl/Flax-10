@@ -168,7 +168,6 @@ export function RightNowWidget({
   sortedEvents,
   scheduleCountdownSecs,
   tflDelays = [],
-  savedRoutes = [],
   hasTimerSession,
   timerMode,
   timeLeft,

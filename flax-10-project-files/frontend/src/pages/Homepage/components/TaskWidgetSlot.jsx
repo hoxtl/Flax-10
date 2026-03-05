@@ -256,7 +256,6 @@ export function TaskWidgetSlot({
             </>
           ) : (
             <EmptyStateCard
-              displayName={displayName}
               sub={null}
               message="All caught up for today."
               action={

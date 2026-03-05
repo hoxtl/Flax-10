@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Calendar, AlertTriangle, Train, X, Check } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
@@ -36,14 +36,12 @@ function useTflDelays() {
 export default function IntelligenceRow({
   displayName,
   statusStrip,
-  tflContext,
   slot1TodayTasks,
   slot3Urgent,
   studyPulseWindows,
   studyPulseNow,
   studyPulseOnStartFocus,
   studyPulseDeadlines,
-  slot5Commute,
   slot5Data,
 }) {
   const tflDelays = useTflDelays();
@@ -76,24 +74,11 @@ export default function IntelligenceRow({
       <BentoGrid>
         {/* Col 1, Rows 1–2: Right Now — hero card */}
         <BentoCard className={styles.posRightNow}>
-          {slot5Data ? (
-            <RightNowWidget
-              {...slot5Data}
-              tflDelays={tflDelays}
-              onOpenTimer={() => navigate("/timer")}
-            />
-          ) : (
-            <>
-              {statusStrip?.variant === "Conflict" && statusStrip?.text?.includes("Schedule overlap") && (
-                <div className={styles.rightNowScheduleWarning} role="alert">
-                  <AlertTriangle size={16} strokeWidth={2} aria-hidden />
-                  <span>{statusStrip.text}</span>
-                </div>
-              )}
-              {slot5Commute}
-              <TravelAlertsSection tflContext={tflContext} />
-            </>
-          )}
+          <RightNowWidget
+            {...slot5Data}
+            tflDelays={tflDelays}
+            onOpenTimer={() => navigate("/timer")}
+          />
         </BentoCard>
 
         {/* Cols 2–3, Row 1: Today's Tasks — wide */}
@@ -130,71 +115,3 @@ export default function IntelligenceRow({
   );
 }
 
-function TravelAlertsSection({ tflContext }) {
-  const delays = useTflDelays();
-  const [dismissed, setDismissed] = useState(new Set());
-  const [expanded, setExpanded] = useState(false);
-
-  const visible = delays && delays.length > 0 ? delays.filter(d => !dismissed.has(d.lineName)) : [];
-  const INITIAL_SHOW = 3;
-  const showCollapseToggle = visible.length > INITIAL_SHOW;
-  const displayed = showCollapseToggle && !expanded ? visible.slice(0, INITIAL_SHOW) : visible;
-  const hiddenCount = visible.length - displayed.length;
-
-  const dismiss = (lineName) => setDismissed(prev => new Set([...prev, lineName]));
-
-  return (
-    <div className={styles.rightNowTflSection}>
-      <div className={styles.rightNowTflHeader}>
-        <div className={styles.rightNowTflRoundel} aria-hidden>
-          <Train size={14} strokeWidth={2.5} />
-        </div>
-        <span className={styles.rightNowTflTitle}>Travel alerts</span>
-      </div>
-      {delays === undefined && (
-        <p className={styles.rightNowTflLoading}>Checking…</p>
-      )}
-      {delays && delays.length === 0 && (
-        <div className={styles.rightNowTflAllGood}>
-          <Check size={16} strokeWidth={2.5} aria-hidden />
-          <span>All lines running normally</span>
-        </div>
-      )}
-      {visible.length > 0 && (
-        <>
-          <div className={styles.rightNowTflList} role="list">
-            {displayed.map((delay) => (
-              <div key={delay.lineName} className={styles.rightNowTflLineRow} role="listitem">
-                <span
-                  className={styles.rightNowTflLineDot}
-                  style={{ background: delay.color }}
-                  aria-hidden
-                />
-                <span className={styles.rightNowTflLineName}>{delay.lineName}</span>
-                <span className={styles.rightNowTflLineSep}>·</span>
-                <span className={styles.rightNowTflLineStatus}>{delay.severityDescription}</span>
-                <button
-                  type="button"
-                  className={styles.rightNowTflLineDismiss}
-                  onClick={() => dismiss(delay.lineName)}
-                  aria-label={`Dismiss ${delay.lineName} alert`}
-                >
-                  <X size={12} strokeWidth={2.5} aria-hidden />
-                </button>
-              </div>
-            ))}
-          </div>
-          {showCollapseToggle && (
-            <button
-              type="button"
-              className={styles.rightNowTflCollapseToggle}
-              onClick={() => setExpanded(e => !e)}
-            >
-              {expanded ? "Show less" : `Show ${hiddenCount} more alert${hiddenCount !== 1 ? "s" : ""}`}
-            </button>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
