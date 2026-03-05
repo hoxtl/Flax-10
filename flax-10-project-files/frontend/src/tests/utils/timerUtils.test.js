@@ -43,35 +43,39 @@ const mockAudioContext = vi.fn(function () {
 
 const setupMocks = () => {
     NotificationMock = vi.fn();
-    global.Notification = Object.assign(NotificationMock, {
+    vi.stubGlobal('Notification', Object.assign(NotificationMock, {
         permission: 'granted', requestPermission: vi.fn()
-    });
-    global.window.AudioContext = mockAudioContext;
+    }));
+    vi.stubGlobal('AudioContext', mockAudioContext);
 };
 
 const testAutoAdvance = () => {
     const startNext = vi.fn();
     const notify = vi.fn();
+    const setIsActive = vi.fn();
 
     renderHook(() => useCompletionCheck(
-        { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive: vi.fn() },
+        { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive },
         startNext, notify
     ));
 
     expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String));
+    expect(setIsActive).toHaveBeenCalledWith(false);
     expect(startNext).toHaveBeenCalled();
 };
 
 const testOvertime = () => {
     const startNext = vi.fn();
     const notify = vi.fn();
+    const setIsActive = vi.fn();
 
     renderHook(() => useCompletionCheck(
-        { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5 },
+        { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive },
         startNext, notify
     ));
 
     expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String));
+    expect(setIsActive).not.toHaveBeenCalled();
     expect(startNext).not.toHaveBeenCalled();
 };
 

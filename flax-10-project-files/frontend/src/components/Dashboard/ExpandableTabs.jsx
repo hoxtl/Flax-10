@@ -78,7 +78,9 @@ function useTabState(onChange) {
   const handleSelect = (index) => {
     const next = selected === index ? null : index;
     setSelected(next);
-    onChange?.(next);
+    // Always trigger onChange when a tab is explicitly clicked, even if it's already selected
+    // This ensures actionable tabs like "Add" always fire their callbacks.
+    onChange?.(index);
   };
   return { selected, deselect, handleSelect };
 }

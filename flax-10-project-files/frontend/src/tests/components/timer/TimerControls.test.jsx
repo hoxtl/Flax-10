@@ -5,16 +5,26 @@ import { TimerControls } from '../../../components/Timer/TimerComponents';
 const testButtons = () => {
     const onToggle = vi.fn();
     const onReset = vi.fn();
-    render(<TimerControls isActive={false} onToggle={onToggle} onReset={onReset} timeLeft={60} task="Focus" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Resume' }));
+    const onEndEarly = vi.fn();
+
+    // Test inactive state
+    const { rerender } = render(<TimerControls isActive={false} isPaused={false} onToggle={onToggle} onReset={onReset} onEndEarly={onEndEarly} />);
+    fireEvent.click(screen.getByText('Start'));
     expect(onToggle).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+    expect(screen.queryByText('Reset')).not.toBeInTheDocument();
+    expect(screen.queryByText('End Early')).not.toBeInTheDocument();
+
+    // Test active state
+    rerender(<TimerControls isActive={true} isPaused={false} onToggle={onToggle} onReset={onReset} onEndEarly={onEndEarly} />);
+    fireEvent.click(screen.getByText('Reset'));
     expect(onReset).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('End Early'));
+    expect(onEndEarly).toHaveBeenCalled();
 };
 
 const testPause = () => {
     render(<TimerControls isActive={true} onToggle={() => { }} onReset={() => { }} />);
-    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+    expect(screen.getByText('Pause')).toBeInTheDocument();
 };
 
 describe('TimerControls', () => {

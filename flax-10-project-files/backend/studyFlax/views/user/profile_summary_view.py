@@ -112,8 +112,14 @@ def derive_persona(sessions):
 # Badge definitions — full set, computed from all-time sessions
 # ---------------------------------------------------------------------------
 
-def compute_badges(sessions_all, sessions_90, current_streak, longest_streak, module_count, user):
+def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, user):
     now = timezone.now()
+
+    # Filter out incomplete sessions for badge calculations
+    sessions_all = [s for s in sessions_all if s.status != 'Incomplete']
+    sessions_90 = [s for s in sessions_90 if s.status != 'Incomplete']
+    
+    _, longest_streak = compute_streaks(sessions_all)
 
     # All-time stats
     total_minutes  = sum(s.duration for s in sessions_all)
