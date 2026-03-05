@@ -10,21 +10,34 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+.headerIconWrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(139, 115, 85, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
 .headerIcon {
   flex-shrink: 0;
-  color: #a89279;
+  color: #C4A46D;
 }
 
 .headerLabel {
-  font-size: 10px;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  color: #2c1810;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #a89279;
 }
 
 .list {
@@ -40,8 +53,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
-  border-radius: 14px;
+  padding: 12px 20px;
+  border-radius: 12px;
   background: #2c1810;
   border: none;
   cursor: pointer;
@@ -83,8 +96,8 @@
 }
 
 .primaryLabel {
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 13px;
+  font-weight: 600;
   color: #fffcf8;
   line-height: 1.2;
 }

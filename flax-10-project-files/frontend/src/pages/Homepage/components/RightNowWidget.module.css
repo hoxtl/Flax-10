@@ -5,29 +5,40 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  height: 100%;
 }
 
 /* Section header */
 .widgetHeader {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   flex-shrink: 0;
-  margin-bottom: 4px;
+  margin-bottom: 16px;
+}
+
+.headerIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(74, 124, 90, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .headerIcon {
   flex-shrink: 0;
-  color: #a89279;
+  color: #4A7C5A;
 }
 
 .headerLabel {
-  font-size: 10px;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  color: #2c1810;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #a89279;
   flex: 1;
 }
 
@@ -54,10 +65,18 @@
   }
 }
 
+.headerClockDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7BB38E;
+  flex-shrink: 0;
+}
+
 .headerClock {
-  font-size: 12px;
-  font-weight: 500;
-  color: #a89279;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4A7C5A;
   font-variant-numeric: tabular-nums;
 }
 
@@ -83,197 +102,114 @@
 }
 
 .currentEventCard {
-  position: relative;
-  overflow: hidden;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 16px 20px;
-  border: 1px solid rgba(139, 115, 85, 0.06);
-  border-left-width: 4px;
-  border-left-style: solid;
-  box-shadow: 0 1px 4px rgba(44, 24, 16, 0.04);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  background: #FAFAF6;
+  border-radius: 0 10px 10px 0;
+  padding: 12px 16px;
+  border-left: 3px solid #7BB38E;
 }
 
-.currentEventCard:hover {
-  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.08), 0 8px 24px rgba(44, 24, 16, 0.04);
-  transform: translateY(-1px);
-}
-
-.currentEventCard:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(44, 24, 16, 0.04);
-}
-
-.currentEventStatusRow {
+.currentEventRow1 {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.currentEventDotWrap {
-  position: relative;
-  width: 10px;
-  height: 10px;
-  flex-shrink: 0;
-}
-
-.currentEventDotPulse {
-  position: absolute;
-  inset: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(34, 197, 94, 0.25);
-  pointer-events: none;
-}
-
-.currentEventDotInner {
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22c55e;
-}
-
-.currentEventNowLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: #22c55e;
-}
-
-.currentEventStatusRight {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
+  justify-content: space-between;
   gap: 8px;
-}
-
-.currentEventTimestamp {
-  font-size: 12px;
-  font-weight: 500;
-  color: #a89279;
-  font-variant-numeric: tabular-nums;
-}
-
-.currentEventBadgePill {
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.currentEventBadgePill_over30 {
-  background: #f0ebe3;
-  color: #8b7355;
-}
-
-.currentEventBadgePill_10to30 {
-  background: #fef3e2;
-  color: #d4850a;
-}
-
-.currentEventBadgePill_under10,
-.currentEventBadgePill_over {
-  background: #fee9e9;
-  color: #dc3545;
-}
-
-.currentEventTitleRow {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.currentEventPillsWrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
 }
 
 .currentEventCardTitle {
-  font-size: 17px;
-  font-weight: 650;
-  color: #1a1207;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A1207;
   line-height: 1.3;
   margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.currentEventDetailsRow {
-  margin-top: 6px;
+.currentEventTimeLeft {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.currentEventRow2 {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .currentEventTimeRange {
-  font-size: 13px;
-  font-weight: 500;
-  color: #8b7355;
-}
-
-.currentEventSep {
-  color: #d4c4a8;
-  margin: 0 2px;
-  font-weight: 400;
-}
-
-.currentEventLocationWrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  color: #8b7355;
-}
-
-.currentEventLocationIcon {
+  font-size: 12px;
+  color: #A89279;
+  white-space: nowrap;
   flex-shrink: 0;
-  color: #a89279;
-}
-
-.currentEventProgressWrap {
-  margin-top: 14px;
 }
 
 .currentEventProgressTrack {
-  position: relative;
+  flex-grow: 1;
   height: 3px;
-  border-radius: 1.5px;
-  background: #f0e6d9;
-  width: 100%;
-  overflow: visible;
+  border-radius: 2px;
+  background: #E8E0D4;
+  overflow: hidden;
+  position: relative;
 }
 
 .currentEventProgressFill {
-  height: 3px;
-  border-radius: 1.5px;
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
-  width: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: #7BB38E;
 }
 
-.currentEventProgressPlayhead {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: 2px solid;
-  background: #ffffff;
-  pointer-events: none;
-  transition: left 1s cubic-bezier(0.23, 1, 0.32, 1);
+/* Stats row */
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #A89279;
+}
+
+.statsDot {
+  color: #D4C4A8;
+}
+
+/* Compact commute row */
+.commuteRow {
+  padding: 8px 0;
+  border-top: 1px solid rgba(139, 115, 85, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.commuteRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commuteRowIcon {
+  color: #A89279;
+  flex-shrink: 0;
+}
+
+.commuteRowText {
+  font-size: 11px;
+  color: #A89279;
+}
+
+.commuteRowStatus {
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
 }
 
 /* Empty state — nothing on right now */
@@ -319,6 +255,111 @@
   margin: 0;
 }
 
+/* Free state glance grid */
+.glanceWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.glanceFreeLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c1810;
+  margin: 0;
+}
+
+.glanceNextHint {
+  font-size: 12px;
+  color: #a89279;
+  margin: 0;
+}
+
+.glanceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.glanceStat {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fafaf6;
+  border: 1px solid rgba(139, 115, 85, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.glanceStatNum {
+  font-size: 20px;
+  font-weight: 800;
+  color: #2c1810;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.glanceStatLabel {
+  font-size: 11px;
+  color: #a89279;
+  font-weight: 500;
+}
+
+/* End of day state */
+.endOfDayWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.endOfDayTopRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.endOfDayTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c1810;
+  margin: 0;
+}
+
+.endOfDaySub {
+  font-size: 12px;
+  color: #a89279;
+  margin: 3px 0 0;
+}
+
+.tomorrowSection {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tomorrowLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c4b8a0;
+  margin: 0 0 6px;
+}
+
+.tomorrowFirstTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c1810;
+  margin: 0;
+}
+
+.tomorrowFirstTime {
+  font-size: 13px;
+  color: #8b7355;
+  margin: 2px 0 0;
+}
+
 /* Day complete / empty day state */
 .emptyDay {
   display: flex;
@@ -333,18 +374,9 @@
 
 .emptyDayTitle {
   font-size: 15px;
-  font-weight: 500;
-  color: #8b7355;
+  font-weight: 600;
+  color: #2c1810;
   margin: 8px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.emptyDayIcon {
-  flex-shrink: 0;
-  color: #22c55e;
 }
 
 .emptyDaySubtitle {
@@ -353,123 +385,51 @@
   margin: 2px 0 0;
 }
 
-/* Up next card */
-.upNextCardBox {
+.emptyDayTomorrow {
+  font-size: 12px;
+  color: #8b7355;
+  margin: 6px 0 0;
+  font-weight: 500;
+}
+
+/* Up next row */
+.upNextRow {
+  padding: 10px 0;
+  border-top: 1px solid rgba(139, 115, 85, 0.04);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 14px 18px;
-  border: 1px solid rgba(139, 115, 85, 0.06);
-  border-left-width: 3px;
-  border-left-style: solid;
-  border-left-color: #e8dfd1;
-  box-shadow: 0 1px 3px rgba(44, 24, 16, 0.03);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.upNextCardBox:hover {
-  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.08), 0 8px 24px rgba(44, 24, 16, 0.04);
-  transform: translateY(-1px);
-}
-
-.upNextCardBox:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 3px rgba(44, 24, 16, 0.03);
-}
-
-.upNextCardLabel {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #a89279;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-.upNextCardTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: #2c1810;
-  margin: 4px 0 0;
-  line-height: 1.3;
-}
-
-.upNextMetaRow {
+.upNextRowLeft {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 5px;
-  flex-wrap: wrap;
-}
-
-.upNextMetaTime {
-  font-size: 12px;
-  color: #a89279;
-  font-variant-numeric: tabular-nums;
-}
-
-.upNextMetaSep {
-  color: #b8a890;
-  font-size: 12px;
-}
-
-.upNextMetaLocation {
-  font-size: 12px;
-  color: #a89279;
-}
-
-.upNextCountdownPill_over30,
-.upNextCountdownPill_10to30,
-.upNextCountdownPill_under10 {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  padding: 5px 14px;
-  border-radius: 20px;
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-.upNextCountdownPill_over30 {
-  background: #f0ebe3;
-  color: #8b7355;
-}
-
-.upNextCountdownPill_10to30 {
-  background: #fef3e2;
-  color: #d4850a;
-}
-
-.upNextCountdownPill_under10 {
-  background: #fee9e9;
-  color: #dc3545;
-}
-
-.upNextCountdownText {
-  display: inline-block;
-  font-variant-numeric: tabular-nums;
-}
-
-.upNextCardLeft {
   min-width: 0;
-  flex: 1;
 }
 
-.countdownIconUrgent {
+.upNextRowLabel {
+  font-size: 11px;
+  color: #A89279;
+  font-weight: 500;
   flex-shrink: 0;
-  color: #dc3545;
 }
 
-.countdownIconWarning {
+.upNextRowTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1207;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upNextRowCountdown {
+  font-size: 11px;
+  font-weight: 600;
   flex-shrink: 0;
-  color: #d4850a;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Tomorrow section */
@@ -726,47 +686,21 @@
 .conflictRowNew {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: #fffbf0;
-  border: 1px solid rgba(230, 168, 23, 0.15);
-  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.conflictRowNew:hover {
-  border-color: rgba(230, 168, 23, 0.3);
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(196, 164, 109, 0.06);
+  border-radius: 8px;
 }
 
 .conflictIconNew {
   flex-shrink: 0;
-  color: #e6a817;
+  color: #C4946D;
 }
 
 .conflictTextNew {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-}
-
-.conflictLabel {
-  font-weight: 600;
-  color: #a16207;
-}
-
-.conflictSep {
-  color: #d4b87a;
-}
-
-.conflictEventName {
-  font-weight: 600;
-  color: #92400e;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.conflictEventName:hover {
-  text-decoration: underline;
-  color: #8b6914;
+  color: #8C6D3F;
 }
 
 /* Timer session */

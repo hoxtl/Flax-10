@@ -129,9 +129,9 @@
   .timeline { display: flex; flex-direction: column; }
 
   .timelineBox {
-    border: 1px solid rgba(120, 113, 108, 0.6);
+    border: 1px solid rgba(139, 115, 85, 0.15);
     border-radius: 1rem;
-    background: #ffffff;
+    background: #fffcf8;
     padding: 1.5rem;
     overflow: visible;
     position: relative;
@@ -324,12 +324,12 @@
     min-height: 20px;
   }
   .planTimelineTime {
-    font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
-    font-size: 0.65rem;
-    font-weight: 600;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: var(--home-text-meta);
-    letter-spacing: 0.02em;
+    color: #B8A890;
+    letter-spacing: 0;
   }
   .planTimelineSpineCell {
     display: flex;
@@ -352,12 +352,12 @@
     z-index: 1;
   }
   .planTimelineHourMarkLabel {
-    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-    font-size: 0.62rem;
-    font-weight: 700;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: rgba(107, 83, 68, 0.6);
-    letter-spacing: 0.05em;
+    color: #B8A890;
+    letter-spacing: 0;
     text-align: right;
     line-height: 1;
   }
@@ -467,15 +467,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  /* Live Compass: hairline 1px Flax-Gold line, tight glow; NOW = 6pt monospace left of spine */
+  /* Live Compass: hairline 1px dark line; NOW = bold tag left of spine */
   .planTimelineNowLine {
-    height: 1.5px;
-    width: 100%;
-    background: #84A98C;
     flex: 1;
-    min-width: 24px;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px rgba(132, 169, 140, 0.18), 0 0 6px 1px rgba(132, 169, 140, 0.12);
+    height: 1.5px;
+    background: #2c1810;
+    opacity: 0.25;
+    border-radius: 1px;
   }
   .planTimelineNowWrap {
     display: flex;
@@ -500,13 +498,28 @@
     0%, 100% { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 3px rgba(132, 169, 140, 0.35); }
     50%       { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 5px rgba(132, 169, 140, 0.15); }
   }
+  /* Small pulsing dot before "Now" label */
+  .planTimelineNowDot {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    min-height: 8px;
+    border-radius: 50%;
+    background: #7BB38E;
+    flex-shrink: 0;
+    animation: nowDotPulse 2s ease-in-out infinite;
+  }
+
   .planTimelineNowTag {
-    font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
-    font-size: 8px;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 10px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #5a8a65;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: #4A7C5A;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
     flex-shrink: 0;
   }
   .planTimelineCard {
@@ -1455,16 +1468,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px solid rgba(123, 103, 81, 0.2);
-    background: #F8F5F2;
-    color: #a8a29e;
-  }
-  .timelineHeaderIconWrap svg {
-    width: 16px;
-    height: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(74, 109, 140, 0.08);
+    color: #4A6D8C;
+    border: none;
   }
 
   .timelineHeaderRight {
@@ -1475,26 +1484,47 @@
   }
 
   .timelineHeaderCta {
-    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
     font-weight: 500;
-    color: #a8a29e;
+    color: #8b7355;
+    background: rgba(139, 115, 85, 0.06);
+    border: 1px solid rgba(139, 115, 85, 0.13);
+    border-radius: 9999px;
+    padding: 4px 12px;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     white-space: nowrap;
+    margin-top: 4px;
   }
   .timelineHeaderCta:hover {
-    color: #57534e;
+    background: rgba(139, 115, 85, 0.11);
+    color: #5a4a3a;
+    border-color: rgba(139, 115, 85, 0.2);
   }
 
-  /* Same as bento widget titles: text-sm font-semibold uppercase tracking-wider text-stone-700 */
   .timelineTitle {
     margin: 0;
-    font-family: var(--font-body, "Lexend", system-ui, sans-serif);
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #44403c;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #1A1207;
+  }
+
+  .timelineHeaderSub {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #A89279;
+    text-decoration: none;
+    margin-top: 2px;
+    transition: color 0.15s ease;
+  }
+  .timelineHeaderSub:hover {
+    color: #8B7355;
   }
 
   .timelineSub {

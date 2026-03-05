@@ -23,12 +23,26 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, onRePlanDay, focu
 
   const handleFocus = () => (onStartFocus ? onStartFocus() : navigate("/timer"));
   const handleAddEvent = () => (onAddEvent ? onAddEvent() : navigate("/calendar"));
-  const handleRePlan = () => (onRePlanDay ? onRePlanDay() : navigate("/calendar"));
+  const handleRePlan = () => {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("flax-open-chat", {
+          detail: {
+            initialMessage: "Help me re-plan my day. I have some missed or overdue tasks I need to rearrange — can you help me fit them into my free time today?",
+          },
+        })
+      );
+    } catch (_) {
+      navigate("/calendar");
+    }
+  };
 
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Zap className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        <div className={styles.headerIconWrap}>
+          <Zap className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        </div>
         <span className={styles.headerLabel}>Quick Actions</span>
       </div>
 
