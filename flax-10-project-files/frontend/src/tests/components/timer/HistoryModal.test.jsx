@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HistoryModal from '../../../components/Timer/HistoryModal';
-import * as historyUtils from '../../../utils/historyUtils';
+import * as historyUtils from '../../../components/Timer/utils/historyUtils';
 import {
     mockHistoryData, expectBlock1Summary, expectBlock2Summary,
     expectLegacyBlockSummary, expectDatesPresent, expectSessionCounts
@@ -27,7 +27,11 @@ const testClearHistory = async () => {
     render(<HistoryModal onClose={onClose} />);
     const clearBtn = await screen.findByText('Clear History');
     fireEvent.click(clearBtn);
-    expect(window.confirm).toHaveBeenCalled();
+
+    // Wait for the custom confirmation modal to open
+    const confirmBtn = await screen.findByText('Confirm');
+    fireEvent.click(confirmBtn);
+
     expect(historyUtils.clearHistory).toHaveBeenCalled();
 };
 

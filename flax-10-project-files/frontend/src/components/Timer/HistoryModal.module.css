@@ -16,7 +16,8 @@
     padding: 2rem;
     border-radius: 16px;
     width: 90%;
-    max-width: 500px;
+    max-width: 555px;
+    /* Increased from 400px to make it wider */
     max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -100,18 +101,27 @@
 
 .statsRow {
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.statsRow::-webkit-scrollbar {
+    display: none;
 }
 
 .statPill {
-    font-size: 0.85rem;
-    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 20px;
     font-weight: 500;
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    white-space: nowrap;
 }
 
 .focusPill {
@@ -124,6 +134,13 @@
     color: #065f46;
 }
 
+.pausePill {
+    background: #fef08a;
+    /* Soft Yellow */
+    color: #854d0e;
+    /* Darker Yellow/Brown for text */
+}
+
 .sessionPill {
     background: #e0e7ff;
     color: #3730a3;
@@ -134,4 +151,76 @@
     color: #9ca3af;
     font-style: italic;
     padding: 2rem;
+}
+
+/* Clear Confirm Modal Styles */
+.confirmModal {
+    max-width: 450px;
+    padding: 1.5rem;
+}
+
+.confirmOverlay {
+    z-index: 1001;
+}
+
+.confirmIcon {
+    min-width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #374151;
+}
+
+.confirmTitle {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.confirmMessage {
+    margin: 0;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.confirmTextCol {
+    flex: 1;
+    text-align: left;
+}
+
+.confirmTopRow {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.confirmBtnsRow {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.confirmCancelBtn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #111827;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.confirmSubmitBtn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    border: none;
+    background: #111827;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
 }

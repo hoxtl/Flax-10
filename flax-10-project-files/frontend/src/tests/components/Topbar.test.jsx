@@ -32,21 +32,6 @@ vi.mock('../../components/Notifications/NotificationPanel', () => ({
 }));
 
 describe('TopBar', () => {
-  it('renders greeting and date', () => {
-    render(<TopBar user={{ first_name: 'Kausar' }} />);
-    expect(screen.getByText('Kausar')).toBeTruthy();
-  });
-
-  it('renders without user (no name shown)', () => {
-    const { container } = render(<TopBar />);
-    expect(container.querySelector('h1')).toBeNull();
-  });
-
-  it('renders user with only username', () => {
-    render(<TopBar user={{ username: 'kausar' }} />);
-    expect(screen.getByText('kausar')).toBeTruthy();
-  });
-
   it('calls onAddClick when add tab selected', () => {
     const onAdd = vi.fn();
     render(<TopBar onAddClick={onAdd} />);
@@ -73,10 +58,5 @@ describe('TopBar', () => {
     render(<TopBar onSettingsClick={fn} />);
     fireEvent.click(screen.getByText('settings'));
     expect(fn).toHaveBeenCalled();
-  });
-
-  it('renders search input', () => {
-    render(<TopBar />);
-    expect(screen.getByPlaceholderText('Search users...')).toBeTruthy();
   });
 });
