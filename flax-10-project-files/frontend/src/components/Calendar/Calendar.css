@@ -17,6 +17,9 @@
 
 @media (max-width: 768px) {
     .calendar-container {
-        padding: 4px; /* Minimal padding */
+        padding: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
     }
 }
