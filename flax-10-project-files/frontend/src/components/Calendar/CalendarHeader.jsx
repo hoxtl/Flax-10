@@ -26,14 +26,27 @@ async function handleImport(url, dispatch, selectedDate, viewMode) {
 }
 
 function useCalendarHeader() {
-  const { selectedDate, viewMode } = useCalendar();
+  const { selectedDate, viewMode, filter, allEvents } = useCalendar();
   const dispatch = useCalendarDispatch();
   const { openModal } = useEventModal();
   const [showImportModal, setShowImportModal] = useState(false);
   const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
-  const jumpToDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+  const jumpToDate = (date) =>
+    dispatch({ type: "SET_SELECTED_DATE", payload: date });
   const onImport = (url) => handleImport(url, dispatch, selectedDate, viewMode);
-  return { selectedDate, viewMode, dispatch, openModal, showImportModal, setShowImportModal, navigate, jumpToDate, onImport };
+  return {
+    selectedDate,
+    viewMode,
+    filter,
+    allEvents,
+    dispatch,
+    openModal,
+    showImportModal,
+    setShowImportModal,
+    navigate,
+    jumpToDate,
+    onImport,
+  };
 }
 
 export function CalendarHeader() {
