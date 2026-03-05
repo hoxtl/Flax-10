@@ -14,7 +14,7 @@
     background: var(--bg);
 }
 
-/* Focus transition overlay when navigating from task Play */
+/* Zoom-in transition when navigating from task Play */
 .focusModeTransition {
     position: absolute;
     inset: 0;
@@ -245,6 +245,13 @@
 .button.danger.outline:hover {
     background: #fee2e2;
     border-color: #fca5a5;
+}
+
+.settingsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 .settings {
