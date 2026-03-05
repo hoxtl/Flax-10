@@ -243,7 +243,6 @@
     display: none;
   }
 
-  /* Calendar bar adapts for mobile */
   .calendar-header {
     border-radius: 0;
     margin-bottom: 0;
@@ -263,5 +262,15 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+  }
+
+  .date-pill {
+    background: #e8e3de;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b7355;
+    margin-left: auto;
   }
 }
