@@ -1,24 +1,31 @@
 .page {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .filters {
-    padding: 12px 32px 0;
-    flex-shrink: 0;
+  padding: 12px 32px 0;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
-    .filters {
-        padding: 8px 12px 0;
-        overflow-x: auto;
-        white-space: nowrap;
-        display: flex;
-        -webkit-overflow-scrolling: touch;
-    }
+  .filters {
+    padding: 8px 12px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    -webkit-overflow-scrolling: touch;
+  }
 
-    .filters::-webkit-scrollbar {
-        display: none;
-    }
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
