@@ -147,18 +147,20 @@ function PageHeader({ is_teacher, onCreateModule }) {
     );
 }
 
+const filter_options = [
+    { value: 'all', label: 'All Modules' },
+    { value: 'enrolled', label: 'My Enrollments' },
+];
+
+const sortOptions = [
+    { value: 'name', label: 'Sort by Name' },
+    { value: 'deadlines', label: 'Sort by Deadlines' },
+];
+
 function Toolbar({ search, sorting, departments }) {
-    const filter_options = [
-        { value: 'all', label: 'All Modules' },
-        { value: 'enrolled', label: 'My Enrollments' },
-    ];
     const dept_options = [
-        { value: 'all', 'label': 'All Departments' },
+    { value: 'all', 'label': 'All Departments' },
         ...departments.map(d => ({ value: d, label: d })),
-    ];
-    const sortOptions = [
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'deadlines', label: 'Sort by Deadlines' },
     ];
     return (
         <div className={styles.toolbar}>
