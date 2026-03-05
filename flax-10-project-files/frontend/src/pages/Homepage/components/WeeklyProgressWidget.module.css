@@ -1,0 +1,190 @@
+/* Weekly Progress widget */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+.headerIcon {
+  flex-shrink: 0;
+  color: #a89279;
+}
+
+.headerLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a89279;
+}
+
+/* Progress ring */
+.ringWrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring {
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: #f0e6d9;
+}
+
+.ringFill {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.ringCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringPct {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c1810;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ringSubtitle {
+  font-size: 11px;
+  color: #a89279;
+  text-align: center;
+  margin: 6px 0 0;
+  flex-shrink: 0;
+}
+
+/* Stats row */
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 12px;
+  flex-shrink: 0;
+}
+
+.statsStudied {
+  font-size: 13px;
+  font-weight: 650;
+  color: #2c1810;
+  font-variant-numeric: tabular-nums;
+}
+
+.statsGoal {
+  font-size: 13px;
+  color: #a89279;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Streak */
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #c4946d;
+  flex-shrink: 0;
+}
+
+.streakIcon {
+  flex-shrink: 0;
+  color: #c4946d;
+}
+
+/* Daily breakdown */
+.dailyBreakdown {
+  width: 100%;
+  margin-top: 16px;
+  flex-shrink: 0;
+}
+
+.dailyLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a89279;
+  margin-bottom: 8px;
+}
+
+.dailyBars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dailyRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dailyDay {
+  font-size: 9px;
+  font-weight: 700;
+  color: #a89279;
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.dailyBarTrack {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #f0e6d9;
+  overflow: hidden;
+  position: relative;
+}
+
+.dailyBarFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 2px;
+  background: #c4a46d;
+  transform-origin: left;
+}
+
+.dailyBarFill.dailyBarToday {
+  background: #2c1810;
+}
+
+.dailyHours {
+  font-size: 9px;
+  color: #a89279;
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}

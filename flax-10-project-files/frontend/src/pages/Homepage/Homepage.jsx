@@ -142,6 +142,7 @@ export default function Homepage({ onNavigate }) {
   const [showAllActionHubTasks, setShowAllActionHubTasks] = useState(false);
   const actionHubRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
+  const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
   const [savedRoutes, setSavedRoutes] = useState([]);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
@@ -1328,6 +1329,7 @@ export default function Homepage({ onNavigate }) {
           <DeadlinesWidget
             deadlines={upcomingDeadlines || []}
             onSelectDeadline={setSelectedDeadline}
+            onSelectModule={(mod) => setSelectedModulePill(mod)}
           />
         }
         slot4Energy={
@@ -1364,6 +1366,60 @@ export default function Homepage({ onNavigate }) {
       </div>
 
       {/* Deadline detail popup — blurred backdrop, module/deadline card */}
+      {/* Module pill popup — blurred backdrop, module card */}
+      {selectedModulePill && (() => {
+        const mCode = selectedModulePill.code || "";
+        const mId = selectedModulePill.id;
+        const mColors = getModulePillColors(mCode);
+        const mModule = enrolledModules.find((m) =>
+          (mId && String(m.id) === String(mId)) ||
+          (m.module_code || "").toUpperCase() === mCode.toUpperCase()
+        );
+        const mName = mModule?.module_name || mModule?.name || null;
+        const mUrl = mId ? `/modules?moduleId=${mId}` : `/modules?code=${encodeURIComponent(mCode)}`;
+        return (
+          <div
+            className={styles.deadlineDetailOverlay}
+            onClick={() => setSelectedModulePill(null)}
+            role="dialog"
+            aria-modal
+            aria-labelledby="module-card-title"
+          >
+            <div className={styles.moduleCardCard} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.moduleCardHeader}>
+                <div
+                  className={styles.moduleCardColorBar}
+                  style={{ background: mColors.bg, color: mColors.text }}
+                >
+                  {mCode.slice(0, 2)}
+                </div>
+                <button
+                  type="button"
+                  className={styles.deadlineDetailClose}
+                  onClick={() => setSelectedModulePill(null)}
+                  aria-label="Close"
+                >
+                  <X size={14} strokeWidth={2} aria-hidden />
+                </button>
+              </div>
+              <h2 id="module-card-title" className={styles.moduleCardCode} style={{ color: mColors.text }}>
+                {mCode}
+              </h2>
+              {mName && <p className={styles.moduleCardName}>{mName}</p>}
+              <div className={styles.moduleCardDivider} />
+              <Link
+                to={mUrl}
+                className={styles.moduleCardLink}
+                style={{ background: mColors.text }}
+                onClick={() => setSelectedModulePill(null)}
+              >
+                View module →
+              </Link>
+            </div>
+          </div>
+        );
+      })()}
+
       {selectedDeadline && (
         <div className={styles.deadlineDetailOverlay} onClick={() => setSelectedDeadline(null)} role="dialog" aria-modal aria-labelledby="deadline-detail-title">
           <div className={styles.deadlineDetailCard} onClick={(e) => e.stopPropagation()}>
@@ -1423,7 +1479,14 @@ export default function Homepage({ onNavigate }) {
       )}
       </div>
 
-      <div className={styles.bentoSpine} id="timeline-section">
+      <motion.div
+        className={styles.bentoSpine}
+        id="timeline-section"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+      >
           <div className={styles.timelineBox}>
             <div className={styles.timelineHeader}>
               <div className={styles.timelineHeaderLeft}>
@@ -1495,7 +1558,7 @@ export default function Homepage({ onNavigate }) {
               </motion.div>
             </div>
           </div>
-      </div>
+      </motion.div>
 
       {showCreateTaskModal && (
         <CreateTaskModal

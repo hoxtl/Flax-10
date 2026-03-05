@@ -4,8 +4,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
-  border-radius: 6px;
+  padding: 3px 8px;
+  border-radius: 5px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -46,13 +46,11 @@
 .typePill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-left: 4px;
   line-height: 1.2;
 }

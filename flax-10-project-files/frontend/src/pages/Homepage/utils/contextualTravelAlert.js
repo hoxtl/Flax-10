@@ -104,11 +104,11 @@ export function getContextualTravelAlert(nextEvent, tflDelays, options = {}) {
     const anyDelays = (tflDelays || []).length > 0;
     return {
       severity: anyDelays ? TRAVEL_SEVERITY.MINOR : TRAVEL_SEVERITY.GOOD,
-      headline: anyDelays ? "Some TfL lines have delays" : "All lines running normally",
+      headline: anyDelays ? "Some lines have delays — your route looks fine" : "All lines running normally",
       affectedLines: [],
       recommendation: anyDelays
-        ? "Your next event's route looks clear. Check other lines below if needed."
-        : "No action needed.",
+        ? "Your commute route looks clear — no action needed."
+        : "No disruptions on your saved routes.",
       leaveBy: null,
       suggestedLeaveBy: null,
       relatedEvent: null,
@@ -118,22 +118,12 @@ export function getContextualTravelAlert(nextEvent, tflDelays, options = {}) {
 
   const eventTimeStr = nextEvent.start_time ? formatTime(nextEvent.start_time) : "";
   const locationStr = (nextEvent.location || "").trim();
-  const locationPart = locationStr ? ` at ${locationStr}` : "";
+  const eventTitle = (nextEvent.title || "").trim();
+  const eventRef = eventTitle ? `your ${eventTimeStr} ${eventTitle}` : `your ${eventTimeStr} event`;
 
-  let headline;
-  switch (severity) {
-    case TRAVEL_SEVERITY.SUSPENDED:
-      headline = `Line(s) suspended — check before travelling for your ${eventTimeStr} event${locationPart}`;
-      break;
-    case TRAVEL_SEVERITY.SEVERE:
-      headline = `Severe disruption on your route for ${eventTimeStr}${locationPart}`;
-      break;
-    case TRAVEL_SEVERITY.MINOR:
-      headline = `Minor delays on your route for ${eventTimeStr}${locationPart}`;
-      break;
-    default:
-      headline = `Travel update for ${eventTimeStr}${locationPart}`;
-  }
+  const minsUntilEvent = nextEvent.start_time
+    ? Math.floor((new Date(nextEvent.start_time).getTime() - Date.now()) / 60000)
+    : null;
 
   const affectedLines = relevantDelays.map((d) => ({
     id: (d.lineName || "").toLowerCase().replace(/\s+/g, "-"),
@@ -144,7 +134,7 @@ export function getContextualTravelAlert(nextEvent, tflDelays, options = {}) {
     severityDescription: d.severityDescription || "Disruption",
   }));
 
-  const lineNames = [...new Set(affectedLines.map((l) => l.lineName))].join(", ");
+  const lineNames = [...new Set(affectedLines.map((l) => l.lineName))].join(" & ");
   const severityBufferMinutes =
     severity === TRAVEL_SEVERITY.SUSPENDED ? 30
     : severity === TRAVEL_SEVERITY.SEVERE ? 20
@@ -152,16 +142,42 @@ export function getContextualTravelAlert(nextEvent, tflDelays, options = {}) {
     : 0;
   const totalMinutesBefore = normalCommuteMinutes + severityBufferMinutes;
 
-  let recommendation =
-    severity === TRAVEL_SEVERITY.GOOD
-      ? "No action needed."
-      : `Leave ${severityBufferMinutes || leaveEarlyMinutes} mins early for ${lineNames}. ${locationStr ? `You're heading to ${locationStr}.` : ""}`;
+  // Time-aware headline tiers
+  let headline;
+  if (severity === TRAVEL_SEVERITY.SUSPENDED) {
+    headline = minsUntilEvent !== null && minsUntilEvent < 30
+      ? `${lineNames} suspended — ${eventRef} is in ${minsUntilEvent}m, plan B needed now`
+      : `${lineNames} suspended — you'll need an alternative route for ${eventRef}`;
+  } else if (severity === TRAVEL_SEVERITY.SEVERE) {
+    headline = minsUntilEvent !== null && minsUntilEvent < 30
+      ? `Severe disruption — ${eventRef} starts in ${minsUntilEvent}m, head out now`
+      : `${lineNames} severely disrupted — leave early for ${eventRef}`;
+  } else {
+    if (minsUntilEvent !== null && minsUntilEvent < 30) {
+      headline = `${lineNames} delays — ${eventRef} is soon, leave now`;
+    } else if (minsUntilEvent !== null && minsUntilEvent < 90) {
+      headline = `${lineNames} delays — leave ${severityBufferMinutes} mins early for ${eventRef}`;
+    } else {
+      headline = `${lineNames} delays — keep an eye on this before ${eventRef}`;
+    }
+  }
+
+  // Student-friendly recommendation
+  let recommendation;
+  if (severity === TRAVEL_SEVERITY.SUSPENDED) {
+    recommendation = `${lineNames} is suspended. Check TfL for alternatives${locationStr ? ` to ${locationStr}` : ""} — you don't want to miss this one.`;
+  } else if (severity === TRAVEL_SEVERITY.SEVERE) {
+    recommendation = `Things are bad on ${lineNames}. Leave ${severityBufferMinutes} mins earlier than usual${locationStr ? ` to get to ${locationStr}` : ""}.`;
+  } else {
+    recommendation = `${lineNames} is running slow — leaving ${severityBufferMinutes} mins early should cover it.`;
+  }
+
   const savedRoutes = options.savedRoutes;
   if (severity === TRAVEL_SEVERITY.SUSPENDED && savedRoutes && typeof savedRoutes === "object" && !Array.isArray(savedRoutes)) {
     const locKey = (locationStr || "").toLowerCase().trim();
     const routeEntry = savedRoutes[locKey] || (Object.values(savedRoutes)[0]);
     if (routeEntry?.alternatives) {
-      recommendation = recommendation.trim() + ` Consider: ${routeEntry.alternatives}.`;
+      recommendation = recommendation.trim() + ` Try: ${routeEntry.alternatives}.`;
     }
   }
 
