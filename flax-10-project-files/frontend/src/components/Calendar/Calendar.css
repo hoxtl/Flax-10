@@ -14,3 +14,9 @@
   border-radius: 8px;
   color: var(--muted, #8B7355);
 }
+
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 4px; /* Minimal padding */
+    }
+}
