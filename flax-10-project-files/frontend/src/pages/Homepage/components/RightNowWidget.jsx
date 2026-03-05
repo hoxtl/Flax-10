@@ -179,9 +179,8 @@ export function RightNowWidget({
   tomorrowFirstEvent,
   todayVsYesterday,
   taskWidgetItemsOnly = [],
-  actionHubItemsOnly = [],
 }) {
-  const tasks = taskWidgetItemsOnly.length ? taskWidgetItemsOnly : actionHubItemsOnly;
+  const tasks = taskWidgetItemsOnly;
   const nav = navigatorContext || {};
   const nowMs = now.getTime();
   const liveClock = useLiveClock(30000);

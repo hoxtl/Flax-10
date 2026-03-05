@@ -117,19 +117,26 @@ export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
     return <div className={styles.settingsContainer}>{inputs}{disc}</div>;
 };
 
-const SoundOptions = () => (
-    <>
-        <option value="none">None 🔇</option>
-        <option value="white">White Noise 🌊</option>
-        <option value="pink">Pink Noise 🌧️</option>
-        <option value="brown">Brown Noise 🏔️</option>
-    </>
-);
+const SOUND_OPTIONS = [
+    { value: 'none', label: 'None 🔇' },
+    { value: 'white', label: 'White Noise 🌊' },
+    { value: 'pink', label: 'Pink Noise 🌧️' },
+    { value: 'brown', label: 'Brown Noise 🏔️' },
+];
 
 const SoundControls = ({ noiseType, setNoiseType }) => {
     const lbl = <span className={styles.label}>Calming Sound:</span>;
-    const sel = <select className={styles.soundSelect} value={noiseType} onChange={(e) => setNoiseType(e.target.value)}><SoundOptions /></select>;
-    return <div className={styles.soundControls}>{lbl}{sel}</div>;
+    const dropdown = (
+        <AnimatedDropdown
+            value={noiseType}
+            onChange={setNoiseType}
+            placeholder="Select sound"
+            options={SOUND_OPTIONS}
+            grouped={false}
+            className={styles.soundDropdown}
+        />
+    );
+    return <div className={styles.soundControls}>{lbl}{dropdown}</div>;
 };
 
 const applyNoise = (noiseType) => {

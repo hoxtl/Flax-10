@@ -115,8 +115,8 @@ export default function Homepage() {
   const [analyticsSummary, setAnalyticsSummary] = useState(null);
   const [analyticsProgress, setAnalyticsProgress] = useState(null);
   const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
-  const [showAllActionHubTasks, setShowAllActionHubTasks] = useState(false);
-  const actionHubRef = useRef(null);
+  const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
+  const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
   const [savedRoutes, setSavedRoutes] = useState([]);
@@ -316,7 +316,7 @@ export default function Homepage() {
     return 8;
   };
 
-  const handleActionHubComplete = useCallback(async (t) => {
+  const handleTaskWidgetComplete = useCallback(async (t) => {
     const newCompleted = !t.completed;
     const numericId = typeof t.id === "string" && t.id.startsWith("task-") ? Number(t.id.replace("task-", "")) : t.id;
     try {
@@ -715,7 +715,7 @@ export default function Homepage() {
   }, [filteredTasksDueToday, getTag]);
 
   /** Today's Action Hub: task-only. Only tasks due today or tomorrow—no entire week, no later dates. */
-  const actionHubList = useMemo(() => {
+  const taskWidgetList = useMemo(() => {
     if (!isToday(selectedDate)) return [];
     const now = new Date();
     const dayStart = new Date(selectedDate);
@@ -744,16 +744,16 @@ export default function Homepage() {
       .map((t) => {
         const due = t.due_date ? new Date(t.due_date) : null;
         const isOverdue = due && due < now && !t.completed;
-        let actionHubStatus = "upcoming";
-        if (t.completed) actionHubStatus = "completed";
-        else if (isOverdue) actionHubStatus = "overdue";
+        let taskWidgetStatus = "upcoming";
+        if (t.completed) taskWidgetStatus = "completed";
+        else if (isOverdue) taskWidgetStatus = "overdue";
         return {
           type: "task",
           id: `task-${t.id}`,
           sortTime: due || dayEnd,
           endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : dayEnd,
           isOverdue,
-          actionHubStatus,
+          taskWidgetStatus,
           ...t,
         };
       });
@@ -762,33 +762,33 @@ export default function Homepage() {
     const nowTask = futureTasks.sort(
       (a, b) => new Date(a.sortTime).getTime() - new Date(b.sortTime).getTime()
     )[0];
-    if (nowTask) nowTask.actionHubStatus = "now";
+    if (nowTask) nowTask.taskWidgetStatus = "now";
 
     const order = (a, b) => {
       const statusOrder = { overdue: 0, now: 1, upcoming: 2, completed: 3 };
-      return (statusOrder[a.actionHubStatus] ?? 2) - (statusOrder[b.actionHubStatus] ?? 2);
+      return (statusOrder[a.taskWidgetStatus] ?? 2) - (statusOrder[b.taskWidgetStatus] ?? 2);
     };
     return [...tasks].sort(order);
   }, [selectedDate, allTasks, getTag]);
 
   /** Task-only: no events. */
-  const actionHubItemsOnly = useMemo(
-    () => actionHubList.filter((i) => i.type === "task"),
-    [actionHubList]
+  const taskWidgetItemsOnly = useMemo(
+    () => taskWidgetList.filter((i) => i.type === "task"),
+    [taskWidgetList]
   );
-  const actionHubAllDone = useMemo(
+  const taskWidgetAllDone = useMemo(
     () =>
-      actionHubItemsOnly.length === 0 ||
-      actionHubItemsOnly.every((i) => i.completed),
-    [actionHubItemsOnly]
+      taskWidgetItemsOnly.length === 0 ||
+      taskWidgetItemsOnly.every((i) => i.completed),
+    [taskWidgetItemsOnly]
   );
-  const actionHubCompletedCount = useMemo(
-    () => actionHubItemsOnly.filter((i) => i.completed).length,
-    [actionHubItemsOnly]
+  const taskWidgetCompletedCount = useMemo(
+    () => taskWidgetItemsOnly.filter((i) => i.completed).length,
+    [taskWidgetItemsOnly]
   );
-  const actionHubSpineCompletedPct =
-    actionHubItemsOnly.length > 0 ? (actionHubCompletedCount / actionHubItemsOnly.length) * 100 : 0;
-  const actionHubRemainingCount = actionHubItemsOnly.filter((i) => !i.completed).length;
+  const taskWidgetSpineCompletedPct =
+    taskWidgetItemsOnly.length > 0 ? (taskWidgetCompletedCount / taskWidgetItemsOnly.length) * 100 : 0;
+  const taskWidgetRemainingCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
 
   /** Today's free windows from schedule (>= 20 min, chronological). */
   const todayFreeWindows = useMemo(() => {
@@ -810,14 +810,14 @@ export default function Homepage() {
 
   /** Most urgent incomplete task for focus suggestion. */
   const topActionTask = useMemo(() => {
-    const incomplete = actionHubItemsOnly.filter((t) => !t.completed);
+    const incomplete = taskWidgetItemsOnly.filter((t) => !t.completed);
     return (
-      incomplete.find((t) => t.actionHubStatus === "overdue") ||
-      incomplete.find((t) => t.actionHubStatus === "now") ||
+      incomplete.find((t) => t.taskWidgetStatus === "overdue") ||
+      incomplete.find((t) => t.taskWidgetStatus === "now") ||
       incomplete[0] ||
       null
     );
-  }, [actionHubItemsOnly]);
+  }, [taskWidgetItemsOnly]);
 
   /** Smart nudge: pairs the nearest urgent deadline (≤ 24h) with the next free window. */
   const smartNudge = useMemo(() => {
@@ -879,17 +879,17 @@ export default function Homepage() {
   }, [selectedDate, isToday, now, sortedEvents]);
 
   /** Focus hours: task-based (estimated work for hub tasks only). */
-  const actionHubFocusHours = useMemo(() => {
-    const totalMins = actionHubList
+  const taskWidgetFocusHours = useMemo(() => {
+    const totalMins = taskWidgetList
       .filter((t) => !t.completed)
       .reduce((acc, t) => acc + (t.estimated_blocks || 1) * 25, 0);
     return totalMins / 60;
-  }, [actionHubList]);
+  }, [taskWidgetList]);
 
   /** Overdue count (incomplete tasks past due). */
-  const actionHubOverdueCount = useMemo(
-    () => actionHubItemsOnly.filter((i) => !i.completed && i.actionHubStatus === "overdue").length,
-    [actionHubItemsOnly]
+  const taskWidgetOverdueCount = useMemo(
+    () => taskWidgetItemsOnly.filter((i) => !i.completed && i.taskWidgetStatus === "overdue").length,
+    [taskWidgetItemsOnly]
   );
 
   /** Status strip for IntelligenceRow header — smart schedule + task awareness */
@@ -906,11 +906,11 @@ export default function Homepage() {
     }
 
     // 2. Overdue tasks — urgent, warm red
-    if (actionHubOverdueCount > 0) {
-      if (actionHubOverdueCount === 1 && topActionTask) {
+    if (taskWidgetOverdueCount > 0) {
+      if (taskWidgetOverdueCount === 1 && topActionTask) {
         return { variant: "Conflict", text: `⚠ Running behind — focus on ${topActionTask.title}` };
       }
-      return { variant: "Conflict", text: `⚠ ${actionHubOverdueCount} tasks overdue` };
+      return { variant: "Conflict", text: `⚠ ${taskWidgetOverdueCount} tasks overdue` };
     }
 
     // 3. Currently in a scheduled event/task
@@ -937,20 +937,20 @@ export default function Homepage() {
     const allEventsDone =
       (sortedEvents?.length ?? 0) > 0 &&
       sortedEvents.every(e => !e.end_time || new Date(e.end_time).getTime() < now.getTime());
-    if (allEventsDone && actionHubRemainingCount > 0) {
+    if (allEventsDone && taskWidgetRemainingCount > 0) {
       return {
         variant: "Gap",
-        text: `Events done for today · ${actionHubRemainingCount} task${actionHubRemainingCount !== 1 ? "s" : ""} still need attention`,
+        text: `Events done for today · ${taskWidgetRemainingCount} task${taskWidgetRemainingCount !== 1 ? "s" : ""} still need attention`,
       };
     }
 
     // 7. Everything done / end of day
-    if (nav.state === "endOfDay" || (allEventsDone && actionHubRemainingCount === 0)) {
+    if (nav.state === "endOfDay" || (allEventsDone && taskWidgetRemainingCount === 0)) {
       return { variant: "", text: "All clear — great work today ✓" };
     }
 
     return null;
-  }, [navigatorContext, selectedDate, isToday, actionHubOverdueCount, topActionTask, actionHubRemainingCount, sortedEvents, now]);
+  }, [navigatorContext, selectedDate, isToday, taskWidgetOverdueCount, topActionTask, taskWidgetRemainingCount, sortedEvents, now]);
 
   /** Time allocation by category for today's events (Day Progress bar chart). */
   const dayTimeAllocation = useMemo(() => {
@@ -974,11 +974,11 @@ export default function Homepage() {
   }, [selectedDate, sortedEvents]);
 
   /** Dynamic status line text. */
-  const actionHubStatusLine = useMemo(() => {
-    if (actionHubItemsOnly.length === 0 || actionHubRemainingCount === 0) return "All clear! Ready to wrap up?";
-    if (actionHubOverdueCount > 0) return `You have ${actionHubOverdueCount} item${actionHubOverdueCount === 1 ? "" : "s"} behind schedule. Tackle these first?`;
+  const taskWidgetStatusLine = useMemo(() => {
+    if (taskWidgetItemsOnly.length === 0 || taskWidgetRemainingCount === 0) return "All clear! Ready to wrap up?";
+    if (taskWidgetOverdueCount > 0) return `You have ${taskWidgetOverdueCount} item${taskWidgetOverdueCount === 1 ? "" : "s"} behind schedule. Tackle these first?`;
     return "You are perfectly on schedule for today.";
-  }, [actionHubItemsOnly.length, actionHubRemainingCount, actionHubOverdueCount]);
+  }, [taskWidgetItemsOnly.length, taskWidgetRemainingCount, taskWidgetOverdueCount]);
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
   const [replanLoading, setReplanLoading] = useState(false);
@@ -1117,9 +1117,8 @@ export default function Homepage() {
     return { remainingMins: remaining, predictedFinishTime };
   }, [selectedDate, sortedEvents]);
 
-  /** Aliases for legacy/cached references (actionHubFocusWindowMinutes, actionHubReadItem). */
-  const actionHubFocusWindowMinutes = actionHubFocusHours * 60;
-  const actionHubReadItem = planTimelineReadItem;
+  /** Aliases for legacy/cached references. */
+  const taskWidgetFocusWindowMinutes = taskWidgetFocusHours * 60;
 
   const handleTaskToggle = useCallback(
     async (task, completed) => {
@@ -1182,21 +1181,21 @@ export default function Homepage() {
         displayName={displayName}
         statusStrip={navStatusStrip}
         tflContext={tflContext}
-        slot1ActionHub={
+        slot1TodayTasks={
           <TaskWidgetSlot
             styles={taskWidgetStyles}
             displayName={displayName}
             isToday={isToday(selectedDate)}
-            taskWidgetOverdueCount={actionHubOverdueCount}
-            taskWidgetSpineCompletedPct={actionHubSpineCompletedPct}
-            taskWidgetItemsOnly={actionHubItemsOnly}
-            taskWidgetList={actionHubList}
-            showAllTaskWidgetTasks={showAllActionHubTasks}
-            setShowAllTaskWidgetTasks={setShowAllActionHubTasks}
+            taskWidgetOverdueCount={taskWidgetOverdueCount}
+            taskWidgetSpineCompletedPct={taskWidgetSpineCompletedPct}
+            taskWidgetItemsOnly={taskWidgetItemsOnly}
+            taskWidgetList={taskWidgetList}
+            showAllTaskWidgetTasks={showAllTaskWidgetTasks}
+            setShowAllTaskWidgetTasks={setShowAllTaskWidgetTasks}
             getTaskCategoryPill={getTaskCategoryPill}
             getTaskCategoryColor={getTaskCategoryColor}
-            handleTaskWidgetComplete={handleActionHubComplete}
-            taskWidgetRef={actionHubRef}
+            handleTaskWidgetComplete={handleTaskWidgetComplete}
+            taskWidgetRef={taskWidgetRef}
             hasTimerSession={hasTimerSession}
             onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
           />
@@ -1227,7 +1226,7 @@ export default function Homepage() {
           timerTask,
           tomorrowFirstEvent,
           todayVsYesterday,
-          actionHubItemsOnly,
+          taskWidgetItemsOnly,
           savedRoutes,
         }}
       />

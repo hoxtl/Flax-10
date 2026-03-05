@@ -182,7 +182,7 @@ export function TaskWidgetSlot({
                 layout
               >
                 {visibleIncomplete.map((t) => {
-                  const status      = t.taskWidgetStatus ?? t.actionHubStatus;
+                  const status      = t.taskWidgetStatus;
                   const isOverdue   = status === "overdue";
                   const categoryLabel = getTaskCategoryPill ? getTaskCategoryPill(t) : null;
                   const catStyle    = categoryLabel ? getCategoryStyle(categoryLabel) : null;

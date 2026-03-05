@@ -37,7 +37,7 @@ export default function IntelligenceRow({
   displayName,
   statusStrip,
   tflContext,
-  slot1ActionHub,
+  slot1TodayTasks,
   slot3Urgent,
   studyPulseWindows,
   studyPulseNow,
@@ -98,7 +98,7 @@ export default function IntelligenceRow({
 
         {/* Cols 2–3, Row 1: Today's Tasks — wide */}
         <BentoCard className={styles.posTodaysTasks}>
-          {slot1ActionHub}
+          {slot1TodayTasks}
         </BentoCard>
 
         {/* Col 2, Row 2: Quick Actions */}

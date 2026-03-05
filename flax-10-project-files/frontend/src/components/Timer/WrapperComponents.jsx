@@ -5,11 +5,17 @@ import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSetting
 import { OvertimePopup, GoalModal, BreakModal, EndEarlyModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
-const TimerHeader = ({ onOpenHistory, isMobile }) => {
-    const title = <div className={styles.title}>Study Timer</div>;
-    const btn = !isMobile ? <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">History 📜</button> : null;
-    return <div className={styles.header}>{title}{btn}</div>;
-};
+/** Header with title and history button (original layout) */
+const TimerHeader = ({ onOpenHistory, isMobile }) => (
+  <div className={styles.header}>
+    <div className={styles.title}>Study Timer</div>
+    {!isMobile && (
+      <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
+        History 📜
+      </button>
+    )}
+  </div>
+);
 
 const TimerTopSection = ({ t, onOpenHistory, isMobile }) => {
     const handleTaskSelect = useCallback((task) => {

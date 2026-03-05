@@ -14,6 +14,7 @@
     background: var(--bg);
 }
 
+/* Focus transition overlay when navigating from task Play */
 .focusModeTransition {
     position: absolute;
     inset: 0;
@@ -23,6 +24,7 @@
     justify-content: center;
     background: var(--bg);
     z-index: 10;
+    animation: focusOverlayZoomInHoldZoomOut 6s ease-in-out forwards;
 }
 
 .focusModeTransitionText {
@@ -30,15 +32,30 @@
     font-weight: 600;
     color: var(--color-sage-primary, #52796f);
     letter-spacing: 0.04em;
+    animation: focusTransitionTextFade 0.4s ease-out;
 }
 
-.focusModeTransitionDot {
-    animation: focusModeTransitionBlink 0.6s ease-in-out infinite;
+@keyframes focusTransitionTextFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-@keyframes focusModeTransitionBlink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0.3; }
+@keyframes focusOverlayZoomInHoldZoomOut {
+    0% { opacity: 1; transform: scale(0.92); }
+    6% { transform: scale(1); }
+    6.01%, 90% { transform: scale(1); }
+    100% { opacity: 0; pointer-events: none; transform: scale(1.06); }
+}
+
+.containerFocusEntering .focusModeContent {
+    animation: focusContentZoomIn 0.9s 5.1s ease-out forwards;
+    opacity: 0;
+    transform: scale(0.94);
+}
+
+@keyframes focusContentZoomIn {
+    0% { opacity: 0; transform: scale(0.94); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 .mainContentWrap {
@@ -492,13 +509,8 @@
     gap: 1rem;
 }
 
-.soundSelect {
-    padding: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    background-color: white;
-    font-size: 0.9rem;
-    color: #374151;
+.soundDropdown {
+    min-width: 160px;
 }
 
 .volumeSlider {
