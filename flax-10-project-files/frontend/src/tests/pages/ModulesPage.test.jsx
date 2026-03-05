@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { getDepartments } from '../../components/Modules/utils/moduleUtils';
 
 const mockHook = {
     loading: false,
@@ -17,6 +18,7 @@ vi.mock('../../components/Modules/hooks/useModules', () => ({ default: () => moc
 vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     filterModules: vi.fn((modules) => modules),
+    applyFiltersAndSort: vi.fn((modules) => modules),
 }));
 vi.mock('../../components/Modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
