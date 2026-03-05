@@ -39,13 +39,13 @@ describe('ModulesCard', () => {
         render(<ModulesCard {...mockParameters} isTeacher={true} />);
         expect(screen.getByText('✎ Edit')).toBeInTheDocument();
         expect(screen.getByText('× Delete')).toBeInTheDocument();
-        expect(screen.getByText('Deadlines')).toBeInTheDocument();
+        expect(screen.getByText('Assignments')).toBeInTheDocument();
     });
 
-    it('should call onManageDeadlines when deadlines button is clicked', () => {
+    it('should call onManageDeadlines when assignments button is clicked', () => {
         const onManageDeadlines = vi.fn();
         render(<ModulesCard {...mockParameters} isTeacher={true} onManageDeadlines={onManageDeadlines} />);
-        fireEvent.click(screen.getByText('Deadlines'));
+        fireEvent.click(screen.getByText('Assignments'));
         expect(onManageDeadlines).toHaveBeenCalled();
     });
 

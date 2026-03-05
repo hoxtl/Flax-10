@@ -7,18 +7,15 @@ export const getProgress = (t) => {
 };
 
 export const useCompletionCheck = (timer, startNext, notify) => {
-    const handledRef = useRef(false);
-
+    const hasNotified = useRef(false);
     useEffect(() => { requestPermission(); }, []);
 
     useEffect(() => {
-        if (timer.timeLeft > 0) handledRef.current = false;
-    }, [timer.timeLeft]);
-
-    useEffect(() => {
-        if (timer.timeLeft === 0 && timer.isActive && !handledRef.current) {
-            handledRef.current = true;
+        if (timer.timeLeft === 0 && timer.isActive && !hasNotified.current) {
+            hasNotified.current = true;
             handleCompletion(timer, startNext, notify);
+        } else if (timer.timeLeft > 0) {
+            hasNotified.current = false;
         }
     }, [timer.timeLeft, timer.isActive, timer.mode, timer.breakTime, startNext, notify]);
 };

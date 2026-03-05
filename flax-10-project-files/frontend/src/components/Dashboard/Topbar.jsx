@@ -1,41 +1,15 @@
 import styles from "./Topbar.module.css";
-import { DAYS, MONTHS } from "../../lib/uiConstants";
-import { getGreeting } from "../Calendar/utils/dateUtils";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
 import { NotificationPanel } from "../Notifications/NotificationPanel";
-import { getDisplayName } from "../Authentication/utils/userDisplay";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus, ChevronDown } from "lucide-react";
-import { TypingAnimation } from "./TypingAnimation";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
-function getFirstName(user) {
-  const display = (getDisplayName(user) || "").trim();
-  return display ? display.split(" ")[0] : "";
-}
-
-function getCurrentDateString() {
-  const now = new Date();
-  return `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
-}
-
-function TopBarGreeting({ user }) {
-  const name = getFirstName(user);
-  return (
-    <div className={styles.greeting}>
-      <span className={styles.subGreeting}>{getGreeting()}!</span>
-      <div className={styles.nameRow}>
-        {!!name && <h1 className={styles.name}><TypingAnimation text={name} duration={180} /></h1>}
-        <span className={styles.date}>{getCurrentDateString()}</span>
-      </div>
-    </div>
-  );
-}
 
 function BrandLogo({ onNavChange }) {
   const nav = () => onNavChange?.("home");
@@ -89,14 +63,16 @@ function NavDropdownMenu({ routes, activeNav, onNavChange, setIsOpen }) {
 
 function NavDropdown({ title, routes, activeNav, onNavChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef(null), timeout = useRef(null);
   useClickOutside(ref, () => setIsOpen(false));
   const hasActive = routes.some(r => r.id === activeNav);
-  const toggle = () => setIsOpen(!isOpen);
+  const enter = () => { clearTimeout(timeout.current); setIsOpen(true); };
+  const leave = () => { timeout.current = setTimeout(() => setIsOpen(false), 150); };
+  const menu = <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />;
   return (
-    <div className={styles.navGroup} ref={ref}>
-      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={toggle} />
-      <AnimatePresence>{isOpen && <NavDropdownMenu routes={routes} activeNav={activeNav} onNavChange={onNavChange} setIsOpen={setIsOpen} />}</AnimatePresence>
+    <div className={styles.navGroup} ref={ref} onMouseEnter={enter} onMouseLeave={leave}>
+      <NavDropdownTrigger title={title} isOpen={isOpen} hasActive={hasActive} onClick={() => setIsOpen(!isOpen)} />
+      <AnimatePresence>{isOpen && menu}</AnimatePresence>
     </div>
   );
 }
@@ -125,13 +101,13 @@ function QuickTabs({ onAddClick }) {
   return <ExpandableTabs tabs={tabs} onChange={change} />;
 }
 
-function ActionPill({ onAddClick }) {
+function ActionPill({ onAddClick, onNavChange }) {
   return (
     <div className={styles.actionPill}>
       <ThemeToggle />
       <div className={styles.pillDivider} />
       <QuickTabs onAddClick={onAddClick} />
-      <NotificationPanel />
+      <NotificationPanel onNavChange={onNavChange} />
     </div>
   );
 }
@@ -155,20 +131,29 @@ function ToolsPill({ onNavChange, activeNav }) {
   );
 }
 
-function TopBarActions({ onAddClick, user: u, onSettingsClick: sC, onLogoutClick: lC, onProfileClick: pC, onNavChange: nC, activeNav: aN }) {
-  return (
-    <div className={styles.actions}>
-      <ToolsPill onNavChange={nC} activeNav={aN} /><MiniTimer onNavigate={nC} activeNav={aN} /><ActionPill onAddClick={onAddClick} />
-      <ProfileDropdown user={u} onSettingsClick={sC} onLogoutClick={lC} onProfileClick={pC} />
-    </div>
-  );
+const TopbarTools = ({ onNavChange, activeNav }) => (
+  <div className={styles.toolsWrapper}>
+    <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
+    <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
+  </div>
+);
+
+function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+  const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} />;
+  const action = <ActionPill onAddClick={onAddClick} onNavChange={onNavChange} />;
+  const pDrop = <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />;
+  return <div className={styles.actions}>{tools}{action}{pDrop}</div>;
 }
 
+const TopBarLeftSection = ({ onNavChange, activeNav, user }) => (
+  <div className={styles.leftSection}>
+    <BrandLogo onNavChange={onNavChange} />
+    <TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} />
+  </div>
+);
+
 export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
-  return (
-    <header className={styles.container}>
-      <div className={styles.leftSection}><BrandLogo onNavChange={onNavChange} /><TopBarNav activeNav={activeNav} onNavChange={onNavChange} user={user} /></div>
-      <div className={styles.rightSection}><TopBarGreeting user={user} /><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>
-    </header>
-  );
+  const left = <TopBarLeftSection onNavChange={onNavChange} activeNav={activeNav} user={user} />;
+  const right = <div className={styles.rightSection}><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>;
+  return <header className={styles.container}>{left}{right}</header>;
 }

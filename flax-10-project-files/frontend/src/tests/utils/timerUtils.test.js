@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { getProgress, useCompletionCheck } from '../../hooks/timerUtils';
+import { getProgress, useCompletionCheck } from '../../components/Timer/utils/timerUtils';
 
 const testProgressBreak = () => {
     expect(getProgress({ mode: 'break' })).toBe(100);
@@ -43,64 +43,61 @@ const mockAudioContext = vi.fn(function () {
 
 const setupMocks = () => {
     NotificationMock = vi.fn();
-    global.Notification = Object.assign(NotificationMock, {
+    vi.stubGlobal('Notification', Object.assign(NotificationMock, {
         permission: 'granted', requestPermission: vi.fn()
-    });
-    global.window.AudioContext = mockAudioContext;
+    }));
+    vi.stubGlobal('AudioContext', mockAudioContext);
 };
 
 const testAutoAdvance = () => {
     const startNext = vi.fn();
-    const setModal = vi.fn();
+    const notify = vi.fn();
     const setIsActive = vi.fn();
 
     renderHook(() => useCompletionCheck(
         { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive },
-        startNext, setModal
+        startNext, notify
     ));
 
-    expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
+    expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String));
     expect(setIsActive).toHaveBeenCalledWith(false);
     expect(startNext).toHaveBeenCalled();
-    expect(setModal).not.toHaveBeenCalled();
 };
 
 const testOvertime = () => {
     const startNext = vi.fn();
-    const setModal = vi.fn();
+    const notify = vi.fn();
     const setIsActive = vi.fn();
 
     renderHook(() => useCompletionCheck(
         { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive },
-        startNext, setModal
+        startNext, notify
     ));
 
-    expect(NotificationMock).toHaveBeenCalledWith("Time's Up!", expect.any(Object));
-    expect(setIsActive).not.toHaveBeenCalled(); // Should NOT stop timer
-    expect(setModal).not.toHaveBeenCalled();    // Should NOT show break modal
+    expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String));
+    expect(setIsActive).not.toHaveBeenCalled();
     expect(startNext).not.toHaveBeenCalled();
 };
 
 const testBreakCompletion = () => {
     const startNext = vi.fn();
-    const setModal = vi.fn();
+    const notify = vi.fn();
 
     renderHook(() => useCompletionCheck(
-        { mode: 'break', timeLeft: 0, isActive: true }, startNext, setModal
+        { mode: 'break', timeLeft: 0, isActive: true }, startNext, notify
     ));
 
-    expect(NotificationMock).toHaveBeenCalledWith("Break Over!", expect.any(Object));
+    expect(notify).toHaveBeenCalledWith("Break Over!", expect.any(String));
 };
 
 const testNoAction = () => {
     const startNext = vi.fn();
-    const setModal = vi.fn();
+    const notify = vi.fn();
     renderHook(() => useCompletionCheck(
-        { mode: 'work', timeLeft: 10, isActive: true, breakTime: 0 }, startNext, setModal
+        { mode: 'work', timeLeft: 10, isActive: true, breakTime: 0 }, startNext, notify
     ));
-    expect(NotificationMock).not.toHaveBeenCalled();
+    expect(notify).not.toHaveBeenCalled();
     expect(startNext).not.toHaveBeenCalled();
-    expect(setModal).not.toHaveBeenCalled();
 };
 
 describe('timerUtils: useCompletionCheck', () => {
