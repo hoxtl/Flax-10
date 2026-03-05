@@ -1,10 +1,14 @@
-import { useMemo } from 'react';
-import { Calendar } from '../../components/Calendar/Calendar';
-import PillFilters from '../../components/Tags/PillFilters';
-import { useCalendar, useCalendarDispatch } from '../../context/CalendarContext';
-import { getVisibleEventsInView } from '../../components/Calendar/utils/eventUtils';
-import styles from './CalendarPage.module.css';
-import { EventPopups } from '../../components/Calendar/EventPopups';
+import { useMemo } from "react";
+import { Calendar } from "../../components/Calendar/Calendar";
+import PillFilters from "../../components/Tags/PillFilters";
+import {
+  useCalendar,
+  useCalendarDispatch,
+} from "../../context/CalendarContext";
+import { getVisibleEventsInView } from "../../components/Calendar/utils/eventUtils";
+import styles from "./CalendarPage.module.css";
+import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
+import { EventPopups } from "../../components/Calendar/EventPopups";
 
 export default function CalendarPage() {
     const { filter, allEvents, selectedDate, viewMode } = useCalendar();
