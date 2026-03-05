@@ -24,32 +24,12 @@ export function formatScheduleCountdown(secs) {
   return mins ? `${h}h ${mins}m` : `${h}h`;
 }
 
-/** "In 2h 15m" from now to due date (for Action Hub upcoming cards). */
-export function formatCountdownTo(dueDateStr) {
-  if (!dueDateStr) return "";
-  const now = new Date();
-  const due = new Date(dueDateStr);
-  const diffMs = due.getTime() - now.getTime();
-  if (diffMs <= 0) return "";
-  const mins = Math.round(diffMs / 60000);
-  if (mins < 60) return `In ${mins}m`;
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return m ? `In ${h}h ${m}m` : `In ${h}h`;
-}
-
 export function fmtDuration(mins) {
   if (mins == null) return "";
   if (mins < 60) return `${mins}m`;
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   return m ? `${h}h ${m}m` : `${h}h`;
-}
-
-/** Minutes-only for timeline duration pill: "60m", "25m", "90m" */
-export function fmtDurationMinsOnly(mins) {
-  if (mins == null) return "";
-  return `${mins}m`;
 }
 
 /** Duration for plan timeline card: "1h 30m" or "45m". */
@@ -77,12 +57,4 @@ export function formatHour12h(hour, min = 0) {
   const period = hour < 12 ? "am" : "pm";
   const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
   return min === 0 ? `${h12}${period}` : `${h12}:${String(min).padStart(2, "0")}${period}`;
-}
-
-export function getTimeOfDay(date) {
-  const d = date instanceof Date ? date : new Date(date);
-  const h = d.getHours();
-  if (h < 12) return "morning";
-  if (h < 17) return "afternoon";
-  return "evening";
 }

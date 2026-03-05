@@ -34,7 +34,7 @@ async function savePassword(data, setPasswordError, setSuccessMessage, setIsSavi
 }
 
 async function tryUpdateSettings(data) {
-  const response = await updateUserSettings({ theme: data.theme });
+  const response = await updateUserSettings(data);
   if (response?.user) saveUserToStorage(response.user);
   return response;
 }

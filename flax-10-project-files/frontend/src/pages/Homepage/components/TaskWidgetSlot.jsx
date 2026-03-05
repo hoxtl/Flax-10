@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { CheckSquare, Check } from "lucide-react";
-import EmptyStateCard from "../../../components/EmptyStateCard";
-import AllTasksCompleteCard from "../../../components/AllTasksCompleteCard";
+import EmptyStateCard from "./EmptyStateCard";
+import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 

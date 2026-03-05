@@ -1,6 +1,6 @@
 import styles from "./EmptyStateCard.module.css";
 
-/** Simple checkmark-in-circle icon for "all caught up" / empty states (no animal illustration). */
+/** Simple checkmark-in-circle icon for "all caught up" / empty states. */
 function DoneIcon({ className }) {
   return (
     <svg
@@ -31,8 +31,7 @@ export default function EmptyStateCard({
   message: messageOverride,
   action,
 }) {
-  const name = (displayName || "").trim() || "friend";
-  const message = messageOverride ?? `The garden is at peace. You've earned your rest, ${name}.`;
+  const message = messageOverride ?? "All caught up. You've earned your rest.";
 
   return (
     <div className={styles.wrap}>

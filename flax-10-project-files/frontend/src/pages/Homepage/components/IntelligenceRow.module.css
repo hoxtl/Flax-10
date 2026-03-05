@@ -95,17 +95,6 @@
   gap: 8px;
 }
 
-/* Schedule insight — italic one-liner below pills */
-.scheduleInsight {
-  font-family: "Lexend", system-ui, sans-serif;
-  font-size: 0.73rem;
-  font-weight: 500;
-  font-style: italic;
-  color: #9a8778;
-  margin: 2px 0 0;
-  line-height: 1.4;
-}
-
 /* Compact Day Progress in greeting header */
 .headerDayProgress {
   display: flex;

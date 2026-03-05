@@ -3,8 +3,8 @@
  * with an inline action bar below. No floating popover.
  */
 
-import { AlertTriangle, RotateCw } from "lucide-react";
-import { formatTime, formatTime12h, formatHour12h } from "../../utils/dateFormatUtils";
+import { AlertTriangle } from "lucide-react";
+import { formatTime, formatHour12h } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { DAY_START_HOUR } from "../../utils/timelineUtils";

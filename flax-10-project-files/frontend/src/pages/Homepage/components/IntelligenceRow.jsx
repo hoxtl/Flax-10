@@ -3,12 +3,12 @@ import { motion } from "framer-motion";
 import { Calendar, AlertTriangle, Train, X, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
-import { tflService } from "../../api/tflService";
-import { RightNowWidget } from "../../pages/Homepage/components/RightNowWidget";
-import { BentoGrid, BentoCard } from "../ui/bento-grid";
-import { QuickActionsWidget } from "../../pages/Homepage/components/QuickActionsWidget";
-import { SocialDiscoverWidget } from "../../pages/Homepage/components/SocialDiscoverWidget";
-import { StudyPulseWidget } from "../../pages/Homepage/components/StudyPulseWidget";
+import { tflService } from "../../../api/tflService";
+import { RightNowWidget } from "./RightNowWidget";
+import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
+import { QuickActionsWidget } from "./QuickActionsWidget";
+import { SocialDiscoverWidget } from "./SocialDiscoverWidget";
+import { StudyPulseWidget } from "./StudyPulseWidget";
 
 function getGreeting(name) {
   const h = new Date().getHours();
@@ -35,13 +35,9 @@ function useTflDelays() {
 
 export default function IntelligenceRow({
   displayName,
-  taskCount = 0,
   statusStrip,
-  scheduleInsight,
   tflContext,
   slot1ActionHub,
-  slot1Meta,
-  daySummary,
   slot3Urgent,
   studyPulseWindows,
   studyPulseNow,
@@ -49,7 +45,6 @@ export default function IntelligenceRow({
   studyPulseDeadlines,
   slot5Commute,
   slot5Data,
-  hasOverdue = false,
 }) {
   const tflDelays = useTflDelays();
   const navigate = useNavigate();

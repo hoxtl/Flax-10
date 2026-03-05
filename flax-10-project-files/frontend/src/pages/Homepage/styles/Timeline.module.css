@@ -196,36 +196,6 @@
     line-height: 1.4;
   }
 
-  .gardenGrowthStreakWrap {
-    padding: 0.5rem 1.5rem 0.75rem;
-    border-bottom: 1px solid var(--home-border-soft, var(--border));
-  }
-  .gardenGrowthStreakLabel {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--home-text-label);
-    margin-bottom: 0.4rem;
-  }
-  .gardenGrowthStreakGrid {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .gardenGrowthStreakRow {
-    display: flex;
-    gap: 3px;
-    flex-direction: row;
-  }
-  .gardenGrowthStreakCell {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    transition: background 0.2s ease;
-  }
   .heatmapEmpty { background: var(--heatmap-empty); }
   .heatmapLow { background: var(--heatmap-low); }
   .heatmapMid { background: var(--heatmap-mid); }

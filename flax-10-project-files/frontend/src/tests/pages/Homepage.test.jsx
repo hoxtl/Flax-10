@@ -57,10 +57,10 @@ vi.mock('../../context/TimerContext', () => ({
 }));
 
 vi.mock('../../context/TaskCompletionContext', () => ({
-  useTaskCompletion: () => ({ showCompletionToast: vi.fn(), showLevelUpToast: vi.fn() }),
+  useTaskCompletion: () => ({ showCompletionToast: vi.fn() }),
 }));
 
-vi.mock('../../components/Homepage/IntelligenceRow', () => ({
+vi.mock('../../pages/Homepage/components/IntelligenceRow', () => ({
   __esModule: true,
   default: () => <div data-testid="intelligence-row">Good Morning</div>,
 }));

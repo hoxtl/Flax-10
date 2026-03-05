@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { TrendingUp, Flame, Clock, ArrowRight, CalendarClock, Zap, CheckCircle2, AlertTriangle } from "lucide-react";
+import { TrendingUp, Flame, Clock, ArrowRight, CalendarClock, Zap, CheckCircle2 } from "lucide-react";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import analyticsService from "../../../api/analyticsService";
 import styles from "./StudyPulseWidget.module.css";

@@ -26,11 +26,10 @@ import { playCompletionChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 import { getUserSettings } from "../../api/userService";
 
-import EmptyStateCard from "../../components/EmptyStateCard";
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import CreateListModal from "../Tasks/components/CreateListModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
-import IntelligenceRow from "../../components/Homepage/IntelligenceRow";
+import IntelligenceRow from "./components/IntelligenceRow";
 import styles from "./Homepage.module.css";
 
 import {
@@ -56,30 +55,12 @@ import { MiniTimeline } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
-import { FocusWindowsWidget } from "./components/FocusWindowsWidget";
 import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
-
-/** Module code → pill color (same hash as TaskCard for consistency). */
-const MODULE_COLORS = [
-  { text: "#9a3412", bg: "rgba(251, 146, 60, 0.18)" },
-  { text: "#1d4ed8", bg: "rgba(96, 165, 250, 0.18)" },
-  { text: "#15803d", bg: "rgba(74, 222, 128, 0.16)" },
-  { text: "#7e22ce", bg: "rgba(192, 132, 252, 0.16)" },
-  { text: "#b45309", bg: "rgba(252, 211, 77, 0.20)" },
-  { text: "#be123c", bg: "rgba(251, 113, 133, 0.16)" },
-  { text: "#0e7490", bg: "rgba(34, 211, 238, 0.15)" },
-  { text: "#4338ca", bg: "rgba(165, 180, 252, 0.18)" },
-];
-function getModuleColor(code) {
-  if (!code) return { text: "#5a4a3a", bg: "rgba(74, 55, 40, 0.08)" };
-  let hash = 0;
-  for (let i = 0; i < code.length; i++) hash = ((hash << 5) - hash + code.charCodeAt(i)) | 0;
-  return MODULE_COLORS[Math.abs(hash) % MODULE_COLORS.length];
-}
+import SleepBanner from "./components/SleepBanner";
 
 /* HOME PAGE */
-export default function Homepage({ onNavigate }) {
+export default function Homepage() {
   const navigate         = useNavigate();
   const { selectedDate, events: allCalEvents } = useCalendar();
   const dispatch         = useCalendarDispatch();
@@ -811,23 +792,6 @@ export default function Homepage({ onNavigate }) {
   const actionHubSpineCompletedPct =
     actionHubItemsOnly.length > 0 ? (actionHubCompletedCount / actionHubItemsOnly.length) * 100 : 0;
   const actionHubRemainingCount = actionHubItemsOnly.filter((i) => !i.completed).length;
-  const slot1Meta = isToday(selectedDate) && actionHubItemsOnly.length > 0
-    ? `${actionHubRemainingCount} due · ${Math.round(actionHubSpineCompletedPct)}% done`
-    : null;
-
-  /** On-track / ahead / behind based on % done vs % of workday elapsed. */
-  const dayProgressStatus = useMemo(() => {
-    if (!isToday(selectedDate) || actionHubItemsOnly.length === 0) return null;
-    const workdayStart = 9;
-    const workdayEnd = 21;
-    const nowH = now.getHours() + now.getMinutes() / 60;
-    if (nowH < workdayStart || nowH >= workdayEnd) return null;
-    const elapsed = ((nowH - workdayStart) / (workdayEnd - workdayStart)) * 100;
-    const done = actionHubSpineCompletedPct;
-    if (done >= elapsed + 15) return "ahead";
-    if (done >= elapsed - 15) return "ontrack";
-    return "behind";
-  }, [selectedDate, now, actionHubItemsOnly.length, actionHubSpineCompletedPct]);
 
   /** Today's free windows from schedule (>= 20 min, chronological). */
   const todayFreeWindows = useMemo(() => {
@@ -916,42 +880,6 @@ export default function Homepage({ onNavigate }) {
     const leaveStr = new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
     return { eventTitle: nextEvent.title || "next event", leaveStr };
   }, [selectedDate, isToday, now, sortedEvents]);
-
-  /** Schedule-aware one-liner shown below the status pills in the greeting header. */
-  const scheduleInsight = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return null;
-    const todayEvs = sortedEvents.filter(e => e.start_time && e.end_time);
-    const lectureCount = todayEvs.filter(e =>
-      /lecture|seminar|tutorial|lab/i.test(e.title || "")
-    ).length;
-    const totalMins = todayEvs.reduce((acc, e) => {
-      const m = Math.round((new Date(e.end_time) - new Date(e.start_time)) / 60000);
-      return acc + Math.max(0, m);
-    }, 0);
-    const sorted = [...todayEvs].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    let hasBackToBack = false;
-    for (let i = 1; i < sorted.length; i++) {
-      const gap = (new Date(sorted[i].start_time) - new Date(sorted[i - 1].end_time)) / 60000;
-      if (gap >= 0 && gap < 10) { hasBackToBack = true; break; }
-    }
-    const hour = now.getHours();
-    if (lectureCount >= 2 && hasBackToBack) {
-      return `${lectureCount} lectures today with back-to-back sessions — remember to take breaks`;
-    }
-    if (lectureCount >= 1) {
-      return `${lectureCount} lecture${lectureCount > 1 ? "s" : ""} today · ${todayFreeWindows.length} free window${todayFreeWindows.length !== 1 ? "s" : ""} to study`;
-    }
-    if (totalMins >= 360) {
-      return `Packed day — ${Math.round(totalMins / 60)}h scheduled · guard your energy`;
-    }
-    if (hour >= 21 && actionHubRemainingCount > 0) {
-      return `It's late — ${actionHubRemainingCount} task${actionHubRemainingCount !== 1 ? "s" : ""} remaining. Prioritise sleep if needed`;
-    }
-    if (todayFreeWindows.length >= 3) {
-      return `Light schedule today — ${todayFreeWindows.length} windows to make real progress`;
-    }
-    return null;
-  }, [selectedDate, isToday, sortedEvents, todayFreeWindows, now, actionHubRemainingCount]);
 
   /** Focus hours: task-based (estimated work for hub tasks only). */
   const actionHubFocusHours = useMemo(() => {
@@ -1249,16 +1177,14 @@ export default function Homepage({ onNavigate }) {
         </div>
       )}
 
+      <SleepBanner />
+
       {/* Intelligence Row — Monochrome Bento with real time-management data */}
       <div className={styles.intelligenceRowWrap}>
       <IntelligenceRow
         displayName={displayName}
-        taskCount={actionHubRemainingCount}
-        hasOverdue={actionHubOverdueCount > 0}
         statusStrip={navStatusStrip}
-        scheduleInsight={scheduleInsight}
         tflContext={tflContext}
-        slot1Meta={slot1Meta}
         slot1ActionHub={
           <TaskWidgetSlot
             styles={taskWidgetStyles}
@@ -1278,15 +1204,6 @@ export default function Homepage({ onNavigate }) {
             onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
           />
         }
-        daySummary={isToday(selectedDate) ? {
-          pct: actionHubSpineCompletedPct,
-          done: actionHubCompletedCount,
-          total: actionHubItemsOnly.length,
-          remaining: actionHubRemainingCount,
-          overdue: actionHubOverdueCount,
-          status: dayProgressStatus,
-          streak: analyticsSummary?.summary?.current_streak_days ?? 0,
-        } : null}
         slot3Urgent={
           <DeadlinesWidget
             deadlines={upcomingDeadlines || []}

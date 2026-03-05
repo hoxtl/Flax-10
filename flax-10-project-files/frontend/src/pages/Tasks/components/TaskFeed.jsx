@@ -8,7 +8,7 @@ import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import MultiSelectDropdown from "../../../components/ui/MultiSelectDropdown";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
-import AllTasksCompleteCard from "../../../components/AllTasksCompleteCard";
+import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 
 import styles from "./TaskFeed.module.css";

@@ -12,7 +12,7 @@ import {
 import { Sun, Clock, AlertTriangle, Bus, Sparkles } from "lucide-react";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useCountdown } from "../hooks/useCountdown";
-import { isNow } from "../utils";
+import { isNow } from "../utils/eventUtils";
 import styles from "./RightNowWidget.module.css";
 
 /** Minutes left until event end — for time-left badge colour band. */
