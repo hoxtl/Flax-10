@@ -13,7 +13,7 @@ import {
   useCalendarEvents,
   useEventActions,
 } from "../../components/Calendar/hooks/useCalendarEvents";
-import { fetchTasks, updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskService";
+import { updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskService";
 import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import { getModules, getEnrollments } from "../../api/moduleApi";
@@ -35,18 +35,12 @@ import styles from "./Homepage.module.css";
 import {
   formatTime,
   isNow,
-  isLecture,
   isRoutineEvent,
   getNavigatorContext,
-  getMotivationMessage,
-  getUrgencyLevel,
-  computeTimelineWithGaps,
   getNextFreeSlotToday,
   getAllFreeWindowsToday,
   isRoutineOrEventTask,
-  isAutoPassedTask,
 } from "./utils/index";
-import { DAY_START_HOUR, DAY_END_HOUR } from "./utils/timelineUtils";
 import { useHomeData } from "./hooks/useHomeData";
 import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
 import { MiniTimeline } from "./components";
@@ -66,15 +60,9 @@ export default function Homepage() {
   const { removeEvent, addEvent, editEvent } = useEventActions();
   const { openModal }    = useEventModal();
   const { getTag, tags }       = useTags();
-  const { setActiveTaskId, isActive: timerActive, timeLeft, task: timerTask, progress: timerProgress, setIsActive: setTimerActive, mode: timerMode, setMode: setTimerMode, setTimeLeft, workTime, breakTime, resetTimer, setTask: setTimerTask } = useTimerContext();
+  const { isActive: timerActive, timeLeft, task: timerTask, mode: timerMode, workTime, breakTime } = useTimerContext();
   const hasTimerSession = timerActive;
 
-  const startFocusInWidget = useCallback(() => {
-    setTimerMode("work");
-    setTimeLeft((workTime || 25) * 60);
-    setTimerTask("Focus");
-    setTimerActive(true);
-  }, [setTimerMode, setTimeLeft, workTime, setTimerTask, setTimerActive]);
   const { showCompletionToast } = useTaskCompletion();
 
   const displayName = useMemo(() => {
@@ -88,31 +76,21 @@ export default function Homepage() {
     }
   }, []);
 
-  const { dayEvents, dayTasks, allTasks, removePendingTask, refetchTasks } = useHomeData(selectedDate);
-  const isBrandNewTasks = (allTasks || []).length === 0;
-  const isAllTasksCompleted = (allTasks || []).length > 0 && (allTasks || []).filter((t) => !t.completed).length === 0;
+  const { dayEvents, dayTasks, allTasks, refetchTasks } = useHomeData(selectedDate);
   const [toast, setToast] = useState(null);
-  const [pastCollapsed, setPastCollapsed] = useState(true);
-  const [activeTimerTaskId, setActiveTimerTaskId] = useState(null);
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
-  const [moduleFilterId, setModuleFilterId] = useState(null);
+  const [moduleFilterId] = useState(null);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
   const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
   const [lastCreatedListId, setLastCreatedListId] = useState(null);
   const [rescheduleTask, setRescheduleTask] = useState(null);
   const [planTimelineReadItem, setPlanTimelineReadItem] = useState(null);
-  const [celebratingTaskId, setCelebratingTaskId] = useState(null);
-  const [floatingSeedTaskId, setFloatingSeedTaskId] = useState(null);
-  const [floatingSeedXp, setFloatingSeedXp] = useState(0);
-  const [nowHeroFocusBtnHovered, setNowHeroFocusBtnHovered] = useState(false);
-  const [showXPSparks, setShowXPSparks] = useState(false);
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
   const scheduleCountdownSecs = useScheduleCountdown(selectedDate, dayEvents);
-  const [analyticsSummary, setAnalyticsSummary] = useState(null);
   const [analyticsProgress, setAnalyticsProgress] = useState(null);
   const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
   const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
@@ -127,12 +105,6 @@ export default function Homepage() {
     today.setHours(0, 0, 0, 0);
     dispatch({ type: "SET_SELECTED_DATE", payload: today });
   }, [dispatch]);
-  useEffect(() => {
-    const read = () => { try { setActiveTimerTaskId(sessionStorage.getItem("timerTaskId")); } catch (_) {} };
-    read();
-    window.addEventListener("focus", read);
-    return () => window.removeEventListener("focus", read);
-  }, []);
 
   /* Live Compass: recalc every 60s so the NOW line moves without refresh */
   useEffect(() => {
@@ -151,7 +123,6 @@ export default function Homepage() {
   }, []);
 
   useEffect(() => {
-    analyticsService.getSummary(7).then((data) => setAnalyticsSummary(data)).catch(() => setAnalyticsSummary(null));
     analyticsService.getProgress(14).then((data) => setAnalyticsProgress(data)).catch(() => setAnalyticsProgress(null));
   }, []);
 
@@ -161,13 +132,10 @@ export default function Homepage() {
       .catch(() => setSavedRoutes([]));
   }, []);
 
-  /* When work timer hits 0 in the NOW widget: soft chime + subtle +1 XP sparks */
+  /* When work timer hits 0 in the NOW widget: soft chime */
   useEffect(() => {
     if (hasTimerSession && timerMode === "work" && prevTimeLeftRef.current > 0 && timeLeft === 0) {
       playCompletionChime(0.35);
-      setShowXPSparks(true);
-      const t = setTimeout(() => setShowXPSparks(false), 1400);
-      return () => clearTimeout(t);
     }
     prevTimeLeftRef.current = timeLeft;
   }, [hasTimerSession, timerMode, timeLeft]);
@@ -183,62 +151,12 @@ export default function Homepage() {
     fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
   }, []);
 
-  const handleModuleTagClick = useCallback((moduleId, moduleCode) => {
-    const url = moduleId
-      ? `/modules?moduleId=${moduleId}`
-      : moduleCode
-        ? `/modules?code=${encodeURIComponent(moduleCode)}`
-        : "/modules";
-    navigate(url);
-  }, [navigate]);
-
-  const modulesWithSeeds = useMemo(() => {
-    const now = new Date();
-    const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    return (modulesList || []).map((mod) => {
-      const related = (allTasks || []).filter(
-        (t) =>
-          String(t.module_id || t.module || t.moduleId || "") === String(mod.id) ||
-          (t.module_code || "").toUpperCase().trim() === (mod.module_code || "").toUpperCase().trim()
-      );
-      const totalTasks = related.length;
-      const seedsGrown = related.filter((t) => t.completed).length;
-      const pct = totalTasks > 0 ? Math.round((seedsGrown / totalTasks) * 100) : 0;
-      const hasUrgent =
-        pct === 0 &&
-        totalTasks > 0 &&
-        related.some(
-          (t) =>
-            !t.completed &&
-            t.due_date &&
-            (new Date(t.due_date) <= now || new Date(t.due_date) <= in7Days)
-        );
-      return { ...mod, seedsGrown, totalTasks, pct, hasUrgent };
-    });
-  }, [modulesList, allTasks]);
-
-  /* Current Modules: only enrolled modules that have deadlines, max 3; hide section if none */
-  const moduleIdsWithDeadlines = useMemo(
-    () => new Set((upcomingDeadlines || []).map((d) => String(d.module ?? d.module_id ?? "")).filter(Boolean)),
-    [upcomingDeadlines]
-  );
-  const currentModules = useMemo(() => {
-    return (modulesWithSeeds || [])
-      .filter((m) => isEnrolledIn(m.id, enrollments) && moduleIdsWithDeadlines.has(String(m.id)))
-      .slice(0, 3);
-  }, [modulesWithSeeds, enrollments, moduleIdsWithDeadlines]);
 
   const enrolledModules = useMemo(
     () => (modulesList || []).filter((m) => isEnrolledIn(m.id, enrollments)),
     [modulesList, enrollments]
   );
 
-  // Analytics-derived intelligence
-  const urgencyLevel = useMemo(
-    () => getUrgencyLevel(upcomingDeadlines, analyticsProgress),
-    [upcomingDeadlines, analyticsProgress]
-  );
-  const isUrgentOrange = urgencyLevel === "urgent";
 
   /** Tomorrow's first scheduled event — used in endOfDay Right Now state */
   const tomorrowFirstEvent = useMemo(() => {
@@ -265,20 +183,6 @@ export default function Homepage() {
     return { label: `↓ ${Math.abs(diff)}h less than yesterday`, dir: "down" };
   }, [analyticsProgress]);
 
-  /** vs last week: compare today's actual_hours vs same weekday 7 days ago */
-  const vsLastWeek = useMemo(() => {
-    const dp = analyticsProgress?.daily_progress;
-    if (!dp?.length) return null;
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const lastWeekStr = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-    const todayEntry = dp.find((d) => d.date === todayStr);
-    const lastWeekEntry = dp.find((d) => d.date === lastWeekStr);
-    if (!todayEntry || !lastWeekEntry) return null;
-    const diff = Math.round((todayEntry.actual_hours - lastWeekEntry.actual_hours) * 10) / 10;
-    if (Math.abs(diff) < 0.1) return { label: "≈ same as last week", dir: "flat" };
-    if (diff > 0) return { label: `↑ ${diff}h vs last week`, dir: "up" };
-    return { label: `↓ ${Math.abs(diff)}h vs last week`, dir: "down" };
-  }, [analyticsProgress]);
 
   const getTaskCategoryPillMeta = useCallback((task) => {
     const listId = task.task_list != null ? String(task.task_list) : null;
@@ -308,13 +212,6 @@ export default function Homepage() {
     return "flax";
   }, [getTag]);
 
-  const getActionHubXp = (task) => {
-    const p = task?.priority;
-    if (p === "urgent") return 15;
-    if (p === "high") return 12;
-    if (p === "medium") return 10;
-    return 8;
-  };
 
   const handleTaskWidgetComplete = useCallback(async (t) => {
     const newCompleted = !t.completed;
@@ -323,13 +220,9 @@ export default function Homepage() {
       await updateTask(numericId, { completed: newCompleted });
       refetchTasks();
       if (newCompleted) {
-        const xp = getActionHubXp(t);
         const isRoutine = isRoutineTask(t);
         showCompletionToast(getCompletionMessage(t), { isRoutine });
         if (!isRoutine) {
-          setFloatingSeedXp(xp);
-          setFloatingSeedTaskId(numericId);
-          setTimeout(() => { setFloatingSeedTaskId(null); setFloatingSeedXp(0); }, 1400);
           try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ctx.createOscillator();
@@ -390,20 +283,6 @@ export default function Homepage() {
   }, [sortedEvents, pastItems]);
 
   /* Include overlapping past events in timeline so both show side-by-side in the same time block */
-  const upcomingForTimeline = useMemo(() => {
-    const upcomingIds = new Set(upcomingItems.map((e) => e.id));
-    const pastThatOverlap = pastItems.filter((past) => {
-      const pastStart = new Date(past.start_time);
-      const pastEnd = new Date(past.end_time || past.start_time);
-      return upcomingItems.some((up) => {
-        const upStart = new Date(up.start_time);
-        const upEnd = new Date(up.end_time || up.start_time);
-        return pastEnd > upStart && pastStart < upEnd;
-      });
-    });
-    const combined = [...upcomingItems, ...pastThatOverlap];
-    return combined.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-  }, [upcomingItems, pastItems]);
 
   const pastIdsShownInTimeline = useMemo(
     () => new Set(
@@ -538,26 +417,6 @@ export default function Homepage() {
     [dayTasks, scheduledTitles]
   );
 
-  const upcomingTimeline = useMemo(
-    () => computeTimelineWithGaps(upcomingForTimeline, suggestableTasks),
-    [upcomingForTimeline, suggestableTasks]
-  );
-
-  /* Current time as % of visible day (6am–10pm) for timeline now-line; only when viewing today */
-  const timelineNowPercent = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const startMins = 6 * 60;
-    const endMins = 22 * 60;
-    const nowMins = now.getHours() * 60 + now.getMinutes();
-    if (nowMins < startMins) return 0;
-    if (nowMins >= endMins) return 100;
-    return Math.max(0, Math.min(100, ((nowMins - startMins) / (endMins - startMins)) * 100));
-  }, [selectedDate, now]);
-
-  const lectureCount = useMemo(
-    () => sortedEvents.filter(isLecture).length,
-    [sortedEvents]
-  );
 
   const tasksDueToday = useMemo(() => {
     if (!isToday(selectedDate)) return [];
@@ -591,35 +450,6 @@ export default function Homepage() {
     );
   }, [tasksDueToday, moduleFilterId, enrolledModules]);
 
-  /* Live progress: task-based so it updates when checkboxes change or tasks are rescheduled. Routine/event tasks count as "done" when time has passed (auto-pass). */
-  const todaysTaskProgress = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const total = tasksDueToday.length;
-    const crushed = tasksDueToday.filter(
-      (t) => t.completed || isAutoPassedTask(t, now, getTag)
-    ).length;
-    const percent = total > 0 ? Math.round((crushed / total) * 100) : 0;
-    return { total, crushed, percent };
-  }, [selectedDate, tasksDueToday, now, getTag]);
-
-  /* Goals Crushed / Seed Growth: only non-routine tasks. Routine events do NOT count. */
-  const goalsOnlyProgress = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const goalTasks = tasksDueToday.filter((t) => !isRoutineOrEventTask(t, getTag));
-    const total = goalTasks.length;
-    const crushed = goalTasks.filter((t) => t.completed).length;
-    const percent = total > 0 ? Math.round((crushed / total) * 100) : 0;
-    return { total, crushed, percent };
-  }, [selectedDate, tasksDueToday, getTag]);
-
-  const motivationMessage = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const p = todaysTaskProgress;
-    if (p && p.total > 0) {
-      return getMotivationMessage(now, p.total, p.crushed, lectureCount);
-    }
-    return getMotivationMessage(now, sortedEvents.length, pastItems.length, lectureCount);
-  }, [selectedDate, now, sortedEvents.length, pastItems.length, lectureCount, todaysTaskProgress]);
 
   /** Daily Navigator context: task/gap/conflict/endOfDay, currentBlock, nextItem, gapMins, overlaps, conflictAt. */
   const navigatorContext = useMemo(
@@ -627,26 +457,6 @@ export default function Homepage() {
     [now, selectedDate, sortedEvents, isToday]
   );
 
-  const mostUrgentDeadline = useMemo(() => {
-    const list = (upcomingDeadlines || []).filter((d) => d.start_due_date);
-    if (list.length === 0) return null;
-    return [...list].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date))[0];
-  }, [upcomingDeadlines]);
-
-  const hasDeadlineWithin24h = useMemo(() => {
-    const nowMs = Date.now();
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    return (upcomingDeadlines || []).some(
-      (d) => d.start_due_date && (new Date(d.start_due_date) - nowMs) <= oneDayMs && (new Date(d.start_due_date) - nowMs) >= 0
-    );
-  }, [upcomingDeadlines]);
-
-  const upcomingDeadlinesCount = useMemo(
-    () => (upcomingDeadlines || []).filter(
-      (d) => d.start_due_date && (new Date(d.start_due_date) - Date.now()) <= 21 * 24 * 60 * 60 * 1000
-    ).length,
-    [upcomingDeadlines]
-  );
 
   /** Deadlines within 14 days that have no matching revision/study event already in the calendar. */
   const deadlineSuggestions = useMemo(() => {
@@ -670,36 +480,6 @@ export default function Homepage() {
       .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
   }, [selectedDate, upcomingDeadlines, sortedEvents]);
 
-  const seedsCountFromTasks = useMemo(() => {
-    if (!isToday(selectedDate)) return 0;
-    const todayStart = new Date(selectedDate);
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(selectedDate);
-    todayEnd.setHours(23, 59, 59, 999);
-    const dueToday = (t) => {
-      const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= todayStart && d <= todayEnd;
-    };
-    return (allTasks || []).filter((t) => {
-      if (!t.completed) return false;
-      const title = (t.title || "").toLowerCase();
-      if (/breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title)) return false;
-      const completedAt = t.completed_at ?? t.completedAt;
-      if (completedAt) return isToday(new Date(completedAt));
-      return dueToday(t);
-    }).length;
-  }, [selectedDate, allTasks]);
-
-  const hasOverdueToday = useMemo(() => {
-    const now = new Date();
-    return tasksDueToday.some(
-      (t) =>
-        !isRoutineOrEventTask(t, getTag) &&
-        !t.completed &&
-        t.due_date &&
-        new Date(t.due_date) < now
-    );
-  }, [tasksDueToday, getTag]);
 
   const overdueTasksForNow = useMemo(() => {
     const now = new Date();
@@ -714,7 +494,7 @@ export default function Homepage() {
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
   }, [filteredTasksDueToday, getTag]);
 
-  /** Today's Action Hub: task-only. Only tasks due today or tomorrow—no entire week, no later dates. */
+  /** task-only. Only tasks due today or tomorrow—no entire week, no later dates. */
   const taskWidgetList = useMemo(() => {
     if (!isToday(selectedDate)) return [];
     const now = new Date();
@@ -776,12 +556,6 @@ export default function Homepage() {
     () => taskWidgetList.filter((i) => i.type === "task"),
     [taskWidgetList]
   );
-  const taskWidgetAllDone = useMemo(
-    () =>
-      taskWidgetItemsOnly.length === 0 ||
-      taskWidgetItemsOnly.every((i) => i.completed),
-    [taskWidgetItemsOnly]
-  );
   const taskWidgetCompletedCount = useMemo(
     () => taskWidgetItemsOnly.filter((i) => i.completed).length,
     [taskWidgetItemsOnly]
@@ -798,15 +572,6 @@ export default function Homepage() {
       .sort((a, b) => a.start - b.start);
   }, [selectedDate, sortedEvents]);
 
-  /** Focus Windows summary: total free time + count for today */
-  const focusSummary = useMemo(() => {
-    if (!isToday(selectedDate) || !todayFreeWindows.length) return null;
-    const totalMins = todayFreeWindows.reduce((s, w) => s + w.minutes, 0);
-    const h = Math.floor(totalMins / 60);
-    const m = totalMins % 60;
-    const durLabel = h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ""}` : `${m}m`;
-    return { count: todayFreeWindows.length, durLabel };
-  }, [selectedDate, todayFreeWindows]);
 
   /** Most urgent incomplete task for focus suggestion. */
   const topActionTask = useMemo(() => {
@@ -819,50 +584,6 @@ export default function Homepage() {
     );
   }, [taskWidgetItemsOnly]);
 
-  /** Smart nudge: pairs the nearest urgent deadline (≤ 24h) with the next free window. */
-  const smartNudge = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const nowMs = now.getTime();
-    const nextWindow = todayFreeWindows.find((w) => w.end.getTime() > nowMs);
-    if (!nextWindow) return null;
-
-    const windowMins = nextWindow.minutes;
-    const winLabel =
-      windowMins >= 60
-        ? `${Math.floor(windowMins / 60)}h${windowMins % 60 > 0 ? ` ${windowMins % 60}m` : ""}`
-        : `${windowMins}m`;
-    const winStart = formatTime(nextWindow.start.toISOString());
-
-    // Priority 1: deadline due within 24h
-    const urgentDeadline = [...(upcomingDeadlines || [])]
-      .filter((d) => {
-        if (!d.start_due_date) return false;
-        const ms = new Date(d.start_due_date) - nowMs;
-        return ms > 0 && ms <= 24 * 3600000;
-      })
-      .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date))[0];
-
-    if (urgentDeadline) {
-      const msUntilDue = new Date(urgentDeadline.start_due_date) - nowMs;
-      const h = Math.floor(msUntilDue / 3600000);
-      const m = Math.floor((msUntilDue % 3600000) / 60000);
-      const dueIn = h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ""}` : `${m}m`;
-      return {
-        type: "deadline",
-        taskTitle: urgentDeadline.title || urgentDeadline.name || "Deadline",
-        dueIn,
-        winLabel,
-        winStart,
-      };
-    }
-
-    // Priority 2: top incomplete task + free window
-    if (topActionTask) {
-      return { type: "task", taskTitle: topActionTask.title, winLabel, winStart };
-    }
-
-    return null;
-  }, [selectedDate, isToday, now, todayFreeWindows, upcomingDeadlines, topActionTask]);
 
   /** TFL context: next upcoming event so the delay pill can say "leave by 18:50 for Dinner with Mum". */
   const tflContext = useMemo(() => {
@@ -878,13 +599,6 @@ export default function Homepage() {
     return { eventTitle: nextEvent.title || "next event", leaveStr };
   }, [selectedDate, isToday, now, sortedEvents]);
 
-  /** Focus hours: task-based (estimated work for hub tasks only). */
-  const taskWidgetFocusHours = useMemo(() => {
-    const totalMins = taskWidgetList
-      .filter((t) => !t.completed)
-      .reduce((acc, t) => acc + (t.estimated_blocks || 1) * 25, 0);
-    return totalMins / 60;
-  }, [taskWidgetList]);
 
   /** Overdue count (incomplete tasks past due). */
   const taskWidgetOverdueCount = useMemo(
@@ -952,33 +666,6 @@ export default function Homepage() {
     return null;
   }, [navigatorContext, selectedDate, isToday, taskWidgetOverdueCount, topActionTask, taskWidgetRemainingCount, sortedEvents, now]);
 
-  /** Time allocation by category for today's events (Day Progress bar chart). */
-  const dayTimeAllocation = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return null;
-    const buckets = { study: 0, personal: 0, other: 0 };
-    sortedEvents.forEach((e) => {
-      if (!e.start_time || !e.end_time) return;
-      const mins = Math.round((new Date(e.end_time) - new Date(e.start_time)) / 60000);
-      if (mins <= 0) return;
-      const t = (e.title || "").toLowerCase();
-      if (/lecture|study|library|revision|seminar|tutorial|lab|coursework/.test(t)) {
-        buckets.study += mins;
-      } else if (/gym|yoga|run|breakfast|lunch|dinner|wellness|walk/.test(t)) {
-        buckets.personal += mins;
-      } else {
-        buckets.other += mins;
-      }
-    });
-    const total = buckets.study + buckets.personal + buckets.other;
-    return total > 0 ? { ...buckets, total } : null;
-  }, [selectedDate, sortedEvents]);
-
-  /** Dynamic status line text. */
-  const taskWidgetStatusLine = useMemo(() => {
-    if (taskWidgetItemsOnly.length === 0 || taskWidgetRemainingCount === 0) return "All clear! Ready to wrap up?";
-    if (taskWidgetOverdueCount > 0) return `You have ${taskWidgetOverdueCount} item${taskWidgetOverdueCount === 1 ? "" : "s"} behind schedule. Tackle these first?`;
-    return "You are perfectly on schedule for today.";
-  }, [taskWidgetItemsOnly.length, taskWidgetRemainingCount, taskWidgetOverdueCount]);
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
   const [replanLoading, setReplanLoading] = useState(false);
@@ -1049,85 +736,13 @@ export default function Homepage() {
     }
   }, [missedItems, overdueTasksForNow, sortedEvents, selectedDate, editEvent, addEvent, loadEvents, showToast, refetchTasks]);
 
-  /** Plan timeline: total focus window minutes (gaps >= 30 min between events today) for daily summary. */
-  const planTimelineFocusWindowMinutes = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return 0;
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(DAY_START_HOUR, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(DAY_END_HOUR, 0, 0, 0);
-    const inWindow = sortedEvents.filter((e) => {
-      const s = new Date(e.start_time).getTime();
-      const eEnd = new Date(e.end_time || e.start_time).getTime();
-      return eEnd > dayStart.getTime() && s < dayEnd.getTime();
-    }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    let total = 0;
-    let lastEnd = dayStart.getTime();
-    for (const ev of inWindow) {
-      const start = new Date(ev.start_time).getTime();
-      const end = new Date(ev.end_time || ev.start_time).getTime();
-      const gapMins = (start - lastEnd) / 60000;
-      if (gapMins >= 30) total += Math.round(gapMins);
-      if (end > lastEnd) lastEnd = end;
-    }
-    const tailMins = (dayEnd.getTime() - lastEnd) / 60000;
-    if (tailMins >= 30) total += Math.round(tailMins);
-    return total;
-  }, [selectedDate, sortedEvents]);
-
-  /** Remaining focus window minutes (future gaps only) and predicted finish time for today. */
-  const planTimelinePredictedFinish = useMemo(() => {
-    if (!isToday(selectedDate) || !sortedEvents?.length) return { remainingMins: 0, predictedFinishTime: null };
-    const now = new Date();
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(DAY_START_HOUR, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(DAY_END_HOUR, 0, 0, 0);
-    if (now >= dayEnd) return { remainingMins: 0, predictedFinishTime: null };
-    const inWindow = sortedEvents.filter((e) => {
-      const s = new Date(e.start_time).getTime();
-      const eEnd = new Date(e.end_time || e.start_time).getTime();
-      return eEnd > dayStart.getTime() && s < dayEnd.getTime();
-    }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    let remaining = 0;
-    let lastEnd = dayStart.getTime();
-    for (const ev of inWindow) {
-      const start = new Date(ev.start_time).getTime();
-      const end = new Date(ev.end_time || ev.start_time).getTime();
-      const gapMins = (start - lastEnd) / 60000;
-      const gapEnd = lastEnd + gapMins * 60000;
-      if (gapMins >= 30 && gapEnd > now.getTime()) {
-        const startInGap = Math.max(lastEnd, now.getTime());
-        remaining += Math.round((gapEnd - startInGap) / 60000);
-      }
-      if (end > lastEnd) lastEnd = end;
-    }
-    const tailMins = (dayEnd.getTime() - lastEnd) / 60000;
-    const tailEnd = lastEnd + tailMins * 60000;
-    if (tailMins >= 30 && tailEnd > now.getTime()) {
-      const startInTail = Math.max(lastEnd, now.getTime());
-      remaining += Math.round((tailEnd - startInTail) / 60000);
-    }
-    const predictedFinishTime = remaining > 0
-      ? (() => {
-          const finish = new Date(now.getTime() + remaining * 60000);
-          return `${String(finish.getHours()).padStart(2, "0")}:${String(finish.getMinutes()).padStart(2, "0")}`;
-        })()
-      : null;
-    return { remainingMins: remaining, predictedFinishTime };
-  }, [selectedDate, sortedEvents]);
-
-  /** Aliases for legacy/cached references. */
-  const taskWidgetFocusWindowMinutes = taskWidgetFocusHours * 60;
 
   const handleTaskToggle = useCallback(
     async (task, completed) => {
       const markingComplete = completed === true;
       const isRoutine = isRoutineTask(task);
       if (markingComplete) {
-        if (!isRoutine) setCelebratingTaskId(task.id);
         showCompletionToast(getCompletionMessage(task), { isRoutine });
-        if (!isRoutine) setTimeout(() => setCelebratingTaskId(null), 500);
       }
       try {
         await updateTask(task.id, { completed });
@@ -1155,7 +770,7 @@ export default function Homepage() {
   )}
 
       <div>
-      {/* Active focus session banner */}
+      {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
       {hasTimerSession && (
         <div className={styles.focusBanner}>
           <div className={styles.focusBannerLeft}>
@@ -1173,15 +788,17 @@ export default function Homepage() {
         </div>
       )}
 
+      {/* ─── SLEEP BANNER ─── motivational greeting shown at the top */}
       <SleepBanner />
 
-      {/* Intelligence Row — Monochrome Bento with real time-management data */}
+      {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
       <div className={styles.intelligenceRowWrap}>
       <IntelligenceRow
         displayName={displayName}
         statusStrip={navStatusStrip}
         tflContext={tflContext}
         slot1TodayTasks={
+          // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
           <TaskWidgetSlot
             styles={taskWidgetStyles}
             displayName={displayName}
@@ -1201,16 +818,19 @@ export default function Homepage() {
           />
         }
         slot3Urgent={
+          // ─── SLOT 3: DEADLINES WIDGET ─── upcoming coursework/assessment deadlines
           <DeadlinesWidget
             deadlines={upcomingDeadlines || []}
             onSelectDeadline={setSelectedDeadline}
             onSelectModule={(mod) => setSelectedModulePill(mod)}
           />
         }
+        // ─── SLOT 2: STUDY PULSE WIDGET ─── free windows + focus suggestions
         studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
         studyPulseNow={now}
         studyPulseOnStartFocus={() => navigate("/timer")}
         studyPulseDeadlines={upcomingDeadlines || []}
+        // ─── SLOT 5: RIGHT NOW WIDGET ─── live schedule compass + timer overlay
         slot5Data={{
           now,
           isToday: isToday(selectedDate),

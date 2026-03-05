@@ -1,30 +1,4 @@
 /* Homepage slots & layout — focus banner, overlays, bento, triage, intRow, etc. (renamed from ActionHub) */
-  /* +1 XP sparks when work timer hits zero */
-  .xpSparksWrap {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10;
-  }
-  .xpSpark {
-    position: absolute;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--restoration-sage, #87A96B);
-    text-shadow: 0 0 8px rgba(135, 169, 107, 0.5);
-    opacity: 0;
-    animation: xpSparkFloat 1.2s ease-out forwards;
-  }
-  @keyframes xpSparkFloat {
-    0% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-28px) scale(1.1);
-    }
-  }
   .triageDeadlines {
     border-radius: 12px;
     border: 1px solid rgba(107, 83, 68, 0.2);
