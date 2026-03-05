@@ -322,6 +322,7 @@
     font-size: 1rem;
     color: #5d4037;
   }
+}
 
 @media (max-width: 800px) {
   .btn-import-text-full {
@@ -330,5 +331,16 @@
 
   .btn-import-text-short {
     display: inline;
+  }
+}
+
+@media (max-width: 670px) {
+  .calendar-title {
+    position: static;
+    transform: none;
+    text-align: left;
+    left: auto;
+    font-size: 1rem;
+    color: #5d4037;
   }
 }
