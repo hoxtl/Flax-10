@@ -10,22 +10,34 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   flex-shrink: 0;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.headerIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(184, 139, 139, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .headerIcon {
   flex-shrink: 0;
-  color: #a89279;
+  color: #B38B8B;
 }
 
 .headerLabel {
-  font-size: 10px;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  color: #2c1810;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #a89279;
 }
 
 /* Coursemates */
@@ -49,8 +61,8 @@
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 2px solid #fffcf8;
   display: flex;
@@ -236,4 +248,39 @@
 
 .societyCard:hover .societyChevron {
   color: #8b7355;
+}
+
+/* Society spotlight label */
+.societySpotlightLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c4b8a0;
+  margin: 0 0 6px;
+}
+
+/* Study tip section */
+.studyTipSection {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 2px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(196, 164, 109, 0.04);
+}
+
+.studyTipIcon {
+  color: #C4A46D;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.studyTipText {
+  font-size: 11px;
+  font-style: italic;
+  color: #8b7355;
+  line-height: 1.4;
+  font-weight: 500;
 }

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Users, ChevronRight } from "lucide-react";
+import { Users, ChevronRight, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSocieties } from "../../../components/Society/hooks/useSocieties";
 import styles from "./SocialDiscoverWidget.module.css";
@@ -38,7 +38,7 @@ function getSocietyMeta(society) {
   return { text: "Active society", color: "#A89279" };
 }
 
-export function SocialDiscoverWidget({ coursemates, moduleName }) {
+export function SocialDiscoverWidget({ coursemates, moduleName, studyTip }) {
   const { societies, loading } = useSocieties();
 
   const displayCoursemates = coursemates?.length ? coursemates.slice(0, 4) : MOCK_COURSEMATES;
@@ -55,7 +55,9 @@ export function SocialDiscoverWidget({ coursemates, moduleName }) {
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Users className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        <div className={styles.headerIconWrap}>
+          <Users className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        </div>
         <span className={styles.headerLabel}>Discover</span>
       </div>
 
@@ -103,6 +105,7 @@ export function SocialDiscoverWidget({ coursemates, moduleName }) {
         animate="visible"
         variants={sectionVariants}
       >
+        <p className={styles.societySpotlightLabel}>Society for you</p>
         {joinedSociety ? (
           <Link to="/societies" className={styles.societyCard}>
             {joinedSociety.cover_image || joinedSociety.image ? (
@@ -149,6 +152,19 @@ export function SocialDiscoverWidget({ coursemates, moduleName }) {
           View all societies →
         </Link>
       </motion.div>
+
+      {/* Study tip */}
+      {(studyTip || true) && (
+        <>
+          <div className={styles.divider} />
+          <div className={styles.studyTipSection}>
+            <Lightbulb className={styles.studyTipIcon} size={14} strokeWidth={1.75} aria-hidden />
+            <p className={styles.studyTipText}>
+              {studyTip || "Your best focus windows are usually in the morning — block time then for deep work."}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }

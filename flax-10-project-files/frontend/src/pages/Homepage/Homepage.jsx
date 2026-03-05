@@ -1332,18 +1332,10 @@ export default function Homepage({ onNavigate }) {
             onSelectModule={(mod) => setSelectedModulePill(mod)}
           />
         }
-        slot4Energy={
-          !isToday(selectedDate) ? (
-            <p className={styles.intRowSlotText}>Select today to see study windows</p>
-          ) : (
-            <FocusWindowsWidget
-              windows={todayFreeWindows}
-              now={now}
-              onViewAnalytics={() => onNavigate?.("analytics")}
-              onStartFocus={() => navigate("/timer")}
-            />
-          )
-        }
+        studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
+        studyPulseNow={now}
+        studyPulseOnStartFocus={() => navigate("/timer")}
+        studyPulseDeadlines={upcomingDeadlines || []}
         slot5Data={{
           now,
           isToday: isToday(selectedDate),
@@ -1376,6 +1368,9 @@ export default function Homepage({ onNavigate }) {
           (m.module_code || "").toUpperCase() === mCode.toUpperCase()
         );
         const mName = mModule?.module_name || mModule?.name || null;
+        const mDept = mModule?.department || mModule?.school || null;
+        const mDesc = mModule?.description || null;
+        const mLeader = mModule?.module_leader || mModule?.leader || null;
         const mUrl = mId ? `/modules?moduleId=${mId}` : `/modules?code=${encodeURIComponent(mCode)}`;
         return (
           <div
@@ -1406,6 +1401,9 @@ export default function Homepage({ onNavigate }) {
                 {mCode}
               </h2>
               {mName && <p className={styles.moduleCardName}>{mName}</p>}
+              {mDept && <p className={styles.moduleCardDept}>{mDept}</p>}
+              {mDesc && <p className={styles.moduleCardDesc}>{mDesc.length > 120 ? mDesc.slice(0, 120) + "…" : mDesc}</p>}
+              {mLeader && <p className={styles.moduleCardLeader}>Leader: {mLeader}</p>}
               <div className={styles.moduleCardDivider} />
               <Link
                 to={mUrl}
@@ -1491,17 +1489,14 @@ export default function Homepage({ onNavigate }) {
             <div className={styles.timelineHeader}>
               <div className={styles.timelineHeaderLeft}>
                 <div className={styles.timelineHeaderIconWrap} aria-hidden>
-                  <CalendarIcon size={20} strokeWidth={1.5} />
+                  <CalendarIcon size={17} strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className={styles.timelineTitle}>Your Plan for the Day</h3>
-                  {!isToday(selectedDate) && <span className={styles.timelineSub}>Preview & adjust.</span>}
+                  <h3 className={styles.timelineTitle}>Your Day</h3>
+                  <Link to="/calendar" className={styles.timelineHeaderSub}>View calendar →</Link>
                 </div>
               </div>
               <div className={styles.timelineHeaderRight}>
-                <Link to="/calendar" className={styles.timelineHeaderCta}>
-                  View Detailed Planner →
-                </Link>
                 {isToday(selectedDate) && (missedItems?.length > 0 || (overdueTasksForNow?.length ?? 0) > 0) && (
                   <motion.button
                     type="button"
