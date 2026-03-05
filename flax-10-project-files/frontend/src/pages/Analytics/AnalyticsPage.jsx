@@ -54,8 +54,9 @@ export default function AnalyticsPage() {
         setData(summary);
         setProgressData(progress);
         setThemeStats(theme);
-      } catch {
-        setError('Failed to load analytics data.');
+      } catch (err) {
+        const message = err?.message || 'Failed to load analytics data.';
+        setError(message);
       } finally {
         setLoading(false);
       }
