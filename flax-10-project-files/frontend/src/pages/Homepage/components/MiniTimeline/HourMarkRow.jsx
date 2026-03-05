@@ -2,11 +2,13 @@
  * Plan timeline hour mark row.
  */
 
+import { formatHour12h } from "../../utils/dateFormatUtils";
+
 export function HourMarkRow({ row, styles }) {
   return (
     <div key={row.id} className={styles.planTimelineHourMark}>
       <span className={styles.planTimelineHourMarkLabel}>
-        {String(row.hour).padStart(2, "0")}:00
+        {formatHour12h(row.hour, 0)}
       </span>
       <span className={styles.planTimelineHourMarkDot} aria-hidden />
       <span className={styles.planTimelineHourMarkLine} aria-hidden />

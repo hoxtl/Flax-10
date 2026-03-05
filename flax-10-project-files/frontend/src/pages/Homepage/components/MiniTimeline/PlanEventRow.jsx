@@ -5,34 +5,34 @@
 
 import { Link } from "react-router-dom";
 import { RotateCw, Pencil, AlertTriangle } from "lucide-react";
-import { formatTime, fmtDurationShort } from "../../utils/dateFormatUtils";
+import { formatTime12h, fmtDurationShort } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 
-/* Event type → accent colour mapping (seed data: Lecture, Routine, Practical, Study Session,
-   Meeting, Gym, Wellness, KCLSU society events) */
+/* Event type → accent colour mapping */
 const EVENT_ACCENTS = {
-  lecture:  "#84A98C", // sage green — Lecture: module_name
-  routine:  "#A0A09A", // slate     — Breakfast / Lunch / Dinner
-  wellness: "#C0714E", // terracotta — Gym / Yoga / Run
-  study:    "#7B9BAD", // steel blue — Study Session / Library
-  social:   "#9A8CB0", // lavender  — KCLSU / Society / Social
-  meeting:  "#B8956A", // warm amber — Meeting / Seminar / Tutor
-  default:  "#A08B72", // warm brown — everything else
+  lecture:  "#7B9BAD", // dusty blue      — lectures/seminars/tutorials
+  study:    "#9A8CB0", // muted lavender  — study sessions/library/revision
+  routine:  "#B8956A", // warm amber      — meals/sleep
+  wellness: "#7BB38E", // sage green      — gym/yoga/run/sport
+  social:   "#C0714E", // terracotta      — friends/coffee/pub/social
+  society:  "#C4906A", // warm dusty rose — KCLSU/society events
+  meeting:  "#A08B72", // warm brown      — meetings/office hours/tutor
+  admin:    "#C4A46D", // warm gold       — errands/laundry/medical/admin
+  default:  "#A08B72", // warm brown      — everything else
 };
 
 function getEventTypeKey(title, tagName) {
   const t = (title || "").toLowerCase();
   const tn = (tagName || "").toLowerCase();
   if (tn === "lecture" || /^lecture:/i.test(title)) return "lecture";
-  if (tn === "routine" || /^(breakfast|lunch|dinner)$/i.test(title.trim())) return "routine";
-  if (tn === "gym" || tn === "wellness" || /\b(gym|yoga|run|pilates|swim|detox)\b/.test(t))
-    return "wellness";
-  if (tn === "study session" || /\b(study|library|review|revision|maughan)\b/.test(t))
-    return "study";
-  if (tn === "meeting" || /\b(meeting|seminar|tutorial|office hours|tutor)\b/.test(t))
-    return "meeting";
-  if (/kclsu|society|social|flatmates|friends|girls/i.test(t)) return "social";
+  if (tn === "routine" || /^(breakfast|lunch|dinner|sleep|brunch)$/i.test(t)) return "routine";
+  if (tn === "wellness" || /\b(gym|yoga|run|pilates|swim|sport|exercise)\b/.test(t)) return "wellness";
+  if (/kclsu|society/i.test(t) || tn === "society") return "society";
+  if (/coffee|pub|cinema|birthday|facetime|restaurant|bar|flatmates|friends/i.test(t) || tn === "social") return "social";
+  if (/\b(study|library|review|revision|coursework|essay|assignment)\b/.test(t) || /academic|study/i.test(tn)) return "study";
+  if (/\b(meeting|seminar|tutorial|office hours|tutor)\b/.test(t)) return "meeting";
+  if (/shop|tesco|laundry|clean|haircut|dentist|doctor|rent|bills/i.test(t) || tn === "admin") return "admin";
   return "default";
 }
 
@@ -60,9 +60,9 @@ export function PlanEventRow({
   styles,
 }) {
   const { item, isPast, active, matchTask, isOverlap, isRoutine, moduleCode, durationMins } = row;
-  const startTimeStr = item.start_time ? formatTime(item.start_time) : "";
+  const startTimeStr = item.start_time ? formatTime12h(item.start_time) : "";
   const endTimeStr =
-    item.end_time && item.end_time !== item.start_time ? formatTime(item.end_time) : "";
+    item.end_time && item.end_time !== item.start_time ? formatTime12h(item.end_time) : "";
   const titleClean = stripEmojiFromTitle(item.title);
   const showConflictPopover = conflictPopoverRowId === row.id;
   const nextFreeRow =

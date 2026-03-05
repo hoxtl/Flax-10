@@ -3,20 +3,23 @@
  * with an inline action bar below. No floating popover.
  */
 
-import { AlertTriangle, RotateCw, Pencil } from "lucide-react";
-import { formatTime } from "../../utils/dateFormatUtils";
+import { AlertTriangle, RotateCw } from "lucide-react";
+import { formatTime12h } from "../../utils/dateFormatUtils";
+import { formatHour12h } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
 
 const EVENT_ACCENTS = {
-  lecture:  "#84A98C",
-  routine:  "#A0A09A",
-  wellness: "#C0714E",
-  study:    "#7B9BAD",
-  social:   "#9A8CB0",
-  meeting:  "#B8956A",
+  lecture:  "#7B9BAD",
+  study:    "#9A8CB0",
+  routine:  "#B8956A",
+  wellness: "#7BB38E",
+  social:   "#C0714E",
+  society:  "#C4906A",
+  meeting:  "#A08B72",
+  admin:    "#C4A46D",
   default:  "#A08B72",
 };
 
@@ -24,11 +27,13 @@ function getAccent(title, tagName) {
   const t = (title || "").toLowerCase();
   const tn = (tagName || "").toLowerCase();
   if (tn === "lecture" || /^lecture:/i.test(title)) return EVENT_ACCENTS.lecture;
-  if (tn === "routine" || /^(breakfast|lunch|dinner)$/i.test(title.trim())) return EVENT_ACCENTS.routine;
-  if (tn === "wellness" || /\b(gym|yoga|run|pilates|swim)\b/.test(t)) return EVENT_ACCENTS.wellness;
-  if (/\b(study|library|review|revision)\b/.test(t)) return EVENT_ACCENTS.study;
-  if (/\b(meeting|seminar|tutorial|office hours)\b/.test(t)) return EVENT_ACCENTS.meeting;
-  if (/kclsu|society|social|flatmates/i.test(t)) return EVENT_ACCENTS.social;
+  if (tn === "routine" || /^(breakfast|lunch|dinner|sleep|brunch)$/i.test(t)) return EVENT_ACCENTS.routine;
+  if (tn === "wellness" || /\b(gym|yoga|run|pilates|swim|sport|exercise)\b/.test(t)) return EVENT_ACCENTS.wellness;
+  if (/kclsu|society/i.test(t) || tn === "society") return EVENT_ACCENTS.society;
+  if (/coffee|pub|cinema|birthday|facetime|restaurant|bar|flatmates|friends/i.test(t) || tn === "social") return EVENT_ACCENTS.social;
+  if (/\b(study|library|review|revision|coursework|essay|assignment)\b/.test(t) || /academic|study/i.test(tn)) return EVENT_ACCENTS.study;
+  if (/\b(meeting|seminar|tutorial|office hours|tutor)\b/.test(t)) return EVENT_ACCENTS.meeting;
+  if (/shop|tesco|laundry|clean|haircut|dentist|doctor|rent|bills/i.test(t) || tn === "admin") return EVENT_ACCENTS.admin;
   return EVENT_ACCENTS.default;
 }
 
@@ -42,10 +47,10 @@ export function ConflictPairRow({
   selectedDate,
 }) {
   const { items } = row;
-  const timeStr =
-    String(Math.floor(DAY_START_HOUR + row.startMins / 60)).padStart(2, "0") +
-    ":" +
-    String(row.startMins % 60).padStart(2, "0");
+  const timeStr = formatHour12h(
+    Math.floor(DAY_START_HOUR + row.startMins / 60),
+    row.startMins % 60
+  );
 
   // Find the best candidate to auto-move: the one with a free window after the conflict
   const movable = items.find((r) => {
@@ -120,41 +125,22 @@ export function ConflictPairRow({
             );
           })}
         </div>
-        {/* Inline action bar */}
+        {/* Inline action bar — simplified */}
         <div className={styles.planTimelineConflictPairActions}>
-          <AlertTriangle size={11} strokeWidth={2.5} className={styles.planTimelineConflictPairIcon} aria-hidden />
-          <span className={styles.planTimelineConflictPairLabel}>
+          <AlertTriangle size={13} strokeWidth={2} className={styles.planTimelineConflictPairIcon} aria-hidden />
+          <span className={styles.planTimelineConflictPairLabelText}>
             {items.length} events overlap
           </span>
-          <div className={styles.planTimelineConflictPairBtns}>
+          {freeRow && (
             <button
               type="button"
-              className={`${styles.planTimelineConflictPairBtn} ${styles.planTimelineConflictPairBtnPrimary}`}
+              className={styles.planTimelineConflictAutoBtn}
               onClick={handleAutoMove}
-              disabled={!freeRow}
-              title={freeRow ? `Move "${movable?.item?.title}" to next free window` : "No free window found"}
+              title={`Move "${movable?.item?.title}" to next free window`}
             >
-              <RotateCw size={11} strokeWidth={2} aria-hidden />
-              {freeRow ? "Auto-arrange" : "No free window"}
+              · Auto-arrange →
             </button>
-            {items.map((r) => (
-              <span
-                key={r.id}
-                className={styles.planTimelineConflictPairLabel}
-                title={`Edit "${r.item.title}"`}
-              >
-                <button
-                  type="button"
-                  className={styles.planTimelineConflictPairLabelBtn}
-                  onClick={() => onEdit?.(r.item, r.item.tag)}
-                  aria-label={`Edit ${stripEmojiFromTitle(r.item.title)}`}
-                >
-                  <Pencil size={10} strokeWidth={2} aria-hidden />
-                  {stripEmojiFromTitle(r.item.title).slice(0, 18)}
-                </button>
-              </span>
-            ))}
-          </div>
+          )}
         </div>
       </div>
     </div>

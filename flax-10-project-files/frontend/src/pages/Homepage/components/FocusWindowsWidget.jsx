@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Target, FileText, Zap, Timer, CalendarX } from "lucide-react";
+import { Sparkles, Target, FileText, Zap, Timer } from "lucide-react";
 import { formatTime } from "../utils/dateFormatUtils";
 import styles from "./FocusWindowsWidget.module.css";
 
@@ -33,13 +33,20 @@ function EmptyState({ subtitle, onViewAnalytics }) {
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Sparkles className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        <div className={styles.headerIconWrap}>
+          <Sparkles className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        </div>
         <span className={styles.headerLabel}>Focus Windows</span>
       </div>
       <div className={styles.emptyState}>
-        <CalendarX size={28} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
-        <p className={styles.emptyTitle}>Fully booked today</p>
-        <p className={styles.emptySubtitle}>{subtitle}</p>
+        <motion.div
+          animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Sparkles size={32} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
+        </motion.div>
+        <p className={styles.emptyTitle}>No focus windows right now</p>
+        <p className={styles.emptySubtitle}>{subtitle || "Free gaps in your schedule will appear here as study opportunities"}</p>
       </div>
       {onViewAnalytics && (
         <div className={styles.footer}>
@@ -118,13 +125,15 @@ export function FocusWindowsWidget({
   })();
 
   if (!Array.isArray(windows)) return null;
-  if (windows.length === 0) return <EmptyState subtitle="No free windows available — consider rescheduling something" onViewAnalytics={onViewAnalytics} />;
-  if (futureWindows.length === 0) return <EmptyState subtitle="No free windows left — next free time is tomorrow" onViewAnalytics={onViewAnalytics} />;
+  if (windows.length === 0) return <EmptyState subtitle="Your schedule looks packed — consider freeing a slot" onViewAnalytics={onViewAnalytics} />;
+  if (futureWindows.length === 0) return <EmptyState subtitle="No free windows left today — check tomorrow's schedule" onViewAnalytics={onViewAnalytics} />;
 
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Sparkles className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        <div className={styles.headerIconWrap}>
+          <Sparkles className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        </div>
         <span className={styles.headerLabel}>Focus Windows</span>
       </div>
 

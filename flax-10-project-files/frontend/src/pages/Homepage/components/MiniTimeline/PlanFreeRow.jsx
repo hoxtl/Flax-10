@@ -14,6 +14,8 @@ import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { getTasksThatFitGap, taskDurationMins } from "../../utils/taskUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
+import { formatHour12h } from "../../utils/dateFormatUtils";
+import { Sparkles } from "lucide-react";
 
 function durationLabel(minutes) {
   if (minutes >= 60) {
@@ -36,7 +38,7 @@ function formatDueLabel(task) {
   return `due in ${d}d`;
 }
 
-/** Build a responsive gap header based on context + upcoming task deadline. */
+/** Build a concise gap header based on context + upcoming task deadline. */
 function buildStudyHeader(suggestedTask, durLabel) {
   if (!suggestedTask?.due_date) return `${durLabel} free`;
   const due = new Date(suggestedTask.due_date);
@@ -44,15 +46,14 @@ function buildStudyHeader(suggestedTask, durLabel) {
   const diffMs = due - now;
   const diffDays = Math.floor(diffMs / 86400000);
   const diffH = Math.floor(diffMs / 3600000);
-  // Truncate long titles
-  const title = suggestedTask.title?.length > 28
-    ? suggestedTask.title.slice(0, 26) + "…"
+  const title = suggestedTask.title?.length > 22
+    ? suggestedTask.title.slice(0, 20) + "…"
     : suggestedTask.title;
-  if (diffMs < 0) return `${title} is overdue — now's your chance`;
-  if (diffH < 12) return `${title} due in ${diffH}h — use this gap`;
-  if (diffDays === 0) return `${title} due today — want to prep?`;
-  if (diffDays === 1) return `${title} due tomorrow — prep now`;
-  if (diffDays <= 3) return `${title} due in ${diffDays}d — good time to push`;
+  if (diffMs < 0) return `${title} — overdue`;
+  if (diffH < 12) return `${title} due in ${diffH}h`;
+  if (diffDays === 0) return `${title} due today`;
+  if (diffDays === 1) return `${title} due tomorrow`;
+  if (diffDays <= 3) return `${title} due in ${diffDays}d`;
   return `${durLabel} free`;
 }
 
@@ -84,10 +85,10 @@ export function PlanFreeRow({
   const gapStartDate = getGapStartDate(selectedDate, row.gapStartMins);
   const isBestWindow = row.minutes >= 60;
   const durLabel = durationLabel(row.minutes);
-  const timeStr =
-    String(Math.floor(DAY_START_HOUR + row.gapStartMins / 60)).padStart(2, "0") +
-    ":" +
-    String(row.gapStartMins % 60).padStart(2, "0");
+  const timeStr = formatHour12h(
+    Math.floor(DAY_START_HOUR + row.gapStartMins / 60),
+    row.gapStartMins % 60
+  );
 
   function startTask(task) {
     if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task);
@@ -156,7 +157,7 @@ export function PlanFreeRow({
                 onClick={() => startTask(top1)}
                 aria-label={`Start ${top1.title}`}
               >
-                Work on →
+                Slot in →
               </button>
             </div>
           )}
@@ -175,12 +176,9 @@ export function PlanFreeRow({
         <div className={styles.planTimelineGutter}>
           <span className={styles.planTimelineTime}>{timeStr}</span>
         </div>
-        <div className={styles.planTimelineSpineCell}>
-          <span className={styles.planTimelineNode} aria-hidden />
-        </div>
+        <div className={styles.planTimelineSpineCell} aria-hidden />
         <div className={styles.planTimelineGapPersonal}>
-          <span className={styles.planTimelineGapPersonalDur}>{durLabel}</span>
-          <span className={styles.planTimelineGapPersonalText}>Your time — take a breather</span>
+          <span className={styles.planTimelineGapPersonalDur}>{durLabel} free</span>
         </div>
       </div>
     );
@@ -196,12 +194,9 @@ export function PlanFreeRow({
         <div className={styles.planTimelineGutter}>
           <span className={styles.planTimelineTime}>{timeStr}</span>
         </div>
-        <div className={styles.planTimelineSpineCell}>
-          <span className={styles.planTimelineNode} aria-hidden />
-        </div>
+        <div className={styles.planTimelineSpineCell} aria-hidden />
         <div className={styles.planTimelineGapEvening}>
-          <span className={styles.planTimelineGapEveningDur}>{durLabel}</span>
-          <span className={styles.planTimelineGapEveningText}>Evening — time to wind down</span>
+          <span className={styles.planTimelineGapEveningDur}>{durLabel} free</span>
         </div>
       </div>
     );
@@ -228,67 +223,70 @@ export function PlanFreeRow({
           />
         </div>
         <div className={styles.planTimelineGapBestWindow}>
+          {/* Suggested panel header */}
           <div className={styles.planTimelineGapBestWindowHeader}>
-            <span className={styles.planTimelineGapBestWindowLabel}>{header}</span>
+            <div className={styles.planTimelineGapSuggestedHeaderLeft}>
+              <Sparkles size={13} style={{ color: "#C4A46D", flexShrink: 0 }} aria-hidden />
+              <span className={styles.planTimelineGapSuggestedLabel}>Suggested</span>
+            </div>
             <span className={styles.planTimelineGapBestWindowDur}>{durLabel} free</span>
           </div>
-          {/* Deadline revision suggestion — pinned above regular tasks */}
+          {/* Deadline suggestion */}
           {topDeadline && (
-            <div className={styles.planTimelineGapDeadlineRow}>
-              <div className={styles.planTimelineGapDeadlineInfo}>
-                <span className={styles.planTimelineGapDeadlineChip}>
-                  {deadlineDueLabel(topDeadline)}
-                </span>
-                <span className={styles.planTimelineGapDeadlineTitle}>
+            <div className={styles.planTimelineGapSuggestedItem}>
+              <div className={styles.planTimelineGapSuggestedItemLeft}>
+                <span className={styles.planTimelineGapSuggestedDot} style={{ background: "#C4946D" }} />
+                <span className={styles.planTimelineGapSuggestedItemTitle} title={topDeadline.assessment_title || topDeadline.title}>
                   {topDeadline.assessment_title || topDeadline.title}
                   {topDeadline.module_code ? ` · ${topDeadline.module_code}` : ""}
                 </span>
-                <span className={styles.planTimelineGapDeadlineMeta}>no revision scheduled</span>
+                {deadlineDueLabel(topDeadline) && (
+                  <span className={styles.planTimelineGapSuggestedItemCtx}>
+                    · {deadlineDueLabel(topDeadline)}
+                  </span>
+                )}
               </div>
               <button
                 type="button"
-                className={styles.planTimelineGapDeadlineBtn}
+                className={styles.planTimelineGapSlotInBtn}
                 onClick={() => startTask({
                   title: `Revision: ${topDeadline.assessment_title || topDeadline.title}`,
                   estimated_blocks: Math.round(revisionBlockMins / 25),
                 })}
-                aria-label={`Schedule revision for ${topDeadline.assessment_title || topDeadline.title}`}
+                aria-label={`Slot in revision for ${topDeadline.assessment_title || topDeadline.title}`}
               >
-                Schedule {revisionBlockMins}m →
+                Slot in →
               </button>
             </div>
           )}
-          {top2.length > 0 ? (
-            <div className={styles.planTimelineGapTaskList}>
-              {top2.map((task) => {
-                const due = formatDueLabel(task);
-                const mins = taskDurationMins(task);
-                return (
-                  <div key={task.id ?? task.title} className={styles.planTimelineGapTaskRow}>
-                    <div className={styles.planTimelineGapTaskInfo}>
-                      <span className={styles.planTimelineGapTaskTitle} title={task.title}>
-                        {task.title}
-                      </span>
-                      <span className={styles.planTimelineGapTaskMeta}>
-                        {mins}m{due ? ` · ${due}` : ""}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      className={styles.planTimelineGapStartBtn}
-                      onClick={() => startTask(task)}
-                      aria-label={`Start ${task.title}`}
-                    >
-                      Work on →
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <span className={styles.planTimelineGapNoTasks}>
-              {durLabel} free — great window to go deep.
-            </span>
+          {top2.map((task) => {
+            const due = formatDueLabel(task);
+            const mins = taskDurationMins(task);
+            const isOverdue = due === "overdue";
+            return (
+              <div key={task.id ?? task.title} className={styles.planTimelineGapSuggestedItem}>
+                <div className={styles.planTimelineGapSuggestedItemLeft}>
+                  <span className={styles.planTimelineGapSuggestedDot} style={{ background: isOverdue ? "#C4746D" : "#C4A46D" }} />
+                  <span className={styles.planTimelineGapSuggestedItemTitle} title={task.title}>
+                    {task.title}
+                  </span>
+                  <span className={styles.planTimelineGapSuggestedItemCtx}>
+                    · {mins}m{due ? ` · ${due}` : ""}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.planTimelineGapSlotInBtn}
+                  onClick={() => startTask(task)}
+                  aria-label={`Slot in ${task.title}`}
+                >
+                  Slot in →
+                </button>
+              </div>
+            );
+          })}
+          {!topDeadline && top2.length === 0 && (
+            <span className={styles.planTimelineGapNoTasks}>{durLabel} to use however you like</span>
           )}
         </div>
       </div>
@@ -349,7 +347,7 @@ export function PlanFreeRow({
               onClick={() => startTask(suggestedTask)}
               aria-label={`Start ${suggestedTask.title}`}
             >
-              Work on →
+              Slot in →
             </button>
           </div>
         ) : (

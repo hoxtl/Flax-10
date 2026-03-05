@@ -1,50 +1,59 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, CheckCircle2 } from "lucide-react";
-import { ModulePill, TypePill, getModulePillColors } from "./ModulePill";
+import { CalendarClock, CheckCircle2, ArrowRight } from "lucide-react";
 import styles from "./DeadlinesWidget.module.css";
 
-const MAX_SHOWN = 3;
+const MAX_SHOWN = 5;
+
+function getDayCount(dueDate) {
+  const ms = new Date(dueDate).getTime() - Date.now();
+  return Math.floor(ms / 86400000);
+}
 
 function getUrgencyTier(dueDate) {
-  const ms = new Date(dueDate).getTime() - Date.now();
-  const days = ms / 86400000;
-  if (days < 0) return "overdue";
-  if (days < 3) return "critical";
-  if (days < 7) return "urgent";
-  if (days < 14) return "warning";
-  return "ok";
+  const days = getDayCount(dueDate);
+  if (days < 0)   return "overdue";
+  if (days <= 2)  return "critical";
+  if (days <= 5)  return "urgent";
+  if (days <= 14) return "upcoming";
+  return "distant";
 }
 
 function getDaysLabel(dueDate) {
-  const due = new Date(dueDate);
-  const ms = due.getTime() - Date.now();
-  const days = Math.floor(ms / 86400000);
-  if (days < 0) return null;
+  const days = getDayCount(dueDate);
+  if (days < 0) {
+    const over = Math.abs(days);
+    return over === 0 ? "Overdue" : over === 1 ? "1d overdue" : `${over}d overdue`;
+  }
   if (days === 0) return "Today";
   if (days === 1) return "Tomorrow";
-  const weekday = due.toLocaleDateString("en-GB", { weekday: "short" });
-  const day = due.getDate();
-  const month = due.toLocaleDateString("en-GB", { month: "short" });
-  return `${days}d · ${weekday} ${day} ${month}`;
+  return `${days}d`;
 }
 
-function getDaysOverdue(dueDate) {
-  const ms = Date.now() - new Date(dueDate).getTime();
-  const days = Math.floor(ms / 86400000);
-  if (days <= 0) return "Overdue";
-  if (days === 1) return "1d overdue";
-  return `${days}d overdue`;
-}
+const TIER_DOT = {
+  overdue:  "#DC4545",
+  critical: "#E07A6A",
+  urgent:   "#D4924A",
+  upcoming: "#C4A46D",
+  distant:  "#D4C4A8",
+};
+
+const TIER_TEXT = {
+  overdue:  "#B83232",
+  critical: "#B86050",
+  urgent:   "#A06030",
+  upcoming: "#8C6D3F",
+  distant:  "#A89279",
+};
 
 const listVariants = {
-  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.05, delayChildren: 0.04 } },
 };
 
 const rowVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.23, 1, 0.32, 1] } },
+  hidden:  { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
 };
 
 export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModule }) {
@@ -61,12 +70,17 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
 
   if (!Array.isArray(deadlines)) return null;
 
+  const hiddenCount = totalCount - MAX_SHOWN;
+
   return (
     <div className={styles.root}>
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <Calendar className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
-          <span className={styles.headerLabel}>Upcoming Deadlines</span>
+          <div className={styles.headerIconWrap}>
+            <CalendarClock className={styles.headerIcon} size={17} strokeWidth={1.75} aria-hidden />
+          </div>
+          <span className={styles.headerTitle}>Deadlines</span>
         </div>
         {totalCount > 0 && (
           <span className={styles.headerBadge}>{totalCount}</span>
@@ -75,7 +89,7 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
 
       {sorted.length === 0 ? (
         <div className={styles.emptyState}>
-          <CheckCircle2 size={28} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
+          <CheckCircle2 size={26} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
           <p className={styles.emptyTitle}>All caught up</p>
           <p className={styles.emptySubtitle}>No upcoming deadlines</p>
         </div>
@@ -87,10 +101,11 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
           animate="visible"
           variants={listVariants}
         >
-          {sorted.map((d) => (
+          {sorted.map((d, idx) => (
             <DeadlineRow
               key={d.id}
               deadline={d}
+              isLast={idx === sorted.length - 1 && hiddenCount <= 0}
               onSelect={() => onSelectDeadline?.(d)}
               onSelectModule={onSelectModule}
             />
@@ -99,87 +114,61 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       )}
 
       <div className={styles.footer}>
-        <Link to="/modules?filter=enrolled" className={styles.footerBtn}>
-          View my modules →
-        </Link>
+        {hiddenCount > 0 ? (
+          <Link to="/modules?filter=enrolled" className={styles.footerLink}>
+            + {hiddenCount} more deadline{hiddenCount !== 1 ? "s" : ""}
+            <ArrowRight size={11} strokeWidth={2} aria-hidden />
+          </Link>
+        ) : (
+          <Link to="/modules?filter=enrolled" className={styles.footerLinkMuted}>
+            View all modules
+            <ArrowRight size={11} strokeWidth={2} aria-hidden />
+          </Link>
+        )}
       </div>
     </div>
   );
 }
 
-function DeadlineRow({ deadline, onSelect, onSelectModule }) {
-  const due = deadline.start_due_date;
+function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
+  const due  = deadline.start_due_date;
   const tier = getUrgencyTier(due);
-  const isOverdue = tier === "overdue";
-  const isToday = getDaysLabel(due) === "Today";
-
-  const title = deadline.assessment_title || deadline.title || "Assignment";
+  const daysLabel  = getDaysLabel(due);
+  const title      = deadline.assessment_title || deadline.title || "Assignment";
   const moduleCode = deadline.module_code || "";
-  const typeLabel = deadline.deadline_type
-    ? deadline.deadline_type.charAt(0).toUpperCase() + deadline.deadline_type.slice(1)
-    : "";
-  const daysLabel = getDaysLabel(due);
 
-  const tasksDone = deadline.tasks_done ?? null;
-  const tasksTotal = deadline.tasks_total ?? null;
-  const hasTaskProgress = tasksDone !== null && tasksTotal !== null && tasksTotal > 0;
-
-  const rowClass = [
-    styles.row,
-    styles[`rowTier_${tier}`],
-    isToday ? styles.rowTier_todayPulse : "",
-  ].filter(Boolean).join(" ");
+  const dotColor  = TIER_DOT[tier]  || "#D4C4A8";
+  const textColor = TIER_TEXT[tier] || "#A89279";
 
   return (
     <motion.div
       role="button"
       tabIndex={0}
-      className={rowClass}
+      className={`${styles.row} ${isLast ? styles.rowLast : ""}`}
       variants={rowVariants}
       onClick={onSelect}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onSelect?.();
-        }
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect?.(); }
       }}
     >
-      <div className={styles.rowBody}>
-        <p className={styles.rowTitle}>{title}</p>
-        <div className={styles.rowPills}>
-          {moduleCode && (
-            <ModulePill
-              moduleCode={moduleCode}
-              asButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelectModule?.({
-                  code: moduleCode,
-                  id: deadline.module_id ?? deadline.module ?? null,
-                });
-              }}
-            />
-          )}
-          {typeLabel && (
-            <TypePill
-              typeLabel={typeLabel}
-              accentColor={moduleCode ? getModulePillColors(moduleCode).accent : undefined}
-            />
-          )}
-        </div>
+      <div className={styles.rowLeft}>
+        <span className={styles.urgencyDot} style={{ background: dotColor }} />
+        <span className={styles.rowTitle} title={title}>{title}</span>
       </div>
-
       <div className={styles.rowRight}>
-        {isOverdue ? (
-          <span className={styles.overdueChip}>{getDaysOverdue(due)}</span>
-        ) : (
-          <span className={`${styles.daysLabel} ${styles[`daysLabel_${tier}`]}`}>
-            {daysLabel}
-          </span>
+        {moduleCode && (
+          <button
+            type="button"
+            className={styles.modulePill}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectModule?.({ code: moduleCode, id: deadline.module_id ?? deadline.module ?? null });
+            }}
+          >
+            {moduleCode}
+          </button>
         )}
-        {hasTaskProgress && (
-          <span className={styles.taskHint}>{tasksDone}/{tasksTotal} tasks</span>
-        )}
+        <span className={styles.daysLabel} style={{ color: textColor }}>{daysLabel}</span>
       </div>
     </motion.div>
   );
