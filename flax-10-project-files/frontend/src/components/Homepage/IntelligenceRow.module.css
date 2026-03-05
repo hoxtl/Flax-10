@@ -13,17 +13,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  opacity: 0;
   background: transparent;
-}
-
-.section.sectionVisible {
-  animation: intRowIntro 0.9s ease-out forwards;
-}
-
-@keyframes intRowIntro {
-  0% { opacity: 0; transform: translate3d(0, 28px, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 .header {
@@ -978,4 +968,15 @@
 .travelAlertDismiss:hover {
   background: rgba(185, 130, 55, 0.12);
   color: #7A5520;
+}
+
+/* ── Bento grid positions (desktop 3-col layout) ─────────────────── */
+@media (min-width: 1024px) {
+  .posRightNow       { grid-column: 1;     grid-row: 1 / 3; }
+  .posTodaysTasks    { grid-column: 2 / 4; grid-row: 1;     }
+  .posQuickActions   { grid-column: 2;     grid-row: 2;     }
+  .posSocialDiscover { grid-column: 3;     grid-row: 2;     }
+  .posDeadlines      { grid-column: 1;     grid-row: 3;     }
+  .posFocusWindows   { grid-column: 2;     grid-row: 3;     }
+  .posWeeklyProgress { grid-column: 3;     grid-row: 3;     }
 }

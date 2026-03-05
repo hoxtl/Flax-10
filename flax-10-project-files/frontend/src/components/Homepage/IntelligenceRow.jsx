@@ -1,23 +1,36 @@
-import React, { useRef, useEffect, useState } from "react";
-import { CheckSquare, AlertCircle, Zap, Clock, Calendar, Train, X, AlertTriangle, Check, ClipboardList } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Calendar, AlertTriangle, Train, X, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../api/tflService";
 import { RightNowWidget } from "../../pages/Homepage/components/RightNowWidget";
+import { BentoGrid, BentoCard } from "../ui/bento-grid";
+import { QuickActionsWidget } from "../../pages/Homepage/components/QuickActionsWidget";
+import { SocialDiscoverWidget } from "../../pages/Homepage/components/SocialDiscoverWidget";
+import { WeeklyProgressWidget } from "../../pages/Homepage/components/WeeklyProgressWidget";
 
-/** Dynamic greeting by time of day */
 function getGreeting(name) {
   const h = new Date().getHours();
   const timeOfDay = h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
   return `Good ${timeOfDay}${name ? `, ${name}` : ""}.`;
 }
 
-/** Today's date label e.g. "WEDNESDAY · 4 MAR" */
 function getTodayLabel() {
   const now = new Date();
   const day = now.toLocaleDateString("en-GB", { weekday: "long" }).toUpperCase();
   const date = now.toLocaleDateString("en-GB", { day: "numeric", month: "short" }).toUpperCase();
   return `${day} · ${date}`;
+}
+
+function useTflDelays() {
+  const [delays, setDelays] = useState(undefined);
+  useEffect(() => {
+    tflService.getTfLDelays()
+      .then(data => setDelays(Array.isArray(data) ? data : []))
+      .catch(() => setDelays([]));
+  }, []);
+  return delays;
 }
 
 export default function IntelligenceRow({
@@ -35,53 +48,36 @@ export default function IntelligenceRow({
   slot5Data,
   hasOverdue = false,
 }) {
-  const sectionRef = useRef(null);
-  const [sectionVisible, setSectionVisible] = useState(false);
   const tflDelays = useTflDelays();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!sectionRef.current || typeof window === "undefined") return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setSectionVisible(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
-    observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      className={`${styles.section} ${sectionVisible ? styles.sectionVisible : ""}`}
-    >
+    <section className={styles.section}>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <span className={styles.headerDateRow}>
+          <motion.span
+            className={styles.headerDateRow}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
             <Calendar className={styles.headerDateIcon} size={14} strokeWidth={2} aria-hidden />
             <span className={styles.headerLabel}>{getTodayLabel()}</span>
-          </span>
-          <h2 className={styles.headerTitle}>{getGreeting(displayName)}</h2>
+          </motion.span>
+          <motion.h2
+            className={styles.headerTitle}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
+          >
+            {getGreeting(displayName)}
+          </motion.h2>
         </div>
       </header>
 
-      <div className={styles.grid}>
-        <BentoSlot
-          span={styles.span5}
-          slotVariant="rightNow"
-          title="Right Now"
-          meta={null}
-          icon={Clock}
-          index={0}
-          isVisible={sectionVisible}
-        >
+      <BentoGrid>
+        {/* Col 1, Rows 1–2: Right Now — hero card */}
+        <BentoCard className={styles.posRightNow}>
           {slot5Data ? (
             <RightNowWidget
               {...slot5Data}
@@ -100,116 +96,42 @@ export default function IntelligenceRow({
               <TravelAlertsSection tflContext={tflContext} />
             </>
           )}
-        </BentoSlot>
+        </BentoCard>
 
-        <BentoSlot
-          span={styles.span1}
-          slotVariant="tasks"
-          title="Today's Tasks"
-          meta={slot1Meta}
-          icon={CheckSquare}
-          iconPulse={hasOverdue}
-          index={1}
-          isVisible={sectionVisible}
-        >
+        {/* Cols 2–3, Row 1: Today's Tasks — wide */}
+        <BentoCard className={styles.posTodaysTasks}>
           {slot1ActionHub}
-        </BentoSlot>
+        </BentoCard>
 
-        <BentoSlot
-          span={styles.span3}
-          slotVariant="deadlines"
-          title="Upcoming Deadlines"
-          meta={null}
-          icon={ClipboardList}
-          index={2}
-          isVisible={sectionVisible}
-        >
+        {/* Col 2, Row 2: Quick Actions */}
+        <BentoCard className={styles.posQuickActions}>
+          <QuickActionsWidget />
+        </BentoCard>
+
+        {/* Col 3, Row 2: Social Discover */}
+        <BentoCard className={styles.posSocialDiscover}>
+          <SocialDiscoverWidget />
+        </BentoCard>
+
+        {/* Col 1, Row 3: Upcoming Deadlines */}
+        <BentoCard className={styles.posDeadlines}>
           {slot3Urgent}
-        </BentoSlot>
+        </BentoCard>
 
-        <BentoSlot
-          span={styles.span4}
-          slotVariant="focus"
-          title="Focus Windows"
-          meta={null}
-          icon={Zap}
-          index={3}
-          isVisible={sectionVisible}
-        >
+        {/* Col 2, Row 3: Focus Windows */}
+        <BentoCard className={styles.posFocusWindows}>
           {slot4Energy}
-        </BentoSlot>
-      </div>
+        </BentoCard>
+
+        {/* Col 3, Row 3: Weekly Progress */}
+        <BentoCard className={styles.posWeeklyProgress}>
+          <WeeklyProgressWidget />
+        </BentoCard>
+      </BentoGrid>
     </section>
   );
 }
 
-function BentoSlot({
-  span,
-  slotVariant,
-  title,
-  meta,
-  icon: Icon,
-  iconPulse = false,
-  index,
-  isVisible,
-  centeredBody = false,
-  children,
-}) {
-  const cardRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: "50%", y: "50%" });
-
-  const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x: `${x}%`, y: `${y}%` });
-  };
-
-  const handleMouseLeave = () => setMousePos({ x: "50%", y: "50%" });
-
-  const variantClass = slotVariant ? styles[`bentoSlotVariant${slotVariant.charAt(0).toUpperCase()}${slotVariant.slice(1)}`] : null;
-
-  return (
-    <article
-      ref={cardRef}
-      className={`${styles.bentoSlot} ${span} ${variantClass || ""} ${isVisible ? styles.bentoVisible : ""} ${iconPulse ? styles.iconPulse : ""}`}
-      style={{ animationDelay: `${index * 0.12}s` }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div
-        className={styles.bentoGlow}
-        style={{ ["--x"]: mousePos.x, ["--y"]: mousePos.y }}
-        aria-hidden
-      />
-      <div className={styles.bentoContent}>
-        <div className={styles.bentoTop}>
-          <div className={`${styles.bentoIconWrap} ${iconPulse ? styles.bentoIconOverdue : ""}`}>
-            <Icon className={styles.bentoIcon} strokeWidth={1.5} aria-hidden />
-          </div>
-          <div className={styles.bentoHeader}>
-            <h3 className={styles.bentoTitle}>{title}</h3>
-            {meta && <span className={styles.bentoMeta}>{meta}</span>}
-          </div>
-        </div>
-        <div className={`${styles.bentoBody} ${centeredBody ? styles.bentoCenteredBody : ""}`}>{children}</div>
-      </div>
-    </article>
-  );
-}
-
-function useTflDelays() {
-  const [delays, setDelays] = useState(undefined); // undefined = loading
-  useEffect(() => {
-    tflService.getTfLDelays()
-      .then(data => setDelays(Array.isArray(data) ? data : []))
-      .catch(() => setDelays([]));
-  }, []);
-  return delays;
-}
-
-/** Right Now: TFL Travel Alerts section — always visible, header + all-clear or line disruptions */
 function TravelAlertsSection({ tflContext }) {
   const delays = useTflDelays();
   const [dismissed, setDismissed] = useState(new Set());
@@ -278,4 +200,3 @@ function TravelAlertsSection({ tflContext }) {
     </div>
   );
 }
-
