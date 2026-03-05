@@ -92,7 +92,7 @@ function MainArea({
           activeNav={activeNav}
         />
       )}
-      {showWeekBar && <WeekBar date={selectedDate} />}
+      {showWeekBar && !isMobile && <WeekBar date={selectedDate} />}
       <PageContent activeNav={activeNav}>{children}</PageContent>
     </div>
   );
@@ -177,7 +177,12 @@ function DashboardSidebars({
   );
 }
 
-function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal }) {
+function DashboardModals({
+  showQuickAdd,
+  setShowQuickAdd,
+  onSelectType,
+  modal,
+}) {
   return (
     <>
       <QuickAddGate
