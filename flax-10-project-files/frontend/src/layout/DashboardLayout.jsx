@@ -133,7 +133,7 @@ function useDashboardState(activeNav, onNavChange) {
   const [pendingNav, setPendingNav] = useState(null);
 
   const handleNavChange = (nav) => {
-    if (activeNav === "timer" && t.isActive && nav !== "timer") {
+    if (activeNav === "timer" && t.isActive && !t.isPaused && nav !== "timer") {
       setPendingNav(nav);
     } else {
       onNavChange?.(nav);
@@ -227,7 +227,7 @@ function DashboardMain({ state, onNavChange, children }) {
       <MainArea
         user={user}
         onQuickAdd={() => {
-          if (activeNav === "timer" && t.isActive) {
+          if (activeNav === "timer" && t.isActive && !t.isPaused) {
             setPendingNav("QUICK_ADD");
           } else {
             setShowQuickAdd(true);
