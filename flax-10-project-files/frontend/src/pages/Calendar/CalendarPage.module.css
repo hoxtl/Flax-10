@@ -37,7 +37,7 @@
 @media (max-width: 768px) {
   .filters {
     padding: 8px 12px;
-    background: #f6f4f1; /* Matches header */
+    background: #f6f4f1;
     border-bottom: 1px solid #e8e3de;
   }
 }
@@ -59,8 +59,8 @@
 
 .mainContent {
   flex: 1;
-  overflow-y: hidden; /* Calendar component handles its own scroll */
+  overflow-y: hidden;
   background: white;
-  border-top-left-radius: 24px; /* Optional rounded top for a modern look */
+  border-top-left-radius: 24px;
   border-top-right-radius: 24px;
 }
