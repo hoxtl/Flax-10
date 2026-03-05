@@ -81,8 +81,13 @@ function HeaderActions({ openModal, viewMode, selectedDate, onImportClick }) {
 function ImportButton({ onImport }) {
   return (
     <div className="btn-import-wrapper">
-      <button className="btn-import" onClick={onImport}>Import timetable</button>
-      <span className="btn-import-tooltip">Import your timetable using the shareable link</span>
+      <button className="btn-import" onClick={onImport}>
+        <span className="btn-import-text-full">Import timetable</span>
+        <span className="btn-import-text-short">Import</span>
+      </button>
+      <span className="btn-import-tooltip">
+        Import your timetable using the shareable link
+      </span>
     </div>
   );
 }
