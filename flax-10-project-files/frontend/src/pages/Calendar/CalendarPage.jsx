@@ -19,6 +19,10 @@ export default function CalendarPage() {
     [allEvents, selectedDate, viewMode],
   );
 
+  const handleFilterChange = (key) => {
+    dispatch({ type: "SET_FILTER", payload: key });
+  };
+
   return (
     <div className={styles.page}>
       <CalendarHeader />
