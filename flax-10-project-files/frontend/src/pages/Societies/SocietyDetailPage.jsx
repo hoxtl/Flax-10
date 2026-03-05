@@ -12,12 +12,12 @@ import ImageGalleryModal from "../../components/Society/SocietyDetail/imageHandl
 import SettingsModal from "../../components/Society/SocietyDetail/SettingsModal";
 import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal";
 
-export default function SocietyDetailPage({ societyId, onBack }) {
+export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
     const hookData = useSocietyDetail(societyId);
     const { society, loading, error, updateSociety, members, publishChanges } = hookData;
     const changeTracker = useChangeTracker();
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState(location.state?.activeTab || "calendar");
+    const [activeTab, setActiveTab] = useState(initialTab || location.state?.activeTab || "calendar");
     const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
     const [galleryOpen, setGalleryOpen] = useState(false);

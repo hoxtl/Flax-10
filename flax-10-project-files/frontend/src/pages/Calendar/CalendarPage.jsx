@@ -5,10 +5,12 @@ import { useCalendar, useCalendarDispatch } from '../../context/CalendarContext'
 import { getVisibleEventsInView } from '../../components/Calendar/utils/eventUtils';
 import styles from './CalendarPage.module.css';
 import { EventPopups } from '../../components/Calendar/EventPopups';
+import { useEventPopupListener } from '../../components/Calendar/hooks/useEventPopupListener';
 
 export default function CalendarPage() {
     const { filter, allEvents, selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
+    useEventPopupListener();
 
     const visibleItems = useMemo(() =>
         getVisibleEventsInView(allEvents, selectedDate, viewMode),

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { requestPermission } from '../../Notifications/utils/browserNotification';
 
 export const getProgress = (t) => {
@@ -7,10 +7,17 @@ export const getProgress = (t) => {
 };
 
 export const useCompletionCheck = (timer, startNext, notify) => {
+    const handledRef = useRef(false);
+
     useEffect(() => { requestPermission(); }, []);
 
     useEffect(() => {
-        if (timer.timeLeft === 0 && timer.isActive) {
+        if (timer.timeLeft > 0) handledRef.current = false;
+    }, [timer.timeLeft]);
+
+    useEffect(() => {
+        if (timer.timeLeft === 0 && timer.isActive && !handledRef.current) {
+            handledRef.current = true;
             handleCompletion(timer, startNext, notify);
         }
     }, [timer.timeLeft, timer.isActive, timer.mode, timer.breakTime, startNext, notify]);

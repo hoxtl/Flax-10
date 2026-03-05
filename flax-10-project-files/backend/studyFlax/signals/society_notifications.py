@@ -48,6 +48,7 @@ def handle_event_delete(sender, instance, **kwargs):
         'message': f'"{instance.title}" has been removed from the calendar.',
         'notification_type': 'society_event',
         'society_id': instance.society_id,
+        'action_url': build_society_calendar_url(instance.society_id),
     })
 
 
@@ -141,11 +142,11 @@ def build_delete_message(title, has_event):
 
 
 def build_society_calendar_url(society_id):
-    return f"societies/{society_id}/calendar"
+    return f"societies_{society_id}_calendar"
 
 
 def build_society_announcements_url(society_id):
-    return f"societies/{society_id}/announcements"
+    return f"societies_{society_id}_announcements"
 
 
 def format_event_time(event):

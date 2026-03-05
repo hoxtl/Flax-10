@@ -10,9 +10,10 @@ const POLL_INTERVAL = 30000;
 export function NotificationProvider({ children }) {
     const { notifications, setNotifications, loading } = useNotificationLoader();
     const [isOpen, setIsOpen] = useState(false);
-    const actions = useNotificationActions(setNotifications);
+    const knownIds = useRef(new Set());
+    const actions = useNotificationActions(setNotifications, knownIds);
 
-    useNotificationPolling(notifications, setNotifications);
+    useNotificationPolling(notifications, setNotifications, knownIds);
 
     const value = {
         notifications, isOpen, hasUnread: notifications.some(n => !n.read), loading, ...actions,
@@ -37,17 +38,15 @@ function useNotificationLoader() {
     return { notifications, setNotifications, loading };
 }
 
-function useNotificationPolling(notifications, setNotifications) {
-    const knownIds = useRef(new Set());
-
+function useNotificationPolling(notifications, setNotifications, knownIds) {
     useEffect(() => {
         notifications.forEach(n => knownIds.current.add(n.id));
-    }, [notifications]);
+    }, [notifications, knownIds]);
 
     useEffect(() => {
         const interval = setInterval(() => pollNotifications(knownIds.current, setNotifications), POLL_INTERVAL);
         return () => clearInterval(interval);
-    }, [setNotifications]);
+    }, [setNotifications, knownIds]);
 }
 
 function processNewNotifications(fresh, knownIds, setNotifications) {
@@ -67,12 +66,13 @@ async function pollNotifications(knownIds, setNotifications) {
 
 function notifyUser(notification) {
     const action = parseNotificationAction(notification);
-    sendBrowserNotification(notification.title, notification.message, null, action);
+    const tag = `notification-${notification.id}`;
+    sendBrowserNotification(notification.title, notification.message, tag, action);
     playNotificationSound();
 }
 
-function useNotificationActions(set) {
-    const addNotification = useCallback((n) => createNotify(n, set), [set]);
+function useNotificationActions(set, knownIds) {
+    const addNotification = useCallback((n) => createNotify(n, set, knownIds), [set, knownIds]);
     const dismissNotification = useCallback((id) => dismissNotify(id, set), [set]);
     const markAllRead = useCallback(() => markAll(set), [set]);
     const clearAll = useCallback(() => clear(set), [set]);
@@ -80,9 +80,10 @@ function useNotificationActions(set) {
     return { addNotification, dismissNotification, markAllRead, clearAll };
 }
 
-async function createNotify(notification, set) {
+async function createNotify(notification, set, knownIds) {
     try {
         const created = await api.createNotification(notification);
+        if (knownIds?.current) knownIds.current.add(created.id);
         set(prev => [created, ...prev]);
     } catch (err) { console.error('Failed to create notification:', err); }
 }
