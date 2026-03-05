@@ -7,3 +7,13 @@
     padding: 12px 32px 0;
     flex-shrink: 0;
 }
+
+@media (max-width: 768px) {
+    .filters {
+        padding: 8px 12px 0; /* Reduced from 32px */
+        overflow-x: auto; /* Allow horizontal scrolling for filters */
+        white-space: nowrap;
+        display: flex;
+        -webkit-overflow-scrolling: touch;
+    }
+}
