@@ -377,3 +377,14 @@
     display: none;
   }
 }
+
+@media (min-width: 901px) {
+  .mobile-calendar-header::after {
+    content: "";
+    display: block;
+    height: 1px;
+    background: var(--border, #e8e3de);
+    border-radius: 999px;
+    margin: 0 2rem 0.25rem;
+  }
+}
