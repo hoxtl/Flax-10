@@ -229,4 +229,17 @@
     position: relative;
     padding: 16px 16px 8px;
   }
+
+
+  .date-strip-wrapper {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 16px 12px;
+    scrollbar-width: none;
+  }
+
+  .date-strip-wrapper::-webkit-scrollbar {
+    display: none;
+  }
 }
