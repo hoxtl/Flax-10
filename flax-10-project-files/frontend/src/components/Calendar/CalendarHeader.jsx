@@ -50,7 +50,29 @@ function useCalendarHeader() {
 }
 
 export function CalendarHeader() {
-  const { selectedDate, viewMode, dispatch, openModal, showImportModal, setShowImportModal, navigate, jumpToDate, onImport } = useCalendarHeader();
+  const {
+    selectedDate,
+    viewMode,
+    filter,
+    allEvents,
+    dispatch,
+    openModal,
+    showImportModal,
+    setShowImportModal,
+    navigate,
+    jumpToDate,
+    onImport,
+  } = useCalendarHeader();
+
+  const termStartDate = new Date("2026-01-12");
+  const weekNumber = Math.ceil(
+    (Math.floor((selectedDate - termStartDate) / (24 * 60 * 60 * 1000)) + 1) /
+      7,
+  );
+
+  const weekStart = getStartOfWeek(selectedDate);
+  const weekDays = [...Array(7)].map((_, i) => addDays(weekStart, i));
+
   return (
     <>
       <div className="calendar-header">
@@ -93,35 +115,41 @@ function ImportButton({ onImport }) {
 }
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
-  if (viewMode === 'year') {
+  if (viewMode === "year") {
     const newDate = new Date(selectedDate);
     newDate.setFullYear(newDate.getFullYear() + dir);
-    dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
+    dispatch({ type: "SET_SELECTED_DATE", payload: newDate });
     return;
   }
-  dispatch({ type: 'SET_SELECTED_DATE', payload: addDays(selectedDate, { day: 1, week: 7, month: 30 }[viewMode] * dir) });
+  dispatch({
+    type: "SET_SELECTED_DATE",
+    payload: addDays(
+      selectedDate,
+      { day: 1, week: 7, month: 30 }[viewMode] * dir,
+    ),
+  });
 }
 
 function getTitle(selectedDate, viewMode) {
-  if (viewMode === 'day') return formatDate(selectedDate);
-  if (viewMode === 'month') return formatMonthYear(selectedDate);
-  if (viewMode === 'year') return selectedDate.getFullYear().toString();
+  if (viewMode === "day") return formatDate(selectedDate);
+  if (viewMode === "month") return formatMonthYear(selectedDate);
+  if (viewMode === "year") return selectedDate.getFullYear().toString();
   return getWeekTitle(selectedDate);
 }
 
 function getWeekTitle(selectedDate) {
   const week = getWeekDays(selectedDate);
-  const fmt = { month: 'short', day: 'numeric' };
+  const fmt = { month: "short", day: "numeric" };
   return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
 }
 
 function openForView(openModal, viewMode, selectedDate) {
-  if (viewMode === 'day') openModal(null, null, selectedDate);
+  if (viewMode === "day") openModal(null, null, selectedDate);
   else openModal();
 }
 
 async function reloadEvents(dispatch, selectedDate, viewMode) {
   const { start, end } = getDateRangeForView(selectedDate, viewMode);
   const data = await getEvents({ start, end });
-  dispatch({ type: 'SET_EVENTS', payload: data });
+  dispatch({ type: "SET_EVENTS", payload: data });
 }
