@@ -4,8 +4,7 @@
  */
 
 import { AlertTriangle, RotateCw } from "lucide-react";
-import { formatTime12h } from "../../utils/dateFormatUtils";
-import { formatHour12h } from "../../utils/dateFormatUtils";
+import { formatTime, formatTime12h, formatHour12h } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { DAY_START_HOUR } from "../../utils/timelineUtils";

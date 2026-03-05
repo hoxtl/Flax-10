@@ -88,8 +88,11 @@
 
 /* ── Checkbox ── */
 .check {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    aspect-ratio: 1;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: transparent;
@@ -99,6 +102,8 @@
     display: grid;
     place-items: center;
     transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    box-sizing: border-box;
+    padding: 0;
 }
 
 .check:hover {
@@ -131,7 +136,7 @@
 
 .checkMark {
     color: white;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 800;
     line-height: 1;
     animation: checkMarkIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
@@ -434,16 +439,16 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* ═══ Task details (read-only) modal — clean, scannable UI ═══ */
+/* ═══ Task details (read-only) modal — Flax themed, scannable UI ═══ */
 .infoModal {
     position: relative;
     width: min(420px, 92vw);
     max-height: 85vh;
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+    background: var(--card-bg, #FFFCFA);
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 18%, transparent);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 24px 48px rgba(74, 52, 33, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
     animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
     flex-direction: column;
@@ -455,7 +460,7 @@
     top: 0;
     bottom: 0;
     width: 4px;
-    background: var(--info-accent, var(--sage, #84A98C));
+    background: var(--info-accent, var(--primary, #7B6751));
     border-radius: 16px 0 0 16px;
 }
 
@@ -463,14 +468,14 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px 20px 14px;
-    background: var(--card-bg, #fff);
-    border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+    padding: 18px 20px 16px;
+    background: var(--card-bg, #FFFCFA);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary, #7B6751) 12%, transparent);
 }
 
 .infoModalIcon {
     flex-shrink: 0;
-    color: var(--info-accent, var(--sage, #84A98C));
+    color: var(--info-accent, var(--primary, #7B6751));
 }
 
 .infoModalHeaderText {
@@ -483,7 +488,7 @@
     font-family: var(--font-body);
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--text, #1c1917);
+    color: var(--text, #292524);
     letter-spacing: -0.02em;
     line-height: 1.25;
 }
@@ -493,7 +498,7 @@
     font-family: var(--font-body);
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--muted, #78716c);
+    color: #57534e;
     letter-spacing: 0.01em;
 }
 
@@ -510,23 +515,24 @@
     transition: background 0.2s, color 0.2s;
 }
 .infoModalClose:hover {
-    background: rgba(0, 0, 0, 0.06);
-    color: var(--text, #1c1917);
+    background: color-mix(in srgb, var(--primary, #7B6751) 10%, transparent);
+    color: var(--text, #292524);
 }
 
 .infoModalBody {
-    padding: 16px 20px 20px;
+    padding: 18px 20px 20px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
+    background: var(--card-bg, #FFFCFA);
 }
 
 .infoHero {
-    margin-bottom: 16px;
-    padding: 14px 16px;
-    background: rgba(0, 0, 0, 0.03);
+    margin-bottom: 18px;
+    padding: 16px 18px;
+    background: color-mix(in srgb, var(--primary, #7B6751) 4%, transparent);
     border-radius: 12px;
-    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 14%, transparent);
 }
 
 .infoHeroTitle {
@@ -534,14 +540,14 @@
     font-family: var(--font-body);
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text, #1c1917);
+    color: var(--text, #292524);
     line-height: 1.4;
 }
 
 .infoHeroDesc {
     margin: 8px 0 0;
     font-size: 0.875rem;
-    color: var(--muted, #78716c);
+    color: #44403c;
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
@@ -560,9 +566,9 @@
     justify-content: space-between;
     gap: 10px;
     padding: 10px 12px;
-    background: rgba(0, 0, 0, 0.02);
+    background: color-mix(in srgb, var(--primary, #7B6751) 3%, transparent);
     border-radius: 10px;
-    border: 1px solid transparent;
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 10%, transparent);
 }
 
 .infoRowFull {
@@ -579,19 +585,19 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--muted, #78716c);
+    color: #57534e;
 }
 .infoLabel svg {
     flex-shrink: 0;
-    opacity: 0.85;
-    color: var(--info-accent, var(--sage, #84A98C));
+    opacity: 0.9;
+    color: var(--info-accent, var(--primary, #7B6751));
 }
 
 .infoVal {
     font-family: var(--font-body);
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text, #1c1917);
+    color: var(--text, #292524);
 }
 .infoRowFull .infoVal {
     font-weight: 500;
@@ -602,9 +608,9 @@
     font-weight: 500;
     padding: 4px 10px;
     border-radius: 9999px;
-    background: rgba(0, 0, 0, 0.06);
-    color: var(--text, #44403c);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: color-mix(in srgb, var(--primary, #7B6751) 8%, transparent);
+    color: #44403c;
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 20%, transparent);
 }
 
 .infoListDot {
@@ -621,9 +627,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 20px 16px;
-    border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
-    background: rgba(0, 0, 0, 0.02);
+    padding: 14px 20px 18px;
+    border-top: 1px solid color-mix(in srgb, var(--primary, #7B6751) 12%, transparent);
+    background: color-mix(in srgb, var(--primary, #7B6751) 3%, transparent);
     flex-shrink: 0;
 }
 
@@ -634,17 +640,17 @@
     font-family: var(--font-body);
     font-size: 0.6875rem;
     font-weight: 500;
-    color: var(--muted, #a8a29e);
+    color: #57534e;
 }
 .infoHint svg {
-    opacity: 0.7;
+    opacity: 0.8;
     flex-shrink: 0;
 }
 
 .infoCloseBtn {
     padding: 10px 20px;
     border-radius: 10px;
-    background: var(--text, #1c1917);
+    background: var(--primary, #7B6751);
     border: none;
     color: #fff;
     font-family: inherit;
@@ -654,9 +660,9 @@
     transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
 }
 .infoCloseBtn:hover {
-    background: var(--text, #292524);
+    background: var(--primary-strong, #5D4037);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(123, 103, 81, 0.25);
 }
 
 :root[data-theme="dark"] .infoModal {
@@ -668,6 +674,9 @@
     background: var(--card-bg);
     border-bottom-color: var(--border-color);
 }
+:root[data-theme="dark"] .infoModalBody {
+    background: var(--card-bg);
+}
 :root[data-theme="dark"] .infoHero {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--border-color);
@@ -675,6 +684,7 @@
 :root[data-theme="dark"] .infoRow,
 :root[data-theme="dark"] .infoRowFull {
     background: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-color);
 }
 :root[data-theme="dark"] .infoValPill {
     background: rgba(255, 255, 255, 0.08);
@@ -686,11 +696,11 @@
     border-top-color: var(--border-color);
 }
 :root[data-theme="dark"] .infoCloseBtn {
-    background: var(--text-primary);
+    background: var(--primary);
     color: var(--card-bg);
 }
 :root[data-theme="dark"] .infoCloseBtn:hover {
-    background: var(--text-primary);
+    background: var(--primary);
     filter: brightness(1.1);
 }
 

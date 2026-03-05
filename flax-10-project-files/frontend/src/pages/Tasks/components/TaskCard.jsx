@@ -198,7 +198,7 @@ function TaskInfoModal({ task, listName, listColor, onClose }) {
         <div className={styles.modalBackdrop} onMouseDown={onClose}>
             <div
                 className={styles.infoModal}
-                style={{ "--info-accent": listColor || "var(--sage, #84A98C)" }}
+                style={{ "--info-accent": listColor || "var(--primary, #7B6751)" }}
                 onMouseDown={e => e.stopPropagation()}
             >
                 <div className={styles.infoModalAccent} aria-hidden />

@@ -1,6 +1,7 @@
 /**
  * Vibrant, classy list colours.
  * Used in CreateListModal palette, list sidebar, and task modals.
+ * 21 colours = 3 rows × 7 for a full grid.
  */
 export const FOCUS_BLOCK_COLOURS = [
   "#4a3728",
@@ -18,6 +19,12 @@ export const FOCUS_BLOCK_COLOURS = [
   "#9b6dcc",
   "#e8a838",
   "#e07575",
+  "#c44569",
+  "#00b894",
+  "#0984e3",
+  "#fd79a8",
+  "#fdcb6e",
+  "#636e72",
 ];
 
 /** Hex only, for fallback lookups by index */
