@@ -10,9 +10,11 @@ import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js
 import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
-function useModulesPage(initialSearch = '') {
+function getIsTeacher() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const is_teacher = user.role === 'teacher';
+    return user.role === 'teacher';
+}
+function useModulesPage(initialSearch = '') {
     const [search_query, setSearchQuery] = useState(initialSearch);
     const [filter_mode, setFilterMode] = useState('all');
     const [show_form, setShowForm] = useState(false);
@@ -29,8 +31,8 @@ function useModulesPage(initialSearch = '') {
         );
         if (match) setViewingModule(match);
     }, [initialSearch, hook.loading, hook.modules]);
-
-    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
+    
+    return { is_teacher: getIsTeacher(), search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }
 
 function useMainView(state) {
