@@ -3,6 +3,11 @@
   flex-direction: column;
 }
 
+.header-top-row,
+.date-strip-wrapper {
+  display: none;
+}
+
 /* Main header container */
 .calendar-header {
   display: flex;
