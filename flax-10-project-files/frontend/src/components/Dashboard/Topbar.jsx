@@ -5,7 +5,7 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, Plus, ChevronDown } from "lucide-react";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -146,21 +146,27 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   );
 }
 
-function QuickTabs() {
+function QuickTabs({ onAddClick }) {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.read).length;
-  const tabs = [{ title: "Notifications", icon: Bell, badge: unreadCount }];
-  /* Only open/close panel when user clicks the bell tab (index 0), not when clicking outside (onChange(null)). */
-  const change = (index) => { if (index === 0) togglePanel(); };
+  const tabs = [
+    { title: "Add", icon: Plus, autoCollapse: true },
+    { type: "separator" },
+    { title: "Notifications", icon: Bell, badge: unreadCount },
+  ];
+  const change = (index) => {
+    if (index === 0) onAddClick?.();
+    if (index === 2) togglePanel();
+  };
   return <ExpandableTabs tabs={tabs} onChange={change} />;
 }
 
-function ActionPill() {
+function ActionPill({ onAddClick }) {
   return (
     <div className={styles.actionPill}>
       <ThemeToggle />
       <div className={styles.pillDivider} />
-      <QuickTabs />
+      <QuickTabs onAddClick={onAddClick} />
       <NotificationPanel />
     </div>
   );
@@ -221,6 +227,7 @@ function ToolsPill({ onNavChange, activeNav }) {
 
 function TopBarActions({
   user: u,
+  onAddClick,
   onSettingsClick: sC,
   onLogoutClick: lC,
   onProfileClick: pC,
@@ -231,7 +238,7 @@ function TopBarActions({
     <div className={styles.actions}>
       <ToolsPill onNavChange={nC} activeNav={aN} />
       <MiniTimer onNavigate={nC} activeNav={aN} />
-      <ActionPill />
+      <ActionPill onAddClick={onAddClick} />
       <ProfileDropdown
         user={u}
         onSettingsClick={sC}
@@ -244,6 +251,7 @@ function TopBarActions({
 
 export default function TopBar({
   user,
+  onAddClick,
   onSettingsClick,
   onLogoutClick,
   onProfileClick,
@@ -263,6 +271,7 @@ export default function TopBar({
       <div className={styles.rightSection}>
         <TopBarActions
           user={user}
+          onAddClick={onAddClick}
           onSettingsClick={onSettingsClick}
           onLogoutClick={onLogoutClick}
           onProfileClick={onProfileClick}
