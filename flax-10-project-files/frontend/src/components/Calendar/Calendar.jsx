@@ -72,8 +72,13 @@ function CalendarContent() {
 }
 
 function CalendarView({ viewMode }) {
-    const views = { day: DayView, week: WeekView, month: MonthView, year: YearView };
-    const View = views[viewMode];
+  const views = {
+    day: DayView,
+    week: WeekView,
+    month: MonthView,
+    year: YearView,
+  };
+  const View = views[viewMode];
 
-    return View ? <View /> : null;
+  return View ? <View /> : null;
 }
