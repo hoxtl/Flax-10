@@ -82,6 +82,7 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
     due_date: defaultDueDate ?? "",
     task_list: defaultListId || (sortedLists[0]?.id ?? ""),
     estimated_blocks: 1,
+    estimated_minutes: null,
     module: "",
   });
   const [addToSchedule, setAddToSchedule] = useState(false);
@@ -107,7 +108,9 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
     ? getListColor(selectedList, sortedLists.indexOf(selectedList))
     : null;
 
-  const durationMinutes = BLOCK_MINUTES[form.estimated_blocks] ?? 25;
+  const durationMinutes = form.estimated_minutes != null && form.estimated_minutes > 0
+    ? form.estimated_minutes
+    : (BLOCK_MINUTES[form.estimated_blocks] ?? 25);
   const endTimeDisplay = useMemo(() => {
     if (!form.due_date) return "—";
     const start = new Date(form.due_date);
@@ -125,6 +128,7 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
       ...form,
       due_date: form.due_date || null,
       module: form.module ? Number(form.module) : null,
+      estimated_minutes: form.estimated_minutes != null && form.estimated_minutes > 0 ? form.estimated_minutes : null,
     };
     if (showAddToScheduleToggle) {
       await onSave(payload, { addToSchedule });
@@ -202,12 +206,38 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
                 <button
                   key={value}
                   type="button"
-                  className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`}
-                  onClick={() => set("estimated_blocks", value)}
+                  className={`${styles.chip} ${form.estimated_blocks === value && form.estimated_minutes == null ? styles.chipActive : ""}`}
+                  onClick={() => setForm((p) => ({ ...p, estimated_blocks: value, estimated_minutes: null }))}
                 >
                   {label}
                 </button>
               ))}
+            </div>
+            <div className={styles.customDurationWrap}>
+              <span className={styles.customDurationLabel}>Custom</span>
+              <input
+                type="number"
+                min={1}
+                max={480}
+                step={5}
+                placeholder="e.g. 45"
+                className={styles.customDurationInput}
+                value={form.estimated_minutes != null && form.estimated_minutes > 0 ? String(form.estimated_minutes) : ""}
+                onChange={(e) => {
+                  const raw = e.target.value.trim();
+                  if (raw === "") {
+                    setForm((p) => ({ ...p, estimated_minutes: null }));
+                    return;
+                  }
+                  const n = parseInt(raw, 10);
+                  if (!Number.isNaN(n) && n >= 1) setForm((p) => ({ ...p, estimated_minutes: Math.min(480, n) }));
+                }}
+                onBlur={(e) => {
+                  const raw = e.target.value.trim();
+                  if (raw !== "" && Number.isNaN(parseInt(raw, 10))) setForm((p) => ({ ...p, estimated_minutes: null }));
+                }}
+              />
+              <span className={styles.customDurationSuffix}>min</span>
             </div>
           </div>
 
