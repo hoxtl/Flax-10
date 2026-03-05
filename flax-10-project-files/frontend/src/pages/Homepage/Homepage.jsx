@@ -39,7 +39,6 @@ import {
   isRoutineEvent,
   getNavigatorContext,
   getMotivationMessage,
-  getPeakHours,
   getUrgencyLevel,
   computeTimelineWithGaps,
   getNextFreeSlotToday,
@@ -48,7 +47,6 @@ import {
   isAutoPassedTask,
 } from "./utils/index";
 import { DAY_START_HOUR, DAY_END_HOUR } from "./utils/timelineUtils";
-import { formatScheduleCountdown } from "./utils/dateFormatUtils";
 import { useHomeData } from "./hooks/useHomeData";
 import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
 import { MiniTimeline } from "./components";
@@ -236,7 +234,6 @@ export default function Homepage() {
   );
 
   // Analytics-derived intelligence
-  const peakHours = useMemo(() => getPeakHours(analyticsSummary?.heatmap), [analyticsSummary]);
   const urgencyLevel = useMemo(
     () => getUrgencyLevel(upcomingDeadlines, analyticsProgress),
     [upcomingDeadlines, analyticsProgress]

@@ -17,32 +17,6 @@
     gap: 8px;
 }
 
-/* ── New task button ── */
-.newTaskBtn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 8px 16px;
-    background: var(--primary);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 12px;
-    transition: opacity 0.15s;
-}
-.newTaskBtn:hover { opacity: 0.88; }
-
-.newTaskPlus {
-    font-size: 1.1rem;
-    line-height: 1;
-    font-weight: 400;
-}
-
 /* ── Section labels ── */
 .sectionLabel {
     display: flex;
@@ -57,23 +31,6 @@
     padding: 8px 8px 4px;
     margin-top: 8px;
 }
-
-.newListBtn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1rem;
-    font-family: inherit;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    line-height: 1;
-    transition: background 0.1s, color 0.1s;
-}
-.newListBtn:hover { background: var(--hover); color: var(--text); }
 
 /* ── Nav (smart filters) ── */
 .nav {
@@ -165,7 +122,6 @@
     background: rgba(74, 55, 40, 0.04);
     transform: translateX(2px);
 }
-.listItem:hover .listDelete { opacity: 1; }
 
 .listActive {
     background: rgba(74, 55, 40, 0.06) !important;
@@ -197,13 +153,6 @@
     flex-shrink: 0;
 }
 
-.listIcon {
-    font-size: 0.82rem;
-    flex-shrink: 0;
-    width: 18px;
-    text-align: center;
-}
-
 .listName {
     flex: 1;
     min-width: 0;
@@ -228,20 +177,6 @@
     text-align: center;
     flex-shrink: 0;
 }
-
-.listDelete {
-    opacity: 0;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.6rem;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 12px;
-    transition: opacity 0.15s, background 0.1s, color 0.1s;
-    flex-shrink: 0;
-}
-.listDelete:hover { background: #fee2e2; color: #ef4444; }
 
 .emptyLists {
     font-family: var(--font-body);

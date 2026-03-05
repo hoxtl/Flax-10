@@ -164,10 +164,6 @@
   box-shadow: inset 2px 0 0 rgba(196, 148, 109, 0.6);
 }
 
-.taskWidgetTaskRowDone {
-  opacity: 0.45;
-}
-
 /* ── Checkbox ── */
 .taskWidgetCheckbox {
   background: none;
@@ -197,12 +193,6 @@
   border-color: #8b7355;
 }
 
-.taskWidgetCheckboxCircleChecked {
-  background: #7BB38E !important;
-  border-color: #7BB38E !important;
-  color: #fff;
-}
-
 /* ── Task title ── */
 .taskWidgetTaskTitle {
   flex: 1;
@@ -213,11 +203,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.taskWidgetTaskTitleDone {
-  color: #B8A890;
-  text-decoration: line-through;
 }
 
 /* ── Category pill ── */

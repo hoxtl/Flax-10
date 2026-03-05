@@ -2567,31 +2567,6 @@
   margin-bottom: 14px;
 }
 
-.moduleCardMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.moduleCardMetaRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8125rem;
-  color: #8b7355;
-}
-
-.moduleCardMetaLabel {
-  font-weight: 600;
-  color: #a89279;
-  width: 70px;
-  flex-shrink: 0;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 .moduleCardLink {
   display: inline-flex;
   align-items: center;

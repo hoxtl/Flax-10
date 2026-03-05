@@ -116,16 +116,9 @@
     border-color: var(--list-color, var(--primary));
     animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.checkCircleDone {
-    color: #fff;
-    flex-shrink: 0;
-}
 .checkDoneCompleted {
     background: #22c55e !important;
     border-color: #22c55e !important;
-}
-.checkDoneCompleted .checkCircleDone {
-    color: #fff;
 }
 
 @keyframes checkPop {
@@ -180,25 +173,6 @@
     transform: translateX(0);
 }
 
-.menuTrigger {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: none;
-    background: none;
-    color: #b0a59e;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition: color 0.15s, background 0.15s;
-    font-size: 1rem;
-    line-height: 1;
-}
-.menuTrigger:hover {
-    color: #4a3728;
-    background: rgba(74, 55, 40, 0.06);
-}
-
 .actionBarBtn {
     width: 32px;
     height: 32px;
@@ -237,52 +211,10 @@
     transform: translateX(2px);
 }
 
-.actionBarBtnDanger:hover {
-    background: color-mix(in srgb, #dc2626 12%, transparent);
-    color: #b91c1c;
-}
-
 .actionIcon {
     flex-shrink: 0;
     color: inherit;
 }
-
-.menuDropdown {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 4px;
-    min-width: 160px;
-    background: var(--panel, #FFFCFA);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: var(--shadow-lg);
-    z-index: 100;
-    overflow: hidden;
-    animation: menuPop 0.12s ease;
-}
-@keyframes menuPop {
-    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.menuItem {
-    width: 100%;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.8rem;
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.1s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.menuItem:hover { background: var(--hover); }
-.menuItemDanger { color: #b91c1c; }
-.menuItemDanger:hover { background: #fee2e2; }
 
 /* ── Title row: task name + date right-aligned ── */
 .titleRow {
@@ -870,6 +802,10 @@
 /* ════════════════════════════════════════════════
    CONTEXT MENU (portal)
    ════════════════════════════════════════════════ */
+@keyframes menuPop {
+    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 .ctxMenu {
     position: fixed;
     min-width: 160px;
