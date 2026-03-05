@@ -78,8 +78,16 @@ function ActiveEventCard({
           {timeLeftStr && (
             <motion.span
               className={`${styles.currentEventBadgePill} ${styles[`currentEventBadgePill_${band}`]}`}
-              animate={{ backgroundColor: badgeStyle.bg, color: badgeStyle.color }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
+              animate={
+                band === "under10"
+                  ? { scale: [1, 1.04, 1] }
+                  : { backgroundColor: badgeStyle.bg, color: badgeStyle.color }
+              }
+              transition={
+                band === "under10"
+                  ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+                  : { duration: 0.6, ease: "easeInOut" }
+              }
             >
               {timeLeftStr}
             </motion.span>
@@ -371,27 +379,31 @@ export function RightNowWidget({
           <span className={styles.headerLabel}>RIGHT NOW</span>
           <span className={styles.headerClock}>{liveClock}</span>
         </div>
-        <div className={`${styles.section} ${styles.sectionFirst}`}>
-          <p className={styles.nowEmpty}>Day complete · great work today</p>
-        </div>
-        {(completedCount > 0 || eventsToday > 0) && (
-          <div className={styles.section}>
-            <p className={styles.nowEmpty}>
-              {completedCount > 0 && `${completedCount}${totalCount > 0 ? `/${totalCount}` : ""} tasks`}
+        <div className={styles.emptyDay}>
+          <motion.div
+            animate={{ y: [0, -4, 0], rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Sparkles size={32} strokeWidth={1.25} color="#d4c4a8" aria-hidden />
+          </motion.div>
+          <p className={styles.emptyDayTitle}>Day complete · great work</p>
+          {(completedCount > 0 || eventsToday > 0) && (
+            <p className={styles.emptyDaySubtitle}>
+              {completedCount > 0 && `${completedCount}${totalCount > 0 ? `/${totalCount}` : ""} tasks done`}
               {completedCount > 0 && eventsToday > 0 && " · "}
               {eventsToday > 0 && `${eventsToday} event${eventsToday !== 1 ? "s" : ""} attended`}
             </p>
-          </div>
-        )}
+          )}
+        </div>
         {tomorrowFirstEvent && (
-          <div className={`${styles.section} ${styles.sectionLast}`}>
-            <p className={styles.upNextLabel}>Tomorrow</p>
-            <p className={styles.upNextTitle}>{tomorrowFirstEvent.title}</p>
-            {tomorrowTime && <p className={styles.upNextDetails}>at {tomorrowTime}</p>}
-          </div>
-        )}
-        {!tomorrowFirstEvent && (completedCount > 0 || eventsToday > 0) && (
-          <div className={`${styles.section} ${styles.sectionLast}`} />
+          <>
+            <div className={styles.sectionDivider} aria-hidden />
+            <div className={styles.section}>
+              <p className={styles.upNextLabel}>Tomorrow</p>
+              <p className={styles.upNextTitle}>{tomorrowFirstEvent.title}</p>
+              {tomorrowTime && <p className={styles.upNextDetails}>at {tomorrowTime}</p>}
+            </div>
+          </>
         )}
       </motion.div>
     );
@@ -692,7 +704,7 @@ export function RightNowWidget({
                   })}
                 </div>
                 <p className={styles.commuteCardRec}>
-                  Leave ~{leaveMins} mins early — aim for {contextualAlert?.leaveBy} for your {eventTimeStr} {nextEvent.title}
+                  {contextualAlert?.recommendation || `Leaving ~${leaveMins} mins early should cover it.`}
                 </p>
                 {contextualAlert?.leaveBy && (
                   <span className={styles.commuteLeaveByBadge}>
