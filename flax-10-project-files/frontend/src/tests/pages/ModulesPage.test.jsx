@@ -19,6 +19,7 @@ vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     filterModules: vi.fn((modules) => modules),
     applyFiltersAndSort: vi.fn((modules) => modules),
+    getDepartments: vi.fn(() => []),
 }));
 vi.mock('../../components/Modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
