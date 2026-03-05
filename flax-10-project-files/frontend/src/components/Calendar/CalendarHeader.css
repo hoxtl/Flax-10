@@ -8,6 +8,10 @@
   display: none;
 }
 
+.btn-import-text-short {
+  display: none;
+}
+
 /* Main header container */
 .calendar-header {
   display: flex;
