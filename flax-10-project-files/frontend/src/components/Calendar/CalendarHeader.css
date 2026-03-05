@@ -250,4 +250,9 @@
     background: #f6f4f1;
     padding: 8px 16px;
   }
+
+  .view-select {
+    font-size: 0.85rem;
+    padding: 4px 10px;
+  }
 }
