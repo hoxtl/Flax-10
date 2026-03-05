@@ -8,7 +8,7 @@ import { RightNowWidget } from "../../pages/Homepage/components/RightNowWidget";
 import { BentoGrid, BentoCard } from "../ui/bento-grid";
 import { QuickActionsWidget } from "../../pages/Homepage/components/QuickActionsWidget";
 import { SocialDiscoverWidget } from "../../pages/Homepage/components/SocialDiscoverWidget";
-import { WeeklyProgressWidget } from "../../pages/Homepage/components/WeeklyProgressWidget";
+import { StudyPulseWidget } from "../../pages/Homepage/components/StudyPulseWidget";
 
 function getGreeting(name) {
   const h = new Date().getHours();
@@ -43,7 +43,10 @@ export default function IntelligenceRow({
   slot1Meta,
   daySummary,
   slot3Urgent,
-  slot4Energy,
+  studyPulseWindows,
+  studyPulseNow,
+  studyPulseOnStartFocus,
+  studyPulseDeadlines,
   slot5Commute,
   slot5Data,
   hasOverdue = false,
@@ -118,14 +121,14 @@ export default function IntelligenceRow({
           {slot3Urgent}
         </BentoCard>
 
-        {/* Col 2, Row 3: Focus Windows */}
-        <BentoCard className={styles.posFocusWindows}>
-          {slot4Energy}
-        </BentoCard>
-
-        {/* Col 3, Row 3: Weekly Progress */}
-        <BentoCard className={styles.posWeeklyProgress}>
-          <WeeklyProgressWidget />
+        {/* Cols 2–3, Row 3: Study Pulse (focus windows + weekly progress) */}
+        <BentoCard className={styles.posStudyPulse}>
+          <StudyPulseWidget
+            windows={studyPulseWindows ?? []}
+            now={studyPulseNow ?? new Date()}
+            onStartFocus={studyPulseOnStartFocus}
+            deadlines={studyPulseDeadlines ?? []}
+          />
         </BentoCard>
       </BentoGrid>
     </section>

@@ -1,4 +1,4 @@
-/* Today's Tasks slot — warm palette, no CSS vars, no dark mode */
+/* Today's Tasks widget — compact flat rows */
 
 .taskWidgetSlotRoot {
   display: flex;
@@ -6,24 +6,36 @@
   min-height: 0;
 }
 
+/* ── Header ── */
 .taskWidgetSlotHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .taskWidgetSlotHeaderLeft {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
+}
+
+.taskWidgetSlotIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(74, 109, 140, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .taskWidgetSlotIcon {
   flex-shrink: 0;
-  color: #a89279;
+  color: #4A6D8C;
 }
 
 .taskWidgetSlotTitleBlock {
@@ -34,27 +46,65 @@
 }
 
 .taskWidgetSlotTitle {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
   color: #2c1810;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   margin: 0;
   line-height: 1.2;
 }
 
 .taskWidgetSlotMeta {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 400;
   color: #a89279;
   line-height: 1.2;
 }
 
-.taskWidgetSlotHeaderRight {
+/* Header ring */
+.taskRingWrap {
+  position: relative;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   flex-shrink: 0;
 }
 
+.taskRingSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.taskRingTrack {
+  fill: none;
+  stroke: #f0e6d9;
+  stroke-width: 3;
+}
+
+.taskRingFill {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.taskRingCount {
+  position: relative;
+  font-size: 8px;
+  font-weight: 700;
+  color: #2c1810;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ── All done wrap ── */
 .taskWidgetSlotAllDoneWrap {
   background: linear-gradient(135deg, #FFF8F2, #FFF4EC);
   border-radius: 16px;
@@ -80,122 +130,7 @@
   color: #fffcf8;
 }
 
-/* Progress ring (28px) */
-.taskWidgetRingWrap {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.taskWidgetRingSvg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.taskWidgetRingTrack {
-  fill: none;
-  stroke: #f0e6d9;
-  stroke-width: 3;
-}
-
-.taskWidgetRingFill {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-
-.taskWidgetDonutCount {
-  font-size: 13px;
-  font-weight: 700;
-  color: #2c1810;
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.taskWidgetDonutCount span {
-  color: #a89279;
-  font-weight: 500;
-  font-size: 12px;
-}
-
-/* On-track status row */
-.taskWidgetTrackRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.trackStatusPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  line-height: 1.2;
-}
-
-.trackStatusDot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.taskWidgetEstTime {
-  font-size: 11px;
-  color: #a89279;
-}
-
-/* Footer */
-.taskWidgetManageFooter {
-  margin-top: 10px;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(139, 115, 85, 0.08);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.taskWidgetManageFooter.taskWidgetBottomRow {
-  justify-content: center;
-}
-
-.taskWidgetManageLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 7px 16px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #8b7355;
-  background: rgba(139, 115, 85, 0.06);
-  border: 1px solid rgba(139, 115, 85, 0.13);
-  border-radius: 9999px;
-  text-decoration: none;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-
-.taskWidgetManageLink:hover {
-  color: #5a4a3a;
-  background: rgba(139, 115, 85, 0.11);
-  border-color: rgba(139, 115, 85, 0.2);
-}
-
-.taskWidgetBottomRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Task list rows */
+/* ── Task list ── */
 .taskWidgetTaskList {
   list-style: none;
   margin: 0;
@@ -208,12 +143,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0.6rem 0;
-  min-height: 36px;
-  border-bottom: 1px solid rgba(139, 115, 85, 0.06);
-  border-radius: 0;
-  transition: background 0.12s;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(139, 115, 85, 0.04);
   cursor: default;
+  transition: background 0.1s;
 }
 
 .taskWidgetTaskRow:last-child {
@@ -222,18 +155,20 @@
 
 .taskWidgetTaskRow:hover {
   background: rgba(139, 115, 85, 0.02);
-  border-radius: 6px;
+  border-radius: 4px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
-.taskWidgetTaskRowOverdue .taskWidgetTaskTitle {
-  color: #2c1810;
+.taskWidgetTaskRowOverdue {
+  box-shadow: inset 2px 0 0 rgba(196, 148, 109, 0.6);
 }
 
 .taskWidgetTaskRowDone {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
-/* Checkbox */
+/* ── Checkbox ── */
 .taskWidgetCheckbox {
   background: none;
   border: none;
@@ -242,6 +177,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .taskWidgetCheckboxCircle {
@@ -262,95 +198,62 @@
 }
 
 .taskWidgetCheckboxCircleChecked {
-  background: #5a8c6a !important;
-  border-color: #5a8c6a !important;
+  background: #7BB38E !important;
+  border-color: #7BB38E !important;
   color: #fff;
 }
 
-/* Task title */
+/* ── Task title ── */
 .taskWidgetTaskTitle {
   flex: 1;
   min-width: 0;
-  font-size: 0.8125rem;
+  font-size: 13px;
   font-weight: 500;
-  color: #3d2814;
+  color: #1A1207;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .taskWidgetTaskTitleDone {
+  color: #B8A890;
   text-decoration: line-through;
 }
 
-/* Task right side */
-.taskWidgetTaskRight {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-/* Category pill (replaces old plain tag) */
+/* ── Category pill ── */
 .taskWidgetCategoryPill {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 4px;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  line-height: 1.2;
   white-space: nowrap;
-}
-
-.taskWidgetCategoryDot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* NEXT badge */
-.taskWidgetTaskTagNext {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 0.15rem 0.45rem;
-  border-radius: 4px;
-  background: #fff4ee;
-  color: #8c5d3f;
-  white-space: nowrap;
-  border: 1px solid rgba(140, 93, 63, 0.15);
+/* ── Completed line ── */
+.taskWidgetCompletedLine {
+  list-style: none;
+  font-size: 11px;
+  color: #B8A890;
+  padding: 6px 0 2px;
+  font-weight: 400;
 }
 
-/* LATE badge */
-.taskWidgetTaskTagLate {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 0.15rem 0.45rem;
-  border-radius: 4px;
-  background: #f5e8e8;
-  color: #8c4a4a;
-  white-space: nowrap;
-  border: 1px solid rgba(140, 74, 74, 0.15);
-}
-
-/* Show more / less */
+/* ── Show more ── */
 .taskWidgetMoreText {
   background: none;
   border: none;
-  padding: 4px 4px;
-  font-size: 0.75rem;
+  padding: 4px 0;
+  font-size: 11px;
   color: #a89279;
   cursor: pointer;
   text-align: left;
   transition: color 0.12s;
+  display: block;
 }
 
 .taskWidgetMoreText:hover {
@@ -358,7 +261,29 @@
   text-decoration: underline;
 }
 
-/* Empty state link */
+/* ── Footer ── */
+.taskWidgetManageFooter {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(139, 115, 85, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.taskWidgetManageLink {
+  font-size: 11px;
+  font-weight: 500;
+  color: #a89279;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.taskWidgetManageLink:hover {
+  color: #8b7355;
+}
+
+/* ── Empty state link ── */
 .taskWidgetLink {
   font-size: 0.75rem;
   font-weight: 500;

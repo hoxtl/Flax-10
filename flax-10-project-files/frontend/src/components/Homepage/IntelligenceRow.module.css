@@ -60,7 +60,7 @@
 }
 
 .headerTitle {
-  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -976,7 +976,6 @@
   .posTodaysTasks    { grid-column: 2 / 4; grid-row: 1;     }
   .posQuickActions   { grid-column: 2;     grid-row: 2;     }
   .posSocialDiscover { grid-column: 3;     grid-row: 2;     }
-  .posDeadlines      { grid-column: 1;     grid-row: 3;     }
-  .posFocusWindows   { grid-column: 2;     grid-row: 3;     }
-  .posWeeklyProgress { grid-column: 3;     grid-row: 3;     }
+  .posDeadlines  { grid-column: 1;     grid-row: 3; }
+  .posStudyPulse { grid-column: 2 / 4; grid-row: 3; }
 }

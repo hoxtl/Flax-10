@@ -1,9 +1,9 @@
 /**
- * Task widget slot — Today's tasks with stagger animation, ring progress, on-track status.
+ * Task widget slot — compact flat rows, header ring, no track-status pill.
  */
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { CheckSquare, Check } from "lucide-react";
 import EmptyStateCard from "../../../components/EmptyStateCard";
@@ -13,14 +13,17 @@ import { getModulePillColors } from "./ModulePill";
 
 const VISIBLE_COUNT = 5;
 
+const RING_R    = 11;
+const RING_CIRC = 2 * Math.PI * RING_R;
+
 const CATEGORY_COLOURS = {
-  UNIVERSITY: { bg: "#EDF4FC", text: "#4A6D8C", dot: "#7BA3C4" },
-  HEALTH:     { bg: "#EFF7F0", text: "#4A7C5A", dot: "#7BB38E" },
-  PERSONAL:   { bg: "#F5F0E8", text: "#736048", dot: "#A89279" },
-  WORK:       { bg: "#FFF4EE", text: "#8C5D3F", dot: "#C49070" },
-  FINANCE:    { bg: "#F0EDE8", text: "#6B6048", dot: "#A89070" },
-  STUDY:      { bg: "#F3F0FF", text: "#5B4A8A", dot: "#8B7BB8" },
-  default:    { bg: "#F5F0E8", text: "#736048", dot: "#A89279" },
+  UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
+  HEALTH:     { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
+  PERSONAL:   { bg: "#F5F0E8",                   text: "#736048" },
+  WORK:       { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
+  FINANCE:    { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
+  STUDY:      { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
+  default:    { bg: "#F5F0E8",                   text: "#736048" },
 };
 
 const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
@@ -30,7 +33,7 @@ function getCategoryStyle(label) {
   const key = label.toUpperCase().trim();
   if (MODULE_CODE_RE.test(key)) {
     const c = getModulePillColors(key);
-    return { bg: c.bg, text: c.text, dot: c.accent };
+    return { bg: c.bg, text: c.text };
   }
   return CATEGORY_COLOURS[key] || CATEGORY_COLOURS.default;
 }
@@ -39,14 +42,6 @@ function getRingColor(pct) {
   if (pct >= 70) return "#5A8C6A";
   if (pct >= 30) return "#C4904A";
   return "#A86060";
-}
-
-function getTrackStatus(items) {
-  if (!items || items.length === 0) return null;
-  const pct = items.filter((t) => t.completed).length / items.length;
-  if (pct >= 0.8) return "ahead";
-  if (pct >= 0.4) return "on-track";
-  return "behind";
 }
 
 function getEstTime(items) {
@@ -59,21 +54,12 @@ function getEstTime(items) {
   return m > 0 ? `~${h}h ${m}m left` : `~${h}h left`;
 }
 
-const RING_R = 11;
-const RING_CIRC = 2 * Math.PI * RING_R;
-
-const TRACK_CONFIG = {
-  ahead:        { label: "Ahead",    dot: "#5A8C6A", text: "#4A7C5A", bg: "#EFF7F0" },
-  "on-track":   { label: "On Track", dot: "#C4904A", text: "#8C6D3F", bg: "#FFF4EE" },
-  behind:       { label: "Behind",   dot: "#A86060", text: "#7A4A4A", bg: "#F5E8E8" },
-};
-
 const listVariants = {
-  animate: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
+  animate: { transition: { staggerChildren: 0.04, delayChildren: 0.04 } },
 };
 const itemVariants = {
-  initial: { opacity: 0, y: 6 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.23, 1, 0.32, 1] } },
+  initial: { opacity: 0, y: 5 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } },
 };
 
 export function TaskWidgetSlot({
@@ -93,24 +79,30 @@ export function TaskWidgetSlot({
   hasTimerSession,
   onStartFocus,
 }) {
-  const visibleList = showAllTaskWidgetTasks ? taskWidgetList : taskWidgetList.slice(0, VISIBLE_COUNT);
-  const hiddenCount = Math.max(0, taskWidgetList.length - VISIBLE_COUNT);
+  const navigate = useNavigate();
+
+  const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
+  const completedTasks    = taskWidgetList.filter((t) => t.completed);
+  const visibleIncomplete = showAllTaskWidgetTasks
+    ? incompleteTasks
+    : incompleteTasks.slice(0, VISIBLE_COUNT);
+  const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
+
   const completedCount = taskWidgetItemsOnly.filter((i) => i.completed).length;
-  const allTasksDone = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
-  const clearMessage = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
+  const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
+  const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
 
-  const ringPct = taskWidgetItemsOnly.length > 0 ? (completedCount / taskWidgetItemsOnly.length) * 100 : 0;
+  const ringPct    = taskWidgetItemsOnly.length > 0 ? (completedCount / taskWidgetItemsOnly.length) * 100 : 0;
+  const ringColor  = getRingColor(ringPct);
   const ringOffset = RING_CIRC - (ringPct / 100) * RING_CIRC;
-  const ringColor = getRingColor(ringPct);
 
-  const trackStatus = getTrackStatus(taskWidgetItemsOnly);
   const estTime = getEstTime(taskWidgetItemsOnly);
-  const trackConfig = trackStatus ? TRACK_CONFIG[trackStatus] : null;
+  const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
 
-  const metaStr =
-    taskWidgetItemsOnly.length > 0 && !allTasksDone
-      ? `${taskWidgetItemsOnly.filter((i) => !i.completed).length} due · ${Math.round(taskWidgetSpineCompletedPct)}% done`
-      : null;
+  const subStr = taskWidgetItemsOnly.length > 0 && !allTasksDone
+    ? [incompleteCount > 0 ? `${incompleteCount} remaining` : null, estTime]
+        .filter(Boolean).join(" · ")
+    : null;
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -145,50 +137,43 @@ export function TaskWidgetSlot({
         >
           {taskWidgetItemsOnly.length > 0 ? (
             <>
+              {/* Header */}
               <div className={styles.taskWidgetSlotHeader}>
                 <div className={styles.taskWidgetSlotHeaderLeft}>
-                  <CheckSquare className={styles.taskWidgetSlotIcon} size={18} strokeWidth={1.5} aria-hidden />
+                  <div className={styles.taskWidgetSlotIconWrap}>
+                    <CheckSquare className={styles.taskWidgetSlotIcon} size={17} strokeWidth={1.75} aria-hidden />
+                  </div>
                   <div className={styles.taskWidgetSlotTitleBlock}>
                     <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
-                    {metaStr && <span className={styles.taskWidgetSlotMeta}>{metaStr}</span>}
+                    {subStr && <span className={styles.taskWidgetSlotMeta}>{subStr}</span>}
                   </div>
                 </div>
-                <div className={styles.taskWidgetSlotHeaderRight}>
-                  <div className={styles.taskWidgetRingWrap}>
-                    <svg className={styles.taskWidgetRingSvg} viewBox="0 0 28 28" aria-hidden>
-                      <circle className={styles.taskWidgetRingTrack} cx="14" cy="14" r={RING_R} />
-                      <motion.circle
-                        className={styles.taskWidgetRingFill}
-                        cx="14"
-                        cy="14"
-                        r={RING_R}
-                        stroke={ringColor}
-                        strokeDasharray={RING_CIRC}
-                        initial={{ strokeDashoffset: RING_CIRC }}
-                        animate={{ strokeDashoffset: ringOffset }}
-                        transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                      />
-                    </svg>
-                  </div>
-                  <span className={styles.taskWidgetDonutCount}>
-                    {completedCount}<span>/{taskWidgetItemsOnly.length} done</span>
+
+                {/* Ring progress */}
+                <div
+                  className={styles.taskRingWrap}
+                  aria-label={`${completedCount} of ${taskWidgetItemsOnly.length} tasks done`}
+                  role="img"
+                >
+                  <svg className={styles.taskRingSvg} viewBox="0 0 28 28" aria-hidden>
+                    <circle className={styles.taskRingTrack} cx="14" cy="14" r={RING_R} />
+                    <motion.circle
+                      className={styles.taskRingFill}
+                      cx="14" cy="14" r={RING_R}
+                      stroke={ringColor}
+                      strokeDasharray={RING_CIRC}
+                      initial={{ strokeDashoffset: RING_CIRC }}
+                      animate={{ strokeDashoffset: ringOffset }}
+                      transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                    />
+                  </svg>
+                  <span className={styles.taskRingCount}>
+                    {completedCount}/{taskWidgetItemsOnly.length}
                   </span>
                 </div>
               </div>
 
-              {trackConfig && (
-                <div className={styles.taskWidgetTrackRow}>
-                  <span
-                    className={styles.trackStatusPill}
-                    style={{ background: trackConfig.bg, color: trackConfig.text }}
-                  >
-                    <span className={styles.trackStatusDot} style={{ background: trackConfig.dot }} />
-                    {trackConfig.label}
-                  </span>
-                  {estTime && <span className={styles.taskWidgetEstTime}>{estTime}</span>}
-                </div>
-              )}
-
+              {/* Task list */}
               <motion.ul
                 className={styles.taskWidgetTaskList}
                 variants={listVariants}
@@ -196,84 +181,76 @@ export function TaskWidgetSlot({
                 animate="animate"
                 layout
               >
-                {visibleList.map((t) => {
-                  const status = t.taskWidgetStatus ?? t.actionHubStatus;
-                  const isOverdue = status === "overdue";
-                  const isNow = status === "now";
+                {visibleIncomplete.map((t) => {
+                  const status      = t.taskWidgetStatus ?? t.actionHubStatus;
+                  const isOverdue   = status === "overdue";
                   const categoryLabel = getTaskCategoryPill ? getTaskCategoryPill(t) : null;
-                  const catStyle = categoryLabel ? getCategoryStyle(categoryLabel) : null;
+                  const catStyle    = categoryLabel ? getCategoryStyle(categoryLabel) : null;
 
                   return (
                     <motion.li
                       key={t.id}
                       layout
                       variants={itemVariants}
-                      className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""} ${t.completed ? styles.taskWidgetTaskRowDone : ""}`}
+                      className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""}`}
                     >
+                      {/* Checkbox */}
                       <button
                         type="button"
                         className={styles.taskWidgetCheckbox}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTaskWidgetComplete(t);
-                        }}
-                        aria-label={t.completed ? "Mark incomplete" : `Complete ${t.title}`}
+                        onClick={(e) => { e.stopPropagation(); handleTaskWidgetComplete(t); }}
+                        aria-label={`Complete ${t.title}`}
                       >
                         <motion.span
-                          className={`${styles.taskWidgetCheckboxCircle} ${t.completed ? styles.taskWidgetCheckboxCircleChecked : ""}`}
+                          className={styles.taskWidgetCheckboxCircle}
                           aria-hidden
-                          animate={t.completed ? { scale: [0.8, 1.15, 1] } : { scale: 1 }}
-                          transition={{ duration: 0.25 }}
-                        >
-                          {t.completed && <Check size={10} strokeWidth={3} />}
-                        </motion.span>
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                        />
                       </button>
 
-                      <span
-                        className={`${styles.taskWidgetTaskTitle} ${t.completed ? styles.taskWidgetTaskTitleDone : ""}`}
-                        title={t.title}
-                      >
+                      {/* Title */}
+                      <span className={styles.taskWidgetTaskTitle} title={t.title}>
                         {t.title}
                       </span>
 
-                      <div className={styles.taskWidgetTaskRight}>
-                        {categoryLabel && catStyle && !t.completed && (
-                          <span
-                            className={styles.taskWidgetCategoryPill}
-                            style={{ background: catStyle.bg, color: catStyle.text }}
-                          >
-                            <span
-                              className={styles.taskWidgetCategoryDot}
-                              style={{ background: catStyle.dot }}
-                            />
-                            {categoryLabel}
-                          </span>
-                        )}
-                        {isNow && !t.completed && (
-                          <span className={styles.taskWidgetTaskTagNext}>▸ NEXT</span>
-                        )}
-                        {isOverdue && !t.completed && (
-                          <span className={styles.taskWidgetTaskTagLate}>LATE</span>
-                        )}
-                      </div>
+                      {/* Right: category pill only */}
+                      {categoryLabel && catStyle && (
+                        <span
+                          className={styles.taskWidgetCategoryPill}
+                          style={{ background: catStyle.bg, color: catStyle.text }}
+                        >
+                          {categoryLabel}
+                        </span>
+                      )}
                     </motion.li>
                   );
                 })}
+
+                {hiddenCount > 0 && (
+                  <li>
+                    <button
+                      type="button"
+                      className={styles.taskWidgetMoreText}
+                      onClick={() => setShowAllTaskWidgetTasks((v) => !v)}
+                    >
+                      {showAllTaskWidgetTasks ? "Show less" : `+ ${hiddenCount} more`}
+                    </button>
+                  </li>
+                )}
+
+                {/* Completed count — static, no expand */}
+                {completedTasks.length > 0 && (
+                  <li className={styles.taskWidgetCompletedLine}>
+                    {completedTasks.length} completed
+                  </li>
+                )}
               </motion.ul>
 
-              {hiddenCount > 0 && (
-                <button
-                  type="button"
-                  className={styles.taskWidgetMoreText}
-                  onClick={() => setShowAllTaskWidgetTasks((v) => !v)}
-                >
-                  {showAllTaskWidgetTasks ? "Show less" : `+ ${hiddenCount} more`}
-                </button>
-              )}
-
-              <div className={`${styles.taskWidgetBottomRow} ${styles.taskWidgetManageFooter}`}>
+              {/* Footer */}
+              <div className={styles.taskWidgetManageFooter}>
                 <Link to="/tasks" className={styles.taskWidgetManageLink}>
-                  Manage all →
+                  Manage tasks →
                 </Link>
               </div>
             </>
