@@ -67,7 +67,12 @@ function HeaderActions({ openModal, viewMode, selectedDate, onImportClick }) {
   return (
     <div className="actions">
       <ImportButton onImport={onImportClick} />
-      <button className="btn-add" onClick={() => openForView(openModal, viewMode, selectedDate)}>+</button>
+      <button
+        className="btn-add"
+        onClick={() => openForView(openModal, viewMode, selectedDate)}
+      >
+        +
+      </button>
       <ViewModeToggle viewMode={viewMode} dispatch={useCalendarDispatch()} />
     </div>
   );
