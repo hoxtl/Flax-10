@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import './NotificationPanel.css';
 
-export function NotificationPanel() {
+export function NotificationPanel({ onNavChange }) {
     const { isOpen, notifications, closePanel, markAllRead, dismissNotification, clearAll } = useNotifications();
     const panelRef = useRef(null);
 
@@ -14,7 +14,7 @@ export function NotificationPanel() {
     return (
         <div className="notification-panel" ref={panelRef}>
             <PanelHeader onMarkAllRead={markAllRead} onClearAll={clearAll} count={notifications.length} />
-            <NotificationList notifications={notifications} onDismiss={dismissNotification} />
+            <NotificationList notifications={notifications} onDismiss={dismissNotification} onNavChange={onNavChange} closePanel={closePanel} />
         </div>
     );
 }
@@ -72,7 +72,7 @@ function MenuDropdown({ onRead, onClear, close }) {
     );
 }
 
-function NotificationList({ notifications, onDismiss }) {
+function NotificationList({ notifications, onDismiss, onNavChange, closePanel }) {
     if (notifications.length === 0) {
         return <div className="notification-empty">No notifications</div>;
     }
@@ -80,26 +80,27 @@ function NotificationList({ notifications, onDismiss }) {
     return (
         <ul className="notification-list">
             {notifications.map(n => (
-                <NotificationItem key={n.id} notification={n} onDismiss={onDismiss} />
+                <NotificationItem key={n.id} notification={n} onDismiss={onDismiss} onNavChange={onNavChange} closePanel={closePanel} />
             ))}
         </ul>
     );
 }
 
-function NotificationItem({ notification, onDismiss }) {
+function NotificationItem({ notification, onDismiss, onNavChange, closePanel }) {
     const { id, title, message, read, created_at, action_url } = notification;
 
     const handleClick = (e) => {
         // Prevent click if they clicked the dismiss button
         if (e.target.closest('.dismiss-btn')) return;
         if (action_url) {
-            // Trigger a custom event that App.jsx can listen to for navigation, 
-            // since NotificationPanel might not have access to standard router context 
-            // if it's placed outside Routes, OR use standard window event:
-            window.location.hash = `#${action_url}`; // For HashRouter
-            // But since this app uses standard path routing via activeNav state:
-            const event = new CustomEvent('navigate', { detail: action_url.replace(/^\//, '') });
-            window.dispatchEvent(event);
+            const path = action_url.replace(/^\//, '');
+            if (onNavChange) {
+                onNavChange(path);
+            } else {
+                const event = new CustomEvent('navigate', { detail: path });
+                window.dispatchEvent(event);
+            }
+            if (closePanel) closePanel();
         }
     };
 

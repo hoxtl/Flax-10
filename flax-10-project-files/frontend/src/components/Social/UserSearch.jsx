@@ -4,6 +4,7 @@ import { getModules } from '../../api/moduleApi';
 import { fetchSocieties } from '../../api/societyApi';
 import socialStyles from './Social.module.css';
 import searchStyles from './UserSearch.module.css';
+import SearchBar from '../common/SearchBar/SearchBar';
 const styles = { ...socialStyles, ...searchStyles };
 
 async function fetchUserResults(query, mods, socs, setRes, setL) {
@@ -132,7 +133,7 @@ const FilterTabs = ({ activeTab, setTab }) => (
 );
 
 const FilterSearchInput = ({ query, setQuery, tab }) => (
-    <input type="text" placeholder={`Search ${tab}...`} value={query} onChange={(e) => setQuery(e.target.value)} className={styles.filterSearchInput} />
+    <SearchBar value={query} onChange={setQuery} placeholder={`Search ${tab}...`} />
 );
 
 const ExpandBtn = ({ count, isExpanded, sectionKey, toggle }) => (
@@ -206,8 +207,7 @@ function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDpdwn, d
     const onFocus = () => setFocus();
     return (
         <div className={`${styles.searchContainer} ${styles.relativeContainer}`} ref={containerRef}>
-            <span className={styles.searchIcon}>🔍</span>
-            <input type="text" className={styles.searchInput} placeholder="Search users..." value={query} onChange={(e) => setQuery(e.target.value)} onFocus={onFocus} />
+            <SearchBar value={query} onChange={setQuery} onFocus={onFocus} placeholder="Search users..." className={styles.searchBarContainer} />
             {showDpdwn && dpdwnPos && <SearchDropdown pos={dpdwnPos} loading={loading} query={query} userResults={userResults} onUserSelect={handleSel} />}
         </div>
     );
