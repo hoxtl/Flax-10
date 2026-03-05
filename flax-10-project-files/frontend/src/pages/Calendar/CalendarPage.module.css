@@ -56,3 +56,11 @@
   display: flex;
   gap: 8px;
 }
+
+.mainContent {
+  flex: 1;
+  overflow-y: hidden; /* Calendar component handles its own scroll */
+  background: white;
+  border-top-left-radius: 24px; /* Optional rounded top for a modern look */
+  border-top-right-radius: 24px;
+}
