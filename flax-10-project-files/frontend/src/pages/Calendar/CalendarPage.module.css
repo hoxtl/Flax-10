@@ -49,3 +49,10 @@
   background-color: #f6f4f1;
 }
 
+.filters {
+  padding: 4px 16px 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+}
