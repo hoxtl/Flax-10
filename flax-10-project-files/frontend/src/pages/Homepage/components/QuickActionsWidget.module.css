@@ -1,0 +1,164 @@
+/* Quick Actions widget */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  flex-shrink: 0;
+  color: #a89279;
+}
+
+.headerLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a89279;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  flex: 1;
+}
+
+/* ── Primary card: Start Focus Session ── */
+.primaryCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #2c1810;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryCard:hover {
+  background: #1a0e08;
+  box-shadow: 0 4px 16px rgba(44, 24, 16, 0.2);
+}
+
+.primaryLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.primaryDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c4a46d;
+  flex-shrink: 0;
+}
+
+.primaryIcon {
+  flex-shrink: 0;
+  color: #c4a46d;
+}
+
+.primaryTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.primaryLabel {
+  font-size: 14px;
+  font-weight: 650;
+  color: #fffcf8;
+  line-height: 1.2;
+}
+
+.primarySub {
+  font-size: 11px;
+  color: rgba(255, 252, 248, 0.5);
+  line-height: 1.2;
+}
+
+.primaryArrow {
+  flex-shrink: 0;
+  color: rgba(255, 252, 248, 0.5);
+  display: flex;
+  align-items: center;
+}
+
+/* ── Secondary cards ── */
+.secondaryCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(139, 115, 85, 0.1);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.secondaryCard:hover {
+  background: #fffcf8;
+  border-color: rgba(139, 115, 85, 0.18);
+  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.04);
+}
+
+.secondaryIconAdd {
+  flex-shrink: 0;
+  color: #7bb38e;
+}
+
+.secondaryIconRefresh {
+  flex-shrink: 0;
+  color: #8b7bb8;
+}
+
+.secondaryLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c1810;
+  flex: 1;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.secondaryArrow {
+  flex-shrink: 0;
+  color: #d4c4a8;
+  display: flex;
+  align-items: center;
+}
+
+/* AI pill badge */
+.aiPill {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: #f3f0ff;
+  color: #5b4a8a;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
