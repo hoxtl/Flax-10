@@ -103,7 +103,27 @@ export function CalendarHeader() {
           />
         </div>
 
-
+        <div className="date-strip-wrapper">
+          <div className="date-strip">
+            {weekDays.map((day) => (
+              <button
+                key={day.toString()}
+                className={`date-card ${isSameDay(day, selectedDate) ? "active" : ""}`}
+                onClick={() => {
+                  dispatch({ type: "SET_SELECTED_DATE", payload: day });
+                  dispatch({ type: "SET_VIEW_MODE", payload: "day" });
+                }}
+              >
+                <span className="day-name">
+                  {day
+                    .toLocaleDateString("en-US", { weekday: "short" })
+                    .charAt(0)}
+                </span>
+                <span className="day-number">{day.getDate()}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </header>
       <TimetableImportModal
         isOpen={showImportModal}
