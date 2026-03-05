@@ -27,23 +27,48 @@ function CurrentTimeIndicator({ hourHeight = 60 }) {
 }
 
 export function Calendar() {
-    return (
-        <ResizeHighlightProvider>
-            <CalendarContent />
-        </ResizeHighlightProvider>
-    );
+  return (
+    <ResizeHighlightProvider>
+      <CalendarContent />
+    </ResizeHighlightProvider>
+  );
 }
 
 function CalendarContent() {
-    const { viewMode } = useCalendar();
-    useCalendarEvents();
+  const { viewMode } = useCalendar();
+  const scrollContainerRef = useRef(null);
+  useCalendarEvents();
 
-    return (
-        <div className="calendar-container">
-            <CalendarHeader />
-            <CalendarView viewMode={viewMode} />
-        </div>
-    );
+  // Auto-scroll logic
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const now = new Date();
+      const hourHeight = 60;
+      const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+
+      // Calculates vertical scroll
+      const verticalOffset = (minutesSinceMidnight / 60) * hourHeight - 200;
+
+      scrollContainerRef.current.scrollTo({
+        top: verticalOffset,
+        behavior: "smooth",
+      });
+    }
+  }, [viewMode]); // Triggers when view changes
+
+  return (
+    <div className="calendar-container" ref={scrollContainerRef}>
+      <div
+        className="calendar-view-relative-wrapper"
+        style={{ position: "relative" }}
+      >
+        {(viewMode === "day" || viewMode === "week") && (
+          <CurrentTimeIndicator />
+        )}
+        <CalendarView viewMode={viewMode} />
+      </div>
+    </div>
+  );
 }
 
 function CalendarView({ viewMode }) {
