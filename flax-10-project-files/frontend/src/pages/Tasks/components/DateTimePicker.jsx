@@ -91,15 +91,28 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     }
   }, [value]);
 
-  // Close on outside click (trigger and portaled dropdown are separate)
+  // Close on outside interaction (trigger and portaled dropdown are separate)
   useEffect(() => {
     if (!open) return;
-    const h = e => {
+    const handleOutside = (e) => {
       if (ref.current?.contains(e.target) || dropdownRef.current?.contains(e.target)) return;
       setOpen(false);
     };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+
+    // Use capture so this still runs even when other handlers stop bubbling.
+    document.addEventListener("pointerdown", handleOutside, true);
+    document.addEventListener("mousedown", handleOutside, true);
+    document.addEventListener("touchstart", handleOutside, true);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("pointerdown", handleOutside, true);
+      document.removeEventListener("mousedown", handleOutside, true);
+      document.removeEventListener("touchstart", handleOutside, true);
+      document.removeEventListener("keydown", handleEsc);
+    };
   }, [open]);
 
   const emitChange = (date, h, m) => {

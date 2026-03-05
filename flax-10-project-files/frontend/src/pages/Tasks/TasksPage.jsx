@@ -27,17 +27,26 @@ function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = [])
         }
 
         if (activeFilter === "overdue")
-            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < dayStart);
+            return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < new Date());
         if (activeFilter === "today")
             return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
         if (activeFilter === "this_week")
             return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= weekEnd);
+        if (activeFilter === "later")
+            return filtered.filter(t => t.due_date && new Date(t.due_date) > weekEnd);
         return filtered;
     }, [tasks, activeListId, activeFilter, filterListIds]);
 }
 
 function getTodayEndISO() {
     const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d.toISOString();
+}
+
+function getTomorrowEndISO() {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
     d.setHours(23, 59, 59, 999);
     return d.toISOString();
 }
@@ -50,6 +59,7 @@ export default function TasksPage() {
     const [filterListIds,   setFilterListIds]   = useState([]);
     const [activeFilter,   setActiveFilter]    = useState("all");
     const [showTaskModal,   setShowTaskModal]   = useState(false);
+    const [taskModalDueDate, setTaskModalDueDate] = useState(null);
     const [showListModal,   setShowListModal]   = useState(false);
     const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
     const [lastCreatedListId, setLastCreatedListId] = useState(null);
@@ -161,11 +171,18 @@ export default function TasksPage() {
                 activeListId={activeListId}
                 activeModuleCode={activeModuleCode}
                 defaultDueDateForNewTask={defaultDueDateForNewTask}
+                onPlanTomorrow={() => {
+                    setTaskModalDueDate(getTomorrowEndISO());
+                    setShowTaskModal(true);
+                }}
                 filterListIds={filterListIds}
                 onToggleComplete={toggleComplete}
                 onDeleteTask={handleDeleteTask}
                 onEditTask={handleEditTask}
-                onCreateTask={() => setShowTaskModal(true)}
+                onCreateTask={() => {
+                    setTaskModalDueDate(null);
+                    setShowTaskModal(true);
+                }}
                 onAddTask={async (data) => {
                     const created = await addTask(data);
                     if (created) {
@@ -179,7 +196,7 @@ export default function TasksPage() {
                 <CreateTaskModal
                     lists={lists}
                     defaultListId={activeListId}
-                    defaultDueDate={defaultDueDateForNewTask}
+                    defaultDueDate={taskModalDueDate ?? defaultDueDateForNewTask}
                     onOpenCreateList={() => setShowCreateListFromTask(true)}
                     newListIdCreated={lastCreatedListId}
                     onSave={async (data) => {
@@ -187,7 +204,11 @@ export default function TasksPage() {
                         setToastUndo(created ? { taskId: created.id, title: created.title } : null);
                         if (created) setTimeout(() => setToastUndo(null), 5000);
                     }}
-                    onClose={() => { setShowTaskModal(false); setLastCreatedListId(null); }}
+                    onClose={() => {
+                        setShowTaskModal(false);
+                        setLastCreatedListId(null);
+                        setTaskModalDueDate(null);
+                    }}
                 />
             )}
             {toastUndo && (

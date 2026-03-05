@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronRight, Search, X, Plus, Filter } from "lucide-react";
+import { ChevronDown, Search, X, Plus, Filter } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import TaskCard from "./TaskCard";
@@ -99,6 +99,7 @@ function Section({
   if (isEmpty && !showEmptyState && completedCount === 0) return null;
 
   const accentCls = isOverdueSection ? styles.sectionAccentDanger : "";
+  const emptyEmoji = (sectionType === "all" || sectionType === "overdue") ? "🗂️" : "✨";
 
   return (
     <div className={`${styles.section} ${accentCls} ${isOverdueSection ? styles.sectionOverdue : ""}`}>
@@ -110,28 +111,34 @@ function Section({
       >
         <span className={styles.sectionIcon}>{emoji}</span>
         <span className={styles.sectionTitle}>{title}</span>
-        <span className={styles.sectionCountWrap}>
-          {totalInGroup > 0 && (
-            <svg className={styles.sectionRing} width="22" height="22" viewBox="0 0 22 22" aria-hidden>
-              <circle cx="11" cy="11" r="9" fill="none" stroke="rgba(123,103,81,0.1)" strokeWidth="2.5" />
-              <circle cx="11" cy="11" r="9" fill="none"
-                className={`${styles.sectionRingFill} ${isOverdueSection ? styles.sectionRingDanger : ""}`}
-                strokeWidth="2.5" strokeLinecap="round"
-                strokeDasharray={`${(2 * Math.PI * 9 * progressPct) / 100} ${2 * Math.PI * 9}`}
-                transform="rotate(-90 11 11)"
-              />
-            </svg>
-          )}
-          <span className={styles.sectionCountPill} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
-          {completedCount > 0 && (
-            <span className={styles.sectionCountDone}>· {completedCount} done</span>
-          )}
+        <span className={styles.sectionStatsChip}>
+          <span className={styles.sectionCountWrap}>
+            {totalInGroup > 0 && (
+              <svg className={styles.sectionRing} width="22" height="22" viewBox="0 0 22 22" aria-hidden>
+                <circle cx="11" cy="11" r="9" fill="none" stroke="rgba(123,103,81,0.1)" strokeWidth="2.5" />
+                <circle cx="11" cy="11" r="9" fill="none"
+                  className={`${styles.sectionRingFill} ${isOverdueSection ? styles.sectionRingDanger : ""}`}
+                  strokeWidth="2.5" strokeLinecap="round"
+                  strokeDasharray={`${(2 * Math.PI * 9 * progressPct) / 100} ${2 * Math.PI * 9}`}
+                  transform="rotate(-90 11 11)"
+                />
+              </svg>
+            )}
+            <span className={styles.sectionCountPill} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
+            {completedCount > 0 && (
+              <span className={`${styles.sectionCountDone} ${collapsed ? styles.sectionCountDoneMuted : ""}`}>· {completedCount} done</span>
+            )}
+          </span>
+          <span className={styles.sectionChevronBtn} aria-hidden>
+            <motion.span
+              className={styles.sectionChevron}
+              animate={{ rotate: collapsed ? -90 : 0 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ChevronDown size={16} />
+            </motion.span>
+          </span>
         </span>
-        {collapsed ? (
-          <ChevronRight size={14} className={styles.sectionChevron} aria-hidden />
-        ) : (
-          <ChevronDown size={14} className={styles.sectionChevron} aria-hidden />
-        )}
       </button>
 
       <AnimatePresence initial={false}>
@@ -160,7 +167,7 @@ function Section({
                   />
                 ) : (
                 <div className={styles.sectionEmptyState}>
-                  <span className={styles.sectionEmptyIcon} aria-hidden>🎉</span>
+                  <span className={styles.sectionEmptyIcon} aria-hidden>{emptyEmoji}</span>
                   <p className={styles.sectionEmptyMessage}>{emptyMessage}</p>
                   {emptySub && <p className={styles.sectionEmptySub}>{emptySub}</p>}
                 </div>
@@ -219,6 +226,7 @@ export default function TaskFeed({
   activeListId,
   activeModuleCode,
   defaultDueDateForNewTask,
+  onPlanTomorrow,
   onToggleComplete,
   onTaskCompleted,
   onDeleteTask,
@@ -357,8 +365,8 @@ export default function TaskFeed({
   const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
   const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
 
-  const overdue = filtered.filter(t => t.due_date && new Date(t.due_date) < dayStart && !t.completed && !isRoutineOrEventTask(t));
-  const today = filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
+  const overdue = filtered.filter(t => t.due_date && new Date(t.due_date) < now && !t.completed && !isRoutineOrEventTask(t));
+  const today = filtered.filter(t => t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd);
   const thisWeek = filtered.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); return d > todayEnd && d <= weekEnd; });
   const later = filtered.filter(t => !t.due_date || new Date(t.due_date) > weekEnd);
 
@@ -394,8 +402,11 @@ export default function TaskFeed({
       ? `${completedTodayCount} task${completedTodayCount !== 1 ? "s" : ""} completed today. Take a moment — you earned it.`
       : "No tasks due today.",
     ctaLabel: "Plan tomorrow →",
-    onCtaClick: () => navigate("/tasks?open=fullPlanning"),
-  }), [completedTodayCount, todayEmptyMessage]);
+    onCtaClick: () => {
+      if (typeof onPlanTomorrow === "function") onPlanTomorrow();
+      else navigate("/tasks?open=fullPlanning");
+    },
+  }), [completedTodayCount, todayEmptyMessage, onPlanTomorrow, navigate]);
 
   const displayName = useMemo(() => {
     try {
@@ -417,6 +428,8 @@ export default function TaskFeed({
     ? "Today's tasks"
     : activeFilter === "this_week"
       ? "This Week's Tasks"
+      : activeFilter === "later"
+        ? "Later tasks"
       : activeFilter === "overdue"
         ? "Overdue tasks"
         : activeList
@@ -525,7 +538,7 @@ export default function TaskFeed({
               value={sortBy}
               onChange={setSortBy}
               options={[
-                { value: "priority",   label: "Urgency"       },
+                { value: "priority",   label: "Priority"      },
                 { value: "due",        label: "Due date"      },
                 { value: "alpha",      label: "A → Z"        },
                 { value: "date_added", label: "Date added"    },
@@ -668,6 +681,17 @@ export default function TaskFeed({
               emptyCardProps={todayEmptyCardProps}
               {...sectionProps}
             />
+          ) : activeFilter === "overdue" ? (
+            <Section
+              title="Overdue"
+              emoji="⚠️"
+              tasks={filtered}
+              sectionType="overdue"
+              completedCount={0}
+              isOverdueSection
+              emptyMessage="No overdue tasks."
+              {...sectionProps}
+            />
           ) : activeFilter === "this_week" ? (
             <>
               <Section
@@ -683,6 +707,13 @@ export default function TaskFeed({
                 {...sectionProps}
               />
             </>
+          ) : activeFilter === "later" ? (
+            <Section
+              title="Later" emoji="⏳" tasks={later}
+              sectionType="later" completedCount={completedLaterCount}
+              emptyMessage="No tasks due later."
+              {...sectionProps}
+            />
           ) : (
             <Section
               title="All tasks"
@@ -701,14 +732,20 @@ export default function TaskFeed({
               <button type="button" className={styles.sectionHeader} onClick={() => setShowDone(s => !s)} aria-expanded={showDone}>
                 <span className={styles.sectionIcon}>🎯</span>
                 <span className={styles.sectionTitle}>Completed</span>
-                <span className={styles.sectionCountWrap}>
-                  <span className={styles.sectionCountPill} aria-label={`${filteredCompleted.length} tasks`}>{filteredCompleted.length}</span>
+                <span className={styles.sectionStatsChip}>
+                  <span className={styles.sectionCountWrap}>
+                    <span className={styles.sectionCountPill} aria-label={`${filteredCompleted.length} tasks`}>{filteredCompleted.length}</span>
+                  </span>
+                  <span className={styles.sectionChevronBtn} aria-hidden>
+                    <motion.span
+                      className={styles.sectionChevron}
+                      animate={{ rotate: showDone ? 0 : -90 }}
+                      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <ChevronDown size={16} />
+                    </motion.span>
+                  </span>
                 </span>
-                {showDone ? (
-                  <ChevronDown size={14} className={styles.sectionChevron} aria-hidden />
-                ) : (
-                  <ChevronRight size={14} className={styles.sectionChevron} aria-hidden />
-                )}
               </button>
               <AnimatePresence initial={false}>
                 {showDone && (

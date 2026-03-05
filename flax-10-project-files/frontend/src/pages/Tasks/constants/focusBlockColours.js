@@ -4,27 +4,27 @@
  * 21 colours = 3 rows × 7 for a full grid.
  */
 export const FOCUS_BLOCK_COLOURS = [
-  "#4a3728",
-  "#6b5344",
-  "#b8860b",
-  "#d4a017",
-  "#a0522d",
-  "#2e8b7a",
-  "#3a9d5e",
-  "#2f7ab7",
-  "#6c5ce7",
-  "#d63031",
-  "#7fbc8c",
-  "#5b9bd5",
-  "#9b6dcc",
-  "#e8a838",
-  "#e07575",
-  "#c44569",
-  "#00b894",
-  "#0984e3",
-  "#fd79a8",
-  "#fdcb6e",
-  "#636e72",
+  "#2563eb", // vivid blue
+  "#7c3aed", // purple
+  "#dc2626", // red
+  "#16a34a", // green
+  "#0ea5e9", // sky
+  "#db2777", // pink
+  "#f59e0b", // amber
+  "#14b8a6", // teal
+  "#9333ea", // violet
+  "#f97316", // orange
+  "#22c55e", // emerald
+  "#3b82f6", // blue-500
+  "#ef4444", // red-500
+  "#eab308", // yellow
+  "#10b981", // emerald-500
+  "#a855f7", // purple-500
+  "#06b6d4", // cyan
+  "#84cc16", // lime
+  "#f43f5e", // rose
+  "#6366f1", // indigo
+  "#ec4899", // fuchsia
 ];
 
 /** Hex only, for fallback lookups by index */

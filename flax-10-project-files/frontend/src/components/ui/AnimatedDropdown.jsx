@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";
 import styles from "./AnimatedDropdown.module.css";
@@ -82,9 +82,11 @@ export default function AnimatedDropdown({
   placeholder = "Select…",
   options = [],
   grouped = false,
+  menuMaxHeight = 260,
   className = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openDirection, setOpenDirection] = useState("down");
   const rootRef = useRef(null);
 
   useEffect(() => {
@@ -97,6 +99,34 @@ export default function AnimatedDropdown({
   }, [isOpen]);
 
   const allOptions = getAllOptions(options, grouped);
+  const estimatedMenuHeight = useMemo(() => {
+    const base = grouped ? 72 : 24;
+    const perOption = 38;
+    const raw = base + allOptions.length * perOption;
+    const numericCap = typeof menuMaxHeight === "number" ? menuMaxHeight : 260;
+    return Math.min(numericCap, Math.max(140, raw));
+  }, [allOptions.length, grouped, menuMaxHeight]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const recomputeDirection = () => {
+      if (!rootRef.current) return;
+      const rect = rootRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldOpenUp = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
+      setOpenDirection(shouldOpenUp ? "up" : "down");
+    };
+
+    recomputeDirection();
+    window.addEventListener("resize", recomputeDirection);
+    window.addEventListener("scroll", recomputeDirection, true);
+    return () => {
+      window.removeEventListener("resize", recomputeDirection);
+      window.removeEventListener("scroll", recomputeDirection, true);
+    };
+  }, [isOpen, estimatedMenuHeight]);
   const selectedLabel =
     allOptions.find((o) => o.value === value)?.label || placeholder;
 
@@ -128,12 +158,15 @@ export default function AnimatedDropdown({
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scaleY: 0.95 }}
+            initial={{ opacity: 0, y: openDirection === "up" ? 6 : -6, scaleY: 0.95 }}
             animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            exit={{ opacity: 0, y: -6, scaleY: 0.95 }}
+            exit={{ opacity: 0, y: openDirection === "up" ? 6 : -6, scaleY: 0.95 }}
             transition={{ duration: 0.16 }}
-            style={{ originY: 0 }}
-            className={styles.menu}
+            style={{
+              originY: openDirection === "up" ? 1 : 0,
+              maxHeight: typeof menuMaxHeight === "number" ? `${menuMaxHeight}px` : menuMaxHeight,
+            }}
+            className={`${styles.menu} ${openDirection === "up" ? styles.menuUp : ""}`}
           >
             {grouped ? (
               <GroupedOptions options={options} value={value} onSelect={handleSelect} />

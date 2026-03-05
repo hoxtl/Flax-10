@@ -28,8 +28,8 @@
   box-shadow: 0 24px 80px rgba(74, 52, 33, 0.12), 0 2px 8px rgba(74, 52, 33, 0.06);
   animation: slideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
-  max-height: 92vh;
-  min-height: min(64vh, 620px);
+  max-height: 96vh;
+  min-height: min(78vh, 760px);
 }
 
 .modal input,
@@ -188,7 +188,7 @@
 
 .timeRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   align-items: flex-start;
   gap: 16px;
 }
@@ -316,7 +316,7 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition: background 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, transform 0.12s;
   white-space: nowrap; 
 }
 
@@ -325,11 +325,20 @@
   border-color: rgba(74, 52, 33, 0.25);
 }
 
+.chip:active {
+  transform: translateY(0.5px) scale(0.985);
+}
+
 .chipActive {
-  background: color-mix(in srgb, var(--primary) 15%, transparent);
-  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
-  color: var(--text);
+  background: color-mix(in srgb, var(--primary, #7B6751) 24%, #fff 76%);
+  border-color: color-mix(in srgb, var(--primary, #7B6751) 58%, transparent);
+  color: #3f2f24;
   font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 0 2px color-mix(in srgb, var(--primary, #7B6751) 14%, transparent),
+    0 2px 6px rgba(74, 52, 33, 0.12);
+  transform: translateY(-0.5px);
 }
 
 .dateTimeWrap {

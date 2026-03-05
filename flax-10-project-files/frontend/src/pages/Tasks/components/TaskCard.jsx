@@ -13,14 +13,14 @@ import CreateTaskModal from "./CreateTaskModal";
 import styles from "./TaskCard.module.css";
 
 const MODULE_COLORS = [
-    { text: "#9a3412", bg: "rgba(251, 146, 60, 0.18)", border: "rgba(234, 88, 12, 0.35)" },    // orange
-    { text: "#1d4ed8", bg: "rgba(96, 165, 250, 0.18)", border: "rgba(59, 130, 246, 0.35)" },    // blue
-    { text: "#15803d", bg: "rgba(74, 222, 128, 0.16)", border: "rgba(22, 163, 74, 0.32)" },     // green
-    { text: "#7e22ce", bg: "rgba(192, 132, 252, 0.16)", border: "rgba(147, 51, 234, 0.32)" },   // purple
-    { text: "#b45309", bg: "rgba(252, 211, 77, 0.20)", border: "rgba(245, 158, 11, 0.35)" },    // amber
-    { text: "#be123c", bg: "rgba(251, 113, 133, 0.16)", border: "rgba(225, 29, 72, 0.30)" },    // rose
-    { text: "#0e7490", bg: "rgba(34, 211, 238, 0.15)", border: "rgba(6, 182, 212, 0.32)" },     // cyan
-    { text: "#4338ca", bg: "rgba(165, 180, 252, 0.18)", border: "rgba(99, 102, 241, 0.32)" },   // indigo
+    { text: "#5a4a3a", bg: "rgba(123, 103, 81, 0.10)", border: "rgba(123, 103, 81, 0.24)" },
+    { text: "#615547", bg: "rgba(138, 125, 118, 0.12)", border: "rgba(138, 125, 118, 0.24)" },
+    { text: "#6a5a45", bg: "rgba(150, 127, 98, 0.11)", border: "rgba(150, 127, 98, 0.25)" },
+    { text: "#56515b", bg: "rgba(120, 112, 128, 0.10)", border: "rgba(120, 112, 128, 0.24)" },
+    { text: "#4f5a63", bg: "rgba(106, 121, 133, 0.10)", border: "rgba(106, 121, 133, 0.24)" },
+    { text: "#61584f", bg: "rgba(135, 123, 107, 0.10)", border: "rgba(135, 123, 107, 0.24)" },
+    { text: "#5d544a", bg: "rgba(129, 116, 99, 0.10)", border: "rgba(129, 116, 99, 0.24)" },
+    { text: "#564f47", bg: "rgba(118, 107, 95, 0.10)", border: "rgba(118, 107, 95, 0.24)" },
 ];
 
 function getModuleColor(code) {
@@ -45,7 +45,11 @@ const PRIORITY_LABELS = {
     urgent: "Urgent",
     high:   "High",
     medium: "Medium",
-    low:    "Low",
+};
+const PRIORITY_MARKS = {
+    urgent: "❗❗❗",
+    high: "❗❗",
+    medium: "❗",
 };
 
 /* Monochromatic icons */
@@ -205,7 +209,7 @@ const ENERGY_LABELS = {
 };
 
 /** Read-only task details modal — clean, scannable layout with clear hierarchy. */
-function TaskInfoModal({ task, listName, listColor, onClose }) {
+function TaskInfoModal({ task, listName, onClose }) {
     const due = formatDueDate(task.due_date);
     const dueFormatted = task.due_date
         ? new Date(task.due_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
@@ -215,7 +219,6 @@ function TaskInfoModal({ task, listName, listColor, onClose }) {
         <div className={styles.modalBackdrop} onMouseDown={onClose}>
             <div
                 className={styles.infoModal}
-                style={{ "--info-accent": listColor || "var(--primary, #7B6751)" }}
                 onMouseDown={e => e.stopPropagation()}
             >
                 <div className={styles.infoModalAccent} aria-hidden />
@@ -257,7 +260,7 @@ function TaskInfoModal({ task, listName, listColor, onClose }) {
                             <div className={styles.infoRowFull}>
                                 <span className={styles.infoLabel}><List size={14} strokeWidth={2} /> List</span>
                                 <span className={styles.infoVal}>
-                                    <span className={styles.infoListDot} style={{ background: listColor || "var(--muted)" }} />
+                                    <span className={styles.infoListDot} />
                                     {listName}
                                 </span>
                             </div>
@@ -314,7 +317,9 @@ export default function TaskCard({
     const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
 
     const due = formatDueDate(task.due_date);
-    const showPriority = task.priority === "urgent" || task.priority === "high";
+    const priorityKey = (task.priority || "").toLowerCase();
+    const isVisualPriority = ["medium", "high", "urgent"].includes(priorityKey);
+    const showPriorityText = isVisualPriority && !task.completed;
 
     const handleCheckClick = () => {
         const wasIncomplete = !task.completed;
@@ -351,8 +356,6 @@ export default function TaskCard({
         ? styles.cardAccentHigh
         : !task.completed && task.priority === "medium"
         ? styles.cardAccentMedium
-        : !task.completed && (task.priority === "low" || !task.priority)
-        ? styles.cardAccentLow
         : "";
 
     return (
@@ -386,27 +389,30 @@ export default function TaskCard({
                         <span className={`${styles.title} ${styles.titleClickable} ${task.completed ? styles.titleDone : ""}`}>
                             <HighlightText text={task.title} query={searchQuery} />
                         </span>
-                        {due && !hideDueBadge && (
-                            <span className={`${styles.dueLabel} ${task.completed && isCompletedSection ? styles.dueLabelCompleted : ""} ${styles[`due_${due.status}`]}`}>
-                                {(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}
-                                {task.completed && isCompletedSection ? getCompletedDueLabel(task.due_date) : due.label}
-                            </span>
-                        )}
+                        <span className={styles.titleMetaRight}>
+                            {showPriorityText && (
+                                <span className={`${styles.priorityText} ${styles[`priorityText_${priorityKey}`]}`}>
+                                    <span className={styles.priorityMarks}>{PRIORITY_MARKS[priorityKey] || ""}</span>
+                                    <span className={styles.priorityLabel}>{PRIORITY_LABELS[priorityKey] || "Priority"}</span>
+                                </span>
+                            )}
+                            {due && !hideDueBadge && (
+                                <span className={`${styles.dueLabel} ${task.completed && isCompletedSection ? styles.dueLabelCompleted : ""} ${styles[`due_${due.status}`]}`}>
+                                    {(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}
+                                    {task.completed && isCompletedSection ? getCompletedDueLabel(task.due_date) : due.label}
+                                </span>
+                            )}
+                        </span>
                     </div>
 
                     <div className={`${styles.meta} ${task.completed ? styles.metaDone : ""}`}>
-                        {showPriority && (
-                            <span className={`${styles.priorityPill} ${styles[`priority_${task.priority}`]}`}>
-                                {PRIORITY_LABELS[task.priority]}
-                            </span>
-                        )}
                         {listName && !hideListBadge && (
                             <span
                                 className={styles.listIndicator}
                                 style={{
                                     "--lc": listColor || "#a89890",
-                                    background: `color-mix(in srgb, ${listColor || "#a89890"} 12%, transparent)`,
-                                    borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 25%, transparent)`,
+                                    background: `color-mix(in srgb, ${listColor || "#a89890"} 8%, transparent)`,
+                                    borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 18%, transparent)`,
                                 }}
                             >
                                 <span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />
@@ -423,7 +429,7 @@ export default function TaskCard({
                                 <Link
                                     to={to}
                                     className={`${styles.modulePill} ${styles.modulePillLink}`}
-                                    style={{ color: mc.text, background: mc.bg, borderColor: mc.border }}
+                                    style={{ color: mc.text, background: "transparent", borderColor: mc.border }}
                                     onClick={(e) => e.stopPropagation()}
                                     title={`Open ${task.module_code} module`}
                                 >
@@ -467,7 +473,6 @@ export default function TaskCard({
                 <TaskInfoModal
                     task={task}
                     listName={listName}
-                    listColor={listColor}
                     onClose={() => setShowInfo(false)}
                 />
             )}

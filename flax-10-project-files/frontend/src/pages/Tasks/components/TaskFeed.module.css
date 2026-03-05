@@ -732,8 +732,23 @@
 .sectionCountWrap {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
+}
+.sectionStatsChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 4px 2px 8px;
+    border: 1px solid rgba(74, 52, 33, 0.13);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.16s ease;
+}
+.sectionHeader:hover .sectionStatsChip {
+    border-color: rgba(74, 52, 33, 0.24);
+    background: rgba(255, 255, 255, 0.98);
+    transform: scale(1.02);
 }
 .sectionRing {
     flex-shrink: 0;
@@ -749,12 +764,12 @@
     justify-content: center;
     min-width: auto;
     height: auto;
-    padding: 0;
+    padding: 1px 6px;
     font-size: 0.75rem;
     font-weight: 600;
     color: #44403c;
-    background: transparent;
-    border-radius: 0;
+    background: rgba(123, 103, 81, 0.09);
+    border-radius: 999px;
     font-family: var(--font-body);
     letter-spacing: 0.01em;
 }
@@ -764,10 +779,28 @@
     color: #78716c;
     font-family: var(--font-body);
 }
+.sectionCountDoneMuted {
+    color: #9b948e;
+}
 
 /* Chevron — right-most item; ChevronRight when collapsed, ChevronDown when expanded */
+.sectionChevronBtn {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(74, 52, 33, 0.14);
+    background: rgba(255, 255, 255, 0.98);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+.sectionHeader:hover .sectionChevronBtn {
+    border-color: rgba(74, 52, 33, 0.25);
+    transform: scale(1.06);
+}
 .sectionChevron {
-    color: var(--c-greige, #B4A490);
+    color: #6b5f57;
     flex-shrink: 0;
     transition: transform 0.2s ease, color 0.2s ease;
 }
@@ -917,7 +950,21 @@
 }
 
 .taskRow {
-    border-bottom: 1px solid rgba(74, 52, 33, 0.12);
+    border-bottom: 1px solid rgba(74, 52, 33, 0.08);
+    border-radius: 10px;
+    padding: 4px 6px;
+    box-shadow: 0 1px 3px rgba(74, 52, 33, 0.05);
+    transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.taskRow:hover {
+    background: rgba(123, 103, 81, 0.035);
+    transform: translateY(-0.5px);
+    box-shadow: 0 2px 8px rgba(74, 52, 33, 0.06);
+}
+.taskRow:active {
+    background: rgba(123, 103, 81, 0.06);
+    transform: translateY(0);
 }
 
 .taskRow:last-child {
@@ -1009,7 +1056,7 @@
 }
 .sectionAccentDone .sectionCountPill {
     color: var(--sage, #8C9A86);
-    background: rgba(140, 154, 134, 0.1);
+    background: rgba(140, 154, 134, 0.14);
 }
 
 .completedCards {

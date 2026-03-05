@@ -176,29 +176,27 @@ task_list_fixtures = (
 # list_name must match one of the names in task_list_fixtures above
 personal_task_fixtures = (
     # ── Urgent / today ──
-    ("Reply to supervisor email",       "Confirm your project meeting time and attach the latest draft.",             "urgent", 1,  0, "University"),
+    ("Send supervisor check-in",        "Confirm this week's milestones and attach your latest draft snapshot.",       "urgent", 1,  0, "University"),
     ("Plan the week ahead",             "Look at the week's deadlines and block out study time in your calendar.",   "medium", 1,  0, "Personal"),
-    ("Check KEATS announcements",       "Scan all module pages for new posts, resources or changes.",                "low",    1,  0, "University"),
+    ("Scan KEATS for surprises",        "Quick sweep of module pages for hidden updates, new files, and changes.",   "low",    1,  0, "University"),
 
     # ── Day 1 ──
-    ("Submit KEATS quiz",               "Weekly online quiz — must be done before midnight tonight.",                "urgent", 1,  1, "University"),
-    ("Email personal tutor",            "Check in — ask about the upcoming assessment.",                             "medium", 1,  1, "University"),
+    ("Beat the weekly KEATS quiz",      "Complete the quiz in one focused block before the midnight lockout.",       "urgent", 1,  1, "University"),
     ("Morning run",                     "30 min — don't skip it this week.",                                         "low",    1,  1, "Health"),
 
     # ── Day 2 ──
-    ("Book revision room at Maughan",   "Reserve a silent study room for the upcoming exam period.",                 "medium", 1,  2, "University"),
-    ("Make flashcards: this week",      "Make Anki cards for the key concepts from this week's lectures.",          "low",    2,  2, "University"),
+    ("Book a Maughan deep-focus slot",  "Reserve a quiet room and lock in a distraction-free revision sprint.",      "medium", 1,  2, "University"),
+    ("Build this week's flashcard pack","Turn lecture takeaways into an Anki deck you can actually reuse later.",    "low",    2,  2, "University"),
     ("Track spending this week",        "Log all expenses and check you're on budget.",                              "low",    1,  2, "Finance"),
 
     # ── Day 3 ──
     ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "high",   1,  3, "Internships"),
-    ("Prep for seminar",                "Re-read the set text and write two discussion points.",                     "medium", 2,  3, "University"),
+    ("Seminar talking points prep",     "Re-read the core text and draft two sharp questions for discussion.",       "medium", 2,  3, "University"),
     ("GP appointment",                  "Nothing urgent — just a general check-up.",                                 "low",    1,  3, "Health"),
 
     # ── Day 4 ──
     ("Book dentist appointment",        "Overdue — call and book for sometime next month.",                          "low",    1,  4, "Health"),
-    ("Print lecture notes",             "Print the PDFs from KEATS for this week.",                                  "low",    1,  4, "University"),
-    ("Review past exam paper",          "Work through one past paper under timed conditions.",                       "high",   4,  4, "University"),
+    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "high",   4,  4, "University"),
 
     # ── Day 5 ──
     ("Update CV",                       "Add the latest project or placement before applying to grad roles.",        "medium", 2,  5, "Internships"),
@@ -208,7 +206,7 @@ personal_task_fixtures = (
     # ── Day 6 ──
     ("Tidy desk and study space",       "A clear space = a clear mind. 15 mins max.",                                "low",    1,  6, "Home & Admin"),
     ("Plan next week's meals",          "Decide on 3-4 dinners and write a shopping list.",                         "low",    1,  6, "Home & Admin"),
-    ("Submit lab report draft",         "Send draft to supervisor for early feedback.",                              "high",   3,  6, "University"),
+    ("Ship lab report draft v1",        "Submit your first draft early so you still have time to iterate.",          "high",   3,  6, "University"),
 
     # ── Day 7 ──
     ("Weekly review",                   "Go through what you completed and what carried over from last week.",       "medium", 1,  7, "Personal"),
@@ -223,18 +221,14 @@ personal_task_fixtures = (
     # ── Day 11-14 ──
     ("Buy train ticket home",           "Book the cheapest advance ticket while they're still available.",          "medium", 1,  11, "Finance"),
     ("Mid-semester self-assessment",    "Reflect on your progress and identify two areas to improve.",              "medium", 2,  12, "Personal"),
-    ("Revision timetable",              "Build a realistic revision plan mapping topics to days.",                   "high",   2,  14, "University"),
 
     # ── Day 15-21 ──
-    ("Past paper practice",             "Work through the full past paper and mark your answers.",                  "high",   4,  15, "University"),
     ("Sort student email aliases",      "Check your KCL email is forwarded correctly.",                             "low",    1,  16, "Home & Admin"),
     ("Deep clean the kitchen",          "Full wipe-down — fridge, oven, surfaces.",                                 "low",    2,  18, "Home & Admin"),
-    ("Flashcard review session",        "Go through your full Anki deck and reset anything overdue.",              "medium", 2,  21, "University"),
 
     # ── Day 22-35 ──
-    ("Exam technique practice",         "Work on timing — try answering questions in strict timed blocks.",         "high",   3,  22, "University"),
     ("Reach out to alumni network",     "Message two people for a 15-minute informational chat.",                   "medium", 2,  25, "Internships"),
-    ("Final essay proofread",           "Read it aloud to catch any awkward phrasing or errors.",                  "urgent", 2,  28, "University"),
+    ("Final essay polish pass",         "Read it aloud, tighten the argument, and clean up phrasing before submit.", "urgent", 2,  28, "University"),
     ("Budget review",                   "Check your spending against this month's budget.",                         "medium", 1,  30, "Finance"),
     ("Back up laptop files",            "Upload everything to Google Drive or external hard drive.",                "low",    1,  35, "Home & Admin"),
 

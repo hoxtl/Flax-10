@@ -92,6 +92,7 @@ export default function ListSidebar({
     const overdueCount = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now && !isRoutineOrEventTask(t)).length;
     const todayCount   = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) >= now && new Date(t.due_date) <= todayEnd).length;
     const thisWeekCount = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= weekEnd).length;
+    const laterCount   = tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) > weekEnd).length;
     const allCount     = tasks.filter(t => !t.completed).length;
 
     const listCounts = lists.reduce((acc, l) => {
@@ -103,6 +104,7 @@ export default function ListSidebar({
         { id: "all",   label: "All tasks", emoji: "📋", count: allCount },
         { id: "today", label: "Today",     emoji: "📅", count: todayCount },
         { id: "this_week", label: "This Week", emoji: "🗓️", count: thisWeekCount },
+        { id: "later", label: "Later", emoji: "⏳", count: laterCount },
         ...(overdueCount > 0 ? [{ id: "overdue", label: "Overdue", emoji: "⚠️", count: overdueCount, danger: true }] : []),
     ];
 
@@ -121,6 +123,7 @@ export default function ListSidebar({
                         key={f.id}
                         className={`${styles.navItem} ${!activeListId && activeFilter === f.id ? styles.navActive : ""} ${f.danger ? styles.navDanger : ""}`}
                         onClick={() => { onSelectList(null); onSelectFilter(f.id); }}
+                        title={f.label}
                     >
                         <span className={styles.navEmoji}>{f.emoji}</span>
                         <span className={styles.navLabel}>{f.label}</span>
@@ -156,6 +159,7 @@ export default function ListSidebar({
                                 <button
                                     className={styles.listBtn}
                                     onClick={() => { onSelectList(list.id); onSelectFilter("all"); }}
+                                    title={list.name}
                                 >
                                     <span className={styles.listDot} style={{ background: color }} />
                                     <span className={styles.listName}>{list.name}</span>

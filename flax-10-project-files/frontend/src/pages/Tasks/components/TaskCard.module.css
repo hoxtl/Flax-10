@@ -10,7 +10,7 @@
     padding: 10px 12px;
     background: transparent;
     border: none;
-    border-left: 3px solid transparent;
+    border-left: 3px solid rgba(74, 52, 33, 0.12);
     border-radius: 6px;
     transition: background 0.1s, border-color 0.2s, opacity 0.2s;
     overflow: hidden;
@@ -20,18 +20,36 @@
     background: rgba(123, 103, 81, 0.03);
 }
 
-/* Priority-based left accent borders (3px) */
+/* Priority accents: keep row clean, use left rail only */
 .cardAccentUrgent {
-    border-left-color: rgba(123, 103, 81, 0.24);
+    border-left-color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.55);
+    box-shadow:
+        0 0 0 1px rgba(239, 68, 68, 0.28),
+        0 0 16px rgba(239, 68, 68, 0.22);
+    animation: urgentGlowPulse 1.8s ease-in-out infinite;
 }
 .cardAccentHigh {
-    border-left-color: rgba(123, 103, 81, 0.24);
+    border-left-color: #fb923c;
+    border: none;
+    box-shadow: none;
+    animation: none;
 }
 .cardAccentMedium {
-    border-left-color: rgba(123, 103, 81, 0.24);
+    border-left-color: #fdba74;
 }
-.cardAccentLow {
-    border-left-color: rgba(123, 103, 81, 0.18);
+
+@keyframes urgentGlowPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(239, 68, 68, 0.28),
+            0 0 14px rgba(239, 68, 68, 0.18);
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(239, 68, 68, 0.4),
+            0 0 20px rgba(239, 68, 68, 0.3);
+    }
 }
 .cardDone {
     opacity: 1;
@@ -67,23 +85,34 @@
     align-items: center;
     font-family: var(--font-body);
     font-size: 0.75rem;
-    font-weight: 500;
-    padding: 2px 8px;
+    font-weight: 600;
+    padding: 2px 9px;
     border-radius: 9999px;
     border: 1px solid transparent;
     letter-spacing: 0.01em;
     white-space: nowrap;
     line-height: 1.4;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .priority_urgent {
-    color: #b91c1c;
-    background: #fef2f2;
-    border-color: #fecaca;
+    color: #991b1b;
+    background: #fee2e2;
+    border-color: #ef4444;
 }
 .priority_high {
-    color: #c2410c;
+    color: #9a3412;
+    background: #ffedd5;
+    border-color: #fb923c;
+}
+.priority_medium {
+    color: #b45309;
     background: #fff7ed;
-    border-color: #fed7aa;
+    border-color: #fdba74;
+}
+.priority_low {
+    color: #854d0e;
+    background: #fef9c3;
+    border-color: #facc15;
 }
 
 /* ── Checkbox ── */
@@ -155,6 +184,10 @@
     gap: 4px;
     cursor: pointer;
 }
+.content:focus,
+.content:focus-visible {
+    outline: none;
+}
 
 /* ── Action bar: ... menu + icons, far right, visible on hover ── */
 .actionBar {
@@ -223,6 +256,14 @@
     gap: 10px;
 }
 
+.titleMetaRight {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 /* Task names: text-sm font-medium text-stone-800 */
 .title {
     font-family: var(--font-body);
@@ -242,11 +283,49 @@
     align-items: center;
     gap: 3px;
     font-family: var(--font-body);
-    font-size: 0.82rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 400;
     white-space: nowrap;
     flex-shrink: 0;
     color: #8d847d;
+}
+
+.priorityText {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    line-height: 1.35;
+}
+.priorityText_urgent {
+    color: #b91c1c;
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.28);
+}
+.priorityText_high {
+    color: #c2410c;
+    background: rgba(251, 146, 60, 0.14);
+    border-color: rgba(251, 146, 60, 0.3);
+}
+.priorityText_medium {
+    color: #a16207;
+    background: rgba(250, 204, 21, 0.16);
+    border-color: rgba(250, 204, 21, 0.34);
+}
+.priorityText_low { color: #854d0e; }
+.priorityMarks {
+    font-size: 0.64rem;
+    line-height: 1;
+    letter-spacing: 0;
+    margin-right: 4px;
+}
+.priorityLabel {
+    line-height: 1;
 }
 
 .titleClickable {
@@ -311,15 +390,16 @@
     align-items: center;
     font-family: var(--font-body);
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     padding: 2px 8px;
     border-radius: 9999px;
     border: 1px solid;
     white-space: nowrap;
     line-height: 1.4;
     color: var(--c-greige, #B4A490);
-    background: rgba(123, 103, 81, 0.04);
+    background: rgba(123, 103, 81, 0.06);
     letter-spacing: 0.02em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .modulePillLink {
     text-decoration: none;
@@ -341,12 +421,13 @@
     gap: 5px;
     font-family: var(--font-body);
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
-    color: #44403c;
+    color: #3f3a36;
     border: 1px solid;
     border-radius: 999px;
     padding: 2px 8px 2px 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 .listDot {
     width: 6px;
@@ -553,6 +634,7 @@
     border-radius: 50%;
     margin-right: 6px;
     vertical-align: middle;
+    background: var(--primary, #7B6751);
 }
 
 .infoModalFooter {

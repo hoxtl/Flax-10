@@ -78,7 +78,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
       await onAddTask({
         title: t,
         description: "",
-        priority: "medium",
+        priority: null,
         due_date: defaultDueDate ?? null,
         task_list: taskListId || sortedLists[0]?.id,
         estimated_blocks: estimatedBlocks,

@@ -18,11 +18,11 @@ import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 import styles from "./CreateTaskModal.module.css";
 
 const PRIORITY_OPTIONS = [
-  { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
   { value: "high", label: "High" },
   { value: "urgent", label: "Urgent" },
 ];
+const ALLOWED_PRIORITIES = new Set(PRIORITY_OPTIONS.map((p) => p.value));
 
 const ENERGY_OPTIONS = [
   { value: "low", label: "Low" },
@@ -36,9 +36,6 @@ const STUDY_BLOCK_OPTIONS = [
   { value: 3, label: "1h 15m" },
   { value: 4, label: "1h 40m" },
 ];
-
-/** estimated_blocks value -> duration in minutes */
-const BLOCK_MINUTES = { 1: 25, 2: 50, 3: 75, 4: 100 };
 
 const FALLBACK_COLOURS = FOCUS_BLOCK_COLOURS_HEX;
 
@@ -95,8 +92,8 @@ export default function CreateTaskModal({
     return {
       title: task.title ?? "",
       description: task.description ?? "",
-      priority: task.priority ?? "medium",
-      energy_level: task.energy_level || task.energyLevel || "medium",
+      priority: ALLOWED_PRIORITIES.has(task.priority) ? task.priority : "",
+      energy_level: task.energy_level || task.energyLevel || "",
       due_date: taskDue || (defaultDueDate ?? ""),
       task_list: String(task.task_list ?? defaultListId ?? sortedLists[0]?.id ?? ""),
       estimated_blocks: task.estimated_blocks ?? 1,
@@ -106,6 +103,7 @@ export default function CreateTaskModal({
   });
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const categoryOptions = useMemo(
     () => [
@@ -127,9 +125,6 @@ export default function CreateTaskModal({
     ? getListColor(selectedList, sortedLists.indexOf(selectedList))
     : null;
 
-  const durationMinutes = form.estimated_minutes != null && form.estimated_minutes > 0
-    ? form.estimated_minutes
-    : (BLOCK_MINUTES[form.estimated_blocks] ?? 25);
   const askFlaxInitialMessage = useMemo(() => {
     const title = (form.title || "").trim();
     if (!title) {
@@ -137,32 +132,38 @@ export default function CreateTaskModal({
     }
     return `Help me estimate how long "${title}" might take and which focus block I should pick.`;
   }, [form.title]);
-  const endTimeDisplay = useMemo(() => {
-    if (!form.due_date) return "—";
-    const start = new Date(form.due_date);
-    const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${pad(end.getHours())}:${pad(end.getMinutes())}`;
-  }, [form.due_date, durationMinutes]);
 
   const set = (field, val) => setForm((p) => ({ ...p, [field]: val }));
 
   const handleSave = async () => {
-    if (!form.title.trim()) return;
+    if (!form.title.trim() || !form.due_date) return;
+    setSaveError("");
     setSaving(true);
+    const computedBlocks = form.estimated_minutes != null && form.estimated_minutes > 0
+      ? Math.max(1, Math.round(form.estimated_minutes / 25))
+      : (form.estimated_blocks ?? 1);
     const payload = {
-      ...form,
-      due_date: form.due_date || null,
+      title: form.title.trim(),
+      description: form.description || "",
+      priority: form.priority || "medium",
+      energy_level: form.energy_level || "",
+      due_date: form.due_date,
+      task_list: form.task_list ? Number(form.task_list) : null,
+      estimated_blocks: computedBlocks,
       module: form.module ? Number(form.module) : null,
-      estimated_minutes: form.estimated_minutes != null && form.estimated_minutes > 0 ? form.estimated_minutes : null,
     };
-    if (mode === "create" && showAddToScheduleToggle) {
-      await onSave(payload, { addToSchedule });
-    } else {
-      await onSave(payload);
+    try {
+      if (mode === "create" && showAddToScheduleToggle) {
+        await onSave(payload, { addToSchedule });
+      } else {
+        await onSave(payload);
+      }
+      onClose();
+    } catch (err) {
+      setSaveError(err?.message || "Couldn’t save task. Please try again.");
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    onClose();
   };
 
   const handleKey = (e) => {
@@ -220,18 +221,12 @@ export default function CreateTaskModal({
 
           <div className={styles.timeRow}>
             <div className={styles.dateTimeWrap}>
-              <label className={styles.gridLabel}>Start time</label>
+              <label className={styles.gridLabel}>Due date <span className={styles.labelRequired}>*</span></label>
               <DateTimePicker
                 value={form.due_date}
                 onChange={(val) => set("due_date", val)}
-                placeholder="Optional"
+                placeholder="Select due date"
               />
-            </div>
-            <div className={styles.endTimeWrap}>
-              <label className={styles.gridLabel}>End time</label>
-              <div className={styles.endTimeDisplay} aria-live="polite">
-                {form.due_date ? endTimeDisplay : "—"}
-              </div>
             </div>
           </div>
           <div className={styles.durationRow}>
@@ -301,6 +296,7 @@ export default function CreateTaskModal({
                     }}
                     placeholder="Select list"
                     options={categoryOptions}
+                    menuMaxHeight={420}
                     className={styles.listAnimatedDropdown}
                   />
                 </div>
@@ -316,7 +312,7 @@ export default function CreateTaskModal({
                       key={value}
                       type="button"
                       className={`${styles.chip} ${form.priority === value ? styles.chipActive : ""}`}
-                      onClick={() => set("priority", value)}
+                      onClick={() => set("priority", form.priority === value ? "" : value)}
                     >
                       {label}
                     </button>
@@ -334,7 +330,7 @@ export default function CreateTaskModal({
                       key={value}
                       type="button"
                       className={`${styles.chip} ${form.energy_level === value ? styles.chipActive : ""}`}
-                      onClick={() => set("energy_level", value)}
+                      onClick={() => set("energy_level", form.energy_level === value ? "" : value)}
                       title={value === "high" ? "High cognitive load — avoid back-to-back with another high-energy task" : value === "low" ? "Quick / low effort" : "Moderate"}
                     >
                       {label}
@@ -381,6 +377,9 @@ export default function CreateTaskModal({
         </div>
 
         <div className={styles.footer}>
+          {saveError && (
+            <p className={styles.saveError} role="alert">{saveError}</p>
+          )}
           {isEditMode && onDeleteTask && (
             <button type="button" className={styles.deleteBtn} onClick={handleDelete} disabled={saving}>
               Delete task
@@ -393,7 +392,7 @@ export default function CreateTaskModal({
             type="button"
             className={styles.saveBtn}
             onClick={handleSave}
-            disabled={saving || !form.title.trim()}
+            disabled={saving || !form.title.trim() || !form.due_date}
           >
             {saving ? "Saving…" : (isEditMode ? "Save" : "Add task")}
           </button>
