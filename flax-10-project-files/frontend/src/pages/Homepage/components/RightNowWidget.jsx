@@ -1,6 +1,7 @@
 /**
- * RIGHT NOW widget — answers "What do I need to know RIGHT NOW to stay on time?"
- * Sections: Header (pulsing dot + live clock), Current event, Up next, Travel, Overlap warning.
+ * RIGHT NOW widget — live schedule compass.
+ * Shows: current event + progress, up next + countdown,
+ * smart TFL leave-by alert, and schedule conflicts.
  */
 
 import { useState, useEffect } from "react";
@@ -8,19 +9,118 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   getRelevantDelays,
   getTflLinesForLocation,
+  getTflLinePillStyle,
+  isSevereDisruption,
 } from "../utils/kclTflMapping";
-import { Sun, Clock, AlertTriangle, Bus, Sparkles } from "lucide-react";
+import { Sun, Clock, AlertTriangle, Train, Sparkles, CheckCircle } from "lucide-react";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useCountdown } from "../hooks/useCountdown";
 import { isNow } from "../utils/eventUtils";
 import styles from "./RightNowWidget.module.css";
 
-/** Minutes left until event end — for time-left badge colour band. */
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
 function getTimeLeftBand(minutesLeft) {
   if (minutesLeft == null || minutesLeft < 0) return "over";
   if (minutesLeft < 10) return "under10";
   if (minutesLeft < 30) return "10to30";
   return "over30";
+}
+
+function getCurrentBlock(sortedEvents, now) {
+  const list = Array.isArray(sortedEvents) ? sortedEvents : [];
+  return list.find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time)) || null;
+}
+
+function getNextEvent(sortedEvents, now) {
+  const list = Array.isArray(sortedEvents) ? sortedEvents : [];
+  const nowMs = now.getTime();
+  return list
+    .filter((e) => e.start_time && new Date(e.start_time).getTime() > nowMs)
+    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0] || null;
+}
+
+function hasCampusCommute(nextEvent) {
+  if (!nextEvent) return false;
+  const loc = (nextEvent.location || "").trim();
+  const title = (nextEvent.title || "").trim();
+  return getTflLinesForLocation(loc).length > 0 || getTflLinesForLocation(title).length > 0;
+}
+
+function formatTimeLeft(endTime, nowMs) {
+  if (!endTime) return null;
+  const ms = new Date(endTime).getTime() - nowMs;
+  if (ms <= 0) return "Ended";
+  const m = Math.floor(ms / 60000);
+  const h = Math.floor(m / 60);
+  return h > 0 ? `${h}h ${m % 60}m left` : `${m}m left`;
+}
+
+function useLiveClock() {
+  const [clock, setClock] = useState(() =>
+    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  );
+  useEffect(() => {
+    const id = setInterval(
+      () => setClock(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
+      30000
+    );
+    return () => clearInterval(id);
+  }, []);
+  return clock;
+}
+
+/**
+ * Given relevant delays and the next event, compute a smart "leave by" recommendation.
+ * Base commute buffer: 35 min. Severe disruption: +20 min. Minor: +10 min.
+ */
+function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
+  if (!nextEvent?.start_time || !relevantDelays.length) return null;
+  const startMs = new Date(nextEvent.start_time).getTime();
+  const hasSevere = relevantDelays.some((d) => isSevereDisruption(d.severityDescription));
+  const bufferMins = 35 + (hasSevere ? 20 : 10);
+  const leaveByMs = startMs - bufferMins * 60000;
+  const minsUntilLeave = Math.floor((leaveByMs - nowMs) / 60000);
+  const leaveByStr = new Date(leaveByMs).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  if (nowMs >= leaveByMs) {
+    return { urgency: "critical", label: "Leave now", sub: `You may be late for ${nextEvent.title}`, leaveByStr, hasSevere };
+  }
+  if (minsUntilLeave <= 15) {
+    return { urgency: "urgent", label: `Leave in ${minsUntilLeave}m`, sub: `to reach ${nextEvent.title} on time`, leaveByStr, hasSevere };
+  }
+  return { urgency: "info", label: `Leave by ${leaveByStr}`, sub: `${nextEvent.title} affected by delays`, leaveByStr, hasSevere };
+}
+
+// ─── Simple fade-in helper ───────────────────────────────────────────────────
+
+function fadeIn(delay = 0) {
+  return {
+    initial: { opacity: 0, y: 6 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.35, delay, ease: [0.23, 1, 0.32, 1] },
+  };
+}
+
+// ─── Sub-components ─────────────────────────────────────────────────────────
+
+function WidgetHeader({ liveClock, eventCount, taskCount }) {
+  return (
+    <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
+      <div className={styles.headerIconWrap}>
+        <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
+      </div>
+      <span className={styles.headerLabel}>Right Now</span>
+      <span className={styles.headerMeta}>
+        {eventCount} event{eventCount !== 1 ? "s" : ""}
+        {taskCount > 0 && ` · ${taskCount} task${taskCount !== 1 ? "s" : ""} left`}
+      </span>
+      <span className={styles.headerClockDot} aria-hidden />
+      <span className={styles.headerClock}>{liveClock}</span>
+    </motion.div>
+  );
 }
 
 function ActiveEventCard({ currentBlock, timeRangeStr, timeLeftStr, currentProgressPct }) {
@@ -30,14 +130,12 @@ function ActiveEventCard({ currentBlock, timeRangeStr, timeLeftStr, currentProgr
       : null;
   const band = getTimeLeftBand(minutesLeft);
   const timeLeftColor =
-    band === "under10" ? "#dc3545" :
-    band === "10to30" ? "#d4850a" :
-    "#4A7C5A";
+    band === "under10" ? "#dc3545" : band === "10to30" ? "#d4850a" : "#4A7C5A";
 
   return (
-    <div className={styles.currentEventCard}>
+    <motion.div className={styles.currentEventCard} {...fadeIn(0.07)}>
       <div className={styles.currentEventRow1}>
-        <span className={styles.currentEventCardTitle}>{currentBlock.title}</span>
+        <span className={styles.currentEventTitle}>{currentBlock.title}</span>
         {timeLeftStr && (
           <span className={styles.currentEventTimeLeft} style={{ color: timeLeftColor }}>
             {timeLeftStr}
@@ -48,9 +146,9 @@ function ActiveEventCard({ currentBlock, timeRangeStr, timeLeftStr, currentProgr
         <div className={styles.currentEventRow2}>
           <span className={styles.currentEventTimeRange}>{timeRangeStr}</span>
           {currentProgressPct != null && (
-            <div className={styles.currentEventProgressTrack}>
+            <div className={styles.progressTrack}>
               <motion.div
-                className={styles.currentEventProgressFill}
+                className={styles.progressFill}
                 initial={{ width: "0%" }}
                 animate={{ width: `${currentProgressPct}%` }}
                 transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
@@ -59,114 +157,118 @@ function ActiveEventCard({ currentBlock, timeRangeStr, timeLeftStr, currentProgr
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
-function getCurrentBlock(sortedEvents, now) {
-  const list = Array.isArray(sortedEvents) ? sortedEvents : [];
-  return list.find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time, now)) || null;
-}
+function TflDelayCard({ leaveByInfo, relevantDelays }) {
+  const lineNames = [...new Set(relevantDelays.map((d) => d.lineName))];
+  const isUrgent = leaveByInfo.urgency === "urgent" || leaveByInfo.urgency === "critical";
+  const isCritical = leaveByInfo.urgency === "critical";
 
-function getNextEvent(sortedEvents, now) {
-  const list = Array.isArray(sortedEvents) ? sortedEvents : [];
-  const nowMs = now.getTime();
-  const future = list
-    .filter((e) => e.start_time && new Date(e.start_time).getTime() > nowMs)
-    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-  return future[0] || null;
-}
-
-function hasCampusCommute(nextEvent) {
-  if (!nextEvent) return false;
-  const loc = (nextEvent.location || "").trim();
-  const title = (nextEvent.title || "").trim();
-  const linesFromLoc = getTflLinesForLocation(loc).length > 0;
-  const linesFromTitle = getTflLinesForLocation(title).length > 0;
-  return linesFromLoc || linesFromTitle;
-}
-
-/** Format time remaining until end (e.g. "36m left") */
-function formatTimeLeft(endTime, nowMs) {
-  if (!endTime) return null;
-  const end = new Date(endTime).getTime();
-  const ms = end - nowMs;
-  if (ms <= 0) return "Ended";
-  const m = Math.floor(ms / 60000);
-  const h = Math.floor(m / 60);
-  if (h > 0) return `${h}h ${m % 60}m left`;
-  return `${m}m left`;
-}
-
-/** Live clock string "12:24 PM" */
-function useLiveClock(intervalMs = 30000) {
-  const [clock, setClock] = useState(() =>
-    new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+  return (
+    <motion.div
+      className={`${styles.tflCard} ${isCritical ? styles.tflCardCritical : isUrgent ? styles.tflCardUrgent : styles.tflCardInfo}`}
+      {...fadeIn(0.14)}
+      layout
+    >
+      <div className={styles.tflCardHeader}>
+        <Train size={13} strokeWidth={2} className={styles.tflCardIcon} aria-hidden />
+        <span className={styles.tflCardLabel}>{leaveByInfo.label}</span>
+        {isUrgent && (
+          <motion.span
+            className={`${styles.tflBadge} ${isCritical ? styles.tflBadgeCritical : styles.tflBadgeUrgent}`}
+            animate={{ opacity: [1, 0.5, 1] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            {isCritical ? "NOW" : "SOON"}
+          </motion.span>
+        )}
+      </div>
+      <p className={styles.tflCardSub}>{leaveByInfo.sub}</p>
+      <div className={styles.tflLinePills}>
+        {lineNames.slice(0, 3).map((name) => {
+          const pill = getTflLinePillStyle(name);
+          return (
+            <span
+              key={name}
+              className={styles.tflLinePill}
+              style={{ background: pill.bg, color: pill.text }}
+            >
+              {name}
+            </span>
+          );
+        })}
+      </div>
+    </motion.div>
   );
-  useEffect(() => {
-    const tick = () =>
-      setClock(new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
-    const id = setInterval(tick, intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
-  return clock;
 }
 
-const containerMotion = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] },
-};
+function ConflictSummary({ conflicts }) {
+  const [expanded, setExpanded] = useState(false);
+  const count = conflicts.length;
+  const label =
+    count === 1
+      ? `Overlap: ${conflicts[0].a?.title || "Event"} & ${conflicts[0].b?.title || "Event"}`
+      : `${count} schedule overlaps today`;
 
-const containerVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.23, 1, 0.32, 1],
-      staggerChildren: 0.1,
-      delayChildren: 0,
-    },
-  },
-};
+  return (
+    <motion.div className={styles.conflictWrap} {...fadeIn(0.21)}>
+      <button
+        type="button"
+        className={styles.conflictPill}
+        onClick={() => count > 1 && setExpanded((e) => !e)}
+        aria-expanded={expanded}
+      >
+        <AlertTriangle size={12} strokeWidth={2} className={styles.conflictIcon} aria-hidden />
+        <span className={styles.conflictText}>{label}</span>
+        {count > 1 && (
+          <span className={styles.conflictChevron}>{expanded ? "▲" : "▼"}</span>
+        )}
+      </button>
+      <AnimatePresence>
+        {expanded && count > 1 && (
+          <motion.div
+            className={styles.conflictExpanded}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            {conflicts.map((c, i) => (
+              <p key={i} className={styles.conflictExpandedRow}>
+                {c.a?.title || "Event"} &amp; {c.b?.title || "Event"}
+              </p>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
-const sectionVariants = {
-  initial: { opacity: 0, y: 8 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-};
+// ─── Shared header for early-return views ───────────────────────────────────
 
-const staggerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    },
-  },
-};
+function SimpleHeader({ liveClock }) {
+  return (
+    <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
+      <div className={styles.headerIconWrap}>
+        <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
+      </div>
+      <span className={styles.headerLabel}>Right Now</span>
+      <span className={styles.headerClockDot} aria-hidden />
+      <span className={styles.headerClock}>{liveClock}</span>
+    </motion.div>
+  );
+}
 
-const staggerChildVariants = {
-  hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.45, ease: [0.23, 1, 0.32, 1] },
-  },
-};
+// ─── Main export ─────────────────────────────────────────────────────────────
 
 export function RightNowWidget({
   now,
   isToday,
   navigatorContext,
   sortedEvents,
-  scheduleCountdownSecs,
   tflDelays = [],
   hasTimerSession,
   timerMode,
@@ -176,154 +278,108 @@ export function RightNowWidget({
   timerTask,
   onOpenTimer,
   tomorrowFirstEvent,
-  todayVsYesterday,
   taskWidgetItemsOnly = [],
 }) {
-  const tasks = taskWidgetItemsOnly;
   const nav = navigatorContext || {};
   const nowMs = now.getTime();
-  const liveClock = useLiveClock(30000);
+  const liveClock = useLiveClock();
 
   const currentBlock = nav.currentBlock ?? nav.current ?? getCurrentBlock(sortedEvents || [], now);
-  const nextEvent =
-    nav.nextItem ?? nav.next ?? getNextEvent(sortedEvents || [], now);
+  const nextEvent = nav.nextItem ?? nav.next ?? getNextEvent(sortedEvents || [], now);
   const nextEventTarget = nextEvent?.start_time ? new Date(nextEvent.start_time) : null;
   const countdown = useCountdown(nextEventTarget);
   const conflicts = Array.isArray(nav.overlaps) ? nav.overlaps : [];
 
   const relevantDelays = nextEvent ? getRelevantDelays(nextEvent, tflDelays) : [];
-  const hasRelevantDelays = relevantDelays.length > 0;
   const hasCampus = hasCampusCommute(nextEvent);
+  const showTfl = relevantDelays.length > 0 && hasCampus && nextEvent;
+  const leaveByInfo = showTfl ? getLeaveByInfo(nextEvent, relevantDelays, nowMs) : null;
 
-  const hasActiveEvent = !!currentBlock?.title;
-  const emptyDay = isToday && !currentBlock && !nextEvent && (sortedEvents || []).length === 0;
+  const tasks = taskWidgetItemsOnly;
+  const tasksPending = tasks.filter((t) => !t.completed).length;
+  const eventCount = (sortedEvents || []).length;
+  const tomorrowTime = tomorrowFirstEvent?.start_time ? formatTime(tomorrowFirstEvent.start_time) : null;
 
-  // --- Timer session: single compact block ---
+  const currentProgressPct =
+    currentBlock?.start_time && currentBlock?.end_time
+      ? Math.min(100, Math.max(0,
+          ((nowMs - new Date(currentBlock.start_time).getTime()) /
+            (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
+        ))
+      : null;
+  const timeRangeStr =
+    currentBlock?.start_time && currentBlock?.end_time
+      ? `${formatTime(currentBlock.start_time)} – ${formatTime(currentBlock.end_time)}`
+      : null;
+  const timeLeftStr = currentBlock?.end_time ? formatTimeLeft(currentBlock.end_time, nowMs) : null;
+
+  // ── Timer session ──────────────────────────────────────────────────────────
   if (hasTimerSession) {
     const isBreak = timerMode === "break";
     const totalSecs = (isBreak ? breakTime || 5 : workTime || 25) * 60;
     const pct = Math.max(0, Math.min(100, ((totalSecs - Math.max(0, timeLeft)) / totalSecs) * 100));
-    const fmt = (s) => {
-      const t = Math.max(0, s);
-      return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
-    };
+    const fmt = (s) =>
+      `${String(Math.floor(Math.max(0, s) / 60)).padStart(2, "0")}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
     return (
-      <motion.div
-        initial={containerMotion.initial}
-        animate={containerMotion.animate}
-        transition={containerMotion.transition}
-        className={styles.root}
-      >
-        <div className={styles.widgetHeader}>
-          <div className={styles.headerIconWrap}>
-            <Clock size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
-          </div>
-          <span className={styles.headerLabel}>Right Now</span>
-          <span className={styles.headerClockDot} aria-hidden />
-          <span className={styles.headerClock}>{liveClock}</span>
-        </div>
-        <div className={`${styles.section} ${styles.sectionFirst} ${styles.sectionLast} ${styles.timerBlock}`}>
-          <div className={styles.nowRow}>
-            <span className={styles.nowLabel}>
-              {isBreak ? "BREAK" : "FOCUS"} · {timerTask || (isBreak ? "Break time" : "Focus session")} · {fmt(timeLeft)} left
-            </span>
-          </div>
+      <div className={styles.root}>
+        <SimpleHeader liveClock={liveClock} />
+        <motion.div className={styles.timerBlock} {...fadeIn(0.07)}>
+          <p className={styles.timerLabel}>
+            {isBreak ? "BREAK" : "FOCUS"} · {timerTask || (isBreak ? "Break time" : "Focus session")} · {fmt(timeLeft)} left
+          </p>
           <div className={styles.progressTrack}>
             <div className={styles.progressFill} style={{ width: `${pct}%` }} />
           </div>
           <button type="button" className={styles.timerBtn} onClick={onOpenTimer}>
             Open timer →
           </button>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     );
   }
 
-  // --- Non-today ---
+  // ── Non-today ──────────────────────────────────────────────────────────────
   if (!isToday) {
     const firstEv = sortedEvents?.[0];
-    if (!firstEv)
-      return (
-        <motion.div
-          initial={containerMotion.initial}
-          animate={containerMotion.animate}
-          transition={containerMotion.transition}
-          className={styles.root}
-        >
-          <div className={styles.widgetHeader}>
-            <div className={styles.headerIconWrap}>
-              <Clock size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
-            </div>
-            <span className={styles.headerLabel}>Right Now</span>
-            <span className={styles.headerClockDot} aria-hidden />
-            <span className={styles.headerClock}>{liveClock}</span>
-          </div>
-          <div className={`${styles.section} ${styles.sectionFirst} ${styles.sectionLast}`}>
-            <p className={styles.nowEmpty}>No events for this day.</p>
-          </div>
-        </motion.div>
-      );
-    const firstTime = firstEv.start_time ? formatTime(firstEv.start_time) : null;
     return (
-      <motion.div
-        initial={containerMotion.initial}
-        animate={containerMotion.animate}
-        transition={containerMotion.transition}
-        className={styles.root}
-      >
-        <div className={styles.widgetHeader}>
-          <div className={styles.headerIconWrap}>
-            <Clock size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
-          </div>
-          <span className={styles.headerLabel}>Right Now</span>
-          <span className={styles.headerClockDot} aria-hidden />
-          <span className={styles.headerClock}>{liveClock}</span>
-        </div>
-        <div className={`${styles.section} ${styles.sectionFirst} ${styles.sectionLast}`}>
-          <p className={styles.upNextTitle}>{firstEv.title}</p>
-          {firstTime && <p className={styles.upNextDetails}>{firstTime}</p>}
-        </div>
-      </motion.div>
+      <div className={styles.root}>
+        <SimpleHeader liveClock={liveClock} />
+        <motion.div {...fadeIn(0.07)}>
+          {firstEv ? (
+            <>
+              <p className={styles.upNextTitle}>{firstEv.title}</p>
+              {firstEv.start_time && <p className={styles.upNextDetails}>{formatTime(firstEv.start_time)}</p>}
+            </>
+          ) : (
+            <p className={styles.nowEmpty}>No events for this day.</p>
+          )}
+        </motion.div>
+      </div>
     );
   }
 
-  const tomorrowTime = tomorrowFirstEvent?.start_time ? formatTime(tomorrowFirstEvent.start_time) : null;
-
-  // --- End of day ---
+  // ── End of day ─────────────────────────────────────────────────────────────
   if (nav.state === "endOfDay") {
     const completedCount = tasks.filter((t) => t.completed).length;
-    const totalCount = tasks.length;
     const eventsToday = (sortedEvents || []).filter(
       (e) => e.start_time && new Date(e.start_time).getTime() < nowMs
     ).length;
     return (
-      <motion.div
-        initial={containerMotion.initial}
-        animate={containerMotion.animate}
-        transition={containerMotion.transition}
-        className={styles.root}
-      >
-        <div className={styles.widgetHeader}>
-          <div className={styles.headerIconWrap}>
-            <Clock size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
-          </div>
-          <span className={styles.headerLabel}>Right Now</span>
-          <span className={styles.headerClockDot} aria-hidden />
-          <span className={styles.headerClock}>{liveClock}</span>
-        </div>
-        <div className={styles.endOfDayWrap}>
+      <div className={styles.root}>
+        <SimpleHeader liveClock={liveClock} />
+        <motion.div className={styles.endOfDayWrap} {...fadeIn(0.07)}>
           <div className={styles.endOfDayTopRow}>
             <motion.div
               animate={{ rotate: [0, 8, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Sparkles size={28} strokeWidth={1.25} color="#C4A46D" aria-hidden />
+              <Sparkles size={26} strokeWidth={1.25} color="#C4A46D" aria-hidden />
             </motion.div>
             <div>
               <p className={styles.endOfDayTitle}>Day complete — nice work!</p>
               {(completedCount > 0 || eventsToday > 0) && (
                 <p className={styles.endOfDaySub}>
-                  {completedCount > 0 && `${completedCount}${totalCount > 0 ? `/${totalCount}` : ""} tasks done`}
+                  {completedCount > 0 && `${completedCount}${tasks.length > 0 ? `/${tasks.length}` : ""} tasks`}
                   {completedCount > 0 && eventsToday > 0 && " · "}
                   {eventsToday > 0 && `${eventsToday} event${eventsToday !== 1 ? "s" : ""} attended`}
                 </p>
@@ -340,193 +396,113 @@ export function RightNowWidget({
               </div>
             </>
           )}
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     );
   }
 
-  // --- Countdown from useCountdown (updates every 60s, or 1s when < 5min) ---
-  const eventTimeStr = nextEvent?.start_time ? formatTime(nextEvent.start_time) : "";
-  const lineNames = [...new Set(relevantDelays.map((d) => d.lineName))];
-
-  // Current event progress %
-  const currentProgressPct =
-    currentBlock?.start_time && currentBlock?.end_time
-      ? (() => {
-          const evStart = new Date(currentBlock.start_time).getTime();
-          const evEnd = new Date(currentBlock.end_time).getTime();
-          if (evEnd <= evStart) return null;
-          return Math.min(100, Math.max(0, ((nowMs - evStart) / (evEnd - evStart)) * 100));
-        })()
-      : null;
-
-  const timeRangeStr =
-    currentBlock?.start_time && currentBlock?.end_time
-      ? `${formatTime(currentBlock.start_time)} – ${formatTime(currentBlock.end_time)}`
-      : null;
-  const timeLeftStr = currentBlock?.end_time ? formatTimeLeft(currentBlock.end_time, nowMs) : null;
-
-  // --- Empty day state ---
-  if (emptyDay) {
+  // ── Empty day ──────────────────────────────────────────────────────────────
+  if (isToday && !currentBlock && !nextEvent && eventCount === 0) {
     return (
-      <motion.div
-        initial={containerMotion.initial}
-        animate={containerMotion.animate}
-        transition={containerMotion.transition}
-        className={styles.root}
-      >
-        <div className={styles.widgetHeader}>
-          <div className={styles.headerIconWrap}>
-            <Clock size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
-          </div>
-          <span className={styles.headerLabel}>Right Now</span>
-          <span className={styles.headerClockDot} aria-hidden />
-          <span className={styles.headerClock}>{liveClock}</span>
-        </div>
-        <div className={styles.emptyDay}>
+      <div className={styles.root}>
+        <SimpleHeader liveClock={liveClock} />
+        <motion.div className={styles.emptyDay} {...fadeIn(0.07)}>
           <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-            <Sun size={32} strokeWidth={1.25} color="#C4A46D" aria-hidden />
+            <Sun size={30} strokeWidth={1.25} color="#C4A46D" aria-hidden />
           </motion.div>
           <p className={styles.emptyDayTitle}>Nothing planned today</p>
-          <p className={styles.emptyDaySubtitle}>Enjoy your day — or add something to your schedule</p>
+          <p className={styles.emptyDaySubtitle}>Enjoy your day</p>
           {tomorrowFirstEvent && tomorrowTime && (
-            <p className={styles.emptyDayTomorrow}>Tomorrow starts with {tomorrowFirstEvent.title} at {tomorrowTime}</p>
+            <p className={styles.emptyDayTomorrow}>
+              Tomorrow: {tomorrowFirstEvent.title} at {tomorrowTime}
+            </p>
           )}
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     );
   }
 
+  // ── Main today view ────────────────────────────────────────────────────────
   return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      variants={containerVariants}
-      className={`${styles.root} ${hasActiveEvent ? styles.rootHasActive : ""}`}
-    >
-      {/* Header: Clock icon + "RIGHT NOW" + live clock (+ pulsing dot when happening now) */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerVariants}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
-        <motion.div className={styles.widgetHeader} variants={staggerChildVariants}>
-          <div className={styles.headerIconWrap}>
-            <Clock size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
-          </div>
-          <span className={styles.headerLabel}>Right Now</span>
-          <span className={styles.headerClockDot} aria-hidden />
-          <span className={styles.headerClock}>{liveClock}</span>
-        </motion.div>
+    <div className={styles.root}>
+      {/* Header */}
+      <WidgetHeader liveClock={liveClock} eventCount={eventCount} taskCount={tasksPending} />
 
-      {/* Stats row — always shown */}
-      <motion.div className={styles.statsRow} variants={staggerChildVariants}>
-        <span>{(sortedEvents || []).length} events today</span>
-        {tasks.filter((t) => !t.completed).length > 0 && (
-          <>
-            <span className={styles.statsDot}>·</span>
-            <span>{tasks.filter((t) => !t.completed).length} tasks left</span>
-          </>
-        )}
-      </motion.div>
-
-      {/* Current event card — only if active */}
-      {currentBlock?.title && (
-        <motion.div className={`${styles.section} ${styles.sectionCurrent}`} variants={staggerChildVariants}>
+      {/* Current event */}
+      <AnimatePresence>
+        {currentBlock?.title && (
           <ActiveEventCard
+            key="current"
             currentBlock={currentBlock}
             timeRangeStr={timeRangeStr}
             timeLeftStr={timeLeftStr}
             currentProgressPct={currentProgressPct}
           />
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
 
-      {/* Up next row */}
-      {nextEvent ? (
-        <motion.div className={styles.upNextRow} variants={staggerChildVariants}>
-          <div className={styles.upNextRowLeft}>
-            <span className={styles.upNextRowLabel}>Next:</span>
-            <span className={styles.upNextRowTitle}>{nextEvent.title}</span>
-          </div>
-          <AnimatePresence mode="popLayout">
-            <motion.span
-              key={countdown.text}
-              className={styles.upNextRowCountdown}
-              style={{
-                color:
-                  countdown.urgency === "urgent" ? "#B87A6D" :
-                  countdown.urgency === "soon" ? "#C4946D" : "#A89279",
-              }}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.2 }}
-            >
-              {countdown.text || ""}
-            </motion.span>
-          </AnimatePresence>
-        </motion.div>
-      ) : (
-        <motion.div className={styles.nowEmptyRow} variants={staggerChildVariants}>
-          <motion.div
-            className={styles.nowEmptyIconWrap}
-            animate={{ y: [0, -3, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Sparkles size={28} strokeWidth={1.25} className={styles.nowEmptyIconRelaxed} aria-hidden />
+      {/* Up next / done */}
+      <AnimatePresence mode="popLayout">
+        {nextEvent ? (
+          <motion.div key="upnext" className={styles.upNextRow} {...fadeIn(0.14)} layout>
+            <div className={styles.upNextLeft}>
+              <span className={styles.upNextLabel}>Next</span>
+              <span className={styles.upNextTitle}>{nextEvent.title}</span>
+            </div>
+            <AnimatePresence mode="popLayout">
+              <motion.span
+                key={countdown.text}
+                className={styles.upNextCountdown}
+                style={{
+                  color:
+                    countdown.urgency === "urgent" ? "#B87A6D" :
+                    countdown.urgency === "soon" ? "#C4946D" : "#A89279",
+                }}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.2 }}
+              >
+                {countdown.text || ""}
+              </motion.span>
+            </AnimatePresence>
           </motion.div>
-          <div className={styles.nowEmptyTextWrap}>
-            <p className={styles.nowEmptyPrimary}>You&apos;re done for the day</p>
-            <p className={styles.nowEmptySecondary}>No more events today</p>
-          </div>
-        </motion.div>
-      )}
+        ) : currentBlock ? (
+          // In an event but nothing more scheduled — compact note
+          <motion.div key="lastev" className={styles.lastEventRow} {...fadeIn(0.14)} layout>
+            <CheckCircle size={13} strokeWidth={2} className={styles.lastEventIcon} aria-hidden />
+            <span className={styles.lastEventText}>Last event of the day</span>
+          </motion.div>
+        ) : (
+          // Truly free — no current and no next
+          <motion.div key="free" className={styles.freeRow} {...fadeIn(0.14)} layout>
+            <motion.div
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Sparkles size={22} strokeWidth={1.25} className={styles.freeIcon} aria-hidden />
+            </motion.div>
+            <div>
+              <p className={styles.freePrimary}>You&apos;re done for the day</p>
+              <p className={styles.freeSecondary}>No more events today</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Commute row — compact */}
-      <motion.div className={styles.commuteRow} variants={staggerChildVariants}>
-        <div className={styles.commuteRowLeft}>
-          <Bus size={14} strokeWidth={1.75} className={styles.commuteRowIcon} aria-hidden />
-          <span className={styles.commuteRowText}>
-            {hasCampus && nextEvent
-              ? `Next commute in ${countdown.text || "…"}`
-              : "No commute coming up"}
-          </span>
-        </div>
-        <span
-          className={styles.commuteRowStatus}
-          style={{
-            color:
-              tflDelays === undefined ? "#B8A890" :
-              hasRelevantDelays && hasCampus && nextEvent ? "#C4946D" : "#7BB38E",
-          }}
-        >
-          {tflDelays === undefined
-            ? "Checking…"
-            : hasRelevantDelays && hasCampus && nextEvent
-              ? `${lineNames[0] || "Line"} delays`
-              : "All clear"}
-        </span>
-      </motion.div>
+      {/* TFL delay card — only when relevant */}
+      <AnimatePresence>
+        {showTfl && leaveByInfo && (
+          <TflDelayCard key="tfl" leaveByInfo={leaveByInfo} relevantDelays={relevantDelays} />
+        )}
+      </AnimatePresence>
 
-      {/* Overlap warning */}
-      {Array.isArray(conflicts) && conflicts.length > 0 && (
-        <motion.div variants={staggerChildVariants}>
-          {conflicts.map((c, idx) => {
-            const aTitle = c.a?.title || "Event A";
-            const bTitle = c.b?.title || "Event B";
-            const eventNames = [aTitle, bTitle].filter(Boolean).join(" & ");
-            return (
-              <div key={idx} className={styles.conflictRowNew} role="alert">
-                <AlertTriangle size={13} strokeWidth={1.75} className={styles.conflictIconNew} aria-hidden />
-                <span className={styles.conflictTextNew}>Overlap: {eventNames}</span>
-              </div>
-            );
-          })}
-        </motion.div>
-      )}
-      </motion.div>
-    </motion.div>
+      {/* Conflicts */}
+      <AnimatePresence>
+        {conflicts.length > 0 && (
+          <ConflictSummary key="conflicts" conflicts={conflicts} />
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

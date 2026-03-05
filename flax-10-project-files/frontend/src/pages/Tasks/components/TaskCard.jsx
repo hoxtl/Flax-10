@@ -8,7 +8,7 @@ import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import DateTimePicker from "./DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import CreateTaskModal from "./CreateTaskModal";
 
 import styles from "./TaskCard.module.css";
 
@@ -149,7 +149,21 @@ function ContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }
                         <button
                             key={l.id}
                             className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`}
-                            onClick={() => { onEdit({ task_list: l.id }); onClose(); }}
+                            onClick={() => {
+                                const fromList = (lists || []).find((x) => String(x.id) === String(task.task_list));
+                                onEdit(
+                                    { task_list: l.id },
+                                    {
+                                        source: "context-menu",
+                                        action: "move-list",
+                                        listId: l.id,
+                                        listName: l.name,
+                                        fromListId: task.task_list,
+                                        fromListName: fromList?.name || null,
+                                    }
+                                );
+                                onClose();
+                            }}
                         >
                             <span className={styles.ctxListDot} style={{ background: l.color }} />
                             {l.name}
@@ -168,7 +182,10 @@ function ContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }
                             value={dueValue}
                             onChange={val => {
                                 setDueValue(val);
-                                onEdit({ due_date: val || null });
+                                onEdit(
+                                    { due_date: val || null },
+                                    { source: "context-menu", action: "set-due-date", dueDate: val || null }
+                                );
                                 onClose();
                             }}
                             placeholder="Pick date & time"
@@ -265,103 +282,18 @@ function TaskInfoModal({ task, listName, listColor, onClose }) {
     return createPortal(modal, document.body);
 }
 
-export function EditTaskModal({ task, onSave, onDelete, onClose }) {
-    const [form, setForm] = useState({
-        title:       task.title,
-        description: task.description || "",
-        priority:    task.priority,
-        energy_level: task.energy_level || task.energyLevel || "medium",
-        due_date:    task.due_date ? task.due_date.slice(0, 16) : "",
-    });
-    const [saving, setSaving] = useState(false);
-    const set = (field, val) => setForm(p => ({ ...p, [field]: val }));
-
-    const handleSave = async () => {
-        setSaving(true);
-        await onSave({ ...form, due_date: form.due_date || null });
-        setSaving(false);
-        onClose();
-    };
-
-    const handleDelete = () => {
-        onDelete?.();
-        onClose();
-    };
-
-    const modal = (
-        <div className={styles.modalBackdrop} onMouseDown={onClose}>
-            <div className={styles.editModal} onMouseDown={e => e.stopPropagation()}>
-                <div className={styles.editHeader}>
-                    <h3 className={styles.editTitle}>Edit Task</h3>
-                    <button className={styles.editClose} onClick={onClose}>✕</button>
-                </div>
-                <div className={styles.editBody}>
-                    <input
-                        className={styles.editInput}
-                        value={form.title}
-                        onChange={e => set("title", e.target.value)}
-                        placeholder="Task title"
-                    />
-                    <textarea
-                        className={styles.editDesc}
-                        value={form.description}
-                        onChange={e => set("description", e.target.value)}
-                        placeholder="Description (optional)"
-                        rows={2}
-                    />
-                    <div className={styles.editGrid}>
-                        <div className={styles.editField}>
-                            <label className={styles.editLabel}>Priority</label>
-                            <AnimatedDropdown
-                                value={form.priority}
-                                onChange={val => set("priority", val)}
-                                placeholder="Select priority"
-                                options={[
-                                    { value: "low",    label: "Low"    },
-                                    { value: "medium", label: "Medium" },
-                                    { value: "high",   label: "High"   },
-                                    { value: "urgent", label: "Urgent" },
-                                ]}
-                            />
-                        </div>
-                        <div className={styles.editField}>
-                            <label className={styles.editLabel}>Energy</label>
-                            <AnimatedDropdown
-                                value={form.energy_level}
-                                onChange={val => set("energy_level", val)}
-                                placeholder="Select energy"
-                                options={[
-                                    { value: "low",    label: "Low"    },
-                                    { value: "medium", label: "Medium" },
-                                    { value: "high",   label: "High"   },
-                                ]}
-                            />
-                        </div>
-                        <div className={styles.editField} style={{ gridColumn: "1 / -1" }}>
-                            <label className={styles.editLabel}>Due date</label>
-                            <DateTimePicker
-                                value={form.due_date}
-                                onChange={val => set("due_date", val)}
-                                placeholder="Pick date & time (optional)"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className={styles.editFooter}>
-                    <button type="button" className={styles.editDeleteLink} onClick={handleDelete}>
-                        Delete task
-                    </button>
-                    <div className={styles.editFooterActions}>
-                        <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-                        <button type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving}>
-                            {saving ? "Saving…" : "Save"}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+export function EditTaskModal({ task, onSave, onDelete, onClose, lists = [] }) {
+    return (
+        <CreateTaskModal
+            mode="edit"
+            initialTask={task}
+            defaultListId={task.task_list}
+            lists={lists}
+            onSave={onSave}
+            onDeleteTask={onDelete}
+            onClose={onClose}
+        />
     );
-    return createPortal(modal, document.body);
 }
 
 export default function TaskCard({
@@ -545,6 +477,7 @@ export default function TaskCard({
                     task={task}
                     onSave={data => onEdit(data)}
                     onDelete={onDelete}
+                    lists={lists}
                     onClose={() => setShowEdit(false)}
                 />
             )}

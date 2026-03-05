@@ -23,7 +23,6 @@ import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
 import { playCompletionChime } from "../../lib/sounds";
-import analyticsService from "../../api/analyticsService";
 
 import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import CreateListModal from "../Tasks/components/CreateListModal";
@@ -41,7 +40,6 @@ import {
   isRoutineOrEventTask,
 } from "./utils/index";
 import { useHomeData } from "./hooks/useHomeData";
-import { useScheduleCountdown } from "./hooks/useScheduleCountdown";
 import { MiniTimeline } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
@@ -89,8 +87,6 @@ export default function Homepage() {
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
-  const scheduleCountdownSecs = useScheduleCountdown(selectedDate, dayEvents);
-  const [analyticsProgress, setAnalyticsProgress] = useState(null);
   const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
   const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
   const taskWidgetRef = useRef(null);
@@ -120,9 +116,6 @@ export default function Homepage() {
     getUpcomingDeadlines().then((list) => setUpcomingDeadlines(Array.isArray(list) ? list : [])).catch(() => setUpcomingDeadlines([]));
   }, []);
 
-  useEffect(() => {
-    analyticsService.getProgress(14).then((data) => setAnalyticsProgress(data)).catch(() => setAnalyticsProgress(null));
-  }, []);
 
 
   /* When work timer hits 0 in the NOW widget: soft chime */
@@ -161,20 +154,6 @@ export default function Homepage() {
     return events[0] ?? null;
   }, [allCalEvents, selectedDate]);
 
-  /** Today vs yesterday scheduled hours — used in endOfDay Right Now state */
-  const todayVsYesterday = useMemo(() => {
-    const dp = analyticsProgress?.daily_progress;
-    if (!dp?.length) return null;
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const yestStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-    const todayEntry = dp.find(d => d.date === todayStr);
-    const yestEntry = dp.find(d => d.date === yestStr);
-    if (!todayEntry || !yestEntry) return null;
-    const diff = Math.round((todayEntry.actual_hours - yestEntry.actual_hours) * 10) / 10;
-    if (Math.abs(diff) < 0.1) return { label: "≈ same hours as yesterday", dir: "flat" };
-    if (diff > 0) return { label: `↑ ${diff}h more than yesterday`, dir: "up" };
-    return { label: `↓ ${Math.abs(diff)}h less than yesterday`, dir: "down" };
-  }, [analyticsProgress]);
 
 
   const getTaskCategoryPillMeta = useCallback((task) => {
@@ -557,8 +536,6 @@ export default function Homepage() {
   );
   const taskWidgetSpineCompletedPct =
     taskWidgetItemsOnly.length > 0 ? (taskWidgetCompletedCount / taskWidgetItemsOnly.length) * 100 : 0;
-  const taskWidgetRemainingCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
-
   /** Today's free windows from schedule (>= 20 min, chronological). */
   const todayFreeWindows = useMemo(() => {
     if (!isToday(selectedDate)) return [];
@@ -568,16 +545,6 @@ export default function Homepage() {
   }, [selectedDate, sortedEvents]);
 
 
-  /** Most urgent incomplete task for focus suggestion. */
-  const topActionTask = useMemo(() => {
-    const incomplete = taskWidgetItemsOnly.filter((t) => !t.completed);
-    return (
-      incomplete.find((t) => t.taskWidgetStatus === "overdue") ||
-      incomplete.find((t) => t.taskWidgetStatus === "now") ||
-      incomplete[0] ||
-      null
-    );
-  }, [taskWidgetItemsOnly]);
 
 
 
@@ -588,65 +555,6 @@ export default function Homepage() {
     [taskWidgetItemsOnly]
   );
 
-  /** Status strip for IntelligenceRow header — smart schedule + task awareness */
-  const navStatusStrip = useMemo(() => {
-    if (!isToday(selectedDate)) return null;
-    const nav = navigatorContext;
-
-    // 1. Schedule conflict — always top priority
-    if (nav.state === "conflict") {
-      const timeStr = nav.conflictAt
-        ? new Date(nav.conflictAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
-        : null;
-      return { variant: "Conflict", text: `Warning: Schedule overlap${timeStr ? ` at ${timeStr}` : ""}` };
-    }
-
-    // 2. Overdue tasks — urgent, warm red
-    if (taskWidgetOverdueCount > 0) {
-      if (taskWidgetOverdueCount === 1 && topActionTask) {
-        return { variant: "Conflict", text: `⚠ Running behind — focus on ${topActionTask.title}` };
-      }
-      return { variant: "Conflict", text: `⚠ ${taskWidgetOverdueCount} tasks overdue` };
-    }
-
-    // 3. Currently in a scheduled event/task
-    if (nav.state === "task" && nav.currentBlock?.title) {
-      return { variant: "Task", text: `Now: ${nav.currentBlock.title}` };
-    }
-
-    // 4. Free gap — show it
-    if (nav.state === "gap" && (nav.gapMins ?? 0) >= 15) {
-      return { variant: "Gap", text: `Free window · ${nav.gapMins}m until ${nav.nextItem?.title || "next item"}` };
-    }
-
-    // 5. Morning — day hasn't started yet
-    if (nav.state === "beforeDay") {
-      const firstEvent = sortedEvents?.[0];
-      if (firstEvent?.title && firstEvent.start_time) {
-        const timeStr = new Date(firstEvent.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-        return { variant: "Gap", text: `Your day starts with ${firstEvent.title} at ${timeStr}` };
-      }
-      return null;
-    }
-
-    // 6. All events done but tasks still remain
-    const allEventsDone =
-      (sortedEvents?.length ?? 0) > 0 &&
-      sortedEvents.every(e => !e.end_time || new Date(e.end_time).getTime() < now.getTime());
-    if (allEventsDone && taskWidgetRemainingCount > 0) {
-      return {
-        variant: "Gap",
-        text: `Events done for today · ${taskWidgetRemainingCount} task${taskWidgetRemainingCount !== 1 ? "s" : ""} still need attention`,
-      };
-    }
-
-    // 7. Everything done / end of day
-    if (nav.state === "endOfDay" || (allEventsDone && taskWidgetRemainingCount === 0)) {
-      return { variant: "", text: "All clear — great work today ✓" };
-    }
-
-    return null;
-  }, [navigatorContext, selectedDate, isToday, taskWidgetOverdueCount, topActionTask, taskWidgetRemainingCount, sortedEvents, now]);
 
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
@@ -777,7 +685,6 @@ export default function Homepage() {
       <div className={styles.intelligenceRowWrap}>
       <IntelligenceRow
         displayName={displayName}
-        statusStrip={navStatusStrip}
 
         slot1TodayTasks={
           // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
@@ -818,8 +725,6 @@ export default function Homepage() {
           isToday: isToday(selectedDate),
           navigatorContext,
           sortedEvents,
-          scheduleCountdownSecs,
-          statusStrip: navStatusStrip,
           hasTimerSession,
           timerMode,
           timeLeft,
@@ -827,7 +732,6 @@ export default function Homepage() {
           breakTime,
           timerTask,
           tomorrowFirstEvent,
-          todayVsYesterday,
           taskWidgetItemsOnly,
         }}
       />

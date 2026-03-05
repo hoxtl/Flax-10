@@ -35,7 +35,6 @@ function useTflDelays() {
 
 export default function IntelligenceRow({
   displayName,
-  statusStrip,
   slot1TodayTasks,
   slot3Urgent,
   studyPulseWindows,

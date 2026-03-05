@@ -1,12 +1,12 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronRight, Search, X, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, X, Plus, Filter } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import TaskCard from "./TaskCard";
 import CreateTaskBar from "./CreateTaskBar";
 import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
-import MultiSelectDropdown from "../../../components/ui/MultiSelectDropdown";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
@@ -134,73 +134,80 @@ function Section({
         )}
       </button>
 
-      {totalInGroup > 0 && (
-        <div className={styles.sectionProgressBar} aria-hidden>
-          <div
-            className={`${styles.sectionProgressFill} ${isOverdueSection ? styles.sectionProgressFillDanger : sectionType === "today" ? styles.sectionProgressFillToday : ""}`}
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      )}
-
-      <div className={`${styles.sectionCollapse} ${collapsed ? styles.sectionCollapseHidden : ""}`}>
-        <div className={styles.sectionBody}>
-          {showEmptyState ? (
-            emptyCardProps ? (
-              <AllTasksCompleteCard
-                emoji="🎉"
-                message={emptyCardProps.message}
-                sub={emptyCardProps.sub}
-                ctaLabel={emptyCardProps.ctaLabel}
-                onCtaClick={emptyCardProps.onCtaClick}
-              />
-            ) : (
-            <div className={styles.sectionEmptyState}>
-              <span className={styles.sectionEmptyIcon} aria-hidden>🎉</span>
-              <p className={styles.sectionEmptyMessage}>{emptyMessage}</p>
-              {emptySub && <p className={styles.sectionEmptySub}>{emptySub}</p>}
-            </div>
-            )
-          ) : (
-            <>
-              {visibleTasks.map(task => {
-                const list = listMap[String(task.task_list)];
-                return (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    listName={list?.name}
-                    listColor={getListColor(list)}
-                    lists={lists}
-                    onToggle={() => {
-                      const wasIncomplete = !task.completed;
-                      onToggleComplete(task.id, task.completed);
-                      if (wasIncomplete && onTaskCompleted) onTaskCompleted(task);
-                    }}
-                    onDelete={() => onDeleteTask(task.id)}
-                    onEdit={data => onEditTask(task.id, data)}
-                    hideDueBadge={hideDueBadge}
-                    hideListBadge={hideListBadge}
-                    isOverdue={isOverdueSection}
-                    searchQuery={searchQuery}
+      <AnimatePresence initial={false}>
+        {!collapsed && (
+          <motion.div
+            key="section-body"
+            initial={{ height: 0, opacity: 0, y: -4 }}
+            animate={{ height: "auto", opacity: 1, y: 0 }}
+            exit={{ height: 0, opacity: 0, y: -4 }}
+            transition={{
+              height: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+              opacity: { duration: 0.2, ease: "easeOut" },
+              y: { duration: 0.2, ease: "easeOut" },
+            }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className={styles.sectionBody}>
+              {showEmptyState ? (
+                emptyCardProps ? (
+                  <AllTasksCompleteCard
+                    emoji="🎉"
+                    message={emptyCardProps.message}
+                    sub={emptyCardProps.sub}
+                    ctaLabel={emptyCardProps.ctaLabel}
+                    onCtaClick={emptyCardProps.onCtaClick}
                   />
-                );
-              })}
-              {applyLimit && hiddenCount > 0 && (
-                <div className={styles.showMoreWrap}>
-                  <button
-                    type="button"
-                    className={styles.showMoreBtn}
-                    onClick={() => setShowAll(v => !v)}
-                  >
-                    {showAll ? "Show less ↑" : `Show all ${tasks.length} →`}
-                  </button>
+                ) : (
+                <div className={styles.sectionEmptyState}>
+                  <span className={styles.sectionEmptyIcon} aria-hidden>🎉</span>
+                  <p className={styles.sectionEmptyMessage}>{emptyMessage}</p>
+                  {emptySub && <p className={styles.sectionEmptySub}>{emptySub}</p>}
                 </div>
+                )
+              ) : (
+                <>
+                  {visibleTasks.map(task => {
+                    const list = listMap[String(task.task_list)];
+                    return (
+                      <div key={task.id} className={styles.taskRow}>
+                        <TaskCard
+                          task={task}
+                          listName={list?.name}
+                          listColor={getListColor(list)}
+                          lists={lists}
+                          onToggle={() => {
+                            const wasIncomplete = !task.completed;
+                            onToggleComplete(task.id, task.completed);
+                            if (wasIncomplete && onTaskCompleted) onTaskCompleted(task);
+                          }}
+                          onDelete={() => onDeleteTask(task.id)}
+                          onEdit={(data, meta) => onEditTask(task.id, data, meta)}
+                          hideDueBadge={hideDueBadge}
+                          hideListBadge={hideListBadge}
+                          isOverdue={isOverdueSection}
+                          searchQuery={searchQuery}
+                        />
+                      </div>
+                    );
+                  })}
+                  {applyLimit && hiddenCount > 0 && (
+                    <div className={styles.showMoreWrap}>
+                      <button
+                        type="button"
+                        className={styles.showMoreBtn}
+                        onClick={() => setShowAll(v => !v)}
+                      >
+                        {showAll ? "Show less ↑" : `Show all ${tasks.length} →`}
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -225,7 +232,11 @@ export default function TaskFeed({
   const [sortBy, setSortBy] = useState("due");
   const [showDone, setShowDone] = useState(true);
   const [filterModuleCodes, setFilterModuleCodes] = useState([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [activeFilterTab, setActiveFilterTab] = useState("lists");
+  const [filterQuery, setFilterQuery] = useState("");
   const searchInputRef = useRef(null);
+  const filterRef = useRef(null);
 
   // Build list lookup map: id → { name, color, idx }
   const listMap = useMemo(() => {
@@ -239,8 +250,8 @@ export default function TaskFeed({
   // Apply module filter to tasks
   const tasksByModule = useMemo(() => {
     if (!filterModuleCodes || filterModuleCodes.length === 0) return tasks;
-    const set = new Set(filterModuleCodes.map(String));
-    return tasks.filter((t) => set.has(String(t.module_code || "")));
+    const selected = new Set(filterModuleCodes.map(String));
+    return tasks.filter((t) => selected.has(String(t.module_code || "")));
   }, [tasks, filterModuleCodes]);
 
   const pending = tasksByModule.filter(t => !t.completed);
@@ -258,6 +269,58 @@ export default function TaskFeed({
     ],
     [lists]
   );
+  const listItems = useMemo(
+    () => listFilterOptions.filter((o) => o.value !== ""),
+    [listFilterOptions]
+  );
+  const moduleItems = useMemo(
+    () => moduleOptions.filter((o) => o.value !== ""),
+    [moduleOptions]
+  );
+
+  const visibleListItems = useMemo(() => {
+    const q = filterQuery.trim().toLowerCase();
+    if (!q) return listItems;
+    return listItems.filter((o) => o.label.toLowerCase().includes(q));
+  }, [listItems, filterQuery]);
+
+  const moduleCodePrefix = (code = "") => code.match(/^[A-Za-z]+/)?.[0]?.toUpperCase() || "Other";
+  const groupedVisibleModuleItems = useMemo(() => {
+    const q = filterQuery.trim().toLowerCase();
+    const base = !q
+      ? moduleItems
+      : moduleItems.filter((o) => o.label.toLowerCase().includes(q));
+    return base.reduce((acc, item) => {
+      const k = moduleCodePrefix(item.value);
+      if (!acc[k]) acc[k] = [];
+      acc[k].push(item);
+      return acc;
+    }, {});
+  }, [moduleItems, filterQuery]);
+  const moduleGroupKeys = useMemo(
+    () => Object.keys(groupedVisibleModuleItems).sort(),
+    [groupedVisibleModuleItems]
+  );
+
+  const toggleListFilter = (value) => {
+    const v = String(value);
+    const curr = new Set((filterListIds || []).map(String));
+    if (curr.has(v)) curr.delete(v);
+    else curr.add(v);
+    onFilterByList?.(Array.from(curr));
+  };
+  const toggleModuleFilter = (value) => {
+    const v = String(value);
+    setFilterModuleCodes((prev) => (
+      prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]
+    ));
+  };
+  const clearAllFilters = () => {
+    onFilterByList?.([]);
+    setFilterModuleCodes([]);
+    setFilterQuery("");
+  };
+  const activeFilterCount = (filterListIds?.length || 0) + filterModuleCodes.length;
 
   const filtered = useMemo(() => {
     if (!search.trim()) return pending;
@@ -350,9 +413,15 @@ export default function TaskFeed({
     return lists.find(l => String(l.id) === String(activeListId)) || null;
   }, [activeListId, lists]);
 
-  const headerTitle = activeList
-    ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
-    : (activeModuleCode || "All tasks");
+  const headerTitle = activeFilter === "today"
+    ? "Today's tasks"
+    : activeFilter === "this_week"
+      ? "This Week's Tasks"
+      : activeFilter === "overdue"
+        ? "Overdue tasks"
+        : activeList
+          ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
+          : (activeModuleCode || "All tasks");
   const sectionProps = {
     sortBy, listMap, lists,
     onToggleComplete, onTaskCompleted, onDeleteTask, onEditTask,
@@ -381,12 +450,26 @@ export default function TaskFeed({
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
+  useEffect(() => {
+    if (!isFilterOpen) return;
+    const onDown = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) setIsFilterOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [isFilterOpen]);
+
   return (
     <div className={styles.feed}>
       {/* Dynamic list header */}
       <header className={styles.listHeader} key={activeListId ?? "all"}>
         <div className={styles.listHeaderTitleWrap}>
-          <h1 className={styles.listHeaderTitle} title={headerTitle}>{headerTitle}</h1>
+          <h1
+            className={`${styles.listHeaderTitle} ${["All tasks", "Today's tasks", "This Week's Tasks"].includes(headerTitle) ? styles.listHeaderTitleModulesLike : ""}`}
+            title={headerTitle}
+          >
+            {headerTitle}
+          </h1>
         </div>
         <div className={styles.listHeaderDivider} aria-hidden />
       </header>
@@ -451,31 +534,106 @@ export default function TaskFeed({
               className={styles.sortDropdown}
             />
           </div>
-          {typeof onFilterByList === "function" && (
-            <div className={styles.filterWrap}>
-              <label className={styles.sortLabel}>FILTER BY LIST</label>
-              <MultiSelectDropdown
-                value={filterListIds}
-                onChange={onFilterByList}
-                options={listFilterOptions}
-                placeholder="All lists"
-                countLabel="lists"
-                className={styles.sortDropdown}
-                displayAsPills
-              />
-            </div>
-          )}
-          <div className={styles.filterWrap}>
-            <label className={styles.sortLabel}>FILTER BY MODULE</label>
-            <MultiSelectDropdown
-              value={filterModuleCodes}
-              onChange={setFilterModuleCodes}
-              options={moduleOptions}
-              placeholder="All modules"
-              countLabel="modules"
-              className={styles.sortDropdown}
-              displayAsPills
-            />
+          <div className={styles.filterPanelWrap} ref={filterRef}>
+            <button
+              type="button"
+              className={styles.filterBtn}
+              onClick={() => setIsFilterOpen((o) => !o)}
+              aria-haspopup="dialog"
+              aria-expanded={isFilterOpen}
+            >
+              <Filter size={14} />
+              <span>Filter</span>
+              {activeFilterCount > 0 && <span className={styles.filterCount}>{activeFilterCount}</span>}
+            </button>
+            <AnimatePresence>
+              {isFilterOpen && (
+              <motion.div
+                className={styles.filterPanel}
+                role="dialog"
+                aria-label="Task filters"
+                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                style={{ originY: 0, originX: 1 }}
+              >
+                <div className={styles.filterTabs}>
+                  <button
+                    type="button"
+                    className={`${styles.filterTab} ${activeFilterTab === "lists" ? styles.filterTabActive : ""}`}
+                    onClick={() => setActiveFilterTab("lists")}
+                  >
+                    Lists
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.filterTab} ${activeFilterTab === "modules" ? styles.filterTabActive : ""}`}
+                    onClick={() => setActiveFilterTab("modules")}
+                  >
+                    Modules
+                  </button>
+                </div>
+                <div className={styles.filterSearchWrap}>
+                  <Search size={14} className={styles.filterSearchIcon} />
+                  <input
+                    type="text"
+                    value={filterQuery}
+                    onChange={(e) => setFilterQuery(e.target.value)}
+                    className={styles.filterSearchInput}
+                    placeholder={`Search ${activeFilterTab}...`}
+                  />
+                </div>
+                <div className={styles.filterListContainer}>
+                  {activeFilterTab === "lists" && (
+                    visibleListItems.length === 0 ? (
+                      <p className={styles.filterEmptyText}>No lists found.</p>
+                    ) : (
+                      <div className={styles.filterItems}>
+                        {visibleListItems.map((item) => {
+                          const checked = (filterListIds || []).map(String).includes(String(item.value));
+                          return (
+                            <label key={item.value} className={styles.filterItemRow}>
+                              <input type="checkbox" checked={checked} onChange={() => toggleListFilter(item.value)} />
+                              <span>{item.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )
+                  )}
+                  {activeFilterTab === "modules" && (
+                    moduleGroupKeys.length === 0 ? (
+                      <p className={styles.filterEmptyText}>No modules found.</p>
+                    ) : (
+                      <div className={styles.filterGroups}>
+                        {moduleGroupKeys.map((group) => (
+                          <div key={group} className={styles.filterGroup}>
+                            <h4 className={styles.filterGroupTitle}>{group}</h4>
+                            <div className={styles.filterItems}>
+                              {(groupedVisibleModuleItems[group] || []).map((item) => {
+                                const checked = filterModuleCodes.includes(String(item.value));
+                                return (
+                                  <label key={item.value} className={styles.filterItemRow}>
+                                    <input type="checkbox" checked={checked} onChange={() => toggleModuleFilter(item.value)} />
+                                    <span>{item.label}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  )}
+                </div>
+                <div className={styles.filterActions}>
+                  <button type="button" className={styles.filterClearBtn} onClick={clearAllFilters}>Clear all</button>
+                </div>
+              </motion.div>
+            )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -510,6 +668,21 @@ export default function TaskFeed({
               emptyCardProps={todayEmptyCardProps}
               {...sectionProps}
             />
+          ) : activeFilter === "this_week" ? (
+            <>
+              <Section
+                title="Today" emoji="📅" tasks={today} hideDueBadge
+                sectionType="today" completedCount={completedTodayCount}
+                emptyCardProps={todayEmptyCardProps}
+                {...sectionProps}
+              />
+              <Section
+                title="This week" emoji="🗓️" tasks={thisWeek}
+                sectionType="thisWeek" completedCount={completedWeekCount}
+                emptyMessage="Nothing else due this week."
+                {...sectionProps}
+              />
+            </>
           ) : (
             <Section
               title="All tasks"
@@ -537,29 +710,42 @@ export default function TaskFeed({
                   <ChevronRight size={14} className={styles.sectionChevron} aria-hidden />
                 )}
               </button>
-              <div className={styles.sectionProgressBar} aria-hidden>
-                <div className={`${styles.sectionProgressFill} ${styles.sectionProgressFillToday}`} style={{ width: "100%" }} />
-              </div>
-              <div className={`${styles.sectionCollapse} ${!showDone ? styles.sectionCollapseHidden : ""}`}>
-                <div className={styles.completedCards}>
-                  {sortTasks(filteredCompleted, sortBy, listMap).map(task => {
-                    const list = listMap[String(task.task_list)];
-                    return (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        listName={list?.name}
-                        listColor={getListColor(list)}
-                        lists={lists}
-                        onToggle={() => onToggleComplete(task.id, task.completed)}
-                        onDelete={() => onDeleteTask(task.id)}
-                        onEdit={data => onEditTask(task.id, data)}
-                        isCompletedSection
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+              <AnimatePresence initial={false}>
+                {showDone && (
+                  <motion.div
+                    key="completed-section-body"
+                    initial={{ height: 0, opacity: 0, y: -4 }}
+                    animate={{ height: "auto", opacity: 1, y: 0 }}
+                    exit={{ height: 0, opacity: 0, y: -4 }}
+                    transition={{
+                      height: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+                      opacity: { duration: 0.2, ease: "easeOut" },
+                      y: { duration: 0.2, ease: "easeOut" },
+                    }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <div className={styles.completedCards}>
+                      {sortTasks(filteredCompleted, sortBy, listMap).map(task => {
+                        const list = listMap[String(task.task_list)];
+                        return (
+                          <div key={task.id} className={styles.taskRow}>
+                            <TaskCard
+                              task={task}
+                              listName={list?.name}
+                              listColor={getListColor(list)}
+                              lists={lists}
+                              onToggle={() => onToggleComplete(task.id, task.completed)}
+                              onDelete={() => onDeleteTask(task.id)}
+                              onEdit={(data, meta) => onEditTask(task.id, data, meta)}
+                              isCompletedSection
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </div>

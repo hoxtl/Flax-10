@@ -9,7 +9,7 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
-import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
+import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
 function useModulesPage(initialSearch = '') {
@@ -196,9 +196,9 @@ function Toolbar({ search, sorting, departments }) {
     return (
         <div className={styles.toolbar}>
             <SearchInput value={search.query} onChange={search.onQueryChange} />
-            <ModuleDropdown value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-            <ModuleDropdown value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-            <ModuleDropdown value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+            <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+            <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+            <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
         </div>
     );
 }

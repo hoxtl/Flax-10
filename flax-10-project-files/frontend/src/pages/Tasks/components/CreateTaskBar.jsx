@@ -33,6 +33,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
   const [inputFocused, setInputFocused] = useState(false);
   const [enrolledModules, setEnrolledModules] = useState([]);
   const inputRef = useRef(null);
+  const cardRef = useRef(null);
 
   useEffect(() => {
     Promise.all([getModules(), getEnrollments()])
@@ -49,6 +50,24 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
     if (!next) return;
     setTaskListId((prev) => (prev === next ? prev : next));
   }, [defaultListId, sortedLists.length, sortedLists[0]?.id]);
+
+  useEffect(() => {
+    if (!inputFocused) return;
+    const handleDown = (e) => {
+      if (!cardRef.current) return;
+      if (!cardRef.current.contains(e.target)) {
+        setInputFocused(false);
+        const inp = externalInputRef?.current || inputRef.current;
+        inp?.blur?.();
+      }
+    };
+    document.addEventListener("mousedown", handleDown);
+    document.addEventListener("touchstart", handleDown);
+    return () => {
+      document.removeEventListener("mousedown", handleDown);
+      document.removeEventListener("touchstart", handleDown);
+    };
+  }, [inputFocused, externalInputRef]);
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
@@ -90,7 +109,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
   );
 
   return (
-    <form className={styles.card} onSubmit={handleSubmit}>
+    <form className={styles.card} onSubmit={handleSubmit} ref={cardRef}>
       <div className={styles.inputRow}>
         <input
           ref={externalInputRef ?? inputRef}
@@ -106,6 +125,13 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
               const insideForm = activeEl && activeEl.closest && activeEl.closest(`.${styles.card}`);
               if (!insideForm) setInputFocused(false);
             }, 0);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              setInputFocused(false);
+              e.currentTarget.blur();
+            }
           }}
           aria-label="Quick add task"
         />

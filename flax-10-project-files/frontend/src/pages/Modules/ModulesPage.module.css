@@ -52,6 +52,11 @@
     margin-bottom: 2rem;
     align-items: stretch;
 }
+.toolbarDropdown {
+    width: 170px;
+    min-width: 170px;
+    flex: 0 0 170px;
+}
 .searchContainer {
     position: relative;
     display: flex;

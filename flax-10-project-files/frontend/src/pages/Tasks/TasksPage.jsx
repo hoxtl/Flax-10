@@ -16,6 +16,7 @@ function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = [])
     return useMemo(() => {
         const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
+        const weekEnd = new Date(todayEnd); weekEnd.setDate(weekEnd.getDate() + 7);
 
         let filtered = tasks;
         if (filterListIds && filterListIds.length > 0) {
@@ -29,6 +30,8 @@ function useFilteredTasks(tasks, activeListId, activeFilter, filterListIds = [])
             return filtered.filter(t => !t.completed && t.due_date && new Date(t.due_date) < dayStart);
         if (activeFilter === "today")
             return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
+        if (activeFilter === "this_week")
+            return filtered.filter(t => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= weekEnd);
         return filtered;
     }, [tasks, activeListId, activeFilter, filterListIds]);
 }
@@ -52,6 +55,7 @@ export default function TasksPage() {
     const [lastCreatedListId, setLastCreatedListId] = useState(null);
     const [toastUndo,       setToastUndo]      = useState(null);
     const [toastDelete,     setToastDelete]    = useState(false);
+    const [toastInfo,       setToastInfo]      = useState(null);
     const openedFullPlanningFromUrl = useRef(false);
 
     useEffect(() => {
@@ -86,6 +90,28 @@ export default function TasksPage() {
         removeTask(taskId);
         setToastDelete(true);
         setTimeout(() => setToastDelete(false), 3500);
+    };
+
+    const handleEditTask = async (taskId, data, meta = null) => {
+        const updated = await editTask(taskId, data);
+
+        if (meta?.source === "context-menu" && meta?.action === "move-list") {
+            const toListName =
+                meta?.listName ||
+                lists.find((l) => String(l.id) === String(updated?.task_list ?? data?.task_list))?.name ||
+                "new list";
+            setToastInfo(`Task moved to ${toListName}.`);
+            setTimeout(() => setToastInfo(null), 3000);
+            return updated;
+        }
+
+        if (meta?.source === "context-menu" && meta?.action === "set-due-date") {
+            setToastInfo(data?.due_date ? "Task due date updated." : "Task due date removed.");
+            setTimeout(() => setToastInfo(null), 3000);
+            return updated;
+        }
+
+        return updated;
     };
 
     const handleDeleteList = (listId) => {
@@ -138,7 +164,7 @@ export default function TasksPage() {
                 filterListIds={filterListIds}
                 onToggleComplete={toggleComplete}
                 onDeleteTask={handleDeleteTask}
-                onEditTask={editTask}
+                onEditTask={handleEditTask}
                 onCreateTask={() => setShowTaskModal(true)}
                 onAddTask={async (data) => {
                     const created = await addTask(data);
@@ -175,6 +201,12 @@ export default function TasksPage() {
                 <div className={`${styles.toast} ${styles.toastDelete}`}>
                     <span>🗑 Task deleted.</span>
                     <button type="button" className={styles.toastClose} onClick={() => setToastDelete(false)}>✕</button>
+                </div>
+            )}
+            {toastInfo && (
+                <div className={`${styles.toast} ${styles.toastDelete}`}>
+                    <span>{toastInfo}</span>
+                    <button type="button" className={styles.toastClose} onClick={() => setToastInfo(null)}>✕</button>
                 </div>
             )}
             {showListModal && (

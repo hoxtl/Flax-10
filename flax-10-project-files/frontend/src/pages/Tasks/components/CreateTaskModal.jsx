@@ -8,7 +8,7 @@
  */
 
 import { useState, useMemo, useEffect } from "react";
-import { Flag } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import DateTimePicker from "./DateTimePicker";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
@@ -65,7 +65,21 @@ function getListColor(list, idx) {
  * Optional: newListIdCreated — when set (after creating a list from that modal), form category is set to this list.
  * Optional: showAddToScheduleToggle, addToScheduleLabel, modules.
  */
-export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, onSave, onClose, onOpenCreateList, newListIdCreated, showAddToScheduleToggle = false, addToScheduleLabel = "Add to today's schedule", modules = [] }) {
+export default function CreateTaskModal({
+  lists,
+  defaultListId,
+  defaultDueDate,
+  onSave,
+  onClose,
+  onOpenCreateList,
+  newListIdCreated,
+  showAddToScheduleToggle = false,
+  addToScheduleLabel = "Add to today's schedule",
+  modules = [],
+  mode = "create",
+  initialTask = null,
+  onDeleteTask,
+}) {
   const sortedLists = useMemo(
     () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
     [lists]
@@ -74,16 +88,21 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
     () => [...(modules || [])].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")),
     [modules]
   );
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    priority: "medium",
-    energy_level: "medium",
-    due_date: defaultDueDate ?? "",
-    task_list: defaultListId || (sortedLists[0]?.id ?? ""),
-    estimated_blocks: 1,
-    estimated_minutes: null,
-    module: "",
+  const [form, setForm] = useState(() => {
+    const task = initialTask || {};
+    const taskDue = task.due_date ? String(task.due_date).slice(0, 16) : "";
+    const taskModuleId = task.module_id ?? task.module ?? task.moduleId ?? "";
+    return {
+      title: task.title ?? "",
+      description: task.description ?? "",
+      priority: task.priority ?? "medium",
+      energy_level: task.energy_level || task.energyLevel || "medium",
+      due_date: taskDue || (defaultDueDate ?? ""),
+      task_list: String(task.task_list ?? defaultListId ?? sortedLists[0]?.id ?? ""),
+      estimated_blocks: task.estimated_blocks ?? 1,
+      estimated_minutes: task.estimated_minutes ?? null,
+      module: taskModuleId ? String(taskModuleId) : "",
+    };
   });
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -111,6 +130,13 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
   const durationMinutes = form.estimated_minutes != null && form.estimated_minutes > 0
     ? form.estimated_minutes
     : (BLOCK_MINUTES[form.estimated_blocks] ?? 25);
+  const askFlaxInitialMessage = useMemo(() => {
+    const title = (form.title || "").trim();
+    if (!title) {
+      return "Help me estimate how long this task might take — what time block should I pick?";
+    }
+    return `Help me estimate how long "${title}" might take and which focus block I should pick.`;
+  }, [form.title]);
   const endTimeDisplay = useMemo(() => {
     if (!form.due_date) return "—";
     const start = new Date(form.due_date);
@@ -130,7 +156,7 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
       module: form.module ? Number(form.module) : null,
       estimated_minutes: form.estimated_minutes != null && form.estimated_minutes > 0 ? form.estimated_minutes : null,
     };
-    if (showAddToScheduleToggle) {
+    if (mode === "create" && showAddToScheduleToggle) {
       await onSave(payload, { addToSchedule });
     } else {
       await onSave(payload);
@@ -143,11 +169,24 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
     if (e.key === "Escape") onClose();
   };
 
-  return (
+  const handleDelete = async () => {
+    if (!onDeleteTask) return;
+    setSaving(true);
+    try {
+      await onDeleteTask();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isEditMode = mode === "edit";
+
+  const modal = (
     <div className={styles.overlay} onMouseDown={onClose} onKeyDown={handleKey}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>New task</h2>
+          <h2 className={styles.title}>{isEditMode ? "Edit task" : "New task"}</h2>
           <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
             ✕
           </button>
@@ -199,8 +238,10 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
             <EstTimeHelpBanner
               message="Not sure what estimated time to put? Ask Flax for a suggestion."
               ctaLabel="Ask Flax"
+              initialMessage={askFlaxInitialMessage}
               className={styles.estTimeBannerModal}
             />
+            <span className={styles.focusBlocksLabel}>Focus blocks</span>
             <div className={styles.chipGroup}>
               {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
                 <button
@@ -241,32 +282,34 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
             </div>
           </div>
 
-          <div className={styles.row}>
-            <div className={styles.listWrap}>
-              <span className={styles.listWrapLabel}>Category</span>
-              {selectedListColor && (
-                <span className={styles.listDot} style={{ background: selectedListColor }} />
-              )}
-              <div className={styles.listDropdownTriggerWrap}>
-                <AnimatedDropdown
-                  value={form.task_list ? String(form.task_list) : ""}
-                  onChange={(v) => {
-                    if (v === "__new_list__") {
-                      onOpenCreateList?.();
-                      return;
-                    }
-                    setForm((p) => ({ ...p, task_list: v }));
-                  }}
-                  placeholder="Select list"
-                  options={categoryOptions}
-                  className={styles.listAnimatedDropdown}
-                />
+          <div className={styles.settingsStack}>
+            <div className={styles.settingRow}>
+              <div className={styles.listWrap}>
+                <span className={styles.listWrapLabel}>Category</span>
+                {selectedListColor && (
+                  <span className={styles.listDot} style={{ background: selectedListColor }} />
+                )}
+                <div className={styles.listDropdownTriggerWrap}>
+                  <AnimatedDropdown
+                    value={form.task_list ? String(form.task_list) : ""}
+                    onChange={(v) => {
+                      if (v === "__new_list__") {
+                        onOpenCreateList?.();
+                        return;
+                      }
+                      setForm((p) => ({ ...p, task_list: v }));
+                    }}
+                    placeholder="Select list"
+                    options={categoryOptions}
+                    className={styles.listAnimatedDropdown}
+                  />
+                </div>
               </div>
             </div>
-            <div className={styles.rowBlock}>
-              <span className={styles.rowLabel}>Priority</span>
-              <div className={styles.iconGroup}>
-                <Flag className={styles.icon} size={16} aria-hidden />
+
+            <div className={styles.settingRow}>
+              <div className={styles.rowBlock}>
+                <span className={styles.rowLabel}>Priority</span>
                 <div className={`${styles.chipGroup} ${styles.chipGroupSingleRow}`}>
                   {PRIORITY_OPTIONS.map(({ value, label }) => (
                     <button
@@ -281,20 +324,23 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
                 </div>
               </div>
             </div>
-            <div className={styles.rowBlock}>
-              <span className={styles.rowLabel}>Energy</span>
-              <div className={styles.chipGroup}>
-                {ENERGY_OPTIONS.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    className={`${styles.chip} ${form.energy_level === value ? styles.chipActive : ""}`}
-                    onClick={() => set("energy_level", value)}
-                    title={value === "high" ? "High cognitive load — avoid back-to-back with another high-energy task" : value === "low" ? "Quick / low effort" : "Moderate"}
-                  >
-                    {label}
-                  </button>
-                ))}
+
+            <div className={styles.settingRow}>
+              <div className={styles.rowBlock}>
+                <span className={styles.rowLabel}>Energy</span>
+                <div className={styles.chipGroup}>
+                  {ENERGY_OPTIONS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={`${styles.chip} ${form.energy_level === value ? styles.chipActive : ""}`}
+                      onClick={() => set("energy_level", value)}
+                      title={value === "high" ? "High cognitive load — avoid back-to-back with another high-energy task" : value === "low" ? "Quick / low effort" : "Moderate"}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -319,7 +365,7 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
             </div>
           )}
 
-          {showAddToScheduleToggle && (
+          {mode === "create" && showAddToScheduleToggle && (
             <div className={styles.scheduleRow}>
               <label className={styles.scheduleLabel}>
                 <input
@@ -335,6 +381,11 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
         </div>
 
         <div className={styles.footer}>
+          {isEditMode && onDeleteTask && (
+            <button type="button" className={styles.deleteBtn} onClick={handleDelete} disabled={saving}>
+              Delete task
+            </button>
+          )}
           <button type="button" className={styles.cancelBtn} onClick={onClose}>
             Cancel
           </button>
@@ -344,10 +395,11 @@ export default function CreateTaskModal({ lists, defaultListId, defaultDueDate, 
             onClick={handleSave}
             disabled={saving || !form.title.trim()}
           >
-            {saving ? "Saving…" : "Add task"}
+            {saving ? "Saving…" : (isEditMode ? "Save" : "Add task")}
           </button>
         </div>
       </div>
     </div>
   );
+  return createPortal(modal, document.body);
 }

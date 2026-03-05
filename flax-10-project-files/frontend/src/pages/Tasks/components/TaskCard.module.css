@@ -22,16 +22,16 @@
 
 /* Priority-based left accent borders (3px) */
 .cardAccentUrgent {
-    border-left-color: #f87171;
+    border-left-color: rgba(123, 103, 81, 0.24);
 }
 .cardAccentHigh {
-    border-left-color: #fb923c;
+    border-left-color: rgba(123, 103, 81, 0.24);
 }
 .cardAccentMedium {
-    border-left-color: #fcd34d;
+    border-left-color: rgba(123, 103, 81, 0.24);
 }
 .cardAccentLow {
-    border-left-color: #e7e5e4;
+    border-left-color: rgba(123, 103, 81, 0.18);
 }
 .cardDone {
     opacity: 1;
@@ -226,10 +226,11 @@
 /* Task names: text-sm font-medium text-stone-800 */
 .title {
     font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 550;
     color: #292524;
-    line-height: 1.4;
+    line-height: 1.38;
+    letter-spacing: -0.005em;
     word-break: break-word;
     flex: 1;
     min-width: 0;
@@ -241,17 +242,17 @@
     align-items: center;
     gap: 3px;
     font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 400;
+    font-size: 0.82rem;
+    font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
-    color: #a8a29e;
+    color: #8d847d;
 }
 
 .titleClickable {
     cursor: pointer;
 }
-.titleClickable:hover { text-decoration: underline; text-decoration-color: rgba(68, 64, 60, 0.25); text-underline-offset: 2px; }
+.titleClickable:hover { text-decoration: none; }
 
 .titleDone {
     text-decoration: line-through;
@@ -275,7 +276,7 @@
 .meta {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     flex-wrap: wrap;
 }
 .metaDone {

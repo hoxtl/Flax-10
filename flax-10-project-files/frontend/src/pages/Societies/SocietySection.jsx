@@ -18,7 +18,7 @@ function SectionHeader({ title, type, onAction }) {
 
     return (
         <div className={styles.sectionHeader}>
-            <h3>{title}</h3>
+            <h3 className={styles.sectionTitle}>{title}</h3>
             {showPlus && <button className={styles.miniAddBtn} onClick={onAction}>+</button>}
         </div>
     );
