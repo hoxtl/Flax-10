@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
-import { useCountUp } from "../../hooks/useCountUp";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -23,8 +22,6 @@ import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
-import { getLevelUpThresholdCrossed, getLevelUpMessageForThreshold, getSaplingCelebrationCrossed, getSaplingCelebrationMessage } from "../../lib/gardenStatus";
-import { getSeedsPerDayThisWeek } from "../../lib/weeklySeedCount";
 import { playCompletionChime } from "../../lib/sounds";
 import analyticsService from "../../api/analyticsService";
 import { getUserSettings } from "../../api/userService";
@@ -99,7 +96,7 @@ export default function Homepage({ onNavigate }) {
     setTimerTask("Focus");
     setTimerActive(true);
   }, [setTimerMode, setTimeLeft, workTime, setTimerTask, setTimerActive]);
-  const { showCompletionToast, showLevelUpToast } = useTaskCompletion();
+  const { showCompletionToast } = useTaskCompletion();
 
   const displayName = useMemo(() => {
     try {
@@ -715,12 +712,6 @@ export default function Homepage({ onNavigate }) {
     }).length;
   }, [selectedDate, allTasks]);
 
-  /* Tasks completed per day this week (Mon–Sun) — uses shared lib for Analytics bridge */
-  const seedsPerDayThisWeek = useMemo(
-    () => getSeedsPerDayThisWeek(allTasks, (t) => isRoutineOrEventTask(t, getTag)),
-    [allTasks, getTag]
-  );
-
   const hasOverdueToday = useMemo(() => {
     const now = new Date();
     return tasksDueToday.some(
@@ -837,8 +828,6 @@ export default function Homepage({ onNavigate }) {
     if (done >= elapsed - 15) return "ontrack";
     return "behind";
   }, [selectedDate, now, actionHubItemsOnly.length, actionHubSpineCompletedPct]);
-
-  const dayProgressCountRef = useCountUp(Math.round(actionHubSpineCompletedPct));
 
   /** Today's free windows from schedule (>= 20 min, chronological). */
   const todayFreeWindows = useMemo(() => {
@@ -1206,33 +1195,6 @@ export default function Homepage({ onNavigate }) {
   /** Aliases for legacy/cached references (actionHubFocusWindowMinutes, actionHubReadItem). */
   const actionHubFocusWindowMinutes = actionHubFocusHours * 60;
   const actionHubReadItem = planTimelineReadItem;
-
-  const prevSeedsCountRef = useRef(seedsCountFromTasks);
-  const [seedsBounce, setSeedsBounce] = useState(false);
-  useEffect(() => {
-    if (!isToday(selectedDate)) return;
-    try {
-      if (localStorage.getItem("evolution_sapling_seen") === "1") return;
-    } catch (_) {}
-    if (seedsCountFromTasks > prevSeedsCountRef.current) {
-      const prev = prevSeedsCountRef.current;
-      if (getSaplingCelebrationCrossed(prev, seedsCountFromTasks)) {
-        showLevelUpToast(getSaplingCelebrationMessage());
-        try {
-          localStorage.setItem("evolution_sapling_seen", "1");
-        } catch (_) {}
-      } else {
-        const threshold = getLevelUpThresholdCrossed(prev, seedsCountFromTasks);
-        if (threshold) showLevelUpToast(getLevelUpMessageForThreshold(threshold));
-      }
-      setSeedsBounce(true);
-      const t = setTimeout(() => setSeedsBounce(false), 500);
-      prevSeedsCountRef.current = seedsCountFromTasks;
-      return () => clearTimeout(t);
-    } else {
-      prevSeedsCountRef.current = seedsCountFromTasks;
-    }
-  }, [seedsCountFromTasks, selectedDate, showLevelUpToast]);
 
   const handleTaskToggle = useCallback(
     async (task, completed) => {

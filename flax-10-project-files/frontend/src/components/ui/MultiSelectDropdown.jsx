@@ -1,11 +1,3 @@
-/**
- * MultiSelectDropdown — multi-select version of AnimatedDropdown.
- * value: string[] (selected option values)
- * onChange: (selected: string[]) => void
- * options: [{ value, label }] — first option with value "" is treated as "All" (clears selection when clicked)
- * displayAsPills: when true, selected items show as removable pills instead of "2 lists" / "2 modules"
- */
-
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, X } from "lucide-react";

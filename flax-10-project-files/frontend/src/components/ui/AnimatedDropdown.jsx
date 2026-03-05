@@ -1,17 +1,3 @@
-/**
- * AnimatedDropdown — reusable animated select replacement.
- *
- * Props:
- *   value        – current selected value
- *   onChange(v)  – called with selected value on change
- *   placeholder  – text shown when no value is selected
- *   options      – one of:
- *                    flat strings:   ["Low", "Medium", "High"]
- *                    flat objects:   [{ value: "low", label: "Low" }, ...]
- *                    grouped:        [{ label: "Group", options: [{ value, label }] }]
- *   grouped      – true when options is the grouped format
- */
-
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";

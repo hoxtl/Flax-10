@@ -1,4 +1,3 @@
-/* ── BentoGrid container ──────────────────────────────────────────── */
 .grid {
   display: grid;
   width: 100%;
@@ -20,12 +19,10 @@
   }
 }
 
-/* ── Card wrapper (motion div — handles grid positioning) ─────────── */
 .cardWrapper {
   min-height: 0;
 }
 
-/* ── Card visual shell ────────────────────────────────────────────── */
 .card {
   position: relative;
   height: 100%;
@@ -37,7 +34,6 @@
   box-sizing: border-box;
 }
 
-/* ── Mouse-tracking warm glow ─────────────────────────────────────── */
 .glow {
   pointer-events: none;
   position: absolute;
@@ -57,7 +53,6 @@
   opacity: 1;
 }
 
-/* ── Flat hover tint overlay ──────────────────────────────────────── */
 .hoverOverlay {
   pointer-events: none;
   position: absolute;
@@ -72,7 +67,6 @@
   background: rgba(139, 115, 85, 0.015);
 }
 
-/* ── Content layer (above glow) ───────────────────────────────────── */
 .content {
   position: relative;
   z-index: 1;
