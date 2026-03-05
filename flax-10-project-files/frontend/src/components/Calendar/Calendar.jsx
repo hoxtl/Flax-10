@@ -8,6 +8,24 @@ import { YearView } from "./YearView/YearView";
 import "./Calendar.css";
 import { useEffect, useRef, useState } from "react";
 
+function CurrentTimeIndicator({ hourHeight = 60 }) {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+  const topPosition = (minutesSinceMidnight / 60) * hourHeight;
+
+  return (
+    <div className="current-time-line" style={{ top: `${topPosition}px` }}>
+      <div className="current-time-dot" />
+    </div>
+  );
+}
+
 export function Calendar() {
     return (
         <ResizeHighlightProvider>
