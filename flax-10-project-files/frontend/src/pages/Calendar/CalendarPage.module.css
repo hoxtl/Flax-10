@@ -10,10 +10,15 @@
 
 @media (max-width: 768px) {
     .filters {
-        padding: 8px 12px 0; /* Reduced from 32px */
-        overflow-x: auto; /* Allow horizontal scrolling for filters */
+        padding: 8px 12px 0;
+        overflow-x: auto;
         white-space: nowrap;
         display: flex;
         -webkit-overflow-scrolling: touch;
     }
+
+    .filters::-webkit-scrollbar {
+        display: none;
+    }
 }
+
