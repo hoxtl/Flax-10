@@ -14,6 +14,11 @@ export default function CalendarPage() {
   const { filter, allEvents, selectedDate, viewMode } = useCalendar();
   const dispatch = useCalendarDispatch();
 
+  const visibleItems = useMemo(
+    () => getVisibleEventsInView(allEvents, selectedDate, viewMode),
+    [allEvents, selectedDate, viewMode],
+  );
+
   return (
     <div className={styles.page}>
       <CalendarHeader />
