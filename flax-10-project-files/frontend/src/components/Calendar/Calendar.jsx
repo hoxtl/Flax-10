@@ -1,12 +1,12 @@
-import { useCalendar } from '../../context/CalendarContext';
-import { ResizeHighlightProvider } from '../../context/ResizeHighlightContext';
-import { useCalendarEvents } from './hooks/useCalendarEvents';
-import { CalendarHeader } from './CalendarHeader';
-import { DayView } from './DayView/DayView';
-import { WeekView } from './WeekView/WeekView';
-import { MonthView } from './MonthView/MonthView';
-import { YearView } from './YearView/YearView';
-import './Calendar.css';
+import { useCalendar } from "../../context/CalendarContext";
+import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
+import { useCalendarEvents } from "./hooks/useCalendarEvents";
+import { DayView } from "./DayView/DayView";
+import { WeekView } from "./WeekView/WeekView";
+import { MonthView } from "./MonthView/MonthView";
+import { YearView } from "./YearView/YearView";
+import "./Calendar.css";
+import { useEffect, useRef, useState } from "react";
 
 export function Calendar() {
     return (
