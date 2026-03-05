@@ -1,3 +1,4 @@
+import { useCallback, useEffect } from "react";
 import styles from "../../pages/Timer/TimerPage.module.css";
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
@@ -11,9 +12,29 @@ const TimerHeader = ({ onOpenHistory, isMobile }) => {
 };
 
 const TimerTopSection = ({ t, onOpenHistory, isMobile }) => {
+    const handleTaskSelect = useCallback((task) => {
+        t.setTask(task.title);
+        const mins = (task.estimated_blocks || 1) * 25;
+        t.updateTime('work', mins);
+        t.setTimeLeft(mins * 60);
+        t.setIsActive(true);
+        if (t.setActiveTaskId) t.setActiveTaskId(task.id, { title: task.title, categoryColor: task.list_color });
+        try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
+    }, [t]);
+
+    useEffect(() => {
+        try {
+            const suggested = sessionStorage.getItem('timerSuggestedTask');
+            if (suggested && typeof t.setTask === 'function') {
+                t.setTask(suggested);
+                sessionStorage.removeItem('timerSuggestedTask');
+            }
+        } catch (_) {}
+    }, [t]);
+
     const mobileBtn = isMobile ? <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>View History 📜</button> : null;
     const header = <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />;
-    const input = <TaskInput value={t.task} onChange={t.setTask} />;
+    const input = <TaskInput value={t.task} onChange={t.setTask} onTaskSelect={handleTaskSelect} />;
     const tree = <TreeAnimation progress={t.progress} mode={t.mode} />;
     return <>{header}{input}{mobileBtn}{tree}</>;
 };
