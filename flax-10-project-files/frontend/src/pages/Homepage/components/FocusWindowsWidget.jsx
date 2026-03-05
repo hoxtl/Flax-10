@@ -1,15 +1,11 @@
-/**
- * Focus Windows widget — free gaps in schedule for focused work.
- * Summary line, best-window hero card, next/after list, timeline bar, footer.
- */
-
 import { useState, useMemo } from "react";
-import { Zap, Target, FileText, Timer, CalendarX } from "lucide-react";
+import { motion } from "framer-motion";
+import { Sparkles, Target, FileText, Zap, Timer, CalendarX } from "lucide-react";
 import { formatTime } from "../utils/dateFormatUtils";
 import styles from "./FocusWindowsWidget.module.css";
 
-const DAY_START_MINS = 8 * 60;   // 8 AM
-const DAY_END_MINS = 22 * 60;    // 10 PM
+const DAY_START_MINS = 8 * 60;
+const DAY_END_MINS = 22 * 60;
 const TOTAL_DAY_MINS = DAY_END_MINS - DAY_START_MINS;
 
 function formatTime24(d) {
@@ -28,6 +24,34 @@ function getSuggestion(minutes) {
   return { text: "Short burst", Icon: Timer };
 }
 
+const barVariants = {
+  hidden: { scaleX: 0 },
+  visible: { scaleX: 1, transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.2 } },
+};
+
+function EmptyState({ subtitle, onViewAnalytics }) {
+  return (
+    <div className={styles.root}>
+      <div className={styles.header}>
+        <Sparkles className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        <span className={styles.headerLabel}>Focus Windows</span>
+      </div>
+      <div className={styles.emptyState}>
+        <CalendarX size={28} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
+        <p className={styles.emptyTitle}>Fully booked today</p>
+        <p className={styles.emptySubtitle}>{subtitle}</p>
+      </div>
+      {onViewAnalytics && (
+        <div className={styles.footer}>
+          <button type="button" className={styles.footerLink} onClick={onViewAnalytics}>
+            View full analytics →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FocusWindowsWidget({
   windows = [],
   now = new Date(),
@@ -35,10 +59,8 @@ export function FocusWindowsWidget({
   onStartFocus,
 }) {
   const [otherExpanded, setOtherExpanded] = useState(false);
-
   const nowMs = now.getTime();
 
-  // Only future/current windows (end > now)
   const futureWindows = useMemo(() => {
     return [...windows]
       .filter((w) => w.end.getTime() > nowMs)
@@ -72,7 +94,6 @@ export function FocusWindowsWidget({
 
   const isBestNow = bestWindow && nowMs >= bestWindow.start.getTime() && nowMs < bestWindow.end.getTime();
 
-  // Timeline segments (8 AM – 10 PM)
   const segments = useMemo(() => {
     const toMins = (d) => d.getHours() * 60 + d.getMinutes();
     const freeSorted = [...windows].sort((a, b) => a.start.getTime() - b.start.getTime());
@@ -89,71 +110,22 @@ export function FocusWindowsWidget({
     return segs;
   }, [windows]);
 
-  const nowPositionPct =
-    (() => {
-      const nowMins = now.getHours() * 60 + now.getMinutes();
-      if (nowMins <= DAY_START_MINS) return 0;
-      if (nowMins >= DAY_END_MINS) return 100;
-      return ((nowMins - DAY_START_MINS) / TOTAL_DAY_MINS) * 100;
-    })();
+  const nowPositionPct = (() => {
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    if (nowMins <= DAY_START_MINS) return 0;
+    if (nowMins >= DAY_END_MINS) return 100;
+    return ((nowMins - DAY_START_MINS) / TOTAL_DAY_MINS) * 100;
+  })();
 
   if (!Array.isArray(windows)) return null;
-
-  // Empty: no windows at all today
-  if (windows.length === 0) {
-    return (
-      <div className={styles.root}>
-        <div className={styles.header}>
-          <Zap className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
-          <span className={styles.headerTitle}>Focus Windows</span>
-        </div>
-        <div className={styles.emptyCard}>
-          <p className={styles.emptyTitle}>
-            <CalendarX size={18} className={styles.emptyTitleIcon} aria-hidden /> Fully booked today
-          </p>
-          <p className={styles.emptySubtitle}>No free windows available — consider rescheduling something</p>
-        </div>
-        {onViewAnalytics && (
-          <div className={styles.footer}>
-            <button type="button" className={styles.footerBtnGhost} onClick={onViewAnalytics}>
-              View full analytics →
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Has windows but all in the past
-  if (futureWindows.length === 0) {
-    return (
-      <div className={styles.root}>
-        <div className={styles.header}>
-          <Zap className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
-          <span className={styles.headerTitle}>Focus Windows</span>
-        </div>
-        <div className={styles.emptyCard}>
-          <p className={styles.emptyTitle}>
-            <CalendarX size={18} className={styles.emptyTitleIcon} aria-hidden /> Fully booked today
-          </p>
-          <p className={styles.emptySubtitle}>No free windows left — next free time is tomorrow</p>
-        </div>
-        {onViewAnalytics && (
-          <div className={styles.footer}>
-            <button type="button" className={styles.footerBtnGhost} onClick={onViewAnalytics}>
-              View full analytics →
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
+  if (windows.length === 0) return <EmptyState subtitle="No free windows available — consider rescheduling something" onViewAnalytics={onViewAnalytics} />;
+  if (futureWindows.length === 0) return <EmptyState subtitle="No free windows left — next free time is tomorrow" onViewAnalytics={onViewAnalytics} />;
 
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Zap className={styles.headerIcon} size={18} strokeWidth={1.5} aria-hidden />
-        <span className={styles.headerTitle}>Focus Windows</span>
+        <Sparkles className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+        <span className={styles.headerLabel}>Focus Windows</span>
       </div>
 
       {summary && (
@@ -164,39 +136,37 @@ export function FocusWindowsWidget({
 
       {bestWindow && (
         <div className={styles.bestCard}>
-          <span className={styles.bestLabel}>Best Window</span>
-          <div className={styles.bestRow}>
-            <div className={styles.bestLeft}>
-              {isBestNow && (
-                <div className={styles.bestNowBadge}>
-                  <span className={styles.bestNowDot} aria-hidden />
-                  <span>Available now</span>
-                </div>
-              )}
-              <span className={styles.bestTimeRange}>
-                {formatTime24(bestWindow.start)} – {formatTime24(bestWindow.end)}
-              </span>
-              <span className={styles.bestSuggestion}>
-                {(() => {
-                  const { text, Icon } = getSuggestion(bestWindow.minutes);
-                  return (
-                    <>
-                      <Icon size={14} className={styles.bestSuggestionIcon} aria-hidden />
-                      {text}
-                    </>
-                  );
-                })()}
-              </span>
-            </div>
-            <span className={styles.bestPill}>{formatDuration(bestWindow.minutes)}</span>
+          <div className={styles.bestCardTop}>
+            <span className={styles.bestLabel}>Best Window</span>
+            <span className={styles.bestDuration}>{formatDuration(bestWindow.minutes)}</span>
           </div>
+          {isBestNow && (
+            <div className={styles.bestNowBadge}>
+              <span className={styles.bestNowDot} aria-hidden />
+              <span>Available now</span>
+            </div>
+          )}
+          <p className={styles.bestTimeRange}>
+            {formatTime24(bestWindow.start)} – {formatTime24(bestWindow.end)}
+          </p>
+          <p className={styles.bestSuggestion}>
+            {(() => {
+              const { text, Icon } = getSuggestion(bestWindow.minutes);
+              return (
+                <>
+                  <Icon size={12} className={styles.bestSuggestionIcon} aria-hidden />
+                  {text}
+                </>
+              );
+            })()}
+          </p>
         </div>
       )}
 
       {displayOthers.length > 0 && (
         <div className={styles.otherList}>
           {displayOthers.map((w, i) => {
-            const label = i === 0 ? "Next:" : i === 1 ? "After:" : null;
+            const label = i === 0 ? "Next" : i === 1 ? "After" : null;
             return (
               <div key={i} className={styles.otherRow}>
                 <span className={styles.otherTime}>
@@ -218,35 +188,46 @@ export function FocusWindowsWidget({
       <div className={styles.timelineWrap}>
         <span className={styles.timelineLabel}>8 AM</span>
         <div className={styles.timelineBarContainer}>
-          <div className={styles.timelineBar}>
+          <motion.div
+            className={styles.timelineBar}
+            style={{ originX: 0 }}
+            variants={barVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {segments.map((seg, i) => (
               <span
                 key={i}
                 className={seg.free ? styles.timelineFree : styles.timelineBusy}
                 style={{ width: `${((seg.end - seg.start) / TOTAL_DAY_MINS) * 100}%` }}
-                title={seg.free && seg.window ? `${formatTime(seg.window.start.toISOString())} – ${formatTime(seg.window.end.toISOString())} (${formatDuration(seg.window.minutes)})` : undefined}
               />
             ))}
-          </div>
+          </motion.div>
           <span
             className={styles.timelineNow}
             style={{ left: `${nowPositionPct}%` }}
-            title="Current time"
             aria-hidden
           />
         </div>
         <span className={styles.timelineLabel}>10 PM</span>
       </div>
 
+      {isBestNow && onStartFocus && (
+        <motion.button
+          type="button"
+          className={styles.ctaBtn}
+          onClick={onStartFocus}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          Start focus session →
+        </motion.button>
+      )}
+
       <div className={styles.footer}>
         {onViewAnalytics && (
-          <button type="button" className={styles.footerBtnGhost} onClick={onViewAnalytics}>
+          <button type="button" className={styles.footerLink} onClick={onViewAnalytics}>
             View full analytics →
-          </button>
-        )}
-        {onStartFocus && (
-          <button type="button" className={styles.footerBtnPrimary} onClick={onStartFocus}>
-            Start focus session →
           </button>
         )}
       </div>
