@@ -221,4 +221,12 @@
     top: 0;
     z-index: 30;
   }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 16px 16px 8px;
+  }
 }
