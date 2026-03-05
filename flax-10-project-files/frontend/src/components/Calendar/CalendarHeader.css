@@ -343,4 +343,25 @@
     font-size: 1rem;
     color: #5d4037;
   }
+
+
+  .btn-calendar {
+    display: none;
+  }
+
+  .calendar-header {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    padding: 6px 12px;
+  }
+
+  .nav-buttons {
+    margin-right: 0;
+    gap: 0.1rem;
+  }
+
+  .actions {
+    margin-left: auto;
+    gap: 0.25rem;
+  }
 }
