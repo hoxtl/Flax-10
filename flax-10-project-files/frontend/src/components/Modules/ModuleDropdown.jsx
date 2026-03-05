@@ -16,6 +16,15 @@ function useDropdown() {
     return {is_open, setIsOpen, ref};
 }
 
+function DropdownOption({opt, value, onChange, setIsOpen}) {
+    return (
+        <button className={styles.option} onClick={() => {onChange(opt.value); setIsOpen(false);}}>
+            <span>{opt.label}</span>
+            {value === opt.value && <Check size={13} className={styles.check} />}
+        </button> 
+    )
+}
+
 export default function ModuleDropdown({value, onChange, options}) {
     const {is_open, setIsOpen, ref} = useDropdown();
     const selected = options.find(opt => opt.value === value);
@@ -27,11 +36,10 @@ export default function ModuleDropdown({value, onChange, options}) {
             </button>
             {is_open && (
                 <div className={styles.menu}>
-                    {options.map(opt => (
-                        <button key ={opt.value} className={styles.option} onClick={() => {onChange(opt.value); setIsOpen(false);}}>
-                            <span>{opt.label}</span>
-                                {value === opt.value && <Check size={13} className={styles.check} />}
-                        </button> ))}
+                    {options.map(opt => <DropdownOption key = {opt.value} opt={opt} value={value} 
+                    onChange={onChange} setIsOpen={setIsOpen} />)}
                 </div>
-            )}</div> );
+            )}
+        </div> 
+    );
 }
