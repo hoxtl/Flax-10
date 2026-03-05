@@ -242,4 +242,12 @@
   .date-strip-wrapper::-webkit-scrollbar {
     display: none;
   }
+
+  /* Calendar bar adapts for mobile */
+  .calendar-header {
+    border-radius: 0;
+    margin-bottom: 0;
+    background: #f6f4f1;
+    padding: 8px 16px;
+  }
 }
