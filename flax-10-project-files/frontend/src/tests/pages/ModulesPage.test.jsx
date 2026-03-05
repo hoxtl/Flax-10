@@ -68,7 +68,7 @@ describe('ModulesPage', () => {
     it('should render the empty state when no modules', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
         render(<ModulesPage />);
-        expect(screen.getByText(/no modules available/i)).toBeInTheDocument();
+        expect(screen.getByText(/no modules found/i)).toBeInTheDocument();
     });
 
     it('should render module grid when modules exist', async () => {
