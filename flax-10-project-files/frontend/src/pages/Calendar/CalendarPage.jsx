@@ -11,24 +11,26 @@ import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 
 export default function CalendarPage() {
-    const { filter, allEvents, selectedDate, viewMode } = useCalendar();
-    const dispatch = useCalendarDispatch();
+  const { filter, allEvents, selectedDate, viewMode } = useCalendar();
+  const dispatch = useCalendarDispatch();
 
-    const visibleItems = useMemo(() =>
-        getVisibleEventsInView(allEvents, selectedDate, viewMode),
-        [allEvents, selectedDate, viewMode]
-    );
+  return (
+    <div className={styles.page}>
+      <CalendarHeader />
 
-    const handleFilterChange = (key) => {
-        dispatch({ type: 'SET_FILTER', payload: key });
-    };
+      <div className={styles.filters}>
+        <PillFilters
+          active={filter}
+          onChange={handleFilterChange}
+          items={visibleItems}
+        />
+      </div>
 
-    return (
-        <div className={styles.page}>
-            <div className={styles.filters}>
-                <PillFilters active={filter} onChange={handleFilterChange} items={visibleItems} />
-            </div>
-            <Calendar />
-            <EventPopups />
-        </div>);
+      <main className={styles.mainContent}>
+        <Calendar />
+      </main>
+
+      <EventPopups />
+    </div>
+  );
 }
