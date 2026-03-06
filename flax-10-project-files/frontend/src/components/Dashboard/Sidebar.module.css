@@ -522,6 +522,64 @@
   margin: 4px 0;
 }
 
+.mobileDrawerNav {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  gap: 2px;
+}
+
+.mobileDrawerNavItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s;
+  overflow: hidden;
+}
+
+.mobileDrawerNavItem:active {
+  background: var(--hover);
+}
+
+.mobileDrawerNavItemActive {
+  background: var(--active, rgba(196, 168, 130, 0.15));
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.mobileDrawerNavIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.mobileDrawerNavLabel {
+  flex: 1;
+}
+
+.mobileDrawerActivePill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 56%;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
