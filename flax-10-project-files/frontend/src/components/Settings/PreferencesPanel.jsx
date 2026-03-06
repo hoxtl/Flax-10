@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { SectionHeader, SubmitButton, ThemeSelector } from "./SettingsUI";
-import { SleepSchedulePanel } from "./SleepSchedulePanel";
 import styles from "../../pages/Settings/Settings.module.css";
 
 function ThemeFormGroup({ theme, onChange }) {
@@ -32,9 +31,6 @@ export default function PreferencesPanel({ onSave, isSaving }) {
       <SectionHeader title="Appearance" description="Customize how StudyFlax looks" />
       <ThemeFormGroup theme={formData.theme} onChange={handleThemeChange} />
       <SubmitButton isSaving={isSaving} label="Save Preferences" savingLabel="Saving..." />
-
-      <SectionHeader title="Sleep schedule" description="When you plan to sleep — we'll nudge you if you're adding tasks during this window" />
-      <SleepSchedulePanel onSave={onSave} isSaving={isSaving} />
     </form>
   );
 }

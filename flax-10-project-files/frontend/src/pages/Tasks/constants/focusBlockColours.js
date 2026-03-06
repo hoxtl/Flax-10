@@ -1,30 +1,30 @@
 /**
- * Vibrant, classy list colours.
+ * Muted list colours for a softer task-page palette.
  * Used in CreateListModal palette, list sidebar, and task modals.
  * 21 colours = 3 rows × 7 for a full grid.
  */
 export const FOCUS_BLOCK_COLOURS = [
-  "#2563eb", // vivid blue
-  "#7c3aed", // purple
-  "#dc2626", // red
-  "#16a34a", // green
-  "#0ea5e9", // sky
-  "#db2777", // pink
-  "#f59e0b", // amber
-  "#14b8a6", // teal
-  "#9333ea", // violet
-  "#f97316", // orange
-  "#22c55e", // emerald
-  "#3b82f6", // blue-500
-  "#ef4444", // red-500
-  "#eab308", // yellow
-  "#10b981", // emerald-500
-  "#a855f7", // purple-500
-  "#06b6d4", // cyan
-  "#84cc16", // lime
-  "#f43f5e", // rose
-  "#6366f1", // indigo
-  "#ec4899", // fuchsia
+  "#6F89B8", // muted blue
+  "#8B79B5", // muted violet
+  "#B46F6F", // muted red
+  "#6F9A79", // muted green
+  "#6FA4B8", // muted sky
+  "#B5799D", // muted pink
+  "#BE9A68", // muted amber
+  "#6FA8A0", // muted teal
+  "#9A7DB8", // soft purple
+  "#C08B63", // soft orange
+  "#7EAD88", // soft emerald
+  "#7C95C6", // dusty blue
+  "#C48282", // dusty red
+  "#C8AE70", // soft yellow
+  "#74A894", // muted mint
+  "#A186C1", // soft lavender
+  "#6FAFC0", // soft cyan
+  "#9DB66D", // soft lime
+  "#C37B8F", // dusty rose
+  "#7F86C1", // muted indigo
+  "#C08AAE", // soft fuchsia
 ];
 
 /** Hex only, for fallback lookups by index */

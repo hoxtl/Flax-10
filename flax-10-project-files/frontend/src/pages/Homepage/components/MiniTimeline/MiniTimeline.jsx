@@ -5,6 +5,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 
+import { getUserSettings } from "../../../../api/userService";
 import { isToday } from "../../../../components/Calendar/utils/dateUtils";
 import { DAY_START_HOUR, DAY_END_HOUR } from "../../utils/timelineUtils";
 import { formatTime } from "../../utils/dateFormatUtils";
@@ -51,6 +52,7 @@ export function MiniTimeline({
   const [conflictPopoverRowId, setConflictPopoverRowId] = useState(null);
   const [slotPopoverRowId, setSlotPopoverRowId] = useState(null);
   const [eventCtxMenu, setEventCtxMenu] = useState(null);
+  const [sleepWindow, setSleepWindow] = useState({ sleepTime: "23:00", wakeTime: "07:00" });
   const conflictPopoverRef = useRef(null);
   const slotPopoverRef = useRef(null);
   const timelineScrollRef = useRef(null);
@@ -75,6 +77,25 @@ export function MiniTimeline({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [slotPopoverRowId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getUserSettings()
+      .then((data) => {
+        if (cancelled) return;
+        setSleepWindow({
+          sleepTime: data?.sleep_time?.slice(0, 5) || "23:00",
+          wakeTime: data?.wake_time?.slice(0, 5) || "07:00",
+        });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSleepWindow({ sleepTime: "23:00", wakeTime: "07:00" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Auto-scroll the NOW line into view on mount / when date changes to today
   useEffect(() => {
@@ -216,6 +237,7 @@ export function MiniTimeline({
             getTag={getTag}
             styles={styles}
             selectedDate={selectedDate}
+            sleepWindow={sleepWindow}
           />
         );
       }
@@ -241,10 +263,11 @@ export function MiniTimeline({
           isToday={isToday}
           getTag={getTag}
           styles={styles}
+          sleepWindow={sleepWindow}
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef, sleepWindow]
   );
 
   return (

@@ -8,6 +8,7 @@ import { RotateCw, Pencil, AlertTriangle } from "lucide-react";
 import { formatTime12h, fmtDurationShort } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
+import { isDuringSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 
 /* Event type → accent colour mapping */
 const EVENT_ACCENTS = {
@@ -60,6 +61,7 @@ export function PlanEventRow({
   isToday,
   getTag,
   styles,
+  sleepWindow,
 }) {
   const { item, isPast, active, matchTask, isOverlap, isRoutine, moduleCode, durationMins } = row;
   const startTimeStr = item.start_time ? formatTime12h(item.start_time) : "";
@@ -74,6 +76,13 @@ export function PlanEventRow({
         )
       : null;
   const propMinHeight = durationMins > 0 ? Math.max(56, Math.min(durationMins * 1.2, 180)) : 56;
+  const isSleepTime =
+    !!item.start_time &&
+    isDuringSleepWindow(
+      sleepWindow?.sleepTime || "23:00",
+      sleepWindow?.wakeTime || "07:00",
+      new Date(item.start_time),
+    );
 
   /* Event type accent — terracotta for conflicts, otherwise type-based */
   const tagName = getTag?.(item.tag)?.name ?? item.tag_name ?? "";
@@ -206,7 +215,18 @@ export function PlanEventRow({
                   )}
                 </div>
               </div>
-              <span className={styles.planTimelineCardTitle}>{titleClean || item.title}</span>
+              <div className={styles.planTimelineCardTitleRow}>
+                <span className={styles.planTimelineCardTitle}>{titleClean || item.title}</span>
+                {isSleepTime && (
+                  <span
+                    className={styles.planTimelineSleepBadge}
+                    title="Scheduled during sleep hours"
+                    aria-label="Scheduled during sleep hours"
+                  >
+                    😴
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           {durationMins > 0 && (

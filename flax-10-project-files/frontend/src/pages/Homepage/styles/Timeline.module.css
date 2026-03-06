@@ -565,6 +565,21 @@
     min-width: 0;
     max-width: 100%;
   }
+  .planTimelineCardTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .planTimelineSleepBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    line-height: 1;
+    opacity: 0.9;
+    flex-shrink: 0;
+  }
   .planTimelineCardDurationPill {
     display: inline-flex;
     align-items: center;
@@ -2449,6 +2464,21 @@
     text-overflow: ellipsis;
     min-width: 0;
     max-width: 100%;
+  }
+  .planTimelineConflictPairCardTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .planTimelineConflictSleepBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
+    line-height: 1;
+    opacity: 0.9;
+    flex-shrink: 0;
   }
 
   /* Inline action bar */

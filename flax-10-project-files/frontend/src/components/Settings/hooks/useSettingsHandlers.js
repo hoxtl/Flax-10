@@ -7,7 +7,6 @@ function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);
   setTimeout(() => setter(""), duration);
 }
-
 function isPasswordTooShort(password) { return password.length < 8; }
 function passwordsDoNotMatch(a, b) { return a !== b; }
 
@@ -35,13 +34,13 @@ async function savePassword(data, setPasswordError, setSuccessMessage, setIsSavi
 }
 
 async function tryUpdateSettings(data) {
-  const response = await updateUserSettings(data);
+  const response = await updateUserSettings({ theme: data.theme });
   if (response?.user) saveUserToStorage(response.user);
   return response;
 }
 
 async function savePreferences(data, setSuccessMessage, setIsSaving) {
-  const response = await tryUpdateSettings({ theme: data.theme }).catch(() => null);
+  const response = await tryUpdateSettings(data).catch(() => null);
   const msg = response ? "Preferences saved successfully!" : "Failed to save preferences";
   showTemporaryMessage(setSuccessMessage, msg);
   setIsSaving(false);
@@ -113,4 +112,5 @@ export default function useSettingsHandlers() {
     await saveSleep(data, setSuccessMessage, setIsSaving);
   };
   
-  return { isSaving, successMessage, passwordError, homeAddressError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, handleSleepSave };}
+  return { isSaving, successMessage, passwordError, homeAddressError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, handleSleepSave };
+}

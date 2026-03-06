@@ -9,6 +9,7 @@ import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
+import { isDuringSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 
 const EVENT_ACCENTS = {
   lecture:  "#7B9BAD",
@@ -47,6 +48,7 @@ export function ConflictPairRow({
   getTag,
   styles,
   selectedDate,
+  sleepWindow,
 }) {
   const { items } = row;
   const timeStr = formatHour12h(
@@ -99,6 +101,13 @@ export function ConflictPairRow({
             const accent = getAccent(r.item.title, tagName);
             const start = r.item.start_time ? formatTime(r.item.start_time) : "";
             const end = r.item.end_time ? formatTime(r.item.end_time) : "";
+            const isSleepTime =
+              !!r.item.start_time &&
+              isDuringSleepWindow(
+                sleepWindow?.sleepTime || "23:00",
+                sleepWindow?.wakeTime || "07:00",
+                new Date(r.item.start_time),
+              );
             return (
               <div
                 key={r.id}
@@ -129,9 +138,20 @@ export function ConflictPairRow({
                 <span className={styles.planTimelineConflictPairCardTime}>
                   {start}{end && end !== start ? `–${end}` : ""}
                 </span>
-                <span className={styles.planTimelineConflictPairCardTitle}>
-                  {stripEmojiFromTitle(r.item.title)}
-                </span>
+                <div className={styles.planTimelineConflictPairCardTitleRow}>
+                  <span className={styles.planTimelineConflictPairCardTitle}>
+                    {stripEmojiFromTitle(r.item.title)}
+                  </span>
+                  {isSleepTime && (
+                    <span
+                      className={styles.planTimelineConflictSleepBadge}
+                      title="Scheduled during sleep hours"
+                      aria-label="Scheduled during sleep hours"
+                    >
+                      😴
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
