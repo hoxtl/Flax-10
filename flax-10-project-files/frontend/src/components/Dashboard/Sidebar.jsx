@@ -283,6 +283,36 @@ function MobileDrawer({
             </nav>
 
             <div className={styles.mobileDrawerDivider} />
+
+            <div className={styles.mobileDrawerFooter}>
+              <button
+                className={styles.mobileDrawerFooterBtn}
+                onClick={() => {
+                  onProfile?.();
+                  onClose();
+                }}
+              >
+                <span>👤</span> Profile
+              </button>
+              <button
+                className={styles.mobileDrawerFooterBtn}
+                onClick={() => {
+                  onSettings?.();
+                  onClose();
+                }}
+              >
+                <span>⚙️</span> Settings
+              </button>
+              <button
+                className={`${styles.mobileDrawerFooterBtn} ${styles.mobileDrawerLogout}`}
+                onClick={() => {
+                  onLogout?.();
+                  onClose();
+                }}
+              >
+                <span>🚪</span> Log out
+              </button>
+            </div>
           </motion.div>
         </>
       )}
