@@ -52,7 +52,7 @@ function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused }) {
     }, [isFocused]);
 
     return (
-        <div ref={cardRef} className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
+        <div ref={cardRef} id={`announcement-${announcement.id}`} className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
             {editMode && <EditButton onClick={onEdit} />}
             <CardHeader announcement={announcement} tag={tag} />
             <p className={styles.announcementContent}>{announcement.content}</p>

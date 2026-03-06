@@ -136,7 +136,8 @@ export default function ModuleForm({ module, onSuccess, onCancel }) {
     return (
         <div className={styles.formContainer}>
             <FormHeader is_editing={is_editing} />
-            <FormBody form_data={form_data} errors={errors} submitting={submitting} is_editing={is_editing} onChange={on_change} onSubmit={on_submit} onCancel={onCancel} />
+            <FormBody form_data={form_data} errors={errors} submitting={submitting} is_editing={is_editing} 
+            onChange={on_change} onSubmit={on_submit} onCancel={onCancel} />
         </div>
     );
 }

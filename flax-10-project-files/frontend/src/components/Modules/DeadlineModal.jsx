@@ -3,14 +3,16 @@ import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';
 import styles from './DeadlineModal.module.css';
 
-export default function DeadlineModal({ module, onClose }) {
-    const modal = useDeadlineModal(module.id);
+export default function DeadlineModal({ module, onClose, startCreating }) {
+    const modal = useDeadlineModal(module.id, startCreating);
+    const handleCancel = () => { if (startCreating && !modal.editing) onClose(); else modal.close(); };
+    const handleSubmitWrap = async (d) => { await modal.handleSubmit(d); if (startCreating && !modal.editing) onClose(); };
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.content} onClick={e => e.stopPropagation()}>
                 <ModalHeader module={module} onClose={onClose} />
                 {modal.showForm
-                    ? <DeadlineForm initial={modal.editing} onSubmit={modal.handleSubmit} onCancel={modal.close} />
+                    ? <DeadlineForm initial={modal.editing} onSubmit={handleSubmitWrap} onCancel={handleCancel} />
                     : <ModalBody modal={modal} />}
             </div>
         </div>

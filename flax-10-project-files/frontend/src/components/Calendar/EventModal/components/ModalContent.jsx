@@ -18,7 +18,7 @@ function SleepWarningView({ settings, onCancel, onConfirm }) {
         return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
     };
     return (
-        <div className="modal-content overlap-warning" onClick={e => e.stopPropagation()}>
+        <div className="overlap-warning">
             <div className="modal-header">
                 <h3>Sleep Hours</h3>
                 <button className="close-btn" onClick={onCancel}>x</button>
@@ -40,7 +40,7 @@ function SleepWarningView({ settings, onCancel, onConfirm }) {
 
 function OverlapWarningView({ warning, onCancel, onConfirm }) {
     return (
-        <div className="modal-content overlap-warning" onClick={e => e.stopPropagation()}>
+        <div className="overlap-warning">
             <div className="modal-header">
                 <h3>Scheduling Conflict</h3>
                 <button className="close-btn" onClick={onCancel}>x</button>
@@ -67,10 +67,10 @@ function OverlapWarningView({ warning, onCancel, onConfirm }) {
 
 function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, onDelete, showReminder, tags }) {
     return (
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
             <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={onDelete} showReminder={showReminder} tags={tags} />
-        </div>
+        </>
     );
 }

@@ -1,6 +1,7 @@
 import { useEventForm } from './useEventForm';
 import { useTags } from '../../../context/TagContext';
 import { ModalContent } from './components/ModalContent';
+import StandardModal from '../../common/StandardModal/StandardModal';
 import './EventModal.css';
 
 export function EventModal({ event, onClose, initialType, initialDate, showReminder = true, customTags = null, onSubmit = null, onDelete = null }) {
@@ -15,9 +16,9 @@ export function EventModal({ event, onClose, initialType, initialDate, showRemin
     const logic = useEventForm(event, onClose, options);
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <StandardModal onClose={onClose}>
             <ModalContent onClose={onClose} showReminder={showReminder} tags={tags} {...logic} onDelete={onDelete} />
-        </div>
+        </StandardModal>
     );
 }
 

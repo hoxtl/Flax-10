@@ -30,7 +30,7 @@ function ReadOnlyEvent({ event, style, minWidth }) {
     };
 
     return (
-        <div className={getReadOnlyClassName(event)} style={buildStyle(style, theme)} onClick={handleClick}>
+        <div className={getReadOnlyClassName(event)} style={buildStyle(style, theme)} onClick={handleClick} data-event-id={event.id}>
             <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
         </div>
     );
@@ -72,7 +72,7 @@ function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, o
     const renderStyle = buildStyle(style, theme, resize.resizePreview);
 
     return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} data-event-id={event.id} {...dragProps}>
             <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={resize.handleResizeStart} />
         </div>

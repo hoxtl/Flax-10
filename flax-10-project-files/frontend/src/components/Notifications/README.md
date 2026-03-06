@@ -1,6 +1,6 @@
 # Notification System Guidelines
 
-This guide explains how to use the `useNotify` hook to send notifications in the Flax-10 frontend. This hook unifies **Browser Notifications**, **In-App Toasts**, and **Notification Sounds** into a single function call.
+This guide explains how to use notifications in Flax-10, including clickable notifications that navigate users to relevant pages.
 
 ## The `useNotify` Hook
 
@@ -15,20 +15,12 @@ The `useNotify` hook provides a simple function to trigger notifications. It han
 
 ### Usage
 
-1.  **Import the Hook**:
-    ```javascript
-    import { useNotify } from '../../components/Notifications/hooks/useNotify'; // Adjust path as needed
-    ```
+```javascript
+import { useNotify } from '../../components/Notifications/hooks/useNotify';
 
-2.  **Initialize Inside Component**:
-    ```javascript
-    const notify = useNotify();
-    ```
-
-3.  **Call the Function**:
-    ```javascript
-    notify("Lecture Starting", "Your Software Engineering lecture starts in 10 minutes.");
-    ```
+const notify = useNotify();
+notify("Lecture Starting", "Your lecture starts in 10 minutes.");
+```
 
 ### Signature
 ```javascript
@@ -37,38 +29,107 @@ notify(title, message, options)
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `title` | `string` | **Yes** | The bold title of the notification (e.g., "New Event"). |
+| `title` | `string` | **Yes** | The bold title of the notification. |
 | `message` | `string` | **Yes** | The body text of the notification. |
-| `options` | `object` | No | Optional settings. Currently supports `{ tag: string }` for grouping browser notifications. |
+| `options` | `object` | No | See options below. |
 
-### Example Implementation
+## Clickable Notifications
 
-Here is an example of how to use it in a component (e.g., when a timer finishes):
+To make a notification clickable, add `url` to the options. When clicked, the user navigates to that page.
+
+### URL Format
+
+Use underscores to separate path segments:
+
+| Destination | URL Format |
+| :--- | :--- |
+| Home | `home` |
+| Calendar | `calendar` |
+| Timer | `timer` |
+| Profile (own) | `profile` |
+| Profile (other user) | `profile_<userId>` |
+| Admin page | `admin` |
+| Society page | `societies_<id>` |
+| Society calendar tab | `societies_<id>_calendar` |
+| Society announcements tab | `societies_<id>_announcements` |
+| Modules page | `modules` |
+
+### Example: Basic Clickable Notification
 
 ```javascript
-import React from 'react';
-import { useNotify } from '../components/Notifications/hooks/useNotify';
-
-export function TimerButton() {
-    // 1. Get the notify function
-    const notify = useNotify();
-
-    const handleTimerFinish = () => {
-        // ... timer logic ...
-
-        // 2. Trigger notification
-        notify(
-            "Timer Finished",           // Title
-            "Your 25-minute focus session is complete!" // Message
-        );
-    };
-
-    return <button onClick={handleTimerFinish}>Start Timer</button>;
-}
+notify("New Event", "Check out the new workshop!", {
+    url: "societies_4_calendar"
+});
 ```
+
+### Example: Scroll to Element
+
+Add `scrollToId` to auto-scroll to a specific element after navigation:
+
+```javascript
+notify("New Announcement", "Important update posted!", {
+    url: "societies_4_announcements",
+    scrollToId: "announcement-123"
+});
+```
+
+The element with `id="announcement-123"` will be scrolled into view and highlighted.
+
+### Example: Open Event Popup (Calendar Reminders)
+
+For calendar reminders, use `notificationType: 'reminder'` with `scrollToId` set to the event ID:
+
+```javascript
+notify("Reminder", "Meeting starts in 10 minutes", {
+    notificationType: "reminder",
+    url: "calendar",
+    scrollToId: "456"  // event ID
+});
+```
+
+This navigates to calendar and opens the event detail popup.
+
+## Backend Notifications
+
+When creating notifications from the backend (Django), set these fields:
+
+```python
+Notification.objects.create(
+    user=user,
+    title="New event in Chess Club",
+    message="Tournament next week!",
+    notification_type="society_event",
+    action_url="societies_5_calendar",      # clickable destination
+    scroll_to_id="announcement-10",         # optional: element to scroll to
+)
+```
+
+### Non-Clickable Notifications
+
+Leave `action_url` as `None` or empty for notifications that shouldn't navigate:
+- Module action not allowed (compulsory module)
+- Module added successfully
+- Module deleted (notifies enrolled students)
+- Society deletion
+
+## Notification Types Reference
+
+| Type | Clickable | Destination |
+| :--- | :--- | :--- |
+| `society_event` | Yes | Society calendar tab |
+| `society_announcement` | Yes | Society announcements tab |
+| `society_update` | Yes | Society page |
+| `society_deleted` | No | - |
+| `ratification_request` | Yes | Admin page |
+| `ratification_approved` | Yes | Society page |
+| `ratification_rejected` | Yes | Society page |
+| `reminder` | Yes | Calendar (opens event popup) |
+| `general` | Depends | Set `action_url` as needed |
+| `module_deleted` | No | - |
 
 ## Best Practices
 
 -   **Concise Titles**: Keep titles short and clear (2-4 words).
--   **Actionable Messages**: The message should tell the user what happened or what to do next.
--   **Don't Overuse**: Only notify for important events to avoid "notification fatigue".
+-   **Actionable Messages**: Tell the user what happened or what to do next.
+-   **Don't Overuse**: Only notify for important events to avoid fatigue.
+-   **Use Tags**: Pass a unique `tag` option to prevent duplicate browser notifications.

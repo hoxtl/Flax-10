@@ -10,7 +10,7 @@ export function EventDot({ e, onEventClick, customTags }) {
     const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType);
 
     return (
-        <div className={className} title={getTitle(e)} onClick={onClick}
+        <div className={className} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
             style={{ backgroundColor: color, color: 'white', borderLeft: 'none' }}
             {...(isReadOnly ? {} : dragProps)}>
             {e.title}

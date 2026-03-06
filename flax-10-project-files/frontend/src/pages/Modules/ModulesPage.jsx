@@ -10,18 +10,19 @@ import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js
 import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
-function useModulesPage(initialSearch = '') {
+function getIsTeacher() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const is_teacher = user.role === 'teacher';
+    return user.role === 'teacher';
+}
+function useModulesPage(initialSearch = '', initialCreate = false) {
     const [search_query, setSearchQuery] = useState(initialSearch);
     const [filter_mode, setFilterMode] = useState('all');
-    const [show_form, setShowForm] = useState(false);
+    const [show_form, setShowForm] = useState(!!initialCreate);
     const [editing_module, setEditingModule] = useState(null);
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
 
-    // Auto-open the specific module detail when navigated from a profile card
     useEffect(() => {
         if (!initialSearch || hook.loading || hook.modules.length === 0) return;
         const match = hook.modules.find(
@@ -30,7 +31,7 @@ function useModulesPage(initialSearch = '') {
         if (match) setViewingModule(match);
     }, [initialSearch, hook.loading, hook.modules]);
 
-    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
+    return { is_teacher: getIsTeacher(), search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }
 
 function useMainView(state) {
@@ -46,8 +47,8 @@ function useMainView(state) {
     return { sorting, search, departments: getDepartments(hook.modules) };
 }
 
-export default function ModulesPage({ initialSearch = '' }) {
-    const state = useModulesPage(initialSearch);
+export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
+    const state = useModulesPage(initialSearch, initialCreate);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
     if (hook.loading) return <LoadingView />;
     if (show_form) return <FormView state={state} />;
@@ -147,18 +148,20 @@ function PageHeader({ is_teacher, onCreateModule }) {
     );
 }
 
+const filter_options = [
+    { value: 'all', label: 'All Modules' },
+    { value: 'enrolled', label: 'My Enrollments' },
+];
+
+const sortOptions = [
+    { value: 'name', label: 'Sort by Name' },
+    { value: 'deadlines', label: 'Sort by Deadlines' },
+];
+
 function Toolbar({ search, sorting, departments }) {
-    const filter_options = [
-        { value: 'all', label: 'All Modules' },
-        { value: 'enrolled', label: 'My Enrollments' },
-    ];
     const dept_options = [
         { value: 'all', 'label': 'All Departments' },
         ...departments.map(d => ({ value: d, label: d })),
-    ];
-    const sortOptions = [
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'deadlines', label: 'Sort by Deadlines' },
     ];
     return (
         <div className={styles.toolbar}>

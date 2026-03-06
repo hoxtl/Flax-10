@@ -48,6 +48,7 @@ def handle_event_delete(sender, instance, **kwargs):
         'message': f'"{instance.title}" has been removed from the calendar.',
         'notification_type': 'society_event',
         'society_id': instance.society_id,
+        'action_url': build_society_calendar_url(instance.society_id),
     })
 
 
@@ -108,6 +109,7 @@ def build_event_notification(event, action='new'):
         'message': f"{event.title} - {format_event_time(event)}",
         'notification_type': 'society_event',
         'society_id': event.society_id,
+        'action_url': build_society_calendar_url(event.society_id),
     }
 
 
@@ -117,17 +119,34 @@ def build_announcement_notification(announcement):
         'message': announcement.title,
         'notification_type': 'society_announcement',
         'society_id': announcement.society_id,
+        'action_url': build_society_announcements_url(announcement.society_id),
+        'scroll_to_id': f"announcement-{announcement.id}",
     }
 
 
 def build_delete_notification(announcement, has_event):
-    message = f'"{announcement.title}" and its event have been removed' if has_event else f'"{announcement.title}" has been removed'
+    message = build_delete_message(announcement.title, has_event)
     return {
         'title': f"Announcement deleted in {announcement.society.name}",
         'message': message,
         'notification_type': 'society_announcement',
         'society_id': announcement.society_id,
+        'action_url': build_society_announcements_url(announcement.society_id),
     }
+
+
+def build_delete_message(title, has_event):
+    if has_event:
+        return f'"{title}" and its event have been removed'
+    return f'"{title}" has been removed'
+
+
+def build_society_calendar_url(society_id):
+    return f"societies_{society_id}_calendar"
+
+
+def build_society_announcements_url(society_id):
+    return f"societies_{society_id}_announcements"
 
 
 def format_event_time(event):

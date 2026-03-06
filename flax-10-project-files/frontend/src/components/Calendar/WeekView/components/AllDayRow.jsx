@@ -42,7 +42,7 @@ function AllDayEventBar({ item, readOnly }) {
     };
 
     return (
-        <div className="all-day-event-bar" style={style} onClick={handleClick}>
+        <div className="all-day-event-bar" style={style} onClick={handleClick} data-event-id={event.id}>
             {event.title}
         </div>
     );
