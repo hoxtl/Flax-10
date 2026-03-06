@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { AlertCircle } from 'lucide-react';
 import styles from './HistoryModal.module.css';
 import { getHistory, clearHistory } from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
+import { useConfirm } from '../../context/ConfirmContext';
 
 const HistoryHeader = ({ onClose }) => {
     const title = <h2 className={styles.title}>History</h2>;

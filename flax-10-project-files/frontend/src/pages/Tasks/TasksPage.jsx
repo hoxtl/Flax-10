@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import useTasks from "./hooks/useTasks";
 import useTaskLists from "./hooks/useTaskLists";
+import { useConfirm } from "../../context/ConfirmContext";
 
 import TaskFeed from "./components/TaskFeed";
 import ListSidebar from "./components/ListSidebar";
@@ -55,6 +56,7 @@ export default function TasksPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { lists, archivedLists, loading: listsLoading, addList, removeList, renameList, restoreList, permanentlyDeleteList } = useTaskLists();
     const { tasks, initialLoading: tasksInitialLoading, addTask, editTask, removeTask, toggleComplete, reload: reloadTasks } = useTasks();
+    const confirm = useConfirm();
     const [activeListId,    setActiveListId]    = useState(null);
     const [filterListIds,   setFilterListIds]   = useState([]);
     const [activeFilter,   setActiveFilter]    = useState("all");
@@ -135,7 +137,13 @@ export default function TasksPage() {
     };
 
     const handlePermanentlyDeleteList = async (listId) => {
-        if (!window.confirm("Permanently delete this list? You won’t be able to restore it.")) return;
+        const confirmed = await confirm({
+            title: "Delete List Permanently",
+            message: "Permanently delete this list? You won't be able to restore it.",
+            confirmText: "Delete",
+            isDanger: true,
+        });
+        if (!confirmed) return;
         await permanentlyDeleteList(listId);
     };
 
