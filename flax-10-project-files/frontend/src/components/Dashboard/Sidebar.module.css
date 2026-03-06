@@ -322,6 +322,40 @@
   border-radius: 1px;
 }
 
+.mobileBottomScrollHint {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.mobileBottomScroll {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 4px 4px 4px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 168, 130, 0.5) transparent;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+}
+
+.mobileBottomScroll::-webkit-scrollbar {
+  height: 3px;
+}
+
+.mobileBottomScroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 99px;
+}
+
+.mobileBottomScroll::-webkit-scrollbar-thumb {
+  background: rgba(196, 168, 130, 0.55);
+  border-radius: 99px;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
