@@ -871,18 +871,16 @@ export default function Homepage() {
                 <div className={styles.timelineHeaderIconWrap} aria-hidden>
                   <CalendarIcon size={17} strokeWidth={1.75} />
                 </div>
-                <div>
-                  <h3 className={styles.timelineTitle}>Your Day</h3>
-                  <Link to="/calendar" className={styles.timelineHeaderSub}>View calendar →</Link>
-                </div>
+                <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
               </div>
               <div className={styles.timelineHeaderRight}>
-                {isToday(selectedDate) && (missedItems?.length > 0 || (overdueTasksForNow?.length ?? 0) > 0) && (
+                <Link to="/calendar" className={styles.timelineHeaderActionLink}>View Detailed Planner →</Link>
+                {isToday(selectedDate) && (
                   <motion.button
                     type="button"
                     className={styles.replanBtn}
                     onClick={handleReplanDay}
-                    disabled={replanLoading}
+                    disabled={replanLoading || (!missedItems?.length && !(overdueTasksForNow?.length))}
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}

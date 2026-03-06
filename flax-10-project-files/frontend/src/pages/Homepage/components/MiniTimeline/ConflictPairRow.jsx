@@ -130,16 +130,30 @@ export function ConflictPairRow({
           <span className={styles.planTimelineConflictPairLabelText}>
             {items.length} events overlap
           </span>
-          {freeRow && (
+          <button
+            type="button"
+            className={styles.planTimelineConflictAutoBtn}
+            onClick={handleAutoMove}
+            disabled={!freeRow}
+            title={
+              freeRow
+                ? `Move "${movable?.item?.title}" to next free window`
+                : "No free window available right now"
+            }
+          >
+            {freeRow ? "Auto-arrange" : "No free window"}
+          </button>
+          {items.map((r) => (
             <button
+              key={`resolve-${r.id}`}
               type="button"
-              className={styles.planTimelineConflictAutoBtn}
-              onClick={handleAutoMove}
-              title={`Move "${movable?.item?.title}" to next free window`}
+              className={styles.planTimelineConflictItemBtn}
+              onClick={() => onEdit?.(r.item, r.item.tag)}
+              title={`Open "${stripEmojiFromTitle(r.item.title)}"`}
             >
-              · Auto-arrange →
+              ✎ {stripEmojiFromTitle(r.item.title)}
             </button>
-          )}
+          ))}
         </div>
       </div>
     </div>
