@@ -234,6 +234,19 @@ function MobileDrawer({
           >
             <div className={styles.mobileDrawerHandle} />
 
+            <div className={styles.mobileDrawerHeader}>
+              <div className={styles.mobileDrawerLogo}>
+                <div className={styles.logoMark} />
+                <span className={styles.mobileDrawerTitle}>StudyFlax</span>
+              </div>
+              <button
+                className={styles.mobileDrawerClose}
+                onClick={onClose}
+                aria-label="Close menu"
+              >
+                ✕
+              </button>
+            </div>
           </motion.div>
         </>
       )}
