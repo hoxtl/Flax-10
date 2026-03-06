@@ -117,3 +117,14 @@ button:focus-visible {
 .MuiChartsAxis-tickLabel tspan {
   fill: var(--muted) !important;
 }
+
+/* Notification highlight effect for scroll-to elements */
+.notification-highlight {
+  animation: notificationPulse 2s ease-out;
+}
+
+@keyframes notificationPulse {
+  0%, 100% { box-shadow: none; }
+  25%, 75% { box-shadow: 0 0 0 4px rgba(158, 126, 93, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(158, 126, 93, 0.6); }
+}

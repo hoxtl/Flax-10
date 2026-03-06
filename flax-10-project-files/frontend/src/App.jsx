@@ -20,6 +20,7 @@ import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
+import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
@@ -88,8 +89,10 @@ function resolveRouteContent(activeNav, user, setActiveNav) {
   const el = route.element;
   if (el && typeof el === "object") {
     const extraProps = { user, onNavChange: setActiveNav };
-    // Pass the search param to modules view if provided
-    if (baseNav === 'modules' && navParam) {
+    // Pass the search param or create flag to modules view if provided
+    if (baseNav === 'modules' && navParam === 'create') {
+      extraProps.initialCreate = true;
+    } else if (baseNav === 'modules' && navParam) {
       extraProps.initialSearch = navParam;
     }
     return { ...el, props: { ...el.props, ...extraProps } };
@@ -283,29 +286,23 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
-
   if (activeNav === "profile")
-    return (
-      <Profile
-        user={user}
-        onBack={() => setActiveNav("home")}
-        onNavigate={setActiveNav}
-      />
-    );
-
-  if (activeNav.startsWith("profile_")) {
-    const viewedUserId = activeNav.split("_")[1];
-    return (
-      <Profile
-        user={user}
-        viewedUserId={viewedUserId}
-        onBack={() => setActiveNav("home")}
-        onNavigate={setActiveNav}
-      />
-    );
-  }
-
+    return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+  if (activeNav.startsWith("profile_"))
+    return renderProfileView(activeNav, setActiveNav, user);
+  if (activeNav.startsWith("societies_"))
+    return renderSocietyView(activeNav, setActiveNav);
   return resolveRouteContent(activeNav, user, setActiveNav);
+}
+
+function renderProfileView(activeNav, setActiveNav, user) {
+  const viewedUserId = activeNav.split("_")[1];
+  return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+}
+
+function renderSocietyView(activeNav, setActiveNav) {
+  const parts = activeNav.split("_");
+  return <SocietyDetailPage societyId={parts[1]} initialTab={parts[2] || "calendar"} onBack={() => setActiveNav("societies")} />;
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
