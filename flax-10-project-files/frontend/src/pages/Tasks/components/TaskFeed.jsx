@@ -237,7 +237,7 @@ export default function TaskFeed({
   onFilterByList,
 }) {
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("due");
+  const [sortBy, setSortBy] = useState("priority");
   const [showDone, setShowDone] = useState(true);
   const [filterModuleCodes, setFilterModuleCodes] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
