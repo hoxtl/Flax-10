@@ -7,6 +7,7 @@ import { getModules } from "../../api/moduleApi";
 const CORE_TYPES = [
   { id: 'event', icon: '📅', label: 'Event', color: '#3b82f6' },
   { id: 'society', icon: '👨‍👨‍👧‍👧', label: 'Society', color: '#8b5cf6' },
+  { id: 'schedule', icon: '🗓️', label: 'Schedule', color: '#ffd62e'}
 ];
 
 //Unlock when features are implemented
@@ -88,6 +89,7 @@ function useQuickAddLogic(onSelectType) {
     if (id === 'event') setView('tag');
     else if (id === 'module') setView('module');
     else if (id === 'add_deadline') setView('module_picker');
+    else if (id === 'schedule') setView('schedule');
     else onSelectType(id);
   };
   return { tags, view, handleType };
@@ -97,6 +99,7 @@ function getHeader(view) {
   if (view === 'module') return { title: 'Module Options', sub: 'Create a module or add a deadline' };
   if (view === 'tag') return { title: 'Choose Event Tag', sub: 'What kind of event is this?' };
   if (view === 'module_picker') return { title: 'Select Module', sub: 'Which module is this deadline for?' };
+  if (view === 'schedule') return {title: 'Add Schedule', sub: 'Make schedule out of current calendar or auto schedule?'}
   return { title: 'Quick Add', sub: 'What would you like to add?' };
 }
 
