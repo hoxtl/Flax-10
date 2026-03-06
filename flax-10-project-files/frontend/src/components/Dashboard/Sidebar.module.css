@@ -356,6 +356,16 @@
   border-radius: 99px;
 }
 
+.mobileScrollFade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  background: linear-gradient(to right, transparent, rgba(250, 247, 244, 0.96));
+  pointer-events: none;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
