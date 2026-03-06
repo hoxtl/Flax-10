@@ -457,6 +457,13 @@
   flex-shrink: 0;
 }
 
+.mobileDrawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 8px;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
