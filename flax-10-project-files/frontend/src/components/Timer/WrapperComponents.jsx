@@ -18,15 +18,36 @@ const TimerHeader = ({ onOpenHistory, isMobile }) => (
 );
 
 const TimerTopSection = ({ t, onOpenHistory, isMobile }) => {
+    const splitEstimatedBlocks = useCallback((blocks) => {
+        const total = Math.max(1, Number(blocks) || 1);
+        for (const perSession of [1, 2, 3, 4]) {
+            if (total % perSession !== 0) continue;
+            const sessions = total / perSession;
+            if (sessions >= 1 && sessions <= 12) {
+                return { sessionCount: sessions, workMinutes: perSession * 25 };
+            }
+        }
+        return { sessionCount: 1, workMinutes: total * 25 };
+    }, []);
+
     const handleTaskSelect = useCallback((task) => {
         t.setTask(task.title);
-        const mins = (task.estimated_blocks || 1) * 25;
-        t.updateTime('work', mins);
-        t.setTimeLeft(mins * 60);
+        const split = splitEstimatedBlocks(task.estimated_blocks || 1);
+        t.updateTime('work', split.workMinutes);
+        t.updateTime('sessions', split.sessionCount);
+        t.setTimeLeft(split.workMinutes * 60);
         t.setIsActive(true);
-        if (t.setActiveTaskId) t.setActiveTaskId(task.id, { title: task.title, categoryColor: task.list_color });
+        if (t.setActiveTaskId) {
+            t.setActiveTaskId(task.id, {
+                title: task.title,
+                categoryColor: task.list_color,
+                estimatedBlocks: Number(task.estimated_blocks || 1),
+                estimatedSessionCount: split.sessionCount,
+                estimatedWorkMinutes: split.workMinutes,
+            });
+        }
         try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
-    }, [t]);
+    }, [t, splitEstimatedBlocks]);
 
     useEffect(() => {
         try {
