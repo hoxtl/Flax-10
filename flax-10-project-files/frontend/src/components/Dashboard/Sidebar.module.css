@@ -448,6 +448,15 @@
   flex-direction: column;
 }
 
+.mobileDrawerHandle {
+  width: 40px;
+  height: 4px;
+  background: rgba(180, 160, 140, 0.35);
+  border-radius: 99px;
+  margin: 14px auto 4px;
+  flex-shrink: 0;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
