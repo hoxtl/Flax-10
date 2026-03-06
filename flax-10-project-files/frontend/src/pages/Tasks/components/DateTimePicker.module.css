@@ -155,6 +155,10 @@
     border-top: 1px solid var(--border);
     padding-top: 0.6rem;
   }
+  .timeOnlyPicker {
+    border-top: none;
+    padding-top: 0;
+  }
   .timeIcon {
     color: var(--muted, #9a8778);
     flex-shrink: 0;

@@ -1,46 +1,28 @@
 .recurrence-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .recurrence-row {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
-}
-
-.recurrence-field label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #7b6751;
 }
 
 .recurrence-row .frequency-select {
     flex: 1;
+    padding-right: 32px;
 }
 
 .interval-input {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #5e5249;
-    font-size: 0.82rem;
-    font-weight: 600;
 }
 
 .interval-input input {
-    width: 58px;
-    padding: 0.45rem 0.55rem;
-    border: 1px solid rgba(107, 83, 68, 0.18);
-    border-radius: 10px;
-    background: #f4f5f8;
-    color: #3f352e;
-    font-size: 0.82rem;
-    font-weight: 600;
-    font-family: var(--font-body, inherit);
+    width: 60px;
 }
 
 .end-repeat-section {
@@ -50,31 +32,16 @@
 }
 
 .end-repeat-section label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #7b6751;
+    font-size: 13px;
+    color: #666;
 }
 
 .end-repeat-row {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
-}
-
-.end-type-select {
-    min-width: 130px;
 }
 
 .end-date-input {
     flex: 1;
-    padding: 0.5rem 0.65rem;
-    border: 1px solid rgba(107, 83, 68, 0.18);
-    border-radius: 10px;
-    background: #f4f5f8;
-    color: #3f352e;
-    font-size: 0.82rem;
-    font-weight: 600;
-    font-family: var(--font-body, inherit);
 }

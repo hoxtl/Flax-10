@@ -48,9 +48,20 @@ function calendarDays(year, month) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time" }) {
+function parseIncomingValue(value, timeOnly) {
+  if (!value) return null;
+  if (timeOnly && /^\d{2}:\d{2}$/.test(value)) {
+    const [h, m] = value.split(":").map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+  return new Date(value);
+}
+
+export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false }) {
   // Parse incoming value
-  const parsed = useMemo(() => value ? new Date(value) : null, [value]);
+  const parsed = useMemo(() => parseIncomingValue(value, timeOnly), [value, timeOnly]);
 
   const [open,    setOpen]    = useState(false);
   const [viewY,   setViewY]   = useState((parsed || new Date()).getFullYear());
@@ -68,19 +79,20 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     if (!open || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const gap = 6;
-    const dropdownHeight = 320;
+    const dropdownHeight = timeOnly ? 130 : 320;
     const spaceBelow = window.innerHeight - rect.bottom;
     const openAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
     setDropdownPos({
       top: openAbove ? rect.top - dropdownHeight - gap : rect.bottom + gap,
       left: rect.left,
     });
-  }, [open]);
+  }, [open, timeOnly]);
 
   // Sync selDate/time when value prop changes externally
   useEffect(() => {
     if (value) {
-      const d = new Date(value);
+      const d = parseIncomingValue(value, timeOnly);
+      if (!d || Number.isNaN(d.getTime())) return;
       setSelDate(d);
       setHour(d.getHours());
       setMinute(d.getMinutes());
@@ -89,7 +101,7 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     } else {
       setSelDate(null);
     }
-  }, [value]);
+  }, [value, timeOnly]);
 
   // Close on outside interaction (trigger and portaled dropdown are separate)
   useEffect(() => {
@@ -119,6 +131,10 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     if (!date) { onChange?.(""); return; }
     const d = new Date(date);
     d.setHours(h, m, 0, 0);
+    if (timeOnly) {
+      onChange?.(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+      return;
+    }
     // Return as "YYYY-MM-DDTHH:mm" (compatible with datetime-local input)
     const iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     onChange?.(iso);
@@ -155,8 +171,12 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
         className={`${styles.trigger} ${open ? styles.triggerOpen : ""} ${!selDate ? styles.triggerEmpty : ""}`}
         onClick={() => setOpen(p => !p)}
       >
-        <span className={styles.triggerIcon}>📅</span>
-        <span className={selDate ? styles.triggerValueMono : ""}>{selDate ? formatDisplay(selDate) : placeholder}</span>
+        <span className={styles.triggerIcon}>{timeOnly ? "🕒" : "📅"}</span>
+        <span className={selDate ? styles.triggerValueMono : ""}>
+          {selDate
+            ? (timeOnly ? `${pad(selDate.getHours())}:${pad(selDate.getMinutes())}` : formatDisplay(selDate))
+            : placeholder}
+        </span>
         {selDate && (
           <button
             type="button"
@@ -178,36 +198,40 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
             zIndex: 10000,
           }}
         >
-          {/* Month navigation */}
-          <div className={styles.calHeader}>
-            <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
-            <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
-            <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
-          </div>
+          {!timeOnly && (
+            <>
+              {/* Month navigation */}
+              <div className={styles.calHeader}>
+                <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
+                <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
+                <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
+              </div>
 
-          {/* Day-of-week headers */}
-          <div className={styles.calGrid}>
-            {DAYS.map(d => (
-              <div key={d} className={styles.dayHeader}>{d}</div>
-            ))}
-            {days.map((d, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`${styles.dayCell}
-                  ${!d ? styles.dayCellEmpty : ""}
-                  ${d && isToday(d) ? styles.dayCellToday : ""}
-                  ${d && isSel(d)   ? styles.dayCellSel   : ""}`}
-                onClick={() => d && selectDay(d)}
-                disabled={!d}
-              >
-                {d || ""}
-              </button>
-            ))}
-          </div>
+              {/* Day-of-week headers */}
+              <div className={styles.calGrid}>
+                {DAYS.map(d => (
+                  <div key={d} className={styles.dayHeader}>{d}</div>
+                ))}
+                {days.map((d, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`${styles.dayCell}
+                    ${!d ? styles.dayCellEmpty : ""}
+                    ${d && isToday(d) ? styles.dayCellToday : ""}
+                    ${d && isSel(d)   ? styles.dayCellSel   : ""}`}
+                    onClick={() => d && selectDay(d)}
+                    disabled={!d}
+                  >
+                    {d || ""}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
           {/* Time pickers */}
-          <div className={styles.timePicker}>
+          <div className={`${styles.timePicker} ${timeOnly ? styles.timeOnlyPicker : ""}`}>
             <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
             <div className={styles.timeDropdown}>
               <AnimatedDropdown

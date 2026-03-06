@@ -45,22 +45,7 @@ export function useEventForm(event, onClose, options = {}) {
             doSubmit(e, false);
         };
 
-    // When user chooses "Save anyway", clear the warning view first so
-    // any backend errors are shown in the normal form error banner.
-    const handleConfirmSave = () => {
-        setOverlapWarning(null);
-        return validateAndSubmit(
-            null,
-            form,
-            event,
-            actions,
-            onClose,
-            setError,
-            setOverlapWarning,
-            calendarContext?.events || [],
-            true,
-        );
-    };
+    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], true);
     const handleCancelSave = () => setOverlapWarning(null);
 
     const handleConfirmSleep = () => {
@@ -68,7 +53,6 @@ export function useEventForm(event, onClose, options = {}) {
         pendingSubmit?.();
         setPendingSubmit(null);
     };
-
     const handleCancelSleep = () => {
         setSleepWarning(false);
         setPendingSubmit(null);

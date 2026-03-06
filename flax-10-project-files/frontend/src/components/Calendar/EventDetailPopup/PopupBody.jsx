@@ -1,11 +1,11 @@
 import styles from "./EventDetailPopup.module.css";
-import { formatDateWithYear, formatTimeRange } from "../utils/dateUtils";
+import { formatDateRange, formatTimeRange } from "../utils/dateUtils";
 
 export function PopupBody({ event }) {
     return (
         <div className={styles.body}>
             {event.location && <InfoLine icon="📍" value={event.location} />}
-            <InfoLine icon="📅" value={formatDateWithYear(new Date(event.start_time))} />
+            <InfoLine icon="📅" value={formatDateRange(event.start_time, event.end_time, event.all_day)} />
             <InfoLine icon="🕐" value={formatTimeRange(event.start_time, event.end_time, event.all_day)} />
             {event.description && <Description text={event.description} />}
         </div>

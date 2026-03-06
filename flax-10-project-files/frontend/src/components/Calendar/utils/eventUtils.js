@@ -7,8 +7,6 @@ export function extractBaseEventId(id, event = null) {
         return /^\d+$/.test(base) ? parseInt(base, 10) : base;
     }
 
-    // Some events (e.g. from backend or sync) use numeric padding for occurrences: baseId * 10000 + index.
-    // We only divide if the ID is suspiciously large (e.g. > 1M) to avoid breaking real IDs like 40653.
     if (typeof id === 'number' && id >= 1000000) {
         return Math.floor(id / 10000);
     }
@@ -30,7 +28,6 @@ export function isReadOnlyEvent(event) {
 
 export function getEventType(event) {
     if (!event) return 'personal';
-    if (event.source === 'task') return 'task';
     if (event.source === 'society') return 'society';
     if (event.module) return 'module';
     if (event.source && event.external_id) return 'timetable';
@@ -67,7 +64,7 @@ export function getVisibleEventsInView(events, selectedDate, viewMode) {
         const d = new Date(selectedDate);
         const day = d.getDay();
         const start = new Date(d); start.setDate(d.getDate() - day); start.setHours(0, 0, 0, 0);
-        const end = new Date(start); end.setDate(start.getDate() + 7);
+        const end = new Date(start); end.setDate(start.getDate() + 7); // Start of next Sunday
 
         return events.filter(e => {
             const eStart = new Date(e.start_time);

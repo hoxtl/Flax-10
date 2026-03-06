@@ -1,6 +1,5 @@
 import { FormField } from './FormField';
 import { getType, handleDateChange, getDisplayValue, handleToggle } from './timeRowHelpers';
-import DateTimePicker from '../../../../pages/Tasks/components/DateTimePicker';
 import './TimeRow.css';
 
 export function TimeRow({ form, update, setForm }) {
@@ -45,18 +44,6 @@ function TimeFields({ form, update }) {
 }
 
 function TimeInput({ label, value, field, update, type, isAllDay }) {
-    if (!isAllDay && type === 'datetime-local') {
-        return (
-            <div className="form-field">
-                <label>{label}</label>
-                <DateTimePicker
-                    value={value || ''}
-                    onChange={(iso) => update(field)({ target: { value: iso || '' } })}
-                    placeholder={label === 'Start' ? 'Pick start date & time' : 'Pick end date & time'}
-                />
-            </div>
-        );
-    }
     return (
         <FormField
             label={label}

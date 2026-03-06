@@ -1,19 +1,4 @@
-import AnimatedDropdown from '../../../../components/ui/AnimatedDropdown';
 import './RecurrenceField.css';
-
-const REPEAT_OPTIONS = [
-    { value: 'none', label: 'None' },
-    { value: 'daily', label: 'Daily' },
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'biweekly', label: 'Biweekly' },
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'yearly', label: 'Yearly' },
-];
-
-const END_REPEAT_OPTIONS = [
-    { value: 'never', label: 'Never' },
-    { value: 'on_date', label: 'On date' },
-];
 
 export function RecurrenceField({ value, onChange }) {
     const { frequency = 'none', interval = 1, end_date = null } = value || {};
@@ -41,13 +26,14 @@ function RecurrenceOptions({ frequency, interval, onChange }) {
 
 function FrequencySelect({ frequency, onChange }) {
     return (
-        <AnimatedDropdown
-            value={frequency}
-            onChange={(val) => onChange({ target: { value: val } })}
-            options={REPEAT_OPTIONS}
-            placeholder="None"
-            className="frequency-select"
-        />
+        <select value={frequency} onChange={onChange} className="frequency-select">
+            <option value="none">None</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="biweekly">Biweekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
     );
 }
 
@@ -79,13 +65,10 @@ function EndRepeatField({ endDate, onChange }) {
 function EndRepeatOptions({ endType, endDate, onTypeChange, onChange }) {
     return (
         <div className="end-repeat-row">
-            <AnimatedDropdown
-                value={endType}
-                onChange={(val) => onTypeChange({ target: { value: val } })}
-                options={END_REPEAT_OPTIONS}
-                placeholder="Never"
-                className="end-type-select"
-            />
+            <select value={endType} onChange={onTypeChange} className="end-type-select">
+                <option value="never">Never</option>
+                <option value="on_date">On date</option>
+            </select>
             {endType === 'on_date' && <DateInput endDate={endDate} onChange={onChange} />}
         </div>
     );
