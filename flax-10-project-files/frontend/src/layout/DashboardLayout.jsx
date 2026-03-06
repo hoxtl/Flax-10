@@ -327,16 +327,6 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
             }
             setPendingNav(null);
           }}
-          onExit={() => {
-            t.setIsActive(false);
-            t.resetTimer();
-            if (pendingNav === "QUICK_ADD") {
-              setShowQuickAdd(true);
-            } else {
-              onNavChange(pendingNav);
-            }
-            setPendingNav(null);
-          }}
         />
       )}
 
