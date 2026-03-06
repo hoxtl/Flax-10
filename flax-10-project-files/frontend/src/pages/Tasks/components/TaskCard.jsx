@@ -102,7 +102,7 @@ function HighlightText({ text, query }) {
  * Right-click context menu — Edit, Move to list, Set due date, Delete.
  * Renders as a portal so it's never clipped by parent overflow.
  */
-function ContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }) {
+export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }) {
     const menuRef = useRef(null);
     const [view, setView] = useState("main");
     const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
@@ -488,7 +488,7 @@ export default function TaskCard({
             </div>
 
             {ctxMenu && (
-                <ContextMenu
+                <TaskContextMenu
                     task={task}
                     onEditOpen={() => setShowEdit(true)}
                     onDelete={onDelete}

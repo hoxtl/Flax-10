@@ -15,7 +15,6 @@ import { getGapStartDate } from "../../utils/timelineUtils";
 import { getTasksThatFitGap, taskDurationMins } from "../../utils/taskUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
 import { formatHour12h } from "../../utils/dateFormatUtils";
-import { Sparkles } from "lucide-react";
 
 function durationLabel(minutes) {
   if (minutes >= 60) {
@@ -36,33 +35,6 @@ function formatDueLabel(task) {
   if (h < 24) return `due in ${h}h`;
   const d = Math.floor(diff / 86400000);
   return `due in ${d}d`;
-}
-
-/** Build a concise gap header based on context + upcoming task deadline. */
-function buildStudyHeader(suggestedTask, durLabel) {
-  if (!suggestedTask?.due_date) return `${durLabel} free`;
-  const due = new Date(suggestedTask.due_date);
-  const now = new Date();
-  const diffMs = due - now;
-  const diffDays = Math.floor(diffMs / 86400000);
-  const diffH = Math.floor(diffMs / 3600000);
-  const title = suggestedTask.title?.length > 22
-    ? suggestedTask.title.slice(0, 20) + "…"
-    : suggestedTask.title;
-  if (diffMs < 0) return `${title} — overdue`;
-  if (diffH < 12) return `${title} due in ${diffH}h`;
-  if (diffDays === 0) return `${title} due today`;
-  if (diffDays === 1) return `${title} due tomorrow`;
-  if (diffDays <= 3) return `${title} due in ${diffDays}d`;
-  return `${durLabel} free`;
-}
-
-function deadlineDueLabel(deadline) {
-  if (!deadline?.start_due_date) return null;
-  const ms = new Date(deadline.start_due_date) - Date.now();
-  if (ms <= 0) return "overdue";
-  const d = Math.ceil(ms / 86400000);
-  return d === 1 ? "due tomorrow" : `due in ${d}d`;
 }
 
 export function PlanFreeRow({
@@ -202,99 +174,19 @@ export function PlanFreeRow({
     );
   }
 
-  /* ── 60+ min: Study window ── */
-  if (isBestWindow) {
-    const top2 = top3Tasks.slice(0, 2);
-    const header = buildStudyHeader(suggestedTask, durLabel);
-    const topDeadline = deadlineSuggestions[0] ?? null;
-    const revisionBlockMins = Math.min(Math.ceil(row.minutes / 25) * 25, 90);
-    return (
-      <div
-        className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
-        style={{ marginTop: row.spacingBeforePx || 0 }}
-      >
-        <div className={styles.planTimelineGutter}>
-          <span className={styles.planTimelineTime}>{timeStr}</span>
-        </div>
-        <div className={styles.planTimelineSpineCell}>
-          <span
-            className={`${styles.planTimelineNode} ${styles.planTimelineNodeBestWindow}`}
-            aria-hidden
-          />
-        </div>
-        <div className={styles.planTimelineGapBestWindow}>
-          {/* Suggested panel header */}
-          <div className={styles.planTimelineGapBestWindowHeader}>
-            <div className={styles.planTimelineGapSuggestedHeaderLeft}>
-              <Sparkles size={13} style={{ color: "#C4A46D", flexShrink: 0 }} aria-hidden />
-              <span className={styles.planTimelineGapSuggestedLabel}>Suggested</span>
-            </div>
-            <span className={styles.planTimelineGapBestWindowDur}>{durLabel} free</span>
-          </div>
-          {/* Deadline suggestion */}
-          {topDeadline && (
-            <div className={styles.planTimelineGapSuggestedItem}>
-              <div className={styles.planTimelineGapSuggestedItemLeft}>
-                <span className={styles.planTimelineGapSuggestedDot} style={{ background: "#C4946D" }} />
-                <span className={styles.planTimelineGapSuggestedItemTitle} title={topDeadline.assessment_title || topDeadline.title}>
-                  {topDeadline.assessment_title || topDeadline.title}
-                  {topDeadline.module_code ? ` · ${topDeadline.module_code}` : ""}
-                </span>
-                {deadlineDueLabel(topDeadline) && (
-                  <span className={styles.planTimelineGapSuggestedItemCtx}>
-                    · {deadlineDueLabel(topDeadline)}
-                  </span>
-                )}
-              </div>
-              <button
-                type="button"
-                className={styles.planTimelineGapSlotInBtn}
-                onClick={() => startTask({
-                  title: `Revision: ${topDeadline.assessment_title || topDeadline.title}`,
-                  estimated_blocks: Math.round(revisionBlockMins / 25),
-                })}
-                aria-label={`Slot in revision for ${topDeadline.assessment_title || topDeadline.title}`}
-              >
-                Slot in →
-              </button>
-            </div>
-          )}
-          {top2.map((task) => {
-            const due = formatDueLabel(task);
-            const mins = taskDurationMins(task);
-            const isOverdue = due === "overdue";
-            return (
-              <div key={task.id ?? task.title} className={styles.planTimelineGapSuggestedItem}>
-                <div className={styles.planTimelineGapSuggestedItemLeft}>
-                  <span className={styles.planTimelineGapSuggestedDot} style={{ background: isOverdue ? "#C4746D" : "#C4A46D" }} />
-                  <span className={styles.planTimelineGapSuggestedItemTitle} title={task.title}>
-                    {task.title}
-                  </span>
-                  <span className={styles.planTimelineGapSuggestedItemCtx}>
-                    · {mins}m{due ? ` · ${due}` : ""}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  className={styles.planTimelineGapSlotInBtn}
-                  onClick={() => startTask(task)}
-                  aria-label={`Slot in ${task.title}`}
-                >
-                  Slot in →
-                </button>
-              </div>
-            );
-          })}
-          {!topDeadline && top2.length === 0 && (
-            <span className={styles.planTimelineGapNoTasks}>{durLabel} to use however you like</span>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  /* ── 30–59 min: Short study window ── */
+  /* ── Study windows (compact single-line style) ── */
   const topDeadlineShort = deadlineSuggestions[0] ?? null;
+  const candidateTask = suggestedTask || (topDeadlineShort
+    ? {
+        title: `Revision: ${topDeadlineShort.assessment_title || topDeadlineShort.title}`,
+        estimated_blocks: Math.max(1, Math.round(row.minutes / 25)),
+        due_date: topDeadlineShort.start_due_date,
+      }
+    : null);
+  const candidateDueLabel = formatDueLabel(candidateTask);
+  const urgent = candidateDueLabel === "overdue" || (candidateDueLabel?.startsWith("due in") && /(\d+)h/.test(candidateDueLabel));
+  const windowLabel = candidateTask ? `${durLabel} window` : `${durLabel} free`;
+
   return (
     <div
       className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
@@ -304,54 +196,36 @@ export function PlanFreeRow({
         <span className={styles.planTimelineTime}>{timeStr}</span>
       </div>
       <div className={styles.planTimelineSpineCell}>
-        <span className={styles.planTimelineNode} aria-hidden />
+        <span
+          className={`${styles.planTimelineNode} ${isBestWindow ? styles.planTimelineNodeBestWindow : ""}`}
+          aria-hidden
+        />
       </div>
       <div className={styles.planTimelineGapShortWindow}>
-        <span className={styles.planTimelineGapShortDur}>{durLabel} window</span>
-        {topDeadlineShort && !suggestedTask ? (
+        <span className={styles.planTimelineGapShortDur}>{windowLabel}</span>
+        {candidateTask ? (
           <div className={styles.planTimelineGapShortTaskRow}>
-            <div className={styles.planTimelineGapDeadlineInfo}>
-              <span className={styles.planTimelineGapDeadlineChip}>
-                {deadlineDueLabel(topDeadlineShort)}
-              </span>
-              <span className={styles.planTimelineGapTaskTitle}>
-                {topDeadlineShort.assessment_title || topDeadlineShort.title}
-              </span>
-            </div>
-            <button
-              type="button"
-              className={styles.planTimelineGapStartBtnSm}
-              onClick={() => startTask({
-                title: `Revision: ${topDeadlineShort.assessment_title || topDeadlineShort.title}`,
-                estimated_blocks: Math.max(1, Math.round(row.minutes / 25)),
-              })}
-              aria-label={`Schedule revision for ${topDeadlineShort.assessment_title || topDeadlineShort.title}`}
-            >
-              Schedule →
-            </button>
-          </div>
-        ) : suggestedTask ? (
-          <div className={styles.planTimelineGapShortTaskRow}>
+            {urgent && <span className={styles.planTimelineGapUrgencyChip}>urgent!</span>}
             <span
               className={styles.planTimelineGapTaskTitle}
-              title={suggestedTask.title}
+              title={candidateTask.title}
             >
-              {suggestedTask.title}
+              {candidateTask.title}
             </span>
             <span className={styles.planTimelineGapTaskMeta}>
-              {taskDurationMins(suggestedTask)}m
+              {taskDurationMins(candidateTask)}m
             </span>
             <button
               type="button"
               className={styles.planTimelineGapStartBtnSm}
-              onClick={() => startTask(suggestedTask)}
-              aria-label={`Start ${suggestedTask.title}`}
+              onClick={() => startTask(candidateTask)}
+              aria-label={`Start ${candidateTask.title}`}
             >
               Slot in →
             </button>
           </div>
         ) : (
-          <span className={styles.planTimelineGapNoTasks}>Catch your breath</span>
+          <span className={styles.planTimelineGapNoTasks}>Your time — take a breather</span>
         )}
       </div>
     </div>

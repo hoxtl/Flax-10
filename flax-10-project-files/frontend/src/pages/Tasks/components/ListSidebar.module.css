@@ -67,7 +67,7 @@
     color: var(--primary);
     transform: translateX(2px);
 }
-.navActive .navLabel { color: var(--primary); font-weight: 700; }
+.navActive .navLabel { color: var(--primary); font-weight: 600; }
 .navActive .navEmoji { filter: none; }
 
 .navDanger .navLabel { color: #ef4444; }
@@ -85,7 +85,7 @@
     min-width: 0;
     font-family: var(--font-body);
     font-size: 0.97rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -126,7 +126,7 @@
 
 .listActive {
     background: var(--hover) !important;
-    font-weight: 600;
+    font-weight: 500;
     border-left-color: var(--primary);
     padding-left: 9px;
     transform: translateX(2px);
@@ -159,7 +159,7 @@
     min-width: 0;
     font-family: var(--font-body);
     font-size: 0.97rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
