@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useCalendar,
   useCalendarDispatch,
@@ -19,6 +19,16 @@ import { NavigationButtons } from "./header/NavigationButtons";
 import { ViewModeToggle } from "./header/ViewModeToggle";
 import TimetableImportModal from "../TimetableImportModal";
 import "./CalendarHeader.css";
+
+function useIsMobile(breakpoint = 900) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 async function handleImport(url, dispatch, selectedDate, viewMode) {
   await importTimetable(url);
@@ -72,6 +82,10 @@ export function CalendarHeader() {
 
   const weekStart = getStartOfWeek(selectedDate);
   const weekDays = [...Array(7)].map((_, i) => addDays(weekStart, i));
+  const isMobile = useIsMobile();
+  const availableModes = isMobile
+    ? ["day", "month", "year"]
+    : ["day", "week", "month", "year"];
 
   return (
     <>
@@ -100,30 +114,33 @@ export function CalendarHeader() {
             viewMode={viewMode}
             selectedDate={selectedDate}
             onImportClick={() => setShowImportModal(true)}
+            modes={availableModes}
           />
         </div>
 
-        <div className="date-strip-wrapper">
-          <div className="date-strip">
-            {weekDays.map((day) => (
-              <button
-                key={day.toString()}
-                className={`date-card ${isSameDay(day, selectedDate) ? "active" : ""}`}
-                onClick={() => {
-                  dispatch({ type: "SET_SELECTED_DATE", payload: day });
-                  dispatch({ type: "SET_VIEW_MODE", payload: "day" });
-                }}
-              >
-                <span className="day-name">
-                  {day
-                    .toLocaleDateString("en-US", { weekday: "short" })
-                    .charAt(0)}
-                </span>
-                <span className="day-number">{day.getDate()}</span>
-              </button>
-            ))}
+        {viewMode === "day" && (
+          <div className="date-strip-wrapper">
+            <div className="date-strip">
+              {weekDays.map((day) => (
+                <button
+                  key={day.toString()}
+                  className={`date-card ${isSameDay(day, selectedDate) ? "active" : ""}`}
+                  onClick={() => {
+                    dispatch({ type: "SET_SELECTED_DATE", payload: day });
+                    dispatch({ type: "SET_VIEW_MODE", payload: "day" });
+                  }}
+                >
+                  <span className="day-name">
+                    {day
+                      .toLocaleDateString("en-US", { weekday: "short" })
+                      .charAt(0)}
+                  </span>
+                  <span className="day-number">{day.getDate()}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </header>
       <TimetableImportModal
         isOpen={showImportModal}
@@ -134,7 +151,13 @@ export function CalendarHeader() {
   );
 }
 
-function HeaderActions({ openModal, viewMode, selectedDate, onImportClick }) {
+function HeaderActions({
+  openModal,
+  viewMode,
+  selectedDate,
+  onImportClick,
+  modes,
+}) {
   return (
     <div className="actions">
       <ImportButton onImport={onImportClick} />
@@ -144,7 +167,11 @@ function HeaderActions({ openModal, viewMode, selectedDate, onImportClick }) {
       >
         +
       </button>
-      <ViewModeToggle viewMode={viewMode} dispatch={useCalendarDispatch()} />
+      <ViewModeToggle
+        viewMode={viewMode}
+        dispatch={useCalendarDispatch()}
+        modes={modes}
+      />
     </div>
   );
 }
