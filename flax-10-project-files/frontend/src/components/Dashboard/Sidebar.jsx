@@ -16,6 +16,8 @@ function UserFooter({ user, open, onSettings, onLogout, onProfile, isMobile }) {
     setShowMenu(false);
   }, [open]);
 
+  if (isMobile) return null;
+
   return (
     <div className={styles.sidebarFooter}>
       <AnimatePresence>
@@ -67,7 +69,11 @@ function UserFooter({ user, open, onSettings, onLogout, onProfile, isMobile }) {
 
 function Hamburger({ onClick }) {
   return (
-    <button className={styles.hamburger} onClick={onClick}>
+    <button
+      className={styles.hamburger}
+      onClick={onClick}
+      aria-label="Open menu"
+    >
       <div className={styles.hamburgerLine} />
       <div className={styles.hamburgerLine} />
       <div className={styles.hamburgerLine} />
@@ -174,6 +180,27 @@ function SidebarNav({ active, onChange, open, user }) {
   );
 }
 
+function MobileNavIcon({ item, isActive, onClick }) {
+  return (
+    <motion.button
+      className={`${styles.mobileNavIcon} ${isActive ? styles.mobileNavIconActive : ""}`}
+      onClick={onClick}
+      whileTap={{ scale: 0.88 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+    >
+      <span className={styles.mobileNavIconEmoji}>{item.icon}</span>
+      <span className={styles.mobileNavIconLabel}>{item.label}</span>
+      {isActive && (
+        <motion.span
+          className={styles.mobileNavActiveDot}
+          layoutId="mobileActiveDot"
+          transition={{ type: "spring", stiffness: 400, damping: 28 }}
+        />
+      )}
+    </motion.button>
+  );
+}
+
 export default function Sidebar({
   active,
   onChange,
@@ -213,29 +240,22 @@ export default function Sidebar({
 
   const open = isHovered;
   const sidebarStatusClass = open ? styles.sidebarOpen : styles.sidebarClosed;
-  const w = isMobile
-    ? open
-      ? "100vw"
-      : COLLAPSED_W
-    : open
-      ? EXPANDED_W
-      : COLLAPSED_W;
+  const w = open ? EXPANDED_W : COLLAPSED_W;
 
   return (
     <motion.aside
       className={`${styles.sidebar} ${sidebarStatusClass}`}
       animate={{ width: w, minWidth: w }}
       transition={SIDEBAR_SPRING}
-      onMouseEnter={() => !isMobile && setIsHovered(true)}
-      onMouseLeave={() => !isMobile && setIsHovered(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <SidebarHeader open={open} isMobile={isMobile} onToggle={onToggle} />
+      <SidebarHeader open={open} isMobile={false} onToggle={onToggle} />
       <SidebarNav active={active} onChange={onChange} open={open} user={user} />
-
       <UserFooter
         user={user}
         open={open}
-        isMobile={isMobile}
+        isMobile={false}
         onSettings={onSettingsClick}
         onLogout={onLogoutClick}
         onProfile={onProfileClick}
