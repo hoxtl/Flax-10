@@ -499,6 +499,29 @@
   color: var(--text);
 }
 
+.mobileDrawerUserInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileDrawerUserName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mobileDrawerUserEmail {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mobileDrawerDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
