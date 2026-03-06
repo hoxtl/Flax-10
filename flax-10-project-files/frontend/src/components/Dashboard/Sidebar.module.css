@@ -252,6 +252,30 @@
   z-index: 99;
 }
 
+.mobileBottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  background: rgba(250, 247, 244, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(180, 160, 140, 0.18);
+  box-shadow: 0 -4px 24px rgba(74, 52, 33, 0.09);
+  padding: 0 8px 0 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobileBottomLeft {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
