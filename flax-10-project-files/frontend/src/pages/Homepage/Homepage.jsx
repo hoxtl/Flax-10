@@ -49,11 +49,12 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
+import PillFilters from "../../components/Tags/PillFilters";
 
 /* HOME PAGE */
 export default function Homepage() {
   const navigate         = useNavigate();
-  const { selectedDate, events: allCalEvents } = useCalendar();
+  const { selectedDate, events: allCalEvents, filter } = useCalendar();
   const dispatch         = useCalendarDispatch();
   const { loadEvents }   = useCalendarEvents();
   const { removeEvent, addEvent, editEvent } = useEventActions();
@@ -754,6 +755,10 @@ export default function Homepage() {
     return `${Math.floor(t / 60).toString().padStart(2, "0")}:${(t % 60).toString().padStart(2, "0")}`;
   };
 
+  const handleFilterChange = useCallback((key) => {
+    dispatch({ type: "SET_FILTER", payload: key });
+  }, [dispatch]);
+
   return (
     <div className={`${styles.page} ${hasTimerSession ? styles.focusModeActive : ""}`}>
       {toast && (
@@ -800,6 +805,11 @@ export default function Homepage() {
 
       {/* ─── SLEEP BANNER ─── motivational greeting shown at the top */}
       <SleepBanner />
+
+      {/* Pills row (includes ✎ tag manager button) */}
+      <div className={styles.homePillsRow}>
+        <PillFilters active={filter} onChange={handleFilterChange} items={sortedEvents} />
+      </div>
 
       {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
       <div className={styles.intelligenceRowWrap}>

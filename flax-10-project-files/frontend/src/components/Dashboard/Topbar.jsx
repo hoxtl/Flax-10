@@ -150,7 +150,7 @@ function QuickTabs({ onAddClick }) {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.read).length;
   const tabs = [
-    { title: "Add", icon: Plus, autoCollapse: true },
+    { title: "Add", icon: Plus, autoCollapse: false },
     { type: "separator" },
     { title: "Notifications", icon: Bell, badge: unreadCount },
   ];
