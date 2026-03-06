@@ -126,7 +126,11 @@ function BrandName() {
 function SidebarHeader({ open, isMobile, onToggle }) {
   return (
     <div className={styles.header}>
-      {isMobile ? <Hamburger onClick={onToggle} /> : <LogoMark sidebarHovered={open} />}
+      {isMobile ? (
+        <Hamburger onClick={onToggle} />
+      ) : (
+        <LogoMark sidebarHovered={open} />
+      )}
       <AnimatePresence>{open && <BrandName />}</AnimatePresence>
     </div>
   );
@@ -162,7 +166,9 @@ function NavItem({ item, isActive, open, onClick, hasPressure }) {
     styles.navItem,
     isActive ? styles.navItemActive : "",
     showPressure ? styles.navItemPressure : "",
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
     <motion.button
       onClick={onClick}
@@ -191,7 +197,14 @@ function SidebarNav({ active, onChange, open, user, hasPressure }) {
   return (
     <nav className={styles.nav}>
       {getRoutes(user).map((n) => (
-        <NavItem key={n.id} item={n} isActive={active === n.id} open={open} onClick={() => onChange?.(n.id)} hasPressure={hasPressure} />
+        <NavItem
+          key={n.id}
+          item={n}
+          isActive={active === n.id}
+          open={open}
+          onClick={() => onChange?.(n.id)}
+          hasPressure={hasPressure}
+        />
       ))}
     </nav>
   );
@@ -337,7 +350,6 @@ function MobileDrawer({
   );
 }
 
-
 // ── Mobile Bottom Bar ─────────────────────────────────────────────────────────
 
 function MobileBottomBar({
@@ -429,11 +441,19 @@ export default function Sidebar({
 
   useEffect(() => {
     getUpcomingDeadlines()
-      .then((list) => setHasPressure(hasDeadlineWithin48Hours(Array.isArray(list) ? list : [])))
+      .then((list) =>
+        setHasPressure(
+          hasDeadlineWithin48Hours(Array.isArray(list) ? list : []),
+        ),
+      )
       .catch(() => setHasPressure(false));
     const interval = setInterval(() => {
       getUpcomingDeadlines()
-        .then((list) => setHasPressure(hasDeadlineWithin48Hours(Array.isArray(list) ? list : [])))
+        .then((list) =>
+          setHasPressure(
+            hasDeadlineWithin48Hours(Array.isArray(list) ? list : []),
+          ),
+        )
         .catch(() => setHasPressure(false));
     }, 60_000);
     return () => clearInterval(interval);
@@ -476,7 +496,13 @@ export default function Sidebar({
       onMouseLeave={() => setIsHovered(false)}
     >
       <SidebarHeader open={open} isMobile={isMobile} onToggle={onToggle} />
-      <SidebarNav active={active} onChange={onChange} open={open} user={user} hasPressure={hasPressure} />
+      <SidebarNav
+        active={active}
+        onChange={onChange}
+        open={open}
+        user={user}
+        hasPressure={hasPressure}
+      />
 
       <UserFooter
         user={user}

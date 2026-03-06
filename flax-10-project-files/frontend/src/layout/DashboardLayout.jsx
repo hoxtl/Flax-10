@@ -114,7 +114,13 @@ function MainArea({
 
 function QuickAddGate({ open, onClose, onSelectType, isTeacher }) {
   if (!open) return null;
-  return <QuickAddModal onClose={onClose} onSelectType={onSelectType} isTeacher={isTeacher} />;
+  return (
+    <QuickAddModal
+      onClose={onClose}
+      onSelectType={onSelectType}
+      isTeacher={isTeacher}
+    />
+  );
 }
 
 function EventModalGate({ modal }) {
@@ -144,7 +150,8 @@ function useDashboardState(activeNav, onNavChange) {
   const [deadlineModule, setDeadlineModule] = useState(null);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
+  const showWeekBar =
+    activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
   const onPickNav = (id) => {
     onNavChange?.(id);
@@ -152,9 +159,9 @@ function useDashboardState(activeNav, onNavChange) {
   };
   const onSelectType = (id, extra) => {
     setShowQuickAdd(false);
-    if (id === 'society') setShowSocietyModal(true);
-    else if (id === 'create_module') onPickNav('modules_create');
-    else if (id === 'add_deadline') setDeadlineModule(extra);
+    if (id === "society") setShowSocietyModal(true);
+    else if (id === "create_module") onPickNav("modules_create");
+    else if (id === "add_deadline") setDeadlineModule(extra);
     else modal.openModal(null, id, selectedDate);
   };
   return {
@@ -210,7 +217,9 @@ function useSocietyCreation(setShowSocietyModal) {
       await createSociety(form);
       addNotification("Society created successfully!", "success");
       setShowSocietyModal(false);
-    } catch (e) { addNotification("Failed to create society.", "error"); }
+    } catch (e) {
+      addNotification("Failed to create society.", "error");
+    }
   };
   return create;
 }
@@ -219,11 +228,26 @@ function DashboardModals({ state }) {
   const createSoc = useSocietyCreation(state.setShowSocietyModal);
   return (
     <>
-      <QuickAddGate open={state.showQuickAdd} onClose={() => state.setShowQuickAdd(false)}
-        onSelectType={state.onSelectType} isTeacher={state.user?.role === 'teacher'} />
+      <QuickAddGate
+        open={state.showQuickAdd}
+        onClose={() => state.setShowQuickAdd(false)}
+        onSelectType={state.onSelectType}
+        isTeacher={state.user?.role === "teacher"}
+      />
       <EventModalGate modal={state.modal} />
-      {state.showSocietyModal && <CreateSocietyModal onClose={() => state.setShowSocietyModal(false)} onCreate={createSoc} />}
-      {state.deadlineModule && <DeadlineModal module={state.deadlineModule} onClose={() => state.setDeadlineModule(null)} startCreating={true} />}
+      {state.showSocietyModal && (
+        <CreateSocietyModal
+          onClose={() => state.setShowSocietyModal(false)}
+          onCreate={createSoc}
+        />
+      )}
+      {state.deadlineModule && (
+        <DeadlineModal
+          module={state.deadlineModule}
+          onClose={() => state.setDeadlineModule(null)}
+          startCreating={true}
+        />
+      )}
     </>
   );
 }
