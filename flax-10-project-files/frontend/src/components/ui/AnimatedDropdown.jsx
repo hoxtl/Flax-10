@@ -82,7 +82,10 @@ function filterGrouped(options, query) {
 function filterFlat(options, query) {
   if (!query.trim()) return options;
   const q = query.toLowerCase();
-  return options.filter(o => o.toLowerCase().includes(q));
+  return options.filter(o => {
+    const label = typeof o === 'string' ? o : o.label;
+    return label.toLowerCase().includes(q);
+  });
 }
 
 /**
@@ -143,17 +146,21 @@ function GroupedOptions({ options, value, onSelect }) {
  * @param {Function} props.onSelect - Selection callback.
  */
 function FlatOptions({ options, value, onSelect }) {
-  return options.map((opt, i) => (
-    <motion.button type="button" key={opt}
-      initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.15, delay: i * 0.03 }}
-      onClick={() => onSelect(opt)}
-      className={`${styles.dropdownItem} ${value === opt ? styles.dropdownItemActive : ''}`}
-    >
-      <span>{opt}</span>
-      {value === opt && <CheckMark />}
-    </motion.button>
-  ));
+  return options.map((opt, i) => {
+    const optValue = typeof opt === 'string' ? opt : opt.value;
+    const optLabel = typeof opt === 'string' ? opt : opt.label;
+    return (
+      <motion.button type="button" key={optValue ?? i}
+        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.15, delay: i * 0.03 }}
+        onClick={() => onSelect(optValue)}
+        className={`${styles.dropdownItem} ${value === optValue ? styles.dropdownItemActive : ''}`}
+      >
+        <span>{optLabel}</span>
+        {value === optValue && <CheckMark />}
+      </motion.button>
+    );
+  });
 }
 
 /**
@@ -263,7 +270,7 @@ function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, q
 function useDropdownOptions(options, grouped) {
   return grouped
     ? options.flatMap(g => g.options.map(o => ({ ...o, group: g.label })))
-    : options.map(o => ({ value: o, label: o }));
+    : options.map(o => typeof o === 'string' ? { value: o, label: o } : o);
 }
 
 /**
