@@ -137,11 +137,14 @@
   .dayCellToday {
     font-weight: 700;
     color: var(--primary);
+    background: color-mix(in srgb, var(--primary, #7B6751) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 28%, transparent);
   }
   .dayCellSel {
     background: var(--primary) !important;
     color: white !important;
     font-weight: 700;
+    border: 1px solid var(--primary);
   }
   
   /* ── Time picker row ──────────────────────────────────────── */

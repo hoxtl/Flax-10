@@ -24,12 +24,6 @@ const PRIORITY_OPTIONS = [
 ];
 const ALLOWED_PRIORITIES = new Set(PRIORITY_OPTIONS.map((p) => p.value));
 
-const ENERGY_OPTIONS = [
-  { value: "low", label: "Low" },
-  { value: "medium", label: "Medium" },
-  { value: "high", label: "High" },
-];
-
 const STUDY_BLOCK_OPTIONS = [
   { value: 1, label: "25m" },
   { value: 2, label: "50m" },
@@ -52,7 +46,9 @@ function getListColor(list, idx) {
       const s = localStorage.getItem("listColor:" + list.id);
       if (s) return s;
     }
-  } catch (_) {}
+  } catch {
+    // Ignore localStorage access issues and use fallback colors.
+  }
   return FALLBACK_COLOURS[idx % FALLBACK_COLOURS.length];
 }
 
@@ -93,11 +89,9 @@ export default function CreateTaskModal({
       title: task.title ?? "",
       description: task.description ?? "",
       priority: ALLOWED_PRIORITIES.has(task.priority) ? task.priority : "",
-      energy_level: task.energy_level || task.energyLevel || "",
       due_date: taskDue || (defaultDueDate ?? ""),
       task_list: String(task.task_list ?? defaultListId ?? sortedLists[0]?.id ?? ""),
       estimated_blocks: task.estimated_blocks ?? 1,
-      estimated_minutes: task.estimated_minutes ?? null,
       module: taskModuleId ? String(taskModuleId) : "",
     };
   });
@@ -139,17 +133,13 @@ export default function CreateTaskModal({
     if (!form.title.trim() || !form.due_date) return;
     setSaveError("");
     setSaving(true);
-    const computedBlocks = form.estimated_minutes != null && form.estimated_minutes > 0
-      ? Math.max(1, Math.round(form.estimated_minutes / 25))
-      : (form.estimated_blocks ?? 1);
     const payload = {
       title: form.title.trim(),
       description: form.description || "",
       priority: form.priority || "medium",
-      energy_level: form.energy_level || "",
       due_date: form.due_date,
       task_list: form.task_list ? Number(form.task_list) : null,
-      estimated_blocks: computedBlocks,
+      estimated_blocks: Math.max(1, Number(form.estimated_blocks) || 1),
       module: form.module ? Number(form.module) : null,
     };
     try {
@@ -236,44 +226,18 @@ export default function CreateTaskModal({
               initialMessage={askFlaxInitialMessage}
               className={styles.estTimeBannerModal}
             />
-            <span className={styles.focusBlocksLabel}>Focus blocks</span>
+            <span className={styles.focusBlocksLabel}>Est. time</span>
             <div className={styles.chipGroup}>
               {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
                 <button
                   key={value}
                   type="button"
-                  className={`${styles.chip} ${form.estimated_blocks === value && form.estimated_minutes == null ? styles.chipActive : ""}`}
-                  onClick={() => setForm((p) => ({ ...p, estimated_blocks: value, estimated_minutes: null }))}
+                  className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`}
+                  onClick={() => setForm((p) => ({ ...p, estimated_blocks: value }))}
                 >
                   {label}
                 </button>
               ))}
-            </div>
-            <div className={styles.customDurationWrap}>
-              <span className={styles.customDurationLabel}>Custom</span>
-              <input
-                type="number"
-                min={1}
-                max={480}
-                step={5}
-                placeholder="e.g. 45"
-                className={styles.customDurationInput}
-                value={form.estimated_minutes != null && form.estimated_minutes > 0 ? String(form.estimated_minutes) : ""}
-                onChange={(e) => {
-                  const raw = e.target.value.trim();
-                  if (raw === "") {
-                    setForm((p) => ({ ...p, estimated_minutes: null }));
-                    return;
-                  }
-                  const n = parseInt(raw, 10);
-                  if (!Number.isNaN(n) && n >= 1) setForm((p) => ({ ...p, estimated_minutes: Math.min(480, n) }));
-                }}
-                onBlur={(e) => {
-                  const raw = e.target.value.trim();
-                  if (raw !== "" && Number.isNaN(parseInt(raw, 10))) setForm((p) => ({ ...p, estimated_minutes: null }));
-                }}
-              />
-              <span className={styles.customDurationSuffix}>min</span>
             </div>
           </div>
 
@@ -321,24 +285,6 @@ export default function CreateTaskModal({
               </div>
             </div>
 
-            <div className={styles.settingRow}>
-              <div className={styles.rowBlock}>
-                <span className={styles.rowLabel}>Energy</span>
-                <div className={styles.chipGroup}>
-                  {ENERGY_OPTIONS.map(({ value, label }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      className={`${styles.chip} ${form.energy_level === value ? styles.chipActive : ""}`}
-                      onClick={() => set("energy_level", form.energy_level === value ? "" : value)}
-                      title={value === "high" ? "High cognitive load — avoid back-to-back with another high-energy task" : value === "low" ? "Quick / low effort" : "Moderate"}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
 
           {sortedModules.length > 0 && (

@@ -121,13 +121,31 @@
   min-width: 140px;
   max-width: 200px;
 }
+.moduleDropdownWrap {
+  flex: 1;
+  min-width: 300px;
+  max-width: 460px;
+}
+.listDropdownWrap {
+  min-width: 170px;
+  max-width: 190px;
+}
 .dropdownWrap :global([class*="trigger"]) {
   border-radius: 9999px;
   padding: 5px 12px;
   font-size: 0.75rem;
+  min-height: 36px;
 }
 .moduleListDropdown {
   width: 100%;
+}
+.moduleDropdownWrap .moduleListDropdown :global([class*="trigger"] > span:first-child) {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Duration chips ── */

@@ -13,7 +13,6 @@ import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import styles from "./CreateTaskBar.module.css";
 
 const DURATION_OPTIONS = [
-  { value: 0, label: "5m", ariaLabel: "5 minutes (quick task)" },
   { value: 1, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
   { value: 2, label: "50m", ariaLabel: "50 minutes (2 Pomodoro blocks)" },
 ];
@@ -78,9 +77,10 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
       await onAddTask({
         title: t,
         description: "",
-        priority: null,
+        priority: "medium",
+        energy_level: "",
         due_date: defaultDueDate ?? null,
-        task_list: taskListId || sortedLists[0]?.id,
+        task_list: taskListId ? Number(taskListId) : (sortedLists[0]?.id ?? null),
         estimated_blocks: estimatedBlocks,
         module: moduleId ? Number(moduleId) : null,
       });
@@ -169,7 +169,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
         <span className={styles.optionsRowDivider} aria-hidden />
 
         <span className={styles.optionsRowLabel}>Module</span>
-        <div className={styles.dropdownWrap}>
+        <div className={`${styles.dropdownWrap} ${styles.moduleDropdownWrap}`}>
           <AnimatedDropdown
             value={moduleId ?? ""}
             onChange={(v) => setModuleId(v === "" ? null : v)}
@@ -182,7 +182,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
         <span className={styles.optionsRowDivider} aria-hidden />
         <span className={styles.optionsRowLabel}>List</span>
 
-        <div className={styles.dropdownWrap}>
+        <div className={`${styles.dropdownWrap} ${styles.listDropdownWrap}`}>
           <AnimatedDropdown
             value={taskListId || ""}
             onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))}

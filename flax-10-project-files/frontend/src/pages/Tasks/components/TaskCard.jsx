@@ -202,11 +202,34 @@ function ContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }
     return createPortal(menu, document.body);
 }
 
-const ENERGY_LABELS = {
-    low: "Low",
-    medium: "Medium",
-    high: "High",
-};
+function formatFocusBlocks(blocks) {
+    const split = splitEstimatedBlocks(blocks);
+    if (split) {
+        const totalMins = split.sessionCount * split.workMinutes;
+        return `${split.sessionCount} session${split.sessionCount === 1 ? "" : "s"} · ${totalMins}m`;
+    }
+    const total = Math.max(1, Number(blocks) || 1);
+    for (const perSession of [1, 2, 3, 4]) {
+        if (total % perSession !== 0) continue;
+        const sessions = total / perSession;
+        if (sessions >= 1 && sessions <= 12) {
+            return `${sessions} session${sessions === 1 ? "" : "s"} · ${total * 25}m`;
+        }
+    }
+    return `${total * 25}m total`;
+}
+
+function splitEstimatedBlocks(blocks) {
+    const total = Math.max(1, Number(blocks) || 1);
+    for (const perSession of [1, 2, 3, 4]) {
+        if (total % perSession !== 0) continue;
+        const sessions = total / perSession;
+        if (sessions >= 1 && sessions <= 12) {
+            return { sessionCount: sessions, workMinutes: perSession * 25 };
+        }
+    }
+    return { sessionCount: 1, workMinutes: total * 25 };
+}
 
 /** Read-only task details modal — clean, scannable layout with clear hierarchy. */
 function TaskInfoModal({ task, listName, onClose }) {
@@ -247,9 +270,9 @@ function TaskInfoModal({ task, listName, onClose }) {
                             </span>
                         </div>
                         <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}><Zap size={14} strokeWidth={2} /> Energy</span>
+                            <span className={styles.infoLabel}><Zap size={14} strokeWidth={2} /> Sessions</span>
                             <span className={`${styles.infoVal} ${styles.infoValPill}`}>
-                                {ENERGY_LABELS[task.energy_level || task.energyLevel] || "—"}
+                                {formatFocusBlocks(task.estimated_blocks)}
                             </span>
                         </div>
                         <div className={styles.infoRowFull}>
@@ -446,7 +469,14 @@ export default function TaskCard({
                             type="button"
                             className={`${styles.actionBarBtn} ${styles.actionBarBtnPlay}`}
                             onClick={() => {
-                                setActiveTaskId(task.id, { title: task.title, categoryColor: listColor || undefined });
+                                const split = splitEstimatedBlocks(task.estimated_blocks);
+                                setActiveTaskId(task.id, {
+                                    title: task.title,
+                                    categoryColor: listColor || undefined,
+                                    estimatedBlocks: Number(task.estimated_blocks || 1),
+                                    estimatedSessionCount: split.sessionCount,
+                                    estimatedWorkMinutes: split.workMinutes,
+                                });
                                 nav("/timer", { state: { fromTaskPlay: true } });
                             }}
                             aria-label="Study now"

@@ -456,7 +456,7 @@
 /* ═══ Task details (read-only) modal — Flax themed, scannable UI ═══ */
 .infoModal {
     position: relative;
-    width: min(420px, 92vw);
+    width: min(540px, 94vw);
     max-height: 85vh;
     background: var(--card-bg, #FFFCFA);
     border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 18%, transparent);
@@ -625,6 +625,7 @@
     background: color-mix(in srgb, var(--primary, #7B6751) 8%, transparent);
     color: #44403c;
     border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 20%, transparent);
+    white-space: nowrap;
 }
 
 .infoListDot {
