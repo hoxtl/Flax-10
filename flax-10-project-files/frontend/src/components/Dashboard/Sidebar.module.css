@@ -366,7 +366,6 @@
   pointer-events: none;
 }
 
-/* Individual nav icon button */
 .mobileNavIcon {
   display: flex;
   flex-direction: column;
@@ -422,6 +421,15 @@
   height: 4px;
   border-radius: 50%;
   background: var(--accent);
+}
+
+.mobileDrawerBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 10, 0.42);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 300;
 }
 
 .hamburger {
