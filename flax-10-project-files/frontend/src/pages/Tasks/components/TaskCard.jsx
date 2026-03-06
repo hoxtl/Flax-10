@@ -6,6 +6,9 @@ import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft, Flag, Za
 import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
+import { getUserSettings } from "../../../api/userService";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import DateTimePicker from "./DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
@@ -106,6 +109,8 @@ export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos
     const menuRef = useRef(null);
     const [view, setView] = useState("main");
     const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
+    const [sleepSettings, setSleepSettings] = useState(null);
+    const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
 
     useEffect(() => {
         const handler = (e) => {
@@ -117,87 +122,123 @@ export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos
         return () => document.removeEventListener("mousedown", handler);
     }, [onClose]);
 
+    useEffect(() => {
+        let cancelled = false;
+        getUserSettings()
+            .then((data) => {
+                if (cancelled) return;
+                setSleepSettings({
+                    sleep_time: data?.sleep_time?.slice(0, 5) || "23:00",
+                    wake_time: data?.wake_time?.slice(0, 5) || "07:00",
+                });
+            })
+            .catch(() => {
+                if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" });
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const handleDueDateChange = (val) => {
+        const dueDate = val || null;
+        setDueValue(val);
+
+        if (!dueDate) {
+            onEdit(
+                { due_date: null },
+                { source: "context-menu", action: "set-due-date", dueDate: null }
+            );
+            onClose();
+            return;
+        }
+
+        checkSleepAndRun(dueDate, () => {
+            onEdit(
+                { due_date: dueDate },
+                { source: "context-menu", action: "set-due-date", dueDate }
+            );
+            onClose();
+        });
+    };
+
     const menu = (
-        <div
-            ref={menuRef}
-            className={styles.ctxMenu}
-            style={{ top: pos.y, left: pos.x }}
-            onMouseDown={e => e.stopPropagation()}
-        >
-            {view === "main" && (
-                <>
-                    <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}>
-                        <Pencil size={14} strokeWidth={2} /> Edit
-                    </button>
-                    {(lists?.length > 0) && (
-                        <button className={styles.ctxItem} onClick={() => setView("move")}>
-                            <FolderInput size={14} strokeWidth={2} /> Move to list
+        <>
+            <div
+                ref={menuRef}
+                className={styles.ctxMenu}
+                style={{ top: pos.y, left: pos.x }}
+                onMouseDown={e => e.stopPropagation()}
+            >
+                {view === "main" && (
+                    <>
+                        <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}>
+                            <Pencil size={14} strokeWidth={2} /> Edit
                         </button>
-                    )}
-                    <button className={styles.ctxItem} onClick={() => setView("due")}>
-                        <CalendarDays size={14} strokeWidth={2} /> Set due date
-                    </button>
-                    <div className={styles.ctxDivider} />
-                    <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onDelete(); onClose(); }}>
-                        <Trash2 size={14} strokeWidth={2} /> Delete
-                    </button>
-                </>
-            )}
-            {view === "move" && (
-                <>
-                    <button className={styles.ctxBack} onClick={() => setView("main")}>
-                        <ChevronLeft size={14} strokeWidth={2} /> Back
-                    </button>
-                    <div className={styles.ctxDivider} />
-                    {(lists || []).map(l => (
-                        <button
-                            key={l.id}
-                            className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`}
-                            onClick={() => {
-                                const fromList = (lists || []).find((x) => String(x.id) === String(task.task_list));
-                                onEdit(
-                                    { task_list: l.id },
-                                    {
-                                        source: "context-menu",
-                                        action: "move-list",
-                                        listId: l.id,
-                                        listName: l.name,
-                                        fromListId: task.task_list,
-                                        fromListName: fromList?.name || null,
-                                    }
-                                );
-                                onClose();
-                            }}
-                        >
-                            <span className={styles.ctxListDot} style={{ background: l.color }} />
-                            {l.name}
+                        {(lists?.length > 0) && (
+                            <button className={styles.ctxItem} onClick={() => setView("move")}>
+                                <FolderInput size={14} strokeWidth={2} /> Move to list
+                            </button>
+                        )}
+                        <button className={styles.ctxItem} onClick={() => setView("due")}>
+                            <CalendarDays size={14} strokeWidth={2} /> Set due date
                         </button>
-                    ))}
-                </>
-            )}
-            {view === "due" && (
-                <>
-                    <button className={styles.ctxBack} onClick={() => setView("main")}>
-                        <ChevronLeft size={14} strokeWidth={2} /> Back
-                    </button>
-                    <div className={styles.ctxDivider} />
-                    <div className={styles.ctxDateWrap}>
-                        <DateTimePicker
-                            value={dueValue}
-                            onChange={val => {
-                                setDueValue(val);
-                                onEdit(
-                                    { due_date: val || null },
-                                    { source: "context-menu", action: "set-due-date", dueDate: val || null }
-                                );
-                                onClose();
-                            }}
-                            placeholder="Pick date & time"
-                        />
-                    </div>
-                </>
-            )}
-        </div>
+                        <div className={styles.ctxDivider} />
+                        <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onDelete(); onClose(); }}>
+                            <Trash2 size={14} strokeWidth={2} /> Delete
+                        </button>
+                    </>
+                )}
+                {view === "move" && (
+                    <>
+                        <button className={styles.ctxBack} onClick={() => setView("main")}>
+                            <ChevronLeft size={14} strokeWidth={2} /> Back
+                        </button>
+                        <div className={styles.ctxDivider} />
+                        {(lists || []).map(l => (
+                            <button
+                                key={l.id}
+                                className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`}
+                                onClick={() => {
+                                    const fromList = (lists || []).find((x) => String(x.id) === String(task.task_list));
+                                    onEdit(
+                                        { task_list: l.id },
+                                        {
+                                            source: "context-menu",
+                                            action: "move-list",
+                                            listId: l.id,
+                                            listName: l.name,
+                                            fromListId: task.task_list,
+                                            fromListName: fromList?.name || null,
+                                        }
+                                    );
+                                    onClose();
+                                }}
+                            >
+                                <span className={styles.ctxListDot} style={{ background: l.color }} />
+                                {l.name}
+                            </button>
+                        ))}
+                    </>
+                )}
+                {view === "due" && (
+                    <>
+                        <button className={styles.ctxBack} onClick={() => setView("main")}>
+                            <ChevronLeft size={14} strokeWidth={2} /> Back
+                        </button>
+                        <div className={styles.ctxDivider} />
+                        <div className={styles.ctxDateWrap}>
+                            <DateTimePicker
+                                value={dueValue}
+                                onChange={handleDueDateChange}
+                                placeholder="Pick date & time"
+                            />
+                        </div>
+                    </>
+                )}
+            </div>
+            {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}
+        </>
     );
     return createPortal(menu, document.body);
 }

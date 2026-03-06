@@ -425,13 +425,13 @@ export default function TaskFeed({
   }, [activeListId, lists]);
 
   const headerTitle = activeFilter === "today"
-    ? "Today's tasks"
+    ? "Today"
     : activeFilter === "this_week"
-      ? "This Week's Tasks"
+      ? "This Week"
       : activeFilter === "later"
-        ? "Later tasks"
-      : activeFilter === "overdue"
-        ? "Overdue tasks"
+        ? "Later"
+        : activeFilter === "overdue"
+        ? "Overdue"
         : activeList
           ? (activeModuleCode ? `${activeList.name || "List"}: ${activeModuleCode}` : (activeList.name || "List"))
           : (activeModuleCode || "All tasks");
@@ -478,7 +478,7 @@ export default function TaskFeed({
       <header className={styles.listHeader} key={activeListId ?? "all"}>
         <div className={styles.listHeaderTitleWrap}>
           <h1
-            className={`${styles.listHeaderTitle} ${["All tasks", "Today's tasks", "This Week's Tasks"].includes(headerTitle) ? styles.listHeaderTitleModulesLike : ""}`}
+            className={`${styles.listHeaderTitle} ${["All tasks", "Today", "This Week"].includes(headerTitle) ? styles.listHeaderTitleModulesLike : ""}`}
             title={headerTitle}
           >
             {headerTitle}
