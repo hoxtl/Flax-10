@@ -12,7 +12,7 @@
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
   background: transparent;
 }
 
@@ -417,14 +417,14 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 12px;
   align-items: stretch;
 }
 
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 12px;
   }
 }
 
@@ -451,8 +451,8 @@
   border-radius: 1rem;
   border: 1px solid rgba(120, 113, 108, 0.6);
   background: #ffffff;
-  padding: 1.5rem;
-  min-height: 200px;
+  padding: 1.08rem;
+  min-height: 160px;
   opacity: 0;
 }
 
@@ -543,7 +543,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
   min-height: 0;
 }
@@ -551,7 +551,7 @@
 .bentoTop {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 .bentoIconWrap {
@@ -796,10 +796,10 @@
 
 /* ── Bento grid positions (desktop 3-col layout) ─────────────────── */
 @media (min-width: 1024px) {
-  .posRightNow       { grid-column: 1;     grid-row: 1 / 3; }
+  .posRightNow       { grid-column: 1;     grid-row: 1; align-self: start; }
   .posTodaysTasks    { grid-column: 2 / 4; grid-row: 1;     }
-  .posQuickActions   { grid-column: 2;     grid-row: 2;     }
-  .posSocialDiscover { grid-column: 3;     grid-row: 2;     }
-  .posDeadlines  { grid-column: 1;     grid-row: 3; }
-  .posStudyPulse { grid-column: 2 / 4; grid-row: 3; }
+  .posQuickActions   { grid-column: 1;     grid-row: 2; margin-top: 0; align-self: start; }
+  .posStudyPulse     { grid-column: 2 / 4; grid-row: 2;     }
+  .posDeadlines      { grid-column: 1;     grid-row: 3; margin-top: 0; align-self: start; }
+  .posSocialDiscover { grid-column: 2 / 4; grid-row: 3;     }
 }

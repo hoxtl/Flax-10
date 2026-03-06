@@ -253,7 +253,7 @@
   .planTimelineList::before {
     content: "";
     position: absolute;
-    left: calc(12px + 44px + 20px + 9px);
+    left: calc(8px + 56px + 18px + 13px);
     top: 0;
     bottom: 0;
     width: 2px;
@@ -265,11 +265,11 @@
   }
   .planTimelineRow {
     display: grid;
-    grid-template-columns: 44px 20px 1fr;
-    gap: 0 20px;
+    grid-template-columns: 56px 26px 1fr;
+    gap: 0 18px;
     align-items: center;
-    min-height: 56px;
-    padding: 0 12px 0;
+    min-height: 60px;
+    padding: 0 8px 0;
     position: relative;
     z-index: 1;
   }
@@ -282,7 +282,7 @@
   .planTimelineRow:first-of-type { margin-top: 0; }
   .planTimelineRow:last-of-type { padding-bottom: 4px; }
   .planTimelineRowGap {
-    min-height: 38px;
+    min-height: 40px;
   }
   .planTimelineRowGap > *:nth-child(3) {
     align-items: center;
@@ -295,7 +295,7 @@
   }
   .planTimelineTime {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     color: #B8A890;
@@ -313,17 +313,17 @@
   /* ── Hour Rail Markers ── */
   .planTimelineHourMark {
     display: grid;
-    grid-template-columns: 44px 20px 1fr;
-    gap: 0 20px;
+    grid-template-columns: 56px 26px 1fr;
+    gap: 0 18px;
     align-items: center;
     min-height: 22px;
-    padding: 0 12px;
+    padding: 0 8px;
     position: relative;
     z-index: 1;
   }
   .planTimelineHourMarkLabel {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     color: #B8A890;
@@ -332,8 +332,8 @@
     line-height: 1;
   }
   .planTimelineHourMarkDot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #F9F8F6;
     border: 2px solid rgba(107, 83, 68, 0.4);
@@ -499,15 +499,15 @@
     grid-template-rows: 1fr;
     gap: 0 10px;
     align-items: center;
-    height: 56px;
-    min-height: 56px;
-    max-height: 56px;
+    height: 58px;
+    min-height: 58px;
+    max-height: 58px;
     padding: 0 10px 0 12px;
     margin-left: 0;
     border-radius: 10px;
     border: 1px solid #D0CEC9;
     background: #FAF9F6;
-    cursor: grab;
+    cursor: pointer;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
     width: 100%;
     min-width: 0;
@@ -517,6 +517,8 @@
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     animation: planTimelineCardPop 0.2s ease-out both;
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
   }
   @keyframes planTimelineCardPop {
     0% { opacity: 0.7; transform: scale(0.98); }
@@ -525,7 +527,7 @@
   .planTimelineCard:hover {
     border-color: #B8B6B0;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
-    cursor: grabbing;
+    cursor: pointer;
   }
   .planTimelineCardBody {
     min-width: 0;
@@ -562,7 +564,7 @@
   }
   .planTimelineCardTitle {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: var(--flax-charcoal-heading, #1e261e);
     line-height: 1.2;
@@ -600,19 +602,27 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(132, 169, 140, 0.18);
   }
   .planTimelineCardPast {
-    opacity: 0.35;
-    filter: grayscale(0.8);
+    opacity: 1;
+    filter: none;
   }
 
   /* Row-level past fade — dims gutter time, dot AND card together */
   .planTimelineRowPast {
-    opacity: 0.38;
-    filter: grayscale(0.75);
+    opacity: 1;
+    filter: none;
     transition: opacity 0.3s ease, filter 0.3s ease;
   }
   .planTimelineRowPast:hover {
-    opacity: 0.6;
-    filter: grayscale(0.3);
+    opacity: 1;
+    filter: none;
+  }
+  .planTimelineRowPast .planTimelineCardTitle {
+    color: #2f2f2f;
+  }
+  .planTimelineRowPast .planTimelineCardTimeSlot,
+  .planTimelineRowPast .planTimelineCardDurationPill,
+  .planTimelineRowPast .planTimelineModulePill {
+    opacity: 0.78;
   }
   .planTimelineCardOverlap {
     border-color: #E5E4E2;
@@ -2377,8 +2387,8 @@
     gap: 6px;
     padding: 8px 10px;
     border-radius: 10px;
-    border: 1.5px solid rgba(192, 113, 78, 0.3);
-    background: rgba(192, 113, 78, 0.04);
+    border: 1.5px solid rgba(192, 113, 78, 0.24);
+    background: rgba(192, 113, 78, 0.03);
     flex: 1;
     min-width: 0;
   }
@@ -2395,7 +2405,7 @@
     flex-direction: column;
     gap: 2px;
     padding: 8px 10px 8px 14px;
-    min-height: 48px;
+    min-height: 52px;
     border-radius: 8px;
     border: 1px solid rgba(192, 113, 78, 0.2);
     background: #FFFFFF;
@@ -2446,8 +2456,10 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     padding-top: 2px;
+    min-width: 0;
   }
 
   .planTimelineConflictPairLabelText {
@@ -2467,18 +2479,22 @@
     gap: 4px;
     padding: 4px 10px;
     border-radius: 9999px;
-    border: 1px solid rgba(192, 113, 78, 0.35);
-    background: rgba(192, 113, 78, 0.09);
-    color: #8c4d35;
-    font-size: 0.72rem;
-    font-weight: 700;
+    border: 1px solid rgba(192, 113, 78, 0.4);
+    background: rgba(192, 113, 78, 0.1);
+    color: #8b5a3c;
+    font-size: 0.75rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
     white-space: nowrap;
+    line-height: 1;
+    margin-left: 4px;
+    flex-shrink: 0;
   }
   .planTimelineConflictAutoBtn:hover:not(:disabled) {
     background: rgba(192, 113, 78, 0.16);
-    border-color: rgba(192, 113, 78, 0.55);
+    border-color: rgba(192, 113, 78, 0.58);
+    color: #7a4d31;
   }
   .planTimelineConflictAutoBtn:disabled {
     opacity: 0.55;
@@ -2506,6 +2522,25 @@
   .planTimelineConflictItemBtn:hover {
     background: #fbf8f4;
     border-color: rgba(107, 83, 68, 0.45);
+  }
+
+  .planTimelineConflictPillGroup {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .planTimelineConflictItemText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    display: inline-block;
+    vertical-align: bottom;
   }
 
   .planTimelineConflictPairIcon {
@@ -2677,11 +2712,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-radius: 8px;
     border: 1px dashed rgba(160, 139, 114, 0.4);
-    background: rgba(160, 139, 114, 0.04);
+    background: rgba(160, 139, 114, 0.03);
     flex-wrap: wrap;
+    min-height: 32px;
   }
 
   .planTimelineGapShortDur {
@@ -2748,8 +2784,8 @@
 
   .planTimelineGapNoTasks {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.75rem;
-    color: #9ca3af;
+    font-size: 0.8rem;
+    color: #8f8a81;
     font-style: italic;
   }
 
@@ -2856,8 +2892,8 @@
     background: rgba(132, 169, 140, 0.08);
     color: #5a8a65;
     font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-    font-size: 0.6rem;
-    font-weight: 600;
+    font-size: 0.62rem;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.15s;
     flex-shrink: 0;
@@ -2865,6 +2901,21 @@
   }
   .planTimelineGapStartBtnSm:hover {
     background: rgba(132, 169, 140, 0.18);
+  }
+
+  .planTimelineGapUrgencyChip {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    border: 1px solid rgba(192, 113, 78, 0.35);
+    background: rgba(192, 113, 78, 0.08);
+    color: #a05034;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.2;
   }
 
   /* ── Gap: Transit (terracotta) ── */

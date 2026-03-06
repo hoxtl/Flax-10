@@ -5,6 +5,7 @@
     overflow-x: hidden;
     gap: 0;
     font-family: var(--font-body);
+    font-size: 0.94rem;
     background: var(--bg);
 }
 

@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CalendarClock, CheckCircle2, ArrowRight } from "lucide-react";
+import { AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
 import styles from "./DeadlinesWidget.module.css";
 
-const MAX_SHOWN = 5;
+const MAX_SHOWN = 3;
 
 function getDayCount(dueDate) {
   const ms = new Date(dueDate).getTime() - Date.now();
@@ -30,14 +30,6 @@ function getDaysLabel(dueDate) {
   if (days === 1) return "Tomorrow";
   return `${days}d`;
 }
-
-const TIER_DOT = {
-  overdue:  "#DC4545",
-  critical: "#E07A6A",
-  urgent:   "#D4924A",
-  upcoming: "#C4A46D",
-  distant:  "#D4C4A8",
-};
 
 const TIER_TEXT = {
   overdue:  "#B83232",
@@ -78,13 +70,10 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.headerIconWrap}>
-            <CalendarClock className={styles.headerIcon} size={17} strokeWidth={1.75} aria-hidden />
+            <AlertCircle className={styles.headerIcon} size={18} strokeWidth={1.85} aria-hidden />
           </div>
           <span className={styles.headerTitle}>Deadlines</span>
         </div>
-        {totalCount > 0 && (
-          <span className={styles.headerBadge}>{totalCount}</span>
-        )}
       </div>
 
       {sorted.length === 0 ? (
@@ -114,17 +103,10 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       )}
 
       <div className={styles.footer}>
-        {hiddenCount > 0 ? (
-          <Link to="/modules?filter=enrolled" className={styles.footerLink}>
-            + {hiddenCount} more deadline{hiddenCount !== 1 ? "s" : ""}
-            <ArrowRight size={11} strokeWidth={2} aria-hidden />
-          </Link>
-        ) : (
-          <Link to="/modules?filter=enrolled" className={styles.footerLinkMuted}>
-            View all modules
-            <ArrowRight size={11} strokeWidth={2} aria-hidden />
-          </Link>
-        )}
+        <Link to="/modules?filter=enrolled" className={styles.footerLinkMuted}>
+          View my modules
+          <ArrowRight size={11} strokeWidth={2} aria-hidden />
+        </Link>
       </div>
     </div>
   );
@@ -136,8 +118,7 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
   const daysLabel  = getDaysLabel(due);
   const title      = deadline.assessment_title || deadline.title || "Assignment";
   const moduleCode = deadline.module_code || "";
-
-  const dotColor  = TIER_DOT[tier]  || "#D4C4A8";
+  const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
   const textColor = TIER_TEXT[tier] || "#A89279";
 
   return (
@@ -152,22 +133,24 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
       }}
     >
       <div className={styles.rowLeft}>
-        <span className={styles.urgencyDot} style={{ background: dotColor }} />
+        <div className={styles.rowTopPills}>
+          {moduleCode && (
+            <button
+              type="button"
+              className={styles.moduleCodePill}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectModule?.({ code: moduleCode, id: deadline.module_id ?? deadline.module ?? null });
+              }}
+            >
+              {moduleCode}
+            </button>
+          )}
+          <span className={styles.deadlineTypePill}>{typeLabel}</span>
+        </div>
         <span className={styles.rowTitle} title={title}>{title}</span>
       </div>
       <div className={styles.rowRight}>
-        {moduleCode && (
-          <button
-            type="button"
-            className={styles.modulePill}
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelectModule?.({ code: moduleCode, id: deadline.module_id ?? deadline.module ?? null });
-            }}
-          >
-            {moduleCode}
-          </button>
-        )}
         <span className={styles.daysLabel} style={{ color: textColor }}>{daysLabel}</span>
       </div>
     </motion.div>

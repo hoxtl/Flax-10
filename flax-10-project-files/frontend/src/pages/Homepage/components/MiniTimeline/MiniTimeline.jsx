@@ -132,6 +132,7 @@ export function MiniTimeline({
             row={row}
             rows={rows}
             onConflictAutoMove={onConflictAutoMove}
+            onCardClick={onCardClick}
             onEdit={onEdit}
             getTag={getTag}
             styles={styles}

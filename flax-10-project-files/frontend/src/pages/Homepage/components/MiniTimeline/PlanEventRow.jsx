@@ -118,18 +118,23 @@ export function PlanEventRow({
           role="button"
           tabIndex={0}
           className={`${styles.planTimelineCard} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isOverlap ? styles.planTimelineCardOverlap : ""} ${isRoutine ? styles.planTimelineCardRoutine : ""} ${durationMins > 0 ? styles.planTimelineCardWithDuration : ""}`}
-          onClick={handleConflictCardClick}
+          onClick={(e) => {
+            if (isOverlap) {
+              handleConflictCardClick();
+              return;
+            }
+            if (onCardClick) {
+              onCardClick(item, matchTask, e.currentTarget.getBoundingClientRect());
+              return;
+            }
+            onEdit?.(item, item.tag);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               handleConflictCardClick();
             }
           }}
-          title={
-            item.end_time
-              ? `${item.title} — ${startTimeStr} – ${endTimeStr}`
-              : `${item.title} — ${startTimeStr}`
-          }
           style={{ "--card-accent": accentColor }}
         >
           {/* Coloured left-border accent */}

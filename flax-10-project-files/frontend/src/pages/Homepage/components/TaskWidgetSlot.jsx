@@ -4,12 +4,13 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
+import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 
 const VISIBLE_COUNT = 5;
 
@@ -45,6 +46,16 @@ function getEstTime(items) {
   return m > 0 ? `~${h}h ${m}m left` : `~${h}h left`;
 }
 
+function getUrgencyMeta(task) {
+  const status = task?.taskWidgetStatus;
+  const p = String(task?.priority || "").toLowerCase();
+  if (status === "overdue") return { label: "Urgent", tone: "urgent" };
+  if (p === "urgent") return { label: "Urgent", tone: "urgent" };
+  if (p === "high") return { label: "High", tone: "high" };
+  if (status === "now") return { label: "Now", tone: "now" };
+  return null;
+}
+
 const listVariants = {
   animate: { transition: { staggerChildren: 0.04, delayChildren: 0.04 } },
 };
@@ -70,7 +81,12 @@ export function TaskWidgetSlot({
   taskWidgetRef,
   hasTimerSession,
   onStartFocus,
+  taskLists = [],
+  onEditTask,
+  onDeleteTask,
+  onInlineTaskEdit,
 }) {
+  const [ctxMenu, setCtxMenu] = useState(null);
   const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
   const visibleIncomplete = showAllTaskWidgetTasks
     ? incompleteTasks
@@ -141,9 +157,8 @@ export function TaskWidgetSlot({
                 {visibleIncomplete.map((t, idx) => {
                   const status      = t.taskWidgetStatus;
                   const isOverdue   = status === "overdue";
-                  const categoryLabel = getTaskCategoryPill ? getTaskCategoryPill(t) : null;
-                  const catStyle    = categoryLabel ? getCategoryStyle(categoryLabel) : null;
-                  const rowAccent = catStyle?.text || "#8B7355";
+                  const rowAccent = isOverdue ? "#C0714E" : "#8B7355";
+                  const urgency = getUrgencyMeta(t);
 
                   return (
                     <motion.li
@@ -152,6 +167,11 @@ export function TaskWidgetSlot({
                       variants={itemVariants}
                       className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""} ${idx === 0 ? styles.taskWidgetTaskRowNext : ""}`}
                       style={{ "--task-row-accent": rowAccent }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        setCtxMenu({ task: t, x: e.clientX, y: e.clientY });
+                      }}
+                      title="Right-click for options"
                     >
                       {/* Checkbox */}
                       <button
@@ -170,19 +190,23 @@ export function TaskWidgetSlot({
 
                       <div className={styles.taskWidgetTaskBody}>
                         <div className={styles.taskWidgetTaskTopRow}>
-                          {categoryLabel && catStyle && (
+                          <span className={styles.taskWidgetTaskTitle} title={t.title}>
+                            {t.title}
+                          </span>
+                          {urgency && (
                             <span
-                              className={styles.taskWidgetCategoryPill}
-                              style={{ background: "#4A2E1B", color: "#F4ECE3" }}
+                              className={`${styles.taskWidgetUrgencyPill} ${
+                                urgency.tone === "urgent"
+                                  ? styles.taskWidgetUrgencyPillUrgent
+                                  : urgency.tone === "high"
+                                    ? styles.taskWidgetUrgencyPillHigh
+                                    : styles.taskWidgetUrgencyPillNow
+                              }`}
                             >
-                              {categoryLabel}
+                              {urgency.label}
                             </span>
                           )}
-                          {idx === 0 && <span className={styles.taskWidgetNextPill}>Next</span>}
                         </div>
-                        <span className={styles.taskWidgetTaskTitle} title={t.title}>
-                          {t.title}
-                        </span>
                       </div>
                     </motion.li>
                   );
@@ -200,6 +224,26 @@ export function TaskWidgetSlot({
                   </li>
                 )}
               </motion.ul>
+
+              {ctxMenu && (
+                <TaskContextMenu
+                  task={ctxMenu.task}
+                  lists={taskLists}
+                  pos={{ x: ctxMenu.x, y: ctxMenu.y }}
+                  onClose={() => setCtxMenu(null)}
+                  onEditOpen={() => {
+                    onEditTask?.(ctxMenu.task);
+                    setCtxMenu(null);
+                  }}
+                  onDelete={async () => {
+                    await onDeleteTask?.(ctxMenu.task);
+                    setCtxMenu(null);
+                  }}
+                  onEdit={async (patch) => {
+                    await onInlineTaskEdit?.(ctxMenu.task, patch);
+                  }}
+                />
+              )}
             </>
           ) : (
             <EmptyStateCard

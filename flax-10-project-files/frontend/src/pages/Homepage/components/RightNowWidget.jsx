@@ -9,10 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   getRelevantDelays,
   getTflLinesForLocation,
-  getTflLinePillStyle,
   isSevereDisruption,
 } from "../utils/kclTflMapping";
-import { Sun, Clock, AlertTriangle, Train, Sparkles, CheckCircle } from "lucide-react";
+import { Sun, Clock, AlertTriangle, Train, Sparkles, X } from "lucide-react";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useCountdown } from "../hooks/useCountdown";
 import { isNow } from "../utils/eventUtils";
@@ -77,6 +76,9 @@ function useLiveClock() {
 function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
   if (!nextEvent?.start_time || !relevantDelays.length) return null;
   const startMs = new Date(nextEvent.start_time).getTime();
+  const primary = relevantDelays[0];
+  const lineName = primary?.lineName || "TfL";
+  const severity = primary?.severityDescription || "Delays";
   const hasSevere = relevantDelays.some((d) => isSevereDisruption(d.severityDescription));
   const bufferMins = 35 + (hasSevere ? 20 : 10);
   const leaveByMs = startMs - bufferMins * 60000;
@@ -86,12 +88,33 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
     minute: "2-digit",
   });
   if (nowMs >= leaveByMs) {
-    return { urgency: "critical", label: "Leave now", sub: `You may be late for ${nextEvent.title}`, leaveByStr, hasSevere };
+    return {
+      urgency: "critical",
+      lineName,
+      severity,
+      message: `${lineName} Line: ${severity} — leave now for ${nextEvent.title}`,
+      leaveByStr,
+      hasSevere,
+    };
   }
   if (minsUntilLeave <= 15) {
-    return { urgency: "urgent", label: `Leave in ${minsUntilLeave}m`, sub: `to reach ${nextEvent.title} on time`, leaveByStr, hasSevere };
+    return {
+      urgency: "urgent",
+      lineName,
+      severity,
+      message: `${lineName} Line: ${severity} — leave in ${minsUntilLeave}m for ${nextEvent.title}`,
+      leaveByStr,
+      hasSevere,
+    };
   }
-  return { urgency: "info", label: `Leave by ${leaveByStr}`, sub: `${nextEvent.title} affected by delays`, leaveByStr, hasSevere };
+  return {
+    urgency: "info",
+    lineName,
+    severity,
+    message: `${lineName} Line: ${severity} — leave by ${leaveByStr} for ${nextEvent.title}`,
+    leaveByStr,
+    hasSevere,
+  };
 }
 
 // ─── Simple fade-in helper ───────────────────────────────────────────────────
@@ -106,7 +129,7 @@ function fadeIn(delay = 0) {
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
-function WidgetHeader({ liveClock, eventCount, taskCount }) {
+function WidgetHeader({ eventCount, taskCount }) {
   return (
     <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
       <div className={styles.headerIconWrap}>
@@ -117,8 +140,6 @@ function WidgetHeader({ liveClock, eventCount, taskCount }) {
         {eventCount} event{eventCount !== 1 ? "s" : ""}
         {taskCount > 0 && ` · ${taskCount} task${taskCount !== 1 ? "s" : ""} left`}
       </span>
-      <span className={styles.headerClockDot} aria-hidden />
-      <span className={styles.headerClock}>{liveClock}</span>
     </motion.div>
   );
 }
@@ -161,103 +182,51 @@ function ActiveEventCard({ currentBlock, timeRangeStr, timeLeftStr, currentProgr
   );
 }
 
-function TflDelayCard({ leaveByInfo, relevantDelays }) {
-  const lineNames = [...new Set(relevantDelays.map((d) => d.lineName))];
-  const isUrgent = leaveByInfo.urgency === "urgent" || leaveByInfo.urgency === "critical";
-  const isCritical = leaveByInfo.urgency === "critical";
-
+function TflDelayCard({ leaveByInfo, onDismiss }) {
   return (
     <motion.div
-      className={`${styles.tflCard} ${isCritical ? styles.tflCardCritical : isUrgent ? styles.tflCardUrgent : styles.tflCardInfo}`}
+      className={styles.alertPill}
       {...fadeIn(0.14)}
       layout
     >
-      <div className={styles.tflCardHeader}>
-        <Train size={13} strokeWidth={2} className={styles.tflCardIcon} aria-hidden />
-        <span className={styles.tflCardLabel}>{leaveByInfo.label}</span>
-        {isUrgent && (
-          <motion.span
-            className={`${styles.tflBadge} ${isCritical ? styles.tflBadgeCritical : styles.tflBadgeUrgent}`}
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {isCritical ? "NOW" : "SOON"}
-          </motion.span>
-        )}
-      </div>
-      <p className={styles.tflCardSub}>{leaveByInfo.sub}</p>
-      <div className={styles.tflLinePills}>
-        {lineNames.slice(0, 3).map((name) => {
-          const pill = getTflLinePillStyle(name);
-          return (
-            <span
-              key={name}
-              className={styles.tflLinePill}
-              style={{ background: pill.bg, color: pill.text }}
-            >
-              {name}
-            </span>
-          );
-        })}
-      </div>
+      <Train size={13} strokeWidth={2} className={styles.alertIcon} aria-hidden />
+      <span className={styles.alertText}>{leaveByInfo.message}</span>
+      <button type="button" className={styles.alertDismiss} onClick={onDismiss} aria-label="Dismiss delay alert">
+        <X size={12} strokeWidth={2} />
+      </button>
     </motion.div>
   );
 }
 
-function ConflictSummary({ conflicts }) {
-  const [expanded, setExpanded] = useState(false);
-  const count = conflicts.length;
-  const label =
-    count === 1
-      ? `Overlap: ${conflicts[0].a?.title || "Event"} & ${conflicts[0].b?.title || "Event"}`
-      : `${count} schedule overlaps today`;
-
+function ConflictSummary({ conflicts, onDismiss }) {
+  const count = conflicts.length || 0;
+  const first = conflicts[0];
+  const overlapTime = first?.a?.start_time
+    ? new Date(first.a.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+    : null;
+  const label = overlapTime
+    ? `Warning: Schedule overlap at ${overlapTime}`
+    : `${count} schedule overlap${count === 1 ? "" : "s"} today`;
   return (
-    <motion.div className={styles.conflictWrap} {...fadeIn(0.21)}>
-      <button
-        type="button"
-        className={styles.conflictPill}
-        onClick={() => count > 1 && setExpanded((e) => !e)}
-        aria-expanded={expanded}
-      >
-        <AlertTriangle size={12} strokeWidth={2} className={styles.conflictIcon} aria-hidden />
-        <span className={styles.conflictText}>{label}</span>
-        {count > 1 && (
-          <span className={styles.conflictChevron}>{expanded ? "▲" : "▼"}</span>
-        )}
+    <motion.div className={styles.alertPill} {...fadeIn(0.12)}>
+      <AlertTriangle size={12} strokeWidth={2} className={styles.alertIconWarn} aria-hidden />
+      <span className={styles.alertTextWarn}>{label}</span>
+      <button type="button" className={styles.alertDismiss} onClick={onDismiss} aria-label="Dismiss warning">
+        <X size={12} strokeWidth={2} />
       </button>
-      <AnimatePresence>
-        {expanded && count > 1 && (
-          <motion.div
-            className={styles.conflictExpanded}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            {conflicts.map((c, i) => (
-              <p key={i} className={styles.conflictExpandedRow}>
-                {c.a?.title || "Event"} &amp; {c.b?.title || "Event"}
-              </p>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
 
 // ─── Shared header for early-return views ───────────────────────────────────
 
-function SimpleHeader({ liveClock }) {
+function SimpleHeader() {
   return (
     <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
       <div className={styles.headerIconWrap}>
         <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
       </div>
       <span className={styles.headerLabel}>Right Now</span>
-      <span className={styles.headerClockDot} aria-hidden />
-      <span className={styles.headerClock}>{liveClock}</span>
     </motion.div>
   );
 }
@@ -283,6 +252,8 @@ export function RightNowWidget({
   const nav = navigatorContext || {};
   const nowMs = now.getTime();
   const liveClock = useLiveClock();
+  const [showConflictAlert, setShowConflictAlert] = useState(true);
+  const [showTflAlert, setShowTflAlert] = useState(true);
 
   const currentBlock = nav.currentBlock ?? nav.current ?? getCurrentBlock(sortedEvents || [], now);
   const nextEvent = nav.nextItem ?? nav.next ?? getNextEvent(sortedEvents || [], now);
@@ -426,83 +397,46 @@ export function RightNowWidget({
   return (
     <div className={styles.root}>
       {/* Header */}
-      <WidgetHeader liveClock={liveClock} eventCount={eventCount} taskCount={tasksPending} />
-
-      {/* Current event */}
-      <AnimatePresence>
-        {currentBlock?.title && (
-          <ActiveEventCard
-            key="current"
-            currentBlock={currentBlock}
-            timeRangeStr={timeRangeStr}
-            timeLeftStr={timeLeftStr}
-            currentProgressPct={currentProgressPct}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Up next / done */}
-      <AnimatePresence mode="popLayout">
-        {nextEvent ? (
-          <motion.div key="upnext" className={styles.upNextRow} {...fadeIn(0.14)} layout>
-            <div className={styles.upNextLeft}>
-              <span className={styles.upNextLabel}>Next</span>
-              <span className={styles.upNextTitle}>{nextEvent.title}</span>
-            </div>
-            <AnimatePresence mode="popLayout">
-              <motion.span
-                key={countdown.text}
-                className={styles.upNextCountdown}
-                style={{
-                  color:
-                    countdown.urgency === "urgent" ? "#B87A6D" :
-                    countdown.urgency === "soon" ? "#C4946D" : "#A89279",
-                }}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.2 }}
-              >
-                {countdown.text || ""}
-              </motion.span>
-            </AnimatePresence>
-          </motion.div>
-        ) : currentBlock ? (
-          // In an event but nothing more scheduled — compact note
-          <motion.div key="lastev" className={styles.lastEventRow} {...fadeIn(0.14)} layout>
-            <CheckCircle size={13} strokeWidth={2} className={styles.lastEventIcon} aria-hidden />
-            <span className={styles.lastEventText}>Last event of the day</span>
-          </motion.div>
-        ) : (
-          // Truly free — no current and no next
-          <motion.div key="free" className={styles.freeRow} {...fadeIn(0.14)} layout>
-            <motion.div
-              animate={{ y: [0, -3, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Sparkles size={22} strokeWidth={1.25} className={styles.freeIcon} aria-hidden />
-            </motion.div>
-            <div>
-              <p className={styles.freePrimary}>You&apos;re done for the day</p>
-              <p className={styles.freeSecondary}>No more events today</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* TFL delay card — only when relevant */}
-      <AnimatePresence>
-        {showTfl && leaveByInfo && (
-          <TflDelayCard key="tfl" leaveByInfo={leaveByInfo} relevantDelays={relevantDelays} />
-        )}
-      </AnimatePresence>
+      <WidgetHeader eventCount={eventCount} taskCount={tasksPending} />
 
       {/* Conflicts */}
       <AnimatePresence>
-        {conflicts.length > 0 && (
-          <ConflictSummary key="conflicts" conflicts={conflicts} />
+        {showConflictAlert && conflicts.length > 0 && (
+          <ConflictSummary key="conflicts" conflicts={conflicts} onDismiss={() => setShowConflictAlert(false)} />
         )}
       </AnimatePresence>
+
+      {/* TFL delay advice */}
+      <AnimatePresence>
+        {showTflAlert && showTfl && leaveByInfo && (
+          <TflDelayCard key="tfl" leaveByInfo={leaveByInfo} onDismiss={() => setShowTflAlert(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* NOW row */}
+      <motion.div className={styles.nowLine} {...fadeIn(0.16)}>
+        <span className={styles.nowPill}>Now</span>
+        <span className={styles.nowText}>
+          {currentBlock?.title ? currentBlock.title : "Nothing on right now"}
+        </span>
+      </motion.div>
+
+      {/* NEXT row */}
+      <motion.div className={styles.nextLine} {...fadeIn(0.2)}>
+        <span className={styles.nextPill}>Next</span>
+        {nextEvent ? (
+          <div className={styles.nextBlock}>
+            <span className={styles.nextTitle}>{nextEvent.title}</span>
+            <span className={styles.nextMeta}>
+              at {formatTime(nextEvent.start_time)}
+              {countdown.text ? ` · ${countdown.text}` : ""}
+            </span>
+          </div>
+        ) : (
+          <span className={styles.nextTitle}>No more events today</span>
+        )}
+      </motion.div>
+
     </div>
   );
 }

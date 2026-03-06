@@ -3,7 +3,7 @@
  * with an inline action bar below. No floating popover.
  */
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, RotateCw } from "lucide-react";
 import { formatTime, formatHour12h } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
@@ -40,6 +40,7 @@ export function ConflictPairRow({
   row,
   rows,
   onConflictAutoMove,
+  onCardClick,
   onEdit,
   getTag,
   styles,
@@ -104,14 +105,19 @@ export function ConflictPairRow({
                 style={{ "--card-accent": accent }}
                 role="button"
                 tabIndex={0}
-                onClick={() => onEdit?.(r.item, r.item.tag)}
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  if (onCardClick) onCardClick(r.item, null, rect);
+                  else onEdit?.(r.item, r.item.tag);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    onEdit?.(r.item, r.item.tag);
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    if (onCardClick) onCardClick(r.item, null, rect);
+                    else onEdit?.(r.item, r.item.tag);
                   }
                 }}
-                title={`${r.item.title} — ${start}–${end}. Click to edit.`}
               >
                 <div className={styles.planTimelineConflictPairCardAccent} aria-hidden />
                 <span className={styles.planTimelineConflictPairCardTime}>
@@ -124,36 +130,40 @@ export function ConflictPairRow({
             );
           })}
         </div>
-        {/* Inline action bar — simplified */}
+        {/* Inline action bar — prototype style */}
         <div className={styles.planTimelineConflictPairActions}>
           <AlertTriangle size={13} strokeWidth={2} className={styles.planTimelineConflictPairIcon} aria-hidden />
           <span className={styles.planTimelineConflictPairLabelText}>
             {items.length} events overlap
           </span>
-          <button
-            type="button"
-            className={styles.planTimelineConflictAutoBtn}
-            onClick={handleAutoMove}
-            disabled={!freeRow}
-            title={
-              freeRow
-                ? `Move "${movable?.item?.title}" to next free window`
-                : "No free window available right now"
-            }
-          >
-            {freeRow ? "Auto-arrange" : "No free window"}
-          </button>
-          {items.map((r) => (
+          <div className={styles.planTimelineConflictPillGroup}>
             <button
-              key={`resolve-${r.id}`}
               type="button"
-              className={styles.planTimelineConflictItemBtn}
-              onClick={() => onEdit?.(r.item, r.item.tag)}
-              title={`Open "${stripEmojiFromTitle(r.item.title)}"`}
+              className={styles.planTimelineConflictAutoBtn}
+              onClick={handleAutoMove}
+              disabled={!freeRow}
+              title={
+                freeRow
+                  ? `Move "${movable?.item?.title}" to next free window`
+                  : "No free window available right now"
+              }
             >
-              ✎ {stripEmojiFromTitle(r.item.title)}
+              <RotateCw size={12} strokeWidth={2.1} aria-hidden />
+              {freeRow ? "Auto-arrange" : "No free window"}
             </button>
-          ))}
+            {items.map((r) => (
+              <button
+                key={`edit-${r.id}`}
+                type="button"
+                className={styles.planTimelineConflictItemBtn}
+                onClick={() => onEdit?.(r.item, r.item.tag)}
+                title={`Edit ${stripEmojiFromTitle(r.item.title)}`}
+              >
+                <span aria-hidden>✎</span>
+                <span className={styles.planTimelineConflictItemText}>{stripEmojiFromTitle(r.item.title)}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

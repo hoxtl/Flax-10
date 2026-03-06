@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap, Sparkles, Plus, RefreshCw, ArrowRight } from "lucide-react";
+import { Zap, Sparkles, Plus, RefreshCw, ArrowRight, MapPinned } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./QuickActionsWidget.module.css";
 
@@ -23,6 +23,7 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
 
   const handleFocus = () => (onStartFocus ? onStartFocus() : navigate("/timer"));
   const handleAddEvent = () => (onAddEvent ? onAddEvent() : navigate("/calendar"));
+  const handleOpenMap = () => navigate("/map");
   const handleRePlan = () => {
     try {
       window.dispatchEvent(
@@ -128,6 +129,27 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
             Re-plan My Day
             <span className={styles.aiPill}>AI</span>
           </span>
+          <motion.span
+            className={styles.secondaryArrow}
+            aria-hidden
+            whileHover={{ x: 3 }}
+            transition={{ duration: 0.15 }}
+          >
+            <ArrowRight size={14} strokeWidth={1.75} />
+          </motion.span>
+        </motion.button>
+
+        {/* Map: Plan my journey */}
+        <motion.button
+          type="button"
+          className={styles.secondaryCard}
+          variants={cardVariants}
+          whileHover={{ y: -1 }}
+          whileTap={{ y: 0 }}
+          onClick={handleOpenMap}
+        >
+          <MapPinned size={18} strokeWidth={1.75} className={styles.secondaryIconMap} aria-hidden />
+          <span className={styles.secondaryLabel}>Plan my journey</span>
           <motion.span
             className={styles.secondaryArrow}
             aria-hidden

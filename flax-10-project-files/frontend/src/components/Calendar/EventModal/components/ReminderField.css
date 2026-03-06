@@ -4,24 +4,26 @@
 
 .reminder-dropdown-btn {
     width: 100%;
-    padding: 0.6rem 0.85rem;
-    border: none;
-    border-radius: 12px;
-    background: #F3F4F6;
-    color: var(--text);
+    padding: 0.54rem 0.7rem;
+    border: 1px solid rgba(107, 83, 68, 0.15);
+    border-radius: 10px;
+    background: #f4f5f8;
+    color: #3c3028;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.875rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+    font-family: var(--font-body, inherit);
 }
 
 .reminder-dropdown-btn:hover {
-    background: #E5E7EB;
+    background: #f9f6f2;
 }
 
 .dropdown-arrow {
-    color: var(--muted);
+    color: #968579;
     font-size: 14px;
 }
 
@@ -42,7 +44,7 @@
 .reminder-status {
     padding: 6px 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: #87776b;
     border-bottom: 1px solid var(--border);
     margin-bottom: 4px;
 }
@@ -84,8 +86,9 @@
     gap: 10px;
     padding: 8px 12px;
     cursor: pointer;
-    font-size: 14px;
-    color: var(--text);
+    font-size: 13px;
+    color: #3c3028;
+    font-family: var(--font-body, inherit);
 }
 
 .reminder-option:hover {
@@ -118,9 +121,10 @@
     padding: 6px 8px;
     border: 1px solid var(--border);
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 12px;
     background: var(--bg);
-    color: var(--text);
+    color: #3c3028;
+    font-family: var(--font-body, inherit);
 }
 
 .custom-reminder button {
@@ -130,7 +134,8 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
+    font-family: var(--font-body, inherit);
 }
 
 .custom-reminder button:hover {

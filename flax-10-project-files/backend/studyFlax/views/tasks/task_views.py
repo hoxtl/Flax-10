@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from datetime import timedelta
 
 from studyFlax.models.tasks.taskModel import Task, TaskList
 from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSerialiser
@@ -24,16 +25,44 @@ def get_user_tasks(user, params):
     return qs.order_by("completed", "priority", "due_date")
 
 
-def create_calendar_event_for_task(task: Task):
-    if not task.add_to_calendar or not task.due_date:
+def _task_event_qs(task: Task):
+    return CalendarEvent.objects.filter(
+        user=task.user,
+        source="task",
+        external_id=str(task.id),
+    )
+
+
+def sync_calendar_event_for_task(task: Task):
+    # Keep calendar in sync with due-dated tasks:
+    # - create/update event when task has a due date and is incomplete
+    # - remove linked event otherwise (completed / no due date)
+    should_exist = bool(task.due_date) and not task.completed
+    existing_qs = _task_event_qs(task)
+
+    if not should_exist:
+        existing_qs.delete()
         return
+
+    blocks = max(1, int(task.estimated_blocks or 1))
+    duration_minutes = max(25, blocks * 25)
+    event_payload = dict(
+        title=task.title,
+        start_time=task.due_date,
+        end_time=task.due_date + timedelta(minutes=duration_minutes),
+        description=task.description or "",
+        priority=task.priority or "medium",
+    )
+
+    if existing_qs.exists():
+        existing_qs.update(**event_payload)
+        return
+
     CalendarEvent.objects.create(
         user=task.user,
-        title=f"Task: {task.title}",
-        start_time=task.due_date,
-        end_time=task.due_date,
-        description=task.description or "",
         source="task",
+        external_id=str(task.id),
+        **event_payload,
     )
 
 
@@ -85,7 +114,7 @@ def task_list(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
 
     task = serialiser.save(user=request.user)
-    create_calendar_event_for_task(task)
+    sync_calendar_event_for_task(task)
     return Response(TaskSerialiser(task).data, status=status.HTTP_201_CREATED)
 
 
@@ -95,14 +124,16 @@ def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id, user=request.user)
 
     if request.method == "DELETE":
+        _task_event_qs(task).delete()
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     serialiser = TaskSerialiser(task, data=request.data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    serialiser.save()
-    return Response(serialiser.data)
+    updated_task = serialiser.save()
+    sync_calendar_event_for_task(updated_task)
+    return Response(TaskSerialiser(updated_task).data)
 
 
 @api_view(["POST"])

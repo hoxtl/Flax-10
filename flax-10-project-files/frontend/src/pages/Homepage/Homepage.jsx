@@ -8,6 +8,7 @@ import {
   useCalendar,
   useCalendarDispatch,
   useEventModal,
+  useEventPopup,
 } from "../../context/CalendarContext";
 import {
   useCalendarEvents,
@@ -47,6 +48,7 @@ import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
+import { EventPopups } from "../../components/Calendar/EventPopups";
 
 /* HOME PAGE */
 export default function Homepage() {
@@ -56,6 +58,7 @@ export default function Homepage() {
   const { loadEvents }   = useCalendarEvents();
   const { removeEvent, addEvent, editEvent } = useEventActions();
   const { openModal }    = useEventModal();
+  const { openPopup }    = useEventPopup();
   const { getTag, tags }       = useTags();
   const { isActive: timerActive, timeLeft, task: timerTask, mode: timerMode, workTime, breakTime } = useTimerContext();
   const hasTimerSession = timerActive;
@@ -99,6 +102,14 @@ export default function Homepage() {
     today.setHours(0, 0, 0, 0);
     dispatch({ type: "SET_SELECTED_DATE", payload: today });
   }, [dispatch]);
+
+  /* Homepage reliability: re-fetch once after initial date set if events are still empty. */
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if ((allCalEvents || []).length === 0) loadEvents();
+    }, 220);
+    return () => clearTimeout(id);
+  }, [selectedDate, allCalEvents, loadEvents]);
 
   /* Live Compass: recalc every 60s so the NOW line moves without refresh */
   useEffect(() => {
@@ -468,7 +479,7 @@ export default function Homepage() {
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
   }, [filteredTasksDueToday, getTag]);
 
-  /** task-only. Only tasks due today or tomorrow—no entire week, no later dates. */
+  /** task-only. Include due-today tasks and incomplete overdue tasks. */
   const taskWidgetList = useMemo(() => {
     if (!isToday(selectedDate)) return [];
     const now = new Date();
@@ -476,24 +487,19 @@ export default function Homepage() {
     dayStart.setHours(0, 0, 0, 0);
     const dayEnd = new Date(selectedDate);
     dayEnd.setHours(23, 59, 59, 999);
-    const tomorrowStart = new Date(dayStart);
-    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-    const tomorrowEnd = new Date(tomorrowStart);
-    tomorrowEnd.setHours(23, 59, 59, 999);
     const isDueToday = (t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
       return d && d >= dayStart && d <= dayEnd;
     };
-    const isDueTomorrow = (t) => {
+    const isOverdueTask = (t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= tomorrowStart && d <= tomorrowEnd;
+      return d && d < now && !t.completed;
     };
 
     const tasks = (allTasks || [])
       .filter(
         (t) =>
-          !isRoutineOrEventTask(t, getTag) &&
-          (isDueToday(t) || isDueTomorrow(t))
+          (isDueToday(t) || isOverdueTask(t))
       )
       .map((t) => {
         const due = t.due_date ? new Date(t.due_date) : null;
@@ -530,6 +536,18 @@ export default function Homepage() {
     () => taskWidgetList.filter((i) => i.type === "task"),
     [taskWidgetList]
   );
+  const taskWidgetDueTodayCount = useMemo(() => {
+    if (!isToday(selectedDate)) return 0;
+    const dayStart = new Date(selectedDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(selectedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+    return (taskWidgetItemsOnly || []).filter((t) => {
+      if (t.completed || !t.due_date) return false;
+      const due = new Date(t.due_date);
+      return due >= dayStart && due <= dayEnd;
+    }).length;
+  }, [selectedDate, taskWidgetItemsOnly, isToday]);
   const taskWidgetCompletedCount = useMemo(
     () => taskWidgetItemsOnly.filter((i) => i.completed).length,
     [taskWidgetItemsOnly]
@@ -642,6 +660,11 @@ export default function Homepage() {
     [refetchTasks, showCompletionToast]
   );
 
+  const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
+    if (!event) return;
+    openPopup(event, anchorRect);
+  }, [openPopup]);
+
   const fmtTimerSecs = (s) => {
     const t = Math.max(0, s);
     return `${Math.floor(t / 60).toString().padStart(2, "0")}:${(t % 60).toString().padStart(2, "0")}`;
@@ -693,6 +716,7 @@ export default function Homepage() {
             displayName={displayName}
             isToday={isToday(selectedDate)}
             taskWidgetOverdueCount={taskWidgetOverdueCount}
+            taskWidgetDueTodayCount={taskWidgetDueTodayCount}
             taskWidgetSpineCompletedPct={taskWidgetSpineCompletedPct}
             taskWidgetItemsOnly={taskWidgetItemsOnly}
             taskWidgetList={taskWidgetList}
@@ -704,6 +728,16 @@ export default function Homepage() {
             taskWidgetRef={taskWidgetRef}
             hasTimerSession={hasTimerSession}
             onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
+            taskLists={taskLists}
+            onEditTask={(task) => setRescheduleTask(task)}
+            onDeleteTask={async (task) => {
+              await deleteTask(task.id);
+              refetchTasks();
+            }}
+            onInlineTaskEdit={async (task, patch) => {
+              await updateTask(task.id, patch);
+              refetchTasks();
+            }}
           />
         }
         slot3Urgent={
@@ -909,7 +943,7 @@ export default function Homepage() {
                   taskLists={taskLists}
                   onQuickStart={handleQuickStartGap}
                   onTaskToggle={handleTaskToggle}
-                  onCardClick={(ev, matchTask) => setPlanTimelineReadItem({ event: ev, task: matchTask ?? null })}
+                  onCardClick={openTimelinePopup}
                   onEdit={(ev) => openModal(ev, ev.tag)}
                   onConflictAutoMove={handleConflictAutoMove}
                   onDelete={removeEvent}
@@ -972,6 +1006,8 @@ export default function Homepage() {
           addToScheduleLabel="Add to today's schedule"
         />
       )}
+
+      <EventPopups />
 
       {showCreateListFromTask && (
         <CreateListModal
