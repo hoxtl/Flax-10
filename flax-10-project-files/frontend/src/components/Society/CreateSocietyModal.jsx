@@ -5,6 +5,7 @@ import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
 import CategorySelector from "./CategorySelector";
+import StandardModal from "../common/StandardModal/StandardModal";
 
 const isValidEmail = (email) => {
     const trimmed = email.trim();
@@ -15,13 +16,10 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
     const logic = useCreateSocietyForm(onCreate, onClose);
     return (
         <>
-            <div className={styles.backdrop} onMouseDown={onClose}>
-                <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                    <ModalHeader onClose={onClose} />
-                    <FormFields {...logic} />
-                    <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
-                </div>
-            </div>
+            <StandardModal title="Create Society" subtitle="Start your own society or club" onClose={onClose}>
+                <FormFields {...logic} />
+                <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
+            </StandardModal>
             {logic.showCollabModal && <AddCollaboratorModal {...logic.collabModalProps} />}
             {logic.showPhotoModal && <CoverImageModal {...logic.photoModalProps} />}
         </>
@@ -68,17 +66,6 @@ function getPhotoModalProps(form, setShowPhotoModal, update) {
     };
 }
 
-function ModalHeader({ onClose }) {
-    return (
-        <div className={styles.header}>
-            <div>
-                <h2 className={styles.title}>Create Society</h2>
-                <p className={styles.sub}>Start your own society or club</p>
-            </div>
-            <button className={styles.close} onClick={onClose} type="button">&times;</button>
-        </div>
-    );
-}
 
 function FormFields({ form, update, setShowCollabModal, setShowPhotoModal, emailsInvalid }) {
     const handlers = getFieldHandlers(form, update);

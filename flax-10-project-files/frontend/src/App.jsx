@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
-import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
 import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
@@ -10,6 +9,7 @@ import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { NotificationToast } from "./components/Notifications";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
@@ -20,6 +20,9 @@ import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
+import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
+
+import "./App.css";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
@@ -83,13 +86,14 @@ function resolveScreen(authed, user, showWelcome) {
 function resolveRouteContent(activeNav, user, setActiveNav) {
   const baseNav = activeNav.split('_')[0];
   const navParam = activeNav.split('_').slice(1).join('_');
-
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
     const extraProps = { user, onNavChange: setActiveNav };
-    // Pass the search param to modules view if provided
-    if (baseNav === 'modules' && navParam) {
+    // Pass the search param or create flag to modules view if provided
+    if (baseNav === 'modules' && navParam === 'create') {
+      extraProps.initialCreate = true;
+    } else if (baseNav === 'modules' && navParam) {
       extraProps.initialSearch = navParam;
     }
     return { ...el, props: { ...el.props, ...extraProps } };
@@ -171,10 +175,10 @@ function useAppState() {
   useSyncAuth(setAuthed, setUser, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
 
-  const setActiveNav = (nav) => {
+  const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
-  };
+  }, []);
 
   useEffect(() => {
     const handleNavigate = (e) => setActiveNav(e.detail);
@@ -225,8 +229,10 @@ function AppProviders({ children }) {
       <CalendarProvider>
         <TagProvider>
           <TimerProvider>
-            {children}
-            <NotificationToast />
+            <TaskCompletionProvider>
+              {children}
+              <NotificationToast />
+            </TaskCompletionProvider>
           </TimerProvider>
         </TagProvider>
       </CalendarProvider>
@@ -283,29 +289,23 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
 function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
-
   if (activeNav === "profile")
-    return (
-      <Profile
-        user={user}
-        onBack={() => setActiveNav("home")}
-        onNavigate={setActiveNav}
-      />
-    );
-
-  if (activeNav.startsWith("profile_")) {
-    const viewedUserId = activeNav.split("_")[1];
-    return (
-      <Profile
-        user={user}
-        viewedUserId={viewedUserId}
-        onBack={() => setActiveNav("home")}
-        onNavigate={setActiveNav}
-      />
-    );
-  }
-
+    return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+  if (activeNav.startsWith("profile_"))
+    return renderProfileView(activeNav, setActiveNav, user);
+  if (activeNav.startsWith("societies_"))
+    return renderSocietyView(activeNav, setActiveNav);
   return resolveRouteContent(activeNav, user, setActiveNav);
+}
+
+function renderProfileView(activeNav, setActiveNav, user) {
+  const viewedUserId = activeNav.split("_")[1];
+  return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+}
+
+function renderSocietyView(activeNav, setActiveNav) {
+  const parts = activeNav.split("_");
+  return <SocietyDetailPage societyId={parts[1]} initialTab={parts[2] || "calendar"} onBack={() => setActiveNav("societies")} />;
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
@@ -328,7 +328,7 @@ function OnboardingWrapper({ onComplete }) {
   const [showOnboarding, setShowOnboarding] = useOnboardingCheck();
   const handleComplete = () => {
     setShowOnboarding(false);
-    window.location.reload();
+    window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
   };
   return (
     <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />
@@ -336,24 +336,32 @@ function OnboardingWrapper({ onComplete }) {
 }
 
 function AppScreen({ activeNav, setActiveNav, user }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  useSyncNavFromUrl(location.pathname, setActiveNav);
+  const handleNavChange = (id) => {
+    setActiveNav(id);
+    const route = APP_ROUTES.find((r) => r.id === id);
+    if (route) navigate(route.path);
+  };
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
-        <DashboardLayout
-          activeNav={activeNav}
-          onNavChange={setActiveNav}
-          user={user}
-        >
-          <AnimatedDashboardContent
-            activeNav={activeNav}
-            setActiveNav={setActiveNav}
-            user={user}
-          />
+        <DashboardLayout activeNav={activeNav} onNavChange={handleNavChange} user={user}>
+          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </DashboardLayout>
         <OnboardingWrapper />
       </AppProviders>
     </ScreenWrap>
   );
+}
+
+function useSyncNavFromUrl(pathname, setActiveNav) {
+  useEffect(() => {
+    const path = pathname || "/";
+    const route = APP_ROUTES.find((r) => r.path === path);
+    if (route) setActiveNav(route.id);
+  }, [pathname, setActiveNav]);
 }
 
 // Screen render

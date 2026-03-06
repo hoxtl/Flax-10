@@ -9,6 +9,7 @@ import { getVisibleEventsInView } from "../../components/Calendar/utils/eventUti
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
+import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -24,6 +25,7 @@ export default function CalendarPage() {
   const { filter, allEvents, selectedDate, viewMode } = useCalendar();
   const dispatch = useCalendarDispatch();
   const isMobile = useIsMobile();
+  useEventPopupListener();
 
   // Redirect week view to day view on mobile
   useEffect(() => {

@@ -128,6 +128,7 @@ class Migration(migrations.Migration):
                 ('notification_type', models.CharField(choices=[('general', 'General'), ('society_event', 'Society Event'), ('society_announcement', 'Society Announcement'), ('reminder', 'Reminder'), ('ratification_request', 'Ratification Request'), ('ratification_approved', 'Ratification Approved'), ('ratification_rejected', 'Ratification Rejected')], default='general', max_length=30)),
                 ('society_id', models.IntegerField(blank=True, null=True)),
                 ('action_url', models.CharField(blank=True, max_length=255, null=True)),
+                ('scroll_to_id', models.CharField(blank=True, max_length=255, null=True)),
                 ('read', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to=settings.AUTH_USER_MODEL)),

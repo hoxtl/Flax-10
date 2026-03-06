@@ -1,0 +1,650 @@
+  /* Daily Navigator — schedule-aware time widget */
+  .dailyNavigatorWrap {
+    padding: 0 18px 12px;
+    width: 100%;
+  }
+  .dailyNavigator {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    background: #F9F8F6;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+  .dailyNavigator.navigatorTimerActive {
+    border-color: rgba(135, 169, 107, 0.4);
+    box-shadow: 0 0 0 2px rgba(135, 169, 107, 0.15);
+  }
+  .dailyNavigator.navigatorConflict {
+    border-color: rgba(255, 159, 103, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 159, 103, 0.12);
+  }
+  .navigatorLayout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+  .navigatorStatusPane {
+    flex: 1;
+    min-width: 200px;
+  }
+  .navigatorStatusText {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-charcoal);
+  }
+  .navigatorCountdown {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-charcoal);
+    margin: 0.25rem 0;
+  }
+  .navigatorRailWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 140px;
+  }
+  .navigatorProgressRail {
+    display: flex;
+    gap: 4px;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.06);
+  }
+  .navigatorRailSegment {
+    flex: 1;
+    min-width: 20px;
+  }
+  .navigatorRailSegment[data-type="conflict"] { background: #FF9F67; }
+  .navigatorRailSegment[data-type="gap"] { background: var(--restoration-sage); }
+  .navigatorRailSegment[data-type="neutral"] { background: rgba(0, 0, 0, 0.08); }
+  .navigatorFillGapBtn,
+  .navigatorResolveBtn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--restoration-sage);
+    background: transparent;
+    color: var(--restoration-sage);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .navigatorFillGapBtn:hover,
+  .navigatorResolveBtn:hover {
+    background: rgba(135, 169, 107, 0.15);
+  }
+  .navigatorResolveBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .navigatorHorizonPane {
+    min-width: 160px;
+  }
+  .navigatorHorizonLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--home-text-meta);
+    margin-bottom: 4px;
+  }
+  .navigatorHorizonItem {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .navigatorHorizonTitle {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-charcoal);
+  }
+  .navigatorHorizonTime {
+    font-size: 0.75rem;
+    color: var(--home-text-meta);
+  }
+  .navigatorTflRow {
+    font-size: 0.7rem;
+    color: var(--home-text-meta);
+    margin-top: 6px;
+  }
+  .navigatorTankWrap {
+    flex-shrink: 0;
+    width: 130px;
+    height: 130px;
+  }
+  .navigatorMainBtn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--restoration-sage);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .navigatorMainBtn:hover { filter: brightness(1.08); }
+
+  /* ─── Day Status Bar ─────────────────────────────────────────────────────── */
+
+  .dayStatusBar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding: 10px 18px;
+    background: #FFFFFF;
+    border: 1px solid #EAE8E4;
+    border-radius: 10px;
+    min-height: 44px;
+  }
+
+  .dayStatusTimerActive {
+    border-color: rgba(132, 169, 140, 0.45);
+    background: rgba(132, 169, 140, 0.04);
+  }
+
+  .dayStatusDate {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #9a8778;
+    flex-shrink: 0;
+  }
+
+  .dayStatusNow,
+  .dayStatusNext {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .dayStatusNow::before,
+  .dayStatusNext::before {
+    content: "·";
+    color: #D1CFCA;
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-right: 2px;
+  }
+
+  .dayStatusBadge {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 99px;
+    flex-shrink: 0;
+  }
+
+  .dayStatusBadgeTask {
+    background: #4A3421;
+    color: #F7F6F3;
+  }
+
+  .dayStatusBadgeFree {
+    background: rgba(132, 169, 140, 0.15);
+    color: #4a7a57;
+    border: 1px solid rgba(132, 169, 140, 0.35);
+  }
+
+  .dayStatusBadgeConflict {
+    background: rgba(192, 113, 78, 0.12);
+    color: #C0714E;
+    border: 1px solid rgba(192, 113, 78, 0.3);
+  }
+
+  .dayStatusBadgeDone {
+    background: rgba(132, 169, 140, 0.12);
+    color: #4a7a57;
+    border: 1px solid rgba(132, 169, 140, 0.3);
+  }
+
+  .dayStatusNowText {
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #2d352d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+  }
+
+  .dayStatusNowMeta {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    color: #84A98C;
+    white-space: nowrap;
+  }
+
+  .dayStatusNextLabel {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9a8778;
+  }
+
+  .dayStatusNextText {
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #4A3421;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+
+  .dayStatusNextMeta {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.65rem;
+    color: #84A98C;
+    white-space: nowrap;
+  }
+
+  .dayStatusActionBtn {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid rgba(192, 113, 78, 0.4);
+    color: #C0714E;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .dayStatusActionBtn:hover {
+    background: rgba(192, 113, 78, 0.08);
+  }
+
+  /* Timer active mode */
+  .dayStatusTimerMode {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: #4A3421;
+    color: #F7F6F3;
+    flex-shrink: 0;
+  }
+
+  .dayStatusTimerTask {
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #2d352d;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dayStatusTimerCountdown {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2d352d;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  .dayStatusTimerTrack {
+    width: 72px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .dayStatusTimerFill {
+    height: 100%;
+    background: #84A98C;
+    border-radius: 2px;
+    transition: width 1s linear;
+  }
+
+  .dayStatusTimerActions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+
+  .dayStatusTimerBtn {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid rgba(123, 103, 81, 0.25);
+    color: #4A3421;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .dayStatusTimerBtn:hover {
+    background: rgba(123, 103, 81, 0.08);
+  }
+
+  .dayStatusTimerBtnEnd {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(192, 113, 78, 0.1);
+    border: 1px solid rgba(192, 113, 78, 0.3);
+    color: #C0714E;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .dayStatusTimerBtnEnd:hover {
+    background: rgba(192, 113, 78, 0.18);
+  }
+
+  .dayStatusTimerBtnSecondary {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-family: var(--font-body, "Quicksand", sans-serif);
+    font-size: 0.72rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: #84A98C;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Left bento column: Action Hub + NOW hero — ~25% width */
+  .bentoLeft {
+    grid-area: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .triageHero {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--hero-flax-border, #b8956e);
+    background: rgba(210, 180, 140, 0.15);
+    color: var(--text-charcoal);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: box-shadow 0.4s ease, border-color 0.4s ease;
+    position: relative;
+  }
+  .nowHeroTankWrap {
+    flex-shrink: 0;
+  }
+  .nowHeroTankWrap.swirl .tank .liquidWrap .wave,
+  .nowHeroTankWrap.swirl .tank .liquidWrap .wave2 {
+    will-change: transform;
+  }
+  .triageHero.heroVibeGap {
+    animation: heroGlowFlax 4s ease-in-out infinite;
+  }
+  .triageHero.heroVibeFocus {
+    animation: heroGlowSage 4s ease-in-out infinite;
+  }
+  @keyframes heroGlowFlax {
+    0%, 100% { box-shadow: 0 6px 24px rgba(74, 52, 33, 0.08), 0 0 0 1px rgba(82, 121, 111, 0.08), 0 0 28px rgba(238, 220, 130, 0.18); border-color: rgba(196, 163, 90, 0.4); }
+    50% { box-shadow: 0 6px 24px rgba(74, 52, 33, 0.08), 0 0 0 1px rgba(82, 121, 111, 0.08), 0 0 36px rgba(238, 220, 130, 0.28); border-color: rgba(196, 163, 90, 0.5); }
+  }
+  @keyframes heroGlowSage {
+    0%, 100% { box-shadow: 0 6px 24px rgba(74, 52, 33, 0.08), 0 0 0 1px rgba(82, 121, 111, 0.08), 0 0 28px rgba(82, 121, 111, 0.2); border-color: rgba(82, 121, 111, 0.45); }
+    50% { box-shadow: 0 6px 24px rgba(74, 52, 33, 0.08), 0 0 0 1px rgba(82, 121, 111, 0.08), 0 0 36px rgba(82, 121, 111, 0.28); border-color: rgba(82, 121, 111, 0.55); }
+  }
+  .triageHero.heroDeepWork {
+    animation: heroBreathingSage 3.5s ease-in-out infinite;
+  }
+  @keyframes heroBreathingSage {
+    0%, 100% { box-shadow: 0 6px 24px rgba(74, 52, 33, 0.06), 0 0 24px rgba(135, 169, 107, 0.2); border-color: rgba(135, 169, 107, 0.4); }
+    50% { box-shadow: 0 6px 28px rgba(74, 52, 33, 0.08), 0 0 32px rgba(135, 169, 107, 0.35); border-color: rgba(135, 169, 107, 0.55); }
+  }
+  .heroVibeLabel {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-charcoal, #2d352d);
+    opacity: 0.7;
+    margin-bottom: 4px;
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Monaco, Consolas, monospace;
+  }
+  .heroVibeMessageRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .heroVibeIcon {
+    font-size: 1rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+  }
+  .heroVibeMessage {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: var(--font-weight-title);
+    color: var(--text-charcoal);
+    margin: 0;
+    line-height: 1.35;
+  }
+  .heroVibeUpNext {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-caption);
+    color: var(--text-muted-sage);
+    margin: 0;
+    line-height: 1.3;
+  }
+  .heroVibeUpNext .heroTimeMono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .heroNowUpcomingStack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 0.35rem;
+  }
+  .heroNowUpcomingLine {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-body);
+    line-height: 1.4;
+    max-width: 100%;
+  }
+  .heroNowUpcomingLabel {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--home-text-meta);
+    flex-shrink: 0;
+  }
+  .heroNowUpcomingTaskName {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #2D2D2D;
+    flex: 1;
+    min-width: 0;
+  }
+  .heroNowUpcomingTimerWrap {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .heroCountdownIn {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--home-text-meta);
+  }
+  .heroCountdownMono {
+    font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-sage, #87A96B);
+  }
+  .triageHeroNowNext {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+    flex: 1;
+  }
+  .heroSmartContext {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--restoration-charcoal, #2d352d);
+    opacity: 0.9;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 4px;
+  }
+  .heroDayProgressWrap {
+    height: 2px;
+    width: 100%;
+    max-width: 200px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .heroDayProgressFill {
+    height: 100%;
+    background: var(--restoration-flax, #EEDC82);
+    border-radius: 1px;
+    transition: width 0.35s ease;
+  }
+  .triageHeroNowRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .triageHeroPulsingDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #52796f;
+    box-shadow: 0 0 0 0 rgba(82, 121, 111, 0.5);
+    animation: heroPulseBreathe 3s ease-in-out infinite;
+  }
+  @keyframes heroPulseBreathe {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(82, 121, 111, 0.5); opacity: 1; }
+    50% { box-shadow: 0 0 0 8px rgba(82, 121, 111, 0); opacity: 0.9; }
+  }
+  .triageHeroLabelNow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--restoration-charcoal, #2d352d);
+  }
+  .triageHeroValue {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--restoration-charcoal, #2d352d);
+    margin: 0;
+    line-height: 1.25;
+  }
+  .triageHeroNextLine {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--home-text-meta);
+    margin: 0;
+    line-height: 1.3;
+  }
+  .triageHeroLabelNext {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--home-text-meta);
+    margin-top: 0.15rem;
+  }
+  .triageHeroValueNext {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--home-text-meta);
+    margin: 0;
+  }
+  .triageHeroCountdown {
+    font-family: var(--font-mono);
+    font-size: 1.45rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-charcoal, #2d352d);
+    margin: 0.25rem 0 0;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+  /* Timer session branch: keep contrast on glass */
+  .triageHero .heroSessionProgressWrap,
+  .triageHero .heroSessionProgressBar,
+  .triageHero .heroSessionProgressFill,
+  .triageHero .heroSessionBtn,
+  .triageHero .heroSessionBtnSecondary {
+    color: var(--restoration-charcoal);
+  }
+  .triageHero .heroSessionProgressBar {
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .triageHero .heroSessionProgressFill {
+    background: var(--restoration-sage);
+  }
+  .triageHero .heroSessionBtn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--restoration-charcoal);
+  }
+  .triageHero .heroSessionBtnSecondary {
+    background: transparent;
+    border: 1px solid var(--restoration-sage);
+    color: var(--restoration-sage);
+  }

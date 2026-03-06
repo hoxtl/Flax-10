@@ -32,31 +32,26 @@ vi.mock('../../components/Notifications/NotificationPanel', () => ({
 }));
 
 describe('TopBar', () => {
-  it('calls onAddClick when add tab selected', () => {
-    const onAdd = vi.fn();
-    render(<TopBar onAddClick={onAdd} />);
-    fireEvent.click(screen.getByText('add-tab'));
-    expect(onAdd).toHaveBeenCalled();
+  it('renders brand', () => {
+    render(<TopBar user={{ first_name: 'Kausar', username: 'kk' }} />);
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
-  it('does not call onAddClick for non-0 tab index', () => {
-    const onAdd = vi.fn();
-    render(<TopBar onAddClick={onAdd} />);
-    fireEvent.click(screen.getByText('notif-tab'));
-    expect(onAdd).not.toHaveBeenCalled();
-  });
-
-  it('handles null tab index without crash', () => {
-    expect(() => {
-      render(<TopBar onAddClick={vi.fn()} />);
-      fireEvent.click(screen.getByText('deselect'));
-    }).not.toThrow();
+  it('renders without user', () => {
+    render(<TopBar />);
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
   it('calls onSettingsClick', () => {
     const fn = vi.fn();
-    render(<TopBar onSettingsClick={fn} />);
+    render(<TopBar user={{}} onSettingsClick={fn} />);
     fireEvent.click(screen.getByText('settings'));
     expect(fn).toHaveBeenCalled();
+  });
+
+  it('renders theme toggle and timer', () => {
+    render(<TopBar />);
+    expect(screen.getByText('theme')).toBeTruthy();
+    expect(screen.getByText('timer')).toBeTruthy();
   });
 });

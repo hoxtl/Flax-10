@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNotifications } from '../../context/NotificationContext';
 import { playNotificationSound } from './utils/notificationSound';
+import { executeNotificationAction, parseNotificationAction, hasNotificationAction } from './utils/notificationAction';
 import './NotificationToast.css';
 
 export function NotificationToast() {
@@ -53,8 +54,14 @@ function queueNew(notifications, refs, currentToast, showNext) {
 }
 
 function Toast({ notification }) {
+    const isClickable = hasNotificationAction(notification);
+    const handleClick = () => {
+        const action = parseNotificationAction(notification);
+        executeNotificationAction(action);
+    };
+
     return (
-        <div className="notification-toast">
+        <div className={`notification-toast ${isClickable ? 'clickable' : ''}`} onClick={isClickable ? handleClick : undefined}>
             <span className="toast-title">{notification.title}</span>
             <span className="toast-message">{notification.message}</span>
         </div>

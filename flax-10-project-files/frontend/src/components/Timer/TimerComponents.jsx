@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import styles from "../../pages/Timer/TimerPage.module.css";
 import { noiseGenerator } from './utils/noiseUtils';
+import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
+import AnimatedDropdown from '../ui/AnimatedDropdown';
+import MultiSelectDropdown from '../ui/MultiSelectDropdown';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {
@@ -114,19 +117,26 @@ export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
     return <div className={styles.settingsContainer}>{inputs}{disc}</div>;
 };
 
-const SoundOptions = () => (
-    <>
-        <option value="none">None 🔇</option>
-        <option value="white">White Noise 🌊</option>
-        <option value="pink">Pink Noise 🌧️</option>
-        <option value="brown">Brown Noise 🏔️</option>
-    </>
-);
+const SOUND_OPTIONS = [
+    { value: 'none', label: 'None 🔇' },
+    { value: 'white', label: 'White Noise 🌊' },
+    { value: 'pink', label: 'Pink Noise 🌧️' },
+    { value: 'brown', label: 'Brown Noise 🏔️' },
+];
 
 const SoundControls = ({ noiseType, setNoiseType }) => {
     const lbl = <span className={styles.label}>Calming Sound:</span>;
-    const sel = <select className={styles.soundSelect} value={noiseType} onChange={(e) => setNoiseType(e.target.value)}><SoundOptions /></select>;
-    return <div className={styles.soundControls}>{lbl}{sel}</div>;
+    const dropdown = (
+        <AnimatedDropdown
+            value={noiseType}
+            onChange={setNoiseType}
+            placeholder="Select sound"
+            options={SOUND_OPTIONS}
+            grouped={false}
+            className={styles.soundDropdown}
+        />
+    );
+    return <div className={styles.soundControls}>{lbl}{dropdown}</div>;
 };
 
 const applyNoise = (noiseType) => {
@@ -153,7 +163,220 @@ const handleTaskKey = (e) => {
     if (e.key === 'Enter') e.target.blur();
 };
 
-export const TaskInput = ({ value, onChange }) => {
-    const inp = <input type="text" className={styles.taskInput} placeholder="What are you working on? 🎯" value={value} onChange={(e) => onChange(e.target.value)} onKeyDown={handleTaskKey} />;
-    return <div className={styles.taskInputContainer}>{inp}</div>;
+/** Task input with optional pick-from-tasks list (sort by urgency/due/time, filter by list/module) */
+const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
+const SORT_URGENCY = 'urgency';
+const SORT_TIME = 'time';
+const SORT_DUE = 'due';
+const SORT_ALPHA = 'alpha';
+const SORT_DATE_ADDED = 'date_added';
+
+const SORT_OPTIONS = [
+    { value: SORT_URGENCY,   label: 'Urgency' },
+    { value: SORT_DUE,       label: 'Due date' },
+    { value: SORT_ALPHA,     label: 'A → Z' },
+    { value: SORT_DATE_ADDED, label: 'Date added' },
+    { value: SORT_TIME,      label: 'Estimated time' },
+];
+
+export const TaskInput = ({ value, onChange, onTaskSelect }) => {
+    const [open, setOpen] = useState(false);
+    const [tasks, setTasks] = useState([]);
+    const [lists, setLists] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [sortBy, setSortBy] = useState(SORT_URGENCY);
+    const [search, setSearch] = useState('');
+    const [filterListIds, setFilterListIds] = useState([]);
+    const [filterModuleCodes, setFilterModuleCodes] = useState([]);
+    const ref = useRef(null);
+
+    const loadTasks = useCallback((sort = sortBy) => {
+        setLoading(true);
+        Promise.all([
+            import('../../api/taskService').then(({ fetchTasks }) => fetchTasks()),
+            import('../../api/taskService').then(({ fetchTaskLists }) => fetchTaskLists()),
+        ])
+            .then(([tasksData, listsData]) => {
+                const listMap = {};
+                const listArr = listsData || [];
+                listArr.forEach((list, idx) => {
+                    listMap[String(list.id)] = {
+                        name: list.name || 'Other',
+                        color: list.color || FOCUS_BLOCK_COLOURS_HEX[idx % FOCUS_BLOCK_COLOURS_HEX.length],
+                    };
+                });
+                setLists(listArr);
+                let list = (tasksData || []).filter((t) => !t.completed).map((t) => {
+                    const listInfo = listMap[String(t.task_list)] || { name: 'Other', color: '#94a3b8' };
+                    return { ...t, list_name: listInfo.name, list_color: listInfo.color };
+                });
+                if (sort === SORT_TIME) {
+                    list.sort((a, b) => ((a.estimated_blocks || 1) - (b.estimated_blocks || 1)) || ((PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)));
+                } else if (sort === SORT_DUE) {
+                    list.sort((a, b) => {
+                        if (!a.due_date && !b.due_date) return 0;
+                        if (!a.due_date) return 1;
+                        if (!b.due_date) return -1;
+                        return new Date(a.due_date) - new Date(b.due_date);
+                    });
+                } else if (sort === SORT_ALPHA) {
+                    list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                } else if (sort === SORT_DATE_ADDED) {
+                    list.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+                } else {
+                    list.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4));
+                }
+                setTasks(list.slice(0, 100));
+            })
+            .catch(() => setTasks([]))
+            .finally(() => setLoading(false));
+    }, [sortBy]);
+
+    useEffect(() => {
+        if (!open) return;
+        const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, [open]);
+
+    const handleOpen = () => {
+        if (!open) loadTasks();
+        setOpen((o) => !o);
+    };
+
+    const selectTask = (task) => {
+        onChange(task.title);
+        setOpen(false);
+        onTaskSelect?.(task);
+    };
+
+    const searchLower = (search || '').toLowerCase().trim();
+    const listOptions = useMemo(() => [
+        { value: '', label: 'All lists' },
+        ...(lists || []).map((l) => ({ value: String(l.id), label: l.name || 'Other' })),
+    ], [lists]);
+    const moduleOptions = useMemo(() => {
+        const codes = [...new Set((tasks || []).map((t) => t.module_code).filter(Boolean))].sort();
+        return [{ value: '', label: 'All modules' }, ...codes.map((c) => ({ value: c, label: c }))];
+    }, [tasks]);
+
+    let filteredTasks = searchLower
+        ? tasks.filter((t) => (t.title || '').toLowerCase().includes(searchLower) || (t.list_name || '').toLowerCase().includes(searchLower) || ((t.module_code || '').toLowerCase().includes(searchLower)))
+        : tasks;
+    if (filterListIds && filterListIds.length > 0) {
+        const set = new Set(filterListIds.map(String));
+        filteredTasks = filteredTasks.filter((t) => set.has(String(t.task_list)));
+    }
+    if (filterModuleCodes && filterModuleCodes.length > 0) {
+        const set = new Set(filterModuleCodes.map(String));
+        filteredTasks = filteredTasks.filter((t) => set.has(String(t.module_code || '')));
+    }
+
+    return (
+        <div className={styles.taskInputWrap}>
+            {value && (
+                <div className={styles.currentTaskLabel}>Currently focusing on:</div>
+            )}
+            <div className={styles.taskInputContainer} ref={ref}>
+                <input
+                    type="text"
+                    className={`${styles.taskInput} ${value ? styles.taskInputHasValue : ''}`}
+                    placeholder="What are you working on? 🎯"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    onKeyDown={handleTaskKey}
+                />
+                <div className={styles.taskInputActions}>
+                    <span className={styles.taskInputHint}>Choose a task to start</span>
+                    <button
+                        type="button"
+                        className={styles.taskPickBtn}
+                        onClick={handleOpen}
+                        title="Select a task"
+                    >
+                        Select Task
+                    </button>
+                </div>
+                {open && (
+                    <>
+                    <div className={styles.taskPickBackdrop} onClick={() => setOpen(false)} />
+                    <div className={styles.taskPickDropdown} role="dialog" aria-label="Select task">
+                        <div className={styles.taskPickSearchRow}>
+                            <span className={styles.taskPickSearchIcon} aria-hidden>🔍</span>
+                            <input
+                                type="text"
+                                className={styles.taskPickSearchInput}
+                                placeholder="Search tasks…"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                        <div className={styles.taskPickSortRow}>
+                            <label className={styles.taskPickSortLabel}>SORT</label>
+                            <AnimatedDropdown
+                                value={sortBy}
+                                onChange={(v) => { setSortBy(v); loadTasks(v); }}
+                                options={SORT_OPTIONS}
+                                className={styles.taskPickSortDropdown}
+                            />
+                        </div>
+                        <div className={styles.taskPickSortRow}>
+                            <label className={styles.taskPickSortLabel}>FILTER BY LIST</label>
+                            <MultiSelectDropdown
+                                value={filterListIds}
+                                onChange={setFilterListIds}
+                                options={listOptions}
+                                placeholder="All lists"
+                                countLabel="lists"
+                                className={styles.taskPickSortDropdown}
+                            />
+                        </div>
+                        <div className={styles.taskPickSortRow}>
+                            <label className={styles.taskPickSortLabel}>FILTER BY MODULE</label>
+                            <MultiSelectDropdown
+                                value={filterModuleCodes}
+                                onChange={setFilterModuleCodes}
+                                options={moduleOptions}
+                                placeholder="All modules"
+                                countLabel="modules"
+                                className={styles.taskPickSortDropdown}
+                            />
+                        </div>
+                        {loading ? (
+                            <div className={styles.taskPickEmpty}>Loading…</div>
+                        ) : filteredTasks.length === 0 ? (
+                            <div className={styles.taskPickEmpty}>{searchLower ? 'No tasks match.' : 'No tasks. Add some on the Tasks page.'}</div>
+                        ) : (
+                            <div className={styles.taskPickList}>
+                                {filteredTasks.map((task) => {
+                                    const duration = task.estimated_blocks ? `${task.estimated_blocks * 25}m` : '25m';
+                                    const listName = task.list_name || 'Other';
+                                    const listColor = task.list_color || '#94a3b8';
+                                    return (
+                                        <button
+                                            key={task.id}
+                                            type="button"
+                                            className={`${styles.taskPickItem} ${value === task.title ? styles.taskPickItemSelected : ''}`}
+                                            onClick={() => selectTask(task)}
+                                        >
+                                            <span className={styles.taskPickTitle}>{task.title}</span>
+                                            <span
+                                                className={styles.taskPickListPill}
+                                                style={{ background: `${listColor}22`, color: listColor }}
+                                            >
+                                                {listName}
+                                            </span>
+                                            <span className={styles.taskPickDuration}>{duration}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 };

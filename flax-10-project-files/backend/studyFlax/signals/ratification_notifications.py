@@ -21,8 +21,6 @@ def cache_old_ratification_status(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Society)
 def notify_on_ratification_change(sender, instance, created, **kwargs):
-    if getattr(instance, '_skip_notification', False):
-        return
     old_status = getattr(instance, '_old_ratification_status', None)
     new_status = instance.ratification_status
     if old_status == new_status:
@@ -58,7 +56,12 @@ def build_pending_notification(admin, society):
         message=f"Society '{society.name}' has requested ratification approval.",
         notification_type='ratification_request',
         society_id=society.id,
+        action_url='admin',
     )
+
+
+def build_society_url(society_id):
+    return f"societies_{society_id}"
 
 
 def build_status_notification(user, society, status):
@@ -71,6 +74,7 @@ def build_status_notification(user, society, status):
         message=message,
         notification_type=notification_type,
         society_id=society.id,
+        action_url=build_society_url(society.id),
     )
 
 

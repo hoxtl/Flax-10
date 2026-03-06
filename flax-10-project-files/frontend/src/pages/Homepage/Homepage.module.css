@@ -1,0 +1,16 @@
+/* Homepage module — composed from logical partials */
+@import './styles/Variables.module.css';
+@import './styles/Bento.module.css';
+@import './styles/Navigator.module.css';
+@import './styles/HomepageSlots.module.css';
+@import './styles/Analytics.module.css';
+@import './styles/DailyNarrative.module.css';
+@import './styles/Timer.module.css';
+@import './styles/Timeline.module.css';
+@import './styles/Overlays.module.css';
+
+.homePillsRow {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
