@@ -3,6 +3,7 @@ import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import BasePill from "../../components/Tags/BasePill";
 import SearchBar from "../../components/common/SearchBar";
+import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 
@@ -60,14 +61,18 @@ function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
     );
 }
 
+const SORT_OPTIONS = [
+    { value: "name", label: "A-Z" },
+    { value: "name-desc", label: "Z-A" },
+    { value: "newest", label: "Newest" },
+    { value: "members", label: "Most Members" },
+];
+
 function SortDropdown({ value, onChange }) {
     return (
-        <select className={styles.sortDropdown} value={value} onChange={e => onChange(e.target.value)}>
-            <option value="name">A-Z</option>
-            <option value="name-desc">Z-A</option>
-            <option value="newest">Newest</option>
-            <option value="members">Most Members</option>
-        </select>
+        <div className={styles.sortWrapper}>
+            <AnimatedDropdown value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />
+        </div>
     );
 }
 
