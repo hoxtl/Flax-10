@@ -30,12 +30,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.listHeaderTitleModulesLike {
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-}
 .listHeaderDivider {
     height: 1px;
     background: var(--border, rgba(74, 52, 33, 0.12));

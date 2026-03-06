@@ -82,7 +82,6 @@ export default function Homepage() {
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
-  const [moduleFilterId] = useState(null);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
   const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
   const [lastCreatedListId, setLastCreatedListId] = useState(null);
@@ -509,18 +508,6 @@ export default function Homepage() {
     });
   }, [selectedDate, allTasks]);
 
-  const filteredTasksDueToday = useMemo(() => {
-    if (!moduleFilterId) return tasksDueToday;
-    const mod = (enrolledModules || []).find((m) => String(m.id) === String(moduleFilterId));
-    if (!mod) return tasksDueToday;
-    return tasksDueToday.filter(
-      (t) =>
-        String(t.module_id || t.module || t.moduleId || "") === String(moduleFilterId) ||
-        (t.module_code || "").toUpperCase().trim() === (mod.module_code || "").toUpperCase().trim()
-    );
-  }, [tasksDueToday, moduleFilterId, enrolledModules]);
-
-
   /** Daily Navigator context: task/gap/conflict/endOfDay, currentBlock, nextItem, gapMins, overlaps, conflictAt. */
   const navigatorContext = useMemo(
     () => getNavigatorContext(now, selectedDate, sortedEvents || [], isToday),
@@ -553,7 +540,7 @@ export default function Homepage() {
 
   const overdueTasksForNow = useMemo(() => {
     const now = new Date();
-    return (filteredTasksDueToday || [])
+    return (tasksDueToday || [])
       .filter(
         (t) =>
           !isRoutineOrEventTask(t, getTag) &&
@@ -562,7 +549,7 @@ export default function Homepage() {
           new Date(t.due_date) < now
       )
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
-  }, [filteredTasksDueToday, getTag]);
+  }, [tasksDueToday, getTag]);
 
   /** task-only. Include due-today tasks and incomplete overdue tasks. */
   const taskWidgetList = useMemo(() => {
@@ -1044,7 +1031,7 @@ export default function Homepage() {
                   selectedDate={selectedDate}
                   now={now}
                   dayTasks={dayTasks}
-                  tasksDueToday={filteredTasksDueToday}
+                  tasksDueToday={tasksDueToday}
                   suggestableTasks={suggestableTasks}
                   deadlineSuggestions={deadlineSuggestions}
                   taskLists={taskLists}

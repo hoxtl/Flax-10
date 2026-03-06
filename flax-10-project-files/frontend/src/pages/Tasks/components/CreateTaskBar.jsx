@@ -100,7 +100,6 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
         title: taskTitle,
         description: "",
         priority: "medium",
-        energy_level: "",
         due_date: defaultDueDate ?? null,
         task_list: taskListId ? Number(taskListId) : (sortedLists[0]?.id ?? null),
         estimated_blocks: estimatedBlocks,

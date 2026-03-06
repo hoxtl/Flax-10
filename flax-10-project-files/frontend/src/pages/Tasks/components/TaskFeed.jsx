@@ -79,7 +79,6 @@ function Section({
   isOverdueSection = false, hideListBadge = false,
   completedCount = 0, sectionType = "default",
   applyLimit = false, searchQuery = "",
-  onTaskCompleted,
   emptyMessage = null,
   emptySub = null,
   emptyCardProps = null,
@@ -184,9 +183,7 @@ function Section({
                           listColor={getListColor(list)}
                           lists={lists}
                           onToggle={() => {
-                            const wasIncomplete = !task.completed;
                             onToggleComplete(task.id, task.completed);
-                            if (wasIncomplete && onTaskCompleted) onTaskCompleted(task);
                           }}
                           onDelete={() => onDeleteTask(task.id)}
                           onEdit={(data, meta) => onEditTask(task.id, data, meta)}
@@ -228,7 +225,6 @@ export default function TaskFeed({
   defaultDueDateForNewTask,
   onPlanTomorrow,
   onToggleComplete,
-  onTaskCompleted,
   onDeleteTask,
   onEditTask,
   onCreateTask,
@@ -437,7 +433,7 @@ export default function TaskFeed({
           : (activeModuleCode || "All tasks");
   const sectionProps = {
     sortBy, listMap, lists,
-    onToggleComplete, onTaskCompleted, onDeleteTask, onEditTask,
+    onToggleComplete, onDeleteTask, onEditTask,
     hideListBadge: !!activeListId,
     searchQuery: search,
   };
@@ -478,7 +474,7 @@ export default function TaskFeed({
       <header className={styles.listHeader} key={activeListId ?? "all"}>
         <div className={styles.listHeaderTitleWrap}>
           <h1
-            className={`${styles.listHeaderTitle} ${["All tasks", "Today", "This Week"].includes(headerTitle) ? styles.listHeaderTitleModulesLike : ""}`}
+            className={styles.listHeaderTitle}
             title={headerTitle}
           >
             {headerTitle}

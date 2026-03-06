@@ -13,25 +13,6 @@ export function formatTimeHHMM(dateOrStr) {
   return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
 }
 
-/** Format seconds as "17m" or "2h 15m" for UPCOMING countdown. */
-export function formatScheduleCountdown(secs) {
-  if (secs == null || secs < 0) return "";
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  if (m < 60) return `${m}m`;
-  const h = Math.floor(m / 60);
-  const mins = m % 60;
-  return mins ? `${h}h ${mins}m` : `${h}h`;
-}
-
-export function fmtDuration(mins) {
-  if (mins == null) return "";
-  if (mins < 60) return `${mins}m`;
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return m ? `${h}h ${m}m` : `${h}h`;
-}
-
 /** Duration for plan timeline card: "1h 30m" or "45m". */
 export function fmtDurationShort(mins) {
   if (mins == null || mins < 0) return "";
