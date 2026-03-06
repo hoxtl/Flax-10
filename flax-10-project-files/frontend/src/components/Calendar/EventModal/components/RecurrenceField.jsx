@@ -1,3 +1,4 @@
+import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import './RecurrenceField.css';
 
 export function RecurrenceField({ value, onChange }) {
@@ -76,11 +77,11 @@ function EndRepeatOptions({ endType, endDate, onTypeChange, onChange }) {
 
 function DateInput({ endDate, onChange }) {
     return (
-        <input
-            type="date"
-            value={endDate}
-            onChange={(e) => onChange('end_date', e.target.value || null)}
-            className="end-date-input"
+        <DateTimePicker
+            value={endDate || ''}
+            onChange={(val) => onChange('end_date', val || null)}
+            dateOnly
+            placeholder="Select end date"
         />
     );
 }
