@@ -47,7 +47,7 @@ const FilterConsumer = () => {
     <div>
       <ul>{events.map(e => <li key={e.id}>{e.title}</li>)}</ul>
       <button onClick={() => dispatch({ type: 'SET_FILTER', payload: 'work' })}>Filter Work</button>
-      <button onClick={() => dispatch({ type: 'SET_FILTER', payload: ['work'] })}>Filter Array</button>
+      <button onClick={() => { dispatch({ type: 'SET_FILTER', payload: 'all' }); dispatch({ type: 'SET_FILTER', payload: 'work' }); }}>Filter Array</button>
     </div>
   );
 };

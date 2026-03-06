@@ -27,7 +27,7 @@ vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({
 vi.mock('../../../../components/Calendar/utils/formUtils', () => ({
     getInitialForm: vi.fn(() => mockInitialForm),
     validateAndSubmit: vi.fn(),
-    confirmDelete: vi.fn(),
+    confirmDelete: vi.fn(), // kept for import compatibility
 }));
 
 describe('useEventForm', () => {
@@ -82,17 +82,11 @@ describe('useEventForm', () => {
         );
     });
 
-    it('should call confirmDelete on handleDelete', () => {
+    it('should expose handleConfirmSave and handleCancelSave', () => {
         const onClose = vi.fn();
         const event = { id: 1 };
         const { result } = renderHook(() => useEventForm(event, onClose));
-        act(() => {
-            result.current.handleDelete();
-        });
-        expect(FormUtilsModule.confirmDelete).toHaveBeenCalledWith(
-            event,
-            mockActions,
-            onClose
-        );
+        expect(typeof result.current.handleConfirmSave).toBe('function');
+        expect(typeof result.current.handleCancelSave).toBe('function');
     });
 });

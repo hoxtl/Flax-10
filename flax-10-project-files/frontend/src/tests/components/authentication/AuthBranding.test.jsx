@@ -4,6 +4,7 @@ import { AuthBrand, AuthFooter } from '../../../components/Authentication/AuthBr
 
 describe('AuthBrand', () => {
   it('renders brand name and tagline', () => {
+    Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 900 });
     render(<AuthBrand />);
     expect(screen.getByText('STUDYFLAX')).toBeTruthy();
     expect(screen.getByText('Built for calm study.')).toBeTruthy();

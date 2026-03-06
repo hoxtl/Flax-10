@@ -5,6 +5,7 @@ import { HoverSummary } from '../../../../components/Calendar/YearView/HoverSumm
 vi.mock('../../../../context/TagContext', () => ({
     useTags: () => ({
         getTag: (id) => ({ color: '#000', label: 'Test Tag' }),
+        getTagByName: (name) => ({ name, color: '#000', icon: '📚' }),
     }),
     TagProvider: ({ children }) => <div>{children}</div>
 }));

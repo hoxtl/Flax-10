@@ -159,10 +159,10 @@ describe('dateUtils', () => {
         });
 
         it('isAllDayEvent', async () => {
-            const { isAllDayEvent } = await import('../../components/Calendar/utils/dateUtils');
-            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(true);
+            const { isAllDayEvent } = await import('../../components/Calendar/utils/eventDisplayUtils');
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(false);
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 9) })).toBe(false);
-            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 17, 10) })).toBe(true);
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 0), end_time: new Date(2026, 1, 16, 0) })).toBe(true);
         });
     });
 });

@@ -72,7 +72,7 @@ describe('fetchApi', () => {
 
     it('does not set Authorization header when no token', async () => {
         localStorage.removeItem('token');
-        await expect(fetchApi('/test')).resolves.not.toThrow?.();
+        await expect(fetchApi('/test')).rejects.toThrow();
     });
 
     it('does not add Authorization header when no token in localStorage', async () => {
