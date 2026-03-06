@@ -12,51 +12,33 @@
   text-align: center;
   background: var(--panel, #f6f4f1);
   border-radius: 8px;
-  color: var(--muted, #8B7355);
+  color: var(--muted, #8b7355);
 }
 
 .calendar-view-relative-wrapper {
-    position: relative;
-    flex: 1;
-}
-
-.current-time-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: #ea4335;
-    z-index: 50;
-    pointer-events: none;
-}
-
-.current-time-dot {
-    position: absolute;
-    left: 45px;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    background-color: #ea4335;
-    border-radius: 50%;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 @media (max-width: 768px) {
-    .calendar-container {
-        padding: 0;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        display: block;
-    }
+  .calendar-container {
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+  }
 
-    .calendar-grid {
-        min-width: 800px;
-        display: grid;
-    }
+  .calendar-grid {
+    min-width: 800px;
+    display: grid;
+  }
 
-    .current-time-dot {
-        left: 40px;
-        width: 10px;
-        height: 10px;
-    }
+  .current-time-dot {
+    left: 40px;
+    width: 10px;
+    height: 10px;
+  }
 }
