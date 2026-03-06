@@ -908,7 +908,7 @@ export default function Homepage() {
                 <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
               </div>
               <div className={styles.timelineHeaderRight}>
-                <Link to="/calendar" className={styles.timelineHeaderActionLink}>View Detailed Planner →</Link>
+                <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
                 {isToday(selectedDate) && (
                   <motion.button
                     type="button"

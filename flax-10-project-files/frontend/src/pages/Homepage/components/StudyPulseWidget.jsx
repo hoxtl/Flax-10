@@ -213,10 +213,7 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
 
   const nextWindow = futureWindows[0] ?? null;
 
-  const handleStartFocus = () => {
-    if (onStartFocus) onStartFocus();
-    else navigate("/timer");
-  };
+  const handleViewAnalytics = () => navigate("/analytics");
 
   return (
     <div className={styles.root}>
@@ -351,8 +348,8 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
           )}
 
           {/* CTA */}
-          <button type="button" className={styles.startBtn} onClick={handleStartFocus}>
-            Start focus session →
+          <button type="button" className={styles.startBtn} onClick={handleViewAnalytics}>
+            View detailed analysis →
           </button>
         </div>
       </div>
