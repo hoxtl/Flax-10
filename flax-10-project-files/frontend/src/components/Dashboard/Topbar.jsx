@@ -78,7 +78,7 @@ function NavDropdown({ title, routes, activeNav, onNavChange }) {
 }
 
 const NAV_SECTIONS = [
-  { title: "Planning", ids: ["calendar", "timer", "analytics"] },
+  { title: "Planning", ids: ["calendar", "timer", "analytics", "schedules"] },
   { title: "Academic", ids: ["modules"] }, { title: "Campus", ids: ["map"] },
   { title: "Social", ids: ["users", "societies"] }, { title: "Admin", ids: ["admin"] }
 ];

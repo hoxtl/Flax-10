@@ -7,6 +7,7 @@ import TimerPage from "../pages/Timer/TimerPage";
 import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
 import AdminPage from "../pages/AdminPage";
 import Discover from "../pages/Discover/Discover";
+import SchedulesPage from "../pages/Schedules/SchedulesPage";
 
 export const APP_ROUTES = [
     { id: "home", label: "Home", icon: "🏠", path: "/", element: <Home /> },
@@ -18,6 +19,7 @@ export const APP_ROUTES = [
     { id: "map", label: "UniMap", icon: "🗺️", path: "/map", element: <CampusMap /> },
     { id: "analytics", label: "Analytics", icon: "📊", path: "/analytics", element: <AnalyticsPage /> },
     { id: "admin", label: "Admin", icon: "🛡️", path: "/admin", element: <AdminPage />, isAdminOnly: true },
+    { id: "schedules", label: "Schedules", icon: "🗂️", path: "/schedules", element: <SchedulesPage /> },
     // { id: "todo", label: "To-do", icon: "✅", path: "/todo", element: <Todo /> },
     // { id: "courses", label: "Courses", icon: "📘", path: "/courses", element: <Courses /> }
     // { id: "activities", label: "Activities", icon: "⚡️", path: "/activities", element: <Activities /> }
