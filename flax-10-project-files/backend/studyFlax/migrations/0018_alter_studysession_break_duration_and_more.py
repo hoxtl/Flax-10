@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0017_merge_0012_add_home_address_0016_merge_20260304_1733'),
+        ('studyFlax', '0017_usersettings_sleep_wake'),
     ]
 
     operations = [

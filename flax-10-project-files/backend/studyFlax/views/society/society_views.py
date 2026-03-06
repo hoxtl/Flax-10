@@ -69,20 +69,38 @@ def publish_changes(request, society_id):
 
 def build_update_notification(society, changes):
     message = build_change_message(changes)
+    action_url = get_notification_action_url(society.id, changes)
     return {
         'title': f"{society.name} has been updated",
         'message': message or 'Check out the latest changes.',
         'notification_type': 'society_update',
         'society_id': society.id,
+        'action_url': action_url,
     }
+
+
+def get_notification_action_url(society_id, changes):
+    if is_only_announcement_changes(changes):
+        return f"societies_{society_id}_announcements"
+    return f"societies_{society_id}"
+
+
+def is_only_announcement_changes(changes):
+    announcement_keys = {'announcements_added', 'announcements_updated', 'announcements_deleted'}
+    event_keys = {'events_added', 'events_updated', 'events_deleted'}
+    has_announcements = any(changes.get(k) for k in announcement_keys)
+    has_events = any(changes.get(k) for k in event_keys)
+    return has_announcements and not has_events
 
 
 def build_change_message(changes):
     parts = []
     parts.extend(format_change_list(changes.get('events_added', []), 'New event'))
     parts.extend(format_change_list(changes.get('events_updated', []), 'Updated event'))
+    parts.extend(format_change_list(changes.get('events_deleted', []), 'Deleted event'))
     parts.extend(format_change_list(changes.get('announcements_added', []), 'New announcement'))
     parts.extend(format_change_list(changes.get('announcements_updated', []), 'Updated announcement'))
+    parts.extend(format_change_list(changes.get('announcements_deleted', []), 'Deleted announcement'))
     return ' | '.join(parts) if parts else None
 
 

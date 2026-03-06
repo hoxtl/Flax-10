@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0017_merge_0012_add_home_address_0016_merge_20260304_1733'),
+        ('studyFlax', '0019_reconcile_user_home_columns'),
         ('studyFlax', '0019_remove_user_home_address_remove_user_home_latitude_and_more'),
     ]
 

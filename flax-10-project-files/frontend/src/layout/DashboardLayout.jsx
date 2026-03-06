@@ -12,6 +12,10 @@ import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
+import CreateSocietyModal from "../components/Society/CreateSocietyModal";
+import DeadlineModal from "../components/Modules/DeadlineModal";
+import { createSociety } from "../api/societyApi";
+import { useNotifications } from "../context/NotificationContext";
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -35,6 +39,7 @@ function parseStoredUser(user) {
     email: user.email,
     username: user.username,
     isAdmin: !!user.is_superuser,
+    role: user.role,
   };
 }
 
@@ -107,9 +112,9 @@ function MainArea({
   );
 }
 
-function QuickAddGate({ open, onClose, onSelectType }) {
+function QuickAddGate({ open, onClose, onSelectType, isTeacher }) {
   if (!open) return null;
-  return <QuickAddModal onClose={onClose} onSelectType={onSelectType} />;
+  return <QuickAddModal onClose={onClose} onSelectType={onSelectType} isTeacher={isTeacher} />;
 }
 
 function EventModalGate({ modal }) {
@@ -130,18 +135,22 @@ function useDashboardState(activeNav, onNavChange) {
   const user = useMemo(() => getUser(), []);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showSocietyModal, setShowSocietyModal] = useState(false);
+  const [deadlineModule, setDeadlineModule] = useState(null);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const showWeekBar =
-    activeNav === "calendar" || location.pathname.startsWith("/calendar");
+  const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
   const onPickNav = (id) => {
     onNavChange?.(id);
     setMobileSidebarOpen(false);
   };
-  const onSelectType = (type) => {
+  const onSelectType = (id, extra) => {
     setShowQuickAdd(false);
-    modal.openModal(null, type, selectedDate);
+    if (id === 'society') setShowSocietyModal(true);
+    else if (id === 'create_module') onPickNav('modules_create');
+    else if (id === 'add_deadline') setDeadlineModule(extra);
+    else modal.openModal(null, id, selectedDate);
   };
   return {
     isMobile,
@@ -155,6 +164,10 @@ function useDashboardState(activeNav, onNavChange) {
     modal,
     onPickNav,
     onSelectType,
+    showSocietyModal,
+    setShowSocietyModal,
+    deadlineModule,
+    setDeadlineModule,
   };
 }
 
@@ -185,15 +198,27 @@ function DashboardSidebars({
   );
 }
 
-function DashboardModals({ showQuickAdd, setShowQuickAdd, onSelectType, modal }) {
+function useSocietyCreation(setShowSocietyModal) {
+  const { addNotification } = useNotifications();
+  const create = async (form) => {
+    try {
+      await createSociety(form);
+      addNotification("Society created successfully!", "success");
+      setShowSocietyModal(false);
+    } catch (e) { addNotification("Failed to create society.", "error"); }
+  };
+  return create;
+}
+
+function DashboardModals({ state }) {
+  const createSoc = useSocietyCreation(state.setShowSocietyModal);
   return (
     <>
-      <QuickAddGate
-        open={showQuickAdd}
-        onClose={() => setShowQuickAdd(false)}
-        onSelectType={onSelectType}
-      />
-      <EventModalGate modal={modal} />
+      <QuickAddGate open={state.showQuickAdd} onClose={() => state.setShowQuickAdd(false)}
+        onSelectType={state.onSelectType} isTeacher={state.user?.role === 'teacher'} />
+      <EventModalGate modal={state.modal} />
+      {state.showSocietyModal && <CreateSocietyModal onClose={() => state.setShowSocietyModal(false)} onCreate={createSoc} />}
+      {state.deadlineModule && <DeadlineModal module={state.deadlineModule} onClose={() => state.setDeadlineModule(null)} startCreating={true} />}
     </>
   );
 }
@@ -226,12 +251,7 @@ function DashboardMain({ state, onNavChange, children }) {
       >
         {children}
       </MainArea>
-      <DashboardModals
-        showQuickAdd={showQuickAdd}
-        setShowQuickAdd={setShowQuickAdd}
-        onSelectType={onSelectType}
-        modal={modal}
-      />
+      <DashboardModals state={state} />
     </>
   );
 }

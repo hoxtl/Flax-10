@@ -139,3 +139,4 @@ function getPopupActions(event, onViewAnnouncement, editMode, handlers) {
     }
     return actions.length > 0 ? actions : null;
 }
+

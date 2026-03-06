@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('studyFlax', '0005_tasklist_task'),
-        ('studyFlax', '0006_enrollment_is_core'),
     ]
 
     operations = [

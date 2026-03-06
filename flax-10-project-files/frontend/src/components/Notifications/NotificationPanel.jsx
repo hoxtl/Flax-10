@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 
 import { useNotifications } from '../../context/NotificationContext';
-
+import { executeNotificationAction, parseNotificationAction, hasNotificationAction } from './utils/notificationAction';
 import './NotificationPanel.css';
 
-export function NotificationPanel({ onNavChange }) {
+export function NotificationPanel() {
     const { isOpen, notifications, closePanel, markAllRead, dismissNotification, clearAll } = useNotifications();
     const panelRef = useRef(null);
 
@@ -16,7 +16,7 @@ export function NotificationPanel({ onNavChange }) {
     return (
         <div className="notification-panel" ref={panelRef}>
             <PanelHeader onMarkAllRead={markAllRead} onClearAll={clearAll} count={notifications.length} />
-            <NotificationList notifications={notifications} onDismiss={dismissNotification} onNavChange={onNavChange} closePanel={closePanel} />
+            <NotificationList notifications={notifications} onDismiss={dismissNotification} onClose={closePanel} />
         </div>
     );
 }
@@ -74,7 +74,7 @@ function MenuDropdown({ onRead, onClear, close }) {
     );
 }
 
-function NotificationList({ notifications, onDismiss, onNavChange, closePanel }) {
+function NotificationList({ notifications, onDismiss, onClose }) {
     if (notifications.length === 0) {
         return <div className="notification-empty">No notifications</div>;
     }
@@ -82,32 +82,26 @@ function NotificationList({ notifications, onDismiss, onNavChange, closePanel })
     return (
         <ul className="notification-list">
             {notifications.map(n => (
-                <NotificationItem key={n.id} notification={n} onDismiss={onDismiss} onNavChange={onNavChange} closePanel={closePanel} />
+                <NotificationItem key={n.id} notification={n} onDismiss={onDismiss} onClose={onClose} />
             ))}
         </ul>
     );
 }
 
-function NotificationItem({ notification, onDismiss, onNavChange, closePanel }) {
-    const { id, title, message, read, created_at, action_url } = notification;
+function NotificationItem({ notification, onDismiss, onClose }) {
+    const { id, title, message, read, created_at } = notification;
+    const isClickable = hasNotificationAction(notification);
 
     const handleClick = (e) => {
-        // Prevent click if they clicked the dismiss button
         if (e.target.closest('.dismiss-btn')) return;
-        if (action_url) {
-            const path = action_url.replace(/^\//, '');
-            if (onNavChange) {
-                onNavChange(path);
-            } else {
-                const event = new CustomEvent('navigate', { detail: path });
-                window.dispatchEvent(event);
-            }
-            if (closePanel) closePanel();
-        }
+        if (!isClickable) return;
+        onClose();
+        const action = parseNotificationAction(notification);
+        executeNotificationAction(action);
     };
 
     return (
-        <li className={`notification-item ${read ? '' : 'unread'} ${action_url ? 'clickable' : ''}`} onClick={handleClick}>
+        <li className={`notification-item ${read ? '' : 'unread'} ${isClickable ? 'clickable' : ''}`} onClick={handleClick}>
             <div className="notification-content">
                 <span className="notification-title">{title}</span>
                 <span className="notification-message">{message}</span>

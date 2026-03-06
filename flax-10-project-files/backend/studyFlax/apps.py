@@ -6,4 +6,5 @@ class StudyflaxConfig(AppConfig):
 
     def ready(self):
         import studyFlax.signals.society_notifications  # noqa
+        import studyFlax.signals.ratification_notifications  # noqa
         import studyFlax.signals.user_signals  # noqa

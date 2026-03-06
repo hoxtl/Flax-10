@@ -133,3 +133,14 @@ body.focusShieldActive.focusShieldSage {
 body.focusShieldActive.focusShieldTerracotta {
   box-shadow: inset 0 0 120px 20px rgba(192, 90, 62, 0.12), inset 0 0 60px 10px rgba(192, 90, 62, 0.06);
 }
+
+/* Notification highlight effect for scroll-to elements */
+.notification-highlight {
+  animation: notificationPulse 2s ease-out;
+}
+
+@keyframes notificationPulse {
+  0%, 100% { box-shadow: none; }
+  25%, 75% { box-shadow: 0 0 0 4px rgba(158, 126, 93, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(158, 126, 93, 0.6); }
+}
