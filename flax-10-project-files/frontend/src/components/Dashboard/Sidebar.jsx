@@ -339,7 +339,6 @@ function MobileBottomBar({
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
     >
-      {/* Hamburger + separator */}
       <div className={styles.mobileBottomLeft}>
         <motion.button
           className={`${styles.mobileHamburgerBtn} ${
@@ -378,6 +377,20 @@ function MobileBottomBar({
           </AnimatePresence>
         </motion.button>
         <div className={styles.mobileBottomSeparator} />
+      </div>
+
+      <div className={styles.mobileBottomScrollHint}>
+        <div className={styles.mobileBottomScroll}>
+          {routes.map((item) => (
+            <MobileNavIcon
+              key={item.id}
+              item={item}
+              isActive={active === item.id}
+              onClick={() => onChange?.(item.id)}
+            />
+          ))}
+        </div>
+        <div className={styles.mobileScrollFade} />
       </div>
     </motion.div>
   );
