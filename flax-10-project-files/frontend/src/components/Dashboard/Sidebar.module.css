@@ -464,6 +464,12 @@
   padding: 12px 20px 8px;
 }
 
+.mobileDrawerLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
