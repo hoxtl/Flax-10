@@ -10,6 +10,7 @@ import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { ConfirmProvider } from "./context/ConfirmContext";
 import { NotificationToast } from "./components/Notifications";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
@@ -225,14 +226,16 @@ function ScreenWrap({ animKey, children }) {
 function AppProviders({ children }) {
   return (
     <NotificationProvider>
-      <CalendarProvider>
-        <TagProvider>
-          <TimerProvider>
-            {children}
-            <NotificationToast />
-          </TimerProvider>
-        </TagProvider>
-      </CalendarProvider>
+      <ConfirmProvider>
+        <CalendarProvider>
+          <TagProvider>
+            <TimerProvider>
+              {children}
+              <NotificationToast />
+            </TimerProvider>
+          </TagProvider>
+        </CalendarProvider>
+      </ConfirmProvider>
     </NotificationProvider>
   );
 }

@@ -62,7 +62,7 @@ function EventPopupContainer() {
 }
 
 function DeleteConfirmModal({ event, onConfirm, onCancel }) {
-    return <ConfirmModal title="Delete Event" message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`} onConfirm={onConfirm} onCancel={onCancel} />;
+    return <ConfirmModal title="Delete Event" message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`} onConfirm={onConfirm} onCancel={onCancel} isDanger={true} confirmText="Delete" />;
 }
 
 function getEventTag(event, getTag) {

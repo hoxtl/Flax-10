@@ -5,9 +5,6 @@ export function ModalContent(props) {
     if (props.sleepWarning) {
         return <SleepWarningView settings={props.sleepSettings} onCancel={props.handleCancelSleep} onConfirm={props.handleConfirmSleep} />;
     }
-    if (props.overlapWarning) {
-        return <OverlapWarningView warning={props.overlapWarning} onCancel={props.handleCancelSave} onConfirm={props.handleConfirmSave} />;
-    }
     return <EventFormView {...props} />;
 }
 
@@ -33,33 +30,6 @@ function SleepWarningView({ settings, onCancel, onConfirm }) {
             <div className="modal-actions">
                 <button className="btn-secondary" onClick={onCancel}>Cancel</button>
                 <button className="btn-primary" onClick={onConfirm}>Add Anyway</button>
-            </div>
-        </div>
-    );
-}
-
-function OverlapWarningView({ warning, onCancel, onConfirm }) {
-    return (
-        <div className="overlap-warning">
-            <div className="modal-header">
-                <h3>Scheduling Conflict</h3>
-                <button className="close-btn" onClick={onCancel}>x</button>
-            </div>
-            <div className="modal-body">
-                <p>This event overlaps with existing events:</p>
-                <ul className="overlap-list">
-                    {warning.map(e => (
-                        <li key={e.id}>
-                            <strong>{e.title}</strong><br />
-                            {`${new Date(e.start_time).toLocaleTimeString()} - ${new Date(e.end_time).toLocaleTimeString()}`}
-                        </li>
-                    ))}
-                </ul>
-                <p>Do you want to save it anyway?</p>
-            </div>
-            <div className="modal-actions">
-                <button className="btn-secondary" onClick={onCancel}>Cancel</button>
-                <button className="btn-primary" onClick={onConfirm}>Save Anyway</button>
             </div>
         </div>
     );

@@ -11,11 +11,25 @@ export function findOverlappingEvents(event, allEvents) {
     return allEvents.filter(e => eventsOverlap(event, e));
 }
 
-export function checkOverlapWithConfirm(event, allEvents) {
+export async function checkOverlapWithConfirm(event, allEvents, confirmFn) {
     const overlapping = findOverlappingEvents(event, allEvents);
     if (overlapping.length === 0) return true;
-    const names = overlapping.map(e => e.title).join(', ');
-    return confirm(`This event overlaps with: ${names}\\n\\nDo you want to continue?`);
+
+    const message = (
+        <div>
+            <p style={{ margin: '0 0 10px 0' }}>This overlaps with existing events:</p>
+            <ul style={{ paddingLeft: '20px', margin: '0 0 16px 0', fontSize: '0.9em', color: 'var(--text, #1f2937)' }}>
+                {overlapping.map(e => <li key={e.id}><strong>{e.title}</strong></li>)}
+            </ul>
+            <p style={{ margin: 0 }}>Do you want to save it anyway?</p>
+        </div>
+    );
+
+    return await confirmFn({
+        title: "Scheduling Conflict",
+        message,
+        confirmText: "Save Anyway"
+    });
 }
 
 function processGroup(groupEvents, columnsMap) {

@@ -50,7 +50,21 @@
     background: var(--border, #e5e7eb);
 }
 
-.confirmBtn {
+.primaryBtn {
+    padding: 0.5rem 1rem;
+    background: var(--primary, #3b82f6);
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.primaryBtn:hover {
+    background: var(--primary-hover, #2563eb);
+}
+
+.dangerBtn {
     padding: 0.5rem 1rem;
     background: #ef4444;
     border: none;
@@ -60,6 +74,6 @@
     font-size: 0.9rem;
 }
 
-.confirmBtn:hover {
+.dangerBtn:hover {
     background: #dc2626;
 }
