@@ -1,0 +1,28 @@
+.page {
+  padding: 18px;
+}
+
+.list {
+  display: grid; gap: 10px;
+  margin-top: 12px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+  display:flex; justify-content:space-between;
+  align-items:center;
+}
+.actions {
+  display:flex; gap: 8px;
+}
+
+.actions button {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--bg); cursor:pointer;
+}
+.empty {
+  color: #6b7280;
+}
