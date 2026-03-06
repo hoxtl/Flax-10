@@ -1,7 +1,18 @@
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
+import { SleepWarningModal } from '../../../common/SleepWarningModal';
 
 export function ModalContent(props) {
+    if (props.sleepWarning) {
+        return (
+            <SleepWarningModal
+                sleepTime={props.sleepSettings?.sleepTime}
+                wakeTime={props.sleepSettings?.wakeTime}
+                onConfirm={props.handleConfirmSleep}
+                onCancel={props.handleCancelSleep}
+            />
+        );
+    }
     if (props.overlapWarning) {
         return <OverlapWarningView warning={props.overlapWarning} onCancel={props.handleCancelSave} onConfirm={props.handleConfirmSave} />;
     }

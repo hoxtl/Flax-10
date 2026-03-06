@@ -13,7 +13,10 @@ import { createPortal } from "react-dom";
 import DateTimePicker from "./DateTimePicker";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
+import { getUserSettings } from "../../../api/userService";
 
 import styles from "./CreateTaskModal.module.css";
 
@@ -98,6 +101,8 @@ export default function CreateTaskModal({
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [sleepSettings, setSleepSettings] = useState(null);
+  const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
 
   const categoryOptions = useMemo(
     () => [
@@ -110,6 +115,24 @@ export default function CreateTaskModal({
   useEffect(() => {
     if (newListIdCreated) setForm((p) => ({ ...p, task_list: String(newListIdCreated) }));
   }, [newListIdCreated]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getUserSettings()
+      .then((data) => {
+        if (cancelled) return;
+        setSleepSettings({
+          sleep_time: data?.sleep_time?.slice(0, 5) || "23:00",
+          wake_time: data?.wake_time?.slice(0, 5) || "07:00",
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const selectedList = useMemo(
     () => sortedLists.find((l) => String(l.id) === String(form.task_list)),
@@ -129,8 +152,7 @@ export default function CreateTaskModal({
 
   const set = (field, val) => setForm((p) => ({ ...p, [field]: val }));
 
-  const handleSave = async () => {
-    if (!form.title.trim() || !form.due_date) return;
+  const doSave = async () => {
     setSaveError("");
     setSaving(true);
     const payload = {
@@ -154,6 +176,11 @@ export default function CreateTaskModal({
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = () => {
+    if (!form.title.trim() || !form.due_date || saving) return;
+    checkSleepAndRun(form.due_date, doSave);
   };
 
   const handleKey = (e) => {
@@ -346,5 +373,11 @@ export default function CreateTaskModal({
       </div>
     </div>
   );
-  return createPortal(modal, document.body);
+  return createPortal(
+    <>
+      {modal}
+      {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}
+    </>,
+    document.body
+  );
 }

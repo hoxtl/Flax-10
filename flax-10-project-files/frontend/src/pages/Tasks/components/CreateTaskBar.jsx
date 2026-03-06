@@ -9,6 +9,9 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+import { getUserSettings } from "../../../api/userService";
 
 import styles from "./CreateTaskBar.module.css";
 
@@ -31,8 +34,10 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
   const [saving, setSaving] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [enrolledModules, setEnrolledModules] = useState([]);
+  const [sleepSettings, setSleepSettings] = useState(null);
   const inputRef = useRef(null);
   const cardRef = useRef(null);
+  const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
 
   useEffect(() => {
     Promise.all([getModules(), getEnrollments()])
@@ -44,6 +49,25 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
       })
       .catch(() => setEnrolledModules([]));
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getUserSettings()
+      .then((data) => {
+        if (cancelled) return;
+        setSleepSettings({
+          sleep_time: data?.sleep_time?.slice(0, 5) || "23:00",
+          wake_time: data?.wake_time?.slice(0, 5) || "07:00",
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     const next = (defaultListId || sortedLists[0]?.id) ?? "";
     if (!next) return;
@@ -68,14 +92,12 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
     };
   }, [inputFocused, externalInputRef]);
 
-  const handleSubmit = async (e) => {
-    e?.preventDefault();
-    const t = title.trim();
-    if (!t || saving || !onAddTask) return;
+  const doAdd = async (taskTitle) => {
+    if (saving || !onAddTask) return;
     setSaving(true);
     try {
       await onAddTask({
-        title: t,
+        title: taskTitle,
         description: "",
         priority: "medium",
         energy_level: "",
@@ -89,6 +111,17 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
+    const t = title.trim();
+    if (!t || saving || !onAddTask) return;
+    if (defaultDueDate) {
+      checkSleepAndRun(defaultDueDate, () => doAdd(t));
+      return;
+    }
+    await doAdd(t);
   };
 
   const showOptions = inputFocused;
@@ -109,6 +142,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
   );
 
   return (
+    <>
     <form className={styles.card} onSubmit={handleSubmit} ref={cardRef}>
       <div className={styles.inputRow}>
         <input
@@ -194,5 +228,7 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
         </div>
       </div>
     </form>
+    {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}
+    </>
   );
 }
