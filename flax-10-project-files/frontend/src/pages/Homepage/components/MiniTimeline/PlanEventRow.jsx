@@ -208,36 +208,6 @@ export function PlanEventRow({
               {fmtDurationShort(durationMins)}
             </span>
           )}
-          {matchTask && onTaskToggle && (
-            <button
-              type="button"
-              className={styles.planTimelineCardCheck}
-              onClick={(e) => {
-                e.stopPropagation();
-                onTaskToggle(matchTask, !matchTask.completed);
-              }}
-              aria-label={matchTask.completed ? "Mark incomplete" : "Mark done"}
-              aria-pressed={matchTask.completed}
-            >
-              {matchTask.completed ? "✓" : ""}
-            </button>
-          )}
-          {!matchTask && onToggleComplete && (
-            <button
-              type="button"
-              className={`${styles.planTimelineEventCheck} ${completedEventIds.has(row.id) ? styles.planTimelineEventCheckDone : ""}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleComplete(row.id);
-              }}
-              aria-label={
-                completedEventIds.has(row.id) ? "Mark incomplete" : "Mark complete"
-              }
-              title={completedEventIds.has(row.id) ? "Completed" : "Mark as done"}
-            >
-              {completedEventIds.has(row.id) ? "✓" : ""}
-            </button>
-          )}
           {isPast &&
             !completedEventIds.has(row.id) &&
             !matchTask?.completed &&

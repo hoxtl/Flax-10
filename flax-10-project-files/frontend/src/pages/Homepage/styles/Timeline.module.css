@@ -437,13 +437,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  /* Live Compass: hairline 1px dark line; NOW = bold tag left of spine */
+  /* Live Compass: glowing green line */
   .planTimelineNowLine {
     flex: 1;
     height: 1.5px;
-    background: #2c1810;
-    opacity: 0.25;
+    background: #7BB38E;
     border-radius: 1px;
+    box-shadow: 0 0 6px rgba(123, 179, 142, 0.7), 0 0 14px rgba(123, 179, 142, 0.3);
   }
   .planTimelineNowWrap {
     display: flex;
@@ -453,16 +453,6 @@
     grid-column: 3;
     margin-left: 0;
     padding-left: 0;
-  }
-  .planTimelineNowWrap::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #84A98C;
-    flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 3px rgba(132, 169, 140, 0.35);
-    animation: nowDotPulse 2s ease-in-out infinite;
   }
   @keyframes nowDotPulse {
     0%, 100% { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 3px rgba(132, 169, 140, 0.35); }
@@ -1458,8 +1448,9 @@
 
   .timelineHeaderRight {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
     flex-shrink: 0;
   }
 
@@ -2463,10 +2454,10 @@
   }
 
   .planTimelineConflictPairLabelText {
-    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
     color: #b06a47;
     text-transform: uppercase;
     margin-right: 2px;
@@ -2721,10 +2712,10 @@
   }
 
   .planTimelineGapShortDur {
-    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #7B6751;
     flex-shrink: 0;

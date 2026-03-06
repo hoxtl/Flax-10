@@ -186,11 +186,8 @@ export function MiniTimeline({
           <span className={styles.planTimelineNowStripTimer}>{formatTime(currentBlock.end_time)}</span>
         </div>
       )}
-      <motion.div
+      <div
         className={`${styles.planTimelineList} ${rows.some((r) => r.type === "eventGroup") ? styles.planTimelineListHasConflict : ""}`}
-        initial="hidden"
-        animate="visible"
-        variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
       >
         {rows.length === 0 && (
           <div className={styles.planTimelineEmpty}>
@@ -200,15 +197,14 @@ export function MiniTimeline({
         {rows.map((row) => (
           <motion.div
             key={row.id}
-            variants={{
-              hidden: { opacity: 0, y: 6 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
-            }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
           >
             {renderRow(row)}
           </motion.div>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }

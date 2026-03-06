@@ -21,7 +21,7 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
   const navigate = useNavigate();
   const hasFocusNow = !!onStartFocus;
 
-  const handleFocus = () => (onStartFocus ? onStartFocus() : navigate("/timer"));
+  const handleFocus = () => (onStartFocus ? onStartFocus() : navigate("/timer", { state: { fromTaskPlay: true } }));
   const handleAddEvent = () => (onAddEvent ? onAddEvent() : navigate("/calendar"));
   const handleOpenMap = () => navigate("/map");
   const handleRePlan = () => {
