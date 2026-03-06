@@ -175,6 +175,15 @@ task_list_fixtures = (
 # Format: (title, description, priority, estimated_blocks, days_from_now, list_name)
 # list_name must match one of the names in task_list_fixtures above
 personal_task_fixtures = (
+    # ── Overdue ──
+    ("Submit ethics form",              "Missed the window — chase the admin office and resubmit ASAP.",              "urgent", 1, -1, "University"),
+    ("Pay rent",                        "Bank transfer due — check landlord details before sending.",                  "urgent", 1, -2, "Finance"),
+    ("Return library books",            "Two books overdue — return before the fine increases further.",               "medium", 1, -3, "University"),
+    ("Reply to careers email",          "Careers service sent a follow-up — respond and confirm your slot.",          "high",   1, -4, "Internships"),
+    ("File lecture notes — week 5",     "Consolidate and file your notes before the backlog grows.",                  "medium", 2, -5, "University"),
+    ("Cancel free trial",               "Free period ended — cancel before the next billing cycle.",                  "low",    1, -6, "Finance"),
+    ("Log gym sessions for the month",  "Track all sessions in your fitness log before you forget the details.",      "low",    1, -7, "Health"),
+
     # ── Urgent / today ──
     ("Send supervisor check-in",        "Confirm this week's milestones and attach your latest draft snapshot.",       "urgent", 1,  0, "University"),
     ("Plan the week ahead",             "Look at the week's deadlines and block out study time in your calendar.",   "medium", 1,  0, "Personal"),
