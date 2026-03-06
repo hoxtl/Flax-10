@@ -12,13 +12,14 @@ export function ConfirmProvider({ children }) {
         });
     }, []);
 
-    const onConfirm = () => { state.resolve?.(true); setState({ isOpen: false }); };
-    const onCancel = () => { state.resolve?.(false); setState({ isOpen: false }); };
+    const onConfirm = () => { state.resolve?.(state.confirmValue ?? true); setState({ isOpen: false }); };
+    const onAlternate = () => { state.resolve?.(state.alternateValue ?? 'ALTERNATE'); setState({ isOpen: false }); };
+    const onCancel = () => { state.resolve?.(state.cancelValue ?? false); setState({ isOpen: false }); };
 
     return (
         <ConfirmContext.Provider value={confirm}>
             {children}
-            {state.isOpen && <ConfirmModal {...state} onConfirm={onConfirm} onCancel={onCancel} />}
+            {state.isOpen && <ConfirmModal {...state} onConfirm={onConfirm} onAlternate={onAlternate} onCancel={onCancel} />}
         </ConfirmContext.Provider>
     );
 }

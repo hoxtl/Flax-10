@@ -3,8 +3,9 @@ import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
 import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
+import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
-function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify) {
+function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn) {
   return {
     modules, enrollments, loading,
     handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
@@ -12,7 +13,7 @@ function useModuleActions(modules, enrollments, loading, setModules, setEnrollme
     toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
       ? handleDisenrol(m, enrollments, setEnrollments, notify)
       : handleEnrollment(m, setEnrollments, notify),
-    handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, cb),
+    handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, confirmFn, cb),
     handleModuleCreated: (m) => { setModules(prev => [...prev, m]); notify('Module created successfully', 'success'); },
     handleModuleUpdated: (m) => { setModules(prev => prev.map(x => x.id === m.id ? m : x)); notify('Module updated successfully', 'success'); },
   };
@@ -67,8 +68,14 @@ async function confirmDelete(module, setModules, notify, onSuccess) {
   }
 }
 
-async function handleDeleteModule(module, setModules, notify, onSuccess) {
-  const confirmed = confirm(`Delete ${module.module_name}? This will delete enrollments too.`);
+async function handleDeleteModule(module, setModules, notify, confirmFn, onSuccess) {
+  const confirmed = await confirmFn({
+    title: "Delete Module",
+    message: `Delete ${module.module_name}? This will delete enrollments too.`,
+    confirmText: "Delete",
+    cancelText: "Cancel",
+    isDanger: true
+  });
   if (!confirmed) return;
   await confirmDelete(module, setModules, notify, onSuccess);
 }
@@ -79,7 +86,8 @@ export default function useModules() {
   const [enrollments, setEnrollments] = useState([]);
   const { addNotification } = useNotifications();
   const notify = createNotify(addNotification);
+  const confirmFn = useConfirm();
 
   useEffect(() => { loadData(setLoading, setModules, setEnrollments, notify); }, []);
-  return useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify);
+  return useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn);
 }
