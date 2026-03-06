@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import styles from "./DashboardLayout.module.css";
@@ -132,7 +132,12 @@ function EventModalGate({ modal }) {
 function useDashboardState(activeNav, onNavChange) {
   const location = useLocation();
   const isMobile = useIsMobile(900);
-  const user = useMemo(() => getUser(), []);
+  const [user, setUser] = useState(() => getUser());
+  useEffect(() => {
+    const sync = () => setUser(getUser());
+    window.addEventListener("auth-changed", sync);
+    return () => window.removeEventListener("auth-changed", sync);
+  }, []);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showSocietyModal, setShowSocietyModal] = useState(false);

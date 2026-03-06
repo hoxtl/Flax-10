@@ -234,23 +234,6 @@ export function PlanEventRow({
               {fmtDurationShort(durationMins)}
             </span>
           )}
-          {isPast &&
-            !completedEventIds.has(row.id) &&
-            !matchTask?.completed &&
-            onReschedule &&
-            isToday(selectedDate) && (
-              <button
-                type="button"
-                className={styles.planTimelineMissedBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onReschedule(item);
-                }}
-                title="Reschedule this missed session"
-              >
-                Reschedule?
-              </button>
-            )}
         </div>
         {showConflictPopover && (
           <div className={styles.planTimelineConflictPopover}>
