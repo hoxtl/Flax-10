@@ -55,11 +55,11 @@ export default function SummaryCards({ data }) {
 
   const cards = [
     { icon: '⏱', label: 'Total Study Hours', value: summary.total_study_hours, unit: 'hrs', color: '#9E7E5D', delay: 0, tooltip: 'Total focused study time recorded across all sessions' },
-    { icon: '🎯', label: 'Sessions', value: summary.total_sessions, unit: null, color: '#5C6BC0', delay: 0.06, tooltip: 'Number of study sessions completed in this period' },
-    { icon: '📏', label: 'Avg Session', value: summary.avg_session_minutes, unit: 'min', color: '#26A69A', delay: 0.12, tooltip: 'Average duration of a single study session' },
-    { icon: '🔥', label: 'Current Streak', value: summary.current_streak_days, unit: 'days', color: '#EF6C00', delay: 0.18, tooltip: 'Consecutive days with at least one study session' },
-    { icon: '🏆', label: 'Longest Session', value: summary.longest_session_minutes, unit: 'min', color: '#7B1FA2', delay: 0.24, tooltip: 'Your longest single study session ever recorded' },
-    { icon: '📅', label: 'Active Days', value: activeDays, unit: null, color: '#388E3C', delay: 0.30, tooltip: 'Days in this period where you studied at least once' },
+    { icon: '🎯', label: 'Sessions', value: summary.total_sessions, unit: null, color: '#5C6BC0', delay: 0.03, tooltip: 'Number of study sessions completed in this period' },
+    { icon: '📏', label: 'Avg Session', value: summary.avg_session_minutes, unit: 'min', color: '#26A69A', delay: 0.06, tooltip: 'Average duration of a single study session' },
+    { icon: '🔥', label: 'Current Streak', value: summary.current_streak_days, unit: 'days', color: '#EF6C00', delay: 0.09, tooltip: 'Consecutive days with at least one study session' },
+    { icon: '🏆', label: 'Longest Session', value: summary.longest_session_minutes, unit: 'min', color: '#7B1FA2', delay: 0.12, tooltip: 'Your longest single study session ever recorded' },
+    { icon: '📅', label: 'Active Days', value: activeDays, unit: null, color: '#388E3C', delay: 0.15, tooltip: 'Days in this period where you studied at least once' },
   ];
 
   return (

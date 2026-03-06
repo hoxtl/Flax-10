@@ -1,51 +1,51 @@
 import styles from "../../pages/Timer/TimerPage.module.css";
 import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
-import { OvertimePopup, GoalModal, BreakModal } from './TimerPopups';
+import { OvertimePopup, GoalModal, BreakModal, EndEarlyModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
 
-/** Header component with title and history toggle */
-const TimerHeader = ({ onOpenHistory, isMobile }) => (
-    <div className={styles.header}>
-        <div className={styles.title}>Study Timer</div>
-        {!isMobile && (
-            <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">
-                History 📜
-            </button>
-        )}
-    </div>
-);
+const TimerHeader = ({ onOpenHistory, isMobile }) => {
+    const title = <div className={styles.title}>Study Timer</div>;
+    const btn = !isMobile ? <button className={styles.historyButton} onClick={onOpenHistory} aria-label="History">History 📜</button> : null;
+    return <div className={styles.header}>{title}{btn}</div>;
+};
 
-/** Main timer UI layout including visuals, controls, and settings */
-export const MainSection = ({ t, onOpenHistory, isMobile }) => (
-    <>
-        <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />
-        <TaskInput value={t.task} onChange={t.setTask} />
+const TimerTopSection = ({ t, onOpenHistory, isMobile }) => {
+    const mobileBtn = isMobile ? <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>View History 📜</button> : null;
+    const header = <TimerHeader onOpenHistory={onOpenHistory} isMobile={isMobile} />;
+    const input = <TaskInput value={t.task} onChange={t.setTask} />;
+    const tree = <TreeAnimation progress={t.progress} mode={t.mode} />;
+    return <>{header}{input}{mobileBtn}{tree}</>;
+};
 
-        {isMobile && (
-            <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>
-                View History 📜
-            </button>
-        )}
+const TimerInfoSection = ({ t }) => {
+    const isOvertime = t.isOvertime || t.isBreakOvertime;
+    const indicator = <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />;
+    const status = <SessionStatus current={t.completedSessions} total={t.targetSessions} />;
+    const display = <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={isOvertime} />;
+    return <>{indicator}{status}{display}</>;
+};
 
-        <TreeAnimation progress={t.progress} mode={t.mode} />
+const TimerBottomSection = ({ t }) => {
+    const controls = <TimerControls isActive={t.isActive} isPaused={t.isPaused} onToggle={() => t.setIsActive(true)} onPause={t.togglePause} onReset={t.resetTimer} totalPaused={t.totalPaused} onEndEarly={() => t.setModal('endEarly')} />;
+    const settings = <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />;
+    const sound = <SoundSelector />;
+    return <>{controls}{settings}{sound}</>;
+};
 
-        <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
-        <SessionStatus current={t.completedSessions} total={t.targetSessions} />
-        <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={t.isOvertime || t.isBreakOvertime} />
-        <TimerControls isActive={t.isActive} onToggle={() => t.setIsActive(!t.isActive)} onReset={t.resetTimer} />
-        <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
-        <SoundSelector />
-    </>
-);
+export const MainSection = ({ t, onOpenHistory, isMobile }) => {
+    const top = <TimerTopSection t={t} onOpenHistory={onOpenHistory} isMobile={isMobile} />;
+    const info = <TimerInfoSection t={t} />;
+    const bottom = <TimerBottomSection t={t} />;
+    return <>{top}{info}{bottom}</>;
+};
 
-/** Container for all timerrelated modals and popups */
-export const PopupSection = ({ t, showHistory, onCloseHistory }) => (
-    <>
-        {showHistory && <HistoryModal onClose={onCloseHistory} />}
-        {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} />}
-        {t.isBreakOvertime && <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} />}
-        {t.modal === 'break' && <BreakModal onAction={t.handlers.break} />}
-        {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.totalWork} breakTime={t.totalBreak} onAction={t.handlers.goal} />}
-    </>
-);
+export const PopupSection = ({ t, showHistory, onCloseHistory }) => {
+    const h = showHistory ? <HistoryModal onClose={onCloseHistory} /> : null;
+    const oWork = t.isOvertime ? <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} /> : null;
+    const oBreak = t.isBreakOvertime ? <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} /> : null;
+    const bModal = t.modal === 'break' ? <BreakModal onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} /> : null;
+    const gModal = t.modal === 'goal' ? <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} /> : null;
+    const eModal = t.modal === 'endEarly' ? <EndEarlyModal onConfirm={t.handlers.endEarly} onCancel={() => t.setModal(null)} /> : null;
+    return <>{h}{oWork}{oBreak}{bModal}{gModal}{eModal}</>;
+};

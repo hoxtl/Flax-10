@@ -16,33 +16,26 @@ function NotificationPrompt({ permission, request }) {
   );
 }
 
-export default function TimerPage() {
-  const timerData = useTimerContext();
-  const [showHistory, setShowHistory] = useState(false);
-  const { permission, request } = useNotificationPermission();
-
+const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
-
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 900);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  return isMobile;
+};
 
+export default function TimerPage() {
+  const t = useTimerContext();
+  const [showHistory, setShowHistory] = useState(false);
+  const { permission, request } = useNotificationPermission();
+  const isMobile = useIsMobile();
   return (
     <div className={styles.container}>
       <NotificationPrompt permission={permission} request={request} />
-
-      <MainSection
-        t={timerData}
-        onOpenHistory={() => setShowHistory(true)}
-        isMobile={isMobile}
-      />
-      <PopupSection
-        t={timerData}
-        showHistory={showHistory}
-        onCloseHistory={() => setShowHistory(false)}
-      />
+      <MainSection t={t} onOpenHistory={() => setShowHistory(true)} isMobile={isMobile} />
+      <PopupSection t={t} showHistory={showHistory} onCloseHistory={() => setShowHistory(false)} />
     </div>
   );
 }
