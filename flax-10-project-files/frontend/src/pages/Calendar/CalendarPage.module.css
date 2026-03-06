@@ -59,8 +59,11 @@
 
 .mainContent {
   flex: 1;
+  min-height: 0;
   overflow-y: hidden;
   background: white;
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
+  display: flex;
+  flex-direction: column;
 }
