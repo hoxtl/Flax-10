@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { AnimatePresence, motion } from "framer-motion";
 import { searchUsers } from '../../api/userService';
 import { getModules } from '../../api/moduleApi';
 import { fetchSocieties } from '../../api/societyApi';
@@ -223,7 +224,19 @@ const useUserSearchEffects = (query, selectedModules, selectedSocieties, setUser
 export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     <div ref={fRef} className={styles.relativeContainer}>
         <button onClick={setOpen} className={styles.filterBtn}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter</button>
-        {isOpen && <FilterDropdown {...props} />}
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ originY: 0, originX: 1 }}
+                >
+                    <FilterDropdown {...props} />
+                </motion.div>
+            )}
+        </AnimatePresence>
     </div>
 );
 

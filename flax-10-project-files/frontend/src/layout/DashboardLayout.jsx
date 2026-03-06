@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
+
 import styles from "./DashboardLayout.module.css";
 import TopBar from "../components/Dashboard/Topbar";
 import Sidebar from "../components/Dashboard/Sidebar";
@@ -9,7 +11,7 @@ import { useEventModal, useCalendar } from "../context/CalendarContext";
 import { authService } from "../api/authService";
 import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingChat from "../components/FloatingChat";
-import { useLocation } from "react-router-dom";
+import { BackToTop } from "../components/Pagination/Pagination";
 import CreateSocietyModal from "../components/Society/CreateSocietyModal";
 import DeadlineModal from "../components/Modules/DeadlineModal";
 import { createSociety } from "../api/societyApi";
@@ -64,9 +66,14 @@ async function handleLogoutClick() {
 
 function PageContent({ activeNav, children }) {
   const isMapPage = activeNav === "map";
+  const isTasksPage = activeNav === "tasks";
   const mapStyle = { padding: 0, overflow: "hidden", height: "100%" };
+  const tasksStyle = { padding: 0 };
   return (
-    <div className={styles.content} style={isMapPage ? mapStyle : undefined}>
+    <div
+      className={styles.content}
+      style={isMapPage ? mapStyle : isTasksPage ? tasksStyle : undefined}
+    >
       {children}
     </div>
   );
@@ -86,21 +93,23 @@ function MainArea({
   children,
 }) {
   return (
-    <div className={styles.main}>
-      {/* Topbar shown on desktop only */}
-      {!isMobile && (
-        <TopBar
-          user={user}
-          onAddClick={onQuickAdd}
-          onSettingsClick={onSettingsClick}
-          onLogoutClick={onLogoutClick}
-          onProfileClick={onProfileClick}
-          onNavChange={onNavChange}
-          activeNav={activeNav}
-        />
-      )}
-      {showWeekBar && <WeekBar date={selectedDate} />}
-      <PageContent activeNav={activeNav}>{children}</PageContent>
+    <div className={styles.main} data-dashboard-main>
+      <div className={styles.mainContent} data-dashboard-main-content>
+        {/* Topbar shown on desktop only */}
+        {!isMobile && (
+          <TopBar
+            user={user}
+            onAddClick={onQuickAdd}
+            onSettingsClick={onSettingsClick}
+            onLogoutClick={onLogoutClick}
+            onProfileClick={onProfileClick}
+            onNavChange={onNavChange}
+            activeNav={activeNav}
+          />
+        )}
+        {showWeekBar && <WeekBar date={selectedDate} />}
+        <PageContent activeNav={activeNav}>{children}</PageContent>
+      </div>
     </div>
   );
 }
@@ -125,7 +134,12 @@ function EventModalGate({ modal }) {
 function useDashboardState(activeNav, onNavChange) {
   const location = useLocation();
   const isMobile = useIsMobile(900);
-  const user = useMemo(() => getUser(), []);
+  const [user, setUser] = useState(() => getUser());
+  useEffect(() => {
+    const sync = () => setUser(getUser());
+    window.addEventListener("auth-changed", sync);
+    return () => window.removeEventListener("auth-changed", sync);
+  }, []);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showSocietyModal, setShowSocietyModal] = useState(false);
@@ -134,7 +148,6 @@ function useDashboardState(activeNav, onNavChange) {
   const selectedDate = calendarState?.selectedDate || new Date();
   const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
-
   const t = useTimerContext();
   const [pendingNav, setPendingNav] = useState(null);
 
@@ -158,10 +171,21 @@ function useDashboardState(activeNav, onNavChange) {
     else modal.openModal(null, id, selectedDate);
   };
   return {
-    isMobile, user, mobileSidebarOpen, setMobileSidebarOpen,
-    showQuickAdd, setShowQuickAdd, selectedDate, showWeekBar,
-    modal, onPickNav, onSelectType,
-    showSocietyModal, setShowSocietyModal, deadlineModule, setDeadlineModule,
+    isMobile,
+    user,
+    mobileSidebarOpen,
+    setMobileSidebarOpen,
+    showQuickAdd,
+    setShowQuickAdd,
+    selectedDate,
+    showWeekBar,
+    modal,
+    onPickNav,
+    onSelectType,
+    showSocietyModal,
+    setShowSocietyModal,
+    deadlineModule,
+    setDeadlineModule,
     handleNavChange,
     pendingNav,
     setPendingNav,
@@ -180,7 +204,6 @@ function DashboardSidebars({
   onLogout,
   onProfile,
 }) {
-  // Sidebar shown on mobile only
   if (!isMobile) return null;
   return (
     <Sidebar
@@ -234,7 +257,7 @@ function DashboardMain({ state, onNavChange, children }) {
     onSelectType,
     isMobile,
     t,
-    setPendingNav
+    setPendingNav,
   } = state;
   return (
     <>
@@ -265,11 +288,9 @@ function DashboardMain({ state, onNavChange, children }) {
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
-  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav, handleNavChange, pendingNav, setPendingNav, t, setShowQuickAdd } =
-    state;
+  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav, handleNavChange, pendingNav, setPendingNav, t, setShowQuickAdd } = state;
   return (
     <div className={styles.root}>
-      {/* Sidebar — mobile only */}
       <DashboardSidebars
         {...state}
         activeNav={activeNav}
@@ -277,7 +298,6 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         onLogout={handleLogoutClick}
         onProfile={() => handleNavChange("profile")}
       />
-      {/* Main area — Topbar shown inside on desktop */}
       <DashboardMain
         state={{ ...state, activeNav, isMobile }}
         onNavChange={handleNavChange}
@@ -285,7 +305,6 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
         {children}
       </DashboardMain>
       <FloatingChat />
-
       {pendingNav && (
         <LeaveTimerModal
           onCancel={() => setPendingNav(null)}
@@ -308,8 +327,24 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
             }
             setPendingNav(null);
           }}
+          onExit={() => {
+            t.setIsActive(false);
+            t.resetTimer();
+            if (pendingNav === "QUICK_ADD") {
+              setShowQuickAdd(true);
+            } else {
+              onNavChange(pendingNav);
+            }
+            setPendingNav(null);
+          }}
         />
       )}
+
+      {activeNav !== "map" &&
+        activeNav !== "modules" &&
+        activeNav !== "tasks" && (
+          <BackToTop containerSelector="[data-dashboard-main]" />
+        )}
     </div>
   );
 }

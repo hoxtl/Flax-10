@@ -9,6 +9,11 @@ async function submitOnboarding(year, major) {
     headers: { "Content-Type": "application/json", "Authorization": `Token ${token}` },
     body: JSON.stringify({ year, major }),
   });
+  const current = JSON.parse(localStorage.getItem("user") || "{}");
+  current.year = year;
+  current.major = major;
+  localStorage.setItem("user", JSON.stringify(current));
+  window.dispatchEvent(new Event("auth-changed"));
 }
 
 function useOnboardingState() {

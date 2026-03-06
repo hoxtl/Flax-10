@@ -1,0 +1,158 @@
+import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import styles from "./DeadlinesWidget.module.css";
+
+const MAX_SHOWN = 3;
+
+function getDayCount(dueDate) {
+  const ms = new Date(dueDate).getTime() - Date.now();
+  return Math.floor(ms / 86400000);
+}
+
+function getUrgencyTier(dueDate) {
+  const days = getDayCount(dueDate);
+  if (days < 0)   return "overdue";
+  if (days <= 2)  return "critical";
+  if (days <= 5)  return "urgent";
+  if (days <= 14) return "upcoming";
+  return "distant";
+}
+
+function getDaysLabel(dueDate) {
+  const days = getDayCount(dueDate);
+  if (days < 0) {
+    const over = Math.abs(days);
+    return over === 0 ? "Overdue" : over === 1 ? "1d overdue" : `${over}d overdue`;
+  }
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return `${days}d`;
+}
+
+const TIER_TEXT = {
+  overdue:  "#B83232",
+  critical: "#B86050",
+  urgent:   "#A06030",
+  upcoming: "#8C6D3F",
+  distant:  "#A89279",
+};
+
+const listVariants = {
+  visible: { transition: { staggerChildren: 0.05, delayChildren: 0.04 } },
+};
+
+const rowVariants = {
+  hidden:  { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
+};
+
+export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModule }) {
+  const { sorted, totalCount } = useMemo(() => {
+    const list = [...(deadlines || [])].filter((d) => d.start_due_date);
+    list.sort((a, b) => {
+      const aOver = getUrgencyTier(a.start_due_date) === "overdue";
+      const bOver = getUrgencyTier(b.start_due_date) === "overdue";
+      if (aOver !== bOver) return aOver ? -1 : 1;
+      return new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime();
+    });
+    return { sorted: list.slice(0, MAX_SHOWN), totalCount: list.length };
+  }, [deadlines]);
+
+  if (!Array.isArray(deadlines)) return null;
+
+  const hiddenCount = totalCount - MAX_SHOWN;
+
+  return (
+    <div className={styles.root}>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <div className={styles.headerIconWrap}>
+            <AlertCircle className={styles.headerIcon} size={18} strokeWidth={1.85} aria-hidden />
+          </div>
+          <span className={styles.headerTitle}>Deadlines</span>
+        </div>
+      </div>
+
+      {sorted.length === 0 ? (
+        <div className={styles.emptyState}>
+          <CheckCircle2 size={26} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
+          <p className={styles.emptyTitle}>All caught up</p>
+          <p className={styles.emptySubtitle}>No upcoming deadlines</p>
+        </div>
+      ) : (
+        <motion.div
+          className={styles.list}
+          role="list"
+          initial="hidden"
+          animate="visible"
+          variants={listVariants}
+        >
+          {sorted.map((d, idx) => (
+            <DeadlineRow
+              key={d.id}
+              deadline={d}
+              isLast={idx === sorted.length - 1 && hiddenCount <= 0}
+              onSelect={() => onSelectDeadline?.(d)}
+              onSelectModule={onSelectModule}
+            />
+          ))}
+        </motion.div>
+      )}
+
+      <div className={styles.footer}>
+        <Link to="/modules?filter=enrolled" className={styles.footerLinkMuted}>
+          View my modules
+          <ArrowRight size={11} strokeWidth={2} aria-hidden />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
+  const due  = deadline.start_due_date;
+  const tier = getUrgencyTier(due);
+  const daysLabel  = getDaysLabel(due);
+  const title      = deadline.assessment_title || deadline.title || "Assignment";
+  const moduleCode = deadline.module_code || "";
+  const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
+  const textColor = TIER_TEXT[tier] || "#A89279";
+
+  return (
+    <motion.div
+      role="button"
+      tabIndex={0}
+      className={`${styles.row} ${isLast ? styles.rowLast : ""}`}
+      variants={rowVariants}
+      onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect?.(); }
+      }}
+    >
+      <div className={styles.rowLeft}>
+        <div className={styles.rowTopPills}>
+          {moduleCode && (
+            <button
+              type="button"
+              className={styles.moduleCodePill}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectModule?.({ code: moduleCode, id: deadline.module_id ?? deadline.module ?? null });
+              }}
+            >
+              {moduleCode}
+            </button>
+          )}
+          <span className={styles.deadlineTypePill}>{typeLabel}</span>
+        </div>
+        <span className={styles.rowTitle} title={title}>{title}</span>
+      </div>
+      <div className={styles.rowRight}>
+        <span className={styles.daysLabel} style={{ color: textColor }}>{daysLabel}</span>
+      </div>
+    </motion.div>
+  );
+}

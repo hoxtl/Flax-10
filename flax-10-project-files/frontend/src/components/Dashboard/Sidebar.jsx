@@ -1,13 +1,28 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import styles from "./Sidebar.module.css";
+
 import { APP_ROUTES } from "../../lib/routes";
+import { getUpcomingDeadlines } from "../../api/deadlineApi";
+
+import styles from "./Sidebar.module.css";
 
 const EXPANDED_W = 224;
 const COLLAPSED_W = 72;
 const NAV_SPRING = { type: "spring", stiffness: 400, damping: 25 };
 const SIDEBAR_SPRING = { type: "spring", stiffness: 280, damping: 30 };
 const LOGO_SPRING = { type: "spring", stiffness: 400, damping: 20 };
+
+const PRESSURE_ROUTE_IDS = ["tasks", "home"];
+const MS_48H = 48 * 60 * 60 * 1000;
+
+function hasDeadlineWithin48Hours(deadlines) {
+  if (!Array.isArray(deadlines) || deadlines.length === 0) return false;
+  const now = Date.now();
+  return deadlines.some((d) => {
+    const due = d.start_due_date ? new Date(d.start_due_date).getTime() : NaN;
+    return Number.isFinite(due) && due - now > 0 && due - now < MS_48H;
+  });
+}
 
 function UserFooter({ user, open, onSettings, onLogout, onProfile, isMobile }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -75,11 +90,14 @@ function Hamburger({ onClick }) {
   );
 }
 
-function LogoMark() {
+function LogoMark({ sidebarHovered }) {
   return (
     <motion.div
       className={styles.logoMark}
-      whileHover={{ rotate: 8, scale: 1.08 }}
+      animate={{
+        rotate: sidebarHovered ? 8 : 0,
+        scale: sidebarHovered ? 1.08 : 1,
+      }}
       transition={LOGO_SPRING}
     />
   );
@@ -102,7 +120,7 @@ function BrandName() {
 function SidebarHeader({ open, isMobile, onToggle }) {
   return (
     <div className={styles.header}>
-      {isMobile ? <Hamburger onClick={onToggle} /> : <LogoMark />}
+      {isMobile ? <Hamburger onClick={onToggle} /> : <LogoMark sidebarHovered={open} />}
       <AnimatePresence>{open && <BrandName />}</AnimatePresence>
     </div>
   );
@@ -132,8 +150,13 @@ function ActivePill() {
   );
 }
 
-function NavItem({ item, isActive, open, onClick }) {
-  const cls = `${styles.navItem} ${isActive ? styles.navItemActive : ""}`;
+function NavItem({ item, isActive, open, onClick, hasPressure }) {
+  const showPressure = hasPressure && PRESSURE_ROUTE_IDS.includes(item.id);
+  const cls = [
+    styles.navItem,
+    isActive ? styles.navItemActive : "",
+    showPressure ? styles.navItemPressure : "",
+  ].filter(Boolean).join(" ");
   return (
     <motion.button
       onClick={onClick}
@@ -158,17 +181,11 @@ function getRoutes(user) {
   );
 }
 
-function SidebarNav({ active, onChange, open, user }) {
+function SidebarNav({ active, onChange, open, user, hasPressure }) {
   return (
     <nav className={styles.nav}>
       {getRoutes(user).map((n) => (
-        <NavItem
-          key={n.id}
-          item={n}
-          isActive={active === n.id}
-          open={open}
-          onClick={() => onChange?.(n.id)}
-        />
+        <NavItem key={n.id} item={n} isActive={active === n.id} open={open} onClick={() => onChange?.(n.id)} hasPressure={hasPressure} />
       ))}
     </nav>
   );
@@ -186,6 +203,20 @@ export default function Sidebar({
   onProfileClick,
 }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [hasPressure, setHasPressure] = useState(false);
+
+  useEffect(() => {
+    getUpcomingDeadlines()
+      .then((list) => setHasPressure(hasDeadlineWithin48Hours(Array.isArray(list) ? list : [])))
+      .catch(() => setHasPressure(false));
+    const interval = setInterval(() => {
+      getUpcomingDeadlines()
+        .then((list) => setHasPressure(hasDeadlineWithin48Hours(Array.isArray(list) ? list : [])))
+        .catch(() => setHasPressure(false));
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const open = isMobile ? isOpen : isHovered;
   const sidebarStatusClass = open ? styles.sidebarOpen : styles.sidebarClosed;
   const w = isMobile
@@ -205,7 +236,7 @@ export default function Sidebar({
       onMouseLeave={() => !isMobile && setIsHovered(false)}
     >
       <SidebarHeader open={open} isMobile={isMobile} onToggle={onToggle} />
-      <SidebarNav active={active} onChange={onChange} open={open} user={user} />
+      <SidebarNav active={active} onChange={onChange} open={open} user={user} hasPressure={hasPressure} />
 
       <UserFooter
         user={user}

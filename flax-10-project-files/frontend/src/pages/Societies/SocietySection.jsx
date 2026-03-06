@@ -18,7 +18,7 @@ function SectionHeader({ title, type, onAction }) {
 
     return (
         <div className={styles.sectionHeader}>
-            <h3>{title}</h3>
+            <h3 className={styles.sectionTitle}>{title}</h3>
             {showPlus && <button className={styles.miniAddBtn} onClick={onAction}>+</button>}
         </div>
     );
@@ -31,8 +31,8 @@ function SectionContent({ items, isMember, onAction, allSocieties, onSelect }) {
 
     return (
         <div className={styles.grid}>
-            {isMember && <BrowseCard onClick={onAction} societies={allSocieties} />}
             {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
+            {isMember && <BrowseCard onClick={onAction} societies={allSocieties} />}
         </div>
     );
 }

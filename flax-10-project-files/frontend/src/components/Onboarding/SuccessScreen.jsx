@@ -4,14 +4,13 @@ import styles from "./OnboardingModal.module.css";
 const hintStyle = {
   background: 'var(--hover-bg, #f5f5f5)', borderRadius: '10px',
   padding: '0.9rem 1rem', fontSize: '0.88rem',
-  color: 'var(--muted)', marginBottom: '1.5rem', lineHeight: 1.6,
+  color: 'var(--text)', marginBottom: '1.5rem', lineHeight: 1.6,
 };
 
 function EnrolmentsHint() {
   return (
     <div style={hintStyle}>
-      📚 Want to see your enrolled modules in detail?
-      Head to <strong>My Enrolments</strong> in the Modules section.
+      Want to customise your sleep time and theme preferences? Head over to <strong>Settings</strong>.
     </div>
   );
 }
@@ -33,11 +32,11 @@ export default function SuccessScreen({ major, onComplete }) {
       style={{ textAlign: 'center', padding: '1rem 0' }}>
       <SuccessEmoji />
       <h2 className={styles.title} style={{ marginBottom: '0.5rem' }}>You're all set!</h2>
-      <p style={{ color: 'var(--muted)', fontSize: '0.95rem', marginBottom: '1rem', lineHeight: 1.6 }}>
+      <p style={{ color: 'var(--text)', fontSize: '0.95rem', marginBottom: '1rem', lineHeight: 1.6 }}>
         Your modules for <strong>{major}</strong> have been added to your profile.
       </p>
       <EnrolmentsHint />
-      <button className={styles.btn} onClick={onComplete}>Go to Dashboard</button>
+      <button className={styles.btn} onClick={onComplete}>Open Settings</button>
     </motion.div>
   );
 }

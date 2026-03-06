@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 
-import "./App.css";
 import { APP_ROUTES } from "./lib/routes";
 import { getUserSettings, getUserProfile } from "./api/userService";
 import { CalendarProvider } from "./context/CalendarContext";
@@ -11,6 +10,7 @@ import { NotificationProvider } from "./context/NotificationContext";
 import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ConfirmProvider } from "./context/ConfirmContext";
+import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { NotificationToast } from "./components/Notifications";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
@@ -22,6 +22,8 @@ import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
 import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
+
+import "./App.css";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
@@ -85,7 +87,6 @@ function resolveScreen(authed, user, showWelcome) {
 function resolveRouteContent(activeNav, user, setActiveNav) {
   const baseNav = activeNav.split('_')[0];
   const navParam = activeNav.split('_').slice(1).join('_');
-
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
@@ -175,10 +176,10 @@ function useAppState() {
   useSyncAuth(setAuthed, setUser, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
 
-  const setActiveNav = (nav) => {
+  const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
-  };
+  }, []);
 
   useEffect(() => {
     const handleNavigate = (e) => setActiveNav(e.detail);
@@ -230,13 +231,15 @@ function AppProviders({ children }) {
         <CalendarProvider>
           <TagProvider>
             <TimerProvider>
-              {children}
-              <NotificationToast />
+              <TaskCompletionProvider>
+                {children}
+                <NotificationToast />
+              </TaskCompletionProvider>
             </TimerProvider>
           </TagProvider>
         </CalendarProvider>
       </ConfirmProvider>
-    </NotificationProvider>
+    </NotificationProvider >
   );
 }
 
@@ -328,7 +331,7 @@ function OnboardingWrapper({ onComplete }) {
   const [showOnboarding, setShowOnboarding] = useOnboardingCheck();
   const handleComplete = () => {
     setShowOnboarding(false);
-    window.location.reload();
+    window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
   };
   return (
     <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />
@@ -336,24 +339,32 @@ function OnboardingWrapper({ onComplete }) {
 }
 
 function AppScreen({ activeNav, setActiveNav, user }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  useSyncNavFromUrl(location.pathname, setActiveNav);
+  const handleNavChange = (id) => {
+    setActiveNav(id);
+    const route = APP_ROUTES.find((r) => r.id === id);
+    if (route) navigate(route.path);
+  };
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
-        <DashboardLayout
-          activeNav={activeNav}
-          onNavChange={setActiveNav}
-          user={user}
-        >
-          <AnimatedDashboardContent
-            activeNav={activeNav}
-            setActiveNav={setActiveNav}
-            user={user}
-          />
+        <DashboardLayout activeNav={activeNav} onNavChange={handleNavChange} user={user}>
+          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </DashboardLayout>
         <OnboardingWrapper />
       </AppProviders>
     </ScreenWrap>
   );
+}
+
+function useSyncNavFromUrl(pathname, setActiveNav) {
+  useEffect(() => {
+    const path = pathname || "/";
+    const route = APP_ROUTES.find((r) => r.path === path);
+    if (route) setActiveNav(route.id);
+  }, [pathname, setActiveNav]);
 }
 
 // Screen render

@@ -11,6 +11,7 @@
   align-items: start;
 }
 
+/* On the Analytics PAGE these stay tall; on Home they're overridden via :global */
 .panel,
 .chatPanel {
   background: var(--panel);
@@ -37,6 +38,13 @@
   padding: 1.375rem 1.5rem 1.25rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+.panelHeaderCompact {
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--border);
 }
 
 .panelTitle {
@@ -220,7 +228,7 @@
 }
 
 .rowUser { flex-direction: row-reverse; }
-.rowAI { flex-direction: row; }
+.rowAI  { flex-direction: row; }
 
 .avatar {
   width: 28px;
@@ -279,7 +287,7 @@
 
 @keyframes bounce {
   0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px); }
+  40%           { transform: translateY(-6px); }
 }
 
 .inputRow {
@@ -365,6 +373,7 @@
   .panel, .chatPanel { min-height: 420px; max-height: 520px; }
 }
 
+/* ── Panel body ── */
 .panelBody {
   flex: 1;
   overflow: hidden;
@@ -373,6 +382,11 @@
   flex-direction: column;
 }
 
+/* ── centeredState ──
+   IMPORTANT: min-height reduced from 300px → 0 so the Home sidebar card
+   doesn't balloon. The Analytics page panels are tall enough on their own
+   (min-height: 540px on .panel) so this change has no visible effect there.
+*/
 .centeredState {
   flex: 1;
   display: flex;
@@ -381,10 +395,10 @@
   justify-content: center;
   text-align: center;
   gap: 0.625rem;
-  padding: 2rem;
+  padding: 1.25rem 2rem;   /* was 2rem — a bit tighter */
   color: var(--muted);
   font-size: 0.875rem;
-  min-height: 300px;
+  min-height: 0;           /* was 300px — removed so Home card stays compact */
 }
 
 .insightItem {
