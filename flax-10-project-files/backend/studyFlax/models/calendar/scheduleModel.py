@@ -29,10 +29,10 @@ class Schedule(models.Model):
     week_preference = models.CharField(max_length=10, choices=WEEK_PREFERENCE_CHOICES, default='both')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"{self.user.email}'s schedule {self.title}"
-        
+
     def delete(self, *args, **kwargs):
         generated_events = CalendarEvent.objects.filter(schedule_allocations__schedule=self).distinct()
         super().delete(*args, **kwargs)
@@ -43,12 +43,11 @@ class Schedule(models.Model):
 class ScheduleEventAllocation(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='event_allocations')
     event = models.ForeignKey(CalendarEvent, on_delete=models.CASCADE, related_name='schedule_allocations')
-    deadline = models.ForeignKey(Deadline, on_delete=models.CASCADE, related_name='event_allocations')
+    deadline = models.ForeignKey(Deadline, on_delete=models.CASCADE, related_name='event_allocations', null=True, blank=True)
     allocated_minutes = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ('schedule', 'event')
-    
+
     def __str__(self):
         return f"{self.shcedule_id}:{self.deadline_id}:{self.event_id}"
-        
