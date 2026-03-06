@@ -580,6 +580,33 @@
   background: var(--accent);
 }
 
+.mobileDrawerFooter {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 20px;
+  gap: 2px;
+}
+
+.mobileDrawerFooterBtn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--text);
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+.mobileDrawerFooterBtn:active {
+  background: var(--hover);
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
