@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
@@ -7,31 +9,61 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
-import ModuleDropdown from '../../components/Modules/ModuleDropdown.jsx';
+import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
-function getIsTeacher() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return user.role === 'teacher';
-}
 function useModulesPage(initialSearch = '', initialCreate = false) {
-    const [search_query, setSearchQuery] = useState(initialSearch);
-    const [filter_mode, setFilterMode] = useState('all');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const is_teacher = user.role === 'teacher';
+    const [search_query, setSearchQuery] = useState(initialSearch || '');
+    const filterFromUrl = searchParams.get('filter');
+    const [filter_mode, setFilterMode] = useState(filterFromUrl === 'enrolled' ? 'enrolled' : 'all');
     const [show_form, setShowForm] = useState(!!initialCreate);
     const [editing_module, setEditingModule] = useState(null);
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
     const hook = useModules();
 
-    useEffect(() => {
-        if (!initialSearch || hook.loading || hook.modules.length === 0) return;
-        const match = hook.modules.find(
-            m => m.module_code?.toLowerCase() === initialSearch.toLowerCase()
-        );
-        if (match) setViewingModule(match);
-    }, [initialSearch, hook.loading, hook.modules]);
+    const codeFromUrl = searchParams.get('code');
+    const moduleIdFromUrl = searchParams.get('moduleId');
 
-    return { is_teacher: getIsTeacher(), search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
+    useEffect(() => {
+        if (initialSearch && !codeFromUrl && !moduleIdFromUrl && hook.modules?.length > 0) {
+            const match = hook.modules.find(m => m.module_code?.toLowerCase() === initialSearch.toLowerCase());
+            if (match) setViewingModule(match);
+        }
+    }, [initialSearch, hook.modules]);
+
+    useEffect(() => {
+        if (!codeFromUrl && !moduleIdFromUrl) return;
+        if (hook.loading) return;
+        if (moduleIdFromUrl && hook.modules) {
+            const id = Number(moduleIdFromUrl);
+            const match = hook.modules.find((m) => m.id === id);
+            if (match) {
+                setViewingModule(match);
+                const next = new URLSearchParams(searchParams);
+                next.delete('moduleId');
+                setSearchParams(next.toString(), { replace: true });
+                return;
+            }
+        }
+        if (codeFromUrl && hook.modules) {
+            const norm = (s) => (s || '').toUpperCase().replace(/\s/g, '');
+            const code = norm(codeFromUrl);
+            const match = hook.modules?.find((m) => norm(m.module_code) === code);
+            if (match) {
+                setViewingModule(match);
+                setSearchParams({}, { replace: true });
+            } else {
+                setSearchQuery(codeFromUrl.trim());
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [codeFromUrl, moduleIdFromUrl, hook.loading, hook.modules, searchParams, setSearchParams]);
+
+    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
 }
 
 function useMainView(state) {
@@ -148,27 +180,25 @@ function PageHeader({ is_teacher, onCreateModule }) {
     );
 }
 
-const filter_options = [
-    { value: 'all', label: 'All Modules' },
-    { value: 'enrolled', label: 'My Enrollments' },
-];
-
-const sortOptions = [
-    { value: 'name', label: 'Sort by Name' },
-    { value: 'deadlines', label: 'Sort by Deadlines' },
-];
-
 function Toolbar({ search, sorting, departments }) {
+    const filter_options = [
+        { value: 'all', label: 'All Modules' },
+        { value: 'enrolled', label: 'My Enrollments' },
+    ];
     const dept_options = [
         { value: 'all', 'label': 'All Departments' },
         ...departments.map(d => ({ value: d, label: d })),
     ];
+    const sortOptions = [
+        { value: 'name', label: 'Sort by Name' },
+        { value: 'deadlines', label: 'Sort by Deadlines' },
+    ];
     return (
         <div className={styles.toolbar}>
             <SearchInput value={search.query} onChange={search.onQueryChange} />
-            <ModuleDropdown value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-            <ModuleDropdown value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-            <ModuleDropdown value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+            <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+            <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+            <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
         </div>
     );
 }

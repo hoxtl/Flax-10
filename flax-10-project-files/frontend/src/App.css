@@ -3,6 +3,17 @@
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: var(--font-body);
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-title);
+  color: var(--text-charcoal);
 }
 
 .logo {
@@ -39,4 +50,12 @@
 
 .read-the-docs {
   color: #888;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.seeds-count-animate {
+  animation: bounce 0.5s ease-in-out;
 }

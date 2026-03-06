@@ -54,8 +54,9 @@ export default function AnalyticsPage() {
         setData(summary);
         setProgressData(progress);
         setThemeStats(theme);
-      } catch {
-        setError('Failed to load analytics data.');
+      } catch (err) {
+        const message = err?.message || 'Failed to load analytics data.';
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -161,7 +162,11 @@ export default function AnalyticsPage() {
                 },
                 progressData && {
                   title: 'Planned vs Actual',
-                  el: <PlannedVsActualChart data={progressData.daily_progress} />,
+                  el: (
+                    <div className={styles.chartContainerMin}>
+                      <PlannedVsActualChart data={progressData.daily_progress} />
+                    </div>
+                  ),
                   i: 4,
                   wide: true,
                 },

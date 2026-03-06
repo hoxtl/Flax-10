@@ -8,6 +8,7 @@ import styles from './FloatingChat.module.css';
 const SUGGESTIONS = [
   'When should I study this week?',
   'Am I a night owl or morning person?',
+  'Plan my week around my deadlines',
   'How can I improve my consistency?',
   'What does my study pattern say about me?',
 ];
@@ -33,16 +34,26 @@ const mdComponents = (styles) => ({
   strong: ({children}) => <strong className={styles.mdStrong}>{children}</strong>,
 });
 
-function ChatWindow({ onClose }) {
+function ChatWindow({ onClose, initialMessage = '' }) {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialMessage);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const bottomRef = useRef(null);
+  const didAutoSend = useRef(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  /* When opened with initialMessage (e.g. from banner "Ask Flax"), pre-fill and auto-send once */
+  useEffect(() => {
+    const msg = (initialMessage || '').trim();
+    if (!msg || didAutoSend.current || loading) return;
+    didAutoSend.current = true;
+    const timer = setTimeout(() => send(msg), 400);
+    return () => clearTimeout(timer);
+  }, [initialMessage]);
 
   const send = async (text) => {
     const msg = (text || input).trim();
@@ -96,7 +107,7 @@ function ChatWindow({ onClose }) {
             <motion.div className={styles.empty}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className={styles.emptyIcon}>💬</div>
-              <p className={styles.emptyText}>I have access to your real study data. Ask me anything.</p>
+              <p className={styles.emptyText}>Hi, I'm Flax! I can help you plan your study time, estimate tasks, and stay on track. What would you like to know?</p>
               <div className={styles.suggestions}>
                 {SUGGESTIONS.map((s, i) => (
                   <button key={i} className={styles.suggestion} onClick={() => send(s)}>{s}</button>
@@ -110,7 +121,7 @@ function ChatWindow({ onClose }) {
               className={`${styles.messageRow} ${msg.role === 'user' ? styles.rowUser : styles.rowAI}`}
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}>
-              {msg.role === 'assistant' && <div className={styles.avatar}>✦</div>}
+              {msg.role === 'assistant' && <div className={styles.avatar}>💬</div>}
               <div className={`${styles.bubble} ${msg.role === 'user' ? styles.bubbleUser : styles.bubbleAI}`}>
                 {msg.role === 'user'
                   ? <p className={styles.bubbleLine}>{msg.content}</p>
@@ -127,7 +138,7 @@ function ChatWindow({ onClose }) {
           {loading && (
             <motion.div key="typing" className={`${styles.messageRow} ${styles.rowAI}`}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <div className={styles.avatar}>✦</div>
+              <div className={styles.avatar}>💬</div>
               <TypingIndicator />
             </motion.div>
           )}
@@ -143,7 +154,7 @@ function ChatWindow({ onClose }) {
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKey}
           placeholder="Ask about your study patterns…"
-          rows={1}
+          rows={3}
           disabled={loading}
         />
         <button className={styles.sendBtn} onClick={() => send()} disabled={loading || !input.trim()}>↑</button>
@@ -154,11 +165,27 @@ function ChatWindow({ onClose }) {
 
 export default function FloatingChat() {
   const [open, setOpen] = useState(false);
+  const [initialMessage, setInitialMessage] = useState('');
+
+  useEffect(() => {
+    const onOpen = (e) => {
+      const msg = e?.detail?.initialMessage;
+      setInitialMessage(typeof msg === 'string' ? msg : '');
+      setOpen(true);
+    };
+    window.addEventListener("flax-open-chat", onOpen);
+    return () => window.removeEventListener("flax-open-chat", onOpen);
+  }, []);
 
   return (
     <div className={styles.root}>
       <AnimatePresence>
-        {open && <ChatWindow onClose={() => setOpen(false)} />}
+        {open && (
+          <ChatWindow
+            onClose={() => { setOpen(false); setInitialMessage(''); }}
+            initialMessage={initialMessage}
+          />
+        )}
       </AnimatePresence>
 
       <motion.button
@@ -170,7 +197,7 @@ export default function FloatingChat() {
         <AnimatePresence mode="wait">
           {open
             ? <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>✕</motion.span>
-            : <motion.span key="open"  initial={{ rotate: 90,  opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>✦</motion.span>
+            : <motion.span key="open"  initial={{ rotate: 90,  opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>💬</motion.span>
           }
         </AnimatePresence>
       </motion.button>
