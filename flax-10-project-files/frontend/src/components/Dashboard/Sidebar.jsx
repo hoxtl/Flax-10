@@ -217,7 +217,6 @@ function MobileDrawer({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             className={styles.mobileDrawerBackdrop}
             initial={{ opacity: 0 }}
@@ -226,6 +225,16 @@ function MobileDrawer({
             transition={{ duration: 0.22 }}
             onClick={onClose}
           />
+          <motion.div
+            className={styles.mobileDrawer}
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 320, damping: 34 }}
+          >
+            <div className={styles.mobileDrawerHandle} />
+
+          </motion.div>
         </>
       )}
     </AnimatePresence>
