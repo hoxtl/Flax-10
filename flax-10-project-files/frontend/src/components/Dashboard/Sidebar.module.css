@@ -470,6 +470,13 @@
   gap: 10px;
 }
 
+.mobileDrawerTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
