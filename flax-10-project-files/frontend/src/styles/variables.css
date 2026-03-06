@@ -190,7 +190,7 @@
 
 :root[data-theme="dark"] {
   /* Global Design Language (dark): glass + inner glow */
-  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-bg: rgba(26, 19, 16, 0.65);
   --glass-border: 1px solid rgba(255, 255, 255, 0.08);
   --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
@@ -201,12 +201,12 @@
   --c-olive: #6d6050;
   --c-cocoa: #2a1e15;
 
-  /* Solid black background across the app (no rhythm / no blue-grey) */
-  --bg: #0f172a;
-  --panel: #1e293b;
-  --sidebar: #1e293b;
+  /* Warm near-black — matches topbar rgba(26,19,16) */
+  --bg: #1a1310;
+  --panel: #241a14;
+  --sidebar: #201812;
 
-  --border: rgba(148, 163, 184, 0.2);
+  --border: rgba(180, 155, 126, 0.18);
 
   /* Semantic text (Dark) */
   --text: #f1f5f9;
@@ -232,37 +232,37 @@
   --pill-bg: rgba(148, 163, 184, 0.15);
   --pill-hover: rgba(148, 163, 184, 0.25);
 
-  --card-bg: #1e293b;
+  --card-bg: #241a14;
   --bento-card-bg: var(--glass-bg);
-  --calendar-bg: #0f172a;
-  --weekbar-bg: #1e293b;
+  --calendar-bg: #1a1310;
+  --weekbar-bg: #241a14;
   --search-bg: #141414;
   --btn-black: #262626;
   --btn-black-hover: #404040;
-  --event-card-bg: #1e293b;
+  --event-card-bg: #241a14;
   --nav-btn-bg: #262626;
   --nav-btn-hover: #404040;
   --sidebar-active: rgba(163, 177, 138, 0.2);
   --user-details-text: #f1f5f9;
 
-  --surface: #1e293b;
+  --surface: #241a14;
 
   /* Topbar (dark) */
-  --topbar-bg: rgba(15, 23, 42, 0.95);
-  --topbar-border: rgba(148, 163, 184, 0.15);
+  --topbar-bg: rgba(26, 19, 16, 0.95);
+  --topbar-border: rgba(180, 155, 126, 0.15);
   --search-glass: rgba(255, 255, 255, 0.08);
 
   /* Unified frame (sidebar + topbar): glassmorphism */
-  --frame-bg: rgba(30, 41, 59, 0.85);
-  --frame-border: rgba(148, 163, 184, 0.15);
+  --frame-bg: rgba(36, 26, 20, 0.85);
+  --frame-border: rgba(180, 155, 126, 0.15);
   --frame-blur: 20px;
 
   --now-banner-bg: rgba(255, 255, 255, 0.08);
   --now-banner-bg-idle: rgba(255, 255, 255, 0.06);
 
-  /* Home: same slate, no time-based rhythm */
-  --bg-home: #0f172a;
-  --bg-home-night: #0f172a;
+  /* Home: warm near-black, matches topbar */
+  --bg-home: #1a1310;
+  --bg-home-night: #1a1310;
 
   --success-bg: rgba(140, 154, 134, 0.2);
   --success-text: #a3b18a;
@@ -290,12 +290,12 @@
   --color-sage-primary: #8C9A86;
   --color-sage-glow: rgba(140, 154, 134, 0.5);
   --color-border-light: rgba(255, 255, 255, 0.12);
-  --glass-bg: rgba(30, 41, 59, 0.6);
+  --glass-bg: rgba(26, 19, 16, 0.6);
   --growth-tank-deep: var(--color-sage-dark);
   --growth-tank-fill: var(--sage);
   --timeline-now-line: #c4a35a;
-  --heatmap-empty: #1e293b;
-  --heatmap-low: #334155;
+  --heatmap-empty: #241a14;
+  --heatmap-low: #3a2a1e;
   --heatmap-mid: #64748b;
   --heatmap-high: var(--sage);
   --heatmap-full: var(--color-sage-dark);

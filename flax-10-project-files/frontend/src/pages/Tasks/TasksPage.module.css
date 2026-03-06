@@ -5,7 +5,7 @@
     overflow-x: hidden;
     gap: 0;
     font-family: var(--font-body);
-    background: #ffffff;
+    background: var(--bg);
 }
 
 /* Enforce single font everywhere: form elements inherit on task page */
@@ -23,15 +23,15 @@
     justify-content: center;
     gap: 10px;
     height: 100%;
-    color: #8a7d76;
+    color: var(--muted);
 }
 
 .loadingSpinner {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid #e8ddd8;
-    border-top-color: #6b5f57;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
     animation: taskSpin 0.7s linear infinite;
 }
 
@@ -39,7 +39,7 @@
     margin: 0;
     font-size: 0.86rem;
     font-weight: 500;
-    color: #8a7d76;
+    color: var(--muted);
 }
 
 @keyframes taskSpin {
@@ -85,7 +85,7 @@
 .toastClose:hover { opacity: 1; }
 
 .toastDelete {
-    background: #4A3421;
+    background: var(--primary-strong);
 }
 
 @media (max-width: 900px) {

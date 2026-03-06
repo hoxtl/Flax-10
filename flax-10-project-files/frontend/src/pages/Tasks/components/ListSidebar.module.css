@@ -8,7 +8,7 @@
     max-width: 220px;
     flex-shrink: 0;
     border-right: 1px solid var(--frame-border);
-    background: #ffffff;
+    background: var(--sidebar);
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
@@ -27,7 +27,7 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #a8a29e;
+    color: var(--muted);
     padding: 8px 8px 4px;
     margin-top: 8px;
 }
@@ -86,7 +86,7 @@
     font-family: var(--font-body);
     font-size: 0.97rem;
     font-weight: 700;
-    color: #44403c;
+    color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -105,8 +105,8 @@
     text-align: center;
 }
 .navCountDanger {
-    background: #fee2e2;
-    color: #ef4444;
+    background: var(--danger-bg);
+    color: var(--danger);
 }
 
 /* ── List items ── */
@@ -120,14 +120,14 @@
     transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease;
 }
 .listItem:hover {
-    background: rgba(74, 55, 40, 0.04);
+    background: var(--hover-light);
     transform: translateX(2px);
 }
 
 .listActive {
-    background: rgba(74, 55, 40, 0.06) !important;
+    background: var(--hover) !important;
     font-weight: 600;
-    border-left-color: #4a3728;
+    border-left-color: var(--primary);
     padding-left: 9px;
     transform: translateX(2px);
 }
@@ -160,7 +160,7 @@
     font-family: var(--font-body);
     font-size: 0.97rem;
     font-weight: 700;
-    color: #44403c;
+    color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -171,8 +171,8 @@
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    color: #8a7d76;
-    background: #f5f0ed;
+    color: var(--muted);
+    background: var(--pill-bg);
     border-radius: 8px;
     padding: 1px 6px;
     min-width: 18px;
@@ -194,9 +194,9 @@
     margin-top: 8px;
     padding: 8px 12px;
     background: none;
-    border: 1.5px dashed #b0a59e;
+    border: 1.5px dashed var(--muted);
     border-radius: 6px;
-    color: #b0a59e;
+    color: var(--muted);
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 500;
@@ -205,9 +205,9 @@
     transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .createListBtn:hover {
-    color: #4a3728;
-    border-color: #4a3728;
-    background: rgba(74, 55, 40, 0.04);
+    color: var(--text);
+    border-color: var(--primary);
+    background: var(--hover-light);
 }
 
 /* ── Rename input ── */
@@ -252,16 +252,16 @@
     font-family: var(--font-body);
     font-size: 0.76rem;
     font-weight: 500;
-    color: #3d3228;
+    color: var(--text);
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 7px;
     transition: background 0.12s, color 0.12s;
 }
-.ctxItem svg { color: #9a8b7a; flex-shrink: 0; transition: color 0.12s; }
-.ctxItem:hover { background: rgba(123, 103, 81, 0.07); }
-.ctxItem:hover svg { color: #6b5a49; }
+.ctxItem svg { color: var(--muted); flex-shrink: 0; transition: color 0.12s; }
+.ctxItem:hover { background: var(--hover); }
+.ctxItem:hover svg { color: var(--text); }
 .ctxDelete { color: #c53030; }
 .ctxDelete svg { color: #c53030; opacity: 0.7; }
 .ctxDelete:hover { background: rgba(197, 48, 48, 0.06); }
@@ -269,7 +269,7 @@
 
 .ctxDivider {
     height: 1px;
-    background: rgba(74, 52, 33, 0.07);
+    background: var(--border);
     margin: 2px 6px;
 }
 

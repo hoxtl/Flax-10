@@ -5,13 +5,13 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 import { useCalendar } from "../../../context/CalendarContext";
-import { useCalendarEvents } from "../../../components/Calendar/hooks/useCalendarEvents";
 import { fetchTasks } from "../../../api/taskService";
+import { getEvents } from "../../../api/eventApi";
 
 export function useHomeData(selectedDate) {
-  const { events } = useCalendar();
+  const { events, allEvents } = useCalendar();
   const [allTasks, setAllTasks] = useState([]);
-  useCalendarEvents();
+  const [fallbackDayEvents, setFallbackDayEvents] = useState([]);
 
   useEffect(() => {
     fetchTasks()
@@ -19,10 +19,37 @@ export function useHomeData(selectedDate) {
       .catch(() => {});
   }, []);
 
-  const dayEvents = useMemo(
-    () => events.filter((e) => overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate)),
-    [events, selectedDate]
-  );
+  useEffect(() => {
+    let cancelled = false;
+    const dayStart = new Date(selectedDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(selectedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    getEvents({ start: dayStart.toISOString(), end: dayEnd.toISOString() })
+      .then((data) => {
+        if (!cancelled) setFallbackDayEvents(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setFallbackDayEvents([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedDate]);
+
+  const dayEvents = useMemo(() => {
+    const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
+    const merged = [...(primary || []), ...(fallbackDayEvents || [])];
+    const deduped = merged.filter((e, idx, arr) => {
+      if (!e || e.id == null) return false;
+      return arr.findIndex((x) => x && x.id === e.id) === idx;
+    });
+    return deduped.filter((e) =>
+      overlapsDay(new Date(e.start_time), new Date(e.end_time || e.start_time), selectedDate)
+    );
+  }, [allEvents, events, fallbackDayEvents, selectedDate]);
 
   const dayTasks = useMemo(() => {
     const incomplete = allTasks.filter((t) => !t.completed);

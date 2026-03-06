@@ -3,18 +3,15 @@
  */
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useMemo } from "react";
-import { CheckSquare, Check } from "lucide-react";
+import { CheckSquare } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 
 const VISIBLE_COUNT = 5;
-
-const RING_R    = 11;
-const RING_CIRC = 2 * Math.PI * RING_R;
 
 const CATEGORY_COLOURS = {
   UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
@@ -36,12 +33,6 @@ function getCategoryStyle(label) {
     return { bg: c.bg, text: c.text };
   }
   return CATEGORY_COLOURS[key] || CATEGORY_COLOURS.default;
-}
-
-function getRingColor(pct) {
-  if (pct >= 70) return "#5A8C6A";
-  if (pct >= 30) return "#C4904A";
-  return "#A86060";
 }
 
 function getEstTime(items) {
@@ -67,6 +58,7 @@ export function TaskWidgetSlot({
   displayName,
   isToday,
   taskWidgetOverdueCount,
+  taskWidgetDueTodayCount = 0,
   taskWidgetSpineCompletedPct,
   taskWidgetItemsOnly,
   taskWidgetList,
@@ -79,30 +71,15 @@ export function TaskWidgetSlot({
   hasTimerSession,
   onStartFocus,
 }) {
-  const navigate = useNavigate();
-
   const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
-  const completedTasks    = taskWidgetList.filter((t) => t.completed);
   const visibleIncomplete = showAllTaskWidgetTasks
     ? incompleteTasks
     : incompleteTasks.slice(0, VISIBLE_COUNT);
   const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
 
-  const completedCount = taskWidgetItemsOnly.filter((i) => i.completed).length;
   const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
   const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
-
-  const ringPct    = taskWidgetItemsOnly.length > 0 ? (completedCount / taskWidgetItemsOnly.length) * 100 : 0;
-  const ringColor  = getRingColor(ringPct);
-  const ringOffset = RING_CIRC - (ringPct / 100) * RING_CIRC;
-
-  const estTime = getEstTime(taskWidgetItemsOnly);
   const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
-
-  const subStr = taskWidgetItemsOnly.length > 0 && !allTasksDone
-    ? [incompleteCount > 0 ? `${incompleteCount} remaining` : null, estTime]
-        .filter(Boolean).join(" · ")
-    : null;
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -145,32 +122,12 @@ export function TaskWidgetSlot({
                   </div>
                   <div className={styles.taskWidgetSlotTitleBlock}>
                     <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
-                    {subStr && <span className={styles.taskWidgetSlotMeta}>{subStr}</span>}
                   </div>
                 </div>
+              </div>
 
-                {/* Ring progress */}
-                <div
-                  className={styles.taskRingWrap}
-                  aria-label={`${completedCount} of ${taskWidgetItemsOnly.length} tasks done`}
-                  role="img"
-                >
-                  <svg className={styles.taskRingSvg} viewBox="0 0 28 28" aria-hidden>
-                    <circle className={styles.taskRingTrack} cx="14" cy="14" r={RING_R} />
-                    <motion.circle
-                      className={styles.taskRingFill}
-                      cx="14" cy="14" r={RING_R}
-                      stroke={ringColor}
-                      strokeDasharray={RING_CIRC}
-                      initial={{ strokeDashoffset: RING_CIRC }}
-                      animate={{ strokeDashoffset: ringOffset }}
-                      transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                    />
-                  </svg>
-                  <span className={styles.taskRingCount}>
-                    {completedCount}/{taskWidgetItemsOnly.length}
-                  </span>
-                </div>
+              <div className={styles.taskWidgetDueTodayPill}>
+                {taskWidgetDueTodayCount} due today
               </div>
 
               {/* Task list */}
@@ -181,18 +138,20 @@ export function TaskWidgetSlot({
                 animate="animate"
                 layout
               >
-                {visibleIncomplete.map((t) => {
+                {visibleIncomplete.map((t, idx) => {
                   const status      = t.taskWidgetStatus;
                   const isOverdue   = status === "overdue";
                   const categoryLabel = getTaskCategoryPill ? getTaskCategoryPill(t) : null;
                   const catStyle    = categoryLabel ? getCategoryStyle(categoryLabel) : null;
+                  const rowAccent = catStyle?.text || "#8B7355";
 
                   return (
                     <motion.li
                       key={t.id}
                       layout
                       variants={itemVariants}
-                      className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""}`}
+                      className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""} ${idx === 0 ? styles.taskWidgetTaskRowNext : ""}`}
+                      style={{ "--task-row-accent": rowAccent }}
                     >
                       {/* Checkbox */}
                       <button
@@ -209,20 +168,22 @@ export function TaskWidgetSlot({
                         />
                       </button>
 
-                      {/* Title */}
-                      <span className={styles.taskWidgetTaskTitle} title={t.title}>
-                        {t.title}
-                      </span>
-
-                      {/* Right: category pill only */}
-                      {categoryLabel && catStyle && (
-                        <span
-                          className={styles.taskWidgetCategoryPill}
-                          style={{ background: catStyle.bg, color: catStyle.text }}
-                        >
-                          {categoryLabel}
+                      <div className={styles.taskWidgetTaskBody}>
+                        <div className={styles.taskWidgetTaskTopRow}>
+                          {categoryLabel && catStyle && (
+                            <span
+                              className={styles.taskWidgetCategoryPill}
+                              style={{ background: "#4A2E1B", color: "#F4ECE3" }}
+                            >
+                              {categoryLabel}
+                            </span>
+                          )}
+                          {idx === 0 && <span className={styles.taskWidgetNextPill}>Next</span>}
+                        </div>
+                        <span className={styles.taskWidgetTaskTitle} title={t.title}>
+                          {t.title}
                         </span>
-                      )}
+                      </div>
                     </motion.li>
                   );
                 })}
@@ -238,21 +199,7 @@ export function TaskWidgetSlot({
                     </button>
                   </li>
                 )}
-
-                {/* Completed count — static, no expand */}
-                {completedTasks.length > 0 && (
-                  <li className={styles.taskWidgetCompletedLine}>
-                    {completedTasks.length} completed
-                  </li>
-                )}
               </motion.ul>
-
-              {/* Footer */}
-              <div className={styles.taskWidgetManageFooter}>
-                <Link to="/tasks" className={styles.taskWidgetManageLink}>
-                  Manage tasks →
-                </Link>
-              </div>
             </>
           ) : (
             <EmptyStateCard
