@@ -186,7 +186,32 @@ export default function Sidebar({
   onProfileClick,
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  const open = isMobile ? isOpen : isHovered;
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileDrawer
+          isOpen={isOpen}
+          onClose={onToggle}
+          user={user}
+          active={active}
+          onChange={onChange}
+          onSettings={onSettingsClick}
+          onLogout={onLogoutClick}
+          onProfile={onProfileClick}
+        />
+        <MobileBottomBar
+          active={active}
+          onChange={onChange}
+          user={user}
+          onToggleDrawer={onToggle}
+          drawerOpen={isOpen}
+        />
+      </>
+    );
+  }
+
+  const open = isHovered;
   const sidebarStatusClass = open ? styles.sidebarOpen : styles.sidebarClosed;
   const w = isMobile
     ? open
