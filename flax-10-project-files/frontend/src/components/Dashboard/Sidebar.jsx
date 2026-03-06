@@ -247,6 +247,42 @@ function MobileDrawer({
                 ✕
               </button>
             </div>
+
+            <div className={styles.mobileDrawerDivider} />
+
+            <nav className={styles.mobileDrawerNav}>
+              {routes.map((item, i) => (
+                <motion.button
+                  key={item.id}
+                  className={`${styles.mobileDrawerNavItem} ${
+                    active === item.id ? styles.mobileDrawerNavItemActive : ""
+                  }`}
+                  onClick={() => {
+                    onChange?.(item.id);
+                    onClose();
+                  }}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.04, duration: 0.22 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <span className={styles.mobileDrawerNavIcon}>
+                    {item.icon}
+                  </span>
+                  <span className={styles.mobileDrawerNavLabel}>
+                    {item.label}
+                  </span>
+                  {active === item.id && (
+                    <motion.span
+                      className={styles.mobileDrawerActivePill}
+                      layoutId="drawerActivePill"
+                    />
+                  )}
+                </motion.button>
+              ))}
+            </nav>
+
+            <div className={styles.mobileDrawerDivider} />
           </motion.div>
         </>
       )}
