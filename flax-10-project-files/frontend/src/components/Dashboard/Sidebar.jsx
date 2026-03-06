@@ -201,6 +201,38 @@ function MobileNavIcon({ item, isActive, onClick }) {
   );
 }
 
+function MobileDrawer({
+  isOpen,
+  onClose,
+  user,
+  active,
+  onChange,
+  onSettings,
+  onLogout,
+  onProfile,
+}) {
+  const routes = APP_ROUTES.filter((r) => !r.isAdminOnly || user?.isAdmin);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className={styles.mobileDrawerBackdrop}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            onClick={onClose}
+          />
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+
 export default function Sidebar({
   active,
   onChange,
