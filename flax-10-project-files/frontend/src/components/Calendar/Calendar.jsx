@@ -6,25 +6,6 @@ import { WeekView } from "./WeekView/WeekView";
 import { MonthView } from "./MonthView/MonthView";
 import { YearView } from "./YearView/YearView";
 import "./Calendar.css";
-import { useEffect, useRef, useState } from "react";
-
-function CurrentTimeIndicator({ hourHeight = 60 }) {
-  const [now, setNow] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
-  const topPosition = (minutesSinceMidnight / 60) * hourHeight;
-
-  return (
-    <div className="current-time-line" style={{ top: `${topPosition}px` }}>
-      <div className="current-time-dot" />
-    </div>
-  );
-}
 
 export function Calendar() {
   return (
@@ -36,35 +17,11 @@ export function Calendar() {
 
 function CalendarContent() {
   const { viewMode } = useCalendar();
-  const scrollContainerRef = useRef(null);
   useCalendarEvents();
 
-  // Auto-scroll logic
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const now = new Date();
-      const hourHeight = 60;
-      const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
-
-      // Calculates vertical scroll
-      const verticalOffset = (minutesSinceMidnight / 60) * hourHeight - 200;
-
-      scrollContainerRef.current.scrollTo({
-        top: verticalOffset,
-        behavior: "smooth",
-      });
-    }
-  }, [viewMode]); // Triggers when view changes
-
   return (
-    <div className="calendar-container" ref={scrollContainerRef}>
-      <div
-        className="calendar-view-relative-wrapper"
-        style={{ position: "relative" }}
-      >
-        {(viewMode === "day" || viewMode === "week") && (
-          <CurrentTimeIndicator />
-        )}
+    <div className="calendar-container">
+      <div className="calendar-view-relative-wrapper">
         <CalendarView viewMode={viewMode} />
       </div>
     </div>
