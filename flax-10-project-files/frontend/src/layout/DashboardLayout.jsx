@@ -15,7 +15,11 @@ import { BackToTop } from "../components/Pagination/Pagination";
 import CreateSocietyModal from "../components/Society/CreateSocietyModal";
 import DeadlineModal from "../components/Modules/DeadlineModal";
 import { createSociety } from "../api/societyApi";
+import { createTask, fetchTaskLists } from "../api/taskService";
+import { getModules, getEnrollments } from "../api/moduleApi";
+import { isEnrolledIn } from "../components/Modules/utils/moduleUtils";
 import { useNotifications } from "../context/NotificationContext";
+import CreateTaskModal from "../pages/Tasks/components/CreateTaskModal";
 import { useTimerContext } from "../context/TimerContext";
 import { LeaveTimerModal } from "../components/Timer/TimerPopups";
 
@@ -143,6 +147,7 @@ function useDashboardState(activeNav, onNavChange) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showSocietyModal, setShowSocietyModal] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
   const [deadlineModule, setDeadlineModule] = useState(null);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
@@ -166,6 +171,7 @@ function useDashboardState(activeNav, onNavChange) {
   const onSelectType = (id, extra) => {
     setShowQuickAdd(false);
     if (id === 'society') setShowSocietyModal(true);
+    else if (id === 'task') setShowTaskModal(true);
     else if (id === 'create_module') onPickNav('modules_create');
     else if (id === 'add_deadline') setDeadlineModule(extra);
     else modal.openModal(null, id, selectedDate);
@@ -184,6 +190,8 @@ function useDashboardState(activeNav, onNavChange) {
     onSelectType,
     showSocietyModal,
     setShowSocietyModal,
+    showTaskModal,
+    setShowTaskModal,
     deadlineModule,
     setDeadlineModule,
     handleNavChange,
@@ -232,6 +240,44 @@ function useSocietyCreation(setShowSocietyModal) {
   return create;
 }
 
+function GlobalTaskModal({ onClose }) {
+  const { addNotification } = useNotifications();
+  const [lists, setLists] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
+
+  useEffect(() => {
+    fetchTaskLists().then(res => setLists(Array.isArray(res) ? res : [])).catch(() => { });
+    getModules().then(res => setModules(Array.isArray(res) ? res : [])).catch(() => { });
+    getEnrollments().then(res => setEnrollments(Array.isArray(res) ? res : [])).catch(() => { });
+  }, []);
+
+  const enrolledModules = useMemo(() =>
+    modules.filter(m => isEnrolledIn(m.id, enrollments)),
+    [modules, enrollments]);
+
+  const handleSave = async (data) => {
+    try {
+      await createTask(data);
+      addNotification("Task created successfully!", "success");
+      onClose();
+      // Dispatch an event so views (like Homepage) know to refetch tasks
+      window.dispatchEvent(new Event("task-created"));
+    } catch {
+      addNotification("Failed to create task.", "error");
+    }
+  };
+
+  return (
+    <CreateTaskModal
+      lists={lists}
+      modules={enrolledModules}
+      onSave={handleSave}
+      onClose={onClose}
+    />
+  );
+}
+
 function DashboardModals({ state }) {
   const createSoc = useSocietyCreation(state.setShowSocietyModal);
   return (
@@ -240,6 +286,7 @@ function DashboardModals({ state }) {
         onSelectType={state.onSelectType} isTeacher={state.user?.role === 'teacher'} />
       <EventModalGate modal={state.modal} />
       {state.showSocietyModal && <CreateSocietyModal onClose={() => state.setShowSocietyModal(false)} onCreate={createSoc} />}
+      {state.showTaskModal && <GlobalTaskModal onClose={() => state.setShowTaskModal(false)} />}
       {state.deadlineModule && <DeadlineModal module={state.deadlineModule} onClose={() => state.setDeadlineModule(null)} startCreating={true} />}
     </>
   );
