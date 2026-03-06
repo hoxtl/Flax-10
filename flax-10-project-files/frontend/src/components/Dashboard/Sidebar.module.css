@@ -445,17 +445,6 @@
   font-weight: 700;
 }
 
-.mobileNavActiveDot {
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-
 .mobileDrawerBackdrop {
   position: fixed;
   inset: 0;

@@ -220,13 +220,6 @@ function MobileNavIcon({ item, isActive, onClick }) {
     >
       <span className={styles.mobileNavIconEmoji}>{item.icon}</span>
       <span className={styles.mobileNavIconLabel}>{item.label}</span>
-      {isActive && (
-        <motion.span
-          className={styles.mobileNavActiveDot}
-          layoutId="mobileActiveDot"
-          transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        />
-      )}
     </motion.button>
   );
 }
