@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.utils import timezone
 from rest_framework import status
-from studyFlax.models import CalendarEvent, Deadline, Enrollment, Module, Schedule
+from studyFlax.models import CalendarEvent, Deadline, Enrollment, Module, Notification, Schedule
 from ..base import BaseTestCase
 
 
@@ -44,7 +44,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(len(response.data['event_allocations']), 3)
 
         schedule = Schedule.objects.get(id=response.data['id'])
-        self.assertEqual(schedule.deadlines.count(), 1)
+        self.assertEqual(schedule.deadline.count(), 1)
         self.assertEqual(schedule.event_allocations.count(), 3)
 
     def test_delete_schedule_cascades_allocated_events(self):
@@ -63,4 +63,95 @@ class ScheduleViewsTests(BaseTestCase):
         delete_response = self.client.delete(f'/api/schedules/{schedule_id}/')
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Schedule.objects.filter(id=schedule_id).exists())
-        self.assertEqual(CalendarEvent.objects.filter(source='auto_scheduler').count(), 0)
+        self.assertEqual(CalendarEvent.objects.filter(source='auto_scheduler').count(), 0)def test_create_manual_schedule_from_existing_schedule_tagged_events(self):
+        tag = Tag.objects.create(name='schedule', is_default=True)
+        start = timezone.now() + timedelta(days=1)
+        event_1 = CalendarEvent.objects.create(
+            user=self.user,
+            title='Session A',
+            start_time=start,
+            end_time=start + timedelta(hours=1),
+            tag=tag,
+        )
+        event_2 = CalendarEvent.objects.create(
+            user=self.user,
+            title='Session B',
+            start_time=start + timedelta(hours=2),
+            end_time=start + timedelta(hours=3),
+            tag=tag,
+        )
+
+        response = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Named schedule',
+            'event_ids': [event_1.id, event_2.id],
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['title'], 'Named schedule')
+        self.assertEqual(len(response.data['event_allocations']), 2)
+
+    def test_same_name_schedule_overwrites_previous_and_creates_notification(self):
+        payload = {
+            'title': 'Reusable Name',
+            'worktime_preference': 'day',
+            'week_preference': 'both',
+            'deadline_preferences': [
+                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30},
+            ],
+        }
+        first = self.client.post(self.url, payload, format='json')
+        self.assertEqual(first.status_code, status.HTTP_201_CREATED)
+
+        second = self.client.post(self.url, payload, format='json')
+        self.assertEqual(second.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(second.data['overwritten'])
+        self.assertEqual(Schedule.objects.filter(user=self.user, title='Reusable Name').count(), 1)
+        self.assertTrue(Notification.objects.filter(user=self.user, title='Schedule overwritten').exists())
+
+
+    def test_create_manual_schedule_from_existing_schedule_tagged_events(self):
+        tag = Tag.objects.create(name='schedule', is_default=True)
+        start = timezone.now() + timedelta(days=1)
+        event_1 = CalendarEvent.objects.create(
+            user=self.user,
+            title='Session A',
+            start_time=start,
+            end_time=start + timedelta(hours=1),
+            tag=tag,
+        )
+        event_2 = CalendarEvent.objects.create(
+            user=self.user,
+            title='Session B',
+            start_time=start + timedelta(hours=2),
+            end_time=start + timedelta(hours=3),
+            tag=tag,
+        )
+
+        response = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Named schedule',
+            'event_ids': [event_1.id, event_2.id],
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['title'], 'Named schedule')
+        self.assertEqual(len(response.data['event_allocations']), 2)
+
+    def test_same_name_schedule_overwrites_previous_and_creates_notification(self):
+        payload = {
+            'title': 'Reusable Name',
+            'worktime_preference': 'day',
+            'week_preference': 'both',
+            'deadline_preferences': [
+                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30},
+            ],
+        }
+        first = self.client.post(self.url, payload, format='json')
+        self.assertEqual(first.status_code, status.HTTP_201_CREATED)
+
+        second = self.client.post(self.url, payload, format='json')
+        self.assertEqual(second.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(second.data['overwritten'])
+        self.assertEqual(Schedule.objects.filter(user=self.user, title='Reusable Name').count(), 1)
+        self.assertTrue(Notification.objects.filter(user=self.user, title='Schedule overwritten').exists())
