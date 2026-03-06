@@ -321,6 +321,68 @@ function MobileDrawer({
 }
 
 
+// ── Mobile Bottom Bar ─────────────────────────────────────────────────────────
+
+function MobileBottomBar({
+  active,
+  onChange,
+  user,
+  onToggleDrawer,
+  drawerOpen,
+}) {
+  const routes = APP_ROUTES.filter((r) => !r.isAdminOnly || user?.isAdmin);
+
+  return (
+    <motion.div
+      className={styles.mobileBottomBar}
+      initial={{ y: 80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
+    >
+      {/* Hamburger + separator */}
+      <div className={styles.mobileBottomLeft}>
+        <motion.button
+          className={`${styles.mobileHamburgerBtn} ${
+            drawerOpen ? styles.mobileHamburgerBtnActive : ""
+          }`}
+          onClick={onToggleDrawer}
+          whileTap={{ scale: 0.88 }}
+          aria-label="Open menu"
+        >
+          <AnimatePresence mode="wait">
+            {drawerOpen ? (
+              <motion.span
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className={styles.mobileHamburgerIcon}
+              >
+                ✕
+              </motion.span>
+            ) : (
+              <motion.div
+                key="open"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className={styles.mobileHamburgerLines}
+              >
+                <div className={styles.hamburgerLine} />
+                <div className={styles.hamburgerLine} />
+                <div className={styles.hamburgerLine} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
+        <div className={styles.mobileBottomSeparator} />
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Sidebar({
   active,
   onChange,
