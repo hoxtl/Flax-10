@@ -454,6 +454,28 @@ export default function Homepage() {
     [editEvent, loadEvents, showToast]
   );
 
+  const handleTimelineDelete = useCallback(
+    async (eventLike) => {
+      const eventObj = eventLike && typeof eventLike === "object" ? eventLike : null;
+      const rawId = eventObj?.id ?? eventLike;
+      const baseId = extractBaseEventId(rawId, eventObj);
+      try {
+        if (eventObj?.source === "task" && eventObj?.external_id) {
+          await deleteTask(eventObj.external_id);
+          await Promise.all([loadEvents(), refetchTasks()]);
+          showToast(`"${eventObj.title}" removed from tasks and calendar.`);
+          return;
+        }
+        await removeEvent(baseId);
+        await loadEvents();
+        showToast(`"${eventObj?.title || "Event"}" deleted.`);
+      } catch {
+        showToast("Couldn't delete this item. Try again.");
+      }
+    },
+    [removeEvent, loadEvents, refetchTasks, showToast]
+  );
+
   const scheduledTitles = useMemo(
     () => new Set(upcomingItems.map((e) => e.title?.toLowerCase())),
     [upcomingItems]
@@ -1022,7 +1044,7 @@ export default function Homepage() {
                   onEdit={(ev) => openModal(ev, ev.tag)}
                   onConflictAutoMove={handleConflictAutoMove}
                   onPushTomorrow={handleConflictPushTomorrow}
-                  onDelete={removeEvent}
+                  onDelete={handleTimelineDelete}
                   onReschedule={handleReschedule}
                   getTag={getTag}
                   completedEventIds={completedEventIds}
@@ -1135,8 +1157,7 @@ export default function Homepage() {
             openModal({ ...ev, id: extractBaseEventId(ev.id) }, ev.tag);
           }}
           onDeleteEvent={async (ev) => {
-            await removeEvent(extractBaseEventId(ev.id));
-            await loadEvents();
+            await handleTimelineDelete(ev);
           }}
         />
       )}

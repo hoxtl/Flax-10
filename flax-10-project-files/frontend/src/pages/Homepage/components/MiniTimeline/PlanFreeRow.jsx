@@ -12,7 +12,7 @@
 
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
-import { getTasksThatFitGap, taskDurationMins } from "../../utils/taskUtils";
+import { taskDurationMins } from "../../utils/taskUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
 import { formatHour12h } from "../../utils/dateFormatUtils";
 
@@ -40,10 +40,6 @@ export function PlanFreeRow({
   assignedTask = null,
 }) {
   const gapContext = row.gapContext || { type: "study" };
-  const { suggested: suggestedTask, top3: top3Tasks } = getTasksThatFitGap(
-    suggestableTasks || [],
-    gapContext.type === "transit-partial" ? (gapContext.freeAfterTransit ?? row.minutes) : row.minutes,
-  );
   const gapStartDate = getGapStartDate(selectedDate, row.gapStartMins);
   const isBestWindow = row.minutes >= 60;
   const durLabel = durationLabel(row.minutes);
@@ -60,6 +56,21 @@ export function PlanFreeRow({
 
   function startTask(task) {
     if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task);
+  }
+
+  function isOverdue(task) {
+    if (!task?.due_date) return false;
+    return new Date(task.due_date) < new Date();
+  }
+
+  function isUrgent(task) {
+    return String(task?.priority || "").toLowerCase() === "urgent";
+  }
+
+  function withUrgencyEmoji(task) {
+    if (!task) return "";
+    const title = task.title || "";
+    return isOverdue(task) || isUrgent(task) ? `❗ ${title}` : title;
   }
 
   /* ── Transit: entire gap is travel time ── */
@@ -97,7 +108,7 @@ export function PlanFreeRow({
     const from = CAMPUS_DISPLAY[gapContext.prevCampus] || "campus";
     const to = CAMPUS_DISPLAY[gapContext.nextCampus] || "next campus";
     const freeLabel = durationLabel(gapContext.freeAfterTransit || 0);
-    const top1 = top3Tasks[0] || null;
+    const top1 = assignedTask || null;
     return (
       <div
         className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
@@ -117,7 +128,7 @@ export function PlanFreeRow({
           </div>
           {top1 && (
             <div className={styles.planTimelineGapShortTaskRow}>
-              <span className={styles.planTimelineGapTaskTitle} title={top1.title}>{top1.title}</span>
+              <span className={styles.planTimelineGapTaskTitle} title={withUrgencyEmoji(top1)}>{withUrgencyEmoji(top1)}</span>
               <span className={styles.planTimelineGapTaskMeta}>{taskDurationMins(top1)}m</span>
               <button
                 type="button"
@@ -186,16 +197,17 @@ export function PlanFreeRow({
 
   /* ── Study windows (compact single-line style) ── */
   const topDeadlineShort = deadlineSuggestions[0] ?? null;
-  const candidateTask = assignedTask || suggestedTask || (topDeadlineShort
+  const candidateTask = assignedTask || (topDeadlineShort
     ? {
         title: `Revision: ${topDeadlineShort.assessment_title || topDeadlineShort.title}`,
         estimated_blocks: Math.max(1, Math.round(row.minutes / 25)),
         due_date: topDeadlineShort.start_due_date,
+        priority: "urgent",
       }
     : null);
   const windowLabel = `${durLabel} free`;
   const recommendationText = candidateTask
-    ? `${candidateTask.title}`
+    ? `${withUrgencyEmoji(candidateTask)}`
     : `Short breather`;
 
   return (

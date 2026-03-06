@@ -41,12 +41,8 @@ export function useHomeData(selectedDate) {
 
   const dayEvents = useMemo(() => {
     const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
-    const merged = [...(primary || []), ...(fallbackDayEvents || [])];
-    const deduped = merged.filter((e, idx, arr) => {
-      if (!e || e.id == null) return false;
-      return arr.findIndex((x) => x && x.id === e.id) === idx;
-    });
-    return deduped.filter((e) =>
+    const source = Array.isArray(primary) && primary.length > 0 ? primary : (fallbackDayEvents || []);
+    return source.filter((e) =>
       overlapsDay(new Date(e.start_time), new Date(e.end_time || e.start_time), selectedDate)
     );
   }, [allEvents, events, fallbackDayEvents, selectedDate]);

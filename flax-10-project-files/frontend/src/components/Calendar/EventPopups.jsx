@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
+import { useEventModal, useEventPopup } from '../../context/CalendarContext';
+import { useTimerContext } from '../../context/TimerContext';
 import { EventModal } from './EventModal/EventModal';
 import { EventDetailPopup } from './EventDetailPopup';
 import { useTags } from '../../context/TagContext';
@@ -9,6 +10,7 @@ import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { disenrolByModuleId } from '../../api/moduleApi';
 import { unsyncCalendar } from '../../api/societyApi';
+import { deleteTask } from '../../api/taskService';
 import ConfirmModal from '../common/ConfirmModal';
 
 export function EventPopups() {
@@ -45,6 +47,7 @@ function EventPopupContainer() {
     const { popupEvent, popupAnchorRect, closePopup, readOnly } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
+    const { setActiveTaskId } = useTimerContext();
     const tags = useTags();
     const navigate = useNavigate();
     const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
@@ -53,7 +56,14 @@ function EventPopupContainer() {
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, tags);
-    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate };
+    const handlers = {
+        openModal,
+        onDeleteRequest: handleDeleteRequest,
+        closePopup,
+        loadEvents,
+        navigate,
+        setActiveTaskId,
+    };
     const actions = readOnly ? null : getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
 }
@@ -72,6 +82,7 @@ function getCalendarPopupActions(event, handlers) {
     if (event?.forcePersonalPopup) return getPersonalActions(event, handlers);
     const type = getEventType(event);
     if (type === 'personal') return getPersonalActions(event, handlers);
+    if (type === 'task') return getTaskActions(event, handlers);
     if (type === 'module') return getModuleActions(event, handlers);
     if (type === 'society') return getSocietyActions(event, handlers);
     return null;
@@ -82,6 +93,32 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
         { label: 'Edit', onClick: () => { closePopup(); openModal(event); } },
         { label: 'Delete', variant: 'danger', onClick: () => onDeleteRequest(event) }
     ];
+}
+
+function getTaskActions(event, { closePopup, loadEvents, navigate, setActiveTaskId }) {
+    const taskId = getTaskIdFromEvent(event);
+    const focusTask = () => {
+        closePopup();
+        if (taskId != null) setActiveTaskId(taskId, { title: event.title });
+        navigate('/timer', { state: { fromTaskPlay: true } });
+    };
+    const removeTask = async () => {
+        if (taskId == null) return;
+        closePopup();
+        await deleteTask(taskId);
+        await loadEvents();
+    };
+    return [
+        { label: '▶ Focus', onClick: focusTask },
+        { label: 'Delete Task', variant: 'danger', onClick: removeTask },
+    ];
+}
+
+function getTaskIdFromEvent(event) {
+    const raw = event?.external_id;
+    if (raw == null) return null;
+    const asNumber = Number(raw);
+    return Number.isFinite(asNumber) ? asNumber : null;
 }
 
 function getModuleActions(event, { closePopup, loadEvents }) {

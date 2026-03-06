@@ -28,6 +28,7 @@ export function isReadOnlyEvent(event) {
 
 export function getEventType(event) {
     if (!event) return 'personal';
+    if (event.source === 'task') return 'task';
     if (event.source === 'society') return 'society';
     if (event.module) return 'module';
     if (event.source && event.external_id) return 'timetable';

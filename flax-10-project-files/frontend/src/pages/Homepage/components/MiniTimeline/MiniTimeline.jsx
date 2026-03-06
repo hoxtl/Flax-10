@@ -11,7 +11,7 @@ import { formatTime } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { isNow } from "../../utils/eventUtils";
 import { computePlanTimelineRows } from "../../utils/planTimelineRows";
-import { getTasksThatFitGap } from "../../utils/taskUtils";
+import { getTasksThatFitGap, taskDurationMins } from "../../utils/taskUtils";
 
 import { HourMarkRow } from "./HourMarkRow";
 import { TinyGapRow } from "./TinyGapRow";
@@ -139,15 +139,38 @@ export function MiniTimeline({
     const used = new Set();
     const map = {};
 
+    const rankForGap = (task, gapMins) => {
+      const due = task?.due_date ? new Date(task.due_date) : null;
+      const isOverdue = !!(due && due < now);
+      const priorityRank = priorityOrder[task?.priority] ?? 2;
+      const duration = taskDurationMins(task);
+      const durationFit = Math.abs((gapMins || 0) - duration);
+      return [
+        isOverdue ? 0 : 1,
+        priorityRank,
+        durationFit,
+        -(duration || 0), // prefer longer focused work when urgency is tied
+      ];
+    };
+
+    const compareRank = (a, b) => {
+      for (let i = 0; i < a.length; i += 1) {
+        if (a[i] !== b[i]) return a[i] - b[i];
+      }
+      return 0;
+    };
+
     for (const row of freeRows) {
       const mins = row.minutes || 0;
-      const pick = queue.find((t) => !used.has(t.id) && getTasksThatFitGap([t], mins).suggested);
+      const candidates = queue.filter((t) => !used.has(t.id) && getTasksThatFitGap([t], mins).suggested);
+      const pick = candidates
+        .sort((a, b) => compareRank(rankForGap(a, mins), rankForGap(b, mins)))[0];
       if (!pick) continue;
       map[row.id] = pick;
       used.add(pick.id);
     }
     return map;
-  }, [rows, suggestableTasks]);
+  }, [rows, suggestableTasks, now]);
 
   const currentBlock = useMemo(
     () => (!hasTimerSession && isToday(selectedDate)) ? (sortedEvents || []).find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time)) : null,
@@ -270,7 +293,7 @@ export function MiniTimeline({
             onClose={() => setEventCtxMenu(null)}
             onEdit={(ev) => onEdit?.(ev, ev?.tag)}
             onDelete={async (ev) => {
-              await onDelete?.(ev?.id ?? ev);
+              await onDelete?.(ev);
             }}
           />
         )}
