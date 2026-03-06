@@ -36,15 +36,35 @@
 }
 
 @keyframes focusTransitionTextFade {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes focusOverlayZoomInHoldZoomOut {
-    0% { opacity: 1; transform: scale(0.92); }
-    6% { transform: scale(1); }
-    6.01%, 90% { transform: scale(1); }
-    100% { opacity: 0; pointer-events: none; transform: scale(1.06); }
+    0% {
+        opacity: 1;
+        transform: scale(0.92);
+    }
+
+    6% {
+        transform: scale(1);
+    }
+
+    6.01%,
+    90% {
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(1.06);
+    }
 }
 
 .containerFocusEntering .focusModeContent {
@@ -54,8 +74,15 @@
 }
 
 @keyframes focusContentZoomIn {
-    0% { opacity: 0; transform: scale(0.94); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .mainContentWrap {
@@ -74,7 +101,6 @@
     justify-content: center;
     gap: 1rem;
     margin-bottom: 1rem;
-    position: relative;
     width: 100%;
     box-sizing: border-box;
 }
@@ -90,8 +116,7 @@
 .historyButton {
     position: absolute;
     right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 2rem;
     background: var(--pill-bg);
     border: none;
     font-size: 0.9rem;
@@ -105,11 +130,12 @@
     align-items: center;
     gap: 0.5rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    z-index: 10;
 }
 
 .historyButton:hover {
     background: #e5e7eb;
-    transform: translateY(-50%) scale(1.02);
+    transform: scale(1.02);
 }
 
 
@@ -157,14 +183,17 @@
     background: transparent;
     color: var(--color-sage-primary);
 }
+
 .timerResumeBtn:hover {
     background: rgba(139, 166, 143, 0.12);
 }
+
 .timerResumeBtnActive {
     background: var(--color-sage-primary);
     color: white;
     border-color: var(--color-sage-primary);
 }
+
 .timerResumeBtnActive:hover {
     filter: brightness(1.05);
 }
@@ -566,6 +595,7 @@
     padding: 0.35rem 0.6rem 0.4rem;
     border-bottom: 1px solid var(--border, #e5e7eb);
 }
+
 .taskPickSortLabel {
     font-size: 0.65rem;
     font-weight: 700;
@@ -573,6 +603,7 @@
     letter-spacing: 0.04em;
     color: var(--muted, #6b7280);
 }
+
 .taskPickSortSelect {
     font-size: 0.75rem;
     font-weight: 600;
@@ -589,14 +620,17 @@
     background-position: right 0.5rem center;
     transition: border-color 0.12s, background-color 0.12s;
 }
+
 .taskPickSortSelect:hover {
     border-color: var(--primary);
 }
+
 .taskPickSortSelect:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
 }
+
 .taskPickSortDropdown {
     flex: 1;
     min-width: 0;
@@ -610,10 +644,12 @@
     border-bottom: 1px solid var(--border, #e5e7eb);
     background: var(--bg, #fafafa);
 }
+
 .taskPickSearchIcon {
     font-size: 0.85rem;
     opacity: 0.6;
 }
+
 .taskPickSearchInput {
     flex: 1;
     min-width: 0;
@@ -626,9 +662,11 @@
     outline: none;
     transition: border-color 0.15s;
 }
+
 .taskPickSearchInput::placeholder {
     color: var(--muted, #9ca3af);
 }
+
 .taskPickSearchInput:focus {
     border-color: var(--primary);
 }
@@ -674,7 +712,11 @@
     font-weight: 600;
     border-bottom-color: color-mix(in srgb, var(--primary) 40%, transparent);
 }
-.taskInputHasValue::placeholder { color: var(--primary); opacity: 0.7; }
+
+.taskInputHasValue::placeholder {
+    color: var(--primary);
+    opacity: 0.7;
+}
 
 .taskPickBtn {
     font-size: 0.75rem;
@@ -686,6 +728,7 @@
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
 }
+
 .taskPickBtn:hover {
     background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
@@ -715,27 +758,39 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
     z-index: 101;
     padding: 0.5rem;
     animation: modalIn 0.2s ease;
 }
+
 .taskPickDropdown::-webkit-scrollbar {
     width: 6px;
 }
+
 .taskPickDropdown::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .taskPickDropdown::-webkit-scrollbar-thumb {
     background: #d1d5db;
     border-radius: 9999px;
 }
+
 .taskPickDropdown::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
 }
+
 @keyframes modalIn {
-    from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 .taskPickEmpty {
@@ -768,6 +823,7 @@
     transition: background 0.15s ease, color 0.15s ease;
     position: relative;
 }
+
 .taskPickItem:hover {
     background: #f0f2eb;
 }
@@ -776,6 +832,7 @@
     background: color-mix(in srgb, var(--primary) 10%, transparent);
     font-weight: 600;
 }
+
 .taskPickItemSelected:hover {
     background: color-mix(in srgb, var(--primary) 16%, transparent);
 }

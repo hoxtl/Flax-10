@@ -11,6 +11,8 @@ import TagFilterBar from "../../tags/TagFilterBar";
 import TagManager from "../../tags/TagManager";
 import { EventDetailPopup } from "../../../../Calendar/EventDetailPopup";
 import SyncButton from "./SyncButton";
+import { EventsSummaryModal } from "../../../../Calendar/EventsSummaryModal/EventsSummaryModal";
+import { useConfirm } from "../../../../../context/ConfirmContext";
 
 export default function CalendarTab(props) {
     return (
@@ -24,7 +26,9 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
     const [popupState, setPopupState] = useState({ event: null, rect: null });
+    const [summaryDate, setSummaryDate] = useState(null);
     const { openModal } = useEventModal();
+    const confirmFn = useConfirm();
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
     const closePopup = () => setPopupState({ event: null, rect: null });
@@ -48,29 +52,52 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
                         setPopupState({ event: e, rect: r });
                     }
                 }}
+                onMoreClick={setSummaryDate}
                 customTags={tags} />
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
             {popupState.event && <EventDetailPopup event={popupState.event} anchorRect={popupState.rect}
                 tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
                 actions={getPopupActions(popupState.event, onViewAnnouncement, editMode, {
                     onEdit: () => openModal(popupState.event, 'society', popupState.event.start_time),
-                    onDelete: (e) => handlePopupDelete(e, eventHandlers, closePopup)
+                    onDelete: async (e) => await handlePopupDelete(e, eventHandlers, closePopup, confirmFn)
                 })} />}
+            <EventsSummaryModal
+                isOpen={!!summaryDate}
+                onClose={() => setSummaryDate(null)}
+                allEvents={events}
+                baseDate={summaryDate}
+                isMutualOrSelf={true}
+            />
         </div>
     );
 }
 
-function handlePopupDelete(event, handlers, closePopup) {
+async function handlePopupDelete(event, handlers, closePopup, confirmFn) {
     try {
         const isRecurring = hasRecurrence(event);
-        const choice = isRecurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
-        const baseId = extractBaseEventId(event.id, event);
-
-        if (choice) handlers?.onDelete?.(baseId, event.title);
-        else {
-            const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
-            handlers?.onAddException?.(baseId, dateStr);
+        let choice = true;
+        if (isRecurring) {
+            choice = await confirmFn({
+                title: "Delete Recurring Society Event",
+                message: "This is a recurring event. How would you like to delete it?",
+                confirmText: "Delete ALL occurrences",
+                alternateText: "Delete ONLY this one",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+        } else {
+            choice = await confirmFn({
+                title: "Delete Society Event",
+                message: `Are you sure you want to delete "${event.title}"?`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                isDanger: true
+            });
         }
+
+        const baseId = extractBaseEventId(event.id, event);
+        if (choice === true) handlers?.onDelete?.(baseId, event.title);
+        else if (choice === 'ALTERNATE') handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
     } catch (err) {
         console.error('Deletion failed:', err);
     }
@@ -101,8 +128,9 @@ function NavButtons({ date, setDate }) {
 
 function SocietyEventModal({ eventHandlers, tags, editMode }) {
     const { isModalOpen, closeModal, modalEvent, modalInitialDate } = useEventModal();
+    const confirmFn = useConfirm();
     if (!isModalOpen || !editMode) return null;
-    const handleDelete = () => handlePopupDelete(modalEvent, eventHandlers, closeModal);
+    const handleDelete = async () => await handlePopupDelete(modalEvent, eventHandlers, closeModal, confirmFn);
     return (
         <EventModal event={modalEvent} initialDate={modalInitialDate} onClose={closeModal}
             showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)}

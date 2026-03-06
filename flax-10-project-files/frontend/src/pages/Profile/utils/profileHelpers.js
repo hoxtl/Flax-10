@@ -26,9 +26,9 @@ function isInRange(eventStart, today, range) {
   return eventStart >= today && eventStart < dateOffset(today, 30);
 }
 
-export function getFilteredEvents(allEvents, eventRange) {
-  const today = getToday();
-  return allEvents
+export function getFilteredEvents(allEvents, eventRange, baseDate) {
+  const today = baseDate ? new Date(baseDate) : getToday();
+  return (allEvents || [])
     .filter(e => isInRange(new Date(e.start_time), today, eventRange))
     .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }

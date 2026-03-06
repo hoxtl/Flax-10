@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CampusMap.module.css';
 import { tflService } from "../../api/tflService";
+import { getHomeAddress } from "../../api/userService";
 
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -100,8 +101,12 @@ export default function CampusMap() {
   const [tflRouteInfo, setTflRouteInfo] = useState(null);
   const [loadingTflRoute, setLoadingTflRoute] = useState(false);
   const [tflRouteError, setTflRouteError] = useState('');
-  const[disruptions, setDisruptions] = useState([]);
-  const[loadingDisruptions, setLoadingDisruptions] = useState(false);
+  const [disruptions, setDisruptions] = useState([]);
+  const [loadingDisruptions, setLoadingDisruptions] = useState(false);
+
+  const [userHome, setUserHome] = useState(null);
+  const homePointer = useRef(null);
+  const homePopup = useRef(null);
 
   useEffect(() => {
     if (map.current) return;
@@ -246,6 +251,94 @@ export default function CampusMap() {
       map.current = null;
     };
   }, []);
+
+  // Load user's home address on the map
+  useEffect(() => {
+    const loadHomeAddress = async() => {
+      try {
+        const data = await getHomeAddress();
+        if (data.home_latitude && data.home_longitude) {
+          setUserHome({
+            address: data.home_address,
+            lat: data.home_latitude,
+            lng: data.home_longitude,
+          });
+        }
+      } catch (error) {
+        console.error('User home could not be loaded: ', error);
+      }
+    };
+
+    loadHomeAddress();
+
+    const handleHomeUpdate = () => loadHomeAddress();
+    window.addEventListener('home-address-updated', handleHomeUpdate);
+
+    return () => window.removeEventListener('home-address-updated', handleHomeUpdate);
+  }, []);
+
+  // Display user's home pointer on the map
+  useEffect(() => {
+    if (!mapLoaded || !userHome) return;
+
+    if (homePointer.current) {
+      homePointer.current.remove();
+      homePointer.current = null;
+    }
+    if (homePopup.current) {
+      homePopup.current.remove();
+      homePopup.current = null;
+    }
+
+    const el = document.createElement('div');
+    el.className = styles.homePointer;
+    el.innerHTML = '🏠';
+    el.title = 'User Home';
+
+    homePopup.current = new mapboxgl.Popup({
+      offset: 25,
+      closeButton: false,
+      closeOnClick: false,
+      className: styles.homePopupContainer,
+    }).setHTML(`
+      <div class="HomePopupContent">
+        <div class="HomePopupTitle">🏠User Home</div>
+        <button id="setHomeAsStart" class="HomePopupButton">
+          Set Home as Start
+        </button>
+      </div>`);
+
+      homePointer.current = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([userHome.lng, userHome.lat])
+        .setPopup(homePopup.current)
+        .addTo(map.current);
+      
+      const isHomeStartingLoc = startLocation && 
+        Math.abs(startLocation.lat - userHome.lat) < 0.0001 &&
+        Math.abs(startLocation.lng - userHome.lng) < 0.0001;
+      
+      if (!isHomeStartingLoc) {
+        homePointer.current.togglePopup();
+      }
+
+      setTimeout(() => {
+        const btn = document.getElementById('setHomeAsStart');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            setStartLocation({lng: userHome.lng, lat: userHome.lat});
+            if (homePointer.current && homePointer.current.getPopup().isOpen()) {
+              homePointer.current.togglePopup();
+            }
+            map.current?.flyTo({
+              center: [userHome.lng, userHome.lat],
+              zoom: 15,
+              pitch: 55,
+              duration: 1200
+            });
+          });
+        }
+      }, 100);
+  }, [userHome, mapLoaded, startLocation]);
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {

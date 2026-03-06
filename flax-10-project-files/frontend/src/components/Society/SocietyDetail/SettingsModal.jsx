@@ -3,6 +3,7 @@ import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
 import { RatificationSection } from "./RatificationSection";
+import { useConfirm } from "../../../context/ConfirmContext";
 
 async function addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator) {
   const existingMember = (members || []).find(m => m.username === user.username);
@@ -52,27 +53,26 @@ function CollaboratorsSection({ collaborators, onUpdateRole, onRemove }) {
   );
 }
 
-function DeleteConfirm({ onConfirm, onCancel, onClose }) {
-  const handleDelete = () => { onConfirm?.(); onClose?.(); };
-  return (
-    <div className={styles.dangerSection}>
-      <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <p className={styles.confirmText}>Are you sure? This cannot be undone.</p>
-      <div className={styles.confirmBtns}>
-        <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-        <button className={styles.confirmDeleteBtn} onClick={handleDelete}>Delete</button>
-      </div>
-    </div>
-  );
-}
-
 function DangerSection({ onDelete, onClose }) {
-  const [confirming, setConfirming] = useState(false);
-  if (confirming) return <DeleteConfirm onConfirm={onDelete} onCancel={() => setConfirming(false)} onClose={onClose} />;
+  const confirmFn = useConfirm();
+  const handleDeleteClick = async () => {
+    const choice = await confirmFn({
+      title: "Delete Society",
+      message: "Are you sure? This cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      isDanger: true
+    });
+    if (choice) {
+      onDelete?.();
+      onClose?.();
+    }
+  };
+
   return (
     <div className={styles.dangerSection}>
       <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete Society</button>
+      <button className={styles.deleteBtn} onClick={handleDeleteClick}>Delete Society</button>
     </div>
   );
 }
@@ -100,4 +100,5 @@ export default function SettingsModal(props) {
         <DangerSection onDelete={onDelete} onClose={onClose} />
       </ModalBackdrop>
       {showAddModal && <AddCollaboratorModal onClose={() => setShowAddModal(false)} onAdd={handleAddCollaborators} existingUsernames={collaboratorUsernames} />}
-    </>);}
+    </>);
+}
