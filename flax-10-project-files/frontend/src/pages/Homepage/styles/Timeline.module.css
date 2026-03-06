@@ -258,7 +258,13 @@
     bottom: 0;
     width: 2px;
     margin-left: -1px;
-    background: rgba(107, 83, 68, 0.18);
+    background: linear-gradient(
+      to bottom,
+      rgba(107, 83, 68, 0.04) 0%,
+      rgba(107, 83, 68, 0.30) 10%,
+      rgba(107, 83, 68, 0.32) 90%,
+      rgba(107, 83, 68, 0.04) 100%
+    );
     border-radius: 1px;
     pointer-events: none;
     z-index: 0;
@@ -285,7 +291,7 @@
     min-height: 40px;
   }
   .planTimelineRowGap > *:nth-child(3) {
-    align-items: center;
+    align-items: stretch;
   }
   .planTimelineGutter {
     display: flex;
@@ -332,20 +338,19 @@
     line-height: 1;
   }
   .planTimelineHourMarkDot {
-    width: 7px;
-    height: 7px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: #F9F8F6;
-    border: 2px solid rgba(107, 83, 68, 0.4);
+    background: rgba(107, 83, 68, 0.38);
+    border: none;
+    box-shadow: 0 0 0 2px #fff;
     justify-self: center;
     z-index: 2;
     position: relative;
     flex-shrink: 0;
   }
   .planTimelineHourMarkLine {
-    height: 1px;
-    background: rgba(107, 83, 68, 0.07);
-    width: 100%;
+    display: none;
   }
 
   /* 32px Sage Green node with emoji (bead-on-a-string) + pop on appear */
@@ -421,21 +426,17 @@
   .planTimelineTinyGapLineWrap {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0;
     width: 100%;
     min-width: 0;
   }
-  .planTimelineTinyGapLineWrap .planTimelineTinyGapLine {
-    flex-shrink: 0;
-    width: 24px;
-    margin: 0;
-  }
   .planTimelineTinyGapMicroBreak {
-    font-size: 0.7rem;
-    color: var(--home-text-meta, #6b7280);
+    font-size: 0.72rem;
+    color: #6f7f72;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 2px;
   }
   /* Live Compass: glowing green line */
   .planTimelineNowLine {
@@ -489,9 +490,9 @@
     grid-template-rows: 1fr;
     gap: 0 10px;
     align-items: center;
-    height: 58px;
-    min-height: 58px;
-    max-height: 58px;
+    height: 100%;
+    min-height: 56px;
+    max-height: none;
     padding: 0 10px 0 12px;
     margin-left: 0;
     border-radius: 10px;
@@ -762,6 +763,9 @@
     min-width: 0;
     width: 100%;
     max-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
   }
   .planTimelineCardIconCircle {
     width: 28px;
@@ -1450,7 +1454,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
   }
 
@@ -1486,15 +1490,20 @@
   }
 
   .timelineHeaderActionLink {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #6b6258;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #6a5d4f;
+    letter-spacing: 0.01em;
     text-decoration: none;
     white-space: nowrap;
     transition: color 0.15s ease;
   }
   .timelineHeaderActionLink:hover {
-    color: #3f3427;
+    color: #3e3328;
   }
 
   .timelineHeaderSub {
@@ -2641,7 +2650,7 @@
     min-height: 10px;
     background: var(--node-color, #A08B72);
     font-size: 0;
-    box-shadow: 0 0 0 2px rgba(250, 249, 246, 1), 0 0 0 3px rgba(160, 139, 114, 0.25);
+    box-shadow: 0 0 0 2px #fff;
     border: none;
   }
 
@@ -2653,7 +2662,7 @@
     min-height: 10px;
     background: #84A98C;
     font-size: 0;
-    box-shadow: 0 0 0 2px rgba(250, 249, 246, 1), 0 0 0 4px rgba(132, 169, 140, 0.35);
+    box-shadow: 0 0 0 2px #fff;
     border: none;
   }
 
@@ -2702,22 +2711,141 @@
   .planTimelineGapShortWindow {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
+    gap: 6px;
+    justify-content: center;
+    padding: 6px 0;
     border-radius: 8px;
-    border: 1px dashed rgba(160, 139, 114, 0.4);
-    background: rgba(160, 139, 114, 0.03);
-    flex-wrap: wrap;
-    min-height: 32px;
+    border: 1px solid rgba(132, 169, 140, 0.35);
+    background: rgba(132, 169, 140, 0.10);
+    flex-wrap: nowrap;
+    min-height: 24px;
+    height: 100%;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .planTimelineGapShortWindowFeatured {
+    background: rgba(132, 169, 140, 0.14);
+    border-color: rgba(132, 169, 140, 0.45);
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+
+  .planTimelineGapShortWindowBest {
+    background: rgba(132, 169, 140, 0.16);
+    border-color: rgba(132, 169, 140, 0.52);
+  }
+
+  .planTimelineGapShortWindowNoActions {
+    text-align: center;
+  }
+
+  .planTimelineGapRail {
+    flex: 1;
+    min-width: 14px;
+    border-top: 1px dashed rgba(74, 52, 33, 0.08);
+    height: 0;
+  }
+
+  .planTimelineGapMain {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .planTimelineGapActions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 0;
+    flex-shrink: 0;
+    padding-left: 8px;
+  }
+
+  .planTimelineGapCollapsed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    border-top: 1px dashed rgba(140, 154, 134, 0.3);
+    padding: 4px 6px 0;
+    min-height: 20px;
+  }
+
+  .planTimelineGapCollapsedDur {
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: #7d756d;
+    white-space: nowrap;
+  }
+
+  .planTimelineGapCollapsedText {
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.66rem;
+    font-weight: 500;
+    color: #8a8178;
+    line-height: 1.2;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .planTimelineGapExpandBtn,
+  .planTimelineGapCollapseBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(160, 139, 114, 0.35);
+    background: rgba(255, 255, 255, 0.85);
+    color: #8c7861;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .planTimelineGapExpandBtn:hover,
+  .planTimelineGapCollapseBtn:hover {
+    background: rgba(160, 139, 114, 0.12);
+    border-color: rgba(160, 139, 114, 0.5);
+  }
+
+  .planTimelineGapLeadDot {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    min-height: 8px;
+    border-radius: 50%;
+    background: #84A98C;
+    flex-shrink: 0;
   }
 
   .planTimelineGapShortDur {
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.65rem;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #7B6751;
+    color: #8C9A86;
+    flex-shrink: 0;
+  }
+
+  .planTimelineGapSeparator {
+    color: var(--home-text-meta, #8c837a);
+    opacity: 0.35;
+    margin: 0 8px;
     flex-shrink: 0;
   }
 
@@ -2727,7 +2855,7 @@
     gap: 6px;
     flex: 1;
     min-width: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   /* ── Gap task list (Best Window) ── */
@@ -2756,7 +2884,7 @@
   }
 
   .planTimelineGapTaskTitle {
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
     font-size: 0.8rem;
     font-weight: 600;
     color: #2d352d;
@@ -2766,18 +2894,37 @@
   }
 
   .planTimelineGapTaskMeta {
-    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-    font-size: 0.62rem;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.72rem;
     font-weight: 500;
-    color: #7B6751;
-    opacity: 0.8;
+    color: var(--home-text-meta, #8c837a);
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  .planTimelineGapSuggestionText {
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--home-text-meta, #73675b);
+    font-style: normal;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    min-width: 0;
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .planTimelineGapNoTasks {
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.8rem;
-    color: #8f8a81;
-    font-style: italic;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--home-text-meta, #8c837a);
+    opacity: 0.4;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
   }
 
   /* ── Deadline revision suggestion ── */
@@ -2882,13 +3029,14 @@
     border: 1px solid rgba(132, 169, 140, 0.45);
     background: rgba(132, 169, 140, 0.08);
     color: #5a8a65;
-    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-    font-size: 0.62rem;
-    font-weight: 700;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
     flex-shrink: 0;
     white-space: nowrap;
+    margin-left: auto;
   }
   .planTimelineGapStartBtnSm:hover {
     background: rgba(132, 169, 140, 0.18);
@@ -2902,9 +3050,10 @@
     border: 1px solid rgba(192, 113, 78, 0.35);
     background: rgba(192, 113, 78, 0.08);
     color: #a05034;
-    font-size: 0.58rem;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     line-height: 1.2;
   }
@@ -2917,7 +3066,7 @@
     min-height: 10px;
     background: #C0714E;
     font-size: 0;
-    box-shadow: 0 0 0 2px rgba(250, 249, 246, 1), 0 0 0 3px rgba(192, 113, 78, 0.3);
+    box-shadow: 0 0 0 2px #fff;
     border: none;
   }
 

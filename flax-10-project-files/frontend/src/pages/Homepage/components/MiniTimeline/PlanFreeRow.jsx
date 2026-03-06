@@ -25,18 +25,6 @@ function durationLabel(minutes) {
   return `${minutes}m`;
 }
 
-function formatDueLabel(task) {
-  if (!task?.due_date) return null;
-  const due = new Date(task.due_date);
-  const now = new Date();
-  const diff = due - now;
-  if (diff < 0) return "overdue";
-  const h = Math.floor(diff / 3600000);
-  if (h < 24) return `due in ${h}h`;
-  const d = Math.floor(diff / 86400000);
-  return `due in ${d}d`;
-}
-
 export function PlanFreeRow({
   row,
   suggestableTasks,
@@ -48,6 +36,8 @@ export function PlanFreeRow({
   slotPopoverRef,
   slotPopoverRowId,
   setSlotPopoverRowId,
+  isBestGap = false,
+  assignedTask = null,
 }) {
   const gapContext = row.gapContext || { type: "study" };
   const { suggested: suggestedTask, top3: top3Tasks } = getTasksThatFitGap(
@@ -57,6 +47,12 @@ export function PlanFreeRow({
   const gapStartDate = getGapStartDate(selectedDate, row.gapStartMins);
   const isBestWindow = row.minutes >= 60;
   const durLabel = durationLabel(row.minutes);
+  const endMins = (row.gapStartMins || 0) + (row.minutes || 0);
+  const crossedHourMarkers = Math.max(0, Math.floor(endMins / 60) - Math.floor((row.gapStartMins || 0) / 60));
+  const markerCompensation = crossedHourMarkers * 22;
+  const gapMinHeight = row.minutes > 0
+    ? Math.max(56, Math.min(Math.round(row.minutes * 1.2) + markerCompensation, 260))
+    : 56;
   const timeStr = formatHour12h(
     Math.floor(DAY_START_HOUR + row.gapStartMins / 60),
     row.gapStartMins % 60
@@ -73,7 +69,7 @@ export function PlanFreeRow({
     return (
       <div
         className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
-        style={{ marginTop: row.spacingBeforePx || 0 }}
+        style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
           <span className={styles.planTimelineTime}>{timeStr}</span>
@@ -105,7 +101,7 @@ export function PlanFreeRow({
     return (
       <div
         className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
-        style={{ marginTop: row.spacingBeforePx || 0 }}
+        style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
           <span className={styles.planTimelineTime}>{timeStr}</span>
@@ -143,14 +139,21 @@ export function PlanFreeRow({
     return (
       <div
         className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
-        style={{ marginTop: row.spacingBeforePx || 0 }}
+        style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
           <span className={styles.planTimelineTime}>{timeStr}</span>
         </div>
         <div className={styles.planTimelineSpineCell} aria-hidden />
-        <div className={styles.planTimelineGapPersonal}>
-          <span className={styles.planTimelineGapPersonalDur}>{durLabel} free</span>
+        <div className={`${styles.planTimelineGapShortWindow} ${styles.planTimelineGapShortWindowNoActions}`}>
+          <span className={styles.planTimelineGapRail} aria-hidden />
+          <div className={styles.planTimelineGapMain}>
+            <span className={styles.planTimelineGapLeadDot} aria-hidden />
+            <span className={styles.planTimelineGapShortDur}>{durLabel} free</span>
+            <span className={styles.planTimelineGapSeparator} aria-hidden>·</span>
+            <span className={styles.planTimelineGapNoTasks}>Short breather</span>
+          </div>
+          <span className={styles.planTimelineGapRail} aria-hidden />
         </div>
       </div>
     );
@@ -161,14 +164,21 @@ export function PlanFreeRow({
     return (
       <div
         className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
-        style={{ marginTop: row.spacingBeforePx || 0 }}
+        style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
           <span className={styles.planTimelineTime}>{timeStr}</span>
         </div>
         <div className={styles.planTimelineSpineCell} aria-hidden />
-        <div className={styles.planTimelineGapEvening}>
-          <span className={styles.planTimelineGapEveningDur}>{durLabel} free</span>
+        <div className={`${styles.planTimelineGapShortWindow} ${styles.planTimelineGapShortWindowNoActions}`}>
+          <span className={styles.planTimelineGapRail} aria-hidden />
+          <div className={styles.planTimelineGapMain}>
+            <span className={styles.planTimelineGapLeadDot} aria-hidden />
+            <span className={styles.planTimelineGapShortDur}>{durLabel} free</span>
+            <span className={styles.planTimelineGapSeparator} aria-hidden>·</span>
+            <span className={styles.planTimelineGapNoTasks}>Reset</span>
+          </div>
+          <span className={styles.planTimelineGapRail} aria-hidden />
         </div>
       </div>
     );
@@ -176,45 +186,44 @@ export function PlanFreeRow({
 
   /* ── Study windows (compact single-line style) ── */
   const topDeadlineShort = deadlineSuggestions[0] ?? null;
-  const candidateTask = suggestedTask || (topDeadlineShort
+  const candidateTask = assignedTask || suggestedTask || (topDeadlineShort
     ? {
         title: `Revision: ${topDeadlineShort.assessment_title || topDeadlineShort.title}`,
         estimated_blocks: Math.max(1, Math.round(row.minutes / 25)),
         due_date: topDeadlineShort.start_due_date,
       }
     : null);
-  const candidateDueLabel = formatDueLabel(candidateTask);
-  const urgent = candidateDueLabel === "overdue" || (candidateDueLabel?.startsWith("due in") && /(\d+)h/.test(candidateDueLabel));
-  const windowLabel = candidateTask ? `${durLabel} window` : `${durLabel} free`;
+  const windowLabel = `${durLabel} free`;
+  const recommendationText = candidateTask
+    ? `${candidateTask.title}`
+    : `Short breather`;
 
   return (
     <div
       className={`${styles.planTimelineRow} ${styles.planTimelineRowGap}`}
-      style={{ marginTop: row.spacingBeforePx || 0 }}
+      style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
     >
       <div className={styles.planTimelineGutter}>
         <span className={styles.planTimelineTime}>{timeStr}</span>
       </div>
-      <div className={styles.planTimelineSpineCell}>
-        <span
-          className={`${styles.planTimelineNode} ${isBestWindow ? styles.planTimelineNodeBestWindow : ""}`}
-          aria-hidden
-        />
-      </div>
-      <div className={styles.planTimelineGapShortWindow}>
-        <span className={styles.planTimelineGapShortDur}>{windowLabel}</span>
+      <div className={styles.planTimelineSpineCell} aria-hidden />
+      <div
+        className={`${styles.planTimelineGapShortWindow} ${candidateTask ? styles.planTimelineGapShortWindowFeatured : ""} ${isBestGap ? styles.planTimelineGapShortWindowBest : ""} ${!candidateTask ? styles.planTimelineGapShortWindowNoActions : ""}`}
+      >
+        <span className={styles.planTimelineGapRail} aria-hidden />
+        <div className={styles.planTimelineGapMain}>
+          <span className={styles.planTimelineGapLeadDot} aria-hidden />
+          <span className={styles.planTimelineGapShortDur}>{windowLabel}</span>
+          <span className={styles.planTimelineGapSeparator} aria-hidden>·</span>
+          <span className={styles.planTimelineGapSuggestionText} title={recommendationText}>
+            {recommendationText}
+          </span>
+        </div>
         {candidateTask ? (
-          <div className={styles.planTimelineGapShortTaskRow}>
-            {urgent && <span className={styles.planTimelineGapUrgencyChip}>urgent!</span>}
-            <span
-              className={styles.planTimelineGapTaskTitle}
-              title={candidateTask.title}
-            >
-              {candidateTask.title}
-            </span>
-            <span className={styles.planTimelineGapTaskMeta}>
-              {taskDurationMins(candidateTask)}m
-            </span>
+          <>
+            <span className={styles.planTimelineGapRail} aria-hidden />
+            <div className={styles.planTimelineGapActions}>
+            <span className={styles.planTimelineGapTaskMeta}>({taskDurationMins(candidateTask)}m)</span>
             <button
               type="button"
               className={styles.planTimelineGapStartBtnSm}
@@ -223,9 +232,10 @@ export function PlanFreeRow({
             >
               Slot in →
             </button>
-          </div>
+            </div>
+          </>
         ) : (
-          <span className={styles.planTimelineGapNoTasks}>Your time — take a breather</span>
+          <span className={styles.planTimelineGapRail} aria-hidden />
         )}
       </div>
     </div>

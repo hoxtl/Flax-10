@@ -68,6 +68,8 @@ function getEventTag(event, tags) {
 }
 
 function getCalendarPopupActions(event, handlers) {
+    if (event?.timelineReadOnly) return null;
+    if (event?.forcePersonalPopup) return getPersonalActions(event, handlers);
     const type = getEventType(event);
     if (type === 'personal') return getPersonalActions(event, handlers);
     if (type === 'module') return getModuleActions(event, handlers);

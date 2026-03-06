@@ -187,8 +187,34 @@ function insertNowMarker(sorted, nowMins) {
 }
 
 function addSpacing(sorted) {
+  const rowStart = (r) => {
+    if (r.type === "event") return r.startMins;
+    if (r.type === "free" || r.type === "tinyGap") return r.startMins ?? r.gapStartMins;
+    return null;
+  };
+  const rowEnd = (r) => {
+    if (r.type === "event") return r.endMins;
+    if (r.type === "free" || r.type === "tinyGap") return r.endMins ?? ((r.gapStartMins ?? 0) + (r.minutes ?? 0));
+    return null;
+  };
+
   for (let i = 0; i < sorted.length; i++) {
-    sorted[i].spacingBeforePx = i === 0 ? 0 : FIXED_ROW_GAP_PX;
+    if (i === 0) {
+      sorted[i].spacingBeforePx = 0;
+      continue;
+    }
+    const prev = sorted[i - 1];
+    const curr = sorted[i];
+    const prevEnd = rowEnd(prev);
+    const currStart = rowStart(curr);
+
+    // No visual gap for truly back-to-back timed rows (e.g. 09:00-10:00 then 10:00-12:00).
+    if (prevEnd != null && currStart != null && currStart <= prevEnd) {
+      sorted[i].spacingBeforePx = 0;
+      continue;
+    }
+
+    sorted[i].spacingBeforePx = FIXED_ROW_GAP_PX;
   }
 }
 

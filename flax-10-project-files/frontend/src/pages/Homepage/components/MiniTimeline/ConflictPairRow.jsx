@@ -40,7 +40,9 @@ export function ConflictPairRow({
   row,
   rows,
   onConflictAutoMove,
+  onPushTomorrow,
   onCardClick,
+  onEventContextMenu,
   onEdit,
   getTag,
   styles,
@@ -52,16 +54,17 @@ export function ConflictPairRow({
     row.startMins % 60
   );
 
-  // Find the best candidate to auto-move: the one with a free window after the conflict
-  const movable = items.find((r) => {
+  // Prefer an event that can be auto-moved today; fallback to first overlap event for tomorrow moves.
+  const movableWithGap = items.find((r) => {
     const freeRow = rows.find(
       (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= r.durationMins,
     );
     return !!freeRow;
   });
-  const freeRow = movable
+  const movable = movableWithGap || items[0] || null;
+  const freeRow = movableWithGap
     ? rows.find(
-        (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= movable.durationMins,
+        (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= movableWithGap.durationMins,
       )
     : null;
 
@@ -70,6 +73,11 @@ export function ConflictPairRow({
     const start = getGapStartDate(selectedDate, freeRow.gapStartMins);
     const end = new Date(start.getTime() + movable.durationMins * 60000);
     onConflictAutoMove(movable.item, start, end);
+  };
+
+  const handleMoveTomorrow = () => {
+    if (!movable || !onPushTomorrow) return;
+    onPushTomorrow(movable.item);
   };
 
   return (
@@ -81,14 +89,7 @@ export function ConflictPairRow({
       <div className={styles.planTimelineGutter}>
         <span className={styles.planTimelineTime}>{timeStr}</span>
       </div>
-      {/* Spine — terracotta dot */}
-      <div className={styles.planTimelineSpineCell}>
-        <span
-          className={`${styles.planTimelineNode} ${styles.planTimelineNodeDot}`}
-          style={{ "--node-color": "#C0714E" }}
-          aria-hidden
-        />
-      </div>
+      <div className={styles.planTimelineSpineCell} aria-hidden />
       {/* Conflict group */}
       <div className={styles.planTimelineConflictPairWrap}>
         {/* Side-by-side cards */}
@@ -105,6 +106,11 @@ export function ConflictPairRow({
                 style={{ "--card-accent": accent }}
                 role="button"
                 tabIndex={0}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onEventContextMenu?.(r.item, e.clientX, e.clientY);
+                }}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   if (onCardClick) onCardClick(r.item, null, rect);
@@ -151,6 +157,17 @@ export function ConflictPairRow({
               <RotateCw size={12} strokeWidth={2.1} aria-hidden />
               {freeRow ? "Auto-arrange" : "No free window"}
             </button>
+            {!freeRow && (
+              <button
+                type="button"
+                className={styles.planTimelineConflictAutoBtn}
+                onClick={handleMoveTomorrow}
+                disabled={!movable || !onPushTomorrow}
+                title="Move one conflicting event to tomorrow"
+              >
+                → Move to tomorrow
+              </button>
+            )}
             {items.map((r) => (
               <button
                 key={`edit-${r.id}`}

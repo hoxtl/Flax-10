@@ -95,6 +95,7 @@ export default function Homepage() {
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
+  const toastTimeoutRef = useRef(null);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -146,6 +147,10 @@ export default function Homepage() {
   /* Fetch task lists on mount so Action Hub can show list names (e.g. University, SEG) and link to /tasks?list= */
   useEffect(() => {
     fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
+  }, []);
+
+  useEffect(() => () => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
   }, []);
 
 
@@ -224,14 +229,31 @@ export default function Homepage() {
         }
       }
     } catch {
-      setToast("Couldn't update task.");
+      setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
     }
   }, [showCompletionToast, refetchTasks]);
 
-  // Show toast for 3 seconds
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+  const closeToast = useCallback(() => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+    setToast(null);
+  }, []);
+
+  // Show toast (supports optional action)
+  const showToast = useCallback((msg, opts = {}) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast({
+      message: msg,
+      actionLabel: opts.actionLabel || null,
+      onAction: typeof opts.onAction === "function" ? opts.onAction : null,
+    });
+    const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast(null);
+      toastTimeoutRef.current = null;
+    }, duration);
   }, []);
 
 
@@ -387,6 +409,46 @@ export default function Homepage() {
         showToast("Event moved to next available window.");
       } catch {
         showToast("Couldn't move event. Try again.");
+      }
+    },
+    [editEvent, loadEvents, showToast]
+  );
+
+  const handleConflictPushTomorrow = useCallback(
+    async (event) => {
+      if (!event?.start_time) return;
+      try {
+        const baseId = extractBaseEventId(event.id);
+        const start = new Date(event.start_time);
+        const end = event.end_time ? new Date(event.end_time) : new Date(start.getTime() + 25 * 60000);
+        const durationMins = Math.max(25, Math.round((end - start) / 60000) || 25);
+        const nextDay = new Date(start);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const movedStart = nextDay;
+        const movedEnd = new Date(movedStart.getTime() + durationMins * 60000);
+        await editEvent(baseId, {
+          start_time: movedStart.toISOString(),
+          end_time: movedEnd.toISOString(),
+        });
+        await loadEvents();
+        showToast(`"${event.title}" moved to tomorrow.`, {
+          actionLabel: "Undo",
+          durationMs: 7000,
+          onAction: async () => {
+            try {
+              await editEvent(baseId, {
+                start_time: start.toISOString(),
+                end_time: end.toISOString(),
+              });
+              await loadEvents();
+              showToast(`Undid move for "${event.title}".`);
+            } catch {
+              showToast("Couldn't undo move. Try again.");
+            }
+          },
+        });
+      } catch {
+        showToast("Couldn't move to tomorrow. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
@@ -662,7 +724,7 @@ export default function Homepage() {
 
   const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
     if (!event) return;
-    openPopup(event, anchorRect);
+    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect);
   }, [openPopup]);
 
   const fmtTimerSecs = (s) => {
@@ -676,9 +738,22 @@ export default function Homepage() {
     <div className={styles.alertToast}>
       <div className={styles.alertContent}>
         <span className={styles.alertIcon}>✓</span>
-        <span className={styles.alertMessage}>{toast}</span>
+        <span className={styles.alertMessage}>{toast.message}</span>
       </div>
-      <button className={styles.alertClose} onClick={() => setToast(null)}>✕</button>
+      {toast.actionLabel && toast.onAction && (
+        <button
+          type="button"
+          className={styles.alertAction}
+          onClick={async () => {
+            const action = toast.onAction;
+            closeToast();
+            await action();
+          }}
+        >
+          {toast.actionLabel}
+        </button>
+      )}
+      <button className={styles.alertClose} onClick={closeToast}>✕</button>
     </div>
   )}
 
@@ -946,6 +1021,7 @@ export default function Homepage() {
                   onCardClick={openTimelinePopup}
                   onEdit={(ev) => openModal(ev, ev.tag)}
                   onConflictAutoMove={handleConflictAutoMove}
+                  onPushTomorrow={handleConflictPushTomorrow}
                   onDelete={removeEvent}
                   onReschedule={handleReschedule}
                   getTag={getTag}

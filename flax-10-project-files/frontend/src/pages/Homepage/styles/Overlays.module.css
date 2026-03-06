@@ -313,6 +313,23 @@
   color: var(--text);
 }
 
+.alertAction {
+  border: 1px solid rgba(132, 169, 140, 0.45);
+  background: rgba(132, 169, 140, 0.12);
+  color: #4b7d5a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.alertAction:hover {
+  background: rgba(132, 169, 140, 0.2);
+  border-color: rgba(132, 169, 140, 0.6);
+}
+
 .alertClose {
   background: none;
   border: none;

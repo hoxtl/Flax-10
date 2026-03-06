@@ -11,6 +11,7 @@ import { formatTime } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { isNow } from "../../utils/eventUtils";
 import { computePlanTimelineRows } from "../../utils/planTimelineRows";
+import { getTasksThatFitGap } from "../../utils/taskUtils";
 
 import { HourMarkRow } from "./HourMarkRow";
 import { TinyGapRow } from "./TinyGapRow";
@@ -19,6 +20,7 @@ import { PlanFreeRow } from "./PlanFreeRow";
 
 import { PlanEventRow } from "./PlanEventRow";
 import { ConflictPairRow } from "./ConflictPairRow";
+import { EventContextMenu } from "./EventContextMenu";
 
 export function MiniTimeline({
   sortedEvents,
@@ -35,6 +37,7 @@ export function MiniTimeline({
   onEdit,
   onConflictAutoMove,
   onDelete,
+  onPushTomorrow,
   onReschedule,
   getTag = null,
   completedEventIds = new Set(),
@@ -47,6 +50,7 @@ export function MiniTimeline({
 }) {
   const [conflictPopoverRowId, setConflictPopoverRowId] = useState(null);
   const [slotPopoverRowId, setSlotPopoverRowId] = useState(null);
+  const [eventCtxMenu, setEventCtxMenu] = useState(null);
   const conflictPopoverRef = useRef(null);
   const slotPopoverRef = useRef(null);
   const timelineScrollRef = useRef(null);
@@ -98,6 +102,53 @@ export function MiniTimeline({
     [sortedEvents, selectedDate, dayStart, dayEnd, now, dayTasks, tasksDueToday]
   );
 
+  const bestFreeRowId = useMemo(() => {
+    const freeRows = rows.filter((r) => r.type === "free");
+    if (!freeRows.length) return null;
+    let best = null;
+    let bestScore = -Infinity;
+    for (const r of freeRows) {
+      const { suggested } = getTasksThatFitGap(suggestableTasks || [], r.minutes || 0);
+      const due = suggested?.due_date ? new Date(suggested.due_date) : null;
+      const overdueBoost = due && due < now ? 240 : 0;
+      const urgentBoost = suggested?.priority === "urgent" ? 140 : suggested?.priority === "high" ? 70 : 0;
+      const score = (r.minutes || 0) + overdueBoost + urgentBoost;
+      if (score > bestScore) {
+        bestScore = score;
+        best = r.id;
+      }
+    }
+    return best;
+  }, [rows, suggestableTasks, now]);
+
+  const assignedGapTasks = useMemo(() => {
+    const freeRows = rows
+      .filter((r) => r.type === "free")
+      .sort((a, b) => (a.gapStartMins ?? a.startMins ?? 0) - (b.gapStartMins ?? b.startMins ?? 0));
+
+    const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+    const queue = [...(suggestableTasks || [])]
+      .filter((t) => !t?.completed)
+      .sort((a, b) => {
+        const aDue = a?.due_date ? new Date(a.due_date).getTime() : Number.MAX_SAFE_INTEGER;
+        const bDue = b?.due_date ? new Date(b.due_date).getTime() : Number.MAX_SAFE_INTEGER;
+        if (aDue !== bDue) return aDue - bDue;
+        return (priorityOrder[a?.priority] ?? 2) - (priorityOrder[b?.priority] ?? 2);
+      });
+
+    const used = new Set();
+    const map = {};
+
+    for (const row of freeRows) {
+      const mins = row.minutes || 0;
+      const pick = queue.find((t) => !used.has(t.id) && getTasksThatFitGap([t], mins).suggested);
+      if (!pick) continue;
+      map[row.id] = pick;
+      used.add(pick.id);
+    }
+    return map;
+  }, [rows, suggestableTasks]);
+
   const currentBlock = useMemo(
     () => (!hasTimerSession && isToday(selectedDate)) ? (sortedEvents || []).find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time)) : null,
     [hasTimerSession, selectedDate, sortedEvents]
@@ -122,6 +173,8 @@ export function MiniTimeline({
             slotPopoverRef={slotPopoverRef}
             slotPopoverRowId={slotPopoverRowId}
             setSlotPopoverRowId={setSlotPopoverRowId}
+            isBestGap={row.id === bestFreeRowId}
+            assignedTask={assignedGapTasks[row.id] || null}
           />
         );
       }
@@ -132,7 +185,10 @@ export function MiniTimeline({
             row={row}
             rows={rows}
             onConflictAutoMove={onConflictAutoMove}
+            onDelete={onDelete}
+            onPushTomorrow={onPushTomorrow}
             onCardClick={onCardClick}
+            onEventContextMenu={(eventItem, x, y) => setEventCtxMenu({ eventItem, x, y })}
             onEdit={onEdit}
             getTag={getTag}
             styles={styles}
@@ -150,8 +206,10 @@ export function MiniTimeline({
           conflictPopoverRef={conflictPopoverRef}
           setConflictPopoverRowId={setConflictPopoverRowId}
           onConflictAutoMove={onConflictAutoMove}
+          onPushTomorrow={onPushTomorrow}
           onEdit={onEdit}
           onCardClick={onCardClick}
+          onEventContextMenu={(eventItem, x, y) => setEventCtxMenu({ eventItem, x, y })}
           onTaskToggle={onTaskToggle}
           onToggleComplete={onToggleComplete}
           onReschedule={onReschedule}
@@ -163,7 +221,7 @@ export function MiniTimeline({
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef]
   );
 
   return (
@@ -204,6 +262,18 @@ export function MiniTimeline({
             {renderRow(row)}
           </motion.div>
         ))}
+        {eventCtxMenu && (
+          <EventContextMenu
+            eventItem={eventCtxMenu.eventItem}
+            pos={{ x: eventCtxMenu.x, y: eventCtxMenu.y }}
+            styles={styles}
+            onClose={() => setEventCtxMenu(null)}
+            onEdit={(ev) => onEdit?.(ev, ev?.tag)}
+            onDelete={async (ev) => {
+              await onDelete?.(ev?.id ?? ev);
+            }}
+          />
+        )}
       </div>
     </div>
   );

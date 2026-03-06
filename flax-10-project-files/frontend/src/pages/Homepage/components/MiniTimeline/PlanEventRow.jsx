@@ -48,8 +48,10 @@ export function PlanEventRow({
   conflictPopoverRef,
   setConflictPopoverRowId,
   onConflictAutoMove,
+  onPushTomorrow,
   onEdit,
   onCardClick,
+  onEventContextMenu,
   onTaskToggle,
   onToggleComplete,
   onReschedule,
@@ -94,6 +96,12 @@ export function PlanEventRow({
     setConflictPopoverRowId(null);
   };
 
+  const handleMoveTomorrow = () => {
+    if (!onPushTomorrow) return;
+    onPushTomorrow(item);
+    setConflictPopoverRowId(null);
+  };
+
   return (
     <div
       className={`${styles.planTimelineRow} ${isPast && !active ? styles.planTimelineRowPast : ""}`}
@@ -102,14 +110,7 @@ export function PlanEventRow({
       <div className={styles.planTimelineGutter}>
         <span className={styles.planTimelineTime}>{startTimeStr}</span>
       </div>
-      <div className={styles.planTimelineSpineCell}>
-        {/* Minimal dot node — color matches card accent */}
-        <span
-          className={`${styles.planTimelineNode} ${styles.planTimelineNodeDot}`}
-          style={{ "--node-color": accentColor }}
-          aria-hidden
-        />
-      </div>
+      <div className={styles.planTimelineSpineCell} aria-hidden />
       <div
         className={styles.planTimelineCardWrap}
         ref={showConflictPopover ? conflictPopoverRef : undefined}
@@ -118,6 +119,11 @@ export function PlanEventRow({
           role="button"
           tabIndex={0}
           className={`${styles.planTimelineCard} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isOverlap ? styles.planTimelineCardOverlap : ""} ${isRoutine ? styles.planTimelineCardRoutine : ""} ${durationMins > 0 ? styles.planTimelineCardWithDuration : ""}`}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onEventContextMenu?.(item, e.clientX, e.clientY);
+          }}
           onClick={(e) => {
             if (isOverlap) {
               handleConflictCardClick();
@@ -238,6 +244,16 @@ export function PlanEventRow({
               <RotateCw size={13} strokeWidth={2} aria-hidden />
               <span>{nextFreeRow ? "Auto-move to next gap" : "No free window"}</span>
             </button>
+            {!nextFreeRow && (
+              <button
+                type="button"
+                className={styles.planTimelineConflictPopoverBtn}
+                onClick={handleMoveTomorrow}
+                disabled={!onPushTomorrow}
+              >
+                <span>→ Move to tomorrow</span>
+              </button>
+            )}
             <button
               type="button"
               className={styles.planTimelineConflictPopoverBtn}
