@@ -240,7 +240,18 @@
   color: #ef4444 !important;
 }
 
-/* ── Hamburger Icon ──────────────────────────────────────────────────────── */
+.menuDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
 .hamburger {
   display: flex;
   flex-direction: column;
