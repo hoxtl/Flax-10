@@ -328,7 +328,7 @@ function OnboardingWrapper({ onComplete }) {
   const [showOnboarding, setShowOnboarding] = useOnboardingCheck();
   const handleComplete = () => {
     setShowOnboarding(false);
-    window.location.reload();
+    window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
   };
   return (
     <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />
