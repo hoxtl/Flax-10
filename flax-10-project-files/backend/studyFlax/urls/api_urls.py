@@ -137,6 +137,7 @@ urlpatterns = [
     path("societies/<int:society_id>/events/", society_event_list, name="society-events"),
     path("societies/<int:society_id>/events/<int:event_id>/", society_event_detail, name="society-event-detail"),
     path("societies/<int:society_id>/events/<int:event_id>/exception/", add_society_event_exception, name="society-event-exception"),
+    path("societies/<int:society_id>/report/", report_society, name="society-report"),
     path("societies/<int:society_id>/calendar-sync/", sync_calendar, name="society-calendar-sync"),
     path("societies/<int:society_id>/calendar-unsync/", unsync_calendar, name="society-calendar-unsync"),
     path("societies/<int:society_id>/calendar-sync-status/", sync_status, name="society-calendar-sync-status"),

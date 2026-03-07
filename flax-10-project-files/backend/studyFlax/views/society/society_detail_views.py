@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.models.society import Society, SocietyImage
+from studyFlax.models.society import Society, SocietyImage, SocietyReport
 from studyFlax.serialisers import SocietyDetailSerialiser
 from .helpers import (
     get_society_or_404, get_membership, is_society_admin,
@@ -64,3 +64,23 @@ def delete_society_with_notification(society):
     delete_children_silently(society)
     society._skip_notification = True
     society.delete()
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def report_society(request, society_id):
+    society = get_society_or_404(society_id)
+    if not society:
+        return society_not_found_response()
+    
+    reason = request.data.get('reason')
+    if not reason or not reason.strip():
+        return Response({'error': 'Reason is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    SocietyReport.objects.create(
+        society=society,
+        reporter=request.user,
+        reason=reason.strip()
+    )
+    
+    return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
