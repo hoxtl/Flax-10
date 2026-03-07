@@ -5,6 +5,7 @@ SYSTEM_TAG_CONFIG = {
     'Deadline': {'color': '#E74C3C', 'duration': 60, 'icon': '📝'},
     'Exam': {'color': '#9B59B6', 'duration': 180, 'icon': '📋'},
     'Societies': {'color': '#27AE60', 'duration': 120, 'icon': '👨‍👨‍👧‍👧'},
+    'Schedule': {'color': '#F59E0B', 'duration': 60, 'icon': '🗓️'},
 }
 
 
@@ -88,6 +89,9 @@ def get_exam_tag():
 
 def get_societies_tag():
     return get_system_tag('Societies')
+
+def get_schedule_tag():
+    return get_system_tag('Schedule')
 
 
 def fix_untagged_deadline_events():

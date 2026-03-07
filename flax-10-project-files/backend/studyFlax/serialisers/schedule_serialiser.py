@@ -13,7 +13,7 @@ class ScheduleEventAllocationSerialiser(serializers.ModelSerializer):
 class ScheduleSerialiser(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only = True)
     event_allocations = ScheduleEventAllocationSerialiser(many=True, read_only=True)
-    deadlines = serializers.PrimaryKeyRelatedField(queryset=Deadline.objects.all(), many=True)
+    deadline = serializers.PrimaryKeyRelatedField(queryset=Deadline.objects.all(), many=True)
 
     class Meta:
         model = Schedule

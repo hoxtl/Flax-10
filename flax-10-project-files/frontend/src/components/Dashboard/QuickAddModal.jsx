@@ -115,6 +115,7 @@ export default function QuickAddModal({ onClose, onSelectType, isTeacher }) {
   const { tags, view, handleType } = useQuickAddLogic(onSelectType);
   const { title, sub } = getHeader(view);
   const handlePickerSelect = (m) => onSelectType('add_deadline', m);
+  const done = () => onClose?.();
 
   return (
     <StandardModal title={title} subtitle={sub} onClose={onClose}>

@@ -84,7 +84,7 @@ def _build_manual_schedule(request):
 @permission_classes([IsAuthenticated])
 def schedule_list(request):
     if request.method == 'GET':
-        schedules = schedule_queryset(request.user)
+        schedules = _schedule_queryset(request.user)
         return Response(ScheduleSerialiser(schedules, many=True).data)
 
     if request.data.get('mode') == 'manual':
@@ -116,6 +116,6 @@ def schedule_detail(request, schedule_id):
         payload = ScheduleSerialiser(schedule).data
         payload['overwritten'] = overwritten
         return Response(payload)
-        
+
     schedule.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
