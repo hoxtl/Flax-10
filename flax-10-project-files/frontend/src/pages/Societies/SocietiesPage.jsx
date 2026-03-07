@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
@@ -35,8 +36,19 @@ export default function SocietiesPage() {
 }
 
 function useSocietiesPage() {
-    const [view, setView] = useState("my");
-    const [selectedSocietyId, setSelectedSocietyId] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const view = searchParams.get('tab') === 'all' ? 'all' : 'my';
+    const selectedSocietyId = searchParams.get('id');
+
+    const setView = (v) => setSearchParams(prev => { prev.set('tab', v); return prev; });
+    const setSelectedSocietyId = (id) => {
+        if (!id) {
+            setSearchParams(prev => { prev.delete('id'); return prev; });
+        } else {
+            setSearchParams(prev => { prev.set('id', id); return prev; });
+        }
+    };
+
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [reportingSociety, setReportingSociety] = useState(null);
     const { societies, loading, handleCreate, refresh, updateSocietyLocally } = useSocieties();
@@ -75,7 +87,11 @@ function useSocietiesPage() {
 const PAGE_SIZE = 12;
 
 function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport, onUnreport }) {
-    const [activeTab, setActiveTab] = useState("admin");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('subTab') || "admin";
+
+    const setActiveTab = (t) => setSearchParams(prev => { prev.set('subTab', t); return prev; }, { replace: true });
+
     const adminOf = societies.filter(s => s.is_admin);
     const memberOf = societies.filter(s => s.is_member && !s.is_admin);
 

@@ -81,8 +81,8 @@ def build_update_notification(society, changes):
 
 def get_notification_action_url(society_id, changes):
     if is_only_announcement_changes(changes):
-        return f"societies_{society_id}_announcements"
-    return f"societies_{society_id}"
+        return f"/societies?id={society_id}&tab=announcements"
+    return f"/societies?id={society_id}"
 
 
 def is_only_announcement_changes(changes):

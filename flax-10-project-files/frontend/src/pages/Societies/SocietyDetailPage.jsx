@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import styles from "./SocietyDetailPage.module.css";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
 import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
@@ -18,9 +18,21 @@ import { useConfirm } from "../../context/ConfirmContext";
 import { unreportSociety } from "../../api/societyApi";
 
 function usePageState(initialTab, location) {
-    const [activeTab, setActiveTab] = useState(initialTab || location.state?.activeTab || "calendar");
-    const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
-    const handleTabChange = (tab, announcementId = null) => { setActiveTab(tab); setFocusAnnouncementId(announcementId); };
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Read from search params primarily, fallback to prop or location state, then "calendar"
+    const activeTab = searchParams.get('tab') || initialTab || location.state?.activeTab || "calendar";
+    const focusAnnouncementId = searchParams.get('announcementId') || location.state?.announcementId || null;
+
+    const handleTabChange = (tab, announcementId = null) => {
+        setSearchParams(prev => {
+            prev.set('tab', tab);
+            if (announcementId) prev.set('announcementId', announcementId);
+            else prev.delete('announcementId');
+            return prev;
+        }, { replace: true });
+    };
+
     return { activeTab, focusAnnouncementId, handleTabChange };
 }
 
