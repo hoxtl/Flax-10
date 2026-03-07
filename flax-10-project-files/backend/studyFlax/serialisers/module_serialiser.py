@@ -2,11 +2,13 @@ from rest_framework import serializers
 from studyFlax.models import Module
 from studyFlax.models import User
 from studyFlax.serialisers.deadline_serialisers import DeadlineSummarySerialiser
+from studyFlax.serialisers.reading_serialisers import ReadingSummarySerialiser
 
 class ModuleSerialiser(serializers.ModelSerializer):
     created_by_name = serializers.CharField(source='created_by.first_name', read_only=True)
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=False)
     deadlines = DeadlineSummarySerialiser(many=True, read_only = True)
+    readings = ReadingSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
 
@@ -14,7 +16,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
         model = Module
         fields = ['id', 'module_code', 'module_name', 'description', 'created_by', 
                 'created_by_name', 'start_time', 'end_time', 'location', 
-                'recurrence_rule','is_recurring', 'deadlines', 'created_by_email']
+                'recurrence_rule','is_recurring', 'deadlines', 'created_by_email' , 'readings']
         read_only_fields = ['created_by']
         
     def validate(self, validated_data):
