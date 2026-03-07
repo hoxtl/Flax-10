@@ -9,7 +9,7 @@ import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCateg
 
 const PAGE_SIZE = 20;
 
-export default function AllSocieties({ onBack, onSelect, societies = [] }) {
+export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
     const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
     const { items, totalPages } = usePagination(filtered, page, PAGE_SIZE);
@@ -18,7 +18,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [] }) {
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
             <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
-            <SocietyGrid items={items} onSelect={onSelect} />
+            <SocietyGrid items={items} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             <BackToTop />
         </div>
@@ -102,11 +102,11 @@ function CategoryPills({ current, onChange, societies }) {
     ));
 }
 
-function SocietyGrid({ items, onSelect }) {
+function SocietyGrid({ items, onSelect, onReport, onUnreport }) {
     if (items.length === 0) return <EmptyState />;
     return (
         <div className={styles.grid}>
-            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
+            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} onReport={onReport} onUnreport={onUnreport} />)}
         </div>
     );
 }
