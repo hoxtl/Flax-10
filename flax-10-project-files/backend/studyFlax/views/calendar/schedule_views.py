@@ -7,17 +7,19 @@ from rest_framework.response import Response
 from studyFlax.serialisers import ScheduleSerialiser
 from .auto_scheduler_views import build_auto_schedule
 from django.db import transaction
+from .system_tags import get_schedule_tag
 
 def _schedule_queryset(user):
     return Schedule.objects.filter(user=user).prefetch_related('event_allocations__event', 'deadline')
 
 
 def _events_for_manual_schedule(user, event_ids):
+    schedule_tag = get_schedule_tag()
     return list(
         CalendarEvent.objects.filter(
             user=user,
             id__in=event_ids,
-            tag__name__iexact='schedule',
+            tag=schedule_tag,
         ).order_by('start_time')
     )
 
