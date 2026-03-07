@@ -111,7 +111,7 @@ function MainArea({
             activeNav={activeNav}
           />
         )}
-        {showWeekBar && <WeekBar date={selectedDate} />}
+        {showWeekBar && !isMobile && <WeekBar date={selectedDate} />}
         <PageContent activeNav={activeNav}>{children}</PageContent>
       </div>
     </div>
@@ -120,7 +120,13 @@ function MainArea({
 
 function QuickAddGate({ open, onClose, onSelectType, isTeacher }) {
   if (!open) return null;
-  return <QuickAddModal onClose={onClose} onSelectType={onSelectType} isTeacher={isTeacher} />;
+  return (
+    <QuickAddModal
+      onClose={onClose}
+      onSelectType={onSelectType}
+      isTeacher={isTeacher}
+    />
+  );
 }
 
 function EventModalGate({ modal }) {
@@ -151,7 +157,8 @@ function useDashboardState(activeNav, onNavChange) {
   const [deadlineModule, setDeadlineModule] = useState(null);
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
+  const showWeekBar =
+    activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
   const t = useTimerContext();
   const [pendingNav, setPendingNav] = useState(null);
@@ -170,10 +177,10 @@ function useDashboardState(activeNav, onNavChange) {
   };
   const onSelectType = (id, extra) => {
     setShowQuickAdd(false);
-    if (id === 'society') setShowSocietyModal(true);
-    else if (id === 'task') setShowTaskModal(true);
-    else if (id === 'create_module') onPickNav('modules_create');
-    else if (id === 'add_deadline') setDeadlineModule(extra);
+    if (id === "society") setShowSocietyModal(true);
+    else if (id === "task") setShowTaskModal(true);
+    else if (id === "create_module") onPickNav("modules_create");
+    else if (id === "add_deadline") setDeadlineModule(extra);
     else modal.openModal(null, id, selectedDate);
   };
   return {
@@ -235,7 +242,9 @@ function useSocietyCreation(setShowSocietyModal) {
       await createSociety(form);
       addNotification("Society created successfully!", "success");
       setShowSocietyModal(false);
-    } catch (e) { addNotification("Failed to create society.", "error"); }
+    } catch (e) {
+      addNotification("Failed to create society.", "error");
+    }
   };
   return create;
 }
@@ -247,14 +256,21 @@ function GlobalTaskModal({ onClose }) {
   const [enrollments, setEnrollments] = useState([]);
 
   useEffect(() => {
-    fetchTaskLists().then(res => setLists(Array.isArray(res) ? res : [])).catch(() => { });
-    getModules().then(res => setModules(Array.isArray(res) ? res : [])).catch(() => { });
-    getEnrollments().then(res => setEnrollments(Array.isArray(res) ? res : [])).catch(() => { });
+    fetchTaskLists()
+      .then((res) => setLists(Array.isArray(res) ? res : []))
+      .catch(() => {});
+    getModules()
+      .then((res) => setModules(Array.isArray(res) ? res : []))
+      .catch(() => {});
+    getEnrollments()
+      .then((res) => setEnrollments(Array.isArray(res) ? res : []))
+      .catch(() => {});
   }, []);
 
-  const enrolledModules = useMemo(() =>
-    modules.filter(m => isEnrolledIn(m.id, enrollments)),
-    [modules, enrollments]);
+  const enrolledModules = useMemo(
+    () => modules.filter((m) => isEnrolledIn(m.id, enrollments)),
+    [modules, enrollments],
+  );
 
   const handleSave = async (data) => {
     try {
@@ -282,12 +298,29 @@ function DashboardModals({ state }) {
   const createSoc = useSocietyCreation(state.setShowSocietyModal);
   return (
     <>
-      <QuickAddGate open={state.showQuickAdd} onClose={() => state.setShowQuickAdd(false)}
-        onSelectType={state.onSelectType} isTeacher={state.user?.role === 'teacher'} />
+      <QuickAddGate
+        open={state.showQuickAdd}
+        onClose={() => state.setShowQuickAdd(false)}
+        onSelectType={state.onSelectType}
+        isTeacher={state.user?.role === "teacher"}
+      />
       <EventModalGate modal={state.modal} />
-      {state.showSocietyModal && <CreateSocietyModal onClose={() => state.setShowSocietyModal(false)} onCreate={createSoc} />}
-      {state.showTaskModal && <GlobalTaskModal onClose={() => state.setShowTaskModal(false)} />}
-      {state.deadlineModule && <DeadlineModal module={state.deadlineModule} onClose={() => state.setDeadlineModule(null)} startCreating={true} />}
+      {state.showSocietyModal && (
+        <CreateSocietyModal
+          onClose={() => state.setShowSocietyModal(false)}
+          onCreate={createSoc}
+        />
+      )}
+      {state.showTaskModal && (
+        <GlobalTaskModal onClose={() => state.setShowTaskModal(false)} />
+      )}
+      {state.deadlineModule && (
+        <DeadlineModal
+          module={state.deadlineModule}
+          onClose={() => state.setDeadlineModule(null)}
+          startCreating={true}
+        />
+      )}
     </>
   );
 }
@@ -335,7 +368,18 @@ function DashboardMain({ state, onNavChange, children }) {
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
-  const { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, onPickNav, handleNavChange, pendingNav, setPendingNav, t, setShowQuickAdd } = state;
+  const {
+    isMobile,
+    user,
+    mobileSidebarOpen,
+    setMobileSidebarOpen,
+    onPickNav,
+    handleNavChange,
+    pendingNav,
+    setPendingNav,
+    t,
+    setShowQuickAdd,
+  } = state;
   return (
     <div className={styles.root}>
       <DashboardSidebars
