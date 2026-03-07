@@ -1327,3 +1327,77 @@
     display: flex;
   }
 }
+
+.societiesBox {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+}
+
+.societiesScroll {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin-top: 1rem;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.societiesScroll::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
+}
+
+.societyCard {
+  flex: 0 0 auto;
+  width: 100px;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 0;
+}
+
+.societyCard:hover {
+  transform: translateY(-4px);
+}
+
+.socLogoWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--surface-hover, #f3f4f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.05));
+}
+
+.socLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.socInitial {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary, #8b6e4e);
+}
+
+.socName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text, #1f2937);
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
