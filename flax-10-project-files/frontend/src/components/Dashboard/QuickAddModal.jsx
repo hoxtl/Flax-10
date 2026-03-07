@@ -141,6 +141,7 @@ function ScheduleModeGrid({ onSelect }) {
 function ScheduleManualForm({ onDone }) {
   const { addNotification } = useNotifications();
   const [title, setTitle] = useState('');
+  const [eventSearch, setEventSearch] = useState('');
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState([]);
 
@@ -151,6 +152,13 @@ function ScheduleManualForm({ onDone }) {
       setSelected(scheduleTagged.map(e => e.id));
     }).catch(() => addNotification({ title: 'Schedule', message: 'Unable to load schedule-tagged events.', notification_type: 'general' }));
   }, [addNotification]);
+
+  const filteredEvents = events.filter((event) => {
+    const query = eventSearch.trim().toLowerCase();
+    if (!query) return true;
+    return (event.title || '').toLowerCase().includes(query);
+  });
+
 
   const toggle = (id) => setSelected(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
   const submit = async () => {
@@ -172,9 +180,17 @@ function ScheduleManualForm({ onDone }) {
     <div className={styles.formWrap}>
       <label className={styles.fieldLabel}>Schedule name</label>
       <input className={styles.input} value={title} onChange={e => setTitle(e.target.value)} placeholder="My study schedule" />
+      <label className={styles.fieldLabel}>Search events</label>
+      <input
+        className={styles.input}
+        value={eventSearch}
+        onChange={e => setEventSearch(e.target.value)}
+        placeholder="Search schedule events"
+      />
       <div className={styles.eventList}>
         {events.length === 0 && <p className={styles.muted}>No events tagged "schedule" were found.</p>}
-        {events.map(e => (
+        {events.length > 0 && filteredEvents.length === 0 && <p className={styles.muted}>No events match your search.</p>}
+        {filteredEvents.map(e => (
           <label key={e.id} className={styles.checkRow}>
             <input type="checkbox" checked={selected.includes(e.id)} onChange={() => toggle(e.id)} />
             <span>{e.title}</span>
