@@ -12,7 +12,6 @@ export function TagField({ value, onChange, customTags }) {
             <div className={hasColors ? "select-with-color" : ""}>
                 {hasColors && <span className="color-dot" style={{ backgroundColor: selectedTag.color }} />}
                 <select id="field-tag" value={value || ''} onChange={onChange}>
-                    <option value="">None</option>
                     {(tags || []).map(tag => <option key={tag.id} value={tag.id}>{tag.label}</option>)}
                 </select>
             </div>

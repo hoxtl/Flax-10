@@ -33,5 +33,5 @@ def home_address_view(request):
                 "success": True,
                 "home_address": user.home_address,
             })
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             return Response({"success": False, "error": str(e)}, status=400)

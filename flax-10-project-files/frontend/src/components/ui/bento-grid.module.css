@@ -1,0 +1,76 @@
+.grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr;
+  grid-auto-rows: minmax(9rem, auto);
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+}
+
+.cardWrapper {
+  min-height: 0;
+}
+
+.card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #fffcf8;
+  border: 1px solid rgba(139, 115, 85, 0.06);
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    200px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(139, 115, 85, 0.09),
+    transparent 70%
+  );
+  z-index: 0;
+}
+
+.card:hover .glow {
+  opacity: 1;
+}
+
+.hoverOverlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: transparent;
+  transition: background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 0;
+}
+
+.card:hover .hoverOverlay {
+  background: rgba(139, 115, 85, 0.015);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

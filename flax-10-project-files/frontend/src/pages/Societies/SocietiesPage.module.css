@@ -11,6 +11,16 @@
     padding-bottom: 8px;
 }
 
+.sectionTitle {
+    margin: 0;
+    font-weight: 800;
+    font-size: 32px;
+    color: var(--text);
+    white-space: nowrap;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
 .miniAddBtn {
     background: var(--primary);
     color: var(--c-white);
@@ -204,7 +214,7 @@
     display: none;
   }
 
-  .sectionHeader h3 {
+  .sectionTitle {
     font-size: 18px;
     font-weight: 700;
     color: var(--text);

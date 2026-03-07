@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
+import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from '../hooks/useCalendarEvents';
 import { getInitialForm, validateAndSubmit } from '../utils/formUtils';
 import { getUserSettings } from '../../../api/userService';
@@ -16,10 +17,10 @@ async function fetchSleepSettings() {
 
 export function useEventForm(event, onClose, options = {}) {
     const calendarContext = useCalendar();
+    const confirmFn = useConfirm();
     const actions = useEventActions();
     const [form, setForm] = useState(() => getInitialForm(event, options));
     const [error, setError] = useState('');
-    const [overlapWarning, setOverlapWarning] = useState(null);
     const [sleepWarning, setSleepWarning] = useState(false);
     const [pendingSubmit, setPendingSubmit] = useState(null);
     const [sleepSettings, setSleepSettings] = useState(null);
@@ -27,8 +28,8 @@ export function useEventForm(event, onClose, options = {}) {
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
     useEffect(() => { fetchSleepSettings().then(setSleepSettings); }, []);
 
-    const doSubmit = (e, skipOverlap = false) =>
-        validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], skipOverlap);
+    const doSubmit = async (e, skipOverlap = false) =>
+        await validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, calendarContext?.events || [], skipOverlap);
 
     const handleSubmit = options.customSubmit
         ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError)
@@ -59,10 +60,9 @@ export function useEventForm(event, onClose, options = {}) {
     };
 
     return {
-        form, setForm, error, overlapWarning, sleepWarning,
+        form, setForm, error, sleepWarning,
         sleepSettings, isEditing: !!event?.id,
-        handleSubmit, handleConfirmSave, handleCancelSave,
-        handleConfirmSleep, handleCancelSleep, event
+        handleSubmit, handleConfirmSleep, handleCancelSleep, event
     };
 }
 
