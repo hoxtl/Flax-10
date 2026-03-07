@@ -111,7 +111,9 @@ def should_skip_notification(instance):
 
 
 def notify_society_members(society, notification_data):
-    members = SocietyMembership.objects.filter(society=society).select_related('user')
+    members = SocietyMembership.objects.filter(
+        society=society, is_subscribed=True
+    ).select_related('user')
     notifications = [build_notification(m.user, notification_data) for m in members]
     Notification.objects.bulk_create(notifications)
 

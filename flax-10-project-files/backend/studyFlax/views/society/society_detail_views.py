@@ -33,6 +33,7 @@ def get_society_detail(request, society):
     data['is_member'] = membership is not None
     data['is_admin'] = membership.is_admin if membership else False
     data['role'] = membership.role if membership else None
+    data['is_subscribed'] = membership.is_subscribed if membership else False
     return Response(data)
 
 

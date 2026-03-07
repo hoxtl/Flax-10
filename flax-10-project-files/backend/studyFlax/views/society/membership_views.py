@@ -110,3 +110,17 @@ def get_membership_by_user_id(society, user_id):
         return SocietyMembership.objects.get(society=society, user_id=user_id)
     except SocietyMembership.DoesNotExist:
         return None
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def toggle_subscription(request, society_id):
+    society = get_society_or_404(society_id)
+    if not society:
+        return society_not_found_response()
+    membership = get_membership(request.user, society)
+    if not membership:
+        return Response({'error': 'Not a member'}, status=status.HTTP_403_FORBIDDEN)
+    membership.is_subscribed = request.data.get('is_subscribed', not membership.is_subscribed)
+    membership.save(update_fields=['is_subscribed'])
+    return Response({'is_subscribed': membership.is_subscribed})
