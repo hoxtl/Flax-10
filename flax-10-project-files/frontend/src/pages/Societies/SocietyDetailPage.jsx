@@ -16,6 +16,7 @@ import MemberDirectoryModal from "../../components/Society/SocietyDetail/MemberD
 import { Flag } from "lucide-react";
 import { useConfirm } from "../../context/ConfirmContext";
 import { unreportSociety } from "../../api/societyApi";
+import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
 
 function usePageState(initialTab, location) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -88,6 +89,7 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
     const page = usePageState(initialTab, location);
     const modals = useModalState();
     const handleUnreport = useUnreport(society, updateLocalSociety, confirm);
+    const subscription = useSocietySubscription(societyId, society, updateLocalSociety);
 
     useEffect(() => { scrollContentToTop(); if (location.state?.activeTab) window.history.replaceState({}, document.title); }, []);
 
@@ -105,7 +107,8 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
         <div className={styles.page}>
             <TopBar onBack={onBack} isAdmin={society.role === 'admin'} onSettings={() => modals.setShowSettings(true)} onReport={() => modals.setShowReportModal(true)} onUnreport={handleUnreport} hasReported={society.has_reported} />
             <SocietyHero society={society} onImageClick={() => modals.setGalleryOpen(true)} editMode={modals.editMode} onUpdateName={(name) => updateSociety({ name })} onEditImages={() => modals.setShowCoverModal(true)} />
-            <SocietyInfo society={society} editMode={modals.editMode} onUpdateSociety={updateSociety} onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety} canEdit={society.is_admin} onToggleEditMode={handleToggleEditMode} onViewMembers={() => modals.setShowMembersModal(true)} />
+            <SocietyInfo society={society} editMode={modals.editMode} onUpdateSociety={updateSociety} onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety} canEdit={society.is_admin} onToggleEditMode={handleToggleEditMode} onViewMembers={() => modals.setShowMembersModal(true)}
+                isSubscribed={subscription.isSubscribed} onToggleSubscription={subscription.toggleSubscription} />
             <MainContent activeTab={page.activeTab} setActiveTab={page.handleTabChange} society={society} editMode={modals.editMode} handlers={handlers} focusAnnouncementId={page.focusAnnouncementId} onEditAnnouncement={modals.setEditingAnnouncement} />
             <SocietyModals modals={modals} society={society} handlers={handlers} members={members} updateSociety={updateSociety} updateLocalSociety={updateLocalSociety} societyId={societyId} onBack={onBack} />
         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import * as api from "../../../api/societyApi";
 import { addHourToTime } from "../../Calendar/utils/dateUtils";
 import { useTags } from "../../../context/TagContext";
+import { useConfirm } from "../../../context/ConfirmContext";
 
 function transformAnnouncementData(data) {
     const images = (data.images || []).map(img => (typeof img === 'object' && img.url) ? img.url : img).filter(Boolean);
@@ -193,13 +194,15 @@ function useSocietyMembers(societyId, setSociety) {
 
 function useSocietyMembership(societyId, setSociety) {
     const { refreshTags } = useTags();
+    const confirm = useConfirm();
     const joinSociety = async () => {
         await api.joinSociety(societyId);
         setSociety(prev => ({ ...prev, is_member: true, member_count: prev.member_count + 1 }));
+        await promptNotificationSubscription(societyId, setSociety, confirm);
     };
     const leaveSociety = async () => {
         await api.leaveSociety(societyId, 'me');
-        setSociety(prev => ({ ...prev, is_member: false, member_count: Math.max(0, prev.member_count - 1) }));
+        setSociety(prev => ({ ...prev, is_member: false, is_subscribed: false, member_count: Math.max(0, prev.member_count - 1) }));
         await refreshTags();
     };
     const deleteSociety = async () => await api.deleteSociety(societyId);
@@ -209,6 +212,16 @@ function useSocietyMembership(societyId, setSociety) {
     };
     const publishChanges = async (changes = {}) => await api.publishChanges(societyId, changes);
     return { joinSociety, leaveSociety, deleteSociety, requestRatification, publishChanges };
+}
+
+async function promptNotificationSubscription(societyId, setSociety, confirm) {
+    const yes = await confirm({
+        title: "Enable notifications?",
+        message: "Would you like to turn on notifications for this society?",
+    });
+    if (!yes) return;
+    await api.toggleSubscription(societyId, true);
+    setSociety(prev => ({ ...prev, is_subscribed: true }));
 }
 
 export function useSocietyDetail(societyId) {

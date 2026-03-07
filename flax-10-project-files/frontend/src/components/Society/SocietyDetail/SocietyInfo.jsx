@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
+import { Bell, BellOff } from "lucide-react";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
-export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers }) {
+export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers, isSubscribed, onToggleSubscription }) {
     const categories = society.categories || (society.category ? [society.category] : []);
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
-            <Stats society={society} onViewMembers={onViewMembers} />
+            <Stats society={society} onViewMembers={onViewMembers}
+                isSubscribed={isSubscribed} onToggleSubscription={onToggleSubscription} />
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
         </div>
@@ -72,14 +74,28 @@ function EditIcon({ onClick }) {
     return <button className={styles.editIcon} onClick={onClick} title="Edit">✎</button>;
 }
 
-function Stats({ society, onViewMembers }) {
+function Stats({ society, onViewMembers, isSubscribed, onToggleSubscription }) {
     return (
         <div className={styles.stats}>
+            {society.is_member && (
+                <NotificationBell isSubscribed={isSubscribed} onToggle={onToggleSubscription} />
+            )}
             <button className={styles.memberCountBtn} onClick={onViewMembers} title="View Members">
                 {society.member_count} members
             </button>
             {society.is_ratified && <span className={styles.badge}>Ratified</span>}
         </div>
+    );
+}
+
+function NotificationBell({ isSubscribed, onToggle }) {
+    const Icon = isSubscribed ? Bell : BellOff;
+    const title = isSubscribed ? "Notifications on" : "Notifications off";
+    const className = isSubscribed ? styles.bellActive : styles.bellInactive;
+    return (
+        <button className={`${styles.notificationBell} ${className}`} onClick={onToggle} title={title}>
+            <Icon size={18} />
+        </button>
     );
 }
 

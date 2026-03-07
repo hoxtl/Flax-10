@@ -60,6 +60,10 @@ export const unsyncCalendar = (societyId) => deleteRequest(`${BASE}/${societyId}
 export const reportSociety = (societyId, reason) => postJson(`${BASE}/${societyId}/report/`, { reason });
 export const unreportSociety = (societyId) => deleteRequest(`${BASE}/${societyId}/report/`);
 
+// Subscription
+export const toggleSubscription = (societyId, isSubscribed) =>
+    patchJson(`${BASE}/${societyId}/subscribe/`, { is_subscribed: isSubscribed });
+
 // Ratification
 export const requestRatification = (societyId) =>
     postJson(`${BASE}/${societyId}/ratification/request/`, {});
