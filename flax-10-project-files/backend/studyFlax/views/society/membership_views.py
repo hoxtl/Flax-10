@@ -80,10 +80,14 @@ def leave_or_remove(request, society, user_id):
     membership = get_membership_by_user_id(society, user_id)
     if not membership:
         return Response({'error': 'Not a member'}, status=status.HTTP_404_NOT_FOUND)
-    
+
     # Auto-unsync when leaving
     SocietyCalendarSync.objects.filter(user_id=user_id, society=society).delete()
-    
+
+    # Skip notification for voluntary leave (user leaves themselves)
+    if is_self:
+        membership._skip_notification = True
+
     membership.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
