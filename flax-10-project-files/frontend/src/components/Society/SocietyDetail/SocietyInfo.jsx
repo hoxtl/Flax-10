@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
-export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode }) {
+export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers }) {
     const categories = society.categories || (society.category ? [society.category] : []);
     return (
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
-            <Stats society={society} />
+            <Stats society={society} onViewMembers={onViewMembers} />
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
         </div>
@@ -72,10 +72,12 @@ function EditIcon({ onClick }) {
     return <button className={styles.editIcon} onClick={onClick} title="Edit">✎</button>;
 }
 
-function Stats({ society }) {
+function Stats({ society, onViewMembers }) {
     return (
         <div className={styles.stats}>
-            <span>{society.member_count} members</span>
+            <button className={styles.memberCountBtn} onClick={onViewMembers} title="View Members">
+                {society.member_count} members
+            </button>
             {society.is_ratified && <span className={styles.badge}>Ratified</span>}
         </div>
     );

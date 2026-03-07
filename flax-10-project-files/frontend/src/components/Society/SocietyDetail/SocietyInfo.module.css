@@ -20,6 +20,25 @@
     gap: 16px;
     color: var(--muted);
     font-size: 0.9rem;
+    align-items: center;
+}
+
+.memberCountBtn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease, opacity 0.2s ease;
+}
+
+.memberCountBtn:hover {
+    text-decoration-color: currentColor;
+    opacity: 0.8;
 }
 
 .badge {
