@@ -88,7 +88,7 @@ const PAGE_SIZE = 12;
 
 function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport, onUnreport }) {
     const [searchParams, setSearchParams] = useSearchParams();
-    const activeTab = searchParams.get('subTab') || "admin";
+    const activeTab = searchParams.get('subTab') || "member";
 
     const setActiveTab = (t) => setSearchParams(prev => { prev.set('subTab', t); return prev; }, { replace: true });
 
@@ -100,8 +100,8 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
 
     const common = { onSelect, onReport, onUnreport, hideTitle: true };
     const tabs = [
-        { id: "admin", label: "Managed By Me", content: <SocietySection {...common} title="Managed Societies" items={adminPage.currentItems} type="admin" onAction={onCreateClick} pagination={{ currentPage: adminPage.currentPage, totalPages: adminPage.totalPages, onPageChange: adminPage.setPage }} /> },
-        { id: "member", label: "My Memberships", content: <SocietySection {...common} title="My Memberships" items={memberPage.currentItems} type="member" onAction={() => setView("all")} allSocieties={societies} pagination={{ currentPage: memberPage.currentPage, totalPages: memberPage.totalPages, onPageChange: memberPage.setPage }} /> }
+        { id: "member", label: "My Memberships", content: <SocietySection {...common} title="My Memberships" items={memberPage.currentItems} type="member" onAction={() => setView("all")} allSocieties={societies} pagination={{ currentPage: memberPage.currentPage, totalPages: memberPage.totalPages, onPageChange: memberPage.setPage }} /> },
+        { id: "admin", label: "Managed By Me", content: <SocietySection {...common} title="Managed Societies" items={adminPage.currentItems} type="admin" onAction={onCreateClick} pagination={{ currentPage: adminPage.currentPage, totalPages: adminPage.totalPages, onPageChange: adminPage.setPage }} /> }
     ];
 
     return (
