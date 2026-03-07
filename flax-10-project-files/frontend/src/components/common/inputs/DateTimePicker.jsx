@@ -22,24 +22,24 @@ import { Clock } from "lucide-react";
 import AnimatedDropdown from "../../ui/AnimatedDropdown";
 import styles from "./DateTimePicker.module.css";
 
-const MONTHS = ["January","February","March","April","May","June",
-                "July","August","September","October","November","December"];
-const DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+const MONTHS = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
+const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => ({ value: String(i), label: pad(i) }));
-const MINUTE_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => ({ value: String(m), label: pad(m) }));
+const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => ({ value: String(i), label: pad(i) }));
 
 function formatDisplay(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
     + "  " + pad(date.getHours()) + ":" + pad(date.getMinutes());
 }
 
 function formatDateOnly(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" });
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
 function getDisplayValue(date, timeOnly, dateOnly) {
@@ -75,12 +75,12 @@ function parseIncomingValue(value, timeOnly, dateOnly) {
 export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false }) {
   const parsed = useMemo(() => parseIncomingValue(value, timeOnly, dateOnly), [value, timeOnly, dateOnly]);
 
-  const [open,    setOpen]    = useState(false);
-  const [viewY,   setViewY]   = useState((parsed || new Date()).getFullYear());
-  const [viewM,   setViewM]   = useState((parsed || new Date()).getMonth());
+  const [open, setOpen] = useState(false);
+  const [viewY, setViewY] = useState((parsed || new Date()).getFullYear());
+  const [viewM, setViewM] = useState((parsed || new Date()).getMonth());
   const [selDate, setSelDate] = useState(parsed);
-  const [hour,    setHour]    = useState(parsed ? parsed.getHours()   : 12);
-  const [minute,  setMinute]  = useState(parsed ? parsed.getMinutes() : 0);
+  const [hour, setHour] = useState(parsed ? parsed.getHours() : 12);
+  const [minute, setMinute] = useState(parsed ? parsed.getMinutes() : 0);
 
   const ref = useRef(null);
   const dropdownRef = useRef(null);
@@ -97,10 +97,10 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
   const prevMonth = () => navigateMonth(-1, viewM, setViewM, setViewY);
   const nextMonth = () => navigateMonth(1, viewM, setViewM, setViewY);
 
-  const days  = calendarDays(viewY, viewM);
+  const days = calendarDays(viewY, viewM);
   const today = new Date();
   const isToday = (d) => d === today.getDate() && viewM === today.getMonth() && viewY === today.getFullYear();
-  const isSel   = (d) => selDate && d === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear();
+  const isSel = (d) => selDate && d === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear();
 
   return (
     <div className={styles.wrap} ref={ref}>
@@ -234,8 +234,8 @@ function emitDateTimeChange(date, h, m, timeOnly, dateOnly, onChange) {
   const d = new Date(date);
   d.setHours(h, m, 0, 0);
   if (timeOnly) { onChange?.(`${pad(d.getHours())}:${pad(d.getMinutes())}`); return; }
-  if (dateOnly) { onChange?.(`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`); return; }
-  const iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (dateOnly) { onChange?.(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`); return; }
+  const iso = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   onChange?.(iso);
 }
 
@@ -256,6 +256,6 @@ function handleMinuteChange(m, setMinute, selDate, emitChange, hour) {
 }
 
 function navigateMonth(dir, viewM, setViewM, setViewY) {
-  if (dir === -1) { if (viewM === 0) { setViewY(y => y-1); setViewM(11); } else setViewM(m => m-1); }
-  else { if (viewM === 11) { setViewY(y => y+1); setViewM(0); } else setViewM(m => m+1); }
+  if (dir === -1) { if (viewM === 0) { setViewY(y => y - 1); setViewM(11); } else setViewM(m => m - 1); }
+  else { if (viewM === 11) { setViewY(y => y + 1); setViewM(0); } else setViewM(m => m + 1); }
 }
