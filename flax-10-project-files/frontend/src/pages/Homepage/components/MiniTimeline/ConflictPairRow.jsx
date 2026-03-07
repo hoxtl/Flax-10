@@ -77,11 +77,6 @@ export function ConflictPairRow({
     onConflictAutoMove(movable.item, start, end);
   };
 
-  const handleMoveTomorrow = () => {
-    if (!movable || !onPushTomorrow) return;
-    onPushTomorrow(movable.item);
-  };
-
   return (
     <div
       className={styles.planTimelineRow}
@@ -152,6 +147,19 @@ export function ConflictPairRow({
                     </span>
                   )}
                 </div>
+                {!freeRow && onPushTomorrow && (
+                  <button
+                    type="button"
+                    className={styles.planTimelineConflictCardMoveBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPushTomorrow(r.item);
+                    }}
+                    title={`Move "${stripEmojiFromTitle(r.item.title)}" to tomorrow`}
+                  >
+                    → Move to tomorrow
+                  </button>
+                )}
               </div>
             );
           })}
@@ -177,17 +185,6 @@ export function ConflictPairRow({
               <RotateCw size={12} strokeWidth={2.1} aria-hidden />
               {freeRow ? "Auto-arrange" : "No free window"}
             </button>
-            {!freeRow && (
-              <button
-                type="button"
-                className={styles.planTimelineConflictAutoBtn}
-                onClick={handleMoveTomorrow}
-                disabled={!movable || !onPushTomorrow}
-                title="Move one conflicting event to tomorrow"
-              >
-                → Move to tomorrow
-              </button>
-            )}
             {items.map((r) => (
               <button
                 key={`edit-${r.id}`}
