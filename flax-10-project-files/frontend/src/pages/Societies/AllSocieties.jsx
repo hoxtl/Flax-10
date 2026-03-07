@@ -6,30 +6,24 @@ import SearchBar from "../../components/common/SearchBar";
 import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
+import { usePagination } from "../../hooks/usePagination";
 
 const PAGE_SIZE = 20;
 
 export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
     const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { items, totalPages } = usePagination(filtered, page, PAGE_SIZE);
+    const { currentItems, totalPages } = usePagination(filtered, PAGE_SIZE, page);
 
     return (
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
             <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
-            <SocietyGrid items={items} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
+            <SocietyGrid items={currentItems} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             <BackToTop />
         </div>
     );
-}
-
-function usePagination(items, page, pageSize) {
-    const totalPages = Math.ceil(items.length / pageSize);
-    const start = (page - 1) * pageSize;
-    const paginatedItems = items.slice(start, start + pageSize);
-    return { items: paginatedItems, totalPages };
 }
 
 function useFilters() {

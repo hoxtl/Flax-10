@@ -9,6 +9,8 @@ import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSoc
 import { useConfirm } from "../../context/ConfirmContext";
 import { unreportSociety } from "../../api/societyApi";
 import Tabs from "../../components/common/Tabs/Tabs";
+import { usePagination } from "../../hooks/usePagination";
+import { BackToTop } from "../../components/Pagination/Pagination";
 
 export default function SocietiesPage() {
     const state = useSocietiesPage();
@@ -70,20 +72,26 @@ function useSocietiesPage() {
     return { view, setView, selectedSocietyId, selectSociety, clearSelection, showCreateModal, setShowCreateModal, reportingSociety, setReportingSociety, societies, loading, onCreate, onReportSuccess, handleUnreport };
 }
 
+const PAGE_SIZE = 12;
+
 function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport, onUnreport }) {
     const [activeTab, setActiveTab] = useState("admin");
     const adminOf = societies.filter(s => s.is_admin);
     const memberOf = societies.filter(s => s.is_member && !s.is_admin);
 
+    const adminPage = usePagination(adminOf, PAGE_SIZE);
+    const memberPage = usePagination(memberOf, PAGE_SIZE);
+
     const common = { onSelect, onReport, onUnreport, hideTitle: true };
     const tabs = [
-        { id: "admin", label: "Managed By Me", content: <SocietySection {...common} title="Managed Societies" items={adminOf} type="admin" onAction={onCreateClick} /> },
-        { id: "member", label: "My Memberships", content: <SocietySection {...common} title="My Memberships" items={memberOf} type="member" onAction={() => setView("all")} allSocieties={societies} /> }
+        { id: "admin", label: "Managed By Me", content: <SocietySection {...common} title="Managed Societies" items={adminPage.currentItems} type="admin" onAction={onCreateClick} pagination={{ currentPage: adminPage.currentPage, totalPages: adminPage.totalPages, onPageChange: adminPage.setPage }} /> },
+        { id: "member", label: "My Memberships", content: <SocietySection {...common} title="My Memberships" items={memberPage.currentItems} type="member" onAction={() => setView("all")} allSocieties={societies} pagination={{ currentPage: memberPage.currentPage, totalPages: memberPage.totalPages, onPageChange: memberPage.setPage }} /> }
     ];
 
     return (
         <div className={styles.container}>
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+            <BackToTop />
         </div>
     );
 }
