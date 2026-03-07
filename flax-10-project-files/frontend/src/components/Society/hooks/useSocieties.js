@@ -44,5 +44,9 @@ export function useSocieties() {
         return newSociety;
     };
 
-    return { societies, loading, error, refresh: loadSocieties, handleCreate };
+    const updateSocietyLocally = (id, updates) => {
+        setSocieties(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    };
+
+    return { societies, loading, error, refresh: loadSocieties, handleCreate, updateSocietyLocally };
 }

@@ -28,7 +28,13 @@ function useTagModal() {
     await checkDuplicate(data, tags, editingId, confirmFn, updateTag, resetState, () => commitSave(data, editingId, updateTag, addTag, resetState));
   };
 
-  return { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };
+  const confirmDelete = async (id) => {
+    const tag = tags.find(t => t.id === id);
+    const yes = await confirmFn({ title: "Delete Tag", message: `Are you sure you want to delete "${tag?.label}"?`, confirmText: "Delete", cancelText: "Cancel" });
+    if (yes) deleteTag(id);
+  };
+
+  return { tags, deleteTag: confirmDelete, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };
 }
 
 async function checkDuplicate(data, tags, editingId, confirmFn, updateTag, resetState, onSafe) {

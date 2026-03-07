@@ -182,9 +182,7 @@ function useAppState() {
   }, []);
 
   useEffect(() => {
-    const handleNavigate = (e) => setActiveNav(e.detail);
-    window.addEventListener('navigate', handleNavigate);
-    return () => window.removeEventListener('navigate', handleNavigate);
+    // Moved custom 'navigate' event listener to AppScreen where useNavigate is available
   }, []);
 
   return {
@@ -296,19 +294,12 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
     return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
   if (activeNav.startsWith("profile_"))
     return renderProfileView(activeNav, setActiveNav, user);
-  if (activeNav.startsWith("societies_"))
-    return renderSocietyView(activeNav, setActiveNav);
   return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
 function renderProfileView(activeNav, setActiveNav, user) {
   const viewedUserId = activeNav.split("_")[1];
   return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
-}
-
-function renderSocietyView(activeNav, setActiveNav) {
-  const parts = activeNav.split("_");
-  return <SocietyDetailPage societyId={parts[1]} initialTab={parts[2] || "calendar"} onBack={() => setActiveNav("societies")} />;
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
@@ -338,18 +329,51 @@ function OnboardingWrapper({ onComplete }) {
   );
 }
 
+import ScrollToTop from "./components/common/ScrollToTop";
+
 function AppScreen({ activeNav, setActiveNav, user }) {
   const location = useLocation();
   const navigate = useNavigate();
   useSyncNavFromUrl(location.pathname, setActiveNav);
-  const handleNavChange = (id) => {
-    setActiveNav(id);
-    const route = APP_ROUTES.find((r) => r.id === id);
-    if (route) navigate(route.path);
-  };
+
+  const handleNavChange = useCallback((id) => {
+    if (id.startsWith("societies_")) {
+      setActiveNav("societies");
+      const parts = id.split("_");
+      const socId = parts[1];
+      const tab = parts[2];
+      const url = tab ? `/societies?id=${socId}&tab=${tab}` : `/societies?id=${socId}`;
+      navigate(url);
+      return;
+    }
+
+    if (id.startsWith('/')) {
+      navigate(id);
+      return;
+    }
+
+    const baseNav = id.split('?')[0];
+    const route = APP_ROUTES.find((r) => r.id === baseNav);
+
+    if (route) {
+      setActiveNav(baseNav);
+      const queryPart = id.includes('?') ? `?${id.split('?')[1]}` : '';
+      navigate(`${route.path}${queryPart}`);
+    } else {
+      setActiveNav(id);
+    }
+  }, [navigate, setActiveNav]);
+
+  useEffect(() => {
+    const handleGlobalNavigate = (e) => handleNavChange(e.detail);
+    window.addEventListener('navigate', handleGlobalNavigate);
+    return () => window.removeEventListener('navigate', handleGlobalNavigate);
+  }, [handleNavChange]);
+
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
+        <ScrollToTop />
         <DashboardLayout activeNav={activeNav} onNavChange={handleNavChange} user={user}>
           <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
         </DashboardLayout>
