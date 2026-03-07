@@ -5,11 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from studyFlax.models import Module, Reading, Task
 from studyFlax.serialisers.reading_serialisers import ReadingSerialiser
+from studyFlax.utils.reading_utils import estimated_time_reading
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def reading_list(request, module_id):
-    module = get_object_or_404(Module, module_id)
+    module = get_object_or_404(Module, id=module_id)
     if request.method == 'GET':
         return get_readings(request, module)
     return create_reading(request, module)
@@ -24,3 +25,61 @@ def create_reading(request, module):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     reading = serialiser.save(module=module)
     return Response(ReadingSerialiser(reading, context={'request': request}).data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def reading_detail(request, module_id, reading_id):
+    reading = get_object_or_404(Reading, id=reading_id, module_id=module_id)
+    if request.method == 'GET': 
+        return Response(ReadingSerialiser(reading, context={'request':request}).data)
+    if request.method == 'PUT': 
+        return update_reading(request, reading)
+    return delete_reading(reading)
+
+def update_reading(request, reading):
+    serialiser = ReadingSerialiser(reading, data=request.data, partial=True, context={'request':request})
+    if not serialiser.is_valid():
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(ReadingSerialiser(serialiser.save(), context={'request':request}).data)
+
+def delete_reading(reading):
+    reading.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def load_task(request, reading_id):
+    reading = get_object_or_404(Reading, id=reading_id)
+    return create_reading_task(request.user, reading)
+
+
+def create_reading_task(user, reading):
+    estimated = estimated_time_reading(reading, user)
+    task = Task.objects.create(
+        user=user,
+        title=reading.title,
+        description=create_description(reading),
+        due_date=reading.deadline,
+        module=reading.module,
+        priority='medium',
+        estimated_blocks=max(1,round(estimated/25)),
+        reading=reading,
+    )
+    return Response(task_payload(task), status=status.HTTP_201_CREATED)
+
+def create_description(reading):
+    strings = [reading.title]
+    if reading.chapter:
+        strings.append(reading.chapter)
+    strings.append(f"pages. {reading.start_page}-{reading.end_page}")
+    return ', '.join(strings)
+
+def task_payload(task):
+    return {
+        'id': task.id,
+        'title': task.title,
+        'due_date':task.due_date,
+        'estimated_blocks':task.estimated_blocks,
+        'reading': task.reading_id,
+    }
