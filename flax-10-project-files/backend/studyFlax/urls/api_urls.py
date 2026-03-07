@@ -52,7 +52,7 @@ from studyFlax.views.society import (
     event_list as society_event_list, event_detail as society_event_detail,
     sync_status, sync_calendar, unsync_calendar,
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
-    add_society_event_exception, publish_changes
+    add_society_event_exception, publish_changes, report_society
 )
 # Notifications
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all

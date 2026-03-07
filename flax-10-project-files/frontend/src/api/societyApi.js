@@ -26,8 +26,6 @@ export const updateMemberRole = (societyId, userId, role) =>
 export const addCollaborator = (societyId, identifier, role) =>
     postJson(`${BASE}/${societyId}/members/`, { username: identifier, role });
 
-export const searchUsers = (query) => fetchApi(`/users/search/?q=${encodeURIComponent(query)}`);
-
 // Tags
 export const fetchSocietyTags = (societyId) => fetchApi(`${BASE}/${societyId}/tags/`);
 
@@ -60,6 +58,7 @@ export const unsyncCalendar = (societyId) => deleteRequest(`${BASE}/${societyId}
 
 // Reporting
 export const reportSociety = (societyId, reason) => postJson(`${BASE}/${societyId}/report/`, { reason });
+export const unreportSociety = (societyId) => deleteRequest(`${BASE}/${societyId}/report/`);
 
 // Ratification
 export const requestRatification = (societyId) =>

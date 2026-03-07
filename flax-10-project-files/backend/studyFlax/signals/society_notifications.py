@@ -61,6 +61,15 @@ def handle_society_delete(sender, instance, **kwargs):
     delete_children_silently(instance)
 
 
+@receiver(pre_delete, sender=SocietyMembership)
+def handle_membership_delete(sender, instance, **kwargs):
+    """Notify user when they are removed from a society."""
+    if getattr(instance, '_skip_notification', False):
+        return
+    notification = build_membership_removal_notification(instance.user, instance.society)
+    notification.save()
+
+
 def notify_society_deleted(society):
     """Send deletion notification to all society members."""
     members = SocietyMembership.objects.filter(society=society).select_related('user')
@@ -84,6 +93,15 @@ def build_society_delete_notification(user, society):
         title=f"Society deleted: {society.name}",
         message=f"The society '{society.name}' has been removed. You are no longer a member.",
         notification_type='society_deleted',
+    )
+
+
+def build_membership_removal_notification(user, society):
+    return Notification(
+        user=user,
+        title=f"Removed from {society.name}",
+        message=f"You have been removed from {society.name}.",
+        notification_type='society_membership',
     )
 
 
