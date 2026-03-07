@@ -39,20 +39,25 @@ export default function SchedulesPage() {
 
   return (
     <div className={styles.page}>
-      <h2>Schedules</h2>
+      <header className={styles.header}>
+        <div>
+          <h2 className={styles.title}>Schedules</h2>
+          <p className={styles.subtitle}>Manage manually created and auto-generated study schedules.</p>
+        </div>
+      </header>
       {!schedules.length && <p className={styles.empty}>No schedules yet. Use Quick Add → Schedule to create one.</p>}
       <div className={styles.list}>
         {schedules.map(s => (
-          <div key={s.id} className={styles.card}>
-            <div>
-              <h3>{s.title}</h3>
-              <p>{s.event_allocations?.length || 0} allocated events</p>
+          <article key={s.id} className={styles.card}>
+            <div className={styles.info}>
+              <h3 className={styles.scheduleTitle}>{s.title}</h3>
+              <p className={styles.meta}>{s.event_allocations?.length || 0} allocated events</p>
             </div>
             <div className={styles.actions}>
-              <button onClick={() => onRename(s.id, s.title)}>Rename</button>
-              <button onClick={() => onDelete(s.id)}>Remove</button>
+              <button className={`${styles.button} ${styles.secondaryBtn}`} onClick={() => onRename(s.id, s.title)}>Rename</button>
+              <button className={`${styles.button} ${styles.dangerBtn}`} onClick={() => onDelete(s.id)}>Remove</button>
             </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>
