@@ -7,7 +7,7 @@ from studyFlax.models.society import SocietyCalendarSync
 from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
-PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies'}
+PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'}
 
 
 @api_view(['GET', 'POST'])
@@ -42,7 +42,7 @@ def get_tags(user):
 
 def ensure_user_system_tags(user):
     from studyFlax.views.calendar.system_tags import get_lecture_tag, get_deadline_tag
-    from studyFlax.views.calendar.system_tags import get_exam_tag, get_societies_tag
+    from studyFlax.views.calendar.system_tags import get_exam_tag, get_societies_tag, get_schedule_tag
     from studyFlax.views.calendar.system_tags import fix_untagged_deadline_events
     if has_module_enrollments(user):
         get_lecture_tag()
@@ -51,6 +51,7 @@ def ensure_user_system_tags(user):
         fix_untagged_deadline_events()
     if has_society_syncs(user):
         get_societies_tag()
+    get_schedule_tag()
 
 
 def has_module_enrollments(user):

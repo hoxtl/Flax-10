@@ -5,7 +5,7 @@ import EmojiPicker from './EmojiPicker';
 import StandardModal from '../common/StandardModal/StandardModal';
 import styles from './TagManagerModal.module.css';
 
-const PROTECTED_TAGS = ['other', 'lecture', 'deadline', 'exam', 'societies'];
+const PROTECTED_TAGS = ['other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'];
 
 function isProtectedTag(tagLabel) {
   return PROTECTED_TAGS.includes(tagLabel?.toLowerCase());
