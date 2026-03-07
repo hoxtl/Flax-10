@@ -1,5 +1,7 @@
 import ShareButton from './ShareButton';
-import styles from './Social.module.css';
+import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
+import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
+import UserAvatar from '../common/UserAvatar/UserAvatar';
 
 function getCurrentUser() {
     return JSON.parse(localStorage.getItem('user')) || {};
@@ -19,56 +21,38 @@ function sortUsers(users, currentUser) {
     });
 }
 
-function UserInfo({ user }) {
-    return (
-        <div className={styles.userInfo}>
-            <div className={styles.avatar}>{user.first_name?.[0] || user.username[0]}</div>
-            <div className={styles.userNameDetails}>
-                <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
-                <span className={styles.userHandle}>@{user.username}</span>
-            </div>
-        </div>
-    );
-}
 
-function UserItem({ user, currentUser, onUserClick, onUserUpdate }) {
-    const isSelf = isCurrentUser(user, currentUser);
-    return (
-        <div className={styles.userItem} onClick={() => onUserClick?.(user)}>
-            <UserInfo user={user} />
-            {!isSelf && <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />}
-        </div>
-    );
-}
-
-function ModalHeader({ title, onClose }) {
-    return (
-        <div className={styles.modalHeader}>
-            <h2>{title}</h2>
-            <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-        </div>
-    );
-}
-
-function UserList({ users, currentUser, onUserClick, onUserUpdate }) {
-    if (users.length === 0) return <p className={styles.emptyText}>No users found.</p>;
-    return (
-        <div className={styles.userList}>
-            {users.map((u, i) => <UserItem key={u.id || u.username || i} user={u} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />)}
-        </div>
-    );
+function formatName(user) {
+    const fn = user.first_name || '';
+    const ln = user.last_name || '';
+    return (fn || ln) ? `${fn} ${ln}`.trim() : user.username;
 }
 
 export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
     if (!users) return null;
     const currentUser = getCurrentUser();
     const sortedUsers = sortUsers(users, currentUser);
+
     return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <ModalHeader title={title} onClose={onClose} />
-                <UserList users={sortedUsers} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />
-            </div>
-        </div>
+        <GenericSummaryModal
+            isOpen={true}
+            onClose={onClose}
+            title={title}
+            emptyMessage="No users found."
+            items={sortedUsers}
+            renderItem={(u, i) => {
+                const isSelf = isCurrentUser(u, currentUser);
+                return (
+                    <SummaryItem
+                        key={u.id || u.username || i}
+                        avatar={<UserAvatar user={u} avatarOnly />}
+                        title={formatName(u)}
+                        subtitle={`@${u.username}`}
+                        onClick={() => onUserClick?.(u)}
+                        rightAction={!isSelf ? <ShareButton userId={u.id} initialIsSharing={u.is_sharing} onToggle={onUserUpdate} /> : null}
+                    />
+                );
+            }}
+        />
     );
 }
