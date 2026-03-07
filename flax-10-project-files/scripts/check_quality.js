@@ -30,7 +30,7 @@ function printSection(number, title) {
   console.log(`\n${Colors.BOLD}${Colors.YELLOW}${number}. ${title}${Colors.END}`);
   console.log("─".repeat(75));
 }
-
+ 
 function printSubsection(title) {
   console.log(`\n${Colors.BOLD}${title}${Colors.END}`);
   console.log("·".repeat(75));
