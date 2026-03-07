@@ -7,12 +7,12 @@ import { getModules } from "../../api/moduleApi";
 const CORE_TYPES = [
   { id: 'event', icon: '📅', label: 'Event', color: '#3b82f6' },
   { id: 'society', icon: '👨‍👨‍👧‍👧', label: 'Society', color: '#8b5cf6' },
+  { id: 'task', icon: '✅', label: 'Task', color: '#10b981' },
 ];
 
 //Unlock when features are implemented
 const LOCK_TYPES = [
   { id: 'group', icon: '👥', label: 'Group', color: '#cbd5e1', locked: true },
-  { id: 'task', icon: '✅', label: 'Task', color: '#cbd5e1', locked: true },
 ];
 
 function tileStyle(item) {

@@ -13,7 +13,7 @@
     border-radius: 12px;
     padding: 1.5rem;
     width: 90%;
-    max-width: 400px;
+    max-width: 450px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
@@ -36,6 +36,11 @@
     justify-content: flex-end;
 }
 
+.buttons:has(> :nth-child(3)) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .cancelBtn {
     padding: 0.5rem 1rem;
     background: var(--hover, #f3f4f6);
@@ -50,7 +55,35 @@
     background: var(--border, #e5e7eb);
 }
 
-.confirmBtn {
+.alternateBtn {
+    padding: 0.5rem 1rem;
+    background: var(--hover, #f3f4f6);
+    border: 1px solid var(--border, #e5e7eb);
+    color: var(--text, #1f2937);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.alternateBtn:hover {
+    background: var(--border, #e5e7eb);
+}
+
+.primaryBtn {
+    padding: 0.5rem 1rem;
+    background: var(--primary, #3b82f6);
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.primaryBtn:hover {
+    background: var(--primary-hover, #2563eb);
+}
+
+.dangerBtn {
     padding: 0.5rem 1rem;
     background: #ef4444;
     border: none;
@@ -60,6 +93,6 @@
     font-size: 0.9rem;
 }
 
-.confirmBtn:hover {
+.dangerBtn:hover {
     background: #dc2626;
 }

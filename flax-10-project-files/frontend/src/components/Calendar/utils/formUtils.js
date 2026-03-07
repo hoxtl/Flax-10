@@ -1,4 +1,4 @@
-import { findOverlappingEvents } from './overlapUtils';
+import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
 
@@ -53,26 +53,16 @@ function getDefaultForm(options) {
     };
 }
 
-export async function validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, allEvents, forceSave = false) {
+export async function validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, allEvents, forceSave = false) {
     if (e) e.preventDefault();
     const error = validateForm(form);
     if (error) return setError(error);
 
     const data = buildEventData(form);
-    if (!forceSave && hasOverlaps(data, event, allEvents, setOverlapWarning)) return;
+    const others = allEvents.filter(ev => ev.id !== (event?.id));
+    if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return;
 
-    await submitEvent(event, data, actions, onClose, setError);
-}
-
-function hasOverlaps(data, event, allEvents, setOverlapWarning) {
-    const others = allEvents.filter(e => e.id !== (event?.id));
-    const overlapping = findOverlappingEvents({ ...data, id: event?.id }, others);
-
-    if (overlapping.length > 0) {
-        setOverlapWarning(overlapping);
-        return true;
-    }
-    return false;
+    await submitEvent(event, data, actions, onClose, setError, confirmFn);
 }
 
 function validateForm(form) {
@@ -80,27 +70,32 @@ function validateForm(form) {
     return validateDateRange(form.start_time, form.end_time);
 }
 
-async function submitEvent(event, data, actions, onClose, setError) {
+async function submitEvent(event, data, actions, onClose, setError, confirmFn) {
     try {
-        await saveEvent(event, data, actions);
+        await saveEvent(event, data, actions, confirmFn);
         onClose();
     } catch (err) {
         setError(err.message);
     }
 }
 
-async function saveEvent(event, data, actions) {
+async function saveEvent(event, data, actions, confirmFn) {
     if (!event?.id) {
         await actions.addEvent(data);
     } else if (hasRecurrence(event)) {
-        await handleRecurringEdit(event, data, actions);
+        await handleRecurringEdit(event, data, actions, confirmFn);
     } else {
         await actions.editEvent(extractBaseEventId(event.id, event), data);
     }
 }
 
-async function handleRecurringEdit(event, data, actions) {
-    const choice = window.confirm('This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence');
+async function handleRecurringEdit(event, data, actions, confirmFn) {
+    const choice = await confirmFn({
+        title: "Recurring Event",
+        message: "This is a recurring event. How would you like to edit it?",
+        confirmText: "Edit ALL occurrences",
+        cancelText: "Edit ONLY this occurrence"
+    });
     const baseId = extractBaseEventId(event.id, event);
 
     if (choice) {

@@ -685,7 +685,7 @@ function ProfileContent({ user, state, isMutualOrSelf, isSelf, onNavigate }) {
       {!isSelf && isMutualOrSelf && (
         <div className={styles.calendarSection}>
           <div className={styles.cardLabel}>SHARED CALENDAR</div>
-          <ProfileCalendar events={filteredEvents} />
+          <ProfileCalendar allEvents={filteredEvents || []} />
         </div>
       )}
     </div>
