@@ -8,6 +8,7 @@ import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
 import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSocietyModal";
 import { useConfirm } from "../../context/ConfirmContext";
 import { unreportSociety } from "../../api/societyApi";
+import Tabs from "../../components/common/Tabs/Tabs";
 
 export default function SocietiesPage() {
     const state = useSocietiesPage();
@@ -70,16 +71,19 @@ function useSocietiesPage() {
 }
 
 function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport, onUnreport }) {
+    const [activeTab, setActiveTab] = useState("admin");
     const adminOf = societies.filter(s => s.is_admin);
     const memberOf = societies.filter(s => s.is_member && !s.is_admin);
 
+    const common = { onSelect, onReport, onUnreport, hideTitle: true };
+    const tabs = [
+        { id: "admin", label: "Managed By Me", content: <SocietySection {...common} title="Managed Societies" items={adminOf} type="admin" onAction={onCreateClick} /> },
+        { id: "member", label: "My Memberships", content: <SocietySection {...common} title="My Memberships" items={memberOf} type="member" onAction={() => setView("all")} allSocieties={societies} /> }
+    ];
+
     return (
         <div className={styles.container}>
-            <SocietySection title="Managed Societies" items={adminOf}
-                type="admin" onAction={onCreateClick} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
-
-            <SocietySection title="My Memberships" items={memberOf}
-                type="member" onAction={() => setView("all")} allSocieties={societies} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
+            <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
     );
 }

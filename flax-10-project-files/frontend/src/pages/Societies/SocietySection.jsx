@@ -2,12 +2,12 @@ import styles from "./SocietiesPage.module.css";
 import SocietyCard from "../../components/Society/SocietyCard";
 import BrowseCard from "../../components/Society/BrowseCard";
 
-export default function SocietySection({ title, items, type, onAction, allSocieties = [], onSelect, onReport, onUnreport }) {
+export default function SocietySection({ title, items, type, onAction, allSocieties = [], onSelect, onReport, onUnreport, hideTitle }) {
     const isMember = type === "member";
 
     return (
         <section className={styles.section}>
-            <SectionHeader title={title} type={type} onAction={onAction} />
+            {!hideTitle && <SectionHeader title={title} type={type} onAction={onAction} />}
             <SectionContent items={items} isMember={isMember} onAction={onAction} allSocieties={allSocieties} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
         </section>
     );
