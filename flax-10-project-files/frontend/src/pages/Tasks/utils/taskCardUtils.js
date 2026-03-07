@@ -2,7 +2,7 @@
  * Display and formatting utilities for TaskCard components.
  */
 
-export const MODULE_COLORS = [
+const MODULE_COLORS = [
   { text: "#5a4a3a", bg: "rgba(123,103,81,0.10)",  border: "rgba(123,103,81,0.24)"  },
   { text: "#615547", bg: "rgba(138,125,118,0.12)", border: "rgba(138,125,118,0.24)" },
   { text: "#6a5a45", bg: "rgba(150,127,98,0.11)",  border: "rgba(150,127,98,0.25)"  },
@@ -14,14 +14,9 @@ export const MODULE_COLORS = [
 ];
 
 export const PRIORITY_LABELS = { urgent: "Urgent", high: "High", medium: "Medium" };
-export const PRIORITY_MARKS  = { urgent: "❗❗❗", high: "❗❗", medium: "❗" };
+export const PRIORITY_MARKS = { urgent: "❗❗❗", high: "❗❗", medium: "❗" };
 
-/**
- * Returns a deterministic colour palette entry for a module code string.
- *
- * @param {string} code
- * @returns {{ text: string, bg: string, border: string }}
- */
+/** Returns a deterministic colour palette entry for a module code string. */
 export function getModuleColor(code) {
   let hash = 0;
   for (let i = 0; i < code.length; i++) {
@@ -30,12 +25,7 @@ export function getModuleColor(code) {
   return MODULE_COLORS[Math.abs(hash) % MODULE_COLORS.length];
 }
 
-/**
- * Returns a due date display label and status string.
- *
- * @param {string|null} dueDate
- * @returns {{ label: string, status: string }|null}
- */
+/** Returns a due date display label and status string. */
 export function formatDueDate(dueDate) {
   if (!dueDate) return null;
   const due = new Date(dueDate);
@@ -50,12 +40,7 @@ export function formatDueDate(dueDate) {
   return { label: due.toLocaleDateString(undefined, { month: "short", day: "numeric" }), status: "future" };
 }
 
-/**
- * Returns a human-readable completion label relative to today.
- *
- * @param {string|null} dueDate
- * @returns {string}
- */
+/** Returns a human-readable completion label relative to today. */
 export function getCompletedDueLabel(dueDate) {
   if (!dueDate) return "Completed";
   const due = new Date(dueDate);
@@ -63,17 +48,12 @@ export function getCompletedDueLabel(dueDate) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
   const diffDays = Math.round((dueDay - today) / 86400000);
-  if (diffDays === 0)  return "Completed today";
+  if (diffDays === 0) return "Completed today";
   if (diffDays === -1) return "Completed yesterday";
   return `Completed ${due.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-/**
- * Decomposes an estimated-blocks count into sessions and minutes per session.
- *
- * @param {number} blocks
- * @returns {{ sessionCount: number, workMinutes: number }}
- */
+/** Decomposes an estimated-blocks count into sessions and minutes per session. */
 export function splitEstimatedBlocks(blocks) {
   const total = Math.max(1, Number(blocks) || 1);
   const found = [1, 2, 3, 4]
@@ -87,12 +67,7 @@ export function splitEstimatedBlocks(blocks) {
   return found || { sessionCount: 1, workMinutes: total * 25 };
 }
 
-/**
- * Returns a human-readable focus block summary string.
- *
- * @param {number} blocks
- * @returns {string}
- */
+/** Returns a human-readable focus block summary string. */
 export function formatFocusBlocks(blocks) {
   const split = splitEstimatedBlocks(blocks);
   const unit = split.sessionCount === 1 ? "session" : "sessions";

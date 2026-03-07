@@ -1,3 +1,7 @@
+/**
+ * Task card: checkbox, title, due/list badges, play action, context menu (edit/move/due/delete), info modal, edit modal.
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createPortal } from "react-dom";
@@ -12,25 +16,12 @@ import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarn
 import DateTimePicker from "./DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
+import { TaskInfoModal } from "./TaskInfoModal";
+import { formatDueDate, getCompletedDueLabel, getModuleColor, formatFocusBlocks, splitEstimatedBlocks, PRIORITY_LABELS, PRIORITY_MARKS } from "../utils/taskCardUtils";
 
-import styles from "./TaskCard.module.css";
-
-const MODULE_COLORS = [
-    { text: "#5a4a3a", bg: "rgba(123, 103, 81, 0.10)", border: "rgba(123, 103, 81, 0.24)" },
-    { text: "#615547", bg: "rgba(138, 125, 118, 0.12)", border: "rgba(138, 125, 118, 0.24)" },
-    { text: "#6a5a45", bg: "rgba(150, 127, 98, 0.11)", border: "rgba(150, 127, 98, 0.25)" },
-    { text: "#56515b", bg: "rgba(120, 112, 128, 0.10)", border: "rgba(120, 112, 128, 0.24)" },
-    { text: "#4f5a63", bg: "rgba(106, 121, 133, 0.10)", border: "rgba(106, 121, 133, 0.24)" },
-    { text: "#61584f", bg: "rgba(135, 123, 107, 0.10)", border: "rgba(135, 123, 107, 0.24)" },
-    { text: "#5d544a", bg: "rgba(129, 116, 99, 0.10)", border: "rgba(129, 116, 99, 0.24)" },
-    { text: "#564f47", bg: "rgba(118, 107, 95, 0.10)", border: "rgba(118, 107, 95, 0.24)" },
-];
-
-function getModuleColor(code) {
-    let hash = 0;
-    for (let i = 0; i < code.length; i++) hash = ((hash << 5) - hash + code.charCodeAt(i)) | 0;
-    return MODULE_COLORS[Math.abs(hash) % MODULE_COLORS.length];
-}
+import cardStyles from "./TaskCard.module.css";
+import ctxMenuStyles from "./TaskCardContextMenu.module.css";
+const styles = { ...cardStyles, ...ctxMenuStyles };
 
 function useActiveTimerTaskId() {
     const [id, setId] = useState(() => {
@@ -44,46 +35,9 @@ function useActiveTimerTaskId() {
     return id;
 }
 
-const PRIORITY_LABELS = {
-    urgent: "Urgent",
-    high:   "High",
-    medium: "Medium",
-};
-const PRIORITY_MARKS = {
-    urgent: "❗❗❗",
-    high: "❗❗",
-    medium: "❗",
-};
-
 const IconPlay = () => (
     <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
 );
-
-function formatDueDate(dueDate) {
-    if (!dueDate) return null;
-    const due = new Date(dueDate);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
-    const diffDays = Math.round((dueDay - today) / 86400000);
-    if (diffDays < 0) return { label: "Overdue", status: "overdue" };
-    if (diffDays === 0) return { label: "Today", status: "today" };
-    if (diffDays === 1) return { label: "Tomorrow", status: "tomorrow" };
-    if (diffDays <= 7) return { label: due.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }), status: "future" };
-    return { label: due.toLocaleDateString(undefined, { month: "short", day: "numeric" }), status: "future" };
-}
-
-function getCompletedDueLabel(dueDate) {
-    if (!dueDate) return "Completed";
-    const due = new Date(dueDate);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
-    const diffDays = Math.round((dueDay - today) / 86400000);
-    if (diffDays === 0) return "Completed today";
-    if (diffDays === -1) return "Completed yesterday";
-    return `Completed ${due.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
-}
 
 function HighlightText({ text, query }) {
     if (!query || !text) return <>{text}</>;
@@ -98,247 +52,115 @@ function HighlightText({ text, query }) {
     );
 }
 
+function ModulePillLink({ task }) {
+    const mc = getModuleColor(task.module_code);
+    const moduleId = task.module_id ?? task.module ?? task.moduleId;
+    const to = moduleId ? `/modules?moduleId=${moduleId}` : `/modules?code=${encodeURIComponent(task.module_code)}`;
+    return (
+        <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={{ color: mc.text, background: "transparent", borderColor: mc.border }} onClick={(e) => e.stopPropagation()} title={`Open ${task.module_code} module`}>
+            {task.module_code}
+        </Link>
+    );
+}
+
+function useTaskContextMenuState(task) {
+  const [view, setView] = useState("main");
+  const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
+  const [sleepSettings, setSleepSettings] = useState(null);
+  const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
+  return { view, setView, dueValue, setDueValue, sleepSettings, setSleepSettings, sleepWarning, checkSleepAndRun, sleepWarningProps };
+}
+
+function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
+  useEffect(() => {
+    const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) onClose(); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose]);
+  useEffect(() => {
+    let cancelled = false;
+    getUserSettings()
+      .then((data) => { if (!cancelled) setSleepSettings({ sleep_time: data?.sleep_time?.slice(0, 5) || "23:00", wake_time: data?.wake_time?.slice(0, 5) || "07:00" }); })
+      .catch(() => { if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" }); });
+    return () => { cancelled = true; };
+  }, []);
+}
+
+function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) {
+  return (
+    <>
+      <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>
+      {lists?.length > 0 && <button className={styles.ctxItem} onClick={() => setView("move")}><FolderInput size={14} strokeWidth={2} /> Move to list</button>}
+      <button className={styles.ctxItem} onClick={() => setView("due")}><CalendarDays size={14} strokeWidth={2} /> Set due date</button>
+      <div className={styles.ctxDivider} />
+      <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onDelete(); onClose(); }}><Trash2 size={14} strokeWidth={2} /> Delete</button>
+    </>
+  );
+}
+
+function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
+  return (
+    <>
+      <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
+      <div className={styles.ctxDivider} />
+      {(lists || []).map((l) => {
+        const fromList = (lists || []).find((x) => String(x.id) === String(task.task_list));
+        return (
+          <button key={l.id} className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`} onClick={() => { onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName: fromList?.name || null }); onClose(); }}>
+            <span className={styles.ctxListDot} style={{ background: l.color }} />{l.name}
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
+function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun, setView }) {
+  const handleDueDateChange = (val) => {
+    const dueDate = val || null;
+    setDueValue(val);
+    if (!dueDate) { onEdit({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null }); onClose(); return; }
+    checkSleepAndRun(dueDate, () => { onEdit({ due_date: dueDate }, { source: "context-menu", action: "set-due-date", dueDate }); onClose(); });
+  };
+  return (
+    <>
+      <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
+      <div className={styles.ctxDivider} />
+      <div className={styles.ctxDateWrap}><DateTimePicker value={dueValue} onChange={handleDueDateChange} placeholder="Pick date & time" /></div>
+    </>
+  );
+}
+
 export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }) {
-    const menuRef = useRef(null);
-    const [view, setView] = useState("main");
-    const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
-    const [sleepSettings, setSleepSettings] = useState(null);
-    const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
+  const menuRef = useRef(null);
+  const state = useTaskContextMenuState(task);
+  useTaskContextMenuEffects(menuRef, onClose, state.setSleepSettings);
+  const menu = (
+    <>
+      <div ref={menuRef} className={styles.ctxMenu} style={{ top: pos.y, left: pos.x }} onMouseDown={(e) => e.stopPropagation()}>
+        {state.view === "main" && <ContextMenuMainView onEditOpen={onEditOpen} onDelete={onDelete} onClose={onClose} lists={lists} setView={state.setView} />}
+        {state.view === "move" && <ContextMenuMoveView task={task} lists={lists} onEdit={onEdit} onClose={onClose} setView={state.setView} />}
+        {state.view === "due" && <ContextMenuDueView dueValue={state.dueValue} setDueValue={state.setDueValue} onEdit={onEdit} onClose={onClose} checkSleepAndRun={state.checkSleepAndRun} setView={state.setView} />}
+      </div>
+      {state.sleepWarning && <SleepWarningModal {...state.sleepWarningProps} />}
+    </>
+  );
+  return createPortal(menu, document.body);
+}
 
-    useEffect(() => {
-        const handler = (e) => {
-            if (menuRef.current && !menuRef.current.contains(e.target)) {
-                onClose();
-            }
-        };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, [onClose]);
-
-    useEffect(() => {
-        let cancelled = false;
-        getUserSettings()
-            .then((data) => {
-                if (cancelled) return;
-                setSleepSettings({
-                    sleep_time: data?.sleep_time?.slice(0, 5) || "23:00",
-                    wake_time: data?.wake_time?.slice(0, 5) || "07:00",
-                });
-            })
-            .catch(() => {
-                if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" });
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
-    const handleDueDateChange = (val) => {
-        const dueDate = val || null;
-        setDueValue(val);
-
-        if (!dueDate) {
-            onEdit(
-                { due_date: null },
-                { source: "context-menu", action: "set-due-date", dueDate: null }
-            );
-            onClose();
-            return;
-        }
-
-        checkSleepAndRun(dueDate, () => {
-            onEdit(
-                { due_date: dueDate },
-                { source: "context-menu", action: "set-due-date", dueDate }
-            );
-            onClose();
-        });
+function buildCheckClickHandler(opts) {
+    const { task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast } = opts;
+    return function handleCheckClick() {
+        const wasIncomplete = !task.completed;
+        const routine = isRoutineTask(task);
+        if (!wasIncomplete) { onToggle(); return; }
+        if (!routine) { setBurstPop(true); setCheckBounce(true); setTimeout(() => setCheckBounce(false), 400); }
+        const messageContext = { isOverdue, dueStatus: due?.status };
+        showCompletionToast(getCompletionMessage(task, messageContext), { isRoutine: routine });
+        if (!routine && burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current);
+        if (!routine) burstTimeoutRef.current = setTimeout(() => { setBurstPop(false); burstTimeoutRef.current = null; }, 500);
+        onToggle();
     };
-
-    const menu = (
-        <>
-            <div
-                ref={menuRef}
-                className={styles.ctxMenu}
-                style={{ top: pos.y, left: pos.x }}
-                onMouseDown={e => e.stopPropagation()}
-            >
-                {view === "main" && (
-                    <>
-                        <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}>
-                            <Pencil size={14} strokeWidth={2} /> Edit
-                        </button>
-                        {(lists?.length > 0) && (
-                            <button className={styles.ctxItem} onClick={() => setView("move")}>
-                                <FolderInput size={14} strokeWidth={2} /> Move to list
-                            </button>
-                        )}
-                        <button className={styles.ctxItem} onClick={() => setView("due")}>
-                            <CalendarDays size={14} strokeWidth={2} /> Set due date
-                        </button>
-                        <div className={styles.ctxDivider} />
-                        <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onDelete(); onClose(); }}>
-                            <Trash2 size={14} strokeWidth={2} /> Delete
-                        </button>
-                    </>
-                )}
-                {view === "move" && (
-                    <>
-                        <button className={styles.ctxBack} onClick={() => setView("main")}>
-                            <ChevronLeft size={14} strokeWidth={2} /> Back
-                        </button>
-                        <div className={styles.ctxDivider} />
-                        {(lists || []).map(l => (
-                            <button
-                                key={l.id}
-                                className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`}
-                                onClick={() => {
-                                    const fromList = (lists || []).find((x) => String(x.id) === String(task.task_list));
-                                    onEdit(
-                                        { task_list: l.id },
-                                        {
-                                            source: "context-menu",
-                                            action: "move-list",
-                                            listId: l.id,
-                                            listName: l.name,
-                                            fromListId: task.task_list,
-                                            fromListName: fromList?.name || null,
-                                        }
-                                    );
-                                    onClose();
-                                }}
-                            >
-                                <span className={styles.ctxListDot} style={{ background: l.color }} />
-                                {l.name}
-                            </button>
-                        ))}
-                    </>
-                )}
-                {view === "due" && (
-                    <>
-                        <button className={styles.ctxBack} onClick={() => setView("main")}>
-                            <ChevronLeft size={14} strokeWidth={2} /> Back
-                        </button>
-                        <div className={styles.ctxDivider} />
-                        <div className={styles.ctxDateWrap}>
-                            <DateTimePicker
-                                value={dueValue}
-                                onChange={handleDueDateChange}
-                                placeholder="Pick date & time"
-                            />
-                        </div>
-                    </>
-                )}
-            </div>
-            {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}
-        </>
-    );
-    return createPortal(menu, document.body);
-}
-
-function formatFocusBlocks(blocks) {
-    const split = splitEstimatedBlocks(blocks);
-    if (split) {
-        const totalMins = split.sessionCount * split.workMinutes;
-        return `${split.sessionCount} session${split.sessionCount === 1 ? "" : "s"} · ${totalMins}m`;
-    }
-    const total = Math.max(1, Number(blocks) || 1);
-    for (const perSession of [1, 2, 3, 4]) {
-        if (total % perSession !== 0) continue;
-        const sessions = total / perSession;
-        if (sessions >= 1 && sessions <= 12) {
-            return `${sessions} session${sessions === 1 ? "" : "s"} · ${total * 25}m`;
-        }
-    }
-    return `${total * 25}m total`;
-}
-
-function splitEstimatedBlocks(blocks) {
-    const total = Math.max(1, Number(blocks) || 1);
-    for (const perSession of [1, 2, 3, 4]) {
-        if (total % perSession !== 0) continue;
-        const sessions = total / perSession;
-        if (sessions >= 1 && sessions <= 12) {
-            return { sessionCount: sessions, workMinutes: perSession * 25 };
-        }
-    }
-    return { sessionCount: 1, workMinutes: total * 25 };
-}
-
-function TaskInfoModal({ task, listName, onClose }) {
-    const due = formatDueDate(task.due_date);
-    const dueFormatted = task.due_date
-        ? new Date(task.due_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
-        : null;
-
-    const modal = (
-        <div className={styles.modalBackdrop} onMouseDown={onClose}>
-            <div
-                className={styles.infoModal}
-                onMouseDown={e => e.stopPropagation()}
-            >
-                <div className={styles.infoModalAccent} aria-hidden />
-                <div className={styles.infoModalHeader}>
-                    <ClipboardList size={20} strokeWidth={1.5} className={styles.infoModalIcon} aria-hidden />
-                    <div className={styles.infoModalHeaderText}>
-                        <h3 className={styles.infoModalTitle}>Task details</h3>
-                        <p className={styles.infoModalSub}>Quick glance</p>
-                    </div>
-                    <button type="button" className={styles.infoModalClose} onClick={onClose} aria-label="Close">
-                        <X size={18} strokeWidth={2} aria-hidden />
-                    </button>
-                </div>
-                <div className={styles.infoModalBody}>
-                    <div className={styles.infoHero}>
-                        <p className={styles.infoHeroTitle}>{task.title || "—"}</p>
-                        {(task.description || "").trim() && (
-                            <p className={styles.infoHeroDesc}>{task.description}</p>
-                        )}
-                    </div>
-                    <div className={styles.infoGrid}>
-                        <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}><Flag size={14} strokeWidth={2} /> Priority</span>
-                            <span className={`${styles.infoVal} ${styles.infoValPill}`}>
-                                {PRIORITY_LABELS[task.priority] || task.priority || "—"}
-                            </span>
-                        </div>
-                        <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}><Zap size={14} strokeWidth={2} /> Sessions</span>
-                            <span className={`${styles.infoVal} ${styles.infoValPill}`}>
-                                {formatFocusBlocks(task.estimated_blocks)}
-                            </span>
-                        </div>
-                        <div className={styles.infoRowFull}>
-                            <span className={styles.infoLabel}><Clock size={14} strokeWidth={2} /> Due date</span>
-                            <span className={styles.infoVal}>{dueFormatted || due?.label || "—"}</span>
-                        </div>
-                        {listName && (
-                            <div className={styles.infoRowFull}>
-                                <span className={styles.infoLabel}><List size={14} strokeWidth={2} /> List</span>
-                                <span className={styles.infoVal}>
-                                    <span className={styles.infoListDot} />
-                                    {listName}
-                                </span>
-                            </div>
-                        )}
-                        {task.module_code && (
-                            <div className={styles.infoRowFull}>
-                                <span className={styles.infoLabel}><BookOpen size={14} strokeWidth={2} /> Module</span>
-                                <span className={styles.infoVal}>{task.module_code}{task.module_name ? ` — ${task.module_name}` : ""}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-                <div className={styles.infoModalFooter}>
-                    <span className={styles.infoHint}>
-                        <MousePointer2 size={12} strokeWidth={2} /> Right-click the task to edit or delete
-                    </span>
-                    <button type="button" className={styles.infoCloseBtn} onClick={onClose}>Close</button>
-                </div>
-            </div>
-        </div>
-    );
-    return createPortal(modal, document.body);
 }
 
 export function EditTaskModal({ task, onSave, onDelete, onClose, lists = [] }) {
@@ -355,11 +177,36 @@ export function EditTaskModal({ task, onSave, onDelete, onClose, lists = [] }) {
     );
 }
 
-export default function TaskCard({
-    task, onToggle, onDelete, onEdit, listName, listColor, lists,
-    hideDueBadge = false, hideListBadge = false, isOverdue = false,
-    searchQuery = "", isCompletedSection = false,
-}) {
+function getTaskCardAccentClass(task) {
+  if (task.completed) return "";
+  if (task.priority === "urgent") return styles.cardAccentUrgent;
+  if (task.priority === "high") return styles.cardAccentHigh;
+  if (task.priority === "medium") return styles.cardAccentMedium;
+  return "";
+}
+
+function getTaskCardDerived(task) {
+  const due = formatDueDate(task.due_date);
+  const priorityKey = (task.priority || "").toLowerCase();
+  const showPriorityText = ["medium", "high", "urgent"].includes(priorityKey) && !task.completed;
+  return { due, priorityKey, showPriorityText };
+}
+
+function useTaskCardHandlers(props) {
+  const { task, due, isOverdue, onToggle, setCtxMenu, burstTimeoutRef } = props;
+  const { showCompletionToast } = useTaskCompletion();
+  const setBurstPop = props.setBurstPop;
+  const setCheckBounce = props.setCheckBounce;
+  const handleCheckClick = useCallback(buildCheckClickHandler({
+    task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast,
+  }), [task, due, isOverdue, onToggle, showCompletionToast]);
+  useEffect(() => () => { if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current); }, []);
+  const handleContextMenu = useCallback((e) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY }); }, []);
+  return { handleCheckClick, handleContextMenu };
+}
+
+function useTaskCard(props) {
+    const { task, onToggle, onDelete, onEdit, listName, listColor, lists, hideDueBadge, hideListBadge, isOverdue, searchQuery, isCompletedSection } = props;
     const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [ctxMenu, setCtxMenu] = useState(null);
@@ -368,187 +215,83 @@ export default function TaskCard({
     const burstTimeoutRef = useRef(null);
     const nav = useNavigate();
     const { setActiveTaskId } = useTimerContext();
-    const { showCompletionToast } = useTaskCompletion();
     const activeTimerTaskId = useActiveTimerTaskId();
     const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
+    const { due, priorityKey, showPriorityText } = getTaskCardDerived(task);
+    const { handleCheckClick, handleContextMenu } = useTaskCardHandlers({ task, due, isOverdue, onToggle, setCtxMenu, burstTimeoutRef, setBurstPop, setCheckBounce });
+    const accentCls = getTaskCardAccentClass(task);
+    return { task, listName, listColor, lists, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, showInfo, setShowInfo, showEdit, setShowEdit, ctxMenu, setCtxMenu, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, isOverdue, nav, setActiveTaskId, onDelete, onEdit };
+}
 
-    const due = formatDueDate(task.due_date);
-    const priorityKey = (task.priority || "").toLowerCase();
-    const isVisualPriority = ["medium", "high", "urgent"].includes(priorityKey);
-    const showPriorityText = isVisualPriority && !task.completed;
+function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDueBadge, due, isCompletedSection }) {
+  const dueLabel = task.completed && isCompletedSection ? getCompletedDueLabel(task.due_date) : due?.label;
+  const dueCls = due ? `${styles.dueLabel} ${task.completed && isCompletedSection ? styles.dueLabelCompleted : ""} ${styles[`due_${due.status}`] || ""}` : "";
+  return (
+    <div className={styles.titleRow}>
+      <span className={`${styles.title} ${styles.titleClickable} ${task.completed ? styles.titleDone : ""}`}><HighlightText text={task.title} query={searchQuery} /></span>
+      <span className={styles.titleMetaRight}>
+        {showPriorityText && <span className={`${styles.priorityText} ${styles[`priorityText_${priorityKey}`]}`}><span className={styles.priorityMarks}>{PRIORITY_MARKS[priorityKey] || ""}</span><span className={styles.priorityLabel}>{PRIORITY_LABELS[priorityKey] || "Priority"}</span></span>}
+        {due && !hideDueBadge && <span className={dueCls}>{(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}{dueLabel}</span>}
+      </span>
+    </div>
+  );
+}
 
-    const handleCheckClick = () => {
-        const wasIncomplete = !task.completed;
-        const routine = isRoutineTask(task);
-        if (wasIncomplete) {
-            if (!routine) {
-                setBurstPop(true);
-                setCheckBounce(true);
-                setTimeout(() => setCheckBounce(false), 400);
-            }
-            const messageContext = { isOverdue, dueStatus: due?.status };
-            showCompletionToast(getCompletionMessage(task, messageContext), { isRoutine: routine });
-            if (!routine && burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current);
-            if (!routine) {
-                burstTimeoutRef.current = setTimeout(() => {
-                    setBurstPop(false);
-                    burstTimeoutRef.current = null;
-                }, 500);
-            }
-        }
-        onToggle();
-    };
+function CardMetaRow({ task, listName, hideListBadge, listColor }) {
+  const listStyle = { "--lc": listColor || "#a89890", background: `color-mix(in srgb, ${listColor || "#a89890"} 8%, transparent)`, borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 18%, transparent)` };
+  return (
+    <div className={`${styles.meta} ${task.completed ? styles.metaDone : ""}`}>
+      {listName && !hideListBadge && <span className={styles.listIndicator} style={listStyle}><span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />{listName}</span>}
+      {task.module_code && <ModulePillLink task={task} />}
+    </div>
+  );
+}
 
-    useEffect(() => () => { if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current); }, []);
+function CardContentArea({ card, task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, due, priorityKey, showPriorityText }) {
+  const openInfo = (e) => { if (!e.target.closest?.("button") && !e.target.closest?.("a")) card.setShowInfo(true); };
+  return (
+    <div className={styles.content} role="button" tabIndex={0} onClick={openInfo} onKeyDown={(e) => { if (e.key === "Enter") card.setShowInfo(true); }}>
+      <CardTitleRow task={task} searchQuery={searchQuery} showPriorityText={showPriorityText} priorityKey={priorityKey} hideDueBadge={hideDueBadge} due={due} isCompletedSection={isCompletedSection} />
+      <CardMetaRow task={task} listName={listName} hideListBadge={hideListBadge} listColor={listColor} />
+    </div>
+  );
+}
 
-    const handleContextMenu = useCallback((e) => {
-        e.preventDefault();
-        setCtxMenu({ x: e.clientX, y: e.clientY });
-    }, []);
+function CardPlayButton({ task, listColor, setActiveTaskId, nav }) {
+  const onPlay = () => {
+    const split = splitEstimatedBlocks(task.estimated_blocks);
+    setActiveTaskId(task.id, { title: task.title, categoryColor: listColor || undefined, estimatedBlocks: Number(task.estimated_blocks || 1), estimatedSessionCount: split.sessionCount, estimatedWorkMinutes: split.workMinutes });
+    nav("/timer", { state: { fromTaskPlay: true } });
+  };
+  return (
+    <div className={styles.actionBar}><button type="button" className={`${styles.actionBarBtn} ${styles.actionBarBtnPlay}`} onClick={onPlay} aria-label="Study now"><IconPlay /></button></div>
+  );
+}
 
-    const accentCls = !task.completed && task.priority === "urgent"
-        ? styles.cardAccentUrgent
-        : !task.completed && task.priority === "high"
-        ? styles.cardAccentHigh
-        : !task.completed && task.priority === "medium"
-        ? styles.cardAccentMedium
-        : "";
+function TaskCardView(card) {
+    const { task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, setActiveTaskId, nav } = card;
+    const cardCls = `${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${card.isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`;
+    return (
+        <div className={cardCls} style={{ "--list-color": listColor || "#a89890" }} onContextMenu={handleContextMenu} title="Right-click for more options">
+            <CheckBurst active={burstPop}>
+                <button className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`} onClick={handleCheckClick} aria-label={task.completed ? "Mark incomplete" : "Mark complete"}>
+                    {task.completed && <span className={styles.checkMark}>✓</span>}
+                </button>
+            </CheckBurst>
+            <CardContentArea card={card} task={task} listName={listName} listColor={listColor} hideDueBadge={hideDueBadge} hideListBadge={hideListBadge} isCompletedSection={isCompletedSection} searchQuery={searchQuery} due={due} priorityKey={priorityKey} showPriorityText={showPriorityText} />
+            {!task.completed && <CardPlayButton task={task} listColor={listColor} setActiveTaskId={setActiveTaskId} nav={nav} />}
+        </div>
+    );
+}
 
+export default function TaskCard(props) {
+    const card = useTaskCard(props);
     return (
         <>
-            <div
-                className={`${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`}
-                style={{ "--list-color": listColor || "#a89890" }}
-                onContextMenu={handleContextMenu}
-                title="Right-click for more options"
-            >
-                <CheckBurst active={burstPop}>
-                    <button
-                        className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`}
-                        onClick={handleCheckClick}
-                        aria-label={task.completed ? "Mark incomplete" : "Mark complete"}
-                    >
-                        {task.completed && (
-                          <span className={styles.checkMark}>✓</span>
-                        )}
-                    </button>
-                </CheckBurst>
-
-                <div
-                    className={styles.content}
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => { if (!e.target.closest?.("button") && !e.target.closest?.("a")) setShowInfo(true); }}
-                    onKeyDown={(e) => { if (e.key === "Enter") setShowInfo(true); }}
-                >
-                    <div className={styles.titleRow}>
-                        <span className={`${styles.title} ${styles.titleClickable} ${task.completed ? styles.titleDone : ""}`}>
-                            <HighlightText text={task.title} query={searchQuery} />
-                        </span>
-                        <span className={styles.titleMetaRight}>
-                            {showPriorityText && (
-                                <span className={`${styles.priorityText} ${styles[`priorityText_${priorityKey}`]}`}>
-                                    <span className={styles.priorityMarks}>{PRIORITY_MARKS[priorityKey] || ""}</span>
-                                    <span className={styles.priorityLabel}>{PRIORITY_LABELS[priorityKey] || "Priority"}</span>
-                                </span>
-                            )}
-                            {due && !hideDueBadge && (
-                                <span className={`${styles.dueLabel} ${task.completed && isCompletedSection ? styles.dueLabelCompleted : ""} ${styles[`due_${due.status}`]}`}>
-                                    {(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}
-                                    {task.completed && isCompletedSection ? getCompletedDueLabel(task.due_date) : due.label}
-                                </span>
-                            )}
-                        </span>
-                    </div>
-
-                    <div className={`${styles.meta} ${task.completed ? styles.metaDone : ""}`}>
-                        {listName && !hideListBadge && (
-                            <span
-                                className={styles.listIndicator}
-                                style={{
-                                    "--lc": listColor || "#a89890",
-                                    background: `color-mix(in srgb, ${listColor || "#a89890"} 8%, transparent)`,
-                                    borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 18%, transparent)`,
-                                }}
-                            >
-                                <span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />
-                                {listName}
-                            </span>
-                        )}
-                        {task.module_code && (() => {
-                            const mc = getModuleColor(task.module_code);
-                            const moduleId = task.module_id ?? task.module ?? task.moduleId;
-                            const to = moduleId
-                                ? `/modules?moduleId=${moduleId}`
-                                : `/modules?code=${encodeURIComponent(task.module_code)}`;
-                            return (
-                                <Link
-                                    to={to}
-                                    className={`${styles.modulePill} ${styles.modulePillLink}`}
-                                    style={{ color: mc.text, background: "transparent", borderColor: mc.border }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    title={`Open ${task.module_code} module`}
-                                >
-                                    {task.module_code}
-                                </Link>
-                            );
-                        })()}
-                    </div>
-                </div>
-
-                {!task.completed && (
-                    <div className={styles.actionBar}>
-                        <button
-                            type="button"
-                            className={`${styles.actionBarBtn} ${styles.actionBarBtnPlay}`}
-                            onClick={() => {
-                                const split = splitEstimatedBlocks(task.estimated_blocks);
-                                setActiveTaskId(task.id, {
-                                    title: task.title,
-                                    categoryColor: listColor || undefined,
-                                    estimatedBlocks: Number(task.estimated_blocks || 1),
-                                    estimatedSessionCount: split.sessionCount,
-                                    estimatedWorkMinutes: split.workMinutes,
-                                });
-                                nav("/timer", { state: { fromTaskPlay: true } });
-                            }}
-                            aria-label="Study now"
-                        >
-                            <IconPlay />
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            {ctxMenu && (
-                <TaskContextMenu
-                    task={task}
-                    onEditOpen={() => setShowEdit(true)}
-                    onDelete={onDelete}
-                    onEdit={onEdit}
-                    lists={lists}
-                    pos={ctxMenu}
-                    onClose={() => setCtxMenu(null)}
-                />
-            )}
-
-            {showInfo && (
-                <TaskInfoModal
-                    task={task}
-                    listName={listName}
-                    onClose={() => setShowInfo(false)}
-                />
-            )}
-
-            {showEdit && (
-                <EditTaskModal
-                    task={task}
-                    onSave={data => onEdit(data)}
-                    onDelete={onDelete}
-                    lists={lists}
-                    onClose={() => setShowEdit(false)}
-                />
-            )}
+            <TaskCardView {...card} />
+            {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={() => card.setShowEdit(true)} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
+            {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
+            {card.showEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
         </>
     );
 }
