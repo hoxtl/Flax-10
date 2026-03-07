@@ -321,6 +321,28 @@
   cursor: not-allowed;
 }
 
+.sleepDurationCard {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(123, 103, 81, 0.06), rgba(123, 103, 81, 0.02));
+  padding: 14px 16px;
+  box-sizing: border-box;
+}
+
+.sleepDurationMain {
+  font-size: 1.4rem;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sleepDurationMeta {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 16px 12px;

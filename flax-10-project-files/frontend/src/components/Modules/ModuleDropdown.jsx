@@ -25,11 +25,11 @@ function DropdownOption({opt, value, onChange, setIsOpen}) {
     )
 }
 
-export default function ModuleDropdown({value, onChange, options}) {
+export default function ModuleDropdown({value, onChange, options, className = ''}) {
     const {is_open, setIsOpen, ref} = useDropdown();
     const selected = options.find(opt => opt.value === value);
     return (
-        <div className={styles.wrapper} ref={ref}>
+        <div className={`${styles.wrapper} ${className}`} ref={ref}>
             <button className={styles.trigger} onClick={()=> setIsOpen(!is_open)}>
                 <span>{selected?.label}</span>
                 <ChevronDown size={14} className={`${styles.chevron} ${is_open ? styles.chevronOpen: ''}`} />

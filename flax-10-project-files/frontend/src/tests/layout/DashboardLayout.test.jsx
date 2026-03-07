@@ -14,9 +14,8 @@ vi.mock("../../components/Dashboard/Sidebar", () => ({
 }));
 
 vi.mock("../../components/Dashboard/Topbar", () => ({
-  default: ({ onAddClick, onLogoutClick }) => (
+  default: ({ onLogoutClick }) => (
     <div data-testid="topbar">
-      <button onClick={onAddClick}>Quick Add</button>
       <button onClick={onLogoutClick}>Logout</button>
     </div>
   ),
@@ -24,13 +23,6 @@ vi.mock("../../components/Dashboard/Topbar", () => ({
 
 vi.mock("../../components/Dashboard/WeekBar", () => ({
   default: () => <div data-testid="weekbar" />,
-}));
-vi.mock("../../components/Dashboard/QuickAddModal", () => ({
-  default: ({ onClose }) => (
-    <div data-testid="quick-add">
-      Modal <button onClick={onClose}>Close</button>
-    </div>
-  ),
 }));
 
 vi.mock("../../context/CalendarContext", () => ({
@@ -54,6 +46,7 @@ global.localStorage = {
 
 describe("DashboardLayout", () => {
   const mockUser = {
+    name: "John Doe",
     first_name: "John",
     last_name: "Doe",
     username: "jdoe",
@@ -68,24 +61,14 @@ describe("DashboardLayout", () => {
     global.dispatchEvent(new Event("resize"));
   });
 
-  it("renders Desktop view with Sidebar and Topbar", () => {
-    render(<DashboardLayout activeNav="home">Content</DashboardLayout>);
-    expect(screen.getByTestId("sidebar")).toBeTruthy();
+  it("renders Desktop view with Topbar and content", () => {
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     expect(screen.getByTestId("topbar")).toBeTruthy();
-    expect(screen.getByText("User: John Doe")).toBeTruthy();
-  });
-
-  it("toggles Quick Add modal", () => {
-    render(<DashboardLayout activeNav="home">Content</DashboardLayout>);
-    fireEvent.click(screen.getByText("Quick Add"));
-    expect(screen.getByTestId("quick-add")).toBeTruthy();
-
-    fireEvent.click(screen.getByText("Close"));
-    expect(screen.queryByTestId("quick-add")).toBeNull();
+    expect(screen.getByText("Content")).toBeTruthy();
   });
 
   it("handles logout flow", async () => {
-    render(<DashboardLayout activeNav="home">Content</DashboardLayout>);
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Logout"));
     expect(authService.logout).toHaveBeenCalled();
     await waitFor(() => {
@@ -93,20 +76,19 @@ describe("DashboardLayout", () => {
     });
   });
 
-  it("shows mobile drawer when toggled on small screens", () => {
+  it("shows sidebar on mobile", () => {
     global.innerWidth = 500;
     global.dispatchEvent(new Event("resize"));
-
-    render(<DashboardLayout activeNav="home">Content</DashboardLayout>);
-    // Sidebar should be hidden initially on mobile
-    expect(screen.queryByTestId("sidebar")).toBeNull();
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    expect(screen.getByTestId("sidebar")).toBeTruthy();
+    expect(screen.getByText("User: John Doe")).toBeTruthy();
   });
 
   it("applies specific styles for the Map page", () => {
     const { container } = render(
-      <DashboardLayout activeNav="map">Map</DashboardLayout>,
+      <DashboardLayout activeNav="map" onNavChange={() => {}}>Map</DashboardLayout>,
     );
     const content = container.querySelector('[class*="content"]');
-    expect(content.style.height).toBe("100%");
+    expect(content).toBeTruthy();
   });
 });

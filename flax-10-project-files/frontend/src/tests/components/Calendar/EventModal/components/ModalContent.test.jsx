@@ -42,7 +42,7 @@ describe('ModalContent', () => {
         ];
         render(<ModalContent {...defaultProps} overlapWarning={warning} />);
 
-        expect(screen.getByText('⚠️ Scheduling Conflict')).toBeInTheDocument();
+        expect(screen.getByText('Scheduling Conflict')).toBeInTheDocument();
         expect(screen.getByText('Overlap 1')).toBeInTheDocument();
         expect(screen.getByText('Overlap 2')).toBeInTheDocument();
 
@@ -70,7 +70,7 @@ describe('ModalContent', () => {
         const warning = [{ id: 1, title: 'Overlap', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' }];
         render(<ModalContent {...defaultProps} overlapWarning={warning} />);
 
-        fireEvent.click(screen.getByText('×')); // The close button in ModalHeaderWarning
+        fireEvent.click(screen.getByText('x')); // The close button in ModalHeaderWarning
         expect(defaultProps.handleCancelSave).toHaveBeenCalled();
     });
 
@@ -85,7 +85,7 @@ describe('ModalContent', () => {
         const onClick = vi.fn();
         const warning = [{ id: 1, title: 'Overlap', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' }];
         render(<div onClick={onClick}><ModalContent {...defaultProps} overlapWarning={warning} /></div>);
-        fireEvent.click(screen.getByText('⚠️ Scheduling Conflict').parentElement.parentElement);
+        fireEvent.click(screen.getByText('Scheduling Conflict').parentElement.parentElement);
         expect(onClick).not.toHaveBeenCalled();
     });
 });

@@ -9,7 +9,7 @@ class TagDetailTests(BaseTestCase):
     def setUp(self):
         """Set up tag detail test environment."""
         super().setUp()
-        self.tag = Tag.objects.create(name="test_tag", color="#000000", is_default=True)
+        self.tag = Tag.objects.create(name="test_tag", color="#000000", is_default=False, user=self.user)
         self.url = f"/api/tags/{self.tag.id}/"
         self.detail_url = lambda pk: f"/api/tags/{pk}/"
 

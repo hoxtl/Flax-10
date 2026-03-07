@@ -21,16 +21,19 @@ from studyFlax.models import (
     UserSettings, Module, Enrollment, Deadline,
     Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
 )
+from studyFlax.models.tasks.taskModel import Task, TaskList
+
 from studyFlax.fixtures.data_fixtures import (
-    category_fixtures, tag_fixtures, recurrence_fixtures,
-    module_fixtures, location_fixtures
+    category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
+    module_task_templates, personal_task_fixtures, task_list_fixtures,
+    MODULE_PILL_COLORS, location_fixtures,
 )
 from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
-    build_meal_events, build_module_event, get_user_modules,
+    build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
     build_lecture_events, create_lecture_event, build_deadlines_for_module,
-    create_deadline_calendar_event, build_study_sessions_for_user, 
+    create_deadline_calendar_event, build_study_sessions_for_user,
     build_theme_sessions_for_user,
 )
 from studyFlax.models.timer.sessionModel import StudySession
@@ -95,11 +98,11 @@ class Command(BaseCommand):
         self.modules = list(Module.objects.all())
         self.create_deadlines()
         self.create_enrollments()
+        self.create_tasks()
         self.create_societies()
         self.create_society_memberships()
         self.create_society_events()
         self.create_society_images()
-        #self.create_tasks()
         self.create_study_sessions()
         self.print_stats()  
         
@@ -161,41 +164,26 @@ class Command(BaseCommand):
         self.stdout.write("Seeding tags...")
         from faker import Faker
         f = Faker('en_GB')
+        ROUTINE_COLOR = '#94a3b8'   # neutral slate so Academic (Sage) and Personal stand out
+        WELLNESS_COLOR = '#94a3b8'
+        # Module-specific pill colors for Action Hub (LS4101 Deep Earth Brown, LS4202 Muted Clay)
         for name, duration in tag_fixtures:
-            if name == 'Lecture':
-                self._create_lecture_tag(name, duration)
-            else:
-                self._create_regular_tag(name, duration, f)
-
-    def _create_lecture_tag(self, name, duration):
-        Tag.objects.get_or_create(
-            name=name, user=None,
-            defaults={'default_duration': duration, 'color': '#4A90D9', 'is_default': True},
-        )
-        self._create_system_tags()
-
-    def _create_system_tags(self):
-        from studyFlax.views.calendar.system_tags import SYSTEM_TAG_CONFIG
-        for name, config in SYSTEM_TAG_CONFIG.items():
-            Tag.objects.get_or_create(
-                name=name, user=None,
-                defaults={'default_duration': config['duration'], 'color': config['color'], 'is_default': True},
+            category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
+            user = (
+                category.user if category and category.user
+                else (random.choice(self.users) if self.users and random.random() > 0.7 else None)
             )
-
-    def _create_regular_tag(self, name, duration, faker):
-        category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-        user = self._get_tag_user(category)
-        Tag.objects.get_or_create(
-            name=name, user=user,
-            defaults={'category': category, 'default_duration': duration, 'color': faker.hex_color()},
-        )
-
-    def _get_tag_user(self, category):
-        if category and category.user:
-            return category.user
-        if self.users and random.random() > 0.7:
-            return random.choice(self.users)
-        return None
+            color = ROUTINE_COLOR if name == 'Routine' else (WELLNESS_COLOR if name == 'Wellness' else f.hex_color())
+            Tag.objects.get_or_create(
+                name=name, user=user,
+                defaults={'category': category, 'default_duration': duration, 'color': color},
+            )
+        # Create display tags for LS4101/LS4202 so module pills can use distinct colors
+        for code, pill_color in MODULE_PILL_COLORS.items():
+            Tag.objects.get_or_create(
+                name=code, user=None,
+                defaults={'category': None, 'default_duration': 0, 'color': pill_color},
+            )
 
     def create_events_for_users(self):
         """Seed personal and meal CalendarEvents for every non-staff user."""
@@ -207,7 +195,9 @@ class Command(BaseCommand):
             CalendarEvent.objects.bulk_create(personal_events)
             meal_events = build_meal_events(user, self.tags)
             CalendarEvent.objects.bulk_create(meal_events)
-            total += len(personal_events) + len(meal_events)
+            today_events = build_today_afternoon_events(user, self.tags)
+            CalendarEvent.objects.bulk_create(today_events)
+            total += len(personal_events) + len(meal_events) + len(today_events)
         print(f"  Created {total} events across {len(self.users)} users.          ")
 
     def _create_module(self, code, name, description, teacher, weekly_rule):
@@ -265,6 +255,90 @@ class Command(BaseCommand):
         Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
         self.stdout.write(f"  Created {len(enrollments)} enrollments.")
 
+    def create_tasks(self):
+        self.stdout.write("Seeding tasks...")
+        now   = timezone.now()
+        total = 0
+
+        for user in self.users:
+            if Task.objects.filter(user=user).exists():
+                continue
+
+            # ── Create all task lists for this user ──
+            lists_by_name = {}
+            for list_name, list_category, list_emoji in task_list_fixtures:
+                tl, _ = TaskList.objects.get_or_create(
+                    user=user,
+                    name=list_name,
+                    defaults={"category": list_category},
+                )
+                lists_by_name[list_name] = tl
+
+            # Fallback references
+            uni_list      = lists_by_name.get("University")
+            personal_list = lists_by_name.get("Personal")
+
+            # ── Module tasks (unique per enrollment; full module code then prefix) ──
+            enrolled_modules = list(
+                Enrollment.objects.filter(student=user).select_related('module')
+            )
+            odd_days  = [1, 3, 5]   # LS4101
+            even_days = [2, 4, 6]   # LS4202
+            for enrollment in enrolled_modules:
+                mod    = enrollment.module
+                prefix = mod.module_code[:2]
+                templates = module_task_templates.get(
+                    mod.module_code,
+                    module_task_templates.get(prefix, []),
+                )
+                for i, (title_tmpl, description, priority, estimated_blocks, days_from_now) in enumerate(templates):
+                    if mod.module_code == 'LS4101':
+                        days_from_now = odd_days[i % len(odd_days)]
+                        # Higher XP for Writing-type (Lab Report, Microscopy, Cell Division)
+                        if any(x in title_tmpl.lower() for x in ('lab', 'microscopy', 'cell division')):
+                            estimated_blocks = estimated_blocks + 1
+                    elif mod.module_code == 'LS4202':
+                        days_from_now = even_days[i % len(even_days)]
+                        # Higher XP for Problem Set-type (Enzyme, Protein Folding, Metabolic)
+                        if any(x in title_tmpl.lower() for x in ('enzyme', 'protein folding', 'metabolic')):
+                            estimated_blocks = estimated_blocks + 1
+                    title = title_tmpl.format(module=mod.module_code, module_name=mod.module_name)
+                    due   = (now + timedelta(days=days_from_now)).replace(
+                        hour=23, minute=59, second=0, microsecond=0
+                    )
+                    Task.objects.create(
+                        user=user,
+                        task_list=uni_list,
+                        module=mod,
+                        title=title,
+                        description=description,
+                        priority=priority,
+                        due_date=due,
+                        estimated_blocks=estimated_blocks,
+                        completed=False,
+                    )
+                    total += 1
+
+            # ── Personal tasks ──
+            for title, description, priority, estimated_blocks, days_from_now, list_name in personal_task_fixtures:
+                due  = (now + timedelta(days=days_from_now)).replace(
+                    hour=23, minute=59, second=0, microsecond=0
+                )
+                task_list = lists_by_name.get(list_name, personal_list)
+                Task.objects.create(
+                    user=user,
+                    task_list=task_list,
+                    module=None,
+                    title=title,
+                    description=description,
+                    priority=priority,
+                    due_date=due,
+                    estimated_blocks=estimated_blocks,
+                    completed=False,
+                )
+                total += 1
+
+        self.stdout.write(f"  Created {total} tasks.")
 
     def create_study_sessions(self):
         """Seed StudySession and ThemeSession records for named fixture users.
@@ -275,8 +349,6 @@ class Command(BaseCommand):
         idempotent.
         """
         self.stdout.write("Seeding study sessions and theme sessions...")
-        from studyFlax.models.timer.sessionModel import StudySession
-        from studyFlax.models.timer.themeSessionModel import ThemeSession
 
         # map username → (study_profile, theme_profile)
         PROFILES = {
@@ -289,11 +361,8 @@ class Command(BaseCommand):
             'jmurphy': ('balanced',    'consistent'),
         }
 
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-
-        total_study  = 0
-        total_theme  = 0
+        total_study = 0
+        total_theme = 0
 
         for username, (study_profile, theme_profile) in PROFILES.items():
             try:
@@ -330,25 +399,15 @@ class Command(BaseCommand):
             self._seed_society_tags_from_config(society, data.get('tags', []))
 
     def _create_society_from_config(self, data):
-        is_ratified = random.choice([True, False])
-        status = 'approved' if is_ratified else 'none'
+        status = random.choice(['approved', 'pending', 'rejected', 'none'])
         defaults = {
             'bio': data['bio'], 'about': data['about'],
             'categories': data.get('categories', []),
-            'ratification_status': status, 'is_ratified': is_ratified
+            'ratification_status': status, 'is_ratified': (status == 'approved')
         }
         if data.get('image'):
             defaults['image'] = data['image']
-        existing = Society.objects.filter(name=data['name']).first()
-        if existing:
-            for key, value in defaults.items():
-                setattr(existing, key, value)
-            existing._skip_notification = True
-            existing.save()
-            return existing
-        society = Society(name=data['name'], **defaults)
-        society._skip_notification = True
-        society.save()
+        society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
         return society
 
     def _seed_society_tags_from_config(self, society, tag_labels):
@@ -371,11 +430,10 @@ class Command(BaseCommand):
     def _create_event_from_template(self, society, template, tags):
         title, desc, hour, duration, recurrence, day = template
         start, end = build_event_datetime(hour, duration, day)
-        if SocietyEvent.objects.filter(society=society, title=title).exists():
-            return
-        event = SocietyEvent(society=society, title=title, **self._build_event_defaults(desc, start, end, recurrence, tags))
-        event._skip_notification = True
-        event.save()
+        SocietyEvent.objects.get_or_create(
+            society=society, title=title,
+            defaults=self._build_event_defaults(desc, start, end, recurrence, tags)
+        )
 
     def _build_event_defaults(self, desc, start, end, recurrence, tags):
         return {
@@ -442,8 +500,15 @@ class Command(BaseCommand):
             self.stdout.write(f"  {user:<12}  {role}")
         self.stdout.write("  Database")
         stats = [
-            ("Users", User.objects.count()), ("Modules", Module.objects.count()),
-            ("Societies", Society.objects.count()), ("Events", CalendarEvent.objects.count()),
+            ("Users",       User.objects.count()),
+            ("Modules",     Module.objects.count()),
+            ("Enrollments", Enrollment.objects.count()),
+            ("Deadlines",   Deadline.objects.count()),
+            ("Tasks",       Task.objects.count()),
+            ("Categories",  Category.objects.count()),
+            ("Tags",        Tag.objects.count()),
+            ("Events",      CalendarEvent.objects.count()),
+            ("Societies",   Society.objects.count()),
         ]
         for label, count in stats:
             self.stdout.write(f"  {label:<14}  {count}")

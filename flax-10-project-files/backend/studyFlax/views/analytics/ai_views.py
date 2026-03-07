@@ -13,7 +13,7 @@ from collections import defaultdict
 try:
     from openai import OpenAI
     openai_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     openai_available = False
 
 

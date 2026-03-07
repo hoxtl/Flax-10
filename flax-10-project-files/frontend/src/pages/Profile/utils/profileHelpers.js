@@ -9,10 +9,7 @@ export const RANGE_OPTIONS = [
 export const DATE_FORMAT = { day: 'numeric', month: 'short', year: 'numeric' };
 export const TIME_FORMAT = { hour: '2-digit', minute: '2-digit' };
 
-function getBaseDate(baseDate) {
-  if (baseDate) {
-    return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
-  }
+function getToday() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
@@ -23,22 +20,22 @@ function dateOffset(base, days) {
   return d;
 }
 
-function isInRange(eventStart, base, range) {
-  if (range === 'today') return eventStart >= base && eventStart < dateOffset(base, 1);
-  if (range === 'week') return eventStart >= base && eventStart < dateOffset(base, 7);
-  return eventStart >= base && eventStart < dateOffset(base, 30);
+function isInRange(eventStart, today, range) {
+  if (range === 'today') return eventStart >= today && eventStart < dateOffset(today, 1);
+  if (range === 'week') return eventStart >= today && eventStart < dateOffset(today, 7);
+  return eventStart >= today && eventStart < dateOffset(today, 30);
 }
 
 export function getFilteredEvents(allEvents, eventRange, baseDate) {
-  const base = getBaseDate(baseDate);
-  return allEvents
-    .filter(e => isInRange(new Date(e.start_time), base, eventRange))
+  const today = baseDate ? new Date(baseDate) : getToday();
+  return (allEvents || [])
+    .filter(e => isInRange(new Date(e.start_time), today, eventRange))
     .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
 
-export function getUpcomingCount(allEvents, baseDate) {
-  const base = getBaseDate(baseDate);
-  return allEvents.filter(e => isInRange(new Date(e.start_time), base, 'month')).length;
+export function getUpcomingCount(allEvents) {
+  const today = getToday();
+  return allEvents.filter(e => isInRange(new Date(e.start_time), today, 'month')).length;
 }
 
 export function getRangeLabel(range) {

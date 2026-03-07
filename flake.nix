@@ -66,15 +66,19 @@
 				cd "$FRONTEND_DIR"
 				if [ ! -f package.json ]; then
 					echo "\n"
-					echo "Frontend dorectory empty. Rebuilding template..."
+					echo "Frontend directory empty. Rebuilding template..."
 					echo "\n"
 					npm create vite@latest . -- --template react
 					npm install
+				elif [ ! -d node_modules ]; then
+					echo "\n"
+					echo "Frontend template detected, installing dependencies...\n"
+					echo "\n"
+					npm install
 				else
 					echo "\n"
-					echo "Frontend template detected...\n"
+					echo "Frontend template detected, dependencies already installed.\n"
 					echo "\n"
-					npm ci
 				fi
 				
 				echo "\n"

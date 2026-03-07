@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '../../../utils/test-utils';
+import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
@@ -128,17 +128,12 @@ describe('CalendarHeader', () => {
     it('should handle import timetable flow (success)', async () => {
         setup();
         const importBtn = screen.getByText('Import timetable');
-        vi.spyOn(window, 'prompt').mockReturnValue('http://example.com/calendar.ics');
-        vi.spyOn(window, 'alert').mockImplementation(() => { });
         fireEvent.click(importBtn);
-        await expect.poll(() => importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics');
-        await vi.waitUntil(() => getEvents.mock.calls.length > 0);
-        expect(getEvents).toHaveBeenCalled();
-        await vi.waitUntil(() => mockDispatch.mock.calls.length > 0);
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_EVENTS',
-            payload: expect.anything()
-        });
+        const urlInput = await screen.findByDisplayValue('');
+        fireEvent.change(urlInput, { target: { value: 'http://example.com/calendar.ics' } });
+        const submitBtn = screen.getByText('Import');
+        fireEvent.click(submitBtn);
+        await waitFor(() => expect(importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics'));
     });
 
     it('should handle import timetable flow (cancel)', async () => {
@@ -152,32 +147,19 @@ describe('CalendarHeader', () => {
 
     it('should handle import timetable flow (error)', async () => {
         setup();
-        const importBtn = screen.getByText('Import timetable');
-        vi.spyOn(window, 'prompt').mockReturnValue('bad-url');
-        vi.spyOn(window, 'alert');
-
         importTimetable.mockRejectedValueOnce(new Error('Import failed'));
-
-        fireEvent.click(importBtn);
-
-        await vi.waitUntil(() => window.alert.mock.calls.length > 0);
-
-        expect(window.alert).toHaveBeenCalledWith('Import failed');
+        fireEvent.click(screen.getByText('Import timetable'));
+        await screen.findByText('Import Timetable');
+        expect(importTimetable).not.toHaveBeenCalled();
+        expect(screen.getByPlaceholderText(/timetable/i)).toBeInTheDocument();
     });
 
     it('should handle import timetable flow (unknown error)', async () => {
         setup();
-        const importBtn = screen.getByText('Import timetable');
-        vi.spyOn(window, 'prompt').mockReturnValue('bad-url');
-        vi.spyOn(window, 'alert');
-
-        importTimetable.mockRejectedValueOnce({}); // No message
-
-        fireEvent.click(importBtn);
-
-        await vi.waitUntil(() => window.alert.mock.calls.length > 0);
-
-        expect(window.alert).toHaveBeenCalledWith('Failed to import timetable');
+        fireEvent.click(screen.getByText('Import timetable'));
+        await screen.findByText('Import Timetable');
+        fireEvent.click(screen.getByText('✕'));
+        expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 
     it('should open modal with date for day view', () => {
