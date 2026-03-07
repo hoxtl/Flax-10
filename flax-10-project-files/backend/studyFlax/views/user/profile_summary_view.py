@@ -245,6 +245,14 @@ def get_weekly_study_hours(sessions_all):
     return round(sum(s.duration for s in week_sessions) / 60, 1)
 
 
+def get_society_image(society):
+    """Resolves primary image from Society or the first related SocietyImage."""
+    if society.image:
+        return society.image
+    first_img = society.images.first()
+    return first_img.url if first_img else None
+
+
 # ---------------------------------------------------------------------------
 # Main view
 # ---------------------------------------------------------------------------
@@ -285,7 +293,7 @@ def profile_summary_view(request):
         {
             'id': m.society.id,
             'name': m.society.name,
-            'image': m.society.image,
+            'image': get_society_image(m.society),
         } for m in memberships
     ]
 
