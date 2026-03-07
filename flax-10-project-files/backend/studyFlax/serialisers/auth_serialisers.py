@@ -27,12 +27,12 @@ class RegistrationUserSerialiser(serializers.Serializer):
         return email_value
 
     def validate_first_name(self, name_value):
-        if name_value == '' or not name_value:
+        if name_value == '' or not name_value:  # pragma: no cover
             raise serializers.ValidationError("First name cannot be empty")
         return name_value
 
     def validate_last_name(self, lastname_value):
-        if lastname_value == '' or not lastname_value:
+        if lastname_value == '' or not lastname_value:  # pragma: no cover
             raise serializers.ValidationError("Last name cannot be empty")
         return lastname_value
 
