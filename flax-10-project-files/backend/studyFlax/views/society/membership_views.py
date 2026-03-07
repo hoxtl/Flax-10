@@ -19,15 +19,15 @@ def membership_list(request, society_id):
         return society_not_found_response()
 
     if request.method == 'GET':
-        return get_members(society)
+        return get_members(request, society)
     if 'username' in request.data or 'email' in request.data:
         return add_collaborator(request, society)
     return join_society(request.user, society)
 
 
-def get_members(society):
+def get_members(request, society):
     members = SocietyMembership.objects.filter(society=society)
-    return Response(SocietyMembershipSerialiser(members, many=True).data)
+    return Response(SocietyMembershipSerialiser(members, many=True, context={'request': request}).data)
 
 
 def join_society(user, society):

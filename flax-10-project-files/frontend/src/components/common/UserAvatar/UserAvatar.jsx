@@ -1,13 +1,13 @@
 import styles from './UserAvatar.module.css';
 
-export default function UserAvatar({ user, onClick, avatarOnly = false }) {
+export default function UserAvatar({ user, onClick, avatarOnly = false, size }) {
     if (!user) return null;
 
     const initial = getInitial(user);
-    const photoUrl = user.profile_photo || user.avatar;
+    const photoUrl = user.profile_photo_url || user.profile_photo || user.avatar;
     const fullName = getFullName(user);
 
-    if (avatarOnly) return <AvatarCircle initial={initial} photoUrl={photoUrl} />;
+    if (avatarOnly) return <AvatarCircle initial={initial} photoUrl={photoUrl} size={size} />;
 
     return (
         <div className={styles.userInfo} onClick={onClick}>
@@ -20,9 +20,10 @@ export default function UserAvatar({ user, onClick, avatarOnly = false }) {
     );
 }
 
-function AvatarCircle({ initial, photoUrl }) {
-    if (photoUrl) return <img src={photoUrl} alt="" className={styles.avatar} />;
-    return <div className={styles.avatar}>{initial}</div>;
+function AvatarCircle({ initial, photoUrl, size }) {
+    const sizeStyle = size ? { width: size, height: size, fontSize: `${parseInt(size) / 2.5}px` } : {};
+    if (photoUrl) return <img src={photoUrl} alt="" className={styles.avatar} style={sizeStyle} />;
+    return <div className={styles.avatar} style={sizeStyle}>{initial}</div>;
 }
 
 function getInitial(user) {

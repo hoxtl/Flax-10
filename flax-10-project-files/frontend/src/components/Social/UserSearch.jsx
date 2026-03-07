@@ -6,6 +6,7 @@ import { fetchSocieties } from '../../api/societyApi';
 import socialStyles from './Social.module.css';
 import searchStyles from './UserSearch.module.css';
 import SearchBar from '../common/SearchBar/SearchBar';
+import UserAvatar from '../common/UserAvatar/UserAvatar';
 const styles = { ...socialStyles, ...searchStyles };
 
 async function fetchUserResults(query, mods, socs, setRes, setL) {
@@ -52,11 +53,11 @@ function useDropdownPosition(containerRef, userResults, setDropdownPos, showDrop
     }, [showDropdown, userResults]);
 }
 
+
 export function UserResultItem({ user, onSelect }) {
-    const initials = user.first_name?.[0] || user.username[0];
     return (
         <div className={`${styles.userItem} ${styles.userResultItem}`} onClick={onSelect}>
-            <div className={styles.avatar}>{initials}</div>
+            <UserAvatar user={user} avatarOnly />
             <div className={styles.userNameDetails}>
                 <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
                 <span className={styles.userHandle}>@{user.username}</span>

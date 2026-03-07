@@ -25,10 +25,17 @@ class SocietyAnnouncementImageSerialiser(serializers.ModelSerializer):
 
 class SocietyMembershipSerialiser(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
+    profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = SocietyMembership
-        fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin', 'is_subscribed']
+        fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin', 'is_subscribed', 'profile_photo_url']
+
+    def get_profile_photo_url(self, obj):
+        if not obj.user.profile_photo:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.user.profile_photo.url) if request else None
 
 
 class SocietyListSerialiser(serializers.ModelSerializer):
