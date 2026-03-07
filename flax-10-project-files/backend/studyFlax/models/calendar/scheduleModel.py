@@ -34,9 +34,15 @@ class Schedule(models.Model):
         return f"{self.user.email}'s schedule {self.title}"
 
     def delete(self, *args, **kwargs):
-        generated_events = CalendarEvent.objects.filter(schedule_allocations__schedule=self).distinct()
+        generated_event_ids = list(
+            CalendarEvent.objects.filter(
+                schedule_allocations__schedule=self,
+                source='auto_scheduler',
+            ).values_list('id', flat=True).distinct()
+        )
         super().delete(*args, **kwargs)
-        generated_events.delete()
+        if generated_event_ids:
+            CalendarEvent.objects.filter(id__in=generated_event_ids).delete()
 
 #
 

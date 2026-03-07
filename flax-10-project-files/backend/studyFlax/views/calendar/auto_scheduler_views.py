@@ -128,7 +128,6 @@ def _allocate_deadline_blocks(schedule, user, deadline, minutes_per_day, payload
                 start_time=block_start,
                 end_time=block_end,
                 source='auto_scheduler',
-                module=deadline.module,
             )
             ScheduleEventAllocation.objects.create(
                 schedule=schedule,
