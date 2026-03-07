@@ -53,7 +53,6 @@ def load_task(request, reading_id):
     reading = get_object_or_404(Reading, id=reading_id)
     return create_reading_task(request.user, reading)
 
-
 def create_reading_task(user, reading):
     estimated = estimated_time_reading(reading, user)
     task = Task.objects.create(
