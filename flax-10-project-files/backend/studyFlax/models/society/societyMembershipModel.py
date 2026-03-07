@@ -15,6 +15,7 @@ class SocietyMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='society_memberships')
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='memberships')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='member')
+    is_subscribed = models.BooleanField(default=False)
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

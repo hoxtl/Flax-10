@@ -4,7 +4,7 @@
    ========================================================================== */
 
 .container {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 30px 20px;
   /* Subtle radial warmth so glass blur has something to refract */
@@ -17,31 +17,32 @@
   background: transparent;
 }
 
-.modulesGrid {
+.modulesScroll {
   display: flex;
-  flex-wrap: wrap;
+  overflow-x: auto;
   gap: 12px;
-  margin-bottom: 24px;
+  padding: 4px 0 12px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.modulesScroll::-webkit-scrollbar {
+  display: none;
 }
 
 .moduleCard {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 100px;
-  min-height: 110px;
-  padding: 12px 8px;
+  align-items: flex-start;
+  width: 140px;
+  padding: 12px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  text-align: center;
+  border-radius: 12px;
+  text-align: left;
   cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  transition: all 0.2s ease;
 }
 
 .moduleCard:hover {
@@ -51,29 +52,26 @@
 }
 
 .moduleIcon {
-  font-size: 28px;
-  line-height: 1;
+  font-size: 18px;
+  margin-bottom: 6px;
 }
 
 .moduleCode {
   font-size: 12px;
   font-weight: 700;
   color: var(--text);
-  word-break: break-word;
+  margin-bottom: 1px;
 }
 
 .moduleName {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--muted);
-  word-break: break-word;
   line-height: 1.2;
-  max-width: 100%;
+  white-space: nowrap;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 
@@ -208,7 +206,7 @@
 .profileHome {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 
 .calendarSection {
@@ -221,20 +219,26 @@
 .twoCol {
   display: grid;
   grid-template-columns: 1fr 290px;
-  gap: 12px;
+  gap: 20px;
   align-items: start;
+}
+
+.singleCol {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .leftCol {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 
 .rightCol {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   position: sticky;
   top: 20px;
 }
@@ -306,7 +310,48 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 2px;
+}
+
+/* Standarized Widget Styling */
+.widgetBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .widgetHeader {
+  border-bottom-color: rgba(180, 164, 144, 0.1);
+}
+
+.widgetTitleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.widgetSubtitle {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.widgetAction {
+  display: flex;
+  align-items: center;
+}
+
+.widgetContent {
+  padding: 0 20px 20px;
+}
+
+.modulesWidget .widgetContent {
+  padding: 16px 20px 20px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -763,24 +808,6 @@
 /* ---------------------------------------------------------------------------
    Achievements box — right column
 --------------------------------------------------------------------------- */
-
-.badgesBox {
-  padding: 16px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.badgesBox:hover {
-  border-color: rgba(158, 126, 93, 0.5) !important;
-}
-
-.badgesBoxHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
 .badgesViewAll {
   font-size: 11px;
@@ -1326,4 +1353,80 @@
   .mobileOnly {
     display: flex;
   }
+}
+
+
+.societiesScroll {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin-top: 1rem;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.societiesScroll::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
+}
+
+.societyCard {
+  flex: 0 0 auto;
+  width: 100px;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 0;
+}
+
+.societyCard:hover .socLogoWrap {
+  border-color: var(--primary);
+  background: var(--hover);
+  transform: scale(1.02);
+}
+
+.societyCard:hover .socName {
+  color: var(--primary);
+}
+
+.socLogoWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--surface-hover, #f3f4f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.05));
+}
+
+.socLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.socInitial {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary, #8b6e4e);
+}
+
+.socName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text, #1f2937);
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

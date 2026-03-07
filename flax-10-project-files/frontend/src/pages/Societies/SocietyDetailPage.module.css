@@ -19,6 +19,17 @@
   border-bottom: 1px solid var(--border);
 }
 
+.topBar::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: var(--bg);
+  z-index: -1;
+}
+
 .backBtn {
   background: var(--bg);
   border: 1px solid var(--border);

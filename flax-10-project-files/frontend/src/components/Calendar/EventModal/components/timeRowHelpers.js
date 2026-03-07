@@ -1,13 +1,11 @@
-export function getType(isAllDay) {
-    return isAllDay ? 'date' : 'datetime-local';
+export function handleDatePickerChange(field, update) {
+    return (isoString) => update(field)({ target: { value: isoString } });
 }
 
-export function handleDateChange(field, isAllDay, update) {
+export function handleNativeDateChange(field, update) {
     return (e) => {
         let val = e.target.value;
-        if (isAllDay && val) {
-            val = adjustForAllDay(val, field);
-        }
+        if (val) val = adjustForAllDay(val, field);
         update(field)({ target: { value: val } });
     };
 }

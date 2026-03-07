@@ -4,6 +4,8 @@ import { searchUsers } from "../../api/userService";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
+import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
+
 function UserCardInfo({ user }) {
     return (
         <div className={styles.userInfo}>
@@ -18,10 +20,11 @@ function UserCardInfo({ user }) {
 }
 
 function UserCard({ user, onNavChange }) {
-    const initials = user.first_name?.[0] || user.username[0];
     return (
         <div className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
-            <div className={styles.avatar}>{initials}</div>
+            <div style={{ marginBottom: 16 }}>
+                <UserAvatar user={user} avatarOnly size={80} />
+            </div>
             <UserCardInfo user={user} />
         </div>
     );

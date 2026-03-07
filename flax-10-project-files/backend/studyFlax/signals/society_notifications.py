@@ -3,6 +3,8 @@ from django.dispatch import receiver
 from studyFlax.models.society import Society, SocietyEvent, SocietyAnnouncement, SocietyMembership
 from studyFlax.models.notifications.notificationModel import Notification
 
+_deleting_societies = set()
+
 
 @receiver(pre_save, sender=SocietyEvent)
 def cache_old_event_state(sender, instance, **kwargs):
@@ -57,8 +59,20 @@ def handle_society_delete(sender, instance, **kwargs):
     """Fallback handler for deletions outside the API (e.g., Django admin)."""
     if getattr(instance, '_skip_notification', False):
         return
+    _deleting_societies.add(instance.pk)
     notify_society_deleted(instance)
     delete_children_silently(instance)
+
+
+@receiver(pre_delete, sender=SocietyMembership)
+def handle_membership_delete(sender, instance, **kwargs):
+    """Notify user when they are removed (not during society deletion)."""
+    if getattr(instance, '_skip_notification', False):
+        return
+    if instance.society_id in _deleting_societies:
+        return
+    notification = build_membership_removal_notification(instance.user, instance.society)
+    notification.save()
 
 
 def notify_society_deleted(society):
@@ -87,13 +101,24 @@ def build_society_delete_notification(user, society):
     )
 
 
+def build_membership_removal_notification(user, society):
+    return Notification(
+        user=user,
+        title=f"Removed from {society.name}",
+        message=f"You have been removed from {society.name}.",
+        notification_type='society_membership',
+    )
+
+
 def should_skip_notification(instance):
     """Check if notification should be skipped for this instance."""
     return getattr(instance, '_skip_notification', False)
 
 
 def notify_society_members(society, notification_data):
-    members = SocietyMembership.objects.filter(society=society).select_related('user')
+    members = SocietyMembership.objects.filter(
+        society=society, is_subscribed=True
+    ).select_related('user')
     notifications = [build_notification(m.user, notification_data) for m in members]
     Notification.objects.bulk_create(notifications)
 

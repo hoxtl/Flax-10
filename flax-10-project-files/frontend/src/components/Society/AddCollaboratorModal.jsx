@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { searchUsers } from "../../api/societyApi";
+import { searchUsers } from "../../api/userService";
 import styles from "./AddCollaboratorModal.module.css";
 
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
@@ -33,6 +33,7 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
 }
 
 function filterResults(results, selected, existingUsernames) {
+    if (!Array.isArray(results)) return [];
     const selectedIds = new Set(selected.map(u => u.id));
     return results.filter(u => !existingUsernames.includes(u.username) && !selectedIds.has(u.id));
 }
@@ -41,7 +42,7 @@ async function fetchResults(query, setResults) {
     if (query.length < 2) return setResults([]);
     try {
         const data = await searchUsers(query);
-        setResults(data);
+        setResults(data?.results || data || []);
     } catch { setResults([]); }
 }
 

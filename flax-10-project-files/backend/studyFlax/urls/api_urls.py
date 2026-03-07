@@ -52,7 +52,7 @@ from studyFlax.views.society import (
     event_list as society_event_list, event_detail as society_event_detail,
     sync_status, sync_calendar, unsync_calendar,
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
-    add_society_event_exception, publish_changes
+    add_society_event_exception, publish_changes, report_society, toggle_subscription
 )
 # Notifications
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
@@ -137,6 +137,8 @@ urlpatterns = [
     path("societies/<int:society_id>/events/", society_event_list, name="society-events"),
     path("societies/<int:society_id>/events/<int:event_id>/", society_event_detail, name="society-event-detail"),
     path("societies/<int:society_id>/events/<int:event_id>/exception/", add_society_event_exception, name="society-event-exception"),
+    path("societies/<int:society_id>/report/", report_society, name="society-report"),
+    path("societies/<int:society_id>/subscribe/", toggle_subscription, name="society-subscribe"),
     path("societies/<int:society_id>/calendar-sync/", sync_calendar, name="society-calendar-sync"),
     path("societies/<int:society_id>/calendar-unsync/", unsync_calendar, name="society-calendar-unsync"),
     path("societies/<int:society_id>/calendar-sync-status/", sync_status, name="society-calendar-sync-status"),

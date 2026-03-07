@@ -1,4 +1,5 @@
 import styles from "./CollaboratorList.module.css";
+import AnimatedDropdown from "../ui/AnimatedDropdown";
 
 const ROLES = [
     { value: "editor", label: "Editor" },
@@ -31,8 +32,8 @@ function CollaboratorRow({ collaborator, onRoleChange, onRemove }) {
 
 function RoleSelect({ value, onChange }) {
     return (
-        <select className={styles.select} value={value} onChange={(e) => onChange(e.target.value)}>
-            {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-        </select>
+        <div className={styles.roleDropdown}>
+            <AnimatedDropdown value={value} onChange={onChange} options={ROLES} placeholder="Role" />
+        </div>
     );
 }

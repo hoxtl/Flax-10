@@ -13,7 +13,7 @@ import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMess
 import { getUserSettings } from "../../../api/userService";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
-import DateTimePicker from "./DateTimePicker";
+import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
 import { TaskInfoModal } from "./TaskInfoModal";

@@ -20,6 +20,25 @@
     gap: 16px;
     color: var(--muted);
     font-size: 0.9rem;
+    align-items: center;
+}
+
+.memberCountBtn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease, opacity 0.2s ease;
+}
+
+.memberCountBtn:hover {
+    text-decoration-color: currentColor;
+    opacity: 0.8;
 }
 
 .badge {
@@ -164,4 +183,34 @@
     display: flex;
     gap: 8px;
     align-items: flex-end;
+}
+
+.notificationBell {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.notificationBell:hover {
+    background: var(--hover);
+    transform: scale(1.1);
+}
+
+.bellActive {
+    color: var(--primary);
+}
+
+.bellInactive {
+    color: var(--muted);
+    opacity: 0.6;
+}
+
+.bellInactive:hover {
+    opacity: 1;
 }
