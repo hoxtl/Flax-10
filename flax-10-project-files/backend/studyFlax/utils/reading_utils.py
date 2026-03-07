@@ -16,4 +16,9 @@ def get_avg_time_per_page(user):
         return DEFAULT_PAGE_TIME
     return total_minutes / total_pages
 
+def estimated_time_reading(reading, user):
+    if reading.estimated_minutes is not None:
+        return reading.estimated_minutes
+    avg = get_avg_time_per_page(user)
+    return round(reading.page_count() * avg)
 
