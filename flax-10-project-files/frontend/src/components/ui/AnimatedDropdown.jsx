@@ -334,12 +334,12 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
  * @param {string} [props.emptyMessage="Nothing found"] - Shown when the search has no results.
  * @param {number} [props.menuMaxHeight] - Optional max height for the dropdown menu.
  */
-export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight }) {
+export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className }) {
   const { isOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(options, grouped, placeholder, value, onChange);
   const containerRef = useRef(null);
   const openUpward = useOpenDirection(containerRef, isOpen, menuMaxHeight);
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
+    <div ref={containerRef} className={className} style={{ position: 'relative' }}>
       <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} />
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
