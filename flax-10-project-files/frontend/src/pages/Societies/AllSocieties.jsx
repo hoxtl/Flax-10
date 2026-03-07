@@ -11,16 +11,18 @@ import { usePagination } from "../../hooks/usePagination";
 const PAGE_SIZE = 20;
 
 export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
-    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
+    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { currentItems, totalPages } = usePagination(filtered, PAGE_SIZE, page);
+    const { currentItems, totalPages, currentPage, setPage } = usePagination(filtered, PAGE_SIZE);
+
+    const resetAndSet = (setter) => (...args) => { setter(...args); setPage(1); };
 
     return (
         <div className={styles.container}>
-            <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
-            <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
+            <Header onBack={onBack} search={search} setSearch={resetAndSet(setSearch)} sortBy={sortBy} setSortBy={resetAndSet(setSortBy)} />
+            <FilterPills filters={filters} toggleFilter={(...a) => { toggleFilter(...a); setPage(1); }} clearFilters={() => { clearFilters(); setPage(1); }} societies={societies} />
             <SocietyGrid items={currentItems} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <BackToTop />
         </div>
     );
@@ -30,14 +32,11 @@ function useFilters() {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ ratified: "all", category: "all" });
     const [sortBy, setSortBy] = useState("name");
-    const [page, setPage] = useState(1);
 
-    const handleSearch = (value) => { setSearch(value); setPage(1); };
-    const handleSort = (value) => { setSortBy(value); setPage(1); };
-    const toggleFilter = (type, value) => { setFilters(prev => toggleFilterValue(prev, type, value)); setPage(1); };
-    const clearFilters = () => { setFilters({ ratified: "all", category: "all" }); setPage(1); };
+    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
+    const clearFilters = () => setFilters({ ratified: "all", category: "all" });
 
-    return { search, setSearch: handleSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy: handleSort, page, setPage };
+    return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
 }
 
 function toggleFilterValue(prev, type, value) {
