@@ -1385,8 +1385,14 @@
   padding: 0;
 }
 
-.societyCard:hover {
-  transform: translateY(-4px);
+.societyCard:hover .socLogoWrap {
+  border-color: var(--primary);
+  background: var(--hover);
+  transform: scale(1.02);
+}
+
+.societyCard:hover .socName {
+  color: var(--primary);
 }
 
 .socLogoWrap {

@@ -204,12 +204,13 @@ function useModuleNameMap() {
 
 export function ModulesSection({ modules, onNavigate }) {
     const nameMap = useModuleNameMap();
+    const handleModuleClick = (code) => onNavigate?.(`modules_${code}`);
     if (!modules?.length) return null;
     return (
         <ProfileWidget title="MODULES" className={styles.modulesWidget}>
             <div className={styles.modulesScroll}>
                 {modules.map((code, i) => (
-                    <button key={i} className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
+                    <button key={i} className={styles.moduleCard} onClick={() => handleModuleClick(code)}>
                         <div className={styles.moduleIcon}>📚</div>
                         <div className={styles.moduleCode}>{code}</div>
                         {nameMap[code] && <div className={styles.moduleName}>{nameMap[code]}</div>}
@@ -221,12 +222,13 @@ export function ModulesSection({ modules, onNavigate }) {
 }
 
 export function SocietiesSection({ societies, onNavigate }) {
+    const handleSocClick = (id) => onNavigate?.(`societies_${id}`);
     if (!societies?.length) return null;
     return (
         <ProfileWidget title="SOCIETIES JOINED">
             <div className={styles.societiesScroll}>
                 {societies.map(soc => (
-                    <button key={soc.id} className={styles.societyCard} onClick={() => onNavigate(`society_${soc.id}`)}>
+                    <button key={soc.id} className={styles.societyCard} onClick={() => handleSocClick(soc.id)}>
                         <div className={styles.socLogoWrap}>{soc.image ? <img src={soc.image} alt={soc.name} className={styles.socLogo} /> : <div className={styles.socInitial}>{soc.name[0]}</div>}</div>
                         <span className={styles.socName}>{soc.name}</span>
                     </button>
