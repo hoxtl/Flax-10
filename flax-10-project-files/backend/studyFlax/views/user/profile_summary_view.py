@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.society import SocietyMembership
 
 
 # ---------------------------------------------------------------------------
@@ -279,6 +280,15 @@ def profile_summary_view(request):
     weekly_hours = get_weekly_study_hours(sessions_all)
     weekly_goal  = user.weekly_goal_hours or 20
 
+    memberships = SocietyMembership.objects.filter(user=user).select_related('society')
+    societies = [
+        {
+            'id': m.society.id,
+            'name': m.society.name,
+            'image': m.society.image,
+        } for m in memberships
+    ]
+
     return Response({
         'persona': persona,
         'streaks': {
@@ -291,4 +301,5 @@ def profile_summary_view(request):
             'goal_hours':    weekly_goal,
             'percentage':    min(round((weekly_hours / weekly_goal) * 100), 100) if weekly_goal else 0,
         },
+        'societies': societies,
     })
