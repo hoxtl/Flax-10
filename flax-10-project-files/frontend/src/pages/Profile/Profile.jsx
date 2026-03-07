@@ -45,7 +45,6 @@ function ProfileHome({ onNavigate, visibility, viewedUserId, modules }) {
 
   return (
     <div className={styles.profileHome}>
-      {visibility.isSelf && <PersonaCard persona={summary?.persona} peakHour={peakHour} />}
       <ProfileColumns
         summary={summary}
         analyticsData={analyticsData}
@@ -54,6 +53,7 @@ function ProfileHome({ onNavigate, visibility, viewedUserId, modules }) {
         refetch={refetch}
         onShowAchievements={() => setShowAchievements(true)}
         modules={modules}
+        peakHour={peakHour}
       />
       {showAchievements && <AchievementsModal badges={summary?.badges} onClose={() => setShowAchievements(false)} />}
     </div>
@@ -66,7 +66,7 @@ function computePeakHour(grid) {
   return Math.max(...totals) > 0 ? totals.indexOf(Math.max(...totals)) : null;
 }
 
-function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, onShowAchievements, modules }) {
+function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, onShowAchievements, modules, peakHour }) {
   const bentoStack = (
     <>
       <ModulesSection modules={modules} onNavigate={onNavigate} />
@@ -82,6 +82,7 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
   return (
     <div className={styles.twoCol}>
       <div className={styles.leftCol}>
+        <PersonaCard persona={summary?.persona} peakHour={peakHour} />
         <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={n => fetchApi('/profile/', { method: 'PATCH', body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
         <StudyDNA heatmap={analyticsData?.heatmap} />
         <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
