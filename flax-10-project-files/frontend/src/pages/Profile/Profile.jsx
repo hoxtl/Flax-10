@@ -10,33 +10,15 @@ import analyticsService from "../../api/analyticsService";
 import { fetchApi } from "../../api/client";
 import { getModules } from "../../api/moduleApi";
 import ProfileHeader from "./components/ProfileHeader";
-import { PersonaCard, StudyDNA, MiniHeatmap, ThisWeek, BadgesSection, SocietiesSection } from "./components/ProfileWidgets";
-
-function useModuleNameMap() {
-  const [nameMap, setNameMap] = useState({});
-  useEffect(() => {
-    getModules().then(data => {
-      const list = Array.isArray(data) ? data : data?.results || [];
-      setNameMap(Object.fromEntries(list.filter(m => m.module_code).map(m => [m.module_code, m.module_name])));
-    }).catch(() => { });
-  }, []);
-  return nameMap;
-}
-
-function ModulesGrid({ modules, onNavigate }) {
-  const nameMap = useModuleNameMap();
-  if (!modules?.length) return null;
-  return (
-    <div className={styles.modulesGrid}>
-      {modules.map((code, i) => (
-        <button key={i} className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
-          <span className={styles.moduleIcon}>📚</span><span className={styles.moduleCode}>{code}</span>
-          {nameMap[code] && <span className={styles.moduleName}>{nameMap[code]}</span>}
-        </button>
-      ))}
-    </div>
-  );
-}
+import {
+  PersonaCard,
+  StudyDNA,
+  MiniHeatmap,
+  ThisWeek,
+  BadgesSection,
+  SocietiesSection,
+  ModulesSection
+} from "./components/ProfileWidgets";
 
 function Skeleton() {
   return (
@@ -53,7 +35,7 @@ function useProfileAnalytics(isSelf) {
   return data;
 }
 
-function ProfileHome({ onNavigate, visibility, viewedUserId }) {
+function ProfileHome({ onNavigate, visibility, viewedUserId, modules }) {
   const { summary, loading, refetch } = useProfileSummary(viewedUserId);
   const analyticsData = useProfileAnalytics(visibility.canViewAnalytics);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -64,7 +46,15 @@ function ProfileHome({ onNavigate, visibility, viewedUserId }) {
   return (
     <div className={styles.profileHome}>
       {visibility.isSelf && <PersonaCard persona={summary?.persona} peakHour={peakHour} />}
-      <ProfileColumns summary={summary} analyticsData={analyticsData} visibility={visibility} onNavigate={onNavigate} refetch={refetch} onShowAchievements={() => setShowAchievements(true)} />
+      <ProfileColumns
+        summary={summary}
+        analyticsData={analyticsData}
+        visibility={visibility}
+        onNavigate={onNavigate}
+        refetch={refetch}
+        onShowAchievements={() => setShowAchievements(true)}
+        modules={modules}
+      />
       {showAchievements && <AchievementsModal badges={summary?.badges} onClose={() => setShowAchievements(false)} />}
     </div>
   );
@@ -76,15 +66,19 @@ function computePeakHour(grid) {
   return Math.max(...totals) > 0 ? totals.indexOf(Math.max(...totals)) : null;
 }
 
-function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, onShowAchievements }) {
+function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, onShowAchievements, modules }) {
+  const bentoStack = (
+    <>
+      <ModulesSection modules={modules} onNavigate={onNavigate} />
+      {visibility.canViewSocieties && <SocietiesSection societies={summary?.societies} onNavigate={onNavigate} />}
+      {visibility.canViewAchievements && <BadgesSection badges={summary?.badges} onOpen={onShowAchievements} />}
+    </>
+  );
+
   if (!visibility.isSelf) {
-    return (
-      <div className={styles.singleCol}>
-        {visibility.canViewAchievements && <BadgesSection badges={summary?.badges} onOpen={onShowAchievements} />}
-        {visibility.canViewSocieties && <SocietiesSection societies={summary?.societies} onNavigate={onNavigate} />}
-      </div>
-    );
+    return <div className={styles.singleCol}>{bentoStack}</div>;
   }
+
   return (
     <div className={styles.twoCol}>
       <div className={styles.leftCol}>
@@ -92,10 +86,7 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
         <StudyDNA heatmap={analyticsData?.heatmap} />
         <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
       </div>
-      <div className={styles.rightCol}>
-        <BadgesSection badges={summary?.badges} onOpen={onShowAchievements} />
-        <SocietiesSection societies={summary?.societies} onNavigate={onNavigate} />
-      </div>
+      <div className={styles.rightCol}>{bentoStack}</div>
     </div>
   );
 }
@@ -106,8 +97,7 @@ function ProfileContent({ user, state, visibility, onNavigate }) {
   return (
     <div className={styles.content}>
       <ProfileHeader user={profileData || user} profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} visibility={visibility} />
-      <ModulesGrid modules={modules} onNavigate={onNavigate} />
-      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} />
+      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={modules} />
       {visibility.canViewCalendar && <SharedCalendarSection events={filteredEvents} />}
     </div>
   );

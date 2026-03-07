@@ -1,5 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "../Profile.module.css";
+import { getModules } from "../../../api/moduleApi";
+
+function ProfileWidget({ title, subtitle, action, onClick, children, className = "" }) {
+    return (
+        <div className={`${styles.glassCard} ${styles.widgetBox} ${className}`} onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+            <div className={styles.widgetHeader}>
+                <div className={styles.widgetTitleArea}>
+                    <div className={styles.cardLabel}>{title}</div>
+                    {subtitle && <div className={styles.widgetSubtitle}>{subtitle}</div>}
+                </div>
+                {action && <div className={styles.widgetAction}>{action}</div>}
+            </div>
+            <div className={styles.widgetContent}>{children}</div>
+        </div>
+    );
+}
 
 function PersonaHeader({ label, emoji, peakLabel }) {
     return (
@@ -159,24 +175,55 @@ function WeekContent({ weekly, streaks, editing, setEditing, tempGoal, setTempGo
 
 export function BadgesSection({ badges, onOpen }) {
     const meta = { gold: { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' }, silver: { bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' }, bronze: { bg: 'rgba(146,64,14,0.1)', border: 'rgba(146,64,14,0.25)' } };
+    const viewAll = <span className={styles.badgesViewAll}>View all →</span>;
     return (
-        <div className={`${styles.glassCard} ${styles.badgesBox}`} onClick={onOpen} style={{ cursor: 'pointer' }}>
-            <div className={styles.badgesBoxHeader}><div className={styles.cardLabel}>ACHIEVEMENTS</div><span className={styles.badgesViewAll}>View all →</span></div>
-            <div className={styles.badgesSummary}><span className={styles.badgesCount}>{badges?.length || 0}</span><span className={styles.badgesCountLabel}> / 26 unlocked</span></div>
+        <ProfileWidget title="ACHIEVEMENTS" action={viewAll} onClick={onOpen}>
+            <div className={styles.badgesSummary}>
+                <span className={styles.badgesCount}>{badges?.length || 0}</span>
+                <span className={styles.badgesCountLabel}> / 26 unlocked</span>
+            </div>
             <div className={styles.badgesGrid}>
                 {badges?.slice(0, 6).map(b => (
                     <div key={b.id} className={styles.badge} style={{ background: (meta[b.tier] || meta.bronze).bg, borderColor: (meta[b.tier] || meta.bronze).border }} title={b.description}><span className={styles.badgeEmoji}>{b.emoji}</span>{b.label}</div>
                 ))}
             </div>
-        </div>
+        </ProfileWidget>
+    );
+}
+
+function useModuleNameMap() {
+    const [nameMap, setNameMap] = useState({});
+    useEffect(() => {
+        getModules().then(data => {
+            const list = Array.isArray(data) ? data : data?.results || [];
+            setNameMap(Object.fromEntries(list.filter(m => m.module_code).map(m => [m.module_code, m.module_name])));
+        }).catch(() => { });
+    }, []);
+    return nameMap;
+}
+
+export function ModulesSection({ modules, onNavigate }) {
+    const nameMap = useModuleNameMap();
+    if (!modules?.length) return null;
+    return (
+        <ProfileWidget title="MODULES" className={styles.modulesWidget}>
+            <div className={styles.modulesScroll}>
+                {modules.map((code, i) => (
+                    <button key={i} className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
+                        <div className={styles.moduleIcon}>📚</div>
+                        <div className={styles.moduleCode}>{code}</div>
+                        {nameMap[code] && <div className={styles.moduleName}>{nameMap[code]}</div>}
+                    </button>
+                ))}
+            </div>
+        </ProfileWidget>
     );
 }
 
 export function SocietiesSection({ societies, onNavigate }) {
     if (!societies?.length) return null;
     return (
-        <div className={`${styles.glassCard} ${styles.societiesBox}`}>
-            <div className={styles.cardLabel}>SOCIETIES JOINED</div>
+        <ProfileWidget title="SOCIETIES JOINED">
             <div className={styles.societiesScroll}>
                 {societies.map(soc => (
                     <button key={soc.id} className={styles.societyCard} onClick={() => onNavigate(`society_${soc.id}`)}>
@@ -185,6 +232,6 @@ export function SocietiesSection({ societies, onNavigate }) {
                     </button>
                 ))}
             </div>
-        </div>
+        </ProfileWidget>
     );
 }
