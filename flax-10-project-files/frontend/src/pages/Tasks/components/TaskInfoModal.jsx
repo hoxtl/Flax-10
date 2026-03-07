@@ -1,0 +1,81 @@
+/**
+ * Modal showing a read-only summary of a task's details.
+ */
+
+import { createPortal } from "react-dom";
+import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
+
+import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
+import styles from "./TaskCard.module.css";
+
+function InfoRow({ icon, label, value, full = false }) {
+  return (
+    <div className={full ? styles.infoRowFull : styles.infoRow}>
+      <span className={styles.infoLabel}>{icon} {label}</span>
+      <span className={`${styles.infoVal} ${full ? "" : styles.infoValPill}`}>{value}</span>
+    </div>
+  );
+}
+
+function InfoModalBody({ task, listName }) {
+  const due = formatDueDate(task.due_date);
+  const dueFormatted = task.due_date
+    ? new Date(task.due_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+    : null;
+  return (
+    <div className={styles.infoModalBody}>
+      <div className={styles.infoHero}>
+        <p className={styles.infoHeroTitle}>{task.title || "—"}</p>
+        {(task.description || "").trim() && <p className={styles.infoHeroDesc}>{task.description}</p>}
+      </div>
+      <div className={styles.infoGrid}>
+        <InfoRow icon={<Flag size={14} strokeWidth={2} />}  label="Priority" value={PRIORITY_LABELS[task.priority] || task.priority || "—"} />
+        <InfoRow icon={<Zap size={14} strokeWidth={2} />}   label="Sessions" value={formatFocusBlocks(task.estimated_blocks)} />
+        <InfoRow icon={<Clock size={14} strokeWidth={2} />} label="Due date" value={dueFormatted || due?.label || "—"} full />
+        {listName && (
+          <div className={styles.infoRowFull}>
+            <span className={styles.infoLabel}><List size={14} strokeWidth={2} /> List</span>
+            <span className={styles.infoVal}><span className={styles.infoListDot} />{listName}</span>
+          </div>
+        )}
+        {task.module_code && (
+          <InfoRow icon={<BookOpen size={14} strokeWidth={2} />} label="Module" value={`${task.module_code}${task.module_name ? ` — ${task.module_name}` : ""}`} full />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Portal modal displaying read-only task details.
+ *
+ * @param {object} props
+ * @param {object} props.task
+ * @param {string} [props.listName]
+ * @param {Function} props.onClose
+ */
+export function TaskInfoModal({ task, listName, onClose }) {
+  const modal = (
+    <div className={styles.modalBackdrop} onMouseDown={onClose}>
+      <div className={styles.infoModal} onMouseDown={e => e.stopPropagation()}>
+        <div className={styles.infoModalAccent} aria-hidden />
+        <div className={styles.infoModalHeader}>
+          <ClipboardList size={20} strokeWidth={1.5} className={styles.infoModalIcon} aria-hidden />
+          <div className={styles.infoModalHeaderText}>
+            <h3 className={styles.infoModalTitle}>Task details</h3>
+            <p className={styles.infoModalSub}>Quick glance</p>
+          </div>
+          <button type="button" className={styles.infoModalClose} onClick={onClose} aria-label="Close">
+            <X size={18} strokeWidth={2} aria-hidden />
+          </button>
+        </div>
+        <InfoModalBody task={task} listName={listName} />
+        <div className={styles.infoModalFooter}>
+          <span className={styles.infoHint}><MousePointer2 size={12} strokeWidth={2} /> Right-click the task to edit or delete</span>
+          <button type="button" className={styles.infoCloseBtn} onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+  return createPortal(modal, document.body);
+}
