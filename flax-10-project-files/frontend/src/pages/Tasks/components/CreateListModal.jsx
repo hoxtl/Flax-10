@@ -2,7 +2,6 @@ import { useState } from "react";
 import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
 export default function CreateListModal({ onSave, onClose }) {
   const [name,       setName]       = useState("");
   const [color,      setColor]      = useState(FOCUS_BLOCK_PALETTE[0].hex);

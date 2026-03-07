@@ -1,4 +1,3 @@
-/* Shared "all tasks complete" / day complete card — white like other widgets */
 .card {
   display: flex;
   flex-direction: column;

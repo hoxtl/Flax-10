@@ -1,5 +1,3 @@
-// list side bar for the tasks page
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import styles from "./ListSidebar.module.css";
@@ -217,7 +215,6 @@ export default function ListSidebar({
                 </div>
             )}
 
-            {/* ── Context menu ── */}
             {ctxMenu && (
                 <ListContextMenu
                     x={ctxMenu.x}

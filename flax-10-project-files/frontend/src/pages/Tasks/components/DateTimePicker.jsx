@@ -1,28 +1,9 @@
-/**
- * DateTimePicker.jsx
- *
- * A minimal, self-contained date + time picker.
- * No external UI libraries required — uses native inputs and a lightweight
- * calendar rendered with vanilla JS date math.
- *
- * Usage:
- *   import DateTimePicker from "./DateTimePicker";
- *
- *   <DateTimePicker
- *     value={dateISOString}         // e.g. "2026-03-15T14:00"
- *     onChange={isoStr => ...}      // called with ISO datetime string or ""
- *     placeholder="Pick date & time"
- *   />
- *
- * Dependencies: none (pure React + CSS modules)
- */
 import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { Clock } from "lucide-react";
 import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import styles from "./DateTimePicker.module.css";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
 const MONTHS = ["January","February","March","April","May","June",
                 "July","August","September","October","November","December"];
 const DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
@@ -47,7 +28,6 @@ function calendarDays(year, month) {
   return cells;
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
 function parseIncomingValue(value, timeOnly) {
   if (!value) return null;
   if (timeOnly && /^\d{2}:\d{2}$/.test(value)) {
@@ -60,7 +40,6 @@ function parseIncomingValue(value, timeOnly) {
 }
 
 export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false }) {
-  // Parse incoming value
   const parsed = useMemo(() => parseIncomingValue(value, timeOnly), [value, timeOnly]);
 
   const [open,    setOpen]    = useState(false);
@@ -74,7 +53,6 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
   const dropdownRef = useRef(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
 
-  // Position dropdown when opening (so it's not clipped by modal overflow)
   useEffect(() => {
     if (!open || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
@@ -88,7 +66,6 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     });
   }, [open, timeOnly]);
 
-  // Sync selDate/time when value prop changes externally
   useEffect(() => {
     if (value) {
       const d = parseIncomingValue(value, timeOnly);
@@ -103,7 +80,7 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     }
   }, [value, timeOnly]);
 
-  // Close on outside interaction (trigger and portaled dropdown are separate)
+  // Close on outside interaction 
   useEffect(() => {
     if (!open) return;
     const handleOutside = (e) => {
@@ -114,7 +91,6 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
       if (e.key === "Escape") setOpen(false);
     };
 
-    // Use capture so this still runs even when other handlers stop bubbling.
     document.addEventListener("pointerdown", handleOutside, true);
     document.addEventListener("mousedown", handleOutside, true);
     document.addEventListener("touchstart", handleOutside, true);
@@ -186,7 +162,6 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
         )}
       </button>
 
-      {/* Dropdown — rendered in portal so it's not clipped by modal */}
       {open && createPortal(
         <div
           ref={dropdownRef}
@@ -200,14 +175,12 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
         >
           {!timeOnly && (
             <>
-              {/* Month navigation */}
               <div className={styles.calHeader}>
                 <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
                 <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
                 <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
               </div>
 
-              {/* Day-of-week headers */}
               <div className={styles.calGrid}>
                 {DAYS.map(d => (
                   <div key={d} className={styles.dayHeader}>{d}</div>
@@ -230,7 +203,6 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
             </>
           )}
 
-          {/* Time pickers */}
           <div className={`${styles.timePicker} ${timeOnly ? styles.timeOnlyPicker : ""}`}>
             <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
             <div className={styles.timeDropdown}>

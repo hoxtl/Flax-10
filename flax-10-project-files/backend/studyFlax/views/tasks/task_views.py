@@ -34,9 +34,6 @@ def _task_event_qs(task: Task):
 
 
 def sync_calendar_event_for_task(task: Task):
-    # Keep calendar in sync with due-dated tasks:
-    # - create/update event when task has a due date and is incomplete
-    # - remove linked event otherwise (completed / no due date)
     should_exist = bool(task.due_date) and not task.completed
     existing_qs = _task_event_qs(task)
 
@@ -91,7 +88,6 @@ def task_list_detail(request, list_id):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     data = request.data
-    # Restore from archive: set archived=False and mark all tasks in this list as completed
     if data.get("archived") is False and getattr(task_list, "archived", False):
         Task.objects.filter(task_list=task_list).update(completed=True)
 

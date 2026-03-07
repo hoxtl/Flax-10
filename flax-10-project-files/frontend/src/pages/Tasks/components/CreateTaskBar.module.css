@@ -1,5 +1,3 @@
-/* Create Task bar: two-row layout — primary input row + secondary options row */
-
 .card {
   display: flex;
   flex-direction: column;
@@ -13,7 +11,6 @@
   width: 100%;
 }
 
-/* ── Row 1: input + Add ── */
 .inputRow {
   display: flex;
   align-items: center;
@@ -62,7 +59,6 @@
 .addBtn:hover:not(:disabled) { opacity: 0.88; }
 .addBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Row 2: secondary options — hidden by default, slide down on focus ── */
 .optionsRowWrapper {
   display: flex;
   flex-direction: column;
@@ -93,7 +89,6 @@
   margin-top: 10px;
 }
 
-/* Labels: text-xs font-medium uppercase tracking-wide text-stone-400 */
 .optionsRowLabel {
   font-family: var(--font-body);
   font-size: 0.75rem;
@@ -114,7 +109,6 @@
   flex-shrink: 0;
 }
 
-/* Wrapper for shared AnimatedDropdown (Module + List) — same UI as onboarding */
 .dropdownWrap {
   position: relative;
   flex-shrink: 0;

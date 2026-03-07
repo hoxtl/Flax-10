@@ -9,7 +9,6 @@
     background: var(--bg);
 }
 
-/* Enforce single font everywhere: form elements inherit on task page */
 .page input,
 .page select,
 .page textarea,
