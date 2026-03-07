@@ -1,9 +1,3 @@
-/**
- * Quick Capture bar: two rows.
- *   Row 1: task name input + Add button (primary action)
- *   Row 2: Est. time chips + Module chip + List selector (secondary options)
- * For full planning (calendar, deadline, travel time) use the "Full Planning" button.
- */
 import { useState, useMemo, useEffect, useRef } from "react";
 
 import { getModules, getEnrollments } from "../../../api/moduleApi";
@@ -180,7 +174,6 @@ export default function CreateTaskBar({ lists = [], defaultListId, defaultDueDat
         )}
       </div>
 
-      {/* Row 2: secondary options — est. time, module, list */}
       <div className={styles.optionsRowWrapper}>
         <div className={`${styles.optionsRow} ${showOptions ? styles.optionsRowOpen : ""}`}>
         <span className={styles.optionsRowLabel}>Est. time</span>

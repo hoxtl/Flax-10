@@ -1,12 +1,3 @@
-/**
- * CreateTaskModal.jsx
- *
- * Modal for creating a new task. Provides a lightweight, canvas-style form with
- * borderless inputs, priority and study-block chips, and optional due date.
- * When onOpenCreateList is provided, the Category dropdown shows "+ New List" and
- * opens the same Create List modal used in the list sidebar.
- */
-
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 
@@ -36,12 +27,6 @@ const STUDY_BLOCK_OPTIONS = [
 
 const FALLBACK_COLOURS = FOCUS_BLOCK_COLOURS_HEX;
 
-/**
- * Resolves display colour for a task list (stored colour or fallback by index).
- * @param {Object} list - Task list object (may have .color, .id).
- * @param {number} idx - Index in the lists array for fallback.
- * @returns {string} Hex colour.
- */
 function getListColor(list, idx) {
   if (list?.color) return list.color;
   try {
@@ -55,12 +40,6 @@ function getListColor(list, idx) {
   return FALLBACK_COLOURS[idx % FALLBACK_COLOURS.length];
 }
 
-/**
- * Create Task modal. Public props: lists, defaultListId, onSave, onClose.
- * Optional: onOpenCreateList — when provided, Category dropdown shows "+ New List" and opens the Create List modal (same as sidebar).
- * Optional: newListIdCreated — when set (after creating a list from that modal), form category is set to this list.
- * Optional: showAddToScheduleToggle, addToScheduleLabel, modules.
- */
 export default function CreateTaskModal({
   lists,
   defaultListId,

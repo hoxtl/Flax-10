@@ -120,3 +120,21 @@ def check_event_overlap(user, data):
 
 def parse_date_param(ds):
     return datetime.fromisoformat(ds.replace('Z', '+00:00')) if ds else None
+def get_next_occurrence(start, frequency, interval, num):
+    class FakeRule:
+        pass
+    rule = FakeRule()
+    rule.frequency = frequency
+    rule.interval = interval
+    return calc_occurrence(start, rule, num)
+
+def is_exception_date(dt, rule):
+    return is_exception(dt, rule)
+
+def should_stop_generating(current, end_date, rule):
+    return stop_generation(current, end_date, rule)
+
+def get_base_instance(event, rule):
+    if is_exception(event.start_time, rule):
+        return []
+    return [event]

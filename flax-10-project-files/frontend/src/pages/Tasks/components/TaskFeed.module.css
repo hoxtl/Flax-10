@@ -10,7 +10,6 @@
     background: var(--bg);
 }
 
-/* List Header */
 .listHeader {
     flex-shrink: 0;
     padding: 24px 0 0;
@@ -82,7 +81,6 @@
     min-width: 0;
 }
 
-/* Toolbar row — sits flush to container edges */
 .subHeader .toolbar {
     border-bottom: none;
     padding: 8px 0;
@@ -91,12 +89,10 @@
     gap: 10px;
 }
 
-/* Divider between quick-add and search/filter bar */
 .quickAddDivider {
     display: none;
 }
 
-/* Filter bar strip — no separate background, blends with page */
 .toolbarStrip {
     background: transparent;
     border-radius: 0 0 10px 10px;
@@ -448,7 +444,6 @@
   background: rgba(107, 83, 68, 0.08);
 }
 
-/* Full Planning button */
 .addBtn {
     position: relative;
     display: inline-flex;
@@ -497,8 +492,6 @@
     opacity: 1;
     animation: taskBtnSheen 1.15s ease forwards;
 }
-
-/* Sections area*/
 
 .sectionsWrap {
     display: flex;
@@ -617,7 +610,6 @@
 .sectionHeaderDanger .sectionTitle { color: var(--danger, #C05A3E); }
 .sectionHeaderDanger .sectionIcon  { color: var(--danger, #C05A3E); opacity: 1; }
 
-/* Section icon — emoji */
 .sectionIcon {
     display: inline-flex;
     align-items: center;
@@ -627,7 +619,6 @@
     line-height: 1;
 }
 
-/* Section title — text-xs font-semibold uppercase tracking-wider text-stone-500 */
 .sectionTitle {
     font-family: var(--font-body);
     font-size: 1rem;
@@ -641,7 +632,6 @@
 }
 .sectionAccentDanger .sectionTitle { color: var(--danger, #C05A3E); }
 
-/* Count pill + progress ring — right-aligned cluster */
 .sectionCountWrap {
     display: inline-flex;
     align-items: center;
@@ -696,7 +686,6 @@
     color: var(--muted);
 }
 
-/* Chevron — right-most item; ChevronRight when collapsed, ChevronDown when expanded */
 .sectionChevronBtn {
     width: 24px;
     height: 24px;
@@ -718,7 +707,6 @@
     transition: transform 0.2s ease, color 0.2s ease;
 }
 
-/* Section empty state — e.g. "Everything handled" for Today */
 .sectionEmptyState {
     display: flex;
     flex-direction: column;
@@ -749,7 +737,6 @@
     line-height: 1.3;
 }
 
-/* Show more — pill button, centered below section */
 .showMoreWrap {
     display: flex;
     justify-content: center;
@@ -834,9 +821,6 @@
     border-bottom: none;
 }
 
-/* ══════════════════════════════════════
-   Completed section — visually muted
-   ══════════════════════════════════════ */
 .completedSection {
     margin-top: 4px;
     padding-top: 12px;

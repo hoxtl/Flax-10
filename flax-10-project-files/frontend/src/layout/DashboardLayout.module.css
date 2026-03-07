@@ -77,16 +77,33 @@
   border-radius: 50%;
   border: none;
   background: #7f6a53;
-  color: #F7F6F3;
+  color: #f7f6f3;
   box-shadow: 0 6px 18px rgba(44, 36, 32, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 .scrollToTop:hover {
   background: #6f5d4b;
   box-shadow: 0 8px 22px rgba(44, 36, 32, 0.28);
   transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .root {
+    flex-direction: column;
+  }
+
+  .main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content {
+    padding-bottom: 0;
+  }
 }

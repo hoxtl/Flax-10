@@ -55,7 +55,6 @@ const PRIORITY_MARKS = {
     medium: "❗",
 };
 
-/* Monochromatic icons */
 const IconPlay = () => (
     <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
 );
@@ -74,7 +73,6 @@ function formatDueDate(dueDate) {
     return { label: due.toLocaleDateString(undefined, { month: "short", day: "numeric" }), status: "future" };
 }
 
-/** For completed tasks in Completed section: "Completed today" / "Completed yesterday" / "Completed [date]" */
 function getCompletedDueLabel(dueDate) {
     if (!dueDate) return "Completed";
     const due = new Date(dueDate);
@@ -87,7 +85,6 @@ function getCompletedDueLabel(dueDate) {
     return `Completed ${due.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-/** Highlight search query matches inside a text string. */
 function HighlightText({ text, query }) {
     if (!query || !text) return <>{text}</>;
     const idx = text.toLowerCase().indexOf(query.toLowerCase());
@@ -101,10 +98,6 @@ function HighlightText({ text, query }) {
     );
 }
 
-/**
- * Right-click context menu — Edit, Move to list, Set due date, Delete.
- * Renders as a portal so it's never clipped by parent overflow.
- */
 export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }) {
     const menuRef = useRef(null);
     const [view, setView] = useState("main");
@@ -272,7 +265,6 @@ function splitEstimatedBlocks(blocks) {
     return { sessionCount: 1, workMinutes: total * 25 };
 }
 
-/** Read-only task details modal — clean, scannable layout with clear hierarchy. */
 function TaskInfoModal({ task, listName, onClose }) {
     const due = formatDueDate(task.due_date);
     const dueFormatted = task.due_date

@@ -15,7 +15,6 @@ import styles from "./TaskFeed.module.css";
 
 const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 
-/** Routine/event tasks (meals, lectures, etc.) auto-pass when time has passed — exclude from Overdue. */
 function isRoutineOrEventTask(task) {
   if (!task) return false;
   const title = (task.title || "").toLowerCase();
@@ -379,7 +378,6 @@ export default function TaskFeed({
     [completed]
   );
 
-  /** All tasks in one list for "All tasks" view (overdue + today + this week + later) */
   const allTasksCombined = useMemo(
     () => [...overdue, ...today, ...thisWeek, ...later],
     [overdue, today, thisWeek, later]
@@ -483,7 +481,6 @@ export default function TaskFeed({
         <div className={styles.listHeaderDivider} aria-hidden />
       </header>
 
-      {/* Quick capture + toolbar */}
       <div className={styles.subHeader}>
         <div className={styles.bannerRow}>
           <EstTimeHelpBanner

@@ -110,7 +110,7 @@ function MainArea({
             activeNav={activeNav}
           />
         )}
-        {showWeekBar && <WeekBar date={selectedDate} />}
+        {showWeekBar && !isMobile && <WeekBar date={selectedDate} />}
         <PageContent activeNav={activeNav}>{children}</PageContent>
       </div>
     </div>
@@ -119,7 +119,13 @@ function MainArea({
 
 function QuickAddGate({ open, onClose, onSelectType, isTeacher }) {
   if (!open) return null;
-  return <QuickAddModal onClose={onClose} onSelectType={onSelectType} isTeacher={isTeacher} />;
+  return (
+    <QuickAddModal
+      onClose={onClose}
+      onSelectType={onSelectType}
+      isTeacher={isTeacher}
+    />
+  );
 }
 
 function EventModalGate({ modal }) {
@@ -169,7 +175,8 @@ function useDashboardState(activeNav, onNavChange) {
   const modals = useModalStates();
   const calendarState = useCalendar();
   const selectedDate = calendarState?.selectedDate || new Date();
-  const showWeekBar = activeNav === "calendar" || location.pathname.startsWith("/calendar");
+  const showWeekBar =
+    activeNav === "calendar" || location.pathname.startsWith("/calendar");
   const modal = useEventModal();
   const t = useTimerContext();
   const { pendingNav, setPendingNav, handleNavChange } = useTimerNav(activeNav, onNavChange, t);
@@ -231,14 +238,21 @@ function GlobalTaskModal({ onClose }) {
   const [enrollments, setEnrollments] = useState([]);
 
   useEffect(() => {
-    fetchTaskLists().then(res => setLists(Array.isArray(res) ? res : [])).catch(() => { });
-    getModules().then(res => setModules(Array.isArray(res) ? res : [])).catch(() => { });
-    getEnrollments().then(res => setEnrollments(Array.isArray(res) ? res : [])).catch(() => { });
+    fetchTaskLists()
+      .then((res) => setLists(Array.isArray(res) ? res : []))
+      .catch(() => { });
+    getModules()
+      .then((res) => setModules(Array.isArray(res) ? res : []))
+      .catch(() => { });
+    getEnrollments()
+      .then((res) => setEnrollments(Array.isArray(res) ? res : []))
+      .catch(() => { });
   }, []);
 
-  const enrolledModules = useMemo(() =>
-    modules.filter(m => isEnrolledIn(m.id, enrollments)),
-    [modules, enrollments]);
+  const enrolledModules = useMemo(
+    () => modules.filter((m) => isEnrolledIn(m.id, enrollments)),
+    [modules, enrollments],
+  );
 
   const handleSave = async (data) => {
     try {
@@ -264,12 +278,29 @@ function DashboardModals({ state }) {
   const createSoc = useSocietyCreation(state.setShowSocietyModal);
   return (
     <>
-      <QuickAddGate open={state.showQuickAdd} onClose={() => state.setShowQuickAdd(false)}
-        onSelectType={state.onSelectType} isTeacher={state.user?.role === 'teacher'} />
+      <QuickAddGate
+        open={state.showQuickAdd}
+        onClose={() => state.setShowQuickAdd(false)}
+        onSelectType={state.onSelectType}
+        isTeacher={state.user?.role === "teacher"}
+      />
       <EventModalGate modal={state.modal} />
-      {state.showSocietyModal && <CreateSocietyModal onClose={() => state.setShowSocietyModal(false)} onCreate={createSoc} />}
-      {state.showTaskModal && <GlobalTaskModal onClose={() => state.setShowTaskModal(false)} />}
-      {state.deadlineModule && <DeadlineModal module={state.deadlineModule} onClose={() => state.setDeadlineModule(null)} startCreating={true} />}
+      {state.showSocietyModal && (
+        <CreateSocietyModal
+          onClose={() => state.setShowSocietyModal(false)}
+          onCreate={createSoc}
+        />
+      )}
+      {state.showTaskModal && (
+        <GlobalTaskModal onClose={() => state.setShowTaskModal(false)} />
+      )}
+      {state.deadlineModule && (
+        <DeadlineModal
+          module={state.deadlineModule}
+          onClose={() => state.setDeadlineModule(null)}
+          startCreating={true}
+        />
+      )}
     </>
   );
 }

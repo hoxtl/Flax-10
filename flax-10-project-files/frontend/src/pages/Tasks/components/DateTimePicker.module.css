@@ -1,11 +1,9 @@
-/* ── Wrapper ──────────────────────────────────────────────── */
 .wrap {
   position: relative;
   display: inline-block;
   width: 100%;
 }
 
-/* ── Trigger button ──────────────────────────────────────── */
 .trigger {
   width: 100%;
   display: flex;
@@ -55,7 +53,6 @@
   }
   .clearBtn:hover { background: var(--hover); color: var(--text); }
   
-  /* ── Dropdown ─────────────────────────────────────────────── */
   .dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -74,7 +71,6 @@
     to   { opacity:1; transform:translateY(0) scale(1) }
   }
   
-  /* ── Calendar header ─────────────────────────────────────── */
   .calHeader {
     display: flex;
     align-items: center;
@@ -103,7 +99,6 @@
   }
   .navBtn:hover { background: var(--hover); color: var(--text); }
   
-  /* ── Calendar grid ─────────────────────────────────────────── */
   .calGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -147,7 +142,6 @@
     border: 1px solid var(--primary);
   }
   
-  /* ── Time picker row ──────────────────────────────────────── */
   .timePicker {
     display: flex;
     align-items: center;

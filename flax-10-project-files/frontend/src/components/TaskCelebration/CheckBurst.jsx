@@ -1,7 +1,6 @@
 import styles from "./CheckBurst.module.css";
 
 /**
- * Renders a burst of green/gold particles for 0.5s when `active` is true.
  * Wrap around a checkbox; particles burst outward from center.
  */
 export function CheckBurst({ active, children, className = "" }) {

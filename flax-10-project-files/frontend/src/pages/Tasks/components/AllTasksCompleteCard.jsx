@@ -1,16 +1,9 @@
-/**
- * Shared "all tasks complete" / day complete card.
- * Used on the Tasks page (clear state) and Homepage TODAY'S TASKS slot.
- * Pair with getClearMessage() / getClearCtaLabel() from lib/allTasksCompleteMessages.
- */
-
 import styles from "./AllTasksCompleteCard.module.css";
 
 export default function AllTasksCompleteCard({
   emoji = "🎉",
   message,
   sub,
-  /** CTA: either a React node (e.g. Link) or use ctaLabel + onCtaClick for a button */
   children,
   ctaLabel,
   onCtaClick,
