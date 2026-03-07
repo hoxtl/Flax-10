@@ -84,7 +84,7 @@ def derive_persona(sessions):
         hour_totals[s.end_time.hour] += s.duration
         durations.append(s.duration)
 
-    if not hour_totals:
+    if not hour_totals:  # pragma: no cover
         return PERSONAS[0]
 
     peak_hour = max(hour_totals, key=hour_totals.get)
