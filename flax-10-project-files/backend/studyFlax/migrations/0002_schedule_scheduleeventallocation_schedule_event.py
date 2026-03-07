@@ -45,4 +45,15 @@ class Migration(migrations.Migration):
             name='event',
             field=models.ManyToManyField(blank=True, related_name='schedules', through='studyFlax.ScheduleEventAllocation', to='studyFlax.calendarevent'),
         ),
+        migrations.AlterField(
+            model_name='scheduleeventallocation',
+            name='deadline',
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='event_allocations',
+                to='studyFlax.deadline',
+            ),
+        ),
     ]
