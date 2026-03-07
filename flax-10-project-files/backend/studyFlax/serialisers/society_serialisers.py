@@ -28,7 +28,7 @@ class SocietyMembershipSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = SocietyMembership
-        fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin']
+        fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin', 'is_subscribed']
 
 
 class SocietyListSerialiser(serializers.ModelSerializer):
