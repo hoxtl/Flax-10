@@ -62,40 +62,6 @@
     background-color: var(--hover);
 }
 
-.userInfo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--pill-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: var(--text);
-    text-transform: uppercase;
-}
-
-.userNameDetails {
-    display: flex;
-    flex-direction: column;
-}
-
-.userFullName {
-    font-weight: 500;
-    color: var(--text);
-}
-
-.userHandle {
-    font-size: 0.85rem;
-    color: var(--muted);
-}
-
 .shareButton {
     padding: 0.5rem 1rem;
     border-radius: 8px;
