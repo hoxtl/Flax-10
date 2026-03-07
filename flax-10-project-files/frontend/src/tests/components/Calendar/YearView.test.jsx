@@ -28,7 +28,8 @@ vi.mock('../../../context/TagContext', async () => {
             tags: [
                 { id: 'tag1', color: '#ff0000', label: 'Work' }
             ],
-            getTag: (id) => ({ id, color: '#ff0000', label: 'Work' })
+            getTag: (id) => ({ id, color: '#ff0000', label: 'Work' }),
+            getTagByName: (name) => ({ name, color: '#ff0000', icon: '📚' })
         })
     };
 });

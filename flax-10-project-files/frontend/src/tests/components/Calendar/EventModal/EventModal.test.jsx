@@ -117,10 +117,11 @@ describe('EventModal', () => {
     });
 
     it('should render delete button only when editing', () => {
+        const mockOnDelete = vi.fn();
         mockFormLogic.isEditing = true;
-        renderModal();
+        render(<TagProvider><EventModal onClose={mockOnClose} onDelete={mockOnDelete} /></TagProvider>);
         expect(screen.getByText('Delete')).toBeInTheDocument();
         fireEvent.click(screen.getByText('Delete'));
-        expect(mockFormLogic.handleDelete).toHaveBeenCalled();
+        expect(mockOnDelete).toHaveBeenCalled();
     });
 });

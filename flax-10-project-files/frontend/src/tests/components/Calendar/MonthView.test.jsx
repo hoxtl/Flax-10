@@ -10,7 +10,8 @@ vi.mock('../../../context/TagContext', async () => {
         TagProvider: ({ children }) => <div>{children}</div>,
         useTags: () => ({
             tags: [],
-            getTag: (id) => ({ id, color: '#3b82f6', label: 'Work' })
+            getTag: (id) => ({ id, color: '#3b82f6', label: 'Work' }),
+            getTagByName: (name) => ({ name, color: '#3b82f6', icon: '📚' })
         })
     };
 });
@@ -61,7 +62,7 @@ describe('MonthView', () => {
         vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue(state);
         render(
             <TagProvider>
-                <MonthView />
+                <MonthView onEventClick={mockOpenModal} onDateSelect={(day) => mockDispatch({ type: "SET_SELECTED_DATE", payload: day })} />
             </TagProvider>
         );
     };
@@ -118,7 +119,8 @@ describe('MonthView', () => {
         const eventEl = screen.getByText('Event 1');
         fireEvent.click(eventEl);
         expect(mockOpenModal).toHaveBeenCalledWith(
-            expect.objectContaining({ id: 1, title: 'Event 1' })
+            expect.objectContaining({ id: 1, title: 'Event 1' }),
+            expect.anything()
         );
     });
 
