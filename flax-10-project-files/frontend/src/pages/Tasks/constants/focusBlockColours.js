@@ -3,7 +3,7 @@
  * Used in CreateListModal palette, list sidebar, and task modals.
  * 21 colours = 3 rows × 7 for a full grid.
  */
-export const FOCUS_BLOCK_COLOURS = [
+const FOCUS_BLOCK_COLOURS = [
   "#6F89B8", // muted blue
   "#8B79B5", // muted violet
   "#B46F6F", // muted red

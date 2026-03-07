@@ -11,7 +11,7 @@ import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
 
-import styles from "./TaskFeed.module.css";
+import styles from "./TaskFeedSections.module.css";
 
 const SECTION_SHOW_LIMIT = 8;
 
@@ -37,6 +37,25 @@ function ProgressRing({ progressPct, isOverdue }) {
   );
 }
 
+function SectionStatsChip({ totalInGroup, progressPct, isOverdue, collapsed, tasks, completedCount, onToggle }) {
+  return (
+    <span className={styles.sectionStatsChip}>
+      <span className={styles.sectionCountWrap}>
+        {totalInGroup > 0 && <ProgressRing progressPct={progressPct} isOverdue={isOverdue} />}
+        <span className={styles.sectionCountPill} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
+        {completedCount > 0 && (
+          <span className={`${styles.sectionCountDone} ${collapsed ? styles.sectionCountDoneMuted : ""}`}>· {completedCount} done</span>
+        )}
+      </span>
+      <span className={styles.sectionChevronBtn} aria-hidden>
+        <motion.span className={styles.sectionChevron} animate={{ rotate: collapsed ? -90 : 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+          <ChevronDown size={16} />
+        </motion.span>
+      </span>
+    </span>
+  );
+}
+
 function SectionHeader({ title, emoji, isOverdue, collapsed, tasks, completedCount, totalInGroup, progressPct, onToggle }) {
   return (
     <button
@@ -47,20 +66,7 @@ function SectionHeader({ title, emoji, isOverdue, collapsed, tasks, completedCou
     >
       <span className={styles.sectionIcon}>{emoji}</span>
       <span className={styles.sectionTitle}>{title}</span>
-      <span className={styles.sectionStatsChip}>
-        <span className={styles.sectionCountWrap}>
-          {totalInGroup > 0 && <ProgressRing progressPct={progressPct} isOverdue={isOverdue} />}
-          <span className={styles.sectionCountPill} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
-          {completedCount > 0 && (
-            <span className={`${styles.sectionCountDone} ${collapsed ? styles.sectionCountDoneMuted : ""}`}>· {completedCount} done</span>
-          )}
-        </span>
-        <span className={styles.sectionChevronBtn} aria-hidden>
-          <motion.span className={styles.sectionChevron} animate={{ rotate: collapsed ? -90 : 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-            <ChevronDown size={16} />
-          </motion.span>
-        </span>
-      </span>
+      <SectionStatsChip totalInGroup={totalInGroup} progressPct={progressPct} isOverdue={isOverdue} collapsed={collapsed} tasks={tasks} completedCount={completedCount} onToggle={onToggle} />
     </button>
   );
 }
@@ -116,47 +122,36 @@ function SectionBody({ tasks: visibleTasks, showAll, applyLimit, hiddenCount, em
   );
 }
 
+function useTaskSectionState(props) {
+  const [collapsed, setCollapsed] = useState(props.defaultCollapsed);
+  const [showAll, setShowAll] = useState(false);
+  const sorted = useMemo(() => sortTasks(props.tasks, props.sortBy, props.listMap), [props.tasks, props.sortBy, props.listMap]);
+  const totalInGroup = props.tasks.length + props.completedCount;
+  const progressPct = totalInGroup > 0 ? Math.round((props.completedCount / totalInGroup) * 100) : 0;
+  const visibleTasks = props.applyLimit && !showAll ? sorted.slice(0, SECTION_SHOW_LIMIT) : sorted;
+  const hiddenCount = props.applyLimit ? Math.max(0, sorted.length - SECTION_SHOW_LIMIT) : 0;
+  const isEmpty = props.tasks.length === 0;
+  const showEmptyState = isEmpty && (props.emptyMessage != null || props.emptyCardProps != null);
+  const emptyState = showEmptyState ? <SectionEmptyState sectionType={props.sectionType} emptyMessage={props.emptyMessage} emptySub={props.emptySub} emptyCardProps={props.emptyCardProps} /> : null;
+  const sectionTaskRowProps = { listMap: props.listMap, lists: props.lists, onToggleComplete: props.onToggleComplete, onDeleteTask: props.onDeleteTask, onEditTask: props.onEditTask, hideDueBadge: props.hideDueBadge, hideListBadge: props.hideListBadge, isOverdueSection: props.isOverdueSection, searchQuery: props.searchQuery, onToggleShowAll: () => setShowAll((v) => !v) };
+  return { collapsed, setCollapsed, showAll, totalInGroup, progressPct, visibleTasks, hiddenCount, isEmpty, showEmptyState, emptyState, sectionTaskRowProps };
+}
+
 /**
  * A collapsible group of tasks with a title, emoji, progress ring, and optional empty state.
- *
- * @param {object} props
  */
-export default function TaskSection({
-  title, emoji, tasks, sortBy, listMap, lists,
-  onToggleComplete, onDeleteTask, onEditTask,
-  defaultCollapsed = false, hideDueBadge = false,
-  isOverdueSection = false, hideListBadge = false,
-  completedCount = 0, sectionType = "default",
-  applyLimit = false, searchQuery = "",
-  emptyMessage = null, emptySub = null, emptyCardProps = null,
-}) {
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
-  const [showAll,   setShowAll]   = useState(false);
-  const sorted = useMemo(() => sortTasks(tasks, sortBy, listMap), [tasks, sortBy, listMap]);
-
-  const totalInGroup = tasks.length + completedCount;
-  const progressPct  = totalInGroup > 0 ? Math.round((completedCount / totalInGroup) * 100) : 0;
-  const visibleTasks = applyLimit && !showAll ? sorted.slice(0, SECTION_SHOW_LIMIT) : sorted;
-  const hiddenCount  = applyLimit ? Math.max(0, sorted.length - SECTION_SHOW_LIMIT) : 0;
-
-  const isEmpty        = tasks.length === 0;
-  const showEmptyState = isEmpty && (emptyMessage != null || emptyCardProps != null);
-  if (isEmpty && !showEmptyState && completedCount === 0) return null;
-
-  const accentCls = isOverdueSection ? styles.sectionAccentDanger : "";
-  const emptyState = showEmptyState
-    ? <SectionEmptyState sectionType={sectionType} emptyMessage={emptyMessage} emptySub={emptySub} emptyCardProps={emptyCardProps} />
-    : null;
-
+export default function TaskSection(props) {
+  const state = useTaskSectionState(props);
+  if (state.isEmpty && !state.showEmptyState && props.completedCount === 0) return null;
+  const accentCls = props.isOverdueSection ? styles.sectionAccentDanger : "";
   return (
-    <div className={`${styles.section} ${accentCls} ${isOverdueSection ? styles.sectionOverdue : ""}`}>
-      <SectionHeader title={title} emoji={emoji} isOverdue={isOverdueSection} collapsed={collapsed} tasks={tasks} completedCount={completedCount} totalInGroup={totalInGroup} progressPct={progressPct} onToggle={() => setCollapsed(c => !c)} />
+    <div className={`${styles.section} ${accentCls} ${props.isOverdueSection ? styles.sectionOverdue : ""}`}>
+      <SectionHeader title={props.title} emoji={props.emoji} isOverdue={props.isOverdueSection} collapsed={state.collapsed} tasks={props.tasks} completedCount={props.completedCount} totalInGroup={state.totalInGroup} progressPct={state.progressPct} onToggle={() => state.setCollapsed((c) => !c)} />
       <AnimatePresence initial={false}>
-        {!collapsed && (
+        {!state.collapsed && (
           <motion.div key="section-body" {...SECTION_BODY_ANIM} style={{ overflow: "hidden" }}>
             <div className={styles.sectionBody}>
-              <SectionBody tasks={visibleTasks} showAll={showAll} applyLimit={applyLimit} hiddenCount={hiddenCount} emptyState={emptyState}
-                sectionTaskRowProps={{ listMap, lists, onToggleComplete, onDeleteTask, onEditTask, hideDueBadge, hideListBadge, isOverdueSection, searchQuery, onToggleShowAll: () => setShowAll(v => !v) }} />
+              <SectionBody tasks={state.visibleTasks} showAll={state.showAll} applyLimit={props.applyLimit} hiddenCount={state.hiddenCount} emptyState={state.emptyState} sectionTaskRowProps={state.sectionTaskRowProps} />
             </div>
           </motion.div>
         )}
