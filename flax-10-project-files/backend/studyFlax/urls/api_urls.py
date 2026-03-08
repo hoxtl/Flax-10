@@ -40,6 +40,8 @@ from studyFlax.views.authentication.logout_view import logout_view
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
 from studyFlax.views.settings.user_settings_view import user_settings_view
 
+from studyFlax.views.modules.reading_views import (reading_list, reading_detail, load_task)
+
 # Tasks
 from studyFlax.views.tasks.task_views import (
     task_list_list, task_list_detail, task_list, task_detail, log_task_time
@@ -101,14 +103,17 @@ urlpatterns = [
     path("timetable/import/", timetable_import, name="timetable-import"),
 
     # Modules
-    path("modules/", module_list, name="module_list"),
-    path("modules/<int:module_id>/", module_detail, name="module_detail"),
-    path("enrollments/", enrollment_list, name="enrollment_list"),
-    path("enrollments/<int:enrollment_id>/", enrollment_detail, name="enrollment_detail"),
+    path("modules/", module_list, name="module-list"),
+    path("modules/<int:module_id>/", module_detail, name="module-detail"),
+    path("enrollments/", enrollment_list, name="enrollment-list"),
+    path("enrollments/<int:enrollment_id>/", enrollment_detail, name="enrollment-detail"),
     path("auth/register/", register_view, name='auth-register'),
     path("auth/login/", login_view, name='auth-login'),
     path("auth/logout/", logout_view, name='auth-logout'),
     path("timetable/import/", timetable_import, name="timetable-import"),
+    path("modules/<int:module_id>/readings/", reading_list, name="reading-list"),
+    path("modules/<int:module_id>/readings/<int:reading_id>/", reading_detail, name="reading-detail"),
+    path("readings/<int:reading_id>/load-task/", load_task, name="reading-load-task"),
 
     # Tasks
     path("tasks/", task_list, name="task-list"),
