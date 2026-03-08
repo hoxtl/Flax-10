@@ -106,23 +106,23 @@ describe('TagContext', () => {
 
     it('should handle API errors gracefully', async () => {
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-        TagApi.getTags.mockRejectedValue(new Error('Fetch failed'));
+        TagApi.getTags.mockRejectedValueOnce(new Error('Fetch failed'));
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
-        await waitFor(() => consoleSpy.mock.calls.length > 0 || true); // fetch error fires async on mount
+        await waitFor(() => consoleSpy.mock.calls.length > 0, { timeout: 2000 }).catch(() => {}); // fetch error fires async on mount
         // Create error
-        TagApi.createTag.mockRejectedValue(new Error('Create failed'));
+        TagApi.createTag.mockRejectedValueOnce(new Error('Create failed'));
         await act(async () => { screen.getByText('Add').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to create tag:', expect.any(Error));
         // Update error
-        TagApi.updateTag.mockRejectedValue(new Error('Update failed'));
+        TagApi.updateTag.mockRejectedValueOnce(new Error('Update failed'));
         await act(async () => { screen.getByText('Update').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to update tag:', expect.any(Error));
         // Delete error
-        TagApi.deleteTag.mockRejectedValue(new Error('Delete failed'));
+        TagApi.deleteTag.mockRejectedValueOnce(new Error('Delete failed'));
         await act(async () => { screen.getByText('Delete').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to delete tag:', expect.any(Error));
         consoleSpy.mockRestore();

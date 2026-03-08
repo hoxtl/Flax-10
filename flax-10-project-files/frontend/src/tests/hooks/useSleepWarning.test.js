@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSleepWarning, isDuringSleepWindow } from '../../components/Settings/useSleepWarning';
+import { vi, describe, it, expect } from 'vitest';
+import { useSleepWarning, isDuringSleepWindow } from '../../components/Settings/hooks/useSleepWarning';
 
 const makeDate = (h, m = 0) => { const d = new Date(); d.setHours(h, m, 0, 0); return d; };
 
@@ -21,7 +22,7 @@ describe('useSleepWarning', () => {
 
   it('runs action immediately when outside sleep window', () => {
     const { result } = renderHook(() => useSleepWarning(settings));
-    const action = jest.fn();
+    const action = vi.fn();
     act(() => { result.current.checkSleepAndRun(makeAwakeDate(), action); });
     expect(action).toHaveBeenCalledTimes(1);
     expect(result.current.sleepWarning).toBe(false);
@@ -29,7 +30,7 @@ describe('useSleepWarning', () => {
 
   it('shows warning and does NOT run action during sleep window', () => {
     const { result } = renderHook(() => useSleepWarning(settings));
-    const action = jest.fn();
+    const action = vi.fn();
     act(() => { result.current.checkSleepAndRun(makeSleepDate(), action); });
     expect(action).not.toHaveBeenCalled();
     expect(result.current.sleepWarning).toBe(true);
@@ -37,7 +38,7 @@ describe('useSleepWarning', () => {
 
   it('runs action after confirm', () => {
     const { result } = renderHook(() => useSleepWarning(settings));
-    const action = jest.fn();
+    const action = vi.fn();
     act(() => { result.current.checkSleepAndRun(makeSleepDate(), action); });
     act(() => { result.current.sleepWarningProps.onConfirm(); });
     expect(action).toHaveBeenCalledTimes(1);
@@ -46,7 +47,7 @@ describe('useSleepWarning', () => {
 
   it('dismisses without running action on cancel', () => {
     const { result } = renderHook(() => useSleepWarning(settings));
-    const action = jest.fn();
+    const action = vi.fn();
     act(() => { result.current.checkSleepAndRun(makeSleepDate(), action); });
     act(() => { result.current.sleepWarningProps.onCancel(); });
     expect(action).not.toHaveBeenCalled();
@@ -55,7 +56,7 @@ describe('useSleepWarning', () => {
 
   it('handles null settings with defaults', () => {
     const { result } = renderHook(() => useSleepWarning(null));
-    const action = jest.fn();
+    const action = vi.fn();
     act(() => { result.current.checkSleepAndRun(makeSleepDate(), action); });
     expect(result.current.sleepWarning).toBe(true);
   });

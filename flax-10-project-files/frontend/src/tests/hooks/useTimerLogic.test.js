@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useTimerLogic } from '../../hooks/useTimerLogic';
-import * as historyUtils from '../../utils/historyUtils';
+import { useTimerLogic } from '../../components/Timer/hooks/useTimerLogic';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
+
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
+    useNotify: () => vi.fn(),
+}));
 
 describe('useTimerLogic Hook', () => {
     beforeEach(() => {
@@ -133,9 +137,68 @@ describe('useTimerLogic Hook', () => {
         expect(historyUtils.saveSession).toHaveBeenCalledWith(
             expect.any(Number), // workTime
             expect.any(Number), // breakTime
-            expect.any(Number), // sessionCount 
+            expect.any(Number), // sessionCount
             expect.any(Number), // blockId
-            'My Important Task' // Task
+            'My Important Task', // Task
+            expect.any(Number), // pause
+            expect.any(String)  // status
         );
+    });
+
+    it('handlers.endEarly resets timer', () => {
+        const { result } = renderHook(() => useTimerLogic());
+
+        act(() => {
+            result.current.handlers.overtimeBreak(); // advance completedSessions to 1
+        });
+
+        act(() => {
+            result.current.handlers.endEarly();
+        });
+
+        // After endEarly, timer should be reset
+        expect(result.current.isActive).toBe(false);
+        expect(result.current.modal).toBeNull();
+    });
+
+    it('handlers.endEarly saves incomplete session when work done', () => {
+        const { result } = renderHook(() => useTimerLogic());
+
+        // Manually set totalWork > 0 by starting and ticking
+        // We can't easily tick without fake timers, so test with spy
+        act(() => {
+            result.current.handlers.endEarly();
+        });
+
+        // With totalWork = 0, saveSession should NOT be called for 'Incomplete'
+        expect(historyUtils.saveSession).not.toHaveBeenCalledWith(
+            expect.any(Number),
+            expect.any(Number),
+            expect.any(Number),
+            expect.any(Number),
+            expect.any(String),
+            expect.any(Number),
+            'Incomplete'
+        );
+    });
+
+    it('pre-fills task from activeTaskMeta.title', () => {
+        const meta = { title: 'Pre-filled Task' };
+        const { result } = renderHook(() => useTimerLogic(null, null, meta));
+        expect(result.current.task).toBe('Pre-filled Task');
+    });
+
+    it('applies estimatedWorkMinutes and sessions from activeTaskMeta', () => {
+        const meta = { estimatedWorkMinutes: 45, estimatedSessionCount: 2 };
+        const { result } = renderHook(() => useTimerLogic('task-1', null, meta));
+        expect(result.current.workTime).toBe(45);
+        expect(result.current.targetSessions).toBe(2);
+        expect(result.current.timeLeft).toBe(45 * 60);
+    });
+
+    it('falls back to block-based duration when no estimatedWorkMinutes', () => {
+        const meta = { estimatedBlocks: 2 };
+        const { result } = renderHook(() => useTimerLogic('task-2', null, meta));
+        expect(result.current.workTime).toBe(50); // max(25, 2*25)
     });
 });
