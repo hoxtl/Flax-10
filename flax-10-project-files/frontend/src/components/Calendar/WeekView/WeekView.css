@@ -106,6 +106,12 @@
   border-bottom: 1px solid var(--border) !important;
   box-sizing: border-box;
   position: relative;
+  background-image: none;
+  flex-shrink: 0;
+}
+
+/* Show sub-grid lines only during drag/resize interactions */
+.week-view.show-grid-lines .hour-cell {
   background-image: linear-gradient(
     to bottom,
     transparent 24%,
@@ -121,7 +127,6 @@
     var(--hover) 76%,
     transparent 77%
   );
-  flex-shrink: 0;
 }
 
 .hour-cell.drop-target {

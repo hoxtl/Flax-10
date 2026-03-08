@@ -57,6 +57,11 @@
     border-bottom: 1px solid var(--border);
     box-sizing: border-box;
     position: relative;
+    background-image: none;
+}
+
+/* Show sub-grid lines only during drag/resize interactions */
+.day-view.show-grid-lines .time-slot {
     background-image: linear-gradient(to bottom,
             transparent 24%,
             var(--hover) 25%,
