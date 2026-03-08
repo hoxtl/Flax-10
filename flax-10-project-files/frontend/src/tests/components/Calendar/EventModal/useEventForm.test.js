@@ -30,6 +30,14 @@ vi.mock('../../../../components/Calendar/utils/formUtils', () => ({
     confirmDelete: vi.fn(), // kept for import compatibility
 }));
 
+vi.mock('../../../../context/ConfirmContext', () => ({
+    useConfirm: () => vi.fn(),
+}));
+
+vi.mock('../../../../api/userService', () => ({
+    getUserSettings: vi.fn().mockResolvedValue({}),
+}));
+
 describe('useEventForm', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -76,17 +84,17 @@ describe('useEventForm', () => {
             mockActions,
             onClose,
             expect.any(Function), // setError
-            expect.any(Function), // setOverlapWarning
+            expect.any(Function), // confirmFn
             mockEvents,
             false // forceSave
         );
     });
 
-    it('should expose handleConfirmSave and handleCancelSave', () => {
+    it('should expose handleConfirmSleep and handleCancelSleep', () => {
         const onClose = vi.fn();
         const event = { id: 1 };
         const { result } = renderHook(() => useEventForm(event, onClose));
-        expect(typeof result.current.handleConfirmSave).toBe('function');
-        expect(typeof result.current.handleCancelSave).toBe('function');
+        expect(typeof result.current.handleConfirmSleep).toBe('function');
+        expect(typeof result.current.handleCancelSleep).toBe('function');
     });
 });
