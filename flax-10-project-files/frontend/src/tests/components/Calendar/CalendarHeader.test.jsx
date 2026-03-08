@@ -131,7 +131,7 @@ describe('CalendarHeader', () => {
         fireEvent.click(importBtn);
         const urlInput = await screen.findByDisplayValue('');
         fireEvent.change(urlInput, { target: { value: 'http://example.com/calendar.ics' } });
-        const submitBtn = screen.getByText('Import');
+        const submitBtn = document.querySelector('button[type="submit"]');
         fireEvent.click(submitBtn);
         await waitFor(() => expect(importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics'));
     });
@@ -206,5 +206,14 @@ describe('CalendarHeader', () => {
         const callArgs = mockDispatch.mock.calls[0][0];
         // Jan 15 - 1 = Jan 14
         expect(callArgs.payload.getDate()).toBe(14);
+    });
+
+    it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view', () => {
+        setup({ ...defaultState, viewMode: 'day' });
+        const dateCards = document.querySelectorAll('.date-card');
+        expect(dateCards.length).toBeGreaterThan(0);
+        fireEvent.click(dateCards[0]);
+        expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_SELECTED_DATE' }));
+        expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
     });
 });
