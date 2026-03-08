@@ -18,20 +18,20 @@ class ReadingSerialiser(serializers.ModelSerializer):
         ]
         read_only_fields=['module', 'created_at']
 
-        def validate(self, validated_data):
-            if not self.context['request'].user.is_teacher():
-                raise serializers.ValidationError("Only teachers are allowed to manage readings.")
-            start = validated_data.get('start_page')
-            end = validated_data.get('end_page')
-            if end and end < start:
-                raise serializers.ValidationError("End page must be after start page")
-            return validated_data
+    def validate(self, validated_data):
+        if not self.context['request'].user.is_teacher():
+            raise serializers.ValidationError("Only teachers are allowed to manage readings.")
+        start = validated_data.get('start_page')
+        end = validated_data.get('end_page')
+        if end and end < start:
+            raise serializers.ValidationError("End page must be after start page")
+        return validated_data
 
-        def get_page_count(self,obj):
-            return obj.page_count()
-        
-        def get_duration_minutes(self, obj):
-            return estimated_time_reading(obj, self.context['request'].user)
+    def get_page_count(self,obj):
+        return obj.page_count()
+    
+    def get_duration_minutes(self, obj):
+        return estimated_time_reading(obj, self.context['request'].user)
 
 class ReadingSummarySerialiser(serializers.ModelSerializer):
     page_count = serializers.SerializerMethodField()
