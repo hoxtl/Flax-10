@@ -1,21 +1,29 @@
-/* Main Calendar Header - Clean, borderless design */
+/* Main Calendar Header - Clean design with bottom border */
 .calendar-header {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 12px 0;
     margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.calendar-header > *:first-child {
+    flex: 1;
+    min-width: 0;
 }
 
 .header-center {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     justify-content: center;
 }
 
 .header-actions {
+    flex: 1;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
 }
 
@@ -50,22 +58,22 @@
     background: var(--panel);
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm, 0 1px 3px var(--shadow-color, rgba(0, 0, 0, 0.08)));
 }
 
 .date-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md, 0 4px 12px var(--shadow-color, rgba(0, 0, 0, 0.12)));
 }
 
 .date-card.active {
     background: var(--primary);
-    color: white;
+    color: var(--c-white);
 }
 
 .date-card.active .day-name,
 .date-card.active .day-number {
-    color: white;
+    color: var(--c-white);
 }
 
 .day-name {

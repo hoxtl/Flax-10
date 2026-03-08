@@ -3,37 +3,62 @@
 .nav {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
-.arrowBtn {
+/* Shared 32×32 icon button base */
+.arrowBtn,
+.actionBtn,
+.settingsBtn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: transparent;
     border-radius: 6px;
     cursor: pointer;
     color: var(--text);
     transition: all 0.15s;
 }
 
-.arrowBtn:hover {
+:root[data-theme="dark"] .arrowBtn,
+:root[data-theme="dark"] .actionBtn,
+:root[data-theme="dark"] .settingsBtn {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.arrowBtn svg,
+.actionBtn svg,
+.settingsBtn svg {
+    stroke: currentColor;
+    fill: none;
+    width: 18px;
+    height: 18px;
+}
+
+.arrowBtn:hover,
+.actionBtn:hover,
+.settingsBtn:hover {
     background: var(--hover);
 }
 
 .todayBtn {
     padding: 6px 12px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: transparent;
     border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     color: var(--text);
     transition: all 0.15s;
+}
+
+:root[data-theme="dark"] .todayBtn {
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .todayBtn:hover {
@@ -42,64 +67,16 @@
 
 .title {
     margin: 0;
-    font-size: 1.1rem;
+    margin-left: 8px;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--text);
     white-space: nowrap;
 }
 
-/* Segmented View Switcher */
-.viewSwitcher {
-    display: flex;
-    background: var(--pill-bg);
-    border-radius: 8px;
-    padding: 3px;
-    gap: 2px;
-}
-
-.viewBtn {
-    padding: 6px 14px;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--muted);
-    transition: all 0.15s;
-}
-
-.viewBtn:hover {
-    color: var(--text);
-}
-
-.viewBtn.active {
-    background: var(--bg);
-    color: var(--text);
-    box-shadow: var(--shadow-sm, 0 1px 3px var(--shadow-color, rgba(0, 0, 0, 0.1)));
-}
-
 /* Action Menu */
 .actionMenu {
     position: relative;
-}
-
-.actionBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: var(--primary);
-    border-radius: 6px;
-    cursor: pointer;
-    color: var(--c-white);
-    transition: all 0.15s;
-}
-
-.actionBtn:hover {
-    filter: brightness(0.95);
 }
 
 .dropdown {
@@ -129,24 +106,4 @@
 
 .dropdownItem:hover {
     background: var(--hover);
-}
-
-/* Settings Button */
-.settingsBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    border-radius: 6px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: all 0.15s;
-}
-
-.settingsBtn:hover {
-    background: var(--hover);
-    color: var(--text);
 }

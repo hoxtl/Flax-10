@@ -4,7 +4,7 @@ import { addDays, formatDate, getWeekDays, formatMonthYear, isSameDay, getStartO
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, CalendarTitle, ViewSwitcher, ActionMenu, ViewSettingsButton } from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsButton } from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import "./CalendarHeader.css";
 
@@ -59,8 +59,8 @@ export function CalendarHeader() {
 function DesktopHeader({ selectedDate, viewMode, modes, showToday, onPrev, onNext, onToday, onDatePick, onViewChange, onAddEvent, onImport }) {
     return (
         <header className="calendar-header">
-            <CalendarNav onPrev={onPrev} onNext={onNext} onToday={onToday} showToday={showToday} selectedDate={selectedDate} onDatePick={onDatePick} />
-            <CalendarTitle>{getTitle(selectedDate, viewMode)}</CalendarTitle>
+            <CalendarNav onPrev={onPrev} onNext={onNext} onToday={onToday} showToday={showToday}
+                selectedDate={selectedDate} onDatePick={onDatePick} title={getTitle(selectedDate, viewMode)} />
             <div className="header-center"><ViewSwitcher modes={modes} activeMode={viewMode} onChange={onViewChange} /></div>
             <div className="header-actions">
                 <ActionMenu onAddEvent={onAddEvent} onImport={onImport} />
@@ -105,15 +105,8 @@ function navigateDate(dispatch, selectedDate, viewMode, dir) {
 
 function getTitle(selectedDate, viewMode) {
     if (viewMode === "day") return formatDate(selectedDate);
-    if (viewMode === "month") return formatMonthYear(selectedDate);
     if (viewMode === "year") return selectedDate.getFullYear().toString();
-    return getWeekTitle(selectedDate);
-}
-
-function getWeekTitle(selectedDate) {
-    const week = getWeekDays(selectedDate);
-    const fmt = { month: "short", day: "numeric" };
-    return `${week[0].toLocaleDateString([], fmt)} – ${week[6].toLocaleDateString([], fmt)}`;
+    return formatMonthYear(selectedDate);
 }
 
 function isTodayVisible(viewMode, date) {

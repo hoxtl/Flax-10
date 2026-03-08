@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Settings2, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings2, Plus } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
+import { SegmentedControl } from '../../ui/SegmentedControl';
 import styles from './CalendarHeaderUtils.module.css';
 
-export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick }) {
+export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) {
     return (
         <div className={styles.nav}>
             <NavArrow direction="left" onClick={onPrev} />
-            <NavArrow direction="right" onClick={onNext} />
             {showToday && <button className={styles.todayBtn} onClick={onToday}>Today</button>}
+            <NavArrow direction="right" onClick={onNext} />
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
+            {title && <h2 className={styles.title}>{title}</h2>}
         </div>
     );
 }
@@ -19,19 +21,8 @@ function NavArrow({ direction, onClick }) {
     return <button className={styles.arrowBtn} onClick={onClick}><Icon size={18} /></button>;
 }
 
-export function CalendarTitle({ children }) {
-    return <h2 className={styles.title}>{children}</h2>;
-}
-
 export function ViewSwitcher({ modes, activeMode, onChange }) {
-    return (
-        <div className={styles.viewSwitcher}>
-            {modes.map(mode => (
-                <button key={mode.value} className={`${styles.viewBtn} ${activeMode === mode.value ? styles.active : ''}`}
-                    onClick={() => onChange(mode.value)}>{mode.label}</button>
-            ))}
-        </div>
-    );
+    return <SegmentedControl options={modes} value={activeMode} onChange={onChange} />;
 }
 
 export function ActionMenu({ onAddEvent, onImport }) {

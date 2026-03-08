@@ -19,7 +19,7 @@
   z-index: 10;
   display: flex;
   border-bottom: 2px solid var(--border);
-  background-color: var(--panel);
+  background-color: var(--bg);
   flex-shrink: 0;
 }
 
@@ -113,21 +113,19 @@
 /* Show sub-grid lines only during drag/resize interactions */
 .week-view:has(.draggable-event.dragging) .hour-cell,
 .week-view:has(.draggable-event.resizing) .hour-cell {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 24%,
-    var(--hover) 25%,
-    var(--hover) 26%,
-    transparent 27%,
-    transparent 49%,
-    var(--active) 50%,
-    var(--active) 51%,
-    transparent 52%,
-    transparent 74%,
-    var(--hover) 75%,
-    var(--hover) 76%,
-    transparent 77%
-  );
+  background-image: linear-gradient(to bottom,
+      transparent 24%,
+      var(--hover) 25%,
+      var(--hover) 26%,
+      transparent 27%,
+      transparent 49%,
+      var(--active) 50%,
+      var(--active) 51%,
+      transparent 52%,
+      transparent 74%,
+      var(--hover) 75%,
+      var(--hover) 76%,
+      transparent 77%);
 }
 
 .hour-cell.drop-target {
@@ -154,7 +152,7 @@
   pointer-events: none;
 }
 
-.column-events > * {
+.column-events>* {
   pointer-events: auto;
 }
 
