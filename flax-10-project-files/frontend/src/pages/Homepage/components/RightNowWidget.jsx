@@ -87,12 +87,25 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const eventTitle = nextEvent.title || "your next event";
+  const eventTime = new Date(nextEvent.start_time).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const displayLine = lineName.toLowerCase().includes("line") || lineName.toLowerCase().includes("overground") || lineName.toLowerCase().includes("dlr")
+    ? lineName
+    : `${lineName} line`;
+
   if (nowMs >= leaveByMs) {
     return {
       urgency: "critical",
-      lineName,
-      severity,
-      message: `${lineName} Line: ${severity} — leave now for ${nextEvent.title}`,
+      message: (
+        <>
+          <strong>{displayLine}</strong> delays mean you’ll be <strong>late</strong> for your <strong>{eventTime}</strong>. Leave <strong>now</strong>!
+        </>
+      ),
       leaveByStr,
       hasSevere,
     };
@@ -100,18 +113,22 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
   if (minsUntilLeave <= 15) {
     return {
       urgency: "urgent",
-      lineName,
-      severity,
-      message: `${lineName} Line: ${severity} — leave in ${minsUntilLeave}m for ${nextEvent.title}`,
+      message: (
+        <>
+          <strong>{displayLine}</strong> {severity.toLowerCase()} — leave in <strong>{minsUntilLeave}m</strong> to make it for <strong>{eventTime}</strong>.
+        </>
+      ),
       leaveByStr,
       hasSevere,
     };
   }
   return {
     urgency: "info",
-    lineName,
-    severity,
-    message: `${lineName} Line: ${severity} — leave by ${leaveByStr} for ${nextEvent.title}`,
+    message: (
+      <>
+        <strong>{displayLine}</strong> {severity.toLowerCase()}. Recommended leave by <strong>{leaveByStr}</strong> for your <strong>{eventTime}</strong>.
+      </>
+    ),
     leaveByStr,
     hasSevere,
   };
@@ -274,9 +291,9 @@ export function RightNowWidget({
   const currentProgressPct =
     currentBlock?.start_time && currentBlock?.end_time
       ? Math.min(100, Math.max(0,
-          ((nowMs - new Date(currentBlock.start_time).getTime()) /
-            (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
-        ))
+        ((nowMs - new Date(currentBlock.start_time).getTime()) /
+          (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
+      ))
       : null;
   const timeRangeStr =
     currentBlock?.start_time && currentBlock?.end_time
@@ -428,7 +445,7 @@ export function RightNowWidget({
           <div className={styles.nextBlock}>
             <span className={styles.nextTitle}>{nextEvent.title}</span>
             <span className={styles.nextMeta}>
-              at {formatTime(nextEvent.start_time)}
+              at <strong>{formatTime(nextEvent.start_time)}</strong>
               {countdown.text ? ` · ${countdown.text}` : ""}
             </span>
           </div>
