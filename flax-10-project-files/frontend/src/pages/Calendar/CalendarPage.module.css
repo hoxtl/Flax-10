@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background-color: #f6f4f1;
+  background-color: var(--bg);
 }
 
 .filters {
@@ -23,7 +23,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: hidden;
-  background: white;
+  background: var(--calendar-bg);
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   display: flex;
@@ -33,8 +33,8 @@
 @media (max-width: 768px) {
   .filters {
     padding: 8px 12px;
-    background: #f6f4f1;
-    border-bottom: 1px solid #e8e3de;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
     -webkit-overflow-scrolling: touch;
   }
 }
