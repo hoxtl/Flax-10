@@ -133,10 +133,12 @@ function CreateTaskModalModuleRow({ form, set, sortedModules }) {
   if (sortedModules.length === 0) return null;
   const options = [{ value: "", label: "No module" }, ...sortedModules.map((m) => ({ value: String(m.id), label: `${m.module_code} – ${m.module_name || m.title || ""}` }))];
   return (
-    <div className={styles.row}>
-      <div className={styles.listWrap} style={{ width: "100%" }}>
-        <span className={styles.listWrapLabel}>Link to module</span>
-        <AnimatedDropdown value={form.module ? String(form.module) : ""} onChange={(val) => set("module", val)} placeholder="No module" options={options} />
+    <div className={styles.settingRow}>
+      <div className={styles.listWrap}>
+        <span className={styles.listWrapLabel}>Module</span>
+        <div className={styles.listDropdownTriggerWrap}>
+          <AnimatedDropdown value={form.module ? String(form.module) : ""} onChange={(val) => set("module", val)} placeholder="No module" options={options} menuMaxHeight={420} className={styles.listAnimatedDropdown} />
+        </div>
       </div>
     </div>
   );
@@ -160,9 +162,10 @@ function CreateTaskModalBody({ state, addToScheduleLabel }) {
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />
       <CreateTaskModalDateTime form={form} set={set} />
-      <CreateTaskModalDuration form={form} setForm={setForm} askFlaxInitialMessage={askFlaxInitialMessage} />
-      <CreateTaskModalCategoryPriority form={form} set={set} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
+      <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
+      <CreateTaskModalDuration form={form} setForm={setForm} askFlaxInitialMessage={askFlaxInitialMessage} />
+      <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>
   );

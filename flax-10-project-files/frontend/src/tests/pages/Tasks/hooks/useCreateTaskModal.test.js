@@ -6,10 +6,12 @@ vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
 }));
 
 vi.mock("../../../../api/userService", () => ({ getUserSettings: vi.fn() }));
+vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn(), getEnrollments: vi.fn() }));
 vi.mock("../../../../pages/Tasks/utils/createTaskModalUtils", () => ({ runCreateTaskSave: vi.fn() }));
 
 import { useCreateTaskModal } from "../../../../pages/Tasks/hooks/useCreateTaskModal";
 import { getUserSettings } from "../../../../api/userService";
+import { getModules, getEnrollments } from "../../../../api/moduleApi";
 import { runCreateTaskSave } from "../../../../pages/Tasks/utils/createTaskModalUtils";
 
 function makeProps(overrides = {}) {
@@ -32,6 +34,8 @@ describe("useCreateTaskModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getUserSettings.mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" });
+    getModules.mockResolvedValue([]);
+    getEnrollments.mockResolvedValue([]);
     runCreateTaskSave.mockResolvedValue(undefined);
   });
 
@@ -57,5 +61,16 @@ describe("useCreateTaskModal", () => {
     expect(runCreateTaskSave).toHaveBeenCalled();
     expect(props.onDeleteTask).toHaveBeenCalled();
     expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it("loads enrolled modules when modules prop is missing", async () => {
+    getModules.mockResolvedValue([
+      { id: 11, module_code: "KCL1", module_name: "Alpha" },
+      { id: 22, module_code: "KCL2", module_name: "Beta" },
+    ]);
+    getEnrollments.mockResolvedValue([{ id: 1, module: 22 }]);
+    const { result } = renderHook(() => useCreateTaskModal(makeProps({ modules: undefined })));
+    await waitFor(() => expect(getModules).toHaveBeenCalled());
+    await waitFor(() => expect(result.current.sortedModules.map((m) => m.id)).toEqual([22]));
   });
 });

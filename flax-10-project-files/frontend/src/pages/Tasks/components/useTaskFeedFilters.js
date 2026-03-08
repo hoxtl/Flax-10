@@ -58,8 +58,17 @@ function buildListItems(lists) {
 }
 
 function buildModuleItems(tasks) {
-  const codes = [...new Set((tasks || []).map(t => t.module_code).filter(Boolean))].sort();
-  return codes.map(c => ({ value: c, label: c }));
+  const byCode = new Map();
+  (tasks || []).forEach((t) => {
+    const code = String(t.module_code || "").trim();
+    if (!code) return;
+    const name = String(t.module_name || "").trim();
+    if (!byCode.has(code)) byCode.set(code, name);
+    else if (!byCode.get(code) && name) byCode.set(code, name);
+  });
+  return Array.from(byCode.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([code, name]) => ({ value: code, label: name ? `${code} — ${name}` : code }));
 }
 
 function filterByQuery(items, query) {

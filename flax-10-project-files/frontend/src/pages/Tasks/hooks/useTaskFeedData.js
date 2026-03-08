@@ -4,6 +4,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getModules } from "../../../api/moduleApi";
 import { getHeaderTitle } from "../utils/taskFeedUtils";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import {
@@ -18,6 +19,10 @@ import {
   getCompletedLaterCount,
   getFilterHandlers,
 } from "../utils/taskFeedDataUtils";
+
+function normalizeModuleCode(value) {
+  return String(value || "").trim().toUpperCase();
+}
 
 function useTaskFeedFilterState(filterListIds, onFilterByList) {
   const [search, setSearch] = useState("");
@@ -36,9 +41,24 @@ function useTaskFeedFilterState(filterListIds, onFilterByList) {
   return { search, setSearch, sortBy, setSortBy, filterModuleCodes, isFilterOpen, setIsFilterOpen, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, searchInputRef, filterRef, ...handlers, activeFilterCount };
 }
 
-function useTaskFeedFilterOptions(tasks, lists, filterQuery) {
+function useTaskFeedFilterOptions(tasks, lists, filterQuery, moduleNameMap) {
   const listItems = useMemo(() => (lists || []).map((l) => ({ value: String(l.id), label: l.name || "List" })), [lists]);
-  const moduleItems = useMemo(() => { const codes = [...new Set((tasks || []).map((t) => t.module_code).filter(Boolean))].sort(); return codes.map((c) => ({ value: c, label: c })); }, [tasks]);
+  const moduleItems = useMemo(() => {
+    const byCode = new Map();
+    (tasks || []).forEach((t) => {
+      const code = normalizeModuleCode(t.module_code);
+      if (!code) return;
+      const name = String(t.module_name || moduleNameMap[code] || "").trim();
+      if (!byCode.has(code)) byCode.set(code, name);
+      else if (!byCode.get(code) && name) byCode.set(code, name);
+    });
+    return Array.from(byCode.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([code, name]) => ({
+        value: code,
+        label: name ? `${code} — ${name}` : code,
+      }));
+  }, [tasks, moduleNameMap]);
   const visibleListItems = useMemo(() => { const q = filterQuery.trim().toLowerCase(); return !q ? listItems : listItems.filter((o) => o.label.toLowerCase().includes(q)); }, [listItems, filterQuery]);
   const moduleCodePrefix = (code = "") => code.match(/^[A-Za-z]+/)?.[0]?.toUpperCase() || "Other";
   const groupedVisibleModuleItems = useMemo(() => { const q = filterQuery.trim().toLowerCase(); const base = !q ? moduleItems : moduleItems.filter((o) => o.label.toLowerCase().includes(q)); return base.reduce((acc, item) => { const k = moduleCodePrefix(item.value); if (!acc[k]) acc[k] = []; acc[k].push(item); return acc; }, {}); }, [moduleItems, filterQuery]);
@@ -74,12 +94,34 @@ function useTaskFeedEffects(searchInputRef, filterRef, isFilterOpen, setIsFilter
   useEffect(() => { if (!isFilterOpen) return; const onDown = (e) => { if (filterRef.current && !filterRef.current.contains(e.target)) setIsFilterOpen(false); }; document.addEventListener("mousedown", onDown); return () => document.removeEventListener("mousedown", onDown); }, [isFilterOpen, filterRef, setIsFilterOpen]);
 }
 
+function useTaskFeedModuleNameMap() {
+  const [moduleNameMap, setModuleNameMap] = useState({});
+  useEffect(() => {
+    let cancelled = false;
+    getModules()
+      .then((modules) => {
+        if (cancelled) return;
+        const next = {};
+        (modules || []).forEach((m) => {
+          const code = normalizeModuleCode(m?.module_code);
+          const name = String(m?.module_name || m?.title || "").trim();
+          if (code && name) next[code] = name;
+        });
+        setModuleNameMap(next);
+      })
+      .catch(() => { if (!cancelled) setModuleNameMap({}); });
+    return () => { cancelled = true; };
+  }, []);
+  return moduleNameMap;
+}
+
 /** Derives task feed state and section data from tasks, lists, and filter options. */
 export default function useTaskFeedData(opts) {
   const { tasks, lists, activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
   const navigate = useNavigate();
   const filterState = useTaskFeedFilterState(filterListIds, onFilterByList);
-  const filterOptions = useTaskFeedFilterOptions(tasks, lists, filterState.filterQuery);
+  const moduleNameMap = useTaskFeedModuleNameMap();
+  const filterOptions = useTaskFeedFilterOptions(tasks, lists, filterState.filterQuery, moduleNameMap);
   const listMap = useTaskFeedListMap(lists);
   const tasksByModule = useMemo(() => { if (!filterState.filterModuleCodes?.length) return tasks; const set = new Set(filterState.filterModuleCodes.map(String)); return tasks.filter((t) => set.has(String(t.module_code || ""))); }, [tasks, filterState.filterModuleCodes]);
   const pending = tasksByModule.filter((t) => !t.completed);

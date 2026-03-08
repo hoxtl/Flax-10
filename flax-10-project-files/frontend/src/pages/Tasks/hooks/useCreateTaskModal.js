@@ -5,6 +5,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import { getUserSettings } from "../../../api/userService";
+import { getModules, getEnrollments } from "../../../api/moduleApi";
+import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { runCreateTaskSave } from "../utils/createTaskModalUtils";
 
@@ -28,7 +30,24 @@ function getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists)
 function useCreateTaskModalFormState(props) {
   const { lists, defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
   const sortedLists = useMemo(() => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
-  const sortedModules = useMemo(() => [...(modules || [])].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")), [modules]);
+  const [loadedModules, setLoadedModules] = useState([]);
+  useEffect(() => {
+    if ((modules || []).length > 0) return;
+    let cancelled = false;
+    Promise.all([getModules(), getEnrollments()])
+      .then(([moduleList, enrollments]) => {
+        if (cancelled) return;
+        const enrolled = (moduleList || []).filter((m) => isEnrolledIn(m.id, enrollments || []));
+        setLoadedModules(enrolled);
+      })
+      .catch(() => { if (!cancelled) setLoadedModules([]); });
+    return () => { cancelled = true; };
+  }, [modules]);
+  const availableModules = (modules || []).length > 0 ? modules : loadedModules;
+  const sortedModules = useMemo(
+    () => [...availableModules].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")),
+    [availableModules]
+  );
   const [form, setForm] = useState(() => getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists));
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
