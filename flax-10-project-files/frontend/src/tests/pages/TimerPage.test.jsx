@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as helpers from '../utils/timerTestHelpers';
-import * as historyUtils from '../../utils/historyUtils';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
 import { fireEvent, screen } from '@testing-library/react';
 
 vi.mock('../../components/Timer/TreeAnimation', () => ({

@@ -223,14 +223,19 @@ function DropdownContent({
  * @param {Function} props.setQuery - Setter for the search query.
  * @param {string} props.searchPlaceholder - Placeholder for the search input.
  * @param {string} props.emptyMessage - Message shown when no options match.
+ * @param {boolean} props.openUpward - Whether to open the menu upward.
+ * @param {number} props.menuMaxHeight - Max height for the menu.
  */
 function DropdownPanel({
   grouped, filteredOptions, value, onSelect,
-  searchable, query, setQuery, searchPlaceholder, emptyMessage,
+  searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight,
 }) {
+  const yOffset = openUpward ? 8 : -8;
+  const menuStyle = openUpward ? { bottom: '100%', top: 'auto', marginBottom: 4 } : {};
+  if (menuMaxHeight) menuStyle.maxHeight = menuMaxHeight;
   return (
-    <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }} className={styles.dropdownMenu}>
+    <motion.div initial={{ opacity: 0, y: yOffset }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: yOffset }} transition={{ duration: 0.18 }} className={styles.dropdownMenu} style={menuStyle}>
       <DropdownContent grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} />
     </motion.div>
@@ -250,13 +255,16 @@ function DropdownPanel({
  * @param {Function} props.setQuery - Setter for the search query.
  * @param {string} props.searchPlaceholder - Placeholder for the search input.
  * @param {string} props.emptyMessage - Message shown when no options match.
+ * @param {boolean} props.openUpward - Whether to open the menu upward.
+ * @param {number} props.menuMaxHeight - Max height for the menu.
  */
-function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, query, setQuery, searchPlaceholder, emptyMessage }) {
+function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight }) {
   const filteredOptions = searchable ? (grouped ? filterGrouped(options, query) : filterFlat(options, query)) : options;
   return (
     <AnimatePresence>
       {isOpen && <DropdownPanel grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
-        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} />}
+        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} />}
     </AnimatePresence>
   );
 }
@@ -294,6 +302,26 @@ function useDropdownState(options, grouped, placeholder, value, onChange) {
 }
 
 /**
+ * Determines whether the dropdown should open upward based on available viewport space.
+ * @param {React.RefObject} containerRef - Ref to the dropdown container element.
+ * @param {boolean} isOpen - Whether the dropdown is currently open.
+ * @param {number} menuMaxHeight - Max height of the dropdown menu (default 260).
+ * @returns {boolean} True if the dropdown should open upward.
+ */
+function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
+  const [openUpward, setOpenUpward] = useState(false);
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const shouldOpenUpward = spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
+    setOpenUpward(shouldOpenUpward);
+  }, [isOpen, menuMaxHeight, containerRef]);
+  return openUpward;
+}
+
+/**
  * Animated dropdown with optional search and grouped option support.
  * @param {object} props
  * @param {string} props.value - Currently selected value.
@@ -304,14 +332,18 @@ function useDropdownState(options, grouped, placeholder, value, onChange) {
  * @param {boolean} [props.searchable=false] - Set true to show an inline search bar.
  * @param {string} [props.searchPlaceholder="Search..."] - Placeholder for the search input.
  * @param {string} [props.emptyMessage="Nothing found"] - Shown when the search has no results.
+ * @param {number} [props.menuMaxHeight] - Optional max height for the dropdown menu.
  */
-export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found" }) {
+export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className }) {
   const { isOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(options, grouped, placeholder, value, onChange);
+  const containerRef = useRef(null);
+  const openUpward = useOpenDirection(containerRef, isOpen, menuMaxHeight);
   return (
-    <div style={{ position: 'relative', width: '100%' }}>
+    <div ref={containerRef} className={className} style={{ position: 'relative' }}>
       <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} />
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
-        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} />
+        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} />
     </div>
   );
 }

@@ -51,8 +51,15 @@ function isEventId(id) {
 }
 
 function navigateToUrl(url) {
-    const path = url.replace(/^\//, '');
-    window.dispatchEvent(new CustomEvent('navigate', { detail: path }));
+    // Check if the URL is an old prefixed navigation string (like "societies_1")
+    if (url && !url.startsWith('/') && url.includes('_') && !url.includes('?')) {
+        window.dispatchEvent(new CustomEvent('navigate', { detail: url }));
+        return;
+    }
+
+    // For proper deep links (like "/societies?id=1") or activeNav updates, pass as is
+    const activeNavState = url.startsWith('/') ? url : `/${url}`;
+    window.dispatchEvent(new CustomEvent('navigate', { detail: activeNavState }));
 }
 
 function scheduleEventPopup(eventId) {

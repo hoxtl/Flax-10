@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NoiseGenerator } from '../../utils/noiseUtils';
+import { NoiseGenerator } from '../../components/Timer/utils/noiseUtils';
 
 describe('NoiseGenerator', () => {
     let noiseGenerator;

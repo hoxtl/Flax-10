@@ -9,7 +9,7 @@
   box-sizing: border-box;
 }
 
-.root > * {
+.root>* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -43,7 +43,7 @@
   height: auto;
   overflow-y: visible;
   overflow-x: hidden;
-  padding: 18px 24px 24px;
+  padding: 4px 24px 24px;
   width: 100%;
   box-sizing: border-box;
   background: var(--bg);
@@ -88,6 +88,7 @@
     box-shadow 0.2s,
     transform 0.2s;
 }
+
 .scrollToTop:hover {
   background: #6f5d4b;
   box-shadow: 0 8px 22px rgba(44, 36, 32, 0.28);

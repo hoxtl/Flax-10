@@ -49,18 +49,18 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
-import PillFilters from "../../components/Tags/PillFilters";
+
 
 /* HOME PAGE */
 export default function Homepage() {
-  const navigate         = useNavigate();
-  const { selectedDate, events: allCalEvents, filter } = useCalendar();
-  const dispatch         = useCalendarDispatch();
-  const { loadEvents }   = useCalendarEvents();
+  const navigate = useNavigate();
+  const { selectedDate, events: allCalEvents } = useCalendar();
+  const dispatch = useCalendarDispatch();
+  const { loadEvents } = useCalendarEvents();
   const { removeEvent, addEvent, editEvent } = useEventActions();
-  const { openModal }    = useEventModal();
-  const { openPopup }    = useEventPopup();
-  const { getTag, tags }       = useTags();
+  const { openModal } = useEventModal();
+  const { openPopup } = useEventPopup();
+  const { getTag, tags } = useTags();
   const { isActive: timerActive, timeLeft, task: timerTask, mode: timerMode, workTime, breakTime } = useTimerContext();
   const hasTimerSession = timerActive;
 
@@ -225,7 +225,7 @@ export default function Homepage() {
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.15);
-          } catch (_) {}
+          } catch (_) { }
         }
       }
     } catch {
@@ -528,10 +528,10 @@ export default function Homepage() {
         if (ms <= 0 || ms > fourteenDays) return false;
         // Skip if a calendar event already mentions this deadline's title or module code
         const dTitle = (d.assessment_title || d.title || "").toLowerCase();
-        const dCode  = (d.module_code || "").toLowerCase();
+        const dCode = (d.module_code || "").toLowerCase();
         return !scheduledTitles.some(t =>
           (dTitle && t.includes(dTitle.slice(0, 8))) ||
-          (dCode  && t.includes(dCode))
+          (dCode && t.includes(dCode))
         );
       })
       .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
@@ -727,7 +727,7 @@ export default function Homepage() {
       try {
         await updateTask(task.id, { completed });
         refetchTasks();
-      } catch (_) {}
+      } catch (_) { }
     },
     [refetchTasks, showCompletionToast]
   );
@@ -742,247 +742,242 @@ export default function Homepage() {
     return `${Math.floor(t / 60).toString().padStart(2, "0")}:${(t % 60).toString().padStart(2, "0")}`;
   };
 
-  const handleFilterChange = useCallback((key) => {
-    dispatch({ type: "SET_FILTER", payload: key });
-  }, [dispatch]);
+
 
   return (
     <div className={`${styles.page} ${hasTimerSession ? styles.focusModeActive : ""}`}>
       {toast && (
-    <div className={styles.alertToast}>
-      <div className={styles.alertContent}>
-        <span className={styles.alertIcon}>✓</span>
-        <span className={styles.alertMessage}>{toast.message}</span>
-      </div>
-      {toast.actionLabel && toast.onAction && (
-        <button
-          type="button"
-          className={styles.alertAction}
-          onClick={async () => {
-            const action = toast.onAction;
-            closeToast();
-            await action();
-          }}
-        >
-          {toast.actionLabel}
-        </button>
-      )}
-      <button className={styles.alertClose} onClick={closeToast}>✕</button>
-    </div>
-  )}
-
-      <div>
-      {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
-      {hasTimerSession && (
-        <div className={styles.focusBanner}>
-          <div className={styles.focusBannerLeft}>
-            <span className={`${styles.focusBannerBadge} ${timerMode === "break" ? styles.focusBannerBadgeBreak : ""}`}>
-              {timerMode === "break" ? "BREAK" : "FOCUS"}
-            </span>
-            {timerTask && <span className={styles.focusBannerTask}>{timerTask}</span>}
+        <div className={styles.alertToast}>
+          <div className={styles.alertContent}>
+            <span className={styles.alertIcon}>✓</span>
+            <span className={styles.alertMessage}>{toast.message}</span>
           </div>
-          <div className={styles.focusBannerRight}>
-            <span className={styles.focusBannerTime}>{fmtTimerSecs(timeLeft)}</span>
-            <button type="button" className={styles.focusBannerBtn} onClick={() => navigate("/timer")}>
-              Open timer →
+          {toast.actionLabel && toast.onAction && (
+            <button
+              type="button"
+              className={styles.alertAction}
+              onClick={async () => {
+                const action = toast.onAction;
+                closeToast();
+                await action();
+              }}
+            >
+              {toast.actionLabel}
             </button>
-          </div>
+          )}
+          <button className={styles.alertClose} onClick={closeToast}>✕</button>
         </div>
       )}
 
-      {/* ─── SLEEP BANNER ─── motivational greeting shown at the top */}
-      <SleepBanner />
+      <div>
+        {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
+        {hasTimerSession && (
+          <div className={styles.focusBanner}>
+            <div className={styles.focusBannerLeft}>
+              <span className={`${styles.focusBannerBadge} ${timerMode === "break" ? styles.focusBannerBadgeBreak : ""}`}>
+                {timerMode === "break" ? "BREAK" : "FOCUS"}
+              </span>
+              {timerTask && <span className={styles.focusBannerTask}>{timerTask}</span>}
+            </div>
+            <div className={styles.focusBannerRight}>
+              <span className={styles.focusBannerTime}>{fmtTimerSecs(timeLeft)}</span>
+              <button type="button" className={styles.focusBannerBtn} onClick={() => navigate("/timer")}>
+                Open timer →
+              </button>
+            </div>
+          </div>
+        )}
 
-      {/* Pills row (includes ✎ tag manager button) */}
-      <div className={styles.homePillsRow}>
-        <PillFilters active={filter} onChange={handleFilterChange} items={sortedEvents} />
-      </div>
+        {/* ─── SLEEP BANNER ─── motivational greeting shown at the top */}
+        <SleepBanner />
 
-      {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
-      <div className={styles.intelligenceRowWrap}>
-      <IntelligenceRow
-        displayName={displayName}
 
-        slot1TodayTasks={
-          // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
-          <TaskWidgetSlot
-            styles={taskWidgetStyles}
+
+        {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
+        <div className={styles.intelligenceRowWrap}>
+          <IntelligenceRow
             displayName={displayName}
-            isToday={isToday(selectedDate)}
-            taskWidgetOverdueCount={taskWidgetOverdueCount}
-            taskWidgetDueTodayCount={taskWidgetDueTodayCount}
-            taskWidgetSpineCompletedPct={taskWidgetSpineCompletedPct}
-            taskWidgetItemsOnly={taskWidgetItemsOnly}
-            taskWidgetList={taskWidgetList}
-            showAllTaskWidgetTasks={showAllTaskWidgetTasks}
-            setShowAllTaskWidgetTasks={setShowAllTaskWidgetTasks}
-            getTaskCategoryPill={getTaskCategoryPill}
-            getTaskCategoryColor={getTaskCategoryColor}
-            handleTaskWidgetComplete={handleTaskWidgetComplete}
-            taskWidgetRef={taskWidgetRef}
-            hasTimerSession={hasTimerSession}
-            onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
-            taskLists={taskLists}
-            onEditTask={(task) => setRescheduleTask(task)}
-            onDeleteTask={async (task) => {
-              await deleteTask(task.id);
-              refetchTasks();
-            }}
-            onInlineTaskEdit={async (task, patch) => {
-              await updateTask(task.id, patch);
-              refetchTasks();
-            }}
-          />
-        }
-        slot3Urgent={
-          // ─── SLOT 3: DEADLINES WIDGET ─── upcoming coursework/assessment deadlines
-          <DeadlinesWidget
-            deadlines={upcomingDeadlines || []}
-            onSelectDeadline={setSelectedDeadline}
-            onSelectModule={(mod) => setSelectedModulePill(mod)}
-          />
-        }
-        // ─── SLOT 2: STUDY PULSE WIDGET ─── free windows + focus suggestions
-        studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
-        studyPulseNow={now}
-        studyPulseOnStartFocus={() => navigate("/timer")}
-        studyPulseDeadlines={upcomingDeadlines || []}
-        // ─── SLOT 5: RIGHT NOW WIDGET ─── live schedule compass + timer overlay
-        slot5Data={{
-          now,
-          isToday: isToday(selectedDate),
-          navigatorContext,
-          sortedEvents,
-          hasTimerSession,
-          timerMode,
-          timeLeft,
-          workTime,
-          breakTime,
-          timerTask,
-          tomorrowFirstEvent,
-          taskWidgetItemsOnly,
-        }}
-      />
-      </div>
 
-      {/* Deadline detail popup — blurred backdrop, module/deadline card */}
-      {/* Module pill popup — blurred backdrop, module card */}
-      {selectedModulePill && (() => {
-        const mCode = selectedModulePill.code || "";
-        const mId = selectedModulePill.id;
-        const mColors = getModulePillColors(mCode);
-        const mModule = enrolledModules.find((m) =>
-          (mId && String(m.id) === String(mId)) ||
-          (m.module_code || "").toUpperCase() === mCode.toUpperCase()
-        );
-        const mName = mModule?.module_name || mModule?.name || null;
-        const mDept = mModule?.department || mModule?.school || null;
-        const mDesc = mModule?.description || null;
-        const mLeader = mModule?.module_leader || mModule?.leader || null;
-        const mUrl = mId ? `/modules?moduleId=${mId}` : `/modules?code=${encodeURIComponent(mCode)}`;
-        return (
-          <div
-            className={styles.deadlineDetailOverlay}
-            onClick={() => setSelectedModulePill(null)}
-            role="dialog"
-            aria-modal
-            aria-labelledby="module-card-title"
-          >
-            <div className={styles.moduleCardCard} onClick={(e) => e.stopPropagation()}>
-              <div className={styles.moduleCardHeader}>
-                <div
-                  className={styles.moduleCardColorBar}
-                  style={{ background: mColors.bg, color: mColors.text }}
+            slot1TodayTasks={
+              // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
+              <TaskWidgetSlot
+                styles={taskWidgetStyles}
+                displayName={displayName}
+                isToday={isToday(selectedDate)}
+                taskWidgetOverdueCount={taskWidgetOverdueCount}
+                taskWidgetDueTodayCount={taskWidgetDueTodayCount}
+                taskWidgetSpineCompletedPct={taskWidgetSpineCompletedPct}
+                taskWidgetItemsOnly={taskWidgetItemsOnly}
+                taskWidgetList={taskWidgetList}
+                showAllTaskWidgetTasks={showAllTaskWidgetTasks}
+                setShowAllTaskWidgetTasks={setShowAllTaskWidgetTasks}
+                getTaskCategoryPill={getTaskCategoryPill}
+                getTaskCategoryColor={getTaskCategoryColor}
+                handleTaskWidgetComplete={handleTaskWidgetComplete}
+                taskWidgetRef={taskWidgetRef}
+                hasTimerSession={hasTimerSession}
+                onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
+                taskLists={taskLists}
+                onEditTask={(task) => setRescheduleTask(task)}
+                onDeleteTask={async (task) => {
+                  await deleteTask(task.id);
+                  refetchTasks();
+                }}
+                onInlineTaskEdit={async (task, patch) => {
+                  await updateTask(task.id, patch);
+                  refetchTasks();
+                }}
+              />
+            }
+            slot3Urgent={
+              // ─── SLOT 3: DEADLINES WIDGET ─── upcoming coursework/assessment deadlines
+              <DeadlinesWidget
+                deadlines={upcomingDeadlines || []}
+                onSelectDeadline={setSelectedDeadline}
+                onSelectModule={(mod) => setSelectedModulePill(mod)}
+              />
+            }
+            // ─── SLOT 2: STUDY PULSE WIDGET ─── free windows + focus suggestions
+            studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
+            studyPulseNow={now}
+            studyPulseOnStartFocus={() => navigate("/timer")}
+            studyPulseDeadlines={upcomingDeadlines || []}
+            // ─── SLOT 5: RIGHT NOW WIDGET ─── live schedule compass + timer overlay
+            slot5Data={{
+              now,
+              isToday: isToday(selectedDate),
+              navigatorContext,
+              sortedEvents,
+              hasTimerSession,
+              timerMode,
+              timeLeft,
+              workTime,
+              breakTime,
+              timerTask,
+              tomorrowFirstEvent,
+              taskWidgetItemsOnly,
+            }}
+          />
+        </div>
+
+        {/* Deadline detail popup — blurred backdrop, module/deadline card */}
+        {/* Module pill popup — blurred backdrop, module card */}
+        {selectedModulePill && (() => {
+          const mCode = selectedModulePill.code || "";
+          const mId = selectedModulePill.id;
+          const mColors = getModulePillColors(mCode);
+          const mModule = enrolledModules.find((m) =>
+            (mId && String(m.id) === String(mId)) ||
+            (m.module_code || "").toUpperCase() === mCode.toUpperCase()
+          );
+          const mName = mModule?.module_name || mModule?.name || null;
+          const mDept = mModule?.department || mModule?.school || null;
+          const mDesc = mModule?.description || null;
+          const mLeader = mModule?.module_leader || mModule?.leader || null;
+          const mUrl = mId ? `/modules?moduleId=${mId}` : `/modules?code=${encodeURIComponent(mCode)}`;
+          return (
+            <div
+              className={styles.deadlineDetailOverlay}
+              onClick={() => setSelectedModulePill(null)}
+              role="dialog"
+              aria-modal
+              aria-labelledby="module-card-title"
+            >
+              <div className={styles.moduleCardCard} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.moduleCardHeader}>
+                  <div
+                    className={styles.moduleCardColorBar}
+                    style={{ background: mColors.bg, color: mColors.text }}
+                  >
+                    {mCode.slice(0, 2)}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.deadlineDetailClose}
+                    onClick={() => setSelectedModulePill(null)}
+                    aria-label="Close"
+                  >
+                    <X size={14} strokeWidth={2} aria-hidden />
+                  </button>
+                </div>
+                <h2 id="module-card-title" className={styles.moduleCardCode} style={{ color: mColors.text }}>
+                  {mCode}
+                </h2>
+                {mName && <p className={styles.moduleCardName}>{mName}</p>}
+                {mDept && <p className={styles.moduleCardDept}>{mDept}</p>}
+                {mDesc && <p className={styles.moduleCardDesc}>{mDesc.length > 120 ? mDesc.slice(0, 120) + "…" : mDesc}</p>}
+                {mLeader && <p className={styles.moduleCardLeader}>Leader: {mLeader}</p>}
+                <div className={styles.moduleCardDivider} />
+                <Link
+                  to={mUrl}
+                  className={styles.moduleCardLink}
+                  style={{ background: mColors.text }}
+                  onClick={() => setSelectedModulePill(null)}
                 >
-                  {mCode.slice(0, 2)}
+                  View module →
+                </Link>
+              </div>
+            </div>
+          );
+        })()}
+
+        {selectedDeadline && (
+          <div className={styles.deadlineDetailOverlay} onClick={() => setSelectedDeadline(null)} role="dialog" aria-modal aria-labelledby="deadline-detail-title">
+            <div className={styles.deadlineDetailCard} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.deadlineDetailHeader}>
+                <div className={styles.deadlineDetailPills}>
+                  {selectedDeadline.module_code && (
+                    <ModulePill moduleCode={selectedDeadline.module_code} />
+                  )}
+                  {selectedDeadline.deadline_type && (
+                    <TypePill
+                      typeLabel={selectedDeadline.deadline_type.charAt(0).toUpperCase() + selectedDeadline.deadline_type.slice(1)}
+                      accentColor={selectedDeadline.module_code ? getModulePillColors(selectedDeadline.module_code).accent : undefined}
+                    />
+                  )}
                 </div>
                 <button
                   type="button"
                   className={styles.deadlineDetailClose}
-                  onClick={() => setSelectedModulePill(null)}
+                  onClick={() => setSelectedDeadline(null)}
                   aria-label="Close"
                 >
-                  <X size={14} strokeWidth={2} aria-hidden />
+                  <X size={18} strokeWidth={2} aria-hidden />
                 </button>
               </div>
-              <h2 id="module-card-title" className={styles.moduleCardCode} style={{ color: mColors.text }}>
-                {mCode}
+              <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
+                {selectedDeadline.assessment_title || selectedDeadline.title || "Assignment"}
               </h2>
-              {mName && <p className={styles.moduleCardName}>{mName}</p>}
-              {mDept && <p className={styles.moduleCardDept}>{mDept}</p>}
-              {mDesc && <p className={styles.moduleCardDesc}>{mDesc.length > 120 ? mDesc.slice(0, 120) + "…" : mDesc}</p>}
-              {mLeader && <p className={styles.moduleCardLeader}>Leader: {mLeader}</p>}
-              <div className={styles.moduleCardDivider} />
-              <Link
-                to={mUrl}
-                className={styles.moduleCardLink}
-                style={{ background: mColors.text }}
-                onClick={() => setSelectedModulePill(null)}
-              >
-                View module →
-              </Link>
+              {selectedDeadline.start_due_date && (
+                <p className={styles.deadlineDetailDate}>
+                  Due: {new Date(selectedDeadline.start_due_date).toLocaleDateString("en-GB", {
+                    weekday: "long", day: "numeric", month: "long", year: "numeric"
+                  })}
+                </p>
+              )}
+              {selectedDeadline.description && (
+                <p className={styles.deadlineDetailDesc}>{selectedDeadline.description}</p>
+              )}
+              {selectedDeadline.location && (
+                <p className={styles.deadlineDetailMeta}>
+                  <MapPin size={14} className={styles.deadlineDetailMetaIcon} aria-hidden />
+                  {selectedDeadline.location}
+                </p>
+              )}
+              {(selectedDeadline.module_id != null || selectedDeadline.module != null || selectedDeadline.module_code) && (
+                <Link
+                  to={selectedDeadline.module_id != null || selectedDeadline.module != null
+                    ? `/modules?moduleId=${selectedDeadline.module_id ?? selectedDeadline.module}`
+                    : `/modules?code=${encodeURIComponent(selectedDeadline.module_code)}`}
+                  className={styles.deadlineDetailLink}
+                  onClick={() => setSelectedDeadline(null)}
+                >
+                  Go to module →
+                </Link>
+              )}
             </div>
           </div>
-        );
-      })()}
-
-      {selectedDeadline && (
-        <div className={styles.deadlineDetailOverlay} onClick={() => setSelectedDeadline(null)} role="dialog" aria-modal aria-labelledby="deadline-detail-title">
-          <div className={styles.deadlineDetailCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.deadlineDetailHeader}>
-              <div className={styles.deadlineDetailPills}>
-                {selectedDeadline.module_code && (
-                  <ModulePill moduleCode={selectedDeadline.module_code} />
-                )}
-                {selectedDeadline.deadline_type && (
-                  <TypePill
-                    typeLabel={selectedDeadline.deadline_type.charAt(0).toUpperCase() + selectedDeadline.deadline_type.slice(1)}
-                    accentColor={selectedDeadline.module_code ? getModulePillColors(selectedDeadline.module_code).accent : undefined}
-                  />
-                )}
-              </div>
-              <button
-                type="button"
-                className={styles.deadlineDetailClose}
-                onClick={() => setSelectedDeadline(null)}
-                aria-label="Close"
-              >
-                <X size={18} strokeWidth={2} aria-hidden />
-              </button>
-            </div>
-            <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
-              {selectedDeadline.assessment_title || selectedDeadline.title || "Assignment"}
-            </h2>
-            {selectedDeadline.start_due_date && (
-              <p className={styles.deadlineDetailDate}>
-                Due: {new Date(selectedDeadline.start_due_date).toLocaleDateString("en-GB", {
-                  weekday: "long", day: "numeric", month: "long", year: "numeric"
-                })}
-              </p>
-            )}
-            {selectedDeadline.description && (
-              <p className={styles.deadlineDetailDesc}>{selectedDeadline.description}</p>
-            )}
-            {selectedDeadline.location && (
-              <p className={styles.deadlineDetailMeta}>
-                <MapPin size={14} className={styles.deadlineDetailMetaIcon} aria-hidden />
-                {selectedDeadline.location}
-              </p>
-            )}
-            {(selectedDeadline.module_id != null || selectedDeadline.module != null || selectedDeadline.module_code) && (
-              <Link
-                to={selectedDeadline.module_id != null || selectedDeadline.module != null
-                  ? `/modules?moduleId=${selectedDeadline.module_id ?? selectedDeadline.module}`
-                  : `/modules?code=${encodeURIComponent(selectedDeadline.module_code)}`}
-                className={styles.deadlineDetailLink}
-                onClick={() => setSelectedDeadline(null)}
-              >
-                Go to module →
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+        )}
       </div>
 
       <motion.div
@@ -993,73 +988,73 @@ export default function Homepage() {
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
       >
-          <div className={styles.timelineBox}>
-            <div className={styles.timelineHeader}>
-              <div className={styles.timelineHeaderLeft}>
-                <div className={styles.timelineHeaderIconWrap} aria-hidden>
-                  <CalendarIcon size={17} strokeWidth={1.75} />
-                </div>
-                <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
+        <div className={styles.timelineBox}>
+          <div className={styles.timelineHeader}>
+            <div className={styles.timelineHeaderLeft}>
+              <div className={styles.timelineHeaderIconWrap} aria-hidden>
+                <CalendarIcon size={17} strokeWidth={1.75} />
               </div>
-              <div className={styles.timelineHeaderRight}>
-                <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
-                {isToday(selectedDate) && (
-                  <motion.button
-                    type="button"
-                    className={styles.replanBtn}
-                    onClick={handleReplanDay}
-                    disabled={replanLoading || (!missedItems?.length && !(overdueTasksForNow?.length))}
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25 }}
-                    aria-label="Re-plan overdue and missed items into free windows"
-                  >
-                    {replanLoading ? "Re-planning…" : "✨ Re-plan"}
-                  </motion.button>
-                )}
-              </div>
+              <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
             </div>
-            <div className={styles.timelineTrack}>
-              <motion.div
-                className={styles.timelineTrackContent}
-                layout
-                initial={false}
-                transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              >
-                <MiniTimeline
-                  sortedEvents={sortedEvents}
-                  selectedDate={selectedDate}
-                  now={now}
-                  dayTasks={dayTasks}
-                  tasksDueToday={tasksDueToday}
-                  suggestableTasks={suggestableTasks}
-                  deadlineSuggestions={deadlineSuggestions}
-                  taskLists={taskLists}
-                  onQuickStart={handleQuickStartGap}
-                  onTaskToggle={handleTaskToggle}
-                  onCardClick={openTimelinePopup}
-                  onEdit={(ev) => openModal(ev, ev.tag)}
-                  onConflictAutoMove={handleConflictAutoMove}
-                  onPushTomorrow={handleConflictPushTomorrow}
-                  onDelete={handleTimelineDelete}
-                  onReschedule={handleReschedule}
-                  getTag={getTag}
-                  completedEventIds={completedEventIds}
-                  onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(eventId)) next.delete(eventId);
-                    else next.add(eventId);
-                    return next;
-                  })}
-                  hasTimerSession={hasTimerSession}
-                  timerTask={timerTask}
-                  timeLeft={timeLeft}
-                  timerMode={timerMode}
-                  styles={styles}
-                />
-              </motion.div>
+            <div className={styles.timelineHeaderRight}>
+              <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
+              {isToday(selectedDate) && (
+                <motion.button
+                  type="button"
+                  className={styles.replanBtn}
+                  onClick={handleReplanDay}
+                  disabled={replanLoading || (!missedItems?.length && !(overdueTasksForNow?.length))}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  aria-label="Re-plan overdue and missed items into free windows"
+                >
+                  {replanLoading ? "Re-planning…" : "✨ Re-plan"}
+                </motion.button>
+              )}
             </div>
           </div>
+          <div className={styles.timelineTrack}>
+            <motion.div
+              className={styles.timelineTrackContent}
+              layout
+              initial={false}
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            >
+              <MiniTimeline
+                sortedEvents={sortedEvents}
+                selectedDate={selectedDate}
+                now={now}
+                dayTasks={dayTasks}
+                tasksDueToday={tasksDueToday}
+                suggestableTasks={suggestableTasks}
+                deadlineSuggestions={deadlineSuggestions}
+                taskLists={taskLists}
+                onQuickStart={handleQuickStartGap}
+                onTaskToggle={handleTaskToggle}
+                onCardClick={openTimelinePopup}
+                onEdit={(ev) => openModal(ev, ev.tag)}
+                onConflictAutoMove={handleConflictAutoMove}
+                onPushTomorrow={handleConflictPushTomorrow}
+                onDelete={handleTimelineDelete}
+                onReschedule={handleReschedule}
+                getTag={getTag}
+                completedEventIds={completedEventIds}
+                onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(eventId)) next.delete(eventId);
+                  else next.add(eventId);
+                  return next;
+                })}
+                hasTimerSession={hasTimerSession}
+                timerTask={timerTask}
+                timeLeft={timeLeft}
+                timerMode={timerMode}
+                styles={styles}
+              />
+            </motion.div>
+          </div>
+        </div>
       </motion.div>
 
       {showCreateTaskModal && (
@@ -1125,14 +1120,14 @@ export default function Homepage() {
               await updateTask(rescheduleTask.id, data);
               refetchTasks();
               setRescheduleTask(null);
-            } catch (_) {}
+            } catch (_) { }
           }}
           onDelete={async () => {
             try {
               await deleteTask(rescheduleTask.id);
               refetchTasks();
               setRescheduleTask(null);
-            } catch (_) {}
+            } catch (_) { }
           }}
           onClose={() => setRescheduleTask(null)}
         />

@@ -97,14 +97,7 @@ export function MiniTimeline({
     };
   }, []);
 
-  // Auto-scroll the NOW line into view on mount / when date changes to today
-  useEffect(() => {
-    if (!nowRowRef.current || !isToday(selectedDate)) return;
-    const id = requestAnimationFrame(() => {
-      nowRowRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-    return () => cancelAnimationFrame(id);
-  }, [selectedDate]);
+  // Removed auto-scroll the NOW line into view on mount because it scrolls the entire Homepage down.
 
   const dayStart = useMemo(() => {
     const d = new Date(selectedDate);

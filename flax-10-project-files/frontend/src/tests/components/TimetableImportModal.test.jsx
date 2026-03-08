@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TimetableImportModal from '../../../components/TimetableImportModal';
+import TimetableImportModal from '../../components/TimetableImportModal';
 
-vi.mock('../../../components/TimetableImportModal.module.css', () => ({
+vi.mock('../../components/TimetableImportModal.module.css', () => ({
     default: { overlay: 'overlay', modal: 'modal', header: 'header', closeBtn: 'closeBtn',
                form: 'form', instructions: 'instructions', input: 'input', error: 'error',
                actions: 'actions', cancelBtn: 'cancelBtn', importBtn: 'importBtn' }

@@ -11,6 +11,7 @@ import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
 import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
+import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -181,33 +182,17 @@ function PageHeader({ is_teacher, onCreateModule }) {
 }
 
 function Toolbar({ search, sorting, departments }) {
-    const filter_options = [
-        { value: 'all', label: 'All Modules' },
-        { value: 'enrolled', label: 'My Enrollments' },
-    ];
-    const dept_options = [
-        { value: 'all', 'label': 'All Departments' },
-        ...departments.map(d => ({ value: d, label: d })),
-    ];
-    const sortOptions = [
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'deadlines', label: 'Sort by Deadlines' },
-    ];
+    const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
+    const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
+    const sortOptions = [{ value: 'name', label: 'Sort by Name' }, { value: 'deadlines', label: 'Sort by Deadlines' }];
     return (
         <div className={styles.toolbar}>
-            <SearchInput value={search.query} onChange={search.onQueryChange} />
-            <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-            <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-            <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
-        </div>
-    );
-}
-
-function SearchInput({ value, onChange }) {
-    return (
-        <div className={styles.searchContainer}>
-            <input type="text" className={styles.searchInput} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Search by module name or code..." />
-            {value && <button className={styles.clearButton} onClick={() => onChange('')} aria-label="Clear search">×</button>}
+            <SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />
+            <div className={styles.filters}>
+                <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+                <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+                <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+            </div>
         </div>
     );
 }

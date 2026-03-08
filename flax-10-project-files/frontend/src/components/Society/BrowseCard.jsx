@@ -1,14 +1,12 @@
 import styles from './BrowseCard.module.css';
+import ActionCard from './ActionCard';
 
 export default function BrowseCard({ onClick, societies = [] }) {
     const images = societies.slice(0, 4).map(s => s.cover_image || s.image);
     return (
-        <div className={styles.card} onClick={onClick}>
+        <ActionCard onClick={onClick} text="🔎 Find new society">
             <ImageGrid images={images} />
-            <div className={styles.overlay}>
-                <span className={styles.text}>🔎 Find new society</span>
-            </div>
-        </div>
+        </ActionCard>
     );
 }
 

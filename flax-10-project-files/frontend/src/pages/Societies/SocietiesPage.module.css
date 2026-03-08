@@ -181,6 +181,11 @@
     border-color: var(--primary);
 }
 
+.sortWrapper {
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
 .loadingIndicator {
     text-align: center;
     padding: 32px;

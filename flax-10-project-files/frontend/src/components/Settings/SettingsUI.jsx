@@ -1,4 +1,5 @@
 import styles from "../../pages/Settings/Settings.module.css";
+import AnimatedDropdown from "../ui/AnimatedDropdown";
 
 export function TabButton({ id, label, isActive, onClick }) {
   return (
@@ -75,34 +76,12 @@ export function FormInput({ id, label, type = "text", value, onChange, required,
   );
 }
 
-function GroupedOptions({ options }) {
-  return (
-    <>
-      <option value="" disabled>Select your course</option>
-      {options.map((group) => (
-        <optgroup key={group.label} label={group.label}>
-          {group.options.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </optgroup>
-      ))}
-    </>
-  );
-}
-
-function FlatOptions({ options }) {
-  return options.map((opt) => (
-    <option key={opt.value} value={opt.value}>{opt.label}</option>
-  ));
-}
-
-export function FormSelect({ id, label, value, onChange, options, name, grouped }) {
+export function FormSelect({ id, label, value, onChange, options, grouped }) {
+  const handleChange = (val) => onChange({ target: { value: val } });
   return (
     <div className={styles.formGroup}>
       <label htmlFor={id}>{label}</label>
-      <select id={id} name={name || id} value={value} onChange={onChange}>
-        {grouped ? <GroupedOptions options={options} /> : <FlatOptions options={options} />}
-      </select>
+      <AnimatedDropdown value={value} onChange={handleChange} options={options} grouped={grouped} placeholder="Select" searchable={grouped} />
     </div>
   );
 }

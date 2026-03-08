@@ -2428,7 +2428,7 @@
     transition: border-color 0.15s, box-shadow 0.15s;
     overflow: hidden;
     min-width: 0;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .planTimelineConflictPairCard:hover {
     border-color: rgba(192, 113, 78, 0.4);
@@ -2479,6 +2479,28 @@
     line-height: 1;
     opacity: 0.9;
     flex-shrink: 0;
+  }
+
+  .planTimelineConflictCardMoveBtn {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    margin-top: 5px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    border: 1px solid rgba(192, 113, 78, 0.35);
+    background: rgba(192, 113, 78, 0.08);
+    color: #8b5a3c;
+    font-size: 0.67rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.4;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .planTimelineConflictCardMoveBtn:hover {
+    background: rgba(192, 113, 78, 0.16);
+    border-color: rgba(192, 113, 78, 0.55);
   }
 
   /* Inline action bar */
