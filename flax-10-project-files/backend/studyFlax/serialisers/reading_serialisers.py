@@ -33,7 +33,7 @@ class ReadingSerialiser(serializers.ModelSerializer):
         def get_duration_minutes(self, obj):
             return estimated_time_reading(obj, self.context['request'].user)
 
-class ReadingSummarySerialiser(serializers.ModelSerialzer):
+class ReadingSummarySerialiser(serializers.ModelSerializer):
     page_count = serializers.SerializerMethodField()
 
     class Meta:
