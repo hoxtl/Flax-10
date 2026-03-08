@@ -17,11 +17,13 @@ vi.mock('../../context/CalendarContext', () => ({
   useCalendar: () => ({ selectedDate: mockSelectedDate, events: mockEvents }),
   useCalendarDispatch: () => mockDispatch,
   useEventModal: () => ({ openModal: mockOpenModal }),
+  useEventPopup: () => ({ openPopup: vi.fn() }),
 }));
 
-vi.mock('../../hooks/useCalendarEvents', () => ({
+vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
-  useEventActions: () => ({ removeEvent: mockRemoveEvent }),
+  useEventActions: () => ({ removeEvent: mockRemoveEvent, addEvent: vi.fn(), editEvent: vi.fn() }),
+  useEventPopup: () => ({ openPopup: vi.fn() }),
 }));
 
 vi.mock('../../pages/Homepage/hooks/useHomeData', () => ({
@@ -60,6 +62,22 @@ vi.mock('../../context/TaskCompletionContext', () => ({
   useTaskCompletion: () => ({ showCompletionToast: vi.fn() }),
 }));
 
+vi.mock('../../context/NotificationContext', () => ({
+  useNotifications: () => ({ addNotification: vi.fn() }),
+}));
+
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
+  useNotify: () => vi.fn(),
+}));
+
+vi.mock('../../components/Modules/hooks/useModuleDisenrollment', () => ({
+  useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
+}));
+
+vi.mock('../../context/ConfirmContext', () => ({
+  useConfirm: () => vi.fn(),
+}));
+
 vi.mock('../../pages/Homepage/components/IntelligenceRow', () => ({
   __esModule: true,
   default: () => <div data-testid="intelligence-row">Good Morning</div>,
@@ -70,6 +88,12 @@ beforeEach(() => {
   mockEvents = [];
   vi.clearAllMocks();
   mockUseCalendarEvents.mockReturnValue({ loadEvents: vi.fn() });
+  global.IntersectionObserver = class {
+    constructor() {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
 });
 
 describe('Homepage', () => {

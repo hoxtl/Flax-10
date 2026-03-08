@@ -37,12 +37,27 @@ vi.mock("react-router-dom", () => ({
   useLocation: () => ({ pathname: "/" }),
 }));
 
+vi.mock("../../context/TimerContext", () => ({
+  useTimerContext: () => ({
+    isActive: false,
+    isPaused: false,
+    timeLeft: 1500,
+    togglePause: vi.fn(),
+    setIsActive: vi.fn(),
+    resetTimer: vi.fn(),
+  }),
+}));
+
+vi.mock("../../context/NotificationContext", () => ({
+  useNotifications: () => ({ addNotification: vi.fn() }),
+}));
+
 const mockStore = {};
-global.localStorage = {
+vi.stubGlobal('localStorage', {
   setItem: (key, val) => { mockStore[key] = val.toString(); },
   getItem: (key) => mockStore[key] || null,
   removeItem: (key) => { delete mockStore[key]; },
-};
+});
 
 describe("DashboardLayout", () => {
   const mockUser = {
