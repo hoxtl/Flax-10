@@ -29,22 +29,3 @@ function getFallbackEmojiForTime(date) {
   if (hour >= 17 && hour < 22) return "🌆";
   return "☁️"; // 22:00–06:00
 }
-
-/**
- * Get the best emoji for a task/event.
- * @param {string} title - Task or event title (matched case-insensitively).
- * @param {Date|string|null} [startTime] - Optional start time for fallback when no keyword matches.
- * @returns {string} Single emoji character(s).
- */
-export function getTaskEmoji(title, startTime) {
-  const t = (title || "").trim().toLowerCase();
-  if (!t) return getFallbackEmojiForTime(startTime);
-
-  for (const { keywords, emoji } of EMOJI_MAP) {
-    for (const kw of keywords) {
-      if (t.includes(kw)) return emoji;
-    }
-  }
-
-  return getFallbackEmojiForTime(startTime);
-}

@@ -44,7 +44,6 @@ const useClearAction = (setHistory, confirm) => {
         const confirmed = await confirm({
             title: "Clear History",
             message: "Are you sure you want to delete your history? All your data will be removed.",
-            confirmText: "Clear",
             isDanger: true,
         });
         if (!confirmed) return;
