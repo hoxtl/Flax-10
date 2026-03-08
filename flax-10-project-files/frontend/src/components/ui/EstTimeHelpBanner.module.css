@@ -133,17 +133,3 @@
   color: #fff;
 }
 
-/* Modal variant: slightly more compact, same Flax style */
-.modalVariant {
-  margin-bottom: 6px;
-  padding: 6px 12px;
-}
-
-.modalVariant .text {
-  font-size: 0.78rem;
-}
-
-.modalVariant .cta {
-  padding: 4px 10px;
-  font-size: 0.72rem;
-}

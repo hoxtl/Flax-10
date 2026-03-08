@@ -39,23 +39,3 @@
   box-shadow: none;
 }
 
-/* Active */
-.active {
-  background: var(--primary);
-  box-shadow: 0 6px 18px rgba(158, 126, 93, 0.18);
-  color: #fff;
-  font-weight: 700;
-}
-
-/* Count inside */
-.count {
-  font-weight: 800;
-}
-
-/* Color dot for custom tags */
-.colorDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-}

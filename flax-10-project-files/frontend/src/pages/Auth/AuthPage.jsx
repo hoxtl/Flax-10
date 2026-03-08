@@ -1,4 +1,3 @@
-import React from "react";
 import * as Components from "../../components/Authentication/AuthComponents";
 import { SignUpForm } from "../../components/Authentication/SignUpForm";
 import { SignInForm } from "../../components/Authentication/SignInForm";
