@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CreateListModal from "../../../../pages/Tasks/components/CreateListModal";
 
 describe("CreateListModal", () => {
@@ -29,6 +29,8 @@ describe("CreateListModal", () => {
     render(<CreateListModal onSave={onSave} onClose={vi.fn()} />);
     fireEvent.change(screen.getByPlaceholderText(/List name/i), { target: { value: "My List" } });
     fireEvent.click(screen.getByRole("button", { name: /Create list/i }));
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name: "My List" }));
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name: "My List" }));
+    });
   });
 });
