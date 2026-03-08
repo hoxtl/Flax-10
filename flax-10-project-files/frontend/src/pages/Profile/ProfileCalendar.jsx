@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
 import { addMonths, formatMonthYear, isSameMonth } from '../../components/Calendar/utils/dateUtils';
-import { CalendarNav, CalendarTitle } from "../../components/Calendar/header/CalendarHeaderUtils";
+import { CalendarNav } from "../../components/Calendar/header/CalendarHeaderUtils";
 import { MonthView } from '../../components/Calendar/MonthView/MonthView';
 import { EventPopups } from '../../components/Calendar/EventPopups';
 import { ResizeHighlightProvider } from '../../context/ResizeHighlightContext';
@@ -23,8 +23,8 @@ function ProfileCalendarHeader() {
     return (
         <div className="calendar-header">
             <CalendarNav onPrev={() => setDate(addMonths(selectedDate, -1))} onNext={() => setDate(addMonths(selectedDate, 1))}
-                onToday={() => setDate(new Date())} showToday={showToday} selectedDate={selectedDate} onDatePick={setDate} />
-            <CalendarTitle>{formatMonthYear(selectedDate)}</CalendarTitle>
+                onToday={() => setDate(new Date())} showToday={showToday} selectedDate={selectedDate}
+                onDatePick={setDate} title={formatMonthYear(selectedDate)} />
             <div className="header-actions" />
         </div>
     );
