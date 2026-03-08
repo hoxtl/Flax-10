@@ -74,7 +74,7 @@
   --pill-hover: #eadfd2;
 
   --calendar-bg: var(--bg);
-  --weekbar-bg: white;
+  --weekbar-bg: var(--bg);
   --search-bg: #fafaf9;
   --btn-black: #3a3a3a;
   --btn-black-hover: #2a2a2a;
@@ -236,7 +236,7 @@
   --card-bg: #241a14;
   --bento-card-bg: var(--glass-bg);
   --calendar-bg: var(--bg);
-  --weekbar-bg: #241a14;
+  --weekbar-bg: var(--bg);
   --search-bg: #141414;
   --btn-black: #262626;
   --btn-black-hover: #404040;
