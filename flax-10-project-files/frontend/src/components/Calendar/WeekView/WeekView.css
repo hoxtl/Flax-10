@@ -111,7 +111,8 @@
 }
 
 /* Show sub-grid lines only during drag/resize interactions */
-.week-view.show-grid-lines .hour-cell {
+.week-view:has(.draggable-event.dragging) .hour-cell,
+.week-view:has(.draggable-event.resizing) .hour-cell {
   background-image: linear-gradient(
     to bottom,
     transparent 24%,

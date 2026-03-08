@@ -61,7 +61,8 @@
 }
 
 /* Show sub-grid lines only during drag/resize interactions */
-.day-view.show-grid-lines .time-slot {
+.day-view:has(.draggable-event.dragging) .time-slot,
+.day-view:has(.draggable-event.resizing) .time-slot {
     background-image: linear-gradient(to bottom,
             transparent 24%,
             var(--hover) 25%,
