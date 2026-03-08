@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TimetableImportModal from '../../../components/TimetableImportModal';
+import TimetableImportModal from '../../components/TimetableImportModal';
 
-vi.mock('../../../components/TimetableImportModal.module.css', () => ({
+vi.mock('../../components/TimetableImportModal.module.css', () => ({
     default: { overlay: 'overlay', modal: 'modal', header: 'header', closeBtn: 'closeBtn',
                form: 'form', instructions: 'instructions', input: 'input', error: 'error',
                actions: 'actions', cancelBtn: 'cancelBtn', importBtn: 'importBtn' }
@@ -47,7 +47,7 @@ describe('TimetableImportModal', () => {
 
     it('shows error when submitting empty URL', async () => {
         render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.submit(screen.getByRole('form') ?? document.querySelector('form'));
+        fireEvent.submit(document.querySelector('form'));
         await waitFor(() => {
             expect(screen.getByText('Please enter a URL')).toBeTruthy();
         });
