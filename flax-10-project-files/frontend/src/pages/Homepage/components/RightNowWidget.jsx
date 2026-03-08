@@ -265,6 +265,8 @@ export function RightNowWidget({
   onOpenTimer,
   tomorrowFirstEvent,
   taskWidgetItemsOnly = [],
+  upcomingDeadlines = [],
+  todayFreeWindows = [],
 }) {
   const nav = navigatorContext || {};
   const nowMs = now.getTime();
@@ -358,7 +360,7 @@ export function RightNowWidget({
         <motion.div className={styles.endOfDayWrap} {...fadeIn(0.07)}>
           <div className={styles.endOfDayTopRow}>
             <motion.div
-              animate={{ rotate: [0, 8, -8, 0] }}
+              animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
               <Sparkles size={26} strokeWidth={1.25} color="#C4A46D" aria-hidden />
@@ -367,7 +369,7 @@ export function RightNowWidget({
               <p className={styles.endOfDayTitle}>Day complete — nice work!</p>
               {(completedCount > 0 || eventsToday > 0) && (
                 <p className={styles.endOfDaySub}>
-                  {completedCount > 0 && `${completedCount}${tasks.length > 0 ? `/${tasks.length}` : ""} tasks`}
+                  {completedCount > 0 && `${completedCount}${tasks.length > 0 ? `/${tasks.length}` : ""} tasks done`}
                   {completedCount > 0 && eventsToday > 0 && " · "}
                   {eventsToday > 0 && `${eventsToday} event${eventsToday !== 1 ? "s" : ""} attended`}
                 </p>
@@ -380,7 +382,7 @@ export function RightNowWidget({
               <div className={styles.tomorrowSection}>
                 <p className={styles.tomorrowLabel}>TOMORROW</p>
                 <p className={styles.tomorrowFirstTitle}>{tomorrowFirstEvent.title}</p>
-                {tomorrowTime && <p className={styles.tomorrowFirstTime}>at {tomorrowTime}</p>}
+                {tomorrowTime && <p className={styles.tomorrowFirstTime}>starts at <strong>{tomorrowTime}</strong></p>}
               </div>
             </>
           )}
@@ -389,8 +391,15 @@ export function RightNowWidget({
     );
   }
 
-  // ── Empty day ──────────────────────────────────────────────────────────────
+  // ── Empty day / Idle Purposeful State ──────────────────────────────────────
   if (isToday && !currentBlock && !nextEvent && eventCount === 0) {
+    const nextDeadline = (upcomingDeadlines || [])
+      .filter(d => d.due_date ? new Date(d.due_date) > now : true)
+      .sort((a, b) => new Date(a.due_date || a.start_due_date) - new Date(b.due_date || b.start_due_date))[0];
+
+    const totalFreeMins = (todayFreeWindows || []).reduce((acc, w) => acc + w.minutes, 0);
+    const freeHours = Math.floor(totalFreeMins / 60);
+
     return (
       <div className={styles.root}>
         <SimpleHeader liveClock={liveClock} />
@@ -399,7 +408,22 @@ export function RightNowWidget({
             <Sun size={30} strokeWidth={1.25} color="#C4A46D" aria-hidden />
           </motion.div>
           <p className={styles.emptyDayTitle}>Nothing planned today</p>
-          <p className={styles.emptyDaySubtitle}>Enjoy your day</p>
+
+          {nextDeadline ? (
+            <div className={styles.suggestionBlock}>
+              <p className={styles.suggestionText}>
+                Next deadline: <strong>{nextDeadline.assessment_title || nextDeadline.title}</strong>
+              </p>
+              <p className={styles.suggestionSub}>
+                Why not use your <strong>{freeHours}h free</strong> to get ahead?
+              </p>
+            </div>
+          ) : (
+            <p className={styles.emptyDaySubtitle}>
+              You have <strong>{freeHours}h free</strong> today — enjoy it or plan a session!
+            </p>
+          )}
+
           {tomorrowFirstEvent && tomorrowTime && (
             <p className={styles.emptyDayTomorrow}>
               Tomorrow: {tomorrowFirstEvent.title} at {tomorrowTime}
@@ -433,9 +457,16 @@ export function RightNowWidget({
       {/* NOW row */}
       <motion.div className={styles.nowLine} {...fadeIn(0.16)}>
         <span className={styles.nowPill}>Now</span>
-        <span className={styles.nowText}>
-          {currentBlock?.title ? currentBlock.title : "Nothing on right now"}
-        </span>
+        <div className={styles.nowContent}>
+          <span className={styles.nowText}>
+            {currentBlock?.title ? currentBlock.title : "Nothing on right now"}
+          </span>
+          {!currentBlock && nav.gapMins > 0 && (
+            <span className={styles.gapCountdown}>
+              Free for <strong>{Math.floor(nav.gapMins / 60)}h {nav.gapMins % 60}m</strong>
+            </span>
+          )}
+        </div>
       </motion.div>
 
       {/* NEXT row */}

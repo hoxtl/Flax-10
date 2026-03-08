@@ -856,6 +856,8 @@ export default function Homepage() {
               timerTask,
               tomorrowFirstEvent,
               taskWidgetItemsOnly,
+              upcomingDeadlines,
+              todayFreeWindows,
             }}
           />
         </div>

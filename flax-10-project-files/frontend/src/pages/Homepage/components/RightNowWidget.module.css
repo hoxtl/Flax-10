@@ -942,7 +942,69 @@
 }
 
 .nextMeta {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 500;
+}
+
+.nowContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gapCountdown {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  color: #a89279;
+  line-height: 1.2;
+}
+
+.suggestionBlock {
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(196, 164, 109, 0.05);
+  border: 1px solid rgba(196, 164, 109, 0.1);
+  border-radius: 12px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.suggestionText {
+  font-size: 13px;
+  color: #2c1810;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.suggestionSub {
+  font-size: 12px;
+  color: #8b7355;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.suggestionBlock strong {
+  color: #4a2f19;
+  font-weight: 700;
+}
+
+.gapCountdown strong {
+  color: #857668;
+  font-weight: 700;
+}
+
+@media (max-width: 1600px) {
+  .gapCountdown {
+    font-size: 11px;
+  }
+
+  .suggestionText {
+    font-size: 12px;
+  }
+
+  .suggestionSub {
+    font-size: 11px;
+  }
 }
