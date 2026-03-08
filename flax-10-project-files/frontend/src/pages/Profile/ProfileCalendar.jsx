@@ -1,18 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
-import { addMonths, formatMonthYear } from '../../components/Calendar/utils/dateUtils';
-import { NavigationButtons } from "../../components/Calendar/header/NavigationButtons";
+import { addMonths, formatMonthYear, isSameMonth } from '../../components/Calendar/utils/dateUtils';
+import { CalendarNav } from "../../components/Calendar/header/CalendarHeaderUtils";
 import { MonthView } from '../../components/Calendar/MonthView/MonthView';
 import { EventPopups } from '../../components/Calendar/EventPopups';
 import { ResizeHighlightProvider } from '../../context/ResizeHighlightContext';
 import { EventsSummaryModal } from "../../components/Calendar/EventsSummaryModal/EventsSummaryModal";
-import { useState } from "react";
 import "../../components/Calendar/CalendarHeader.css";
 import "../../components/Calendar/Calendar.css";
 
 function ProfileCalendarHeader() {
     const { selectedDate } = useCalendar();
     const dispatch = useCalendarDispatch();
+    const setDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+    const showToday = !isSameMonth(selectedDate, new Date());
 
     useEffect(() => {
         dispatch({ type: 'SET_VIEW_MODE', payload: 'month' });
@@ -21,13 +22,10 @@ function ProfileCalendarHeader() {
 
     return (
         <div className="calendar-header">
-            <NavigationButtons
-                onNavigate={(dir) => dispatch({ type: 'SET_SELECTED_DATE', payload: addMonths(selectedDate, dir) })}
-                selectedDate={selectedDate}
-                onDatePick={(date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date })}
-            />
-            <h2 className="calendar-title">{formatMonthYear(selectedDate)}</h2>
-            <div className="actions" />
+            <CalendarNav onPrev={() => setDate(addMonths(selectedDate, -1))} onNext={() => setDate(addMonths(selectedDate, 1))}
+                onToday={() => setDate(new Date())} showToday={showToday} selectedDate={selectedDate}
+                onDatePick={setDate} title={formatMonthYear(selectedDate)} />
+            <div className="header-actions" />
         </div>
     );
 }

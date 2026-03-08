@@ -32,7 +32,7 @@ export default function PillFilters({ active, onChange, items }) {
 function getAllPills(tags) {
   return [
     { id: "all", key: "all", label: "All" },
-    ...tags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label })),
+    ...tags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label, color: t.color })),
   ];
 }
 
@@ -40,13 +40,13 @@ function getAllPills(tags) {
  * Renders an individual pill button.
  */
 function PillItem({ pill, active, counts, onChange }) {
-  const isActive = checkActive(active, pill.key);
   return (
     <BasePill
       label={pill.label}
       count={counts[pill.key] || 0}
       isActive={checkActive(active, pill.key)}
       onClick={() => onChange(pill.key)}
+      color={pill.color}
     />
   );
 }
