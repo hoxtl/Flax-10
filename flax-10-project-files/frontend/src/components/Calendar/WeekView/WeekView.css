@@ -1,5 +1,5 @@
 .week-view {
-  background: var(--calendar-bg);
+  background: var(--panel);
   border-radius: 8px;
   overflow-y: auto;
   flex: 1;
@@ -12,7 +12,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--calendar-bg);
+  background: var(--panel);
 }
 
 .week-header {
@@ -87,7 +87,8 @@
   padding: 0.25rem;
   text-align: right;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-task);
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -115,16 +116,16 @@
 .week-view:has(.draggable-event.resizing) .hour-cell {
   background-image: linear-gradient(to bottom,
       transparent 24%,
-      var(--hover) 25%,
-      var(--hover) 26%,
+      var(--divider) 25%,
+      var(--divider) 26%,
       transparent 27%,
       transparent 49%,
-      var(--active) 50%,
-      var(--active) 51%,
+      var(--divider) 50%,
+      var(--divider) 51%,
       transparent 52%,
       transparent 74%,
-      var(--hover) 75%,
-      var(--hover) 76%,
+      var(--divider) 75%,
+      var(--divider) 76%,
       transparent 77%);
 }
 
