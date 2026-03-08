@@ -51,7 +51,7 @@
 /* Segmented View Switcher */
 .viewSwitcher {
     display: flex;
-    background: var(--pill-bg, #f0ebe5);
+    background: var(--pill-bg);
     border-radius: 8px;
     padding: 3px;
     gap: 2px;
@@ -76,7 +76,7 @@
 .viewBtn.active {
     background: var(--bg);
     color: var(--text);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm, 0 1px 3px var(--shadow-color, rgba(0, 0, 0, 0.1)));
 }
 
 /* Action Menu */
@@ -94,7 +94,7 @@
     background: var(--primary);
     border-radius: 6px;
     cursor: pointer;
-    color: white;
+    color: var(--c-white);
     transition: all 0.15s;
 }
 
@@ -110,7 +110,7 @@
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg, 0 4px 16px var(--shadow-color, rgba(0, 0, 0, 0.12)));
     z-index: 100;
     overflow: hidden;
 }

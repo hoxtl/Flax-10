@@ -105,23 +105,13 @@ async function handlePopupDelete(event, handlers, closePopup, confirmFn) {
 }
 
 function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
+    const showToday = !isSameMonth(date, new Date());
     return (
         <div className={styles.calendarHeader}>
-            <NavButtons date={date} setDate={setDate} />
-            <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
+            <CalendarNav onPrev={() => setDate(addMonths(date, -1))} onNext={() => setDate(addMonths(date, 1))}
+                onToday={() => setDate(new Date())} showToday={showToday} selectedDate={date} onDatePick={setDate} />
+            <CalendarTitle>{formatMonthYear(date)}</CalendarTitle>
             {isMember && <SyncButton societyId={societyId} societyName={societyName} />}
-        </div>
-    );
-}
-
-function NavButtons({ date, setDate }) {
-    const nav = (dir) => setDate(addMonths(date, dir));
-    return (
-        <div className={styles.navButtons}>
-            <button onClick={() => nav(-1)}>&larr;</button>
-            <button onClick={() => setDate(new Date())}>Today</button>
-            <button onClick={() => nav(1)}>&rarr;</button>
-            <DatePickerButton selectedDate={date} onDatePick={setDate} />
         </div>
     );
 }
