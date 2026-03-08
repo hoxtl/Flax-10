@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSleepWarning, isDuringSleepWindow } from '../../components/Settings/useSleepWarning';
+import { useSleepWarning, isDuringSleepWindow } from '../../components/Settings/hooks/useSleepWarning';
 
 const makeDate = (h, m = 0) => { const d = new Date(); d.setHours(h, m, 0, 0); return d; };
 

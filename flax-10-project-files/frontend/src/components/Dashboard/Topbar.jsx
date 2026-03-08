@@ -12,7 +12,6 @@ import { useState, useRef, useEffect } from "react";
 
 
 function BrandLogo({ onNavChange }) {
-  const nav = () => onNavChange?.("home");
   return (
     <div className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
       <motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
