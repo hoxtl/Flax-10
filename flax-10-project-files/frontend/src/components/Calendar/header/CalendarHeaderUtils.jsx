@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Settings2, Plus } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
+import AnimatedDropdown from '../../ui/AnimatedDropdown';
 import styles from './CalendarHeaderUtils.module.css';
 
 export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) {
@@ -26,34 +27,33 @@ export function ViewSwitcher({ modes, activeMode, onChange }) {
 }
 
 export function ActionMenu({ onAddEvent, onImport }) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef(null);
-    useClickOutside(ref, () => setOpen(false));
+    const options = [
+        { label: "Add Event", value: "add" },
+        { label: "Import Timetable", value: "import" }
+    ];
     return (
-        <div className={styles.actionMenu} ref={ref}>
-            <button className={styles.actionBtn} onClick={() => setOpen(!open)}><Plus size={18} /></button>
-            {open && <ActionDropdown onAddEvent={() => { onAddEvent(); setOpen(false); }} onImport={() => { onImport(); setOpen(false); }} />}
-        </div>
+        <AnimatedDropdown
+            className={styles.actionMenu}
+            customTrigger={<button className={styles.actionBtn}><Plus size={18} /></button>}
+            options={options}
+            hideCheckmark={true}
+            onChange={(val) => val === 'add' ? onAddEvent() : onImport()}
+        />
     );
 }
 
-function ActionDropdown({ onAddEvent, onImport }) {
+export function ViewSettingsMenu({ isMobile, modes, activeMode, onViewChange }) {
+    if (!isMobile) {
+        return <button className={styles.settingsBtn} title="View Settings"><Settings2 size={18} /></button>;
+    }
+
     return (
-        <div className={styles.dropdown}>
-            <button className={styles.dropdownItem} onClick={onAddEvent}>Add Event</button>
-            <button className={styles.dropdownItem} onClick={onImport}>Import Timetable</button>
-        </div>
+        <AnimatedDropdown
+            className={styles.actionMenu}
+            customTrigger={<button className={styles.settingsBtn} title="View Settings"><Settings2 size={18} /></button>}
+            options={modes}
+            value={activeMode}
+            onChange={onViewChange}
+        />
     );
-}
-
-export function ViewSettingsButton({ onClick }) {
-    return <button className={styles.settingsBtn} onClick={onClick} title="View Settings"><Settings2 size={18} /></button>;
-}
-
-function useClickOutside(ref, handler) {
-    useEffect(() => {
-        const listener = (e) => { if (ref.current && !ref.current.contains(e.target)) handler(); };
-        document.addEventListener('mousedown', listener);
-        return () => document.removeEventListener('mousedown', listener);
-    }, [ref, handler]);
 }

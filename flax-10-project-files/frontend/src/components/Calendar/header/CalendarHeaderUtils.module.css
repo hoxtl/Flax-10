@@ -78,32 +78,3 @@
 .actionMenu {
     position: relative;
 }
-
-.dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    min-width: 160px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: var(--shadow-lg, 0 4px 16px var(--shadow-color, rgba(0, 0, 0, 0.12)));
-    z-index: 100;
-    overflow: hidden;
-}
-
-.dropdownItem {
-    width: 100%;
-    padding: 10px 14px;
-    border: none;
-    background: none;
-    text-align: left;
-    font-size: 0.9rem;
-    cursor: pointer;
-    color: var(--text);
-    transition: background 0.1s;
-}
-
-.dropdownItem:hover {
-    background: var(--hover);
-}

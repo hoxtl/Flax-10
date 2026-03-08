@@ -4,7 +4,7 @@ import { addDays, formatDate, getWeekDays, formatMonthYear, isSameDay, getStartO
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsButton } from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu } from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import "./CalendarHeader.css";
 
@@ -43,30 +43,40 @@ export function CalendarHeader() {
     const setViewMode = (mode) => dispatch({ type: "SET_VIEW_MODE", payload: mode });
     const onImport = async (url) => { await importTimetable(url); await reloadEvents(dispatch, selectedDate, viewMode); };
     const showToday = !isTodayVisible(viewMode, selectedDate);
+    const title = getTitle(selectedDate, viewMode);
 
     return (
         <>
-            <DesktopHeader selectedDate={selectedDate} viewMode={viewMode} modes={modes} showToday={showToday}
-                onPrev={() => navigate(-1)} onNext={() => navigate(1)} onToday={() => jumpToDate(getTodayDate())}
-                onDatePick={jumpToDate} onViewChange={setViewMode} onAddEvent={() => openForView(openModal, viewMode, selectedDate)}
-                onImport={() => setShowImportModal(true)} />
+            <div className="calendar-header-container">
+                <header className="calendar-header">
+                    <CalendarNav
+                        onPrev={() => navigate(-1)}
+                        onNext={() => navigate(1)}
+                        onToday={() => jumpToDate(getTodayDate())}
+                        showToday={showToday}
+                        selectedDate={selectedDate}
+                        onDatePick={jumpToDate}
+                        title={!isMobile ? title : null}
+                    />
+                    {!isMobile && (
+                        <div className="header-center">
+                            <ViewSwitcher modes={modes} activeMode={viewMode} onChange={setViewMode} />
+                        </div>
+                    )}
+                    <div className="header-actions">
+                        <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
+                        <ViewSettingsMenu isMobile={isMobile} modes={modes} activeMode={viewMode} onViewChange={setViewMode} />
+                    </div>
+                </header>
+                {isMobile && (
+                    <div className="mobile-title-row">
+                        <h2 className="title">{title}</h2>
+                    </div>
+                )}
+            </div>
             {viewMode === "day" && <MobileDateStrip selectedDate={selectedDate} dispatch={dispatch} />}
             <TimetableImportModal isOpen={showImportModal} onClose={() => setShowImportModal(false)} onImport={onImport} />
         </>
-    );
-}
-
-function DesktopHeader({ selectedDate, viewMode, modes, showToday, onPrev, onNext, onToday, onDatePick, onViewChange, onAddEvent, onImport }) {
-    return (
-        <header className="calendar-header">
-            <CalendarNav onPrev={onPrev} onNext={onNext} onToday={onToday} showToday={showToday}
-                selectedDate={selectedDate} onDatePick={onDatePick} title={getTitle(selectedDate, viewMode)} />
-            <div className="header-center"><ViewSwitcher modes={modes} activeMode={viewMode} onChange={onViewChange} /></div>
-            <div className="header-actions">
-                <ActionMenu onAddEvent={onAddEvent} onImport={onImport} />
-                <ViewSettingsButton onClick={() => {}} />
-            </div>
-        </header>
     );
 }
 

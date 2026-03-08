@@ -1,4 +1,9 @@
 /* Main Calendar Header - Clean design with bottom border */
+.calendar-header-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .calendar-header {
     display: flex;
     align-items: center;
@@ -8,9 +13,22 @@
     border-bottom: 1px solid var(--border);
 }
 
-.calendar-header > *:first-child {
+.calendar-header>*:first-child {
     flex: 1;
     min-width: 0;
+}
+
+.mobile-title-row {
+    display: flex;
+    justify-content: center;
+    padding: 0 16px 12px;
+}
+
+.mobile-title-row .title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
 }
 
 .header-center {
@@ -32,7 +50,7 @@
     display: none;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 0 16px 12px;
+    padding: 16px 16px 12px;
     scrollbar-width: none;
 }
 
@@ -91,12 +109,18 @@
 
 /* Mobile Responsive */
 @media (max-width: 900px) {
-    .calendar-header {
-        padding: 8px 16px;
+    .calendar-header-container {
         background: var(--panel);
         position: sticky;
         top: 0;
         z-index: 30;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .calendar-header {
+        padding: 8px 16px;
+        border-bottom: none;
+        margin-bottom: 0;
     }
 
     .date-strip-wrapper {
