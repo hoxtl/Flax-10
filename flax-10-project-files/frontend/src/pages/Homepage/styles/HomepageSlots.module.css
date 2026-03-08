@@ -1663,21 +1663,23 @@
 
 .deadlineDetailClose {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border: none;
-  color: #5c4d3e;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(139, 115, 85, 0.06);
+  color: #a89279;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s, transform 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .deadlineDetailClose:hover {
+  background: rgba(139, 115, 85, 0.12);
   color: #2c1810;
-  transform: scale(1.1);
+  border-color: rgba(139, 115, 85, 0.2);
 }
 
 .deadlineDetailTitle {
