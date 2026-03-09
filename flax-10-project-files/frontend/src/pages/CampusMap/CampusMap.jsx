@@ -392,8 +392,10 @@ export default function CampusMap() {
     loadCalendarEvents();
     const handleRefresh = () => loadCalendarEvents();
     window.addEventListener('calendar-event-updated', handleRefresh);
-  }
-)
+    return () => {
+      window.removeEventListener('calendar-event-updated', handleRefresh);
+    };
+  }, []);
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
