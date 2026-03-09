@@ -39,6 +39,7 @@ def update_event(event, data):
         if geocode_result['success']:
             event.location = geocode_result['formatted_address']
             event.location_latitude = geocode_result['latitude']
+            event.location_longitude = geocode_result['longitude']
 
     serialiser.save()
     return Response(CalendarEventSerialiser(event).data)
