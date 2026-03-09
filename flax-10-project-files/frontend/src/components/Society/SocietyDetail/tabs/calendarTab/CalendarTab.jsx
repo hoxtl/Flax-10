@@ -9,7 +9,7 @@ import { CalendarProvider, useEventModal } from "../../../../../context/Calendar
 import { EventModal } from "../../../../Calendar/EventModal/EventModal";
 import TagFilterBar from "../../tags/TagFilterBar";
 import TagManager from "../../tags/TagManager";
-import { EventDetailPopup } from "../../../../Calendar/EventDetailPopup";
+import { EventPopover } from "../../../../Calendar/EventPopover/EventPopover";
 import SyncButton from "./SyncButton";
 import { EventsSummaryModal } from "../../../../Calendar/EventsSummaryModal/EventsSummaryModal";
 import { useConfirm } from "../../../../../context/ConfirmContext";
@@ -55,8 +55,9 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
                 onMoreClick={setSummaryDate}
                 customTags={tags} />
             <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
-            {popupState.event && <EventDetailPopup event={popupState.event} anchorRect={popupState.rect}
+            {popupState.event && <EventPopover event={popupState.event} anchorRect={popupState.rect}
                 tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
+                readOnly={!editMode}
                 actions={getPopupActions(popupState.event, onViewAnnouncement, editMode, {
                     onEdit: () => openModal(popupState.event, 'society', popupState.event.start_time),
                     onDelete: async (e) => await handlePopupDelete(e, eventHandlers, closePopup, confirmFn)
