@@ -909,3 +909,16 @@
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
+
+:global(.eventPopupButton) {
+  padding: 6px 12px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  width: 100%;
+}
