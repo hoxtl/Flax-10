@@ -22,7 +22,14 @@ export function CalendarProvider({ children }) {
 export function useCalendar() {
     const context = useContext(CalendarContext);
     if (!context) {
-        throw new Error('useCalendar must be used within CalendarProvider');
+        return {
+            events: [],
+            allEvents: [],
+            selectedDate: new Date(),
+            viewMode: 'month',
+            displayMode: 'grid',
+            filter: 'all'
+        };
     }
     return getFilteredContext(context);
 }
