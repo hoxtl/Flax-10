@@ -18,7 +18,8 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
     class Meta:
         model = CalendarEvent
         fields = ['id', 'title', 'description',
-        'start_time', 'end_time', 'location', 'tag',
+        'start_time', 'end_time', 'location',
+         'location_latitude', 'tag',
         'tag_name', 'tag_details', 'recurrence_details',
         'recurrence_rule', 'reminder_minutes',
         'source', 'external_id', 'module', 'module_name', 'module_code', 'is_private']
