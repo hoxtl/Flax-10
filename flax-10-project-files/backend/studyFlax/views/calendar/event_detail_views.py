@@ -34,6 +34,8 @@ def update_event(event, data):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     
     location = data.get('location')
+    if location and location.strip():
+        geocode_result = GeocodingService.geocode_location(location)
 
     serialiser.save()
     return Response(CalendarEventSerialiser(event).data)
