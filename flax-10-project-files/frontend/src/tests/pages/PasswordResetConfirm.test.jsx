@@ -88,12 +88,7 @@ describe('PasswordResetConfirm', () => {
         expect(screen.getByText('✅ Success!')).toBeTruthy();
     });
 
-    it('navigates to login after 2 seconds on success', async () => {
-        let timerCallback;
-        const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementationOnce((fn) => {
-            timerCallback = fn;
-            return 1;
-        });
+    it('hides form on successful reset', async () => {
         fetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({ message: 'Password reset successfully.' }),
@@ -103,9 +98,8 @@ describe('PasswordResetConfirm', () => {
         fireEvent.change(screen.getByLabelText('Confirm New Password'), { target: { value: 'pass1234', name: 'confirm_password' } });
         fireEvent.submit(screen.getByRole('button', { name: 'Reset Password' }));
         await waitFor(() => expect(screen.getByText('✅ Success!')).toBeTruthy());
-        timerCallback?.();
-        expect(mockNavigate).toHaveBeenCalledWith('/login');
-        setTimeoutSpy.mockRestore();
+        // Form is hidden after success
+        expect(screen.queryByLabelText('New Password')).toBeNull();
     });
 
     it('shows error on failed reset', async () => {
