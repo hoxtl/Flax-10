@@ -3,15 +3,19 @@ import { renderHook } from '@testing-library/react';
 import { useCountUp } from '../../hooks/useCountUp';
 
 describe('useCountUp', () => {
+    let now = 0;
+
     beforeEach(() => {
-        vi.useFakeTimers();
-        // Mock requestAnimationFrame
-        vi.stubGlobal('requestAnimationFrame', (cb) => { cb(performance.now()); return 1; });
-        vi.stubGlobal('performance', { now: () => Date.now() });
+        now = 0;
+        vi.stubGlobal('performance', { now: () => now });
+        vi.stubGlobal('requestAnimationFrame', (cb) => {
+            now += 1000;
+            cb(now);
+            return 1;
+        });
     });
 
     afterEach(() => {
-        vi.useRealTimers();
         vi.unstubAllGlobals();
     });
 
@@ -25,21 +29,26 @@ describe('useCountUp', () => {
     it('updates textContent of referenced element with integer target', () => {
         const div = document.createElement('div');
         document.body.appendChild(div);
-
-        const { result } = renderHook(() => useCountUp(100, 0));
+        const { result, rerender } = renderHook(({ target, duration }) => useCountUp(target, duration), {
+            initialProps: { target: 100, duration: 100 },
+        });
         result.current.current = div;
 
-        // Trigger effect re-run by calling hook with same value
-        // The effect should have run on mount
+        // retrigger effect after ref is attached
+        rerender({ target: 100, duration: 101 });
+        expect(div.textContent).toBe('100');
         document.body.removeChild(div);
     });
 
     it('uses decimal format for float targets', () => {
         const div = document.createElement('div');
         document.body.appendChild(div);
-
-        // Float target like 2.5
-        renderHook(() => useCountUp(2.5, 0));
+        const { result, rerender } = renderHook(({ target, duration }) => useCountUp(target, duration), {
+            initialProps: { target: 2.5, duration: 100 },
+        });
+        result.current.current = div;
+        rerender({ target: 2.5, duration: 101 });
+        expect(div.textContent).toBe('2.5');
         document.body.removeChild(div);
     });
 });
