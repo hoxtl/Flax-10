@@ -379,7 +379,10 @@ export default function CampusMap() {
 
   // Add calendar events to the map
   useEffect(() => {
-    
+    const loadCalendarEvents = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+    }
   })
 
   // Update the marker on the map when user's start location changes
