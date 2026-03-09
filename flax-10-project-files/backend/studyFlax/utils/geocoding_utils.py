@@ -54,3 +54,10 @@ class GeocodingService:
                     'longitude': longitude,
                     'formatted_address': formatted_address,
                 }
+            else:
+                return {
+                    'success': False,
+                    'latitude': None,
+                    'longitude': None,
+                    'formatted_address': None,
+                }
