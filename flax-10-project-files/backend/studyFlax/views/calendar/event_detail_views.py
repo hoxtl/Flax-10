@@ -36,6 +36,8 @@ def update_event(event, data):
     location = data.get('location')
     if location and location.strip():
         geocode_result = GeocodingService.geocode_location(location)
+        if geocode_result['success']:
+            event.location = geocode_result['formatted_address']
 
     serialiser.save()
     return Response(CalendarEventSerialiser(event).data)
