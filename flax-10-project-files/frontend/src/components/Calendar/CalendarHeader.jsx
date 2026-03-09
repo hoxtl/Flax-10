@@ -4,7 +4,7 @@ import { addDays, formatDate, getWeekDays, formatMonthYear, isSameDay, getStartO
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu } from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton } from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import "./CalendarHeader.css";
 
@@ -64,8 +64,9 @@ export function CalendarHeader() {
                         </div>
                     )}
                     <div className="header-actions">
+                        {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
+                        <ViewSettingsMenu activeMode={viewMode} onViewChange={setViewMode} />
                         <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
-                        <ViewSettingsMenu isMobile={isMobile} modes={modes} activeMode={viewMode} onViewChange={setViewMode} />
                     </div>
                 </header>
                 {isMobile && (

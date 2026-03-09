@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Settings2, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import AnimatedDropdown from '../../ui/AnimatedDropdown';
@@ -42,18 +41,34 @@ export function ActionMenu({ onAddEvent, onImport }) {
     );
 }
 
-export function ViewSettingsMenu({ isMobile, modes, activeMode, onViewChange }) {
-    if (!isMobile) {
-        return <button className={styles.settingsBtn} title="View Settings"><Settings2 size={18} /></button>;
-    }
+const EXTRA_VIEW_OPTIONS = [
+    { label: "List View", value: "list" },
+    { label: "Table View", value: "table" }
+];
 
+export function ViewModeButton({ modes, activeMode, onChange }) {
+    const trigger = <button className={styles.settingsBtn} title="View Mode"><LayoutList size={18} /></button>;
     return (
         <AnimatedDropdown
             className={styles.actionMenu}
-            customTrigger={<button className={styles.settingsBtn} title="View Settings"><Settings2 size={18} /></button>}
+            customTrigger={trigger}
             options={modes}
             value={activeMode}
+            onChange={onChange}
+        />
+    );
+}
+
+export function ViewSettingsMenu({ activeMode, onViewChange }) {
+    const trigger = <button className={styles.settingsBtn} title="View Settings"><Settings2 size={18} /></button>;
+    return (
+        <AnimatedDropdown
+            className={styles.actionMenu}
+            customTrigger={trigger}
+            options={EXTRA_VIEW_OPTIONS}
+            value={activeMode}
             onChange={onViewChange}
+            hideCheckmark={activeMode !== 'list' && activeMode !== 'table'}
         />
     );
 }
