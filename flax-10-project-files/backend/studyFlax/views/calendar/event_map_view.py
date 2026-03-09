@@ -33,3 +33,5 @@ def calendar_events_map_view(request):
             'end_time': event.end_time.isoformat(),
             'priority': event.priority,
         })
+    
+    return Response({'events': event_data})
