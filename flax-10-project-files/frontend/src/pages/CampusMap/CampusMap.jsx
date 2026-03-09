@@ -464,8 +464,12 @@ export default function CampusMap() {
         }, 100);
       });
       eventMarkers.current.push(marker);
-    })
-  })
+    });
+    return () => {
+      eventMarkers.current.forEach(marker => marker.remove());
+      eventMarkers.current = []
+    };
+  }, [calendarEvents, mapLoaded]);
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
