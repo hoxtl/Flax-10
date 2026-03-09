@@ -1,5 +1,6 @@
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { EditableCell } from './cells/EditableCell';
+import { useQuickActions } from '../hooks/useQuickActions';
 import styles from './TableView.module.css';
 
 function formatDateTime(event) {
@@ -40,6 +41,7 @@ function TagCell({ event }) {
 export function TableRow({ event, rowIndex, editState, onCellClick, onKeyDown }) {
     const isReadOnly = isReadOnlyEvent(event);
     const { editingCell, cellValue, updateValue } = editState;
+    const quickAction = useQuickActions(event);
 
     const isEditing = (field) => {
         return editingCell?.eventId === event.id && editingCell?.field === field;
@@ -55,12 +57,17 @@ export function TableRow({ event, rowIndex, editState, onCellClick, onKeyDown })
     return (
         <tr className={`${styles.row} ${isReadOnly ? styles.readOnly : ''}`}>
             <td className={styles.nameCell} onClick={() => handleCellClick('title')}>
-                <EditableCell
-                    value={isEditing('title') ? cellValue : event.title}
-                    isEditing={isEditing('title')}
-                    onChange={updateValue}
-                    onKeyDown={(e) => handleKeyDown(e, 0)}
-                />
+                <div className={styles.nameCellContent}>
+                    <EditableCell
+                        value={isEditing('title') ? cellValue : event.title}
+                        isEditing={isEditing('title')}
+                        onChange={updateValue}
+                        onKeyDown={(e) => handleKeyDown(e, 0)}
+                    />
+                    {isReadOnly && quickAction && (
+                        <button className={styles.quickActionBtn} onClick={quickAction.onClick}>{quickAction.label}</button>
+                    )}
+                </div>
             </td>
             <TagCell event={event} />
             <td className={styles.dateCell}>{formatDateTime(event)}</td>
