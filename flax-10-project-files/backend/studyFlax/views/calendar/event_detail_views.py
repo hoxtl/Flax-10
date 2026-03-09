@@ -51,6 +51,7 @@ def update_event(event, data):
         event.location_validated = False
 
     serialiser.save()
+    event.save()
     return Response(CalendarEventSerialiser(event).data)
 
 
