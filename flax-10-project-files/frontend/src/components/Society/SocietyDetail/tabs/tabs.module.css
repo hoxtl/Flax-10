@@ -282,56 +282,6 @@
     border-bottom: 1px solid var(--border);
 }
 
-.navButtons {
-    display: flex;
-    gap: 4px;
-}
-
-.navButtons button {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.navButtons button:hover {
-    background: var(--hover);
-}
-
-.calendarTitle {
-    font-weight: 600;
-    font-size: 1.1rem;
-    flex: 1;
-}
-
-.viewSwitcher {
-    display: flex;
-    gap: 4px;
-}
-
-.viewBtn {
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-}
-
-.viewBtn:hover {
-    background: var(--hover);
-}
-
-
-.viewBtn.activeView {
-    background: var(--primary);
-    color: var(--c-white);
-    border-color: var(--primary);
-}
-
 .highlight {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px var(--primary);

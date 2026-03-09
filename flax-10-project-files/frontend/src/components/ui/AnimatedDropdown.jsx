@@ -107,15 +107,15 @@ function CheckMark() {
  * @param {Function} props.onSelect - Callback invoked with the selected value.
  * @param {number} props.index - Position index used to stagger the entrance animation.
  */
-function GroupedOptionItem({ opt, value, onSelect, index }) {
+function GroupedOptionItem({ opt, value, onSelect, index, hideCheckmark }) {
   return (
     <motion.button type="button"
       initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.15, delay: index * 0.02 }}
       onClick={() => onSelect(opt.value)}
-      className={`${styles.dropdownItem} ${value === opt.value ? styles.dropdownItemActive : ''}`}>
+      className={`${styles.dropdownItem} ${value === opt.value && !hideCheckmark ? styles.dropdownItemActive : ''}`}>
       <span>{opt.label}</span>
-      {value === opt.value && <CheckMark />}
+      {value === opt.value && !hideCheckmark && <CheckMark />}
     </motion.button>
   );
 }
@@ -127,12 +127,12 @@ function GroupedOptionItem({ opt, value, onSelect, index }) {
  * @param {string} props.value - Currently selected value.
  * @param {Function} props.onSelect - Selection callback.
  */
-function GroupedOptions({ options, value, onSelect }) {
+function GroupedOptions({ options, value, onSelect, hideCheckmark }) {
   return options.map((group) => (
     <div key={group.label}>
       <div className={styles.dropdownGroup}>{group.label}</div>
       {group.options.map((opt, i) => (
-        <GroupedOptionItem key={opt.value} opt={opt} value={value} onSelect={onSelect} index={i} />
+        <GroupedOptionItem key={opt.value} opt={opt} value={value} onSelect={onSelect} index={i} hideCheckmark={hideCheckmark} />
       ))}
     </div>
   ));
@@ -145,7 +145,7 @@ function GroupedOptions({ options, value, onSelect }) {
  * @param {string} props.value - Currently selected value.
  * @param {Function} props.onSelect - Selection callback.
  */
-function FlatOptions({ options, value, onSelect }) {
+function FlatOptions({ options, value, onSelect, hideCheckmark }) {
   return options.map((opt, i) => {
     const optValue = typeof opt === 'string' ? opt : opt.value;
     const optLabel = typeof opt === 'string' ? opt : opt.label;
@@ -154,10 +154,10 @@ function FlatOptions({ options, value, onSelect }) {
         initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.15, delay: i * 0.03 }}
         onClick={() => onSelect(optValue)}
-        className={`${styles.dropdownItem} ${value === optValue ? styles.dropdownItemActive : ''}`}
+        className={`${styles.dropdownItem} ${value === optValue && !hideCheckmark ? styles.dropdownItemActive : ''}`}
       >
         <span>{optLabel}</span>
-        {value === optValue && <CheckMark />}
+        {value === optValue && !hideCheckmark && <CheckMark />}
       </motion.button>
     );
   });
@@ -198,15 +198,15 @@ function DropdownButton({ selectedLabel, value, isOpen, onClick }) {
  */
 function DropdownContent({
   grouped, filteredOptions, value, onSelect,
-  searchable, query, setQuery, searchPlaceholder, emptyMessage,
+  searchable, query, setQuery, searchPlaceholder, emptyMessage, hideCheckmark
 }) {
   const isEmpty = searchable && filteredOptions.length === 0;
   return (
     <>
       {searchable && <SearchInput query={query} setQuery={setQuery} placeholder={searchPlaceholder} />}
       {isEmpty && <EmptyState query={query} emptyMessage={emptyMessage} />}
-      {!isEmpty && grouped && <GroupedOptions options={filteredOptions} value={value} onSelect={onSelect} />}
-      {!isEmpty && !grouped && <FlatOptions options={filteredOptions} value={value} onSelect={onSelect} />}
+      {!isEmpty && grouped && <GroupedOptions options={filteredOptions} value={value} onSelect={onSelect} hideCheckmark={hideCheckmark} />}
+      {!isEmpty && !grouped && <FlatOptions options={filteredOptions} value={value} onSelect={onSelect} hideCheckmark={hideCheckmark} />}
     </>
   );
 }
@@ -223,16 +223,21 @@ function DropdownContent({
  * @param {Function} props.setQuery - Setter for the search query.
  * @param {string} props.searchPlaceholder - Placeholder for the search input.
  * @param {string} props.emptyMessage - Message shown when no options match.
+ * @param {boolean} props.openUpward - Whether to open the menu upward.
+ * @param {number} props.menuMaxHeight - Max height for the menu.
  */
 function DropdownPanel({
   grouped, filteredOptions, value, onSelect,
-  searchable, query, setQuery, searchPlaceholder, emptyMessage,
+  searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark
 }) {
+  const yOffset = openUpward ? 8 : -8;
+  const menuStyle = openUpward ? { bottom: '100%', top: 'auto', marginBottom: 4 } : {};
+  if (menuMaxHeight) menuStyle.maxHeight = menuMaxHeight;
   return (
-    <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }} className={styles.dropdownMenu}>
+    <motion.div initial={{ opacity: 0, y: yOffset }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: yOffset }} transition={{ duration: 0.18 }} className={styles.dropdownMenu} style={menuStyle}>
       <DropdownContent grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
-        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} />
+        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} hideCheckmark={hideCheckmark} />
     </motion.div>
   );
 }
@@ -250,13 +255,16 @@ function DropdownPanel({
  * @param {Function} props.setQuery - Setter for the search query.
  * @param {string} props.searchPlaceholder - Placeholder for the search input.
  * @param {string} props.emptyMessage - Message shown when no options match.
+ * @param {boolean} props.openUpward - Whether to open the menu upward.
+ * @param {number} props.menuMaxHeight - Max height for the menu.
  */
-function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, query, setQuery, searchPlaceholder, emptyMessage }) {
+function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark }) {
   const filteredOptions = searchable ? (grouped ? filterGrouped(options, query) : filterFlat(options, query)) : options;
   return (
     <AnimatePresence>
       {isOpen && <DropdownPanel grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
-        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} />}
+        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} />}
     </AnimatePresence>
   );
 }
@@ -276,21 +284,42 @@ function useDropdownOptions(options, grouped) {
 /**
  * Manages open/closed state, query state, derived label, and event handlers
  * for an AnimatedDropdown instance.
- * @param {Array|string[]} options - Raw options.
- * @param {boolean} grouped - Whether options are grouped.
- * @param {string} placeholder - Placeholder text shown when nothing is selected.
- * @param {string} value - Currently selected value.
- * @param {Function} onChange - External change callback.
- * @returns {{ isOpen, query, setQuery, selectedLabel, handleSelect, handleToggle }}
  */
-function useDropdownState(options, grouped, placeholder, value, onChange) {
-  const [isOpen, setIsOpen] = useState(false);
+function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpenChange) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isCtrl = forceOpen !== undefined;
+  const isOpen = isCtrl ? forceOpen : internalOpen;
+  const updateOpen = (v) => {
+    const next = typeof v === 'function' ? v(isOpen) : v;
+    if (!isCtrl) setInternalOpen(next);
+    if (onOpenChange) onOpenChange(next);
+  };
   const [query, setQuery] = useState("");
-  const allOptions = useDropdownOptions(options, grouped);
-  const selectedLabel = allOptions.find(o => o.value === value)?.label || placeholder;
-  const handleSelect = (val) => { onChange(val); setIsOpen(false); setQuery(""); };
-  const handleToggle = () => { setIsOpen(o => !o); setQuery(""); };
-  return { isOpen, query, setQuery, selectedLabel, handleSelect, handleToggle };
+  const allOptions = useDropdownOptions(opts, grp);
+  const selectedLabel = allOptions.find(o => o.value === val)?.label || ph;
+  const handleSelect = (v) => { onChange(v); updateOpen(false); setQuery(""); };
+  const handleToggle = () => { if (!hover) { updateOpen(!isOpen); setQuery(""); } };
+  return { isOpen, setIsOpen: updateOpen, query, setQuery, selectedLabel, handleSelect, handleToggle };
+}
+
+/**
+ * Determines whether the dropdown should open upward based on available viewport space.
+ * @param {React.RefObject} containerRef - Ref to the dropdown container element.
+ * @param {boolean} isOpen - Whether the dropdown is currently open.
+ * @param {number} menuMaxHeight - Max height of the dropdown menu (default 260).
+ * @returns {boolean} True if the dropdown should open upward.
+ */
+function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
+  const [openUpward, setOpenUpward] = useState(false);
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const shouldOpenUpward = spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
+    setOpenUpward(shouldOpenUpward);
+  }, [isOpen, menuMaxHeight, containerRef]);
+  return openUpward;
 }
 
 /**
@@ -304,14 +333,66 @@ function useDropdownState(options, grouped, placeholder, value, onChange) {
  * @param {boolean} [props.searchable=false] - Set true to show an inline search bar.
  * @param {string} [props.searchPlaceholder="Search..."] - Placeholder for the search input.
  * @param {string} [props.emptyMessage="Nothing found"] - Shown when the search has no results.
+ * @param {number} [props.menuMaxHeight] - Optional max height for the dropdown menu.
+ * @param {boolean} [props.openOnHover] - Whether the dropdown should open on hover.
  */
-export default function AnimatedDropdown({ value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found" }) {
-  const { isOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(options, grouped, placeholder, value, onChange);
+export default function AnimatedDropdown({
+  value, onChange, placeholder, options,
+  grouped = false, searchable = false, searchPlaceholder = "Search...",
+  emptyMessage = "Nothing found", menuMaxHeight, className,
+  customTrigger, hideCheckmark = false, openOnHover = false,
+  isOpen: forceOpen, onOpenChange
+}) {
+  const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
+    options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange
+  );
+  const containerRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const openUpward = useOpenDirection(containerRef, isOpen, menuMaxHeight);
+
+  const handleMouseEnter = () => {
+    if (openOnHover) {
+      clearTimeout(timeoutRef.current);
+      setIsOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (openOnHover) {
+      timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+    }
+  };
+
+  useEffect(() => {
+    if (!openOnHover) {
+      const listener = (event) => {
+        if (containerRef.current && !containerRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", listener);
+      return () => document.removeEventListener("mousedown", listener);
+    }
+  }, [openOnHover, setIsOpen]);
+
   return (
-    <div style={{ position: 'relative', width: '100%' }}>
-      <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} />
+    <div
+      ref={containerRef}
+      className={className}
+      style={{ position: 'relative' }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {customTrigger ? (
+        <div onClick={handleToggle} style={{ display: 'inline-flex', cursor: openOnHover ? 'default' : 'pointer' }}>
+          {customTrigger}
+        </div>
+      ) : (
+        <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} />
+      )}
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
-        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} />
+        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} />
     </div>
   );
 }

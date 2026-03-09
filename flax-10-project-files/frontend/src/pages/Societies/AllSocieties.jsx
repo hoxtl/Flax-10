@@ -3,46 +3,40 @@ import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import BasePill from "../../components/Tags/BasePill";
 import SearchBar from "../../components/common/SearchBar";
+import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
+import { usePagination } from "../../hooks/usePagination";
 
 const PAGE_SIZE = 20;
 
-export default function AllSocieties({ onBack, onSelect, societies = [] }) {
-    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
+export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
+    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy } = useFilters();
     const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { items, totalPages } = usePagination(filtered, page, PAGE_SIZE);
+    const { currentItems, totalPages, currentPage, setPage } = usePagination(filtered, PAGE_SIZE);
+
+    const resetAndSet = (setter) => (...args) => { setter(...args); setPage(1); };
 
     return (
         <div className={styles.container}>
-            <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
-            <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
-            <SocietyGrid items={items} onSelect={onSelect} />
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            <Header onBack={onBack} search={search} setSearch={resetAndSet(setSearch)} sortBy={sortBy} setSortBy={resetAndSet(setSortBy)} />
+            <FilterPills filters={filters} toggleFilter={(...a) => { toggleFilter(...a); setPage(1); }} clearFilters={() => { clearFilters(); setPage(1); }} societies={societies} />
+            <SocietyGrid items={currentItems} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <BackToTop />
         </div>
     );
-}
-
-function usePagination(items, page, pageSize) {
-    const totalPages = Math.ceil(items.length / pageSize);
-    const start = (page - 1) * pageSize;
-    const paginatedItems = items.slice(start, start + pageSize);
-    return { items: paginatedItems, totalPages };
 }
 
 function useFilters() {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ ratified: "all", category: "all" });
     const [sortBy, setSortBy] = useState("name");
-    const [page, setPage] = useState(1);
 
-    const handleSearch = (value) => { setSearch(value); setPage(1); };
-    const handleSort = (value) => { setSortBy(value); setPage(1); };
-    const toggleFilter = (type, value) => { setFilters(prev => toggleFilterValue(prev, type, value)); setPage(1); };
-    const clearFilters = () => { setFilters({ ratified: "all", category: "all" }); setPage(1); };
+    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
+    const clearFilters = () => setFilters({ ratified: "all", category: "all" });
 
-    return { search, setSearch: handleSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy: handleSort, page, setPage };
+    return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
 }
 
 function toggleFilterValue(prev, type, value) {
@@ -60,14 +54,18 @@ function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
     );
 }
 
+const SORT_OPTIONS = [
+    { value: "name", label: "A-Z" },
+    { value: "name-desc", label: "Z-A" },
+    { value: "newest", label: "Newest" },
+    { value: "members", label: "Most Members" },
+];
+
 function SortDropdown({ value, onChange }) {
     return (
-        <select className={styles.sortDropdown} value={value} onChange={e => onChange(e.target.value)}>
-            <option value="name">A-Z</option>
-            <option value="name-desc">Z-A</option>
-            <option value="newest">Newest</option>
-            <option value="members">Most Members</option>
-        </select>
+        <div className={styles.sortWrapper}>
+            <AnimatedDropdown value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />
+        </div>
     );
 }
 
@@ -97,11 +95,11 @@ function CategoryPills({ current, onChange, societies }) {
     ));
 }
 
-function SocietyGrid({ items, onSelect }) {
+function SocietyGrid({ items, onSelect, onReport, onUnreport }) {
     if (items.length === 0) return <EmptyState />;
     return (
         <div className={styles.grid}>
-            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
+            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} onReport={onReport} onUnreport={onUnreport} />)}
         </div>
     );
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import * as Components from "../Authentication/AuthComponents";
 
 const SIGNUP_FIELDS = [

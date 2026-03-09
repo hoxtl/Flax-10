@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import HistoryModal from '../../../components/Timer/HistoryModal';
+import { ConfirmProvider } from '../../../context/ConfirmContext';
 import * as historyUtils from '../../../components/Timer/utils/historyUtils';
 import {
     mockHistoryData, expectBlock1Summary, expectBlock2Summary,
@@ -9,41 +10,43 @@ import {
 
 const onClose = vi.fn();
 
+const renderModal = () => render(
+    <ConfirmProvider><HistoryModal onClose={onClose} /></ConfirmProvider>
+);
+
 const setupWrapper = () => {
     vi.clearAllMocks();
     vi.spyOn(historyUtils, 'getHistory').mockResolvedValue([]);
     vi.spyOn(historyUtils, 'clearHistory').mockResolvedValue();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
     onClose.mockClear();
 };
 
 const testHistoryList = async () => {
     historyUtils.getHistory.mockResolvedValue(mockHistoryData);
-    render(<HistoryModal onClose={onClose} />);
-    await screen.findByText('✅ 2 Sessions'); // Wait for async render
+    renderModal();
+    await screen.findByText('✅ 2 Sessions');
 };
 
 const testClearHistory = async () => {
     historyUtils.getHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
-    render(<HistoryModal onClose={onClose} />);
+    renderModal();
     const clearBtn = await screen.findByText('Clear History');
     fireEvent.click(clearBtn);
 
-    // Wait for the custom confirmation modal to open
     const confirmBtn = await screen.findByText('Confirm');
     fireEvent.click(confirmBtn);
 
-    expect(historyUtils.clearHistory).toHaveBeenCalled();
+    await waitFor(() => expect(historyUtils.clearHistory).toHaveBeenCalled());
 };
 
 const testClose = async () => {
-    render(<HistoryModal onClose={onClose} />);
+    renderModal();
     fireEvent.click(await screen.findByText('×'));
     expect(onClose).toHaveBeenCalled();
 };
 
 const testEmptyState = async () => {
-    render(<HistoryModal onClose={onClose} />);
+    renderModal();
     expect(await screen.findByText('History')).toBeInTheDocument();
     expect(screen.getByText('No recent sessions.')).toBeInTheDocument();
     expect(screen.getByText('×')).toBeInTheDocument();

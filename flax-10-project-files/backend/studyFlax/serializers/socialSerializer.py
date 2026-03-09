@@ -8,10 +8,17 @@ class CalendarShareUserSerializer(serializers.ModelSerializer):
     """Serializer for displaying simple user info in calendar share lists."""
     is_sharing = serializers.SerializerMethodField()
     is_shared_with_me = serializers.SerializerMethodField()
+    profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'is_sharing', 'is_shared_with_me')
+        fields = ('id', 'username', 'first_name', 'last_name', 'is_sharing', 'is_shared_with_me', 'profile_photo_url')
+
+    def get_profile_photo_url(self, obj):
+        if not obj.profile_photo:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.profile_photo.url) if request else None
 
     def get_is_sharing(self, obj):
         request = self.context.get('request')

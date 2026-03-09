@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";
-import { DatePickerButton } from "../../../../Calendar/header/DatePickerButton";
-import { addMonths, formatMonthYear } from "../../../../Calendar/utils/dateUtils";
+import { CalendarNav } from "../../../../Calendar/header/CalendarHeaderUtils";
+import { addMonths, formatMonthYear, isSameMonth } from "../../../../Calendar/utils/dateUtils";
 import { expandRecurringEvents } from "../../../../Calendar/utils/recurrenceUtils";
 import { hasRecurrence, extractBaseEventId } from "../../../../Calendar/utils/eventUtils";
 import { CalendarProvider, useEventModal } from "../../../../../context/CalendarContext";
@@ -105,23 +105,14 @@ async function handlePopupDelete(event, handlers, closePopup, confirmFn) {
 }
 
 function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
+    const showToday = !isSameMonth(date, new Date());
     return (
         <div className={styles.calendarHeader}>
-            <NavButtons date={date} setDate={setDate} />
-            <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
+            <CalendarNav onPrev={() => setDate(addMonths(date, -1))} onNext={() => setDate(addMonths(date, 1))}
+                onToday={() => setDate(new Date())} showToday={showToday} selectedDate={date}
+                onDatePick={setDate} title={formatMonthYear(date)} />
+            <div style={{ flex: 1 }} />
             {isMember && <SyncButton societyId={societyId} societyName={societyName} />}
-        </div>
-    );
-}
-
-function NavButtons({ date, setDate }) {
-    const nav = (dir) => setDate(addMonths(date, dir));
-    return (
-        <div className={styles.navButtons}>
-            <button onClick={() => nav(-1)}>&larr;</button>
-            <button onClick={() => setDate(new Date())}>Today</button>
-            <button onClick={() => nav(1)}>&rarr;</button>
-            <DatePickerButton selectedDate={date} onDatePick={setDate} />
         </div>
     );
 }

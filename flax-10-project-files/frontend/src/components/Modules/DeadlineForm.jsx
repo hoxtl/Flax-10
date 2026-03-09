@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from './utils/deadlineUtils.js';
+import AnimatedDropdown from '../ui/AnimatedDropdown';
 import styles from './DeadlineForm.module.css';
 
 const EMPTY_FORM = { title: '', deadline_type: 'coursework', start_due_date: '', end_due_date: '', location: '', description: '' };
@@ -20,9 +21,7 @@ function TitleField({ value, onChange }) {
 function TypeField({ value, onChange }) {
     return (
         <Field label="Type">
-            <select className={styles.input} value={value} onChange={e => onChange('deadline_type', e.target.value)}>
-                {DEADLINE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
+            <AnimatedDropdown value={value} onChange={(val) => onChange('deadline_type', val)} options={DEADLINE_TYPES} placeholder="Select type" />
         </Field>
     );
 }

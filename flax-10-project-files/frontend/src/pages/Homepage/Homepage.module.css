@@ -9,8 +9,3 @@
 @import './styles/Timeline.module.css';
 @import './styles/Overlays.module.css';
 
-.homePillsRow {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 24px;
-}

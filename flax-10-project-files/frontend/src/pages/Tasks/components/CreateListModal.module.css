@@ -1,4 +1,4 @@
-.overlay {
+  .overlay {
     position: fixed;
     inset: 0;
     background: rgba(74, 52, 33, 0.18);
@@ -7,7 +7,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 300;
+    z-index: 2300;
     animation: fadeIn 0.15s ease;
   }
   @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }

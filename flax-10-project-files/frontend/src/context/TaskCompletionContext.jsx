@@ -23,36 +23,39 @@ function playVictorySound(volume = 0.4) {
   } catch (_) {}
 }
 
-export function TaskCompletionProvider({ children }) {
+function useCompletionToast() {
   const [toast, setToast] = useState({ show: false, message: "", id: 0 });
   const timeoutRef = useRef(null);
-
   const showCompletionToast = useCallback((message, options = {}) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     const { isRoutine } = options;
     if (!isRoutine) playVictorySound(0.4);
-    setToast((prev) => ({
-      show: true,
-      message: message ?? DEFAULT_MESSAGE,
-      id: prev.id + 1,
-    }));
+    setToast((prev) => ({ show: true, message: message ?? DEFAULT_MESSAGE, id: prev.id + 1 }));
     timeoutRef.current = setTimeout(() => {
       setToast((t) => ({ ...t, show: false }));
       timeoutRef.current = null;
     }, 2000);
   }, []);
-
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
+  return { showCompletionToast, toast };
+}
 
+function CompletionToastView({ toast }) {
+  if (!toast.show) return null;
+  return (
+    <div key={toast.id} className={styles.toast} role="status" aria-live="polite">
+      <PartyPopper size={20} className={styles.toastPartyPopper} aria-hidden />
+      <span className={styles.toastMessage}>{toast.message}</span>
+    </div>
+  );
+}
+
+export function TaskCompletionProvider({ children }) {
+  const { showCompletionToast, toast } = useCompletionToast();
   return (
     <TaskCompletionContext.Provider value={{ showCompletionToast }}>
       {children}
-      {toast.show && (
-        <div key={toast.id} className={styles.toast} role="status" aria-live="polite">
-          <PartyPopper size={20} className={styles.toastPartyPopper} aria-hidden />
-          <span className={styles.toastMessage}>{toast.message}</span>
-        </div>
-      )}
+      <CompletionToastView toast={toast} />
     </TaskCompletionContext.Provider>
   );
 }

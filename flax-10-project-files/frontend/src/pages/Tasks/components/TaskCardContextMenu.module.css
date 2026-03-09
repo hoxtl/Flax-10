@@ -1,0 +1,76 @@
+@keyframes menuPop {
+    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ctxMenu {
+    position: fixed;
+    min-width: 160px;
+    background: var(--panel, #FFFCFA);
+    border: 1px solid rgba(74, 52, 33, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
+    z-index: 1500;
+    overflow: hidden;
+    padding: 3px;
+    animation: menuPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ctxItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+.ctxItem svg { color: var(--muted); flex-shrink: 0; transition: color 0.12s; }
+.ctxItem:hover { background: var(--hover); }
+.ctxItem:hover svg { color: var(--text); }
+.ctxItemDanger { color: #c53030; }
+.ctxItemDanger svg { color: #c53030; opacity: 0.7; }
+.ctxItemDanger:hover { background: rgba(197, 48, 48, 0.06); }
+.ctxItemDanger:hover svg { color: #c53030; opacity: 1; }
+.ctxItemActive {
+    background: rgba(123, 103, 81, 0.08);
+    font-weight: 600;
+}
+.ctxDivider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 6px;
+}
+.ctxBack {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+.ctxBack svg { flex-shrink: 0; }
+.ctxBack:hover { background: var(--hover); color: var(--text); }
+.ctxListDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.ctxDateWrap {
+    padding: 6px 8px;
+}

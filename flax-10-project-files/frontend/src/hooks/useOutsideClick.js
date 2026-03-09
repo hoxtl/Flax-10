@@ -1,41 +1,15 @@
+/**
+ * Hook for handling outside-click and escape-key interactions in the Dashboard panel.
+ * Manages closing panel, dropdown menu, and task context menu based on click target.
+ */
 import { useEffect } from 'react';
 
+/** Attaches mousedown and keydown listeners when open, cleaning up on unmount. */
 export function useOutsideClick(open, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId) {
     useEffect(() => {
         if (!open) return;
-
-        function handleMouseDown(e) {
-            const target = e.target;
-
-            // Close task menu if clicking outside taskMenuRef and not a dots button
-            if (taskMenuRef?.current && !taskMenuRef.current.contains(target)) {
-                if (!target.closest?.('[data-task-menu-btn]')) {
-                    setTaskMenuId(null);
-                }
-            }
-
-            // Close menu if clicking outside menuRef
-            if (menuRef?.current && !menuRef.current.contains(target)) {
-                setMenuOpen(false);
-            }
-
-            // Close panel if clicking outside panelRef and outside fab
-            if (
-                panelRef?.current && !panelRef.current.contains(target) &&
-                (!fabRef?.current || !fabRef.current.contains(target))
-            ) {
-                onClose();
-            }
-        }
-
-        function handleKeyDown(e) {
-            if (e.key === 'Escape') {
-                setMenuOpen(false);
-                setTaskMenuId(null);
-                onClose();
-            }
-        }
-
+        const handleMouseDown = (e) => handleClickOutside(e, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId);
+        const handleKeyDown = (e) => { if (e.key === 'Escape') handleEscape(onClose, setMenuOpen, setTaskMenuId); };
         document.addEventListener('mousedown', handleMouseDown);
         document.addEventListener('keydown', handleKeyDown);
         return () => {
@@ -43,4 +17,17 @@ export function useOutsideClick(open, panelRef, menuRef, taskMenuRef, fabRef, on
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [open, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId]);
+}
+
+function handleClickOutside(e, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId) {
+    const { target } = e;
+    if (!menuRef.current?.contains(target)) setMenuOpen(false);
+    if (!taskMenuRef.current?.contains(target) && !target.closest?.('[data-task-menu-btn]')) setTaskMenuId(null);
+    if (!panelRef.current?.contains(target) && !fabRef.current?.contains(target)) onClose();
+}
+
+function handleEscape(onClose, setMenuOpen, setTaskMenuId) {
+    setMenuOpen(false);
+    setTaskMenuId(null);
+    onClose();
 }

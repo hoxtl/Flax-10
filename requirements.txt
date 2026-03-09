@@ -12,3 +12,4 @@ virtualenv==20.36.1
 Pillow==12.1.1
 icalendar==7.0.0
 faker==40.4.0
+requests==2.32.5
