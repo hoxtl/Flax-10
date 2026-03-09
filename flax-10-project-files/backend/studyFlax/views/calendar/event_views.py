@@ -98,6 +98,7 @@ def create_event(request):
         if geocode_result['success']:
             event.location = geocode_result['formatted_address']
             event.location_latitude = geocode_result['latitude']
+            event.location_longitude = geocode_result['longitude']
 
     response_data = CalendarEventSerialiser(event).data
     response_data['has_overlap'] = overlap
