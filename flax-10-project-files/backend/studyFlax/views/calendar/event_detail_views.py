@@ -48,6 +48,7 @@ def update_event(event, data):
         event.location = None
         event.location_latitude = None
         event.location_longitude = None
+        event.location_validated = False
 
     serialiser.save()
     return Response(CalendarEventSerialiser(event).data)
