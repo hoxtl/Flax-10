@@ -445,6 +445,10 @@ export default function CampusMap() {
         .setLngLat([event.longitude, event.latitude])
         .setPopup(popup)
         .addTo(map.current);
+      
+      popup.on('open', () => {
+        
+      })
     })
   })
 
