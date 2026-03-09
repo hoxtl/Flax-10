@@ -424,6 +424,7 @@ export default function CampusMap() {
       }).setHTML(`
         <div class="eventPopupContent">
           <div class="eventPopupTitle">${event.title}</div>
+          <div class="eventPopupLocation">${event.location}</div>
         `)
     })
   })
