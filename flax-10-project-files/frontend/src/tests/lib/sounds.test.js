@@ -29,4 +29,12 @@ describe('playCompletionChime', () => {
         vi.stubGlobal('Audio', vi.fn(() => ({ volume: 0, play })));
         expect(() => playCompletionChime()).not.toThrow();
     });
+
+    it('sets explicit volume and tolerates missing catchable play return', () => {
+        const play = vi.fn(() => undefined);
+        const audioObj = { volume: 0, play };
+        vi.stubGlobal('Audio', vi.fn(function AudioMock() { return audioObj; }));
+        expect(() => playCompletionChime(0.8)).not.toThrow();
+        expect(audioObj.volume).toBe(0.8);
+    });
 });
