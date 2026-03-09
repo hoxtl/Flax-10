@@ -406,6 +406,7 @@ export default function CampusMap() {
     calendarEvents.forEach((event) => {
       const el = document.createElement('div');
       el.className = 'eventMarker';
+      el.innerHTML = '📍';
     })
   })
 
