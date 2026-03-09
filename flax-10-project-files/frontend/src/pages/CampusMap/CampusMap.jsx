@@ -5,6 +5,7 @@ import styles from "./CampusMap.module.css";
 import { tflService } from "../../api/tflService";
 import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
+import { getCalendarEvents } from "../../api/calendarService";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -103,6 +104,7 @@ export default function CampusMap() {
   const [tflRouteError, setTflRouteError] = useState("");
   const [disruptions, setDisruptions] = useState([]);
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
+
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
