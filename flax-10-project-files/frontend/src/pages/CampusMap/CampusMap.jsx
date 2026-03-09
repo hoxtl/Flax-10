@@ -449,6 +449,11 @@ export default function CampusMap() {
       popup.on('open', () => {
         setTimeout(() => {
           const startBtn = document.getElementById(`setEventAsStart-${event.id}`);
+          if (startBtn) {
+            startBtn.addEventListener('click', () => {
+              setStartLocation({ lng: event.longitude, lat: event.latitude});
+            })
+          }
         })
       })
     })
