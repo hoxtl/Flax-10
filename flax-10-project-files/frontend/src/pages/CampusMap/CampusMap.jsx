@@ -452,6 +452,7 @@ export default function CampusMap() {
           if (startBtn) {
             startBtn.addEventListener('click', () => {
               setStartLocation({ lng: event.longitude, lat: event.latitude});
+              marker.togglePopup();
             })
           }
         })
