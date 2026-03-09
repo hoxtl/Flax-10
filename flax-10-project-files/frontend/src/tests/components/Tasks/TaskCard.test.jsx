@@ -141,19 +141,13 @@ describe('TaskCard', () => {
         expect(screen.getByText(/overdue/i)).toBeTruthy();
     });
 
-    it('shows priority indicator for medium priority', () => {
-        renderTaskCard({ task: { ...defaultTask, priority: 'medium' } });
-        expect(screen.getByText('Medium')).toBeTruthy();
-    });
-
-    it('shows Urgent for urgent priority', () => {
-        renderTaskCard({ task: { ...defaultTask, priority: 'urgent' } });
-        expect(screen.getByText('Urgent')).toBeTruthy();
-    });
-
-    it('shows High for high priority', () => {
-        renderTaskCard({ task: { ...defaultTask, priority: 'high' } });
-        expect(screen.getByText('High')).toBeTruthy();
+    it.each([
+        ['medium', 'Medium'],
+        ['urgent', 'Urgent'],
+        ['high', 'High'],
+    ])('shows %s priority indicator', (_, label) => {
+        renderTaskCard({ task: { ...defaultTask, priority: _ } });
+        expect(screen.getByText(label)).toBeTruthy();
     });
 
     it('shows Today for due today', () => {
