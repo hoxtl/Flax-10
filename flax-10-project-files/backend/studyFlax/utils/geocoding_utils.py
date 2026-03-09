@@ -30,3 +30,13 @@ class GeocodingService:
                 'longitude': None,
                 'formatted_address': None,
             }
+        try:
+            encoded_loc = requests.utils.quote(loc_string)
+            url = f"{GeocodingService.MAPBOX_GEOCODING_URL}/{encoded_loc}.json"
+            params = {
+                'access_token': mapbox_token,
+                'limit': 1,
+                'country': 'GB',
+            }
+            response = requests.get(url, params=params, timeout=5)
+            response.raise_for_status()
