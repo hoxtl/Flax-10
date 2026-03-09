@@ -95,6 +95,8 @@ def create_event(request):
     location = request.data.get('location')
     if location and location.strip():
         geocode_result = GeocodingService.geocode_location(location)
+        if geocode_result['success']:
+            event.location = geocode_result['formatted_address']
 
     response_data = CalendarEventSerialiser(event).data
     response_data['has_overlap'] = overlap
