@@ -894,3 +894,10 @@
   color: var(--text);
   margin-bottom: 6px;
 }
+
+:global(.eventPopupLocation) {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
