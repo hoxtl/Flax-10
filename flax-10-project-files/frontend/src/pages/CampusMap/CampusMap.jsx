@@ -453,10 +453,16 @@ export default function CampusMap() {
             startBtn.addEventListener('click', () => {
               setStartLocation({ lng: event.longitude, lat: event.latitude});
               marker.togglePopup();
-            })
+              map.current?.flyTo({
+                center: [event.longitude, event.latitude],
+                zoom: 15,
+                pitch: 55,
+                duration: 1200
+              });
+            });
           }
-        })
-      })
+        }, 100);
+      });
     })
   })
 
