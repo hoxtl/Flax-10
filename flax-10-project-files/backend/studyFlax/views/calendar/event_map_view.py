@@ -16,7 +16,7 @@ def calendar_events_map_view(request):
     events = CalendarEvent.objects.filter(
         user=user,
         location_validated=True,
-        location_latitude___isnull=False,
+        location_latitude__isnull=False,
         location_longitude__isnull=False,
         start_time__gte=today,
         start_time__lte=future_date,
