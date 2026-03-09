@@ -416,6 +416,12 @@ export default function CampusMap() {
       };
       const color = priorityColors[event.priority] || '#4488FF';
       el.style.color = color;
+
+      const popup = new mapboxgl.Popup({
+        offset: 25,
+        closeButton: false,
+        closeOnClick: false,
+      })
     })
   })
 
