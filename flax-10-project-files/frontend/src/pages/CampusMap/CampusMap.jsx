@@ -408,6 +408,12 @@ export default function CampusMap() {
       el.className = 'eventMarker';
       el.innerHTML = '📍';
       el.title = event.title;
+      const priorityColors = {
+        'urgent': '#FF4444',
+        'high': '#FF8800',
+        'medium': '#4488FF',
+        'low': '#888888',
+      };
     })
   })
 
