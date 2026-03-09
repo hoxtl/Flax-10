@@ -1,7 +1,10 @@
-from rest_framework.test import APITestCase
+from unittest.mock import MagicMock, PropertyMock, patch
+
+from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from studyFlax.models.social.shareModel import CalendarShare
+from studyFlax.serializers.socialSerializer import CalendarShareUserSerializer
 
 User = get_user_model()
 
@@ -79,3 +82,33 @@ class CalendarShareViewTests(APITestCase):
         shared_by_ids = [u['id'] for u in results]
         self.assertIn(self.user2.id, shared_by_ids)
         self.assertIn(self.user3.id, shared_by_ids)
+
+
+class CalendarShareUserSerializerPhotoTest(APITestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+
+    def test_profile_photo_url_with_photo_and_request(self):
+        user = User.objects.create_user(username='photoshare', email='ps@test.com', password='pass')
+        mock_photo = MagicMock()
+        mock_photo.url = '/media/profile_photos/share.jpg'
+        mock_photo.__bool__ = lambda self: True
+
+        request = self.factory.get('/')
+        request.user = user
+
+        with patch.object(type(user), 'profile_photo', new_callable=PropertyMock, return_value=mock_photo):
+            serializer = CalendarShareUserSerializer(user, context={'request': request})
+            url = serializer.data['profile_photo_url']
+        self.assertIn('/media/profile_photos/share.jpg', url)
+
+    def test_profile_photo_url_with_photo_no_request(self):
+        user = User.objects.create_user(username='photoshare2', email='ps2@test.com', password='pass')
+        mock_photo = MagicMock()
+        mock_photo.url = '/media/profile_photos/share2.jpg'
+        mock_photo.__bool__ = lambda self: True
+
+        with patch.object(type(user), 'profile_photo', new_callable=PropertyMock, return_value=mock_photo):
+            serializer = CalendarShareUserSerializer(user)
+            url = serializer.data['profile_photo_url']
+        self.assertIsNone(url)

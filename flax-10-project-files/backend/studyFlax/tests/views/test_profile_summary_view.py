@@ -9,6 +9,9 @@ from datetime import timedelta
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
 from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.society.societyModel import Society
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
+from studyFlax.models.society.societyImageModel import SocietyImage
 
 User = get_user_model()
 
@@ -107,3 +110,34 @@ class ProfileSummaryViewTest(TestCase):
     def test_unauthenticated(self):
         response = APIClient().get('/api/profile/summary/')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+    def test_society_image_direct_field(self):
+        """get_society_image returns society.image when set directly."""
+        society = Society.objects.create(
+            name='DirectImg', bio='b', admin_emails='a@b.com',
+            image='http://example.com/direct.jpg'
+        )
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        society_data = next(s for s in response.data['societies'] if s['id'] == society.id)
+        self.assertEqual(society_data['image'], 'http://example.com/direct.jpg')
+
+    def test_society_image_fallback_via_society_image(self):
+        """get_society_image falls back to the first SocietyImage URL when society.image is blank."""
+        society = Society.objects.create(name='FallbackImg', bio='b', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        SocietyImage.objects.create(society=society, url='http://example.com/img.jpg')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        society_data = next(s for s in response.data['societies'] if s['id'] == society.id)
+        self.assertEqual(society_data['image'], 'http://example.com/img.jpg')
+
+    def test_society_image_none_when_no_images(self):
+        """get_society_image returns None when society has no image at all."""
+        society = Society.objects.create(name='NoImg', bio='b', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        society_data = next(s for s in response.data['societies'] if s['id'] == society.id)
+        self.assertIsNone(society_data['image'])

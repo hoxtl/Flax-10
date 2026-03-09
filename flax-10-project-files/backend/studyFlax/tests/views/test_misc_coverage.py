@@ -624,3 +624,44 @@ class EmailUtilsTest(TestCase):
         call_kwargs = mock_send.call_args[1]
         self.assertIn(self.user.email, call_kwargs['recipient_list'])
         self.assertIn('reset password', call_kwargs['subject'].lower())
+
+
+# ---------------------------------------------------------------------------
+# Serialiser: profile_photo_url and get_has_reported branches
+# ---------------------------------------------------------------------------
+
+class SocietyMembershipSerialiserPhotoTest(TestCase):
+    def setUp(self):
+        from rest_framework.test import APIRequestFactory
+        from unittest.mock import MagicMock, PropertyMock, patch
+        self.factory = APIRequestFactory()
+        self.patch = patch
+        self.MagicMock = MagicMock
+        self.PropertyMock = PropertyMock
+
+    def test_profile_photo_url_with_request_and_photo(self):
+        from studyFlax.serialisers.society_serialisers import SocietyMembershipSerialiser
+        from unittest.mock import MagicMock, PropertyMock, patch
+        user = User.objects.create_user(username='mphoto', email='mphoto@test.com', password='pass')
+        society = Society.objects.create(name='PhotoSoc', bio='b', admin_emails='a@b.com')
+        membership = SocietyMembership.objects.create(user=user, society=society, role='member')
+
+        mock_photo = MagicMock()
+        mock_photo.url = '/media/profile_photos/test.jpg'
+        mock_photo.__bool__ = lambda self: True
+
+        request = self.factory.get('/')
+        request.user = user
+
+        with patch.object(type(user), 'profile_photo', new_callable=PropertyMock, return_value=mock_photo):
+            serializer = SocietyMembershipSerialiser(membership, context={'request': request})
+            url = serializer.data['profile_photo_url']
+        self.assertIn('/media/profile_photos/test.jpg', url)
+
+
+class SocietyDetailSerialiserHasReportedTest(TestCase):
+    def test_has_reported_false_without_request(self):
+        from studyFlax.serialisers.society_serialisers import SocietyDetailSerialiser
+        society = Society.objects.create(name='NoReqSoc', bio='b', admin_emails='a@b.com')
+        serializer = SocietyDetailSerialiser(society)
+        self.assertFalse(serializer.data['has_reported'])
