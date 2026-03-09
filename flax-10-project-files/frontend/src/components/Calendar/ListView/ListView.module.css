@@ -25,6 +25,7 @@
 
 .dateText {
     font-size: 0.875rem;
+    padding-left: 16px;
     font-weight: 600;
     color: var(--text);
 }
@@ -47,7 +48,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: var(--event-card-bg);
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
     cursor: pointer;
     transition: background 0.15s;
