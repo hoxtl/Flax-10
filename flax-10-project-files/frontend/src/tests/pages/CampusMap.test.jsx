@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const { mockMap } = vi.hoisted(() => {
     const mockMap = {
@@ -7,10 +7,10 @@ const { mockMap } = vi.hoisted(() => {
         off: vi.fn(),
         remove: vi.fn(),
         addControl: vi.fn(),
-        getStyle: vi.fn(() => ({ layers: [] })),
+        getStyle: vi.fn(() => ({ layers: [{ id: 'labels', type: 'symbol', layout: { 'text-field': 'x' } }] })),
         addLayer: vi.fn(),
         addSource: vi.fn(),
-        getSource: vi.fn(() => null),
+        getSource: vi.fn(() => ({ setData: vi.fn() })),
         getLayer: vi.fn(() => null),
         setLayoutProperty: vi.fn(),
         setFilter: vi.fn(),
@@ -43,6 +43,7 @@ vi.mock('mapbox-gl', () => {
             Marker: function() { return mockMarker; },
             Popup: function() { return mockPopup; },
             accessToken: '',
+            LngLatBounds: function() { return { extend: function() { return this; } }; },
         },
     };
 });
@@ -63,23 +64,50 @@ vi.mock('framer-motion', () => ({
 vi.mock('../../api/tflService', () => ({
     tflService: {
         getTfLDelays: vi.fn().mockResolvedValue([]),
-        getTfLRoute: vi.fn().mockResolvedValue(null),
+        journeyPlanner: vi.fn().mockResolvedValue(null),
     },
 }));
 
 vi.mock('../../api/userService', () => ({
-    getHomeAddress: vi.fn().mockResolvedValue(null),
+    getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 
 import CampusMap from '../../pages/CampusMap/CampusMap';
+import { getHomeAddress } from '../../api/userService';
+import { tflService } from '../../api/tflService';
 
 describe('CampusMap', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // default fetch for directions
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                routes: [{
+                    duration: 600,
+                    distance: 1200,
+                    geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+                    legs: [{
+                        steps: [
+                            { maneuver: { instruction: 'Walk straight', type: 'turn' }, distance: 100, duration: 60 },
+                            { maneuver: { instruction: 'Turn left', type: 'turn' }, distance: 200, duration: 120 },
+                        ],
+                    }],
+                }],
+            }),
+        });
+        // geolocation
+        global.navigator.geolocation = {
+            getCurrentPosition: vi.fn((success) => success({ coords: { latitude: 51.5, longitude: -0.1 } })),
+        };
         // Simulate map 'load' event firing immediately
         mockMap.on.mockImplementation((event, cb) => {
             if (event === 'load') cb();
         });
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it('renders the map container', () => {
@@ -97,5 +125,57 @@ describe('CampusMap', () => {
     it('renders Set My Current Location button', () => {
         render(<CampusMap />);
         expect(screen.getByText(/Set My Current Location/)).toBeTruthy();
+    });
+
+    it('loads home address when available and handles home-address-updated event', async () => {
+        getHomeAddress.mockResolvedValueOnce({
+            home_address: 'Home',
+            home_latitude: 51.49,
+            home_longitude: -0.12,
+        });
+        render(<CampusMap />);
+
+        await waitFor(() => {
+            expect(getHomeAddress).toHaveBeenCalled();
+        });
+
+        // Trigger update event
+        window.dispatchEvent(new Event('home-address-updated'));
+        await waitFor(() => {
+            expect(getHomeAddress).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    it('calculates walking route when start location and campus selected', async () => {
+        render(<CampusMap />);
+
+        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(screen.getAllByText('Strand')[0]);
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalled();
+        });
+
+        // walking card shows duration and distance
+        expect(screen.getByText('Walking')).toBeTruthy();
+        expect(screen.getByText(/Duration/)).toBeTruthy();
+        expect(screen.getByText(/Distance/)).toBeTruthy();
+
+        // show directions toggle reveals step instructions
+        fireEvent.click(screen.getByText('Show directions'));
+        expect(screen.getByText('Walk straight')).toBeTruthy();
+        expect(screen.getByText('Turn left')).toBeTruthy();
+    });
+
+    it('renders TfL error when journeyPlanner returns null', async () => {
+        tflService.journeyPlanner.mockResolvedValueOnce(null);
+        render(<CampusMap />);
+        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(screen.getAllByText('Strand')[0]);
+
+        await waitFor(() => {
+            expect(tflService.journeyPlanner).toHaveBeenCalled();
+        });
+        expect(screen.getByText(/No TfL journey found/i)).toBeTruthy();
     });
 });

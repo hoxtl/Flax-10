@@ -12,28 +12,38 @@ vi.mock('../../pages/Tasks/hooks/useTaskLists', () => ({
 }));
 
 vi.mock('../../pages/Tasks/components/TaskFeed', () => ({
-    default: ({ tasks, onCreateTask, onAddTask }) => (
+    default: ({ tasks, onCreateTask, onAddTask, onDeleteTask, onEditTask, onPlanTomorrow, onFilterByList }) => (
         <div data-testid="task-feed">
             <span>Tasks: {tasks.length}</span>
             <button onClick={onCreateTask}>New Task</button>
             <button onClick={() => onAddTask({ title: 'Quick task' })}>Quick Add</button>
+            <button onClick={() => onDeleteTask(123)}>Delete Task</button>
+            <button onClick={() => onEditTask(1, { task_list: 1 }, { source: 'context-menu', action: 'move-list', listName: 'My List' })}>Move Task</button>
+            <button onClick={() => onEditTask(1, { due_date: null }, { source: 'context-menu', action: 'set-due-date' })}>Remove Due</button>
+            <button onClick={onPlanTomorrow}>Plan Tomorrow</button>
+            <button onClick={() => onFilterByList(['1'])}>Filter List 1</button>
         </div>
     ),
 }));
 
 vi.mock('../../pages/Tasks/components/ListSidebar', () => ({
-    default: ({ lists, onNewList, onSelectFilter, onSelectList }) => (
+    default: ({ lists, onNewList, onSelectFilter, onSelectList, onUnarchiveList, onPermanentlyDeleteList }) => (
         <div data-testid="list-sidebar">
             <span>Lists: {lists.length}</span>
             <button onClick={onNewList}>Add List</button>
             <button onClick={() => onSelectFilter('today')}>Today Filter</button>
+            <button onClick={() => onSelectList('1')}>Select List 1</button>
+            <button onClick={() => onUnarchiveList(7)}>Unarchive List</button>
+            <button onClick={() => onPermanentlyDeleteList(9)}>Permanently Delete List</button>
         </div>
     ),
 }));
 
 vi.mock('../../pages/Tasks/components/CreateTaskModal', () => ({
-    default: ({ onClose, onSave }) => (
+    default: ({ onClose, onSave, defaultListId, defaultDueDate }) => (
         <div data-testid="create-task-modal">
+            <div>defaultListId:{String(defaultListId ?? '')}</div>
+            <div>defaultDueDate:{String(defaultDueDate ?? '')}</div>
             <button onClick={onClose}>Close Modal</button>
             <button onClick={() => onSave({ title: 'New Task' })}>Save Task</button>
         </div>
@@ -165,6 +175,72 @@ describe('TasksPage', () => {
         expect(screen.queryByText('Task added.')).toBeNull();
     });
 
+    it('undo removes newly added task', async () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Quick Add'));
+        await waitFor(() => expect(screen.getByText('Undo')).toBeTruthy());
+        fireEvent.click(screen.getByText('Undo'));
+        expect(mockTasksHook.removeTask).toHaveBeenCalledWith(1);
+        expect(screen.queryByText('Task added.')).toBeNull();
+    });
+
+    it('shows delete toast when a task is deleted and can dismiss it', async () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Delete Task'));
+        expect(mockTasksHook.removeTask).toHaveBeenCalledWith(123);
+        expect(screen.getByText(/Task deleted/)).toBeTruthy();
+        fireEvent.click(screen.getByText('✕'));
+        expect(screen.queryByText(/Task deleted/)).toBeNull();
+    });
+
+    it('shows info toast for context-menu move-list and due-date actions', async () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Move Task'));
+        await waitFor(() => expect(screen.getByText('Task moved to My List.')).toBeTruthy());
+        fireEvent.click(screen.getByText('Remove Due'));
+        await waitFor(() => expect(screen.getByText('Task due date removed.')).toBeTruthy());
+    });
+
+    it('plan tomorrow sets a default due date and opens modal', () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Plan Tomorrow'));
+        expect(screen.getByTestId('create-task-modal')).toBeTruthy();
+        expect(screen.getByText(/defaultDueDate:/)).toBeTruthy();
+    });
+
+    it('filterListIds overrides active list filtering', () => {
+        useTasks.mockReturnValue({
+            ...mockTasksHook,
+            tasks: [
+                { id: 1, title: 'Task 1', task_list: 1 },
+                { id: 2, title: 'Task 2', task_list: 2 },
+            ],
+        });
+        renderTasksPage('/tasks?list=2');
+        // initially list=2 should show 1 task
+        expect(screen.getByText('Tasks: 1')).toBeTruthy();
+        // applying filter list 1 should show list 1 task instead
+        fireEvent.click(screen.getByText('Filter List 1'));
+        expect(screen.getByText('Tasks: 1')).toBeTruthy();
+    });
+
+    it('unarchive list calls restoreList and reloads tasks', async () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Unarchive List'));
+        await waitFor(() => expect(mockListsHook.restoreList).toHaveBeenCalledWith(7));
+        await waitFor(() => expect(mockTasksHook.reload).toHaveBeenCalled());
+    });
+
+    it('permanently delete list respects confirm dialog', async () => {
+        const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Permanently Delete List'));
+        expect(mockListsHook.permanentlyDeleteList).not.toHaveBeenCalled();
+        fireEvent.click(screen.getByText('Permanently Delete List'));
+        await waitFor(() => expect(mockListsHook.permanentlyDeleteList).toHaveBeenCalledWith(9));
+        confirmSpy.mockRestore();
+    });
+
     it('renders BackToTop', () => {
         renderTasksPage();
         expect(screen.getByTestId('back-to-top')).toBeTruthy();
@@ -185,5 +261,24 @@ describe('TasksPage', () => {
         });
         renderTasksPage();
         expect(screen.getByText('Tasks: 2')).toBeTruthy();
+    });
+
+    it('opens task modal with open=fullPlanning URL param', async () => {
+        renderTasksPage('/tasks?open=fullPlanning');
+        await waitFor(() => {
+            expect(screen.getByTestId('create-task-modal')).toBeTruthy();
+        });
+    });
+
+    it('calls Today Filter from sidebar', () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('Today Filter'));
+        expect(screen.getByTestId('list-sidebar')).toBeTruthy();
+    });
+
+    it('opens task modal from New Task and shows create modal', () => {
+        renderTasksPage();
+        fireEvent.click(screen.getByText('New Task'));
+        expect(screen.getByTestId('create-task-modal')).toBeTruthy();
     });
 });

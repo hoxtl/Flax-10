@@ -268,4 +268,98 @@ describe('TaskFeed', () => {
         fireEvent.change(dropdown, { target: { value: 'alpha' } });
         expect(dropdown.value).toBe('alpha');
     });
+
+    it('filters list checkboxes and calls onFilterByList', () => {
+        const onFilterByList = vi.fn();
+        renderFeed({ onFilterByList, filterListIds: [] });
+        fireEvent.click(screen.getByText('Filter'));
+        fireEvent.click(screen.getByText('Work'));
+        expect(onFilterByList).toHaveBeenCalledWith(['1']);
+    });
+
+    it('filters modules and shows active filter count, then clears all', () => {
+        renderFeed({
+            tasks: [
+                { ...baseTasks[0], module_code: 'CS101' },
+                { ...baseTasks[1], module_code: 'MA202' },
+            ],
+            filterListIds: ['1'],
+        });
+        fireEvent.click(screen.getByText('Filter'));
+        fireEvent.click(screen.getByText('Modules'));
+        fireEvent.click(screen.getByText('CS101'));
+        expect(screen.getByText('2')).toBeTruthy();
+        fireEvent.click(screen.getByText('Clear all'));
+        expect(screen.getByText('Filter')).toBeTruthy();
+    });
+
+    it('groups modules by prefix and shows search empty states in filter tabs', () => {
+        renderFeed({
+            tasks: [
+                { ...baseTasks[0], module_code: 'CS100' },
+                { ...baseTasks[1], module_code: 'MA200' },
+            ],
+            lists: [{ id: 1, name: 'Work', color: '#3b82f6' }],
+        });
+        fireEvent.click(screen.getByText('Filter'));
+        fireEvent.click(screen.getByText('Modules'));
+        expect(screen.getByText('CS')).toBeTruthy();
+        expect(screen.getByText('MA')).toBeTruthy();
+        fireEvent.change(screen.getByPlaceholderText('Search modules...'), { target: { value: 'zzz' } });
+        expect(screen.getByText('No modules found.')).toBeTruthy();
+        fireEvent.click(screen.getByText('Lists'));
+        fireEvent.change(screen.getByPlaceholderText('Search lists...'), { target: { value: 'zzz' } });
+        expect(screen.getByText('No lists found.')).toBeTruthy();
+    });
+
+    it('closes filter dialog on outside mousedown', () => {
+        renderFeed();
+        fireEvent.click(screen.getByText('Filter'));
+        expect(screen.getByRole('dialog')).toBeTruthy();
+        fireEvent.mouseDown(document.body);
+        expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('supports keyboard shortcuts for search focus, quick add focus, and escape clear', () => {
+        const quickInput = document.createElement('input');
+        quickInput.setAttribute('aria-label', 'Task name');
+        document.body.appendChild(quickInput);
+
+        renderFeed();
+        const search = screen.getByPlaceholderText('Search… ( / )');
+
+        fireEvent.keyDown(document, { key: '/' });
+        expect(document.activeElement).toBe(search);
+
+        fireEvent.keyDown(document, { key: 'n' });
+        expect(document.activeElement).toBe(quickInput);
+
+        fireEvent.change(search, { target: { value: 'abc' } });
+        fireEvent.keyDown(search, { key: 'Escape' });
+        expect(search.value).toBe('');
+
+        document.body.removeChild(quickInput);
+    });
+
+    it('shows all/less control for long all-tasks section', () => {
+        const manyTasks = Array.from({ length: 10 }, (_, i) => ({
+            id: i + 100,
+            title: `Task ${i + 1}`,
+            completed: false,
+            due_date: null,
+            priority: 'medium',
+            task_list: 1,
+        }));
+        renderFeed({ tasks: manyTasks, activeFilter: 'all' });
+        expect(screen.getByText('Show all 10 →')).toBeTruthy();
+        fireEvent.click(screen.getByText('Show all 10 →'));
+        expect(screen.getByText('Show less ↑')).toBeTruthy();
+    });
+
+    it('handles active module code in header and invalid user JSON safely', () => {
+        mockStore['user'] = '{invalid';
+        renderFeed({ activeListId: '1', activeModuleCode: 'CS9999' });
+        expect(screen.getByText('Work: CS9999')).toBeTruthy();
+        mockStore['user'] = JSON.stringify({ first_name: 'John', username: 'jdoe' });
+    });
 });
