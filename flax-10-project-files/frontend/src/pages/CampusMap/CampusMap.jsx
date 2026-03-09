@@ -432,7 +432,9 @@ export default function CampusMap() {
             hour: '2-digit',
             minute: '2-digit'
           })}</div>
-          
+          <button id="setEventAsStart-${event.id}" class="eventPopupButton">
+            Set as Start
+          </button>
         `)
     })
   })
