@@ -105,6 +105,7 @@ export default function CampusMap() {
   const [disruptions, setDisruptions] = useState([]);
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
   const [calendarEvents, setCalendarEvents] = useState([]);
+  const eventMarkers = useRef([]);
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
