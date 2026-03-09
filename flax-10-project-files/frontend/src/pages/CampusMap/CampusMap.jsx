@@ -421,7 +421,9 @@ export default function CampusMap() {
         offset: 25,
         closeButton: false,
         closeOnClick: false,
-      })
+      }).setHTML(`
+        <div class="eventPopupContent">
+        `)
     })
   })
 
