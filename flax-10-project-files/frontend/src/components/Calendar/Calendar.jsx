@@ -5,6 +5,8 @@ import { DayView } from "./DayView/DayView";
 import { WeekView } from "./WeekView/WeekView";
 import { MonthView } from "./MonthView/MonthView";
 import { YearView } from "./YearView/YearView";
+import { ListView } from "./ListView/ListView";
+import { TableView } from "./TableView/TableView";
 import "./Calendar.css";
 
 export function Calendar() {
@@ -34,6 +36,8 @@ function CalendarView({ viewMode }) {
     week: WeekView,
     month: MonthView,
     year: YearView,
+    list: ListView,
+    table: TableView,
   };
   const View = views[viewMode];
 
