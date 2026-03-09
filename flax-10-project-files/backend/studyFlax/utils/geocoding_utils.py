@@ -61,3 +61,11 @@ class GeocodingService:
                     'longitude': None,
                     'formatted_address': None,
                 }
+        except Exception as e:
+            print(f'Geocoding utils error: {str(e)}')
+            return {
+                'success': False,
+                'latitude': None,
+                'longitude': None,
+                'formatted_address': None,
+            }
