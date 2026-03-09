@@ -47,3 +47,10 @@ class GeocodingService:
                 feature = data['features'][0]
                 longitude, latitude = feature['geeomtry']['coordinates']
                 formatted_address = feature.get('place_name', loc_string)
+
+                return {
+                    'success': True,
+                    'latitude': latitude,
+                    'longitude': longitude,
+                    'formatted_address': formatted_address,
+                }
