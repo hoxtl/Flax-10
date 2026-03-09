@@ -31,6 +31,10 @@ describe('isLecture', () => {
         expect(isLecture({ title: 'CS Lecture 3' })).toBe(true);
     });
 
+    it('returns true for tutorial in title', () => {
+        expect(isLecture({ title: 'Math Tutorial 1' })).toBe(true);
+    });
+
     it('returns true for seminar', () => {
         expect(isLecture({ title: 'Biology Seminar' })).toBe(true);
     });
@@ -45,6 +49,10 @@ describe('isLecture', () => {
 
     it('handles null item', () => {
         expect(isLecture(null)).toBe(false);
+    });
+
+    it('handles undefined title', () => {
+        expect(isLecture({})).toBe(false);
     });
 });
 
@@ -65,6 +73,12 @@ describe('isRoutineEvent', () => {
         expect(isRoutineEvent({ title: 'Lunch break' })).toBe(true);
     });
 
+    it('returns true for dinner, commute, snack in title', () => {
+        expect(isRoutineEvent({ title: 'Evening dinner' })).toBe(true);
+        expect(isRoutineEvent({ title: 'Morning commute' })).toBe(true);
+        expect(isRoutineEvent({ title: 'Afternoon snack' })).toBe(true);
+    });
+
     it('returns false for regular events', () => {
         expect(isRoutineEvent({ title: 'Team meeting' })).toBe(false);
     });
@@ -72,11 +86,19 @@ describe('isRoutineEvent', () => {
     it('handles tag as object with name', () => {
         expect(isRoutineEvent({ title: 'Custom', tag: { name: 'routine' } })).toBe(true);
     });
+
+    it('handles tag_name fallback when tag is object', () => {
+        expect(isRoutineEvent({ title: 'Custom', tag: { name: 'wellness' } })).toBe(true);
+    });
 });
 
 describe('isNow', () => {
     it('returns false when startStr is null', () => {
         expect(isNow(null, '2099-01-01T10:00:00')).toBe(false);
+    });
+
+    it('returns false when endStr is null', () => {
+        expect(isNow('2020-01-01T10:00:00', null)).toBe(false);
     });
 
     it('returns true when current time is within range', () => {
@@ -89,6 +111,12 @@ describe('isNow', () => {
         const future1 = new Date(Date.now() + 60000).toISOString();
         const future2 = new Date(Date.now() + 120000).toISOString();
         expect(isNow(future1, future2)).toBe(false);
+    });
+
+    it('returns false when current time is after range', () => {
+        const past1 = new Date(Date.now() - 120000).toISOString();
+        const past2 = new Date(Date.now() - 60000).toISOString();
+        expect(isNow(past1, past2)).toBe(false);
     });
 });
 
