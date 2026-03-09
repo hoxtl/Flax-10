@@ -87,11 +87,28 @@
     white-space: nowrap;
 }
 
+/* Row Actions (edit/quick action buttons) */
+.rowActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    width: 0;
+    overflow: hidden;
+    transition: width 0.15s ease;
+}
+
+.eventRow:hover .rowActions {
+    width: auto;
+    margin-right: 8px;
+}
+
 /* Badges Container */
 .badgesContainer {
     display: flex;
     gap: 6px;
     flex-shrink: 0;
+    transition: transform 0.15s ease;
 }
 
 /* Tag Badge */
@@ -101,7 +118,8 @@
     font-weight: 500;
     border-radius: 12px;
     background: var(--pill-bg);
-    color: var(--text-primary);
+    color: #fff;
+    white-space: nowrap;
 }
 
 /* Source Badge (module/society name) */
@@ -111,7 +129,8 @@
     font-weight: 500;
     border-radius: 12px;
     background: var(--primary);
-    color: var(--c-white);
+    color: #fff;
+    white-space: nowrap;
 }
 
 /* Edit Button */
@@ -127,12 +146,7 @@
     background: transparent;
     color: var(--muted);
     cursor: pointer;
-    opacity: 0;
     transition: all 0.15s;
-}
-
-.eventRow:hover .editBtn {
-    opacity: 1;
 }
 
 .editBtn:hover {
@@ -149,12 +163,8 @@
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
-    opacity: 0;
+    white-space: nowrap;
     transition: all 0.15s;
-}
-
-.eventRow:hover .quickActionBtn {
-    opacity: 1;
 }
 
 .quickActionBtn:hover {

@@ -3,6 +3,8 @@ import { Pencil } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { useEventModal } from '../../../context/CalendarContext';
 import { useQuickActions } from '../hooks/useQuickActions';
+import { useTags } from '../../../context/TagContext';
+import { getEventTheme } from '../utils/eventStyleUtils';
 import styles from './ListView.module.css';
 
 function formatEventTime(event) {
@@ -11,24 +13,27 @@ function formatEventTime(event) {
     return start.toLocaleTimeString('en-US', opts);
 }
 
-function getTagBadges(event) {
+function getTagBadges(event, tags) {
     const badges = [];
     const tagName = event.tag_name || event.tag?.name;
-    if (tagName) badges.push({ label: tagName, type: 'tag' });
+    const theme = getEventTheme(event, tags);
+    if (tagName) badges.push({ label: tagName, type: 'tag', color: theme.color });
 
     const eventType = getEventType(event);
     if (eventType === 'module' && event.module?.name) {
-        badges.push({ label: event.module.name, type: 'source' });
+        badges.push({ label: event.module.name, type: 'source', color: null });
     }
     if (eventType === 'society' && event.society_name) {
-        badges.push({ label: event.society_name, type: 'source' });
+        const societyColor = event.society_color || theme.color;
+        badges.push({ label: event.society_name, type: 'source', color: societyColor });
     }
     return badges;
 }
 
 function TagBadge({ badge }) {
-    const className = badge.type === 'source' ? styles.sourceBadge : styles.tagBadge;
-    return <span className={className}>{badge.label}</span>;
+    const baseClass = badge.type === 'source' ? styles.sourceBadge : styles.tagBadge;
+    const style = badge.color ? { backgroundColor: badge.color, color: '#fff' } : {};
+    return <span className={baseClass} style={style}>{badge.label}</span>;
 }
 
 function EditButton({ onClick }) {
@@ -42,8 +47,10 @@ function EditButton({ onClick }) {
 export function EventRow({ event }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const { openModal } = useEventModal();
+    const { tags } = useTags();
     const isReadOnly = isReadOnlyEvent(event);
     const quickAction = useQuickActions(event);
+    const badges = getTagBadges(event, tags);
 
     const handleEdit = (e) => { e.stopPropagation(); openModal(event); };
 
@@ -52,13 +59,15 @@ export function EventRow({ event }) {
             <div className={styles.rowMain}>
                 <span className={styles.eventTime}>{formatEventTime(event)}</span>
                 <span className={styles.eventTitle}>{event.title}</span>
-                <div className={styles.badgesContainer}>
-                    {getTagBadges(event).map((b, i) => <TagBadge key={i} badge={b} />)}
+                <div className={styles.rowActions}>
+                    {!isReadOnly && <EditButton onClick={handleEdit} />}
+                    {isReadOnly && quickAction && (
+                        <button className={styles.quickActionBtn} onClick={quickAction.onClick}>{quickAction.label}</button>
+                    )}
                 </div>
-                {!isReadOnly && <EditButton onClick={handleEdit} />}
-                {isReadOnly && quickAction && (
-                    <button className={styles.quickActionBtn} onClick={quickAction.onClick}>{quickAction.label}</button>
-                )}
+                <div className={styles.badgesContainer}>
+                    {badges.map((b, i) => <TagBadge key={i} badge={b} />)}
+                </div>
             </div>
             {isExpanded && (event.location || event.description) && (
                 <div className={styles.expandedContent}>
