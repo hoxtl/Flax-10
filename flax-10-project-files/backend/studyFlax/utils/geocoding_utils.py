@@ -20,3 +20,13 @@ class GeocodingService:
                 'longitude': None,
                 'formatted_address': None,
             }
+        
+        mapbox_token = os.getenv('VITE_MAPBOX_TOKEN')
+        if not mapbox_token:
+            print("ERROR: Mapbox token not found in the environment...")
+            return {
+                'success': False,
+                'latitude': None,
+                'longitude': None,
+                'formatted_address': None,
+            }
