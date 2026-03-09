@@ -158,6 +158,90 @@ class MembershipViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class ReportSocietyViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='reporter', email='r@test.com', password='pass')
+        self.superadmin = User.objects.create_superuser(username='superadmin', email='sa@test.com', password='pass')
+        self.society = make_society()
+        self.client.force_authenticate(user=self.user)
+        self.url = f'/api/societies/{self.society.id}/report/'
+
+    def test_report_society_not_found(self):
+        response = self.client.post('/api/societies/99999/report/', {'reason': 'spam'})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_report_society_missing_reason(self):
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_report_society_blank_reason(self):
+        response = self.client.post(self.url, {'reason': '   '})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_report_society_success_notifies_admins(self):
+        response = self.client.post(self.url, {'reason': 'Spam content'})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        from studyFlax.models.society.societyReportModel import SocietyReport
+        self.assertTrue(SocietyReport.objects.filter(society=self.society, reporter=self.user).exists())
+
+    def test_report_society_success_no_admins(self):
+        self.superadmin.delete()
+        response = self.client.post(self.url, {'reason': 'Spam'})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_remove_report_success(self):
+        from studyFlax.models.society.societyReportModel import SocietyReport
+        SocietyReport.objects.create(society=self.society, reporter=self.user, reason='test')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(SocietyReport.objects.filter(society=self.society, reporter=self.user).exists())
+
+    def test_remove_report_not_found_society(self):
+        response = self.client.delete('/api/societies/99999/report/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ToggleSubscriptionViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='subuser', email='sub@test.com', password='pass')
+        self.society = make_society()
+        self.client.force_authenticate(user=self.user)
+        self.url = f'/api/societies/{self.society.id}/subscribe/'
+
+    def test_toggle_not_found_society(self):
+        response = self.client.patch('/api/societies/99999/subscribe/', {'is_subscribed': True})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_toggle_not_a_member(self):
+        response = self.client.patch(self.url, {'is_subscribed': True})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_toggle_subscription_on(self):
+        membership = make_member(self.user, self.society)
+        membership.is_subscribed = False
+        membership.save()
+        response = self.client.patch(self.url, {'is_subscribed': True})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['is_subscribed'])
+
+    def test_toggle_subscription_off(self):
+        membership = make_member(self.user, self.society)
+        membership.is_subscribed = True
+        membership.save()
+        response = self.client.patch(self.url, {'is_subscribed': False}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data['is_subscribed'])
+
+    def test_toggle_subscription_default_flips(self):
+        membership = make_member(self.user, self.society)
+        original = membership.is_subscribed
+        response = self.client.patch(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['is_subscribed'], not original)
+
+
 class SocietyEventViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
