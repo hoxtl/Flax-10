@@ -3,8 +3,8 @@ import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
 import { useCalendarEvents } from "./hooks/useCalendarEvents";
 import { DayView } from "./DayView/DayView";
 import { WeekView } from "./WeekView/WeekView";
-import { MonthView } from "./MonthView/MonthView";
-import { YearView } from "./YearView/YearView";
+import { InfiniteMonthView } from "./MonthView/InfiniteMonthView";
+import { InfiniteYearView } from "./YearView/InfiniteYearView";
 import { ListView } from "./ListView/ListView";
 import { TableView } from "./TableView/TableView";
 import "./Calendar.css";
@@ -31,7 +31,7 @@ function CalendarContent() {
 }
 
 function CalendarView({ viewMode, displayMode }) {
-  const gridViews = { day: DayView, week: WeekView, month: MonthView, year: YearView };
+  const gridViews = { day: DayView, week: WeekView, month: InfiniteMonthView, year: InfiniteYearView };
   const displayViews = { grid: gridViews[viewMode], list: ListView, table: TableView };
   const View = displayViews[displayMode] || gridViews[viewMode];
 
