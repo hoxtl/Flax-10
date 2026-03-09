@@ -4,8 +4,8 @@ import EmptyStateCard from '../../components/EmptyStateCard';
 
 describe('EmptyStateCard (root)', () => {
   it('renders default message with trimmed displayName and default subtext', () => {
-    render(<EmptyStateCard displayName="  Hamed  " />);
-    expect(screen.getByText(/The garden is at peace/i)).toHaveTextContent('Hamed');
+    render(<EmptyStateCard displayName="  Jane  " />);
+    expect(screen.getByText(/The garden is at peace/i)).toHaveTextContent('Jane');
     expect(screen.getByText('No overdue or due-soon tasks.')).toBeInTheDocument();
   });
 
