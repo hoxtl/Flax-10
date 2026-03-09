@@ -383,6 +383,9 @@ export default function CampusMap() {
       const token = localStorage.getItem('token');
       if (!token) return;
     }
+    try {
+      const data = await getCalendarEvents();
+    }
   })
 
   // Update the marker on the map when user's start location changes
