@@ -390,6 +390,7 @@ export default function CampusMap() {
       }
     };
     loadCalendarEvents();
+    const handleRefresh = () => loadCalendarEvents();
   }
 )
 
