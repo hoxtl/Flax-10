@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { EventModal } from './EventModal/EventModal';
-import { EventDetailPopup } from './EventDetailPopup';
+import { EventPopover } from './EventPopover/EventPopover';
 import { useTags } from '../../context/TagContext';
 import { useNotify } from '../Notifications/hooks/useNotify';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
@@ -65,7 +65,6 @@ function EventPopupContainer() {
     const { disenrollFromModule } = useModuleDisenrollment();
     const { getTag, refreshTags } = useTags();
     const notify = useNotify();
-    const navigate = useNavigate();
     const { handleDeleteRequest } = useEventDeletion();
 
     if (isModalOpen || !popupEvent) return null;
@@ -75,9 +74,9 @@ function EventPopupContainer() {
         closePopup();
         await handleDeleteRequest(ev);
     };
-    const handlers = { openModal, onDeleteRequest: onDeleteWrapped, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags, notify };
+    const handlers = { openModal, onDeleteRequest: onDeleteWrapped, closePopup, loadEvents, disenrollFromModule, refreshTags, notify };
     const actions = getCalendarPopupActions(popupEvent, handlers);
-    return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
+    return <EventPopover event={popupEvent} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} tag={tag} readOnly={readOnly} />;
 }
 
 function getEventTag(event, getTag) {
