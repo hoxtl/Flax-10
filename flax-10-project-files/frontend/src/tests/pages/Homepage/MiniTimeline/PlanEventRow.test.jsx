@@ -148,4 +148,75 @@ describe('PlanEventRow', () => {
         fireEvent.click(card);
         expect(setConflictPopoverRowId).toHaveBeenCalled();
     });
+
+    it('renders Conflict badge and Fix it button when isOverlap', () => {
+        renderRow({ row: { ...baseRow, isOverlap: true } });
+        expect(screen.getByText('Conflict')).toBeTruthy();
+        expect(screen.getByText('Fix it')).toBeTruthy();
+    });
+
+    it('calls handleAutoReschedule when Auto-move clicked and nextFreeRow exists', () => {
+        const onConflictAutoMove = vi.fn();
+        const setConflictPopoverRowId = vi.fn();
+        const freeRow = { type: 'free', gapStartMins: 700, minutes: 60 };
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            rows: [baseRow, freeRow],
+            conflictPopoverRowId: baseRow.id,
+            setConflictPopoverRowId,
+            onConflictAutoMove,
+        });
+        fireEvent.click(screen.getByText('Auto-move to next gap'));
+        expect(onConflictAutoMove).toHaveBeenCalled();
+    });
+
+    it('shows No free window when no nextFreeRow', () => {
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            rows: [baseRow],
+            conflictPopoverRowId: baseRow.id,
+        });
+        expect(screen.getByText('No free window')).toBeTruthy();
+    });
+
+    it('calls onPushTomorrow when Move to tomorrow clicked', () => {
+        const onPushTomorrow = vi.fn();
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            rows: [baseRow],
+            conflictPopoverRowId: baseRow.id,
+            onPushTomorrow,
+        });
+        fireEvent.click(screen.getByText('→ Move to tomorrow'));
+        expect(onPushTomorrow).toHaveBeenCalledWith(baseRow.item);
+    });
+
+    it('calls onEdit when Manually adjust clicked', () => {
+        const onEdit = vi.fn();
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            conflictPopoverRowId: baseRow.id,
+            onEdit,
+        });
+        fireEvent.click(screen.getByText('Manually adjust'));
+        expect(onEdit).toHaveBeenCalledWith(baseRow.item, null);
+    });
+
+    it('responds to keyboard Enter', () => {
+        const onCardClick = vi.fn();
+        renderRow({ onCardClick });
+        const card = document.querySelector('[role="button"]');
+        fireEvent.keyDown(card, { key: 'Enter' });
+        expect(onCardClick).toHaveBeenCalled();
+    });
+
+    it('renders module code pill when moduleCode provided', () => {
+        renderRow({ row: { ...baseRow, moduleCode: 'CS101' } });
+        expect(screen.getByText('CS101')).toBeTruthy();
+    });
+
+    it('renders duration pill when durationMins > 0', () => {
+        renderRow();
+        expect(screen.getByText('1h')).toBeTruthy();
+    });
 });
