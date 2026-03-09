@@ -104,7 +104,7 @@ export default function CampusMap() {
   const [tflRouteError, setTflRouteError] = useState("");
   const [disruptions, setDisruptions] = useState([]);
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
-
+  const [calendarEvents, setCalendarEvents] = useState([]);
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
