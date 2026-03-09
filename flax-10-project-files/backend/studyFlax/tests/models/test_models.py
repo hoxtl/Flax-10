@@ -1,9 +1,19 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from datetime import timedelta
 from studyFlax.models import Tag, Category, RecurrenceRule
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyReportModel import SocietyReport
+from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement, SocietyAnnouncementImage
+from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
+from studyFlax.models.society.societyEventModel import SocietyEvent
+from studyFlax.models.society.societyImageModel import SocietyImage
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
+from studyFlax.models.society.societyTagModel import SocietyTag
+from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.timer.themeSessionModel import ThemeSession
 from studyFlax.admin import ReportedSociety, ReportedSocietyAdmin
 
 User = get_user_model()
@@ -31,6 +41,74 @@ class ModelStringTests(TestCase):
         society = Society.objects.create(name='MySociety', bio='bio', admin_emails='a@b.com')
         report = SocietyReport.objects.create(society=society, reporter=user, reason='spam')
         self.assertEqual(str(report), "Report for MySociety by rep")
+
+    def test_user_is_student(self):
+        user = User.objects.create_user(username='stud', email='stud@test.com', password='pass')
+        self.assertTrue(user.is_student())
+
+    def test_society_str(self):
+        society = Society.objects.create(name='TestSoc', bio='bio', admin_emails='a@b.com')
+        self.assertEqual(str(society), 'TestSoc')
+
+    def test_society_announcement_str(self):
+        society = Society.objects.create(name='AnnSoc', bio='bio', admin_emails='a@b.com')
+        ann = SocietyAnnouncement.objects.create(society=society, title='Hello', content='World')
+        self.assertIn('Hello', str(ann))
+
+    def test_society_announcement_image_str(self):
+        society = Society.objects.create(name='ImgSoc', bio='bio', admin_emails='a@b.com')
+        ann = SocietyAnnouncement.objects.create(society=society, title='AnnImg', content='')
+        img = SocietyAnnouncementImage.objects.create(announcement=ann, url='http://example.com/img.jpg')
+        self.assertIn('AnnImg', str(img))
+
+    def test_society_calendar_sync_str(self):
+        user = User.objects.create_user(username='syncuser', email='syncuser@test.com', password='pass')
+        society = Society.objects.create(name='SyncSoc', bio='bio', admin_emails='a@b.com')
+        sync = SocietyCalendarSync.objects.create(user=user, society=society)
+        self.assertIn('syncuser', str(sync))
+
+    def test_society_event_str(self):
+        society = Society.objects.create(name='EvtSoc', bio='bio', admin_emails='a@b.com')
+        event = SocietyEvent.objects.create(
+            society=society, title='MyEvent',
+            start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
+        )
+        self.assertIn('MyEvent', str(event))
+
+    def test_society_image_str(self):
+        society = Society.objects.create(name='SocImg', bio='bio', admin_emails='a@b.com')
+        img = SocietyImage.objects.create(society=society, url='http://example.com/pic.jpg')
+        self.assertIn('SocImg', str(img))
+
+    def test_society_membership_str(self):
+        user = User.objects.create_user(username='memuser', email='memuser@test.com', password='pass')
+        society = Society.objects.create(name='MemSoc', bio='bio', admin_emails='a@b.com')
+        membership = SocietyMembership.objects.create(user=user, society=society, role='member')
+        self.assertIn('memuser', str(membership))
+
+    def test_society_tag_str(self):
+        society = Society.objects.create(name='TagSoc', bio='bio', admin_emails='a@b.com')
+        tag = SocietyTag.objects.create(society=society, label='Events', color='#ff0000')
+        self.assertIn('Events', str(tag))
+
+    def test_task_list_str(self):
+        user = User.objects.create_user(username='taskuser', email='taskuser@test.com', password='pass')
+        task_list = TaskList.objects.create(user=user, name='My Tasks', category='personal')
+        self.assertIn('taskuser', str(task_list))
+
+    def test_task_str(self):
+        user = User.objects.create_user(username='taskuser2', email='taskuser2@test.com', password='pass')
+        task = Task.objects.create(user=user, title='Buy milk')
+        self.assertEqual(str(task), 'Buy milk')
+
+    def test_theme_session_str(self):
+        user = User.objects.create_user(username='themeuser', email='themeuser@test.com', password='pass')
+        session = ThemeSession.objects.create(
+            user=user, theme='dark',
+            started_at=timezone.now(), ended_at=timezone.now() + timedelta(hours=1),
+            duration_minutes=60,
+        )
+        self.assertIn('dark', str(session))
 
 
 class ReportedSocietyAdminTest(TestCase):
