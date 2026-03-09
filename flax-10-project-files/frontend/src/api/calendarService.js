@@ -7,4 +7,6 @@ function authHeaders(extra = {}) {
 
 async function apiFetch(path, options = {}) {
     const response = await fetch(`${API_BASE}${path}`, options);
+    if (!response.ok) throw new Error(`Calendar API fetch error: ${path}`);
+    return response.json();
 }
