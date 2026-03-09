@@ -1,8 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100%;
   background-color: var(--bg);
 }
 
@@ -12,15 +11,17 @@
   z-index: 100;
   background: var(--bg);
   flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .filters {
-  padding: 4px 16px;
+  padding: 4px 16px 8px;
   flex-shrink: 0;
   overflow-x: auto;
   white-space: nowrap;
   display: flex;
   gap: 8px;
+  scrollbar-width: none;
 }
 
 .filters::-webkit-scrollbar {
@@ -29,20 +30,17 @@
 
 .mainContent {
   flex: 1;
-  min-height: 0;
-  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
   background: var(--calendar-bg);
   border-top-left-radius: 22px;
   border-top-right-radius: 24px;
-  display: flex;
-  flex-direction: column;
 }
 
 @media (max-width: 768px) {
   .filters {
     padding: 8px 12px;
     background: var(--bg);
-    border-bottom: 1px solid var(--border);
     -webkit-overflow-scrolling: touch;
   }
 }
