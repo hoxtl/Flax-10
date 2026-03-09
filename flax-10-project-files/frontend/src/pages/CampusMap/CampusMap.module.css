@@ -876,3 +876,10 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+:global(.eventMarker) {
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: transform 150ms ease;
+  filter: drop-shadow(0 2px 4px rgba(black, 0.3));
+}
