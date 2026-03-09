@@ -389,6 +389,7 @@ export default function CampusMap() {
         console.log('Unable to load calendar events...');
       }
     };
+    loadCalendarEvents();
   }
 )
 
