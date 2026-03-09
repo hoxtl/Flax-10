@@ -442,6 +442,7 @@ export default function CampusMap() {
         element: el,
         anchor: 'bottom',
       })
+        .setLngLat([event.longitude, event.latitude])
     })
   })
 
