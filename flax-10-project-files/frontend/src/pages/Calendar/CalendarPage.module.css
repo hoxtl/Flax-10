@@ -1,7 +1,4 @@
 .page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
   background-color: var(--bg);
 }
 
@@ -10,13 +7,10 @@
   top: 0;
   z-index: 100;
   background: var(--bg);
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
 }
 
 .filters {
   padding: 4px 16px 8px;
-  flex-shrink: 0;
   overflow-x: auto;
   white-space: nowrap;
   display: flex;
@@ -29,9 +23,6 @@
 }
 
 .mainContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   background: var(--calendar-bg);
   border-top-left-radius: 22px;
   border-top-right-radius: 24px;
