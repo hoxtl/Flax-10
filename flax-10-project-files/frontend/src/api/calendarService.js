@@ -12,5 +12,5 @@ async function apiFetch(path, options = {}) {
 }
 
 export function getCalendarEvents() {
-    
+    return apiFetch('/calendar/events/map/', { headers: authHeaders() });
 }
