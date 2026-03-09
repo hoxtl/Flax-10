@@ -21,11 +21,11 @@ vi.mock('remark-gfm', () => ({ default: () => {} }));
 vi.mock('../../../api/analyticsService', () => ({
     default: {
         getAiInsights: vi.fn().mockResolvedValue({ insights: 'You study well!' }),
-        chatWithInsights: vi.fn().mockResolvedValue({ response: 'Great question!' }),
+        aiChat: vi.fn().mockResolvedValue({ reply: 'Great question!' }),
     },
 }));
 
-import AIInsightsTab, { InsightsPanel } from '../../../components/Analytics/AIInsightsTab';
+import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/Analytics/AIInsightsTab';
 import analyticsService from '../../../api/analyticsService';
 
 // jsdom doesn't implement scrollIntoView
@@ -80,5 +80,58 @@ describe('AIInsightsTab', () => {
         render(<AIInsightsTab period={30} />);
         fireEvent.click(screen.getAllByText(/Generate/)[0]);
         await waitFor(() => expect(screen.getAllByTestId('markdown').length).toBeGreaterThan(0));
+    });
+
+    it('shows error banner when insights generation fails', async () => {
+        analyticsService.getAiInsights.mockRejectedValueOnce(new Error('nope'));
+        render(<AIInsightsTab period={30} />);
+        fireEvent.click(screen.getAllByText(/Generate/)[0]);
+        await waitFor(() => expect(screen.getByText(/Failed to generate insights/)).toBeTruthy());
+    });
+});
+
+describe('ChatPanel', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('renders suggestions when empty and sends on suggestion click', async () => {
+        render(<ChatPanel period={14} />);
+        fireEvent.click(screen.getByText('When should I study this week?'));
+        await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalled());
+        expect(screen.getByText('When should I study this week?')).toBeTruthy();
+        await waitFor(() => expect(screen.getAllByTestId('markdown').length).toBeGreaterThan(0));
+    });
+
+    it('sends message on Enter (without shift) and shows reply', async () => {
+        render(<ChatPanel period={7} />);
+        const box = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(box, { target: { value: 'Hello' } });
+        fireEvent.keyDown(box, { key: 'Enter', shiftKey: false });
+        await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalledWith(
+            expect.arrayContaining([expect.objectContaining({ role: 'user', content: 'Hello' })]),
+            7,
+        ));
+        await waitFor(() => expect(screen.getAllByTestId('markdown').length).toBeGreaterThan(0));
+    });
+
+    it('shows error when chat fails', async () => {
+        analyticsService.aiChat.mockRejectedValueOnce(new Error('fail'));
+        render(<ChatPanel period={30} />);
+        const box = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(box, { target: { value: 'Hi' } });
+        fireEvent.click(screen.getByText('↑'));
+        await waitFor(() => expect(screen.getByText(/Could not get a response/)).toBeTruthy());
+    });
+
+    it('shows Clear button after messages and clears chat', async () => {
+        render(<ChatPanel period={30} />);
+        const box = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(box, { target: { value: 'Hi' } });
+        fireEvent.click(screen.getByText('↑'));
+        await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalled());
+        expect(screen.getByText('Clear')).toBeTruthy();
+        fireEvent.click(screen.getByText('Clear'));
+        expect(screen.queryByText('Clear')).toBeNull();
     });
 });
