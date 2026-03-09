@@ -21,3 +21,15 @@ def calendar_events_map_view(request):
         start_time__gte=today,
         start_time__lte=future_date,
     ).order_by('start_time')
+    event_data = []
+    for event in events:
+        event_data.append({
+            'id': event.id,
+            'title': event.title,
+            'location': event.location,
+            'latitude': event.location_latitude,
+            'longitude': event.location_longitude,
+            'start_time': event.start_time.isoformat(),
+            'end_time': event.end_time.isoformat(),
+            'priority': event.priority,
+        })
