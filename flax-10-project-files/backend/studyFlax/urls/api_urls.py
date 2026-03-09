@@ -70,6 +70,7 @@ from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai
 from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 from studyFlax.views.authentication.home_address_view import home_address_view
+from studyFlax.views.calendar.event_map_view import calendar_events_map_view
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -99,6 +100,7 @@ urlpatterns = [
     path("tags/<int:pk>/", tag_detail, name="tag-detail"),
     path("categories/", category_list, name="category-list"),
     path("timetable/import/", timetable_import, name="timetable-import"),
+    path("calendar/events/map", calendar_events_map_view, name='calendar_events_map'),
 
     # Modules
     path("modules/", module_list, name="module_list"),
