@@ -10,3 +10,7 @@ async function apiFetch(path, options = {}) {
     if (!response.ok) throw new Error(`Calendar API fetch error: ${path}`);
     return response.json();
 }
+
+export function getCalendarEvents() {
+    
+}
