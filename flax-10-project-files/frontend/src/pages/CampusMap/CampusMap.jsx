@@ -377,6 +377,11 @@ export default function CampusMap() {
     }, 100);
   }, [userHome, mapLoaded, startLocation]);
 
+  // Add calendar events to the map
+  useEffect(() => {
+    
+  })
+
   // Update the marker on the map when user's start location changes
   useEffect(() => {
     if (!mapLoaded || !startLocation) return;
