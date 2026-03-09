@@ -435,7 +435,13 @@ export default function CampusMap() {
           <button id="setEventAsStart-${event.id}" class="eventPopupButton">
             Set as Start
           </button>
-        `)
+        </div>
+      `);
+
+      const marker = new mapboxgl.Marker({
+        element: el,
+        anchor: 'bottom',
+      })
     })
   })
 
