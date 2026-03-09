@@ -385,6 +385,7 @@ export default function CampusMap() {
     }
     try {
       const data = await getCalendarEvents();
+      setCalendarEvents(data.events || []);
     }
   })
 
