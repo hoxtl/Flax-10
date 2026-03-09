@@ -415,6 +415,7 @@ export default function CampusMap() {
         'low': '#888888',
       };
       const color = priorityColors[event.priority] || '#4488FF';
+      el.style.color = color;
     })
   })
 
