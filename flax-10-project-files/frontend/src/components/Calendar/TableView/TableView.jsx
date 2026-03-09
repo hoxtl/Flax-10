@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
 import { useTableEdit } from '../hooks/useTableEdit';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
@@ -38,7 +39,19 @@ function sortByStartTime(events) {
     return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
 
+function useClickOutside(ref, callback, isActive) {
+    useEffect(() => {
+        if (!isActive) return;
+        const handleClick = (e) => {
+            if (ref.current && !ref.current.contains(e.target)) callback();
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [ref, callback, isActive]);
+}
+
 export function TableView({ selectedDate: propDate, events: propEvents }) {
+    const tableRef = useRef(null);
     const data = useCalendarData({ selectedDate: propDate, events: propEvents });
     const sortedEvents = sortByStartTime(data.events || []);
 
@@ -50,13 +63,15 @@ export function TableView({ selectedDate: propDate, events: propEvents }) {
         editState.cancelEdit
     );
 
+    useClickOutside(tableRef, editState.saveEdit, !!editState.editingCell);
+
     const onCellClick = (eventId, field, value) => {
         editState.startEdit(eventId, field, value);
     };
 
     return (
         <div className={styles.container}>
-            <table className={styles.table}>
+            <table ref={tableRef} className={styles.table}>
                 <TableHeader />
                 <tbody>
                     {!sortedEvents.length && <EmptyState />}

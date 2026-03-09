@@ -1,6 +1,8 @@
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { EditableCell } from './cells/EditableCell';
 import { useQuickActions } from '../hooks/useQuickActions';
+import { useTags } from '../../../context/TagContext';
+import { getEventTheme } from '../utils/eventStyleUtils';
 import styles from './TableView.module.css';
 
 function formatDateTime(event) {
@@ -9,28 +11,31 @@ function formatDateTime(event) {
     return start.toLocaleString('en-US', opts);
 }
 
-function getTagBadges(event) {
+function getTagBadges(event, tags) {
     const badges = [];
     const tagName = event.tag_name || event.tag?.name;
-    if (tagName) badges.push({ label: tagName, type: 'tag' });
+    const theme = getEventTheme(event, tags);
+    if (tagName) badges.push({ label: tagName, type: 'tag', color: theme.color });
 
     const eventType = getEventType(event);
     if (eventType === 'module' && event.module?.name) {
-        badges.push({ label: event.module.name, type: 'source' });
+        badges.push({ label: event.module.name, type: 'source', color: null });
     }
     if (eventType === 'society' && event.society_name) {
-        badges.push({ label: event.society_name, type: 'source' });
+        const societyColor = event.society_color || theme.color;
+        badges.push({ label: event.society_name, type: 'source', color: societyColor });
     }
     return badges;
 }
 
 function TagBadge({ badge }) {
     const cls = badge.type === 'source' ? styles.sourceBadge : styles.tagBadge;
-    return <span className={cls}>{badge.label}</span>;
+    const style = badge.color ? { backgroundColor: badge.color, color: '#fff' } : {};
+    return <span className={cls} style={style}>{badge.label}</span>;
 }
 
-function TagCell({ event }) {
-    const badges = getTagBadges(event);
+function TagCell({ event, tags }) {
+    const badges = getTagBadges(event, tags);
     return (
         <td className={styles.tagCell}>
             {badges.map((b, i) => <TagBadge key={i} badge={b} />)}
@@ -42,6 +47,7 @@ export function TableRow({ event, rowIndex, editState, onCellClick, onKeyDown })
     const isReadOnly = isReadOnlyEvent(event);
     const { editingCell, cellValue, updateValue } = editState;
     const quickAction = useQuickActions(event);
+    const { tags } = useTags();
 
     const isEditing = (field) => {
         return editingCell?.eventId === event.id && editingCell?.field === field;
@@ -69,7 +75,7 @@ export function TableRow({ event, rowIndex, editState, onCellClick, onKeyDown })
                     )}
                 </div>
             </td>
-            <TagCell event={event} />
+            <TagCell event={event} tags={tags} />
             <td className={styles.dateCell}>{formatDateTime(event)}</td>
             <td className={styles.locationCell} onClick={() => handleCellClick('location')}>
                 <EditableCell
