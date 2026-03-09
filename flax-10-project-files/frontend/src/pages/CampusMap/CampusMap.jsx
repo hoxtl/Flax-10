@@ -402,6 +402,10 @@ export default function CampusMap() {
     if (!mapLoaded || calendarEvents.length === 0) return;
     eventMarkers.current.forEach(marker => marker.remove());
     eventMarkers.current = [];
+
+    calendarEvents.forEach((event) => {
+      const el = document.createElement('div');
+    })
   })
 
   // Update the marker on the map when user's start location changes
