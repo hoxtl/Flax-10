@@ -391,6 +391,7 @@ export default function CampusMap() {
     };
     loadCalendarEvents();
     const handleRefresh = () => loadCalendarEvents();
+    window.addEventListener('calendar-event-updated', handleRefresh);
   }
 )
 
