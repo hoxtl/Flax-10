@@ -284,6 +284,7 @@ export default function CampusMap() {
       campusMarkers.current = [];
       eventMarkers.current.forEach(marker => marker.remove());
       eventMarkers.current = [];
+      if (homeMarker.current) homeMarker.current.remove();
       map.current?.remove();
       map.current = null;
     };
