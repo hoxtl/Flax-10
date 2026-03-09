@@ -185,7 +185,12 @@ class LegacyUserSettingsViewTests(TestCase):
         self.factory = APIRequestFactory()
         self.user = make_user()
 
-    def call_legacy_view(self, method, url, **kwargs):
+    def call_legacy_view(self, method, url, data=None, format=None):
+        kwargs = {}
+        if data is not None:
+            kwargs['data'] = data
+        if format is not None:
+            kwargs['format'] = format
         request = getattr(self.factory, method)(url, **kwargs)
         force_authenticate(request, user=self.user)
         return legacy_user_settings_view(request)

@@ -109,3 +109,21 @@ class DeadlineViewTests(BaseTestCase):
     def deadline_payload(self):
         return dict(title='New Deadline', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
+
+    def test_update_deadline_invalid_non_teacher(self):
+        """Test that non-teacher cannot update a deadline."""
+        deadline = Deadline.objects.create(
+            module=self.module, title='D1',
+            deadline_type='coursework',
+            start_due_date=timezone.now() + timedelta(days=3),
+        )
+        self.user.role = 'student'
+        self.user.save()
+        response = self.client.put(
+            f'{self.list_url}{deadline.id}/',
+            {'title': 'Updated'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.user.role = 'teacher'
+        self.user.save()

@@ -156,3 +156,21 @@ class TagListTests(BaseTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotIn('Lecture', [tag['name'] for tag in response.data])
+
+    def test_category_list(self):
+        """Test listing categories returns default categories."""
+        response = self.client.get("/api/categories/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_tag_list_with_society_sync_shows_societies_tag(self):
+        """Test that Societies tag appears when user has society syncs."""
+        from studyFlax.models.society.societyModel import Society
+        from studyFlax.models.society.societyMembershipModel import SocietyMembership
+        from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
+        from studyFlax.views.calendar.system_tags import get_societies_tag
+        society = Society.objects.create(name='TagSyncSoc', bio='bio', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        SocietyCalendarSync.objects.create(user=self.user, society=society)
+        get_societies_tag()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

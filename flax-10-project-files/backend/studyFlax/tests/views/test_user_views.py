@@ -1,12 +1,16 @@
 from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework import status
 from django.contrib.auth import get_user_model
-from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.society.societyModel import Society
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
 
 User = get_user_model()
 
@@ -51,6 +55,11 @@ class ProfileViewTest(TestCase):
 
     def test_patch_profile_remove_photo(self):
         response = self.client.patch('/api/profile/', {'remove_photo': 'true'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch_profile_upload_photo(self):
+        photo = SimpleUploadedFile("photo.jpg", b"fake image content", content_type="image/jpeg")
+        response = self.client.patch('/api/profile/', {'profile_photo': photo}, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_another_user_profile(self):
@@ -216,3 +225,41 @@ class OnboardingViewTest(TestCase):
         response = self.client.post('/api/onboarding/', {'year': '1', 'major': 'Unknown Major XYZ'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrolled_modules'], 0)
+
+
+class ProfileViewCoverageTest(TestCase):
+    """Tests for profile_view update photo branch."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='pv_user', email='pv_user@test.com', password='pass',
+            first_name='PV', last_name='User'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_patch_remove_photo(self):
+        response = self.client.patch('/api/profile/', data={'remove_photo': 'true'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class UserSearchCoverageTest(TestCase):
+    """Tests for user_search_view society filter."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='us_user', email='us_user@test.com', password='pass'
+        )
+        self.other = User.objects.create_user(
+            username='us_other', email='us_other@test.com', password='pass'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_search_by_society(self):
+        society = Society.objects.create(name='SearchSoc', bio='bio', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.other, society=society, role='member')
+        response = self.client.get(f'/api/users/search/?society={society.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [u['id'] for u in response.data['results']]
+        self.assertIn(self.other.id, ids)

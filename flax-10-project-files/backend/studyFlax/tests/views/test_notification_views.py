@@ -1,7 +1,14 @@
 import json
+
+from django.test import TestCase
+from django.contrib.auth import get_user_model
 from rest_framework import status
+from rest_framework.test import APIRequestFactory
+
 from ..base import BaseTestCase
 from studyFlax.models import Notification
+
+User = get_user_model()
 
 class NotificationViewTests(BaseTestCase):
     """Tests for notification views."""
@@ -50,3 +57,34 @@ class NotificationViewTests(BaseTestCase):
         response = self.client.post(self.mark_read_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertTrue(Notification.objects.filter(read=True).count() == 2)
+
+    def test_clear_all_notifications(self):
+        """Test clearing all notifications for the current user."""
+        response = self.client.delete("/api/notifications/clear-all/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Notification.objects.filter(user=self.user).count(), 0)
+
+
+class NotificationAndProfileCoverageTest(TestCase):
+    """Tests for notification and profile helper branches."""
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='profile_cov', email='profile_cov@example.com', password='pass')
+
+    def test_get_notifications_returns_ordered_data(self):
+        from studyFlax.views.notifications.notification_views import get_notifications
+        Notification.objects.create(user=self.user, title='First', message='1')
+        Notification.objects.create(user=self.user, title='Second', message='2')
+        request = self.factory.get('/')
+        request.user = self.user
+        response = get_notifications(request)
+        self.assertEqual(len(response.data), 2)
+
+    def test_profile_build_response_includes_zero_defaults(self):
+        from studyFlax.views.user.profile_view import build_profile_response
+        request = self.factory.get('/')
+        request.user = self.user
+        data = build_profile_response(self.user, request)
+        self.assertEqual(data['task_count'], 0)
+        self.assertEqual(data['module_count'], 0)

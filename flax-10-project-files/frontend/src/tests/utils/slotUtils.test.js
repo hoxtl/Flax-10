@@ -5,7 +5,7 @@ import {
   getAllFreeWindowsToday,
 } from '../../pages/Homepage/utils/slotUtils';
 
-// ─── isNightSlot ──────────────────────────────────────────────────────────
+// Tests for slotUtils — covers isNightSlot, getNextFreeSlotToday, and getAllFreeWindowsToday including edge cases for time boundaries, blocking events, and null inputs
 
 describe('isNightSlot', () => {
   it('returns false for null/undefined', () => {
@@ -55,8 +55,6 @@ describe('isNightSlot', () => {
     expect(isNightSlot(d.toISOString())).toBe(true);
   });
 });
-
-// ─── getNextFreeSlotToday ─────────────────────────────────────────────────
 
 describe('getNextFreeSlotToday', () => {
   it('returns null when selectedDate is not today', () => {
@@ -130,8 +128,6 @@ describe('getNextFreeSlotToday', () => {
     expect(() => getNextFreeSlotToday(undefined, today, 30)).not.toThrow();
   });
 });
-
-// ─── getAllFreeWindowsToday ───────────────────────────────────────────────
 
 describe('getAllFreeWindowsToday', () => {
   it('returns empty array when selectedDate is not today', () => {

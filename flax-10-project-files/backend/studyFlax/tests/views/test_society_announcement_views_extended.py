@@ -1,12 +1,15 @@
+from datetime import timedelta
+
 from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APIClient, APIRequestFactory
 
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyMembershipModel import SocietyMembership
 from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement, SocietyAnnouncementImage
+from studyFlax.models.society.societyTagModel import SocietyTag
 
 User = get_user_model()
 
@@ -162,3 +165,134 @@ class AnnouncementDetailExtendedTest(TestCase):
             {'title': 'X'}
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_society_invalid_data(self):
+        """Test that invalid data for society update returns 400."""
+        response = self.client.patch(
+            f'/api/societies/{self.society.id}/',
+            {'name': ''},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class SocietyViewCoverageTest(TestCase):
+    """Tests for society view branches not yet covered."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_user(
+            username='sv_admin', email='sv_admin@test.com', password='pass'
+        )
+        self.other = User.objects.create_user(
+            username='sv_other', email='sv_other@test.com', password='pass'
+        )
+        self.society = Society.objects.create(
+            name='SVSociety', bio='bio', admin_emails='admin@test.com'
+        )
+        SocietyMembership.objects.create(user=self.admin, society=self.society, role='admin')
+        self.client.force_authenticate(user=self.admin)
+
+    def test_publish_changes_announcement_only_url(self):
+        response = self.client.post(
+            f'/api/societies/{self.society.id}/publish/',
+            {'announcements_added': ['New Post']},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_society_tag_list_not_found(self):
+        response = self.client.get('/api/societies/99999/tags/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_society_tag_create_invalid_data(self):
+        response = self.client.post(
+            f'/api/societies/{self.society.id}/tags/', {}, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_ratification_request_society_not_found(self):
+        response = self.client.post('/api/societies/99999/ratification/request/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_ratification_decision_society_not_found(self):
+        superuser = User.objects.create_superuser(
+            username='sv_super', email='sv_super@test.com', password='pass'
+        )
+        self.client.force_authenticate(user=superuser)
+        response = self.client.post('/api/societies/99999/ratification/approve/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_sync_calendar_society_not_found(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.post('/api/societies/99999/calendar-sync/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unsync_calendar_society_not_found(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.delete('/api/societies/99999/calendar-unsync/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class SocietySerializerCoverageTest(TestCase):
+    """Tests for society serializer branches not yet covered."""
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='serializer_cov', email='serializer_cov@example.com', password='pass')
+        self.society = Society.objects.create(name='Serializer Cov', bio='bio', admin_emails='admin@example.com')
+
+    def test_list_serializer_uses_image_field_before_related_images(self):
+        from studyFlax.serialisers.society_serialisers import SocietyListSerialiser
+        self.society.image = 'https://example.com/direct.jpg'
+        self.society.save()
+        SocietyTag.objects.create(society=self.society, label='General', color='#123456')
+        request = self.factory.get('/')
+        request.user = self.user
+        serializer = SocietyListSerialiser(self.society, context={'request': request})
+        self.assertEqual(serializer.data['cover_image'], 'https://example.com/direct.jpg')
+
+    def test_announcement_serializer_create_update_and_event_id(self):
+        from studyFlax.serialisers.society_serialisers import SocietyAnnouncementSerialiser
+        from studyFlax.models.society.societyEventModel import SocietyEvent
+        announcement = SocietyAnnouncement.objects.create(society=self.society, title='Title', content='Content')
+        event = SocietyEvent.objects.create(
+            society=self.society,
+            title='Linked',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+            recurrence='none',
+            announcement=announcement,
+        )
+        serializer = SocietyAnnouncementSerialiser(announcement, context={'skip_notification': True})
+        self.assertEqual(serializer.data['event_id'], event.id)
+        create_serializer = SocietyAnnouncementSerialiser(
+            data={'title': 'Created', 'content': 'Body'},
+            context={'skip_notification': True},
+        )
+        self.assertTrue(create_serializer.is_valid(), create_serializer.errors)
+        created = create_serializer.save(society=self.society)
+        self.assertTrue(getattr(created, '_skip_notification', False))
+        update_serializer = SocietyAnnouncementSerialiser(
+            created,
+            data={'content': 'Updated'},
+            partial=True,
+            context={'skip_notification': True},
+        )
+        self.assertTrue(update_serializer.is_valid(), update_serializer.errors)
+        updated = update_serializer.save()
+        self.assertTrue(getattr(updated, '_skip_notification', False))
+
+    def test_event_calendar_serializer_color_and_source(self):
+        from studyFlax.serialisers.society_serialisers import SocietyEventCalendarSerialiser
+        announcement = SocietyAnnouncement.objects.create(society=self.society, title='Announcement', content='Body')
+        event = self.society.events.create(
+            title='Event',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+            recurrence='none',
+            announcement=announcement,
+        )
+        serializer = SocietyEventCalendarSerialiser(event)
+        self.assertEqual(serializer.data['source'], 'society')
+        self.assertTrue(serializer.data['society_color'].startswith('#'))

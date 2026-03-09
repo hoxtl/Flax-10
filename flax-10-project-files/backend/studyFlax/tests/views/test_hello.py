@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase
 from django.test.client import RequestFactory
 
@@ -13,6 +14,6 @@ class HelloViewTest(TestCase):
         response = hello(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.json(),
+            json.loads(response.content),
             {"message": "Hello from Django REST Framework"}
         )

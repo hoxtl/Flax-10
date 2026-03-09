@@ -1,10 +1,13 @@
 from unittest.mock import MagicMock, PropertyMock, patch
 
-from rest_framework.test import APITestCase, APIRequestFactory
-from rest_framework import status
+from django.test import TestCase
 from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.test import APITestCase, APIRequestFactory
+
+from studyFlax.models.calendar.categoryModel import Category
 from studyFlax.models.social.shareModel import CalendarShare
-from studyFlax.serializers.socialSerializer import CalendarShareUserSerializer
+from studyFlax.serializers.socialSerializer import CalendarShareUserSerializer, CalendarShareSerializer
 
 User = get_user_model()
 
@@ -107,6 +110,9 @@ class CalendarShareViewTests(APITestCase):
 class CalendarShareUserSerializerPhotoTest(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
+        self.user1 = User.objects.create_user(username='share1', email='share1@example.com', password='pass', first_name='User', last_name='One')
+        self.user2 = User.objects.create_user(username='share2', email='share2@example.com', password='pass', first_name='User', last_name='Two')
+        self.user3 = User.objects.create_user(username='share3', email='share3@example.com', password='pass')
 
     def test_profile_photo_url_with_photo_and_request(self):
         user = User.objects.create_user(username='photoshare', email='ps@test.com', password='pass')
@@ -142,7 +148,7 @@ class CalendarShareUserSerializerPhotoTest(APITestCase):
 
     def test_sharing_flags(self):
         CalendarShare.objects.create(owner=self.user1, shared_with=self.user2)
-        CalendarShare.objects.create(owner=self.user3, shared_with=self.user2)
+        CalendarShare.objects.create(owner=self.user2, shared_with=self.user3)
 
         request = self.factory.get('/')
         request.user = self.user1
@@ -161,8 +167,6 @@ class CalendarShareSerializerTest(APITestCase):
         self.factory = APIRequestFactory()
 
     def test_calendar_share_serializer(self):
-        from studyFlax.serializers.socialSerializer import CalendarShareSerializer
-
         share = CalendarShare.objects.create(owner=self.owner, shared_with=self.viewer)
         request = self.factory.get('/')
         request.user = self.owner
@@ -201,3 +205,15 @@ class CalendarShareSerializerTest(APITestCase):
         share = serializer.save()
         self.assertEqual(share.owner, self.owner)
         self.assertEqual(share.shared_with, self.viewer)
+
+
+class SocialAndCategoryCoverageTest(TestCase):
+    """Tests for CalendarShare __str__ and Category __str__ methods."""
+
+    def test_calendar_share_string_and_category_string(self):
+        owner = User.objects.create_user(username='owner_cov', email='owner_cov@example.com', password='pass')
+        shared = User.objects.create_user(username='shared_cov', email='shared_cov@example.com', password='pass')
+        share = CalendarShare.objects.create(owner=owner, shared_with=shared)
+        category = Category.objects.create(name='Coverage Category', color='#abcdef', is_default=True)
+        self.assertIn('shares with', str(share))
+        self.assertEqual(str(category), 'Coverage Category')

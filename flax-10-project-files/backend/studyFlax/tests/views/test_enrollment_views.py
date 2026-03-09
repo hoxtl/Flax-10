@@ -1,8 +1,13 @@
-from rest_framework import status
-from django.utils import timezone
 from datetime import timedelta
+from unittest.mock import patch
+
+from django.test import TestCase
+from django.utils import timezone
+from rest_framework import status
+
 from ..base import BaseTestCase
-from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline
+from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline, User
+from studyFlax.models.auth.userSettingsModel import UserSettings
 
 
 class EnrollmentViewTests(BaseTestCase):
@@ -91,3 +96,53 @@ class EnrollmentViewTests(BaseTestCase):
         self.assertTrue(CalendarEvent.objects.filter(
             user=self.user, source='module_deadline'
         ).exists())
+
+    def test_cannot_disenroll_another_user(self):
+        """Test that a user cannot disenroll another user."""
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        other = User.objects.create_user(username='other_enroll', email='other_enroll@test.com', password='pass')
+        enrollment = Enrollment.objects.create(student=other, module=self.module)
+        response = self.client.delete(f'/api/enrollments/{enrollment.id}/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cannot_disenroll_from_core_module(self):
+        """Test that a user cannot disenroll from a core module."""
+        UserSettings.objects.create(user=self.user, major='Computer Science')
+        enrollment = Enrollment.objects.create(student=self.user, module=self.module)
+        with patch('studyFlax.views.modules.enrollment_views.course_to_module_prefixes', {'Computer Science': ['5C']}):
+            response = self.client.delete(f'/api/enrollments/{enrollment.id}/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ModuleAndEnrollmentHelperCoverageTest(TestCase):
+    """Tests for module and enrollment helper function branches."""
+
+    def setUp(self):
+        self.student = User.objects.create_user(username='student_cov', email='student_cov@example.com', password='pass')
+        self.teacher = User.objects.create_user(username='teacher_cov', email='teacher_cov@example.com', password='pass')
+        self.teacher.role = 'teacher'
+        self.teacher.save()
+        self.module = Module.objects.create(
+            module_code='CS200',
+            module_name='Coverage Systems',
+            created_by=self.teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+
+    def test_is_core_module_false_without_settings(self):
+        from studyFlax.views.modules.enrollment_views import is_core_module
+        self.assertFalse(is_core_module(self.student, self.module))
+
+    @patch('studyFlax.views.modules.enrollment_views.course_to_module_prefixes', {'Coverage Major': ['CS']})
+    def test_is_core_module_true_with_matching_prefix(self):
+        from studyFlax.views.modules.enrollment_views import is_core_module
+        UserSettings.objects.create(user=self.student, major='Coverage Major')
+        self.assertTrue(is_core_module(self.student, self.module))
+
+    def test_build_deleted_notification_content(self):
+        from studyFlax.views.modules.module_views import build_module_deleted_notification
+        notification = build_module_deleted_notification(self.student, self.module)
+        self.assertEqual(notification.user, self.student)
+        self.assertEqual(notification.notification_type, 'module_deleted')

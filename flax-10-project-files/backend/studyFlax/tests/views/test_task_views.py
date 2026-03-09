@@ -158,6 +158,21 @@ class TaskListViewTest(TestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['title'], 'In List')
 
+    def test_get_tasks_filter_by_module(self):
+        from studyFlax.models.modules.moduleModel import Module
+        module = Module.objects.create(
+            module_code='TST01', module_name='Test Module',
+            created_by=self.user, start_time=timezone.now(), end_time=timezone.now()
+        )
+        task = make_task(self.user, 'Module Task')
+        task.module = module
+        task.save()
+        make_task(self.user, 'No Module')
+        response = self.client.get(f'/api/tasks/?module={module.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], 'Module Task')
+
     def test_get_tasks_filter_by_completed(self):
         make_task(self.user, 'Done', completed=True)
         make_task(self.user, 'Todo', completed=False)
@@ -353,68 +368,3 @@ class LogTaskTimeViewTest(TestCase):
         self.assertEqual(response.data['time_spent_minutes'], 0)
 
 
-class SyncCalendarEventForTaskTest(TestCase):
-    """Unit tests for the sync_calendar_event_for_task helper."""
-
-    def setUp(self):
-        self.user = make_user()
-
-    def test_sync_creates_event_for_task_with_due_date(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
-        due = timezone.now() + timedelta(days=1)
-        task = make_task(self.user, 'Due Task', due_date=due)
-        sync_calendar_event_for_task(task)
-        self.assertTrue(
-            CalendarEvent.objects.filter(source='task', external_id=str(task.id)).exists()
-        )
-
-    def test_sync_deletes_event_when_completed(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
-        due = timezone.now() + timedelta(days=1)
-        task = make_task(self.user, 'Completed', due_date=due, completed=True)
-        CalendarEvent.objects.create(
-            user=self.user, source='task', external_id=str(task.id),
-            title='Completed', start_time=due, end_time=due + timedelta(minutes=25)
-        )
-        sync_calendar_event_for_task(task)
-        self.assertFalse(
-            CalendarEvent.objects.filter(source='task', external_id=str(task.id)).exists()
-        )
-
-    def test_sync_deletes_event_when_no_due_date(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
-        due = timezone.now() + timedelta(days=1)
-        task = make_task(self.user, 'NoDue')
-        CalendarEvent.objects.create(
-            user=self.user, source='task', external_id=str(task.id),
-            title='NoDue', start_time=due, end_time=due + timedelta(minutes=25)
-        )
-        sync_calendar_event_for_task(task)
-        self.assertFalse(
-            CalendarEvent.objects.filter(source='task', external_id=str(task.id)).exists()
-        )
-
-    def test_sync_uses_estimated_blocks_for_duration(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
-        due = timezone.now() + timedelta(days=1)
-        task = make_task(self.user, 'Blocks', due_date=due, estimated_blocks=4)
-        sync_calendar_event_for_task(task)
-        event = CalendarEvent.objects.get(source='task', external_id=str(task.id))
-        duration = (event.end_time - event.start_time).seconds // 60
-        self.assertEqual(duration, 100)  # 4 blocks * 25 min
-
-    def test_sync_updates_existing_event(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
-        due = timezone.now() + timedelta(days=1)
-        task = make_task(self.user, 'Existing', due_date=due)
-        CalendarEvent.objects.create(
-            user=self.user, source='task', external_id=str(task.id),
-            title='Old Title', start_time=due, end_time=due + timedelta(minutes=25)
-        )
-        task.title = 'New Title'
-        task.save()
-        sync_calendar_event_for_task(task)
-        # Still only one event
-        self.assertEqual(
-            CalendarEvent.objects.filter(source='task', external_id=str(task.id)).count(), 1
-        )

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateEventLayout } from '../../components/Calendar/WeekView/components/allDayRowHelpers';
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// Tests for weekViewRowHelpers — covers calculateEventLayout including row assignment, column clamping, overlap handling, and sort order for all-day events
 
 /**
  * Build a week of Date objects starting from the given Monday.
@@ -37,8 +37,6 @@ function makeAllDayEvent(id, startDate, endDate) {
 // Week: Sun 2024-01-07 … Sat 2024-01-13
 const SUN = new Date(2024, 0, 7);
 const WEEK = buildWeek(SUN);
-
-// ─── calculateEventLayout ─────────────────────────────────────────────────
 
 describe('calculateEventLayout', () => {
   it('returns an empty array when no events are provided', () => {

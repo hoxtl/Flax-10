@@ -1,9 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyMembershipModel import SocietyMembership
+from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
 from studyFlax.models.society.societyEventModel import SocietyEvent
 from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
 from studyFlax.models.notifications.notificationModel import Notification
@@ -295,5 +297,62 @@ class SignalHelperFunctionsTest(TestCase):
         delete_children_silently(society)
         self.assertFalse(SocietyEvent.objects.filter(id=event.id).exists())
         self.assertFalse(SocietyAnnouncement.objects.filter(id=ann.id).exists())
-        # No notifications should have been created
         self.assertEqual(Notification.objects.count(), 0)
+
+
+class MembershipAndSyncHelperCoverageTest(TestCase):
+    """Tests for membership and calendar-sync helper function branches."""
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.admin = User.objects.create_user(username='admin_cov', email='admin_cov@example.com', password='pass')
+        self.other = User.objects.create_user(username='other_cov', email='other_cov@example.com', password='pass')
+        self.society = Society.objects.create(name='Coverage Society', bio='bio', admin_emails='admin@example.com')
+        self.admin_membership = SocietyMembership.objects.create(user=self.admin, society=self.society, role='admin')
+
+    def test_find_user_by_identifier_email_and_none(self):
+        from studyFlax.views.society.membership_views import find_user_by_identifier
+        self.assertEqual(find_user_by_identifier({'email': 'other_cov@example.com'}), self.other)
+        self.assertIsNone(find_user_by_identifier({}))
+
+    def test_get_membership_by_user_id_none(self):
+        from studyFlax.views.society.membership_views import get_membership_by_user_id
+        self.assertIsNone(get_membership_by_user_id(self.society, 99999))
+
+    def test_leave_or_remove_sets_skip_notification_for_self(self):
+        from studyFlax.views.society.membership_views import leave_or_remove
+        SocietyMembership.objects.create(user=self.other, society=self.society, role='member')
+        SocietyCalendarSync.objects.create(user=self.other, society=self.society)
+        request = self.factory.delete('/')
+        request.user = self.other
+        response = leave_or_remove(request, self.society, self.other.id)
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(SocietyCalendarSync.objects.filter(user=self.other, society=self.society).exists())
+
+    def test_sync_status_true_and_unsync_deleted_true(self):
+        from studyFlax.views.society.calendar_sync_views import sync_status, unsync_calendar
+        SocietyMembership.objects.create(user=self.other, society=self.society, role='member')
+        SocietyCalendarSync.objects.create(user=self.other, society=self.society)
+        request = self.factory.get('/')
+        force_authenticate(request, user=self.other)
+        status_response = sync_status(request, self.society.id)
+        self.assertTrue(status_response.data['is_synced'])
+        delete_request = self.factory.delete('/')
+        force_authenticate(delete_request, user=self.other)
+        delete_response = unsync_calendar(delete_request, self.society.id)
+        self.assertTrue(delete_response.data['deleted'])
+
+
+class RatificationSignalCoverageTest(TestCase):
+    """Tests for ratification signal skip_notification."""
+
+    def test_skip_notification_suppresses_signal(self):
+        society = Society.objects.create(
+            name='SigSociety', bio='bio', admin_emails='admin@test.com',
+            ratification_status='none',
+        )
+        initial_count = Notification.objects.count()
+        society._skip_notification = True
+        society.ratification_status = 'pending'
+        society.save()
+        self.assertEqual(Notification.objects.count(), initial_count)
