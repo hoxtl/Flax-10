@@ -1,3 +1,6 @@
+/**
+ * Unit tests for society announcement modal flows.
+ */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AnnouncementModal from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal';
@@ -6,6 +9,7 @@ const fetchSocietyEventMock = vi.fn();
 const confirmMock = vi.fn();
 const validateFormMock = vi.fn();
 const handleFileSelectMock = vi.fn();
+const existingPinnedAnnouncement = { id: 1, title: 'Pinned Existing', pinned: true };
 
 vi.mock('../../../api/societyApi', () => ({
   fetchSocietyEvent: (...args) => fetchSocietyEventMock(...args),
@@ -76,6 +80,17 @@ vi.mock('../../../components/common/ConfirmModal', () => ({
   ),
 }));
 
+const renderEditablePinnedModal = (props = {}) =>
+  render(
+    <AnnouncementModal
+      onClose={vi.fn()}
+      onSubmit={vi.fn()}
+      announcement={{ id: 2, title: 'Editing', content: '', pinned: true }}
+      announcements={[existingPinnedAnnouncement, { id: 2, title: 'Editing', pinned: false }]}
+      {...props}
+    />,
+  );
+
 describe('AnnouncementModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -93,12 +108,9 @@ describe('AnnouncementModal', () => {
   it('shows add mode and validation error', () => {
     validateFormMock.mockReturnValue('Title required');
     const onSubmit = vi.fn();
-
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={onSubmit} tags={[]} announcements={[]} />);
-
     expect(screen.getByRole('heading', { name: 'Add Announcement' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Add Announcement' }));
-
     expect(screen.getByText('Title required')).toBeTruthy();
     expect(onSubmit).not.toHaveBeenCalled();
   });
@@ -106,7 +118,6 @@ describe('AnnouncementModal', () => {
   it('loads linked event on edit and handles delete flow with linked-event message', async () => {
     const onDelete = vi.fn();
     const onClose = vi.fn();
-
     render(
       <AnnouncementModal
         onClose={onClose}
@@ -117,52 +128,30 @@ describe('AnnouncementModal', () => {
         announcements={[]}
       />,
     );
-
     expect(await screen.findByText('Edit Announcement')).toBeTruthy();
     await waitFor(() => expect(fetchSocietyEventMock).toHaveBeenCalledWith(3, 77));
-
     fireEvent.click(screen.getByText('Delete'));
     expect(await screen.findByText('Delete Announcement')).toBeTruthy();
     expect(screen.getByText(/linked event/)).toBeTruthy();
-
     fireEvent.click(screen.getByText('confirm-delete'));
     expect(onDelete).toHaveBeenCalledWith(9);
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('handles pin conflict confirmation and cancel/confirm branches', async () => {
+  it('asks for confirmation and aborts when pinned conflict is denied', async () => {
     const onSubmit = vi.fn();
-    const announcements = [
-      { id: 1, title: 'Pinned Existing', pinned: true },
-      { id: 2, title: 'Editing', pinned: false },
-    ];
-
-    const { rerender } = render(
-      <AnnouncementModal
-        onClose={vi.fn()}
-        onSubmit={onSubmit}
-        announcement={{ id: 2, title: 'Editing', content: '', pinned: true }}
-        announcements={announcements}
-      />,
-    );
-
     confirmMock.mockResolvedValueOnce(false);
+    renderEditablePinnedModal({ onSubmit });
     fireEvent.click(screen.getByText('Save Changes'));
     await waitFor(() => expect(confirmMock).toHaveBeenCalled());
     expect(onSubmit).not.toHaveBeenCalled();
+  });
 
-    rerender(
-      <AnnouncementModal
-        onClose={vi.fn()}
-        onSubmit={onSubmit}
-        announcement={{ id: 2, title: 'Editing', content: '', pinned: true }}
-        announcements={announcements}
-      />,
-    );
-
+  it('confirms pinned save when conflict is accepted', async () => {
+    const onSubmit = vi.fn();
     confirmMock.mockResolvedValueOnce(true);
+    renderEditablePinnedModal({ onSubmit });
     fireEvent.click(screen.getByText('Save Changes'));
-
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ id: 2, pinned: true }),
@@ -174,7 +163,6 @@ describe('AnnouncementModal', () => {
   it('supports image add/remove and linked event load failure path', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     fetchSocietyEventMock.mockRejectedValueOnce(new Error('load failed'));
-
     render(
       <AnnouncementModal
         onClose={vi.fn()}
@@ -184,13 +172,10 @@ describe('AnnouncementModal', () => {
         announcements={[]}
       />,
     );
-
     const fileInput = document.querySelector('input[type="file"]');
     fireEvent.change(fileInput, { target: { files: [new File(['x'], 'pic.png', { type: 'image/png' })] } });
-
     expect(handleFileSelectMock).toHaveBeenCalled();
     expect(await screen.findAllByAltText('Preview')).toHaveLength(2);
-
     fireEvent.click(screen.getAllByRole('button', { name: '×' })[0]);
     await waitFor(() => expect(screen.getAllByAltText('Preview')).toHaveLength(1));
     await waitFor(() => expect(errorSpy).toHaveBeenCalled());

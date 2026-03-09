@@ -83,6 +83,26 @@ class CalendarShareViewTests(APITestCase):
         self.assertIn(self.user2.id, shared_by_ids)
         self.assertIn(self.user3.id, shared_by_ids)
 
+    def test_share_user_not_found(self):
+        url = "/api/social/99999/share/"
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unshare_user_not_found(self):
+        url = "/api/social/99999/unshare/"
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_sharing_with_nonexistent_user(self):
+        url = "/api/social/99999/sharing-with/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_shared_with_me_nonexistent_user(self):
+        url = "/api/social/99999/shared-with-me/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class CalendarShareUserSerializerPhotoTest(APITestCase):
     def setUp(self):
@@ -113,6 +133,26 @@ class CalendarShareUserSerializerPhotoTest(APITestCase):
             url = serializer.data['profile_photo_url']
         self.assertIsNone(url)
 
+    def test_flags_without_request_context(self):
+        user = User.objects.create_user(username='flaguser', email='flags@test.com', password='pass')
+        serializer = CalendarShareUserSerializer(user)
+        self.assertIsNone(serializer.data['profile_photo_url'])
+        self.assertFalse(serializer.data['is_sharing'])
+        self.assertFalse(serializer.data['is_shared_with_me'])
+
+    def test_sharing_flags(self):
+        CalendarShare.objects.create(owner=self.user1, shared_with=self.user2)
+        CalendarShare.objects.create(owner=self.user3, shared_with=self.user2)
+
+        request = self.factory.get('/')
+        request.user = self.user1
+        serializer = CalendarShareUserSerializer(self.user2, context={'request': request})
+        self.assertTrue(serializer.data['is_sharing'])
+
+        request.user = self.user3
+        serializer = CalendarShareUserSerializer(self.user2, context={'request': request})
+        self.assertTrue(serializer.data['is_shared_with_me'])
+
 
 class CalendarShareSerializerTest(APITestCase):
     def setUp(self):
@@ -139,3 +179,25 @@ class CalendarShareSerializerTest(APITestCase):
 
         self.assertIn('id', serializer.data)
         self.assertIn('username', serializer.data)
+
+    def test_calendar_share_serializer_blocks_self_share(self):
+        request = self.factory.get('/')
+        request.user = self.owner
+        serializer = CalendarShareSerializer(
+            data={'shared_with': self.owner.id},
+            context={'request': request}
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('non_field_errors', serializer.errors)
+
+    def test_calendar_share_serializer_assigns_owner(self):
+        request = self.factory.get('/')
+        request.user = self.owner
+        serializer = CalendarShareSerializer(
+            data={'shared_with': self.viewer.id},
+            context={'request': request}
+        )
+        self.assertTrue(serializer.is_valid())
+        share = serializer.save()
+        self.assertEqual(share.owner, self.owner)
+        self.assertEqual(share.shared_with, self.viewer)
