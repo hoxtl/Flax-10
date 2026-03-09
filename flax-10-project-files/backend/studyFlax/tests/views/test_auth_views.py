@@ -1,14 +1,25 @@
+"""Tests for authentication views including login, logout, registration, and password reset flows."""
+
+from datetime import timedelta
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient, APIRequestFactory
 from unittest.mock import patch
+
 from studyFlax.models.auth.resetPasswordTokenModel import ResetPasswordToken
+from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.society.societyModel import Society
+from studyFlax.models.tasks.taskModel import Task
 
 User = get_user_model()
 
 class LoginViewTest(TestCase):
+    """Tests for the login endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -29,6 +40,8 @@ class LoginViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 class LogoutViewTest(TestCase):
+    """Tests for the logout endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -49,6 +62,8 @@ class LogoutViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RegisterViewTest(TestCase):
+    """Tests for the registration endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.url = '/api/auth/register/'
@@ -66,6 +81,8 @@ class RegisterViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class PasswordResetRequestViewTest(TestCase):
+    """Tests for the password reset request endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -96,6 +113,8 @@ class PasswordResetRequestViewTest(TestCase):
         self.assertGreater(ResetPasswordToken.objects.filter(user=self.user, token_used=True).count(), 0)
 
 class ConfirmPasswordResetViewTest(TestCase):
+    """Tests for the password reset confirmation endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -148,3 +167,121 @@ class ResetPasswordSerializerTest(TestCase):
         data = {'new_password': 'abc12345', 'confirm_password': 'different', 'token': 'tok'}
         with self.assertRaises(ValidationError):
             serializer.validate_passwords(data)
+
+
+class RegistrationSerializerEmailTest(TestCase):
+    """Tests for RegistrationUserSerialiser duplicate email validation."""
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        User.objects.create_user(
+            username='existing', email='existing@test.com', password='pass',
+            first_name='Ex', last_name='User'
+        )
+
+    def test_duplicate_email_rejected(self):
+        from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser
+        data = {
+            'username': 'newuser',
+            'email': 'existing@test.com',
+            'password': 'password123',
+            'password2': 'password123',
+            'first_name': 'New',
+            'last_name': 'User',
+        }
+        serializer = RegistrationUserSerialiser(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
+
+
+class AuthAndTaskCoverageTest(TestCase):
+    """Tests for auth serializer and task helper branches."""
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='auth_cov', email='auth_cov@example.com', password='pass')
+
+    def test_user_serializer_without_request_returns_false_and_none_values(self):
+        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        serializer = UserSerialiser(self.user)
+        self.assertFalse(serializer.data['is_shared_with_me'])
+        self.assertFalse(serializer.data['is_sharing'])
+        self.assertIsNone(serializer.data['study_hours_this_week'])
+        self.assertIsNone(serializer.data['study_streak'])
+
+    def test_user_serializer_with_settings_modules(self):
+        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        UserSettings.objects.create(user=self.user, modules=['CS200'])
+        request = self.factory.get('/')
+        request.user = self.user
+        serializer = UserSerialiser(self.user, context={'request': request})
+        self.assertEqual(serializer.data['modules'], ['CS200'])
+
+    def test_get_user_tasks_list_filter_helper(self):
+        from studyFlax.views.tasks.task_views import get_user_tasks
+        task_list = self.user.task_lists.create(name='Personal', category='personal')
+        Task.objects.create(user=self.user, title='Listed', task_list=task_list)
+        Task.objects.create(user=self.user, title='Other')
+        tasks = get_user_tasks(self.user, {'list': str(task_list.id)})
+        self.assertEqual(tasks.count(), 1)
+
+
+class SerializerCoverageTest(TestCase):
+    """Tests for serializer branches not yet covered."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='ser_user', email='ser_user@test.com', password='pass'
+        )
+
+    def test_registration_serializer_duplicate_username(self):
+        from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser
+        data = {
+            'username': 'ser_user',
+            'email': 'new@test.com',
+            'password': 'password1',
+            'password2': 'password1',
+            'first_name': 'Test',
+            'last_name': 'User',
+        }
+        serializer = RegistrationUserSerialiser(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('username', serializer.errors)
+
+    def test_user_serializer_is_sharing_self(self):
+        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        factory = APIRequestFactory()
+        request = factory.get('/')
+        request.user = self.user
+        serializer = UserSerialiser(self.user, context={'request': request})
+        self.assertTrue(serializer.data['is_sharing'])
+
+    def test_deadline_serializer_non_teacher_validation(self):
+        from studyFlax.serialisers.deadline_serialisers import DeadlineSerialiser
+        factory = APIRequestFactory()
+        request = factory.post('/')
+        request.user = self.user
+        data = {'title': 'Test', 'deadline_type': 'coursework', 'start_due_date': timezone.now().isoformat()}
+        serializer = DeadlineSerialiser(data=data, context={'request': request})
+        self.assertFalse(serializer.is_valid())
+
+    def test_user_settings_serializer_valid_major_update(self):
+        from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
+        settings = UserSettings.objects.create(user=self.user, theme='light', timezone='Europe/London')
+        serializer = UserSettingsSerialiser(settings, data={'major': 'Physics'}, partial=True)
+        self.assertTrue(serializer.is_valid())
+
+    def test_society_event_serialiser_announcement_prefix(self):
+        from studyFlax.serialisers.society_serialisers import SocietyEventSerialiser
+        from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
+        from studyFlax.models.society.societyEventModel import SocietyEvent
+        society = Society.objects.create(name='PrefixSoc', bio='bio', admin_emails='a@b.com')
+        ann = SocietyAnnouncement.objects.create(society=society, title='Announcement', content='Body')
+        event = SocietyEvent.objects.create(
+            society=society, title='Launch',
+            start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
+            recurrence='none', announcement=ann,
+        )
+        serializer = SocietyEventSerialiser(event)
+        self.assertIn('📢', serializer.data['title'])

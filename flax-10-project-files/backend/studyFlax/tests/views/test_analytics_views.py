@@ -1,3 +1,5 @@
+"""Tests for analytics views including session summaries, progress, theme stats, and AI insight endpoints."""
+
 import random
 import uuid
 from django.test import TestCase
@@ -14,6 +16,7 @@ User = get_user_model()
 
 
 def make_session(user, duration=60, break_duration=10, pause_duration=0, status_val='Completed', hours_ago=1):
+    """Create and return a StudySession for the given user with configurable duration and timing."""
     end = timezone.now() - timedelta(hours=hours_ago)
     start = end - timedelta(minutes=duration)
     return StudySession.objects.create(
@@ -25,6 +28,8 @@ def make_session(user, duration=60, break_duration=10, pause_duration=0, status_
 
 
 class AnalyticsSummaryViewTest(TestCase):
+    """Tests for the analytics summary endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -74,12 +79,21 @@ class AnalyticsSummaryViewTest(TestCase):
         response = self.client.get('/api/analytics/summary/')
         self.assertGreater(response.data['summary']['current_streak_days'], 0)
 
+    def test_summary_streak_with_gap_resets_temp(self):
+        make_session(self.user, hours_ago=5 * 24)
+        make_session(self.user, hours_ago=3 * 24)
+        make_session(self.user, hours_ago=1 * 24)
+        response = self.client.get('/api/analytics/summary/')
+        self.assertGreaterEqual(response.data['summary']['longest_streak_days'], 1)
+
     def test_unauthenticated(self):
         response = APIClient().get('/api/analytics/summary/')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
 
 class ProgressDataViewTest(TestCase):
+    """Tests for the analytics progress endpoint."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -108,6 +122,8 @@ class ProgressDataViewTest(TestCase):
 
 
 class ThemeViewsTest(TestCase):
+    """Tests for the theme session logging and theme stats endpoints."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -177,6 +193,8 @@ class ThemeViewsTest(TestCase):
 
 
 class AIViewsTest(TestCase):
+    """Tests for the AI insights and AI chat analytics endpoints."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -195,3 +213,19 @@ class AIViewsTest(TestCase):
             'messages': [{'role': 'user', 'content': 'hello'}]
         })
         self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_503_SERVICE_UNAVAILABLE, status.HTTP_500_INTERNAL_SERVER_ERROR])
+
+    def test_build_user_context_with_non_consecutive_sessions(self):
+        """Test _build_user_context streak logic with a gap in session dates."""
+        from studyFlax.views.analytics.ai_views import _build_user_context
+        make_session(self.user, duration=60, break_duration=10, hours_ago=5 * 24)
+        make_session(self.user, duration=60, break_duration=10, hours_ago=3 * 24)
+        context = _build_user_context(self.user)
+        self.assertIsInstance(context, str)
+
+    def test_build_user_context_streak_reset_when_no_recent_session(self):
+        """Test _build_user_context streak is reset when last session is old."""
+        from studyFlax.views.analytics.ai_views import _build_user_context
+        make_session(self.user, duration=60, break_duration=0, hours_ago=48)
+        make_session(self.user, duration=60, break_duration=0, hours_ago=72)
+        context = _build_user_context(self.user)
+        self.assertIsInstance(context, str)

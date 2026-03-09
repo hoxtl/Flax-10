@@ -278,6 +278,16 @@ class ExpandRecurringTest(TestCase):
         result = expand_recurring(event, view_start, view_end)
         self.assertLessEqual(len(result), 3)
 
+    def test_break_at_365_iterations(self):
+        from studyFlax.views.calendar.society_sync_service import expand_recurring
+        start = timezone.now() - timedelta(days=400)
+        end = start + timedelta(hours=1)
+        event = make_event(self.society, recurrence='daily', start=start, end=end)
+        view_start = start
+        view_end = timezone.now() + timedelta(days=10)
+        result = expand_recurring(event, view_start, view_end)
+        self.assertLessEqual(len(result), 366)
+
 
 class ExpandAndSerializeTest(TestCase):
     def setUp(self):
