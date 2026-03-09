@@ -3,26 +3,38 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../pages/Tasks/components/TaskCard';
 
+const navigateMock = vi.fn();
+const setActiveTaskIdMock = vi.fn();
+const showCompletionToastMock = vi.fn();
+const isRoutineTaskMock = vi.fn(() => false);
+const getCompletionMessageMock = vi.fn(() => 'Great job!');
+const getUserSettingsMock = vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' });
+const sleepWarningState = {
+    sleepWarning: false,
+    checkSleepAndRun: (_date, fn) => fn(),
+    sleepWarningProps: {},
+};
+
 vi.mock('react-router-dom', async (importOriginal) => {
     const actual = await importOriginal();
-    return { ...actual, useNavigate: vi.fn(() => vi.fn()) };
+    return { ...actual, useNavigate: vi.fn(() => navigateMock) };
 });
 
 vi.mock('../../../context/TimerContext', () => ({
-    useTimerContext: vi.fn(() => ({ setActiveTaskId: vi.fn() })),
+    useTimerContext: vi.fn(() => ({ setActiveTaskId: setActiveTaskIdMock })),
 }));
 
 vi.mock('../../../context/TaskCompletionContext', () => ({
-    useTaskCompletion: vi.fn(() => ({ showCompletionToast: vi.fn() })),
+    useTaskCompletion: vi.fn(() => ({ showCompletionToast: showCompletionToastMock })),
 }));
 
 vi.mock('../../../lib/completionMessages', () => ({
-    getCompletionMessage: vi.fn(() => 'Great job!'),
-    isRoutineTask: vi.fn(() => false),
+    getCompletionMessage: (...args) => getCompletionMessageMock(...args),
+    isRoutineTask: (...args) => isRoutineTaskMock(...args),
 }));
 
 vi.mock('../../../api/userService', () => ({
-    getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
+    getUserSettings: (...args) => getUserSettingsMock(...args),
 }));
 
 vi.mock('../../../components/common/SleepWarningModal', () => ({
@@ -30,11 +42,7 @@ vi.mock('../../../components/common/SleepWarningModal', () => ({
 }));
 
 vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
-    useSleepWarning: vi.fn(() => ({
-        sleepWarning: false,
-        checkSleepAndRun: (_date, fn) => fn(),
-        sleepWarningProps: {},
-    })),
+    useSleepWarning: vi.fn(() => sleepWarningState),
 }));
 
 vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
@@ -88,6 +96,13 @@ function renderTaskCard(props = {}) {
 describe('TaskCard', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        isRoutineTaskMock.mockReturnValue(false);
+        getCompletionMessageMock.mockReturnValue('Great job!');
+        getUserSettingsMock.mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' });
+        sleepWarningState.sleepWarning = false;
+        sleepWarningState.checkSleepAndRun = (_date, fn) => fn();
+        sleepWarningState.sleepWarningProps = {};
+        sessionStorage.clear();
     });
 
     it('renders task title', () => {
@@ -131,6 +146,22 @@ describe('TaskCard', () => {
         expect(screen.getByText('Medium')).toBeTruthy();
     });
 
+    it('shows Urgent for urgent priority', () => {
+        renderTaskCard({ task: { ...defaultTask, priority: 'urgent' } });
+        expect(screen.getByText('Urgent')).toBeTruthy();
+    });
+
+    it('shows High for high priority', () => {
+        renderTaskCard({ task: { ...defaultTask, priority: 'high' } });
+        expect(screen.getByText('High')).toBeTruthy();
+    });
+
+    it('shows Today for due today', () => {
+        const today = new Date();
+        renderTaskCard({ task: { ...defaultTask, due_date: today.toISOString() } });
+        expect(screen.getByText(/today/i)).toBeTruthy();
+    });
+
     it('shows list name badge when listName is provided', () => {
         renderTaskCard({ listName: 'Shopping', hideListBadge: false });
         // list name might appear
@@ -156,6 +187,94 @@ describe('TaskCard', () => {
         fireEvent.contextMenu(screen.getByText('Buy groceries').closest('[class]'));
         fireEvent.click(screen.getByText('Delete'));
         expect(onDelete).toHaveBeenCalledTimes(1);
+    });
+
+    it('opens info modal and closes from footer close button', () => {
+        renderTaskCard({
+            task: {
+                ...defaultTask,
+                title: 'Read paper',
+                description: 'Important notes',
+                module_code: 'CS1234',
+                module_name: 'Algorithms',
+                estimated_blocks: 13,
+            },
+            listName: 'Deep Work',
+        });
+        fireEvent.click(screen.getByText('Read paper'));
+        expect(screen.getByText('Task details')).toBeTruthy();
+        expect(screen.getByText('Important notes')).toBeTruthy();
+        expect(screen.getByText(/1 session/)).toBeTruthy();
+        expect(screen.getByText(/325m/)).toBeTruthy();
+        fireEvent.click(screen.getAllByRole('button', { name: 'Close' })[1]);
+        expect(screen.queryByText('Task details')).toBeNull();
+    });
+
+    it('handles keyboard open and closes info modal via backdrop', () => {
+        renderTaskCard({ task: { ...defaultTask, description: '' } });
+        const content = screen.getByText('Buy groceries').closest('[role="button"]');
+        fireEvent.keyDown(content, { key: 'Enter' });
+        expect(screen.getByText('Task details')).toBeTruthy();
+        fireEvent.mouseDown(document.querySelector('[class*="modalBackdrop"]'));
+        expect(screen.queryByText('Task details')).toBeNull();
+    });
+
+    it('shows highlighted search text when query matches', () => {
+        renderTaskCard({ task: { ...defaultTask, title: 'Deep Study Session' }, searchQuery: 'study' });
+        expect(document.querySelector('mark')).toBeTruthy();
+    });
+
+    it('navigates to timer and sets active task on Study now', () => {
+        renderTaskCard({ task: { ...defaultTask, estimated_blocks: 3 }, listColor: '#123456' });
+        fireEvent.click(screen.getByLabelText('Study now'));
+        expect(setActiveTaskIdMock).toHaveBeenCalledWith(
+            1,
+            expect.objectContaining({
+                title: 'Buy groceries',
+                categoryColor: '#123456',
+                estimatedSessionCount: 3,
+                estimatedWorkMinutes: 25,
+            }),
+        );
+        expect(navigateMock).toHaveBeenCalledWith('/timer', { state: { fromTaskPlay: true } });
+    });
+
+    it('shows completed due labels and hides action bar for completed tasks', () => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        renderTaskCard({
+            task: { ...defaultTask, completed: true, due_date: yesterday.toISOString() },
+            isCompletedSection: true,
+        });
+        expect(screen.getByText(/Completed yesterday/)).toBeTruthy();
+        expect(screen.queryByLabelText('Study now')).toBeNull();
+    });
+
+    it('handles routine completion without burst animation', () => {
+        isRoutineTaskMock.mockReturnValue(true);
+        const onToggle = vi.fn();
+        renderTaskCard({ onToggle });
+        fireEvent.click(screen.getByLabelText('Mark complete'));
+        expect(showCompletionToastMock).toHaveBeenCalledWith('Great job!', { isRoutine: true });
+        expect(onToggle).toHaveBeenCalled();
+    });
+
+    it('uses moduleId and module code links correctly and active timer class', () => {
+        sessionStorage.setItem('timerTaskId', '1');
+        const { rerender } = renderTaskCard({
+            task: { ...defaultTask, module_code: 'CS2000', module_id: 7 },
+        });
+        expect(screen.getByTitle('Open CS2000 module').getAttribute('href')).toContain('/modules?moduleId=7');
+
+        rerender(
+            <MemoryRouter>
+                <TaskCard
+                    {...defaultProps}
+                    task={{ ...defaultTask, module_code: 'CS2001', module_id: null, module: null, moduleId: null }}
+                />
+            </MemoryRouter>,
+        );
+        expect(screen.getByTitle('Open CS2001 module').getAttribute('href')).toContain('/modules?code=CS2001');
     });
 });
 
@@ -221,5 +340,66 @@ describe('TaskContextMenu', () => {
         fireEvent.click(screen.getByText('Move to list'));
         expect(screen.getByText('Shopping')).toBeTruthy();
         expect(screen.getByText('Work')).toBeTruthy();
+    });
+
+    it('calls onClose when clicking outside', () => {
+        const onClose = vi.fn();
+        render(<TaskContextMenu {...menuProps} onClose={onClose} />);
+        fireEvent.mouseDown(document.body);
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onEdit when moving to different list', async () => {
+        const onEdit = vi.fn().mockResolvedValue({});
+        render(<TaskContextMenu {...menuProps} onEdit={onEdit} />);
+        fireEvent.click(screen.getByText('Move to list'));
+        fireEvent.click(screen.getByText('Work'));
+        expect(onEdit).toHaveBeenCalled();
+    });
+
+    it('supports due date view and clearing due date', async () => {
+        const onEdit = vi.fn().mockResolvedValue({});
+        const onClose = vi.fn();
+        render(<TaskContextMenu {...menuProps} task={{ ...defaultTask, due_date: '2026-03-11T10:00' }} onEdit={onEdit} onClose={onClose} />);
+        fireEvent.click(screen.getByText('Set due date'));
+        fireEvent.change(screen.getByTestId('date-picker'), { target: { value: '' } });
+        await waitFor(() => expect(onEdit).toHaveBeenCalledWith(
+            { due_date: null },
+            { source: 'context-menu', action: 'set-due-date', dueDate: null },
+        ));
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    it('supports due date set with sleep warning check callback', async () => {
+        const onEdit = vi.fn().mockResolvedValue({});
+        sleepWarningState.checkSleepAndRun = (date, fn) => {
+            expect(date).toBe('2026-03-12T09:00');
+            fn();
+        };
+        render(<TaskContextMenu {...menuProps} onEdit={onEdit} />);
+        fireEvent.click(screen.getByText('Set due date'));
+        fireEvent.change(screen.getByTestId('date-picker'), { target: { value: '2026-03-12T09:00' } });
+        await waitFor(() => expect(onEdit).toHaveBeenCalledWith(
+            { due_date: '2026-03-12T09:00' },
+            { source: 'context-menu', action: 'set-due-date', dueDate: '2026-03-12T09:00' },
+        ));
+    });
+
+    it('shows sleep warning modal when hook indicates warning', () => {
+        sleepWarningState.sleepWarning = true;
+        sleepWarningState.sleepWarningProps = { test: true };
+        render(<TaskContextMenu {...menuProps} />);
+        expect(screen.getByTestId('sleep-warning-modal')).toBeTruthy();
+    });
+
+    it('uses fallback sleep settings when user settings request fails', async () => {
+        getUserSettingsMock.mockRejectedValueOnce(new Error('settings fail'));
+        render(<TaskContextMenu {...menuProps} />);
+        await waitFor(() => expect(getUserSettingsMock).toHaveBeenCalled());
+    });
+
+    it('does not render move option when lists are empty', () => {
+        render(<TaskContextMenu {...menuProps} lists={[]} />);
+        expect(screen.queryByText('Move to list')).toBeNull();
     });
 });

@@ -133,4 +133,43 @@ describe('ListSidebar', () => {
         const counts = screen.getAllByText('2');
         expect(counts.length).toBeGreaterThan(0);
     });
+
+    it('shows context menu on list right-click', () => {
+        const lists = [{ id: 1, name: 'Work' }];
+        render(<ListSidebar {...defaultProps} lists={lists} />);
+        fireEvent.contextMenu(screen.getByText('Work'));
+        expect(screen.getByText('Rename')).toBeTruthy();
+        expect(screen.getByText('Delete list')).toBeTruthy();
+    });
+
+    it('calls onRenameList when Rename clicked and name saved', () => {
+        const onRenameList = vi.fn();
+        const lists = [{ id: 1, name: 'Work' }];
+        render(<ListSidebar {...defaultProps} lists={lists} onRenameList={onRenameList} />);
+        fireEvent.contextMenu(screen.getByText('Work'));
+        fireEvent.click(screen.getByText('Rename'));
+        const input = screen.getByDisplayValue('Work');
+        fireEvent.change(input, { target: { value: 'New Name' } });
+        fireEvent.blur(input);
+        expect(onRenameList).toHaveBeenCalledWith(1, 'New Name');
+    });
+
+    it('calls onDeleteList when Delete list clicked', () => {
+        const onDeleteList = vi.fn();
+        const lists = [{ id: 1, name: 'Work' }];
+        render(<ListSidebar {...defaultProps} lists={lists} onDeleteList={onDeleteList} />);
+        fireEvent.contextMenu(screen.getByText('Work'));
+        fireEvent.click(screen.getByText('Delete list'));
+        expect(onDeleteList).toHaveBeenCalledWith(1);
+    });
+
+    it('calls onPermanentlyDeleteList when Delete clicked on archived list', () => {
+        const onPermanentlyDeleteList = vi.fn();
+        const archivedLists = [{ id: 99, name: 'Old List' }];
+        render(<ListSidebar {...defaultProps} archivedLists={archivedLists} onPermanentlyDeleteList={onPermanentlyDeleteList} />);
+        fireEvent.click(screen.getByText(/Archived/));
+        const deleteBtns = screen.getAllByText('Delete');
+        fireEvent.click(deleteBtns[deleteBtns.length - 1]);
+        expect(onPermanentlyDeleteList).toHaveBeenCalledWith(99);
+    });
 });
