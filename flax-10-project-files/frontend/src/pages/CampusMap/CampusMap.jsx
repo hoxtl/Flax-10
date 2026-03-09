@@ -447,7 +447,9 @@ export default function CampusMap() {
         .addTo(map.current);
       
       popup.on('open', () => {
-        
+        setTimeout(() => {
+          const startBtn = document.getElementById(`setEventAsStart-${event.id}`);
+        })
       })
     })
   })
