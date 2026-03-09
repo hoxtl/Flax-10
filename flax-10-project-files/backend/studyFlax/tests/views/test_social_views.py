@@ -112,3 +112,30 @@ class CalendarShareUserSerializerPhotoTest(APITestCase):
             serializer = CalendarShareUserSerializer(user)
             url = serializer.data['profile_photo_url']
         self.assertIsNone(url)
+
+
+class CalendarShareSerializerTest(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username='social_owner', email='social_owner@e.com', password='pass')
+        self.viewer = User.objects.create_user(username='social_viewer', email='social_viewer@e.com', password='pass')
+        self.factory = APIRequestFactory()
+
+    def test_calendar_share_serializer(self):
+        from studyFlax.serializers.socialSerializer import CalendarShareSerializer
+
+        share = CalendarShare.objects.create(owner=self.owner, shared_with=self.viewer)
+        request = self.factory.get('/')
+        request.user = self.owner
+
+        serializer = CalendarShareSerializer(share, context={'request': request})
+
+        self.assertIn('id', serializer.data)
+
+    def test_calendar_share_user_serializer(self):
+        request = self.factory.get('/')
+        request.user = self.viewer
+
+        serializer = CalendarShareUserSerializer(self.owner, context={'request': request})
+
+        self.assertIn('id', serializer.data)
+        self.assertIn('username', serializer.data)

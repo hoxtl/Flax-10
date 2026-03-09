@@ -123,3 +123,28 @@ class ConfirmPasswordResetViewTest(TestCase):
         with self.assertLogs('studyFlax.views.authentication.confirm_password_reset_view', level='ERROR'):
             response = self.client.post(self.url, {'token': str(token.token), 'new_password': 'newpass123', 'confirm_password': 'newpass123'})
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ResetPasswordSerializerTest(TestCase):
+    def test_normalise_email(self):
+        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordSerialiser
+        serializer = ResetPasswordSerialiser()
+        self.assertEqual(
+            serializer.normalise_lowercase_email('  TEST@Example.COM  '),
+            'test@example.com',
+        )
+
+    def test_confirm_passwords_match(self):
+        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+        serializer = ResetPasswordConfirmSerialiser()
+        data = {'new_password': 'abc12345', 'confirm_password': 'abc12345', 'token': 'tok'}
+        self.assertEqual(serializer.validate_passwords(data), data)
+
+    def test_confirm_passwords_mismatch(self):
+        from rest_framework.exceptions import ValidationError
+        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+
+        serializer = ResetPasswordConfirmSerialiser()
+        data = {'new_password': 'abc12345', 'confirm_password': 'different', 'token': 'tok'}
+        with self.assertRaises(ValidationError):
+            serializer.validate_passwords(data)
