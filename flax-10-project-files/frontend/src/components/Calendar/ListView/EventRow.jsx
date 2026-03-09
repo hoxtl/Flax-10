@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
-import { useEventModal, useEventPopup } from '../../../context/CalendarContext';
+import { useEventModal } from '../../../context/CalendarContext';
+import { useQuickActions } from '../hooks/useQuickActions';
 import styles from './ListView.module.css';
 
 function formatEventTime(event) {
@@ -38,25 +40,32 @@ function EditButton({ onClick }) {
 }
 
 export function EventRow({ event }) {
+    const [isExpanded, setIsExpanded] = useState(false);
     const { openModal } = useEventModal();
-    const { openPopup } = useEventPopup();
     const isReadOnly = isReadOnlyEvent(event);
-    const badges = getTagBadges(event);
+    const quickAction = useQuickActions(event);
 
-    const handleClick = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        openPopup(event, rect);
-    };
     const handleEdit = (e) => { e.stopPropagation(); openModal(event); };
 
     return (
-        <div className={`${styles.eventRow} ${isReadOnly ? styles.readOnly : ''}`} onClick={handleClick}>
-            <span className={styles.eventTime}>{formatEventTime(event)}</span>
-            <span className={styles.eventTitle}>{event.title}</span>
-            <div className={styles.badgesContainer}>
-                {badges.map((b, i) => <TagBadge key={i} badge={b} />)}
+        <div className={`${styles.eventRow} ${isReadOnly ? styles.readOnly : ''}`} onClick={() => setIsExpanded(e => !e)}>
+            <div className={styles.rowMain}>
+                <span className={styles.eventTime}>{formatEventTime(event)}</span>
+                <span className={styles.eventTitle}>{event.title}</span>
+                <div className={styles.badgesContainer}>
+                    {getTagBadges(event).map((b, i) => <TagBadge key={i} badge={b} />)}
+                </div>
+                {!isReadOnly && <EditButton onClick={handleEdit} />}
+                {isReadOnly && quickAction && (
+                    <button className={styles.quickActionBtn} onClick={quickAction.onClick}>{quickAction.label}</button>
+                )}
             </div>
-            {!isReadOnly && <EditButton onClick={handleEdit} />}
+            {isExpanded && (event.location || event.description) && (
+                <div className={styles.expandedContent}>
+                    {event.location && <div>📍 {event.location}</div>}
+                    {event.description && <div style={{ whiteSpace: 'pre-wrap' }}>📝 {event.description}</div>}
+                </div>
+            )}
         </div>
     );
 }

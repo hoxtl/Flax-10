@@ -45,8 +45,7 @@
 /* Event Row */
 .eventRow {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
     padding: 12px 16px;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
@@ -56,6 +55,13 @@
 
 .eventRow:hover {
     background: var(--hover);
+}
+
+.rowMain {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
 }
 
 .eventRow.readOnly {
@@ -132,6 +138,39 @@
 .editBtn:hover {
     background: var(--hover);
     color: var(--primary);
+}
+
+.quickActionBtn {
+    background: var(--danger-light, #fee2e2);
+    color: var(--danger, #dc2626);
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.15s;
+}
+
+.eventRow:hover .quickActionBtn {
+    opacity: 1;
+}
+
+.quickActionBtn:hover {
+    background: var(--danger, #dc2626);
+    color: white;
+}
+
+.expandedContent {
+    margin-top: 12px;
+    padding-left: 92px;
+    /* 80px time + 12px gap */
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* Empty State */
