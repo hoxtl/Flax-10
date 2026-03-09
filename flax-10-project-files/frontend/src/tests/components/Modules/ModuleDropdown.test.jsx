@@ -1,0 +1,35 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import ModuleDropdown from '../../../components/Modules/ModuleDropdown';
+
+vi.mock('lucide-react', () => ({
+  ChevronDown: () => <span data-testid="chevron" />,
+  Check: () => <span data-testid="check" />,
+}));
+
+describe('ModuleDropdown', () => {
+  const options = [
+    { value: 'a', label: 'Alpha' },
+    { value: 'b', label: 'Beta' },
+  ];
+
+  it('opens menu, selects option, and shows check for selected value', () => {
+    const onChange = vi.fn();
+    render(<ModuleDropdown value="a" onChange={onChange} options={options} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+    expect(screen.getAllByTestId('check')).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Beta' }));
+    expect(onChange).toHaveBeenCalledWith('b');
+  });
+
+  it('closes when clicking outside', () => {
+    render(<ModuleDropdown value="a" onChange={vi.fn()} options={options} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByText('Beta')).not.toBeInTheDocument();
+  });
+});
