@@ -887,3 +887,10 @@
 :global(.eventMarker:hover) {
   transform: scale(1.2);
 }
+
+:global(.eventPopupTitle) {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
