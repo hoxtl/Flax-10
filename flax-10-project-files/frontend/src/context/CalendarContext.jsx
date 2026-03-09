@@ -45,6 +45,7 @@ export function useCalendarData(props = {}) {
         selectedDate: props.selectedDate ?? filtered?.selectedDate ?? new Date(),
         events: props.events ?? filtered?.events ?? [],
         viewMode: props.viewMode ?? filtered?.viewMode ?? 'month',
+        displayMode: props.displayMode ?? filtered?.displayMode ?? 'grid',
     };
 }
 

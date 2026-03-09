@@ -39,11 +39,14 @@ function EditButton({ onClick }) {
 
 export function EventRow({ event }) {
     const { openModal } = useEventModal();
-    const { showPopup } = useEventPopup();
+    const { openPopup } = useEventPopup();
     const isReadOnly = isReadOnlyEvent(event);
     const badges = getTagBadges(event);
 
-    const handleClick = (e) => showPopup(event, e.currentTarget);
+    const handleClick = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        openPopup(event, rect);
+    };
     const handleEdit = (e) => { e.stopPropagation(); openModal(event); };
 
     return (

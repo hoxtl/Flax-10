@@ -41,7 +41,8 @@ export function ActionMenu({ onAddEvent, onImport }) {
     );
 }
 
-const EXTRA_VIEW_OPTIONS = [
+const DISPLAY_MODE_OPTIONS = [
+    { label: "Grid View", value: "grid" },
     { label: "List View", value: "list" },
     { label: "Table View", value: "table" }
 ];
@@ -60,15 +61,14 @@ export function ViewModeButton({ modes, activeMode, onChange }) {
 }
 
 export function ViewSettingsMenu({ activeMode, onViewChange }) {
-    const trigger = <button className={styles.settingsBtn} title="View Settings"><Settings2 size={18} /></button>;
+    const trigger = <button className={styles.settingsBtn} title="Display Mode"><Settings2 size={18} /></button>;
     return (
         <AnimatedDropdown
             className={styles.actionMenu}
             customTrigger={trigger}
-            options={EXTRA_VIEW_OPTIONS}
+            options={DISPLAY_MODE_OPTIONS}
             value={activeMode}
             onChange={onViewChange}
-            hideCheckmark={activeMode !== 'list' && activeMode !== 'table'}
         />
     );
 }

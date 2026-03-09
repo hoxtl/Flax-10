@@ -18,28 +18,22 @@ export function Calendar() {
 }
 
 function CalendarContent() {
-  const { viewMode } = useCalendar();
+  const { viewMode, displayMode } = useCalendar();
   useCalendarEvents();
 
   return (
     <div className="calendar-container">
       <div className="calendar-view-relative-wrapper">
-        <CalendarView viewMode={viewMode} />
+        <CalendarView viewMode={viewMode} displayMode={displayMode} />
       </div>
     </div>
   );
 }
 
-function CalendarView({ viewMode }) {
-  const views = {
-    day: DayView,
-    week: WeekView,
-    month: MonthView,
-    year: YearView,
-    list: ListView,
-    table: TableView,
-  };
-  const View = views[viewMode];
+function CalendarView({ viewMode, displayMode }) {
+  const gridViews = { day: DayView, week: WeekView, month: MonthView, year: YearView };
+  const displayViews = { grid: gridViews[viewMode], list: ListView, table: TableView };
+  const View = displayViews[displayMode] || gridViews[viewMode];
 
   return View ? <View /> : null;
 }

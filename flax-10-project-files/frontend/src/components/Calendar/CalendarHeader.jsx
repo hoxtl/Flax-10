@@ -26,21 +26,22 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function useCalendarHeader() {
-    const { selectedDate, viewMode } = useCalendar();
+    const { selectedDate, viewMode, displayMode } = useCalendar();
     const dispatch = useCalendarDispatch();
     const { openModal } = useEventModal();
     const [showImportModal, setShowImportModal] = useState(false);
-    return { selectedDate, viewMode, dispatch, openModal, showImportModal, setShowImportModal };
+    return { selectedDate, viewMode, displayMode, dispatch, openModal, showImportModal, setShowImportModal };
 }
 
 export function CalendarHeader() {
-    const { selectedDate, viewMode, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
+    const { selectedDate, viewMode, displayMode, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
     const isMobile = useIsMobile();
     const modes = isMobile ? VIEW_MODES.filter(m => m.value !== 'week') : VIEW_MODES;
 
     const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
     const jumpToDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
     const setViewMode = (mode) => dispatch({ type: "SET_VIEW_MODE", payload: mode });
+    const setDisplayMode = (mode) => dispatch({ type: "SET_DISPLAY_MODE", payload: mode });
     const onImport = async (url) => { await importTimetable(url); await reloadEvents(dispatch, selectedDate, viewMode); };
     const showToday = !isTodayVisible(viewMode, selectedDate);
     const title = getTitle(selectedDate, viewMode);
@@ -65,7 +66,7 @@ export function CalendarHeader() {
                     )}
                     <div className="header-actions">
                         {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
-                        <ViewSettingsMenu activeMode={viewMode} onViewChange={setViewMode} />
+                        <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} />
                         <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
                     </div>
                 </header>
