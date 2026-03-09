@@ -407,6 +407,7 @@ export default function CampusMap() {
       const el = document.createElement('div');
       el.className = 'eventMarker';
       el.innerHTML = '📍';
+      el.title = event.title;
     })
   })
 
