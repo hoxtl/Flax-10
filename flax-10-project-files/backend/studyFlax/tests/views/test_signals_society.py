@@ -20,7 +20,7 @@ def make_society(name='Signal Society'):
 
 
 def make_member(user, society, role='member'):
-    return SocietyMembership.objects.create(user=user, society=society, role=role)
+    return SocietyMembership.objects.create(user=user, society=society, role=role, is_subscribed=True)
 
 
 def make_event(society, title='Event', recurrence='none'):

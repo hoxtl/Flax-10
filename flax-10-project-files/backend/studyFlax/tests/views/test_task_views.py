@@ -277,10 +277,49 @@ class TaskDetailViewTest(TestCase):
         new_due = (timezone.now() + timedelta(days=5)).isoformat()
         response = self.client.patch(f'/api/tasks/{task.id}/', {'title': 'Renamed', 'due_date': new_due})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Event should still exist but be updated (only one)
         self.assertEqual(
             CalendarEvent.objects.filter(source='task', external_id=str(task.id)).count(), 1
         )
+
+
+class TaskSerializerTest(TestCase):
+    def setUp(self):
+        self.user = make_user('taskser_user', 'taskser@e.com')
+
+    def test_serializer_marks_completed_at_on_completion(self):
+        from studyFlax.serialisers.task_serialisers import TaskSerialiser
+
+        task = Task.objects.create(user=self.user, title='Test', completed=False)
+        serializer = TaskSerialiser(task, data={'completed': True}, partial=True)
+
+        self.assertTrue(serializer.is_valid())
+        updated = serializer.save()
+        self.assertIsNotNone(updated.completed_at)
+
+    def test_serializer_clears_completed_at_on_reopen(self):
+        from studyFlax.serialisers.task_serialisers import TaskSerialiser
+
+        task = Task.objects.create(
+            user=self.user,
+            title='Test',
+            completed=True,
+            completed_at=timezone.now(),
+        )
+        serializer = TaskSerialiser(task, data={'completed': False}, partial=True)
+
+        self.assertTrue(serializer.is_valid())
+        updated = serializer.save()
+        self.assertIsNone(updated.completed_at)
+
+    def test_task_list_serializer_task_count(self):
+        from studyFlax.serialisers.task_serialisers import TaskListSerialiser
+
+        task_list = TaskList.objects.create(user=self.user, name='Work')
+        Task.objects.create(user=self.user, task_list=task_list, title='Active')
+        Task.objects.create(user=self.user, task_list=task_list, title='Done', completed=True)
+
+        serializer = TaskListSerialiser(task_list)
+        self.assertEqual(serializer.data['task_count'], 1)
 
 
 class LogTaskTimeViewTest(TestCase):

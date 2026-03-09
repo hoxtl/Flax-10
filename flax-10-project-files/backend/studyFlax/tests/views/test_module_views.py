@@ -1,8 +1,11 @@
 from rest_framework import status
 from django.utils import timezone
+from django.test import TestCase
 from datetime import timedelta
 from ..base import BaseTestCase
 from studyFlax.models import Module, User
+from studyFlax.serialisers import ModuleSerialiser
+from rest_framework.test import APIRequestFactory
 
 
 class ModuleViewTests(BaseTestCase):
@@ -68,3 +71,71 @@ class ModuleViewTests(BaseTestCase):
             end_time=(timezone.now() + timedelta(hours=1)).isoformat())
         response = self.client.post('/api/modules/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class ModuleSerialiserTests(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.teacher = User.objects.create_user(
+            username='serial_teacher',
+            email='serial_teacher@example.com',
+            password='pass',
+            first_name='Teach',
+            last_name='Er'
+        )
+        self.teacher.role = 'teacher'
+        self.teacher.save()
+        self.student = User.objects.create_user(
+            username='serial_student',
+            email='serial_student@example.com',
+            password='pass',
+            first_name='Stu',
+            last_name='Dent'
+        )
+
+    def create_module_payload(self):
+        start_time = timezone.now()
+        end_time = start_time + timedelta(hours=1)
+        return {
+            'module_code': '8PH300',
+            'module_name': 'Philosophy',
+            'start_time': start_time.isoformat(),
+            'end_time': end_time.isoformat(),
+        }
+
+    def test_teacher_must_create_modules(self):
+        request = self.factory.get('/')
+        request.user = self.student
+        serializer = ModuleSerialiser(data=self.create_module_payload(), context={'request': request})
+        self.assertFalse(serializer.is_valid())
+        self.assertTrue(serializer.errors)
+
+    def test_is_recurring_true_creates_rule(self):
+        request = self.factory.get('/')
+        request.user = self.teacher
+        serializer = ModuleSerialiser(data=self.create_module_payload(), context={'request': request})
+        self.assertTrue(serializer.is_valid())
+        module = serializer.save()
+        self.assertIsNotNone(module.recurrence_rule)
+
+    def test_is_recurring_false_skips_rule(self):
+        request = self.factory.get('/')
+        request.user = self.teacher
+        payload = self.create_module_payload()
+        payload['module_code'] = '8PH301'
+        payload['is_recurring'] = False
+        serializer = ModuleSerialiser(data=payload, context={'request': request})
+        self.assertTrue(serializer.is_valid())
+        module = serializer.save()
+        self.assertIsNone(module.recurrence_rule)
+
+    def test_created_by_name_unknown_without_owner(self):
+        module = Module(
+            module_code='8PH302',
+            module_name='History of Philosophy',
+            created_by=None,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        serializer = ModuleSerialiser(module)
+        self.assertEqual(serializer.data['created_by_name'], 'Unknown')

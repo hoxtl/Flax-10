@@ -180,6 +180,22 @@ class UserSettingsViewTest(TestCase):
         response = self.client.patch('/api/settings/', {'theme': 'light'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_put_settings_updates_names(self):
+        response = self.client.patch('/api/settings/', {'first_name': 'New', 'last_name': 'Name'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, 'New')
+        self.assertEqual(self.user.last_name, 'Name')
+
+    def test_put_settings_short_password(self):
+        response = self.client.patch('/api/settings/', {'password': 'abc'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_settings_rejects_locked_major_change(self):
+        UserSettings.objects.create(user=self.user, theme='light', timezone='Europe/London', major='Physics')
+        response = self.client.patch('/api/settings/', {'major': 'Math'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class OnboardingViewTest(TestCase):
     def setUp(self):

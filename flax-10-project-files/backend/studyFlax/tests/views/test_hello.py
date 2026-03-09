@@ -1,0 +1,18 @@
+from django.test import TestCase
+from django.test.client import RequestFactory
+
+from studyFlax.views.hello import hello
+
+
+class HelloViewTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_hello_view(self):
+        request = self.factory.get('/hello/')
+        response = hello(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {"message": "Hello from Django REST Framework"}
+        )

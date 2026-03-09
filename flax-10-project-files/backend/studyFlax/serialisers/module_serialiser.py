@@ -4,9 +4,8 @@ from studyFlax.models import User
 from studyFlax.serialisers.deadline_serialisers import DeadlineSummarySerialiser
 
 class ModuleSerialiser(serializers.ModelSerializer):
-    created_by_name = serializers.CharField(source='created_by.first_name', read_only=True)
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=False)
-    deadlines = DeadlineSummarySerialiser(many=True, read_only = True)
+    deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
 

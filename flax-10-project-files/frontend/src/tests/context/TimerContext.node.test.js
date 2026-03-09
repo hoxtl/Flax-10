@@ -1,3 +1,6 @@
+/**
+ * Unit tests for TimerContext provider and persistence helpers.
+ */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const useTimerLogicMock = vi.fn();
@@ -40,6 +43,24 @@ const importModule = async () => {
   return import('../../context/TimerContext');
 };
 
+const createMockStorage = () => ({ setItem: vi.fn(), removeItem: vi.fn() });
+const createBrokenStorage = () => ({
+  setItem: vi.fn(() => {
+    throw new Error('storage error');
+  }),
+  removeItem: vi.fn(() => {
+    throw new Error('storage error');
+  }),
+});
+
+const mountTimerProvider = async (sessionStorageMock) => {
+  const mod = await importModule();
+  resetState([null, null]);
+  Object.defineProperty(globalThis, 'sessionStorage', { value: sessionStorageMock, configurable: true });
+  Object.defineProperty(globalThis, 'window', { value: {}, configurable: true });
+  return { mod, tree: mod.TimerProvider({ children: 'child' }) };
+};
+
 describe('TimerContext (node)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -75,7 +96,7 @@ describe('TimerContext (node)', () => {
 
   it('persistTimerTask writes and clears keys through explicit storage', async () => {
     const mod = await importModule();
-    const storage = { setItem: vi.fn(), removeItem: vi.fn() };
+    const storage = createMockStorage();
 
     mod.persistTimerTask(7, { title: 'Task A', categoryColor: '#00ff00' }, { hasWindow: true, storage });
 
@@ -95,26 +116,8 @@ describe('TimerContext (node)', () => {
     expect(storage.removeItem).toHaveBeenCalledWith('timerTaskCategoryColor');
   });
 
-  it('TimerProvider passes values from useTimerLogic and persists task changes', async () => {
-    const mod = await importModule();
-
-    const sessionStorageMock = {
-      setItem: vi.fn(),
-      removeItem: vi.fn(),
-    };
-    Object.defineProperty(globalThis, 'sessionStorage', {
-      value: sessionStorageMock,
-      configurable: true,
-    });
-    Object.defineProperty(globalThis, 'window', {
-      value: {},
-      configurable: true,
-    });
-
-    resetState([null, null]);
-    stateIndex = 0;
-
-    const tree = mod.TimerProvider({ children: 'child' });
+  it('passes values from useTimerLogic', async () => {
+    const { tree } = await mountTimerProvider(createMockStorage());
 
     expect(useTimerLogicMock).toHaveBeenCalledTimes(1);
     const [activeTaskIdArg, setActiveTaskIdArg, activeTaskMetaArg] = useTimerLogicMock.mock.calls[0];
@@ -126,50 +129,32 @@ describe('TimerContext (node)', () => {
     expect(tree.props.value.timeLeft).toBe(1500);
     expect(tree.props.value.mode).toBe('work');
     expect(typeof tree.props.value.setActiveTaskId).toBe('function');
-
-    tree.props.value.setActiveTaskId(42, { title: 'Essay', categoryColor: '#112233' });
-    expect(stateStore[0]).toBe(42);
-    expect(stateStore[1]).toEqual({ title: 'Essay', categoryColor: '#112233' });
-    expect(sessionStorageMock.setItem).toHaveBeenCalledWith('timerTaskId', '42');
-    expect(sessionStorageMock.setItem).toHaveBeenCalledWith('timerTaskTitle', 'Essay');
-    expect(sessionStorageMock.setItem).toHaveBeenCalledWith('timerTaskCategoryColor', '#112233');
-
-    tree.props.value.setActiveTaskId(11, 'not-object');
-    expect(stateStore[0]).toBe(11);
-    expect(stateStore[1]).toBeNull();
-
-    tree.props.value.setActiveTaskId(null);
-    expect(sessionStorageMock.removeItem).toHaveBeenCalledWith('timerTaskId');
-    expect(sessionStorageMock.removeItem).toHaveBeenCalledWith('timerTaskTitle');
-    expect(sessionStorageMock.removeItem).toHaveBeenCalledWith('timerTaskCategoryColor');
   });
 
-  it('TimerProvider swallows persist errors', async () => {
-    const mod = await importModule();
+  it('exposes timer values from useTimerLogic', async () => {
+    const { tree } = await mountTimerProvider(createMockStorage());
+    expect(tree.props.value.isActive).toBe(false);
+    expect(tree.props.value.timeLeft).toBe(1500);
+    expect(tree.props.value.mode).toBe('work');
+  });
 
-    const brokenStorage = {
-      setItem: vi.fn(() => {
-        throw new Error('storage error');
-      }),
-      removeItem: vi.fn(() => {
-        throw new Error('storage error');
-      }),
-    };
+  it('persists task updates through sessionStorage', async () => {
+    const { tree } = await mountTimerProvider(createMockStorage());
+    tree.props.value.setActiveTaskId(42, { title: 'Essay', categoryColor: '#112233' });
+    tree.props.value.setActiveTaskId(11, 'not-object');
+    tree.props.value.setActiveTaskId(null);
+    expect(stateStore[0]).toBe(11);
+    expect(stateStore[1]).toBeNull();
+    expect(globalThis.sessionStorage.setItem).toHaveBeenCalledWith('timerTaskId', '42');
+    expect(globalThis.sessionStorage.setItem).toHaveBeenCalledWith('timerTaskTitle', 'Essay');
+    expect(globalThis.sessionStorage.setItem).toHaveBeenCalledWith('timerTaskCategoryColor', '#112233');
+    expect(globalThis.sessionStorage.removeItem).toHaveBeenCalledWith('timerTaskId');
+    expect(globalThis.sessionStorage.removeItem).toHaveBeenCalledWith('timerTaskTitle');
+    expect(globalThis.sessionStorage.removeItem).toHaveBeenCalledWith('timerTaskCategoryColor');
+  });
 
-    Object.defineProperty(globalThis, 'sessionStorage', {
-      value: brokenStorage,
-      configurable: true,
-    });
-    Object.defineProperty(globalThis, 'window', {
-      value: {},
-      configurable: true,
-    });
-
-    resetState([null, null]);
-    stateIndex = 0;
-
-    const tree = mod.TimerProvider({ children: 'child' });
-
+  it('swallows persist errors when saving and clearing', async () => {
+    const { tree } = await mountTimerProvider(createBrokenStorage());
     expect(() => tree.props.value.setActiveTaskId(1, { title: 'x' })).not.toThrow();
     expect(() => tree.props.value.setActiveTaskId(null)).not.toThrow();
   });

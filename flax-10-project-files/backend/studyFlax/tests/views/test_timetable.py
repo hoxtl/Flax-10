@@ -41,7 +41,6 @@ class TimetableServiceUnitTest(TestCase):
             username='ttuser', email='tt@example.com', password='pass'
         )
 
-    # --- get_source_key ---
 
     def test_get_source_key_strips_www(self):
         from studyFlax.views.calendar.timetable_service import get_source_key
@@ -51,7 +50,6 @@ class TimetableServiceUnitTest(TestCase):
         from studyFlax.views.calendar.timetable_service import get_source_key
         self.assertEqual(get_source_key('feed.ics'), 'timetable')
 
-    # --- resolve_ics_url ---
 
     def test_resolve_ics_url_direct(self):
         from studyFlax.views.calendar.timetable_service import resolve_ics_url
@@ -79,7 +77,6 @@ class TimetableServiceUnitTest(TestCase):
         result = resolve_ics_url('https://example.com/page')
         self.assertIsNone(result)
 
-    # --- extract_ics_url ---
 
     def test_extract_ics_url_found(self):
         from studyFlax.views.calendar.timetable_service import extract_ics_url
@@ -92,7 +89,6 @@ class TimetableServiceUnitTest(TestCase):
         result = extract_ics_url('<html>no link</html>', 'https://example.com')
         self.assertIsNone(result)
 
-    # --- parse_ics_events ---
 
     def test_parse_ics_events(self):
         from studyFlax.views.calendar.timetable_service import parse_ics_events
@@ -106,7 +102,6 @@ class TimetableServiceUnitTest(TestCase):
         events = parse_ics_events(SAMPLE_ICS_NO_END, 'example.com')
         self.assertEqual(len(events), 0)
 
-    # --- parse_vevent ---
 
     def test_parse_vevent_returns_none_if_missing_start(self):
         from studyFlax.views.calendar.timetable_service import parse_vevent
@@ -115,7 +110,6 @@ class TimetableServiceUnitTest(TestCase):
         result = parse_vevent(vevent, 'src')
         self.assertIsNone(result)
 
-    # --- parse_ics_datetime ---
 
     def test_parse_ics_datetime_none(self):
         from studyFlax.views.calendar.timetable_service import parse_ics_datetime
@@ -142,7 +136,6 @@ class TimetableServiceUnitTest(TestCase):
         result = parse_ics_datetime('20260101T1000')
         self.assertIsNotNone(result)
 
-    # --- to_aware ---
 
     def test_to_aware_naive_becomes_aware(self):
         from studyFlax.views.calendar.timetable_service import to_aware
@@ -156,7 +149,6 @@ class TimetableServiceUnitTest(TestCase):
         result = to_aware(aware)
         self.assertEqual(result, aware)
 
-    # --- is_valid_event ---
 
     def test_is_valid_event_true(self):
         from studyFlax.views.calendar.timetable_service import is_valid_event
@@ -166,7 +158,6 @@ class TimetableServiceUnitTest(TestCase):
         from studyFlax.views.calendar.timetable_service import is_valid_event
         self.assertFalse(is_valid_event({'start_time': 'x'}))
 
-    # --- should_sync ---
 
     def test_should_sync_no_last_synced(self):
         from studyFlax.views.calendar.timetable_service import should_sync
@@ -183,7 +174,6 @@ class TimetableServiceUnitTest(TestCase):
         source = TimetableSource(last_synced=timezone.now() - timedelta(hours=8))
         self.assertTrue(should_sync(source, timedelta(hours=6)))
 
-    # --- find_existing_event ---
 
     def test_find_existing_event_found(self):
         from studyFlax.views.calendar.timetable_service import find_existing_event
@@ -209,7 +199,6 @@ class TimetableServiceUnitTest(TestCase):
         result = find_existing_event('test.com', None, None)
         self.assertIsNone(result)
 
-    # --- create_event ---
 
     def test_create_event(self):
         from studyFlax.views.calendar.timetable_service import create_event
@@ -222,7 +211,6 @@ class TimetableServiceUnitTest(TestCase):
         }, self.user)
         self.assertTrue(CalendarEvent.objects.filter(external_id='uid-abc').exists())
 
-    # --- apply_event_updates ---
 
     def test_apply_event_updates(self):
         from studyFlax.views.calendar.timetable_service import apply_event_updates
@@ -236,7 +224,6 @@ class TimetableServiceUnitTest(TestCase):
         event.refresh_from_db()
         self.assertEqual(event.title, 'New')
 
-    # --- upsert_event ---
 
     def test_upsert_event_creates_new(self):
         from studyFlax.views.calendar.timetable_service import upsert_event
@@ -263,7 +250,6 @@ class TimetableServiceUnitTest(TestCase):
         }, self.user)
         self.assertEqual(result, 'updated')
 
-    # --- count_result ---
 
     def test_count_result_updated(self):
         from studyFlax.views.calendar.timetable_service import count_result
@@ -275,7 +261,6 @@ class TimetableServiceUnitTest(TestCase):
         c, u = count_result('created', 0, 0)
         self.assertEqual((c, u), (1, 0))
 
-    # --- process_event ---
 
     def test_process_event_invalid_skipped(self):
         from studyFlax.views.calendar.timetable_service import process_event
@@ -292,7 +277,6 @@ class TimetableServiceUnitTest(TestCase):
         }, self.user, 0, 0)
         self.assertEqual(c, 1)
 
-    # --- upsert_events ---
 
     def test_upsert_events(self):
         from studyFlax.views.calendar.timetable_service import upsert_events
@@ -307,7 +291,6 @@ class TimetableServiceUnitTest(TestCase):
         self.assertEqual(created, 2)
         self.assertEqual(updated, 0)
 
-    # --- update_source_status ---
 
     def test_update_source_status_success(self):
         from studyFlax.views.calendar.timetable_service import update_source_status
@@ -323,7 +306,6 @@ class TimetableServiceUnitTest(TestCase):
         self.assertIsNone(source.last_synced)
         self.assertEqual(source.last_error, 'Connection error')
 
-    # --- sync_timetable_if_needed ---
 
     def test_sync_timetable_if_needed_no_source(self):
         from studyFlax.views.calendar.timetable_service import sync_timetable_if_needed
@@ -353,7 +335,6 @@ class TimetableServiceUnitTest(TestCase):
         self.assertIsNotNone(result)
         mock_sync.assert_called_once()
 
-    # --- sync_timetable ---
 
     @patch('studyFlax.views.calendar.timetable_service.load_events')
     @patch('studyFlax.views.calendar.timetable_service.upsert_events')
@@ -378,7 +359,6 @@ class TimetableServiceUnitTest(TestCase):
         args = mock_status.call_args[0]
         self.assertFalse(args[2])  # synced=False
 
-    # --- load_events ---
 
     @patch('studyFlax.views.calendar.timetable_service.resolve_ics_url')
     def test_load_events_no_ics_raises(self, mock_resolve):
@@ -396,7 +376,6 @@ class TimetableServiceUnitTest(TestCase):
         events = load_events('https://example.com/cal.ics', 'example.com')
         self.assertEqual(len(events), 1)
 
-    # --- update_event_field ---
 
     def test_update_event_field_sets_value(self):
         from studyFlax.views.calendar.timetable_service import update_event_field
@@ -411,7 +390,6 @@ class TimetableServiceUnitTest(TestCase):
         update_event_field(event, 'title', {})
         self.assertEqual(event.title, 'Original')
 
-    # --- try_parse_format ---
 
     def test_try_parse_format_valid(self):
         from studyFlax.views.calendar.timetable_service import try_parse_format

@@ -2,11 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from datetime import timedelta
 from studyFlax.models.auth.userSettingsModel import UserSettings
 from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_module
 

@@ -1,24 +1,29 @@
+/**
+ * Unit tests for WeekBar rendering and semester week badge behavior.
+ */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+const SEMESTER_TERM_CONFIG = {
+    totalWeeks: 11,
+    hasReadingWeek: true,
+    readingWeekAfterWeek: 5,
+};
+
+const createWeekLabels = (totalWeeks, hasReadingWeek, readingWeekAfterWeek) => {
+    const labels = Array.from({ length: totalWeeks }, (_, index) => String(index + 1));
+    if (!hasReadingWeek) return labels;
+    labels.splice(readingWeekAfterWeek, 0, 'RW');
+    return labels;
+};
+
 vi.mock('../../../lib/termConfig', () => ({
-    loadTermConfig: vi.fn(() => ({
-        totalWeeks: 11,
-        hasReadingWeek: true,
-        readingWeekAfterWeek: 5,
-    })),
+    loadTermConfig: vi.fn(() => SEMESTER_TERM_CONFIG),
 }));
 
 vi.mock('../../../components/Calendar/utils/weekUtils', () => ({
-    buildWeekLabels: vi.fn((total, hasRW, afterWeek) => {
-        const labels = [];
-        for (let i = 1; i <= total; i++) {
-            if (hasRW && i === afterWeek + 1) labels.push('RW');
-            labels.push(String(i));
-        }
-        return labels;
-    }),
-    getWeekIndexForDate: vi.fn(() => 2), // week 3 (0-indexed)
+    buildWeekLabels: vi.fn((total, hasRW, afterWeek) => createWeekLabels(total, hasRW, afterWeek)),
+    getWeekIndexForDate: vi.fn(() => 2),
 }));
 
 import WeekBar from '../../../components/Dashboard/WeekBar';
@@ -32,7 +37,6 @@ describe('WeekBar', () => {
 
     it('shows current week badge', () => {
         render(<WeekBar date={new Date('2024-03-04')} />);
-        // Week at index 2 = "3"
         expect(screen.getByText(/Week 3/)).toBeTruthy();
     });
 
@@ -48,9 +52,8 @@ describe('WeekBar', () => {
     });
 
     it('shows Reading Week badge when on reading week', () => {
-        getWeekIndexForDate.mockReturnValueOnce(5); // index 5 = 'RW' with 5+1 insertion
+        getWeekIndexForDate.mockReturnValueOnce(5);
         render(<WeekBar date={new Date('2024-03-04')} />);
-        // If the label at index 5 is 'RW', badge shows "Reading Week"
         expect(screen.getByText(/Reading Week|Week/)).toBeTruthy();
     });
 });

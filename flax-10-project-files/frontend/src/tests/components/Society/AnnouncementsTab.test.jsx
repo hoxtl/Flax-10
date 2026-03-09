@@ -1,3 +1,6 @@
+/**
+ * Tests for announcement list rendering and edit callbacks.
+ */
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AnnouncementsTab from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementsTab';
@@ -7,6 +10,28 @@ vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
 }));
 
 describe('AnnouncementsTab', () => {
+  const announcementsWithMedia = [
+    {
+      id: 1,
+      title: 'Single Image',
+      content: 'Body 1',
+      tag: 3,
+      pinned: true,
+      created_at: '2026-03-09T10:00:00Z',
+      images: ['a.jpg'],
+    },
+    {
+      id: 2,
+      title: 'Multi Image',
+      content: 'Body 2',
+      created_at: '2026-03-09T10:00:00Z',
+      images: [{ url: 'b.jpg' }, { url: 'c.jpg' }],
+    },
+  ];
+
+  const renderTab = (props = {}) =>
+    render(<AnnouncementsTab tags={[{ id: 3, label: 'Urgent', color: '#f00' }]} announcements={[]} editMode={false} {...props} />);
+
   beforeEach(() => {
     vi.clearAllMocks();
     HTMLElement.prototype.scrollIntoView = vi.fn();
@@ -22,32 +47,7 @@ describe('AnnouncementsTab', () => {
 
   it('renders cards, images, tag badge, pinned badge and edit callback', () => {
     const onEdit = vi.fn();
-
-    render(
-      <AnnouncementsTab
-        editMode
-        onEdit={onEdit}
-        tags={[{ id: 3, label: 'Urgent', color: '#f00' }]}
-        announcements={[
-          {
-            id: 1,
-            title: 'Single Image',
-            content: 'Body 1',
-            tag: 3,
-            pinned: true,
-            created_at: '2026-03-09T10:00:00Z',
-            images: ['a.jpg'],
-          },
-          {
-            id: 2,
-            title: 'Multi Image',
-            content: 'Body 2',
-            created_at: '2026-03-09T10:00:00Z',
-            images: [{ url: 'b.jpg' }, { url: 'c.jpg' }],
-          },
-        ]}
-      />,
-    );
+    renderTab({ onEdit, editMode: true, announcements: announcementsWithMedia });
 
     expect(screen.getByText('Single Image')).toBeTruthy();
     expect(screen.getByText('Pinned')).toBeTruthy();
@@ -56,6 +56,11 @@ describe('AnnouncementsTab', () => {
     expect(screen.getByAltText('Announcement')).toBeTruthy();
     expect(screen.getByAltText('Image 1')).toBeTruthy();
     expect(screen.getByAltText('Image 2')).toBeTruthy();
+  });
+
+  it('invokes edit callback from announcement card', () => {
+    const onEdit = vi.fn();
+    renderTab({ editMode: true, onEdit, announcements: announcementsWithMedia });
 
     fireEvent.click(screen.getAllByTitle('Edit')[0]);
     expect(onEdit).toHaveBeenCalled();

@@ -76,7 +76,8 @@ class PasswordResetRequestViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         mock_email.assert_called_once()
     def test_reset_password_nonexistent_email(self):
-        response = self.client.post(self.url, {'email': 'noone@example.com'})
+        with self.assertLogs('studyFlax.views.authentication.password_reset_request_view', level='WARNING'):
+            response = self.client.post(self.url, {'email': 'noone@example.com'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     def test_reset_password_invalid_data(self):
         response = self.client.post(self.url, {'email': 'not-an-email'})
@@ -84,7 +85,8 @@ class PasswordResetRequestViewTest(TestCase):
     @patch('studyFlax.views.authentication.password_reset_request_view.send_reset_password_email')
     def test_reset_password_email_error(self, mock_email):
         mock_email.side_effect = Exception('SMTP error')
-        response = self.client.post(self.url, {'email': 'test@example.com'})
+        with self.assertLogs('studyFlax.views.authentication.password_reset_request_view', level='ERROR'):
+            response = self.client.post(self.url, {'email': 'test@example.com'})
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
     @patch('studyFlax.views.authentication.password_reset_request_view.send_reset_password_email')
     def test_reset_invalidates_old_tokens(self, mock_email):
@@ -118,5 +120,31 @@ class ConfirmPasswordResetViewTest(TestCase):
     def test_confirm_reset_unexpected_error(self, mock_get):
         mock_get.side_effect = Exception('DB error')
         token = ResetPasswordToken.create_user_token(self.user)
-        response = self.client.post(self.url, {'token': str(token.token), 'new_password': 'newpass123', 'confirm_password': 'newpass123'})
+        with self.assertLogs('studyFlax.views.authentication.confirm_password_reset_view', level='ERROR'):
+            response = self.client.post(self.url, {'token': str(token.token), 'new_password': 'newpass123', 'confirm_password': 'newpass123'})
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ResetPasswordSerializerTest(TestCase):
+    def test_normalise_email(self):
+        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordSerialiser
+        serializer = ResetPasswordSerialiser()
+        self.assertEqual(
+            serializer.normalise_lowercase_email('  TEST@Example.COM  '),
+            'test@example.com',
+        )
+
+    def test_confirm_passwords_match(self):
+        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+        serializer = ResetPasswordConfirmSerialiser()
+        data = {'new_password': 'abc12345', 'confirm_password': 'abc12345', 'token': 'tok'}
+        self.assertEqual(serializer.validate_passwords(data), data)
+
+    def test_confirm_passwords_mismatch(self):
+        from rest_framework.exceptions import ValidationError
+        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+
+        serializer = ResetPasswordConfirmSerialiser()
+        data = {'new_password': 'abc12345', 'confirm_password': 'different', 'token': 'tok'}
+        with self.assertRaises(ValidationError):
+            serializer.validate_passwords(data)

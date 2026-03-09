@@ -9,6 +9,9 @@ from datetime import timedelta
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
 from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.society.societyModel import Society
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
+from studyFlax.models.society.societyImageModel import SocietyImage
 
 User = get_user_model()
 
@@ -107,3 +110,137 @@ class ProfileSummaryViewTest(TestCase):
     def test_unauthenticated(self):
         response = APIClient().get('/api/profile/summary/')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+    def test_society_image_direct_field(self):
+        """get_society_image returns society.image when set directly."""
+        society = Society.objects.create(
+            name='DirectImg', bio='b', admin_emails='a@b.com',
+            image='http://example.com/direct.jpg'
+        )
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        society_data = next(s for s in response.data['societies'] if s['id'] == society.id)
+        self.assertEqual(society_data['image'], 'http://example.com/direct.jpg')
+
+    def test_society_image_fallback_via_society_image(self):
+        """get_society_image falls back to the first SocietyImage URL when society.image is blank."""
+        society = Society.objects.create(name='FallbackImg', bio='b', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        SocietyImage.objects.create(society=society, url='http://example.com/img.jpg')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        society_data = next(s for s in response.data['societies'] if s['id'] == society.id)
+        self.assertEqual(society_data['image'], 'http://example.com/img.jpg')
+
+    def test_society_image_none_when_no_images(self):
+        """get_society_image returns None when society has no image at all."""
+        society = Society.objects.create(name='NoImg', bio='b', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.user, society=society, role='member')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        society_data = next(s for s in response.data['societies'] if s['id'] == society.id)
+        self.assertIsNone(society_data['image'])
+
+    def test_early_bird_persona(self):
+        from studyFlax.views.user.profile_summary_view import derive_persona
+
+        sessions = [self._make_session_for_persona(days_ago=i, hour=7, duration=60) for i in range(8, 15)]
+        persona = derive_persona(sessions)
+
+        self.assertEqual(persona['id'], 'early_bird')
+
+    def test_afternoon_peak_persona(self):
+        from studyFlax.views.user.profile_summary_view import derive_persona
+
+        sessions = [self._make_session_for_persona(days_ago=i, hour=14, duration=60) for i in range(8, 15)]
+        persona = derive_persona(sessions)
+
+        self.assertEqual(persona['id'], 'afternoon_peak')
+
+    def test_consistent_persona(self):
+        from studyFlax.views.user.profile_summary_view import derive_persona
+
+        sessions = [self._make_session_for_persona(days_ago=i, hour=10, duration=60) for i in range(0, 6)]
+        persona = derive_persona(sessions)
+
+        self.assertEqual(persona['id'], 'consistent')
+
+    def test_sprint_persona(self):
+        from studyFlax.views.user.profile_summary_view import derive_persona
+
+        sessions = [self._make_session_for_persona(days_ago=i, hour=10, duration=20) for i in range(8, 15)]
+        persona = derive_persona(sessions)
+
+        self.assertEqual(persona['id'], 'sprint')
+
+    def test_marathon_persona(self):
+        from studyFlax.views.user.profile_summary_view import derive_persona
+
+        sessions = [self._make_session_for_persona(days_ago=i, hour=10, duration=100) for i in range(8, 15)]
+        persona = derive_persona(sessions)
+
+        self.assertEqual(persona['id'], 'marathon')
+
+    def test_no_sessions_returns_first_persona(self):
+        from studyFlax.views.user.profile_summary_view import derive_persona
+
+        persona = derive_persona([])
+        self.assertEqual(persona['id'], 'night_owl')
+
+    def test_profile_summary_no_sessions(self):
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['streaks']['current'], 0)
+        self.assertEqual(response.data['badges'], [])
+
+    def test_compute_badges_hours_milestones(self):
+        from studyFlax.views.user.profile_summary_view import compute_badges
+
+        sessions = [make_session(self.user, duration=60, hours_ago=i * 24 + 1) for i in range(1, 12)]
+        badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)
+
+        self.assertIn('1hr', [badge['id'] for badge in badges])
+        self.assertIn('10hr', [badge['id'] for badge in badges])
+
+    def test_compute_badges_streak(self):
+        from studyFlax.views.user.profile_summary_view import compute_badges
+
+        sessions = [make_session(self.user, duration=60, hours_ago=i * 24 + 1) for i in range(3)]
+        badges = compute_badges(sessions, sessions, 3, 3, 0, self.user)
+
+        self.assertIn('streak_3', [badge['id'] for badge in badges])
+
+    def test_compute_badges_incomplete_sessions_excluded(self):
+        from studyFlax.views.user.profile_summary_view import compute_badges
+
+        incomplete = self._make_session_for_persona(days_ago=1, status_val='Incomplete')
+        badges = compute_badges([incomplete], [incomplete], 0, 0, 0, self.user)
+
+        self.assertNotIn('sessions_1', [badge['id'] for badge in badges])
+
+    def test_get_weekly_study_hours(self):
+        from studyFlax.views.user.profile_summary_view import get_weekly_study_hours
+
+        self._make_session_for_persona(days_ago=0, duration=120)
+        self._make_session_for_persona(days_ago=1, duration=60)
+        self._make_session_for_persona(days_ago=10, duration=300)
+        sessions = list(StudySession.objects.filter(user=self.user))
+
+        self.assertAlmostEqual(get_weekly_study_hours(sessions), 3.0, places=1)
+
+    def _make_session_for_persona(self, days_ago=0, hour=10, duration=60, status_val='Completed'):
+        base = timezone.now() - timedelta(days=days_ago)
+        end_time = base.replace(hour=hour, minute=0, second=0, microsecond=0)
+        start_time = end_time - timedelta(minutes=duration)
+        return StudySession.objects.create(
+            user=self.user,
+            start_time=start_time,
+            end_time=end_time,
+            duration=duration,
+            break_duration=0,
+            pause_duration=0,
+            status=status_val,
+            study_block_id=uuid.uuid4().int % 1000000,
+            session_count=1,
+        )

@@ -1,5 +1,12 @@
+/**
+ * Tests for KCL department/course fixture constants.
+ */
 import { describe, it, expect } from 'vitest';
 import { KCL_DEPARTMENTS, ALL_KCL_COURSES } from '../../lib/kclCourses';
+
+const FLATTEN_COURSES = Object.values(KCL_DEPARTMENTS).flat();
+const ALL_DEPARTMENTS_COURSES = Object.values(KCL_DEPARTMENTS).flat();
+const EXPECTED_COURSE_COUNT = Object.values(KCL_DEPARTMENTS).reduce((sum, courses) => sum + courses.length, 0);
 
 describe('KCL_DEPARTMENTS', () => {
   it('is an object', () => {
@@ -32,12 +39,10 @@ describe('KCL_DEPARTMENTS', () => {
   });
 
   it('each course within a department is a non-empty string', () => {
-    for (const [dept, courses] of Object.entries(KCL_DEPARTMENTS)) {
-      for (const course of courses) {
-        expect(typeof course, `Course in ${dept} should be a string`).toBe('string');
-        expect(course.length, `Course in ${dept} should not be empty`).toBeGreaterThan(0);
-      }
-    }
+    const allCourseTypesAreStrings = FLATTEN_COURSES.every((course) => typeof course === 'string');
+    const allCourseNamesAreNonEmpty = FLATTEN_COURSES.every((course) => course.length > 0);
+    expect(allCourseTypesAreStrings).toBe(true);
+    expect(allCourseNamesAreNonEmpty).toBe(true);
   });
 
   it('Arts & Humanities includes English Literature', () => {
@@ -117,16 +122,12 @@ describe('ALL_KCL_COURSES', () => {
   });
 
   it('contains the correct total number of courses (flat of all departments)', () => {
-    const expectedTotal = Object.values(KCL_DEPARTMENTS).reduce((sum, courses) => sum + courses.length, 0);
-    expect(ALL_KCL_COURSES.length).toBe(expectedTotal);
+    expect(ALL_KCL_COURSES.length).toBe(EXPECTED_COURSE_COUNT);
   });
 
   it('contains all courses from every department', () => {
-    for (const courses of Object.values(KCL_DEPARTMENTS)) {
-      for (const course of courses) {
-        expect(ALL_KCL_COURSES).toContain(course);
-      }
-    }
+    const hasAllCourses = ALL_DEPARTMENTS_COURSES.every((course) => ALL_KCL_COURSES.includes(course));
+    expect(hasAllCourses).toBe(true);
   });
 
   it('contains Computer Science', () => {
