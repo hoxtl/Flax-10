@@ -463,6 +463,7 @@ export default function CampusMap() {
           }
         }, 100);
       });
+      eventMarkers.current.push(marker);
     })
   })
 
