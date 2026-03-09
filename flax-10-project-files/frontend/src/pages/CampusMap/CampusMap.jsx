@@ -443,6 +443,7 @@ export default function CampusMap() {
         anchor: 'bottom',
       })
         .setLngLat([event.longitude, event.latitude])
+        .setPopup(popup)
     })
   })
 
