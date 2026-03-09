@@ -425,6 +425,14 @@ export default function CampusMap() {
         <div class="eventPopupContent">
           <div class="eventPopupTitle">${event.title}</div>
           <div class="eventPopupLocation">${event.location}</div>
+          <div class="eventPopupTime">${new Date(event.start_time).toLocaleString('en-GB', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</div>
+          
         `)
     })
   })
