@@ -1,0 +1,148 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+
+vi.mock('framer-motion', () => ({
+    motion: new Proxy({}, {
+        get: (_, tag) => ({ children, ...props }) => {
+            const Tag = typeof tag === 'string' ? tag : 'div';
+            const { initial, animate, exit, transition, whileHover, whileTap, ...rest } = props;
+            return <Tag {...rest}>{children}</Tag>;
+        },
+    }),
+    AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
+vi.mock('react-markdown', () => ({
+    default: ({ children }) => <div data-testid="markdown">{children}</div>,
+}));
+
+vi.mock('remark-gfm', () => ({ default: vi.fn() }));
+
+vi.mock('../../api/analyticsService', () => ({
+    default: {
+        aiChat: vi.fn(),
+    },
+}));
+
+import FloatingChat from '../../components/FloatingChat';
+import analyticsService from '../../api/analyticsService';
+
+describe('FloatingChat', () => {
+    beforeEach(() => {
+        Element.prototype.scrollIntoView = vi.fn();
+        vi.clearAllMocks();
+    });
+
+    it('renders the FAB button', () => {
+        render(<FloatingChat />);
+        expect(screen.getByRole('button')).toBeTruthy();
+    });
+
+    it('opens chat window when FAB clicked', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        expect(screen.getByText('Study Coach')).toBeTruthy();
+    });
+
+    it('shows subtitle in chat header', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        expect(screen.getByText('Ask about your study habits')).toBeTruthy();
+    });
+
+    it('shows suggestions when no messages', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        expect(screen.getByText("When should I study this week?")).toBeTruthy();
+        expect(screen.getByText("Am I a night owl or morning person?")).toBeTruthy();
+    });
+
+    it('closes chat window when close button clicked', async () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button')); // open
+        // Both the FAB and chat header show ✕ when open; click the first one (chat close)
+        const closeBtns = screen.getAllByText('✕');
+        fireEvent.click(closeBtns[0]);
+        await waitFor(() => {
+            expect(screen.queryByText('Study Coach')).toBeNull();
+        });
+    });
+
+    it('sends message via suggestion click', async () => {
+        analyticsService.aiChat.mockResolvedValue({ reply: 'AI response here' });
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByText('When should I study this week?'));
+        await waitFor(() => {
+            expect(analyticsService.aiChat).toHaveBeenCalled();
+        });
+    });
+
+    it('shows AI reply in chat', async () => {
+        analyticsService.aiChat.mockResolvedValue({ reply: 'Here is my advice' });
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByText('When should I study this week?'));
+        await waitFor(() => {
+            expect(screen.getByTestId('markdown')).toBeTruthy();
+        });
+    });
+
+    it('shows error message when API fails', async () => {
+        analyticsService.aiChat.mockRejectedValue(new Error('Network error'));
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(textarea, { target: { value: 'Test question' } });
+        fireEvent.click(screen.getByText('↑'));
+        await waitFor(() => {
+            expect(screen.getByText('Could not get a response. Please try again.')).toBeTruthy();
+        });
+    });
+
+    it('opens chat via flax-open-chat custom event', () => {
+        render(<FloatingChat />);
+        act(() => {
+            window.dispatchEvent(new CustomEvent('flax-open-chat', { detail: { initialMessage: 'hello' } }));
+        });
+        expect(screen.getByText('Study Coach')).toBeTruthy();
+    });
+
+    it('disables send button when input is empty', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const sendBtn = screen.getByText('↑');
+        expect(sendBtn.disabled).toBe(true);
+    });
+
+    it('enables send button when input has text', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(textarea, { target: { value: 'Hello' } });
+        const sendBtn = screen.getByText('↑');
+        expect(sendBtn.disabled).toBe(false);
+    });
+
+    it('shows Clear button after messages exist', async () => {
+        analyticsService.aiChat.mockResolvedValue({ reply: 'Done' });
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(textarea, { target: { value: 'Hello' } });
+        fireEvent.click(screen.getByText('↑'));
+        await waitFor(() => {
+            expect(screen.getByText('Clear')).toBeTruthy();
+        });
+    });
+
+    it('clears messages when Clear button clicked', async () => {
+        analyticsService.aiChat.mockResolvedValue({ reply: 'Done' });
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByText('When should I study this week?'));
+        await waitFor(() => expect(screen.getByText('Clear')).toBeTruthy());
+        fireEvent.click(screen.getByText('Clear'));
+        expect(screen.queryByText('When should I study this week?')).toBeTruthy(); // suggestions back
+    });
+});
