@@ -40,3 +40,10 @@ class GeocodingService:
             }
             response = requests.get(url, params=params, timeout=5)
             response.raise_for_status()
+
+            data = response.json()
+
+            if data.get('features') and len(data['features']) > 0:
+                feature = data['features'][0]
+                longitude, latitude = feature['geeomtry']['coordinates']
+                formatted_address = feature.get('place_name', loc_string)
