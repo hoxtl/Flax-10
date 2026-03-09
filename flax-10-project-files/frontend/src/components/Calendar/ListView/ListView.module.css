@@ -1,0 +1,164 @@
+/* ListView Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    background: var(--bg);
+    padding: 0 16px;
+}
+
+/* Date Group */
+.dateGroup {
+    margin-bottom: 8px;
+}
+
+/* Sticky Date Header */
+.dateHeader {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--panel);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.dateText {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* Events List */
+.eventsList {
+    display: flex;
+    flex-direction: column;
+}
+
+.flatList {
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px;
+}
+
+/* Event Row */
+.eventRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--event-card-bg);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.eventRow:hover {
+    background: var(--hover);
+}
+
+.eventRow.readOnly {
+    opacity: 0.85;
+}
+
+/* Event Time */
+.eventTime {
+    flex-shrink: 0;
+    width: 80px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+/* Event Title */
+.eventTitle {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Badges Container */
+.badgesContainer {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Tag Badge */
+.tagBadge {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 12px;
+    background: var(--pill-bg);
+    color: var(--text-primary);
+}
+
+/* Source Badge (module/society name) */
+.sourceBadge {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 12px;
+    background: var(--primary);
+    color: var(--c-white);
+}
+
+/* Edit Button */
+.editBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.15s;
+}
+
+.eventRow:hover .editBtn {
+    opacity: 1;
+}
+
+.editBtn:hover {
+    background: var(--hover);
+    color: var(--primary);
+}
+
+/* Empty State */
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--muted);
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .container {
+        padding: 0 12px;
+    }
+
+    .eventRow {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .eventTime {
+        width: 60px;
+        font-size: 0.75rem;
+    }
+
+    .badgesContainer {
+        display: none;
+    }
+}
