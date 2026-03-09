@@ -922,3 +922,7 @@
   transition: opacity 0.2s ease;
   width: 100%;
 }
+
+:global(.eventPopupButton:hover) {
+  opacity: 0.85;
+}
