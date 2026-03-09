@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, renderHook, act, waitFor } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
@@ -44,6 +44,10 @@ import UserSearch, {
     useSearchInit,
     FilterSection,
 } from '../../../components/Social/UserSearch';
+
+import { searchUsers } from '../../../api/userService';
+import { getModules } from '../../../api/moduleApi';
+import { fetchSocieties } from '../../../api/societyApi';
 
 describe('UserResultItem', () => {
     it('renders user initials and name', () => {
@@ -117,6 +121,14 @@ describe('SocietyResultItem', () => {
 });
 
 describe('UserSearch', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     it('renders search bar', () => {
         render(<UserSearch onUserSelect={vi.fn()} />);
         expect(screen.getByTestId('search-bar')).toBeTruthy();
@@ -140,6 +152,71 @@ describe('UserSearch', () => {
         fireEvent.click(screen.getByText('Filter'));
         fireEvent.click(screen.getByText('Filter'));
         expect(screen.queryByText('modules')).toBeNull();
+    });
+
+    it('shows "Start typing..." when focused with empty query', async () => {
+        vi.useFakeTimers();
+        render(<UserSearch onUserSelect={vi.fn()} />);
+        fireEvent.focus(screen.getByTestId('search-bar'));
+        await act(async () => {
+            vi.advanceTimersByTime(350);
+            await vi.runOnlyPendingTimersAsync();
+        });
+        expect(screen.getByText('Start typing...')).toBeTruthy();
+        expect(searchUsers).not.toHaveBeenCalled();
+    });
+
+    it('debounces user search and renders selectable results', async () => {
+        searchUsers.mockResolvedValueOnce({ results: [{ id: 1, first_name: 'Alice', last_name: 'Smith', username: 'asmith' }] });
+        const onUserSelect = vi.fn();
+        render(<UserSearch onUserSelect={onUserSelect} />);
+
+        const input = screen.getByTestId('search-bar');
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'ali' } });
+
+        await waitFor(() => {
+            expect(searchUsers).toHaveBeenCalledWith('ali', '', '');
+        });
+        await screen.findByText('@asmith');
+
+        fireEvent.click(screen.getByText('Alice Smith'));
+        expect(onUserSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+        expect(screen.getByTestId('search-bar').value).toBe('');
+    });
+
+    it('can search with module filter (no query) once focused', async () => {
+        getModules.mockResolvedValueOnce([
+            { id: 1, module_code: 'CS3001', module_name: 'Algorithms' },
+            { id: 2, module_code: 'MA102', module_name: 'Math' },
+        ]);
+        fetchSocieties.mockResolvedValueOnce([]);
+        searchUsers.mockResolvedValueOnce([]);
+        render(<UserSearch onUserSelect={vi.fn()} />);
+
+        // open filter and toggle a module
+        fireEvent.click(screen.getByText('Filter'));
+        await waitFor(() => expect(screen.getByText('CS3001')).toBeTruthy());
+        fireEvent.click(screen.getByText('CS3001'));
+
+        // focusing search activates dropdown + search effect even with empty query
+        const userSearchInput = screen.getAllByTestId('search-bar').find((el) => el.getAttribute('placeholder') === 'Search users...');
+        fireEvent.focus(userSearchInput);
+        await new Promise((r) => setTimeout(r, 350));
+        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', 'CS3001', ''));
+    });
+
+    it('handles module/society init errors without crashing', async () => {
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        getModules.mockRejectedValueOnce(new Error('modules down'));
+        fetchSocieties.mockRejectedValueOnce(new Error('societies down'));
+        render(<UserSearch onUserSelect={vi.fn()} />);
+
+        // Flush the init promises
+        await act(async () => {});
+        expect(screen.getByTestId('search-bar')).toBeTruthy();
+        expect(errSpy).toHaveBeenCalled();
+        errSpy.mockRestore();
     });
 });
 
