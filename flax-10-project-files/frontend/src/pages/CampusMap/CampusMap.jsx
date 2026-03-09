@@ -382,12 +382,15 @@ export default function CampusMap() {
     const loadCalendarEvents = async () => {
       const token = localStorage.getItem('token');
       if (!token) return;
-    }
-    try {
-      const data = await getCalendarEvents();
-      setCalendarEvents(data.events || []);
-    }
-  })
+      try {
+        const data = await getCalendarEvents();
+        setCalendarEvents(data.events || []);
+      } catch (error) {
+        console.log('Unable to load calendar events...');
+      }
+    };
+  }
+)
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
