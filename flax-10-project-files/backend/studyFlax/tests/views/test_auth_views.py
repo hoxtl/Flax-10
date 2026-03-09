@@ -1,4 +1,6 @@
-"""Tests for authentication views including login, logout, registration, and password reset flows."""
+"""
+Tests for authentication views including login, logout, registration, and password reset flows.
+"""
 
 from datetime import timedelta
 
@@ -145,6 +147,7 @@ class ConfirmPasswordResetViewTest(TestCase):
 
 
 class ResetPasswordSerializerTest(TestCase):
+    """Tests for reset password serializer."""
     def test_normalise_email(self):
         from studyFlax.serialisers.reset_password_serialisers import ResetPasswordSerialiser
         serializer = ResetPasswordSerialiser()

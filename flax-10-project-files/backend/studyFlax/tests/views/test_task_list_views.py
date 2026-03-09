@@ -1,4 +1,6 @@
-"""Tests for task view branches not covered in test_task_views.py."""
+"""
+Tests for task view branches not covered in test_task_views.py.
+"""
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model

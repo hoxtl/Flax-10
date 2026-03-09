@@ -1,3 +1,7 @@
+"""
+Backend tests for signals society.
+"""
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -49,7 +53,6 @@ class NotifyMembersOnEventTest(TestCase):
     def test_new_event_notifies_members(self):
         Notification.objects.all().delete()
         make_event(self.society, 'New Event')
-        # All members (including admin) should get a notification
         notifications = Notification.objects.filter(
             notification_type='society_event'
         )
@@ -88,7 +91,6 @@ class NotifyMembersOnEventTest(TestCase):
         self.assertGreaterEqual(notifications.count(), 2)
 
     def test_delete_event_with_announcement_does_not_notify(self):
-        """Events linked to an announcement should not trigger extra notifications on delete."""
         ann = SocietyAnnouncement.objects.create(
             society=self.society, title='Ann', content='C'
         )
@@ -100,7 +102,6 @@ class NotifyMembersOnEventTest(TestCase):
         )
         Notification.objects.all().delete()
         event.delete()
-        # No event-deleted notifications since event is linked to announcement
         event_cancel_notifications = Notification.objects.filter(
             notification_type='society_event',
             title__icontains='cancelled'
@@ -192,7 +193,6 @@ class HandleSocietyDeleteTest(TestCase):
         self.society = make_society('Deleted Society')
         make_member(self.member1, self.society)
         make_member(self.member2, self.society)
-        # Add an event and announcement
         self.event = make_event(self.society, 'Society Event')
         self.ann = SocietyAnnouncement.objects.create(
             society=self.society, title='Ann', content='C'

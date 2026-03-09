@@ -1,3 +1,7 @@
+"""
+Backend tests for user views.
+"""
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -16,6 +20,7 @@ User = get_user_model()
 
 
 class ProfileViewTest(TestCase):
+    """Tests for profile view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass', first_name='Test', last_name='User')
@@ -77,6 +82,7 @@ class ProfileViewTest(TestCase):
 
 
 class CheckUsernameViewTest(TestCase):
+    """Tests for check username view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -110,6 +116,7 @@ class CheckUsernameViewTest(TestCase):
 
 
 class UserSearchViewTest(TestCase):
+    """Tests for user search view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='searcher', email='searcher@example.com', password='pass')
@@ -149,6 +156,7 @@ class UserSearchViewTest(TestCase):
 
 
 class HomeAddressViewTest(TestCase):
+    """Tests for home address view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -172,6 +180,7 @@ class HomeAddressViewTest(TestCase):
 
 
 class UserSettingsViewTest(TestCase):
+    """Tests for user settings view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -207,6 +216,7 @@ class UserSettingsViewTest(TestCase):
 
 
 class OnboardingViewTest(TestCase):
+    """Tests for onboarding view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')

@@ -1,3 +1,7 @@
+"""
+Backend tests for ai views.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -57,7 +61,7 @@ class BuildUserContextTest(TestCase):
 
     def test_build_user_context_broken_streak_is_zero(self):
         from studyFlax.views.analytics.ai_views import _build_user_context
-        make_session(self.user, duration=60, days_ago=5)  # not consecutive with today
+        make_session(self.user, duration=60, days_ago=5)
         context = _build_user_context(self.user, days=30)
         self.assertIn('Current streak: 0', context)
 

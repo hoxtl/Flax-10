@@ -1,3 +1,7 @@
+"""
+Backend tests for society sync service.
+"""
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -28,6 +32,7 @@ def make_event(society, title='Event', recurrence='none', start=None, end=None):
 
 
 class GetSyncedSocietyIdsTest(TestCase):
+    """Tests for get synced society ids."""
     def setUp(self):
         self.user = make_user()
         self.society = make_society()
@@ -45,6 +50,7 @@ class GetSyncedSocietyIdsTest(TestCase):
 
 
 class GetSyncedSocietyEventsTest(TestCase):
+    """Tests for get synced society events."""
     def setUp(self):
         self.user = make_user()
         self.society = make_society()
@@ -72,6 +78,7 @@ class GetSyncedSocietyEventsTest(TestCase):
 
 
 class SerializeEventTest(TestCase):
+    """Tests for serialize event."""
     def setUp(self):
         self.user = make_user()
         self.society = make_society()
@@ -115,6 +122,7 @@ class SerializeEventTest(TestCase):
 
 
 class ShouldContinueTest(TestCase):
+    """Tests for should continue."""
     def test_stops_when_current_exceeds_end(self):
         from studyFlax.views.calendar.society_sync_service import should_continue
         now = timezone.now()
@@ -139,6 +147,7 @@ class ShouldContinueTest(TestCase):
 
 
 class IsInRangeTest(TestCase):
+    """Tests for is in range."""
     def test_event_fully_in_range(self):
         from studyFlax.views.calendar.society_sync_service import is_in_range
         now = timezone.now()
@@ -173,6 +182,7 @@ class IsInRangeTest(TestCase):
 
 
 class GetNextOccurrenceTest(TestCase):
+    """Tests for get next occurrence."""
     def setUp(self):
         self.base = datetime(2026, 3, 1, 10, 0, tzinfo=dt_timezone.utc)
 
@@ -209,6 +219,7 @@ class GetNextOccurrenceTest(TestCase):
 
 
 class AddMonthTest(TestCase):
+    """Tests for add month."""
     def test_normal_month(self):
         from studyFlax.views.calendar.society_sync_service import add_month
         dt = datetime(2026, 1, 15, tzinfo=dt_timezone.utc)
@@ -231,6 +242,7 @@ class AddMonthTest(TestCase):
 
 
 class AddYearTest(TestCase):
+    """Tests for add year."""
     def test_normal_year(self):
         from studyFlax.views.calendar.society_sync_service import add_year
         dt = datetime(2026, 3, 1, tzinfo=dt_timezone.utc)
@@ -239,13 +251,14 @@ class AddYearTest(TestCase):
 
     def test_leap_day_handled(self):
         from studyFlax.views.calendar.society_sync_service import add_year
-        dt = datetime(2024, 2, 29, tzinfo=dt_timezone.utc)  # leap day
+        dt = datetime(2024, 2, 29, tzinfo=dt_timezone.utc)
         result = add_year(dt)
         self.assertEqual(result.year, 2025)
-        self.assertEqual(result.day, 28)  # clamped
+        self.assertEqual(result.day, 28)
 
 
 class ExpandRecurringTest(TestCase):
+    """Tests for expand recurring."""
     def setUp(self):
         self.user = make_user()
         self.society = make_society()
@@ -290,6 +303,7 @@ class ExpandRecurringTest(TestCase):
 
 
 class ExpandAndSerializeTest(TestCase):
+    """Tests for expand and serialize."""
     def setUp(self):
         self.user = make_user()
         self.society = make_society()

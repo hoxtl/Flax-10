@@ -1,3 +1,7 @@
+"""
+Backend tests for society views.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -24,6 +28,7 @@ def make_member(user, society):
 
 
 class SocietyListViewTest(TestCase):
+    """Tests for society list view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -49,6 +54,7 @@ class SocietyListViewTest(TestCase):
 
 
 class SocietyDetailViewTest(TestCase):
+    """Tests for society detail view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -92,6 +98,7 @@ class SocietyDetailViewTest(TestCase):
 
 
 class MembershipViewTest(TestCase):
+    """Tests for membership view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -159,6 +166,7 @@ class MembershipViewTest(TestCase):
 
 
 class ReportSocietyViewTest(TestCase):
+    """Tests for report society view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='reporter', email='r@test.com', password='pass')
@@ -203,6 +211,7 @@ class ReportSocietyViewTest(TestCase):
 
 
 class ToggleSubscriptionViewTest(TestCase):
+    """Tests for toggle subscription view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='subuser', email='sub@test.com', password='pass')
@@ -243,6 +252,7 @@ class ToggleSubscriptionViewTest(TestCase):
 
 
 class SocietyEventViewTest(TestCase):
+    """Tests for society event view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -299,6 +309,7 @@ class SocietyEventViewTest(TestCase):
 
 
 class SocietyTagViewExtendedTest(TestCase):
+    """Tests for society tag view extended."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='stag_admin', email='stag_admin@e.com', password='pass')
@@ -356,6 +367,7 @@ class SocietyTagViewExtendedTest(TestCase):
 
 
 class SocietySerializerEdgeCaseTest(TestCase):
+    """Tests for society serializer edge case."""
     def test_profile_photo_url_with_request_and_photo(self):
         from unittest.mock import MagicMock, PropertyMock, patch
         from rest_framework.test import APIRequestFactory
@@ -386,6 +398,7 @@ class SocietySerializerEdgeCaseTest(TestCase):
 
 
 class SocietyAnnouncementViewTest(TestCase):
+    """Tests for society announcement view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -427,6 +440,7 @@ class SocietyAnnouncementViewTest(TestCase):
 
 
 class SocietyTagViewTest(TestCase):
+    """Tests for society tag view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -460,6 +474,7 @@ class SocietyTagViewTest(TestCase):
 
 
 class RatificationViewTest(TestCase):
+    """Tests for ratification view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -513,6 +528,7 @@ class RatificationViewTest(TestCase):
 
 
 class CalendarSyncViewTest(TestCase):
+    """Tests for calendar sync view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='user', email='user@example.com', password='pass')
@@ -548,6 +564,7 @@ class CalendarSyncViewTest(TestCase):
 
 
 class PublishChangesViewTest(TestCase):
+    """Tests for publish changes view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')

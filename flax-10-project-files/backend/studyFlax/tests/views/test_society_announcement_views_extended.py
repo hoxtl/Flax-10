@@ -1,3 +1,7 @@
+"""
+Backend tests for society announcement views extended.
+"""
+
 from datetime import timedelta
 
 from django.test import TestCase
@@ -31,6 +35,7 @@ def make_announcement(society, title='Announcement', content='Content'):
 
 
 class AnnouncementCreateExtendedTest(TestCase):
+    """Tests for announcement create extended."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='ann_admin', email='annadmin@e.com', password='pass')
@@ -84,6 +89,7 @@ class AnnouncementCreateExtendedTest(TestCase):
 
 
 class AnnouncementDetailExtendedTest(TestCase):
+    """Tests for announcement detail extended."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='anndet_admin', email='anndetadmin@e.com', password='pass')
@@ -120,7 +126,6 @@ class AnnouncementDetailExtendedTest(TestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Old image deleted, new one added
         images = SocietyAnnouncementImage.objects.filter(announcement=self.ann)
         self.assertEqual(images.count(), 1)
         self.assertEqual(images.first().url, 'http://new.jpg')
@@ -167,7 +172,6 @@ class AnnouncementDetailExtendedTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_society_invalid_data(self):
-        """Test that invalid data for society update returns 400."""
         response = self.client.patch(
             f'/api/societies/{self.society.id}/',
             {'name': ''},

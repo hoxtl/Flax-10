@@ -1,3 +1,7 @@
+"""
+Backend tests for profile summary view.
+"""
+
 import random
 import uuid
 from django.test import TestCase
@@ -27,6 +31,7 @@ def make_session(user, duration=60, status_val='Completed', hours_ago=2):
 
 
 class ProfileSummaryViewTest(TestCase):
+    """Tests for profile summary view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -112,7 +117,6 @@ class ProfileSummaryViewTest(TestCase):
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
     def test_society_image_direct_field(self):
-        """get_society_image returns society.image when set directly."""
         society = Society.objects.create(
             name='DirectImg', bio='b', admin_emails='a@b.com',
             image='http://example.com/direct.jpg'
@@ -124,7 +128,6 @@ class ProfileSummaryViewTest(TestCase):
         self.assertEqual(society_data['image'], 'http://example.com/direct.jpg')
 
     def test_society_image_fallback_via_society_image(self):
-        """get_society_image falls back to the first SocietyImage URL when society.image is blank."""
         society = Society.objects.create(name='FallbackImg', bio='b', admin_emails='a@b.com')
         SocietyMembership.objects.create(user=self.user, society=society, role='member')
         SocietyImage.objects.create(society=society, url='http://example.com/img.jpg')
@@ -134,7 +137,6 @@ class ProfileSummaryViewTest(TestCase):
         self.assertEqual(society_data['image'], 'http://example.com/img.jpg')
 
     def test_society_image_none_when_no_images(self):
-        """get_society_image returns None when society has no image at all."""
         society = Society.objects.create(name='NoImg', bio='b', admin_emails='a@b.com')
         SocietyMembership.objects.create(user=self.user, society=society, role='member')
         response = self.client.get('/api/profile/summary/')

@@ -1,3 +1,7 @@
+"""
+Backend tests for task views.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -29,6 +33,7 @@ def make_task(user, title='Test Task', task_list=None, priority='medium',
 
 
 class TaskListListViewTest(TestCase):
+    """Tests for task list list view."""
     def setUp(self):
         self.client = APIClient()
         self.user = make_user()
@@ -82,6 +87,7 @@ class TaskListListViewTest(TestCase):
 
 
 class TaskListDetailViewTest(TestCase):
+    """Tests for task list detail view."""
     def setUp(self):
         self.client = APIClient()
         self.user = make_user()
@@ -137,6 +143,7 @@ class TaskListDetailViewTest(TestCase):
 
 
 class TaskListViewTest(TestCase):
+    """Tests for task list view."""
     def setUp(self):
         self.client = APIClient()
         self.user = make_user()
@@ -222,6 +229,7 @@ class TaskListViewTest(TestCase):
 
 
 class TaskDetailViewTest(TestCase):
+    """Tests for task detail view."""
     def setUp(self):
         self.client = APIClient()
         self.user = make_user()
@@ -298,6 +306,7 @@ class TaskDetailViewTest(TestCase):
 
 
 class TaskSerializerTest(TestCase):
+    """Tests for task serializer."""
     def setUp(self):
         self.user = make_user('taskser_user', 'taskser@e.com')
 
@@ -338,6 +347,7 @@ class TaskSerializerTest(TestCase):
 
 
 class LogTaskTimeViewTest(TestCase):
+    """Tests for log task time view."""
     def setUp(self):
         self.client = APIClient()
         self.user = make_user()
@@ -366,5 +376,4 @@ class LogTaskTimeViewTest(TestCase):
         response = self.client.post(f'/api/tasks/{self.task.id}/log-time/', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['time_spent_minutes'], 0)
-
 

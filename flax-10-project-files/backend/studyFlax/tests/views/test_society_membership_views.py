@@ -1,4 +1,6 @@
-"""Tests for society membership view error branches."""
+"""
+Tests for society membership view error branches.
+"""
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model

@@ -1,4 +1,6 @@
-"""Extended tests for task view helper functions."""
+"""
+Extended tests for task view helper functions.
+"""
 
 from datetime import timedelta
 

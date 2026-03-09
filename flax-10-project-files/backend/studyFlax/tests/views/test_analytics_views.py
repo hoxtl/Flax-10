@@ -1,4 +1,6 @@
-"""Tests for analytics views including session summaries, progress, theme stats, and AI insight endpoints."""
+"""
+Tests for analytics views including session summaries, progress, theme stats, and AI insight endpoints.
+"""
 
 import random
 import uuid
@@ -16,7 +18,6 @@ User = get_user_model()
 
 
 def make_session(user, duration=60, break_duration=10, pause_duration=0, status_val='Completed', hours_ago=1):
-    """Create and return a StudySession for the given user with configurable duration and timing."""
     end = timezone.now() - timedelta(hours=hours_ago)
     start = end - timedelta(minutes=duration)
     return StudySession.objects.create(
@@ -215,7 +216,6 @@ class AIViewsTest(TestCase):
         self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_503_SERVICE_UNAVAILABLE, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
     def test_build_user_context_with_non_consecutive_sessions(self):
-        """Test _build_user_context streak logic with a gap in session dates."""
         from studyFlax.views.analytics.ai_views import _build_user_context
         make_session(self.user, duration=60, break_duration=10, hours_ago=5 * 24)
         make_session(self.user, duration=60, break_duration=10, hours_ago=3 * 24)
@@ -223,7 +223,6 @@ class AIViewsTest(TestCase):
         self.assertIsInstance(context, str)
 
     def test_build_user_context_streak_reset_when_no_recent_session(self):
-        """Test _build_user_context streak is reset when last session is old."""
         from studyFlax.views.analytics.ai_views import _build_user_context
         make_session(self.user, duration=60, break_duration=0, hours_ago=48)
         make_session(self.user, duration=60, break_duration=0, hours_ago=72)
