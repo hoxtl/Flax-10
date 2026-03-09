@@ -103,6 +103,7 @@ def create_event(request):
         else:
             event.location = location
             event.location_validated = False
+        event.save()
 
     response_data = CalendarEventSerialiser(event).data
     response_data['has_overlap'] = overlap
