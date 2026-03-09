@@ -91,6 +91,9 @@ def create_event(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     overlap = check_event_overlap(request.user, serialiser.validated_data)
     event = serialiser.save(user=request.user)
+
+    location = request.data.get('location')
+
     response_data = CalendarEventSerialiser(event).data
     response_data['has_overlap'] = overlap
     return Response(response_data, status=status.HTTP_201_CREATED)
