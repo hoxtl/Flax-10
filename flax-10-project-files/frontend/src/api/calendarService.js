@@ -1,0 +1,6 @@
+const API_BASE = 'http://localhost:8000/api';
+
+function authHeaders(extra = {}) {
+    const token = localStorage.getItem('token');
+    return { 'Authorization': `Token ${token}`, 'Content-Type': 'application/json', ...extra };
+}
