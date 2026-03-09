@@ -9,6 +9,12 @@ import SearchBar from '../common/SearchBar/SearchBar';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
 const styles = { ...socialStyles, ...searchStyles };
 
+function handleErr(label, error, setter) {
+    // Keep the search UI resilient even if the filter sources fail.
+    console.error(label, error);
+    setter([]);
+}
+
 async function fetchUserResults(query, mods, socs, setRes, setL) {
     if (!query.trim() && !mods.trim() && !socs.trim()) return setRes([]);
     setL(true);
@@ -249,7 +255,7 @@ export const useFilterState = (allModules, allSocieties, query, isSearchFocused,
     const [filterQuery, setFilterQuery] = useState('');
     const togMod = (c) => setSelectedModules(p => toggleArr(p, c)), togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
     useUserSearchEffects(query, selectedModules, selectedSocieties, setUserResults, setLoading);
-    const active = isSearchFocused && (query.trim() || selectedModules.length > 0 || selectedSocieties.length > 0);
+    const active = isSearchFocused;
     useDropdownPosition(containerRef, userResults, setDropdownPos, active);
     const props = { activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery, moduleResults: filterObj(allModules, filterQuery, ['module_code', 'module_name']), selectedModules, toggleModule: togMod, societyResults: filterObj(allSocieties, filterQuery, ['name']), selectedSocieties, toggleSociety: togSoc };
     return { isFilterOpen, setIsFilterOpen, active, props };

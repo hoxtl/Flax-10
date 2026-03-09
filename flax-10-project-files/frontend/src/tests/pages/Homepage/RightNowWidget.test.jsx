@@ -1,0 +1,184 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+
+vi.mock('framer-motion', () => ({
+    motion: new Proxy({}, {
+        get: (_, tag) => ({ children, ...props }) => {
+            const Tag = typeof tag === 'string' ? tag : 'div';
+            const { initial, animate, transition, layout, ...rest } = props;
+            return <Tag {...rest}>{children}</Tag>;
+        },
+    }),
+    AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
+vi.mock('../../../pages/Homepage/hooks/useCountdown', () => ({
+    useCountdown: vi.fn(() => ({ text: '5m' })),
+}));
+
+vi.mock('../../../pages/Homepage/utils/kclTflMapping', () => ({
+    getRelevantDelays: vi.fn(() => []),
+    getTflLinesForLocation: vi.fn(() => []),
+    isSevereDisruption: vi.fn(() => false),
+}));
+
+vi.mock('../../../pages/Homepage/utils/eventUtils', () => ({
+    isNow: vi.fn(() => false),
+}));
+
+import { RightNowWidget } from '../../../pages/Homepage/components/RightNowWidget';
+
+const baseNow = new Date('2024-03-08T14:00:00Z');
+
+function renderWidget(props = {}) {
+    return render(
+        <RightNowWidget
+            now={baseNow}
+            isToday={true}
+            sortedEvents={[]}
+            tflDelays={[]}
+            {...props}
+        />
+    );
+}
+
+describe('RightNowWidget', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('renders "Right Now" header', () => {
+        renderWidget();
+        expect(screen.getByText('Right Now')).toBeTruthy();
+    });
+
+    it('shows "Nothing on right now" when no current event', () => {
+        // Use a past event so eventCount > 0, skipping the "empty day" branch
+        const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
+        renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
+        expect(screen.getByText('Nothing on right now')).toBeTruthy();
+    });
+
+    it('shows "No more events today" when no next event', () => {
+        const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
+        renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
+        expect(screen.getByText('No more events today')).toBeTruthy();
+    });
+
+    it('shows next event title and time', () => {
+        const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
+        renderWidget({
+            isToday: true,
+            sortedEvents: [{ title: 'Lecture', start_time: futureTime }],
+        });
+        expect(screen.getByText('Lecture')).toBeTruthy();
+    });
+
+    it('renders timer session view when hasTimerSession is true', () => {
+        renderWidget({
+            hasTimerSession: true,
+            timerMode: 'work',
+            timeLeft: 1200,
+            workTime: 25,
+            breakTime: 5,
+            timerTask: 'Study JS',
+            onOpenTimer: vi.fn(),
+        });
+        expect(screen.getByText(/FOCUS/)).toBeTruthy();
+        expect(screen.getByText('Open timer →')).toBeTruthy();
+    });
+
+    it('calls onOpenTimer when Open timer button is clicked', () => {
+        const onOpenTimer = vi.fn();
+        renderWidget({
+            hasTimerSession: true,
+            timerMode: 'work',
+            timeLeft: 600,
+            workTime: 25,
+            onOpenTimer,
+        });
+        fireEvent.click(screen.getByText('Open timer →'));
+        expect(onOpenTimer).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders break mode in timer session', () => {
+        renderWidget({
+            hasTimerSession: true,
+            timerMode: 'break',
+            timeLeft: 300,
+            breakTime: 5,
+        });
+        expect(screen.getByText(/BREAK/)).toBeTruthy();
+    });
+
+    it('renders non-today view with first event', () => {
+        renderWidget({
+            isToday: false,
+            sortedEvents: [{ title: 'Seminar', start_time: '2024-03-09T10:00:00Z' }],
+        });
+        expect(screen.getByText('Seminar')).toBeTruthy();
+    });
+
+    it('renders non-today empty state', () => {
+        renderWidget({ isToday: false, sortedEvents: [] });
+        expect(screen.getByText('No events for this day.')).toBeTruthy();
+    });
+
+    it('renders end of day state', () => {
+        renderWidget({
+            isToday: true,
+            navigatorContext: { state: 'endOfDay', overlaps: [] },
+            sortedEvents: [],
+        });
+        expect(screen.getByText(/Day complete/)).toBeTruthy();
+    });
+
+    it('renders empty day when no events today', () => {
+        renderWidget({
+            isToday: true,
+            sortedEvents: [],
+            navigatorContext: {},
+        });
+        expect(screen.getByText('Nothing planned today')).toBeTruthy();
+    });
+
+    it('renders conflict summary when conflicts present', () => {
+        const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
+        renderWidget({
+            isToday: true,
+            navigatorContext: {
+                overlaps: [{ a: { start_time: futureTime }, b: { start_time: futureTime } }],
+            },
+            sortedEvents: [
+                { title: 'Event A', start_time: futureTime },
+                { title: 'Event B', start_time: futureTime },
+            ],
+        });
+        expect(screen.getByText(/overlap/i)).toBeTruthy();
+    });
+
+    it('dismisses conflict alert', () => {
+        const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
+        renderWidget({
+            isToday: true,
+            navigatorContext: {
+                overlaps: [{ a: { start_time: futureTime }, b: {} }],
+            },
+            sortedEvents: [{ title: 'E', start_time: futureTime }],
+        });
+        const dismissBtn = screen.getByLabelText('Dismiss warning');
+        fireEvent.click(dismissBtn);
+        expect(screen.queryByLabelText('Dismiss warning')).toBeNull();
+    });
+
+    it('shows end of day with tomorrow event', () => {
+        renderWidget({
+            isToday: true,
+            navigatorContext: { state: 'endOfDay', overlaps: [] },
+            sortedEvents: [],
+            tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
+        });
+        expect(screen.getByText('TOMORROW')).toBeTruthy();
+        expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
+    });
+});

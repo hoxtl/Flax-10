@@ -47,7 +47,7 @@ describe('TimetableImportModal', () => {
 
     it('shows error when submitting empty URL', async () => {
         render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.submit(screen.getByRole('form') ?? document.querySelector('form'));
+        fireEvent.submit(document.querySelector('form'));
         await waitFor(() => {
             expect(screen.getByText('Please enter a URL')).toBeTruthy();
         });

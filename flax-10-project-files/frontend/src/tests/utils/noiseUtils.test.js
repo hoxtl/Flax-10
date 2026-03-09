@@ -85,4 +85,43 @@ describe('NoiseGenerator', () => {
         expect(mockNode.disconnect).toHaveBeenCalled();
         expect(noiseGenerator.node).toBeNull();
     });
+
+    it('returns null for unknown noise type', () => {
+        noiseGenerator.init();
+        const node = noiseGenerator.getNoiseNode('unknown');
+        expect(node).toBeNull();
+    });
+
+    it('processes white noise via onaudioprocess callback', () => {
+        noiseGenerator.play('white');
+        const output = new Float32Array(4096);
+        const mockBuffer = { getChannelData: vi.fn(() => output) };
+        mockNode.onaudioprocess({ outputBuffer: mockBuffer });
+        expect(mockBuffer.getChannelData).toHaveBeenCalledWith(0);
+        // Output should have been modified
+        const hasNonZero = Array.from(output).some(v => v !== 0);
+        expect(hasNonZero).toBe(true);
+    });
+
+    it('processes pink noise via onaudioprocess callback', () => {
+        noiseGenerator.play('pink');
+        const output = new Float32Array(4096);
+        const mockBuffer = { getChannelData: vi.fn(() => output) };
+        mockNode.onaudioprocess({ outputBuffer: mockBuffer });
+        expect(mockBuffer.getChannelData).toHaveBeenCalledWith(0);
+    });
+
+    it('processes brown noise via onaudioprocess callback', () => {
+        noiseGenerator.play('brown');
+        const output = new Float32Array(4096);
+        const mockBuffer = { getChannelData: vi.fn(() => output) };
+        mockNode.onaudioprocess({ outputBuffer: mockBuffer });
+        expect(mockBuffer.getChannelData).toHaveBeenCalledWith(0);
+    });
+
+    it('resumes suspended AudioContext on play', () => {
+        mockContext.state = 'suspended';
+        noiseGenerator.play('white');
+        expect(mockContext.resume).toHaveBeenCalled();
+    });
 });

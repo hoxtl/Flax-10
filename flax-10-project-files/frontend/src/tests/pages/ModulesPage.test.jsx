@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { getDepartments } from '../../components/Modules/utils/moduleUtils';
 
 const mockHook = {
@@ -61,33 +62,33 @@ describe('ModulesPage', () => {
     it('should render the loading state', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
         mockHook.loading = true;
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.getByText(/loading modules/i)).toBeInTheDocument();
     });
 
     it('should render the empty state when no modules', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.getByText(/no modules found/i)).toBeInTheDocument();
     });
 
     it('should render module grid when modules exist', async () => {
         mockHook.modules = [{ id: 1, module_code: '5CCS2SEG', module_name: 'Intro' }];
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.getByText('ModuleGrid')).toBeInTheDocument();
     });
 
     it('should render create button if user is teacher', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.getByText('+ Create Module')).toBeInTheDocument();
     });
 
     it('should open modal when Manage Deadlines is clicked', async () => {
         mockHook.modules = [{ id: 1, module_code: '5CCS2SEG', module_name: 'Intro' }];
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         fireEvent.click(screen.getByText('Manage Deadlines'));
         expect(screen.getByText('CloseModal')).toBeInTheDocument();
     });
@@ -95,7 +96,7 @@ describe('ModulesPage', () => {
     it('should close deadline modal when onClose called', async () => {
         mockHook.modules = [{ id: 1, module_code: '5CCS2SEG', module_name: 'Intro' }];
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         fireEvent.click(screen.getByText('Manage Deadlines'));
         fireEvent.click(screen.getByText('CloseModal'));
         expect(screen.queryByText('CloseModal')).not.toBeInTheDocument();
@@ -103,7 +104,7 @@ describe('ModulesPage', () => {
 
     it('should filter modules by search query', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         const input = screen.getByPlaceholderText(/search/i);
         fireEvent.change(input, { target: { value: 'CS' } });
         expect(input.value).toBe('CS');
@@ -111,14 +112,14 @@ describe('ModulesPage', () => {
 
     it('should open form when create clicked', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         fireEvent.click(screen.getByText('+ Create Module'));
         expect(screen.getByText('ModuleForm')).toBeInTheDocument();
     });
 
     it('should close form when cancel clicked', async () => {
         const { default: ModulesPage } = await import('../../pages/Modules/ModulesPage');
-        render(<ModulesPage />);
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         fireEvent.click(screen.getByText('+ Create Module'));
         fireEvent.click(screen.getByText('Cancel'));
         expect(screen.queryByText('ModuleForm')).not.toBeInTheDocument();

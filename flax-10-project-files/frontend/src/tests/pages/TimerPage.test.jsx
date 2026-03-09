@@ -7,6 +7,15 @@ vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
 
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
+    useNotify: () => vi.fn(),
+}));
+
+vi.mock('react-router-dom', () => ({
+    useLocation: () => ({ pathname: '/timer', state: null }),
+    useNavigate: () => vi.fn(),
+}));
+
 const setupTests = () => {
     vi.useFakeTimers();
     helpers.mockNotifications();
@@ -32,7 +41,7 @@ const testStartStop = () => {
     helpers.advanceTimer(1000);
     helpers.expectTimer('24:59');
     helpers.clickPause();
-    helpers.expectButton('Start');
+    helpers.expectButton('Resume');
 };
 
 const testReset = () => {
