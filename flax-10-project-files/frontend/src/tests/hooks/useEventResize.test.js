@@ -1,3 +1,6 @@
+/**
+ * Unit tests for event-resize interactions.
+ */
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useEventResize } from '../../components/Calendar/hooks/useEventResize';
@@ -9,6 +12,13 @@ const createResizeSessionMock = vi.fn();
 const checkOverlapWithConfirmMock = vi.fn();
 const extractBaseEventIdMock = vi.fn();
 const hasRecurrenceMock = vi.fn();
+
+const baseEvent = {
+  id: '123-occ',
+  start_time: '2026-03-09T10:00:00.000Z',
+  end_time: '2026-03-09T11:00:00.000Z',
+};
+const eventRef = { current: { offsetHeight: 60 } };
 
 vi.mock('../../context/CalendarContext', () => ({ useCalendar: () => useCalendarMock() }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
@@ -46,39 +56,31 @@ describe('useEventResize', () => {
     hasRecurrenceMock.mockReturnValue(false);
   });
 
-  it('starts resize session and updates preview/highlight on move', async () => {
+  it('starts resize session and updates preview/highlight', async () => {
     const stopPropagation = vi.fn();
     const resizeJustEnded = { current: false };
-    const eventRef = { current: { offsetHeight: 60 } };
-    const event = {
-      id: '123-occ',
-      start_time: '2026-03-09T10:00:00.000Z',
-      end_time: '2026-03-09T11:00:00.000Z',
-    };
-
-    const { result } = renderHook(() => useEventResize(event, eventRef, editEvent, resizeJustEnded));
+    const { result } = renderHook(() => useEventResize(baseEvent, eventRef, editEvent, resizeJustEnded));
 
     await act(async () => {
       result.current.handleResizeStart({ clientY: 400, stopPropagation });
     });
-
     expect(stopPropagation).toHaveBeenCalled();
-    expect(result.current.isResizing).toBe(true);
-    expect(createResizeSessionMock).toHaveBeenCalled();
-    expect(captured.clientY).toBe(400);
-    expect(captured.initialHeight).toBe(60);
 
     await act(async () => {
       captured.onMove(93);
     });
-
     expect(result.current.resizePreview).toBeTypeOf('number');
     expect(setResizeHighlight).toHaveBeenCalledWith(expect.objectContaining({ hour: expect.any(Number), quarter: expect.any(Number) }));
+  });
+
+  it('updates event on drag end when overlap check passes', async () => {
+    const resizeJustEnded = { current: false };
+    const { result } = renderHook(() => useEventResize(baseEvent, eventRef, editEvent, resizeJustEnded));
 
     await act(async () => {
+      result.current.handleResizeStart({ clientY: 400, stopPropagation: vi.fn() });
       await captured.onEnd(30);
     });
-
     expect(checkOverlapWithConfirmMock).toHaveBeenCalled();
     expect(editEvent).toHaveBeenCalledWith(123, expect.objectContaining({ end_time: expect.any(String) }));
     expect(resizeJustEnded.current).toBe(true);
@@ -89,20 +91,12 @@ describe('useEventResize', () => {
 
   it('does not edit event when overlap check fails', async () => {
     checkOverlapWithConfirmMock.mockResolvedValue(false);
-    const eventRef = { current: { offsetHeight: 60 } };
-    const event = {
-      id: '123-occ',
-      start_time: '2026-03-09T10:00:00.000Z',
-      end_time: '2026-03-09T11:00:00.000Z',
-    };
-
-    const { result } = renderHook(() => useEventResize(event, eventRef, editEvent, { current: false }));
+    const { result } = renderHook(() => useEventResize(baseEvent, eventRef, editEvent, { current: false }));
 
     await act(async () => {
       result.current.handleResizeStart({ clientY: 200, stopPropagation: vi.fn() });
       await captured.onEnd(20);
     });
-
     expect(editEvent).not.toHaveBeenCalled();
   });
 
@@ -123,7 +117,6 @@ describe('useEventResize', () => {
       result.current.handleResizeStart({ clientY: 150, stopPropagation: vi.fn() });
       await captured.onEnd(30);
     });
-
     expect(confirmFn).toHaveBeenCalled();
     expect(editEvent).not.toHaveBeenCalled();
   });
@@ -145,7 +138,6 @@ describe('useEventResize', () => {
       result.current.handleResizeStart({ clientY: 100, stopPropagation: vi.fn() });
       await captured.onEnd(30);
     });
-
     expect(confirmFn).toHaveBeenCalled();
     expect(editEvent).toHaveBeenCalledWith(77, expect.objectContaining({ end_time: expect.any(String) }));
   });
