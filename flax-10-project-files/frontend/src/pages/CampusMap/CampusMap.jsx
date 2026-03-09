@@ -399,7 +399,9 @@ export default function CampusMap() {
 
   // Display calendar event markers on the map
   useEffect(() => {
-    
+    if (!mapLoaded || calendarEvents.length === 0) return;
+    eventMarkers.current.forEach(marker => marker.remove());
+    eventMarkers.current = [];
   })
 
   // Update the marker on the map when user's start location changes
