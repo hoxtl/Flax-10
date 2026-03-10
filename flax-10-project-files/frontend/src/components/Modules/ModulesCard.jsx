@@ -16,7 +16,7 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
         <article className={getCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
-            <CardBody module={module} enrolled={enrolled} isTeacher={isTeacher}
+            <CardBody module={module} enrolled={enrolled} isTeacher={isTeacher} isCore={isCore}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
