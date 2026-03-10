@@ -17,7 +17,7 @@ import {
   ThisWeek,
   BadgesSection,
   SocietiesSection,
-  ModulesSection
+  ModulesSection,
 } from "./components/ProfileWidgets";
 
 function Skeleton() {
