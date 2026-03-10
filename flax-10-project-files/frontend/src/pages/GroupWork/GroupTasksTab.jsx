@@ -300,14 +300,34 @@ export default function GroupTasksTab({ projectId, members }) {
     const updateTask = async (taskId, patchData) => {
         // Optimistic update
         setTasks((prev) =>
-            prev.map((t) => (t.id === taskId ? { ...t, ...patchData } : t))
+            prev.map((t) => {
+                if (t.id !== taskId) return t;
+                const next = { ...t, ...patchData };
+
+                // If we are updating assigned_to (the IDs), we must also update 
+                // assignees_info (the objects with names) for the UI to update immediately.
+                if (patchData.assigned_to) {
+                    next.assignees_info = patchData.assigned_to.map(uid => {
+                        const m = members.find(mem => mem.user === uid);
+                        return { id: uid, name: m ? m.user_name : "Unknown" };
+                    });
+                }
+
+                return next;
+            })
         );
 
-        await fetch(`/api/tasks/${taskId}/`, {
+        const res = await fetch(`/api/tasks/${taskId}/`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json", ...getAuthHeaders() },
             body: JSON.stringify(patchData),
         });
+
+        if (res.ok) {
+            const updated = await res.json();
+            // Sync with actual server response to ensure everything is correct
+            setTasks((prev) => prev.map((t) => (t.id === taskId ? updated : t)));
+        }
     };
 
     const toggleTask = (taskId, completed) => {
