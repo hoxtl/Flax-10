@@ -41,11 +41,14 @@
 
 .headerLabel {
   font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.875rem; /* text-sm */
+  font-size: 0.875rem;
+  /* text-sm */
   font-weight: 500;
-  letter-spacing: 0.1em; /* tracking-widest */
+  letter-spacing: 0.1em;
+  /* tracking-widest */
   text-transform: uppercase;
-  color: var(--color-primary); /* text-stone-400 */
+  color: var(--color-primary);
+  /* text-stone-400 */
 }
 
 .headerDateRow {
@@ -55,7 +58,8 @@
 }
 
 .headerDateIcon {
-  color: var(--color-primary); /* match stone-400 */
+  color: var(--color-primary);
+  /* match stone-400 */
   flex-shrink: 0;
 }
 
@@ -165,6 +169,7 @@
   gap: 5px;
   margin-bottom: 10px;
 }
+
 .intRowAlertsContainer:has(> *) {
   background: rgba(196, 154, 75, 0.08);
   border-left: 3px solid var(--warning-text);
@@ -211,7 +216,10 @@
   border-radius: 4px;
   transition: color 0.12s;
 }
-.intRowAlertDismiss:hover { color: var(--warning-text); }
+
+.intRowAlertDismiss:hover {
+  color: var(--warning-text);
+}
 
 .intRowAlertOverflow {
   font-size: 0.69rem;
@@ -252,17 +260,24 @@
   border-color: rgba(220, 38, 38, 0.25);
   background: rgba(254, 226, 226, 0.6);
 }
+
 .statusStripConflict .statusStripDot {
   background: var(--error-text);
   animation: stripConflictGlow 1.6s ease-in-out infinite;
 }
-.statusStripConflict .statusStripText { color: var(--error-text); }
+
+.statusStripConflict .statusStripText {
+  color: var(--error-text);
+}
 
 @keyframes stripConflictGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
   }
+
   50% {
     opacity: 0.9;
     box-shadow: 0 0 0 5px rgba(220, 38, 38, 0);
@@ -349,7 +364,10 @@
   transition: color 0.15s;
   margin-top: 1px;
 }
-.tflCardDismiss:hover { color: var(--warning-text); }
+
+.tflCardDismiss:hover {
+  color: var(--warning-text);
+}
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
@@ -374,35 +392,64 @@
   transition: color 0.15s;
   line-height: 1;
 }
-.statusStripPillDismiss:hover { color: var(--warning-text); }
+
+.statusStripPillDismiss:hover {
+  color: var(--warning-text);
+}
 
 /* Gap variant — sage green */
 .statusStripGap {
   border-color: rgba(22, 163, 74, 0.25);
   background: rgba(220, 252, 231, 0.6);
 }
-.statusStripGap .statusStripDot { background: var(--status-sage); }
-.statusStripGap .statusStripText { color: var(--status-sage); }
+
+.statusStripGap .statusStripDot {
+  background: var(--status-sage);
+}
+
+.statusStripGap .statusStripText {
+  color: var(--status-sage);
+}
 
 /* Active task variant — warm brown */
 .statusStripTask {
   border-color: rgba(120, 113, 108, 0.2);
   background: rgba(250, 250, 249, 0.8);
 }
+
 .statusStripTask .statusStripDot {
   background: var(--color-primary);
   animation: stripPulse 2s ease-in-out infinite;
 }
-.statusStripTask .statusStripText { color: var(--text); }
+
+.statusStripTask .statusStripText {
+  color: var(--text);
+}
 
 @keyframes stripPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes intRowPulseTerracotta {
-  0%, 100% { opacity: 0.9; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
 .headerSubtitle {
@@ -428,18 +475,41 @@
   }
 }
 
-/* Row 1: Right Now (left) | Today's Tasks (right) — equal height */
-.span5 { grid-column: 1; grid-row: 1; }
-.span1 { grid-column: 2; grid-row: 1; }
-/* Row 2: Deadlines (left) | Focus Windows (right) — equal height */
-.span3 { grid-column: 1; grid-row: 2; }
-.span4 { grid-column: 2; grid-row: 2; }
+/* Auto-flowing generic grid span classes for drag and drop */
+.span1 {
+  grid-column: span 1;
+}
+
+.span2 {
+  grid-column: span 2;
+}
+
+.span3 {
+  grid-column: span 3;
+}
+
+@media (max-width: 1023px) {
+  .span2 {
+    grid-column: span 1;
+  }
+
+  .span3 {
+    grid-column: span 1;
+  }
+}
 
 @media (max-width: 767px) {
-  .span5 { grid-column: 1 / -1; grid-row: 1; }
-  .span1 { grid-column: 1 / -1; grid-row: 2; }
-  .span3 { grid-column: 1 / -1; grid-row: 3; }
-  .span4 { grid-column: 1 / -1; grid-row: 4; }
+  .span1 {
+    grid-column: 1 / -1;
+  }
+
+  .span2 {
+    grid-column: 1 / -1;
+  }
+
+  .span3 {
+    grid-column: 1 / -1;
+  }
 }
 
 .bentoSlot {
@@ -464,6 +534,7 @@
 .bentoSlotVariantRightNow {
   background: var(--color-card);
 }
+
 .bentoSlotVariantRightNow .bentoIcon {
   color: var(--color-primary);
 }
@@ -471,6 +542,7 @@
 .bentoSlotVariantTasks {
   background: var(--color-card);
 }
+
 .bentoSlotVariantTasks .bentoIcon {
   color: var(--color-primary);
 }
@@ -478,6 +550,7 @@
 .bentoSlotVariantDeadlines {
   background: var(--color-card);
 }
+
 .bentoSlotVariantDeadlines .bentoIcon {
   color: var(--color-primary);
 }
@@ -485,6 +558,7 @@
 .bentoSlotVariantFocus {
   background: var(--color-card);
 }
+
 .bentoSlotVariantFocus .bentoIcon {
   color: var(--color-primary);
 }
@@ -494,18 +568,35 @@
 }
 
 @keyframes intRowCard {
-  0% { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.96); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 .bentoSlot.iconPulse .bentoIcon {
-  color: var(--error-text); /* soft red-600 for overdue pulse */
+  color: var(--error-text);
+  /* soft red-600 for overdue pulse */
   animation: intRowPulseTerracotta 2s ease-in-out infinite;
 }
 
 @keyframes intRowPulseTerracotta {
-  0%, 100% { opacity: 0.9; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
 .bentoGlow {
@@ -515,16 +606,12 @@
   border-radius: 1rem;
   opacity: 0;
   transition: opacity 0.3s;
-  mask-image: radial-gradient(
-    220px 220px at var(--x, 50%) var(--y, 50%),
-    black,
-    transparent
-  );
-  -webkit-mask-image: radial-gradient(
-    220px 220px at var(--x, 50%) var(--y, 50%),
-    black,
-    transparent
-  );
+  mask-image: radial-gradient(220px 220px at var(--x, 50%) var(--y, 50%),
+      black,
+      transparent);
+  -webkit-mask-image: radial-gradient(220px 220px at var(--x, 50%) var(--y, 50%),
+      black,
+      transparent);
 }
 
 .bentoSlot:hover .bentoGlow {
@@ -564,7 +651,8 @@
 }
 
 .bentoIconWrap.bentoIconOverdue .bentoIcon {
-  color: var(--error-text); /* soft red — urgency */
+  color: var(--error-text);
+  /* soft red — urgency */
 }
 
 .bentoIcon {
@@ -794,12 +882,33 @@
   color: var(--warning-text);
 }
 
-/* ── Bento grid positions (desktop 3-col layout) ─────────────────── */
+/* ── Bento grid spans (Flow layout rather than fixed pos) ─────────────────── */
 @media (min-width: 1024px) {
-  .posRightNow       { grid-column: 1;     grid-row: 1; align-self: start; }
-  .posTodaysTasks    { grid-column: 2 / 4; grid-row: 1;     }
-  .posQuickActions   { grid-column: 1;     grid-row: 2; margin-top: 0; align-self: start; }
-  .posStudyPulse     { grid-column: 2 / 4; grid-row: 2;     }
-  .posDeadlines      { grid-column: 1;     grid-row: 3; margin-top: 0; align-self: start; }
-  .posSocialDiscover { grid-column: 2 / 4; grid-row: 3;     }
+  .posRightNow {
+    grid-column: span 1;
+  }
+
+  .posTodaysTasks {
+    grid-column: span 2;
+  }
+
+  .posQuickActions {
+    grid-column: span 1;
+  }
+
+  .posSocialDiscover {
+    grid-column: span 1;
+  }
+
+  .posDeadlines {
+    grid-column: span 1;
+  }
+
+  .posStudyPulse {
+    grid-column: span 2;
+  }
+
+  .posImageWidget {
+    grid-column: span 1;
+  }
 }

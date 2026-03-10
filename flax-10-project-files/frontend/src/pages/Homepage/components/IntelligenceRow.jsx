@@ -9,6 +9,8 @@ import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { QuickActionsWidget } from "./QuickActionsWidget";
 import { SocialDiscoverWidget } from "./SocialDiscoverWidget";
 import { StudyPulseWidget } from "./StudyPulseWidget";
+import { Reorder } from "framer-motion";
+import { Settings, Check, Lock, GripHorizontal } from "lucide-react";
 
 function getGreeting(name) {
   const h = new Date().getHours();
@@ -42,9 +44,57 @@ export default function IntelligenceRow({
   studyPulseOnStartFocus,
   studyPulseDeadlines,
   slot5Data,
+  homepageWidgets = [],
+  isEditingDashboard,
+  setIsEditingDashboard,
+  saveWidgetLayout
 }) {
   const tflDelays = useTflDelays();
   const navigate = useNavigate();
+
+  const renderWidgetContent = (id) => {
+    switch (id) {
+      case "rightNow":
+        return (
+          <RightNowWidget
+            {...slot5Data}
+            tflDelays={tflDelays}
+            onOpenTimer={() => navigate("/timer")}
+          />
+        );
+      case "tasks":
+        return slot1TodayTasks;
+      case "quickActions":
+        return <QuickActionsWidget />;
+      case "socialDiscover":
+        return <SocialDiscoverWidget />;
+      case "deadlines":
+        return slot3Urgent;
+      case "studyPulse":
+        return (
+          <StudyPulseWidget
+            windows={studyPulseWindows ?? []}
+            now={studyPulseNow ?? new Date()}
+            onStartFocus={studyPulseOnStartFocus}
+            deadlines={studyPulseDeadlines ?? []}
+          />
+        );
+      default:
+        return null; // fallback for widgets removed or unavailable
+    }
+  };
+
+  const getWidgetStyleClass = (id) => {
+    switch (id) {
+      case "rightNow": return styles.posRightNow;
+      case "tasks": return styles.posTodaysTasks;
+      case "quickActions": return styles.posQuickActions;
+      case "socialDiscover": return styles.posSocialDiscover;
+      case "deadlines": return styles.posDeadlines;
+      case "studyPulse": return styles.posStudyPulse;
+      default: return "";
+    }
+  };
 
   return (
     <section className={styles.section}>
@@ -68,48 +118,53 @@ export default function IntelligenceRow({
             {getGreeting(displayName)}
           </motion.h2>
         </div>
+        <div className={styles.headerRight}>
+          <button
+            type="button"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full border bg-white shadow-sm hover:bg-stone-50 transition-colors"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            onClick={() => setIsEditingDashboard(!isEditingDashboard)}
+          >
+            {isEditingDashboard ? (
+              <><Check size={14} /> Done Editing</>
+            ) : (
+              <><Settings size={14} /> Edit Dashboard</>
+            )}
+          </button>
+        </div>
       </header>
 
-      <BentoGrid>
-        {/* Col 1, Rows 1–2: Right Now — hero card */}
-        <BentoCard className={styles.posRightNow}>
-          <RightNowWidget
-            {...slot5Data}
-            tflDelays={tflDelays}
-            onOpenTimer={() => navigate("/timer")}
-          />
-        </BentoCard>
-
-        {/* Cols 2–3, Row 1: Today's Tasks — wide */}
-        <BentoCard className={styles.posTodaysTasks}>
-          {slot1TodayTasks}
-        </BentoCard>
-
-        {/* Col 2, Row 2: Quick Actions */}
-        <BentoCard className={styles.posQuickActions}>
-          <QuickActionsWidget />
-        </BentoCard>
-
-        {/* Col 3, Row 2: Social Discover */}
-        <BentoCard className={styles.posSocialDiscover}>
-          <SocialDiscoverWidget />
-        </BentoCard>
-
-        {/* Col 1, Row 3: Upcoming Deadlines */}
-        <BentoCard className={styles.posDeadlines}>
-          {slot3Urgent}
-        </BentoCard>
-
-        {/* Cols 2–3, Row 3: Study Pulse (focus windows + weekly progress) */}
-        <BentoCard className={styles.posStudyPulse}>
-          <StudyPulseWidget
-            windows={studyPulseWindows ?? []}
-            now={studyPulseNow ?? new Date()}
-            onStartFocus={studyPulseOnStartFocus}
-            deadlines={studyPulseDeadlines ?? []}
-          />
-        </BentoCard>
-      </BentoGrid>
+      {isEditingDashboard ? (
+        <Reorder.Group
+          axis="y"
+          values={homepageWidgets}
+          onReorder={saveWidgetLayout}
+          className={styles.grid}
+        >
+          {homepageWidgets.map((widget) => (
+            <Reorder.Item
+              key={widget.id}
+              value={widget}
+              className={getWidgetStyleClass(widget.id)}
+            >
+              <BentoCard className={isEditingDashboard ? 'opacity-80' : ''}>
+                <div className="absolute top-2 right-2 p-1.5 rounded-md bg-stone-100 hover:bg-stone-200 cursor-grab z-10">
+                  <GripHorizontal size={14} className="text-stone-500" />
+                </div>
+                {renderWidgetContent(widget.id)}
+              </BentoCard>
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
+      ) : (
+        <BentoGrid>
+          {homepageWidgets.map((widget) => (
+            <BentoCard key={widget.id} className={getWidgetStyleClass(widget.id)}>
+              {renderWidgetContent(widget.id)}
+            </BentoCard>
+          ))}
+        </BentoGrid>
+      )}
     </section>
   );
 }

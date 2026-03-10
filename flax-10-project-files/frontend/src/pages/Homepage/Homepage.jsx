@@ -19,6 +19,7 @@ import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import { getModules, getEnrollments } from "../../api/moduleApi";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
+import { getUserSettings, updateUserSettings } from "../../api/userService";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
@@ -96,6 +97,47 @@ export default function Homepage() {
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
   const toastTimeoutRef = useRef(null);
+
+  const [homepageWidgets, setHomepageWidgets] = useState([]);
+  const [isEditingDashboard, setIsEditingDashboard] = useState(false);
+
+  useEffect(() => {
+    getUserSettings()
+      .then((settings) => {
+        if (settings.homepage_widgets && Array.isArray(settings.homepage_widgets) && settings.homepage_widgets.length > 0) {
+          setHomepageWidgets(settings.homepage_widgets);
+        } else {
+          // Default layout if none saved
+          setHomepageWidgets([
+            { id: "rightNow", type: "system" },
+            { id: "tasks", type: "system" },
+            { id: "quickActions", type: "system" },
+            { id: "socialDiscover", type: "system" },
+            { id: "deadlines", type: "system" },
+            { id: "studyPulse", type: "system" }
+          ]);
+        }
+      })
+      .catch(() => {
+        setHomepageWidgets([
+          { id: "rightNow", type: "system" },
+          { id: "tasks", type: "system" },
+          { id: "quickActions", type: "system" },
+          { id: "socialDiscover", type: "system" },
+          { id: "deadlines", type: "system" },
+          { id: "studyPulse", type: "system" }
+        ]);
+      });
+  }, []);
+
+  const saveWidgetLayout = async (newLayout) => {
+    setHomepageWidgets(newLayout);
+    try {
+      await updateUserSettings({ homepage_widgets: newLayout });
+    } catch (err) {
+      showToast("Failed to save dashboard layout.");
+    }
+  };
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -859,6 +901,12 @@ export default function Homepage() {
               upcomingDeadlines,
               todayFreeWindows,
             }}
+
+            // Editable layout injection
+            homepageWidgets={homepageWidgets}
+            isEditingDashboard={isEditingDashboard}
+            setIsEditingDashboard={setIsEditingDashboard}
+            saveWidgetLayout={saveWidgetLayout}
           />
         </div>
 
