@@ -101,22 +101,76 @@ export function ThemeSelector({ value, onChange }) {
   );
 }
 
-export function ColorThemeSelector({ value, onChange }) {
+function ThemeCard({ t, currentTheme, onChange }) {
+  const isActive = currentTheme === t.id;
+  return (
+    <div className={`${styles.themeCard} ${isActive ? styles.active : ''}`} onClick={() => onChange(t.id)}>
+      <span className={styles.themeName}>{t.name}</span>
+      <div className={styles.themePreviewContainer}>
+        {/* Light Preview */}
+        <div className={styles.themePreview} style={{ background: t.light.bg, borderColor: t.light.border }}>
+          <span className={styles.swatchTitle} style={{ color: t.light.text }}>Light</span>
+          <div className={styles.swatchGrid}>
+            <div className={styles.swatch} style={{ background: t.light.primary }} />
+            <div className={styles.swatch} style={{ background: t.light.highlight }} />
+            <div className={styles.swatch} style={{ background: t.light.card }} />
+            <div className={styles.swatch} style={{ background: t.light.sidebar }} />
+          </div>
+        </div>
+        {/* Dark Preview */}
+        <div className={styles.themePreview} style={{ background: t.dark.bg, borderColor: t.dark.border }}>
+          <span className={styles.swatchTitle} style={{ color: t.dark.text }}>Dark</span>
+          <div className={styles.swatchGrid}>
+            <div className={styles.swatch} style={{ background: t.dark.primary }} />
+            <div className={styles.swatch} style={{ background: t.dark.highlight }} />
+            <div className={styles.swatch} style={{ background: t.dark.card }} />
+            <div className={styles.swatch} style={{ background: t.dark.sidebar }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ThemeGridSelector({ value, onChange }) {
+  // Hardcode the preview colors so they render independently of active CSS variables
   const themes = [
-    { id: 'flax', name: 'Flax', color: '#7B6751' },
-    { id: 'blue', name: 'Calm Blue', color: '#4F6D8A' }
+    {
+      id: 'flax', name: 'Flax',
+      light: { bg: '#F8F5F2', card: '#FFFCFA', sidebar: '#EEEAE4', primary: '#7B6751', highlight: '#c4a35a', border: 'rgba(74,52,33,0.12)', text: '#1A1A1A' },
+      dark: { bg: '#1a1310', card: '#241a14', sidebar: '#201812', primary: '#B89B7E', highlight: '#e8dcc8', border: 'rgba(180,155,126,0.18)', text: '#f1f5f9' }
+    },
+    {
+      id: 'ocean', name: 'Ocean',
+      light: { bg: '#F3F7FA', card: '#FFFFFF', sidebar: '#E7EFF5', primary: '#4F6D8A', highlight: '#7FA7C2', border: 'rgba(50,70,90,0.12)', text: '#1A1A1A' },
+      dark: { bg: '#1C252E', card: '#242F3A', sidebar: '#202A34', primary: '#7FA7C2', highlight: '#4F6D8A', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+    },
+    {
+      id: 'sage', name: 'Sage Garden',
+      light: { bg: '#F3F6F3', card: '#FFFFFF', sidebar: '#E7ECE7', primary: '#6F8F7B', highlight: '#A6C0AE', border: 'rgba(60,80,60,0.12)', text: '#1A1A1A' },
+      dark: { bg: '#1E2521', card: '#252E29', sidebar: '#212924', primary: '#A6C0AE', highlight: '#6F8F7B', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+    },
+    {
+      id: 'lavender', name: 'Lavender Night',
+      light: { bg: '#F5F3F8', card: '#FFFFFF', sidebar: '#ECE7F3', primary: '#6B5C8E', highlight: '#A79BC8', border: 'rgba(70,60,100,0.12)', text: '#1A1A1A' },
+      dark: { bg: '#211E27', card: '#2A2632', sidebar: '#25212C', primary: '#A79BC8', highlight: '#6B5C8E', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+    },
+    {
+      id: 'sunset', name: 'Sunset',
+      light: { bg: '#F9F4F2', card: '#FFFFFF', sidebar: '#F1E6E2', primary: '#C46A5A', highlight: '#E7A095', border: 'rgba(100,50,40,0.12)', text: '#1A1A1A' },
+      dark: { bg: '#241C1A', card: '#2D2321', sidebar: '#281F1D', primary: '#E7A095', highlight: '#C46A5A', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+    },
+    {
+      id: 'dark-academia', name: 'Dark Academia',
+      light: { bg: '#F8F5F2', card: '#FFFCFA', sidebar: '#EEEAE4', primary: '#7B6751', highlight: '#c4a35a', border: 'rgba(74,52,33,0.12)', text: '#1A1A1A' },
+      dark: { bg: '#1F1C1A', card: '#2A2623', sidebar: '#24201D', primary: '#D4C28D', highlight: '#9C8755', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+    }
   ];
 
   return (
-    <div className={styles.colorThemeSelector}>
+    <div className={styles.themeGrid}>
       {themes.map(t => (
-        <button
-          key={t.id} type="button" onClick={() => onChange(t.id)}
-          className={`${styles.colorThemeOption} ${value === t.id ? styles.active : ''}`}
-        >
-          <span className={styles.colorCircle} style={{ backgroundColor: t.color }} />
-          <span className={styles.themeLabel}>{t.name}</span>
-        </button>
+        <ThemeCard key={t.id} t={t} currentTheme={value} onChange={onChange} />
       ))}
     </div>
   );

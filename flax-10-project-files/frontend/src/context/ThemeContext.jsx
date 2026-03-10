@@ -22,20 +22,25 @@ async function logThemeSession(theme, startedAt) {
   }
 }
 
-function getStoredTheme(fallback) {
-  const stored = localStorage.getItem('theme');
+function getStoredMode(fallback) {
+  const stored = localStorage.getItem('mode');
   return stored === 'light' || stored === 'dark' ? stored : fallback;
 }
 
-function getStoredColorTheme(fallback = 'flax') {
-  return localStorage.getItem('colorTheme') || fallback;
+function getStoredTheme(fallback = 'flax') {
+  return localStorage.getItem('theme') || fallback;
 }
 
-export function ThemeProvider({ children, initialTheme = 'light' }) {
-  const [theme, setThemeState] = useState(() => getStoredTheme(initialTheme));
-  const [colorTheme, setColorThemeState] = useState(() => getStoredColorTheme());
+export function ThemeProvider({ children, initialMode = 'light' }) {
+  const [mode, setModeState] = useState(() => getStoredMode(initialMode));
+  const [theme, setThemeState] = useState(() => getStoredTheme());
   const sessionStart = useRef(new Date().toISOString());
   const currentTheme = useRef(theme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-mode', mode);
+    localStorage.setItem('mode', mode);
+  }, [mode]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -43,39 +48,26 @@ export function ThemeProvider({ children, initialTheme = 'light' }) {
   }, [theme]);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-color-theme', colorTheme);
-    localStorage.setItem('colorTheme', colorTheme);
-  }, [colorTheme]);
-
-  useEffect(() => {
-    const handleUnload = () => logThemeSession(currentMode.current, sessionStart.current);
+    const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, []);
 
-  function toggleMode() {
-    const newMode = mode === 'light' ? 'dark' : 'light';
-    logThemeSession(currentMode.current, sessionStart.current);
-    sessionStart.current = new Date().toISOString();
-    currentMode.current = newMode;
-    setModeState(newMode);
-  }
-
   function setMode(newMode) {
     if (newMode === mode) return;
-    logThemeSession(currentMode.current, sessionStart.current);
-    sessionStart.current = new Date().toISOString();
-    currentMode.current = newMode;
     setModeState(newMode);
   }
 
-  function setColorTheme(newColorTheme) {
-    if (newColorTheme === colorTheme) return;
-    setColorThemeState(newColorTheme);
+  function setTheme(newTheme) {
+    if (newTheme === theme) return;
+    logThemeSession(currentTheme.current, sessionStart.current);
+    sessionStart.current = new Date().toISOString();
+    currentTheme.current = newTheme;
+    setThemeState(newTheme);
   }
 
   return (
-    <ThemeContext.Provider value={{ mode, toggleMode, setMode, colorTheme, setColorTheme }}>
+    <ThemeContext.Provider value={{ mode, setMode, theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
