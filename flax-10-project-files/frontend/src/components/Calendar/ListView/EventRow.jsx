@@ -7,10 +7,31 @@ import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
 import styles from './ListView.module.css';
 
+function isAllDay(event) {
+    if (event.all_day || event.is_all_day) return true;
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    const startMidnight = start.getHours() === 0 && start.getMinutes() === 0;
+    const endMidnight = end.getHours() === 0 && end.getMinutes() === 0;
+    const nextDay = end.getDate() !== start.getDate() || end.getMonth() !== start.getMonth();
+    return startMidnight && endMidnight && nextDay;
+}
+
 function formatEventTime(event) {
+    if (isAllDay(event)) return 'All day';
     const start = new Date(event.start_time);
     const opts = { hour: 'numeric', minute: '2-digit', hour12: true };
     return start.toLocaleTimeString('en-US', opts);
+}
+
+function formatTimeRange(event) {
+    if (isAllDay(event)) return 'All day';
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    const opts = { hour: 'numeric', minute: '2-digit', hour12: true };
+    const startTime = start.toLocaleTimeString('en-US', opts);
+    const endTime = end.toLocaleTimeString('en-US', opts);
+    return `${startTime} - ${endTime}`;
 }
 
 function getTagBadges(event, tags) {
@@ -69,8 +90,9 @@ export function EventRow({ event }) {
                     {badges.map((b, i) => <TagBadge key={i} badge={b} />)}
                 </div>
             </div>
-            {isExpanded && (event.location || event.description) && (
+            {isExpanded && (
                 <div className={styles.expandedContent}>
+                    <div>🕐 {formatTimeRange(event)}</div>
                     {event.location && <div>📍 {event.location}</div>}
                     {event.description && <div style={{ whiteSpace: 'pre-wrap' }}>📝 {event.description}</div>}
                 </div>
