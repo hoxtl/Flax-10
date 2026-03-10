@@ -1,3 +1,7 @@
+"""
+Backend tests for society views.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -24,6 +28,7 @@ def make_member(user, society):
 
 
 class SocietyListViewTest(TestCase):
+    """Tests for society list view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -49,6 +54,7 @@ class SocietyListViewTest(TestCase):
 
 
 class SocietyDetailViewTest(TestCase):
+    """Tests for society detail view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -92,6 +98,7 @@ class SocietyDetailViewTest(TestCase):
 
 
 class MembershipViewTest(TestCase):
+    """Tests for membership view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -158,7 +165,94 @@ class MembershipViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class ReportSocietyViewTest(TestCase):
+    """Tests for report society view."""
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='reporter', email='r@test.com', password='pass')
+        self.superadmin = User.objects.create_superuser(username='superadmin', email='sa@test.com', password='pass')
+        self.society = make_society()
+        self.client.force_authenticate(user=self.user)
+        self.url = f'/api/societies/{self.society.id}/report/'
+
+    def test_report_society_not_found(self):
+        response = self.client.post('/api/societies/99999/report/', {'reason': 'spam'})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_report_society_missing_reason(self):
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_report_society_blank_reason(self):
+        response = self.client.post(self.url, {'reason': '   '})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_report_society_success_notifies_admins(self):
+        response = self.client.post(self.url, {'reason': 'Spam content'})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        from studyFlax.models.society.societyReportModel import SocietyReport
+        self.assertTrue(SocietyReport.objects.filter(society=self.society, reporter=self.user).exists())
+
+    def test_report_society_success_no_admins(self):
+        self.superadmin.delete()
+        response = self.client.post(self.url, {'reason': 'Spam'})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_remove_report_success(self):
+        from studyFlax.models.society.societyReportModel import SocietyReport
+        SocietyReport.objects.create(society=self.society, reporter=self.user, reason='test')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(SocietyReport.objects.filter(society=self.society, reporter=self.user).exists())
+
+    def test_remove_report_not_found_society(self):
+        response = self.client.delete('/api/societies/99999/report/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ToggleSubscriptionViewTest(TestCase):
+    """Tests for toggle subscription view."""
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='subuser', email='sub@test.com', password='pass')
+        self.society = make_society()
+        self.client.force_authenticate(user=self.user)
+        self.url = f'/api/societies/{self.society.id}/subscribe/'
+
+    def test_toggle_not_found_society(self):
+        response = self.client.patch('/api/societies/99999/subscribe/', {'is_subscribed': True})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_toggle_not_a_member(self):
+        response = self.client.patch(self.url, {'is_subscribed': True})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_toggle_subscription_on(self):
+        membership = make_member(self.user, self.society)
+        membership.is_subscribed = False
+        membership.save()
+        response = self.client.patch(self.url, {'is_subscribed': True})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['is_subscribed'])
+
+    def test_toggle_subscription_off(self):
+        membership = make_member(self.user, self.society)
+        membership.is_subscribed = True
+        membership.save()
+        response = self.client.patch(self.url, {'is_subscribed': False}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data['is_subscribed'])
+
+    def test_toggle_subscription_default_flips(self):
+        membership = make_member(self.user, self.society)
+        original = membership.is_subscribed
+        response = self.client.patch(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['is_subscribed'], not original)
+
+
 class SocietyEventViewTest(TestCase):
+    """Tests for society event view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -214,7 +308,97 @@ class SocietyEventViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class SocietyTagViewExtendedTest(TestCase):
+    """Tests for society tag view extended."""
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_user(username='stag_admin', email='stag_admin@e.com', password='pass')
+        self.other = User.objects.create_user(username='stag_other', email='stag_other@e.com', password='pass')
+        self.society = make_society('Tag View Society')
+        make_admin(self.admin, self.society)
+        self.client.force_authenticate(user=self.admin)
+
+    def test_update_tag(self):
+        from studyFlax.models.society.societyTagModel import SocietyTag
+
+        tag = SocietyTag.objects.create(society=self.society, label='Old', color='#000')
+        response = self.client.patch(
+            f'/api/societies/{self.society.id}/tags/{tag.id}/',
+            {'label': 'New', 'color': '#fff'},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['label'], 'New')
+
+    def test_update_tag_invalid(self):
+        from studyFlax.models.society.societyTagModel import SocietyTag
+
+        tag = SocietyTag.objects.create(society=self.society, label='Old', color='#000')
+        response = self.client.patch(f'/api/societies/{self.society.id}/tags/{tag.id}/', {'label': ''})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_tag_non_admin(self):
+        from studyFlax.models.society.societyTagModel import SocietyTag
+
+        tag = SocietyTag.objects.create(society=self.society, label='Tag', color='#000')
+        self.client.force_authenticate(user=self.other)
+        response = self.client.patch(f'/api/societies/{self.society.id}/tags/{tag.id}/', {'label': 'Hack'})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_tag_exceeds_max(self):
+        from studyFlax.models.society.societyTagModel import SocietyTag
+
+        for index in range(7):
+            SocietyTag.objects.create(society=self.society, label=f'Tag{index}', color='#000')
+
+        response = self.client.post(
+            f'/api/societies/{self.society.id}/tags/',
+            {'label': 'Extra', 'color': '#fff'},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Maximum', response.data['error'])
+
+    def test_delete_tag_nonexistent_society(self):
+        response = self.client.delete('/api/societies/99999/tags/1/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class SocietySerializerEdgeCaseTest(TestCase):
+    """Tests for society serializer edge case."""
+    def test_profile_photo_url_with_request_and_photo(self):
+        from unittest.mock import MagicMock, PropertyMock, patch
+        from rest_framework.test import APIRequestFactory
+        from studyFlax.serialisers.society_serialisers import SocietyMembershipSerialiser
+
+        user = User.objects.create_user(username='mphoto', email='mphoto@test.com', password='pass')
+        society = Society.objects.create(name='PhotoSoc', bio='b', admin_emails='a@b.com')
+        membership = SocietyMembership.objects.create(user=user, society=society, role='member')
+        request = APIRequestFactory().get('/')
+        request.user = user
+        mock_photo = MagicMock()
+        mock_photo.url = '/media/profile_photos/test.jpg'
+        mock_photo.__bool__ = lambda self: True
+
+        with patch.object(type(user), 'profile_photo', new_callable=PropertyMock, return_value=mock_photo):
+            serializer = SocietyMembershipSerialiser(membership, context={'request': request})
+            profile_photo_url = serializer.data['profile_photo_url']
+
+        self.assertIn('/media/profile_photos/test.jpg', profile_photo_url)
+
+    def test_has_reported_false_without_request(self):
+        from studyFlax.serialisers.society_serialisers import SocietyDetailSerialiser
+
+        society = Society.objects.create(name='NoReqSoc', bio='b', admin_emails='a@b.com')
+        serializer = SocietyDetailSerialiser(society)
+
+        self.assertFalse(serializer.data['has_reported'])
+
+
 class SocietyAnnouncementViewTest(TestCase):
+    """Tests for society announcement view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -256,6 +440,7 @@ class SocietyAnnouncementViewTest(TestCase):
 
 
 class SocietyTagViewTest(TestCase):
+    """Tests for society tag view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -289,6 +474,7 @@ class SocietyTagViewTest(TestCase):
 
 
 class RatificationViewTest(TestCase):
+    """Tests for ratification view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -342,6 +528,7 @@ class RatificationViewTest(TestCase):
 
 
 class CalendarSyncViewTest(TestCase):
+    """Tests for calendar sync view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='user', email='user@example.com', password='pass')
@@ -377,6 +564,7 @@ class CalendarSyncViewTest(TestCase):
 
 
 class PublishChangesViewTest(TestCase):
+    """Tests for publish changes view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')

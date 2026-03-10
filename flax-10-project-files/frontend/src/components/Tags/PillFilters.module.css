@@ -39,3 +39,21 @@
   box-shadow: none;
 }
 
+/* Active (fallback when no color prop is provided) */
+.active {
+  background: var(--accent);
+  color: var(--c-white);
+  box-shadow: 0 6px 18px rgba(123, 103, 81, 0.18);
+}
+
+/* Tag color dot (inactive state) */
+.colorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+}
