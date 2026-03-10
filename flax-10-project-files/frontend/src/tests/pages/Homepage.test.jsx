@@ -6,6 +6,10 @@ import Homepage from '../../pages/Homepage/Homepage';
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
 const mockRemoveEvent = vi.fn();
+const mockAddEvent = vi.fn();
+const mockEditEvent = vi.fn();
+const mockLoadEvents = vi.fn();
+const mockRefetchTasks = vi.fn();
 const mockUseCalendarEvents = vi.fn();
 const mockNavigate = vi.fn();
 
@@ -15,9 +19,38 @@ let mockEvents = [];
 let mockFilter = 'all';
 let mockTimeLeft = 0;
 let mockTimerActive = false;
+let mockTimerMode = 'work';
 let mockDayEvents = [];
 let mockDayTasks = [];
 let mockAllTasks = [];
+
+vi.mock('../../components/Calendar/utils/dateUtils', () => ({
+  isToday: vi.fn((d) => {
+    const today = new Date();
+    return d && today.toDateString() === new Date(d).toDateString();
+  }),
+  overlapsDay: vi.fn((start, end, day) => {
+    const dayStart = new Date(day);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    return start < dayEnd && end > dayStart;
+  }),
+}));
+
+vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+  extractBaseEventId: vi.fn((id) => (typeof id === 'string' && id.includes('_') ? id.split('_')[0] : id)),
+}));
+
+vi.mock('../../pages/Homepage/utils/index', () => ({
+  formatTime: vi.fn((d) => new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
+  isNow: vi.fn(() => false),
+  isRoutineEvent: vi.fn(() => false),
+  getNavigatorContext: vi.fn(() => ({ state: 'gap', nextItem: null, gapMins: 30, overlaps: [], conflictAt: null })),
+  getNextFreeSlotToday: vi.fn(() => ({ start: new Date(), end: new Date(Date.now() + 25 * 60000) })),
+  getAllFreeWindowsToday: vi.fn(() => [{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]),
+  isRoutineOrEventTask: vi.fn(() => false),
+}));
 
 vi.mock('../../context/CalendarContext', () => ({
   useCalendar: () => ({ selectedDate: mockSelectedDate, events: mockEvents, filter: mockFilter }),
@@ -28,7 +61,7 @@ vi.mock('../../context/CalendarContext', () => ({
 
 vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
-  useEventActions: () => ({ removeEvent: mockRemoveEvent, addEvent: vi.fn(), editEvent: vi.fn() }),
+  useEventActions: () => ({ removeEvent: mockRemoveEvent, addEvent: mockAddEvent, editEvent: mockEditEvent }),
   useEventPopup: () => ({ openPopup: vi.fn() }),
 }));
 
@@ -38,7 +71,7 @@ vi.mock('../../pages/Homepage/hooks/useHomeData', () => ({
     dayTasks: mockDayTasks,
     allTasks: mockAllTasks,
     removePendingTask: vi.fn(),
-    refetchTasks: vi.fn(),
+    refetchTasks: mockRefetchTasks,
   }),
 }));
 
@@ -51,10 +84,10 @@ vi.mock('../../context/TimerContext', () => ({
     setActiveTaskId: vi.fn(),
     isActive: mockTimerActive,
     timeLeft: mockTimeLeft,
-    task: null,
+    task: mockTimerActive ? 'My Task' : null,
     progress: 0,
     setIsActive: vi.fn(),
-    mode: 'work',
+    mode: mockTimerMode,
     setMode: vi.fn(),
     setTimeLeft: vi.fn(),
     workTime: 25,
@@ -110,7 +143,12 @@ vi.mock('../../pages/Homepage/components/TaskWidgetSlot', () => ({
 }));
 
 vi.mock('../../pages/Homepage/components/DeadlinesWidget', () => ({
-  DeadlinesWidget: ({ deadlines }) => <div data-testid="deadlines-count">deadlines:{(deadlines || []).length}</div>,
+  DeadlinesWidget: ({ deadlines, onSelectDeadline, onSelectModule }) => (
+    <div data-testid="deadlines-count">deadlines:{(deadlines || []).length}
+      <button type="button" onClick={() => onSelectDeadline?.({ id: 1, assessment_title: 'Essay', start_due_date: new Date().toISOString(), module_code: 'AB1', deadline_type: 'assignment', description: 'D', location: 'Room 1', module_id: 10 })}>select-deadline</button>
+      <button type="button" onClick={() => onSelectModule?.({ code: 'AB1', id: 10, name: 'Module A' })}>select-module</button>
+    </div>
+  ),
 }));
 
 vi.mock('../../pages/Homepage/components/SleepBanner', () => ({
@@ -127,8 +165,46 @@ vi.mock('../../components/Tags/PillFilters', () => ({
   default: () => <div data-testid="pill-filters" />,
 }));
 
+vi.mock('../../pages/Tasks/components/TaskCard', async () => {
+  const actual = await vi.importActual('../../pages/Tasks/components/TaskCard');
+  return {
+    ...actual,
+    EditTaskModal: ({ task, onSave, onDelete, onClose }) => (
+      <div data-testid="edit-task-modal">
+        <button type="button" onClick={() => onSave?.({ title: task?.title })}>edit-modal-save</button>
+        <button type="button" onClick={() => onDelete?.()}>edit-modal-delete</button>
+        <button type="button" onClick={onClose}>edit-modal-close</button>
+      </div>
+    ),
+  };
+});
+
 vi.mock('../../pages/Homepage/components', () => ({
-  MiniTimeline: ({ sortedEvents }) => <div data-testid="mini-timeline">events:{(sortedEvents || []).length}</div>,
+  MiniTimeline: ({
+    sortedEvents,
+    onQuickStart,
+    onTaskToggle,
+    onCardClick,
+    onEdit,
+    onConflictAutoMove,
+    onPushTomorrow,
+    onDelete,
+    onReschedule,
+    onToggleComplete,
+  }) => (
+    <div data-testid="mini-timeline">events:{(sortedEvents || []).length}
+      <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1, title: 'T', estimated_blocks: 1 })}>quick-start</button>
+      <button type="button" onClick={() => onTaskToggle?.({ id: 1 }, true)}>task-toggle</button>
+      <button type="button" onClick={() => onCardClick?.({ id: 1, title: 'E' })}>card-click</button>
+      <button type="button" onClick={() => onEdit?.({ id: 1 })}>timeline-edit</button>
+      <button type="button" onClick={() => onConflictAutoMove?.({ id: 1 }, new Date(), new Date())}>conflict-auto-move</button>
+      <button type="button" onClick={() => onPushTomorrow?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: 'E' })}>push-tomorrow</button>
+      <button type="button" onClick={() => onDelete?.({ id: 1, title: 'E' })}>timeline-delete</button>
+      <button type="button" onClick={() => onDelete?.({ id: 'ev-1', source: 'task', external_id: 99, title: 'Task Event' })}>timeline-delete-task</button>
+      <button type="button" onClick={() => onReschedule?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: 'E' })}>reschedule</button>
+      <button type="button" onClick={() => onToggleComplete?.(1)}>toggle-complete</button>
+    </div>
+  ),
 }));
 
 vi.mock('../../api/taskService', () => ({
@@ -137,6 +213,41 @@ vi.mock('../../api/taskService', () => ({
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(),
   deleteTask: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../../pages/Tasks/components/CreateTaskModal', () => ({
+  __esModule: true,
+  default: ({ onSave, onClose, onOpenCreateList }) => (
+    <div data-testid="create-task-modal">
+      <button type="button" onClick={() => onSave({ title: 'New Task' }, {})}>create-task-save</button>
+      <button type="button" onClick={() => onSave({ title: 'breakfast' }, {})}>create-task-routine</button>
+      <button type="button" onClick={() => onSave({ title: 'Task', estimated_blocks: 2 }, { addToSchedule: true })}>create-task-with-schedule</button>
+      <button type="button" onClick={onOpenCreateList}>create-task-open-list</button>
+      <button type="button" onClick={onClose}>create-task-close</button>
+    </div>
+  ),
+}));
+
+vi.mock('../../pages/Tasks/components/CreateListModal', () => ({
+  __esModule: true,
+  default: ({ onSave, onClose }) => (
+    <div data-testid="create-list-modal">
+      <button type="button" onClick={() => onSave({ name: 'My List' })}>create-list-save</button>
+      <button type="button" onClick={onClose}>create-list-close</button>
+    </div>
+  ),
+}));
+
+vi.mock('../../pages/Homepage/components/PlanReadDetailModal', () => ({
+  PlanReadDetailModal: ({ item, onClose, onEditTask, onDeleteTask, onEditEvent, onDeleteEvent }) => (
+    <div data-testid="plan-read-detail-modal">
+      <button type="button" onClick={onClose}>plan-read-close</button>
+      <button type="button" onClick={() => item?.task && onEditTask?.(item.task)}>plan-read-edit-task</button>
+      <button type="button" onClick={() => item?.task && onDeleteTask?.(item.task)}>plan-read-delete-task</button>
+      <button type="button" onClick={() => item?.event && onEditEvent?.(item.event)}>plan-read-edit-event</button>
+      <button type="button" onClick={() => item?.event && onDeleteEvent?.(item.event)}>plan-read-delete-event</button>
+    </div>
+  ),
 }));
 
 vi.mock('../../api/moduleApi', () => ({
@@ -168,11 +279,17 @@ beforeEach(() => {
   mockFilter = 'all';
   mockTimeLeft = 0;
   mockTimerActive = false;
+  mockTimerMode = 'work';
   mockDayEvents = [];
   mockDayTasks = [];
   mockAllTasks = [];
   vi.clearAllMocks();
-  mockUseCalendarEvents.mockReturnValue({ loadEvents: vi.fn() });
+  mockUseCalendarEvents.mockReturnValue({ loadEvents: mockLoadEvents });
+  mockAddEvent.mockResolvedValue(undefined);
+  mockEditEvent.mockResolvedValue(undefined);
+  mockRemoveEvent.mockResolvedValue(undefined);
+  mockLoadEvents.mockResolvedValue(undefined);
+  mockRefetchTasks.mockResolvedValue(undefined);
   global.IntersectionObserver = class {
     constructor() {}
     observe() {}
@@ -294,5 +411,493 @@ describe('Homepage', () => {
       </MemoryRouter>
     );
     expect(playCompletionChime).toHaveBeenCalled();
+  });
+
+  it('displayName falls back to username when first_name is empty', () => {
+    window.localStorage.setItem('user', JSON.stringify({ first_name: '  ', username: 'bob' }));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('display-name').textContent).toContain('bob');
+  });
+
+  it('opens deadline detail overlay and closes it', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('select-deadline'));
+    await waitFor(() => expect(screen.getByText('Essay')).toBeInTheDocument());
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Close'));
+    await waitFor(() => expect(screen.queryByText('Essay')).not.toBeInTheDocument());
+  });
+
+  it('opens module pill overlay and closes it', async () => {
+    const { getModules, getEnrollments } = await import('../../api/moduleApi');
+    getModules.mockResolvedValue([{ id: 10, module_code: 'AB1', module_name: 'Module A', department: 'Dept', description: 'Desc', module_leader: 'Lead' }]);
+    getEnrollments.mockResolvedValue([{ module: 10 }]);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByText('select-module')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('select-module'));
+    await waitFor(() => expect(screen.getByText('AB1')).toBeInTheDocument());
+    fireEvent.click(screen.getByLabelText('Close'));
+    await waitFor(() => expect(screen.queryByText('Module A')).not.toBeInTheDocument());
+  });
+
+  it('handleQuickStartGap adds event and shows toast', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('quick-start'));
+    await waitFor(() => expect(mockAddEvent).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText(/added to your schedule/)).toBeInTheDocument());
+  });
+
+  it('handleQuickStartGap shows error toast on fail', async () => {
+    mockAddEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('quick-start'));
+    await waitFor(() => expect(screen.getByText("Couldn't add to schedule. Try again.")).toBeInTheDocument());
+  });
+
+  it('handleConflictAutoMove shows toast on success', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('conflict-auto-move'));
+    await waitFor(() => expect(screen.getByText('Event moved to next available window.')).toBeInTheDocument());
+  });
+
+  it('handleConflictAutoMove shows error toast on fail', async () => {
+    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('conflict-auto-move'));
+    await waitFor(() => expect(screen.getByText("Couldn't move event. Try again.")).toBeInTheDocument());
+  });
+
+  it('handleConflictPushTomorrow moves event and shows undo', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('push-tomorrow'));
+    await waitFor(() => expect(screen.getByText(/moved to tomorrow/)).toBeInTheDocument());
+    expect(screen.getByText('Undo')).toBeInTheDocument();
+  });
+
+  it('handleConflictPushTomorrow undo restores event', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('push-tomorrow'));
+    await waitFor(() => expect(screen.getByText('Undo')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Undo'));
+    await waitFor(() => expect(screen.getByText(/Undid move/)).toBeInTheDocument());
+  });
+
+  it('handleConflictPushTomorrow shows error on fail', async () => {
+    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('push-tomorrow'));
+    await waitFor(() => expect(screen.getByText("Couldn't move to tomorrow. Try again.")).toBeInTheDocument());
+  });
+
+  it('handleTimelineDelete removes event and shows toast', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('timeline-delete'));
+    await waitFor(() => expect(mockRemoveEvent).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText(/deleted/)).toBeInTheDocument());
+  });
+
+  it('handleTimelineDelete task event deletes task and refetches', async () => {
+    const { deleteTask } = await import('../../api/taskService');
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('timeline-delete-task'));
+    await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(99));
+    await waitFor(() => expect(screen.getByText(/removed from tasks and calendar/)).toBeInTheDocument());
+  });
+  it('handleTimelineDelete shows error toast on fail', async () => {
+    mockRemoveEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('timeline-delete'));
+    await waitFor(() => expect(screen.getByText("Couldn't delete this item. Try again.")).toBeInTheDocument());
+  });
+
+  it('timeline edit opens event modal', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('timeline-edit'));
+    expect(mockOpenModal).toHaveBeenCalled();
+  });
+
+  it('card click opens popup', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('card-click'));
+    expect(screen.getByTestId('mini-timeline')).toBeInTheDocument();
+  });
+
+  it('onToggleComplete toggles completed event ids', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('toggle-complete'));
+    expect(screen.getByTestId('mini-timeline')).toBeInTheDocument();
+  });
+
+  it('handleTaskToggle calls updateTask and refetchTasks', async () => {
+    const { updateTask } = await import('../../api/taskService');
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('task-toggle'));
+    await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, { completed: true }));
+    expect(mockRefetchTasks).toHaveBeenCalled();
+  });
+
+  it('Re-plan button shows when today and triggers handleReplanDay', async () => {
+    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    isToday.mockReturnValue(true);
+    const { getNextFreeSlotToday, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
+    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
+    mockDayEvents = [{ id: 1, title: 'Past', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
+    mockAllTasks = [{ id: 1, title: 'T', due_date: new Date().toISOString(), completed: false }];
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
+    await waitFor(() => expect(screen.getByText(/Re-planned|No items could fit|Nothing to re-plan|No free windows/)).toBeInTheDocument());
+  });
+
+  it('Re-plan button is disabled when no missed or overdue items', async () => {
+    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    isToday.mockReturnValue(true);
+    mockDayEvents = [];
+    mockAllTasks = [];
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Re-plan/ })).toBeDisabled();
+  });
+
+  it('Re-plan shows "No free windows" when getAllFreeWindowsToday returns empty', async () => {
+    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
+    const { getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
+    isToday.mockReturnValue(true);
+    getAllFreeWindowsToday.mockReturnValue([]);
+    mockDayEvents = [{ id: 1, title: 'Missed', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
+    await waitFor(() => expect(screen.getByText(/No free windows left today/)).toBeInTheDocument());
+  });
+
+  it('focus banner shows BREAK when timer mode is break', () => {
+    mockTimerActive = true;
+    mockTimerMode = 'break';
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('BREAK')).toBeInTheDocument();
+  });
+
+  it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
+    const mod = await import('../../api/taskService');
+    mod.fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }]);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByTestId('pill').textContent).toContain('University'), { timeout: 2000 });
+  });
+
+  it('handleReschedule moves event to next free slot and shows toast', async () => {
+    const { getNextFreeSlotToday } = await import('../../pages/Homepage/utils/index');
+    const slot = { start: new Date(), end: new Date(Date.now() + 25 * 60000) };
+    getNextFreeSlotToday.mockReturnValue(slot);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('reschedule'));
+    await waitFor(() => expect(mockRemoveEvent).toHaveBeenCalled());
+    await waitFor(() => expect(mockAddEvent).toHaveBeenCalled());
+    await waitFor(() => expect(mockEditEvent).toHaveBeenCalled());
+  });
+
+  it('handleReschedule falls back to tomorrow when no slot and shows toast', async () => {
+    const { getNextFreeSlotToday } = await import('../../pages/Homepage/utils/index');
+    getNextFreeSlotToday.mockReturnValue(null);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('reschedule'));
+    await waitFor(() => expect(mockAddEvent).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText(/re-scheduled for tomorrow/)).toBeInTheDocument());
+  });
+
+  it('handleReschedule rollback on editEvent fail', async () => {
+    const { getNextFreeSlotToday } = await import('../../pages/Homepage/utils/index');
+    getNextFreeSlotToday.mockReturnValue({ start: new Date(), end: new Date(Date.now() + 25 * 60000) });
+    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('reschedule'));
+    await waitFor(() => expect(screen.getByText("Couldn't reschedule. Try again.")).toBeInTheDocument());
+  });
+
+  it('getTaskCategoryColor returns sage for academic tag', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('color').textContent).toBe('sage');
+  });
+
+  it('EditTaskModal save updates task and closes modal', async () => {
+    const { updateTask } = await import('../../api/taskService');
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('edit-task'));
+    await waitFor(() => expect(screen.getByTestId('edit-task-modal')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('edit-modal-save'));
+    await waitFor(() => expect(updateTask).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByTestId('edit-task-modal')).not.toBeInTheDocument());
+  });
+
+  it('EditTaskModal delete deletes task and closes modal', async () => {
+    const { deleteTask } = await import('../../api/taskService');
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('edit-task'));
+    await waitFor(() => expect(screen.getByText('edit-modal-delete')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('edit-modal-delete'));
+    await waitFor(() => expect(deleteTask).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByTestId('edit-task-modal')).not.toBeInTheDocument());
+  });
+
+  it('EditTaskModal close clears reschedule task', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('edit-task'));
+    await waitFor(() => expect(screen.getByTestId('edit-task-modal')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('edit-modal-close'));
+    await waitFor(() => expect(screen.queryByTestId('edit-task-modal')).not.toBeInTheDocument());
+  });
+
+  it('CreateTaskModal save creates task and shows toast', async () => {
+    const { createTask } = await import('../../api/taskService');
+    createTask.mockResolvedValue({ id: 1, title: 'New Task' });
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByTestId('create-task-modal')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('create-task-save'));
+    await waitFor(() => expect(createTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'New Task' })));
+    await waitFor(() => expect(screen.getByText('Task added')).toBeInTheDocument());
+  });
+
+  it('CreateTaskModal save with routine title sets Routine tag', async () => {
+    const { createTask } = await import('../../api/taskService');
+    createTask.mockResolvedValue({ id: 1, title: 'breakfast' });
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('create-task-routine'));
+    await waitFor(() => expect(createTask).toHaveBeenCalledWith(expect.objectContaining({ tag: 1 })));
+  });
+
+  it('CreateTaskModal save with addToSchedule adds event and shows schedule toast', async () => {
+    const { createTask } = await import('../../api/taskService');
+    createTask.mockResolvedValue({ id: 1, title: 'Task', description: '', estimated_blocks: 2 });
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('create-task-with-schedule'));
+    await waitFor(() => expect(mockAddEvent).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText(/added to today's schedule/)).toBeInTheDocument());
+  });
+
+  it('CreateTaskModal save error shows toast', async () => {
+    const { createTask } = await import('../../api/taskService');
+    createTask.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('create-task-save'));
+    await waitFor(() => expect(screen.getByText("Couldn't add task. Try again.")).toBeInTheDocument());
+  });
+
+  it('CreateTaskModal close clears modal and lastCreatedListId', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('create-task-close'));
+    await waitFor(() => expect(screen.queryByTestId('create-task-modal')).not.toBeInTheDocument());
+  });
+
+  it('CreateTaskModal onOpenCreateList shows CreateListModal', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('create-task-open-list'));
+    await waitFor(() => expect(screen.getByTestId('create-list-modal')).toBeInTheDocument());
+  });
+
+  it('CreateListModal save creates list and closes', async () => {
+    const { createTaskList, fetchTaskLists } = await import('../../api/taskService');
+    createTaskList.mockResolvedValue({ id: 2, name: 'My List' });
+    fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }, { id: 2, name: 'My List' }]);
+    render(
+      <MemoryRouter>
+        <Homepage defaultShowCreateTaskModal />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('create-task-open-list'));
+    await waitFor(() => expect(screen.getByText('create-list-save')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('create-list-save'));
+    await waitFor(() => expect(createTaskList).toHaveBeenCalledWith({ name: 'My List' }));
+    await waitFor(() => expect(screen.queryByTestId('create-list-modal')).not.toBeInTheDocument());
+  });
+
+  it('PlanReadDetailModal onClose closes modal', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage defaultPlanTimelineReadItem={{ task: { id: 1, title: 'T' } }} />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByTestId('plan-read-detail-modal')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('plan-read-close'));
+    await waitFor(() => expect(screen.queryByTestId('plan-read-detail-modal')).not.toBeInTheDocument());
+  });
+
+  it('PlanReadDetailModal onEditTask sets rescheduleTask', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage defaultPlanTimelineReadItem={{ task: { id: 1, title: 'T' } }} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('plan-read-edit-task'));
+    await waitFor(() => expect(screen.getByTestId('edit-task-modal')).toBeInTheDocument());
+  });
+
+  it('PlanReadDetailModal onDeleteTask deletes task and refetches', async () => {
+    const { deleteTask } = await import('../../api/taskService');
+    render(
+      <MemoryRouter>
+        <Homepage defaultPlanTimelineReadItem={{ task: { id: 1, title: 'T' } }} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('plan-read-delete-task'));
+    await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(1));
+  });
+
+  it('PlanReadDetailModal onEditEvent opens event modal', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage defaultPlanTimelineReadItem={{ event: { id: 1, title: 'E', tag: 1 } }} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('plan-read-edit-event'));
+    await waitFor(() => expect(mockOpenModal).toHaveBeenCalled());
+  });
+
+  it('PlanReadDetailModal onDeleteEvent calls handleTimelineDelete', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage defaultPlanTimelineReadItem={{ event: { id: 1, title: 'E' } }} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('plan-read-delete-event'));
+    await waitFor(() => expect(mockRemoveEvent).toHaveBeenCalled());
   });
 });
