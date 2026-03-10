@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { isEnrolledIn } from './utils/moduleUtils.js';
-import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
+import { isEnrolledIn, formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
 import styles from './ModulesCard.module.css';
 
 function getCardClass(enrolled, is_teacher) {
@@ -10,7 +9,7 @@ function getCardClass(enrolled, is_teacher) {
     return cls;
 }
 
-export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines }) {
+export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, onManageReadings }) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const enrollment = enrollments?.find(e => e.module === module.id);
     const isCore = enrollment?.is_core || false;
@@ -21,12 +20,13 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
-                onManageDeadlines={(e) => stop(e, onManageDeadlines)} />
+                onManageDeadlines={(e) => stop(e, onManageDeadlines)} 
+                onManageReadings={(e) => stop(e, onManageReadings)}/>
         </article>
     );
 }
 
-function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings }) {
     return (
         <div className={styles.content}>
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} />}
@@ -34,7 +34,7 @@ function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onM
             {module.description && <Description text={module.description} />}
             <ScheduleMeta module={module} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled}
-                onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
+                onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} onManageReadings={onManageReadings} />
         </div>
     );
 }
@@ -91,20 +91,21 @@ function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
 
-function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings }) {
     return (
         <div className={styles.actions}>
             {isTeacher
-                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
+                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} onManageReadings={onManageReadings} />
                 : <StudentAction enrolled={enrolled} onToggle={onToggle} />}
         </div>
     );
 }
 
-function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
+function TeacherActions({ onEdit, onDelete, onManageDeadlines, onManageReadings }) {
     return (
         <>
             <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
+            <button className={styles.deadlineButton} onClick={onManageReadings}>Readings</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
         </>
