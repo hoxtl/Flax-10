@@ -98,7 +98,16 @@ export default function Homepage() {
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
   const toastTimeoutRef = useRef(null);
 
-  const [homepageWidgets, setHomepageWidgets] = useState([]);
+  const defaultWidgets = useMemo(() => [
+    { id: "rightNow", type: "system" },
+    { id: "tasks", type: "system" },
+    { id: "quickActions", type: "system" },
+    { id: "studyPulse", type: "system" },
+    { id: "deadlines", type: "system" },
+    { id: "socialDiscover", type: "system" }
+  ], []);
+
+  const [homepageWidgets, setHomepageWidgets] = useState(defaultWidgets);
   const [isEditingDashboard, setIsEditingDashboard] = useState(false);
 
   useEffect(() => {
@@ -106,27 +115,10 @@ export default function Homepage() {
       .then((settings) => {
         if (settings.homepage_widgets && Array.isArray(settings.homepage_widgets) && settings.homepage_widgets.length > 0) {
           setHomepageWidgets(settings.homepage_widgets);
-        } else {
-          // Default layout if none saved
-          setHomepageWidgets([
-            { id: "rightNow", type: "system" },
-            { id: "tasks", type: "system" },
-            { id: "quickActions", type: "system" },
-            { id: "socialDiscover", type: "system" },
-            { id: "deadlines", type: "system" },
-            { id: "studyPulse", type: "system" }
-          ]);
         }
       })
       .catch(() => {
-        setHomepageWidgets([
-          { id: "rightNow", type: "system" },
-          { id: "tasks", type: "system" },
-          { id: "quickActions", type: "system" },
-          { id: "socialDiscover", type: "system" },
-          { id: "deadlines", type: "system" },
-          { id: "studyPulse", type: "system" }
-        ]);
+        // Keeps default state
       });
   }, []);
 

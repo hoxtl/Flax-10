@@ -191,6 +191,7 @@ export default function IntelligenceRow({
             <Reorder.Item
               key={widget.id}
               value={widget}
+              drag
               className={getWidgetStyleClass(widget.id)}
             >
               <motion.div
@@ -198,16 +199,16 @@ export default function IntelligenceRow({
                 style={{ outlineColor: isEditingDashboard ? 'var(--color-primary)' : 'transparent' }}
               >
                 <BentoCard className="h-full relative pointer-events-none">
-                  <div className="absolute top-2 right-2 flex items-center gap-1 z-10 transition-opacity pointer-events-auto">
-                    <div className="p-1.5 rounded-md hover:bg-black/5 cursor-grab">
-                      <GripHorizontal size={14} style={{ color: 'var(--text)' }} />
+                  <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 z-10 transition-opacity pointer-events-auto bg-white/50 backdrop-blur-sm rounded-lg p-0.5 shadow-sm border border-black/5">
+                    <div className="p-1 rounded-md hover:bg-black/5 cursor-grab">
+                      <GripHorizontal size={12} style={{ color: 'var(--text)' }} />
                     </div>
                     <button
                       type="button"
                       onClick={() => handleRemoveWidget(widget.id)}
-                      className="p-1.5 rounded-md bg-red-50 hover:bg-red-100 text-red-500 cursor-pointer"
+                      className="p-1 rounded-md hover:bg-red-50 text-red-400 hover:text-red-500 cursor-pointer transition-colors"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={12} />
                     </button>
                   </div>
                   <div className="pointer-events-auto h-full w-full">
@@ -217,12 +218,7 @@ export default function IntelligenceRow({
               </motion.div>
             </Reorder.Item>
           ))}
-          <BentoCard className="flex items-center justify-center border-2 border-dashed bg-transparent hover:bg-stone-50 transition-colors cursor-pointer"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
-            onClick={() => { /* TODO: Open modal to add widget */ }}
-          >
-            <Plus size={24} />
-          </BentoCard>
+          {/* Remove placeholder card, Add Button acts as the trigger now */}
         </Reorder.Group>
       ) : (
         <BentoGrid className={layoutModeClass}>
@@ -234,16 +230,16 @@ export default function IntelligenceRow({
         </BentoGrid>
       )}
 
-      {/* Add Widget Button */}
+      {/* Circular Add Widget Button at the bottom */}
       {isEditingDashboard && (
-        <div className="mt-6 flex justify-center pb-8">
+        <div className="w-full flex justify-center mt-8 pb-12">
           <button
             type="button"
-            className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-full border-2 border-dashed bg-transparent hover:bg-stone-50 transition-colors"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            className="flex items-center justify-center w-12 h-12 rounded-full border shadow-sm transition-all hover:scale-105 active:scale-95 bg-white text-stone-600 hover:text-stone-900"
+            style={{ borderColor: 'var(--border)' }}
             onClick={() => setShowAddModal(true)}
           >
-            <Plus size={16} /> Add Widget
+            <Plus size={22} strokeWidth={2.5} />
           </button>
         </div>
       )}
