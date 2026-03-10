@@ -29,13 +29,13 @@ from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
 from studyFlax.views.calendar.timetable_views import timetable_import
-<<<<<<< HEAD
+from studyFlax.views.calendar.attendance_views import (
+    record_attendance,
+    attendance_stats,
+    attendance_records,
+)
 
 # Modules
-=======
-from studyFlax.views.calendar.attendance_views import record_attendance, attendance_stats, attendance_records
-from studyFlax.views.hello import hello
->>>>>>> 6e85fccd (Wire attendance URLs (record, stats, records))
 from studyFlax.views.modules.module_views import module_list, module_detail
 from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
 
@@ -48,6 +48,12 @@ from studyFlax.views.settings.user_settings_view import user_settings_view
 # Tasks
 from studyFlax.views.tasks.task_views import (
     task_list_list, task_list_detail, task_list, task_detail, log_task_time
+)
+from studyFlax.views.groupwork.groupwork_views import (
+    group_project_list,
+    group_project_members,
+    group_project_detail,
+    group_project_member_detail,
 )
 
 # Societies
@@ -121,6 +127,16 @@ urlpatterns = [
     path("tasks/<int:task_id>/log-time/", log_task_time, name="task-log-time"),
     path("tasks/lists/", task_list_list, name="task-list-list"),
     path("tasks/lists/<int:list_id>/", task_list_detail, name="task-list-detail"),
+
+    # Group work
+    path("group-work/projects/", group_project_list, name="group-project-list"),
+    path("group-work/projects/<int:project_id>/members/", group_project_members, name="group-project-members"),
+    path("group-work/projects/<int:project_id>/", group_project_detail, name="group-project-detail"),
+    path(
+        "group-work/projects/<int:project_id>/members/<int:membership_id>/",
+        group_project_member_detail,
+        name="group-project-member-detail",
+    ),
 
     # Attendance
     path("attendance/record/", record_attendance, name="attendance-record"),
