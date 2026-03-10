@@ -102,32 +102,28 @@ export function ThemeSelector({ value, onChange }) {
   );
 }
 
+function ThemePreview({ type, data }) {
+  return (
+    <div className={styles.themePreview} style={{ background: data.bg, borderColor: data.border }}>
+      <span className={styles.swatchTitle} style={{ color: data.text }}>{type}</span>
+      <div className={styles.swatchGrid}>
+        <div className={styles.swatch} style={{ background: data.primary }} />
+        <div className={styles.swatch} style={{ background: data.highlight }} />
+        <div className={styles.swatch} style={{ background: data.card }} />
+        <div className={styles.swatch} style={{ background: data.sidebar }} />
+      </div>
+    </div>
+  );
+}
+
 function ThemeCard({ t, currentTheme, onChange }) {
   const isActive = currentTheme === t.id;
   return (
     <div className={`${styles.themeCard} ${isActive ? styles.active : ''}`} onClick={() => onChange(t.id)}>
       <span className={styles.themeName}>{t.name}</span>
       <div className={styles.themePreviewContainer}>
-        {/* Light Preview */}
-        <div className={styles.themePreview} style={{ background: t.light.bg, borderColor: t.light.border }}>
-          <span className={styles.swatchTitle} style={{ color: t.light.text }}>Light</span>
-          <div className={styles.swatchGrid}>
-            <div className={styles.swatch} style={{ background: t.light.primary }} />
-            <div className={styles.swatch} style={{ background: t.light.highlight }} />
-            <div className={styles.swatch} style={{ background: t.light.card }} />
-            <div className={styles.swatch} style={{ background: t.light.sidebar }} />
-          </div>
-        </div>
-        {/* Dark Preview */}
-        <div className={styles.themePreview} style={{ background: t.dark.bg, borderColor: t.dark.border }}>
-          <span className={styles.swatchTitle} style={{ color: t.dark.text }}>Dark</span>
-          <div className={styles.swatchGrid}>
-            <div className={styles.swatch} style={{ background: t.dark.primary }} />
-            <div className={styles.swatch} style={{ background: t.dark.highlight }} />
-            <div className={styles.swatch} style={{ background: t.dark.card }} />
-            <div className={styles.swatch} style={{ background: t.dark.sidebar }} />
-          </div>
-        </div>
+        <ThemePreview type="Light" data={t.light} />
+        <ThemePreview type="Dark" data={t.dark} />
       </div>
     </div>
   );
