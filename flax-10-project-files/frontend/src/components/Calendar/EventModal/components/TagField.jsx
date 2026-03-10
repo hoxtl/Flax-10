@@ -4,10 +4,8 @@ import AnimatedDropdown from '../../../ui/AnimatedDropdown';
 export function TagField({ value, onChange, customTags }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags;
-
-    // Deduplicate tags by label to prevent duplicates like "Schedule"
     const uniqueTags = Array.from(
-        new Map((tags || []).map(t => [t.label, t])).values()
+        new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
     );
     const options = uniqueTags.map(tag => ({ value: tag.id, label: tag.label }));
 
