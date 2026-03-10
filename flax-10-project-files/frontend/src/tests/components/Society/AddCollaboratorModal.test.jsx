@@ -2,19 +2,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AddCollaboratorModal from '../../../components/Society/AddCollaboratorModal';
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../api/userService', () => ({
     searchUsers: vi.fn(),
 }));
 
-import { searchUsers } from '../../../api/societyApi';
+import { searchUsers } from '../../../api/userService';
 
 describe('AddCollaboratorModal', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        searchUsers.mockResolvedValue([
-            { id: 1, username: 'alice' },
-            { id: 2, username: 'bob' },
-        ]);
+        searchUsers.mockResolvedValue({
+            results: [
+                { id: 1, username: 'alice' },
+                { id: 2, username: 'bob' },
+            ],
+        });
     });
 
     it('renders Add Collaborators title', () => {

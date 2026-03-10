@@ -13,7 +13,21 @@ vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     TYPES_WITH_LOCATION: ['exam', 'presentation'],
 }));
 
-vi.mock('../DeadlineForm.module.css', () => ({ default: {} }));
+vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder }) => (
+        <select
+            aria-label={placeholder}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+        >
+            {(options || []).map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+        </select>
+    ),
+}));
+
+vi.mock('../../../components/Modules/DeadlineForm.module.css', () => ({ default: {} }));
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {
