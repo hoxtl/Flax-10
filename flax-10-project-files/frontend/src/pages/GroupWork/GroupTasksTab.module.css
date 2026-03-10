@@ -1,0 +1,406 @@
+.container {
+    border-radius: 12px;
+    border: 1px solid #f0dfd1;
+    background: #fffaf4;
+    padding: 20px 24px;
+}
+
+.addTaskForm {
+    /* More padding between Task table and Task pill (form area) */
+    margin-bottom: 32px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.taskInput {
+    flex: 1;
+    min-width: 120px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: 1px solid #e3d4c6;
+    background: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.taskInput:focus {
+    border-color: #8d7355;
+    box-shadow: 0 0 0 3px rgba(141, 115, 85, 0.08);
+}
+
+/* Filter Dropdown Styling */
+.filterWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filterSelect {
+    padding: 11px 38px 11px 16px;
+    border-radius: 10px;
+    border: 1px solid #e3d4c6;
+    background: #f7efe7;
+    color: #3c2a20;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    /* Hide default arrow */
+    min-width: 160px;
+    font-family: inherit;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.filterSelect:hover {
+    background: #f1e6db;
+    border-color: #dccdbd;
+}
+
+.filterArrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #8a7355;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.addBtn {
+    padding: 11px 24px;
+    border-radius: 10px;
+    border: none;
+    background: #8d7355;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-family: inherit;
+}
+
+.addBtn:hover {
+    background: #7a6449;
+}
+
+.addBtn:active {
+    transform: scale(0.97);
+}
+
+/* Task Row grid */
+.taskRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px 90px 160px 48px;
+    align-items: center;
+    border-bottom: 1px solid #f0dfd1;
+    padding: 16px 0;
+    gap: 16px;
+    transition: background 0.2s;
+}
+
+.taskRow:last-child {
+    border-bottom: none;
+}
+
+.taskRow:hover {
+    background: rgba(141, 115, 85, 0.02);
+}
+
+.taskMainCell {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+
+/* Checkbox Style - Matching Homepage TaskCard */
+.checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--cb-border, #e3d7c5);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    padding: 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkboxDone {
+    background: var(--cb-bg, #22c55e) !important;
+    border-color: var(--cb-bg, #22c55e) !important;
+}
+
+.titleArea {
+    flex: 1;
+    min-width: 0;
+}
+
+.titleSpan {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: color 0.2s;
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: block;
+    border-bottom: 2px solid transparent;
+}
+
+.titleDone {
+    text-decoration: line-through;
+    color: #a89b91;
+}
+
+.titleEditArea {
+    width: 100%;
+    border: none !important;
+    border-bottom: 2px solid var(--cb-bg, #8d7355) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 2px 0 4px !important;
+    outline: none !important;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    font-family: inherit;
+    resize: none;
+    display: block;
+    color: #3c2a20;
+    overflow: hidden;
+}
+
+/* Priority Select */
+.prioritySelect {
+    border: none;
+    border-radius: 20px;
+    padding: 6px 4px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    text-align: center;
+    width: 100%;
+    letter-spacing: 0.05em;
+    transition: transform 0.15s;
+}
+
+.prioritySelect:hover {
+    transform: translateY(-1px);
+}
+
+/* Date Cell */
+.dateCell {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.dateInput {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.dateLabel {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8f7969;
+    text-align: center;
+    pointer-events: none;
+    padding: 6px 10px;
+    background: rgba(143, 121, 105, 0.05);
+    border-radius: 8px;
+    width: 100%;
+}
+
+/* Assign Cell */
+.assignCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    justify-content: center;
+}
+
+.assignClickTarget {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: background 0.2s;
+    min-height: 38px;
+}
+
+.assignClickTargetActive {
+    background: #eee3d8;
+}
+
+.unassigned {
+    font-size: 12px;
+    color: #cdae99;
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* Avatar Stack */
+.avatarStack {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 800;
+    flex-shrink: 0;
+    border: 2px solid #fffaf4;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.avatarMore {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8f7969;
+    margin-left: 6px;
+}
+
+/* Assign Popup */
+.assignPopup {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    background: #fff;
+    border: 1px solid #e2d1c3;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(60, 42, 32, 0.15);
+    z-index: 100;
+    min-width: 180px;
+    padding: 10px 0;
+    animation: popupFadeIn 0.2s ease;
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.assignPopupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 14px 8px;
+    border-bottom: 1px solid #f9f5f1;
+    margin-bottom: 4px;
+}
+
+.assignPopupTitle {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a89b91;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.closePopupBtn {
+    cursor: pointer;
+    color: #a89b91;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.closePopupBtn:hover {
+    color: #7a6455;
+}
+
+.assignItem {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13px;
+    color: #3c2a20;
+    font-weight: 500;
+}
+
+.assignItem:hover {
+    background: #fdfaf7;
+}
+
+.assignItemSelected {
+    background: #f5eee7;
+}
+
+/* Action Cell */
+.actionCell {
+    display: flex;
+    justify-content: center;
+}
+
+.deleteBtn {
+    background: transparent;
+    border: none;
+    color: #c9a790;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #fff0f0;
+    color: #e57373;
+}
+
+.loadingText {
+    font-size: 13px;
+    color: #8f7969;
+    font-weight: 500;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px 0;
+    color: #a89b91;
+    font-size: 14px;
+    font-weight: 500;
+}

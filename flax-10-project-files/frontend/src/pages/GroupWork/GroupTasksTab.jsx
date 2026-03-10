@@ -1,8 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Check, Hourglass, Circle, Trash2, X, Pencil } from "lucide-react";
+import { Check, Hourglass, Circle, Trash2, X, Pencil, ChevronDown } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
+import styles from "./GroupTasksTab.module.css";
 
-const metaStyle = { fontSize: 13, color: "#8f7969" };
+const USER_COLORS = [
+    "#7B6751", // Warm Brown
+    "#C0714E", // Terracotta
+    "#7BB38E", // Sage Green
+    "#9A8CB0", // Muted Lavender
+    "#7B9BAD", // Dusty Blue
+    "#C4A46D", // Warm Gold
+    "#8A7060", // Muted Bronze
+    "#b08c4b"  // Flax Gold
+];
+
+const getUserColor = (userId) => {
+    if (!userId) return USER_COLORS[0];
+    const idStr = String(userId);
+    let hash = 0;
+    for (let i = 0; i < idStr.length; i++) {
+        hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return USER_COLORS[Math.abs(hash) % USER_COLORS.length];
+};
 
 function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
