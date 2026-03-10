@@ -48,10 +48,10 @@
     background: var(--search-bg);
 }
 
-:root[data-theme="dark"] .input {
+:root[data-mode="dark"] .input {
     background: rgba(255, 255, 255, 0.05);
 }
 
-:root[data-theme="dark"] .input:focus {
+:root[data-mode="dark"] .input:focus {
     background: rgba(255, 255, 255, 0.08);
 }

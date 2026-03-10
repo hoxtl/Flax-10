@@ -96,12 +96,12 @@
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] .today {
+[data-mode="dark"] .today {
   background: rgba(180, 140, 90, 0.2);
   color: var(--primary);
 }
 
-[data-theme="dark"] .today:hover {
+[data-mode="dark"] .today:hover {
   background: rgba(180, 140, 90, 0.3);
 }
 

@@ -212,6 +212,12 @@
   --color-primary-strong: #D4B896;
   --color-highlight: #e8dcc8;
   --color-highlight-soft: #c4a35a;
+  /* Exact topbar/frame from original dark mode */
+  --topbar-bg: rgba(26, 19, 16, 0.95);
+  --topbar-border: rgba(180, 155, 126, 0.15);
+  --frame-bg: rgba(36, 26, 20, 0.85);
+  --frame-border: rgba(180, 155, 126, 0.15);
+  --glass-bg: rgba(26, 19, 16, 0.65);
 }
 
 /* 2️⃣ Ocean (Cool Productivity) */
@@ -350,6 +356,11 @@
   --color-sidebar: #201812;
   --color-border-base: rgba(180, 155, 126, 0.18);
 
+  /* Global Design Language (dark): glass + inner glow */
+  --glass-bg: rgba(26, 19, 16, 0.65);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
   /* Semantic text (Dark) */
   --text: #f1f5f9;
   --text-primary: #f1f5f9;
@@ -375,7 +386,7 @@
   --pill-hover: rgba(148, 163, 184, 0.25);
 
   --card-bg: var(--color-card);
-  --bento-card-bg: var(--color-card);
+  --bento-card-bg: var(--glass-bg);
   --calendar-bg: var(--bg);
   --weekbar-bg: var(--bg);
   --search-bg: rgba(0, 0, 0, 0.2);
@@ -389,14 +400,14 @@
 
   --surface: var(--color-bg);
 
-  /* Topbar: derive from --color-sidebar so it matches the theme */
-  --topbar-bg: color-mix(in srgb, var(--color-sidebar) 95%, transparent);
-  --topbar-border: var(--color-border-base);
+  /* Topbar (dark) */
+  --topbar-bg: rgba(26, 19, 16, 0.95);
+  --topbar-border: rgba(180, 155, 126, 0.15);
   --search-glass: rgba(255, 255, 255, 0.08);
 
-  /* Unified frame */
-  --frame-bg: var(--color-sidebar);
-  --frame-border: var(--color-border-base);
+  /* Unified frame (sidebar + topbar): glassmorphism */
+  --frame-bg: rgba(36, 26, 20, 0.85);
+  --frame-border: rgba(180, 155, 126, 0.15);
   --frame-blur: 20px;
 
   --now-banner-bg: rgba(255, 255, 255, 0.08);

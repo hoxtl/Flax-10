@@ -17,23 +17,20 @@ async function logThemeSession(theme, startedAt) {
       method: 'POST',
       body: JSON.stringify({ theme, started_at: startedAt, ended_at: endedAt }),
     });
-  } catch {
-    // silently fail
-  }
+  } catch { /* silently fail */ }
 }
 
-function getStoredMode(fallback) {
-  const stored = localStorage.getItem('mode');
-  return stored === 'light' || stored === 'dark' ? stored : fallback;
+function getStored(key, valid, fallback) {
+  const stored = localStorage.getItem(key);
+  return valid.includes(stored) ? stored : fallback;
 }
 
-function getStoredTheme(fallback = 'flax') {
-  return localStorage.getItem('theme') || fallback;
-}
+const VALID_MODES = ['light', 'dark'];
+const VALID_THEMES = ['flax', 'ocean', 'sage', 'lavender', 'sunset', 'dark-academia'];
 
-export function ThemeProvider({ children, initialMode = 'light' }) {
-  const [mode, setModeState] = useState(() => getStoredMode(initialMode));
-  const [theme, setThemeState] = useState(() => getStoredTheme());
+export function ThemeProvider({ children }) {
+  const [mode, setModeState] = useState(() => getStored('mode', VALID_MODES, 'light'));
+  const [theme, setThemeState] = useState(() => getStored('colorTheme', VALID_THEMES, 'flax'));
   const sessionStart = useRef(new Date().toISOString());
   const currentTheme = useRef(theme);
 
@@ -44,7 +41,7 @@ export function ThemeProvider({ children, initialMode = 'light' }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('colorTheme', theme);
   }, [theme]);
 
   useEffect(() => {

@@ -186,27 +186,27 @@
   flex-shrink: 0;
 }
 
-:root[data-theme="dark"] .actionPill {
+:root[data-mode="dark"] .actionPill {
   background: rgba(255, 255, 255, 0.04);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-:root[data-theme="dark"] .container {
+:root[data-mode="dark"] .container {
   background: rgba(26, 19, 16, 0.80);
   border-bottom: 1px solid rgba(180, 164, 144, 0.10);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-:root[data-theme="dark"] .toolBtn {
+:root[data-mode="dark"] .toolBtn {
   background: rgba(255, 255, 255, 0.05);
 }
 
-:root[data-theme="dark"] .toolBtn:hover {
+:root[data-mode="dark"] .toolBtn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.1);
   color: var(--text);
 }
 
-:root[data-theme="dark"] .navGroupTriggerActive {
+:root[data-mode="dark"] .navGroupTriggerActive {
   background: rgba(158, 126, 93, 0.2);
 }

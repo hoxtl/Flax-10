@@ -5,7 +5,7 @@ const FLAX_BROWN = '#7B6751';
 const SAGE_GREEN = '#8C9A86';
 
 const PlannedVsActualChart = ({ data = [], variant }) => {
-  const { theme } = useTheme();
+  const { mode: theme } = useTheme();
   const isWarm = variant === 'warm';
   const last14 = (Array.isArray(data) ? data : []).slice(-14);
   const dates = last14.map(d => new Date(d.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }));

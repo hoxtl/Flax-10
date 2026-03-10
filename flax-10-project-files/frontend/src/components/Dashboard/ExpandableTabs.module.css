@@ -52,7 +52,7 @@
     flex-shrink: 0;
 }
 
-:root[data-theme="dark"] .tabActive {
+:root[data-mode="dark"] .tabActive {
     color: var(--primary);
 }
 
@@ -75,6 +75,6 @@
     pointer-events: none;
 }
 
-:root[data-theme="dark"] .badge {
+:root[data-mode="dark"] .badge {
     border-color: #1a1310;
 }

@@ -24,9 +24,9 @@
     transition: all 0.15s;
 }
 
-:root[data-theme="dark"] .arrowBtn,
-:root[data-theme="dark"] .actionBtn,
-:root[data-theme="dark"] .settingsBtn {
+:root[data-mode="dark"] .arrowBtn,
+:root[data-mode="dark"] .actionBtn,
+:root[data-mode="dark"] .settingsBtn {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -57,7 +57,7 @@
     transition: all 0.15s;
 }
 
-:root[data-theme="dark"] .todayBtn {
+:root[data-mode="dark"] .todayBtn {
     border-color: rgba(255, 255, 255, 0.2);
 }
 

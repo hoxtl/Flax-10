@@ -13,7 +13,7 @@
     height: 36px;
 }
 
-:root[data-theme="dark"] .container {
+:root[data-mode="dark"] .container {
     background: rgba(255, 255, 255, 0.04);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
@@ -63,10 +63,10 @@
     stroke: var(--primary-strong);
 }
 
-:root[data-theme="dark"] .active {
+:root[data-mode="dark"] .active {
     color: var(--primary);
 }
 
-:root[data-theme="dark"] .active svg {
+:root[data-mode="dark"] .active svg {
     stroke: var(--primary);
 }

@@ -243,41 +243,41 @@
     box-shadow: 0 4px 12px rgba(123, 103, 81, 0.25);
 }
 
-:root[data-theme="dark"] .infoModal {
+:root[data-mode="dark"] .infoModal {
     background: var(--card-bg);
     border-color: var(--border-color);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
-:root[data-theme="dark"] .infoModalHeader {
+:root[data-mode="dark"] .infoModalHeader {
     background: var(--card-bg);
     border-bottom-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoModalBody {
+:root[data-mode="dark"] .infoModalBody {
     background: var(--card-bg);
 }
-:root[data-theme="dark"] .infoHero {
+:root[data-mode="dark"] .infoHero {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoRow,
-:root[data-theme="dark"] .infoRowFull {
+:root[data-mode="dark"] .infoRow,
+:root[data-mode="dark"] .infoRowFull {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoValPill {
+:root[data-mode="dark"] .infoValPill {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--border-color);
     color: var(--text-primary);
 }
-:root[data-theme="dark"] .infoModalFooter {
+:root[data-mode="dark"] .infoModalFooter {
     background: rgba(255, 255, 255, 0.03);
     border-top-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoCloseBtn {
+:root[data-mode="dark"] .infoCloseBtn {
     background: var(--primary);
     color: var(--card-bg);
 }
-:root[data-theme="dark"] .infoCloseBtn:hover {
+:root[data-mode="dark"] .infoCloseBtn:hover {
     background: var(--primary);
     filter: brightness(1.1);
 }

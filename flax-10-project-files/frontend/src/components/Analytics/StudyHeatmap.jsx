@@ -2,7 +2,7 @@ import styles from './Charts.module.css';
 import { useTheme } from '../../context/ThemeContext';
 
 const StudyHeatmap = ({ heatmapData }) => {
-  const { theme } = useTheme();
+  const { mode: theme } = useTheme();
   const { data, days, hours } = heatmapData;
   
   // Find max value for color scaling
