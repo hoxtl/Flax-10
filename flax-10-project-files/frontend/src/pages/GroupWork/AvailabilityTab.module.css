@@ -47,6 +47,13 @@
     font-size: 15px;
     font-weight: 700;
     color: #3c2a20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bestTimeStar {
+    color: #e0b44b;
 }
 
 .memberList {

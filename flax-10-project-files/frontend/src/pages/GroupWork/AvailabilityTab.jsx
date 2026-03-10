@@ -61,7 +61,16 @@ export default function AvailabilityTab({ projectId }) {
             <div className={styles.slotList}>
                 {suggestions.map((slot, idx) => (
                     <div key={idx} className={styles.slotRow}>
-                        <div className={styles.timeLabel}>{slot.label}</div>
+                        <div className={styles.timeLabel}>
+                            {slot.label}
+                            {slot.free_count === slot.total_count && (
+                                <Star
+                                    size={14}
+                                    className={styles.bestTimeStar}
+                                    fill="currentColor"
+                                />
+                            )}
+                        </div>
 
                         <div className={styles.memberList}>
                             {slot.members.map((m) => {
