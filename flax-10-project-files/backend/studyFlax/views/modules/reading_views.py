@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Module, Reading, Task, Enrollment
 from studyFlax.models.tasks.taskModel import TaskList
 from studyFlax.serialisers.reading_serialisers import ReadingSerialiser
-from studyFlax.utils.reading_utils import estimated_time_reading, get_avg_time_per_page
+from studyFlax.utils.reading_utils import estimated_time_reading, get_avg_time_per_page, DEFAULT_PAGE_TIME, MINUTES_PER_BLOCK
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -67,7 +67,7 @@ def create_reading_task(user, reading):
         due_date=reading.deadline,
         module=reading.module,
         priority='medium',
-        estimated_blocks=max(1,math.ceil(estimated/25)),
+        estimated_blocks=max(1,math.ceil(estimated/MINUTES_PER_BLOCK)),
         reading=reading,
         task_list = get_reading_list(user),
         page_count=reading.page_count(),
@@ -116,5 +116,5 @@ def suggested_readings(request):
 def reading_speed(request):
     avg = get_avg_time_per_page(request.user)
     return Response({'avg_min_per_page': avg,
-                     'is_personalised': avg != 2.0})
+                     'is_personalised': avg != DEFAULT_PAGE_TIME})
 
