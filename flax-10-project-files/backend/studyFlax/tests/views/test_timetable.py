@@ -1,3 +1,7 @@
+"""
+Backend tests for timetable.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -285,7 +289,7 @@ class TimetableServiceUnitTest(TestCase):
         events = [
             {'title': 'E1', 'start_time': start, 'end_time': end, 'source': 'x', 'external_id': 'e1'},
             {'title': 'E2', 'start_time': start, 'end_time': end, 'source': 'x', 'external_id': 'e2'},
-            {'title': 'Bad'},  # invalid - skipped
+            {'title': 'Bad'},
         ]
         created, updated = upsert_events(events, self.user)
         self.assertEqual(created, 2)
@@ -357,7 +361,7 @@ class TimetableServiceUnitTest(TestCase):
             sync_timetable('https://example.com/page', self.user)
         mock_status.assert_called_once()
         args = mock_status.call_args[0]
-        self.assertFalse(args[2])  # synced=False
+        self.assertFalse(args[2])
 
 
     @patch('studyFlax.views.calendar.timetable_service.resolve_ics_url')

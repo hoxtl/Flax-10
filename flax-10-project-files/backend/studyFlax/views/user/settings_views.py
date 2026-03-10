@@ -21,7 +21,7 @@ def apply_settings_updates(settings, data):
         settings.timezone = data['timezone']
     settings.save()
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
     settings = get_or_create_settings(request.user)

@@ -1,3 +1,7 @@
+"""
+Backend tests for timer and serializer.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -142,7 +146,6 @@ class StudySessionViewSetTest(TestCase):
         self.assertEqual(task.completed_blocks, 1)
 
     def test_create_session_with_invalid_task_id_no_error(self):
-        """Non-existent task_id should silently fail (filter returns 0 rows)."""
         now = timezone.now()
         data = {
             'start_time': (now - timedelta(minutes=25)).isoformat(),
@@ -184,7 +187,6 @@ class StudySessionViewSetTest(TestCase):
         make_session(self.user)
         response = self.client.delete('/api/timer/history/clear_history/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Other user's session should still exist
         self.assertEqual(StudySession.objects.filter(user=other).count(), 1)
 
     def test_unauthenticated_access(self):
