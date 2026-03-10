@@ -4,6 +4,7 @@
 
 import { Search } from "lucide-react";
 
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import styles from "./TaskFeedToolbar.module.css";
 
 function FilterCheckboxItem({ label, checked, onChange }) {
@@ -16,7 +17,9 @@ function FilterCheckboxItem({ label, checked, onChange }) {
 }
 
 function ListsTab({ visibleListItems, filterListIds, onToggleList }) {
-  if (visibleListItems.length === 0) return <p className={styles.filterEmptyText}>No lists found.</p>;
+  if (visibleListItems.length === 0) {
+    return <EmptyState icon="🗂️" title="No lists found" description="Try a different filter search." />;
+  }
   return (
     <div className={styles.filterItems}>
       {visibleListItems.map((item) => (
@@ -69,7 +72,9 @@ function FilterSearch({ filterQuery, onQueryChange, activeFilterTab }) {
 }
 
 function ModulesTab({ moduleGroupKeys, groupedModuleItems, filterModuleCodes, onToggleModule }) {
-  if (moduleGroupKeys.length === 0) return <p className={styles.filterEmptyText}>No modules found.</p>;
+  if (moduleGroupKeys.length === 0) {
+    return <EmptyState icon="📚" title="No modules found" description="Try a different filter search." />;
+  }
   return (
     <div className={styles.filterGroups}>
       {moduleGroupKeys.map((group) => (

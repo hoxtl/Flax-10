@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
-
+import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import EmptyState from "../common/EmptyState/EmptyState";
 
 export default function HomeAddressForm({ onSave, isSaving, error }) {
     const [homeAddress, setHomeAddress] = useState("");
@@ -26,9 +27,7 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
         onSave(homeAddress);
     };
 
-    if (loading) {
-        return <div className={styles.loading}>Loading...</div>;
-    }
+    if (loading) return <SectionSkeleton label="Loading home address" rows={1} />;
 
     return (
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -51,7 +50,13 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
                   onChange={e => setHomeAddress(e.target.value)}
                   placeholder="e.g., 123 Example Street, London E1 B23"
                   />
-                  {error && <p className={styles.error}>{error}</p>}
+                  {error && (
+                    <EmptyState
+                      icon="⚠️"
+                      title="Could not save address"
+                      description={error}
+                    />
+                  )}
             </div>
 
             <button type="submit" className={styles.submitButton} disabled={isSaving}>

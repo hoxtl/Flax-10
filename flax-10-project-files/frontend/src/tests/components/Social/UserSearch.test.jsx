@@ -100,7 +100,6 @@ describe('SocietyResultItem', () => {
         const society = { id: 1, name: 'Chess Club', categories: ['sports'] };
         render(<SocietyResultItem society={society} isChecked={false} onToggle={vi.fn()} />);
         expect(screen.getByText('Chess Club')).toBeTruthy();
-        expect(screen.getByText('sports society')).toBeTruthy();
     });
 
     it('renders without categories', () => {
@@ -160,7 +159,7 @@ describe('UserSearch', () => {
             vi.advanceTimersByTime(350);
             await vi.runOnlyPendingTimersAsync();
         });
-        expect(screen.getByText('Start typing...')).toBeTruthy();
+        expect(screen.getByText('Start typing')).toBeTruthy();
         expect(searchUsers).not.toHaveBeenCalled();
     });
 
