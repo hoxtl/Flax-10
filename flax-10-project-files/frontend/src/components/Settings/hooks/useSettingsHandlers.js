@@ -34,7 +34,7 @@ async function savePassword(data, setPasswordError, setSuccessMessage, setIsSavi
 }
 
 async function tryUpdateSettings(data) {
-  const response = await updateUserSettings({ theme: data.theme });
+  const response = await updateUserSettings({ theme: data.theme, mode: data.mode });
   if (response?.user) saveUserToStorage(response.user);
   return response;
 }
@@ -92,9 +92,9 @@ export default function useSettingsHandlers() {
       const coords = await geocodeAddress(address);
 
       if (!coords) {
-      setHomeAddressError("Address not found, please try again...")
-      setIsSaving(false);
-      return;
+        setHomeAddressError("Address not found, please try again...")
+        setIsSaving(false);
+        return;
       }
 
       await saveHomeAddress(address, coords.latitude, coords.longitude);
@@ -111,6 +111,6 @@ export default function useSettingsHandlers() {
   const handleSleepSave = async (data) => {
     await saveSleep(data, setSuccessMessage, setIsSaving);
   };
-  
+
   return { isSaving, successMessage, passwordError, homeAddressError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, handleSleepSave };
 }

@@ -28,11 +28,17 @@ function getStored(key, valid, fallback) {
 const VALID_MODES = ['light', 'dark'];
 const VALID_THEMES = ['flax', 'sunset', 'terracotta', 'amber', 'ocean', 'indigo', 'teal', 'forest', 'rose', 'lavender', 'sage', 'sand'];
 
-export function ThemeProvider({ children }) {
-  const [mode, setModeState] = useState(() => getStored('mode', VALID_MODES, 'light'));
-  const [theme, setThemeState] = useState(() => getStored('colorTheme', VALID_THEMES, 'flax'));
+export function ThemeProvider({ children, initialTheme, initialMode }) {
+  const [mode, setModeState] = useState(() => initialMode || getStored('mode', VALID_MODES, 'light'));
+  const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_MODES, 'flax'));
   const sessionStart = useRef(new Date().toISOString());
   const currentTheme = useRef(theme);
+
+  // Sync state if props change (e.g. after backend fetch completes)
+  useEffect(() => {
+    if (initialMode && VALID_MODES.includes(initialMode)) setModeState(initialMode);
+    if (initialTheme && VALID_THEMES.includes(initialTheme)) setThemeState(initialTheme);
+  }, [initialMode, initialTheme]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-mode', mode);

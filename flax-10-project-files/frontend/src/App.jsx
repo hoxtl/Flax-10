@@ -117,16 +117,18 @@ function onBackToAuth() {
 }
 
 // Async helpers
-async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
+async function loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTheme) {
   if (!authed) {
     setIsLoadingTheme(false);
     return;
   }
   try {
     const s = await getUserSettings();
-    setInitialTheme(s.theme || "light");
+    setInitialTheme(s.theme || "flax");
+    setInitialMode(s.mode || "light");
   } catch {
-    setInitialTheme("light");
+    setInitialTheme("flax");
+    setInitialMode("light");
   } finally {
     setIsLoadingTheme(false);
   }
@@ -154,12 +156,13 @@ function useSyncAuth(setAuthed, setUser, setShowWelcome) {
 }
 
 function useThemeState(authed) {
-  const [initialTheme, setInitialTheme] = useState("light");
+  const [initialTheme, setInitialTheme] = useState("flax");
+  const [initialMode, setInitialMode] = useState("light");
   const [isLoadingTheme, setIsLoadingTheme] = useState(true);
   useEffect(() => {
-    loadTheme(authed, setInitialTheme, setIsLoadingTheme);
+    loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTheme);
   }, [authed]);
-  return { initialTheme, isLoadingTheme };
+  return { initialTheme, initialMode, isLoadingTheme };
 }
 
 function readActiveNav() {
@@ -174,7 +177,7 @@ function useAppState() {
     () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
   );
   useSyncAuth(setAuthed, setUser, setShowWelcome);
-  const { initialTheme, isLoadingTheme } = useThemeState(authed);
+  const { initialTheme, initialMode, isLoadingTheme } = useThemeState(authed);
 
   const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
@@ -189,6 +192,7 @@ function useAppState() {
     activeNav,
     setActiveNav,
     initialTheme,
+    initialMode,
     isLoadingTheme,
     user,
     authed,
@@ -421,7 +425,7 @@ export default function App() {
   if (state.isLoadingTheme) return null;
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
   return (
-    <ThemeProvider initialTheme={state.initialTheme}>
+    <ThemeProvider initialTheme={state.initialTheme} initialMode={state.initialMode}>
       <div style={ROOT_STYLE}>
         <AnimatePresence>{renderScreen(screen, state)}</AnimatePresence>
       </div>
