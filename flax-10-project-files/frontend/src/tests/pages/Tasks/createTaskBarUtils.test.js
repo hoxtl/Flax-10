@@ -54,5 +54,14 @@ describe("createTaskBarUtils", () => {
       expect(state.setSaving).toHaveBeenCalledWith(true);
       expect(state.setSaving).toHaveBeenCalledWith(false);
     });
+
+    it("runs without setSaving when state has no setSaving", async () => {
+      const state = { saving: false, title: "T", setTitle: vi.fn(), setModuleId: vi.fn(), sortedLists: [{ id: 1 }], taskListId: "1", estimatedBlocks: 1, moduleId: null, defaultDueDate: null };
+      const onAddTask = vi.fn().mockResolvedValue(undefined);
+      await runQuickAdd(state, onAddTask, "Task");
+      expect(onAddTask).toHaveBeenCalled();
+      expect(state.setTitle).toHaveBeenCalledWith("");
+      expect(state.setModuleId).toHaveBeenCalledWith(null);
+    });
   });
 });
