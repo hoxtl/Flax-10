@@ -14,7 +14,7 @@ export function SettingsTabs({ activeTab, onChange }) {
     { id: "account", label: "Account" },
     { id: "security", label: "Security" },
     { id: "preferences", label: "Preferences" },
-    { id: "home", label: "Home Address"},
+    { id: "home", label: "Home Address" },
     { id: "sleep", label: "Sleep" },
   ];
   return (
@@ -97,6 +97,27 @@ export function ThemeSelector({ value, onChange }) {
         <span className={styles.themeIcon}>🌙</span>
         <span className={styles.themeLabel}>Dark</span>
       </button>
+    </div>
+  );
+}
+
+export function ColorThemeSelector({ value, onChange }) {
+  const themes = [
+    { id: 'flax', name: 'Flax', color: '#7B6751' },
+    { id: 'blue', name: 'Calm Blue', color: '#4F6D8A' }
+  ];
+
+  return (
+    <div className={styles.colorThemeSelector}>
+      {themes.map(t => (
+        <button
+          key={t.id} type="button" onClick={() => onChange(t.id)}
+          className={`${styles.colorThemeOption} ${value === t.id ? styles.active : ''}`}
+        >
+          <span className={styles.colorCircle} style={{ backgroundColor: t.color }} />
+          <span className={styles.themeLabel}>{t.name}</span>
+        </button>
+      ))}
     </div>
   );
 }

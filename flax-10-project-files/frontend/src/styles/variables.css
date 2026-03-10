@@ -1,4 +1,10 @@
 :root {
+  /* Dynamic Theme Variables */
+  --color-primary: #7B6751;
+  --color-primary-strong: #5c4d3e;
+  --color-highlight: #c4a35a;
+  --color-highlight-soft: #e8dcc8;
+
   /* Global Design Language: 24px card radius, no black/grey borders */
   --radius: 12px;
   --radius-pill: 9999px;
@@ -15,17 +21,17 @@
   --font-weight-task: 500;
   --font-weight-caption: 400;
 
-  /* Semantic text colors for typography — Warm-Classy: Flax Brown for primary headers */
-  --text-charcoal: #7B6751;
+  /* Semantic text colors for typography — Warm-Classy */
+  --text-charcoal: var(--color-primary);
   --text-muted-sage: #5a635a;
 
-  /* Flax-inspired palette: Flax Brown primary + soft yellows/golds */
-  --flax-brown: #7B6751;
-  --flax-brown-strong: #5c4d3e;
-  --flax-gold: #c4a35a;
-  --flax-gold-soft: #e8dcc8;
+  /* Theme-driven palette mappings */
+  --flax-brown: var(--color-primary);
+  --flax-brown-strong: var(--color-primary-strong);
+  --flax-gold: var(--color-highlight);
+  --flax-gold-soft: var(--color-highlight-soft);
   --color-flax-light: #f5f0e8;
-  --flax-charcoal: #7B6751;
+  --flax-charcoal: var(--color-primary);
   --flax-navy: #0f172a;
 
   --c-white: #ffffff;
@@ -58,10 +64,10 @@
   --text-dark: #1e1b2e;
   --muted: #9CA3AF;
 
-  --primary: #7B6751;
-  --primary-strong: #5c4d3e;
+  --primary: var(--color-primary);
+  --primary-strong: var(--color-primary-strong);
   --sage: #8C9A86;
-  --accent: #7B6751;
+  --accent: var(--color-primary);
   --danger: #C05A3E;
   --danger-bg: rgba(192, 90, 62, 0.12);
   --danger-border: rgba(192, 90, 62, 0.4);
@@ -114,7 +120,7 @@
 
   /* Daily Progress widget */
   --color-terracotta: #C05A3E;
-  --color-brown-light: #c4a35a;
+  --color-brown-light: var(--color-highlight);
   --color-error-light: rgba(192, 90, 62, 0.15);
   --color-sage-dark: #3d5a52;
   --color-orange-400: #fb923c;
@@ -126,8 +132,8 @@
   /* Progress wave / growth tank (light) */
   --growth-tank-deep: var(--color-sage-dark);
   --growth-tank-fill: var(--sage);
-  /* Timeline current-time line (gold) */
-  --timeline-now-line: #c4a35a;
+  /* Timeline current-time line (highlight) */
+  --timeline-now-line: var(--color-highlight);
   /* Heatmap: cream → sage scale */
   --heatmap-empty: #f5f3ef;
   --heatmap-low: #e8ebe6;
@@ -174,6 +180,14 @@
   --scroll-btn-hover: #8a6d4f;
 
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
+}
+
+/* Base Theme Configurations */
+:root[data-color-theme="blue"] {
+  --color-primary: #4F6D8A;
+  --color-primary-strong: #3B546C;
+  --color-highlight: #7FA7C2;
+  --color-highlight-soft: #DCE7F0;
 }
 
 /* Completion Burst: burst of green particles from checkbox (0.5s) */
