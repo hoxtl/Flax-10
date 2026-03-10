@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 24px;
-  background: rgba(246, 244, 241, 0.85);
+  background: var(--topbar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
@@ -192,8 +192,8 @@
 }
 
 :root[data-mode="dark"] .container {
-  background: rgba(26, 19, 16, 0.80);
-  border-bottom: 1px solid rgba(180, 164, 144, 0.10);
+  background: var(--topbar-bg);
+  border-bottom: 1px solid var(--topbar-border);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
