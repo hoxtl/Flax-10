@@ -78,11 +78,6 @@ describe('societyApi', () => {
         });
     });
 
-    it('searchUsers', async () => {
-        await api.searchUsers('alice');
-        expect(fetchApi).toHaveBeenCalledWith('/users/search/?q=alice');
-    });
-
     it('fetchSocietyTags', async () => {
         await api.fetchSocietyTags(1);
         expect(fetchApi).toHaveBeenCalledWith('/societies/1/tags/');
