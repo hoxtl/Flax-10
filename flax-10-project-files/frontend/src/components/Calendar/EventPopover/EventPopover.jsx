@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
 import { calculatePopoverPosition, calculateArrowPosition } from './popoverUtils';
+import { isAllDayEvent } from '../utils/eventDisplayUtils';
 import styles from './EventPopover.module.css';
 
 const EVENT_ACCENTS = { module: "#7B9BAD", society: "#C4906A" };
@@ -66,21 +67,24 @@ function DescriptionDetail({ text }) {
     );
 }
 
-function formatTimeRange(start, end) {
+function formatTimeRange(event) {
+    if (isAllDayEvent(event)) return 'All day';
+    const start = event.start_time;
+    const end = event.end_time;
     if (!start) return '';
     const s = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const e = end ? new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
     return e ? `${s} - ${e}` : s;
 }
 
-function usePopoverPosition(popoverRef, anchorRect, event) {
+function usePopoverPosition(popoverRef, anchorRect, event, viewMode) {
     const [position, setPosition] = useState({ top: -9999, left: -9999, placement: 'right' });
     useLayoutEffect(() => {
         if (!popoverRef.current || !anchorRect) return;
         let currentTop = null;
         const update = () => {
             if (!popoverRef.current) return;
-            const pos = calculatePopoverPosition(anchorRect, popoverRef.current.offsetWidth, popoverRef.current.offsetHeight, window.innerWidth, window.innerHeight, currentTop);
+            const pos = calculatePopoverPosition(anchorRect, popoverRef.current.offsetWidth, popoverRef.current.offsetHeight, window.innerWidth, window.innerHeight, currentTop, viewMode);
             currentTop = pos.top;
             setPosition(pos);
         };
@@ -88,7 +92,7 @@ function usePopoverPosition(popoverRef, anchorRect, event) {
         const obs = new ResizeObserver(update);
         obs.observe(popoverRef.current);
         return () => obs.disconnect();
-    }, [anchorRect, event]);
+    }, [anchorRect, event, viewMode]);
     return position;
 }
 
@@ -108,27 +112,37 @@ function EventPopoverContent({ event, tag, actions, onClose, readOnly }) {
     return (
         <div className={styles.popoverContent}>
             <PopoverHeader event={event} title={event.title} tag={tag} actions={actions} onClose={onClose} readOnly={readOnly} />
-            <EventDetail icon={<Clock size={14} />} text={formatTimeRange(event.start_time, event.end_time)} />
+            <EventDetail icon={<Clock size={14} />} text={formatTimeRange(event)} />
             <EventDetail icon={<MapPin size={14} />} text={event.location} />
             <DescriptionDetail text={event.description} />
         </div>
     );
 }
 
-export function EventPopover({ event, anchorRect, onClose, actions, tag, readOnly }) {
+export function EventPopover({ event, anchorRect, onClose, actions, tag, readOnly, viewMode }) {
     const popoverRef = useRef(null);
-    const pos = usePopoverPosition(popoverRef, anchorRect, event);
+    const pos = usePopoverPosition(popoverRef, anchorRect, event, viewMode);
     usePopoverCloseEvents(popoverRef, onClose);
 
     if (!event || !anchorRect) return null;
-    const arrowTop = calculateArrowPosition(anchorRect, pos.top);
-    const arrowCls = pos.placement === 'right' ? styles.popoverArrowRight : pos.placement === 'left' ? styles.popoverArrowLeft : styles.popoverArrowNone;
+    const arrowPos = calculateArrowPosition(anchorRect, pos, pos.placement);
+
+    const arrowClsMap = {
+        right: styles.popoverArrowRight,
+        left: styles.popoverArrowLeft,
+        top: styles.popoverArrowTop,
+        bottom: styles.popoverArrowBottom,
+        none: styles.popoverArrowNone
+    };
+    const arrowCls = arrowClsMap[pos.placement] || styles.popoverArrowNone;
+    const isVertical = pos.placement === 'top' || pos.placement === 'bottom';
+    const arrowStyle = isVertical ? { left: arrowPos } : { top: arrowPos };
 
     const content = (
         <>
             <div className={styles.popoverOverlay} onMouseDown={onClose} />
             <div ref={popoverRef} className={styles.popoverContainer} style={{ top: pos.top, left: pos.left }}>
-                <div className={`${styles.popoverArrow} ${arrowCls}`} style={{ top: arrowTop }} />
+                <div className={`${styles.popoverArrow} ${arrowCls}`} style={arrowStyle} />
                 <EventPopoverContent event={event} tag={tag} actions={actions} onClose={onClose} readOnly={readOnly} />
             </div>
         </>

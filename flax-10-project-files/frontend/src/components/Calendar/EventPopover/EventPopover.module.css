@@ -40,6 +40,16 @@
     transform: rotate(45deg);
 }
 
+.popoverArrowTop {
+    bottom: -6px;
+    transform: rotate(135deg);
+}
+
+.popoverArrowBottom {
+    top: -6px;
+    transform: rotate(-45deg);
+}
+
 .popoverArrowNone {
     display: none;
 }

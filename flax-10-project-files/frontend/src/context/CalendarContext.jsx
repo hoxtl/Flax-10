@@ -98,8 +98,8 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect, readOnly } = context;
+    const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
     const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, readOnly, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
 }
