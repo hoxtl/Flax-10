@@ -6,6 +6,9 @@ const metaStyle = { fontSize: 13, color: "#8f7969" };
 
 function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedTitle, setEditedTitle] = useState(task.title);
+    const [isExpanded, setIsExpanded] = useState(false);
     const popupRef = useRef(null);
     const isDone = task.completed;
 
@@ -42,6 +45,21 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const handleDateChange = (e) => {
         const dateStr = e.target.value;
         onUpdate(task.id, { due_date: dateStr ? new Date(dateStr).toISOString() : null });
+    };
+
+    const handleTitleSave = () => {
+        if (editedTitle.trim() && editedTitle !== task.title) {
+            onUpdate(task.id, { title: editedTitle.trim() });
+        }
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") handleTitleSave();
+        if (e.key === "Escape") {
+            setEditedTitle(task.title);
+            setIsEditing(false);
+        }
     };
 
     // Formatting due date like "1 Mar"
@@ -81,7 +99,7 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                 opacity: isDone ? 0.6 : 1,
             }}
         >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                 <button
                     onClick={() => onToggle(task.id, !isDone)}
                     style={{
@@ -96,6 +114,7 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                         cursor: "pointer",
                         flexShrink: 0,
                         color: isDone ? "#2d6a2d" : "#8f7969",
+                        marginTop: 2,
                     }}
                 >
                     {isDone ? (
@@ -106,19 +125,47 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                         <Circle size={12} />
                     )}
                 </button>
-                <span
-                    style={{
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: isDone ? "#a89b91" : "#3c2a20",
-                        textDecoration: isDone ? "line-through" : "none",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                    }}
-                >
-                    {task.title}
-                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    {isEditing ? (
+                        <input
+                            autoFocus
+                            value={editedTitle}
+                            onChange={(e) => setEditedTitle(e.target.value)}
+                            onBlur={handleTitleSave}
+                            onKeyDown={handleKeyDown}
+                            style={{
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: "#3c2a20",
+                                width: "100%",
+                                border: "1px solid #e3d4c6",
+                                borderRadius: 4,
+                                padding: "2px 4px",
+                                outline: "none",
+                            }}
+                        />
+                    ) : (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+                            <span
+                                onClick={() => setIsExpanded(!isExpanded)}
+                                onDoubleClick={() => setIsEditing(true)}
+                                style={{
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    color: isDone ? "#a89b91" : "#3c2a20",
+                                    textDecoration: isDone ? "line-through" : "none",
+                                    whiteSpace: isExpanded ? "normal" : "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: isExpanded ? "clip" : "ellipsis",
+                                    cursor: "pointer",
+                                    flex: 1,
+                                }}
+                            >
+                                {task.title}
+                            </span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div>
