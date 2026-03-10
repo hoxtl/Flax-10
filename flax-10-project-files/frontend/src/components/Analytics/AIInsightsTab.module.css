@@ -16,22 +16,17 @@
 .chatPanel {
   background: var(--panel);
   border: none;
-  border-radius: 28px;
+  border-radius: var(--ai-panel-radius);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 540px;
   max-height: 680px;
-  box-shadow: 0 30px 80px rgba(49, 32, 16, 0.12), 0 8px 24px rgba(49, 32, 16, 0.06);
+  box-shadow: var(--ai-panel-shadow);
 }
 
 .chatPanel {
   height: 100%;
-}
-
-[data-theme="dark"] .panel,
-[data-theme="dark"] .chatPanel {
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
 }
 
 .panelHeader {
@@ -40,9 +35,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1.3rem 1.3rem 1rem;
-  border-bottom: 1px solid rgba(141, 117, 89, 0.12);
+  border-bottom: 1px solid var(--ai-header-border);
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+  background: var(--ai-header-bg);
 }
 
 .panelHeaderCompact {
@@ -55,13 +50,13 @@
 .panelTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #2e261d;
+  color: var(--ai-card-title);
   margin: 0 0 0.2rem;
 }
 
 .panelSub {
   font-size: 0.8rem;
-  color: #8a7a68;
+  color: var(--ai-card-subtitle);
   margin: 0;
 }
 
@@ -78,8 +73,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #7f694e;
-  background: rgba(159, 133, 100, 0.14);
+  color: var(--ai-icon-fg);
+  background: var(--ai-icon-bg);
   flex-shrink: 0;
 }
 
@@ -88,7 +83,7 @@
   align-items: center;
   gap: 0.4rem;
   background: var(--primary);
-  color: #fff;
+  color: var(--ai-button-fg);
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1rem;
@@ -107,8 +102,8 @@
 .btnSpinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
+  border: 2px solid var(--ai-button-spinner-track);
+  border-top-color: var(--ai-button-spinner-head);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -152,24 +147,32 @@
 }
 
 .emptyIcon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  opacity: 0.8;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ai-icon-bg);
+  color: var(--ai-empty-icon-fg);
+  font-size: 1.35rem;
+  margin-bottom: 0.1rem;
 }
 
 .emptyTitle {
   font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 700;
+  color: var(--ai-card-title);
   margin: 0;
 }
 
 .emptyText {
-  font-size: 0.825rem;
-  color: var(--muted);
-  margin: 0;
-  max-width: 280px;
+  font-size: 0.82rem;
   line-height: 1.55;
+  color: var(--ai-empty-text);
+  font-weight: 500;
+  margin: 0;
+  max-width: 300px;
 }
 
 .insightsBody {
@@ -203,14 +206,14 @@
 
 @media (max-width: 900px) {
   .aiGrid { grid-template-columns: 1fr; }
-  .panel, .chatPanel { min-height: 420px; max-height: 520px; border-radius: 24px; }
+  .panel, .chatPanel { min-height: 420px; max-height: 520px; border-radius: var(--ai-panel-radius-mobile); }
 }
 
 /* ── Panel body ── */
 .panelBody {
   flex: 1;
   overflow: hidden;
-  padding: 1rem 1.25rem;
+  padding: 0.8rem 1.25rem 0.85rem;
   display: flex;
   flex-direction: column;
 }
@@ -227,9 +230,9 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.625rem;
-  padding: 1.25rem 2rem;   /* was 2rem — a bit tighter */
-  color: var(--muted);
+  gap: 0.55rem;
+  padding: 1rem 0 0.25rem;
+  color: var(--ai-empty-text);
   font-size: 0.875rem;
   min-height: 0;           /* was 300px — removed so Home card stays compact */
 }
@@ -243,17 +246,13 @@
   border: none;
   border-radius: 10px;
   border-left: 3px solid var(--primary);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: var(--ai-item-shadow);
   transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-[data-theme="dark"] .insightItem {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .insightItem.insightSelected {
   background: var(--hover);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: var(--ai-item-active-shadow);
 }
 
 .insightNum {
@@ -273,6 +272,35 @@
   margin: 0;
 }
 
+.markdownBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.mdH1 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0.5rem 0 0.1rem;
+}
+
+.mdH2 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0.5rem 0 0.1rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mdH3 {
+  font-size: 0.845rem;
+  font-weight: 650;
+  color: var(--text);
+  margin: 0.4rem 0 0.1rem;
+}
 
 .mdP {
   font-size: 0.845rem;

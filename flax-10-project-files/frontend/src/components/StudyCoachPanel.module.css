@@ -12,9 +12,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1.3rem 1.3rem 1rem;
-  border-bottom: 1px solid rgba(141, 117, 89, 0.12);
+  border-bottom: 1px solid var(--ai-header-border);
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+  background: var(--ai-header-bg);
 }
 
 .headerLeft {
@@ -30,21 +30,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #7f694e;
-  background: rgba(159, 133, 100, 0.14);
+  color: var(--ai-icon-fg);
+  background: var(--ai-icon-bg);
   flex-shrink: 0;
 }
 
 .headerTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #2e261d;
+  color: var(--ai-card-title);
   margin: 0 0 0.2rem;
 }
 
 .headerSub {
   font-size: 0.8rem;
-  color: #8a7a68;
+  color: var(--ai-card-subtitle);
   margin: 0;
 }
 
@@ -60,22 +60,22 @@
   border-radius: 999px;
   padding: 0.35rem 0.65rem;
   font-size: 0.78rem;
-  color: #7b6a58;
+  color: var(--ai-chat-clear-fg);
   cursor: pointer;
   transition: background 0.15s;
   flex-shrink: 0;
 }
 
 .clearBtn:hover {
-  background: rgba(159, 133, 100, 0.1);
+  background: var(--hover-light);
 }
 
 .closeBtn {
   width: 34px;
   height: 34px;
-  color: #8a7a68;
+  color: var(--ai-card-subtitle);
   background: none;
-  border: 1px solid rgba(141, 117, 89, 0.16);
+  border: 1px solid var(--ai-chat-close-border);
   border-radius: 999px;
   cursor: pointer;
   padding: 0;
@@ -85,7 +85,7 @@
 }
 
 .closeBtn:hover {
-  background: rgba(159, 133, 100, 0.08);
+  background: var(--hover-light);
 }
 
 .messages {
@@ -129,15 +129,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(159, 133, 100, 0.14);
-  color: #8b7356;
+  background: var(--ai-icon-bg);
+  color: var(--ai-empty-icon-fg);
   margin-bottom: 0.1rem;
 }
 
 .emptyText {
   font-size: 0.82rem;
   line-height: 1.55;
-  color: #8a7a68;
+  color: var(--ai-empty-text);
   font-weight: 500;
   max-width: 300px;
   margin: 0;
@@ -154,21 +154,21 @@
 
 .suggestion {
   width: 100%;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(141, 117, 89, 0.14);
+  background: var(--ai-chat-suggestion-bg);
+  border: 1px solid var(--ai-chat-suggestion-border);
   border-radius: 16px;
   padding: 0.72rem 0.9rem;
   font-size: 0.78rem;
   line-height: 1.3;
-  color: #2f271f;
+  color: var(--ai-chat-suggestion-fg);
   cursor: pointer;
   text-align: left;
   transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
 .suggestion:hover {
-  background: #ffffff;
-  border-color: rgba(141, 117, 89, 0.28);
+  background: var(--ai-chat-suggestion-hover-bg);
+  border-color: var(--ai-chat-suggestion-hover-border);
   transform: translateY(-1px);
 }
 
@@ -190,8 +190,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(159, 133, 100, 0.16);
-  color: #7f694e;
+  background: var(--ai-icon-bg);
+  color: var(--ai-icon-fg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,17 +208,17 @@
 }
 
 .bubbleUser {
-  background: linear-gradient(145deg, #3f1d0f, #261108);
-  color: #fff8f1;
+  background: var(--ai-chat-user-bubble-bg);
+  color: var(--ai-chat-user-bubble-fg);
   border-bottom-right-radius: 6px;
-  box-shadow: 0 12px 24px rgba(63, 29, 15, 0.18);
+  box-shadow: var(--ai-chat-user-bubble-shadow);
 }
 
 .bubbleAI {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(141, 117, 89, 0.12);
-  box-shadow: none;
-  color: #302820;
+  background: var(--ai-chat-ai-bubble-bg);
+  border: 1px solid var(--ai-chat-ai-bubble-border);
+  box-shadow: var(--ai-chat-ai-bubble-shadow);
+  color: var(--ai-chat-ai-bubble-fg);
   border-bottom-left-radius: 6px;
   min-height: 36px;
   max-width: 92%;
@@ -228,10 +228,6 @@
   align-items: center;
 }
 
-[data-theme="dark"] .bubbleAI {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-}
-
 .bubbleLine {
   margin: 0;
 }
@@ -239,7 +235,7 @@
 .dot {
   width: 7px;
   height: 7px;
-  background: #8a7a68;
+  background: var(--ai-chat-dot);
   border-radius: 50%;
   animation: bounce 1s infinite;
   display: inline-block;
@@ -252,29 +248,29 @@
 
 .error {
   font-size: 0.8rem;
-  color: var(--error-text, #ef4444);
+  color: var(--error-text);
   text-align: center;
   margin: 0;
 }
 
 .inputRow {
   padding: 0.75rem 1.1rem 0.9rem;
-  border-top: 1px solid rgba(141, 117, 89, 0.12);
+  border-top: 1px solid var(--ai-header-border);
   display: flex;
   gap: 0.625rem;
   align-items: flex-end;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.36);
+  background: var(--ai-chat-input-row-bg);
 }
 
 .textarea {
   flex: 1;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(141, 117, 89, 0.16);
+  background: var(--ai-chat-input-bg);
+  border: 1px solid var(--ai-chat-input-border);
   border-radius: 16px;
   padding: 0.72rem 0.9rem;
   font-size: 0.88rem;
-  color: #302820;
+  color: var(--ai-chat-input-fg);
   resize: none;
   outline: none;
   font-family: inherit;
@@ -286,32 +282,32 @@
 }
 
 .textarea:focus {
-  border-color: rgba(141, 117, 89, 0.32);
+  border-color: var(--ai-chat-input-focus-border);
 }
 
 .textarea::placeholder {
-  color: #9c8c7b;
+  color: var(--ai-chat-placeholder);
 }
 
 .sendBtn {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #9f8f83, #b5a79d);
-  color: #fff8f1;
-  border: 1px solid rgba(141, 117, 89, 0.12);
+  background: var(--ai-chat-send-bg);
+  color: var(--ai-chat-send-fg);
+  border: 1px solid var(--ai-chat-send-border);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: opacity 0.18s, transform 0.18s, box-shadow 0.15s;
   flex-shrink: 0;
-  box-shadow: 0 10px 20px rgba(80, 58, 35, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  box-shadow: var(--ai-chat-send-shadow);
 }
 
 .sendBtn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 14px 24px rgba(80, 58, 35, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  box-shadow: var(--ai-chat-send-hover-shadow);
 }
 
 .sendBtn:disabled {
@@ -334,7 +330,7 @@
 .mdH3 {
   font-weight: 700;
   margin: 0.4rem 0 0.2rem;
-  color: #302820;
+  color: var(--ai-markdown-fg);
 }
 
 .mdH1 {
@@ -351,7 +347,7 @@
 
 .mdP {
   margin: 0.2rem 0;
-  color: #302820;
+  color: var(--ai-markdown-fg);
 }
 
 .mdUl,
@@ -362,10 +358,10 @@
 
 .mdLi {
   margin: 0.15rem 0;
-  color: #302820;
+  color: var(--ai-markdown-fg);
 }
 
 .mdStrong {
   font-weight: 650;
-  color: #302820;
+  color: var(--ai-markdown-fg);
 }
