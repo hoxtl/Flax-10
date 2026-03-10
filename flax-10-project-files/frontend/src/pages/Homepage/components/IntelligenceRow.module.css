@@ -526,10 +526,6 @@
   opacity: 0;
 }
 
-.bentoSlot:hover {
-  /* No shadow — clean white cards only */
-}
-
 /* Widget cards: same base style for all — no colored tints */
 .bentoSlotVariantRightNow {
   background: var(--color-card);

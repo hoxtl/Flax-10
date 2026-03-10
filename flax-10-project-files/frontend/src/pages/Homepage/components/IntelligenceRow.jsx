@@ -9,8 +9,9 @@ import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { QuickActionsWidget } from "./QuickActionsWidget";
 import { SocialDiscoverWidget } from "./SocialDiscoverWidget";
 import { StudyPulseWidget } from "./StudyPulseWidget";
+import { ImageWidget } from "./ImageWidget";
 import { Reorder } from "framer-motion";
-import { Settings, Check, Lock, GripHorizontal } from "lucide-react";
+import { Settings, Check, Lock, GripHorizontal, Trash2, Plus, X as CloseIcon } from "lucide-react";
 
 function getGreeting(name) {
   const h = new Date().getHours();
@@ -51,6 +52,11 @@ export default function IntelligenceRow({
 }) {
   const tflDelays = useTflDelays();
   const navigate = useNavigate();
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const handleRemoveWidget = (widgetId) => {
+    saveWidgetLayout(homepageWidgets.filter((w) => w.id !== widgetId));
+  };
 
   const renderWidgetContent = (id) => {
     switch (id) {
@@ -80,11 +86,25 @@ export default function IntelligenceRow({
           />
         );
       default:
+        // Handle custom image widget
+        if (id.startsWith("customImage")) {
+          const wData = homepageWidgets.find((w) => w.id === id);
+          return (
+            <ImageWidget
+              widgetData={wData}
+              isEditing={isEditingDashboard}
+              onUpdateImage={(wId, url) => {
+                saveWidgetLayout(homepageWidgets.map(w => w.id === wId ? { ...w, url } : w));
+              }}
+            />
+          );
+        }
         return null; // fallback for widgets removed or unavailable
     }
   };
 
   const getWidgetStyleClass = (id) => {
+    if (id.startsWith("customImage")) return styles.posImageWidget;
     switch (id) {
       case "rightNow": return styles.posRightNow;
       case "tasks": return styles.posTodaysTasks;
@@ -147,14 +167,29 @@ export default function IntelligenceRow({
               value={widget}
               className={getWidgetStyleClass(widget.id)}
             >
-              <BentoCard className={isEditingDashboard ? 'opacity-80' : ''}>
-                <div className="absolute top-2 right-2 p-1.5 rounded-md bg-stone-100 hover:bg-stone-200 cursor-grab z-10">
-                  <GripHorizontal size={14} className="text-stone-500" />
+              <BentoCard className={isEditingDashboard ? 'opacity-90 outline outline-2 outline-gray-200 outline-offset-2 scale-[0.98]' : ''}>
+                <div className="absolute top-2 right-2 flex items-center gap-1 z-10 transition-opacity">
+                  <div className="p-1.5 rounded-md bg-stone-100 hover:bg-stone-200 cursor-grab">
+                    <GripHorizontal size={14} className="text-stone-500" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveWidget(widget.id)}
+                    className="p-1.5 rounded-md bg-red-50 hover:bg-red-100 text-red-500 cursor-pointer"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
                 {renderWidgetContent(widget.id)}
               </BentoCard>
             </Reorder.Item>
           ))}
+          <BentoCard className="flex items-center justify-center border-2 border-dashed bg-transparent hover:bg-stone-50 transition-colors cursor-pointer"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            onClick={() => { /* TODO: Open modal to add widget */ }}
+          >
+            <Plus size={24} />
+          </BentoCard>
         </Reorder.Group>
       ) : (
         <BentoGrid>
@@ -164,6 +199,72 @@ export default function IntelligenceRow({
             </BentoCard>
           ))}
         </BentoGrid>
+      )}
+
+      {/* Add Widget Button */}
+      {isEditingDashboard && (
+        <div className="mt-6 flex justify-center pb-8">
+          <button
+            type="button"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-full border-2 border-dashed bg-transparent hover:bg-stone-50 transition-colors"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            onClick={() => setShowAddModal(true)}
+          >
+            <Plus size={16} /> Add Widget
+          </button>
+        </div>
+      )}
+
+      {/* Add Widget Modal */}
+      {showAddModal && isEditingDashboard && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
+              <h3 className="text-lg font-semibold text-stone-800">Add Widget</h3>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="p-2 text-stone-400 hover:bg-stone-50 hover:text-stone-600 rounded-full transition-colors"
+              >
+                <CloseIcon size={18} />
+              </button>
+            </div>
+            <div className="p-4 max-h-[60vh] overflow-y-auto flex flex-col gap-3">
+              {[
+                { id: "rightNow", title: "Right Now", desc: "Live compass of your schedule" },
+                { id: "tasks", title: "Today's Tasks", desc: "Your action items and routines" },
+                { id: "quickActions", title: "Quick Actions", desc: "One-click shortcuts" },
+                { id: "socialDiscover", title: "Discover Societies", desc: "Explore events and groups" },
+                { id: "deadlines", title: "Upcoming Deadlines", desc: "Stay on top of coursework" },
+                { id: "studyPulse", title: "Study Pulse", desc: "Monitor weekly focus goals" },
+                { id: "customImage", title: "Photo", desc: "Upload and display a custom image" }
+              ].map((wItem) => {
+                const isSystemInUse = wItem.id !== "customImage" && homepageWidgets.some((w) => w.id === wItem.id);
+                if (isSystemInUse) return null; // Can only have one of each system widget
+
+                return (
+                  <button
+                    key={wItem.id}
+                    type="button"
+                    onClick={() => {
+                      const newId = wItem.id === "customImage" ? `customImage-${Date.now()}` : wItem.id;
+                      saveWidgetLayout([...homepageWidgets, { id: newId, type: wItem.id === "customImage" ? "image" : "system" }]);
+                      setShowAddModal(false);
+                    }}
+                    className="flex flex-col items-start gap-1 p-4 rounded-xl border border-stone-100 bg-white hover:border-stone-200 hover:bg-stone-50 transition-all text-left"
+                  >
+                    <span className="font-semibold text-stone-800">{wItem.title}</span>
+                    <span className="text-sm text-stone-500">{wItem.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
       )}
     </section>
   );
