@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Check, Hourglass, Circle, Trash2, X } from "lucide-react";
+import { Check, Hourglass, Circle, Trash2, X, Pencil } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 
 const metaStyle = { fontSize: 13, color: "#8f7969" };
@@ -8,7 +8,6 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(task.title);
-    const [isExpanded, setIsExpanded] = useState(false);
     const popupRef = useRef(null);
     const isDone = task.completed;
 
@@ -55,7 +54,10 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === "Enter") handleTitleSave();
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleTitleSave();
+        }
         if (e.key === "Escape") {
             setEditedTitle(task.title);
             setIsEditing(false);
@@ -127,12 +129,23 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                 </button>
                 <div style={{ flex: 1, minWidth: 0 }}>
                     {isEditing ? (
-                        <input
+                        <textarea
                             autoFocus
                             value={editedTitle}
-                            onChange={(e) => setEditedTitle(e.target.value)}
+                            onChange={(e) => {
+                                setEditedTitle(e.target.value);
+                                e.target.style.height = 'auto';
+                                e.target.style.height = e.target.scrollHeight + 'px';
+                            }}
                             onBlur={handleTitleSave}
                             onKeyDown={handleKeyDown}
+                            rows={1}
+                            ref={(el) => {
+                                if (el) {
+                                    el.style.height = 'auto';
+                                    el.style.height = el.scrollHeight + 'px';
+                                }
+                            }}
                             style={{
                                 fontSize: 14,
                                 fontWeight: 500,
@@ -142,24 +155,30 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                                 borderRadius: 4,
                                 padding: "2px 4px",
                                 outline: "none",
+                                resize: "none",
+                                overflow: "hidden",
+                                display: "block",
+                                lineHeight: "1.4",
+                                background: "#fff",
+                                fontFamily: "inherit"
                             }}
                         />
                     ) : (
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 8, width: "100%" }}>
                             <span
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                onDoubleClick={() => setIsEditing(true)}
+                                onClick={() => setIsEditing(true)}
                                 style={{
                                     fontSize: 14,
                                     fontWeight: 500,
                                     color: isDone ? "#a89b91" : "#3c2a20",
                                     textDecoration: isDone ? "line-through" : "none",
-                                    whiteSpace: isExpanded ? "normal" : "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: isExpanded ? "clip" : "ellipsis",
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word",
                                     cursor: "pointer",
                                     flex: 1,
+                                    lineHeight: "1.4",
                                 }}
+                                title="Click to edit"
                             >
                                 {task.title}
                             </span>
@@ -326,7 +345,7 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
             >
                 <Trash2 size={16} />
             </button>
-        </div>
+        </div >
     );
 }
 
