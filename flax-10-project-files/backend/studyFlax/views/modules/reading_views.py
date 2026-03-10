@@ -1,11 +1,13 @@
+import math
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from studyFlax.models import Module, Reading, Task
+from studyFlax.models import Module, Reading, Task, Enrollment
+from studyFlax.models.tasks.taskModel import TaskList
 from studyFlax.serialisers.reading_serialisers import ReadingSerialiser
-from studyFlax.utils.reading_utils import estimated_time_reading
+from studyFlax.utils.reading_utils import estimated_time_reading, get_avg_time_per_page
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -53,6 +55,9 @@ def load_task(request, reading_id):
     reading = get_object_or_404(Reading, id=reading_id)
     return create_reading_task(request.user, reading)
 
+def get_reading_list(user):
+    return TaskList.objects.filter(user=user, name__icontains='reading', archived=False,).first()
+
 def create_reading_task(user, reading):
     estimated = estimated_time_reading(reading, user)
     task = Task.objects.create(
@@ -62,8 +67,10 @@ def create_reading_task(user, reading):
         due_date=reading.deadline,
         module=reading.module,
         priority='medium',
-        estimated_blocks=max(1,round(estimated/25)),
+        estimated_blocks=max(1,math.ceil(estimated/25)),
         reading=reading,
+        task_list = get_reading_list(user),
+        page_count=reading.page_count(),
     )
     return Response(task_payload(task), status=status.HTTP_201_CREATED)
 
@@ -80,5 +87,7 @@ def task_payload(task):
         'title': task.title,
         'due_date':task.due_date,
         'estimated_blocks':task.estimated_blocks,
-        'reading': task.reading_id,
+        'reading_id': task.reading_id,
+        'task_list': task.task_list_id,
+        'page_count': task.page_count,
     }
