@@ -1,15 +1,16 @@
 /* Homepage slots & layout — focus banner, overlays, bento, triage, intRow, etc. (renamed from ActionHub) */
   .triageDeadlines {
-    border-radius: 12px;
-    border: 1px solid rgba(107, 83, 68, 0.2);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    background: #F9F8F6;
-    padding: 12px 16px;
+    border-radius: var(--card-radius-token);
+    border: var(--card-border);
+    box-shadow: var(--card-shadow-rest);
+    background: var(--surface-card);
+    padding: var(--card-padding);
     min-width: 0;
     width: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
   .triageDeadlines > *:first-child {
     flex: 1;
@@ -24,18 +25,19 @@
     align-items: center;
     align-content: flex-start;
     gap: 8px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    padding: var(--card-padding);
+    border-radius: var(--card-radius-token);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: var(--home-card-bg);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: var(--card-border);
+    background: var(--surface-card);
+    box-shadow: var(--card-shadow-rest);
     min-width: 120px;
     max-width: 180px;
     min-height: 120px;
     max-height: 160px;
     overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
   .triageDeadlinesFooter {
     margin-top: auto;
@@ -60,19 +62,27 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 14px 16px;
-    border-radius: 12px;
+    padding: var(--card-padding);
+    border-radius: var(--card-radius-token);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: var(--home-card-bg);
+    border: var(--card-border);
+    background: var(--surface-card);
     min-width: 140px;
     overflow: hidden;
-    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    box-shadow: var(--card-shadow-rest);
   }
   .triageFocusActive {
     border-color: rgba(135, 169, 107, 0.5);
     box-shadow: 0 0 16px rgba(135, 169, 107, 0.35);
+  }
+  .triageFocus:hover,
+  .triageModules:hover,
+  .triageDeadlines:hover,
+  .foundation:hover {
+    transform: var(--card-hover-transform);
+    box-shadow: var(--card-shadow-hover);
   }
   .triageFocusLabel {
     font-size: 0.65rem;
@@ -188,13 +198,14 @@
     gap: 18px;
     align-items: start;
     margin-top: 12px;
-    padding: 16px 18px;
-    border-radius: 12px;
+    padding: var(--card-padding);
+    border-radius: var(--card-radius-token);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(238, 220, 130, 0.15);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: var(--card-border);
+    background: color-mix(in srgb, var(--surface-card) 88%, rgba(238, 220, 130, 0.18));
+    box-shadow: var(--card-shadow-rest);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
   .foundationChartWrap {
     min-width: 0;

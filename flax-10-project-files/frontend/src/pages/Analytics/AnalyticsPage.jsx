@@ -11,6 +11,7 @@ import PlannedVsActualChart from '../../components/Analytics/PlannedVsActualChar
 import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
+import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
 import styles from './AnalyticsPage.module.css';
 
 const PERIODS = [
@@ -108,13 +109,7 @@ export default function AnalyticsPage() {
 
       {error && <div className={styles.errorBanner}>{error}</div>}
 
-      {loading && (
-        <div className={styles.skeletonWrap}>
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className={styles.skeleton} style={{ animationDelay: `${i * 0.08}s` }} />
-          ))}
-        </div>
-      )}
+      {loading && <PageSkeleton label="Loading analytics" cardCount={6} cardHeight="100px" columns={3} />}
 
       <AnimatePresence mode="wait">
         {!loading && data && activeTab === 'Overview' && (
