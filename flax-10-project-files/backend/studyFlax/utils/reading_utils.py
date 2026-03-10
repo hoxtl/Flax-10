@@ -2,6 +2,7 @@ import math
 from studyFlax.models.tasks.taskModel import Task 
 
 DEFAULT_PAGE_TIME = 2.0 
+MINUTES_PER_BLOCK = 25
 
 def get_avg_time_per_page(user):
     
@@ -26,7 +27,7 @@ def estimated_time_reading(reading, user):
     return round(reading.page_count() * get_avg_time_per_page(user))
 
 def estimated_blocks_per_page(page_count, avg):
-    return max(1, math.ceil(page_count * avg/25))
+    return max(1, math.ceil(page_count * avg/MINUTES_PER_BLOCK))
 
 def update_estimate_blocks(task,new_blocks):
     if new_blocks != task.estimated_blocks:
