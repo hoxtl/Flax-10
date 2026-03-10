@@ -18,13 +18,13 @@ class TaskSerialiser(serializers.ModelSerializer):
     module_code = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
 
-    assigned_to_name = serializers.SerializerMethodField()
+    assignees_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code',
-            'group_project', 'assigned_to', 'assigned_to_name',
+            'group_project', 'assigned_to', 'assignees_info',
             'title', 'description', 'priority', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
             'estimated_blocks', 'completed_blocks',
@@ -37,10 +37,11 @@ class TaskSerialiser(serializers.ModelSerializer):
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
 
-    def get_assigned_to_name(self, obj):
-        if not obj.assigned_to:
-            return None
-        return obj.assigned_to.first_name or obj.assigned_to.username
+    def get_assignees_info(self, obj):
+        return [
+            {"id": u.id, "name": u.first_name or u.username}
+            for u in obj.assigned_to.all()
+        ]
 
     def update(self, instance, validated_data):
         completed = validated_data.get('completed')
