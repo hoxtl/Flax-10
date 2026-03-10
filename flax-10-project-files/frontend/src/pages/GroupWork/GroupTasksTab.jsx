@@ -64,6 +64,11 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
         }
     };
 
+    const startEditing = () => {
+        setEditedTitle(task.title);
+        setIsEditing(true);
+    };
+
     // Formatting due date like "1 Mar"
     let parsedDateStr = "";
     let fullDateStr = "";
@@ -166,7 +171,7 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                     ) : (
                         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, width: "100%" }}>
                             <span
-                                onClick={() => setIsEditing(true)}
+                                onClick={startEditing}
                                 style={{
                                     fontSize: 14,
                                     fontWeight: 500,
