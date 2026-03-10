@@ -68,23 +68,11 @@
 }
 
 .container {
-  padding: 12px 24px 24px 24px;
+  padding: 1.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.emptyContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-  text-align: center;
-}
-
-.emptyText {
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    color: var(--muted);
-}
 
 .header {
   display: flex;

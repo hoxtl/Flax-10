@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader/PageHeader";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
@@ -119,6 +120,7 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
 
     return (
         <div className={styles.container}>
+            <PageHeader title="Societies" subtitle="Your communities at King's College London" />
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
             <BackToTop />
         </div>

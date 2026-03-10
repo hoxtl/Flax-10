@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
+import EmptyState from "../../components/common/EmptyState/EmptyState";
 import BasePill from "../../components/Tags/BasePill";
 import SearchBar from "../../components/common/SearchBar";
 import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
@@ -96,16 +97,12 @@ function CategoryPills({ current, onChange, societies }) {
 }
 
 function SocietyGrid({ items, onSelect, onReport, onUnreport }) {
-    if (items.length === 0) return <EmptyState />;
+    if (items.length === 0) return <EmptyState icon="🎭" title="No societies found" description="Try adjusting your search or filters." />;
     return (
         <div className={styles.grid}>
             {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} onReport={onReport} onUnreport={onUnreport} />)}
         </div>
     );
-}
-
-function EmptyState() {
-    return <div className={styles.emptyContainer}><p className={styles.emptyText}>No societies found.</p></div>;
 }
 
 function countForFilter(societies, filterId) {

@@ -3,28 +3,6 @@
     max-width: 1400px;
     margin: 0 auto;
 }
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    margin-top: 1.5rem;
-    gap: 2rem;
-}
-.pageTitle {
-    margin: 0 0 0.5rem 0;
-    font-weight: 800;
-    font-size: 32px;
-    color: var(--text);
-    white-space: nowrap;
-    letter-spacing: -0.02em;
-}
-.subtitle {
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--muted);
-    font-weight: 400;
-}
 .createButton {
     padding: 0.75rem 1.5rem;
     background: var(--primary);
@@ -81,26 +59,6 @@
     width: 170px;
     min-width: 170px;
     flex: 0 0 170px;
-}
-.emptyState {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    background: var(--panel);
-    border-radius: 12px;
-    border: 1px dashed var(--border);
-}
-.emptyIcon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-.emptyState p {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin: 0;
 }
 @media (max-width: 768px) {
     .container {

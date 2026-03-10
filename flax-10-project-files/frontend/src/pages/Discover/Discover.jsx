@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
+import PageHeader from "../../components/common/PageHeader/PageHeader";
+import EmptyState from "../../components/common/EmptyState/EmptyState";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
@@ -90,16 +92,6 @@ function useDiscoverSearch() {
     return { ...fetch, searchQuery, setSearchQuery, ...ui };
 }
 
-function DiscoverHeader() {
-    return (
-        <div className={styles.header}>
-            <div>
-                <h1 className={styles.pageTitle}>Users</h1>
-                <p className={styles.subtitle}>Find course mates and study partners</p>
-            </div>
-        </div>
-    );
-}
 
 function SearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState }) {
     const toggle = () => filterState.setIsFilterOpen(!filterState.isFilterOpen);
@@ -130,7 +122,7 @@ function PaginatedGrid({ filtered, onNavChange, currentPage, totalPages, setCurr
 function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCurrentPage }) {
     const self = JSON.parse(localStorage.getItem("user")) || {};
     const filtered = users.filter(u => u.id !== self.id && u.username !== self.username);
-    if (!loading && filtered.length === 0) return <div className={styles.emptyState}>No users found. Try adjusting your filters.</div>;
+    if (!loading && filtered.length === 0) return <EmptyState icon="👥" title="No users found" description="Try adjusting your search or filters." />;
     return <PaginatedGrid filtered={filtered} onNavChange={onNavChange} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
 }
 
@@ -157,7 +149,7 @@ export default function Discover({ onNavChange }) {
 
     return (
         <div className={styles.container}>
-            <DiscoverHeader />
+            <PageHeader title="Discover" subtitle="Find course mates and study partners" />
             {srch}
             {content}
         </div>

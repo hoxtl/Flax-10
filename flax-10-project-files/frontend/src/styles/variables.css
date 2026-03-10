@@ -15,17 +15,17 @@
   --font-weight-task: 500;
   --font-weight-caption: 400;
 
-  /* Semantic text colors for typography — Warm-Classy: Flax Brown for primary headers */
-  --text-charcoal: #7B6751;
+  /* Semantic text colors for typography */
+  --text-charcoal: var(--primary);
   --text-muted-sage: #5a635a;
 
-  /* Flax-inspired palette: Flax Brown primary + soft yellows/golds */
-  --flax-brown: #7B6751;
-  --flax-brown-strong: #5c4d3e;
+  /* Flax-inspired palette: gold/yellows are unique; browns alias --primary */
+  --flax-brown: var(--primary);
+  --flax-brown-strong: var(--primary-strong);
   --flax-gold: #c4a35a;
   --flax-gold-soft: #e8dcc8;
   --color-flax-light: #f5f0e8;
-  --flax-charcoal: #7B6751;
+  --flax-charcoal: var(--primary);
   --flax-navy: #0f172a;
 
   --c-white: #ffffff;
@@ -53,7 +53,7 @@
 
   /* Semantic text & surfaces (light) */
   --text: #1A1A1A;
-  --text-primary: #7B6751;
+  --text-primary: var(--primary);
   --text-secondary: #64748b;
   --text-dark: #1e1b2e;
   --muted: #9CA3AF;
@@ -61,7 +61,7 @@
   --primary: #7B6751;
   --primary-strong: #5c4d3e;
   --sage: #8C9A86;
-  --accent: #7B6751;
+  --accent: var(--primary);
   --danger: #C05A3E;
   --danger-bg: rgba(192, 90, 62, 0.12);
   --danger-border: rgba(192, 90, 62, 0.4);
@@ -96,9 +96,9 @@
   --dot-deadline: var(--urgent);
   --dot-personal: var(--personal);
 
-  /* Status: Sage Green success, Muted Terracotta warnings/conflicts */
-  --status-sage: #8C9A86;
-  --status-terracotta: #C05A3E;
+  /* Status: aliases to canonical semantic vars */
+  --status-sage: var(--sage);
+  --status-terracotta: var(--danger);
   --success-bg: rgba(140, 154, 134, 0.18);
   --success-text: #8C9A86;
   --error-bg: rgba(192, 90, 62, 0.12);
@@ -112,14 +112,14 @@
   --deadline-urgent-bg: rgba(192, 90, 62, 0.1);
   --deadline-urgent-border: #C05A3E;
 
-  /* Daily Progress widget */
-  --color-terracotta: #C05A3E;
-  --color-brown-light: #c4a35a;
+  /* Widget colour tokens */
+  --color-terracotta: var(--danger);
+  --color-brown-light: var(--flax-gold);
   --color-error-light: rgba(192, 90, 62, 0.15);
   --color-sage-dark: #3d5a52;
   --color-orange-400: #fb923c;
   --color-slate-400: #94a3b8;
-  --color-sage-primary: #8C9A86;
+  --color-sage-primary: var(--sage);
   --color-sage-glow: rgba(140, 154, 134, 0.5);
   --color-border-light: rgba(0, 0, 0, 0.08);
 
@@ -152,21 +152,19 @@
   --bg-home: var(--bg);
   --bg-home-night: var(--bg);
 
-  /* Master Restoration: Warm-Classy stationary theme — warm Almond */
-  --restoration-bg: #F8F5F2;
-  --restoration-sage: #8C9A86;
+  /* Restoration aliases — all point to canonical vars */
+  --restoration-bg: var(--bg);
+  --restoration-sage: var(--sage);
   --restoration-flax: #EEDC82;
   --restoration-earth: #6B5344;
-  --restoration-terracotta: #C05A3E;
-  --restoration-widget-radius: 24px;
+  --restoration-terracotta: var(--danger);
+  --restoration-widget-radius: var(--card-radius);
   --restoration-widget-blur: 12px;
-  /* No black/grey borders — use none or very subtle tint only */
   --restoration-widget-border: none;
   --restoration-gold-soft: rgba(238, 220, 130, 0.35);
   --restoration-coral-border: 1px solid rgba(192, 90, 62, 0.5);
   --restoration-coral-glow: 0 0 12px rgba(192, 90, 62, 0.2);
-  /* Body text: Warm-Classy — Flax Brown for primary headers & key accents */
-  --restoration-charcoal: #7B6751;
+  --restoration-charcoal: var(--primary);
 
   --divider: #ddd;
   --text-muted: #888;
@@ -282,13 +280,11 @@
   --scroll-btn-bg: #818cf8;
   --scroll-btn-hover: #6366f1;
 
-  /* Daily Progress widget (dark) */
-  --color-terracotta: #d97a65;
+  /* Widget colour tokens (dark overrides only for values that actually change) */
   --color-error-light: rgba(192, 90, 62, 0.25);
   --color-sage-dark: #5a7a6a;
   --color-orange-400: #fdba74;
   --color-slate-400: #94a3b8;
-  --color-sage-primary: #8C9A86;
   --color-sage-glow: rgba(140, 154, 134, 0.5);
   --color-border-light: rgba(255, 255, 255, 0.12);
   --glass-bg: rgba(26, 19, 16, 0.6);
