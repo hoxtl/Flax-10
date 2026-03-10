@@ -119,4 +119,25 @@ describe('WeekView', () => {
         expect(screen.getByText('Mon')).toBeInTheDocument();
         expect(screen.getByText('Sat')).toBeInTheDocument();
     });
+
+    it('filters events for week via getEventsForWeek', () => {
+        const weekStart = new Date('2024-03-04T00:00:00');
+        const weekEnd = new Date('2024-03-10T23:59:59');
+        const eventsInWeek = [
+            { id: 1, start_time: new Date('2024-03-05T10:00:00').toISOString(), end_time: new Date('2024-03-05T11:00:00').toISOString() },
+            { id: 2, start_time: new Date('2024-03-07T14:00:00').toISOString(), end_time: new Date('2024-03-07T15:00:00').toISOString() },
+        ];
+        vi.mocked(dateUtils.overlapsDay).mockImplementation((start, end, d) => {
+            const dayStr = d.toISOString().slice(0, 10);
+            return [1, 2].some(id => {
+                const s = eventsInWeek.find(e => e.id === id);
+                if (!s) return false;
+                const es = new Date(s.start_time);
+                const ee = new Date(s.end_time);
+                return es.toISOString().slice(0, 10) <= dayStr && ee.toISOString().slice(0, 10) >= dayStr;
+            });
+        });
+        const { getAllByTestId } = render(<WeekView selectedDate={date} events={eventsInWeek} readOnly={false} />);
+        expect(getAllByTestId('day-column').length).toBe(7);
+    });
 });

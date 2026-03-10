@@ -121,6 +121,13 @@ describe('CalendarHeader', () => {
         expect(mockOpenModal).toHaveBeenCalled();
     });
 
+    it('should open modal with no args for week view (not day)', () => {
+        setup({ ...defaultState, viewMode: 'week' });
+        const addBtn = screen.getByText('+');
+        fireEvent.click(addBtn);
+        expect(mockOpenModal).toHaveBeenCalledWith();
+    });
+
     it('should handle Today button', () => {
         setup({ ...defaultState, selectedDate: new Date(2020, 1, 1) });
         const todayBtn = screen.getByText('Today');
@@ -240,5 +247,29 @@ describe('CalendarHeader', () => {
         fireEvent.click(dateCards[0]);
         expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_SELECTED_DATE' }));
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+    });
+
+    it('hides Today button when in month view and selected month is current month', () => {
+        const now = new Date();
+        setup({ selectedDate: new Date(now.getFullYear(), now.getMonth(), 15), viewMode: 'month' });
+        expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    });
+
+    it('shows mobile layout when window is narrow', () => {
+        const originalInnerWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
+        setup({ ...defaultState, viewMode: 'day' });
+        const mobileTitle = document.querySelector('.mobile-title-row');
+        expect(mobileTitle).toBeInTheDocument();
+        expect(mobileTitle?.querySelector('.title')).toHaveTextContent(/Feb|15/);
+        Object.defineProperty(window, 'innerWidth', { value: originalInnerWidth, configurable: true });
+    });
+
+    it('navigate prev in year view decrements year', () => {
+        setup({ ...defaultState, viewMode: 'year' });
+        const prevBtn = screen.getByText('<');
+        fireEvent.click(prevBtn);
+        const callArgs = mockDispatch.mock.calls[0][0];
+        expect(callArgs.payload.getFullYear()).toBe(2025);
     });
 });
