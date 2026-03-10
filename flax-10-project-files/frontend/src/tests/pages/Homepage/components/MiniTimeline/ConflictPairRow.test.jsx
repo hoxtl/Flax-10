@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ConflictPairRow } from '../../../../../pages/Homepage/components/MiniTimeline/ConflictPairRow';
+import * as useSleepWarning from '../../../../../components/Settings/hooks/useSleepWarning';
 
 vi.mock('../../../../../components/Settings/hooks/useSleepWarning', () => ({
   isDuringSleepWindow: vi.fn(() => false),
@@ -162,10 +163,76 @@ describe('ConflictPairRow', () => {
     expect(onEdit).toHaveBeenCalled();
   });
 
+  it('responds to keyboard Space on card', () => {
+    const onCardClick = vi.fn();
+    renderConflictPairRow({ onCardClick });
+    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    fireEvent.keyDown(card, { key: ' ' });
+    expect(onCardClick).toHaveBeenCalled();
+  });
+
+  it('calls onCardClick when card is clicked and onCardClick is provided', () => {
+    const onCardClick = vi.fn();
+    renderConflictPairRow({ onCardClick });
+    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    fireEvent.click(card);
+    expect(onCardClick).toHaveBeenCalled();
+  });
+
+  it('shows sleep badge when isDuringSleepWindow returns true', () => {
+    vi.mocked(useSleepWarning.isDuringSleepWindow).mockReturnValueOnce(true);
+    renderConflictPairRow();
+    expect(screen.getByLabelText('Scheduled during sleep hours')).toBeInTheDocument();
+  });
+
   it('renders time label in gutter', () => {
     renderConflictPairRow();
     const gutter = document.querySelector(`.${mockStyles.planTimelineGutter}`);
     expect(gutter).toBeTruthy();
     expect(gutter?.textContent).toMatch(/\d|am|pm/i);
+  });
+
+  it('does not call handleAutoMove when onConflictAutoMove is missing', () => {
+    renderConflictPairRow({ rows: rowsWithFreeGap, onConflictAutoMove: undefined });
+    const btn = screen.getByText('Auto-arrange');
+    expect(btn).not.toBeDisabled();
+    fireEvent.click(btn);
+  });
+
+  it('does not show Move to tomorrow when freeRow exists', () => {
+    renderConflictPairRow({ rows: rowsWithFreeGap, onPushTomorrow: vi.fn() });
+    expect(screen.queryByText('→ Move to tomorrow')).toBeNull();
+  });
+
+  it('uses getTag for accent when provided', () => {
+    const getTag = vi.fn((tag) => (tag ? { name: 'wellness' } : null));
+    const customRow = {
+      ...row,
+      items: [{ ...row.items[0], item: { ...row.items[0].item, tag: 1 } }],
+    };
+    render(
+      <ConflictPairRow
+        row={customRow}
+        rows={rowsNoFree}
+        styles={mockStyles}
+        selectedDate={selectedDate}
+        sleepWindow={{ sleepTime: '23:00', wakeTime: '07:00' }}
+        getTag={getTag}
+      />
+    );
+    expect(getTag).toHaveBeenCalled();
+  });
+
+  it('renders end time when different from start', () => {
+    renderConflictPairRow();
+    expect(screen.getByText(/11:00/)).toBeTruthy();
+  });
+
+  it('falls back to onEdit when card clicked and no onCardClick, via keyboard Space', () => {
+    const onEdit = vi.fn();
+    renderConflictPairRow({ onCardClick: undefined, onEdit });
+    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    fireEvent.keyDown(card, { key: ' ' });
+    expect(onEdit).toHaveBeenCalled();
   });
 });

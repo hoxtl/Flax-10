@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MiniTimeline } from '../../../../../pages/Homepage/components/MiniTimeline/MiniTimeline';
+import { isToday } from '../../../../../components/Calendar/utils/dateUtils';
 
 let mockRows = [];
 
@@ -25,7 +26,7 @@ vi.mock('../../../../../api/userService', () => ({
 }));
 
 vi.mock('../../../../../components/Calendar/utils/dateUtils', () => ({
-  isToday: () => true,
+  isToday: vi.fn(() => true),
 }));
 
 vi.mock('../../../../../pages/Homepage/utils/planTimelineRows', () => ({
@@ -90,9 +91,10 @@ vi.mock('../../../../../pages/Homepage/components/MiniTimeline/ConflictPairRow',
 }));
 
 vi.mock('../../../../../pages/Homepage/components/MiniTimeline/EventContextMenu', () => ({
-  EventContextMenu: ({ eventItem, onClose, onDelete }) => (
+  EventContextMenu: ({ eventItem, onClose, onDelete, onEdit }) => (
     <div data-testid="ctx">
       <div>CTX:{eventItem?.id}</div>
+      <button type="button" onClick={() => onEdit?.(eventItem)}>edit</button>
       <button type="button" onClick={() => onDelete?.(eventItem)}>delete</button>
       <button type="button" onClick={() => onClose?.()}>close</button>
     </div>
@@ -218,5 +220,82 @@ describe('MiniTimeline', () => {
     fireEvent.click(screen.getByText('close'));
     expect(screen.queryByTestId('ctx')).toBeNull();
   });
+
+  it('calls onEdit when Edit is clicked in event context menu', () => {
+    const onEdit = vi.fn();
+    mockRows = [{ id: 'ev', type: 'event', title: 'Event' }];
+    renderTL({ onEdit });
+    fireEvent.click(screen.getByText('open-ctx'));
+    fireEvent.click(screen.getByText('edit'));
+    expect(onEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 'ev1' }), 'tag1');
+  });
+
+  it('renders Focus label when timer session is work mode', () => {
+    mockRows = [{ id: 'h1', type: 'hourMark' }];
+    renderTL({ hasTimerSession: true, timerMode: 'work', timerTask: 'Code', timeLeft: 300 });
+    expect(screen.getByText('Focus')).toBeTruthy();
+    expect(screen.getByText('Code')).toBeTruthy();
+  });
+
+  it('does not render timer or current block strip when selectedDate is not today', () => {
+    vi.mocked(isToday).mockReturnValueOnce(false);
+    mockRows = [{ id: 'h1', type: 'hourMark' }];
+    const { container } = renderTL({ hasTimerSession: true });
+    expect(container.querySelector(`.${styles.planTimelineNowStrip}`)).toBeNull();
+  });
+
+  it('applies planTimelineListHasConflict when rows include eventGroup', () => {
+    mockRows = [{ id: 'g1', type: 'eventGroup', items: [] }];
+    const { container } = renderTL();
+    const list = container.querySelector(`.${styles.planTimelineList}`);
+    expect(list?.className).toContain(styles.planTimelineListHasConflict);
+  });
+
+  it('uses fallback sleep window when getUserSettings fails', async () => {
+    const { getUserSettings } = await import('../../../../../api/userService');
+    getUserSettings.mockRejectedValueOnce(new Error('network'));
+    mockRows = [{ id: 'free', type: 'free', minutes: 45 }];
+    renderTL({ suggestableTasks: [{ id: 1, title: 'T', estimated_blocks: 1 }] });
+    await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
+  });
+
+  it('uses sleep_time and wake_time from getUserSettings when provided', async () => {
+    const { getUserSettings } = await import('../../../../../api/userService');
+    getUserSettings.mockResolvedValueOnce({ sleep_time: '22:30:00', wake_time: '06:45:00' });
+    mockRows = [{ id: 'free', type: 'free', minutes: 30 }];
+    renderTL({ suggestableTasks: [] });
+    await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
+  });
+
+  it('bestFreeRowId prefers larger gap when both have suggestable task', () => {
+    const now = new Date('2026-03-10T12:00:00Z');
+    mockRows = [
+      { id: 'f1', type: 'free', minutes: 30, gapStartMins: 480 },
+      { id: 'f2', type: 'free', minutes: 60, gapStartMins: 600 },
+    ];
+    renderTL({
+      now,
+      suggestableTasks: [{ id: 1, title: 'Overdue', estimated_blocks: 1, due_date: '2026-03-09', priority: 'urgent' }],
+    });
+    expect(screen.getByText(/FREE:f2:BEST/)).toBeTruthy();
+  });
+
+  it('assigns tasks to free rows by due date and priority', () => {
+    const now = new Date('2026-03-10T12:00:00Z');
+    mockRows = [
+      { id: 'f1', type: 'free', minutes: 60, gapStartMins: 480 },
+      { id: 'f2', type: 'free', minutes: 60, gapStartMins: 600 },
+    ];
+    renderTL({
+      now,
+      suggestableTasks: [
+        { id: 1, title: 'Task A', estimated_blocks: 2, due_date: '2026-03-11', priority: 'high' },
+        { id: 2, title: 'Task B', estimated_blocks: 2, due_date: '2026-03-12', priority: 'medium' },
+      ],
+    });
+    expect(screen.getByText(/Task A/)).toBeTruthy();
+    expect(screen.getByText(/Task B/)).toBeTruthy();
+  });
+
 });
 
