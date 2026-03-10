@@ -39,7 +39,7 @@ function ChapterField({value, onChange}) {
     );
 }
 
-function PageFields({value, onChange}) {
+function PageFields({start, end, onChange}) {
     return (
         <>
             <Field label="Start Page">
@@ -56,11 +56,44 @@ function PageFields({value, onChange}) {
 
 function DeadlineField({value, onChange}) {
     return (
-        <Field label="Chapter (optional)">
-            <input className = {styles.input} type="text" value={value}
-                onChange={e => onChange('chapter', e.target.value)}
-                placeholder="e.g. Chapter 13" />
+        <Field label="Due Date">
+            <input className = {styles.input} type="datetime-local" value={value}
+                onChange={e => onChange('deadline', e.target.value)} required/>
         </Field>
     );
 }
 
+function EstimatedMinutesField({value, onChange}) {
+    return (
+        <Field label="Estimated Minutes (optional) - leave blank to auto-calculate">
+            <input className = {styles.input} type="number" min="1" value={value}
+                onChange={e => onChange('estimated_minutes', e.target.value)}
+                placeholder="Auto-calculated from page count" />
+        </Field>
+    );
+}
+
+function FormActions({ onCancel, isEditing }) {
+    return (
+        <div className={styles.actions}>
+            <button type="button" className={styles.cancelButton} onClick={onCancel}>Cancel</button>
+            <button type="submit" className={styles.submitButton}>{isEditing ? 'Update' : 'Add Reading'}</button>
+        </div>
+    );
+}
+
+export default function ReadingForm({ initial, onSubmit, onCancel }) {
+    const [form, setForm] = useState(initial || EMPTY_FORM);
+    const onChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
+    const handleSubmit = (e) => { e.preventDefault(); onSubmit(buildFormData(form)); };
+    return (
+        <form className={styles.form} onSubmit={handleSubmit}>
+            <TitleField value={form.title} onChange={onChange} />
+            <ChapterField value={form.chapter} onChange={onChange} />
+            <PageFields start={form.start_page} end={form.end_page} onChange={onChange} />
+            <DeadlineField value={form.deadline} onChange={onChange} />
+            <EstimatedMinutesField value={form.estimated_minutes} onChange={onChange} />
+            <FormActions onCancel={onCancel} isEditing={!!initial} />
+        </form>
+    );
+}
