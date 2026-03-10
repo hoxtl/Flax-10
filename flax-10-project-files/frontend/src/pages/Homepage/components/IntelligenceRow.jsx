@@ -12,6 +12,7 @@ import { StudyPulseWidget } from "./StudyPulseWidget";
 import { ImageWidget } from "./ImageWidget";
 import { Reorder } from "framer-motion";
 import { Settings, Check, Lock, GripHorizontal, Trash2, Plus, X as CloseIcon } from "lucide-react";
+import bentoStyles from "../../../components/ui/bento-grid.module.css";
 
 function getGreeting(name) {
   const h = new Date().getHours();
@@ -57,6 +58,13 @@ export default function IntelligenceRow({
   const handleRemoveWidget = (widgetId) => {
     saveWidgetLayout(homepageWidgets.filter((w) => w.id !== widgetId));
   };
+
+  const defaultOrder = ["rightNow", "tasks", "quickActions", "socialDiscover", "deadlines", "studyPulse"];
+  const isDefaultLayout =
+    homepageWidgets.length === defaultOrder.length &&
+    homepageWidgets.every((w, i) => w.id === defaultOrder[i]);
+
+  const layoutModeClass = (!isEditingDashboard && isDefaultLayout) ? styles.defaultLayout : styles.customLayout;
 
   const renderWidgetContent = (id) => {
     switch (id) {
@@ -159,7 +167,7 @@ export default function IntelligenceRow({
           axis="y"
           values={homepageWidgets}
           onReorder={saveWidgetLayout}
-          className={styles.grid}
+          className={`${bentoStyles.grid} ${layoutModeClass}`}
         >
           {homepageWidgets.map((widget) => (
             <Reorder.Item
@@ -192,7 +200,7 @@ export default function IntelligenceRow({
           </BentoCard>
         </Reorder.Group>
       ) : (
-        <BentoGrid>
+        <BentoGrid className={layoutModeClass}>
           {homepageWidgets.map((widget) => (
             <BentoCard key={widget.id} className={getWidgetStyleClass(widget.id)}>
               {renderWidgetContent(widget.id)}

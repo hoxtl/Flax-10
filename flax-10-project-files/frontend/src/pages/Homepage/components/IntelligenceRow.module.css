@@ -880,31 +880,66 @@
 
 /* ── Bento grid spans (Flow layout rather than fixed pos) ─────────────────── */
 @media (min-width: 1024px) {
-  .posRightNow {
+
+  /* Default unchanged layout: perfect specific placements */
+  .defaultLayout .posRightNow {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .defaultLayout .posTodaysTasks {
+    grid-column: 2 / 4;
+    grid-row: 1;
+  }
+
+  .defaultLayout .posQuickActions {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .defaultLayout .posSocialDiscover {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .defaultLayout .posDeadlines {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: start;
+  }
+
+  .defaultLayout .posStudyPulse {
+    grid-column: 2 / 4;
+    grid-row: 3;
+  }
+
+  /* Custom / Editing layout: use fluid auto-spans allowing free placement */
+  .customLayout .posRightNow {
     grid-column: span 1;
   }
 
-  .posTodaysTasks {
+  .customLayout .posTodaysTasks {
     grid-column: span 2;
   }
 
-  .posQuickActions {
+  .customLayout .posQuickActions {
     grid-column: span 1;
   }
 
-  .posSocialDiscover {
+  .customLayout .posSocialDiscover {
     grid-column: span 1;
   }
 
-  .posDeadlines {
+  .customLayout .posDeadlines {
     grid-column: span 1;
   }
 
-  .posStudyPulse {
+  .customLayout .posStudyPulse {
     grid-column: span 2;
   }
 
-  .posImageWidget {
+  .customLayout .posImageWidget {
     grid-column: span 1;
   }
 }
