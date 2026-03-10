@@ -63,9 +63,9 @@ export const THEME_GROUPS = [
                 dark: { bg: '#211E27', card: '#2A2632', sidebar: '#25212C', primary: '#A79BC8', highlight: '#6B5C8E', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
             },
             {
-                id: 'sage', name: 'Sage',
-                light: { bg: '#F3F6F3', card: '#FFFFFF', sidebar: '#E7ECE7', primary: '#6F8F7B', highlight: '#A6C0AE', border: 'rgba(60,80,60,0.12)', text: '#1A1A1A' },
-                dark: { bg: '#1E2521', card: '#252E29', sidebar: '#212924', primary: '#A6C0AE', highlight: '#6F8F7B', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+                id: 'mint', name: 'Mint',
+                light: { bg: '#F1FBF7', card: '#FFFFFF', sidebar: '#E0F3EA', primary: '#4AA88A', highlight: '#92D6C0', border: 'rgba(74,168,138,0.12)', text: '#1A1A1A' },
+                dark: { bg: '#1B2622', card: '#23312C', sidebar: '#1E2B27', primary: '#92D6C0', highlight: '#4AA88A', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
             },
             {
                 id: 'sand', name: 'Sand',

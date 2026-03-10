@@ -253,6 +253,15 @@
 }
 
 /* Dual-preview Theme Grid */
+.groupLabel {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
 .themeGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
