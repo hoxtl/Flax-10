@@ -108,8 +108,79 @@
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--muted);
-    white-space: nowrap;
-    min-width: 140px;
+    min-width: 160px;
+}
+
+.dateCellContent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.dateCellContent .editIcon {
+    opacity: 0;
+}
+
+.row:hover .dateCellContent .editIcon {
+    opacity: 0.6;
+}
+
+.dateEditContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.dateEditRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dateEditLabel {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 36px;
+}
+
+.dateEditActions {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.dateEditBtn {
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    background: var(--primary);
+    color: var(--c-white);
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.dateEditBtn:hover {
+    opacity: 0.9;
+}
+
+.dateEditBtnCancel {
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.dateEditBtnCancel:hover {
+    background: var(--hover);
 }
 
 .locationCell {
@@ -123,6 +194,21 @@
     min-width: 200px;
     max-width: 300px;
     cursor: pointer;
+}
+
+.descCell.descExpanded {
+    max-width: none;
+}
+
+.descCell.descExpanded .cellText {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    white-space: pre-wrap;
+}
+
+.row.expanded {
+    background: var(--hover);
 }
 
 /* Cell Text */
@@ -162,16 +248,44 @@ textarea.cellInput {
     min-height: 60px;
 }
 
+/* Tag Cell Content */
+.tagCellContent {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.emptyTagCell {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    cursor: pointer;
+}
+
+.emptyTagCell .editIcon {
+    opacity: 0;
+}
+
+.row:hover .emptyTagCell .editIcon {
+    opacity: 0.6;
+}
+
 /* Tag Badges */
 .tagBadge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     padding: 2px 8px;
-    margin-right: 4px;
     font-size: 0.7rem;
     font-weight: 500;
     border-radius: 12px;
     background: var(--pill-bg);
     color: var(--text-primary);
+    transition: opacity 0.15s;
+}
+
+.tagCellContent:hover .tagBadge {
+    opacity: 0.85;
 }
 
 .sourceBadge {
@@ -183,6 +297,63 @@ textarea.cellInput {
     border-radius: 12px;
     background: var(--primary);
     color: var(--c-white);
+}
+
+/* Cell Wrapper for edit icon */
+.cellWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Edit Icon */
+.editIcon {
+    opacity: 0;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.row:hover .editIcon {
+    opacity: 0.6;
+}
+
+.row:hover .editIcon:hover {
+    opacity: 1;
+    color: var(--primary);
+}
+
+/* Tag Edit Icon */
+.tagEditIcon {
+    opacity: 0;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.row:hover .tagCellContent .tagEditIcon {
+    opacity: 0.6;
+}
+
+.tagCellContent:hover .tagEditIcon {
+    opacity: 1;
+    color: var(--primary);
+}
+
+/* Tag Select */
+.tagSelect {
+    padding: 4px 8px;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.8rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.tagSelect:focus {
+    box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.2);
 }
 
 /* Empty State */

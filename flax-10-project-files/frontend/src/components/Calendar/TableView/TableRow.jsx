@@ -1,98 +1,108 @@
+import { useState, useEffect } from 'react';
+import { Pencil } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { EditableCell } from './cells/EditableCell';
+import { TagEditCell } from './cells/TagEditCell';
+import { DateTimeCell } from './cells/DateTimeCell';
 import { useQuickActions } from '../hooks/useQuickActions';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
 import styles from './TableView.module.css';
 
-function formatDateTime(event) {
-    const start = new Date(event.start_time);
-    const opts = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
-    return start.toLocaleString('en-US', opts);
-}
-
-function getTagBadges(event, tags) {
-    const badges = [];
-    const tagName = event.tag_name || event.tag?.name;
-    const theme = getEventTheme(event, tags);
-    if (tagName) badges.push({ label: tagName, type: 'tag', color: theme.color });
-
+function getSourceBadge(event) {
     const eventType = getEventType(event);
-    if (eventType === 'module' && event.module?.name) {
-        badges.push({ label: event.module.name, type: 'source', color: null });
-    }
-    if (eventType === 'society' && event.society_name) {
-        const societyColor = event.society_color || theme.color;
-        badges.push({ label: event.society_name, type: 'source', color: societyColor });
-    }
-    return badges;
+    if (eventType === 'module' && event.module?.name) return { label: event.module.name };
+    if (eventType === 'society' && event.society_name) return { label: event.society_name, color: event.society_color };
+    return null;
 }
 
-function TagBadge({ badge }) {
-    const cls = badge.type === 'source' ? styles.sourceBadge : styles.tagBadge;
-    const style = badge.color ? { backgroundColor: badge.color, color: '#fff' } : {};
-    return <span className={cls} style={style}>{badge.label}</span>;
+function SourceBadge({ badge }) {
+    if (!badge) return null;
+    const style = badge.color ? { backgroundColor: badge.color } : {};
+    return <span className={styles.sourceBadge} style={style}>{badge.label}</span>;
 }
 
-function TagCell({ event, tags }) {
-    const badges = getTagBadges(event, tags);
-    return (
-        <td className={styles.tagCell}>
-            {badges.map((b, i) => <TagBadge key={i} badge={b} />)}
-        </td>
-    );
+function EditIcon({ show }) {
+    if (!show) return null;
+    return <Pencil size={14} className={styles.editIcon} />;
 }
 
-export function TableRow({ event, rowIndex, editState, onCellClick, onKeyDown }) {
+export function TableRow({ event, events, rowIndex, editState, navState, onCellClick }) {
     const isReadOnly = isReadOnlyEvent(event);
+    const [isExpanded, setIsExpanded] = useState(false);
     const { editingCell, cellValue, updateValue } = editState;
+    const { focusedCell, handleKeyDown, EDITABLE_COLUMNS } = navState;
     const quickAction = useQuickActions(event);
     const { tags } = useTags();
+    const theme = getEventTheme(event, tags);
 
-    const isEditing = (field) => {
-        return editingCell?.eventId === event.id && editingCell?.field === field;
+    const isEditing = (field) => editingCell?.eventId === event.id && editingCell?.field === field;
+    const isEditingDesc = isEditing('description');
+
+    const handleCellClick = (e, field, colIndex) => {
+        if (isReadOnly) return; // Let it bubble to row for expansion
+        e.stopPropagation();
+        const value = field === 'tag' ? (event.tag || event.tag_id) : event[field];
+        onCellClick(event.id, field, value);
     };
 
-    const handleCellClick = (field) => {
-        if (isReadOnly) return;
-        onCellClick(event.id, field, event[field]);
+    const handleRowClick = () => {
+        if (isReadOnly) setIsExpanded(prev => !prev);
     };
 
-    const handleKeyDown = (e, colIndex) => onKeyDown(e, rowIndex, colIndex);
+    const stopPropIfEditable = (e) => {
+        if (!isReadOnly) e.stopPropagation();
+    };
+
+    const onKeyDown = (e, colIndex) => handleKeyDown(e, rowIndex, colIndex);
+
+    useEffect(() => {
+        if (!focusedCell || focusedCell.row !== rowIndex || isReadOnly) return;
+        const field = EDITABLE_COLUMNS[focusedCell.col];
+        if (field && !isEditing(field)) {
+            const value = field === 'tag' ? (event.tag || event.tag_id) : event[field];
+            onCellClick(event.id, field, value);
+        }
+    }, [focusedCell, rowIndex, isReadOnly, EDITABLE_COLUMNS, event, onCellClick]);
+
+    const sourceBadge = getSourceBadge(event);
+    const rowClass = `${styles.row} ${isReadOnly ? styles.readOnly : ''} ${isExpanded ? styles.expanded : ''}`;
+    const descClass = `${styles.descCell} ${isEditingDesc || isExpanded ? styles.descExpanded : ''}`;
 
     return (
-        <tr className={`${styles.row} ${isReadOnly ? styles.readOnly : ''}`}>
-            <td className={styles.nameCell} onClick={() => handleCellClick('title')}>
+        <tr className={rowClass} onClick={handleRowClick}>
+            <td className={styles.nameCell} onClick={(e) => handleCellClick(e, 'title', 0)}>
                 <div className={styles.nameCellContent}>
-                    <EditableCell
-                        value={isEditing('title') ? cellValue : event.title}
-                        isEditing={isEditing('title')}
-                        onChange={updateValue}
-                        onKeyDown={(e) => handleKeyDown(e, 0)}
-                    />
+                    <EditableCell value={isEditing('title') ? cellValue : event.title}
+                        isEditing={isEditing('title')} onChange={updateValue} onKeyDown={(e) => onKeyDown(e, 0)} />
+                    <EditIcon show={!isReadOnly && !isEditing('title')} />
                     {isReadOnly && quickAction && (
-                        <button className={styles.quickActionBtn} onClick={quickAction.onClick}>{quickAction.label}</button>
+                        <button className={styles.quickActionBtn} onClick={(e) => { e.stopPropagation(); quickAction.onClick(); }}>{quickAction.label}</button>
                     )}
                 </div>
             </td>
-            <TagCell event={event} tags={tags} />
-            <td className={styles.dateCell}>{formatDateTime(event)}</td>
-            <td className={styles.locationCell} onClick={() => handleCellClick('location')}>
-                <EditableCell
-                    value={isEditing('location') ? cellValue : event.location}
-                    isEditing={isEditing('location')}
-                    onChange={updateValue}
-                    onKeyDown={(e) => handleKeyDown(e, 1)}
-                />
+            <td className={styles.tagCell} onClick={stopPropIfEditable}>
+                <TagEditCell event={event} tags={tags} theme={theme} isReadOnly={isReadOnly}
+                    isEditing={isEditing('tag')} editValue={cellValue} onEdit={(e) => handleCellClick(e, 'tag', 1)}
+                    onSave={editState.saveWithValue} onCancel={editState.cancelEdit} />
+                <SourceBadge badge={sourceBadge} />
             </td>
-            <td className={styles.descCell} onClick={() => handleCellClick('description')}>
-                <EditableCell
-                    value={isEditing('description') ? cellValue : event.description}
-                    isEditing={isEditing('description')}
-                    onChange={updateValue}
-                    onKeyDown={(e) => handleKeyDown(e, 2)}
-                    isTextarea
-                />
+            <td className={styles.dateCell} onClick={stopPropIfEditable}>
+                <DateTimeCell event={event} isReadOnly={isReadOnly} onSave={(times) => editState.saveDateTimes(event.id, times)} />
+            </td>
+            <td className={styles.locationCell} onClick={(e) => handleCellClick(e, 'location', 2)}>
+                <div className={styles.cellWrapper}>
+                    <EditableCell value={isEditing('location') ? cellValue : event.location}
+                        isEditing={isEditing('location')} onChange={updateValue} onKeyDown={(e) => onKeyDown(e, 2)} />
+                    <EditIcon show={!isReadOnly && !isEditing('location')} />
+                </div>
+            </td>
+            <td className={descClass} onClick={(e) => handleCellClick(e, 'description', 3)}>
+                <div className={styles.cellWrapper}>
+                    <EditableCell value={isEditingDesc ? cellValue : event.description}
+                        isEditing={isEditingDesc} onChange={updateValue} onKeyDown={(e) => onKeyDown(e, 3)} isTextarea />
+                    <EditIcon show={!isReadOnly && !isEditingDesc} />
+                </div>
             </td>
         </tr>
     );

@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
+import { useTags } from '../../../context/TagContext';
 import { useTableEdit } from '../hooks/useTableEdit';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { usePagination } from '../../../hooks/usePagination';
@@ -16,7 +17,7 @@ const COLUMNS = [
 ];
 
 const PAGE_SIZE = 10;
-const SCROLL_CONTAINER = '[data-dashboard-main]';
+const SCROLL_SELECTOR = '[data-table-view]';
 
 function TableHeader() {
     return (
@@ -54,31 +55,32 @@ function useClickOutside(ref, callback, isActive) {
 export function TableView({ selectedDate: propDate, events: propEvents }) {
     const tableRef = useRef(null);
     const data = useCalendarData({ selectedDate: propDate, events: propEvents });
+    const { tags } = useTags();
     const sortedEvents = sortByStartTime(data.events || []);
 
     const { currentItems, totalPages, currentPage, setPage } = usePagination(sortedEvents, PAGE_SIZE);
 
-    const editState = useTableEdit(currentItems);
-    const { handleKeyDown } = useKeyboardNav(currentItems.length, editState.startEdit, editState.saveEdit, editState.cancelEdit);
+    const editState = useTableEdit(currentItems, tags);
+    const navState = useKeyboardNav(currentItems.length, editState.startEdit, editState.saveEdit, editState.cancelEdit);
 
     useClickOutside(tableRef, editState.saveEdit, !!editState.editingCell);
 
     const onCellClick = (eventId, field, value) => editState.startEdit(eventId, field, value);
 
     return (
-        <div className={styles.container}>
+        <div data-table-view className={styles.container}>
             <table ref={tableRef} className={styles.table}>
                 <TableHeader />
                 <tbody>
                     {!currentItems.length && <EmptyState />}
                     {currentItems.map((event, index) => (
-                        <TableRow key={event.id} event={event} rowIndex={index}
-                            editState={editState} onCellClick={onCellClick} onKeyDown={handleKeyDown} />
+                        <TableRow key={event.id} event={event} events={currentItems} rowIndex={index}
+                            editState={editState} navState={navState} onCellClick={onCellClick} />
                     ))}
                 </tbody>
             </table>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-            <BackToTop containerSelector={SCROLL_CONTAINER} />
+            <BackToTop containerSelector={SCROLL_SELECTOR} />
         </div>
     );
 }
