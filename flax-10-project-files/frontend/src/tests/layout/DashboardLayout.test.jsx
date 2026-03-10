@@ -277,6 +277,19 @@ describe("DashboardLayout", () => {
     expect(screen.getByText("User: John Doe")).toBeTruthy();
   });
 
+  it("useIsMobile resize listener updates isMobile when window is resized", async () => {
+    global.innerWidth = 1000;
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    expect(screen.getByTestId("topbar")).toBeInTheDocument();
+    expect(screen.queryByTestId("sidebar")).toBeNull();
+    global.innerWidth = 500;
+    global.dispatchEvent(new Event("resize"));
+    await waitFor(() => {
+      expect(screen.getByTestId("sidebar")).toBeInTheDocument();
+      expect(screen.queryByTestId("topbar")).toBeNull();
+    });
+  });
+
   it("sidebar Settings and Profile call handleNavChange on mobile", () => {
     global.innerWidth = 500;
     global.dispatchEvent(new Event("resize"));
@@ -391,6 +404,14 @@ describe("DashboardLayout", () => {
     global.dispatchEvent(new Event("resize"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     expect(screen.getByText("User: alice")).toBeInTheDocument();
+  });
+
+  it("parseStoredUser uses username when only first_name present (falsy last_name branch)", () => {
+    localStorage.setItem("user", JSON.stringify({ username: "bob", first_name: "Bob", email: "b@b.com" }));
+    global.innerWidth = 500;
+    global.dispatchEvent(new Event("resize"));
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    expect(screen.getByText("User: bob")).toBeInTheDocument();
   });
 
   it("getUser returns undefined when no user in localStorage", () => {
@@ -539,6 +560,19 @@ describe("DashboardLayout", () => {
     expect(screen.queryByTestId("leave-timer-modal")).toBeNull();
   });
 
+  it("LeaveTimerModal Pause when already paused does not call togglePause", () => {
+    mockTimerContext.isActive = true;
+    mockTimerContext.isPaused = false;
+    const { rerender } = render(<DashboardLayout activeNav="timer" onNavChange={() => {}}>Timer</DashboardLayout>);
+    fireEvent.click(screen.getByText("Quick Add"));
+    expect(screen.getByTestId("leave-timer-modal")).toBeInTheDocument();
+    mockTimerContext.isPaused = true;
+    rerender(<DashboardLayout activeNav="timer" onNavChange={() => {}}>Timer</DashboardLayout>);
+    fireEvent.click(screen.getByText("Pause and Leave"));
+    expect(mockTimerContext.togglePause).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("leave-timer-modal")).toBeNull();
+  });
+
   it("LeaveTimerModal Exit when pendingNav is nav target calls onNavChange", () => {
     mockTimerContext.isActive = true;
     mockTimerContext.isPaused = false;
@@ -612,6 +646,22 @@ describe("DashboardLayout", () => {
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Task"));
     await waitFor(() => expect(screen.getByTestId("create-task-modal")).toBeInTheDocument());
+  });
+
+  it("GlobalTaskModal filters modules by isEnrolledIn so enrolledModules is passed to CreateTaskModal", async () => {
+    const { getModules, getEnrollments } = await import("../../api/moduleApi");
+    const { isEnrolledIn } = await import("../../components/Modules/utils/moduleUtils");
+    getModules.mockResolvedValueOnce([{ id: 1, module_code: "CS101" }, { id: 2, module_code: "CS102" }]);
+    getEnrollments.mockResolvedValueOnce([{ module: 1 }]);
+    isEnrolledIn.mockImplementation((moduleId, enrollments) =>
+      enrollments.some((e) => e.module === moduleId),
+    );
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    fireEvent.click(screen.getByText("Quick Add"));
+    fireEvent.click(screen.getByText("Add Task"));
+    await waitFor(() => expect(screen.getByTestId("create-task-modal")).toBeInTheDocument());
+    expect(isEnrolledIn).toHaveBeenCalledWith(1, [{ module: 1 }]);
+    expect(isEnrolledIn).toHaveBeenCalledWith(2, [{ module: 1 }]);
   });
 
   it("uses fallback selectedDate when useCalendar returns no selectedDate", () => {

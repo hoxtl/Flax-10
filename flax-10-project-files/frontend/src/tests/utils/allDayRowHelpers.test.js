@@ -97,6 +97,14 @@ describe('calculateEventLayout', () => {
         expect(result[0].endCol).toBe(8);
     });
 
+    it('event ending before week range is excluded (getEndIndex returns null)', () => {
+        const events = [
+            { id: 1, title: 'Before week', start_time: '2026-01-04T00:00:00', end_time: '2026-01-04T23:00:00', all_day: true },
+        ];
+        const result = calculateEventLayout(events, days);
+        expect(result).toHaveLength(0);
+    });
+
     it('sorts by startCol then by width descending (wider events first when same start)', () => {
         const events = [
             { id: 1, title: 'Mon only', start_time: '2026-01-05T00:00:00', end_time: '2026-01-05T00:00:00', all_day: true },

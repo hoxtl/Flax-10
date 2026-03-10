@@ -22,11 +22,13 @@ vi.mock('../../../components/Tags/EmojiPicker', () => ({
     default: ({ onSelect, onClose }) => (
         <div data-testid="emoji-picker">
             <button onClick={() => { onSelect('🎉'); onClose(); }}>Pick 🎉</button>
+            <button onClick={() => { onSelect('x'); onClose(); }}>Pick invalid</button>
         </div>
     ),
 }));
 
 import { useTags } from '../../../context/TagContext';
+import { useConfirm } from '../../../context/ConfirmContext';
 
 describe('TagManagerModal', () => {
     beforeEach(() => {
@@ -171,10 +173,81 @@ describe('TagManagerModal', () => {
         fireEvent.click(screen.getByText('+ Add New Tag'));
         const nameInput = screen.getByPlaceholderText('e.g. Gym');
         fireEvent.change(nameInput, { target: { value: 'Test' } });
-        // Manually trigger icon error by entering a non-emoji
-        // EmojiInput uses a picker, but we can test via the validation flow
-        // Open picker and close without selecting to keep empty icon
+        // Open picker and select invalid (non-emoji)
+        const emojiPreviewBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
+        fireEvent.click(emojiPreviewBtn);
+        fireEvent.click(screen.getByText('Pick invalid'));
         fireEvent.click(screen.getByText('Save'));
-        await waitFor(() => expect(screen.getByText('Icon is required.')).toBeTruthy());
+        await waitFor(() => expect(screen.getByText('Only emojis allowed.')).toBeTruthy());
+    });
+
+    it('calls addTag when saving new tag with valid data', async () => {
+        const mockAddTag = vi.fn();
+        useTags.mockReturnValue({
+            tags: [{ id: 1, label: 'Work', color: '#ff0000', icon: '💼' }],
+            addTag: mockAddTag,
+            updateTag: vi.fn(),
+            deleteTag: vi.fn(),
+        });
+        render(<TagManagerModal onClose={vi.fn()} />);
+        fireEvent.click(screen.getByText('+ Add New Tag'));
+        fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: 'Gym' } });
+        const emojiBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
+        fireEvent.click(emojiBtn);
+        fireEvent.click(screen.getByText('Pick 🎉'));
+        fireEvent.click(screen.getByText('Save'));
+        await waitFor(() => expect(mockAddTag).toHaveBeenCalledWith(expect.objectContaining({ label: 'Gym', icon: '🎉' })));
+    });
+
+    it('calls updateTag when saving edited tag', async () => {
+        const mockUpdateTag = vi.fn();
+        useTags.mockReturnValue({
+            tags: [{ id: 1, label: 'Work', color: '#ff0000', icon: '💼' }],
+            addTag: vi.fn(),
+            updateTag: mockUpdateTag,
+            deleteTag: vi.fn(),
+        });
+        render(<TagManagerModal onClose={vi.fn()} />);
+        fireEvent.click(screen.getAllByText('✎')[0]);
+        fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: 'Work Updated' } });
+        fireEvent.click(screen.getByText('Save'));
+        await waitFor(() => expect(mockUpdateTag).toHaveBeenCalledWith(1, expect.objectContaining({ label: 'Work Updated' })));
+    });
+
+    it('does not call deleteTag when user cancels delete confirmation', async () => {
+        const mockDeleteTag = vi.fn();
+        useConfirm.mockReturnValue(vi.fn().mockResolvedValue(false));
+        useTags.mockReturnValue({
+            tags: [{ id: 1, label: 'Work', color: '#ff0000', icon: '💼' }],
+            addTag: vi.fn(),
+            updateTag: vi.fn(),
+            deleteTag: mockDeleteTag,
+        });
+        render(<TagManagerModal onClose={vi.fn()} />);
+        fireEvent.click(screen.getByText('🗑'));
+        await waitFor(() => expect(useConfirm).toHaveBeenCalled());
+        expect(mockDeleteTag).not.toHaveBeenCalled();
+    });
+
+    it('on duplicate name offers replace and calls updateTag when confirmed', async () => {
+        const mockUpdateTag = vi.fn();
+        useConfirm.mockReturnValue(vi.fn().mockResolvedValue(true));
+        useTags.mockReturnValue({
+            tags: [
+                { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
+                { id: 2, label: 'Other', color: '#00ff00', icon: '⭐' },
+            ],
+            addTag: vi.fn(),
+            updateTag: mockUpdateTag,
+            deleteTag: vi.fn(),
+        });
+        render(<TagManagerModal onClose={vi.fn()} />);
+        fireEvent.click(screen.getByText('+ Add New Tag'));
+        fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: 'Work' } });
+        const emojiBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
+        fireEvent.click(emojiBtn);
+        fireEvent.click(screen.getByText('Pick 🎉'));
+        fireEvent.click(screen.getByText('Save'));
+        await waitFor(() => expect(mockUpdateTag).toHaveBeenCalledWith(1, expect.objectContaining({ label: 'Work', icon: '🎉' })));
     });
 });

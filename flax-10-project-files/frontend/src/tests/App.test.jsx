@@ -102,14 +102,26 @@ vi.mock('../context/TaskCompletionContext', () => ({
     TaskCompletionProvider: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../lib/routes', () => ({
-    APP_ROUTES: [
-        { id: 'home', path: '/', element: <div data-testid="home-route">Home</div> },
-        { id: 'settings', path: '/settings', element: <div data-testid="settings-route">Settings Route</div> },
-        { id: 'profile', path: '/profile', element: <div data-testid="profile-route">Profile Route</div> },
-        { id: 'modules', path: '/modules', element: <div data-testid="modules-route">Modules</div> },
-    ],
-}));
+vi.mock('../lib/routes', () => {
+    const React = require('react');
+    const ModulesPlaceholder = (props) => (
+        <div
+            data-testid="modules-route"
+            data-initial-create={props.initialCreate}
+            data-initial-search={props.initialSearch}
+        >
+            Modules
+        </div>
+    );
+    return {
+        APP_ROUTES: [
+            { id: 'home', path: '/', element: <div data-testid="home-route">Home</div> },
+            { id: 'settings', path: '/settings', element: <div data-testid="settings-route">Settings Route</div> },
+            { id: 'profile', path: '/profile', element: <div data-testid="profile-route">Profile Route</div> },
+            { id: 'modules', path: '/modules', element: <ModulesPlaceholder /> },
+        ],
+    };
+});
 
 import App from '../App';
 
@@ -283,6 +295,17 @@ describe('App', () => {
         localStorage.setItem('flax_active_nav', 'modules_create');
         renderApp('/');
         await waitFor(() => expect(screen.getByTestId('modules-route')).toBeTruthy());
+        expect(screen.getByTestId('modules-route').getAttribute('data-initial-create')).toBe('true');
+    });
+
+    it('resolveRouteContent passes initialSearch for modules_param activeNav', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        localStorage.setItem('flax_active_nav', 'modules_5CCS2SEG');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('modules-route')).toBeTruthy());
+        expect(screen.getByTestId('modules-route').getAttribute('data-initial-search')).toBe('5CCS2SEG');
     });
 
     it('renders Profile view when activeNav is profile_userId', async () => {
