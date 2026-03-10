@@ -12,6 +12,7 @@ import {
   useProjectMembers,
 } from "./groupWorkHooks";
 import GroupTasksTab from "./GroupTasksTab";
+import AvailabilityTab from "./AvailabilityTab";
 
 function BackButton({ onClick }) {
   const style = {
@@ -297,48 +298,7 @@ function TabsSection({ activeTab, setActiveTab, projectId, members }) {
         <GroupTasksTab projectId={projectId} members={members} />
       )}
       {activeTab === "availability" && (
-        <div style={detailCardStyle}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1.6fr) 1fr",
-              fontSize: 12,
-              color: "#9a8474",
-              marginBottom: 8,
-            }}
-          >
-            <span>Best times to meet</span>
-            <span style={{ textAlign: "right" }}>Everyone free</span>
-          </div>
-          <div
-            style={{
-              borderRadius: 12,
-              border: "1px solid #f0dfd1",
-              background: "#fffaf4",
-              padding: "10px 12px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-              fontSize: 13,
-              color: "#3c2a20",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <span>Availability not set up yet.</span>
-              <span style={{ fontSize: 11, color: "#c9a790" }}>– / – free</span>
-            </div>
-            <p style={{ ...metaStyle, margin: 0 }}>
-              Suggested meeting slots for this group will appear here once
-              calendar data is connected.
-            </p>
-          </div>
-        </div>
+        <AvailabilityTab projectId={projectId} />
       )}
       {activeTab === "contributions" && (
         <div style={detailCardStyle}>
