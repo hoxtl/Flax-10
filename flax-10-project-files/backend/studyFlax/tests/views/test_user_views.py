@@ -154,6 +154,18 @@ class UserSearchViewTest(TestCase):
         response = self.client.get('/api/users/search/?module=CS101')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_search_by_course(self):
+        UserSettings.objects.create(user=self.other, theme='light', timezone='Europe/London', major='Computer Science')
+        response = self.client.get('/api/users/search/?course=Computer%20Science')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+
+    def test_search_by_year(self):
+        UserSettings.objects.create(user=self.other, theme='light', timezone='Europe/London', year='Year 2')
+        response = self.client.get('/api/users/search/?year=Year%202')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+
 
 class HomeAddressViewTest(TestCase):
     """Tests for home address view."""
