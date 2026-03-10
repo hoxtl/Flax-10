@@ -4,7 +4,7 @@ import { addDays, formatDate, getWeekDays, formatMonthYear, isSameDay, getStartO
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton } from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton } from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import "./CalendarHeader.css";
 
@@ -26,15 +26,16 @@ function useIsMobile(breakpoint = 900) {
 }
 
 function useCalendarHeader() {
-    const { selectedDate, viewMode, displayMode } = useCalendar();
+    const { selectedDate, viewMode, displayMode, searchQuery } = useCalendar();
     const dispatch = useCalendarDispatch();
     const { openModal } = useEventModal();
     const [showImportModal, setShowImportModal] = useState(false);
-    return { selectedDate, viewMode, displayMode, dispatch, openModal, showImportModal, setShowImportModal };
+    const setSearchQuery = (q) => dispatch({ type: 'SET_SEARCH_QUERY', payload: q });
+    return { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, dispatch, openModal, showImportModal, setShowImportModal };
 }
 
 export function CalendarHeader() {
-    const { selectedDate, viewMode, displayMode, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
+    const { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
     const isMobile = useIsMobile();
     const modes = isMobile ? VIEW_MODES.filter(m => m.value !== 'week') : VIEW_MODES;
 
@@ -65,6 +66,7 @@ export function CalendarHeader() {
                         </div>
                     )}
                     <div className="header-actions">
+                        <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
                         {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
                         <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} />
                         <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />

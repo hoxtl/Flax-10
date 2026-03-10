@@ -1,7 +1,9 @@
-import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import AnimatedDropdown from '../../ui/AnimatedDropdown';
+import SearchBar from '../../common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
 
 export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) {
@@ -71,4 +73,30 @@ export function ViewSettingsMenu({ activeMode, onViewChange }) {
             onChange={onViewChange}
         />
     );
+}
+
+function SearchIconButton({ onClick }) {
+    return (
+        <button className={styles.settingsBtn} onClick={onClick} title="Search events">
+            <Search size={18} />
+        </button>
+    );
+}
+
+function SearchExpanded({ value, onChange, onClose, onBlur }) {
+    return (
+        <div className={styles.searchWrapper}>
+            <SearchBar value={value} onChange={onChange} placeholder="Search events..." className={styles.searchBar} onBlur={onBlur} />
+            <button className={styles.searchClose} onClick={onClose}><X size={16} /></button>
+        </div>
+    );
+}
+
+export function SearchButton({ value, onChange }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const toggle = () => { if (isExpanded && value) onChange(''); setIsExpanded(p => !p); };
+    const blur = () => { if (!value) setIsExpanded(false); };
+
+    if (!isExpanded) return <SearchIconButton onClick={toggle} />;
+    return <SearchExpanded value={value} onChange={onChange} onClose={toggle} onBlur={blur} />;
 }
