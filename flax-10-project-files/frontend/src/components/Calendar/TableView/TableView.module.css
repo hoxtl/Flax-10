@@ -145,6 +145,11 @@
     min-width: 36px;
 }
 
+.dateEditError {
+    font-size: 0.75rem;
+    color: var(--danger, #dc2626);
+}
+
 .dateEditActions {
     display: flex;
     gap: 6px;
