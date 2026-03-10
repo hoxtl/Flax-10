@@ -62,13 +62,16 @@ export function ViewModeButton({ modes, activeMode, onChange }) {
     );
 }
 
-export function ViewSettingsMenu({ activeMode, onViewChange }) {
+const MOBILE_DISPLAY_OPTIONS = DISPLAY_MODE_OPTIONS.filter(o => o.value !== 'table');
+
+export function ViewSettingsMenu({ activeMode, onViewChange, isMobile }) {
     const trigger = <button className={styles.settingsBtn} title="Display Mode"><Settings2 size={18} /></button>;
+    const options = isMobile ? MOBILE_DISPLAY_OPTIONS : DISPLAY_MODE_OPTIONS;
     return (
         <AnimatedDropdown
             className={styles.actionMenu}
             customTrigger={trigger}
-            options={DISPLAY_MODE_OPTIONS}
+            options={options}
             value={activeMode}
             onChange={onViewChange}
         />

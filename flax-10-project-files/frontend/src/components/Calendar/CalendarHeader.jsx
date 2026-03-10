@@ -68,7 +68,7 @@ export function CalendarHeader() {
                     <div className="header-actions">
                         <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
                         {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
-                        <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} />
+                        <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
                         <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
                     </div>
                 </header>

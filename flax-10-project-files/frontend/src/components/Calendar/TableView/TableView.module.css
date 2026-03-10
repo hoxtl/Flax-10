@@ -367,27 +367,3 @@ textarea.cellInput {
     text-align: center;
     color: var(--muted);
 }
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .container {
-        padding: 8px;
-    }
-
-    .headerCell,
-    .nameCell,
-    .tagCell,
-    .dateCell,
-    .locationCell,
-    .descCell {
-        padding: 8px 12px;
-    }
-
-    .descCell {
-        display: none;
-    }
-
-    .locationCell {
-        display: none;
-    }
-}
