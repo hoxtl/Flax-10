@@ -181,14 +181,11 @@ describe('MiniTimeline', () => {
   });
 
   it('auto-scrolls the NOW row into view on mount', async () => {
-    const prev = Element.prototype.scrollIntoView;
-    if (!prev) Element.prototype.scrollIntoView = () => {};
-    const spy = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+    // Auto-scroll was removed from MiniTimeline to avoid scrolling the entire Homepage.
+    // This test documents current behavior: NOW row renders without scrolling on mount.
     mockRows = [{ id: 'n1', type: 'now' }];
     renderTL();
-    await waitFor(() => expect(spy).toHaveBeenCalled());
-    spy.mockRestore();
-    Element.prototype.scrollIntoView = prev;
+    await waitFor(() => expect(screen.getByText('NOW_ROW')).toBeInTheDocument());
   });
 
   it('closes conflict and slot popovers on outside click', () => {

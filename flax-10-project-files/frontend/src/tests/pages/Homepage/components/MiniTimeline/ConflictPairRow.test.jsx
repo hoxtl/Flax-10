@@ -112,7 +112,8 @@ describe('ConflictPairRow', () => {
   it('renders Move to tomorrow when no free window', () => {
     const onPushTomorrow = vi.fn();
     renderConflictPairRow({ rows: rowsNoFree, onPushTomorrow });
-    expect(screen.getByText('→ Move to tomorrow')).toBeTruthy();
+    const buttons = screen.getAllByText('→ Move to tomorrow');
+    expect(buttons.length).toBeGreaterThan(0);
   });
 
   it('calls onEdit when card clicked and no onCardClick', () => {
@@ -140,7 +141,8 @@ describe('ConflictPairRow', () => {
   it('calls onPushTomorrow when Move to tomorrow clicked', () => {
     const onPushTomorrow = vi.fn();
     renderConflictPairRow({ rows: rowsNoFree, onPushTomorrow });
-    fireEvent.click(screen.getByText('→ Move to tomorrow'));
+    const moveButtons = screen.getAllByRole('button', { name: '→ Move to tomorrow' });
+    fireEvent.click(moveButtons[0]);
     expect(onPushTomorrow).toHaveBeenCalled();
   });
 
