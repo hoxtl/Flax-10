@@ -48,25 +48,25 @@ export function ThemeProvider({ children, initialTheme = 'light' }) {
   }, [colorTheme]);
 
   useEffect(() => {
-    const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
+    const handleUnload = () => logThemeSession(currentMode.current, sessionStart.current);
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, []);
 
-  function toggleTheme() {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    logThemeSession(currentTheme.current, sessionStart.current);
+  function toggleMode() {
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    logThemeSession(currentMode.current, sessionStart.current);
     sessionStart.current = new Date().toISOString();
-    currentTheme.current = newTheme;
-    setThemeState(newTheme);
+    currentMode.current = newMode;
+    setModeState(newMode);
   }
 
-  function setTheme(newTheme) {
-    if (newTheme === theme) return;
-    logThemeSession(currentTheme.current, sessionStart.current);
+  function setMode(newMode) {
+    if (newMode === mode) return;
+    logThemeSession(currentMode.current, sessionStart.current);
     sessionStart.current = new Date().toISOString();
-    currentTheme.current = newTheme;
-    setThemeState(newTheme);
+    currentMode.current = newMode;
+    setModeState(newMode);
   }
 
   function setColorTheme(newColorTheme) {
@@ -75,7 +75,7 @@ export function ThemeProvider({ children, initialTheme = 'light' }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, colorTheme, setColorTheme }}>
+    <ThemeContext.Provider value={{ mode, toggleMode, setMode, colorTheme, setColorTheme }}>
       {children}
     </ThemeContext.Provider>
   );

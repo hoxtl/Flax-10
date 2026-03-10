@@ -1,5 +1,10 @@
 :root {
   /* Dynamic Theme Variables */
+  --color-bg: #F8F5F2;
+  --color-card: #FFFCFA;
+  --color-sidebar: #EEEAE4;
+  --color-border-base: rgba(74, 52, 33, 0.12);
+
   --color-primary: #7B6751;
   --color-primary-strong: #5c4d3e;
   --color-highlight: #c4a35a;
@@ -52,10 +57,10 @@
   --health: #22C897;
   --neutral: #6B7280;
 
-  --bg: #F8F5F2;
-  --panel: #FFFCFA;
-  --sidebar: #EEEAE4;
-  --border: rgba(74, 52, 33, 0.12);
+  --bg: var(--color-bg);
+  --panel: var(--color-card);
+  --sidebar: var(--color-sidebar);
+  --border: var(--color-border-base);
 
   /* Semantic text & surfaces (light) */
   --text: #1A1A1A;
@@ -90,11 +95,11 @@
   --sidebar-active: rgba(139, 111, 71, 0.12);
   --user-details-text: #1e1b2e;
 
-  --card-bg: #FFFCFA;
-  --bento-card-bg: #FFFCFA;
-  --surface: #F8F5F2;
+  --card-bg: var(--color-card);
+  --bento-card-bg: var(--color-card);
+  --surface: var(--color-bg);
   /* Warm-Classy: Soft Paper for every widget/card */
-  --soft-paper: #FFFCFA;
+  --soft-paper: var(--color-card);
   /* Day-strip / date navigator dots (semantic) */
   --dot-lecture: var(--study);
   --dot-meal: var(--neutral);
@@ -141,12 +146,12 @@
   --heatmap-high: var(--color-sage-primary);
   --heatmap-full: var(--color-sage-dark);
 
-  /* Topbar (light): Warm-Classy — tint from warm Almond */
+  /* Topbar: Warm-Classy */
   --topbar-bg: rgba(248, 245, 242, 0.85);
   --topbar-border: rgba(255, 255, 255, 0.18);
   --search-glass: rgba(255, 255, 255, 0.55);
 
-  /* Unified frame (sidebar + topbar): Warm-Classy Almond tint */
+  /* Unified frame (sidebar + topbar): Warm-Classy */
   --frame-bg: rgba(248, 245, 242, 0.88);
   --frame-border: rgba(0, 0, 0, 0.06);
   --frame-blur: 20px;
@@ -158,8 +163,8 @@
   --bg-home: var(--bg);
   --bg-home-night: var(--bg);
 
-  /* Master Restoration: Warm-Classy stationary theme — warm Almond */
-  --restoration-bg: #F8F5F2;
+  /* Master Restoration: Warm-Classy stationary theme */
+  --restoration-bg: var(--color-bg);
   --restoration-sage: #8C9A86;
   --restoration-flax: #EEDC82;
   --restoration-earth: #6B5344;
@@ -182,12 +187,147 @@
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
 }
 
-/* Base Theme Configurations */
-:root[data-color-theme="blue"] {
+/* =========================================================================
+   Theme Configurations
+   ========================================================================= */
+
+/* 1️⃣ Flax (Warm Paper) */
+:root[data-theme="flax"][data-mode="light"] {
+  --color-bg: #F8F5F2;
+  --color-card: #FFFCFA;
+  --color-sidebar: #EEEAE4;
+  --color-border-base: rgba(74, 52, 33, 0.12);
+  --color-primary: #7B6751;
+  --color-primary-strong: #5c4d3e;
+  --color-highlight: #c4a35a;
+  --color-highlight-soft: #e8dcc8;
+}
+
+:root[data-theme="flax"][data-mode="dark"] {
+  --color-bg: #1a1310;
+  --color-card: #241a14;
+  --color-sidebar: #201812;
+  --color-border-base: rgba(180, 155, 126, 0.18);
+  --color-primary: #B89B7E;
+  --color-primary-strong: #D4B896;
+  --color-highlight: #e8dcc8;
+  --color-highlight-soft: #c4a35a;
+}
+
+/* 2️⃣ Ocean (Cool Productivity) */
+:root[data-theme="ocean"][data-mode="light"] {
+  --color-bg: #F3F7FA;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E7EFF5;
+  --color-border-base: rgba(50, 70, 90, 0.12);
   --color-primary: #4F6D8A;
-  --color-primary-strong: #3B546C;
+  --color-primary-strong: #384F67;
   --color-highlight: #7FA7C2;
   --color-highlight-soft: #DCE7F0;
+}
+
+:root[data-theme="ocean"][data-mode="dark"] {
+  --color-bg: #1C252E;
+  --color-card: #242F3A;
+  --color-sidebar: #202A34;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #7FA7C2;
+  --color-primary-strong: #A7C5DA;
+  --color-highlight: #4F6D8A;
+  --color-highlight-soft: #2E3F50;
+}
+
+/* 3️⃣ Sage Garden (Very Calm Study) */
+:root[data-theme="sage"][data-mode="light"] {
+  --color-bg: #F3F6F3;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E7ECE7;
+  --color-border-base: rgba(60, 80, 60, 0.12);
+  --color-primary: #6F8F7B;
+  --color-primary-strong: #526E5E;
+  --color-highlight: #A6C0AE;
+  --color-highlight-soft: #E4EFE8;
+}
+
+:root[data-theme="sage"][data-mode="dark"] {
+  --color-bg: #1E2521;
+  --color-card: #252E29;
+  --color-sidebar: #212924;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #A6C0AE;
+  --color-primary-strong: #C2D5C7;
+  --color-highlight: #6F8F7B;
+  --color-highlight-soft: #34473D;
+}
+
+/* 4️⃣ Lavender Night (Soft Purple) */
+:root[data-theme="lavender"][data-mode="light"] {
+  --color-bg: #F5F3F8;
+  --color-card: #FFFFFF;
+  --color-sidebar: #ECE7F3;
+  --color-border-base: rgba(70, 60, 100, 0.12);
+  --color-primary: #6B5C8E;
+  --color-primary-strong: #514371;
+  --color-highlight: #A79BC8;
+  --color-highlight-soft: #ECE9F5;
+}
+
+:root[data-theme="lavender"][data-mode="dark"] {
+  --color-bg: #211E27;
+  --color-card: #2A2632;
+  --color-sidebar: #25212C;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #A79BC8;
+  --color-primary-strong: #C1B7DD;
+  --color-highlight: #6B5C8E;
+  --color-highlight-soft: #3C3550;
+}
+
+/* 5️⃣ Sunset (Warm Peach) */
+:root[data-theme="sunset"][data-mode="light"] {
+  --color-bg: #F9F4F2;
+  --color-card: #FFFFFF;
+  --color-sidebar: #F1E6E2;
+  --color-border-base: rgba(100, 50, 40, 0.12);
+  --color-primary: #C46A5A;
+  --color-primary-strong: #9E5246;
+  --color-highlight: #E7A095;
+  --color-highlight-soft: #F7E6E3;
+}
+
+:root[data-theme="sunset"][data-mode="dark"] {
+  --color-bg: #241C1A;
+  --color-card: #2D2321;
+  --color-sidebar: #281F1D;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #E7A095;
+  --color-primary-strong: #F1B7AF;
+  --color-highlight: #C46A5A;
+  --color-highlight-soft: #4C2D28;
+}
+
+/* 6️⃣ Dark Academia */
+:root[data-theme="dark-academia"][data-mode="light"] {
+  /* Using Flax as the light mode variant of Dark Academia */
+  --color-bg: #F8F5F2;
+  --color-card: #FFFCFA;
+  --color-sidebar: #EEEAE4;
+  --color-border-base: rgba(74, 52, 33, 0.12);
+  --color-primary: #7B6751;
+  --color-primary-strong: #5c4d3e;
+  --color-highlight: #c4a35a;
+  --color-highlight-soft: #e8dcc8;
+}
+
+:root[data-theme="dark-academia"][data-mode="dark"] {
+  --color-bg: #1F1C1A;
+  --color-card: #2A2623;
+  --color-sidebar: #24201D;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #D4C28D;
+  --color-primary-strong: #E6D7A9;
+  --color-highlight: #9C8755;
+  --color-highlight-soft: #3E3623;
 }
 
 /* Completion Burst: burst of green particles from checkbox (0.5s) */
@@ -203,26 +343,7 @@
   }
 }
 
-:root[data-theme="dark"] {
-  /* Global Design Language (dark): glass + inner glow */
-  --glass-bg: rgba(26, 19, 16, 0.65);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-  --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-
-  --c-white: #f1f5f9;
-  --c-greige: #8d7d6e;
-  --c-taupe: #8a7a74;
-  --c-caramel: #b8936d;
-  --c-olive: #6d6050;
-  --c-cocoa: #2a1e15;
-
-  /* Warm near-black — matches topbar rgba(26,19,16) */
-  --bg: #1a1310;
-  --panel: #241a14;
-  --sidebar: #201812;
-
-  --border: rgba(180, 155, 126, 0.18);
-
+:root[data-mode="dark"] {
   /* Semantic text (Dark) */
   --text: #f1f5f9;
   --text-primary: #f1f5f9;
@@ -232,10 +353,10 @@
   --text-muted-sage: #94a3b8;
   --muted: #94a3b8;
 
-  --primary: #B89B7E;
-  --primary-strong: #D4B896;
+  --primary: var(--color-primary);
+  --primary-strong: var(--color-primary-strong);
   --sage: #a3b18a;
-  --accent: #B89B7E;
+  --accent: var(--color-primary);
   --danger: #d97a65;
   --danger-bg: rgba(192, 90, 62, 0.2);
   --danger-border: rgba(192, 90, 62, 0.5);
@@ -247,20 +368,20 @@
   --pill-bg: rgba(148, 163, 184, 0.15);
   --pill-hover: rgba(148, 163, 184, 0.25);
 
-  --card-bg: #241a14;
+  --card-bg: var(--color-card);
   --bento-card-bg: var(--glass-bg);
   --calendar-bg: var(--bg);
   --weekbar-bg: var(--bg);
   --search-bg: #141414;
   --btn-black: #262626;
   --btn-black-hover: #404040;
-  --event-card-bg: #241a14;
+  --event-card-bg: var(--color-card);
   --nav-btn-bg: #262626;
   --nav-btn-hover: #404040;
   --sidebar-active: rgba(163, 177, 138, 0.2);
   --user-details-text: #f1f5f9;
 
-  --surface: #241a14;
+  --surface: var(--color-bg);
 
   /* Topbar (dark) */
   --topbar-bg: rgba(26, 19, 16, 0.95);
@@ -275,9 +396,9 @@
   --now-banner-bg: rgba(255, 255, 255, 0.08);
   --now-banner-bg-idle: rgba(255, 255, 255, 0.06);
 
-  /* Home: warm near-black, matches topbar */
-  --bg-home: #1a1310;
-  --bg-home-night: #1a1310;
+  /* Home */
+  --bg-home: var(--color-bg);
+  --bg-home-night: var(--color-bg);
 
   --success-bg: rgba(140, 154, 134, 0.2);
   --success-text: #a3b18a;
