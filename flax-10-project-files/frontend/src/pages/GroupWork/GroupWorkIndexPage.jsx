@@ -13,6 +13,19 @@ import {
   useSelectedProjectId,
 } from "./groupWorkHooks";
 
+function getDeadlineLabel(deadline) {
+  if (!deadline) return null;
+  const due = new Date(deadline);
+  if (Number.isNaN(due.getTime())) return null;
+  const now = new Date();
+  const oneDayMs = 1000 * 60 * 60 * 24;
+  const diffDays = Math.round((due - now) / oneDayMs);
+  if (diffDays < 0) return "Past due";
+  if (diffDays === 0) return "Due today";
+  if (diffDays <= 7) return `Due in ${diffDays} days`;
+  return due.toLocaleDateString();
+}
+
 function CreateProjectForm({ onCreated }) {
   const [name, setName] = useState("");
   const [courseCode, setCourseCode] = useState("");
@@ -152,26 +165,33 @@ export default function GroupWorkIndexPage() {
 
       {!loading && projects.length > 0 && (
         <div style={listStyle}>
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              style={rowStyle}
-              onClick={() => openProject(project.id)}
-            >
-              <div>
-                <div style={{ fontWeight: 500, color: "#3c2a20" }}>{project.name}</div>
-                <div style={metaStyle}>
-                  {project.course_code || "No course code"} ·{" "}
-                  {(project.member_count ?? 0) === 1
-                    ? "1 member"
-                    : `${project.member_count ?? 0} members`}
+          {projects.map((project) => {
+            const deadlineLabel = getDeadlineLabel(project.deadline);
+            return (
+              <div
+                key={project.id}
+                style={rowStyle}
+                onClick={() => openProject(project.id)}
+              >
+                <div>
+                  <div style={{ fontWeight: 500, color: "#3c2a20" }}>
+                    {project.name}
+                  </div>
+                  <div style={metaStyle}>
+                    {project.course_code || "No course code"} ·{" "}
+                    {(project.member_count ?? 0) === 1
+                      ? "1 member"
+                      : `${project.member_count ?? 0} members`}
+                  </div>
                 </div>
+                {deadlineLabel && (
+                  <div style={{ fontSize: 12, color: "#8f7969" }}>
+                    {deadlineLabel}
+                  </div>
+                )}
               </div>
-              {project.deadline && (
-                <div style={{ fontSize: 12, color: "#8f7969" }}>Due soon</div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
