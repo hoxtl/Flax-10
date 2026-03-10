@@ -224,76 +224,11 @@
   --glass-bg: rgba(26, 19, 16, 0.65);
 }
 
-/* 2️⃣ Ocean (Cool Productivity) */
-:root[data-theme="ocean"][data-mode="light"] {
-  --color-bg: #F3F7FA;
-  --color-card: #FFFFFF;
-  --color-sidebar: #E7EFF5;
-  --color-border-base: rgba(50, 70, 90, 0.12);
-  --color-primary: #4F6D8A;
-  --color-primary-strong: #384F67;
-  --color-highlight: #7FA7C2;
-  --color-highlight-soft: #DCE7F0;
-}
+/* =========================================================================
+   🔥 WARM THEMES
+   ========================================================================= */
 
-:root[data-theme="ocean"][data-mode="dark"] {
-  --color-bg: #1C252E;
-  --color-card: #242F3A;
-  --color-sidebar: #202A34;
-  --color-border-base: rgba(255, 255, 255, 0.08);
-  --color-primary: #7FA7C2;
-  --color-primary-strong: #A7C5DA;
-  --color-highlight: #4F6D8A;
-  --color-highlight-soft: #2E3F50;
-}
-
-/* 3️⃣ Sage Garden (Very Calm Study) */
-:root[data-theme="sage"][data-mode="light"] {
-  --color-bg: #F3F6F3;
-  --color-card: #FFFFFF;
-  --color-sidebar: #E7ECE7;
-  --color-border-base: rgba(60, 80, 60, 0.12);
-  --color-primary: #6F8F7B;
-  --color-primary-strong: #526E5E;
-  --color-highlight: #A6C0AE;
-  --color-highlight-soft: #E4EFE8;
-}
-
-:root[data-theme="sage"][data-mode="dark"] {
-  --color-bg: #1E2521;
-  --color-card: #252E29;
-  --color-sidebar: #212924;
-  --color-border-base: rgba(255, 255, 255, 0.08);
-  --color-primary: #A6C0AE;
-  --color-primary-strong: #C2D5C7;
-  --color-highlight: #6F8F7B;
-  --color-highlight-soft: #34473D;
-}
-
-/* 4️⃣ Lavender Night (Soft Purple) */
-:root[data-theme="lavender"][data-mode="light"] {
-  --color-bg: #F5F3F8;
-  --color-card: #FFFFFF;
-  --color-sidebar: #ECE7F3;
-  --color-border-base: rgba(70, 60, 100, 0.12);
-  --color-primary: #6B5C8E;
-  --color-primary-strong: #514371;
-  --color-highlight: #A79BC8;
-  --color-highlight-soft: #ECE9F5;
-}
-
-:root[data-theme="lavender"][data-mode="dark"] {
-  --color-bg: #211E27;
-  --color-card: #2A2632;
-  --color-sidebar: #25212C;
-  --color-border-base: rgba(255, 255, 255, 0.08);
-  --color-primary: #A79BC8;
-  --color-primary-strong: #C1B7DD;
-  --color-highlight: #6B5C8E;
-  --color-highlight-soft: #3C3550;
-}
-
-/* 5️⃣ Sunset (Warm Peach) */
+/* 2️⃣ Sunset */
 :root[data-theme="sunset"][data-mode="light"] {
   --color-bg: #F9F4F2;
   --color-card: #FFFFFF;
@@ -316,28 +251,242 @@
   --color-highlight-soft: #4C2D28;
 }
 
-/* 6️⃣ Dark Academia */
-:root[data-theme="dark-academia"][data-mode="light"] {
-  /* Using Flax as the light mode variant of Dark Academia */
-  --color-bg: #F8F5F2;
-  --color-card: #FFFCFA;
-  --color-sidebar: #EEEAE4;
-  --color-border-base: rgba(74, 52, 33, 0.12);
-  --color-primary: #7B6751;
-  --color-primary-strong: #5c4d3e;
-  --color-highlight: #c4a35a;
-  --color-highlight-soft: #e8dcc8;
+/* 3️⃣ Terracotta */
+:root[data-theme="terracotta"][data-mode="light"] {
+  --color-bg: #F7F2EF;
+  --color-card: #FFFFFF;
+  --color-sidebar: #EFE3DF;
+  --color-border-base: rgba(120, 60, 40, 0.12);
+  --color-primary: #B65C45;
+  --color-primary-strong: #8E4635;
+  --color-highlight: #D58C78;
+  --color-highlight-soft: #F2DDD7;
 }
 
-:root[data-theme="dark-academia"][data-mode="dark"] {
-  --color-bg: #1F1C1A;
-  --color-card: #2A2623;
-  --color-sidebar: #24201D;
+:root[data-theme="terracotta"][data-mode="dark"] {
+  --color-bg: #231916;
+  --color-card: #2D201C;
+  --color-sidebar: #271D1A;
+  --color-border-base: rgba(200, 140, 120, 0.18);
+  --color-primary: #D58C78;
+  --color-primary-strong: #E3A898;
+  --color-highlight: #B65C45;
+  --color-highlight-soft: #4A2018;
+}
+
+/* 4️⃣ Amber */
+:root[data-theme="amber"][data-mode="light"] {
+  --color-bg: #FAF5EF;
+  --color-card: #FFFFFF;
+  --color-sidebar: #F1E5D7;
+  --color-border-base: rgba(120, 80, 30, 0.12);
+  --color-primary: #B57A42;
+  --color-primary-strong: #8A5D31;
+  --color-highlight: #E3B285;
+  --color-highlight-soft: #F5E6D7;
+}
+
+:root[data-theme="amber"][data-mode="dark"] {
+  --color-bg: #1F1A12;
+  --color-card: #29221A;
+  --color-sidebar: #241E16;
+  --color-border-base: rgba(200, 160, 100, 0.18);
+  --color-primary: #E3B285;
+  --color-primary-strong: #ECC8A0;
+  --color-highlight: #B57A42;
+  --color-highlight-soft: #472E16;
+}
+
+/* =========================================================================
+   ❄️ COOL THEMES
+   ========================================================================= */
+
+/* 5️⃣ Ocean */
+:root[data-theme="ocean"][data-mode="light"] {
+  --color-bg: #F3F7FA;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E7EFF5;
+  --color-border-base: rgba(50, 70, 90, 0.12);
+  --color-primary: #4F6D8A;
+  --color-primary-strong: #384F67;
+  --color-highlight: #7FA7C2;
+  --color-highlight-soft: #DCE7F0;
+}
+
+:root[data-theme="ocean"][data-mode="dark"] {
+  --color-bg: #1C252E;
+  --color-card: #242F3A;
+  --color-sidebar: #202A34;
   --color-border-base: rgba(255, 255, 255, 0.08);
-  --color-primary: #D4C28D;
-  --color-primary-strong: #E6D7A9;
-  --color-highlight: #9C8755;
-  --color-highlight-soft: #3E3623;
+  --color-primary: #7FA7C2;
+  --color-primary-strong: #A7C5DA;
+  --color-highlight: #4F6D8A;
+  --color-highlight-soft: #2E3F50;
+}
+
+/* 6️⃣ Indigo */
+:root[data-theme="indigo"][data-mode="light"] {
+  --color-bg: #F3F4FA;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E8EBF5;
+  --color-border-base: rgba(60, 70, 120, 0.12);
+  --color-primary: #4C5D8A;
+  --color-primary-strong: #39476C;
+  --color-highlight: #8C9FD1;
+  --color-highlight-soft: #E1E5F5;
+}
+
+:root[data-theme="indigo"][data-mode="dark"] {
+  --color-bg: #1C1E2C;
+  --color-card: #232534;
+  --color-sidebar: #20222F;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #8C9FD1;
+  --color-primary-strong: #B0BEE0;
+  --color-highlight: #4C5D8A;
+  --color-highlight-soft: #2A3050;
+}
+
+/* 7️⃣ Teal */
+:root[data-theme="teal"][data-mode="light"] {
+  --color-bg: #F2F7F7;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E4F0F0;
+  --color-border-base: rgba(40, 90, 90, 0.12);
+  --color-primary: #3F7C7C;
+  --color-primary-strong: #2E5E5E;
+  --color-highlight: #7DB5B5;
+  --color-highlight-soft: #DCEEEE;
+}
+
+:root[data-theme="teal"][data-mode="dark"] {
+  --color-bg: #192526;
+  --color-card: #1F2E30;
+  --color-sidebar: #1D2A2B;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #7DB5B5;
+  --color-primary-strong: #A0CECE;
+  --color-highlight: #3F7C7C;
+  --color-highlight-soft: #1C3D3D;
+}
+
+/* 8️⃣ Forest */
+:root[data-theme="forest"][data-mode="light"] {
+  --color-bg: #F2F6F3;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E6EFE8;
+  --color-border-base: rgba(50, 80, 60, 0.12);
+  --color-primary: #4E6B57;
+  --color-primary-strong: #3A5142;
+  --color-highlight: #7FA88C;
+  --color-highlight-soft: #DCE9E0;
+}
+
+:root[data-theme="forest"][data-mode="dark"] {
+  --color-bg: #1A2019;
+  --color-card: #222822;
+  --color-sidebar: #1E2420;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #7FA88C;
+  --color-primary-strong: #A0C2AA;
+  --color-highlight: #4E6B57;
+  --color-highlight-soft: #243228;
+}
+
+/* =========================================================================
+   🌸 SOFT THEMES
+   ========================================================================= */
+
+/* 9️⃣ Rose */
+:root[data-theme="rose"][data-mode="light"] {
+  --color-bg: #FAF3F5;
+  --color-card: #FFFFFF;
+  --color-sidebar: #F3E6EA;
+  --color-border-base: rgba(130, 60, 80, 0.12);
+  --color-primary: #B86A7A;
+  --color-primary-strong: #8F505E;
+  --color-highlight: #E2A7B1;
+  --color-highlight-soft: #F5E1E5;
+}
+
+:root[data-theme="rose"][data-mode="dark"] {
+  --color-bg: #241820;
+  --color-card: #2E202A;
+  --color-sidebar: #281C26;
+  --color-border-base: rgba(220, 160, 180, 0.15);
+  --color-primary: #E2A7B1;
+  --color-primary-strong: #EFC0C8;
+  --color-highlight: #B86A7A;
+  --color-highlight-soft: #4E2030;
+}
+
+/* 🔟 Lavender */
+:root[data-theme="lavender"][data-mode="light"] {
+  --color-bg: #F5F3F8;
+  --color-card: #FFFFFF;
+  --color-sidebar: #ECE7F3;
+  --color-border-base: rgba(70, 60, 100, 0.12);
+  --color-primary: #6B5C8E;
+  --color-primary-strong: #514371;
+  --color-highlight: #A79BC8;
+  --color-highlight-soft: #ECE9F5;
+}
+
+:root[data-theme="lavender"][data-mode="dark"] {
+  --color-bg: #211E27;
+  --color-card: #2A2632;
+  --color-sidebar: #25212C;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #A79BC8;
+  --color-primary-strong: #C1B7DD;
+  --color-highlight: #6B5C8E;
+  --color-highlight-soft: #3C3550;
+}
+
+/* 1️⃣1️⃣ Sage */
+:root[data-theme="sage"][data-mode="light"] {
+  --color-bg: #F3F6F3;
+  --color-card: #FFFFFF;
+  --color-sidebar: #E7ECE7;
+  --color-border-base: rgba(60, 80, 60, 0.12);
+  --color-primary: #6F8F7B;
+  --color-primary-strong: #526E5E;
+  --color-highlight: #A6C0AE;
+  --color-highlight-soft: #E4EFE8;
+}
+
+:root[data-theme="sage"][data-mode="dark"] {
+  --color-bg: #1E2521;
+  --color-card: #252E29;
+  --color-sidebar: #212924;
+  --color-border-base: rgba(255, 255, 255, 0.08);
+  --color-primary: #A6C0AE;
+  --color-primary-strong: #C2D5C7;
+  --color-highlight: #6F8F7B;
+  --color-highlight-soft: #34473D;
+}
+
+/* 1️⃣2️⃣ Sand */
+:root[data-theme="sand"][data-mode="light"] {
+  --color-bg: #F6F3EE;
+  --color-card: #FFFFFF;
+  --color-sidebar: #ECE7E0;
+  --color-border-base: rgba(100, 80, 50, 0.12);
+  --color-primary: #8C7A61;
+  --color-primary-strong: #6C5E4A;
+  --color-highlight: #C8B79C;
+  --color-highlight-soft: #EEE7DB;
+}
+
+:root[data-theme="sand"][data-mode="dark"] {
+  --color-bg: #201D18;
+  --color-card: #28251F;
+  --color-sidebar: #24211C;
+  --color-border-base: rgba(180, 160, 130, 0.18);
+  --color-primary: #C8B79C;
+  --color-primary-strong: #DACAB2;
+  --color-highlight: #8C7A61;
+  --color-highlight-soft: #3A3025;
 }
 
 /* Completion Burst: burst of green particles from checkbox (0.5s) */

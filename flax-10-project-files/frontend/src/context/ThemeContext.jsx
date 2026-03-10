@@ -26,7 +26,7 @@ function getStored(key, valid, fallback) {
 }
 
 const VALID_MODES = ['light', 'dark'];
-const VALID_THEMES = ['flax', 'ocean', 'sage', 'lavender', 'sunset', 'dark-academia'];
+const VALID_THEMES = ['flax', 'sunset', 'terracotta', 'amber', 'ocean', 'indigo', 'teal', 'forest', 'rose', 'lavender', 'sage', 'sand'];
 
 export function ThemeProvider({ children }) {
   const [mode, setModeState] = useState(() => getStored('mode', VALID_MODES, 'light'));
