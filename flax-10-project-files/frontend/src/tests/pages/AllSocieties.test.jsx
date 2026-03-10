@@ -22,6 +22,20 @@ vi.mock('../../components/common/SearchBar', () => ({
     ),
 }));
 
+vi.mock('../../components/ui/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder }) => (
+        <select
+            aria-label={placeholder}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+        >
+            {(options || []).map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+        </select>
+    ),
+}));
+
 vi.mock('../../components/Pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages, onPageChange }) => (
         <div data-testid="pagination">
