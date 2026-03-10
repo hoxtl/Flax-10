@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
@@ -19,6 +20,30 @@ vi.mock('../../../api/tagApi', () => ({
     createTag: vi.fn(),
     deleteTag: vi.fn(),
     updateTag: vi.fn(),
+}));
+
+vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
+    CalendarNav: ({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) => (
+        <div className="nav">
+            <button type="button" onClick={onPrev}>&lt;</button>
+            {showToday && <button type="button" className="today" onClick={onToday}>Today</button>}
+            <button type="button" onClick={onNext}>&gt;</button>
+            <button type="button" onClick={() => onDatePick(selectedDate)}>pick</button>
+            {title != null && <h2>{title}</h2>}
+        </div>
+    ),
+    ViewSwitcher: ({ modes, activeMode, onChange }) => (
+        <select role="combobox" value={activeMode} onChange={e => onChange(e.target.value)}>
+            {modes.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+        </select>
+    ),
+    ActionMenu: ({ onAddEvent, onImport }) => (
+        <>
+            <button type="button" onClick={onAddEvent}>+</button>
+            <button type="button" onClick={onImport}>Import timetable</button>
+        </>
+    ),
+    ViewSettingsMenu: () => null,
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
