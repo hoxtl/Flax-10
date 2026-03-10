@@ -104,7 +104,7 @@ export function formatTimeRange(startTime, endTime, allDay) {
     const end = new Date(endTime);
     const isMidnight = (d) => d.getHours() === 0 && d.getMinutes() === 0;
     if (allDay || (isMidnight(start) && isMidnight(end))) return "All day";
-    return `${formatTime(start)} to ${formatTime(end)}`;
+    return `${formatTime(start)} - ${formatTime(end)}`;
 }
 
 export function addHourToTime(time) {

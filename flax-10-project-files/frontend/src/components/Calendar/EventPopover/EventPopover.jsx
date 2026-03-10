@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
 import { calculatePopoverPosition, calculateArrowPosition } from './popoverUtils';
 import { isAllDayEvent } from '../utils/eventDisplayUtils';
+import { formatTimeRange } from '../utils/dateUtils';
 import styles from './EventPopover.module.css';
 
 const EVENT_ACCENTS = { module: "#7B9BAD", society: "#C4906A" };
@@ -67,15 +68,6 @@ function DescriptionDetail({ text }) {
     );
 }
 
-function formatTimeRange(event) {
-    if (isAllDayEvent(event)) return 'All day';
-    const start = event.start_time;
-    const end = event.end_time;
-    if (!start) return '';
-    const s = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const e = end ? new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-    return e ? `${s} - ${e}` : s;
-}
 
 function usePopoverPosition(popoverRef, anchorRect, event, viewMode) {
     const [position, setPosition] = useState({ top: -9999, left: -9999, placement: 'right' });
@@ -112,7 +104,7 @@ function EventPopoverContent({ event, tag, actions, onClose, readOnly }) {
     return (
         <div className={styles.popoverContent}>
             <PopoverHeader event={event} title={event.title} tag={tag} actions={actions} onClose={onClose} readOnly={readOnly} />
-            <EventDetail icon={<Clock size={14} />} text={formatTimeRange(event)} />
+            <EventDetail icon={<Clock size={14} />} text={formatTimeRange(event.start_time, event.end_time, isAllDayEvent(event))} />
             <EventDetail icon={<MapPin size={14} />} text={event.location} />
             <DescriptionDetail text={event.description} />
         </div>
