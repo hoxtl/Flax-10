@@ -1,0 +1,126 @@
+.container {
+    border-radius: 12px;
+    border: 1px solid #f0dfd1;
+    background: #fffaf4;
+    overflow: hidden;
+    margin-top: 15px;
+    /* Match GroupTasksTab */
+}
+
+.header {
+    padding: 20px 24px;
+    background: #fff;
+    border-bottom: 1px solid #f2e6db;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3c2a20;
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #8f7969;
+    margin: 0;
+}
+
+.slotList {
+    background: #fff;
+}
+
+.slotRow {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f2e6db;
+    transition: background 0.2s ease;
+}
+
+.slotRow:last-child {
+    border-bottom: none;
+}
+
+.timeLabel {
+    width: 120px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #3c2a20;
+}
+
+.memberList {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.avatar {
+    width: 54px;
+    height: 32px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    gap: 4px;
+    position: relative;
+    border: 1.5px solid transparent;
+}
+
+.avatarName {
+    text-transform: uppercase;
+}
+
+.statusIcon {
+    font-size: 11px;
+}
+
+/* Specific Member Colors - consistent with GroupTasksTab logic if possible */
+.avatarBusy {
+    background: #fbf6f2;
+    color: #e5dcd3;
+}
+
+.avatarFree {
+    /* Background and border set dynamically via style prop */
+    color: #fff;
+}
+
+.scoreLabel {
+    width: 80px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    color: #7b6655;
+}
+
+.scoreLabelHighlight {
+    color: #4a6741;
+    /* Greenish for full/high availability */
+}
+
+.footer {
+    padding: 12px 24px;
+    background: #fdf8f4;
+    border-top: 1px solid #f2e6db;
+    font-size: 12px;
+    color: #8f7969;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.starIcon {
+    color: #e0b44b;
+}
+
+.loading,
+.empty {
+    padding: 40px;
+    text-align: center;
+    color: #8f7969;
+    font-size: 14px;
+}
