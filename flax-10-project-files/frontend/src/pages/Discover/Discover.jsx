@@ -35,15 +35,15 @@ const USERS_PER_PAGE = 16;
 async function loadUsers(query, filters, page, setU, setTotalPages, setL) {
     setL(true);
     const offset = (page - 1) * USERS_PER_PAGE;
-    const d = await searchUsers(query, filters.mods.join(','), filters.socs.join(','), offset, USERS_PER_PAGE).catch(() => ({ results: [], total_count: 0 }));
+    const d = await searchUsers(query, filters.courses.join(','), filters.socs.join(','), offset, USERS_PER_PAGE, filters.years.join(',')).catch(() => ({ results: [], total_count: 0 }));
     setU(d.results || []);
     setTotalPages(Math.ceil((d.total_count || 0) / USERS_PER_PAGE));
     setL(false);
 }
 
-function usePaginationReset(query, filterMods, filterSocs) {
+function usePaginationReset(query, filterCourses, filterSocs, filterYears) {
     const [currentPage, setCurrentPage] = useState(1);
-    useEffect(() => { setCurrentPage(1); }, [query, filterMods, filterSocs]);
+    useEffect(() => { setCurrentPage(1); }, [query, filterCourses, filterSocs, filterYears]);
     return { currentPage, setCurrentPage };
 }
 
@@ -52,16 +52,21 @@ function useDiscoverFetch(query, filterState) {
     const [users, setUsers] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
 
-    const filterMods = filterState.props.selectedModules.join(',');
+    const filterCourses = filterState.props.selectedCourses.join(',');
     const filterSocs = filterState.props.selectedSocieties.join(',');
+    const filterYears = filterState.props.selectedYears.join(',');
 
-    const { currentPage, setCurrentPage } = usePaginationReset(query, filterMods, filterSocs);
+    const { currentPage, setCurrentPage } = usePaginationReset(query, filterCourses, filterSocs, filterYears);
 
     useEffect(() => {
-        const filters = { mods: filterState.props.selectedModules, socs: filterState.props.selectedSocieties };
+        const filters = {
+            courses: filterState.props.selectedCourses,
+            years: filterState.props.selectedYears,
+            socs: filterState.props.selectedSocieties,
+        };
         const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading), 300);
         return () => clearTimeout(timer);
-    }, [query, filterMods, filterSocs, currentPage]);
+    }, [query, filterCourses, filterSocs, filterYears, currentPage]);
 
     return { loading, users, currentPage, setCurrentPage, totalPages };
 }
@@ -72,8 +77,8 @@ function useDiscoverUIState(query) {
     const [pos, setPos] = useState(null);
     const cRef = useRef(null);
     const fRef = useRef(null);
-    const { allModules, allSocieties } = useSearchInit();
-    const fS = useFilterState(allModules, allSocieties, query, true, cRef, res, setPos, setRes, setSL);
+    const { allCourses, allSocieties } = useSearchInit();
+    const fS = useFilterState(allCourses, allSocieties, query, true, cRef, res, setPos, setRes, setSL);
     useClickOutside(fRef, () => fS.setIsFilterOpen(false));
     return { containerRef: cRef, filterRef: fRef, filterState: fS };
 }
