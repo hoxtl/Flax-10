@@ -31,7 +31,6 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const popupRef = useRef(null);
     const isDone = task.completed;
 
-    // Close on click outside
     useEffect(() => {
         function handleClickOutside(event) {
             if (popupRef.current && !popupRef.current.contains(event.target)) {
@@ -44,8 +43,9 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [showAssignPopup]);
 
-    // Use assignees_info from backend (array of {id, name})
     const assignees = task.assignees_info || [];
+    const taskColor = assignees.length > 0 ? getUserColor(assignees[0].id) : "#8d7355";
+    const taskColorLight = taskColor + "33";
 
     const toggleAssignee = (userId) => {
         let currentIds = assignees.map(a => a.id);
@@ -89,7 +89,6 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
         setIsEditing(true);
     };
 
-    // Formatting due date like "1 Mar"
     let parsedDateStr = "";
     let fullDateStr = "";
     if (task.due_date) {
@@ -100,55 +99,29 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
         fullDateStr = d.toISOString().slice(0, 10);
     }
 
-    // Priority Pill Colors
     const getPriorityStyle = (priority) => {
         const p = (priority || "").toLowerCase();
-        if (p === "high" || p === "urgent") {
-            return { background: "#ffccd5", color: "#a8324e" };
-        }
-        if (p === "medium") {
-            return { background: "#ffe0b2", color: "#bf7b24" };
-        }
-        return { background: "#f0f0f0", color: "#666" };
+        if (p === "high" || p === "urgent") return { background: "#ffccd5", color: "#a8324e" };
+        if (p === "medium") return { background: "#ffe0b2", color: "#bf7b24" };
+        return { background: "#f1ede9", color: "#8f7969" };
     };
 
     const pStyle = getPriorityStyle(task.priority);
 
     return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 90px 80px 140px 40px",
-                alignItems: "center",
-                borderBottom: "1px solid #f0dfd1",
-                padding: "12px 0",
-                gap: 12,
-                opacity: isDone ? 0.6 : 1,
-            }}
-        >
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <div className={styles.taskRow} style={{ opacity: isDone ? 0.6 : 1 }}>
+            <div className={styles.taskMainCell}>
                 <button
                     onClick={() => onToggle(task.id, !isDone)}
+                    className={`${styles.checkbox} ${isDone ? styles.checkboxDone : ""}`}
                     style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: "50%",
-                        border: isDone ? "2px solid #22c55e" : "2px solid #e3d7c5",
-                        background: isDone ? "#22c55e" : "transparent",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        flexShrink: 0,
-                        color: "white",
-                        marginTop: 2,
-                        padding: 0,
-                        transition: "all 0.2s ease"
+                        "--cb-bg": taskColor,
+                        "--cb-border": isDone ? taskColor : taskColorLight
                     }}
                 >
                     {isDone && <Check size={14} strokeWidth={3} />}
                 </button>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className={styles.titleArea}>
                     {isEditing ? (
                         <textarea
                             autoFocus
@@ -167,45 +140,17 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                                     el.style.height = el.scrollHeight + 'px';
                                 }
                             }}
-                            style={{
-                                fontSize: 14,
-                                fontWeight: 500,
-                                color: "#3c2a20",
-                                width: "100%",
-                                border: "none",
-                                borderBottom: "1.5px solid #8d7355",
-                                borderRadius: 0,
-                                padding: "2px 0",
-                                outline: "none",
-                                resize: "none",
-                                overflow: "hidden",
-                                display: "block",
-                                lineHeight: "1.4",
-                                background: "transparent",
-                                fontFamily: "inherit"
-                            }}
+                            className={styles.titleEditArea}
+                            style={{ "--cb-bg": taskColor }}
                         />
                     ) : (
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 8, width: "100%" }}>
-                            <span
-                                onClick={startEditing}
-                                style={{
-                                    fontSize: 14,
-                                    fontWeight: 500,
-                                    color: isDone ? "#a89b91" : "#3c2a20",
-                                    textDecoration: isDone ? "line-through" : "none",
-                                    whiteSpace: "pre-wrap",
-                                    wordBreak: "break-word",
-                                    cursor: "pointer",
-                                    flex: 1,
-                                    lineHeight: "1.4",
-                                    borderBottom: "1.5px solid transparent", // Reserve space to prevent jump
-                                }}
-                                title="Click to edit"
-                            >
-                                {task.title}
-                            </span>
-                        </div>
+                        <span
+                            onClick={startEditing}
+                            className={`${styles.titleSpan} ${isDone ? styles.titleDone : ""}`}
+                            title="Click to edit"
+                        >
+                            {task.title}
+                        </span>
                     )}
                 </div>
             </div>
@@ -214,20 +159,8 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                 <select
                     value={task.priority || "medium"}
                     onChange={handlePriorityChange}
-                    style={{
-                        ...pStyle,
-                        border: "none",
-                        borderRadius: 16,
-                        padding: "4px 8px",
-                        fontSize: 11,
-                        fontWeight: 800,
-                        textTransform: "uppercase",
-                        cursor: "pointer",
-                        outline: "none",
-                        appearance: "none",
-                        textAlign: "center",
-                        width: "100%",
-                    }}
+                    className={styles.prioritySelect}
+                    style={pStyle}
                 >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -236,113 +169,71 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                 </select>
             </div>
 
-            <div style={{ position: "relative" }}>
+            <div className={styles.dateCell}>
                 <input
                     type="date"
+                    className={styles.dateInput}
                     value={fullDateStr}
                     onChange={handleDateChange}
-                    style={{
-                        opacity: 0,
-                        width: "100%",
-                        height: "100%",
-                        position: "absolute",
-                        top: 0, left: 0,
-                        cursor: "pointer",
-                    }}
                 />
-                <div style={{ fontSize: 13, color: "#8f7969", textAlign: "center", pointerEvents: "none" }}>
+                <div className={styles.dateLabel}>
                     {parsedDateStr || "Set Date"}
                 </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 6, position: "relative" }}>
+            <div className={styles.assignCell}>
                 <div
                     onClick={() => setShowAssignPopup(!showAssignPopup)}
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        cursor: "pointer",
-                        padding: "4px 8px",
-                        borderRadius: 8,
-                        background: showAssignPopup ? "#eee3d8" : "transparent"
-                    }}
+                    className={`${styles.assignClickTarget} ${showAssignPopup ? styles.assignClickTargetActive : ""}`}
                 >
                     {assignees.length > 0 ? (
-                        <div style={{ display: "flex", marginLeft: 8 }}>
+                        <div className={styles.avatarStack}>
                             {assignees.slice(0, 3).map((a, i) => (
                                 <div
                                     key={a.id}
                                     title={a.name}
+                                    className={styles.avatar}
                                     style={{
-                                        width: 24,
-                                        height: 24,
-                                        borderRadius: "50%",
-                                        background: "#3c2a20",
-                                        color: "#fff",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        fontSize: 10,
-                                        fontWeight: "bold",
-                                        flexShrink: 0,
+                                        background: getUserColor(a.id),
                                         marginLeft: i > 0 ? -8 : 0,
-                                        border: "2px solid #fffaf4"
                                     }}
                                 >
                                     {(a.name || "?").slice(0, 2).toUpperCase()}
                                 </div>
                             ))}
                             {assignees.length > 3 && (
-                                <div style={{ fontSize: 11, color: "#8f7969", marginLeft: 4, alignSelf: "center" }}>
+                                <span className={styles.avatarMore}>
                                     +{assignees.length - 3}
-                                </div>
+                                </span>
                             )}
                         </div>
                     ) : (
-                        <span style={{ fontSize: 13, color: "#cdae99", fontStyle: "italic" }}>Unassigned</span>
+                        <span className={styles.unassigned}>Unassigned</span>
                     )}
                 </div>
 
                 {showAssignPopup && (
-                    <div
-                        ref={popupRef}
-                        style={{
-                            position: "absolute",
-                            top: "100%", left: 0,
-                            marginTop: 4,
-                            background: "#fff",
-                            border: "1px solid #e2d1c3",
-                            borderRadius: 8,
-                            boxShadow: "0 4px 12px rgba(60,42,32,0.1)",
-                            zIndex: 10,
-                            minWidth: 160,
-                            padding: "8px 0"
-                        }}
-                    >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 12px 6px" }}>
-                            <div style={{ fontSize: 11, fontWeight: 600, color: "#a89b91", textTransform: "uppercase" }}>Assign Members</div>
-                            <X size={12} style={{ cursor: "pointer", color: "#a89b91" }} onClick={() => setShowAssignPopup(false)} />
+                    <div ref={popupRef} className={styles.assignPopup}>
+                        <div className={styles.assignPopupHeader}>
+                            <span className={styles.assignPopupTitle}>Assign Members</span>
+                            <span className={styles.closePopupBtn} onClick={() => setShowAssignPopup(false)}>
+                                <X size={12} />
+                            </span>
                         </div>
                         {members.map(m => {
                             const isSelected = assignees.some(a => String(a.id) === String(m.user));
+                            const userCol = getUserColor(m.user);
                             return (
                                 <div
                                     key={m.id}
                                     onClick={() => toggleAssignee(m.user)}
-                                    style={{
-                                        padding: "8px 12px",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        cursor: "pointer",
-                                        backgroundColor: isSelected ? "#f5eee7" : "transparent",
-                                        fontSize: 13,
-                                        color: "#3c2a20"
-                                    }}
+                                    className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}
                                 >
-                                    <span>{m.user_name}</span>
-                                    {isSelected && <Check size={14} color="#7b4b2b" />}
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: userCol }} />
+                                        <span>{m.user_name}</span>
+                                    </div>
+                                    {isSelected && <Check size={14} color={userCol} strokeWidth={3} />}
                                 </div>
                             );
                         })}
@@ -350,25 +241,16 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                 )}
             </div>
 
-            <button
-                onClick={() => onDelete(task.id)}
-                style={{
-                    background: "transparent",
-                    border: "none",
-                    color: "#c9a790",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 8,
-                    borderRadius: 6,
-                }}
-                className="hover-trigger"
-                title="Delete task"
-            >
-                <Trash2 size={16} />
-            </button>
-        </div >
+            <div className={styles.actionCell}>
+                <button
+                    onClick={() => onDelete(task.id)}
+                    className={styles.deleteBtn}
+                    title="Delete task"
+                >
+                    <Trash2 size={16} />
+                </button>
+            </div>
+        </div>
     );
 }
 
@@ -431,16 +313,12 @@ export default function GroupTasksTab({ projectId, members }) {
             prev.map((t) => {
                 if (t.id !== taskId) return t;
                 const next = { ...t, ...patchData };
-
-                // If we are updating assigned_to (the IDs), we must also update 
-                // assignees_info (the objects with names) for the UI to update immediately.
                 if (patchData.assigned_to) {
                     next.assignees_info = patchData.assigned_to.map(uid => {
                         const m = members.find(mem => mem.user === uid);
                         return { id: uid, name: m ? m.user_name : "Unknown" };
                     });
                 }
-
                 return next;
             })
         );
@@ -453,7 +331,6 @@ export default function GroupTasksTab({ projectId, members }) {
 
         if (res.ok) {
             const updated = await res.json();
-            // Sync with actual server response to ensure everything is correct
             setTasks((prev) => prev.map((t) => (t.id === taskId ? updated : t)));
         }
     };
@@ -463,12 +340,8 @@ export default function GroupTasksTab({ projectId, members }) {
     };
 
     const deleteTask = async (taskId) => {
-        // Confirmation is usually good for deletion
         if (!window.confirm("Are you sure you want to delete this task?")) return;
-
-        // Optimistic delete
         setTasks((prev) => prev.filter((t) => t.id !== taskId));
-
         await fetch(`/api/tasks/${taskId}/`, {
             method: "DELETE",
             headers: getAuthHeaders(),
@@ -477,88 +350,55 @@ export default function GroupTasksTab({ projectId, members }) {
 
     const priorityWeight = { urgent: 4, high: 3, medium: 2, low: 1 };
 
-    // Filter by Assignee, then Sort by Completed > Urgency > Created Date
     const sortedTasks = [...tasks]
         .filter(t => filterUser ? (t.assignees_info || []).some(a => String(a.id) === String(filterUser)) : true)
         .sort((a, b) => {
             if (a.completed !== b.completed) {
-                return a.completed ? 1 : -1; // completed tasks at the bottom
+                return a.completed ? 1 : -1;
             }
             const wA = priorityWeight[(a.priority || "medium").toLowerCase()] || 0;
             const wB = priorityWeight[(b.priority || "medium").toLowerCase()] || 0;
-            if (wA !== wB) return wB - wA; // Urgency desc
-
+            if (wA !== wB) return wB - wA;
             return new Date(a.created_at) - new Date(b.created_at);
         });
 
     return (
-        <div
-            style={{
-                borderRadius: 12,
-                border: "1px solid #f0dfd1",
-                background: "#fffaf4",
-                padding: "16px 20px",
-            }}
-        >
-            <form onSubmit={addTask} style={{ marginBottom: 16, display: "flex", gap: 10 }}>
+        <div className={styles.container}>
+            <form onSubmit={addTask} className={styles.addTaskForm}>
                 <input
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     placeholder="Add a new task..."
-                    style={{
-                        flex: 1,
-                        padding: "10px 14px",
-                        borderRadius: 8,
-                        border: "1px solid #e3d4c6",
-                        background: "#fff",
-                        fontSize: 14,
-                        outline: "none",
-                    }}
+                    className={styles.taskInput}
                 />
 
-                <select
-                    value={filterUser}
-                    onChange={(e) => setFilterUser(e.target.value)}
-                    style={{
-                        padding: "10px 14px",
-                        borderRadius: 8,
-                        border: "1px solid #e3d4c6",
-                        background: "#f7efe7",
-                        color: "#3c2a20",
-                        fontSize: 13,
-                        fontWeight: 500,
-                        outline: "none",
-                        cursor: "pointer",
-                    }}
-                >
-                    <option value="">All Members</option>
-                    {members.map(m => (
-                        <option key={m.id} value={m.user}>
-                            {m.user_name}
-                        </option>
-                    ))}
-                </select>
+                <div className={styles.filterWrapper}>
+                    <select
+                        value={filterUser}
+                        onChange={(e) => setFilterUser(e.target.value)}
+                        className={styles.filterSelect}
+                    >
+                        <option value="">All Members</option>
+                        {members.map(m => (
+                            <option key={m.id} value={m.user}>
+                                {m.user_name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className={styles.filterArrow}>
+                        <ChevronDown size={14} />
+                    </div>
+                </div>
 
-                <button
-                    type="submit"
-                    style={{
-                        padding: "10px 20px",
-                        borderRadius: 8,
-                        border: "none",
-                        background: "#9b8b7c",
-                        color: "#fff",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                    }}
-                >
+                <button type="submit" className={styles.addBtn}>
                     Add
                 </button>
             </form>
 
             {loading ? (
-                <p style={metaStyle}>Loading tasks...</p>
+                <p className={styles.loadingText}>Loading tasks...</p>
             ) : sortedTasks.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "30px 0", color: "#a89b91", fontSize: 13 }}>
+                <div className={styles.emptyState}>
                     No tasks yet. Create one to get started!
                 </div>
             ) : (
