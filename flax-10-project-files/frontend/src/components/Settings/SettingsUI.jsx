@@ -135,7 +135,7 @@ function ThemeCard({ t, currentTheme, onChange }) {
 export function ThemeGridSelector({ value, onChange }) {
   const GROUPS = [
     {
-      label: '🔥 Warm',
+      label: 'Warm',
       themes: [
         {
           id: 'flax', name: 'Flax',
@@ -160,7 +160,7 @@ export function ThemeGridSelector({ value, onChange }) {
       ],
     },
     {
-      label: '❄️ Cool',
+      label: 'Cool',
       themes: [
         {
           id: 'ocean', name: 'Ocean',
@@ -185,7 +185,7 @@ export function ThemeGridSelector({ value, onChange }) {
       ],
     },
     {
-      label: '🌸 Soft',
+      label: 'Soft',
       themes: [
         {
           id: 'rose', name: 'Rose',

@@ -7,7 +7,7 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = UserSettings
-        fields = ['theme', 'timezone', 'year', 'major', 'major_locked', 'sleep_time', 'wake_time']
+        fields = ['theme', 'mode', 'timezone', 'year', 'major', 'major_locked', 'sleep_time', 'wake_time']
 
     def get_major_locked(self, obj):
         return bool(obj.major)
