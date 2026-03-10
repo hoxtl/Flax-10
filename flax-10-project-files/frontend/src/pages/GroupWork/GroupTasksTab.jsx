@@ -1,12 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { Check, Hourglass, Circle } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Check, Hourglass, Circle, Trash2, X } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 
 const metaStyle = { fontSize: 13, color: "#8f7969" };
 
-function TaskRow({ task, members, onToggle, onUpdate }) {
+function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
+    const popupRef = useRef(null);
     const isDone = task.completed;
+
+    // Close on click outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setShowAssignPopup(false);
+            }
+        }
+        if (showAssignPopup) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showAssignPopup]);
 
     // Use assignees_info from backend (array of {id, name})
     const assignees = task.assignees_info || [];
@@ -59,7 +73,7 @@ function TaskRow({ task, members, onToggle, onUpdate }) {
         <div
             style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 90px 80px 140px",
+                gridTemplateColumns: "minmax(0, 1fr) 90px 80px 140px 40px",
                 alignItems: "center",
                 borderBottom: "1px solid #f0dfd1",
                 padding: "12px 0",
@@ -202,19 +216,25 @@ function TaskRow({ task, members, onToggle, onUpdate }) {
                 </div>
 
                 {showAssignPopup && (
-                    <div style={{
-                        position: "absolute",
-                        top: "100%", left: 0,
-                        marginTop: 4,
-                        background: "#fff",
-                        border: "1px solid #e2d1c3",
-                        borderRadius: 8,
-                        boxShadow: "0 4px 12px rgba(60,42,32,0.1)",
-                        zIndex: 10,
-                        minWidth: 160,
-                        padding: "8px 0"
-                    }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: "#a89b91", padding: "0 12px 6px", textTransform: "uppercase" }}>Assign Members</div>
+                    <div
+                        ref={popupRef}
+                        style={{
+                            position: "absolute",
+                            top: "100%", left: 0,
+                            marginTop: 4,
+                            background: "#fff",
+                            border: "1px solid #e2d1c3",
+                            borderRadius: 8,
+                            boxShadow: "0 4px 12px rgba(60,42,32,0.1)",
+                            zIndex: 10,
+                            minWidth: 160,
+                            padding: "8px 0"
+                        }}
+                    >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 12px 6px" }}>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: "#a89b91", textTransform: "uppercase" }}>Assign Members</div>
+                            <X size={12} style={{ cursor: "pointer", color: "#a89b91" }} onClick={() => setShowAssignPopup(false)} />
+                        </div>
                         {members.map(m => {
                             const isSelected = assignees.some(a => String(a.id) === String(m.user));
                             return (
@@ -240,6 +260,25 @@ function TaskRow({ task, members, onToggle, onUpdate }) {
                     </div>
                 )}
             </div>
+
+            <button
+                onClick={() => onDelete(task.id)}
+                style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#c9a790",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 8,
+                    borderRadius: 6,
+                }}
+                className="hover-trigger"
+                title="Delete task"
+            >
+                <Trash2 size={16} />
+            </button>
         </div>
     );
 }
@@ -332,6 +371,19 @@ export default function GroupTasksTab({ projectId, members }) {
 
     const toggleTask = (taskId, completed) => {
         updateTask(taskId, { completed });
+    };
+
+    const deleteTask = async (taskId) => {
+        // Confirmation is usually good for deletion
+        if (!window.confirm("Are you sure you want to delete this task?")) return;
+
+        // Optimistic delete
+        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+
+        await fetch(`/api/tasks/${taskId}/`, {
+            method: "DELETE",
+            headers: getAuthHeaders(),
+        });
     };
 
     const priorityWeight = { urgent: 4, high: 3, medium: 2, low: 1 };
@@ -429,6 +481,7 @@ export default function GroupTasksTab({ projectId, members }) {
                             members={members}
                             onToggle={toggleTask}
                             onUpdate={updateTask}
+                            onDelete={deleteTask}
                         />
                     ))}
                 </div>
