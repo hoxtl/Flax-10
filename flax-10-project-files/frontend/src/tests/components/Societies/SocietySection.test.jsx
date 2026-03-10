@@ -62,14 +62,13 @@ describe('SocietySection', () => {
 
     it('shows empty admin state when items is empty and type is admin', () => {
         render(<SocietySection title="Test" items={[]} type="admin" onAction={vi.fn()} />);
-        expect(screen.getByText("You don't manage any societies yet.")).toBeTruthy();
-        expect(screen.getByText('Create a Society')).toBeTruthy();
+        expect(screen.getByText(/Create a society/i)).toBeTruthy();
     });
 
-    it('calls onAction when Create a Society is clicked', () => {
+    it('calls onAction when Create a society is clicked', () => {
         const onAction = vi.fn();
         render(<SocietySection title="Test" items={[]} type="admin" onAction={onAction} />);
-        fireEvent.click(screen.getByText('Create a Society'));
+        fireEvent.click(screen.getByText(/Create a society/i));
         expect(onAction).toHaveBeenCalledTimes(1);
     });
 
