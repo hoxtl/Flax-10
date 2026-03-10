@@ -1,0 +1,23 @@
+/* Swipe Year View - Single year with swipe navigation */
+.container {
+    background: var(--bg);
+    min-height: 500px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.content {
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.slideUp {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.slideDown {
+    transform: translateY(20px);
+    opacity: 0;
+}
