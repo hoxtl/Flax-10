@@ -344,6 +344,12 @@
 }
 
 :root[data-mode="dark"] {
+  /* Dark fallback layout colors (overridden by [data-theme][data-mode] combos) */
+  --color-bg: #1a1310;
+  --color-card: #241a14;
+  --color-sidebar: #201812;
+  --color-border-base: rgba(180, 155, 126, 0.18);
+
   /* Semantic text (Dark) */
   --text: #f1f5f9;
   --text-primary: #f1f5f9;
@@ -369,10 +375,10 @@
   --pill-hover: rgba(148, 163, 184, 0.25);
 
   --card-bg: var(--color-card);
-  --bento-card-bg: var(--glass-bg);
+  --bento-card-bg: var(--color-card);
   --calendar-bg: var(--bg);
   --weekbar-bg: var(--bg);
-  --search-bg: #141414;
+  --search-bg: rgba(0, 0, 0, 0.2);
   --btn-black: #262626;
   --btn-black-hover: #404040;
   --event-card-bg: var(--color-card);
@@ -383,14 +389,14 @@
 
   --surface: var(--color-bg);
 
-  /* Topbar (dark) */
-  --topbar-bg: rgba(26, 19, 16, 0.95);
-  --topbar-border: rgba(180, 155, 126, 0.15);
+  /* Topbar: derive from --color-sidebar so it matches the theme */
+  --topbar-bg: color-mix(in srgb, var(--color-sidebar) 95%, transparent);
+  --topbar-border: var(--color-border-base);
   --search-glass: rgba(255, 255, 255, 0.08);
 
-  /* Unified frame (sidebar + topbar): glassmorphism */
-  --frame-bg: rgba(36, 26, 20, 0.85);
-  --frame-border: rgba(180, 155, 126, 0.15);
+  /* Unified frame */
+  --frame-bg: var(--color-sidebar);
+  --frame-border: var(--color-border-base);
   --frame-blur: 20px;
 
   --now-banner-bg: rgba(255, 255, 255, 0.08);
