@@ -5,10 +5,10 @@ import CreateCard from "../../components/Society/CreateCard";
 import { Pagination } from "../../components/Pagination/Pagination";
 
 export default function SocietySection({ title, items, type, onAction, allSocieties = [], onSelect, onReport, onUnreport, hideTitle, pagination }) {
-    const isMember = type === "member";
     return (
         <section className={styles.section}>
             {!hideTitle && <SectionHeader title={title} type={type} onAction={onAction} />}
+            {pagination && <Pagination {...pagination} />}
             <SectionContent items={items} type={type} onAction={onAction} allSocieties={allSocieties} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             {pagination && <Pagination {...pagination} />}
         </section>
@@ -37,4 +37,3 @@ function SectionContent({ items, type, onAction, allSocieties, onSelect, onRepor
         </div>
     );
 }
-

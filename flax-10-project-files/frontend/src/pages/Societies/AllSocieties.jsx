@@ -22,6 +22,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [], onRepor
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={resetAndSet(setSearch)} sortBy={sortBy} setSortBy={resetAndSet(setSortBy)} />
             <FilterPills filters={filters} toggleFilter={(...a) => { toggleFilter(...a); setPage(1); }} clearFilters={() => { clearFilters(); setPage(1); }} societies={societies} />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <SocietyGrid items={currentItems} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <BackToTop />

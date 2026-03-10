@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ModuleDropdown from '../../../components/Modules/ModuleDropdown';
 
 vi.mock('lucide-react', () => ({
@@ -25,11 +25,13 @@ describe('ModuleDropdown', () => {
     expect(onChange).toHaveBeenCalledWith('b');
   });
 
-  it('closes when clicking outside', () => {
+  it('closes when clicking outside', async () => {
     render(<ModuleDropdown value="a" onChange={vi.fn()} options={options} />);
     fireEvent.click(screen.getByRole('button', { name: 'Alpha' }));
     expect(screen.getByText('Beta')).toBeInTheDocument();
     fireEvent.mouseDown(document.body);
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Beta')).not.toBeInTheDocument();
+    });
   });
 });

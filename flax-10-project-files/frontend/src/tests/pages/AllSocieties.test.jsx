@@ -22,6 +22,16 @@ vi.mock('../../components/common/SearchBar', () => ({
     ),
 }));
 
+vi.mock('../../components/ui/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder = 'Select' }) => (
+        <select aria-label={placeholder} value={value} onChange={(e) => onChange(e.target.value)}>
+            {options.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+        </select>
+    ),
+}));
+
 vi.mock('../../components/Pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages, onPageChange }) => (
         <div data-testid="pagination">
@@ -77,7 +87,7 @@ describe('AllSocieties', () => {
     it('shows empty state when no societies match', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
         fireEvent.change(screen.getByPlaceholderText('Search societies...'), { target: { value: 'zzz' } });
-        expect(screen.getByText('No societies found.')).toBeTruthy();
+        expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
     it('calls onSelect when a society card is clicked', () => {
@@ -123,11 +133,11 @@ describe('AllSocieties', () => {
 
     it('renders with empty societies list', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={[]} />);
-        expect(screen.getByText('No societies found.')).toBeTruthy();
+        expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
     it('renders pagination', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
-        expect(screen.getByTestId('pagination')).toBeTruthy();
+        expect(screen.getAllByTestId('pagination')).toHaveLength(2);
     });
 });

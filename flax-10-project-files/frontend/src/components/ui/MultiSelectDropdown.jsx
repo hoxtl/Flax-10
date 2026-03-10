@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, X } from "lucide-react";
-import styles from "./AnimatedDropdown.module.css";
+import styles from "../common/AnimatedDropdown/AnimatedDropdown.module.css";
 import pillStyles from "./MultiSelectDropdown.module.css";
 
 function normalise(opt) {
