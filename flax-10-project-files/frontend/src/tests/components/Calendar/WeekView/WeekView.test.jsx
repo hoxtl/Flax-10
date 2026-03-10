@@ -1,12 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 
+const dispatchMock = vi.fn();
 vi.mock('../../../../context/CalendarContext', () => ({
     useCalendarData: vi.fn(({ selectedDate, events }) => ({
         selectedDate: selectedDate || new Date('2024-03-04'),
         events: events || [],
     })),
-    useCalendarDispatch: vi.fn(() => vi.fn()),
+    useCalendarDispatch: vi.fn(() => dispatchMock),
 }));
 
 vi.mock('../../../../components/Calendar/WeekView/DayColumn', () => ({
@@ -48,10 +49,15 @@ vi.mock('../../../../components/Calendar/calendarConstants', () => ({
 }));
 
 import { WeekView } from '../../../../components/Calendar/WeekView/WeekView';
+import * as dateUtils from '../../../../components/Calendar/utils/dateUtils';
 
 const date = new Date('2024-03-04');
 
 describe('WeekView', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     it('renders without crashing', () => {
         const { container } = render(<WeekView selectedDate={date} events={[]} readOnly={false} />);
         expect(container.firstChild).toBeTruthy();
@@ -76,5 +82,41 @@ describe('WeekView', () => {
     it('renders in readOnly mode', () => {
         const { container } = render(<WeekView selectedDate={date} events={[]} readOnly={true} />);
         expect(container.firstChild).toBeTruthy();
+    });
+
+    it('day header click calls onDateSelect when provided', () => {
+        const onDateSelect = vi.fn();
+        render(<WeekView selectedDate={date} events={[]} onDateSelect={onDateSelect} readOnly={false} />);
+        const dayNumbers = document.querySelectorAll('.day-number');
+        expect(dayNumbers.length).toBe(7);
+        fireEvent.click(dayNumbers[1]);
+        expect(onDateSelect).toHaveBeenCalledTimes(1);
+        expect(onDateSelect).toHaveBeenCalledWith(expect.any(Date));
+        expect(onDateSelect.mock.calls[0][0].toISOString().slice(0, 10)).toBe('2024-03-05');
+        expect(dispatchMock).not.toHaveBeenCalled();
+    });
+
+    it('day header click dispatches when onDateSelect not provided', () => {
+        render(<WeekView selectedDate={date} events={[]} readOnly={false} />);
+        const dayNumbers = document.querySelectorAll('.day-number');
+        fireEvent.click(dayNumbers[0]);
+        expect(dispatchMock).toHaveBeenCalledWith({ type: 'SET_SELECTED_DATE', payload: expect.any(Date) });
+        expect(dispatchMock).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+        expect(dispatchMock.mock.calls[0][0].payload.toISOString().slice(0, 10)).toBe('2024-03-04');
+    });
+
+    it('applies is-today class when day matches today', () => {
+        vi.mocked(dateUtils.isSameDay).mockImplementation((day) => day.getDate() === 5);
+        const { container } = render(<WeekView selectedDate={date} events={[]} readOnly={false} />);
+        const todayCells = container.querySelectorAll('.day-header.is-today');
+        expect(todayCells.length).toBe(1);
+        expect(todayCells[0].querySelector('.day-number').textContent).toBe('5');
+    });
+
+    it('renders week header with day names', () => {
+        render(<WeekView selectedDate={date} events={[]} readOnly={false} />);
+        expect(screen.getByText('Sun')).toBeInTheDocument();
+        expect(screen.getByText('Mon')).toBeInTheDocument();
+        expect(screen.getByText('Sat')).toBeInTheDocument();
     });
 });
