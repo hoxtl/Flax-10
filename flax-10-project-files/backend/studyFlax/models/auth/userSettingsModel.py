@@ -12,5 +12,6 @@ class UserSettings(models.Model):
     year = models.CharField(max_length=50, blank=True, default='')
     major = models.CharField(max_length=100, blank=True, default='')
     modules = models.JSONField(default=list, blank=True)
+    homepage_widgets = models.JSONField(default=list, blank=True)
     sleep_time = models.TimeField(default=time(23, 0))
     wake_time = models.TimeField(default=time(7, 0))
