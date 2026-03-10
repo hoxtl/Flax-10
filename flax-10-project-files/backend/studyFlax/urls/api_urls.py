@@ -109,7 +109,7 @@ urlpatterns = [
     path("readings/speed/", reading_speed, name="reading-speed"),
     path("readings/<int:reading_id>/load-task/", load_task, name="reading-load-task"),
     path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline-list"),
-    path("modules/<int:module_id>/deadlines/<int:deadline-id>/", deadline_detail, name="deadline-detail"),
+    path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline-detail"),
     path("deadlines/upcoming/", upcoming_deadlines, name="deadline-upcoming"),
 
     # Tasks
