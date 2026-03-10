@@ -228,50 +228,50 @@
    🔥 WARM THEMES
    ========================================================================= */
 
-/* 2️⃣ Sunset */
-:root[data-theme="sunset"][data-mode="light"] {
-  --color-bg: #F9F4F2;
+/* 2️⃣ Coral */
+:root[data-theme="coral"][data-mode="light"] {
+  --color-bg: #FFF4F2;
   --color-card: #FFFFFF;
-  --color-sidebar: #F1E6E2;
-  --color-border-base: rgba(100, 50, 40, 0.12);
-  --color-primary: #C46A5A;
-  --color-primary-strong: #9E5246;
-  --color-highlight: #E7A095;
-  --color-highlight-soft: #F7E6E3;
+  --color-sidebar: #FCE5E1;
+  --color-border-base: rgba(224, 99, 78, 0.12);
+  --color-primary: #E0634E;
+  --color-primary-strong: #B44B3A;
+  --color-highlight: #F3A79C;
+  --color-highlight-soft: #FDE7E4;
 }
 
-:root[data-theme="sunset"][data-mode="dark"] {
-  --color-bg: #241C1A;
-  --color-card: #2D2321;
-  --color-sidebar: #281F1D;
+:root[data-theme="coral"][data-mode="dark"] {
+  --color-bg: #261715;
+  --color-card: #2F1E1B;
+  --color-sidebar: #2A1A18;
   --color-border-base: rgba(255, 255, 255, 0.08);
-  --color-primary: #E7A095;
-  --color-primary-strong: #F1B7AF;
-  --color-highlight: #C46A5A;
-  --color-highlight-soft: #4C2D28;
+  --color-primary: #F3A79C;
+  --color-primary-strong: #FAD1CC;
+  --color-highlight: #E0634E;
+  --color-highlight-soft: #4D211A;
 }
 
-/* 3️⃣ Terracotta */
-:root[data-theme="terracotta"][data-mode="light"] {
+/* 3️⃣ Rust */
+:root[data-theme="rust"][data-mode="light"] {
   --color-bg: #F7F2EF;
   --color-card: #FFFFFF;
-  --color-sidebar: #EFE3DF;
-  --color-border-base: rgba(120, 60, 40, 0.12);
-  --color-primary: #B65C45;
-  --color-primary-strong: #8E4635;
-  --color-highlight: #D58C78;
-  --color-highlight-soft: #F2DDD7;
+  --color-sidebar: #EFE3DD;
+  --color-border-base: rgba(160, 82, 61, 0.12);
+  --color-primary: #A0523D;
+  --color-primary-strong: #7B3F2F;
+  --color-highlight: #D29A8A;
+  --color-highlight-soft: #F4E1DA;
 }
 
-:root[data-theme="terracotta"][data-mode="dark"] {
-  --color-bg: #231916;
-  --color-card: #2D201C;
-  --color-sidebar: #271D1A;
-  --color-border-base: rgba(200, 140, 120, 0.18);
-  --color-primary: #D58C78;
-  --color-primary-strong: #E3A898;
-  --color-highlight: #B65C45;
-  --color-highlight-soft: #4A2018;
+:root[data-theme="rust"][data-mode="dark"] {
+  --color-bg: #211A18;
+  --color-card: #2B2220;
+  --color-sidebar: #251E1C;
+  --color-border-base: rgba(160, 82, 61, 0.18);
+  --color-primary: #D29A8A;
+  --color-primary-strong: #E6BAB0;
+  --color-highlight: #A0523D;
+  --color-highlight-soft: #3B1E16;
 }
 
 /* 4️⃣ Amber */

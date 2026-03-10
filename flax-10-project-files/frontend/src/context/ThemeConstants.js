@@ -8,14 +8,14 @@ export const THEME_GROUPS = [
                 dark: { bg: '#1a1310', card: '#241a14', sidebar: '#201812', primary: '#B89B7E', highlight: '#E8DCC8', border: 'rgba(180,155,126,0.18)', text: '#f1f5f9' }
             },
             {
-                id: 'sunset', name: 'Sunset',
-                light: { bg: '#F9F4F2', card: '#FFFFFF', sidebar: '#F1E6E2', primary: '#C46A5A', highlight: '#E7A095', border: 'rgba(100,50,40,0.12)', text: '#1A1A1A' },
-                dark: { bg: '#241C1A', card: '#2D2321', sidebar: '#281F1D', primary: '#E7A095', highlight: '#C46A5A', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
+                id: 'coral', name: 'Coral',
+                light: { bg: '#FFF4F2', card: '#FFFFFF', sidebar: '#FCE5E1', primary: '#E0634E', highlight: '#F3A79C', border: 'rgba(224,99,78,0.12)', text: '#1A1A1A' },
+                dark: { bg: '#261715', card: '#2F1E1B', sidebar: '#2A1A18', primary: '#F3A79C', highlight: '#E0634E', border: 'rgba(255,255,255,0.08)', text: '#f1f5f9' }
             },
             {
-                id: 'terracotta', name: 'Terracotta',
-                light: { bg: '#F7F2EF', card: '#FFFFFF', sidebar: '#EFE3DF', primary: '#B65C45', highlight: '#D58C78', border: 'rgba(120,60,40,0.12)', text: '#1A1A1A' },
-                dark: { bg: '#231916', card: '#2D201C', sidebar: '#271D1A', primary: '#D58C78', highlight: '#B65C45', border: 'rgba(200,140,120,0.18)', text: '#f1f5f9' }
+                id: 'rust', name: 'Rust',
+                light: { bg: '#F7F2EF', card: '#FFFFFF', sidebar: '#EFE3DD', primary: '#A0523D', highlight: '#D29A8A', border: 'rgba(160,82,61,0.12)', text: '#1A1A1A' },
+                dark: { bg: '#211A18', card: '#2B2220', sidebar: '#251E1C', primary: '#D29A8A', highlight: '#A0523D', border: 'rgba(160,82,61,0.18)', text: '#f1f5f9' }
             },
             {
                 id: 'amber', name: 'Amber',
