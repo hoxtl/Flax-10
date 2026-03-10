@@ -54,7 +54,7 @@ const testEmptyState = async () => {
 
 const testCancelClear = async () => {
     historyUtils.getHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
-    render(<HistoryModal onClose={onClose} />);
+    renderModal();
     fireEvent.click(await screen.findByText('Clear History'));
     await screen.findByText('Cancel');
     fireEvent.click(screen.getByText('Cancel'));
@@ -83,7 +83,7 @@ const testBlockWithTask = async () => {
 
 const testCancelClearViaOverlay = async () => {
     historyUtils.getHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
-    render(<HistoryModal onClose={onClose} />);
+    renderModal();
     fireEvent.click(await screen.findByText('Clear History'));
     await screen.findByText('Confirm');
     const overlays = document.querySelectorAll('[class*="confirmOverlay"]');

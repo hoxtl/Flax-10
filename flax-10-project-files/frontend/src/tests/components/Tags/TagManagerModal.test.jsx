@@ -61,8 +61,9 @@ describe('TagManagerModal', () => {
 
     it('calls onClose when overlay is clicked', () => {
         const onClose = vi.fn();
-        const { container } = render(<TagManagerModal onClose={onClose} />);
-        fireEvent.click(container.firstChild); // overlay
+        render(<TagManagerModal onClose={onClose} />);
+        const overlay = document.querySelector('[class*="backdrop"]');
+        fireEvent.mouseDown(overlay);
         expect(onClose).toHaveBeenCalled();
     });
 
@@ -110,7 +111,7 @@ describe('TagManagerModal', () => {
         expect(screen.getAllByText('🗑').length).toBe(1);
     });
 
-    it('calls deleteTag when delete button is clicked', () => {
+    it('calls deleteTag when delete button is clicked', async () => {
         const mockDeleteTag = vi.fn();
         useTags.mockReturnValue({
             tags: [{ id: 1, label: 'Work', color: '#ff0000', icon: '💼' }],
@@ -120,7 +121,7 @@ describe('TagManagerModal', () => {
         });
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('🗑'));
-        expect(mockDeleteTag).toHaveBeenCalledWith(1);
+        await waitFor(() => expect(mockDeleteTag).toHaveBeenCalledWith(1));
     });
 
     it('shows validation error when saving without name', () => {

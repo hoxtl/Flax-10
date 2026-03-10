@@ -114,7 +114,7 @@ describe('CoverImageModal', () => {
 
     it('calls onClose via ImageHeader close button', () => {
         render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByText('close-header'));
+        fireEvent.click(screen.getByRole('button', { name: '×' }));
         expect(baseProps.onClose).toHaveBeenCalled();
     });
 });
