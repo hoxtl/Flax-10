@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, memo } from 'react';
+import { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { YearGrid } from './YearGrid';
@@ -22,7 +22,6 @@ export function SwipeYearView() {
             newDate.setFullYear(newDate.getFullYear() + dir);
             dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
             setDirection(null);
-            if (containerRef.current) containerRef.current.scrollTop = 0;
         }, 150);
     }, [selectedDate, dispatch]);
 
@@ -30,6 +29,10 @@ export function SwipeYearView() {
     const onNext = useCallback(() => navigate(1), [navigate]);
 
     useSwipeNavigation({ containerRef, onPrev, onNext });
+
+    useEffect(() => {
+        if (containerRef.current) containerRef.current.scrollTop = 0;
+    }, [selectedDate]);
 
     const animationClass = direction === 1 ? styles.slideUp : direction === -1 ? styles.slideDown : '';
 

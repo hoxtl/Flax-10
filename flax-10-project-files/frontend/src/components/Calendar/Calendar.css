@@ -2,6 +2,9 @@
   padding: 0.5rem 1rem 1rem;
   box-sizing: border-box;
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  height: auto;
 }
 
 .view-placeholder {
@@ -19,7 +22,7 @@
 /* Day and Week views need constrained height for internal scroll */
 .calendar-view-relative-wrapper:has(.day-view),
 .calendar-view-relative-wrapper:has(.week-view) {
-  height: calc(100vh - 200px);
+  height: calc(100vh - 280px);
   min-height: 400px;
   display: flex;
   flex-direction: column;
@@ -33,6 +36,7 @@
 }
 
 @media (max-width: 900px) {
+
   .calendar-view-relative-wrapper:has(.day-view),
   .calendar-view-relative-wrapper:has(.week-view) {
     height: calc(100vh - 240px);

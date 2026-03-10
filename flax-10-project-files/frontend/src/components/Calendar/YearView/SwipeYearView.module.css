@@ -3,6 +3,7 @@
     background: var(--bg);
     min-height: 500px;
     max-height: calc(100vh - 200px);
+    padding-top: 20px;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;

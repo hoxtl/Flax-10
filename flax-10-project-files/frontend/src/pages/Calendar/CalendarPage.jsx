@@ -43,7 +43,9 @@ export default function CalendarPage() {
     dispatch({ type: "SET_FILTER", payload: key });
   };
 
-  const showFilters = viewMode !== "year";
+  const { displayMode } = useCalendar();
+  const isListOrTable = displayMode === "list" || displayMode === "table";
+  const showFilters = viewMode !== "year" || isListOrTable;
 
   return (
     <div className={styles.page}>

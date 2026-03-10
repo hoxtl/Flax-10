@@ -1,12 +1,16 @@
 import { useCalendarData } from '../../../context/CalendarContext';
 import { useEventGrouping } from '../hooks/useEventGrouping';
+import { usePagination } from '../../../hooks/usePagination';
 import { EventRow } from './EventRow';
+import { Pagination, BackToTop } from '../../Pagination/Pagination';
 import styles from './ListView.module.css';
+
+const PAGE_SIZE = 7;
+const SCROLL_CONTAINER = '[data-dashboard-main]';
 
 function formatDateHeader(dateStr) {
     const date = new Date(dateStr);
-    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-US', opts);
+    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
 function StickyDateHeader({ dateKey }) {
@@ -37,11 +41,7 @@ function FlatEventsList({ events }) {
 }
 
 function EmptyState() {
-    return (
-        <div className={styles.emptyState}>
-            <p>No events to display</p>
-        </div>
-    );
+    return <div className={styles.emptyState}><p>No events to display</p></div>;
 }
 
 export function ListView({ selectedDate: propDate, events: propEvents }) {
@@ -49,17 +49,28 @@ export function ListView({ selectedDate: propDate, events: propEvents }) {
     const { viewMode } = data;
     const { groupedEvents, dateKeys, flatEvents } = useEventGrouping(data.events, viewMode);
 
+    const itemsToPage = viewMode === 'day' ? (flatEvents || []) : dateKeys;
+    const { currentItems, totalPages, currentPage, setPage } = usePagination(itemsToPage, PAGE_SIZE);
+
     if (!data.events?.length) return <EmptyState />;
 
     if (viewMode === 'day' && flatEvents) {
-        return <div className={styles.container}><FlatEventsList events={flatEvents} /></div>;
+        return (
+            <div className={styles.container}>
+                <FlatEventsList events={currentItems} />
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+                <BackToTop containerSelector={SCROLL_CONTAINER} />
+            </div>
+        );
     }
 
     return (
         <div className={styles.container}>
-            {dateKeys.map(key => (
+            {currentItems.map(key => (
                 <DateGroup key={key} dateKey={key} events={groupedEvents.get(key)} />
             ))}
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+            <BackToTop containerSelector={SCROLL_CONTAINER} />
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, memo } from 'react';
+import { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { WeekdayHeader } from './WeekdayHeader';
@@ -33,7 +33,6 @@ export function SwipeMonthView({ readOnly: propReadOnly, customTags }) {
             newDate.setMonth(newDate.getMonth() + dir);
             dispatch({ type: 'SET_SELECTED_DATE', payload: newDate });
             setDirection(null);
-            if (containerRef.current) containerRef.current.scrollTop = 0;
         }, 150);
     }, [selectedDate, dispatch]);
 
@@ -46,6 +45,11 @@ export function SwipeMonthView({ readOnly: propReadOnly, customTags }) {
     }, [dispatch]);
 
     useSwipeNavigation({ containerRef, onPrev, onNext });
+
+    // Reset scroll to top when month changes
+    useEffect(() => {
+        if (containerRef.current) containerRef.current.scrollTop = 0;
+    }, [selectedDate]);
 
     const animationClass = direction === 1 ? styles.slideUp : direction === -1 ? styles.slideDown : '';
 
