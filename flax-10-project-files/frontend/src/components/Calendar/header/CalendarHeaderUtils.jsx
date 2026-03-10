@@ -39,6 +39,7 @@ export function ActionMenu({ onAddEvent, onImport }) {
             options={options}
             hideCheckmark={true}
             onChange={(val) => val === 'add' ? onAddEvent() : onImport()}
+            align="right"
         />
     );
 }
@@ -58,6 +59,7 @@ export function ViewModeButton({ modes, activeMode, onChange }) {
             options={modes}
             value={activeMode}
             onChange={onChange}
+            align="right"
         />
     );
 }
@@ -74,6 +76,7 @@ export function ViewSettingsMenu({ activeMode, onViewChange, isMobile }) {
             options={options}
             value={activeMode}
             onChange={onViewChange}
+            align="right"
         />
     );
 }
