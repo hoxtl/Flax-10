@@ -121,9 +121,9 @@
 .deadlineTypePill {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #d6e5d8;
-  background: var(--status-sage);
-  color: var(--status-sage);
+  border: 1px solid rgba(74, 124, 89, 0.15);
+  background: #EBF3EE;
+  color: #4A7C59;
   border-radius: 9999px;
   padding: 4px 10px;
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;

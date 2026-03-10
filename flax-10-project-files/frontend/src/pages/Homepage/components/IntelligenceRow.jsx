@@ -58,8 +58,7 @@ export default function IntelligenceRow({
   const handleRemoveWidget = (widgetId) => {
     saveWidgetLayout(homepageWidgets.filter((w) => w.id !== widgetId));
   };
-
-  const defaultOrder = ["rightNow", "tasks", "quickActions", "socialDiscover", "deadlines", "studyPulse"];
+  const defaultOrder = ["rightNow", "tasks", "quickActions", "studyPulse", "deadlines", "socialDiscover"];
   const isDefaultLayout =
     homepageWidgets.length === defaultOrder.length &&
     homepageWidgets.every((w, i) => w.id === defaultOrder[i]);

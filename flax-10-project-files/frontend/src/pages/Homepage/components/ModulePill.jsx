@@ -30,13 +30,13 @@ const HASH_PALETTE = [
 ];
 
 const TYPE_COLOURS = {
-  COURSEWORK:   { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
-  EXAM:         { bg: "#F5EDE8", text: "#7A5C48", border: "rgba(122, 92, 72, 0.15)" },
+  COURSEWORK: { bg: "#EBF3EE", text: "#4A7C59", border: "rgba(74, 124, 89, 0.15)" },
+  EXAM: { bg: "#EBF3EE", text: "#4A7C59", border: "rgba(74, 124, 89, 0.15)" },
   PRESENTATION: { bg: "#F0EDE8", text: "#6B6048", border: "rgba(107, 96, 72, 0.15)" },
-  LAB:          { bg: "#EDF0E8", text: "#5A6B48", border: "rgba(90, 107, 72, 0.15)" },
-  REPORT:       { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
-  QUIZ:         { bg: "#F5EDE8", text: "#7A5C48", border: "rgba(122, 92, 72, 0.15)" },
-  default:      { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
+  LAB: { bg: "#EDF0E8", text: "#5A6B48", border: "rgba(90, 107, 72, 0.15)" },
+  REPORT: { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
+  QUIZ: { bg: "#EBF3EE", text: "#4A7C59", border: "rgba(74, 124, 89, 0.15)" },
+  default: { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
 };
 
 function hashCode(str) {
