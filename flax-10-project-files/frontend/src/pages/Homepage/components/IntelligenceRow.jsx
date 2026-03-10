@@ -11,7 +11,7 @@ import { SocialDiscoverWidget } from "./SocialDiscoverWidget";
 import { StudyPulseWidget } from "./StudyPulseWidget";
 import { ImageWidget } from "./ImageWidget";
 import { Reorder } from "framer-motion";
-import { Settings, Check, Lock, GripHorizontal, Trash2, Plus, X as CloseIcon } from "lucide-react";
+import { Settings, Check, Lock, GripHorizontal, Trash2, Plus, X as CloseIcon, RotateCcw } from "lucide-react";
 import bentoStyles from "../../../components/ui/bento-grid.module.css";
 
 function getGreeting(name) {
@@ -146,11 +146,29 @@ export default function IntelligenceRow({
             {getGreeting(displayName)}
           </motion.h2>
         </div>
-        <div className={styles.headerRight}>
+        <div className={styles.headerRight} style={{ flexDirection: 'row', gap: '8px' }}>
+          {isEditingDashboard && (
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all hover:bg-red-50"
+              style={{ borderColor: 'var(--border)', color: 'var(--warning-text)', backgroundColor: 'var(--card-bg)' }}
+              onClick={() => {
+                const resetWidgets = defaultOrder.map(id => ({ id, type: "system" }));
+                saveWidgetLayout(resetWidgets);
+                setIsEditingDashboard(false);
+              }}
+            >
+              <RotateCcw size={14} /> Reset Layout
+            </button>
+          )}
           <button
             type="button"
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full border bg-white shadow-sm hover:bg-stone-50 transition-colors"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm hover:opacity-80 transition-all"
+            style={{
+              borderColor: 'var(--border)',
+              color: 'var(--text)',
+              backgroundColor: 'var(--color-card)'
+            }}
             onClick={() => setIsEditingDashboard(!isEditingDashboard)}
           >
             {isEditingDashboard ? (
@@ -167,7 +185,7 @@ export default function IntelligenceRow({
           axis="y"
           values={homepageWidgets}
           onReorder={saveWidgetLayout}
-          className={`${bentoStyles.grid} ${layoutModeClass}`}
+          className={layoutModeClass}
         >
           {homepageWidgets.map((widget) => (
             <Reorder.Item
@@ -175,21 +193,28 @@ export default function IntelligenceRow({
               value={widget}
               className={getWidgetStyleClass(widget.id)}
             >
-              <BentoCard className={isEditingDashboard ? 'opacity-90 outline outline-2 outline-gray-200 outline-offset-2 scale-[0.98]' : ''}>
-                <div className="absolute top-2 right-2 flex items-center gap-1 z-10 transition-opacity">
-                  <div className="p-1.5 rounded-md bg-stone-100 hover:bg-stone-200 cursor-grab">
-                    <GripHorizontal size={14} className="text-stone-500" />
+              <motion.div
+                className={`h-full ${isEditingDashboard ? 'opacity-95 outline outline-2 outline-offset-2 scale-[0.98] active:scale-[0.96] shadow-sm transition-transform cursor-grab active:cursor-grabbing' : ''}`}
+                style={{ outlineColor: isEditingDashboard ? 'var(--color-primary)' : 'transparent' }}
+              >
+                <BentoCard className="h-full relative pointer-events-none">
+                  <div className="absolute top-2 right-2 flex items-center gap-1 z-10 transition-opacity pointer-events-auto">
+                    <div className="p-1.5 rounded-md hover:bg-black/5 cursor-grab">
+                      <GripHorizontal size={14} style={{ color: 'var(--text)' }} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveWidget(widget.id)}
+                      className="p-1.5 rounded-md bg-red-50 hover:bg-red-100 text-red-500 cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveWidget(widget.id)}
-                    className="p-1.5 rounded-md bg-red-50 hover:bg-red-100 text-red-500 cursor-pointer"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-                {renderWidgetContent(widget.id)}
-              </BentoCard>
+                  <div className="pointer-events-auto h-full w-full">
+                    {renderWidgetContent(widget.id)}
+                  </div>
+                </BentoCard>
+              </motion.div>
             </Reorder.Item>
           ))}
           <BentoCard className="flex items-center justify-center border-2 border-dashed bg-transparent hover:bg-stone-50 transition-colors cursor-pointer"

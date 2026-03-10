@@ -914,32 +914,60 @@
     grid-row: 3;
   }
 
-  /* Custom / Editing layout: use fluid auto-spans allowing free placement */
-  .customLayout .posRightNow {
-    grid-column: span 1;
+  /* Custom / Editing layout: use fluid flexbox allowing free placement without grid bugs */
+  .customLayout {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
   }
 
-  .customLayout .posTodaysTasks {
-    grid-column: span 2;
-  }
-
-  .customLayout .posQuickActions {
-    grid-column: span 1;
-  }
-
-  .customLayout .posSocialDiscover {
-    grid-column: span 1;
-  }
-
-  .customLayout .posDeadlines {
-    grid-column: span 1;
-  }
-
-  .customLayout .posStudyPulse {
-    grid-column: span 2;
-  }
-
+  /* Base 1-column items (1/3 width since gap is 12px) */
+  .customLayout .posRightNow,
+  .customLayout .posQuickActions,
+  .customLayout .posSocialDiscover,
+  .customLayout .posDeadlines,
   .customLayout .posImageWidget {
-    grid-column: span 1;
+    width: calc(33.333% - 8px);
+  }
+
+  /* Base 2-column items (2/3 width) */
+  .customLayout .posTodaysTasks,
+  .customLayout .posStudyPulse {
+    width: calc(66.666% - 4px);
+  }
+}
+
+@media (max-width: 1023px) and (min-width: 768px) {
+  .customLayout {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .customLayout .posRightNow,
+  .customLayout .posQuickActions,
+  .customLayout .posSocialDiscover,
+  .customLayout .posDeadlines,
+  .customLayout .posImageWidget {
+    width: calc(50% - 6px);
+  }
+
+  .customLayout .posTodaysTasks,
+  .customLayout .posStudyPulse {
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .customLayout {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .customLayout>* {
+    width: 100% !important;
   }
 }
