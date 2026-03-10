@@ -103,6 +103,9 @@ export default function IntelligenceRow({
               onUpdateImage={(wId, url) => {
                 saveWidgetLayout(homepageWidgets.map(w => w.id === wId ? { ...w, url } : w));
               }}
+              onUpdateSpan={(wId, spanSize) => {
+                saveWidgetLayout(homepageWidgets.map(w => w.id === wId ? { ...w, span: spanSize } : w));
+              }}
             />
           );
         }
@@ -181,10 +184,9 @@ export default function IntelligenceRow({
 
       {isEditingDashboard ? (
         <Reorder.Group
-          axis="y"
           values={homepageWidgets}
           onReorder={saveWidgetLayout}
-          className={layoutModeClass}
+          className={`${layoutModeClass} ${bentoStyles.grid}`}
         >
           {homepageWidgets.map((widget) => (
             <Reorder.Item
@@ -192,6 +194,7 @@ export default function IntelligenceRow({
               value={widget}
               drag
               className={getWidgetStyleClass(widget.id)}
+              style={widget.id.startsWith("customImage") ? { gridColumn: `span ${widget.span ?? 2}` } : undefined}
             >
               <motion.div
                 className={`h-full ${isEditingDashboard ? 'opacity-95 outline outline-2 outline-offset-2 scale-[0.98] active:scale-[0.96] shadow-sm transition-transform cursor-grab active:cursor-grabbing' : ''}`}
@@ -222,7 +225,11 @@ export default function IntelligenceRow({
       ) : (
         <BentoGrid className={layoutModeClass}>
           {homepageWidgets.map((widget) => (
-            <BentoCard key={widget.id} className={getWidgetStyleClass(widget.id)}>
+            <BentoCard
+              key={widget.id}
+              className={getWidgetStyleClass(widget.id)}
+              style={widget.id.startsWith("customImage") ? { gridColumn: `span ${widget.span ?? 2}` } : undefined}
+            >
               {renderWidgetContent(widget.id)}
             </BentoCard>
           ))}

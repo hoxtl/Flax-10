@@ -917,49 +917,52 @@
     grid-row: 3;
   }
 
-  /* Custom / Editing layout: use fluid flexbox allowing free placement without grid bugs */
+  .defaultLayout .posImageWidget {
+    grid-column: span 1;
+    grid-row: auto;
+  }
+
+  /* Custom / Editing layout: use fluid grid allowing free placement */
   .customLayout {
-    display: flex !important;
-    flex-wrap: wrap;
-    align-items: stretch;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: dense;
     gap: 12px;
   }
 
-  /* Base 1-column items (1/3 width since gap is 12px) */
+  /* Base 1-column items */
   .customLayout .posRightNow,
   .customLayout .posQuickActions,
-  .customLayout .posSocialDiscover,
-  .customLayout .posDeadlines,
-  .customLayout .posImageWidget {
-    width: calc(33.333% - 8px);
+  .customLayout .posDeadlines {
+    grid-column: span 1;
   }
 
-  /* Base 2-column items (2/3 width) */
+  /* Base 2-column items */
   .customLayout .posTodaysTasks,
-  .customLayout .posStudyPulse {
-    width: calc(66.666% - 4px);
+  .customLayout .posStudyPulse,
+  .customLayout .posSocialDiscover {
+    grid-column: span 2;
   }
 }
 
 @media (max-width: 1023px) and (min-width: 768px) {
   .customLayout {
-    display: flex !important;
-    flex-wrap: wrap;
-    align-items: stretch;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-flow: dense;
     gap: 12px;
   }
 
   .customLayout .posRightNow,
   .customLayout .posQuickActions,
-  .customLayout .posSocialDiscover,
-  .customLayout .posDeadlines,
-  .customLayout .posImageWidget {
-    width: calc(50% - 6px);
+  .customLayout .posDeadlines {
+    grid-column: span 1;
   }
 
   .customLayout .posTodaysTasks,
-  .customLayout .posStudyPulse {
-    width: 100%;
+  .customLayout .posStudyPulse,
+  .customLayout .posSocialDiscover {
+    grid-column: span 2;
   }
 }
 
