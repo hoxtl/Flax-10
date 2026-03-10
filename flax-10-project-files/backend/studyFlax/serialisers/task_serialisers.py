@@ -36,6 +36,9 @@ class TaskSerialiser(serializers.ModelSerializer):
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
 
+    def get_reading_page_count(self, obj):
+        return obj.reading.page_count() if obj.reading_id else None
+
     def set_time_completed(self, instance, validated_data):
         completed = validated_data.get('completed')
         if completed is True and not instance.completed_at:
