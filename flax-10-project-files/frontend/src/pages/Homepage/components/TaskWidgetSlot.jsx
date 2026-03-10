@@ -4,7 +4,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { CheckSquare } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
@@ -16,12 +16,12 @@ const VISIBLE_COUNT = 5;
 
 const CATEGORY_COLOURS = {
   UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
-  HEALTH:     { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
-  PERSONAL:   { bg: "#F5F0E8",                   text: "#736048" },
-  WORK:       { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
-  FINANCE:    { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
-  STUDY:      { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
-  default:    { bg: "#F5F0E8",                   text: "#736048" },
+  HEALTH: { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
+  PERSONAL: { bg: "#F5F0E8", text: "#736048" },
+  WORK: { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
+  FINANCE: { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
+  STUDY: { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
+  default: { bg: "#F5F0E8", text: "#736048" },
 };
 
 const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
@@ -87,15 +87,30 @@ export function TaskWidgetSlot({
   onInlineTaskEdit,
 }) {
   const [ctxMenu, setCtxMenu] = useState(null);
-  const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const inputRef = useRef(null);
+
+  const incompleteTasks = taskWidgetList.filter((t) => !t.completed);
   const visibleIncomplete = showAllTaskWidgetTasks
     ? incompleteTasks
     : incompleteTasks.slice(0, VISIBLE_COUNT);
   const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
 
-  const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
-  const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
+  const allTasksDone = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
+  const clearMessage = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
   const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
+
+  useEffect(() => {
+    if (editingTaskId && inputRef.current) inputRef.current.focus();
+  }, [editingTaskId]);
+
+  const commitEdit = async (t) => {
+    if (editTitle.trim() && editTitle.trim() !== t.title) {
+      await onInlineTaskEdit?.(t, { title: editTitle.trim() });
+    }
+    setEditingTaskId(null);
+  };
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -155,8 +170,8 @@ export function TaskWidgetSlot({
                 layout
               >
                 {visibleIncomplete.map((t, idx) => {
-                  const status      = t.taskWidgetStatus;
-                  const isOverdue   = status === "overdue";
+                  const status = t.taskWidgetStatus;
+                  const isOverdue = status === "overdue";
                   const rowAccent = isOverdue ? "#C0714E" : "#8B7355";
                   const urgency = getUrgencyMeta(t);
 
@@ -190,18 +205,38 @@ export function TaskWidgetSlot({
 
                       <div className={styles.taskWidgetTaskBody}>
                         <div className={styles.taskWidgetTaskTopRow}>
-                          <span className={styles.taskWidgetTaskTitle} title={t.title}>
-                            {t.title}
-                          </span>
+                          {editingTaskId === t.id ? (
+                            <input
+                              ref={inputRef}
+                              className={styles.taskWidgetTaskTitleInput}
+                              value={editTitle}
+                              onChange={(e) => setEditTitle(e.target.value)}
+                              onBlur={() => commitEdit(t)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") commitEdit(t);
+                                if (e.key === "Escape") setEditingTaskId(null);
+                              }}
+                            />
+                          ) : (
+                            <span
+                              className={styles.taskWidgetTaskTitle}
+                              title={t.title}
+                              onClick={() => {
+                                setEditTitle(t.title);
+                                setEditingTaskId(t.id);
+                              }}
+                            >
+                              {t.title}
+                            </span>
+                          )}
                           {urgency && (
                             <span
-                              className={`${styles.taskWidgetUrgencyPill} ${
-                                urgency.tone === "urgent"
-                                  ? styles.taskWidgetUrgencyPillUrgent
-                                  : urgency.tone === "high"
-                                    ? styles.taskWidgetUrgencyPillHigh
-                                    : styles.taskWidgetUrgencyPillNow
-                              }`}
+                              className={`${styles.taskWidgetUrgencyPill} ${urgency.tone === "urgent"
+                                ? styles.taskWidgetUrgencyPillUrgent
+                                : urgency.tone === "high"
+                                  ? styles.taskWidgetUrgencyPillHigh
+                                  : styles.taskWidgetUrgencyPillNow
+                                }`}
                             >
                               {urgency.label}
                             </span>
