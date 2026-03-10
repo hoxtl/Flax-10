@@ -52,6 +52,6 @@ describe('historyUtils', () => {
 
     it('clearHistory calls API', async () => {
         await clearHistory();
-        expect(fetchApi).toHaveBeenCalledWith('/timer/history/', { method: 'DELETE' });
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/clear_history/', { method: 'DELETE' });
     });
 });

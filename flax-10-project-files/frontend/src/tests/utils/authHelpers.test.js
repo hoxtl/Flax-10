@@ -43,7 +43,7 @@ describe('getErrorMessage', () => {
 
 describe('saveUserData', () => {
   it('saves token and user to localStorage and dispatches event', () => {
-    const user = { username: 'kausar' };
+    const user = { username: 'jane' };
     saveUserData('tok123', user);
     expect(localStorage.getItem('token')).toBe('tok123');
     expect(localStorage.getItem('user')).toBe(JSON.stringify(user));

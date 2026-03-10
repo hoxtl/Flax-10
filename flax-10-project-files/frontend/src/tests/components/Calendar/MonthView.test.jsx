@@ -170,4 +170,29 @@ describe('MonthView', () => {
         expect(screen.queryByText('Ev 4')).not.toBeInTheDocument();
         expect(screen.getByText('+1 more')).toBeInTheDocument();
     });
+
+    it('dispatches date and view mode when +X more clicked (no onMoreClick prop)', () => {
+        const manyEvents = [1, 2, 3, 4].map(i => ({
+            id: i, title: `Ev ${i}`, start_time: new Date(2026, 1, 15, 10, i), end_time: new Date(2026, 1, 15, 11, i)
+        }));
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({ ...defaultState, events: manyEvents });
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue({ ...defaultState, events: manyEvents });
+        render(<MonthView />);
+        const moreBtn = screen.getByText('+1 more');
+        fireEvent.click(moreBtn);
+        expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_SELECTED_DATE', payload: expect.any(Date) });
+        expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+    });
+
+    it('calls onMoreClick prop when +X more clicked', () => {
+        const manyEvents = [1, 2, 3, 4].map(i => ({
+            id: i, title: `Ev ${i}`, start_time: new Date(2026, 1, 15, 10, i), end_time: new Date(2026, 1, 15, 11, i)
+        }));
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({ ...defaultState, events: manyEvents });
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue({ ...defaultState, events: manyEvents });
+        const onMoreClick = vi.fn();
+        render(<MonthView onMoreClick={onMoreClick} />);
+        fireEvent.click(screen.getByText('+1 more'));
+        expect(onMoreClick).toHaveBeenCalledWith(expect.any(Date));
+    });
 });

@@ -9,6 +9,22 @@ export function useTimerContext() {
   return context;
 }
 
+export function persistTimerTask(id, meta, options = {}) {
+  const hasWindow = options.hasWindow ?? (typeof window !== 'undefined');
+  const storage = options.storage ?? (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
+  if (!hasWindow || !storage) return;
+
+  if (id != null) {
+    storage.setItem('timerTaskId', String(id));
+    if (meta?.title != null) storage.setItem('timerTaskTitle', String(meta.title));
+    if (meta?.categoryColor != null) storage.setItem('timerTaskCategoryColor', String(meta.categoryColor));
+  } else {
+    storage.removeItem('timerTaskId');
+    storage.removeItem('timerTaskTitle');
+    storage.removeItem('timerTaskCategoryColor');
+  }
+}
+
 export function TimerProvider({ children }) {
   const [activeTaskId, setActiveTaskIdState] = useState(null);
   const [activeTaskMeta, setActiveTaskMeta] = useState(null);
@@ -17,17 +33,7 @@ export function TimerProvider({ children }) {
     setActiveTaskIdState(id);
     setActiveTaskMeta(meta && typeof meta === 'object' ? meta : null);
     try {
-      if (typeof window !== 'undefined') {
-        if (id != null) {
-          sessionStorage.setItem('timerTaskId', String(id));
-          if (meta?.title != null) sessionStorage.setItem('timerTaskTitle', String(meta.title));
-          if (meta?.categoryColor != null) sessionStorage.setItem('timerTaskCategoryColor', String(meta.categoryColor));
-        } else {
-          sessionStorage.removeItem('timerTaskId');
-          sessionStorage.removeItem('timerTaskTitle');
-          sessionStorage.removeItem('timerTaskCategoryColor');
-        }
-      }
+      persistTimerTask(id, meta);
     } catch (_) {}
   };
 

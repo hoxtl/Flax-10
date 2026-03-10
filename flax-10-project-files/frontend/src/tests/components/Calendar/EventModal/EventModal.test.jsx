@@ -86,7 +86,7 @@ describe('EventModal', () => {
     it('should call onClose when overlay clicked', () => {
         const { container } = renderModal();
         const overlay = container.firstChild;
-        fireEvent.click(overlay);
+        fireEvent.mouseDown(overlay);
         expect(mockOnClose).toHaveBeenCalled();
     });
 

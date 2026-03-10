@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { getProgress, useCompletionCheck } from '../../components/Timer/utils/timerUtils';
+import { renderHook, act } from '@testing-library/react';
+import { getProgress, useCompletionCheck, useNotificationPermission } from '../../components/Timer/utils/timerUtils';
 
 const testProgressBreak = () => {
     expect(getProgress({ mode: 'break' })).toBe(100);
@@ -59,7 +59,7 @@ const testAutoAdvance = () => {
         startNext, notify
     ));
 
-    expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String));
+    expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String), expect.anything());
     expect(setIsActive).toHaveBeenCalledWith(false);
     expect(startNext).toHaveBeenCalled();
 };
@@ -74,7 +74,7 @@ const testOvertime = () => {
         startNext, notify
     ));
 
-    expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String));
+    expect(notify).toHaveBeenCalledWith("Time's Up!", expect.any(String), expect.anything());
     expect(setIsActive).not.toHaveBeenCalled();
     expect(startNext).not.toHaveBeenCalled();
 };
@@ -87,7 +87,7 @@ const testBreakCompletion = () => {
         { mode: 'break', timeLeft: 0, isActive: true }, startNext, notify
     ));
 
-    expect(notify).toHaveBeenCalledWith("Break Over!", expect.any(String));
+    expect(notify).toHaveBeenCalledWith("Break Over!", expect.any(String), expect.anything());
 };
 
 const testNoAction = () => {
@@ -107,4 +107,84 @@ describe('timerUtils: useCompletionCheck', () => {
     it('triggers Notification BUT continues timer (Overtime) when breakTime > 0', testOvertime);
     it('triggers Notification when break ends', testBreakCompletion);
     it('does nothing if conditions not met', testNoAction);
+
+    it('handles break completion when notify is null', () => {
+        const startNext = vi.fn();
+        renderHook(() => useCompletionCheck(
+            { mode: 'break', timeLeft: 0, isActive: true }, startNext, null
+        ));
+        // Should not throw even without notify
+        expect(startNext).not.toHaveBeenCalled();
+    });
+
+    it('handles work completion when notify is null', () => {
+        const startNext = vi.fn();
+        const setIsActive = vi.fn();
+        renderHook(() => useCompletionCheck(
+            { mode: 'work', timeLeft: 0, isActive: true, breakTime: 0, setIsActive }, startNext, null
+        ));
+        expect(setIsActive).toHaveBeenCalledWith(false);
+        expect(startNext).toHaveBeenCalled();
+    });
+});
+
+describe('timerUtils: useNotificationPermission', () => {
+    afterEach(() => vi.clearAllMocks());
+
+    it('returns permission and request function when permission is granted', () => {
+        vi.stubGlobal('Notification', Object.assign(vi.fn(), {
+            permission: 'granted',
+            requestPermission: vi.fn().mockResolvedValue('granted'),
+        }));
+        const { result } = renderHook(() => useNotificationPermission());
+        expect(result.current.permission).toBe('granted');
+        expect(typeof result.current.request).toBe('function');
+        vi.unstubAllGlobals();
+    });
+
+    it('requests permission when default and updates on permission change', async () => {
+        const requestPermission = vi.fn().mockResolvedValue('granted');
+        vi.stubGlobal('Notification', Object.assign(vi.fn(), {
+            permission: 'default',
+            requestPermission,
+        }));
+        vi.useFakeTimers();
+        const { result } = renderHook(() => useNotificationPermission());
+        // The effect runs and calls requestPermission
+        await act(async () => { await Promise.resolve(); });
+        expect(requestPermission).toHaveBeenCalled();
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it('polling detects permission change and updates state', async () => {
+        const requestPermission = vi.fn().mockResolvedValue('granted');
+        const NotifMock = Object.assign(vi.fn(), { permission: 'granted', requestPermission });
+        vi.stubGlobal('Notification', NotifMock);
+        vi.useFakeTimers();
+
+        const { result } = renderHook(() => useNotificationPermission());
+        expect(result.current.permission).toBe('granted');
+
+        // Simulate external permission change
+        NotifMock.permission = 'denied';
+        global.Notification = NotifMock;
+        await act(async () => { vi.advanceTimersByTime(1100); });
+        expect(result.current.permission).toBe('denied');
+
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it('request() calls requestPermission and updates state', async () => {
+        const requestPermission = vi.fn().mockResolvedValue('granted');
+        vi.stubGlobal('Notification', Object.assign(vi.fn(), {
+            permission: 'denied',
+            requestPermission,
+        }));
+        const { result } = renderHook(() => useNotificationPermission());
+        await act(async () => { await result.current.request(); });
+        expect(requestPermission).toHaveBeenCalled();
+        vi.unstubAllGlobals();
+    });
 });

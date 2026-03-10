@@ -40,7 +40,7 @@ describe('ExpandableTabs', () => {
     const btn = screen.getAllByRole('button')[0];
     fireEvent.click(btn);
     fireEvent.click(btn);
-    expect(onChange).toHaveBeenLastCalledWith(null);
+    expect(onChange).toHaveBeenLastCalledWith(0);
   });
 
   it('deselects on outside click', () => {
@@ -67,9 +67,27 @@ describe('ExpandableTabs', () => {
   it('does not deselect when clicking inside the container', () => {
     const onChange = vi.fn();
     const { container } = render(<ExpandableTabs tabs={tabs} onChange={onChange} />);
-    fireEvent.click(screen.getAllByRole('button')[0]); 
+    fireEvent.click(screen.getAllByRole('button')[0]);
     onChange.mockClear();
-    fireEvent.mouseDown(container.firstChild); 
-    expect(onChange).not.toHaveBeenCalled(); 
+    fireEvent.mouseDown(container.firstChild);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('shows 99+ badge when count exceeds 99', () => {
+    const tabsWithHighBadge = [{ title: 'Notifs', icon: IconA, badge: 150 }];
+    render(<ExpandableTabs tabs={tabsWithHighBadge} />);
+    expect(screen.getByText('99+')).toBeTruthy();
+  });
+
+  it('shows numeric badge when count is in range', () => {
+    const tabsWithBadge = [{ title: 'Notifs', icon: IconA, badge: 5 }];
+    render(<ExpandableTabs tabs={tabsWithBadge} />);
+    expect(screen.getByText('5')).toBeTruthy();
+  });
+
+  it('does not show badge when count is 0', () => {
+    const tabsWithZeroBadge = [{ title: 'Notifs', icon: IconA, badge: 0 }];
+    const { container } = render(<ExpandableTabs tabs={tabsWithZeroBadge} />);
+    expect(container.querySelector('[class*="badge"]')).toBeNull();
   });
 });

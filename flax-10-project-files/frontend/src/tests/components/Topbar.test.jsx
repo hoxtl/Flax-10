@@ -33,7 +33,7 @@ vi.mock('../../components/Notifications/NotificationPanel', () => ({
 
 describe('TopBar', () => {
   it('renders brand', () => {
-    render(<TopBar user={{ first_name: 'Kausar', username: 'kk' }} />);
+    render(<TopBar user={{ first_name: 'Jane', username: 'JD' }} />);
     expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 

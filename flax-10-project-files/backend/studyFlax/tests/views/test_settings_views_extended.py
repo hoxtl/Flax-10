@@ -1,13 +1,21 @@
+"""
+Backend tests for settings views extended.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
+from rest_framework.test import APIRequestFactory
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 
 from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.views.user.settings_views import user_settings_view as legacy_user_settings_view
+from rest_framework.test import force_authenticate
 
 User = get_user_model()
 
@@ -64,6 +72,12 @@ class UserSettingsViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['settings']['theme'], 'dark')
 
+    def test_patch_valid_password_updates_password(self):
+        response = self.client.patch('/api/settings/', {'password': 'newpassword123'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('newpassword123'))
+
     def test_unauthenticated_denied(self):
         self.client.force_authenticate(user=None)
         response = self.client.get('/api/settings/')
@@ -102,7 +116,6 @@ class OnboardingViewTest(TestCase):
         self.assertEqual(settings.major, 'Computer Science')
 
     def test_onboarding_enrolls_modules(self):
-        # Create a module matching a known major prefix for Computer Science
         make_module('6CCS3AIN', 'AI', self.user)
         response = self.client.post('/api/onboarding/', {'year': '3', 'major': 'Computer Science'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -120,7 +133,6 @@ class OnboardingViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_onboarding_idempotent(self):
-        """Calling onboarding twice should not crash."""
         self.client.post('/api/onboarding/', {'year': '1', 'major': 'Computer Science'})
         response = self.client.post('/api/onboarding/', {'year': '2', 'major': 'Computer Science'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -145,7 +157,6 @@ class GetModulesForMajorTest(TestCase):
 
     def test_empty_prefix_list_returns_empty(self):
         from studyFlax.views.user.settings_views import get_modules_for_major
-        # Major with no prefix in course_to_module_prefixes returns []
         result = get_modules_for_major('')
         self.assertEqual(result, [])
 
@@ -168,7 +179,92 @@ class EnrollUserInModulesTest(TestCase):
         from studyFlax.views.user.settings_views import enroll_user_in_modules
         m = make_module('CCC101', 'Module C', self.user)
         enroll_user_in_modules(self.user, [m])
-        # Second call should not create duplicate
         count = enroll_user_in_modules(self.user, [m])
         self.assertEqual(count, 0)
         self.assertEqual(Enrollment.objects.filter(student=self.user, module=m).count(), 1)
+
+
+class LegacyUserSettingsViewTests(TestCase):
+    """Directly exercise helper-based settings endpoints."""
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = make_user()
+
+    def call_legacy_view(self, method, url, data=None, format=None):
+        """Call legacy view for tests."""
+        kwargs = {}
+        if data is not None:
+            kwargs['data'] = data
+        if format is not None:
+            kwargs['format'] = format
+        request = getattr(self.factory, method)(url, **kwargs)
+        force_authenticate(request, user=self.user)
+        return legacy_user_settings_view(request)
+
+    def test_get_creates_default_settings(self):
+        response = self.call_legacy_view('get', '/api/user/settings/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['theme'], 'light')
+        self.assertEqual(response.data['timezone'], 'Europe/London')
+
+    def test_patch_updates_timezone(self):
+        response = self.call_legacy_view(
+            'patch',
+            '/api/user/settings/',
+            {'timezone': 'America/New_York'},
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['timezone'], 'America/New_York')
+
+    def test_patch_updates_theme_only(self):
+        response = self.call_legacy_view(
+            'patch',
+            '/api/user/settings/',
+            {'theme': 'dark'},
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['theme'], 'dark')
+
+
+class UserSettingsSerializerTests(TestCase):
+    """Unit tests for UserSettingsSerialiser validation and computed fields."""
+
+    def setUp(self):
+        self.user = make_user()
+
+    def test_major_change_blocked_when_already_set(self):
+        settings = UserSettings.objects.create(
+            user=self.user,
+            major='Physics',
+            theme='light',
+            timezone='Europe/London'
+        )
+        serializer = UserSettingsSerialiser(
+            instance=settings,
+            data={'major': 'Biochemistry'},
+            partial=True
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('major', serializer.errors)
+
+    def test_major_locked_reflects_field_presence(self):
+        settings = UserSettings.objects.create(
+            user=self.user,
+            theme='light',
+            timezone='Europe/London'
+        )
+        serializer = UserSettingsSerialiser(instance=settings)
+        self.assertFalse(serializer.data['major_locked'])
+
+        locked_user = make_user('lock_user', 'lock@example.com')
+        locked_settings = UserSettings.objects.create(
+            user=locked_user,
+            major='Math',
+            theme='light',
+            timezone='Europe/London'
+        )
+        locked_serializer = UserSettingsSerialiser(instance=locked_settings)
+        self.assertTrue(locked_serializer.data['major_locked'])

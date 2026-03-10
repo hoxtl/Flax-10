@@ -3,7 +3,7 @@
     border-bottom: 1px solid var(--border);
     min-height: 2rem;
     flex-shrink: 0;
-    background-color: var(--panel);
+    background-color: var(--bg);
 }
 
 .all-day-label {
