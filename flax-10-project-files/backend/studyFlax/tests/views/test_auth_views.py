@@ -128,6 +128,15 @@ class ConfirmPasswordResetViewTest(TestCase):
     def test_confirm_reset_invalid_token(self):
         response = self.client.post(self.url, {'token': 'nonexistent-token', 'new_password': 'newpass123'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_confirm_reset_token_does_not_exist(self):
+        response = self.client.post(self.url, {
+            'token': 'does-not-exist-in-db',
+            'new_password': 'newpass123',
+            'confirm_password': 'newpass123',
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Reset link does not exist', response.data['error'])
     def test_confirm_reset_invalid_data(self):
         response = self.client.post(self.url, {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -274,6 +283,20 @@ class SerializerCoverageTest(TestCase):
         settings = UserSettings.objects.create(user=self.user, theme='light', timezone='Europe/London')
         serializer = UserSettingsSerialiser(settings, data={'major': 'Physics'}, partial=True)
         self.assertTrue(serializer.is_valid())
+
+    def test_registration_serializer_passwords_mismatch(self):
+        from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser
+        data = {
+            'username': 'mismatch_user',
+            'email': 'mismatch@test.com',
+            'password': 'password1',
+            'password2': 'password2',
+            'first_name': 'Test',
+            'last_name': 'User',
+        }
+        serializer = RegistrationUserSerialiser(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('password', serializer.errors)
 
     def test_society_event_serialiser_announcement_prefix(self):
         from studyFlax.serialisers.society_serialisers import SocietyEventSerialiser

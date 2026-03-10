@@ -72,6 +72,12 @@ class UserSettingsViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['settings']['theme'], 'dark')
 
+    def test_patch_valid_password_updates_password(self):
+        response = self.client.patch('/api/settings/', {'password': 'newpassword123'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('newpassword123'))
+
     def test_unauthenticated_denied(self):
         self.client.force_authenticate(user=None)
         response = self.client.get('/api/settings/')
