@@ -14,10 +14,29 @@
 
 .calendar-view-relative-wrapper {
   position: relative;
-  flex: 1;
+}
+
+/* Day and Week views need constrained height for internal scroll */
+.calendar-view-relative-wrapper:has(.day-view),
+.calendar-view-relative-wrapper:has(.week-view) {
+  height: calc(100vh - 200px);
+  min-height: 400px;
   display: flex;
   flex-direction: column;
+}
+
+.calendar-view-relative-wrapper:has(.day-view) .day-view,
+.calendar-view-relative-wrapper:has(.week-view) .week-view {
+  flex: 1;
   min-height: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .calendar-view-relative-wrapper:has(.day-view),
+  .calendar-view-relative-wrapper:has(.week-view) {
+    height: calc(100vh - 240px);
+  }
 }
 
 @media (max-width: 768px) {

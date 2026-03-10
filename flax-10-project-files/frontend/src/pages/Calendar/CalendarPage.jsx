@@ -43,17 +43,21 @@ export default function CalendarPage() {
     dispatch({ type: "SET_FILTER", payload: key });
   };
 
+  const showFilters = viewMode !== "year";
+
   return (
     <div className={styles.page}>
       <div className={styles.stickyHeader}>
         <CalendarHeader />
-        <div className={styles.filters}>
-          <PillFilters
-            active={filter}
-            onChange={handleFilterChange}
-            items={visibleItems}
-          />
-        </div>
+        {showFilters && (
+          <div className={styles.filters}>
+            <PillFilters
+              active={filter}
+              onChange={handleFilterChange}
+              items={visibleItems}
+            />
+          </div>
+        )}
       </div>
 
       <main className={styles.mainContent}>
