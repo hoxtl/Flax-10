@@ -72,7 +72,10 @@ function parseIncomingValue(value, timeOnly, dateOnly) {
   return new Date(value);
 }
 
-export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false }) {
+export default function DateTimePicker({
+  value, onChange, placeholder = "Pick date & time",
+  timeOnly = false, dateOnly = false, customTrigger = null
+}) {
   const parsed = useMemo(() => parseIncomingValue(value, timeOnly, dateOnly), [value, timeOnly, dateOnly]);
 
   const [open, setOpen] = useState(false);
@@ -104,8 +107,14 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
 
   return (
     <div className={styles.wrap} ref={ref}>
-      <TriggerButton open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly}
-        placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} />
+      {customTrigger ? (
+        <div onClick={() => setOpen(p => !p)} style={{ cursor: "pointer" }}>
+          {customTrigger}
+        </div>
+      ) : (
+        <TriggerButton open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly}
+          placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} />
+      )}
       {open && createPortal(
         <DropdownPanel ref={dropdownRef} pos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY}
           prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel}
