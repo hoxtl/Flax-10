@@ -98,16 +98,27 @@ export default function Homepage() {
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
   const toastTimeoutRef = useRef(null);
 
-  const defaultWidgets = useMemo(() => [
-    { id: "rightNow", type: "system" },
-    { id: "tasks", type: "system" },
-    { id: "quickActions", type: "system" },
-    { id: "studyPulse", type: "system" },
-    { id: "deadlines", type: "system" },
-    { id: "socialDiscover", type: "system" }
-  ], []);
+  const getInitialWidgets = () => {
+    try {
+      const cached = localStorage.getItem("homepageLayout");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (_) { }
+    return [
+      { id: "rightNow", type: "system" },
+      { id: "tasks", type: "system" },
+      { id: "quickActions", type: "system" },
+      { id: "studyPulse", type: "system" },
+      { id: "deadlines", type: "system" },
+      { id: "socialDiscover", type: "system" }
+    ];
+  };
 
-  const [homepageWidgets, setHomepageWidgets] = useState(defaultWidgets);
+  const [homepageWidgets, setHomepageWidgets] = useState(getInitialWidgets);
   const [isEditingDashboard, setIsEditingDashboard] = useState(false);
 
   useEffect(() => {
@@ -115,15 +126,17 @@ export default function Homepage() {
       .then((settings) => {
         if (settings.homepage_widgets && Array.isArray(settings.homepage_widgets) && settings.homepage_widgets.length > 0) {
           setHomepageWidgets(settings.homepage_widgets);
+          localStorage.setItem("homepageLayout", JSON.stringify(settings.homepage_widgets));
         }
       })
       .catch(() => {
-        // Keeps default state
+        // Keeps state
       });
   }, []);
 
   const saveWidgetLayout = async (newLayout) => {
     setHomepageWidgets(newLayout);
+    localStorage.setItem("homepageLayout", JSON.stringify(newLayout));
     try {
       await updateUserSettings({ homepage_widgets: newLayout });
     } catch (err) {
