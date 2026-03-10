@@ -105,14 +105,16 @@ function DateCard({ day, isActive, onClick }) {
 }
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
-    const delta = { day: 1, week: 7, month: 30, year: 365 }[viewMode] * dir;
+    const newDate = new Date(selectedDate);
     if (viewMode === "year") {
-        const newDate = new Date(selectedDate);
         newDate.setFullYear(newDate.getFullYear() + dir);
-        dispatch({ type: "SET_SELECTED_DATE", payload: newDate });
+    } else if (viewMode === "month") {
+        newDate.setMonth(newDate.getMonth() + dir);
     } else {
-        dispatch({ type: "SET_SELECTED_DATE", payload: addDays(selectedDate, delta) });
+        const delta = viewMode === "week" ? 7 : 1;
+        newDate.setDate(newDate.getDate() + delta * dir);
     }
+    dispatch({ type: "SET_SELECTED_DATE", payload: newDate });
 }
 
 function getTitle(selectedDate, viewMode) {
@@ -125,6 +127,7 @@ function isTodayVisible(viewMode, date) {
     const today = new Date();
     if (viewMode === 'day') return isSameDay(date, today);
     if (viewMode === 'week') return getWeekDays(date).some(d => isSameDay(d, today));
+    if (viewMode === 'year') return date.getFullYear() === today.getFullYear();
     return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
 }
 

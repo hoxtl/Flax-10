@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 import { useHoverSummary } from '../hooks/useHoverSummary';
 import { isToday, overlapsDay } from '../utils/dateUtils';
 import { HoverSummary } from './HoverSummary';
 
-export function YearDay({ date, events }) {
+export const YearDay = memo(function YearDay({ date, events }) {
     const dispatch = useCalendarDispatch();
     const { showSummary, binder } = useHoverSummary(2000);
     const dayEvents = getEventsForDay(events, date);
@@ -15,7 +16,7 @@ export function YearDay({ date, events }) {
             {showSummary && <HoverSummary events={dayEvents} date={date} />}
         </div>
     );
-}
+});
 
 function getEventsForDay(events, date) {
     return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), date));

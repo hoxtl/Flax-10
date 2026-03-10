@@ -1,12 +1,13 @@
+import { memo } from 'react';
 import { useMonthDayDrop } from '../hooks/useMonthDayDrop';
 import { useEventModal } from '../../../context/CalendarContext';
 import { isSameDay } from '../utils/dateUtils';
 import { DayEvents } from './DayEvents';
 
-export function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
+export const DayCell = memo(function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
     if (readOnly) return <ReadOnlyDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />;
     return <EditableDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />;
-}
+});
 
 function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, onMoreClick, customTags }) {
     const isToday = isSameDay(day, new Date());

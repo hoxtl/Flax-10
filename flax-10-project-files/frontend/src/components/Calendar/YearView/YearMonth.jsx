@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 import { YearDay } from './YearDay';
 
-export function YearMonth({ year, monthIndex, events }) {
+export const YearMonth = memo(function YearMonth({ year, monthIndex, events }) {
     const date = new Date(year, monthIndex, 1);
     const dispatch = useCalendarDispatch();
     return (
@@ -10,7 +11,7 @@ export function YearMonth({ year, monthIndex, events }) {
             <MonthGrid year={year} monthIndex={monthIndex} events={events} offset={date.getDay()} />
         </div>
     );
-}
+});
 
 function MonthTitle({ date, dispatch }) {
     const name = date.toLocaleString('default', { month: 'long' });
