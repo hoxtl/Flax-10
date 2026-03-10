@@ -134,12 +134,26 @@ function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCu
     return <PaginatedGrid filtered={filtered} onNavChange={onNavChange} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
 }
 
+function DiscoverSkeleton() {
+  return (
+    <div className={styles.skelWrap}>
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className={styles.skelUserCard} style={{ animationDelay: `${i * 0.06}s` }}>
+          <div className={`${styles.skel} ${styles.skelAvatar}`} />
+          <div className={`${styles.skel} ${styles.skelName}`} />
+          <div className={`${styles.skel} ${styles.skelUsername}`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Discover({ onNavChange }) {
     const { loading, users, currentPage, setCurrentPage, totalPages, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
     const showLoader = loading && users.length === 0;
 
     const srch = <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />;
-    const content = showLoader ? <div className={styles.loadingState}>Loading users...</div> : <UsersGrid users={users} onNavChange={onNavChange} loading={loading} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
+    const content = showLoader ? <DiscoverSkeleton /> : <UsersGrid users={users} onNavChange={onNavChange} loading={loading} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
 
     return (
         <div className={styles.container}>

@@ -80,10 +80,27 @@ function useMainView(state) {
     return { sorting, search, departments: getDepartments(hook.modules) };
 }
 
+function ModulesSkeleton() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.skelHeader}>
+        <div className={`${styles.skel} ${styles.skelTitle}`} />
+        <div className={`${styles.skel} ${styles.skelBtn}`} />
+      </div>
+      <div className={`${styles.skel} ${styles.skelSearch}`} />
+      <div className={styles.skelGrid}>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelCard}`} style={{ animationDelay: `${i * 0.08}s` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
     const state = useModulesPage(initialSearch, initialCreate);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
-    if (hook.loading) return <LoadingView />;
+    if (hook.loading) return <ModulesSkeleton />;
     if (show_form) return <FormView state={state} />;
     if (viewing_module) return <DetailsView state={state} />;
     return (
@@ -157,16 +174,6 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
     );
 }
 
-function LoadingView() {
-    return (
-        <div className={styles.container}>
-            <div className={styles.loading}>
-                <div className={styles.spinner} />
-                <p>Loading modules...</p>
-            </div>
-        </div>
-    );
-}
 
 function PageHeader({ is_teacher, onCreateModule }) {
     const subtitle = is_teacher ? 'Manage your course modules and lectures' : 'Browse and enroll into available modules...';
