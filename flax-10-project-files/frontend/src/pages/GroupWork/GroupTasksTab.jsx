@@ -280,16 +280,25 @@ export default function GroupTasksTab({ projectId, members }) {
             priority: "medium",
         };
 
-        const res = await fetch(`/api/tasks/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-            body: JSON.stringify(payload),
-        });
+        try {
+            const res = await fetch(`/api/tasks/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+                body: JSON.stringify(payload),
+            });
 
-        if (res.ok) {
-            const created = await res.json();
-            setTasks((prev) => [...prev, created]);
-            setNewTaskTitle("");
+            if (res.ok) {
+                const created = await res.json();
+                setTasks((prev) => [...prev, created]);
+                setNewTaskTitle("");
+            } else {
+                const errData = await res.json();
+                console.error("Failed to add task:", errData);
+                alert(`Error: ${JSON.stringify(errData)}`);
+            }
+        } catch (err) {
+            console.error("Network error adding task:", err);
+            alert("Network error. Check console.");
         }
     };
 
