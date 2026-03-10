@@ -9,6 +9,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
     deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
+    readings = ReadingSummarySerialiser(many=True, read_only=True)
 
     class Meta:
         model = Module
