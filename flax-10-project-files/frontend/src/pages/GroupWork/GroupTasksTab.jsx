@@ -5,14 +5,20 @@ import { getAuthHeaders } from "./groupWorkHooks";
 const metaStyle = { fontSize: 13, color: "#8f7969" };
 
 function TaskRow({ task, members, onToggle, onUpdate }) {
+    const [showAssignPopup, setShowAssignPopup] = useState(false);
     const isDone = task.completed;
 
-    // Find assignee
-    const assignee = members.find((m) => m.user === task.assigned_to) || null;
+    // Use assignees_info from backend (array of {id, name})
+    const assignees = task.assignees_info || [];
 
-    const handleAssigneeChange = (e) => {
-        const val = e.target.value;
-        onUpdate(task.id, { assigned_to: val ? Number(val) : null });
+    const toggleAssignee = (userId) => {
+        let currentIds = assignees.map(a => a.id);
+        if (currentIds.includes(userId)) {
+            currentIds = currentIds.filter(id => id !== userId);
+        } else {
+            currentIds.push(userId);
+        }
+        onUpdate(task.id, { assigned_to: currentIds });
     };
 
     const handlePriorityChange = (e) => {
@@ -147,49 +153,92 @@ function TaskRow({ task, members, onToggle, onUpdate }) {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 6, position: "relative" }}>
-                {assignee ? (
-                    <>
-                        <div
-                            style={{
-                                width: 24,
-                                height: 24,
-                                borderRadius: "50%",
-                                background: "#3c2a20",
-                                color: "#fff",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: 10,
-                                fontWeight: "bold",
-                                flexShrink: 0,
-                            }}
-                        >
-                            {(assignee.user_name || "?").slice(0, 2).toUpperCase()}
-                        </div>
-                        <span style={{ fontSize: 13, color: "#8f7969", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {assignee.user_name}
-                        </span>
-                    </>
-                ) : (
-                    <span style={{ fontSize: 13, color: "#cdae99", fontStyle: "italic" }}>Unassigned</span>
-                )}
-                <select
-                    value={task.assigned_to || ""}
-                    onChange={handleAssigneeChange}
+                <div
+                    onClick={() => setShowAssignPopup(!showAssignPopup)}
                     style={{
-                        position: "absolute",
-                        top: 0, left: 0, width: "100%", height: "100%",
-                        opacity: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
                         cursor: "pointer",
+                        padding: "4px 8px",
+                        borderRadius: 8,
+                        background: showAssignPopup ? "#eee3d8" : "transparent"
                     }}
                 >
-                    <option value="">Unassigned</option>
-                    {members.map((m) => (
-                        <option key={m.id} value={m.user}>
-                            {m.user_name}
-                        </option>
-                    ))}
-                </select>
+                    {assignees.length > 0 ? (
+                        <div style={{ display: "flex", marginLeft: 8 }}>
+                            {assignees.slice(0, 3).map((a, i) => (
+                                <div
+                                    key={a.id}
+                                    title={a.name}
+                                    style={{
+                                        width: 24,
+                                        height: 24,
+                                        borderRadius: "50%",
+                                        background: "#3c2a20",
+                                        color: "#fff",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontSize: 10,
+                                        fontWeight: "bold",
+                                        flexShrink: 0,
+                                        marginLeft: i > 0 ? -8 : 0,
+                                        border: "2px solid #fffaf4"
+                                    }}
+                                >
+                                    {(a.name || "?").slice(0, 2).toUpperCase()}
+                                </div>
+                            ))}
+                            {assignees.length > 3 && (
+                                <div style={{ fontSize: 11, color: "#8f7969", marginLeft: 4, alignSelf: "center" }}>
+                                    +{assignees.length - 3}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <span style={{ fontSize: 13, color: "#cdae99", fontStyle: "italic" }}>Unassigned</span>
+                    )}
+                </div>
+
+                {showAssignPopup && (
+                    <div style={{
+                        position: "absolute",
+                        top: "100%", left: 0,
+                        marginTop: 4,
+                        background: "#fff",
+                        border: "1px solid #e2d1c3",
+                        borderRadius: 8,
+                        boxShadow: "0 4px 12px rgba(60,42,32,0.1)",
+                        zIndex: 10,
+                        minWidth: 160,
+                        padding: "8px 0"
+                    }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: "#a89b91", padding: "0 12px 6px", textTransform: "uppercase" }}>Assign Members</div>
+                        {members.map(m => {
+                            const isSelected = assignees.some(a => String(a.id) === String(m.user));
+                            return (
+                                <div
+                                    key={m.id}
+                                    onClick={() => toggleAssignee(m.user)}
+                                    style={{
+                                        padding: "8px 12px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        cursor: "pointer",
+                                        backgroundColor: isSelected ? "#f5eee7" : "transparent",
+                                        fontSize: 13,
+                                        color: "#3c2a20"
+                                    }}
+                                >
+                                    <span>{m.user_name}</span>
+                                    {isSelected && <Check size={14} color="#7b4b2b" />}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -199,6 +248,7 @@ export default function GroupTasksTab({ projectId, members }) {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newTaskTitle, setNewTaskTitle] = useState("");
+    const [filterUser, setFilterUser] = useState("");
 
     const fetchTasks = async () => {
         setLoading(true);
@@ -260,12 +310,21 @@ export default function GroupTasksTab({ projectId, members }) {
         updateTask(taskId, { completed });
     };
 
-    const sortedTasks = [...tasks].sort((a, b) => {
-        if (a.completed !== b.completed) {
-            return a.completed ? 1 : -1; // completed tasks at the bottom
-        }
-        return new Date(a.created_at) - new Date(b.created_at);
-    });
+    const priorityWeight = { urgent: 4, high: 3, medium: 2, low: 1 };
+
+    // Filter by Assignee, then Sort by Completed > Urgency > Created Date
+    const sortedTasks = [...tasks]
+        .filter(t => filterUser ? (t.assignees_info || []).some(a => String(a.id) === String(filterUser)) : true)
+        .sort((a, b) => {
+            if (a.completed !== b.completed) {
+                return a.completed ? 1 : -1; // completed tasks at the bottom
+            }
+            const wA = priorityWeight[(a.priority || "medium").toLowerCase()] || 0;
+            const wB = priorityWeight[(b.priority || "medium").toLowerCase()] || 0;
+            if (wA !== wB) return wB - wA; // Urgency desc
+
+            return new Date(a.created_at) - new Date(b.created_at);
+        });
 
     return (
         <div
@@ -291,6 +350,30 @@ export default function GroupTasksTab({ projectId, members }) {
                         outline: "none",
                     }}
                 />
+
+                <select
+                    value={filterUser}
+                    onChange={(e) => setFilterUser(e.target.value)}
+                    style={{
+                        padding: "10px 14px",
+                        borderRadius: 8,
+                        border: "1px solid #e3d4c6",
+                        background: "#f7efe7",
+                        color: "#3c2a20",
+                        fontSize: 13,
+                        fontWeight: 500,
+                        outline: "none",
+                        cursor: "pointer",
+                    }}
+                >
+                    <option value="">All Members</option>
+                    {members.map(m => (
+                        <option key={m.id} value={m.user}>
+                            {m.user_name}
+                        </option>
+                    ))}
+                </select>
+
                 <button
                     type="submit"
                     style={{
