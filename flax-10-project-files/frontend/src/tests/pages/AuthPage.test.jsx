@@ -27,19 +27,19 @@ vi.mock('../../components/Authentication/TestimonialsMarquee', () => ({ Testimon
 vi.mock('../../components/Authentication/AuthBranding', () => ({
   AuthBrand: () => <div />, AuthFooter: () => <div />,
 }));
-vi.mock('../../hooks/useAuthForm', () => ({
-  useAuthForm: (init) => ({ formData: init, updateField: vi.fn() }),
-}));
 
-const mockAuthService = { register: vi.fn(), login: vi.fn() };
+const { mockAuthService } = vi.hoisted(() => ({
+    mockAuthService: { register: vi.fn(), login: vi.fn() },
+}));
 vi.mock('../../api/authService', () => ({ authService: mockAuthService }));
-vi.mock('../../utils/authHelpers', () => ({
+vi.mock('../../components/Authentication/utils/authHelpers', () => ({
   validatePasswords: vi.fn(() => null),
   getErrorMessage: vi.fn(() => 'error'),
   saveUserData: vi.fn(),
+  clearUserData: vi.fn(),
 }));
 
-import { validatePasswords, saveUserData } from '../../utils/authHelpers';
+import { validatePasswords, saveUserData } from '../../components/Authentication/utils/authHelpers';
 
 describe('AuthPage', () => {
   it('renders without crashing', () => {

@@ -50,12 +50,6 @@ def update_username(user, data):
     return None
 
 
-def set_photo(user, files):
-    user.profile_photo = files['profile_photo']
-
-def remove_photo(user):
-    user.profile_photo = None
-
 def update_photo(user, data, files):
     if 'profile_photo' in files:
         user.profile_photo = files['profile_photo']

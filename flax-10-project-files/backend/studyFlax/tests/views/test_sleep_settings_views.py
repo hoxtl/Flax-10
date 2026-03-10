@@ -1,3 +1,7 @@
+"""
+Backend tests for sleep settings views.
+"""
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -7,6 +11,7 @@ User = get_user_model()
 
 class SleepSettingsViewTest(TestCase):
 
+    """Tests for sleep settings view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -22,6 +27,7 @@ class SleepSettingsViewTest(TestCase):
         return response.data['sleep_time']
 
     def get_wake(self, response):
+        """Return wake for tests."""
         if 'settings' in response.data:
             return response.data['settings']['wake_time']
         return response.data['wake_time']
