@@ -30,16 +30,16 @@ export function PlanReadDetailModal({
       if (isTask) await onDeleteTask?.(data);
       else await onDeleteEvent?.(data);
       onClose();
-    } catch (_) {}
+    } catch (_) { }
   };
 
   const title = data?.title ?? "";
   const timeStr = isTask
     ? (data.due_date ? formatTime(data.due_date) : "") +
-      (data.estimated_blocks ? ` · ${(data.estimated_blocks || 1) * 25}m` : "")
+    (data.estimated_blocks ? ` · ${(data.estimated_blocks || 1) * 25}m` : "")
     : (data.start_time ? formatTime(data.start_time) : "") +
-      (data.end_time && data.end_time !== data.start_time ? ` – ${formatTime(data.end_time)}` : "") +
-      (data.start_time && data.end_time ? ` · ${Math.round((new Date(data.end_time) - new Date(data.start_time)) / 60000)}m` : "");
+    (data.end_time && data.end_time !== data.start_time ? ` – ${formatTime(data.end_time)}` : "") +
+    (data.start_time && data.end_time ? ` · ${Math.round((new Date(data.end_time) - new Date(data.start_time)) / 60000)}m` : "");
 
   return (
     <div

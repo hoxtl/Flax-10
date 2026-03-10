@@ -69,6 +69,8 @@
   min-height: 72px;
   border-radius: 12px;
   border: 1px solid #e6dfd7;
+  border-left-width: 4px;
+  /* Dynamic urgency border width */
   background: #fffcf9;
   padding: 10px 12px;
   cursor: pointer;
