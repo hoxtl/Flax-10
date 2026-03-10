@@ -291,14 +291,9 @@ export default function GroupTasksTab({ projectId, members }) {
                 const created = await res.json();
                 setTasks((prev) => [...prev, created]);
                 setNewTaskTitle("");
-            } else {
-                const errData = await res.json();
-                console.error("Failed to add task:", errData);
-                alert(`Error: ${JSON.stringify(errData)}`);
             }
         } catch (err) {
             console.error("Network error adding task:", err);
-            alert("Network error. Check console.");
         }
     };
 
