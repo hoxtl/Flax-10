@@ -110,27 +110,23 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                 <button
                     onClick={() => onToggle(task.id, !isDone)}
                     style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 8,
-                        border: isDone ? "1px solid #a8cfa8" : task.priority === "urgent" || task.priority === "high" ? "1px solid #eadbce" : "1px solid #e2d1c3",
-                        background: isDone ? "#d6ebd6" : task.priority === "urgent" || task.priority === "high" ? "#fdead8" : "#f7ede4",
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        border: isDone ? "2px solid #22c55e" : "2px solid #e3d7c5",
+                        background: isDone ? "#22c55e" : "transparent",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         cursor: "pointer",
                         flexShrink: 0,
-                        color: isDone ? "#2d6a2d" : "#8f7969",
+                        color: "white",
                         marginTop: 2,
+                        padding: 0,
+                        transition: "all 0.2s ease"
                     }}
                 >
-                    {isDone ? (
-                        <Check size={16} />
-                    ) : task.priority === "urgent" || task.priority === "high" ? (
-                        <Hourglass size={14} />
-                    ) : (
-                        <Circle size={12} />
-                    )}
+                    {isDone && <Check size={14} strokeWidth={3} />}
                 </button>
                 <div style={{ flex: 1, minWidth: 0 }}>
                     {isEditing ? (
@@ -156,15 +152,16 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                                 fontWeight: 500,
                                 color: "#3c2a20",
                                 width: "100%",
-                                border: "1px solid #e3d4c6",
-                                borderRadius: 4,
-                                padding: "2px 4px",
+                                border: "none",
+                                borderBottom: "1.5px solid #8d7355",
+                                borderRadius: 0,
+                                padding: "2px 0",
                                 outline: "none",
                                 resize: "none",
                                 overflow: "hidden",
                                 display: "block",
                                 lineHeight: "1.4",
-                                background: "#fff",
+                                background: "transparent",
                                 fontFamily: "inherit"
                             }}
                         />
@@ -182,6 +179,7 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                                     cursor: "pointer",
                                     flex: 1,
                                     lineHeight: "1.4",
+                                    borderBottom: "1.5px solid transparent", // Reserve space to prevent jump
                                 }}
                                 title="Click to edit"
                             >
