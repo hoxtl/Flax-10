@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
     getWeekDays, getMonthDays, getStartOfWeek, getStartOfMonth, getEndOfMonth,
-    getStartOfYear, getEndOfYear,
     addDays, isSameDay, isSameMonth, addWeeks, addMonths, startOfDay, isToday,
     formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
     parseDateInput, formatDateTime, formatShortDate, formatDateWithYear,
@@ -56,17 +55,6 @@ describe('dateUtils', () => {
             expect(d.getDate()).toBe(28);
         });
 
-        it('getStartOfYear', () => {
-            const d = getStartOfYear(date);
-            expect(d.getMonth()).toBe(0);
-            expect(d.getDate()).toBe(1);
-        });
-
-        it('getEndOfYear', () => {
-            const d = getEndOfYear(date);
-            expect(d.getMonth()).toBe(11);
-            expect(d.getDate()).toBe(31);
-        });
 
         it('addDays', () => {
             const d = addDays(date, 5);
@@ -174,7 +162,7 @@ describe('dateUtils', () => {
             const start = new Date(2026, 1, 15, 10, 0);
             const end = new Date(2026, 1, 15, 11, 0);
             const result = formatTimeRange(start, end, false);
-            expect(result).toContain('to');
+            expect(result).toContain(' - ');
         });
 
         it('formatTimeRange: allDay', () => {

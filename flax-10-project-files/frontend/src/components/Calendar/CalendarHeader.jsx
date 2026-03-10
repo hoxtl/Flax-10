@@ -12,7 +12,6 @@ const VIEW_MODES = [
     { value: 'day', label: 'Day' },
     { value: 'week', label: 'Week' },
     { value: 'month', label: 'Month' },
-    { value: 'year', label: 'Year' },
 ];
 
 function useIsMobile(breakpoint = 900) {
@@ -108,9 +107,7 @@ function DateCard({ day, isActive, onClick }) {
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
     const newDate = new Date(selectedDate);
-    if (viewMode === "year") {
-        newDate.setFullYear(newDate.getFullYear() + dir);
-    } else if (viewMode === "month") {
+    if (viewMode === "month") {
         newDate.setMonth(newDate.getMonth() + dir);
     } else {
         const delta = viewMode === "week" ? 7 : 1;
@@ -121,7 +118,6 @@ function navigateDate(dispatch, selectedDate, viewMode, dir) {
 
 function getTitle(selectedDate, viewMode) {
     if (viewMode === "day") return formatDate(selectedDate);
-    if (viewMode === "year") return selectedDate.getFullYear().toString();
     return formatMonthYear(selectedDate);
 }
 
@@ -129,7 +125,6 @@ function isTodayVisible(viewMode, date) {
     const today = new Date();
     if (viewMode === 'day') return isSameDay(date, today);
     if (viewMode === 'week') return getWeekDays(date).some(d => isSameDay(d, today));
-    if (viewMode === 'year') return date.getFullYear() === today.getFullYear();
     return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
 }
 

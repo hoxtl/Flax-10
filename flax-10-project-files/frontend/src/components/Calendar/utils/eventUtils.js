@@ -54,7 +54,6 @@ export function getEffectiveTagName(event) {
  */
 export function getVisibleEventsInView(events, selectedDate, viewMode) {
     if (!events?.length) return [];
-    if (viewMode === 'year') return events;
 
     if (viewMode === 'month') {
         const year = selectedDate.getFullYear();

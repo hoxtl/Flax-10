@@ -45,7 +45,7 @@ export default function CalendarPage() {
 
   const { displayMode } = useCalendar();
   const isListOrTable = displayMode === "list" || displayMode === "table";
-  const showFilters = viewMode !== "year" || isListOrTable;
+  const showFilters = true;
 
   return (
     <div className={styles.page}>
