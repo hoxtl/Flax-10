@@ -12,6 +12,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { ConfirmProvider } from "./context/ConfirmContext";
 import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { NotificationToast } from "./components/Notifications";
+import AttendancePrompt from "./components/Attendance/AttendancePrompt";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -232,12 +233,13 @@ function AppProviders({ children }) {
               <TaskCompletionProvider>
                 {children}
                 <NotificationToast />
+                <AttendancePrompt />
               </TaskCompletionProvider>
             </TimerProvider>
           </TagProvider>
         </CalendarProvider>
       </ConfirmProvider>
-    </NotificationProvider >
+    </NotificationProvider>
   );
 }
 

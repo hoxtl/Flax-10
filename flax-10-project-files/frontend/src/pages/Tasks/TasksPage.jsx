@@ -11,15 +11,6 @@ import { BackToTop } from "../../components/Pagination/Pagination";
 import useTasksPage from "./hooks/useTasksPage";
 import styles from "./TasksPage.module.css";
 
-function TasksPageLoading() {
-  return (
-    <div className={styles.loading}>
-      <div className={styles.loadingSpinner} aria-hidden />
-      <p className={styles.loadingText}>Loading tasks...</p>
-    </div>
-  );
-}
-
 function ToastUndo({ onUndo, onClose }) {
   return (
     <div className={styles.toast}>
@@ -58,9 +49,32 @@ function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask,
   );
 }
 
+function TasksSkeleton() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.skelSidebar}>
+        <div className={`${styles.skel} ${styles.skelSidebarTitle}`} />
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
+        ))}
+        <div className={styles.skelDivider} />
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
+        ))}
+      </div>
+      <div className={styles.skelFeed}>
+        <div className={`${styles.skel} ${styles.skelFeedHeader}`} />
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelTaskRow}`} style={{ animationDelay: `${i * 0.06}s` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function TasksPage() {
   const p = useTasksPage();
-  if (p.loading) return <TasksPageLoading />;
+  if (p.loading) return <TasksSkeleton />;
   return (
     <div className={styles.page}>
       <ListSidebar {...p.sidebarProps} />

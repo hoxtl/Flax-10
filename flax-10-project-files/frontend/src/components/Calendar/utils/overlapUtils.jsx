@@ -89,3 +89,4 @@ function updateGroupEnd(event, currentGroupEnd) {
     const end = new Date(event.end_time);
     return !currentGroupEnd || end > currentGroupEnd ? end : currentGroupEnd;
 }
+

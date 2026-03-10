@@ -51,7 +51,7 @@ class Command(BaseCommand):
 
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
-    USER_COUNT       = 25
+    USER_COUNT       = 58
     DEFAULT_PASSWORD = '1234'
 
     FIXTURE_USERS = [

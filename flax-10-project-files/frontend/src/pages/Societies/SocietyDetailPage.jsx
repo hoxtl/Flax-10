@@ -80,6 +80,30 @@ function SocietyModals({ modals, society, handlers, members, updateSociety, upda
     );
 }
 
+function SocietyDetailSkeleton() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.skelTopBar}>
+        <div className={`${styles.skel} ${styles.skelBackBtn}`} />
+      </div>
+      <div className={`${styles.skel} ${styles.skelHero}`} />
+      <div className={styles.skelTabRow}>
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelTab}`} style={{ animationDelay: `${i * 0.06}s` }} />
+        ))}
+      </div>
+      <div className={styles.skelBody}>
+        <div className={styles.skelMain}>
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className={`${styles.skel} ${styles.skelBlock}`} style={{ animationDelay: `${i * 0.1}s` }} />
+          ))}
+        </div>
+        <div className={`${styles.skel} ${styles.skelSidePanel}`} />
+      </div>
+    </div>
+  );
+}
+
 export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
     const hookData = useSocietyDetail(societyId);
     const { society, loading, error, updateSociety, updateLocalSociety, members, publishChanges } = hookData;
@@ -98,7 +122,7 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
         modals.setEditMode(!modals.editMode);
     };
 
-    if (loading) return <div className={styles.page}>Loading...</div>;
+    if (loading) return <SocietyDetailSkeleton />;
     if (error || !society) return <NotFound onBack={onBack} />;
 
     const handlers = buildHandlers(hookData, modals.editMode, changeTracker);

@@ -68,23 +68,11 @@
 }
 
 .container {
-  padding: 12px 24px 24px 24px;
+  padding: 1.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.emptyContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-  text-align: center;
-}
-
-.emptyText {
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    color: var(--muted);
-}
 
 .header {
   display: flex;
@@ -238,3 +226,31 @@
     border: 1px solid var(--border);
   }
 }
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+}
+.skelPageTitle {
+  height: 34px;
+  width: 220px;
+  margin: 16px 0 24px;
+}
+.skelGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.skelSocCard {
+  height: 200px;
+}
+@media (max-width: 1200px) { .skelGrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) { .skelGrid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .skelGrid { grid-template-columns: 1fr; } }
