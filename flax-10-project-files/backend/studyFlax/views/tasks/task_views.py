@@ -8,7 +8,7 @@ from datetime import timedelta
 from studyFlax.models.tasks.taskModel import Task, TaskList
 from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSerialiser
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-
+from studyFlax.utils.reading_utils import update_reading_estimates
 
 def get_user_lists(user, archived=False):
     return TaskList.objects.filter(user=user, archived=archived).order_by("created_at")
@@ -131,12 +131,16 @@ def task_detail(request, task_id):
     sync_calendar_event_for_task(updated_task)
     return Response(TaskSerialiser(updated_task).data)
 
+def _is_reading_task(task):
+    return bool(task.reading_id or task.page_count)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def log_task_time(request, task_id):
     task = get_object_or_404(Task, id=task_id, user=request.user)
-    minutes = int(request.data.get("minutes", 0))
-    task.time_spent_minutes += minutes
+    task.time_spent_minutes += int(request.data.get("minutes", 0))
     task.save()
+    if _is_reading_task(task):
+        update_reading_estimates(request.user)
     return Response({"time_spent_minutes": task.time_spent_minutes})
+
