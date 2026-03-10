@@ -45,5 +45,5 @@ def update_reading_estimates(user):
         user=user, completed=False, 
         reading__isnull=True, page_count__isnull=False
     ):
-        update_estimate_blocks(task, estimated_blocks_per_page(task.page_count(), avg))
+        update_estimate_blocks(task, estimated_blocks_per_page(task.page_count, avg))
     
