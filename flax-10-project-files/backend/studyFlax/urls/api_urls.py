@@ -55,6 +55,7 @@ from studyFlax.views.groupwork.groupwork_views import (
     group_project_detail,
     group_project_member_detail,
 )
+from studyFlax.views.groupwork.availability_views import group_availability
 
 # Societies
 from studyFlax.views.society import (
@@ -136,6 +137,11 @@ urlpatterns = [
         "group-work/projects/<int:project_id>/members/<int:membership_id>/",
         group_project_member_detail,
         name="group-project-member-detail",
+    ),
+    path(
+        "group-work/projects/<int:project_id>/availability/",
+        group_availability,
+        name="group-availability",
     ),
 
     # Attendance
