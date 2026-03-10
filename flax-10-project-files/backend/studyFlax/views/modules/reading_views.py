@@ -91,3 +91,30 @@ def task_payload(task):
         'task_list': task.task_list_id,
         'page_count': task.page_count,
     }
+
+def enrolled_module_ids(user):
+    return Enrollment.objects.filter(student=user).values_list('module_id', flat=True)
+
+def added_readings(user):
+    return Task.objects.filter(user=user, reading__isnull=False).values_list('reading_id', flat=True)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def suggested_readings(request):
+    """
+    Returns readings from modules the user is enrolled in.
+    Those that have not been converted to a task yet by the user.
+    """
+    readings = Reading.objects.filter(
+        module_id__in = enrolled_module_ids(request.user),
+    ).exclude( id__in = added_readings(request.user),
+    ).select_related('module')
+    return Response(ReadingSerialiser(readings, many=True, context={'request': request}).data)
+
+@api_view(['GET']) 
+@permission_classes([IsAuthenticated])
+def reading_speed(request):
+    avg = get_avg_time_per_page(request.user)
+    return Response({'avg_min_per_page': avg,
+                     'is_personalised': avg != 2.0})
+
