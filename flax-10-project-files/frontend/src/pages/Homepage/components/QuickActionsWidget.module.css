@@ -28,14 +28,14 @@
 
 .headerIcon {
   flex-shrink: 0;
-  color: #C4A46D;
+  color: var(--color-highlight);
 }
 
 .headerLabel {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 700;
-  color: #2c1810;
+  color: var(--text);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -110,13 +110,13 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #c4a46d;
+  background: var(--color-highlight);
   flex-shrink: 0;
 }
 
 .primaryIcon {
   flex-shrink: 0;
-  color: #c4a46d;
+  color: var(--color-highlight);
 }
 
 .primaryTextBlock {
@@ -129,7 +129,7 @@
 .primaryLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #fffcf8;
+  color: var(--color-card);
   line-height: 1.2;
 }
 
@@ -154,7 +154,7 @@
   gap: 9px;
   padding: 9px 12px;
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--color-card);
   border: 1px solid rgba(139, 115, 85, 0.1);
   cursor: pointer;
   text-align: left;
@@ -164,7 +164,7 @@
 }
 
 .secondaryCard:hover {
-  background: #fffcf8;
+  background: var(--color-card);
   border-color: rgba(139, 115, 85, 0.18);
   box-shadow: 0 2px 8px rgba(44, 24, 16, 0.04);
 }
@@ -191,7 +191,7 @@
 
 .secondaryIconAdd {
   flex-shrink: 0;
-  color: #7bb38e;
+  color: var(--status-sage);
 }
 
 .secondaryIconRefresh {
@@ -202,7 +202,7 @@
 .secondaryLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #2c1810;
+  color: var(--text);
   flex: 1;
   text-align: left;
   display: flex;
@@ -212,7 +212,7 @@
 
 .secondaryArrow {
   flex-shrink: 0;
-  color: #d4c4a8;
+  color: var(--color-highlight);
   display: flex;
   align-items: center;
 }

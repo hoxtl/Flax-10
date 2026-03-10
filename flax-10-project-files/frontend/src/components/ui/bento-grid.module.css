@@ -28,7 +28,7 @@
   height: 100%;
   overflow: hidden;
   border-radius: 11px;
-  background: #fffcf8;
+  background: var(--color-card);
   border: 1px solid rgba(139, 115, 85, 0.06);
   padding: 12px;
   box-sizing: border-box;

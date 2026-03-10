@@ -65,7 +65,7 @@
   align-items: center;
   gap: 0.4rem;
   background: var(--primary);
-  color: #fff;
+  color: var(--color-card);
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1rem;
@@ -85,7 +85,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
+  border-top-color: var(--color-card);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -235,7 +235,7 @@
   height: 28px;
   border-radius: 50%;
   background: var(--primary);
-  color: #fff;
+  color: var(--color-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,7 +254,7 @@
 
 .bubbleUser {
   background: var(--primary);
-  color: #fff;
+  color: var(--color-card);
   border-bottom-right-radius: 4px;
 }
 
@@ -324,7 +324,7 @@
   height: 36px;
   border-radius: 10px;
   background: var(--primary);
-  color: #fff;
+  color: var(--color-card);
   border: none;
   font-size: 1.1rem;
   cursor: pointer;

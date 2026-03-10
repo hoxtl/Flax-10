@@ -34,7 +34,7 @@
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 10px;
     font-size: 0.95rem;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     color: var(--text, #1f2937);
     transition: border-color 0.2s;
 }
@@ -49,7 +49,7 @@
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 10px;
     font-size: 0.95rem;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     color: var(--text, #1f2937);
     resize: vertical;
     min-height: 80px;
@@ -140,7 +140,7 @@
 .cancelBtn {
     padding: 10px 20px;
     border: 1px solid var(--border, #e5e7eb);
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 500;

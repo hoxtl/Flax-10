@@ -2,7 +2,7 @@
 
   .page {
     /* Dashboard: warm notebook — one base, accents only for data */
-    --dash-base: #faf8f5;
+    --dash-base: var(--color-card);
     --dash-green: #16a34a;
     --dash-green-bg: #f0fdf4;
     --dash-orange: #ea580c;

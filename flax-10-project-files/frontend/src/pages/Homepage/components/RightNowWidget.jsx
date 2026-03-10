@@ -363,7 +363,7 @@ export function RightNowWidget({
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Sparkles size={26} strokeWidth={1.25} color="#C4A46D" aria-hidden />
+              <Sparkles size={26} strokeWidth={1.25} color="var(--color-highlight)" aria-hidden />
             </motion.div>
             <div>
               <p className={styles.endOfDayTitle}>Day complete — nice work!</p>
@@ -405,7 +405,7 @@ export function RightNowWidget({
         <SimpleHeader liveClock={liveClock} />
         <motion.div className={styles.emptyDay} {...fadeIn(0.07)}>
           <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-            <Sun size={30} strokeWidth={1.25} color="#C4A46D" aria-hidden />
+            <Sun size={30} strokeWidth={1.25} color="var(--color-highlight)" aria-hidden />
           </motion.div>
           <p className={styles.emptyDayTitle}>Nothing planned today</p>
 

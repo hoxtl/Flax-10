@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useSocieties } from "../../../components/Society/hooks/useSocieties";
 import styles from "./SocialDiscoverWidget.module.css";
 
-const AVATAR_COLORS = ["#8B7355", "#7BA3C4", "#B38B8B", "#C4A46D"];
+const AVATAR_COLORS = ["var(--color-primary)", "#7BA3C4", "#B38B8B", "var(--color-highlight)"];
 
 const MOCK_COURSEMATES = [
   { id: 1, name: "Alex R.",  initial: "A" },
@@ -32,10 +32,10 @@ const sectionVariants = {
 };
 
 function getSocietyMeta(society) {
-  if (society.next_event) return { text: society.next_event, color: "#7BB38E" };
-  if (society.new_posts_count > 0) return { text: `${society.new_posts_count} new posts`, color: "#C4A46D" };
-  if (society.member_count) return { text: `${society.member_count} members · active`, color: "#A89279" };
-  return { text: "Active society", color: "#A89279" };
+  if (society.next_event) return { text: society.next_event, color: "var(--status-sage)" };
+  if (society.new_posts_count > 0) return { text: `${society.new_posts_count} new posts`, color: "var(--color-highlight)" };
+  if (society.member_count) return { text: `${society.member_count} members · active`, color: "var(--color-primary)" };
+  return { text: "Active society", color: "var(--color-primary)" };
 }
 
 export function SocialDiscoverWidget({ coursemates, moduleName, studyTip }) {

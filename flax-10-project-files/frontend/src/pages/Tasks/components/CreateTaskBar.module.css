@@ -46,7 +46,7 @@
   padding: var(--btn-padding, 8px 16px);
   font-size: 0.875rem;
   font-weight: 500;
-  color: #fff;
+  color: var(--color-card);
   background: var(--primary);
   border: none;
   border-radius: var(--btn-radius, var(--radius-md, 8px));
@@ -165,7 +165,7 @@
 .durationBtn:hover { background: var(--hover); color: var(--text); border-color: var(--border); }
 .durationBtnActive {
   background: var(--primary, #7B6751);
-  color: #fff;
+  color: var(--color-card);
   border-color: var(--primary, #7B6751);
   font-weight: 600;
 }

@@ -9,21 +9,21 @@ import styles from "./ModulePill.module.css";
 export const MODULE_COLOURS = {
   PS4202: { bg: "#F3F0FF", text: "#5B4A8A", accent: "#8B7BB8" },
   PS4101: { bg: "#EDF4FC", text: "#4A6D8C", accent: "#7BA3C4" },
-  IR4101: { bg: "#FFF6E9", text: "#8C6D3F", accent: "#C4A46D" },
-  EE4303: { bg: "#EFF7F0", text: "#4A7C5A", accent: "#7BB38E" },
+  IR4101: { bg: "#FFF6E9", text: "#8C6D3F", accent: "var(--color-highlight)" },
+  EE4303: { bg: "#EFF7F0", text: "#4A7C5A", accent: "var(--status-sage)" },
   EE4202: { bg: "#FFF0F0", text: "#8C5A5A", accent: "#C48B8B" },
   FR4101: { bg: "#FFF4EE", text: "#8C5D3F", accent: "#C49070" },
   LS4101: { bg: "#F0F7F2", text: "#4A7360", accent: "#7BB396" },
   CS3001: { bg: "#F5F0F0", text: "#7A5A5A", accent: "#B38B8B" },
-  EN4101: { bg: "#FFF6E9", text: "#8C6D3F", accent: "#C4A46D" },
-  default: { bg: "#F5F0E8", text: "#736048", accent: "#A89279" },
+  EN4101: { bg: "#FFF6E9", text: "#8C6D3F", accent: "var(--color-highlight)" },
+  default: { bg: "#F5F0E8", text: "#736048", accent: "var(--color-primary)" },
 };
 
 const HASH_PALETTE = [
   { bg: "#F3F0FF", text: "#5B4A8A", accent: "#8B7BB8" },
   { bg: "#EDF4FC", text: "#4A6D8C", accent: "#7BA3C4" },
-  { bg: "#FFF6E9", text: "#8C6D3F", accent: "#C4A46D" },
-  { bg: "#EFF7F0", text: "#4A7C5A", accent: "#7BB38E" },
+  { bg: "#FFF6E9", text: "#8C6D3F", accent: "var(--color-highlight)" },
+  { bg: "#EFF7F0", text: "#4A7C5A", accent: "var(--status-sage)" },
   { bg: "#FFF0F0", text: "#8C5A5A", accent: "#C48B8B" },
   { bg: "#FFF4EE", text: "#8C5D3F", accent: "#C49070" },
   { bg: "#F5F0F0", text: "#7A5A5A", accent: "#B38B8B" },

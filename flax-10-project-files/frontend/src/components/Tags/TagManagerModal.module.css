@@ -220,7 +220,7 @@
     font-size: 28px;
     border: 1px solid var(--border, #cbd5e1);
     border-radius: 8px;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     cursor: pointer;
     transition: all 0.2s;
     display: flex;

@@ -45,7 +45,7 @@
   font-weight: 500;
   letter-spacing: 0.1em; /* tracking-widest */
   text-transform: uppercase;
-  color: #a8a29e; /* text-stone-400 */
+  color: var(--color-primary); /* text-stone-400 */
 }
 
 .headerDateRow {
@@ -55,7 +55,7 @@
 }
 
 .headerDateIcon {
-  color: #a8a29e; /* match stone-400 */
+  color: var(--color-primary); /* match stone-400 */
   flex-shrink: 0;
 }
 
@@ -64,7 +64,7 @@
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #44403c;
+  color: var(--text);
   margin: 0;
 }
 
@@ -114,7 +114,7 @@
 
 .headerDayProgressFill {
   height: 100%;
-  background: linear-gradient(90deg, #7B6751 0%, #4A3421 100%);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
   border-radius: 2px;
   transition: width 0.6s ease;
 }
@@ -131,14 +131,14 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: #7B6751;
+  color: var(--color-primary);
 }
 
 .headerDayProgressOverdue {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.63rem;
   font-weight: 700;
-  color: #C0714E;
+  color: var(--error-text);
   letter-spacing: 0.02em;
 }
 
@@ -146,7 +146,7 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.63rem;
   font-weight: 600;
-  color: #9a8778;
+  color: var(--color-primary);
   letter-spacing: 0.02em;
 }
 
@@ -167,7 +167,7 @@
 }
 .intRowAlertsContainer:has(> *) {
   background: rgba(196, 154, 75, 0.08);
-  border-left: 3px solid #c49a4b;
+  border-left: 3px solid var(--warning-text);
   border-radius: 8px;
   padding: 8px 12px;
 }
@@ -184,13 +184,13 @@
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: #c49a4b;
+  background: var(--warning-text);
 }
 
 .intRowAlertText {
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
-  color: #8a6d30;
+  color: var(--warning-text);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -202,7 +202,7 @@
   flex-shrink: 0;
   background: none;
   border: none;
-  color: #b8933a;
+  color: var(--warning-text);
   cursor: pointer;
   padding: 2px;
   line-height: 1;
@@ -211,11 +211,11 @@
   border-radius: 4px;
   transition: color 0.12s;
 }
-.intRowAlertDismiss:hover { color: #7a5520; }
+.intRowAlertDismiss:hover { color: var(--warning-text); }
 
 .intRowAlertOverflow {
   font-size: 0.69rem;
-  color: #b8933a;
+  color: var(--warning-text);
   padding-left: 12px;
 }
 
@@ -236,7 +236,7 @@
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: #7B6751;
+  background: var(--color-primary);
 }
 
 .statusStripText {
@@ -244,7 +244,7 @@
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: #5c4d3e;
+  color: var(--color-primary);
 }
 
 /* Conflict variant — terracotta with glow pulse */
@@ -253,10 +253,10 @@
   background: rgba(254, 226, 226, 0.6);
 }
 .statusStripConflict .statusStripDot {
-  background: #dc2626;
+  background: var(--error-text);
   animation: stripConflictGlow 1.6s ease-in-out infinite;
 }
-.statusStripConflict .statusStripText { color: #dc2626; }
+.statusStripConflict .statusStripText { color: var(--error-text); }
 
 @keyframes stripConflictGlow {
   0%, 100% {
@@ -316,14 +316,14 @@
   font-size: 0.67rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #5c3a1e;
+  color: var(--text);
 }
 
 .tflCardStatus {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.65rem;
   font-weight: 500;
-  color: #8a7060;
+  color: var(--color-primary);
 }
 
 .tflCardLeave {
@@ -349,7 +349,7 @@
   transition: color 0.15s;
   margin-top: 1px;
 }
-.tflCardDismiss:hover { color: #7A5520; }
+.tflCardDismiss:hover { color: var(--warning-text); }
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
@@ -374,15 +374,15 @@
   transition: color 0.15s;
   line-height: 1;
 }
-.statusStripPillDismiss:hover { color: #7A5520; }
+.statusStripPillDismiss:hover { color: var(--warning-text); }
 
 /* Gap variant — sage green */
 .statusStripGap {
   border-color: rgba(22, 163, 74, 0.25);
   background: rgba(220, 252, 231, 0.6);
 }
-.statusStripGap .statusStripDot { background: #16a34a; }
-.statusStripGap .statusStripText { color: #16a34a; }
+.statusStripGap .statusStripDot { background: var(--status-sage); }
+.statusStripGap .statusStripText { color: var(--status-sage); }
 
 /* Active task variant — warm brown */
 .statusStripTask {
@@ -390,10 +390,10 @@
   background: rgba(250, 250, 249, 0.8);
 }
 .statusStripTask .statusStripDot {
-  background: #78716c;
+  background: var(--color-primary);
   animation: stripPulse 2s ease-in-out infinite;
 }
-.statusStripTask .statusStripText { color: #44403c; }
+.statusStripTask .statusStripText { color: var(--text); }
 
 @keyframes stripPulse {
   0%, 100% { opacity: 1; }
@@ -409,7 +409,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #7B6751;
+  color: var(--color-primary);
   margin: 0;
   max-width: 320px;
 }
@@ -450,7 +450,7 @@
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgba(120, 113, 108, 0.6);
-  background: #ffffff;
+  background: var(--color-card);
   padding: 1.08rem;
   min-height: 160px;
   opacity: 0;
@@ -462,31 +462,31 @@
 
 /* Widget cards: same base style for all — no colored tints */
 .bentoSlotVariantRightNow {
-  background: #ffffff;
+  background: var(--color-card);
 }
 .bentoSlotVariantRightNow .bentoIcon {
-  color: #a8a29e;
+  color: var(--color-primary);
 }
 
 .bentoSlotVariantTasks {
-  background: #ffffff;
+  background: var(--color-card);
 }
 .bentoSlotVariantTasks .bentoIcon {
-  color: #a8a29e;
+  color: var(--color-primary);
 }
 
 .bentoSlotVariantDeadlines {
-  background: #ffffff;
+  background: var(--color-card);
 }
 .bentoSlotVariantDeadlines .bentoIcon {
-  color: #a8a29e;
+  color: var(--color-primary);
 }
 
 .bentoSlotVariantFocus {
-  background: #ffffff;
+  background: var(--color-card);
 }
 .bentoSlotVariantFocus .bentoIcon {
-  color: #a8a29e;
+  color: var(--color-primary);
 }
 
 .bentoSlot.bentoVisible {
@@ -499,7 +499,7 @@
 }
 
 .bentoSlot.iconPulse .bentoIcon {
-  color: #dc2626; /* soft red-600 for overdue pulse */
+  color: var(--error-text); /* soft red-600 for overdue pulse */
   animation: intRowPulseTerracotta 2s ease-in-out infinite;
 }
 
@@ -564,13 +564,13 @@
 }
 
 .bentoIconWrap.bentoIconOverdue .bentoIcon {
-  color: #dc2626; /* soft red — urgency */
+  color: var(--error-text); /* soft red — urgency */
 }
 
 .bentoIcon {
   width: 16px;
   height: 16px;
-  color: #a8a29e;
+  color: var(--color-primary);
 }
 
 .bentoHeader {
@@ -588,7 +588,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #44403c;
+  color: var(--text);
   margin: 0;
 }
 
@@ -598,7 +598,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
   font-weight: 500;
-  color: #a8a29e;
+  color: var(--color-primary);
 }
 
 .bentoBody {
@@ -628,7 +628,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   text-align: center;
-  color: #7B6751;
+  color: var(--color-primary);
   opacity: 0.85;
 }
 
@@ -672,7 +672,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #7B6751;
+  color: var(--color-primary);
   transition: background 0.2s;
 }
 
@@ -687,7 +687,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
-  color: #2d352d;
+  color: var(--text);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -698,7 +698,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9a8778;
+  color: var(--color-primary);
   white-space: nowrap;
 }
 
@@ -733,7 +733,7 @@
   height: 28px;
   border-radius: 50%;
   background: rgba(185, 130, 55, 0.12);
-  color: #9A6E2A;
+  color: var(--warning-text);
 }
 
 .travelAlertBody {
@@ -750,7 +750,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #7A5520;
+  color: var(--warning-text);
 }
 
 .travelAlertDot,
@@ -763,7 +763,7 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.67rem;
   font-weight: 600;
-  color: #9A6E2A;
+  color: var(--warning-text);
 }
 
 .travelAlertSuggestion {
@@ -791,7 +791,7 @@
 
 .travelAlertDismiss:hover {
   background: rgba(185, 130, 55, 0.12);
-  color: #7A5520;
+  color: var(--warning-text);
 }
 
 /* ── Bento grid positions (desktop 3-col layout) ─────────────────── */

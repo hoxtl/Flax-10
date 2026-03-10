@@ -43,7 +43,7 @@ const TIER_TEXT = {
   critical: "#B86050",
   urgent: "#A06030",
   upcoming: "#8C6D3F",
-  distant: "#A89279",
+  distant: "var(--color-primary)",
 };
 
 const listVariants = {
@@ -126,7 +126,7 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
   const title = deadline.assessment_title || deadline.title || "Assignment";
   const moduleCode = deadline.module_code || "";
   const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
-  const textColor = TIER_TEXT[tier] || "#A89279";
+  const textColor = TIER_TEXT[tier] || "var(--color-primary)";
 
   const daysNum = getDayCount(due);
   const borderColor = getUrgencyColor(daysNum);

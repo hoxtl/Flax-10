@@ -50,12 +50,12 @@
 
   .twRowActiveTimer {
     border-left: none;
-    background: color-mix(in srgb, var(--primary) 8%, #FFFFFF);
+    background: color-mix(in srgb, var(--primary) 8%, var(--color-card));
     animation: twPulse 2s ease-in-out infinite;
   }
   @keyframes twPulse {
-    0%, 100% { background: color-mix(in srgb, var(--primary) 8%, #FFFFFF); }
-    50% { background: color-mix(in srgb, var(--primary) 12%, #FFFFFF); }
+    0%, 100% { background: color-mix(in srgb, var(--primary) 8%, var(--color-card)); }
+    50% { background: color-mix(in srgb, var(--primary) 12%, var(--color-card)); }
   }
 
   .twLeft { display: flex; align-items: flex-start; gap: 0.55rem; flex: 1; min-width: 0; }
@@ -131,7 +131,7 @@
   .timelineBox {
     border: 1px solid rgba(139, 115, 85, 0.15);
     border-radius: 16px;
-    background: #fffcf8;
+    background: var(--color-card);
     padding: 0.75rem 0.95rem 1rem;
     overflow: visible;
     position: relative;
@@ -304,7 +304,7 @@
     font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: #B8A890;
+    color: var(--color-highlight);
     letter-spacing: 0;
   }
   .planTimelineSpineCell {
@@ -332,7 +332,7 @@
     font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: #B8A890;
+    color: var(--color-highlight);
     letter-spacing: 0;
     text-align: right;
     line-height: 1;
@@ -343,7 +343,7 @@
     border-radius: 50%;
     background: rgba(107, 83, 68, 0.38);
     border: none;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px var(--color-card);
     justify-self: center;
     z-index: 2;
     position: relative;
@@ -442,7 +442,7 @@
   .planTimelineNowLine {
     flex: 1;
     height: 1.5px;
-    background: #7BB38E;
+    background: var(--status-sage);
     border-radius: 1px;
     box-shadow: 0 0 6px rgba(123, 179, 142, 0.7), 0 0 14px rgba(123, 179, 142, 0.3);
   }
@@ -466,7 +466,7 @@
     min-width: 8px;
     min-height: 8px;
     border-radius: 50%;
-    background: #7BB38E;
+    background: var(--status-sage);
     flex-shrink: 0;
     animation: nowDotPulse 2s ease-in-out infinite;
   }
@@ -854,7 +854,7 @@
   .planTimelineCardCheck[aria-pressed="true"] {
     background: var(--restoration-sage);
     border-color: var(--restoration-sage);
-    color: #fff;
+    color: var(--color-card);
   }
 
   /* Event-level completion checkbox (for events without a matched task) */
@@ -1105,7 +1105,7 @@
   }
   .planTimelineFreeBtnQuickSlot:hover {
     background: var(--restoration-sage, #87A96B);
-    color: #fff;
+    color: var(--color-card);
     transform: scale(1.08);
   }
   .planTimelineCta {
@@ -1309,7 +1309,7 @@
   .miniTimelinePillCheck[aria-pressed="true"] {
     background: var(--primary);
     border-color: var(--primary);
-    color: #fff;
+    color: var(--color-card);
   }
   .miniTimelinePillCompleted {
     opacity: 0.5;
@@ -1461,7 +1461,7 @@
     height: 34px;
     border-radius: 10px;
     background: rgba(107, 83, 68, 0.07);
-    color: #8B7355;
+    color: var(--color-primary);
     border: none;
   }
 
@@ -1478,7 +1478,7 @@
     align-items: center;
     font-size: 11px;
     font-weight: 500;
-    color: #8b7355;
+    color: var(--color-primary);
     background: rgba(139, 115, 85, 0.06);
     border: 1px solid rgba(139, 115, 85, 0.13);
     border-radius: 9999px;
@@ -1501,7 +1501,7 @@
     font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #1A1207;
+    color: var(--text);
   }
 
   .timelineHeaderActionLink {
@@ -1525,13 +1525,13 @@
     display: block;
     font-size: 11px;
     font-weight: 500;
-    color: #A89279;
+    color: var(--color-primary);
     text-decoration: none;
     margin-top: 2px;
     transition: color 0.15s ease;
   }
   .timelineHeaderSub:hover {
-    color: #8B7355;
+    color: var(--color-primary);
   }
 
   .timelineSub {
@@ -2280,7 +2280,7 @@
   /* Past events */
   .pastDetails {
     border-bottom: none;
-    background: #FFFFFF;
+    background: var(--color-card);
   }
   
   .pastSummary {
@@ -2318,7 +2318,7 @@
   .missedSection {
     padding: var(--home-space-lg);
     border-bottom: none;
-    background: color-mix(in srgb, var(--danger) 6%, #FFFFFF);
+    background: color-mix(in srgb, var(--danger) 6%, var(--color-card));
   }
   .missedSectionHeader {
     font-size: var(--home-text-heading);
@@ -2344,7 +2344,7 @@
     align-items: center;
     gap: var(--home-space-sm);
     padding: 0.5rem 0.6rem;
-    background: #FFFFFF;
+    background: var(--color-card);
     border-radius: 12px;
     border: none;
     box-shadow: var(--home-card-shadow);
@@ -2423,7 +2423,7 @@
     min-height: 52px;
     border-radius: 8px;
     border: 1px solid rgba(192, 113, 78, 0.2);
-    background: #FFFFFF;
+    background: var(--color-card);
     cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
     overflow: hidden;
@@ -2560,7 +2560,7 @@
     padding: 4px 10px;
     border-radius: 9999px;
     border: 1px solid rgba(107, 83, 68, 0.25);
-    background: #fff;
+    background: var(--color-card);
     color: #5f4b39;
     font-size: 0.7rem;
     font-weight: 600;
@@ -2702,7 +2702,7 @@
     min-height: 10px;
     background: var(--node-color, #A08B72);
     font-size: 0;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px var(--color-card);
     border: none;
   }
 
@@ -2714,7 +2714,7 @@
     min-height: 10px;
     background: #84A98C;
     font-size: 0;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px var(--color-card);
     border: none;
   }
 
@@ -3118,7 +3118,7 @@
     min-height: 10px;
     background: #C0714E;
     font-size: 0;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px var(--color-card);
     border: none;
   }
 

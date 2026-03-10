@@ -24,7 +24,7 @@
 
 .badgeNormal {
   background: var(--primary);
-  color: #fff;
+  color: var(--color-card);
 }
 
 .badgeReading {

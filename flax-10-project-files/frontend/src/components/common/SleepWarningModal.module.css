@@ -68,7 +68,7 @@
   padding: 0.65rem 1.4rem;
   border-radius: 10px;
   background: var(--primary, #7c3aed);
-  color: #fff;
+  color: var(--color-card);
   border: none;
   cursor: pointer;
   font-weight: 600;
