@@ -188,18 +188,18 @@
   font-weight: 600;
   line-height: 1.1;
   color: #2f261f;
-  background: #f9f8f6;
-  border: 1px solid #d8d4cf;
-  border-radius: 4px;
-  padding: 2px 4px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #d8d4cf;
+  border-radius: 0;
+  padding: 0 0 2px 0;
   flex: 1 1 auto;
   min-width: 80px;
   outline: none;
 }
 
 .taskWidgetTaskTitleInput:focus {
-  border-color: #8B7355;
-  background: #fff;
+  border-bottom-color: #8B7355;
 }
 
 .taskWidgetUrgencyPill {

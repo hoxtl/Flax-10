@@ -89,6 +89,7 @@ export function TaskWidgetSlot({
   const [ctxMenu, setCtxMenu] = useState(null);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
+  const [optimisticTitles, setOptimisticTitles] = useState({});
   const inputRef = useRef(null);
 
   const incompleteTasks = taskWidgetList.filter((t) => !t.completed);
@@ -106,8 +107,10 @@ export function TaskWidgetSlot({
   }, [editingTaskId]);
 
   const commitEdit = async (t) => {
-    if (editTitle.trim() && editTitle.trim() !== t.title) {
-      await onInlineTaskEdit?.(t, { title: editTitle.trim() });
+    const newTitle = editTitle.trim();
+    if (newTitle && newTitle !== t.title) {
+      setOptimisticTitles(prev => ({ ...prev, [t.id]: newTitle }));
+      await onInlineTaskEdit?.(t, { title: newTitle });
     }
     setEditingTaskId(null);
   };
@@ -174,6 +177,7 @@ export function TaskWidgetSlot({
                   const isOverdue = status === "overdue";
                   const rowAccent = isOverdue ? "#C0714E" : "#8B7355";
                   const urgency = getUrgencyMeta(t);
+                  const displayTitle = optimisticTitles[t.id] || t.title;
 
                   return (
                     <motion.li
@@ -220,13 +224,13 @@ export function TaskWidgetSlot({
                           ) : (
                             <span
                               className={styles.taskWidgetTaskTitle}
-                              title={t.title}
+                              title={displayTitle}
                               onClick={() => {
-                                setEditTitle(t.title);
+                                setEditTitle(displayTitle);
                                 setEditingTaskId(t.id);
                               }}
                             >
-                              {t.title}
+                              {displayTitle}
                             </span>
                           )}
                           {urgency && (
