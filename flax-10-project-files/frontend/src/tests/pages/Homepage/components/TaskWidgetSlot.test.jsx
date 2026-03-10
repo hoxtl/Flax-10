@@ -194,4 +194,76 @@ describe('TaskWidgetSlot', () => {
     fireEvent.contextMenu(row);
     expect(screen.getByTestId('task-context-menu')).toBeTruthy();
   });
+
+  it('shows Show less when showAllTaskWidgetTasks is true', () => {
+    const tasks = Array.from({ length: 7 }, (_, i) => ({
+      id: i + 1,
+      title: `Task ${i + 1}`,
+      completed: false,
+    }));
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: tasks,
+      taskWidgetList: tasks,
+      showAllTaskWidgetTasks: true,
+    });
+    expect(screen.getByText('Show less')).toBeTruthy();
+  });
+
+  it('shows High urgency pill for high priority task', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'High task', completed: false, priority: 'high' }],
+      taskWidgetList: [{ id: 1, title: 'High task', completed: false, priority: 'high' }],
+    });
+    expect(screen.getByText('High')).toBeTruthy();
+  });
+
+  it('shows Now urgency pill for taskWidgetStatus now', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'Now task', completed: false, taskWidgetStatus: 'now' }],
+      taskWidgetList: [{ id: 1, title: 'Now task', completed: false, taskWidgetStatus: 'now' }],
+    });
+    expect(screen.getByText('Now')).toBeTruthy();
+  });
+
+  it('calls onEditTask when context menu Edit is clicked', () => {
+    const onEditTask = vi.fn();
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'Ctx Task', completed: false }],
+      taskWidgetList: [{ id: 1, title: 'Ctx Task', completed: false }],
+      onEditTask,
+    });
+    fireEvent.contextMenu(screen.getByText('Ctx Task').closest('li'));
+    fireEvent.click(screen.getByText('Edit'));
+    expect(onEditTask).toHaveBeenCalledWith(expect.objectContaining({ id: 1, title: 'Ctx Task' }));
+  });
+
+  it('calls onDeleteTask when context menu Delete is clicked', async () => {
+    const onDeleteTask = vi.fn().mockResolvedValue(undefined);
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'Del Task', completed: false }],
+      taskWidgetList: [{ id: 1, title: 'Del Task', completed: false }],
+      onDeleteTask,
+    });
+    fireEvent.contextMenu(screen.getByText('Del Task').closest('li'));
+    fireEvent.click(screen.getByText('Delete'));
+    await vi.waitFor(() => expect(onDeleteTask).toHaveBeenCalledWith(expect.objectContaining({ id: 1 })));
+  });
+
+  it('closes context menu when Close is clicked', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'T', completed: false }],
+      taskWidgetList: [{ id: 1, title: 'T', completed: false }],
+    });
+    fireEvent.contextMenu(screen.getByText('T').closest('li'));
+    fireEvent.click(screen.getByText('Close'));
+    expect(screen.queryByTestId('task-context-menu')).toBeNull();
+  });
+
+  it('all done card shows singular task when one task completed', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'Only', completed: true }],
+      taskWidgetList: [],
+    });
+    expect(screen.getByText(/1 task.*completed today/)).toBeTruthy();
+  });
 });

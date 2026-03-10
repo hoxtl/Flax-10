@@ -131,4 +131,69 @@ describe('DeadlinesWidget', () => {
         expect(screen.queryByText('No Date')).toBeNull();
         expect(screen.getByText('With Date')).toBeTruthy();
     });
+
+    it('returns null when deadlines is not an array', () => {
+        const { container } = render(<DeadlinesWidget deadlines={null} />);
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('shows "Today" for deadline due today', () => {
+        const laterToday = new Date(Date.now() + 2 * 60 * 60 * 1000);
+        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'Due Today', start_due_date: laterToday.toISOString(), deadline_type: 'assessment' }]} />);
+        expect(screen.getByText('Today')).toBeTruthy();
+    });
+
+    it('uses deadline.title when assessment_title is missing', () => {
+        render(<DeadlinesWidget deadlines={[{ id: 1, title: 'Fallback Title', start_due_date: nextWeek.toISOString(), deadline_type: 'assessment' }]} />);
+        expect(screen.getByText('Fallback Title')).toBeTruthy();
+    });
+
+    it('uses "Assignment" when both assessment_title and title missing', () => {
+        render(<DeadlinesWidget deadlines={[{ id: 1, start_due_date: nextWeek.toISOString(), deadline_type: 'assessment' }]} />);
+        expect(screen.getByText('Assignment')).toBeTruthy();
+    });
+
+    it('calls onSelectModule with module_id when present', () => {
+        const onSelectModule = vi.fn();
+        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'T', start_due_date: nextWeek.toISOString(), module_code: 'CS3001', module_id: 42, deadline_type: 'assessment' }]} onSelectModule={onSelectModule} />);
+        fireEvent.click(screen.getByText('CS3001'));
+        expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS3001', id: 42 });
+    });
+
+    it('calls onSelect when row activated via Enter key', () => {
+        const onSelectDeadline = vi.fn();
+        render(<DeadlinesWidget deadlines={mockDeadlines} onSelectDeadline={onSelectDeadline} />);
+        const row = screen.getByText('Essay 1').closest('[role="button"]');
+        fireEvent.keyDown(row, { key: 'Enter', preventDefault: vi.fn() });
+        expect(onSelectDeadline).toHaveBeenCalled();
+    });
+
+    it('calls onSelect when row activated via Space key', () => {
+        const onSelectDeadline = vi.fn();
+        render(<DeadlinesWidget deadlines={mockDeadlines} onSelectDeadline={onSelectDeadline} />);
+        const row = screen.getByText('Essay 1').closest('[role="button"]');
+        fireEvent.keyDown(row, { key: ' ', preventDefault: vi.fn() });
+        expect(onSelectDeadline).toHaveBeenCalled();
+    });
+
+    it('does not render module pill when module_code is empty', () => {
+        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'No Module', start_due_date: nextWeek.toISOString(), deadline_type: 'assessment' }]} />);
+        expect(screen.queryByText(/[A-Z]{2}\d{4}/)).toBeNull();
+    });
+
+    it('shows Xd for deadline more than 1 day away', () => {
+        const in3Days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'In 3', start_due_date: in3Days.toISOString(), deadline_type: 'assessment' }]} />);
+        const label = screen.getByText(/\d+d$/);
+        expect(label).toBeTruthy();
+        expect(label.textContent).toMatch(/^\d+d$/);
+    });
+
+    it('renders single deadline as only row (last row)', () => {
+        const single = [{ id: 1, assessment_title: 'Only', start_due_date: nextWeek.toISOString(), deadline_type: 'coursework' }];
+        render(<DeadlinesWidget deadlines={single} />);
+        const rows = screen.getAllByRole('button');
+        expect(rows).toHaveLength(1);
+        expect(screen.getByText('Only')).toBeTruthy();
+    });
 });

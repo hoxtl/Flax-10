@@ -3,15 +3,29 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Homepage from '../../pages/Homepage/Homepage';
 
-const mockDispatch = vi.fn();
-const mockOpenModal = vi.fn();
-const mockRemoveEvent = vi.fn();
-const mockAddEvent = vi.fn();
-const mockEditEvent = vi.fn();
-const mockLoadEvents = vi.fn();
-const mockRefetchTasks = vi.fn();
-const mockUseCalendarEvents = vi.fn();
-const mockNavigate = vi.fn();
+const {
+  mockDispatch,
+  mockOpenModal,
+  mockRemoveEvent,
+  mockAddEvent,
+  mockEditEvent,
+  mockLoadEvents,
+  mockRefetchTasks,
+  mockUseCalendarEvents,
+  mockNavigate,
+  mockGetTag,
+} = vi.hoisted(() => ({
+  mockDispatch: vi.fn(),
+  mockOpenModal: vi.fn(),
+  mockRemoveEvent: vi.fn(),
+  mockAddEvent: vi.fn(),
+  mockEditEvent: vi.fn(),
+  mockLoadEvents: vi.fn(),
+  mockRefetchTasks: vi.fn(),
+  mockUseCalendarEvents: vi.fn(),
+  mockNavigate: vi.fn(),
+  mockGetTag: vi.fn(() => ({ label: 'Academic' })),
+}));
 
 const TODAY = new Date();
 let mockSelectedDate = TODAY;
@@ -76,7 +90,7 @@ vi.mock('../../pages/Homepage/hooks/useHomeData', () => ({
 }));
 
 vi.mock('../../context/TagContext', () => ({
-  useTags: () => ({ getTag: () => ({ label: 'Academic' }), tags: [{ id: 1, label: 'Routine' }] }),
+  useTags: () => ({ getTag: mockGetTag, tags: [{ id: 1, label: 'Routine' }] }),
 }));
 
 vi.mock('../../context/TimerContext', () => ({
@@ -137,7 +151,9 @@ vi.mock('../../pages/Homepage/components/TaskWidgetSlot', () => ({
       <button type="button" onClick={() => onDeleteTask?.({ id: 1 })}>delete-task</button>
       <button type="button" onClick={() => onInlineTaskEdit?.({ id: 1 }, { title: 'X' })}>inline-edit</button>
       <div data-testid="pill">{getTaskCategoryPill?.({ task_list: 123, tag: 1 })}</div>
+      <div data-testid="pill-null">{getTaskCategoryPill?.({ task_list: 999 }) ?? 'null'}</div>
       <div data-testid="color">{getTaskCategoryColor?.({ tag: 1 })}</div>
+      <div data-testid="color-flax">{getTaskCategoryColor?.({})}</div>
     </div>
   ),
 }));
@@ -146,6 +162,7 @@ vi.mock('../../pages/Homepage/components/DeadlinesWidget', () => ({
   DeadlinesWidget: ({ deadlines, onSelectDeadline, onSelectModule }) => (
     <div data-testid="deadlines-count">deadlines:{(deadlines || []).length}
       <button type="button" onClick={() => onSelectDeadline?.({ id: 1, assessment_title: 'Essay', start_due_date: new Date().toISOString(), module_code: 'AB1', deadline_type: 'assignment', description: 'D', location: 'Room 1', module_id: 10 })}>select-deadline</button>
+      <button type="button" onClick={() => onSelectDeadline?.({ id: 2, assessment_title: 'Exam', start_due_date: new Date().toISOString(), module_code: 'XY' })}>select-deadline-code-only</button>
       <button type="button" onClick={() => onSelectModule?.({ code: 'AB1', id: 10, name: 'Module A' })}>select-module</button>
     </div>
   ),
@@ -194,11 +211,14 @@ vi.mock('../../pages/Homepage/components', () => ({
   }) => (
     <div data-testid="mini-timeline">events:{(sortedEvents || []).length}
       <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1, title: 'T', estimated_blocks: 1 })}>quick-start</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date(), 25, null)}>quick-start-no-task</button>
       <button type="button" onClick={() => onTaskToggle?.({ id: 1 }, true)}>task-toggle</button>
       <button type="button" onClick={() => onCardClick?.({ id: 1, title: 'E' })}>card-click</button>
+      <button type="button" onClick={() => onCardClick?.(null)}>card-click-null</button>
       <button type="button" onClick={() => onEdit?.({ id: 1 })}>timeline-edit</button>
       <button type="button" onClick={() => onConflictAutoMove?.({ id: 1 }, new Date(), new Date())}>conflict-auto-move</button>
       <button type="button" onClick={() => onPushTomorrow?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: 'E' })}>push-tomorrow</button>
+      <button type="button" onClick={() => onPushTomorrow?.({ id: 1 })}>push-tomorrow-no-time</button>
       <button type="button" onClick={() => onDelete?.({ id: 1, title: 'E' })}>timeline-delete</button>
       <button type="button" onClick={() => onDelete?.({ id: 'ev-1', source: 'task', external_id: 99, title: 'Task Event' })}>timeline-delete-task</button>
       <button type="button" onClick={() => onReschedule?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: 'E' })}>reschedule</button>
@@ -284,6 +304,7 @@ beforeEach(() => {
   mockDayTasks = [];
   mockAllTasks = [];
   vi.clearAllMocks();
+  mockGetTag.mockReturnValue({ label: 'Academic' });
   mockUseCalendarEvents.mockReturnValue({ loadEvents: mockLoadEvents });
   mockAddEvent.mockResolvedValue(undefined);
   mockEditEvent.mockResolvedValue(undefined);
@@ -899,5 +920,118 @@ describe('Homepage', () => {
     );
     fireEvent.click(screen.getByText('plan-read-delete-event'));
     await waitFor(() => expect(mockRemoveEvent).toHaveBeenCalled());
+  });
+
+  it('getTaskCategoryColor returns flax for personal tag', () => {
+    mockGetTag.mockReturnValue({ label: 'personal' });
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('color').textContent).toBe('flax');
+  });
+
+  it('getTaskCategoryColor returns flax when no tag and no module', () => {
+    mockGetTag.mockReturnValue(null);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('color-flax').textContent).toBe('flax');
+  });
+
+  it('getTaskCategoryPill returns null when no list, module, or tag', () => {
+    mockGetTag.mockReturnValue(null);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('pill-null').textContent).toBe('null');
+  });
+
+  it('handleConflictPushTomorrow does nothing when event has no start_time', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('push-tomorrow-no-time'));
+    expect(mockEditEvent).not.toHaveBeenCalled();
+  });
+
+  it('handleQuickStartGap does nothing when task is null', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('quick-start-no-task'));
+    expect(mockAddEvent).not.toHaveBeenCalled();
+  });
+
+  it('handleRescheduleTomorrow shows error toast when addEvent fails', async () => {
+    const { getNextFreeSlotToday } = await import('../../pages/Homepage/utils/index');
+    getNextFreeSlotToday.mockReturnValue(null);
+    mockAddEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('reschedule'));
+    await waitFor(() => expect(screen.getByText("Couldn't re-schedule. Try again.")).toBeInTheDocument());
+  });
+
+  it('Re-plan shows "Nothing to re-plan" when missed items are all routine', async () => {
+    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const { isRoutineEvent, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
+    isToday.mockReturnValue(true);
+    isRoutineEvent.mockReturnValue(true);
+    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
+    const past = new Date(Date.now() - 2 * 3600000);
+    mockDayEvents = [{ id: 1, title: 'Routine', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
+    mockAllTasks = [];
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
+    await waitFor(() => expect(screen.getByText('Nothing to re-plan.')).toBeInTheDocument());
+  });
+
+  it('Re-plan shows error toast when editEvent fails', async () => {
+    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
+    const { getAllFreeWindowsToday, isRoutineEvent } = await import('../../pages/Homepage/utils/index');
+    isToday.mockReturnValue(true);
+    isRoutineEvent.mockReturnValue(false);
+    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
+    const past = new Date(Date.now() - 2 * 3600000);
+    mockDayEvents = [{ id: 1, title: 'Missed', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
+    mockAllTasks = [];
+    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
+    await waitFor(() => expect(screen.getByText("Couldn't re-plan. Try again.")).toBeInTheDocument());
+  });
+
+  it('deadline detail shows link to module by code when only module_code set', async () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('select-deadline-code-only'));
+    await waitFor(() => expect(screen.getByText('Exam')).toBeInTheDocument());
+    const link = screen.getByRole('link', { name: /Go to module/ });
+    expect(link).toHaveAttribute('href', '/modules?code=XY');
   });
 });
