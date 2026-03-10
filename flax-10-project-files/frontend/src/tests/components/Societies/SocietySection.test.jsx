@@ -84,4 +84,22 @@ describe('SocietySection', () => {
         fireEvent.click(screen.getAllByTestId('society-card')[0]);
         expect(onSelect).toHaveBeenCalledWith(societies[0]);
     });
+
+    it('does not render section header when hideTitle is true', () => {
+        render(<SocietySection hideTitle title="Hidden Title" items={societies} type="member" onAction={vi.fn()} />);
+        expect(screen.queryByText('Hidden Title')).not.toBeInTheDocument();
+    });
+
+    it('renders pagination when pagination prop is provided and totalPages > 1', () => {
+        render(
+            <SocietySection
+                title="Test"
+                items={societies}
+                type="member"
+                onAction={vi.fn()}
+                pagination={{ currentPage: 1, totalPages: 2, onPageChange: vi.fn() }}
+            />
+        );
+        expect(screen.getByRole('button', { name: /Next/ })).toBeInTheDocument();
+    });
 });

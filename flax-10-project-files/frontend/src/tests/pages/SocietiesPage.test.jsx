@@ -11,6 +11,7 @@ const mockUseSocieties = {
     loading: false,
     handleCreate: vi.fn(),
     refresh: vi.fn(),
+    updateSocietyLocally: vi.fn(),
 };
 
 vi.mock('../../components/Society/hooks/useSocieties', () => ({
@@ -19,19 +20,28 @@ vi.mock('../../components/Society/hooks/useSocieties', () => ({
 
 // Mock child components
 vi.mock('../../pages/Societies/AllSocieties', () => ({
-    default: ({ onBack, onSelect, societies }) => (
+    default: ({ onBack, onSelect, societies, onReport, onUnreport }) => (
         <div data-testid="all-societies">
             <button onClick={onBack}>BackFromAll</button>
             <button onClick={() => onSelect({ id: 'soc-1' })}>SelectSociety</button>
+            {onReport && societies?.length > 0 && (
+                <button onClick={() => onReport(societies[0])}>ReportSociety</button>
+            )}
+            {onUnreport && societies?.length > 0 && (
+                <button onClick={() => onUnreport(societies[0])}>UnreportSociety</button>
+            )}
         </div>
     ),
 }));
 
 vi.mock('../../pages/Societies/SocietySection', () => ({
-    default: ({ title, onAction, onSelect, items }) => (
+    default: ({ title, onAction, onSelect, items, onReport }) => (
         <div data-testid={`section-${title.replace(/\s+/g, '-').toLowerCase()}`}>
             <span>{title}</span>
             <button onClick={onAction}>{`Action-${title}`}</button>
+            {onReport && items?.length > 0 && (
+                <button onClick={() => onReport(items[0])}>ReportInSection</button>
+            )}
             {items.map(s => (
                 <button key={s.id} onClick={() => onSelect(s)}>{s.name}</button>
             ))}
@@ -57,6 +67,25 @@ vi.mock('../../components/Society/CreateSocietyModal', () => ({
     ),
 }));
 
+vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
+    default: ({ society, onClose }) => (
+        <div data-testid="report-modal">
+            <span>Report: {society?.name}</span>
+            <button onClick={onClose}>CloseReport</button>
+        </div>
+    ),
+}));
+
+const mockConfirm = vi.fn();
+vi.mock('../../context/ConfirmContext', () => ({
+    useConfirm: () => mockConfirm,
+}));
+
+const unreportSocietyMock = vi.fn();
+vi.mock('../../api/societyApi', () => ({
+    unreportSociety: (...args) => unreportSocietyMock(...args),
+}));
+
 import SocietiesPage from '../../pages/Societies/SocietiesPage';
 
 function renderWithRouter(ui) {
@@ -70,6 +99,8 @@ describe('SocietiesPage', () => {
         mockUseSocieties.societies = [];
         mockUseSocieties.handleCreate = vi.fn();
         mockUseSocieties.refresh = vi.fn();
+        mockUseSocieties.updateSocietyLocally = vi.fn();
+        mockConfirm.mockResolvedValue(false);
     });
 
     it('shows loading state when loading is true', () => {
@@ -194,5 +225,58 @@ describe('SocietiesPage', () => {
     it('does not show detail page by default', () => {
         renderWithRouter(<SocietiesPage />);
         expect(screen.queryByTestId('society-detail')).not.toBeInTheDocument();
+    });
+
+    it('shows AllSocieties view when URL has tab=all', () => {
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        expect(screen.getByTestId('all-societies')).toBeInTheDocument();
+    });
+
+    it('shows ReportSocietyModal when report is triggered from All view', () => {
+        mockUseSocieties.societies = [{ id: 'r1', name: 'Reported Club' }];
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText('ReportSociety'));
+        expect(screen.getByTestId('report-modal')).toBeInTheDocument();
+        expect(screen.getByText(/Report: Reported Club/)).toBeInTheDocument();
+    });
+
+    it('closes ReportSocietyModal when CloseReport is clicked', () => {
+        mockUseSocieties.societies = [{ id: 'r1', name: 'Club' }];
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText('ReportSociety'));
+        fireEvent.click(screen.getByText('CloseReport'));
+        expect(screen.queryByTestId('report-modal')).not.toBeInTheDocument();
+    });
+
+    it('shows ReportSocietyModal when report is triggered from My view', () => {
+        mockUseSocieties.societies = [{ id: 'm1', name: 'My Club', is_member: true }];
+        renderWithRouter(<SocietiesPage />);
+        fireEvent.click(screen.getByText('ReportInSection'));
+        expect(screen.getByTestId('report-modal')).toBeInTheDocument();
+    });
+
+    it('calls unreportSociety and updateSocietyLocally when user confirms unreport', async () => {
+        const society = { id: 'u1', name: 'Unreport Club' };
+        mockUseSocieties.societies = [society];
+        mockConfirm.mockResolvedValue(true);
+        unreportSocietyMock.mockResolvedValue(undefined);
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText('UnreportSociety'));
+        await waitFor(() => {
+            expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({ title: 'Unreport Society' }));
+        });
+        await waitFor(() => {
+            expect(unreportSocietyMock).toHaveBeenCalledWith('u1');
+            expect(mockUseSocieties.updateSocietyLocally).toHaveBeenCalledWith('u1', { has_reported: false });
+        });
+    });
+
+    it('does not call unreportSociety when user cancels confirm', async () => {
+        mockUseSocieties.societies = [{ id: 'u1', name: 'Club' }];
+        mockConfirm.mockResolvedValue(false);
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText('UnreportSociety'));
+        await waitFor(() => expect(mockConfirm).toHaveBeenCalled());
+        expect(unreportSocietyMock).not.toHaveBeenCalled();
     });
 });
