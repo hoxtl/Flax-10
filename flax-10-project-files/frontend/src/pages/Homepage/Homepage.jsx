@@ -944,7 +944,7 @@ export default function Homepage() {
                   onClick={() => setSelectedDeadline(null)}
                   aria-label="Close"
                 >
-                  <X size={18} strokeWidth={2} aria-hidden />
+                  x
                 </button>
               </div>
               <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
