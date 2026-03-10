@@ -1,3 +1,7 @@
+"""
+Backend tests for enrollment model.
+"""
+
 from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta
@@ -10,7 +14,6 @@ from studyFlax.models.modules.enrollmentModel import Enrollment
 class EnrollmentModelTests(TestCase):
     """ Test suite for Enrollment model."""
     def setUp(self):
-        """ Set up test teacher, student and module."""
         self.teacher = User.objects.create_user(
             username='teacher', email='teacher@test.com',
             password='pass', first_name='Teacher', last_name='Test', role='teacher'
@@ -27,29 +30,24 @@ class EnrollmentModelTests(TestCase):
         )
 
     def test_enrollment_creation(self):
-        """ Test that a student can enroll into a module."""
         enrollment = Enrollment.objects.create(student=self.student, module=self.module)
         self.assertIsInstance(enrollment, Enrollment)
 
     def test_duplicate_enrollment_fails(self):
-        """ Tests that a student can't enroll into the same module twice."""
         Enrollment.objects.create(student=self.student, module=self.module)
         with self.assertRaises(IntegrityError):
             Enrollment.objects.create(student=self.student, module=self.module)
 
     def test_deleted_with_student(self):
-        """ Test enrollments are cascade deleted when student is deleted."""
         Enrollment.objects.create(student=self.student, module=self.module)
         self.student.delete()
         self.assertEqual(Enrollment.objects.count(), 0)
 
     def test_deleted_with_module(self):
-        """ Test enrollments are cascade deleted when module is deleted."""
         Enrollment.objects.create(student=self.student, module=self.module)
         self.module.delete()
         self.assertEqual(Enrollment.objects.count(), 0)
 
     def test_enrolled_at_auto_set(self):
-        """ Test the enrolled_at field is automatically set."""
         enrollment = Enrollment.objects.create(student=self.student, module=self.module)
         self.assertIsNotNone(enrollment.enrolled_at)

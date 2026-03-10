@@ -1,3 +1,7 @@
+"""
+Backend tests for society helpers.
+"""
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
@@ -23,6 +27,7 @@ def make_member(user, society):
 
 
 class SocietyHelpersTest(TestCase):
+    """Tests for society helpers."""
     def setUp(self):
         self.user = make_user()
         self.society = make_society()

@@ -1,3 +1,7 @@
+"""
+Backend tests for society event views extended.
+"""
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -33,6 +37,7 @@ def make_event(society, title='Test Event', recurrence='none'):
 
 
 class SocietyEventCreateExtendedTest(TestCase):
+    """Tests for society event create extended."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@e.com', password='pass')
@@ -53,7 +58,6 @@ class SocietyEventCreateExtendedTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_event_silent_no_notification(self):
-        """silent=true query param should suppress notification."""
         response = self.client.post(
             f'/api/societies/{self.society.id}/events/?silent=true', self.event_data
         )
@@ -69,6 +73,7 @@ class SocietyEventCreateExtendedTest(TestCase):
 
 
 class SocietyEventDetailExtendedTest(TestCase):
+    """Tests for society event detail extended."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin2', email='admin2@e.com', password='pass')
@@ -133,6 +138,7 @@ class SocietyEventDetailExtendedTest(TestCase):
 
 
 class AddSocietyEventExceptionTest(TestCase):
+    """Tests for add society event exception."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='excadmin', email='excadmin@e.com', password='pass')
@@ -167,7 +173,6 @@ class AddSocietyEventExceptionTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.recurring_event.refresh_from_db()
-        # Should not duplicate
         self.assertEqual(self.recurring_event.exception_dates.count('2026-04-01'), 1)
 
     def test_add_exception_missing_date(self):

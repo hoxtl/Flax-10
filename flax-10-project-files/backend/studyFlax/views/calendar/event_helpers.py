@@ -14,9 +14,13 @@ def apply_filter(qs, start, end, rec_q):
     non_rec = Q(recurrence_rule__isnull=True)
     if start and end:
         in_range = Q(start_time__lte=end) & Q(end_time__gte=start)
-        return qs.filter((non_rec & in_range) | (rec_q & Q(start_time__lte=end)))
+        if rec_q is not None:
+            return qs.filter((non_rec & in_range) | (rec_q & Q(start_time__lte=end)))
+        return qs.filter(non_rec & in_range)
     if start:
-        return qs.filter(Q(end_time__gte=start) | rec_q)
+        if rec_q is not None:
+            return qs.filter(Q(end_time__gte=start) | rec_q)
+        return qs.filter(end_time__gte=start)
     return qs.filter(start_time__lte=end)
 
 def expand_recurring_events(events, start_date=None, end_date=None):

@@ -1,9 +1,14 @@
+"""
+Backend tests for society fixtures.
+"""
+
 from datetime import date
 
 from django.test import TestCase
 
 
 class SocietyFixturesTest(TestCase):
+    """Tests for society fixtures."""
     def test_get_events_for_category_sports(self):
         from studyFlax.fixtures.society_fixtures import get_events_for_category
 

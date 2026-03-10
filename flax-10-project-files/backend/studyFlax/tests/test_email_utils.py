@@ -1,3 +1,7 @@
+"""
+Backend tests for email utils.
+"""
+
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -7,6 +11,7 @@ User = get_user_model()
 
 
 class EmailUtilsTest(TestCase):
+    """Tests for email utils."""
     def setUp(self):
         self.user = User.objects.create_user(
             username='email_user',
