@@ -11,6 +11,7 @@ import {
   useProject,
   useProjectMembers,
 } from "./groupWorkHooks";
+import GroupTasksTab from "./GroupTasksTab";
 
 function BackButton({ onClick }) {
   const style = {
@@ -266,7 +267,7 @@ function ProjectHeader({ project, members, onPatch }) {
   );
 }
 
-function TabsSection({ activeTab, setActiveTab }) {
+function TabsSection({ activeTab, setActiveTab, projectId, members }) {
   return (
     <section style={{ marginTop: 24 }}>
       <div style={detailTabsRowStyle}>
@@ -284,46 +285,16 @@ function TabsSection({ activeTab, setActiveTab }) {
         >
           Availability
         </button>
+        <button
+          type="button"
+          style={detailTabStyle(activeTab === "contributions")}
+          onClick={() => setActiveTab("contributions")}
+        >
+          Contributions
+        </button>
       </div>
       {activeTab === "tasks" && (
-        <div style={detailCardStyle}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1.4fr) 80px 110px 90px",
-              fontSize: 12,
-              color: "#9a8474",
-              marginBottom: 8,
-            }}
-          >
-            <span>Task</span>
-            <span>Priority</span>
-            <span>Owner</span>
-            <span>Due</span>
-          </div>
-          <div
-            style={{
-              borderRadius: 12,
-              border: "1px solid #f0dfd1",
-              background: "#fffaf4",
-              padding: "10px 12px",
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1.4fr) 80px 110px 90px",
-              alignItems: "center",
-              fontSize: 13,
-              color: "#3c2a20",
-            }}
-          >
-            <span>No tasks yet for this project.</span>
-            <span style={{ fontSize: 11, color: "#c9a790" }}>–</span>
-            <span style={{ fontSize: 11, color: "#c9a790" }}>–</span>
-            <span style={{ fontSize: 11, color: "#c9a790" }}>–</span>
-          </div>
-          <p style={{ ...metaStyle, marginTop: 10 }}>
-            Your group can add and track project tasks here once tasks are
-            linked.
-          </p>
-        </div>
+        <GroupTasksTab projectId={projectId} members={members} />
       )}
       {activeTab === "availability" && (
         <div style={detailCardStyle}>
@@ -366,6 +337,13 @@ function TabsSection({ activeTab, setActiveTab }) {
               Suggested meeting slots for this group will appear here once
               calendar data is connected.
             </p>
+          </div>
+        </div>
+      )}
+      {activeTab === "contributions" && (
+        <div style={detailCardStyle}>
+          <div style={{ color: "#3c2a20", fontSize: 13 }}>
+            <p style={{ margin: 0 }}>Contributions and analytics will appear here.</p>
           </div>
         </div>
       )}
@@ -469,7 +447,7 @@ export default function GroupProjectDetail({ projectId, onBack }) {
       />
       <MembersSection members={members} onRemove={handleRemoveMember} />
       <AddMemberForm projectId={projectId} onAdded={handleMemberAdded} />
-      <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
+      <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} projectId={projectId} members={members} />
     </div>
   );
 }

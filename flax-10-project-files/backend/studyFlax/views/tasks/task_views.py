@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from datetime import timedelta
 
 from studyFlax.models.tasks.taskModel import Task, TaskList
@@ -15,7 +16,12 @@ def get_user_lists(user, archived=False):
 
 
 def get_user_tasks(user, params):
-    qs = Task.objects.filter(user=user)
+    qs = Task.objects.filter(
+        Q(user=user) | Q(group_project__memberships__user=user)
+    ).distinct()
+    
+    if params.get("group_project"):
+        qs = qs.filter(group_project_id=params["group_project"])
     if params.get("list"):
         qs = qs.filter(task_list_id=params["list"])
     if params.get("module"):
@@ -117,7 +123,12 @@ def task_list(request):
 @api_view(["PATCH", "DELETE"])
 @permission_classes([IsAuthenticated])
 def task_detail(request, task_id):
-    task = get_object_or_404(Task, id=task_id, user=request.user)
+    task = get_object_or_404(
+        Task.objects.filter(
+            Q(user=request.user) | Q(group_project__memberships__user=request.user)
+        ).distinct(),
+        id=task_id
+    )
 
     if request.method == "DELETE":
         _task_event_qs(task).delete()
@@ -135,7 +146,12 @@ def task_detail(request, task_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def log_task_time(request, task_id):
-    task = get_object_or_404(Task, id=task_id, user=request.user)
+    task = get_object_or_404(
+        Task.objects.filter(
+            Q(user=request.user) | Q(group_project__memberships__user=request.user)
+        ).distinct(),
+        id=task_id
+    )
     minutes = int(request.data.get("minutes", 0))
     task.time_spent_minutes += minutes
     task.save()
