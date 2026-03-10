@@ -27,6 +27,7 @@ export const detailTabsRowStyle = {
   gap: 12,
   borderBottom: "1px solid #eee0d4",
   marginTop: 24,
+  paddingBottom: 15,
 };
 
 export const detailTabStyle = (active) => ({
