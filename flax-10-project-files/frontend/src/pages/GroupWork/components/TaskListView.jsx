@@ -6,7 +6,7 @@ import { getUserColor } from "../utils/priorityUtils";
 import TaskAvatarStack from "./TaskAvatarStack";
 import { getPriorityStyle } from "../utils/priorityUtils";
 import { buildToggleAssignee, getDueDateStr } from "../utils/taskUtils";
-import styles from "../GroupTasksTab.module.css";
+import styles from "./TaskListView.module.css";
 
 function TaskCheckbox({ isDone, color, onToggle }) {
     return (
@@ -60,31 +60,49 @@ function PrioritySelect({ priority, onUpdate, taskId }) {
     );
 }
 
-export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
+function DateCell({ taskId, due_date, onUpdate }) {
+    const onChange = val => onUpdate(taskId, { due_date: val ? new Date(val).toISOString() : null });
+    return (
+        <div className={styles.dateCell}>
+            <DateTimePicker value={getDueDateStr(due_date)} onChange={onChange} placeholder="Set Date" dateOnly triggerClassName={styles.dateLabel} hideIcon />
+        </div>
+    );
+}
+
+function ActionCell({ taskId, onDelete }) {
+    return (
+        <div className={styles.actionCell}>
+            <button onClick={() => onDelete(taskId)} className={styles.deleteBtn} title="Delete task"><Trash2 size={16} /></button>
+        </div>
+    );
+}
+
+function useTaskRowEdit(task, onUpdate) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(task.title);
-    const assignees = task.assignees_info || [];
-    const color = assignees.length > 0 ? getUserColor(assignees[0].id) : "#8d7355";
-
     const save = () => { if (editedTitle.trim() && editedTitle !== task.title) onUpdate(task.id, { title: editedTitle.trim() }); setIsEditing(false); };
     const cancel = () => { setEditedTitle(task.title); setIsEditing(false); };
+    const start = () => { setEditedTitle(task.title); setIsEditing(true); };
+    return { isEditing, editedTitle, setEditedTitle, save, cancel, start };
+}
+
+export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
+    const edit = useTaskRowEdit(task, onUpdate);
+    const m = (task.assignees_info || [])[0];
+    const color = m ? getUserColor(m.id) : "#8d7355";
 
     return (
         <div className={styles.taskRow} style={{ opacity: task.completed ? 0.6 : 1 }}>
             <div className={styles.taskMainCell}>
                 <TaskCheckbox isDone={task.completed} color={color} onToggle={() => onToggle(task.id, !task.completed)} />
                 <div className={styles.titleArea}>
-                    <TaskTitleField task={task} isEditing={isEditing} editedTitle={editedTitle} setEditedTitle={setEditedTitle} onSave={save} onCancel={cancel} onStartEdit={() => { setEditedTitle(task.title); setIsEditing(true); }} />
+                    <TaskTitleField task={task} {...edit} onStartEdit={edit.start} onSave={edit.save} onCancel={edit.cancel} />
                 </div>
             </div>
             <PrioritySelect priority={task.priority} onUpdate={onUpdate} taskId={task.id} />
-            <div className={styles.dateCell}>
-                <DateTimePicker value={getDueDateStr(task.due_date)} onChange={val => onUpdate(task.id, { due_date: val ? new Date(val).toISOString() : null })} placeholder="Set Date" dateOnly triggerClassName={styles.dateLabel} hideIcon />
-            </div>
+            <DateCell taskId={task.id} due_date={task.due_date} onUpdate={onUpdate} />
             <AssignCell task={task} members={members} onUpdate={onUpdate} />
-            <div className={styles.actionCell}>
-                <button onClick={() => onDelete(task.id)} className={styles.deleteBtn} title="Delete task"><Trash2 size={16} /></button>
-            </div>
+            <ActionCell taskId={task.id} onDelete={onDelete} />
         </div>
     );
 }
