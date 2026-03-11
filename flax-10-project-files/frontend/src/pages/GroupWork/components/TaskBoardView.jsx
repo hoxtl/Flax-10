@@ -2,26 +2,30 @@ import React, { useMemo } from "react";
 import { Check, Trash2 } from "lucide-react";
 import styles from "./TaskBoardView.module.css";
 
-export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDelete }) {
-    // Currently tasks only have a `completed` boolean rather than a full status enum.
-    // For a Trello-style board, we'll map incomplete to "To Do" and complete to "Done".
-    // Alternatively, if a 'status' field is added later, it will naturally slot in here.
+export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDelete, onAdd }) {
+    const [addingToCol, setAddingToCol] = React.useState(null);
+    const [newCardTitle, setNewCardTitle] = React.useState("");
 
     const columns = useMemo(() => {
         const todo = [];
+        const inProgress = [];
         const done = [];
 
         tasks.forEach(t => {
-            if (t.completed) {
+            const stat = t.status || (t.completed ? "done" : "todo");
+            if (stat === "done") {
                 done.push(t);
+            } else if (stat === "in_progress") {
+                inProgress.push(t);
             } else {
                 todo.push(t);
             }
         });
 
         return [
-            { id: "todo", title: "To Do", tasks: todo, color: "#8a7a6a", bg: "#f2ede5" },
-            { id: "done", title: "Completed", tasks: done, color: "#6b8a6a", bg: "#e8f2e5" }
+            { id: "todo", title: "To Do", tasks: todo, color: "#8a7a6a", bg: "#f2ede5", dotCol: "#c0a080" },
+            { id: "in_progress", title: "In Progress", tasks: inProgress, color: "#547da3", bg: "#e6eff5", dotCol: "#80b2d6" },
+            { id: "done", title: "Done", tasks: done, color: "#6b8a6a", bg: "#e8f2e5", dotCol: "#8bc28a" }
         ];
     }, [tasks]);
 
@@ -38,21 +42,41 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
         return d.toLocaleString('en-US', { month: 'short', day: 'numeric' });
     };
 
+    const handleAddSubmit = (e, colId) => {
+        e.preventDefault();
+        if (newCardTitle.trim()) {
+            onAdd(newCardTitle.trim(), colId);
+        }
+        setAddingToCol(null);
+        setNewCardTitle("");
+    };
+
+    const handleKeyDown = (e, colId) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            handleAddSubmit(e, colId);
+        }
+        if (e.key === "Escape") {
+            setAddingToCol(null);
+            setNewCardTitle("");
+        }
+    };
+
     return (
         <div className={styles.boardContainer}>
             {columns.map(col => (
                 <div key={col.id} className={styles.column} style={{ background: col.bg }}>
                     <div className={styles.colHeader} style={{ color: col.color }}>
                         <div className={styles.colTitleWrapper}>
+                            <div className={styles.colDot} style={{ background: col.dotCol }} />
                             <h3 className={styles.colTitle}>{col.title}</h3>
-                            <span className={styles.taskCount}>{col.tasks.length}</span>
                         </div>
+                        <span className={styles.taskCount}>{col.tasks.length}</span>
                     </div>
 
                     <div className={styles.cardList}>
                         {col.tasks.map(t => {
                             const pColor = priorityColors[(t.priority || "medium").toLowerCase()] || priorityColors.medium;
-                            const isDone = t.completed;
+                            const isDone = (t.status === "done" || t.completed);
                             const dateStr = formatDate(t.due_date);
 
                             return (
@@ -62,13 +86,16 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
                                             {t.priority || "Medium"}
                                         </span>
                                         <div className={styles.cardActions}>
-                                            <button
-                                                onClick={() => onToggle(t.id, !isDone)}
-                                                className={`${styles.iconBtn} ${isDone ? styles.iconBtnDone : ""}`}
-                                                title={isDone ? "Mark as To Do" : "Mark as Done"}
+                                            <select
+                                                value={t.status || (t.completed ? "done" : "todo")}
+                                                onChange={(e) => onUpdate(t.id, { status: e.target.value })}
+                                                className={styles.statusSelect}
+                                                title="Change status"
                                             >
-                                                <Check size={14} strokeWidth={isDone ? 3 : 2} />
-                                            </button>
+                                                <option value="todo">To Do</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="done">Done</option>
+                                            </select>
                                             <button
                                                 onClick={() => onDelete(t.id)}
                                                 className={styles.iconBtnDelete}
@@ -107,6 +134,27 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
                         })}
                         {col.tasks.length === 0 && (
                             <div className={styles.emptyCol}>No tasks</div>
+                        )}
+                        {addingToCol === col.id ? (
+                            <div className={styles.addCardInputWrapper}>
+                                <textarea
+                                    autoFocus
+                                    value={newCardTitle}
+                                    onChange={(e) => setNewCardTitle(e.target.value)}
+                                    onKeyDown={(e) => handleKeyDown(e, col.id)}
+                                    onBlur={(e) => handleAddSubmit(e, col.id)}
+                                    className={styles.addCardInput}
+                                    placeholder="Enter title..."
+                                    rows={2}
+                                />
+                            </div>
+                        ) : (
+                            <button
+                                className={styles.addCardBtn}
+                                onClick={() => setAddingToCol(col.id)}
+                            >
+                                + Add card
+                            </button>
                         )}
                     </div>
                 </div>
