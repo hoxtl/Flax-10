@@ -9,9 +9,7 @@ import TaskTimelineView from "./components/TaskTimelineView";
 import TaskBoardView from "./components/TaskBoardView";
 import styles from "./GroupTasksTab.module.css";
 
-
-
-export default function GroupTasksTab({ projectId, members }) {
+export default function GroupTasksTab({ projectId, members, onStatsUpdate }) {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -44,6 +42,55 @@ export default function GroupTasksTab({ projectId, members }) {
     useEffect(() => {
         fetchTasks();
     }, [projectId]);
+
+    // Calculate completion metrics and pass them up
+    useEffect(() => {
+        if (!onStatsUpdate) return;
+        const total = tasks.length;
+        if (total === 0) {
+            onStatsUpdate({ percent: 0, completed: 0, total: 0, segments: [] });
+            return;
+        }
+
+        const completedArr = tasks.filter(t => t.completed || t.status === "done");
+        const completed = completedArr.length;
+        const percent = Math.round((completed / total) * 100);
+
+        const userCounts = {};
+        let unassignedCount = 0;
+
+        completedArr.forEach(t => {
+            const assignees = t.assignees_info || [];
+            if (assignees.length === 0) {
+                unassignedCount++;
+            } else {
+                assignees.forEach(a => {
+                    if (!userCounts[a.id]) {
+                        userCounts[a.id] = { count: 0, name: a.name, id: a.id };
+                    }
+                    userCounts[a.id].count += (1 / assignees.length);
+                });
+            }
+        });
+
+        const segments = Object.values(userCounts).map(u => ({
+            ...u,
+            percentage: (u.count / total) * 100,
+            tooltip: `${u.name} (${Math.round(u.count)} tasks)`
+        }));
+
+        if (unassignedCount > 0) {
+            segments.push({
+                id: 'unassigned',
+                name: 'Unassigned',
+                count: unassignedCount,
+                percentage: (unassignedCount / total) * 100,
+                tooltip: `Unassigned (${unassignedCount} tasks)`
+            });
+        }
+
+        onStatsUpdate({ percent, completed, total, segments });
+    }, [tasks, onStatsUpdate]);
 
     const handleAddTaskToCol = (title, status) => {
         addTask(new Event("submit"), title, status);
