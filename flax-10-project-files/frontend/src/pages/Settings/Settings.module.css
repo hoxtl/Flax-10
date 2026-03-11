@@ -477,3 +477,17 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.teacherSuccess {
+  font-size: 0.85rem;
+  color: #15803d;
+  font-weight: 600;
+  align-self: center;
+}
+
+.teacherError {
+  font-size: 0.82rem;
+  color: #b91c1c;
+  margin: 0.4rem 0 0;
+  width: 100%;
+}
