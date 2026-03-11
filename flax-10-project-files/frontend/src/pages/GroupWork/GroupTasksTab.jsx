@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Check, Hourglass, Circle, Trash2, X, Pencil, ChevronDown } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
+import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 import styles from "./GroupTasksTab.module.css";
 
 const USER_COLORS = [
@@ -101,7 +102,8 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
 
     const getPriorityStyle = (priority) => {
         const p = (priority || "").toLowerCase();
-        if (p === "high" || p === "urgent") return { background: "#ffccd5", color: "#a8324e" };
+        if (p === "urgent") return { background: "#ffaebe", color: "#9e1f3d" };
+        if (p === "high") return { background: "#fed7aa", color: "#c2410c" };
         if (p === "medium") return { background: "#ffe0b2", color: "#bf7b24" };
         return { background: "#f1ede9", color: "#8f7969" };
     };
@@ -170,15 +172,12 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
             </div>
 
             <div className={styles.dateCell}>
-                <input
-                    type="date"
-                    className={styles.dateInput}
+                <DateTimePicker
                     value={fullDateStr}
-                    onChange={handleDateChange}
+                    onChange={(val) => onUpdate(task.id, { due_date: val ? new Date(val).toISOString() : null })}
+                    placeholder="Set Date"
+                    dateOnly={true}
                 />
-                <div className={styles.dateLabel}>
-                    {parsedDateStr || "Set Date"}
-                </div>
             </div>
 
             <div className={styles.assignCell}>

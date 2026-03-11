@@ -207,29 +207,7 @@
     position: relative;
     display: flex;
     justify-content: center;
-}
-
-.dateInput {
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    cursor: pointer;
-    z-index: 2;
-}
-
-.dateLabel {
-    font-size: 13px;
-    font-weight: 500;
-    color: #8f7969;
-    text-align: center;
-    pointer-events: none;
-    padding: 6px 10px;
-    background: rgba(143, 121, 105, 0.05);
-    border-radius: 8px;
-    width: 100%;
+    align-items: center;
 }
 
 /* Assign Cell */
