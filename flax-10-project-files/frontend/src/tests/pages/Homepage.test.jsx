@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Homepage from '../../pages/Homepage/Homepage';
 
@@ -152,8 +152,11 @@ vi.mock('../../pages/Homepage/components/TaskWidgetSlot', () => ({
       <button type="button" onClick={() => onInlineTaskEdit?.({ id: 1 }, { title: 'X' })}>inline-edit</button>
       <div data-testid="pill">{getTaskCategoryPill?.({ task_list: 123, tag: 1 })}</div>
       <div data-testid="pill-null">{getTaskCategoryPill?.({ task_list: 999 }) ?? 'null'}</div>
+      <div data-testid="pill-module-code">{getTaskCategoryPill?.({ module_code: 'XY1' }) ?? 'null'}</div>
+      <div data-testid="pill-module-id">{getTaskCategoryPill?.({ module_id: 10 }) ?? 'null'}</div>
       <div data-testid="color">{getTaskCategoryColor?.({ tag: 1 })}</div>
       <div data-testid="color-flax">{getTaskCategoryColor?.({})}</div>
+      <div data-testid="color-module">{getTaskCategoryColor?.({ module_code: 'CS101' })}</div>
     </div>
   ),
 }));
@@ -468,9 +471,10 @@ describe('Homepage', () => {
     );
     await waitFor(() => expect(screen.getByText('select-module')).toBeInTheDocument());
     fireEvent.click(screen.getByText('select-module'));
-    await waitFor(() => expect(screen.getByText('AB1')).toBeInTheDocument());
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText('AB1')).toBeInTheDocument();
     fireEvent.click(screen.getByLabelText('Close'));
-    await waitFor(() => expect(screen.queryByText('Module A')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('handleQuickStartGap adds event and shows toast', async () => {
@@ -942,6 +946,26 @@ describe('Homepage', () => {
     expect(screen.getByTestId('color-flax').textContent).toBe('flax');
   });
 
+  it('getTaskCategoryColor returns sage when task has module_code and no tag', () => {
+    mockGetTag.mockReturnValue(null);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('color-module').textContent).toBe('sage');
+  });
+
+  it('getTaskCategoryPill returns module_code when task has module_code and no list or tag', () => {
+    mockGetTag.mockReturnValue(null);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('pill-module-code').textContent).toBe('XY1');
+  });
+
   it('getTaskCategoryPill returns null when no list, module, or tag', () => {
     mockGetTag.mockReturnValue(null);
     render(
@@ -950,6 +974,67 @@ describe('Homepage', () => {
       </MemoryRouter>
     );
     expect(screen.getByTestId('pill-null').textContent).toBe('null');
+  });
+
+  it('getTaskCategoryPill returns enrolled module code when task has module_id matching enrolled module', async () => {
+    const { getModules, getEnrollments } = await import('../../api/moduleApi');
+    getModules.mockResolvedValue([{ id: 10, module_code: 'AB1', module_name: 'Module Alpha' }]);
+    getEnrollments.mockResolvedValue([{ module: 10 }]);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByTestId('pill-module-id')).toBeInTheDocument());
+    expect(screen.getByTestId('pill-module-id').textContent).toBe('AB1');
+  });
+
+  it('EditTaskModal onSave error does not close modal', async () => {
+    const { updateTask } = await import('../../api/taskService');
+    updateTask.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('edit-task'));
+    await waitFor(() => expect(screen.getByTestId('edit-task-modal')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('edit-modal-save'));
+    await waitFor(() => expect(updateTask).toHaveBeenCalled());
+    expect(screen.getByTestId('edit-task-modal')).toBeInTheDocument();
+  });
+
+  it('EditTaskModal onDelete error does not close modal', async () => {
+    const { deleteTask } = await import('../../api/taskService');
+    deleteTask.mockRejectedValueOnce(new Error('fail'));
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('edit-task'));
+    await waitFor(() => expect(screen.getByText('edit-modal-delete')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('edit-modal-delete'));
+    await waitFor(() => expect(deleteTask).toHaveBeenCalled());
+    expect(screen.getByTestId('edit-task-modal')).toBeInTheDocument();
+  });
+
+  it('module pill overlay truncates long description with ellipsis', async () => {
+    const { getModules, getEnrollments } = await import('../../api/moduleApi');
+    const longDesc = 'a'.repeat(150);
+    getModules.mockResolvedValue([{ id: 10, module_code: 'AB1', module_name: 'Module A', description: longDesc }]);
+    getEnrollments.mockResolvedValue([{ module: 10 }]);
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByText('select-module')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('select-module'));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText('AB1')).toBeInTheDocument();
+    const truncated = 'a'.repeat(120) + '…';
+    expect(document.body.textContent).toContain(truncated);
   });
 
   it('handleConflictPushTomorrow does nothing when event has no start_time', () => {
@@ -970,6 +1055,28 @@ describe('Homepage', () => {
     );
     fireEvent.click(screen.getByText('quick-start-no-task'));
     expect(mockAddEvent).not.toHaveBeenCalled();
+  });
+
+  it('onInlineTaskEdit updates task and refetches', async () => {
+    const { updateTask } = await import('../../api/taskService');
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('inline-edit'));
+    await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, expect.objectContaining({ title: 'X' })));
+    expect(mockRefetchTasks).toHaveBeenCalled();
+  });
+
+  it('onStartFocus navigates to timer with state', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('start-focus'));
+    expect(mockNavigate).toHaveBeenCalledWith('/timer', { state: { fromTaskPlay: true } });
   });
 
   it('handleRescheduleTomorrow shows error toast when addEvent fails', async () => {

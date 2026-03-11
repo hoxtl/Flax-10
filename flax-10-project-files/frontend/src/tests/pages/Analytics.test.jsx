@@ -121,4 +121,19 @@ describe('AnalyticsPage', () => {
         fireEvent.click(screen.getByText('7d'));
         expect(analyticsService.getSummary).toHaveBeenCalledWith(7);
     });
+
+    it('refetches with 90d when 90d period clicked', async () => {
+        render(<AnalyticsPage />);
+        await waitFor(() => screen.getByText('90d'));
+        fireEvent.click(screen.getByText('90d'));
+        expect(analyticsService.getSummary).toHaveBeenCalledWith(90);
+    });
+
+    it('shows generic error when fetch fails without message', async () => {
+        analyticsService.getSummary.mockRejectedValueOnce({});
+        analyticsService.getProgress.mockRejectedValueOnce({});
+        analyticsService.getThemeStats.mockRejectedValueOnce({});
+        render(<AnalyticsPage />);
+        await waitFor(() => expect(screen.getByText(/Failed to load analytics data/)).toBeTruthy());
+    });
 });
