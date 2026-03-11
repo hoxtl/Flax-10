@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ProfileCalendar } from '../../../pages/Profile/ProfileCalendar';
+import { useCalendarDispatch } from '../../../context/CalendarContext';
 
 vi.mock('../../../context/CalendarContext', () => ({
     CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
@@ -13,7 +14,13 @@ vi.mock('../../../context/ResizeHighlightContext', () => ({
 }));
 
 vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
-    MonthView: ({ readOnly }) => <div data-testid="month-view" data-readonly={String(readOnly)} />,
+    MonthView: ({ readOnly, onMoreClick }) => (
+        <div data-testid="month-view" data-readonly={String(readOnly)}>
+            <button type="button" onClick={() => onMoreClick && onMoreClick(new Date('2024-03-08'))}>
+                Open day summary
+            </button>
+        </div>
+    ),
 }));
 
 vi.mock('../../../components/Calendar/EventPopups', () => ({
@@ -29,7 +36,14 @@ vi.mock('../../../components/Calendar/header/NavigationButtons', () => ({
 }));
 
 vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
-    CalendarNav: ({ title }) => <div data-testid="nav-buttons">{title}</div>,
+    CalendarNav: ({ onPrev, onNext, onToday, title }) => (
+        <div data-testid="nav-buttons">
+            <span>{title}</span>
+            <button type="button" onClick={() => onPrev?.()}>Prev</button>
+            <button type="button" onClick={() => onNext?.()}>Next</button>
+            <button type="button" onClick={() => onToday?.()}>Today</button>
+        </div>
+    ),
 }));
 
 vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
@@ -68,5 +82,24 @@ describe('ProfileCalendar', () => {
     it('summary modal is not visible by default', () => {
         render(<ProfileCalendar allEvents={[]} />);
         expect(screen.queryByTestId('summary-modal')).toBeNull();
+    });
+
+    it('summary modal opens when onMoreClick is triggered', () => {
+        render(<ProfileCalendar allEvents={[]} />);
+        expect(screen.queryByTestId('summary-modal')).toBeNull();
+        fireEvent.click(screen.getByText('Open day summary'));
+        expect(screen.getByTestId('summary-modal')).toBeTruthy();
+    });
+
+    it('calendar nav prev/next/today call dispatch', () => {
+        const dispatch = vi.fn();
+        vi.mocked(useCalendarDispatch).mockReturnValue(dispatch);
+        render(<ProfileCalendar allEvents={[]} />);
+        fireEvent.click(screen.getByText('Prev'));
+        expect(dispatch).toHaveBeenCalled();
+        fireEvent.click(screen.getByText('Next'));
+        expect(dispatch).toHaveBeenCalled();
+        fireEvent.click(screen.getByText('Today'));
+        expect(dispatch).toHaveBeenCalled();
     });
 });

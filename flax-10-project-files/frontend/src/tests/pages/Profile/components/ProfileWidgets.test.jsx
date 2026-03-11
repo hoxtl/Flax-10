@@ -2,7 +2,7 @@
  * Tests for ProfileWidgets components (PersonaCard, StudyDNA, MiniHeatmap, ThisWeek, BadgesSection, ModulesSection, SocietiesSection).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import {
   PersonaCard,
   StudyDNA,
@@ -258,14 +258,14 @@ describe('ModulesSection', () => {
     vi.clearAllMocks();
   });
 
-  it('returns null when modules is empty', () => {
+  it('returns null when modules is empty', async () => {
     const { container } = render(<ModulesSection modules={[]} />);
-    expect(container.firstChild).toBeNull();
+    await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
-  it('returns null when modules is undefined', () => {
+  it('returns null when modules is undefined', async () => {
     const { container } = render(<ModulesSection />);
-    expect(container.firstChild).toBeNull();
+    await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
   it('renders module codes and names from API', async () => {
