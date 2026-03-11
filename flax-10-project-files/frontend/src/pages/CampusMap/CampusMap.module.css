@@ -926,3 +926,7 @@
 :global(.eventPopupButton:hover) {
   opacity: 0.85;
 }
+
+.calendarIcon {
+  font-size: 1rem;
+}
