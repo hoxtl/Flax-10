@@ -29,6 +29,16 @@ function MeetingVoteCount({ count, icon: Icon, title }) {
     return <span className={styles.voteCount} title={title}><Icon size={14} /> {count}</span>;
 }
 
+function MeetingCardActions({ s, currentUserId, onVote, onDelete }) {
+    return (
+        <div className={styles.suggestionActions}>
+            <button onClick={() => onVote(s.id, 'accepted')} className={styles.acceptBtn}><Check size={20} /></button>
+            <button onClick={() => onVote(s.id, 'rejected')} className={styles.rejectBtn}><X size={20} /></button>
+            {s.suggested_by.id === currentUserId && <button onClick={() => onDelete(s.id)} className={styles.deleteBtn}><Trash2 size={20} /></button>}
+        </div>
+    );
+}
+
 function ProposedMeetingCard({ s, currentUserId, onVote, onDelete }) {
     const dateLabel = new Date(s.start).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     const accepted = s.responses.filter(r => r.status === 'accepted').length;
@@ -45,11 +55,7 @@ function ProposedMeetingCard({ s, currentUserId, onVote, onDelete }) {
                     <MeetingVoteCount count={rejected} icon={X} title={`${rejected} rejected`} />
                 </div>
             </div>
-            <div className={styles.suggestionActions}>
-                <button onClick={() => onVote(s.id, 'accepted')} className={styles.acceptBtn}><Check size={20} /></button>
-                <button onClick={() => onVote(s.id, 'rejected')} className={styles.rejectBtn}><X size={20} /></button>
-                {s.suggested_by.id === currentUserId && <button onClick={() => onDelete(s.id)} className={styles.deleteBtn}><Trash2 size={20} /></button>}
-            </div>
+            <MeetingCardActions s={s} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />
         </div>
     );
 }
@@ -109,50 +115,48 @@ function SuggestionModal({ slot, onCancel, onConfirm }) {
 
 // --- Logic Hook ---
 
-function useAvailabilityData(projectId) {
+function useAvailabilityData(pid) {
     const [data, setData] = useState({ suggestions: [], active_suggestions: [], current_user_id: null });
     const [loading, setLoading] = useState(true);
-    const fetchAvail = async () => {
-        try {
-            const res = await fetch(`/api/group-work/projects/${projectId}/availability/`, { headers: getAuthHeaders() });
-            if (res.ok) setData(await res.json());
-        } catch (err) { console.error(err); } finally { setLoading(false); }
+    const fetchAvail = () => {
+        fetch(`/api/group-work/projects/${pid}/availability/`, { headers: getAuthHeaders() })
+            .then(res => res.ok ? res.json() : null)
+            .then(d => d && setData(d))
+            .finally(() => setLoading(false));
     };
-    useEffect(() => { fetchAvail(); }, [projectId]);
+    useEffect(() => { fetchAvail(); }, [pid]);
     return { data, fetchAvail, loading };
 }
 
-function useAvailabilityActions(projectId, fetchAvail, confirm) {
-    const handleSuggestTime = async (slot) => {
+function useSuggestionActions(pid, fetchAvail, confirm) {
+    const onSuggest = async (slot) => {
         const end = new Date(new Date(slot.start).getTime() + 3600000).toISOString();
-        const res = await fetch(`/api/group-work/projects/${projectId}/suggestions/`, {
-            method: "POST", headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-            body: JSON.stringify({ start_time: slot.start, end_time: end }),
-        });
+        const res = await fetch(`/api/group-work/projects/${pid}/suggestions/`, { method: "POST", headers: { ...getAuthHeaders(), "Content-Type": "application/json" }, body: JSON.stringify({ start_time: slot.start, end_time: end }) });
         if (res.ok) fetchAvail();
     };
+    const onDelete = (id) => fetch(`/api/group-work/suggestions/${id}/`, { method: "DELETE", headers: getAuthHeaders() }).then(res => res.ok && fetchAvail());
     const handleDelete = async (id) => {
-        const isConfirmed = await confirm({ title: "Delete Suggestion", message: "Delete this meeting suggestion?", confirmText: "Delete", isDanger: true });
-        if (isConfirmed) fetch(`/api/group-work/suggestions/${id}/`, { method: "DELETE", headers: getAuthHeaders() }).then(res => res.ok && fetchAvail());
+        const conf = { title: "Delete Suggestion", message: "Delete this meeting suggestion?", confirmText: "Delete", isDanger: true };
+        if (await confirm(conf)) onDelete(id);
     };
-    const handleVote = async (id, status) => {
-        const res = await fetch(`/api/group-work/suggestions/${id}/respond/`, {
-            method: "POST", headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-            body: JSON.stringify({ status }),
-        });
-        if (res.ok) fetchAvail();
-    };
-    return { handleSuggestTime, handleDelete, handleVote };
+    return { onSuggest, handleDelete };
 }
 
-function useAvailability(projectId, confirm) {
-    const { data, fetchAvail, loading } = useAvailabilityData(projectId);
-    const { handleSuggestTime, handleDelete, handleVote } = useAvailabilityActions(projectId, fetchAvail, confirm);
+function useAvailabilityActions(pid, fetchAvail, confirm) {
+    const { onSuggest, handleDelete } = useSuggestionActions(pid, fetchAvail, confirm);
+    const handleVote = async (id, status) => {
+        const res = await fetch(`/api/group-work/suggestions/${id}/respond/`, { method: "POST", headers: { ...getAuthHeaders(), "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+        if (res.ok) fetchAvail();
+    };
+    return { handleSuggestTime: onSuggest, handleDelete, handleVote };
+}
+
+function useAvailability(pid, confirm) {
+    const { data, fetchAvail, loading } = useAvailabilityData(pid);
+    const acts = useAvailabilityActions(pid, fetchAvail, confirm);
     const [suggestingSlot, setSuggestingSlot] = useState(null);
-
-    const suggest = (slot) => { handleSuggestTime(slot).then(() => setSuggestingSlot(null)); };
-
-    return { ...data, loading, suggestingSlot, setSuggestingSlot, handleSuggestTime: suggest, handleDelete, handleVote };
+    const suggest = (s) => acts.handleSuggestTime(s).then(() => setSuggestingSlot(null));
+    return { ...data, loading, suggestingSlot, setSuggestingSlot, ...acts, handleSuggestTime: suggest };
 }
 
 // --- Main Component ---
