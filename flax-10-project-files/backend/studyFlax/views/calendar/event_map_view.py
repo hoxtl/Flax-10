@@ -19,8 +19,13 @@ def calendar_events_map_view(request):
         location_validated=True,
         location_latitude__isnull=False,
         location_longitude__isnull=False,
-        start_time__gte=today,
-        start_time__lte=future_date,
+        start_time__gte=start_time,
+        start_time__lte=end_time,
+        end_time__gte=now,
+    ).only(
+        'id', 'title', 'location',
+        'location_latitude', 'location_longitude',
+        'start_time', 'end_time', 'priority'
     ).order_by('start_time')
     event_data = []
     for event in events:
