@@ -8,7 +8,6 @@ from studyFlax.serialisers.event_serialisers import (
     CalendarEventCreateSerialiser
 )
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.utils.geocoding_utils import GeocodingService
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
