@@ -43,6 +43,17 @@ class TaskSerialiser(serializers.ModelSerializer):
             for u in obj.assigned_to.all()
         ]
 
+    def create(self, validated_data):
+        # Handle status logic explicitly upon creation
+        status_val = validated_data.get('status', 'todo')
+        validated_data['status'] = status_val
+        validated_data['completed'] = (status_val == 'done')
+        
+        if validated_data['completed']:
+            validated_data['completed_at'] = timezone.now()
+            
+        return super().create(validated_data)
+
     def update(self, instance, validated_data):
         # Sync completed and status fields
         status = validated_data.get('status', instance.status)
