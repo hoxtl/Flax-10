@@ -1,30 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GroupProjectDetail from "./GroupWorkDetail";
-import {
-  containerStyle,
-  listStyle,
-  rowStyle,
-  metaStyle,
-} from "./groupWorkStyles";
-import {
-  getAuthHeaders,
-  useGroupProjects,
-  useSelectedProjectId,
-} from "./groupWorkHooks";
-
-function getDeadlineLabel(deadline) {
-  if (!deadline) return null;
-  const due = new Date(deadline);
-  if (Number.isNaN(due.getTime())) return null;
-  const now = new Date();
-  const oneDayMs = 1000 * 60 * 60 * 24;
-  const diffDays = Math.round((due - now) / oneDayMs);
-  if (diffDays < 0) return "Past due";
-  if (diffDays === 0) return "Due today";
-  if (diffDays <= 7) return `Due in ${diffDays} days`;
-  return due.toLocaleDateString();
-}
+import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
+import { getDeadlineLabel } from "./utils/taskUtils";
+import styles from "./GroupWorkIndexPage.module.css";
 
 function CreateProjectForm({ onCreated }) {
   const [name, setName] = useState("");
@@ -35,92 +14,43 @@ function CreateProjectForm({ onCreated }) {
     event.preventDefault();
     if (!name.trim()) return;
 
-    const body = JSON.stringify({
-      name: name.trim(),
-      course_code: courseCode.trim() || "",
-      deadline: deadline ? new Date(deadline).toISOString() : null,
-    });
     const res = await fetch("/api/group-work/projects/", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body,
+      body: JSON.stringify({
+        name: name.trim(),
+        course_code: courseCode.trim() || "",
+        deadline: deadline ? new Date(deadline).toISOString() : null,
+      }),
     });
     if (!res.ok) return;
-    const project = await res.json();
-    onCreated(project);
-    setName("");
-    setCourseCode("");
-    setDeadline("");
+    onCreated(await res.json());
+    setName(""); setCourseCode(""); setDeadline("");
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        display: "flex",
-        gap: 8,
-        alignItems: "center",
-        marginTop: 16,
-      }}
-    >
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Group project name"
-        style={{
-          flex: 2,
-          padding: "10px 12px",
-          borderRadius: 999,
-          border: "1px solid var(--border)",
-          background: "var(--hover)",
-          fontSize: 13,
-        }}
-        required
-      />
-      <input
-        value={courseCode}
-        onChange={(e) => setCourseCode(e.target.value)}
-        placeholder="Course code (optional)"
-        style={{
-          flex: 1,
-          padding: "10px 12px",
-          borderRadius: 999,
-          border: "1px solid var(--border)",
-          background: "var(--hover)",
-          fontSize: 13,
-        }}
-      />
-      <input
-        type="date"
-        value={deadline}
-        onChange={(e) => setDeadline(e.target.value)}
-        style={{
-          flex: 1,
-          padding: "10px 12px",
-          borderRadius: 999,
-          border: "1px solid var(--border)",
-          background: "var(--hover)",
-          fontSize: 13,
-          color: "var(--text)",
-        }}
-      />
-      <button
-        type="submit"
-        style={{
-          padding: "10px 18px",
-          borderRadius: 999,
-          border: "none",
-          background: "var(--primary)",
-          color: "white",
-          fontSize: 13,
-          fontWeight: 500,
-          cursor: "pointer",
-          whiteSpace: "nowrap",
-        }}
-      >
-        Create
-      </button>
+    <form onSubmit={handleSubmit} className={styles.createProjectForm}>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Group project name" className={`${styles.input} ${styles.inputName}`} required />
+      <input value={courseCode} onChange={(e) => setCourseCode(e.target.value)} placeholder="Course code (optional)" className={`${styles.input} ${styles.inputField}`} />
+      <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className={`${styles.input} ${styles.inputField}`} />
+      <button type="submit" className={styles.submitBtn}>Create</button>
     </form>
+  );
+}
+
+function ProjectRow({ project, onClick }) {
+  const deadlineLabel = getDeadlineLabel(project.deadline);
+  return (
+    <div className={styles.projectRow} onClick={onClick}>
+      <div>
+        <div className={styles.projectName}>{project.name}</div>
+        <div className={styles.subtitle}>
+          {project.course_code || "No course code"} ·{" "}
+          {(project.member_count ?? 0) === 1 ? "1 member" : `${project.member_count ?? 0} members`}
+        </div>
+      </div>
+      {deadlineLabel && <div className={styles.projectDeadline}>{deadlineLabel}</div>}
+    </div>
   );
 }
 
@@ -129,72 +59,27 @@ export default function GroupWorkIndexPage() {
   const navigate = useNavigate();
   const projectId = useSelectedProjectId();
 
-  const handleCreated = (project) => {
-    setProjects((prev) => [project, ...prev]);
-  };
-
-  const openProject = (id) => {
-    navigate(`/group-work?project=${id}`);
-  };
-
-  const title = "Group work";
-  const subtitle = "Create shared projects and link them to your modules.";
-
   if (projectId) {
-    return (
-      <GroupProjectDetail
-        projectId={projectId}
-        onBack={() => navigate("/group-work")}
-      />
-    );
+    return <GroupProjectDetail projectId={projectId} onBack={() => navigate("/group-work")} />;
   }
 
   return (
-    <div style={containerStyle}>
-      <h1 style={{ fontSize: 24, margin: 0 }}>{title}</h1>
-      <p style={metaStyle}>{subtitle}</p>
-      <CreateProjectForm onCreated={handleCreated} />
+    <div className={styles.container}>
+      <h1 className={styles.title}>Group work</h1>
+      <p className={styles.subtitle}>Create shared projects and link them to your modules.</p>
+      <CreateProjectForm onCreated={(p) => setProjects((prev) => [p, ...prev])} />
 
-      {loading && <p style={metaStyle}>Loading your group projects…</p>}
-
+      {loading && <p className={styles.loading}>Loading your group projects…</p>}
       {!loading && projects.length === 0 && (
-        <p style={{ marginTop: 24, fontSize: 14, color: "var(--text-secondary)" }}>
-          You do not have any group projects yet. Use the form above to create one.
-        </p>
+        <p className={styles.emptyMessage}>You do not have any group projects yet. Use the form above to create one.</p>
       )}
-
       {!loading && projects.length > 0 && (
-        <div style={listStyle}>
-          {projects.map((project) => {
-            const deadlineLabel = getDeadlineLabel(project.deadline);
-            return (
-              <div
-                key={project.id}
-                style={rowStyle}
-                onClick={() => openProject(project.id)}
-              >
-                <div>
-                  <div style={{ fontWeight: 500, color: "var(--text)" }}>
-                    {project.name}
-                  </div>
-                  <div style={metaStyle}>
-                    {project.course_code || "No course code"} ·{" "}
-                    {(project.member_count ?? 0) === 1
-                      ? "1 member"
-                      : `${project.member_count ?? 0} members`}
-                  </div>
-                </div>
-                {deadlineLabel && (
-                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                    {deadlineLabel}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className={styles.projectList}>
+          {projects.map((p) => (
+            <ProjectRow key={p.id} project={p} onClick={() => navigate(`/group-work?project=${p.id}`)} />
+          ))}
         </div>
       )}
     </div>
   );
 }
-

@@ -1,242 +1,175 @@
 import { useState, useEffect } from "react";
+import { Check, X, Star, Trash2 } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
-import { Check, X, Star, Trash2 } from "lucide-react";
+import { getUserColor } from "./utils/priorityUtils";
 import styles from "./AvailabilityTab.module.css";
 
-const USER_COLORS = ["#d4850a", "#4a7c59", "#b04b4b", "#5a4b81", "#4b8178", "#816d4b", "#4b6181"];
-const getUserColor = (userId) => {
-    if (!userId) return USER_COLORS[0];
-    return USER_COLORS[userId % USER_COLORS.length];
-};
+// --- Sub-components ---
 
-export default function AvailabilityTab({ projectId }) {
-    const [suggestions, setSuggestions] = useState([]);
-    const [activeSuggestions, setActiveSuggestions] = useState([]);
-    const [currentUserId, setCurrentUserId] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [suggestingSlot, setSuggestingSlot] = useState(null);
-    const confirm = useConfirm();
+function AvailabilityHeader() {
+    return (
+        <div className={styles.header}>
+            <h3 className={styles.title}>Best times to meet</h3>
+            <p className={styles.subtitle}>Click a slot below to suggest it to the group.</p>
+        </div>
+    );
+}
 
-    const fetchAvailability = async () => {
-        try {
-            const res = await fetch(`/api/group-work/projects/${projectId}/availability/`, {
-                headers: getAuthHeaders(),
-            });
-            if (!res.ok) throw new Error("Failed to fetch availability");
-            const data = await res.json();
-            setCurrentUserId(data.current_user_id || null);
-            setSuggestions(data.suggestions || []);
-            setActiveSuggestions(data.active_suggestions || []);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+function AvailabilityFooter() {
+    return (
+        <div className={styles.footer}>
+            <Star size={12} className={styles.starIcon} fill="currentColor" />
+            <span>= all members available · Suggested times will notify the group</span>
+        </div>
+    );
+}
 
-    useEffect(() => {
-        fetchAvailability();
-    }, [projectId]);
+function MeetingVoteCount({ count, icon: Icon, title }) {
+    return <span className={styles.voteCount} title={title}><Icon size={14} /> {count}</span>;
+}
 
-    const handleSuggestTime = async (slot) => {
-        const endTime = new Date(new Date(slot.start).getTime() + 60 * 60 * 1000).toISOString();
-        try {
-            const res = await fetch(`/api/group-work/projects/${projectId}/suggestions/`, {
-                method: "POST",
-                headers: {
-                    ...getAuthHeaders(),
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    start_time: slot.start,
-                    end_time: endTime,
-                }),
-            });
-            if (!res.ok) throw new Error("Failed to create suggestion");
-            setSuggestingSlot(null);
-            fetchAvailability();
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
-    const handleDeleteSuggestion = async (suggestionId) => {
-        const isConfirmed = await confirm({
-            title: "Delete Suggestion",
-            message: "Are you sure you want to delete this meeting suggestion? This cannot be undone.",
-            confirmText: "Delete",
-            isDanger: true,
-        });
-        if (!isConfirmed) return;
-
-        try {
-            const res = await fetch(`/api/group-work/suggestions/${suggestionId}/`, {
-                method: "DELETE",
-                headers: getAuthHeaders(),
-            });
-            if (!res.ok) throw new Error("Failed to delete suggestion");
-            fetchAvailability();
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
-    const handleVote = async (suggestionId, status) => {
-        try {
-            const res = await fetch(`/api/group-work/suggestions/${suggestionId}/respond/`, {
-                method: "POST",
-                headers: {
-                    ...getAuthHeaders(),
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ status }),
-            });
-            if (!res.ok) throw new Error("Failed to record vote");
-            fetchAvailability();
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
-    if (loading) {
-        return <div className={styles.loading}>Analyzing member calendars...</div>;
-    }
-
-    // Sort active suggestions by time
-    const sortedActive = [...activeSuggestions].sort((a, b) => new Date(a.start) - new Date(b.start));
+function ProposedMeetingCard({ s, currentUserId, onVote, onDelete }) {
+    const dateLabel = new Date(s.start).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const accepted = s.responses.filter(r => r.status === 'accepted').length;
+    const rejected = s.responses.filter(r => r.status === 'rejected').length;
 
     return (
-        <div className={styles.container}>
-            {sortedActive.length > 0 && (
-                <div className={styles.activeSection}>
-                    <h4 className={styles.sectionTitle}>Proposed Meetings</h4>
-                    {sortedActive.map((s) => {
-                        const dateLabel = new Date(s.start).toLocaleString([], {
-                            weekday: 'short', month: 'short', day: 'numeric',
-                            hour: 'numeric', minute: '2-digit'
-                        });
-                        const accepted = s.responses.filter(r => r.status === 'accepted');
-                        const rejected = s.responses.filter(r => r.status === 'rejected');
-
-                        return (
-                            <div key={s.id} className={styles.suggestionCard}>
-                                <div className={styles.suggestionInfo}>
-                                    <div className={styles.suggestionTitle}>{dateLabel}</div>
-                                    <div className={styles.suggestionMeta}>Proposed by {s.suggested_by.username}</div>
-                                    <div className={styles.votes}>
-                                        <span className={styles.voteCount} title={`${accepted.length} accepted`}>
-                                            <Check size={14} style={{ marginRight: 4, verticalAlign: 'text-bottom' }} /> {accepted.length}
-                                        </span>
-                                        <span className={styles.voteSeparator}>·</span>
-                                        <span className={styles.voteCount} title={`${rejected.length} rejected`}>
-                                            <X size={14} style={{ marginRight: 4, verticalAlign: 'text-bottom' }} /> {rejected.length}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className={styles.suggestionActions}>
-                                    <button
-                                        onClick={() => handleVote(s.id, 'accepted')}
-                                        className={styles.acceptBtn}
-                                        title="Accept"
-                                    >
-                                        <Check size={20} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleVote(s.id, 'rejected')}
-                                        className={styles.rejectBtn}
-                                        title="Reject"
-                                    >
-                                        <X size={20} />
-                                    </button>
-                                    {s.suggested_by.id === currentUserId && (
-                                        <button
-                                            onClick={() => handleDeleteSuggestion(s.id)}
-                                            className={styles.deleteBtn}
-                                            title="Delete Suggestion"
-                                        >
-                                            <Trash2 size={20} />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+        <div className={styles.suggestionCard}>
+            <div className={styles.suggestionInfo}>
+                <div className={styles.suggestionTitle}>{dateLabel}</div>
+                <div className={styles.suggestionMeta}>Proposed by {s.suggested_by.username}</div>
+                <div className={styles.votes}>
+                    <MeetingVoteCount count={accepted} icon={Check} title={`${accepted} accepted`} />
+                    <span className={styles.voteSeparator}>·</span>
+                    <MeetingVoteCount count={rejected} icon={X} title={`${rejected} rejected`} />
                 </div>
-            )}
-
-            <div className={styles.header}>
-                <h3 className={styles.title}>Best times to meet</h3>
-                <p className={styles.subtitle}>
-                    Click a slot below to suggest it to the group.
-                </p>
             </div>
-
-            <div className={styles.slotList}>
-                {suggestions.map((slot, idx) => (
-                    <div
-                        key={idx}
-                        className={styles.slotRow}
-                        onClick={() => setSuggestingSlot(slot)}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <div className={styles.timeLabel}>
-                            {slot.label}
-                            {slot.free_count === slot.total_count && (
-                                <Star
-                                    size={14}
-                                    className={styles.bestTimeStar}
-                                    fill="currentColor"
-                                />
-                            )}
-                        </div>
-
-                        <div className={styles.memberList}>
-                            {slot.members.map((m) => {
-                                const userColor = getUserColor(m.id);
-                                const isFree = m.is_free;
-
-                                return (
-                                    <div
-                                        key={m.id}
-                                        className={`${styles.avatar} ${isFree ? styles.avatarFree : styles.avatarBusy}`}
-                                        style={isFree ? { backgroundColor: userColor, borderColor: userColor } : {}}
-                                        title={`${m.name} is ${isFree ? 'free' : 'busy'}`}
-                                    >
-                                        <span className={styles.avatarName}>{m.initials}</span>
-                                        <span className={styles.statusIcon}>
-                                            {isFree ? <Check size={10} strokeWidth={3} /> : <X size={10} strokeWidth={3} />}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <div className={`${styles.scoreLabel} ${slot.free_count === slot.total_count ? styles.scoreLabelHighlight : ""}`}>
-                            {slot.free_count}/{slot.total_count} free
-                        </div>
-                    </div>
-                ))}
+            <div className={styles.suggestionActions}>
+                <button onClick={() => onVote(s.id, 'accepted')} className={styles.acceptBtn}><Check size={20} /></button>
+                <button onClick={() => onVote(s.id, 'rejected')} className={styles.rejectBtn}><X size={20} /></button>
+                {s.suggested_by.id === currentUserId && <button onClick={() => onDelete(s.id)} className={styles.deleteBtn}><Trash2 size={20} /></button>}
             </div>
+        </div>
+    );
+}
 
-            {suggestingSlot && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modal}>
-                        <h4>Suggest {suggestingSlot.label}?</h4>
-                        <p>This will notify all members and allow them to vote.</p>
-                        <div className={styles.modalButtons}>
-                            <button onClick={() => setSuggestingSlot(null)} className={styles.cancelBtn}>Cancel</button>
-                            <button onClick={() => handleSuggestTime(suggestingSlot)} className={styles.confirmBtn}>Suggest Time</button>
-                        </div>
-                    </div>
+function ProposedMeetings({ suggestions, currentUserId, onVote, onDelete }) {
+    if (suggestions.length === 0) return null;
+    const sorted = [...suggestions].sort((a, b) => new Date(a.start) - new Date(b.start));
+
+    return (
+        <div className={styles.activeSection}>
+            <h4 className={styles.sectionTitle}>Proposed Meetings</h4>
+            {sorted.map(s => <ProposedMeetingCard key={s.id} s={s} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />)}
+        </div>
+    );
+}
+
+function MemberAvatar({ m }) {
+    const color = getUserColor(m.id);
+    const st = m.is_free ? { backgroundColor: color, borderColor: color } : {};
+    return (
+        <div className={`${styles.avatar} ${m.is_free ? styles.avatarFree : styles.avatarBusy}`} style={st} title={`${m.name} is ${m.is_free ? 'free' : 'busy'}`}>
+            <span className={styles.avatarName}>{m.initials}</span>
+            <span className={styles.statusIcon}>{m.is_free ? <Check size={10} strokeWidth={3} /> : <X size={10} strokeWidth={3} />}</span>
+        </div>
+    );
+}
+
+function SlotRow({ slot, onClick }) {
+    const isBest = slot.free_count === slot.total_count;
+    return (
+        <div className={styles.slotRow} onClick={onClick} style={{ cursor: 'pointer' }}>
+            <div className={styles.timeLabel}>
+                {slot.label}
+                {isBest && <Star size={14} className={styles.bestTimeStar} fill="currentColor" />}
+            </div>
+            <div className={styles.memberList}>{slot.members.map(m => <MemberAvatar key={m.id} m={m} />)}</div>
+            <div className={`${styles.scoreLabel} ${isBest ? styles.scoreLabelHighlight : ""}`}>{slot.free_count}/{slot.total_count} free</div>
+        </div>
+    );
+}
+
+function SuggestionModal({ slot, onCancel, onConfirm }) {
+    if (!slot) return null;
+    return (
+        <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+                <h4>Suggest {slot.label}?</h4>
+                <p>This will notify all members and allow them to vote.</p>
+                <div className={styles.modalButtons}>
+                    <button onClick={onCancel} className={styles.cancelBtn}>Cancel</button>
+                    <button onClick={() => onConfirm(slot)} className={styles.confirmBtn}>Suggest Time</button>
                 </div>
-            )}
-
-            <div className={styles.footer}>
-                <Star size={12} className={styles.starIcon} fill="currentColor" />
-                <span>= all members available · Suggested times will notify the group</span>
             </div>
+        </div>
+    );
+}
+
+// --- Logic Hook ---
+
+function useAvailabilityData(projectId) {
+    const [data, setData] = useState({ suggestions: [], active_suggestions: [], current_user_id: null });
+    const [loading, setLoading] = useState(true);
+    const fetchAvail = async () => {
+        try {
+            const res = await fetch(`/api/group-work/projects/${projectId}/availability/`, { headers: getAuthHeaders() });
+            if (res.ok) setData(await res.json());
+        } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    useEffect(() => { fetchAvail(); }, [projectId]);
+    return { data, fetchAvail, loading };
+}
+
+function useAvailabilityActions(projectId, fetchAvail, confirm) {
+    const handleSuggestTime = async (slot) => {
+        const end = new Date(new Date(slot.start).getTime() + 3600000).toISOString();
+        const res = await fetch(`/api/group-work/projects/${projectId}/suggestions/`, {
+            method: "POST", headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+            body: JSON.stringify({ start_time: slot.start, end_time: end }),
+        });
+        if (res.ok) fetchAvail();
+    };
+    const handleDelete = async (id) => {
+        const isConfirmed = await confirm({ title: "Delete Suggestion", message: "Delete this meeting suggestion?", confirmText: "Delete", isDanger: true });
+        if (isConfirmed) fetch(`/api/group-work/suggestions/${id}/`, { method: "DELETE", headers: getAuthHeaders() }).then(res => res.ok && fetchAvail());
+    };
+    const handleVote = async (id, status) => {
+        const res = await fetch(`/api/group-work/suggestions/${id}/respond/`, {
+            method: "POST", headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+        });
+        if (res.ok) fetchAvail();
+    };
+    return { handleSuggestTime, handleDelete, handleVote };
+}
+
+function useAvailability(projectId, confirm) {
+    const { data, fetchAvail, loading } = useAvailabilityData(projectId);
+    const { handleSuggestTime, handleDelete, handleVote } = useAvailabilityActions(projectId, fetchAvail, confirm);
+    const [suggestingSlot, setSuggestingSlot] = useState(null);
+
+    const suggest = (slot) => { handleSuggestTime(slot).then(() => setSuggestingSlot(null)); };
+
+    return { ...data, loading, suggestingSlot, setSuggestingSlot, handleSuggestTime: suggest, handleDelete, handleVote };
+}
+
+// --- Main Component ---
+
+export default function AvailabilityTab({ projectId }) {
+    const confirm = useConfirm();
+    const { suggestions, active_suggestions, current_user_id, loading, suggestingSlot, setSuggestingSlot, handleSuggestTime, handleDelete, handleVote } = useAvailability(projectId, confirm);
+
+    if (loading) return <div className={styles.loading}>Analyzing member calendars...</div>;
+
+    return (
+        <div style={{ marginTop: 24 }}>
+            <ProposedMeetings suggestions={active_suggestions} currentUserId={current_user_id} onVote={handleVote} onDelete={handleDelete} />
+            <AvailabilityHeader />
+            <div className={styles.slotList}>{suggestions.map((s, i) => <SlotRow key={i} slot={s} onClick={() => setSuggestingSlot(s)} />)}</div>
+            <SuggestionModal slot={suggestingSlot} onCancel={() => setSuggestingSlot(null)} onConfirm={handleSuggestTime} />
+            <AvailabilityFooter />
         </div>
     );
 }

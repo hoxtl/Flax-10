@@ -1,293 +1,142 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Check, Trash2, X, ChevronDown, List, CalendarIcon, Square } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { List, CalendarIcon, Square, ChevronDown } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
-import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
 import TaskListView from "./components/TaskListView";
 import TaskTimelineView from "./components/TaskTimelineView";
 import TaskBoardView from "./components/TaskBoardView";
+import { calcCompletionSegments } from "./utils/taskStatsUtils";
+import { sortTasks } from "./utils/taskUtils";
 import styles from "./GroupTasksTab.module.css";
-import { getUserColor } from "./components/TaskAssigneePopup";
 
-export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
-    const [tasks, setTasks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [newTaskTitle, setNewTaskTitle] = useState("");
-    const [filterUser, setFilterUser] = useState("");
-    const [taskView, setTaskView] = useState("list");
-    const confirm = useConfirm();
+// --- Sub-components ---
 
+function TaskFilter({ filterUser, setFilterUser, members }) {
+    const options = [{ value: "", label: "All Members" }, ...members.map(m => ({ value: String(m.user), label: m.user_name }))];
+    const selectedName = filterUser ? members.find(m => String(m.user) === String(filterUser))?.user_name : "All Members";
+
+    return (
+        <div className={styles.filterWrapper}>
+            <AnimatedDropdown value={filterUser} onChange={setFilterUser} placeholder="All Members" options={options}
+                customTrigger={
+                    <div className={styles.filterCustomTrigger}>
+                        <span>{selectedName}</span>
+                        <div className={styles.filterCustomArrow}><ChevronDown size={14} /></div>
+                    </div>
+                }
+            />
+        </div>
+    );
+}
+
+function AddTaskForm({ newTaskTitle, setNewTaskTitle, filterUser, setFilterUser, members, onAdd }) {
+    return (
+        <form onSubmit={onAdd} className={styles.addTaskForm}>
+            <input value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Add a new task..." className={styles.taskInput} />
+            <TaskFilter filterUser={filterUser} setFilterUser={setFilterUser} members={members} />
+            <button type="submit" className={styles.addBtn}>Add</button>
+        </form>
+    );
+}
+
+function TaskViewSwitcher({ currentView, setTaskView }) {
     const views = [
         { id: "list", icon: <List size={14} />, label: "List" },
         { id: "timeline", icon: <CalendarIcon size={14} />, label: "Timeline" },
         { id: "board", icon: <Square size={14} />, label: "Board" },
     ];
+    return (
+        <div className={styles.viewToggleGroup}>
+            {views.map(v => (
+                <button key={v.id} onClick={() => setTaskView(v.id)} className={`${styles.viewToggleBtn} ${currentView === v.id ? styles.viewToggleBtnActive : ""}`}>
+                    {v.icon} {v.label}
+                </button>
+            ))}
+        </div>
+    );
+}
 
-    const fetchTasks = async () => {
+function TaskContent({ taskView, tasks, members, onToggle, onUpdate, onDelete, onAddCol }) {
+    if (taskView === "list") return <TaskListView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />;
+    if (taskView === "timeline") return <TaskTimelineView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} />;
+    if (taskView === "board") return <TaskBoardView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} onAdd={onAddCol} />;
+    return null;
+}
+
+// --- Logic Hook ---
+
+function useFetchTasks(projectId) {
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
         setLoading(true);
-        try {
-            const res = await fetch(`/api/tasks/?group_project=${projectId}`, {
-                headers: getAuthHeaders(),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setTasks(data);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchTasks();
+        fetch(`/api/tasks/?group_project=${projectId}`, { headers: getAuthHeaders() })
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { setTasks(data); setLoading(false); });
     }, [projectId]);
-
-    // Calculate completion metrics and pass them up
-    useEffect(() => {
-        if (!onStatsUpdate) return;
-        const total = tasks.length;
-        if (total === 0) {
-            onStatsUpdate({ percent: 0, completed: 0, total: 0, segments: [] });
-            return;
-        }
-
-        const completedArr = tasks.filter(t => t.completed || t.status === "done");
-        const completed = completedArr.length;
-        const percent = Math.round((completed / total) * 100);
-
-        const userCounts = {};
-        let unassignedCount = 0;
-
-        completedArr.forEach(t => {
-            const assignees = t.assignees_info || [];
-            if (assignees.length === 0) {
-                unassignedCount++;
-            } else {
-                assignees.forEach(a => {
-                    if (!userCounts[a.id]) {
-                        // Find member name from official members list
-                        const memberInfo = members.find(m => String(m.user) === String(a.id));
-                        userCounts[a.id] = {
-                            totalShare: 0,
-                            tasksDone: 0,
-                            name: memberInfo ? memberInfo.user_name : (a.name || "Unknown Member"),
-                            id: a.id
-                        };
-                    }
-                    userCounts[a.id].totalShare += (1 / assignees.length);
-                    userCounts[a.id].tasksDone += 1;
-                });
-            }
-        });
+    return { tasks, setTasks, loading };
+}
 
 
-        const segments = Object.values(userCounts).map(u => ({
-            ...u,
-            percentage: (u.totalShare / total) * 100,
-            tooltip: `${u.name}: ${u.tasksDone} task${u.tasksDone !== 1 ? 's' : ''} completed`,
-            color: getUserColor(u.id)
-        }));
-
-        if (unassignedCount > 0) {
-            segments.push({
-                id: 'unassigned',
-                name: 'Unassigned',
-                percentage: (unassignedCount / total) * 100,
-                tooltip: `Unassigned: ${unassignedCount} task${unassignedCount !== 1 ? 's' : ''} completed`,
-                color: "#e0e0e0"
-            });
-        }
-
-        onStatsUpdate({ percent, completed, total, segments });
-    }, [tasks, onStatsUpdate]);
-
-    const handleAddTaskToCol = (title, status) => {
-        addTask(new Event("submit"), title, status);
-    };
-
-    const addTask = async (e, directTitle = null, directStatus = null) => {
-        if (e && e.preventDefault) e.preventDefault();
-
-        const title = directTitle || newTaskTitle.trim();
-        if (!title) return;
-
-        const payload = {
-            title: title,
-            group_project: projectId,
-            priority: "medium",
-            status: directStatus || "todo"
-        };
-
-        try {
-            const res = await fetch(`/api/tasks/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-                body: JSON.stringify(payload),
-            });
-
-            if (res.ok) {
-                const created = await res.json();
-                setTasks((prev) => [...prev, created]);
-                if (!directTitle) setNewTaskTitle("");
-            }
-        } catch (err) {
-            console.error("Network error adding task:", err);
-        }
-    };
-
+// Actually let's do a better split
+function useTaskActions(setTasks, confirm) {
     const updateTask = async (taskId, patchData) => {
-        // Optimistic update
-        setTasks((prev) =>
-            prev.map((t) => {
-                if (t.id !== taskId) return t;
-                const next = { ...t, ...patchData };
-
-                // Keep completed boolean synced with status if one changes explicitly
-                if (patchData.status !== undefined) {
-                    next.completed = patchData.status === "done";
-                } else if (patchData.completed !== undefined) {
-                    next.status = patchData.completed ? "done" : "todo";
-                }
-
-                if (patchData.assigned_to) {
-                    next.assignees_info = patchData.assigned_to.map(uid => {
-                        const m = members.find(mem => mem.user === uid);
-                        return { id: uid, name: m ? m.user_name : "Unknown" };
-                    });
-                }
-                return next;
-            })
-        );
-
         const res = await fetch(`/api/tasks/${taskId}/`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+            method: "PATCH", headers: { "Content-Type": "application/json", ...getAuthHeaders() },
             body: JSON.stringify(patchData),
         });
-
-        if (res.ok) {
-            const updated = await res.json();
-            setTasks((prev) => prev.map((t) => (t.id === taskId ? updated : t)));
+        if (res.ok) { const updated = await res.json(); setTasks(prev => prev.map(t => t.id === taskId ? updated : t)); }
+    };
+    const deleteTask = async (taskId) => {
+        const isConfirmed = await confirm({ title: "Delete Task", message: "Delete this task permanently?", confirmText: "Delete", isDanger: true });
+        if (isConfirmed) {
+            setTasks(prev => prev.filter(t => t.id !== taskId));
+            await fetch(`/api/tasks/${taskId}/`, { method: "DELETE", headers: getAuthHeaders() });
         }
     };
+    return { updateTask, deleteTask };
+}
 
-    const toggleTask = (taskId, completed) => {
-        updateTask(taskId, { completed });
+function useTasks(projectId, members, onStatsUpdate, confirm) {
+    const { tasks, setTasks, loading } = useFetchTasks(projectId);
+    const { updateTask, deleteTask } = useTaskActions(setTasks, confirm);
+    const [newTaskTitle, setNewTaskTitle] = useState("");
+    useEffect(() => { onStatsUpdate?.(calcCompletionSegments(tasks, members)); }, [tasks, members]);
+
+    const addTask = async (e, directTitle, directStatus) => {
+        e?.preventDefault?.();
+        const title = directTitle || newTaskTitle.trim();
+        if (!title) return;
+        const res = await fetch(`/api/tasks/`, {
+            method: "POST", headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({ title, group_project: projectId, priority: "medium", status: directStatus || "todo" }),
+        });
+        if (res.ok) { const created = await res.json(); setTasks(prev => [...prev, created]); setNewTaskTitle(""); }
     };
 
-    const deleteTask = async (taskId) => {
-        const isConfirmed = await confirm({
-            title: "Delete Task",
-            message: "Are you sure you want to delete this task? This action cannot be undone.",
-            confirmText: "Delete",
-            isDanger: true,
-        });
-        if (!isConfirmed) return;
+    return { tasks, loading, newTaskTitle, setNewTaskTitle, addTask, updateTask, deleteTask };
+}
 
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
-        await fetch(`/api/tasks/${taskId}/`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-        });
-    };
+// --- Main Component ---
 
-    const priorityWeight = { urgent: 4, high: 3, medium: 2, low: 1 };
+export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
+    const confirm = useConfirm();
+    const { tasks, loading, newTaskTitle, setNewTaskTitle, addTask, updateTask, deleteTask } = useTasks(projectId, members, onStatsUpdate, confirm);
+    const [filterUser, setFilterUser] = useState("");
+    const [taskView, setTaskView] = useState("list");
 
-    const sortedTasks = [...tasks]
-        .filter(t => filterUser ? (t.assignees_info || []).some(a => String(a.id) === String(filterUser)) : true)
-        .sort((a, b) => {
-            if (a.completed !== b.completed) {
-                return a.completed ? 1 : -1;
-            }
-            const wA = priorityWeight[(a.priority || "medium").toLowerCase()] || 0;
-            const wB = priorityWeight[(b.priority || "medium").toLowerCase()] || 0;
-            if (wA !== wB) return wB - wA;
-            return new Date(a.created_at) - new Date(b.created_at);
-        });
+    const filtered = tasks.filter(t => filterUser ? (t.assignees_info || []).some(a => String(a.id) === String(filterUser)) : true);
+    const sortedTasks = sortTasks(filtered);
 
     return (
-        <div className={styles.container}>
+        <div style={{ marginTop: 24 }}>
             <div className={styles.headerRow}>
-                <form onSubmit={addTask} className={styles.addTaskForm}>
-                    <input
-                        value={newTaskTitle}
-                        onChange={(e) => setNewTaskTitle(e.target.value)}
-                        placeholder="Add a new task..."
-                        className={styles.taskInput}
-                    />
-
-                    <div className={styles.filterWrapper}>
-                        <AnimatedDropdown
-                            value={filterUser}
-                            onChange={(val) => setFilterUser(val)}
-                            placeholder="All Members"
-                            options={[
-                                { value: "", label: "All Members" },
-                                ...members.map(m => ({ value: String(m.user), label: m.user_name }))
-                            ]}
-                            customTrigger={
-                                <div className={styles.filterCustomTrigger}>
-                                    <span>{filterUser ? members.find(m => String(m.user) === String(filterUser))?.user_name : "All Members"}</span>
-                                    <div className={styles.filterCustomArrow}>
-                                        <ChevronDown size={14} />
-                                    </div>
-                                </div>
-                            }
-                        />
-                    </div>
-
-                    <button type="submit" className={styles.addBtn}>
-                        Add
-                    </button>
-                </form>
-
-                <div className={styles.viewToggleGroup}>
-                    {views.map(v => (
-                        <button
-                            key={v.id}
-                            onClick={() => setTaskView(v.id)}
-                            className={`${styles.viewToggleBtn} ${taskView === v.id ? styles.viewToggleBtnActive : ""}`}
-                        >
-                            {v.icon} {v.label}
-                        </button>
-                    ))}
-                </div>
+                <AddTaskForm newTaskTitle={newTaskTitle} setNewTaskTitle={setNewTaskTitle} filterUser={filterUser} setFilterUser={setFilterUser} members={members} onAdd={addTask} />
+                <TaskViewSwitcher currentView={taskView} setTaskView={setTaskView} />
             </div>
-
-            {loading ? (
-                <p className={styles.loadingText}>Loading tasks...</p>
-            ) : (
-                <>
-                    {taskView === "list" && (
-                        <TaskListView
-                            tasks={sortedTasks}
-                            members={members}
-                            onToggle={toggleTask}
-                            onUpdate={updateTask}
-                            onDelete={deleteTask}
-                        />
-                    )}
-                    {taskView === "timeline" && (
-                        <TaskTimelineView
-                            tasks={sortedTasks}
-                            members={members}
-                            onToggle={toggleTask}
-                            onUpdate={updateTask}
-                        />
-                    )}
-                    {taskView === "board" && (
-                        <TaskBoardView
-                            tasks={sortedTasks}
-                            members={members}
-                            onToggle={toggleTask}
-                            onUpdate={updateTask}
-                            onDelete={deleteTask}
-                            onAdd={handleAddTaskToCol}
-                        />
-                    )}
-                </>
+            {loading ? <p className={styles.loadingText}>Loading tasks...</p> : (
+                <TaskContent taskView={taskView} tasks={sortedTasks} members={members} onToggle={(id, c) => updateTask(id, { completed: c })} onUpdate={updateTask} onDelete={deleteTask} onAddCol={(t, s) => addTask(null, t, s)} />
             )}
         </div>
     );

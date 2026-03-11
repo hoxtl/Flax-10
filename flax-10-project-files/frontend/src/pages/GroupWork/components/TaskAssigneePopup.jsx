@@ -1,120 +1,65 @@
+/**
+ * TaskAssigneePopup — animated dropdown to assign/unassign group members to a task.
+ * Uses MemberAvatar for consistent avatar rendering.
+ */
 import React, { useRef, useEffect, useState } from "react";
 import { Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import MemberAvatar, { getDisplayName } from "./MemberAvatar";
+import { getUserColor } from "../utils/priorityUtils";
 import styles from "./TaskAssigneePopup.module.css";
 
-const USER_COLORS = [
-    "#7B6751", "#C0714E", "#7BB38E", "#9A8CB0",
-    "#7B9BAD", "#C4A46D", "#8A7060", "#b08c4b"
-];
-
-export const getUserColor = (userId) => {
-    if (!userId) return USER_COLORS[0];
-    const idStr = String(userId);
-    let hash = 0;
-    for (let i = 0; i < idStr.length; i++) {
-        hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return USER_COLORS[Math.abs(hash) % USER_COLORS.length];
-};
-
-export default function TaskAssigneePopup({
-    isOpen,
-    onClose,
-    members,
-    assignees,
-    onToggleAssignee,
-    triggerRef,
-    position = "bottom" // Default fallback, but dynamically calculated internally
-}) {
+function usePopupPosition(isOpen, triggerRef, onClose) {
     const popupRef = useRef(null);
-    const [calcPos, setCalcPos] = useState(position);
+    const [calcPos, setCalcPos] = useState("bottom");
 
     useEffect(() => {
-        function handleClickOutside(event) {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                onClose();
-            }
-        }
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-
-            // Calculate position when opening
-            if (triggerRef?.current) {
-                const rect = triggerRef.current.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                const estimatedPopupHeight = 250;
-                setCalcPos((spaceBelow < estimatedPopupHeight && rect.top > estimatedPopupHeight) ? "top" : "bottom");
-            }
+        const handleClickOutside = e => { if (popupRef.current && !popupRef.current.contains(e.target)) onClose(); };
+        if (!isOpen) return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
+        if (triggerRef?.current) {
+            const { bottom, top } = triggerRef.current.getBoundingClientRect();
+            setCalcPos((window.innerHeight - bottom < 250 && top > 250) ? "top" : "bottom");
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isOpen, onClose, triggerRef]);
 
+    return { popupRef, calcPos };
+}
+
+function MemberRow({ member, isSelected, onToggle }) {
+    const color = getUserColor(member.user);
+    return (
+        <div onClick={e => { e.stopPropagation(); onToggle(member.user); }} className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}>
+            <div className={styles.assignItemLeft}>
+                <MemberAvatar member={member} size={20} />
+                <span>{getDisplayName(member)}</span>
+            </div>
+            {isSelected && <Check size={14} color={color} strokeWidth={3} />}
+        </div>
+    );
+}
+
+export default function TaskAssigneePopup({ isOpen, onClose, members, assignees, onToggleAssignee, triggerRef, position = "bottom" }) {
+    const { popupRef, calcPos } = usePopupPosition(isOpen, triggerRef, onClose);
+    const isTop = calcPos === "top";
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div
-                    ref={popupRef}
-                    className={styles.assignPopupBoard}
-                    initial={{ opacity: 0, scale: 0.95, y: calcPos === "top" ? 10 : -10 }}
+                <motion.div ref={popupRef} className={styles.assignPopupBoard}
+                    initial={{ opacity: 0, scale: 0.95, y: isTop ? 10 : -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: calcPos === "top" ? 10 : -10 }}
+                    exit={{ opacity: 0, scale: 0.95, y: isTop ? 10 : -10 }}
                     transition={{ duration: 0.15, ease: "easeOut" }}
-                    style={{
-                        originY: calcPos === "top" ? 1 : 0,
-                        ...(calcPos === "top" ? { top: "auto", bottom: "100%", marginBottom: "8px", marginTop: 0 } : {})
-                    }}
+                    style={{ originY: isTop ? 1 : 0, ...(isTop ? { top: "auto", bottom: "100%", marginBottom: 8, marginTop: 0 } : {}) }}
                 >
                     <div className={styles.assignPopupHeader}>
                         <span className={styles.assignPopupTitle}>Assign Members</span>
-                        <span className={styles.closePopupBtn} onClick={onClose}>
-                            <X size={12} />
-                        </span>
+                        <span className={styles.closePopupBtn} onClick={onClose}><X size={12} /></span>
                     </div>
-                    {members.map(m => {
-                        const isSelected = assignees.some(a => String(a.id) === String(m.user));
-                        const userCol = getUserColor(m.user);
-                        return (
-                            <div
-                                key={m.id}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onToggleAssignee(m.user);
-                                }}
-                                className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}
-                            >
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    {m.profile_photo_url ? (
-                                        <img
-                                            src={m.profile_photo_url}
-                                            alt=""
-                                            style={{ width: 20, height: 20, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
-                                        />
-                                    ) : (
-                                        <div style={{
-                                            width: 20,
-                                            height: 20,
-                                            borderRadius: "50%",
-                                            background: userCol,
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            color: "#fff",
-                                            fontSize: 9,
-                                            fontWeight: 700,
-                                            flexShrink: 0,
-                                        }}>
-                                            {m.first_name && m.last_name
-                                                ? `${m.first_name[0]}${m.last_name[0]}`.toUpperCase()
-                                                : (m.first_name?.[0] || m.user_name?.[0] || "?").toUpperCase()}
-                                        </div>
-                                    )}
-                                    <span>{m.first_name ? `${m.first_name} ${m.last_name || ""}`.trim() : m.user_name}</span>
-                                </div>
-                                {isSelected && <Check size={14} color={userCol} strokeWidth={3} />}
-                            </div>
-                        );
-                    })}
+                    {members.map(m => (
+                        <MemberRow key={m.id} member={m} isSelected={assignees.some(a => String(a.id) === String(m.user))} onToggle={onToggleAssignee} />
+                    ))}
                 </motion.div>
             )}
         </AnimatePresence>

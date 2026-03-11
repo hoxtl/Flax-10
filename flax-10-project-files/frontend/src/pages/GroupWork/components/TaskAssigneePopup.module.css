@@ -66,3 +66,9 @@
 .assignItemSelected {
     background: rgba(0, 0, 0, 0.02);
 }
+
+.assignItemLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
