@@ -13,6 +13,7 @@ import {
 } from "./groupWorkHooks";
 import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
+import { getUserColor } from "./components/TaskAssigneePopup";
 
 function BackButton({ onClick }) {
   const style = {
@@ -159,7 +160,7 @@ function MembersSection({ members, onRemove }) {
   );
 }
 
-function ProjectHeader({ project, members, onPatch }) {
+function ProjectHeader({ project, members, onPatch, taskStats }) {
   const headerStyle = {
     display: "flex",
     justifyContent: "space-between",
@@ -167,17 +168,18 @@ function ProjectHeader({ project, members, onPatch }) {
     gap: 16,
   };
   const progressBarOuter = {
-    height: 8,
-    borderRadius: 999,
-    background: "#f3e4d7",
+    height: 12,
+    borderRadius: 6,
+    background: "#ede6dc",
     overflow: "hidden",
+    display: "flex",
     marginBottom: 4,
+    boxShadow: "inset 0 2px 4px rgba(0,0,0,0.05)"
   };
-  const progressBarInner = {
-    width: "0%",
+  const progressBarSegment = {
     height: "100%",
-    borderRadius: 999,
-    background: "#5b3b2a",
+    transition: "width 0.5s ease-out",
+    cursor: "pointer",
   };
   const deadlinePill = {
     display: "inline-flex",
@@ -242,9 +244,19 @@ function ProjectHeader({ project, members, onPatch }) {
           </p>
           <div style={{ marginTop: 8 }}>
             <div style={progressBarOuter}>
-              <div style={progressBarInner} />
+              {taskStats.segments && taskStats.segments.map(seg => (
+                <div
+                  key={seg.id}
+                  style={{
+                    ...progressBarSegment,
+                    width: `${seg.percentage}%`,
+                    background: seg.id === 'unassigned' ? '#c0b8b0' : getUserColor(seg.id)
+                  }}
+                  title={seg.tooltip}
+                />
+              ))}
             </div>
-            <p style={metaStyle}>0 / 0 tasks complete · 0% complete</p>
+            <p style={metaStyle}>{taskStats.completed} / {taskStats.total} tasks complete · {taskStats.percent}% complete</p>
           </div>
         </div>
         <div style={deadlinePill}>
@@ -268,7 +280,7 @@ function ProjectHeader({ project, members, onPatch }) {
   );
 }
 
-function TabsSection({ activeTab, setActiveTab, projectId, members }) {
+function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdate }) {
   return (
     <section style={{ marginTop: 24 }}>
       <div style={detailTabsRowStyle}>
@@ -295,7 +307,7 @@ function TabsSection({ activeTab, setActiveTab, projectId, members }) {
         </button>
       </div>
       {activeTab === "tasks" && (
-        <GroupTasksTab projectId={projectId} members={members} />
+        <GroupTasksTab projectId={projectId} members={members} onStatsUpdate={onStatsUpdate} />
       )}
       {activeTab === "availability" && (
         <AvailabilityTab projectId={projectId} />
@@ -315,6 +327,7 @@ export default function GroupProjectDetail({ projectId, onBack }) {
   const { project, setProject, loading } = useProject(projectId);
   const { members, setMembers } = useProjectMembers(projectId);
   const [activeTab, setActiveTab] = useState("tasks");
+  const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
 
   const patchProject = async (partial) => {
     const res = await fetch(`/api/group-work/projects/${projectId}/`, {
@@ -404,10 +417,11 @@ export default function GroupProjectDetail({ projectId, onBack }) {
         project={project}
         members={members}
         onPatch={patchProject}
+        taskStats={taskStats}
       />
       <MembersSection members={members} onRemove={handleRemoveMember} />
       <AddMemberForm projectId={projectId} onAdded={handleMemberAdded} />
-      <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} projectId={projectId} members={members} />
+      <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} projectId={projectId} members={members} onStatsUpdate={setTaskStats} />
     </div>
   );
 }
