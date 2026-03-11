@@ -979,3 +979,11 @@
   width: 4px;
   flex-shrink: 0;
 }
+
+.eventCardContent {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
