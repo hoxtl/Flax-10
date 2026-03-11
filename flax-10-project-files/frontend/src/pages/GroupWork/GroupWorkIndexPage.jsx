@@ -71,8 +71,8 @@ function CreateProjectForm({ onCreated }) {
           flex: 2,
           padding: "10px 12px",
           borderRadius: 999,
-          border: "1px solid #e3d4c6",
-          background: "#fffaf4",
+          border: "1px solid var(--border)",
+          background: "var(--hover)",
           fontSize: 13,
         }}
         required
@@ -85,8 +85,8 @@ function CreateProjectForm({ onCreated }) {
           flex: 1,
           padding: "10px 12px",
           borderRadius: 999,
-          border: "1px solid #e3d4c6",
-          background: "#fffaf4",
+          border: "1px solid var(--border)",
+          background: "var(--hover)",
           fontSize: 13,
         }}
       />
@@ -98,10 +98,10 @@ function CreateProjectForm({ onCreated }) {
           flex: 1,
           padding: "10px 12px",
           borderRadius: 999,
-          border: "1px solid #e3d4c6",
-          background: "#fffaf4",
+          border: "1px solid var(--border)",
+          background: "var(--hover)",
           fontSize: 13,
-          color: "#3c2a20",
+          color: "var(--text)",
         }}
       />
       <button
@@ -110,8 +110,8 @@ function CreateProjectForm({ onCreated }) {
           padding: "10px 18px",
           borderRadius: 999,
           border: "none",
-          background: "#9b8b7c",
-          color: "#fffaf4",
+          background: "var(--primary)",
+          color: "white",
           fontSize: 13,
           fontWeight: 500,
           cursor: "pointer",
@@ -158,7 +158,7 @@ export default function GroupWorkIndexPage() {
       {loading && <p style={metaStyle}>Loading your group projects…</p>}
 
       {!loading && projects.length === 0 && (
-        <p style={{ marginTop: 24, fontSize: 14, color: "#8f7969" }}>
+        <p style={{ marginTop: 24, fontSize: 14, color: "var(--text-secondary)" }}>
           You do not have any group projects yet. Use the form above to create one.
         </p>
       )}
@@ -174,7 +174,7 @@ export default function GroupWorkIndexPage() {
                 onClick={() => openProject(project.id)}
               >
                 <div>
-                  <div style={{ fontWeight: 500, color: "#3c2a20" }}>
+                  <div style={{ fontWeight: 500, color: "var(--text)" }}>
                     {project.name}
                   </div>
                   <div style={metaStyle}>
@@ -185,7 +185,7 @@ export default function GroupWorkIndexPage() {
                   </div>
                 </div>
                 {deadlineLabel && (
-                  <div style={{ fontSize: 12, color: "#8f7969" }}>
+                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
                     {deadlineLabel}
                   </div>
                 )}

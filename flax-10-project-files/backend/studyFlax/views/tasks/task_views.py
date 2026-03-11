@@ -17,7 +17,7 @@ def get_user_lists(user, archived=False):
 
 def get_user_tasks(user, params):
     qs = Task.objects.filter(
-        Q(user=user) | Q(group_project__memberships__user=user)
+        Q(user=user) | Q(assigned_to=user) | Q(group_project__memberships__user=user)
     ).distinct()
     
     if params.get("group_project"):

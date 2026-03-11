@@ -84,8 +84,32 @@ export default function TaskAssigneePopup({
                                 className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}
                             >
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: userCol }} />
-                                    <span>{m.user_name}</span>
+                                    {m.profile_photo_url ? (
+                                        <img
+                                            src={m.profile_photo_url}
+                                            alt=""
+                                            style={{ width: 20, height: 20, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                                        />
+                                    ) : (
+                                        <div style={{
+                                            width: 20,
+                                            height: 20,
+                                            borderRadius: "50%",
+                                            background: userCol,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            color: "#fff",
+                                            fontSize: 9,
+                                            fontWeight: 700,
+                                            flexShrink: 0,
+                                        }}>
+                                            {m.first_name && m.last_name
+                                                ? `${m.first_name[0]}${m.last_name[0]}`.toUpperCase()
+                                                : (m.first_name?.[0] || m.user_name?.[0] || "?").toUpperCase()}
+                                        </div>
+                                    )}
+                                    <span>{m.first_name ? `${m.first_name} ${m.last_name || ""}`.trim() : m.user_name}</span>
                                 </div>
                                 {isSelected && <Check size={14} color={userCol} strokeWidth={3} />}
                             </div>

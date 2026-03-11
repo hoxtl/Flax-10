@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   containerStyle,
   detailTabsRowStyle,
@@ -163,6 +163,7 @@ function MembersSection({ members, onRemove }) {
 }
 
 function ProjectHeader({ project, members, onPatch, taskStats }) {
+  const [hoveredSeg, setHoveredSeg] = useState(null);
   const headerStyle = {
     display: "flex",
     justifyContent: "space-between",
@@ -173,18 +174,24 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
     height: 12,
     borderRadius: 6,
     background: "var(--border)",
-    overflow: "hidden",
+    overflow: "visible",
     display: "flex",
     marginBottom: 4,
-    boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)"
+    boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
+    position: "relative",
+  };
+  const progressBarInner = {
+    display: "flex",
+    width: "100%",
+    borderRadius: 6,
+    overflow: "hidden",
+    height: "100%",
   };
   const progressBarSegment = {
     height: "100%",
     transition: "all 0.3s ease",
-    cursor: "help",
+    cursor: "pointer",
     position: "relative",
-    zIndex: 1,
-    pointerEvents: "auto",
   };
   const deadlinePill = {
     display: "inline-flex",
@@ -228,7 +235,7 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
               border: "none",
               background: "transparent",
               fontWeight: 600,
-              color: "#3c2a20",
+              color: "var(--text)",
             }}
           />
           <p style={metaStyle}>
@@ -240,7 +247,7 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
                 border: "none",
                 background: "transparent",
                 fontSize: 13,
-                color: "#8f7969",
+                color: "var(--text-secondary)",
                 padding: 0,
                 marginRight: 4,
               }}
@@ -249,17 +256,56 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
           </p>
           <div style={{ marginTop: 8 }}>
             <div style={progressBarOuter}>
-              {taskStats.segments && taskStats.segments.map(seg => (
-                <div
-                  key={seg.id}
-                  style={{
-                    ...progressBarSegment,
-                    width: `${seg.percentage}%`,
-                    background: seg.id === 'unassigned' ? '#c0b8b0' : getUserColor(seg.id)
-                  }}
-                  title={seg.tooltip}
-                />
-              ))}
+              <div style={progressBarInner}>
+                {taskStats.segments && taskStats.segments.map((seg, idx) => (
+                  <div
+                    key={seg.id ?? idx}
+                    style={{
+                      ...progressBarSegment,
+                      width: `${seg.percentage}%`,
+                      background: seg.id === 'unassigned' ? '#c0b8b0' : getUserColor(seg.id),
+                      opacity: hoveredSeg && hoveredSeg !== (seg.id ?? idx) ? 0.65 : 1,
+                    }}
+                    onMouseEnter={() => setHoveredSeg(seg.id ?? idx)}
+                    onMouseLeave={() => setHoveredSeg(null)}
+                  />
+                ))}
+              </div>
+              {hoveredSeg !== null && taskStats.segments && (() => {
+                const seg = taskStats.segments.find(s => (s.id ?? s.name) === hoveredSeg) ||
+                  taskStats.segments[hoveredSeg];
+                if (!seg) return null;
+                return (
+                  <div style={{
+                    position: "absolute",
+                    top: "calc(100% + 6px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "var(--card-bg)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "var(--text)",
+                    whiteSpace: "nowrap",
+                    boxShadow: "var(--shadow-md)",
+                    zIndex: 100,
+                    pointerEvents: "none",
+                  }}>
+                    <span style={{
+                      display: "inline-block",
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: seg.id === 'unassigned' ? '#c0b8b0' : getUserColor(seg.id),
+                      marginRight: 6,
+                      verticalAlign: "middle"
+                    }} />
+                    {seg.tooltip || seg.name}
+                  </div>
+                );
+              })()}
             </div>
             <p style={metaStyle}>{taskStats.completed} / {taskStats.total} tasks complete · {taskStats.percent}% complete</p>
           </div>

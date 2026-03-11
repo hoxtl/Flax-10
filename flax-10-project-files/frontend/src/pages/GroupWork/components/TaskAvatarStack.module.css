@@ -14,7 +14,8 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     text-transform: uppercase;
     font-size: 8px;
-    /* Default small, scaled by size prop if needed */
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 .more {

@@ -8,8 +8,9 @@ import TaskListView from "./components/TaskListView";
 import TaskTimelineView from "./components/TaskTimelineView";
 import TaskBoardView from "./components/TaskBoardView";
 import styles from "./GroupTasksTab.module.css";
+import { getUserColor } from "./components/TaskAssigneePopup";
 
-export default function GroupTasksTab({ projectId, members, onStatsUpdate }) {
+export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -81,19 +82,21 @@ export default function GroupTasksTab({ projectId, members, onStatsUpdate }) {
             }
         });
 
+
         const segments = Object.values(userCounts).map(u => ({
             ...u,
             percentage: (u.totalShare / total) * 100,
-            tooltip: `${u.name} (${u.tasksDone} task${u.tasksDone !== 1 ? 's' : ''})`
+            tooltip: `${u.name}: ${u.tasksDone} task${u.tasksDone !== 1 ? 's' : ''} completed`,
+            color: getUserColor(u.id)
         }));
 
         if (unassignedCount > 0) {
             segments.push({
                 id: 'unassigned',
                 name: 'Unassigned',
-                count: unassignedCount,
                 percentage: (unassignedCount / total) * 100,
-                tooltip: `Unassigned (${unassignedCount} tasks)`
+                tooltip: `Unassigned: ${unassignedCount} task${unassignedCount !== 1 ? 's' : ''} completed`,
+                color: "#e0e0e0"
             });
         }
 

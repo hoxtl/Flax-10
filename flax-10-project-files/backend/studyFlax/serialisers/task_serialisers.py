@@ -17,6 +17,8 @@ class TaskListSerialiser(serializers.ModelSerializer):
 class TaskSerialiser(serializers.ModelSerializer):
     module_code = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
+    group_project_name = serializers.SerializerMethodField()
+
 
     assignees_info = serializers.SerializerMethodField()
 
@@ -24,7 +26,8 @@ class TaskSerialiser(serializers.ModelSerializer):
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code',
-            'group_project', 'assigned_to', 'assignees_info',
+            'group_project', 'group_project_name', 'assigned_to', 'assignees_info',
+
             'title', 'description', 'priority', 'status', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
             'estimated_blocks', 'completed_blocks',
@@ -36,6 +39,10 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
+
+    def get_group_project_name(self, obj):
+        return obj.group_project.name if obj.group_project else None
+
 
     def get_assignees_info(self, obj):
         return [
