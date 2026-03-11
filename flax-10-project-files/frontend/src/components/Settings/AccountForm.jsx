@@ -70,24 +70,45 @@ function EditableCourseField({ value, onChange }) {
   );
 }
 
+function syncRoleToStorage(role) {
+  try {
+    const stored = localStorage.getItem("user");
+    if (!stored) return;
+    const u = JSON.parse(stored);
+    if (u.role !== role) {
+      u.role = role;
+      localStorage.setItem("user", JSON.stringify(u));
+      window.dispatchEvent(new Event("auth-changed"));
+    }
+  } catch (_) {}
+}
+
 function useAccountForm(user) {
   const [formData, setFormData] = useState(getInitialData(user));
+  const [liveRole, setLiveRole] = useState(user?.role || "student");
+
   useEffect(() => {
     getUserProfile()
       .then((data) => {
         setFormData((prev) => ({
           ...prev,
-          year: data?.year || "",
-          major: data?.major || "",
+          year: data?.year || prev.year,
+          major: data?.major || prev.major,
         }));
+        if (data?.role) {
+          setLiveRole(data.role);
+          syncRoleToStorage(data.role);
+        }
       })
       .catch(() => {});
   }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  return { formData, handleChange };
+
+  return { formData, handleChange, liveRole };
 }
 
 function PersonalInfoFields({ formData, onChange }) {
@@ -140,43 +161,37 @@ function CourseRow({ formData, onChange }) {
   );
 }
 
-function TeacherRoleSection({ role }) {
+function TeacherBadge() {
+  return (
+    <div className={styles.teacherBadge}>
+      <span className={styles.teacherBadgeIcon}>🎓</span>
+      <div>
+        <strong>You are a Teacher</strong>
+        <p className={styles.teacherBadgeSub}>
+          You have access to module creation and teacher features.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function TeacherPending() {
+  return (
+    <div className={styles.teacherPending}>
+      <span>⏳</span>
+      <div>
+        <strong>Teacher Request Pending</strong>
+        <p className={styles.teacherBadgeSub}>
+          An admin will review your request shortly.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function useTeacherRequest() {
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState("");
-
-  if (role === "teacher") {
-    return (
-      <div className={styles.teacherSection}>
-        <SectionHeader title="Role" />
-        <div className={styles.teacherBadge}>
-          <span className={styles.teacherBadgeIcon}>🎓</span>
-          <div>
-            <strong>You are a Teacher</strong>
-            <p className={styles.teacherBadgeSub}>
-              You have access to module creation and teacher features.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (role === "pending_teacher") {
-    return (
-      <div className={styles.teacherSection}>
-        <SectionHeader title="Role" />
-        <div className={styles.teacherPending}>
-          <span>⏳</span>
-          <div>
-            <strong>Teacher Request Pending</strong>
-            <p className={styles.teacherBadgeSub}>
-              An admin will review your request shortly.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const handleRequest = async () => {
     setStatus("loading");
@@ -184,53 +199,63 @@ function TeacherRoleSection({ role }) {
       const res = await requestTeacherRole();
       setMessage(res?.message || "Request submitted!");
       setStatus("done");
-      const stored = localStorage.getItem("user");
-      if (stored) {
-        try {
-          const u = JSON.parse(stored);
-          u.role = "pending_teacher";
-          localStorage.setItem("user", JSON.stringify(u));
-          window.dispatchEvent(new Event("auth-changed"));
-        } catch (_) {}
-      }
+      syncRoleToStorage("pending_teacher");
     } catch (e) {
       setMessage(e.message || "Request failed.");
       setStatus("error");
     }
   };
 
+  return { status, message, handleRequest };
+}
+
+function TeacherRequestButton({ onRequest, status, message }) {
+  return (
+    <div className={styles.teacherRequest}>
+      <div>
+        <strong>Become a Teacher</strong>
+        <p className={styles.teacherBadgeSub}>
+          Teachers can create and manage modules. Submit a request for admin
+          approval.
+        </p>
+      </div>
+      {status === "done" ? (
+        <span className={styles.teacherSuccess}>{message}</span>
+      ) : (
+        <button
+          type="button"
+          className={styles.teacherBtn}
+          onClick={onRequest}
+          disabled={status === "loading"}
+        >
+          {status === "loading" ? "Requesting…" : "🎓 Request Teacher Role"}
+        </button>
+      )}
+      {status === "error" && <p className={styles.teacherError}>{message}</p>}
+    </div>
+  );
+}
+
+function TeacherRoleSection({ role }) {
+  const { status, message, handleRequest } = useTeacherRequest();
   return (
     <div className={styles.teacherSection}>
       <SectionHeader title="Role" />
-      <div className={styles.teacherRequest}>
-        <div>
-          <strong>Become a Teacher</strong>
-          <p className={styles.teacherBadgeSub}>
-            Teachers can create and manage modules. Submit a request for admin
-            approval.
-          </p>
-        </div>
-        {status === "done" ? (
-          <span className={styles.teacherSuccess}>{message}</span>
-        ) : (
-          <button
-            type="button"
-            className={styles.teacherBtn}
-            onClick={handleRequest}
-            disabled={status === "loading"}
-          >
-            {status === "loading" ? "Requesting…" : "🎓 Request Teacher Role"}
-          </button>
-        )}
-        {status === "error" && <p className={styles.teacherError}>{message}</p>}
-      </div>
+      {role === "teacher" && <TeacherBadge />}
+      {role === "pending_teacher" && <TeacherPending />}
+      {role === "student" && (
+        <TeacherRequestButton
+          onRequest={handleRequest}
+          status={status}
+          message={message}
+        />
+      )}
     </div>
   );
 }
 
 export default function AccountForm({ user, onSave, isSaving }) {
-  const { formData, handleChange } = useAccountForm(user);
-  const role = user?.role || "student";
+  const { formData, handleChange, liveRole } = useAccountForm(user);
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
@@ -240,7 +265,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
       <SectionHeader title="Personal Information" />
       <PersonalInfoFields formData={formData} onChange={handleChange} />
       <CourseRow formData={formData} onChange={handleChange} />
-      <TeacherRoleSection role={role} />
+      <TeacherRoleSection role={liveRole} />
       <SubmitButton
         isSaving={isSaving}
         label="Save Changes"
