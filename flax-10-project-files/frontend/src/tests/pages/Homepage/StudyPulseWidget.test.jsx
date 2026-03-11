@@ -119,4 +119,47 @@ describe('StudyPulseWidget', () => {
         renderWidget({ windows: [] });
         expect(screen.getByText('No free windows left today')).toBeTruthy();
     });
+
+    it('renders today target met when today studied meets daily budget', async () => {
+        const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+        const dailyBreakdown = Array.from({ length: 7 }, (_, i) => ({
+            hours_studied: i === todayIdx ? 1 : 0,
+            goal_hours: 1,
+        }));
+        useProfileSummary.mockReturnValueOnce({
+            summary: { weekly: { percentage: 80, hours_studied: 8, goal_hours: 10 }, streaks: { current: 0 } },
+            loading: false,
+        });
+        analyticsService.getSummary.mockResolvedValueOnce({ daily_breakdown: dailyBreakdown });
+        renderWidget({ now: new Date() });
+        await vi.waitFor(() => expect(screen.getByText(/Today's target met/)).toBeTruthy());
+    });
+
+    it('renders budget left insight when budgetLeft > 0', () => {
+        useProfileSummary.mockReturnValueOnce({
+            summary: {
+                weekly: { percentage: 30, hours_studied: 2, goal_hours: 10 },
+                streaks: { current: 0 },
+            },
+            loading: false,
+        });
+        renderWidget({ now: new Date('2026-03-09T12:00:00Z') });
+        expect(screen.getByText(/more today keeps you on track/)).toBeTruthy();
+    });
+
+    it('renders next focus window with duration 90 minutes', () => {
+        const now = new Date('2026-03-09T10:00:00Z');
+        const windows = [{
+            start: new Date('2026-03-09T15:00:00Z'),
+            end: new Date('2026-03-09T16:30:00Z'),
+            minutes: 90,
+        }];
+        renderWidget({ now, windows });
+        expect(screen.getByText('1h 30m')).toBeTruthy();
+    });
+
+    it('View detailed analysis button is present', () => {
+        renderWidget();
+        expect(screen.getByText('View detailed analysis →')).toBeTruthy();
+    });
 });

@@ -28,9 +28,14 @@ vi.mock('../../../components/Calendar/header/NavigationButtons', () => ({
     NavigationButtons: () => <div data-testid="nav-buttons" />,
 }));
 
+vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
+    CalendarNav: ({ title }) => <div data-testid="nav-buttons">{title}</div>,
+}));
+
 vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     addMonths: vi.fn((d, n) => d),
     formatMonthYear: vi.fn(() => 'March 2024'),
+    isSameMonth: vi.fn(() => false),
 }));
 
 describe('ProfileCalendar', () => {

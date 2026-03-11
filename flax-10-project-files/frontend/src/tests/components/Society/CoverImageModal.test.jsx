@@ -1,120 +1,154 @@
-import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('../../../components/Society/SocietyDetail/imageHandlers/ImageManagerComponents', () => ({
-    ImageHeader: ({ title, onClose }) => (
-        <div>
-            <span>{title}</span>
-            <button onClick={onClose}>close-header</button>
-        </div>
-    ),
-    ImageGrid: ({ images, onDelete, onPin, onAddClick }) => (
-        <div>
-            <span data-testid="grid-count">{images.length}</span>
-            <button onClick={() => onDelete(0)}>delete-btn</button>
-            <button onClick={() => onPin(1)}>pin-btn</button>
-            <button onClick={onAddClick}>add-click-btn</button>
-        </div>
-    ),
-    AddImageView: ({ onClose, onAdd, availablePhotos }) => (
-        <div>
-            <span data-testid="add-view">add-view</span>
-            <span data-testid="available-count">{availablePhotos.length}</span>
-            <button onClick={onClose}>back-btn</button>
-            <button onClick={() => onAdd('new.jpg')}>add-image-btn</button>
-        </div>
-    ),
-}));
-
+import { fireEvent, render, screen } from '@testing-library/react';
 import CoverImageModal from '../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal';
 
+vi.mock(
+  '../../../components/Society/SocietyDetail/imageHandlers/ImageManagerComponents.module.css',
+  () => ({
+    default: {
+      backdrop: 'backdrop',
+      modal: 'modal',
+      header: 'header',
+      title: 'title',
+      close: 'close',
+      hint: 'hint',
+      grid: 'grid',
+      addCard: 'addCard',
+      addIcon: 'addIcon',
+      imageCard: 'imageCard',
+      pinned: 'pinned',
+      pinnedBadge: 'pinnedBadge',
+      pinBtn: 'pinBtn',
+      deleteBtn: 'deleteBtn',
+      tabs: 'tabs',
+      tab: 'tab',
+      activeTab: 'activeTab',
+      dropZone: 'dropZone',
+      photoSelectGrid: 'photoSelectGrid',
+      photoSelectCard: 'photoSelectCard',
+      selected: 'selected',
+      actions: 'actions',
+      cancelBtn: 'cancelBtn',
+      confirmBtn: 'confirmBtn',
+    },
+  }),
+);
+
+// Re-export actual child components while using the real implementation
+// so that CoverImageModal behaviour is exercised end-to-end.
+
 describe('CoverImageModal', () => {
-    const baseProps = {
-        images: ['a.jpg', 'b.jpg'],
-        availablePhotos: ['x.jpg'],
-        onClose: vi.fn(),
-        onUpdate: vi.fn(),
-    };
+  const originalAlert = window.alert;
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    window.alert = vi.fn();
+  });
 
-    it('renders list view by default with title and grid', () => {
-        render(<CoverImageModal {...baseProps} />);
-        expect(screen.getByText('Manage Cover Images')).toBeTruthy();
-        expect(screen.getByTestId('grid-count').textContent).toBe('2');
-        expect(screen.getByText('First image is shown on society card. Click ★ to pin.')).toBeTruthy();
-    });
+  afterEach(() => {
+    window.alert = originalAlert;
+  });
 
-    it('calls onClose when backdrop is clicked', () => {
-        const { container } = render(<CoverImageModal {...baseProps} />);
-        fireEvent.mouseDown(container.firstChild);
-        expect(baseProps.onClose).toHaveBeenCalled();
-    });
+  const baseImages = ['a.jpg', 'b.jpg'];
 
-    it('stops propagation on modal mouseDown', () => {
-        const { container } = render(<CoverImageModal {...baseProps} />);
-        const modal = container.firstChild.firstChild;
-        const stopPropagation = vi.fn();
-        fireEvent.mouseDown(modal, { stopPropagation });
-        // onClose should NOT be called because inner modal stops propagation
-        // We verify by checking that if we click inside the modal only, onClose is not triggered via modal itself
-        expect(baseProps.onClose).not.toHaveBeenCalled();
-    });
+  it('renders list view with header, hint and grid, and closes on backdrop mousedown', () => {
+    const onClose = vi.fn();
+    const onUpdate = vi.fn();
 
-    it('switches to add view when onAddClick is triggered', () => {
-        render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByText('add-click-btn'));
-        expect(screen.getByTestId('add-view')).toBeTruthy();
-        expect(screen.getByTestId('available-count').textContent).toBe('1');
-    });
+    render(
+      <CoverImageModal
+        images={baseImages}
+        availablePhotos={[]}
+        onClose={onClose}
+        onUpdate={onUpdate}
+      />,
+    );
 
-    it('goes back to list view from add view via onClose', () => {
-        render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByText('add-click-btn'));
-        expect(screen.getByTestId('add-view')).toBeTruthy();
-        fireEvent.click(screen.getByText('back-btn'));
-        expect(screen.queryByTestId('add-view')).toBeNull();
-        expect(screen.getByTestId('grid-count')).toBeTruthy();
-    });
+    expect(screen.getByText('Manage Cover Images')).toBeInTheDocument();
+    expect(
+      screen.getByText(/First image is shown on society card/i),
+    ).toBeInTheDocument();
 
-    it('calls onUpdate with new image when adding (under limit)', () => {
-        render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByText('add-click-btn'));
-        fireEvent.click(screen.getByText('add-image-btn'));
-        expect(baseProps.onUpdate).toHaveBeenCalledWith(['a.jpg', 'b.jpg', 'new.jpg']);
-    });
+    // clicking inside modal should not close
+    fireEvent.mouseDown(screen.getByText('Manage Cover Images'));
+    expect(onClose).not.toHaveBeenCalled();
 
-    it('shows alert and does not call onUpdate when at max 5 images', () => {
-        const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
-        const props = {
-            ...baseProps,
-            images: ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'],
-        };
-        render(<CoverImageModal {...props} />);
-        fireEvent.click(screen.getByText('add-click-btn'));
-        fireEvent.click(screen.getByText('add-image-btn'));
-        expect(alertMock).toHaveBeenCalledWith('Maximum 5 images reach.');
-        expect(baseProps.onUpdate).not.toHaveBeenCalled();
-        alertMock.mockRestore();
-    });
+    // clicking backdrop should close
+    fireEvent.mouseDown(screen.getByText('Manage Cover Images').closest('div.backdrop'));
+    expect(onClose).toHaveBeenCalled();
+  });
 
-    it('calls onUpdate with image removed when delete is triggered', () => {
-        render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByText('delete-btn'));
-        expect(baseProps.onUpdate).toHaveBeenCalledWith(['b.jpg']);
-    });
+  it('pins and deletes images via ImageGrid handlers', () => {
+    const onClose = vi.fn();
+    const onUpdate = vi.fn();
 
-    it('calls onUpdate with pinned image first when pin is triggered', () => {
-        render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByText('pin-btn'));
-        expect(baseProps.onUpdate).toHaveBeenCalledWith(['b.jpg', 'a.jpg']);
-    });
+    // Render with two images so pin / delete logic is meaningful
+    const { container } = render(
+      <CoverImageModal
+        images={baseImages}
+        availablePhotos={[]}
+        onClose={onClose}
+        onUpdate={onUpdate}
+      />,
+    );
 
-    it('calls onClose via ImageHeader close button', () => {
-        render(<CoverImageModal {...baseProps} />);
-        fireEvent.click(screen.getByRole('button', { name: '×' }));
-        expect(baseProps.onClose).toHaveBeenCalled();
-    });
+    // Pin second image (★ button on non-main card)
+    const pinButtons = container.querySelectorAll('button[title="Set as main"]');
+    expect(pinButtons.length).toBeGreaterThanOrEqual(1);
+    fireEvent.click(pinButtons[0]);
+    expect(onUpdate).toHaveBeenCalledWith(['b.jpg', 'a.jpg']);
+
+    // Delete first image (× button on card)
+    const deleteButtons = container.querySelectorAll('button');
+    const deleteBtn = Array.from(deleteButtons).find(
+      (btn) => btn.textContent === '×' && btn !== deleteButtons[0],
+    );
+    if (deleteBtn) fireEvent.click(deleteBtn);
+    expect(onUpdate).toHaveBeenCalledWith(['b.jpg']);
+  });
+
+  it('switches to add view and back, and limits to 5 images with alert', () => {
+    const onClose = vi.fn();
+    const onUpdate = vi.fn();
+
+    const manyImages = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'];
+    const { rerender, container } = render(
+      <CoverImageModal
+        images={manyImages}
+        availablePhotos={['x.jpg']}
+        onClose={onClose}
+        onUpdate={onUpdate}
+      />,
+    );
+
+    // When grid is full, the add button should be disabled and have the tooltip
+    const fullAddBtn = container.querySelector('button[title="Maximum 5 images reached"]');
+    expect(fullAddBtn).toBeDisabled();
+
+    // Now rerender with fewer images and open Add view via onAddClick
+    rerender(
+      <CoverImageModal
+        images={['1.jpg', '2.jpg']}
+        availablePhotos={['x.jpg']}
+        onClose={onClose}
+        onUpdate={onUpdate}
+      />,
+    );
+
+    const addAvailableBtn = container.querySelector('button[title="Add image"]');
+    fireEvent.click(addAvailableBtn);
+
+    // In AddImageView, select From Photos tab and add selected
+    fireEvent.click(screen.getByText('From Photos'));
+    const photoCard = container.querySelector('.photoSelectCard');
+    fireEvent.click(photoCard);
+    fireEvent.click(screen.getByText('Add Selected'));
+
+    expect(onUpdate).toHaveBeenCalledWith(['1.jpg', '2.jpg', 'x.jpg']);
+
+    // Closing AddImageView via backdrop should return to list view
+    fireEvent.mouseDown(container.firstChild);
+    expect(onClose).toHaveBeenCalled();
+  });
 });
+

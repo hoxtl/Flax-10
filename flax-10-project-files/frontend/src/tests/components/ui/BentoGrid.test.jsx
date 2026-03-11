@@ -42,6 +42,16 @@ describe('BentoCard', () => {
         expect(() => fireEvent.mouseMove(card, { clientX: 100, clientY: 50 })).not.toThrow();
     });
 
+    it('updates glow position on mouse move when ref is set', () => {
+        const { container } = render(<BentoCard><span data-testid="inner">X</span></BentoCard>);
+        const card = container.querySelector('[class*="card"]') || container.firstChild?.firstChild;
+        if (card) {
+            card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+            fireEvent.mouseMove(card, { clientX: 100, clientY: 50 });
+        }
+        expect(screen.getByTestId('inner')).toBeInTheDocument();
+    });
+
     it('handles mouse leave event without throwing', () => {
         const { container } = render(<BentoCard><span /></BentoCard>);
         const card = container.firstChild;

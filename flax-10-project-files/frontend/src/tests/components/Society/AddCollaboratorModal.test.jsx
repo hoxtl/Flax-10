@@ -11,10 +11,12 @@ import { searchUsers } from '../../../api/userService';
 describe('AddCollaboratorModal', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        searchUsers.mockResolvedValue([
-            { id: 1, username: 'alice' },
-            { id: 2, username: 'bob' },
-        ]);
+        searchUsers.mockResolvedValue({
+            results: [
+                { id: 1, username: 'alice' },
+                { id: 2, username: 'bob' },
+            ],
+        });
     });
 
     it('renders Add Collaborators title', () => {

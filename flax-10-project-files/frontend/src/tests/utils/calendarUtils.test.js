@@ -81,6 +81,13 @@ describe('weekUtils', () => {
             const idx = getWeekIndexForDate(new Date('2026-12-01'), cfg);
             expect(idx).toBe(2); // maxIdx = 3 + 0 - 1 = 2
         });
+
+        it('includes reading week in maxIdx when hasReadingWeek is true', () => {
+            const cfg = { startDate: '2026-01-01', totalWeeks: 10, hasReadingWeek: true };
+            const idx = getWeekIndexForDate(new Date('2026-03-15'), cfg);
+            expect(idx).toBeGreaterThanOrEqual(0);
+            expect(idx).toBeLessThanOrEqual(10); // maxIdx = 10 + 1 - 1 = 10
+        });
     });
 });
 

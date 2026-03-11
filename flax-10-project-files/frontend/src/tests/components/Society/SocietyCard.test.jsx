@@ -53,4 +53,23 @@ describe('SocietyCard', () => {
         const { container } = render(<SocietyCard society={{ ...society, image: '/alt.jpg' }} onClick={vi.fn()} />);
         expect(container.firstChild.style.backgroundImage).toContain('/alt.jpg');
     });
+
+    it('calls onReport when report button clicked and not reported', () => {
+        const onReport = vi.fn();
+        render(<SocietyCard society={society} onClick={vi.fn()} onReport={onReport} />);
+        fireEvent.click(screen.getByTitle('Report society'));
+        expect(onReport).toHaveBeenCalledWith(society);
+    });
+
+    it('calls onUnreport when report button clicked and already reported', () => {
+        const onUnreport = vi.fn();
+        render(<SocietyCard society={{ ...society, has_reported: true }} onClick={vi.fn()} onUnreport={onUnreport} />);
+        fireEvent.click(screen.getByTitle(/unreport/i));
+        expect(onUnreport).toHaveBeenCalledWith(expect.objectContaining({ has_reported: true }));
+    });
+
+    it('does not throw when report clicked without onReport or onUnreport', () => {
+        render(<SocietyCard society={society} onClick={vi.fn()} />);
+        expect(() => fireEvent.click(screen.getByTitle('Report society'))).not.toThrow();
+    });
 });

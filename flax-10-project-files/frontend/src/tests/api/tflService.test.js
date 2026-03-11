@@ -66,6 +66,30 @@ describe('tflService', () => {
             expect(result.legs[0].departurePoint).toBe('');
             expect(result.legs[0].path).toBeNull();
         });
+
+        it('decodes path.lineString when present', async () => {
+            const mockData = {
+                journeys: [{
+                    duration: 20,
+                    legs: [{
+                        mode: { name: 'tube' },
+                        duration: 20,
+                        instruction: { summary: 'Board' },
+                        departurePoint: { commonName: 'A' },
+                        arrivalPoint: { commonName: 'B' },
+                        routeOptions: [],
+                        path: { lineString: '_p~iF~ps|U_ulLnnqC_mqNvxq`@' },
+                    }],
+                }],
+            };
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: vi.fn().mockResolvedValue(mockData),
+            });
+            const result = await tflService.journeyPlanner(51.5, -0.1, 51.52, -0.12);
+            expect(result.legs[0].path).toBeDefined();
+            expect(Array.isArray(result.legs[0].path)).toBe(true);
+        });
     });
 
     describe('getTfLDelays', () => {
@@ -152,6 +176,14 @@ describe('tflService', () => {
             expect(Array.isArray(result)).toBe(true);
             expect(result.length).toBeGreaterThan(0);
             expect(result[0]).toHaveLength(2);
+        });
+
+        it('decodes multiple points when encoded string has repeated pattern', () => {
+            // Longer encoded string to exercise full while loop (lat and lng decoding)
+            const encoded = 'gxs}Fxw}Cu@';
+            const result = tflService.decodeTfLPolyline(encoded);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result.length).toBeGreaterThanOrEqual(1);
         });
     });
 });

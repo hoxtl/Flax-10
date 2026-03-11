@@ -143,4 +143,29 @@ describe('PasswordResetConfirm', () => {
         fireEvent.submit(screen.getByRole('button', { name: 'Reset Password' }));
         expect(screen.getByText('Resetting Password...')).toBeTruthy();
     });
+
+    it('shows fallback error when API returns ok:false with no error or confirm_password', async () => {
+        fetch.mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({}),
+        });
+        renderPage();
+        fireEvent.change(screen.getByLabelText('New Password'), { target: { value: 'pass1234', name: 'new_password' } });
+        fireEvent.change(screen.getByLabelText('Confirm New Password'), { target: { value: 'pass1234', name: 'confirm_password' } });
+        fireEvent.submit(screen.getByRole('button', { name: 'Reset Password' }));
+        await waitFor(() => expect(screen.getByText('Failed to reset password')).toBeTruthy());
+    });
+
+    it('navigates to /login after successful reset (after 2s)', async () => {
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ message: 'Password reset successfully.' }),
+        });
+        renderPage();
+        fireEvent.change(screen.getByLabelText('New Password'), { target: { value: 'pass1234', name: 'new_password' } });
+        fireEvent.change(screen.getByLabelText('Confirm New Password'), { target: { value: 'pass1234', name: 'confirm_password' } });
+        fireEvent.submit(screen.getByRole('button', { name: 'Reset Password' }));
+        await waitFor(() => expect(screen.getByText('✅ Success!')).toBeTruthy());
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/login'), { timeout: 3000 });
+    }, 5000);
 });

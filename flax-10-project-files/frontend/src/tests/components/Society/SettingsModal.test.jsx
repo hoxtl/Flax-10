@@ -119,4 +119,35 @@ describe('SocietyDetail/SettingsModal', () => {
     await waitFor(() => expect(confirmMock).toHaveBeenCalled());
     expect(props.onDelete).not.toHaveBeenCalled();
   });
+
+  it('closes add collaborator modal without submitting', async () => {
+    const props = baseProps();
+    render(<SettingsModal {...props} />);
+
+    fireEvent.click(screen.getByText('+ Add Collaborators'));
+    expect(await screen.findByText('submit-add')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('close-add-modal'));
+    await waitFor(() => expect(screen.queryByText('submit-add')).toBeNull());
+  });
+
+  it('handles members being null', () => {
+    const props = baseProps({ members: null });
+    render(<SettingsModal {...props} />);
+    expect(screen.getByText('Society Settings')).toBeTruthy();
+    expect(screen.getByTestId('collab-count').textContent).toBe('0');
+  });
+
+  it('handles add only new users when none exist in members', async () => {
+    const props = baseProps({ members: [] });
+    render(<SettingsModal {...props} />);
+
+    fireEvent.click(screen.getByText('+ Add Collaborators'));
+    fireEvent.click(await screen.findByText('submit-add'));
+
+    await waitFor(() => {
+      expect(props.onAddCollaborator).toHaveBeenCalledWith('existingUser', 'editor');
+      expect(props.onAddCollaborator).toHaveBeenCalledWith('newUser', 'editor');
+    });
+  });
 });
