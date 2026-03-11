@@ -800,7 +800,15 @@ export default function CampusMap() {
         <section className={styles.section}>
           <div className={styles.sectionLabel}>
             <span className={styles.calendarIcon}>📅</span>
+            Events Today
           </div>
+
+          {calendarEvents.length === 0} ? (
+            <div className={styles.noEvents}>
+              <span className={styles.noEventsIcon}>✨</span>
+              <p>No events to show on UniMap...</p>
+            </div>
+          )
         </section>
 
         <section className={styles.section}>
