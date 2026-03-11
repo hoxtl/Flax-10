@@ -1,0 +1,11 @@
+/* ── BannedPage ──────────────────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg, #f9fafb);
+  padding: 2rem;
+  text-align: center;
+}
