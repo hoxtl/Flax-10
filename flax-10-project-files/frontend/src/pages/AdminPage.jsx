@@ -32,6 +32,13 @@ const rowAnim = {
   transition: { duration: 0.2 },
 };
 
+const TABS = [
+  { id: "users", label: "👤 Users" },
+  { id: "ratifications", label: "🏛️ Ratifications" },
+  { id: "teachers", label: "🎓 Teacher Requests" },
+  { id: "reports", label: "🚩 Reported Societies" },
+];
+
 export default function AdminPage() {
   return (
     <div className={styles.container}>
