@@ -392,6 +392,14 @@ export default function GroupTasksTab({ projectId, members }) {
                             { value: "", label: "All Members" },
                             ...members.map(m => ({ value: String(m.user), label: m.user_name }))
                         ]}
+                        customTrigger={
+                            <div className={styles.filterCustomTrigger}>
+                                <span>{filterUser ? members.find(m => String(m.user) === String(filterUser))?.user_name : "All Members"}</span>
+                                <div className={styles.filterCustomArrow}>
+                                    <ChevronDown size={14} />
+                                </div>
+                            </div>
+                        }
                     />
                 </div>
 
