@@ -1,57 +1,17 @@
-import React, { useMemo, useState, useRef, useEffect } from "react";
-import { Check, Trash2, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useMemo, useState, useRef } from "react";
+import { Trash2 } from "lucide-react";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+import TaskAssigneePopup, { getUserColor } from "./TaskAssigneePopup";
+import TaskAvatarStack from "./TaskAvatarStack";
 import styles from "./TaskBoardView.module.css";
 
-const USER_COLORS = [
-    "#7B6751", "#C0714E", "#7BB38E", "#9A8CB0",
-    "#7B9BAD", "#C4A46D", "#8A7060", "#b08c4b"
-];
-
-const getUserColor = (userId) => {
-    if (!userId) return USER_COLORS[0];
-    const idStr = String(userId);
-    let hash = 0;
-    for (let i = 0; i < idStr.length; i++) {
-        hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return USER_COLORS[Math.abs(hash) % USER_COLORS.length];
-};
 
 function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragStart }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
-    const [popupPos, setPopupPos] = useState("bottom");
-    const popupRef = useRef(null);
     const triggerRef = useRef(null);
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                setShowAssignPopup(false);
-            }
-        }
-        if (showAssignPopup) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [showAssignPopup]);
 
     const handleTogglePopup = (e) => {
         e.stopPropagation();
-        if (!showAssignPopup) {
-            // Measure before opening
-            if (triggerRef.current) {
-                const rect = triggerRef.current.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                const estimatedPopupHeight = 250;
-                if (spaceBelow < estimatedPopupHeight && rect.top > estimatedPopupHeight) {
-                    setPopupPos("top");
-                } else {
-                    setPopupPos("bottom");
-                }
-            }
-        }
         setShowAssignPopup(v => !v);
     };
 
@@ -68,14 +28,6 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
 
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevent standard browser right-click menu
-        if (!showAssignPopup) {
-            if (triggerRef.current) {
-                const rect = triggerRef.current.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                if (spaceBelow < 250 && rect.top > 250) setPopupPos("top");
-                else setPopupPos("bottom");
-            }
-        }
         setShowAssignPopup(true);
     };
 
@@ -134,70 +86,20 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
                 </div>
                 <div
                     ref={triggerRef}
-                    className={styles.avatarStack}
                     onClick={handleTogglePopup}
                     style={{ cursor: "pointer" }}
                 >
-                    {assignees.slice(0, 3).map((a, i) => (
-                        <div
-                            key={a.id}
-                            className={styles.avatarMini}
-                            style={{
-                                marginLeft: i > 0 ? -6 : 0,
-                                background: getUserColor(a.id)
-                            }}
-                            title={a.name}
-                        >
-                            {(a.name || "?").slice(0, 2).toUpperCase()}
-                        </div>
-                    ))}
-                    {assignees.length > 3 && (
-                        <div className={styles.avatarMini} style={{ marginLeft: -6, fontSize: 8 }}>
-                            +{(assignees.length - 3)}
-                        </div>
-                    )}
+                    <TaskAvatarStack assignees={assignees} size={20} />
                 </div>
 
-                <AnimatePresence>
-                    {showAssignPopup && (
-                        <motion.div
-                            ref={popupRef}
-                            className={styles.assignPopupBoard}
-                            initial={{ opacity: 0, scale: 0.95, y: popupPos === "top" ? 10 : -10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: popupPos === "top" ? 10 : -10 }}
-                            transition={{ duration: 0.15, ease: "easeOut" }}
-                            style={{
-                                originY: popupPos === "top" ? 1 : 0,
-                                ...(popupPos === "top" ? { top: "auto", bottom: "100%", marginBottom: "8px", marginTop: 0 } : {})
-                            }}
-                        >
-                            <div className={styles.assignPopupHeader}>
-                                <span className={styles.assignPopupTitle}>Assign Members</span>
-                                <span className={styles.closePopupBtn} onClick={() => setShowAssignPopup(false)}>
-                                    <X size={12} />
-                                </span>
-                            </div>
-                            {members.map(m => {
-                                const isSelected = assignees.some(a => String(a.id) === String(m.user));
-                                const userCol = getUserColor(m.user);
-                                return (
-                                    <div
-                                        key={m.id}
-                                        onClick={() => toggleAssignee(m.user)}
-                                        className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}
-                                    >
-                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                            <div style={{ width: 8, height: 8, borderRadius: "50%", background: userCol }} />
-                                            <span>{m.user_name}</span>
-                                        </div>
-                                        {isSelected && <Check size={14} color={userCol} strokeWidth={3} />}
-                                    </div>
-                                );
-                            })}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                <TaskAssigneePopup
+                    isOpen={showAssignPopup}
+                    onClose={() => setShowAssignPopup(false)}
+                    members={members}
+                    assignees={assignees}
+                    onToggleAssignee={toggleAssignee}
+                    triggerRef={triggerRef}
+                />
             </div>
         </div>
     );
