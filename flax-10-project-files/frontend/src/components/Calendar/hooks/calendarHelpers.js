@@ -1,4 +1,5 @@
 import { getStartOfWeek, getStartOfMonth, getEndOfMonth, addDays } from '../utils/dateUtils';
+import { loadTermConfig } from '../../../lib/termConfig';
 
 /**
  * Figures out what date range to fetch events for based on the current view
@@ -10,7 +11,17 @@ import { getStartOfWeek, getStartOfMonth, getEndOfMonth, addDays } from '../util
 export function getDateRangeForView(date, viewMode) {
     if (viewMode === 'day') return getDayRange(date);
     if (viewMode === 'week') return getWeekRange(date);
+    if (viewMode === 'term') return getTermRange();
     return getMonthRange(date);
+}
+
+function getTermRange() {
+    const { startDate, totalWeeks, hasReadingWeek } = loadTermConfig();
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = addDays(start, (totalWeeks + (hasReadingWeek ? 1 : 0)) * 7);
+    end.setHours(23, 59, 59, 999);
+    return { start: start.toISOString(), end: end.toISOString() };
 }
 
 

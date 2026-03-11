@@ -6,12 +6,12 @@ import AnimatedDropdown from '../../ui/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
 
-export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) {
+export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title, hideNav }) {
     return (
         <div className={styles.nav}>
-            <NavArrow direction="left" onClick={onPrev} />
-            {showToday && <button className={styles.todayBtn} onClick={onToday}>Today</button>}
-            <NavArrow direction="right" onClick={onNext} />
+            {!hideNav && <NavArrow direction="left" onClick={onPrev} />}
+            {!hideNav && showToday && <button className={styles.todayBtn} onClick={onToday}>Today</button>}
+            {!hideNav && <NavArrow direction="right" onClick={onNext} />}
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
             {title && <h2 className={styles.title}>{title}</h2>}
         </div>

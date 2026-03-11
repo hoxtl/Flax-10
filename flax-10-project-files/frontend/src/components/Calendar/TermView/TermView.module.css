@@ -1,0 +1,183 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--home-space-lg);
+    padding: var(--home-space-lg);
+    background: var(--home-card-bg);
+    border-radius: var(--card-radius);
+    border: var(--home-border-card);
+    backdrop-filter: blur(var(--home-glass-blur));
+    height: 100%;
+    min-height: calc(100vh - 250px);
+    padding: 32px 32px 16px 32px;
+}
+
+.grid {
+    display: flex;
+    justify-content: space-between;
+    height: calc(100vh - 460px);
+    gap: var(--home-space-sm);
+    align-items: stretch;
+    margin-bottom: 24px;
+    background-image: linear-gradient(to bottom,
+            transparent calc(25% - 0.5px), rgba(0, 0, 0, 0.06) 25%, transparent calc(25% + 0.5px),
+            transparent calc(50% - 0.5px), rgba(0, 0, 0, 0.06) 50%, transparent calc(50% + 0.5px),
+            transparent calc(75% - 0.5px), rgba(0, 0, 0, 0.06) 75%, transparent calc(75% + 0.5px),
+            transparent calc(100% - 0.5px), rgba(0, 0, 0, 0.06) 100%);
+    background-size: 100% 100%;
+}
+
+.column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--home-space-sm);
+    cursor: pointer;
+    padding: var(--home-space-md) 0;
+    border-radius: var(--radius);
+    transition: background 0.2s;
+    border: 1.5px solid transparent;
+    /* Align with highlight border */
+}
+
+.pastWeek {
+    opacity: 0.4 !important;
+}
+
+.column:hover {
+    background: var(--hover-light);
+}
+
+.currentWeek {
+    background: #eef9ee !important;
+    /* Force subtle green for light theme */
+    border: none !important;
+    border-radius: 12px;
+    padding: 8px 4px;
+    box-shadow: 0 0 0 1.5px #7cb87c !important;
+}
+
+:global(.dark-mode) .currentWeek {
+    background: rgba(124, 184, 124, 0.15) !important;
+    box-shadow: 0 0 0 1.5px #7cb87c !important;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--home-text-primary);
+    margin-bottom: 8px;
+    pointer-events: none;
+}
+
+.barStack {
+    width: 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--home-border-soft);
+    position: relative;
+    pointer-events: none;
+}
+
+.bar {
+    width: 100%;
+    transition: height 0.3s ease;
+    min-height: 4px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.bar:last-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.lecture {
+    background: #7cb87c;
+}
+
+.deadline {
+    background: #e06b6b;
+}
+
+.exam {
+    background: #9b7fc7;
+}
+
+.other {
+    background: var(--muted);
+}
+
+.date {
+    font-size: 11px;
+    color: var(--home-text-primary);
+    opacity: 0.5;
+    white-space: nowrap;
+    margin-top: 8px;
+    pointer-events: none;
+}
+
+.insightBar {
+    display: flex;
+    align-items: center;
+    gap: var(--home-space-sm);
+    padding: 12px 20px;
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    border-radius: 12px;
+    color: var(--warning-text);
+    font-size: 13px;
+    font-weight: var(--font-weight-task);
+    margin: 0 auto 24px auto;
+    max-width: 600px;
+    width: fit-content;
+}
+
+.insightIcon {
+    color: var(--warning);
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 6px 20px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 20px;
+    margin: 0 auto 12px auto;
+    width: fit-content;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--home-text-primary);
+    font-weight: 500;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.preStartedBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}

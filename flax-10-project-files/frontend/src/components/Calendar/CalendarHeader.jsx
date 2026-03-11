@@ -12,6 +12,7 @@ const VIEW_MODES = [
     { value: 'day', label: 'Day' },
     { value: 'week', label: 'Week' },
     { value: 'month', label: 'Month' },
+    { value: 'term', label: 'Term' },
 ];
 
 function useIsMobile(breakpoint = 900) {
@@ -58,6 +59,7 @@ export function CalendarHeader() {
                         selectedDate={selectedDate}
                         onDatePick={jumpToDate}
                         title={!isMobile ? title : null}
+                        hideNav={viewMode === 'term'}
                     />
                     {!isMobile && (
                         <div className="header-center">
@@ -67,7 +69,7 @@ export function CalendarHeader() {
                     <div className="header-actions">
                         <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
                         {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
-                        <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
+                        {viewMode !== 'term' && <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />}
                         <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
                     </div>
                 </header>
@@ -118,6 +120,7 @@ function navigateDate(dispatch, selectedDate, viewMode, dir) {
 
 function getTitle(selectedDate, viewMode) {
     if (viewMode === "day") return formatDate(selectedDate);
+    if (viewMode === "term") return "Semester Overview";
     return formatMonthYear(selectedDate);
 }
 
