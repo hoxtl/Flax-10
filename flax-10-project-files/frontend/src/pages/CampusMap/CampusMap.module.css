@@ -939,3 +939,8 @@
   padding: 20px 12px;
   text-align: center;
 }
+
+.noEventsIcon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
