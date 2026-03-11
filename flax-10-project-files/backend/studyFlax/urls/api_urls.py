@@ -71,6 +71,14 @@ from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 from studyFlax.views.authentication.home_address_view import home_address_view
 
+# Admin
+from studyFlax.views.admin.admin_views import (
+    user_list, ban_user,
+    teacher_requests, resolve_teacher_request,
+    reported_societies, dismiss_report,
+    request_teacher_role,
+)
+
 urlpatterns = [
     path("", include(router.urls)),
     #path("hello/", hello, name="hello"),
@@ -168,4 +176,13 @@ urlpatterns = [
     path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
     path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
     path("user/home-address/", home_address_view, name='home_address'),
+
+    # Admin
+    path("admin/users/", user_list, name='admin-user-list'),
+    path("admin/users/<int:user_id>/ban/", ban_user, name='admin-ban-user'),
+    path("admin/teacher-requests/", teacher_requests, name='admin-teacher-requests'),
+    path("admin/teacher-requests/<int:user_id>/resolve/", resolve_teacher_request, name='admin-resolve-teacher'),
+    path("admin/reported-societies/", reported_societies, name='admin-reported-societies'),
+    path("admin/reports/<int:report_id>/dismiss/", dismiss_report, name='admin-dismiss-report'),
+    path("request-teacher-role/", request_teacher_role, name='request-teacher-role'),
 ]
