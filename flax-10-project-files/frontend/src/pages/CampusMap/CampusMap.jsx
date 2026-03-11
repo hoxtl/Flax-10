@@ -828,7 +828,13 @@ export default function CampusMap() {
                             minute: '2-digit'
                           })}
                         </span>
+                        <span
+                          className={styles.eventPriority}
+                          style={{ color: color }}>
+                            {event.priority}
+                          </span>
                       </div>
+                      <div className={styles.eventTitle}>{event.title}</div>
                     </div>
                 )
               })}
