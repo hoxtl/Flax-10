@@ -12,13 +12,14 @@
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 200px);
-    border: 1px solid #e8e0d4;
+    border: 1px solid var(--border);
+    background: var(--bg);
     overflow: hidden;
 }
 
 .colHeader {
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border);
 }
 
 .colTitleWrapper {
@@ -37,16 +38,18 @@
     margin: 0;
     font-size: 14px;
     font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
     letter-spacing: 0.02em;
+    color: var(--text);
 }
 
 .taskCount {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--hover);
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 11px;
     font-weight: 700;
+    color: var(--text-secondary);
 }
 
 .cardList {
@@ -59,11 +62,11 @@
 }
 
 .boardCard {
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    border: 1px solid #efeae4;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -73,7 +76,7 @@
 
 .boardCard:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
 }
 
 .boardCardDone {
@@ -97,7 +100,7 @@
     text-transform: uppercase;
     padding: 4px 8px;
     border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
     letter-spacing: 0.05em;
 }
 
@@ -108,9 +111,11 @@
     text-transform: uppercase;
     padding: 2px 8px;
     border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
     letter-spacing: 0.05em;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
     cursor: pointer;
     outline: none;
     line-height: 1.5;
@@ -135,7 +140,7 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #a39587;
+    color: var(--text-secondary);
     padding: 4px;
     border-radius: 6px;
     display: flex;
@@ -144,8 +149,8 @@
 }
 
 .iconBtn:hover {
-    background: #f0e9df;
-    color: #5b4b3b;
+    background: var(--hover);
+    color: var(--text);
 }
 
 .iconBtnDone {
@@ -160,7 +165,7 @@
 .cardTitle {
     font-size: 14px;
     font-weight: 600;
-    color: #3b322a;
+    color: var(--text);
     line-height: 1.4;
     word-break: break-word;
 }
@@ -169,14 +174,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #f2ede5;
+    border-top: 1px solid var(--border);
     padding-top: 12px;
     margin-top: 4px;
 }
 
 .cardDate {
     font-size: 11px;
-    color: #9b8a78;
+    color: var(--text-secondary);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -191,15 +196,15 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #5b4b3b;
+    background: var(--primary);
     color: #fff;
     font-size: 9px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1.5px solid #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1.5px solid var(--card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .emptyCol {
@@ -242,17 +247,17 @@
 }
 
 .addCardBtn:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--hover);
     border-style: solid;
-    color: #5b4b3b;
+    color: var(--text);
 }
 
 .addCardInputWrapper {
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    border: 1px solid #efeae4;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
 }
 
 .addCardInput {
@@ -262,7 +267,7 @@
     font-size: 14px;
     font-family: inherit;
     font-weight: 500;
-    color: #3b322a;
+    color: var(--text);
     outline: none;
     background: transparent;
 }
@@ -292,12 +297,12 @@
     top: 100%;
     margin-top: -30px;
     right: -20px;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 12px;
     width: 200px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
     z-index: 100;
     max-height: 250px;
     overflow-y: auto;
@@ -309,20 +314,20 @@
     align-items: center;
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border);
 }
 
 .assignPopupTitle {
     font-size: 11px;
     font-weight: 700;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .closePopupBtn {
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -332,8 +337,8 @@
 }
 
 .closePopupBtn:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.8);
+    background: var(--hover);
+    color: var(--text);
 }
 
 .assignItem {
@@ -345,10 +350,11 @@
     font-size: 13px;
     cursor: pointer;
     margin-bottom: 2px;
+    color: var(--text);
 }
 
 .assignItem:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--hover-light);
 }
 
 .assignItemSelected {
