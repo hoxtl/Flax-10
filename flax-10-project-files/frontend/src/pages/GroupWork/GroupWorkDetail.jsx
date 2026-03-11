@@ -20,14 +20,15 @@ function BackButton({ onClick }) {
     padding: "8px 14px",
     borderRadius: 999,
     border: "none",
-    background: "#f3e4d7",
-    color: "#3c2a20",
+    background: "var(--hover)",
+    color: "var(--text)",
     fontSize: 13,
     fontWeight: 500,
     display: "inline-flex",
     alignItems: "center",
     gap: 6,
     cursor: "pointer",
+    transition: "all 0.2s ease",
   };
   return (
     <button type="button" onClick={onClick} style={style}>
@@ -59,16 +60,17 @@ function AddMemberForm({ projectId, onAdded }) {
     flex: 1,
     padding: "9px 12px",
     borderRadius: 999,
-    border: "1px solid #e3d4c6",
-    background: "#fffaf4",
+    border: "1px solid var(--border)",
+    background: "var(--bg)",
+    color: "var(--text)",
     fontSize: 13,
   };
   const buttonStyle = {
     padding: "9px 16px",
     borderRadius: 999,
     border: "none",
-    background: "#9b8b7c",
-    color: "#fffaf4",
+    background: "var(--primary)",
+    color: "white",
     fontSize: 13,
     fontWeight: 500,
     cursor: "pointer",
@@ -105,8 +107,8 @@ function MembersSection({ members, onRemove }) {
     gap: 8,
     padding: "4px 10px",
     borderRadius: 999,
-    background: "#f7efe7",
-    color: "#3c2a20",
+    background: "var(--hover)",
+    color: "var(--text)",
     fontSize: 12,
     fontWeight: 500,
   };
@@ -114,8 +116,8 @@ function MembersSection({ members, onRemove }) {
     width: 24,
     height: 24,
     borderRadius: "999px",
-    background: "#3f2a20",
-    color: "#fff8f1",
+    background: "var(--primary)",
+    color: "white",
     fontSize: 11,
     display: "inline-flex",
     alignItems: "center",
@@ -127,7 +129,7 @@ function MembersSection({ members, onRemove }) {
     fontSize: 11,
     border: "none",
     background: "transparent",
-    color: "#b85c5c",
+    color: "var(--danger)",
     cursor: "pointer",
   };
 
@@ -170,16 +172,19 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
   const progressBarOuter = {
     height: 12,
     borderRadius: 6,
-    background: "#ede6dc",
+    background: "var(--border)",
     overflow: "hidden",
     display: "flex",
     marginBottom: 4,
-    boxShadow: "inset 0 2px 4px rgba(0,0,0,0.05)"
+    boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)"
   };
   const progressBarSegment = {
     height: "100%",
-    transition: "width 0.5s ease-out",
-    cursor: "pointer",
+    transition: "all 0.3s ease",
+    cursor: "help",
+    position: "relative",
+    zIndex: 1,
+    pointerEvents: "auto",
   };
   const deadlinePill = {
     display: "inline-flex",
@@ -187,10 +192,10 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
     gap: 8,
     padding: "4px 10px",
     borderRadius: 999,
-    background: "#f3e4d7",
+    background: "var(--hover)",
     fontSize: 12,
     fontWeight: 500,
-    color: "#7b4b2b",
+    color: "var(--text-primary)",
     whiteSpace: "nowrap",
   };
 
@@ -271,7 +276,7 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
               border: "none",
               background: "transparent",
               fontSize: 12,
-              color: "#7b4b2b",
+              color: "var(--primary)",
             }}
           />
         </div>
@@ -298,26 +303,12 @@ function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdat
         >
           Availability
         </button>
-        <button
-          type="button"
-          style={detailTabStyle(activeTab === "contributions")}
-          onClick={() => setActiveTab("contributions")}
-        >
-          Contributions
-        </button>
       </div>
       {activeTab === "tasks" && (
         <GroupTasksTab projectId={projectId} members={members} onStatsUpdate={onStatsUpdate} />
       )}
       {activeTab === "availability" && (
         <AvailabilityTab projectId={projectId} />
-      )}
-      {activeTab === "contributions" && (
-        <div style={detailCardStyle}>
-          <div style={{ color: "#3c2a20", fontSize: 13 }}>
-            <p style={{ margin: 0 }}>Contributions and analytics will appear here.</p>
-          </div>
-        </div>
       )}
     </section>
   );
@@ -403,11 +394,12 @@ export default function GroupProjectDetail({ projectId, onBack }) {
             padding: "6px 12px",
             borderRadius: 999,
             border: "none",
-            background: "#f7e1df",
-            color: "#8c3b32",
+            background: "var(--danger-bg)",
+            color: "var(--danger)",
             fontSize: 12,
             fontWeight: 500,
             cursor: "pointer",
+            transition: "all 0.2s ease",
           }}
         >
           Delete project
