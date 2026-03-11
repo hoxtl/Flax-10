@@ -377,3 +377,30 @@
     font-size: 24px;
   }
 }
+
+.courseWrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.courseLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.lockedCourse {
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--search-bg);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.courseHint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
