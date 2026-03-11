@@ -116,7 +116,9 @@
   background: var(--bg, #f9fafb);
   color: var(--text, #111);
   outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
   font-family: inherit;
 }
 .search:focus {
@@ -253,11 +255,26 @@
   text-transform: capitalize;
   letter-spacing: 0.01em;
 }
-.badgeActive  { background: #dcfce7; color: #15803d; }
-.badgeBanned  { background: #fee2e2; color: #b91c1c; }
-.badgeTeacher { background: #ede9fe; color: #5b21b6; }
-.badgeStudent { background: #f3f4f6; color: #374151; }
-.badgePending { background: #fef3c7; color: #b45309; }
+.badgeActive {
+  background: #dcfce7;
+  color: #15803d;
+}
+.badgeBanned {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.badgeTeacher {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+.badgeStudent {
+  background: #f3f4f6;
+  color: #374151;
+}
+.badgePending {
+  background: #fef3c7;
+  color: #b45309;
+}
 
 .staffBadge {
   font-size: 0.72rem;
@@ -266,4 +283,86 @@
   background: var(--bg, #f3f4f6);
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
+}
+
+.banBtn,
+.unbanBtn,
+.approveBtn,
+.rejectBtn,
+.dismissBtn,
+.cancelBtn,
+.dangerBtn {
+  padding: 0.38rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    opacity 0.15s,
+    transform 0.12s,
+    box-shadow 0.15s;
+}
+
+.banBtn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.banBtn:hover {
+  background: #fecaca;
+}
+.unbanBtn {
+  background: #dcfce7;
+  color: #15803d;
+}
+.unbanBtn:hover {
+  background: #bbf7d0;
+}
+
+.approveBtn {
+  background: #dcfce7;
+  color: #15803d;
+}
+.approveBtn:hover {
+  background: #bbf7d0;
+}
+.rejectBtn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.rejectBtn:hover {
+  background: #fecaca;
+}
+
+.dismissBtn {
+  background: var(--bg, #f3f4f6);
+  color: var(--muted, #374151);
+}
+.dismissBtn:hover {
+  background: #e5e7eb;
+}
+
+.cancelBtn {
+  background: var(--bg, #f3f4f6);
+  color: var(--text, #374151);
+}
+.cancelBtn:hover {
+  background: #e5e7eb;
+}
+
+.dangerBtn {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+.dangerBtn:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }
