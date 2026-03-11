@@ -64,18 +64,18 @@ function buildBoardColumns(tasks) {
         else todo.push(t);
     });
     return [
-        { id: "todo", title: "To Do", tasks: todo, color: "#8a7a6a", bg: "#f2ede5", dotCol: "#c0a080" },
-        { id: "in_progress", title: "In Progress", tasks: inProgress, color: "#547da3", bg: "#e6eff5", dotCol: "#80b2d6" },
-        { id: "done", title: "Done", tasks: done, color: "#6b8a6a", bg: "#e8f2e5", dotCol: "#8bc28a" }
+        { id: "todo", title: "To Do", tasks: todo, className: styles.colTodo, dotClass: styles.colTodoDot, textClass: styles.colTodoText },
+        { id: "in_progress", title: "In Progress", tasks: inProgress, className: styles.colInProgress, dotClass: styles.colInProgressDot, textClass: styles.colInProgressText },
+        { id: "done", title: "Done", tasks: done, className: styles.colDone, dotClass: styles.colDoneDot, textClass: styles.colDoneText }
     ];
 }
 
 function ColumnHeader({ col }) {
     return (
-        <div className={styles.colHeader} style={{ color: col.color }}>
+        <div className={styles.colHeader}>
             <div className={styles.colTitleWrapper}>
-                <div className={styles.colDot} style={{ background: col.dotCol }} />
-                <h3 className={styles.colTitle}>{col.title}</h3>
+                <div className={`${styles.colDot} ${col.dotClass}`} />
+                <h3 className={`${styles.colTitle} ${col.textClass}`}>{col.title}</h3>
             </div>
             <span className={styles.taskCount}>{col.tasks.length}</span>
         </div>
@@ -102,11 +102,11 @@ function BoardColumn({ col, members, onUpdate, onDelete, adding, actions }) {
         if (taskId) onUpdate(Number(taskId), { status: col.id });
     };
     return (
-        <div key={col.id} className={styles.column} style={{ background: col.bg }} onDragOver={e => e.preventDefault()} onDrop={onDrop}>
+        <div key={col.id} className={`${styles.column} ${col.className}`} onDragOver={e => e.preventDefault()} onDrop={onDrop}>
             <ColumnHeader col={col} />
             <div className={styles.cardList}>
                 {col.tasks.map(t => <BoardCard key={t.id} t={t} isDone={t.status === "done" || t.completed} pColor={getPriorityStyle(t.priority)} onUpdate={onUpdate} onDelete={onDelete} members={members} handleDragStart={handleDragStartTask} />)}
-                {col.tasks.length === 0 && <div className={styles.emptyCol}>No tasks</div>}
+                {col.tasks.length === 0 && !adding.addingToCol && <div className={styles.emptyCol}>No tasks</div>}
                 <AddCardWidget colId={col.id} {...adding} {...actions} />
             </div>
         </div>
