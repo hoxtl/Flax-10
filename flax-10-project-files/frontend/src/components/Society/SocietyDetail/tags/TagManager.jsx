@@ -1,3 +1,7 @@
+/**
+ * TagManager allows society admins to define, color-code, and delete
+ * custom tags for categorizing society events and announcements.
+ */
 import { useState } from "react";
 import styles from "./TagManager.module.css";
 
@@ -5,23 +9,21 @@ const DEFAULT_COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "
 const MAX_TAGS = 7;
 
 export default function TagManager({ tags = [], onAddTag, onDeleteTag }) {
-    const [newTag, setNewTag] = useState({ label: "", color: getNextColor(tags) });
-    const canAddMore = tags.length < MAX_TAGS;
+    const nextColor = getNextColor(tags);
+    const [newTag, setNewTag] = useState({ label: "", color: nextColor });
+    const canAdd = tags.length < MAX_TAGS;
 
     const handleAdd = async () => {
-        if (!newTag.label.trim() || !canAddMore) return;
-        const tagData = { label: newTag.label.trim(), color: newTag.color };
-        await onAddTag?.(tagData);
-        setNewTag({ label: "", color: getNextColor([...tags, tagData]) });
+        if (!newTag.label.trim() || !canAdd) return;
+        const data = { label: newTag.label.trim(), color: newTag.color };
+        if (await onAddTag?.(data)) setNewTag({ label: "", color: getNextColor([...tags, data]) });
     };
-
-    const handleRemove = (id) => onDeleteTag?.(id);
 
     return (
         <div className={styles.manager}>
             <ManagerHeader count={tags.length} max={MAX_TAGS} />
-            <TagList tags={tags} onRemove={handleRemove} />
-            {canAddMore && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} />}
+            <TagList tags={tags} onRemove={onDeleteTag} />
+            {canAdd && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} />}
         </div>
     );
 }

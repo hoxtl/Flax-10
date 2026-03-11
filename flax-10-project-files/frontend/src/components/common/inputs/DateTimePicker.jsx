@@ -132,14 +132,15 @@ function TriggerButton({ open, setOpen, selDate, timeOnly, dateOnly, placeholder
     : placeholder;
 
   const handleClear = (e) => { e.stopPropagation(); setSelDate(null); onChange?.(""); };
+  const handleKeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(p => !p); } };
 
   return (
-    <button type="button" onClick={() => setOpen(p => !p)}
+    <div role="button" tabIndex={0} onClick={() => setOpen(p => !p)} onKeyDown={handleKeydown}
       className={`${styles.trigger} ${open ? styles.triggerOpen : ""} ${!selDate ? styles.triggerEmpty : ""}`}>
       <span className={styles.triggerIcon}>{timeOnly ? "🕒" : "📅"}</span>
       <span className={selDate ? styles.triggerValueMono : ""}>{displayValue}</span>
       {selDate && <button type="button" className={styles.clearBtn} onClick={handleClear}>✕</button>}
-    </button>
+    </div>
   );
 }
 

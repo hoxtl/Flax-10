@@ -1,3 +1,7 @@
+/**
+ * ImageManagerComponents provides a suite of reusable UI elements for
+ * managing society cover photos and gallery images.
+ */
 import { useState, useRef } from "react";
 import styles from "./ImageManagerComponents.module.css";
 
@@ -42,6 +46,7 @@ export function ImageCard({ src, index, onDelete, onPin }) {
     );
 }
 
+/** Modal view for uploading a new image or selecting from existing photos. */
 export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
     const [tab, setTab] = useState("upload");
     const [selected, setSelected] = useState(null);
@@ -49,10 +54,7 @@ export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
 
     const handleUpload = (e) => {
         const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => onAdd(ev.target.result);
-        reader.readAsDataURL(file);
+        if (file) performUpload(file, onAdd);
     };
 
     return (
@@ -66,6 +68,12 @@ export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
             </div>
         </div>
     );
+}
+
+function performUpload(file, onAdd) {
+    const reader = new FileReader();
+    reader.onload = (ev) => onAdd(ev.target.result);
+    reader.readAsDataURL(file);
 }
 
 function TabSelector({ active, onSelect, hasPhotos }) {

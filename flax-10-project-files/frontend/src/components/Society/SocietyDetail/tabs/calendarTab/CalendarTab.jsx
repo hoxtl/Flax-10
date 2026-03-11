@@ -1,3 +1,7 @@
+/**
+ * CalendarTab integrates the society's specific events into a MonthView,
+ * allowing members to view and admins to manage scheduled social activities.
+ */
 import { useState } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";
@@ -22,87 +26,102 @@ export default function CalendarTab(props) {
     );
 }
 
-function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, tags, tagHandlers, onViewAnnouncement, societyId, isMember, onEditAnnouncement, announcements, societyName }) {
+/** Inner content that utilizes the CalendarProvider context. */
+function CalendarTabContent(props) {
+    const { events: raw, editMode, tags, societyId, isMember, societyName } = props;
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [tagFilters, setTagFilters] = useState([]);
-    const [popupState, setPopupState] = useState({ event: null, rect: null });
+    const [popup, setPopup] = useState({ event: null, rect: null });
     const [summaryDate, setSummaryDate] = useState(null);
-    const { openModal } = useEventModal();
-    const confirmFn = useConfirm();
-    const expanded = expandRecurringEvents(rawEvents, selectedDate);
-    const events = filterEvents(convertEvents(expanded, tags), tagFilters);
-    const closePopup = () => setPopupState({ event: null, rect: null });
+
+    const events = filterEvents(convertEvents(expandRecurringEvents(raw, selectedDate), tags), tagFilters);
 
     return (
         <div className={styles.calendarTab}>
-            {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
-            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} societyName={societyName} />
-            <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
-            <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
-                readOnly={!editMode}
-                onEventClick={(e, r) => {
-                    if (editMode) {
-                        if (e.announcement && onEditAnnouncement) {
-                            const announcement = announcements?.find(a => a.id === e.announcement);
-                            if (announcement) onEditAnnouncement(announcement);
-                        } else {
-                            openModal(e, 'society', e.start_time);
-                        }
-                    } else {
-                        setPopupState({ event: e, rect: r });
-                    }
-                }}
-                onMoreClick={setSummaryDate}
-                customTags={tags} />
-            <SocietyEventModal eventHandlers={eventHandlers} tags={tags} editMode={editMode} />
-            {popupState.event && <EventPopover event={popupState.event} anchorRect={popupState.rect}
-                tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
-                readOnly={!editMode}
-                actions={getPopupActions(popupState.event, onViewAnnouncement, editMode, {
-                    onEdit: () => openModal(popupState.event, 'society', popupState.event.start_time),
-                    onDelete: async (e) => await handlePopupDelete(e, eventHandlers, closePopup, confirmFn)
-                })} />}
-            <EventsSummaryModal
-                isOpen={!!summaryDate}
-                onClose={() => setSummaryDate(null)}
-                allEvents={events}
-                baseDate={summaryDate}
-                isMutualOrSelf={true}
-            />
+            <CalendarControls props={props} selectedDate={selectedDate} setSelectedDate={setSelectedDate}
+                tagFilters={tagFilters} setTagFilters={setTagFilters} />
+            <CalendarView props={props} events={events} selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate} setPopup={setPopup} setSummaryDate={setSummaryDate} />
+            <SocietyEventModal eventHandlers={props.eventHandlers} tags={tags} editMode={editMode} />
+            <CalendarPopovers popup={popup} setPopup={setPopup} props={props} events={events} summaryDate={summaryDate}
+                setSummaryDate={setSummaryDate} />
         </div>
     );
 }
 
+function CalendarControls({ props, selectedDate, setSelectedDate, tagFilters, setTagFilters }) {
+    const { editMode, tags, tagHandlers, societyId, isMember, societyName } = props;
+    return (
+        <>
+            {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
+            <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId} isMember={isMember} societyName={societyName} />
+            <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />
+        </>
+    );
+}
+
+function CalendarView({ props, events, selectedDate, setSelectedDate, setPopup, setSummaryDate }) {
+    const { editMode, onEditAnnouncement, announcements } = props;
+    const { openModal } = useEventModal();
+    const handleEvent = (e, r) => {
+        if (!editMode) return setPopup({ event: e, rect: r });
+        if (e.announcement && onEditAnnouncement) {
+            const ann = announcements?.find(a => a.id === e.announcement);
+            if (ann) return onEditAnnouncement(ann);
+        }
+        openModal(e, 'society', e.start_time);
+    };
+
+    return <MonthView selectedDate={selectedDate} events={events} onDateSelect={setSelectedDate}
+        readOnly={!editMode} onEventClick={handleEvent} onMoreClick={setSummaryDate} customTags={props.tags} />;
+}
+
+function CalendarPopovers({ popup, setPopup, props, events, summaryDate, setSummaryDate }) {
+    const { tags, onViewAnnouncement, editMode, eventHandlers } = props;
+    const { openModal } = useEventModal();
+    const confirmFn = useConfirm();
+    const close = () => setPopup({ event: null, rect: null });
+    const acts = popup.event ? getPopupActions(popup.event, onViewAnnouncement, editMode, {
+        onEdit: () => openModal(popup.event, 'society', popup.event.start_time),
+        onDelete: (e) => handlePopupDelete(e, eventHandlers, close, confirmFn)
+    }) : null;
+
+    return (
+        <>
+            {popup.event && <EventPopover event={popup.event} anchorRect={popup.rect} tags={tags}
+                onClose={close} readOnly={!editMode} actions={acts} />}
+            <EventsSummaryModal isOpen={!!summaryDate} onClose={() => setSummaryDate(null)}
+                allEvents={events} baseDate={summaryDate} isMutualOrSelf={true} />
+        </>
+    );
+}
+
+/** Deletion handler with recurrence awareness and confirmation. */
 async function handlePopupDelete(event, handlers, closePopup, confirmFn) {
     try {
-        const isRecurring = hasRecurrence(event);
-        let choice = true;
-        if (isRecurring) {
-            choice = await confirmFn({
-                title: "Delete Recurring Society Event",
-                message: "This is a recurring event. How would you like to delete it?",
-                confirmText: "Delete ALL occurrences",
-                alternateText: "Delete ONLY this one",
-                cancelText: "Cancel",
-                isDanger: true
-            });
-        } else {
-            choice = await confirmFn({
-                title: "Delete Society Event",
-                message: `Are you sure you want to delete "${event.title}"?`,
-                confirmText: "Delete",
-                cancelText: "Cancel",
-                isDanger: true
-            });
-        }
-
+        const choice = await confirmDeletion(event, confirmFn);
+        if (choice === null) return;
         const baseId = extractBaseEventId(event.id, event);
         if (choice === true) handlers?.onDelete?.(baseId, event.title);
-        else if (choice === 'ALTERNATE') handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
-    } catch (err) {
-        console.error('Deletion failed:', err);
-    }
+        else if (choice === 'ALTERNATE') {
+            handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
+        }
+    } catch (err) { console.error('Deletion failed:', err); }
     closePopup();
+}
+
+async function confirmDeletion(event, confirmFn) {
+    const isRecurring = hasRecurrence(event);
+    if (!isRecurring) return await confirmFn({
+        title: "Delete Event", message: `Delete "${event.title}"?`,
+        confirmText: "Delete", cancelText: "Cancel", isDanger: true
+    });
+    return await confirmFn({
+        title: "Delete Recurring Event",
+        message: "Delete this occurrence or all?",
+        confirmText: "All", alternateText: "Just this one",
+        cancelText: "Cancel", isDanger: true
+    });
 }
 
 function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
