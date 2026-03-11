@@ -117,14 +117,15 @@ function CategoryPills({ current, onChange, societies }) {
 /** Renders the results grid with integrated pagination. */
 function PaginatedGrid({ items, onSelect, onReport, onUnreport }) {
     const { currentItems, totalPages, currentPage, setPage } = usePagination(items, PAGE_SIZE);
-
     if (items.length === 0) {
         return <EmptyState icon="🎭" title="No societies found"
             description="Try adjusting your search or filters." />;
     }
-
     return (
         <>
+            <div className={styles.topPagination}>
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+            </div>
             <div className={styles.grid}>
                 {currentItems.map(s => (
                     <SocietyCard key={s.id} society={s} onClick={onSelect}
