@@ -37,7 +37,7 @@ function ReadingCardInfo({ reading, avgMinPerPage }) {
   const deadline = formatDeadline(reading.deadline);
   const estimatedMinutes = estimateMinutes(reading.page_count, avgMinPerPage);
   return (
-    <div className={styles.rowIn}>
+    <div className={styles.rowInfo}>
       {reading.page_count && (<span className={styles.rowInfo}><FileText size={11} strokeWidth={2} /> {reading.page_count} pages</span>)}
       {deadline && (<span className={styles.rowInfo}><Calendar size={11} strokeWidth={2} /> Due {deadline}</span>)}
       {estimatedMinutes && (<span className={styles.rowInfo}><Clock size={11} strokeWidth={2} /> {estimatedMinutes} min to read</span>)}
@@ -61,7 +61,7 @@ function ReadingCardButton({ added, loading, handleAdd }) {
   );
 }
 
-export default function SuggestedReadingCard({ reading, onAdded, avgMinPerPage }) {
+export function SuggestedReadingCard({ reading, onAdded, avgMinPerPage }) {
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
 
