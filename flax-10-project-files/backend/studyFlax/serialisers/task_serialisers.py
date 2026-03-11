@@ -25,7 +25,7 @@ class TaskSerialiser(serializers.ModelSerializer):
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code',
             'group_project', 'assigned_to', 'assignees_info',
-            'title', 'description', 'priority', 'energy_level', 'due_date',
+            'title', 'description', 'priority', 'status', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
             'estimated_blocks', 'completed_blocks',
             'created_at', 'updated_at'
@@ -44,9 +44,21 @@ class TaskSerialiser(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        completed = validated_data.get('completed')
+        # Sync completed and status fields
+        status = validated_data.get('status', instance.status)
+        completed = validated_data.get('completed', instance.completed)
+        
+        # If toggling 'completed' directly from older UI
+        if 'completed' in validated_data and 'status' not in validated_data:
+            validated_data['status'] = 'done' if completed else 'todo'
+        # If updating status from new UI
+        elif 'status' in validated_data:
+            validated_data['completed'] = (status == 'done')
+            completed = validated_data['completed']
+
         if completed is True and not instance.completed_at:
             validated_data['completed_at'] = timezone.now()
         elif completed is False:
             validated_data['completed_at'] = None
+            
         return super().update(instance, validated_data)
