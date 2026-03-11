@@ -6,12 +6,58 @@
     margin-top: 15px;
 }
 
-.addTaskForm {
-    /* More padding between Task table and Task pill (form area) */
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 32px;
+}
+
+.addTaskForm {
+    flex: 1;
     display: flex;
     gap: 12px;
     align-items: center;
+}
+
+/* View Toggle Styling */
+.viewToggleGroup {
+    display: flex;
+    background: #f7efe7;
+    border: 1px solid #e3d4c6;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    margin-left: 24px;
+}
+
+.viewToggleBtn {
+    padding: 8px 16px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    color: #8a7355;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.viewToggleBtn:hover {
+    color: #5c4436;
+}
+
+.viewToggleBtnActive {
+    background: #3c2a20;
+    color: #fff;
+}
+
+.viewToggleBtnActive:hover {
+    color: #f7efe7;
 }
 
 .taskInput {
