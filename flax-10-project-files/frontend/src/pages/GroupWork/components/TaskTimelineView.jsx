@@ -1,5 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
+import TaskAssigneePopup, { getUserColor } from "./TaskAssigneePopup";
+import TaskAvatarStack from "./TaskAvatarStack";
 import styles from "./TaskTimelineView.module.css";
+
 
 // Helper to determine week/day index
 // We'll anchor the timeline to "this week's Monday"
@@ -41,10 +44,10 @@ export default function TaskTimelineView({ tasks, members, onUpdate }) {
     }, [anchorMonday]);
 
     const colors = {
-        urgent: { bg: "#f9a8c9", border: "#f472a8", text: "#9b2257" },
-        high: { bg: "#fcd5a8", border: "#f4a872", text: "#9b5a22" },
-        medium: { bg: "#f5e6a3", border: "#e8d660", text: "#7a6a1a" },
-        low: { bg: "#b8e8c8", border: "#60d888", text: "#1a6a3a" },
+        urgent: { bg: "#f9a8c9", border: "#f9a8c9", text: "#9b2257" },
+        high: { bg: "#fcd5a8", border: "#fcd5a8", text: "#9b5a22" },
+        medium: { bg: "#f5e6a3", border: "#f5e6a3", text: "#7a6a1a" },
+        low: { bg: "#b8e8c8", border: "#b8e8c8", text: "#1a6a3a" },
     };
 
     // Calculate dynamic weeks from the current tasks
@@ -53,7 +56,7 @@ export default function TaskTimelineView({ tasks, members, onUpdate }) {
         const layout = Array.from({ length: weeks.length }, () => [[], [], [], [], [], []]);
 
         tasks.forEach(t => {
-            if (!t.due_date) return;
+            if (!t.due_date || t.completed || t.status === "done") return; // exclude completed from main grid
             const ts = new Date(t.due_date).getTime();
 
             // Find which week it falls in
@@ -77,7 +80,7 @@ export default function TaskTimelineView({ tasks, members, onUpdate }) {
 
     // Filter tasks for the unscheduled widget
     const unscheduledTasks = useMemo(() => {
-        return tasks.filter(t => !t.due_date && !t.completed);
+        return tasks.filter(t => !t.due_date && !t.completed && t.status !== "done");
     }, [tasks]);
 
     const handleDragStart = (e, taskId) => {
@@ -127,122 +130,160 @@ export default function TaskTimelineView({ tasks, members, onUpdate }) {
     const visibleWeeks = weeks.slice(page * WEEKS_PER_PAGE, (page + 1) * WEEKS_PER_PAGE);
 
     return (
-        <div className={styles.viewContainer}>
-            {/* Unscheduled Widget (Left Sidebar) */}
-            <div className={styles.unscheduledWidget}>
-                <div className={styles.widgetHeader}>
-                    <h3 className={styles.widgetTitle}>
-                        Unscheduled
-                        <span className={styles.widgetCount}>{unscheduledTasks.length}</span>
-                    </h3>
-                </div>
-                <div
-                    className={styles.widgetList}
-                    onDragOver={handleDragOverWidget}
-                    onDragLeave={handleDragLeaveWidget}
-                    onDrop={handleDropWidget}
-                >
-                    {unscheduledTasks.map(t => {
-                        const c = colors[(t.priority || "medium").toLowerCase()] || colors.medium;
-                        return (
-                            <div
-                                key={t.id}
-                                className={styles.unscheduledCard}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, t.id)}
-                            >
-                                <div style={{ fontSize: 13, fontWeight: 600, color: "#3b322a", marginBottom: 8, lineHeight: 1.3 }}>{t.title}</div>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <span style={{ fontSize: 9, fontWeight: 800, color: c.text, opacity: 0.9, textTransform: "uppercase", background: c.bg, padding: "3px 6px", borderRadius: 4 }}>{t.priority || "MEDIUM"}</span>
-                                    <div style={{ display: "flex" }}>
-                                        {(t.assignees_info || []).slice(0, 3).map((a, i) => (
-                                            <div key={a.id} className={styles.avatarMini} style={{ marginLeft: i > 0 ? -6 : 0 }} title={a.name}>
-                                                {(a.name || "?").slice(0, 2).toUpperCase()}
-                                            </div>
-                                        ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "calc(100vh - 220px)" }}>
+            <div className={styles.viewContainer} style={{ height: "auto", flex: 1 }}>
+                {/* Unscheduled Widget (Left Sidebar) */}
+                <div className={styles.unscheduledWidget}>
+                    <div className={styles.widgetHeader}>
+                        <h3 className={styles.widgetTitle}>
+                            Unscheduled
+                            <span className={styles.widgetCount}>{unscheduledTasks.length}</span>
+                        </h3>
+                    </div>
+                    <div
+                        className={styles.widgetList}
+                        onDragOver={handleDragOverWidget}
+                        onDragLeave={handleDragLeaveWidget}
+                        onDrop={handleDropWidget}
+                    >
+                        {unscheduledTasks.map(t => {
+                            const c = colors[(t.priority || "medium").toLowerCase()] || colors.medium;
+                            return (
+                                <div
+                                    key={t.id}
+                                    className={styles.unscheduledCard}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, t.id)}
+                                >
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8, lineHeight: 1.3 }}>{t.title}</div>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                        <span style={{ fontSize: 9, fontWeight: 800, color: c.text, textTransform: "uppercase", background: c.bg, padding: "3px 6px", borderRadius: 4 }}>{t.priority || "MEDIUM"}</span>
+                                        <TaskAvatarStack assignees={t.assignees_info || []} size={16} />
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                    {unscheduledTasks.length === 0 && (
-                        <div style={{ textAlign: "center", color: "#a39587", fontSize: 13, padding: "24px 0", fontWeight: 500 }}>All tasks scheduled!</div>
-                    )}
-                </div>
-            </div>
-
-            {/* Timeline Area (Right Viewport) */}
-            <div className={styles.timelineArea}>
-                <div className={styles.timelineHeaderRow}>
-                    <div style={{ padding: "14px 20px", fontWeight: 700, fontSize: 12, color: "#8a7a6a", letterSpacing: "0.06em", fontFamily: "'DM Sans', sans-serif" }} />
-                    {days.map(d => (
-                        <div key={d} className={styles.timelineHeaderCell}>{d}</div>
-                    ))}
+                            );
+                        })}
+                        {unscheduledTasks.length === 0 && (
+                            <div style={{ textAlign: "center", color: "var(--text-secondary)", fontSize: 13, padding: "24px 0", fontWeight: 500 }}>All tasks scheduled!</div>
+                        )}
+                    </div>
                 </div>
 
-                <div className={styles.timelineScrollable}>
-                    {visibleWeeks.map((wk) => (
-                        <div key={wk.id} className={styles.timelineRow}>
-                            <div className={styles.timelineWeekLabel}>
-                                {wk.label.replace(" (", "\n(")}
-                            </div>
-                            {days.map((_, di) => {
-                                const cellTasks = placedTasks[wk.id][di] || [];
-                                const cellDateTs = wk.startTs + di * DAY_MS;
+                {/* Timeline Area (Right Viewport) */}
+                <div className={styles.timelineArea}>
+                    <div className={styles.timelineHeaderRow}>
+                        <div style={{ padding: "14px 20px", fontWeight: 700, fontSize: 12, color: "#8a7a6a", letterSpacing: "0.06em", fontFamily: "'DM Sans', sans-serif" }} />
+                        {days.map(d => (
+                            <div key={d} className={styles.timelineHeaderCell}>{d}</div>
+                        ))}
+                    </div>
 
-                                return (
-                                    <div
-                                        key={di}
-                                        className={styles.timelineCell}
-                                        onDragOver={handleDragOver}
-                                        onDragLeave={handleDragLeave}
-                                        onDrop={(e) => handleDrop(e, cellDateTs)}
-                                    >
-                                        {cellTasks.map(t => {
-                                            const c = colors[(t.priority || "medium").toLowerCase()] || colors.medium;
-                                            return (
-                                                <div
+                    <div className={styles.timelineScrollable}>
+                        {visibleWeeks.map((wk) => (
+                            <div key={wk.id} className={styles.timelineRow}>
+                                <div className={styles.timelineWeekLabel}>
+                                    {wk.label.replace(" (", "\n(")}
+                                </div>
+                                {days.map((_, di) => {
+                                    const cellTasks = placedTasks[wk.id][di] || [];
+                                    const cellDateTs = wk.startTs + di * DAY_MS;
+
+                                    return (
+                                        <div
+                                            key={di}
+                                            className={styles.timelineCell}
+                                            onDragOver={handleDragOver}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={(e) => handleDrop(e, cellDateTs)}
+                                        >
+                                            {cellTasks.map(t => (
+                                                <TimelineCard
                                                     key={t.id}
-                                                    className={styles.timelineCard}
-                                                    style={{ background: c.bg, border: `1.5px solid ${c.border}` }}
-                                                    draggable
-                                                    onDragStart={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDragStart(e, t.id);
-                                                    }}
-                                                >
-                                                    <div style={{ fontSize: 11, fontWeight: 700, color: c.text, fontFamily: "'DM Sans', sans-serif", marginBottom: 4, lineHeight: 1.3 }}>{t.title}</div>
-                                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <span style={{ fontSize: 9, fontWeight: 800, color: c.text, opacity: 0.75, fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase" }}>{t.priority || "MEDIUM"}</span>
-                                                        <div style={{ display: "flex" }}>
-                                                            {(t.assignees_info || []).slice(0, 2).map((a, i) => (
-                                                                <div key={a.id} className={styles.avatarMini} style={{ marginLeft: i > 0 ? -6 : 0 }} title={a.name}>
-                                                                    {(a.name || "?").slice(0, 2).toUpperCase()}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ))}
-                </div>
+                                                    task={t}
+                                                    colors={colors}
+                                                    members={members}
+                                                    assignees={t.assignees_info || []}
+                                                    onUpdate={onUpdate}
+                                                    onDragStart={handleDragStart}
+                                                />
+                                            ))}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ))}
+                    </div>
 
-                <div className={styles.paginationArea}>
-                    {Array.from({ length: totalPages }).map((_, i) => (
-                        <button
-                            key={i}
-                            className={`${styles.pageDot} ${page === i ? styles.pageDotActive : ""}`}
-                            onClick={() => setPage(i)}
-                            aria-label={`Go to page ${i + 1}`}
-                        />
-                    ))}
+                    <div className={styles.paginationArea}>
+                        {Array.from({ length: totalPages }).map((_, i) => (
+                            <button
+                                key={i}
+                                className={`${styles.pageDot} ${page === i ? styles.pageDotActive : ""}`}
+                                onClick={() => setPage(i)}
+                                aria-label={`Go to page ${i + 1}`}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function TimelineCard({ task, colors, members, assignees, onUpdate, onDragStart }) {
+    const [showPopup, setShowPopup] = useState(false);
+    const triggerRef = useRef(null);
+    const c = colors[(task.priority || "medium").toLowerCase()] || colors.medium;
+
+    const toggleAssignee = (userId) => {
+        let currentIds = assignees.map(a => a.id);
+        if (currentIds.includes(userId)) {
+            currentIds = currentIds.filter(id => id !== userId);
+        } else {
+            currentIds.push(userId);
+        }
+        onUpdate(task.id, { assigned_to: currentIds });
+    };
+
+    return (
+        <div
+            className={styles.timelineCard}
+            style={{
+                background: c.bg,
+                border: `1.5px solid ${c.border}`,
+                position: showPopup ? "relative" : "static",
+                zIndex: showPopup ? 50 : "auto"
+            }}
+            draggable
+            onDragStart={(e) => {
+                e.stopPropagation();
+                onDragStart(e, task.id);
+            }}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                setShowPopup(true);
+            }}
+        >
+            <div style={{ fontSize: 11, fontWeight: 700, color: c.text, marginBottom: 4, lineHeight: 1.3 }}>{task.title}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: 9, fontWeight: 800, color: c.text, textTransform: "uppercase" }}>{task.priority || "MEDIUM"}</span>
+                <div
+                    ref={triggerRef}
+                    style={{ cursor: "pointer" }}
+                    onClick={(e) => { e.stopPropagation(); setShowPopup(v => !v); }}
+                >
+                    <TaskAvatarStack assignees={assignees} size={16} max={2} />
+                </div>
+            </div>
+
+            <TaskAssigneePopup
+                isOpen={showPopup}
+                onClose={() => setShowPopup(false)}
+                members={members}
+                assignees={assignees}
+                onToggleAssignee={toggleAssignee}
+                triggerRef={triggerRef}
+            />
         </div>
     );
 }
