@@ -265,3 +265,86 @@
 .addCardInput::placeholder {
     color: #b0a396;
 }
+
+.dateLabelInteractive {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dateLabelInteractive:hover {
+    text-decoration: underline;
+}
+
+.assignPopupBoard {
+    position: absolute;
+    bottom: 30px;
+    right: -20px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.assignPopupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.assignPopupTitle {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.closePopupBtn {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.closePopupBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.assignItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 2px;
+}
+
+.assignItem:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.assignItemSelected {
+    background: rgba(0, 0, 0, 0.02);
+}
