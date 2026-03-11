@@ -130,3 +130,20 @@ def request_teacher_role(request):
     user.role = 'pending_teacher'
     user.save()
     return Response({'message': 'Teacher role request submitted successfully.'})
+
+# Helper functions
+
+def _serialize_user(u):
+    return {
+        'id': u.id,
+        'username': u.username,
+        'email': u.email,
+        'first_name': u.first_name,
+        'last_name': u.last_name,
+        'role': u.role,
+        'is_active': u.is_active,
+        'is_staff': u.is_staff,
+        'is_superuser': u.is_superuser,
+        'date_joined': u.date_joined,
+        'ban_reason': u.ban_reason,
+    }
