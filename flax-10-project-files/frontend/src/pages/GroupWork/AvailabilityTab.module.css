@@ -124,6 +124,170 @@
     color: #e0b44b;
 }
 
+.activeSection {
+    padding: 20px 24px;
+    background: #fff;
+    border-bottom: 2px solid #f2e6db;
+}
+
+.sectionTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #8f7969;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+}
+
+.suggestionCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fffaf4;
+    border: 1px solid #f0dfd1;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.suggestionCard:last-child {
+    margin-bottom: 0;
+}
+
+.suggestionInfo {
+    flex: 1;
+}
+
+.suggestionTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #3c2a20;
+    margin-bottom: 4px;
+}
+
+.suggestionMeta {
+    font-size: 13px;
+    color: #9a8474;
+    margin-bottom: 8px;
+}
+
+.votes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.voteCount {
+    color: #7b6655;
+}
+
+.voteSeparator {
+    color: #d1c1b5;
+}
+
+.suggestionActions {
+    display: flex;
+    gap: 12px;
+}
+
+.acceptBtn,
+.rejectBtn,
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    padding: 6px;
+    opacity: 0.8;
+}
+
+.acceptBtn:hover,
+.rejectBtn:hover,
+.deleteBtn:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.acceptBtn {
+    color: #4a6741;
+}
+
+.rejectBtn {
+    color: #8b4513;
+}
+
+.deleteBtn {
+    color: #b04b4b;
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(60, 42, 32, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.modal h4 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    color: #3c2a20;
+}
+
+.modal p {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    color: #7b6655;
+    line-height: 1.5;
+}
+
+.modalButtons {
+    display: flex;
+    gap: 12px;
+}
+
+.cancelBtn,
+.confirmBtn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cancelBtn {
+    border: 1px solid #f0dfd1;
+    background: #fff;
+    color: #7b6655;
+}
+
+.confirmBtn {
+    border: none;
+    background: #d4850a;
+    color: #fff;
+}
+
 .loading,
 .empty {
     padding: 40px;

@@ -91,6 +91,32 @@ def group_availability(request, project_id):
     # High score first, then sooner date
     suggestions.sort(key=lambda x: (-x["free_count"], x["start"]))
     
+    # 7. Include active suggestions
+    active_suggestions_qs = project.suggestions.filter(
+        start_time__gte=timezone.now()
+    ).prefetch_related("responses__user", "suggested_by")
+    
+    active_suggestions = []
+    for s in active_suggestions_qs:
+        active_suggestions.append({
+            "id": s.id,
+            "start": s.start_time.isoformat(),
+            "end": s.end_time.isoformat(),
+            "suggested_by": {
+                "id": s.suggested_by.id,
+                "username": s.suggested_by.username,
+            },
+            "responses": [
+                {
+                    "user_id": r.user.id,
+                    "username": r.user.username,
+                    "status": r.status
+                } for r in s.responses.all()
+            ]
+        })
+    
     return Response({
-        "suggestions": suggestions[:5]
+        "current_user_id": request.user.id,
+        "suggestions": suggestions[:5],
+        "active_suggestions": active_suggestions
     })
