@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 ROLE_CHOICES = [
     ('student', 'Student'),
     ('teacher', 'Teacher'),
+    ('pending_teacher', 'Pending Teacher'),
 ]
 
 class User(AbstractUser):
@@ -20,10 +21,11 @@ class User(AbstractUser):
 
     weekly_goal_hours = models.IntegerField(default=20)
     role = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=ROLE_CHOICES,
         default='student'
     )
+    ban_reason = models.TextField(blank=True, default="")
 
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
 
@@ -32,3 +34,6 @@ class User(AbstractUser):
 
     def is_student(self):
         return self.role == 'student'
+
+    def is_pending_teacher(self):
+        return self.role == 'pending_teacher'
