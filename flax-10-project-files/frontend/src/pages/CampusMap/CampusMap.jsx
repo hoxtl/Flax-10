@@ -796,6 +796,9 @@ export default function CampusMap() {
           </div>
         </section>
 
+        {/* Calendar Events */}
+        <section className={styles.section}></section>
+
         <section className={styles.section}>
           <div className={styles.sectionLabel}>
             <span className={styles.stepBadge}>1</span>
