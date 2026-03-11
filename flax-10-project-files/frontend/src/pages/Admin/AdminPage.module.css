@@ -1,0 +1,9 @@
+.page {
+  padding: 2rem 2.5rem 4rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  font-family: inherit;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+}
