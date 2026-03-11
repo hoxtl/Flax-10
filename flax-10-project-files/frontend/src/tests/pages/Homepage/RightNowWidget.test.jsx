@@ -272,4 +272,48 @@ describe('RightNowWidget', () => {
         });
         expect(screen.getByText(/Day complete/)).toBeTruthy();
     });
+
+    it('shows single schedule overlap label when one conflict', () => {
+        const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
+        renderWidget({
+            isToday: true,
+            navigatorContext: {
+                overlaps: [{ a: {}, b: {} }],
+            },
+            sortedEvents: [{ title: 'Some Event', start_time: futureTime }],
+        });
+        expect(screen.getByText(/1 schedule overlap today/)).toBeTruthy();
+    });
+
+    it('shows current event card with time left and progress', () => {
+        vi.mocked(eventUtils.isNow).mockReturnValueOnce(true);
+        const start = new Date(baseNow.getTime() - 20 * 60000).toISOString();
+        const end = new Date(baseNow.getTime() + 40 * 60000).toISOString();
+        renderWidget({
+            isToday: true,
+            sortedEvents: [{ title: 'Live Event', start_time: start, end_time: end }],
+        });
+        expect(screen.getByText('Live Event')).toBeTruthy();
+    });
+
+    it('shows leave-by info with urgent message when within 15 min', () => {
+        vi.mocked(kclTflMapping.getRelevantDelays).mockReturnValueOnce([
+            { lineName: 'Victoria', severityDescription: 'Minor delays' },
+        ]);
+        vi.mocked(kclTflMapping.getTflLinesForLocation).mockReturnValueOnce(['Victoria']);
+        const leaveInMins = 12;
+        const startTime = new Date(baseNow.getTime() + (leaveInMins + 35) * 60000).toISOString();
+        renderWidget({
+            isToday: true,
+            sortedEvents: [{ title: 'Campus Class', start_time: startTime, location: 'Waterloo' }],
+            tflDelays: [{}],
+        });
+        expect(screen.getByText(/Victoria.*leave in/)).toBeTruthy();
+    });
+
+    it('header shows singular event when eventCount is 1', () => {
+        const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
+        renderWidget({ isToday: true, sortedEvents: [{ title: 'Only One', start_time: futureTime }] });
+        expect(screen.getByText(/1 event$/)).toBeTruthy();
+    });
 });

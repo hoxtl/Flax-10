@@ -279,4 +279,16 @@ describe('SocietiesPage', () => {
         await waitFor(() => expect(mockConfirm).toHaveBeenCalled());
         expect(unreportSocietyMock).not.toHaveBeenCalled();
     });
+
+    it('handleUnreport catches API error and logs without updating', async () => {
+        mockUseSocieties.societies = [{ id: 'e1', name: 'Error Club' }];
+        mockConfirm.mockResolvedValue(true);
+        unreportSocietyMock.mockRejectedValue(new Error('API failed'));
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText('UnreportSociety'));
+        await waitFor(() => expect(unreportSocietyMock).toHaveBeenCalledWith('e1'));
+        expect(mockUseSocieties.updateSocietyLocally).not.toHaveBeenCalled();
+        errSpy.mockRestore();
+    });
 });

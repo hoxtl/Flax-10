@@ -94,4 +94,51 @@ describe('UserListModal', () => {
     expect(handles[0]).toBe('@alice');
     expect(screen.queryByTestId('share-1')).not.toBeInTheDocument();
   });
+
+  it('uses username when first_name and last_name are both empty', () => {
+    const usersOnlyUsername = [
+      { id: 10, username: 'anon', first_name: '', last_name: '', is_sharing: false },
+    ];
+    render(<UserListModal title="People" users={usersOnlyUsername} onClose={vi.fn()} />);
+    expect(screen.getByText('anon')).toBeInTheDocument();
+  });
+
+  it('formats name from first_name only', () => {
+    const usersFirstOnly = [
+      { id: 20, username: 'jane', first_name: 'Jane', last_name: '', is_sharing: false },
+    ];
+    render(<UserListModal title="People" users={usersFirstOnly} onClose={vi.fn()} />);
+    expect(screen.getByText('Jane')).toBeInTheDocument();
+  });
+
+  it('sorts sharing users before non-sharing when neither is current user', () => {
+    localStorage.setItem('user', JSON.stringify({ id: 99, username: 'other' }));
+    const list = [
+      { id: 1, username: 'a', first_name: 'A', last_name: 'A', is_sharing: false },
+      { id: 2, username: 'b', first_name: 'B', last_name: 'B', is_sharing: true },
+    ];
+    render(<UserListModal title="People" users={list} onClose={vi.fn()} />);
+    const handles = screen.getAllByText(/@/).map((el) => el.textContent);
+    expect(handles).toEqual(['@b', '@a']);
+  });
+
+  it('handles missing onUserClick without crashing', () => {
+    render(<UserListModal title="People" users={users} onClose={vi.fn()} />);
+    fireEvent.click(screen.getByText('@bob'));
+  });
+
+  it('handles empty localStorage user and sorts by is_sharing', () => {
+    localStorage.removeItem('user');
+    render(<UserListModal title="People" users={users} onClose={vi.fn()} />);
+    const handles = screen.getAllByText(/@/).map((el) => el.textContent);
+    expect(handles).toEqual(['@alice', '@cara', '@bob']);
+  });
+
+  it('renders user without id using username as key', () => {
+    const usersNoId = [
+      { username: 'noid', first_name: 'No', last_name: 'Id', is_sharing: false },
+    ];
+    render(<UserListModal title="People" users={usersNoId} onClose={vi.fn()} />);
+    expect(screen.getByText('No Id')).toBeInTheDocument();
+  });
 });

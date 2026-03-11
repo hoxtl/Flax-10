@@ -23,6 +23,22 @@ describe('BentoGrid', () => {
         const { container } = render(<BentoGrid className="my-grid"><span /></BentoGrid>);
         expect(container.firstChild.className).toContain('my-grid');
     });
+
+    it('renders without className', () => {
+        const { container } = render(<BentoGrid><span>X</span></BentoGrid>);
+        expect(screen.getByText('X')).toBeInTheDocument();
+    });
+
+    it('renders multiple children', () => {
+        render(
+            <BentoGrid>
+                <div>One</div>
+                <div>Two</div>
+            </BentoGrid>
+        );
+        expect(screen.getByText('One')).toBeInTheDocument();
+        expect(screen.getByText('Two')).toBeInTheDocument();
+    });
 });
 
 describe('BentoCard', () => {
@@ -38,23 +54,40 @@ describe('BentoCard', () => {
 
     it('handles mouse move event without throwing', () => {
         const { container } = render(<BentoCard><span /></BentoCard>);
-        const card = container.querySelector('[class*="card"]') || container.firstChild.firstChild;
+        const card = container.querySelector('[class*="card"]') || container.firstChild?.firstChild;
         expect(() => fireEvent.mouseMove(card, { clientX: 100, clientY: 50 })).not.toThrow();
     });
 
     it('updates glow position on mouse move when ref is set', () => {
         const { container } = render(<BentoCard><span data-testid="inner">X</span></BentoCard>);
-        const card = container.querySelector('[class*="card"]') || container.firstChild?.firstChild;
-        if (card) {
-            card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
-            fireEvent.mouseMove(card, { clientX: 100, clientY: 50 });
-        }
+        const contentDiv = container.querySelector('[class*="content"]');
+        const card = contentDiv?.parentElement;
+        card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+        fireEvent.mouseMove(card, { clientX: 100, clientY: 50 });
         expect(screen.getByTestId('inner')).toBeInTheDocument();
     });
 
-    it('handles mouse leave event without throwing', () => {
-        const { container } = render(<BentoCard><span /></BentoCard>);
-        const card = container.firstChild;
-        expect(() => fireEvent.mouseLeave(card)).not.toThrow();
+    it('handles mouse leave and resets glow position', () => {
+        const { container } = render(<BentoCard><span data-testid="inner">X</span></BentoCard>);
+        const contentDiv = container.querySelector('[class*="content"]');
+        const card = contentDiv?.parentElement;
+        card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+        fireEvent.mouseMove(card, { clientX: 100, clientY: 50 });
+        fireEvent.mouseLeave(card);
+        expect(screen.getByTestId('inner')).toBeInTheDocument();
+    });
+
+    it('renders without className', () => {
+        render(<BentoCard><span>Content</span></BentoCard>);
+        expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+
+    it('handles mouse move and updates glow position', () => {
+        const { container } = render(<BentoCard><span>X</span></BentoCard>);
+        const contentDiv = container.querySelector('[class*="content"]');
+        const card = contentDiv?.parentElement;
+        card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 100, height: 100 });
+        fireEvent.mouseMove(card, { clientX: 50, clientY: 50 });
+        expect(screen.getByText('X')).toBeInTheDocument();
     });
 });

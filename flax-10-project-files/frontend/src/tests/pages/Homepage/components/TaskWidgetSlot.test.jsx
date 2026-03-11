@@ -20,12 +20,13 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('../../../../pages/Tasks/components/TaskCard', () => ({
-  TaskContextMenu: ({ task, onClose, onEditOpen, onDelete }) => (
+  TaskContextMenu: ({ task, onClose, onEditOpen, onDelete, onEdit }) => (
     <div data-testid="task-context-menu">
       <span>{task?.title}</span>
       <button onClick={onClose}>Close</button>
       <button onClick={onEditOpen}>Edit</button>
       <button onClick={onDelete}>Delete</button>
+      {onEdit && <button onClick={() => onEdit({ title: 'Updated title' })}>Inline Edit</button>}
     </div>
   ),
 }));
@@ -265,5 +266,27 @@ describe('TaskWidgetSlot', () => {
       taskWidgetList: [],
     });
     expect(screen.getByText(/1 task.*completed today/)).toBeTruthy();
+  });
+
+  it('calls onInlineTaskEdit when context menu Inline Edit is clicked', async () => {
+    const onInlineTaskEdit = vi.fn().mockResolvedValue(undefined);
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'Edit Me', completed: false }],
+      taskWidgetList: [{ id: 1, title: 'Edit Me', completed: false }],
+      onInlineTaskEdit,
+    });
+    fireEvent.contextMenu(screen.getByText('Edit Me').closest('li'));
+    fireEvent.click(screen.getByText('Inline Edit'));
+    await vi.waitFor(() =>
+      expect(onInlineTaskEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }), { title: 'Updated title' })
+    );
+  });
+
+  it('shows Urgent pill for priority urgent', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: 'Urgent task', completed: false, priority: 'urgent' }],
+      taskWidgetList: [{ id: 1, title: 'Urgent task', completed: false, priority: 'urgent' }],
+    });
+    expect(screen.getByText('Urgent')).toBeTruthy();
   });
 });

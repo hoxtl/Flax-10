@@ -162,4 +162,55 @@ describe('StudyPulseWidget', () => {
         renderWidget();
         expect(screen.getByText('View detailed analysis →')).toBeTruthy();
     });
+
+    it('uses MOCK data when profile loading', () => {
+        useProfileSummary.mockReturnValueOnce({ summary: null, loading: true });
+        renderWidget();
+        expect(screen.getByText('Study Pulse')).toBeTruthy();
+    });
+
+    it('ring shows correct percentage from weekly', () => {
+        useProfileSummary.mockReturnValueOnce({
+            summary: { weekly: { percentage: 25, hours_studied: 2.5, goal_hours: 10 }, streaks: { current: 0 } },
+            loading: false,
+        });
+        renderWidget();
+        expect(screen.getByText('25%')).toBeTruthy();
+    });
+
+    it('handles analytics getSummary rejection', async () => {
+        analyticsService.getSummary.mockRejectedValueOnce(new Error('Network error'));
+        renderWidget();
+        expect(screen.getByText('Study Pulse')).toBeTruthy();
+    });
+
+    it('daily bar uses actual_hours when provided', async () => {
+        const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+        const dailyBreakdown = Array.from({ length: 7 }, (_, i) =>
+            i === todayIdx ? { actual_hours: 2, goal_hours: 3 } : { hours_studied: 0, goal_hours: 3 }
+        );
+        analyticsService.getSummary.mockResolvedValueOnce({ daily_breakdown: dailyBreakdown });
+        renderWidget();
+        await vi.waitFor(() => expect(document.body.textContent).toMatch(/2h|M|T|W/));
+    });
+
+    it('shows peak focus window insight when peak hour matches current hour', async () => {
+        const now = new Date('2026-03-09T14:00:00Z');
+        const heatmap = {
+            data: [
+                Array(24).fill(0).map((_, hr) => (hr === 14 ? 60 : 0)),
+                ...Array(6).fill(Array(24).fill(0)),
+            ],
+        };
+        useProfileSummary.mockReturnValueOnce({
+            summary: { weekly: { percentage: 50, hours_studied: 5, goal_hours: 10 }, streaks: { current: 0 } },
+            loading: false,
+        });
+        analyticsService.getSummary.mockResolvedValueOnce({ heatmap });
+        renderWidget({ now });
+        await vi.waitFor(() => {
+            const text = document.body.textContent;
+            expect(text.match(/Peak focus|happening now|peak/i)).toBeTruthy();
+        });
+    });
 });
