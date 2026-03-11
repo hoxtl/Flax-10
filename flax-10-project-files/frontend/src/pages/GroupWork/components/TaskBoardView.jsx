@@ -61,10 +61,32 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
         }
     };
 
+    const handleDrop = (e, colId) => {
+        e.preventDefault();
+        const taskId = e.dataTransfer.getData("taskId");
+        if (taskId) {
+            onUpdate(Number(taskId), { status: colId });
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    const handleDragStart = (e, taskId) => {
+        e.dataTransfer.setData("taskId", taskId);
+    };
+
     return (
         <div className={styles.boardContainer}>
             {columns.map(col => (
-                <div key={col.id} className={styles.column} style={{ background: col.bg }}>
+                <div
+                    key={col.id}
+                    className={styles.column}
+                    style={{ background: col.bg }}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, col.id)}
+                >
                     <div className={styles.colHeader} style={{ color: col.color }}>
                         <div className={styles.colTitleWrapper}>
                             <div className={styles.colDot} style={{ background: col.dotCol }} />
@@ -80,7 +102,12 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
                             const dateStr = formatDate(t.due_date);
 
                             return (
-                                <div key={t.id} className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""}`}>
+                                <div
+                                    key={t.id}
+                                    className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""}`}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, t.id)}
+                                >
                                     <div className={styles.cardHeader}>
                                         <span className={styles.cardPriority} style={{ background: pColor.bg, color: pColor.text }}>
                                             {t.priority || "Medium"}
