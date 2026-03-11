@@ -80,9 +80,6 @@
     box-shadow: var(--shadow-md);
 }
 
-.boardCardDone {
-    opacity: 0.6;
-}
 
 .boardCardActive {
     position: relative;
@@ -155,13 +152,30 @@
 }
 
 .iconBtnDone {
-    color: #4ade80;
+    color: var(--success);
 }
 
 .iconBtnDelete:hover {
     background: var(--danger-bg);
     color: var(--danger);
 }
+
+/* Status Column Themes */
+.colTodo { background: var(--hover-light) !important; color: #8a7a6a; }
+.colInProgress { background: rgba(84, 125, 163, 0.08) !important; color: #547da3; }
+.colDone { background: rgba(107, 138, 106, 0.08) !important; color: #6b8a6a; }
+
+[data-theme="dark"] .colTodo { background: rgba(180, 164, 144, 0.1) !important; color: #b0a396; }
+[data-theme="dark"] .colInProgress { background: rgba(84, 125, 163, 0.15) !important; color: #80b2d6; }
+[data-theme="dark"] .colDone { background: rgba(107, 138, 106, 0.15) !important; color: #8bc28a; }
+
+.colTodoDot { background: #c0a080; }
+.colInProgressDot { background: #80b2d6; }
+.colDoneDot { background: #8bc28a; }
+
+.colTodoText { color: inherit; }
+.colInProgressText { color: inherit; }
+.colDoneText { color: inherit; }
 
 .cardTitle {
     font-size: 14px;
@@ -219,7 +233,7 @@
 .statusSelect {
     appearance: none;
     background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 2px 6px;
     font-size: 11px;
@@ -235,7 +249,7 @@
 
 .addCardBtn {
     background: transparent;
-    border: 1px dashed rgba(0, 0, 0, 0.15);
+    border: 1px dashed var(--border);
     border-radius: 12px;
     width: 100%;
     padding: 12px;
