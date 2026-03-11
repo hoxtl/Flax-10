@@ -126,7 +126,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8a7355;
+    color: var(--text-secondary);
     margin-left: 8px;
     transition: transform 0.2s ease;
 }
