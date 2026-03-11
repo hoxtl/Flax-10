@@ -45,14 +45,21 @@ export default function GroupTasksTab({ projectId, members }) {
         fetchTasks();
     }, [projectId]);
 
-    const addTask = async (e) => {
-        e.preventDefault();
-        if (!newTaskTitle.trim()) return;
+    const handleAddTaskToCol = (title, status) => {
+        addTask(new Event("submit"), title, status);
+    };
+
+    const addTask = async (e, directTitle = null, directStatus = null) => {
+        if (e && e.preventDefault) e.preventDefault();
+
+        const title = directTitle || newTaskTitle.trim();
+        if (!title) return;
 
         const payload = {
-            title: newTaskTitle,
+            title: title,
             group_project: projectId,
             priority: "medium",
+            status: directStatus || "todo"
         };
 
         try {
@@ -65,7 +72,7 @@ export default function GroupTasksTab({ projectId, members }) {
             if (res.ok) {
                 const created = await res.json();
                 setTasks((prev) => [...prev, created]);
-                setNewTaskTitle("");
+                if (!directTitle) setNewTaskTitle("");
             }
         } catch (err) {
             console.error("Network error adding task:", err);
@@ -211,6 +218,7 @@ export default function GroupTasksTab({ projectId, members }) {
                             onToggle={toggleTask}
                             onUpdate={updateTask}
                             onDelete={deleteTask}
+                            onAdd={handleAddTaskToCol}
                         />
                     )}
                 </>
