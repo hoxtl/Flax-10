@@ -114,3 +114,19 @@ def dismiss_report(request, report_id):
         return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
     report.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+# Allow students to request teacher role
+
+@api_view(['POST'])
+def request_teacher_role(request):
+    """Allow a student to request the teacher role."""
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    if user.role == 'teacher':
+        return Response({'error': 'You are already a teacher'}, status=status.HTTP_400_BAD_REQUEST)
+    if user.role == 'pending_teacher':
+        return Response({'error': 'You already have a pending request'}, status=status.HTTP_400_BAD_REQUEST)
+    user.role = 'pending_teacher'
+    user.save()
+    return Response({'message': 'Teacher role request submitted successfully.'})
