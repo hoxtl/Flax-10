@@ -40,28 +40,30 @@ function MemberRow({ member, isSelected, onToggle }) {
     );
 }
 
-export default function TaskAssigneePopup({ isOpen, onClose, members, assignees, onToggleAssignee, triggerRef, position = "bottom" }) {
-    const { popupRef, calcPos } = usePopupPosition(isOpen, triggerRef, onClose);
-    const isTop = calcPos === "top";
+function AnimatedPopup({ isOpen, isTop, children, popupRef }) {
+    const motionProps = { initial: { opacity: 0, scale: 0.95, y: isTop ? 10 : -10 }, animate: { opacity: 1, scale: 1, y: 0 }, exit: { opacity: 0, scale: 0.95, y: isTop ? 10 : -10 }, transition: { duration: 0.15, ease: "easeOut" } };
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div ref={popupRef} className={styles.assignPopupBoard}
-                    initial={{ opacity: 0, scale: 0.95, y: isTop ? 10 : -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: isTop ? 10 : -10 }}
-                    transition={{ duration: 0.15, ease: "easeOut" }}
-                    style={{ originY: isTop ? 1 : 0, ...(isTop ? { top: "auto", bottom: "100%", marginBottom: 8, marginTop: 0 } : {}) }}
-                >
-                    <div className={styles.assignPopupHeader}>
-                        <span className={styles.assignPopupTitle}>Assign Members</span>
-                        <span className={styles.closePopupBtn} onClick={onClose}><X size={12} /></span>
-                    </div>
-                    {members.map(m => (
-                        <MemberRow key={m.id} member={m} isSelected={assignees.some(a => String(a.id) === String(m.user))} onToggle={onToggleAssignee} />
-                    ))}
+                <motion.div ref={popupRef} className={styles.assignPopupBoard} {...motionProps} style={{ originY: isTop ? 1 : 0, ...(isTop ? { top: "auto", bottom: "100%", marginBottom: 8, marginTop: 0 } : {}) }}>
+                    {children}
                 </motion.div>
             )}
         </AnimatePresence>
+    );
+}
+
+export default function TaskAssigneePopup({ isOpen, onClose, members, assignees, onToggleAssignee, triggerRef }) {
+    const { popupRef, calcPos } = usePopupPosition(isOpen, triggerRef, onClose);
+    return (
+        <AnimatedPopup isOpen={isOpen} isTop={calcPos === "top"} popupRef={popupRef}>
+            <div className={styles.assignPopupHeader}>
+                <span className={styles.assignPopupTitle}>Assign Members</span>
+                <span className={styles.closePopupBtn} onClick={onClose}><X size={12} /></span>
+            </div>
+            {members.map(m => (
+                <MemberRow key={m.id} member={m} isSelected={assignees.some(a => String(a.id) === String(m.user))} onToggle={onToggleAssignee} />
+            ))}
+        </AnimatedPopup>
     );
 }
