@@ -8,7 +8,10 @@ import styles from "./MemberAvatar.module.css";
 function getInitials(member) {
     if (member.first_name && member.last_name)
         return `${member.first_name[0]}${member.last_name[0]}`.toUpperCase();
-    return (member.first_name?.[0] || member.user_name?.[0] || member.name?.[0] || "?").toUpperCase();
+    const name = member.user_name || member.name || member.first_name || "";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return (parts[0]?.[0] || "?").toUpperCase();
 }
 
 function getDisplayName(member) {
