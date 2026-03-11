@@ -188,6 +188,23 @@ describe('useTimerLogic Hook', () => {
         expect(result.current.task).toBe('Pre-filled Task');
     });
 
+    it('does not pre-fill task when activeTaskMeta.title is null or empty', () => {
+        const { result: r1 } = renderHook(() => useTimerLogic(null, null, { title: null }));
+        expect(r1.current.task).toBe('');
+        const { result: r2 } = renderHook(() => useTimerLogic(null, null, { title: '' }));
+        expect(r2.current.task).toBe('');
+        const { result: r3 } = renderHook(() => useTimerLogic(null, null, {}));
+        expect(r3.current.task).toBe('');
+    });
+
+    it('does not apply estimated blocks when both workMins and blocks invalid', () => {
+        const meta = { estimatedWorkMinutes: NaN, estimatedSessionCount: 0, estimatedBlocks: 0 };
+        const { result } = renderHook(() => useTimerLogic('task-x', null, meta));
+        expect(result.current.workTime).toBe(25);
+        expect(result.current.targetSessions).toBe(4);
+        expect(result.current.timeLeft).toBe(1500);
+    });
+
     it('applies estimatedWorkMinutes and sessions from activeTaskMeta', () => {
         const meta = { estimatedWorkMinutes: 45, estimatedSessionCount: 2 };
         const { result } = renderHook(() => useTimerLogic('task-1', null, meta));

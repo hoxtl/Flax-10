@@ -367,7 +367,7 @@ function LeaveTimerActions({ pendingNav, setPendingNav, t, setShowQuickAdd, onNa
 }
 
 function shouldShowBackToTop(activeNav) {
-  return activeNav !== "map" && activeNav !== "modules" && activeNav !== "tasks";
+  return activeNav !== "home" && activeNav !== "map" && activeNav !== "modules" && activeNav !== "tasks";
 }
 
 export default function DashboardLayout({ activeNav, onNavChange, children }) {

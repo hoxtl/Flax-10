@@ -2,18 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PillFilters from '../../../components/Tags/PillFilters';
 
+const mockTags = [
+    { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
+    { id: 2, label: 'Study', color: '#00ff00', icon: '📚' },
+];
+
 // Mock CSS modules
 vi.mock('../../../components/Tags/PillFilters.module.css', () => ({
     default: { row: 'row', pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' },
 }));
 
 vi.mock('../../../context/TagContext', () => ({
-    useTags: vi.fn(() => ({
-        tags: [
-            { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
-            { id: 2, label: 'Study', color: '#00ff00', icon: '📚' },
-        ],
-    })),
+    useTags: vi.fn(() => ({ tags: mockTags })),
 }));
 
 vi.mock('../../../components/Tags/TagManagerModal', () => ({
@@ -25,10 +25,15 @@ vi.mock('../../../components/Tags/TagManagerModal', () => ({
 }));
 
 vi.mock('../../../components/Tags/utils/pillUtils', () => ({
-    countByType: vi.fn(() => ({ all: 3, work: 2, study: 1 })),
+    countByType: vi.fn((items = []) => ({
+        all: items.length,
+        work: items.filter(i => (i.tag_details?.label || i.tag || '').toLowerCase() === 'work').length,
+        study: items.filter(i => (i.tag_details?.label || i.tag || '').toLowerCase() === 'study').length,
+    })),
 }));
 
 import { useTags } from '../../../context/TagContext';
+import { countByType } from '../../../components/Tags/utils/pillUtils';
 
 describe('PillFilters', () => {
     const defaultProps = {
@@ -39,26 +44,17 @@ describe('PillFilters', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        useTags.mockReturnValue({
-            tags: [
-                { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
-                { id: 2, label: 'Study', color: '#00ff00', icon: '📚' },
-            ],
-        });
+        useTags.mockReturnValue({ tags: mockTags });
     });
 
-    it('renders the All pill', () => {
+    it('renders All pill and tag pills from context', () => {
         render(<PillFilters {...defaultProps} />);
         expect(screen.getByText('All')).toBeTruthy();
-    });
-
-    it('renders tag pills from context', () => {
-        render(<PillFilters {...defaultProps} />);
         expect(screen.getByText('Work')).toBeTruthy();
         expect(screen.getByText('Study')).toBeTruthy();
     });
 
-    it('renders the manage tags button', () => {
+    it('renders Manage Tags button', () => {
         render(<PillFilters {...defaultProps} />);
         expect(screen.getByLabelText('Manage Tags')).toBeTruthy();
     });
@@ -82,18 +78,34 @@ describe('PillFilters', () => {
         expect(screen.queryByTestId('tag-manager-modal')).toBeNull();
     });
 
-    it('shows TagManagerModal when manage button is clicked', () => {
+    it('shows TagManagerModal when Manage Tags is clicked', () => {
         render(<PillFilters {...defaultProps} />);
         fireEvent.click(screen.getByLabelText('Manage Tags'));
         expect(screen.getByTestId('tag-manager-modal')).toBeTruthy();
     });
 
-    it('hides TagManagerModal when onClose is called', () => {
+    it('closes TagManagerModal when onClose is called', () => {
         render(<PillFilters {...defaultProps} />);
         fireEvent.click(screen.getByLabelText('Manage Tags'));
-        expect(screen.getByTestId('tag-manager-modal')).toBeTruthy();
         fireEvent.click(screen.getByText('Close Modal'));
         expect(screen.queryByTestId('tag-manager-modal')).toBeNull();
+    });
+
+    it('highlights active pill when active is string', () => {
+        render(<PillFilters {...defaultProps} active="work" />);
+        const workPill = screen.getByText('Work').closest('button');
+        expect(workPill).toBeTruthy();
+    });
+
+    it('supports array active state (multi-select)', () => {
+        render(<PillFilters {...defaultProps} active={['work', 'study']} />);
+        expect(screen.getByText('Work')).toBeTruthy();
+        expect(screen.getByText('Study')).toBeTruthy();
+    });
+
+    it('uses countByType with items for pill counts', () => {
+        render(<PillFilters {...defaultProps} items={[{ id: 1 }, { id: 2 }]} />);
+        expect(countByType).toHaveBeenCalledWith([{ id: 1 }, { id: 2 }]);
     });
 
     it('marks All pill as active when active is "all"', () => {

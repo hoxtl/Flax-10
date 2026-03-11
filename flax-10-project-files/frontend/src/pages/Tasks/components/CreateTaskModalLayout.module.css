@@ -3,16 +3,10 @@
  * Form field styles live in CreateTaskModalForm.module.css.
  */
 
-.overlay {
-  position: fixed;
-  inset: 0;
+.modalBackdrop {
   background: rgba(74, 52, 33, 0.18);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2200;
   animation: fadeIn 0.15s ease;
 }
 
@@ -21,26 +15,29 @@
   to { opacity: 1; }
 }
 
-.modal {
+.modalShell {
   font-family: var(--font-body);
-  background: var(--panel, #FFFCFA);
   border: none;
   border-radius: 20px;
   width: min(840px, 95vw);
   max-width: 840px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 80px rgba(74, 52, 33, 0.12), 0 2px 8px rgba(74, 52, 33, 0.06);
   animation: slideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
   max-height: 96vh;
   min-height: min(64vh, 620px);
+  padding: 0;
 }
 
-.modal input,
-.modal select,
-.modal textarea,
-.modal button {
+.modalContent {
+  padding: 0;
+}
+
+.modalShell input,
+.modalShell select,
+.modalShell textarea,
+.modalShell button {
   font-family: var(--font-body);
 }
 
@@ -179,7 +176,7 @@
 }
 
 @media (max-width: 900px) {
-  .modal {
+  .modalShell {
     width: min(92vw, 760px);
     min-height: min(70vh, 620px);
   }

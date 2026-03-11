@@ -42,6 +42,18 @@ describe('PopupHeader', () => {
         expect(screen.queryByText('None')).toBeNull();
     });
 
+    it('uses tag.name when tag.label is missing in TagBadge', () => {
+        const tag = { id: 'custom', name: 'Custom Tag', color: '#00ff00' };
+        render(<PopupHeader event={event} tag={tag} onClose={vi.fn()} />);
+        expect(screen.getByText('Custom Tag')).toBeTruthy();
+    });
+
+    it('uses default color when tag.color is missing', () => {
+        const tag = { id: 'work', label: 'Work' };
+        render(<PopupHeader event={event} tag={tag} onClose={vi.fn()} />);
+        expect(screen.getByText('Work')).toBeTruthy();
+    });
+
     it('renders society badge for society events', () => {
         const societyEvent = { title: 'Event', source: 'society', society_name: 'Chess Club' };
         render(<PopupHeader event={societyEvent} onClose={vi.fn()} />);

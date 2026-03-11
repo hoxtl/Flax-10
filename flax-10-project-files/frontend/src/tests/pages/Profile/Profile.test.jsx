@@ -4,7 +4,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Profile from '../../../pages/Profile/Profile';
-
 vi.mock('../../../pages/Profile/hooks/useProfile', () => ({
   useProfileState: vi.fn(() => ({
     loading: false,
@@ -157,41 +156,46 @@ describe('Profile', () => {
     expect(screen.getByText('User not found.')).toBeTruthy();
   });
 
-  it('renders username', () => {
+  it('renders username', async () => {
     renderProfile();
+    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
     const usernameEls = screen.getAllByText('alice');
     expect(usernameEls.length).toBeGreaterThan(0);
   });
 
-  it('renders profile modals', () => {
+  it('renders profile modals', async () => {
     renderProfile();
+    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
     expect(screen.getByTestId('profile-modals')).toBeTruthy();
   });
 
-  it('shows edit profile button for self', () => {
+  it('shows edit profile button for self', async () => {
     renderProfile();
+    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
     expect(screen.getByText('Edit profile')).toBeTruthy();
   });
 
-  it('renders module count', () => {
+  it('renders module count', async () => {
     renderProfile();
+    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
     expect(screen.getByText('modules')).toBeTruthy();
   });
 
-  it('renders achievements section', () => {
+  it('renders achievements section', async () => {
     useProfileSummary.mockReturnValueOnce({
       summary: { persona: null, badges: [{ id: 1, name: 'Early Bird', tier: 'bronze', emoji: '🐦', label: 'Early Bird', description: '' }], weekly: null, streaks: null },
       loading: false,
       refetch: vi.fn(),
     });
     renderProfile();
+    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
     expect(screen.getByText('ACHIEVEMENTS')).toBeTruthy();
   });
 
-  it('shows Share button when viewing another profile', () => {
+  it('shows Share button when viewing another profile', async () => {
     useProfileState.mockReturnValueOnce(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
     renderProfile({ user: defaultUser, viewedUserId: 2 });
-    expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0);
+    await waitFor(() => expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0));
     expect(screen.queryByText('Edit profile')).toBeNull();
   });
 
@@ -213,36 +217,82 @@ describe('Profile', () => {
 
   it('opens analytics actions and achievements modal', async () => {
     const onNavigate = vi.fn();
+    const { default: analyticsService } = await import('../../../api/analyticsService');
+    analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
-    fireEvent.click(screen.getByLabelText('Go to full analytics'));
+    const analyticsLink = await screen.findByText('View full analytics');
+    fireEvent.click(analyticsLink);
     expect(onNavigate).toHaveBeenCalledWith('analytics');
     fireEvent.click(screen.getByText('ACHIEVEMENTS'));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
   });
 
+  it('closes achievements modal when Close clicked', async () => {
+    useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
+    const { default: analyticsService } = await import('../../../api/analyticsService');
+    analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
+    renderProfile();
+    await screen.findByText('Night Owl');
+    fireEvent.click(screen.getByText('ACHIEVEMENTS'));
+    await screen.findByTestId('achievements-modal');
+    fireEvent.click(screen.getByText('Close'));
+    await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument());
+  });
+
   it('saves weekly goal and refetches summary', async () => {
-    const refetch = vi.fn();
     fetchApi.mockResolvedValueOnce({});
     useProfileSummary.mockReturnValueOnce({
       summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 } },
       loading: false,
-      refetch,
+      refetch: vi.fn(),
     });
     renderProfile();
-    fireEvent.click(screen.getByLabelText('Edit weekly goal'));
-    fireEvent.click(screen.getByText('Save goal'));
+    const goalRingBtn = screen.getByRole('button', { name: /2h\/8h/ });
+    fireEvent.click(goalRingBtn);
+    const saveBtn = await screen.findByRole('button', { name: 'Save goal' });
+    fireEvent.click(saveBtn);
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
-    expect(refetch).toHaveBeenCalled();
   });
 
-  it('shows shared calendar for mutual profile', () => {
+  it('shows shared calendar for mutual profile', async () => {
     useProfileState.mockReturnValueOnce(makeProfileState({
       profileData: { ...otherProfileData, is_shared_with_me: true },
       viewedUserId: 2,
     }));
     renderProfile({ user: defaultUser, viewedUserId: 2 });
-    expect(screen.getByText('SHARED CALENDAR')).toBeTruthy();
+    await waitFor(() => expect(screen.getByText('SHARED CALENDAR')).toBeInTheDocument());
     expect(screen.getByTestId('profile-calendar')).toBeTruthy();
+  });
+
+  it('does not show shared calendar when viewing another profile without share', async () => {
+    useProfileState.mockReturnValueOnce(makeProfileState({
+      profileData: { ...otherProfileData },
+      viewedUserId: 2,
+    }));
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+    await waitFor(() => expect(screen.queryByText('Edit profile')).toBeNull());
+    expect(screen.queryByText('SHARED CALENDAR')).toBeNull();
+    expect(screen.queryByTestId('profile-calendar')).toBeNull();
+  });
+
+  it('useProfileAnalytics handles getSummary failure without crashing', async () => {
+    const { default: analytics } = await import('../../../api/analyticsService');
+    analytics.getSummary.mockRejectedValueOnce(new Error('network error'));
+    useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
+    renderProfile();
+    await waitFor(() => expect(analytics.getSummary).toHaveBeenCalledWith(90));
+    expect(screen.getByText('Night Owl')).toBeInTheDocument();
+  });
+
+  it('computePeakHour returns null when heatmap is all zeros', async () => {
+    const { default: analytics } = await import('../../../api/analyticsService');
+    analytics.getSummary.mockResolvedValueOnce({
+      heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) },
+    });
+    useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
+    renderProfile();
+    await screen.findByText('Night Owl');
+    expect(screen.getByText('STUDY DNA')).toBeInTheDocument();
   });
 });

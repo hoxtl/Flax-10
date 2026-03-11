@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../api/userService';
 import DateTimePicker from '../../pages/Tasks/components/DateTimePicker';
 import { SectionHeader, SubmitButton } from './SettingsUI';
+import SectionSkeleton from '../common/LoadingState/SectionSkeleton';
 import styles from '../../pages/Settings/Settings.module.css';
 
 export function SleepSchedulePanel({ onSave, isSaving }) {
@@ -41,7 +42,7 @@ export function SleepSchedulePanel({ onSave, isSaving }) {
     return `${mins} minutes total`;
   };
 
-  if (loading) return <div className={styles.loading}>Loading…</div>;
+  if (loading) return <SectionSkeleton label="Loading sleep schedule" rows={3} />;
 
   return (
     <form className={styles.form} onSubmit={handleSave}>

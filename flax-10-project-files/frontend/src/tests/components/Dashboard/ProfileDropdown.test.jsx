@@ -85,4 +85,32 @@ describe('ProfileDropdown', () => {
         fireEvent.click(screen.getByLabelText('User menu'));
         await waitFor(() => expect(screen.getByText(/Year 2/)).toBeTruthy());
     });
+
+    it('shows displayName fallback when user has no name or first/last', () => {
+        renderDropdown({ user: {} });
+        fireEvent.click(screen.getByLabelText('User menu'));
+        expect(screen.getByText('User')).toBeTruthy();
+    });
+
+    it('shows profile photo in dropdown when getUserProfile returns photo url', async () => {
+        const { getUserProfile } = await import('../../../api/userService');
+        getUserProfile.mockResolvedValueOnce({ profile_photo_url: 'https://example.com/me.jpg', year: 'Year 1', major: 'Math' });
+        renderDropdown();
+        fireEvent.click(screen.getByLabelText('User menu'));
+        await waitFor(() => expect(screen.getAllByAltText('Profile').length).toBeGreaterThan(0));
+    });
+
+    it('handles getUserProfile failure gracefully', async () => {
+        const { getUserProfile } = await import('../../../api/userService');
+        getUserProfile.mockRejectedValueOnce(new Error('network'));
+        renderDropdown();
+        fireEvent.click(screen.getByLabelText('User menu'));
+        await waitFor(() => expect(screen.getByText('Profile')).toBeTruthy());
+    });
+
+    it('does not register click outside when dropdown is closed', () => {
+        render(<ProfileDropdown user={defaultUser} onSettingsClick={vi.fn()} onLogoutClick={vi.fn()} onProfileClick={vi.fn()} />);
+        fireEvent.mouseDown(document.body);
+        expect(screen.queryByText('Settings')).toBeNull();
+    });
 });

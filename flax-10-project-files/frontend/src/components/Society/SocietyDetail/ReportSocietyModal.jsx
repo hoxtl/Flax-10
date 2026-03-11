@@ -34,6 +34,7 @@ export default function ReportSocietyModal({ society, onClose, onReportSuccess }
             onClose={onClose}
         >
             <div className={styles.container}>
+                <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} data-testid="report-form">
                 <textarea
                     className={styles.textarea}
                     placeholder="Enter the reason for reporting..."
@@ -59,6 +60,7 @@ export default function ReportSocietyModal({ society, onClose, onReportSuccess }
                         {submitting ? "Submitting..." : "Submit Report"}
                     </button>
                 </div>
+                </form>
             </div>
         </StandardModal>
     );

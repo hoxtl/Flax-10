@@ -15,6 +15,8 @@ function saveAnnouncement(data, handlers, conflictingAnnouncement) {
     return handlers?.onAdd?.(data);
 }
 
+export { saveAnnouncement };
+
 function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
 

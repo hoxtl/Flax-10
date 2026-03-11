@@ -28,7 +28,7 @@ vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
   getToday: () => [{ id: 2 }],
   getThisWeek: () => [{ id: 3 }],
   getLater: () => [{ id: 4 }],
-  getCompletedTodayCount: () => 1,
+  getCompletedTodayCount: vi.fn(() => 1),
   getCompletedWeekCount: () => 2,
   getCompletedLaterCount: () => 3,
   getFilterHandlers: () => ({
@@ -39,10 +39,12 @@ vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
 }));
 
 import useTaskFeedData from "../../../../pages/Tasks/hooks/useTaskFeedData";
+import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
 
 describe("useTaskFeedData", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(1);
   });
 
   it("builds sections and header", () => {
@@ -67,5 +69,23 @@ describe("useTaskFeedData", () => {
     const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
     act(() => result.current.todayEmptyCardProps.onCtaClick());
     expect(navigateMock).toHaveBeenCalledWith("/tasks?open=fullPlanning");
+  });
+
+  it("todayEmptyCardProps shows plural when completedTodayCount is 2", () => {
+    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(2);
+    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
+    expect(result.current.todayEmptyCardProps.sub).toContain("2 tasks");
+    expect(result.current.todayEmptyCardProps.sub).toContain("completed today");
+  });
+
+  it("todayEmptyCardProps shows singular when completedTodayCount is 1", () => {
+    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
+    expect(result.current.todayEmptyCardProps.sub).toContain("1 task completed today");
+  });
+
+  it("todayEmptyCardProps shows No tasks due today when completedTodayCount is 0", () => {
+    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(0);
+    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
+    expect(result.current.todayEmptyCardProps.sub).toBe("No tasks due today.");
   });
 });

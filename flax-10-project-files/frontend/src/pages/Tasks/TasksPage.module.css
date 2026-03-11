@@ -16,35 +16,6 @@
     font-family: inherit;
 }
 
-.loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    height: 100%;
-    color: var(--muted);
-}
-
-.loadingSpinner {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    border-top-color: var(--primary);
-    animation: taskSpin 0.7s linear infinite;
-}
-
-.loadingText {
-    margin: 0;
-    font-size: 0.86rem;
-    font-weight: 500;
-    color: var(--muted);
-}
-
-@keyframes taskSpin {
-    to { transform: rotate(360deg); }
-}
 
 .toast {
     position: fixed;
@@ -92,4 +63,59 @@
     .toast {
         left: 50%;
     }
+}
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+.skelSidebar {
+  width: 220px;
+  min-width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar, var(--panel));
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px 24px;
+  gap: 10px;
+}
+.skelSidebarTitle {
+  height: 20px;
+  width: 100px;
+  margin-bottom: 4px;
+}
+.skelSidebarRow {
+  height: 34px;
+  width: 100%;
+  border-radius: 8px;
+}
+.skelDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+.skelFeed {
+  flex: 1;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skelFeedHeader {
+  height: 40px;
+  width: 220px;
+  margin-bottom: 8px;
+}
+.skelTaskRow {
+  height: 52px;
+  width: 100%;
+  border-radius: 10px;
 }

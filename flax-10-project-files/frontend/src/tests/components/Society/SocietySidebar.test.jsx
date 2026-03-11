@@ -98,4 +98,31 @@ describe('SocietySidebar', () => {
     expect(onAddEvent).toHaveBeenCalledWith({ title: 'new-event' });
     await waitFor(() => expect(screen.queryByText('submit-event')).toBeNull());
   });
+
+  it('announcement submit without conflicting pinned does not call onUpdateAnnouncement', async () => {
+    const onAddAnnouncement = vi.fn();
+    const onUpdateAnnouncement = vi.fn();
+
+    render(
+      <SocietySidebar
+        society={baseSociety({ announcements: [{ id: 1, title: 'A', content: 'c', pinned: false }] })}
+        editMode
+        onAddAnnouncement={onAddAnnouncement}
+        onUpdateAnnouncement={onUpdateAnnouncement}
+        tags={[]}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('+ Add Announcement'));
+    fireEvent.click(await screen.findByText('submit-announcement'));
+
+    expect(onAddAnnouncement).toHaveBeenCalledWith({ title: 'new-announcement' });
+    expect(onUpdateAnnouncement).not.toHaveBeenCalled();
+  });
+
+  it('edit mode shows AddButtons even when no pinned or next event', () => {
+    render(<SocietySidebar society={baseSociety()} editMode tags={[]} />);
+    expect(screen.getByText('+ Add Announcement')).toBeTruthy();
+    expect(screen.getByText('+ Add Event')).toBeTruthy();
+  });
 });

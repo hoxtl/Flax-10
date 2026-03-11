@@ -12,7 +12,7 @@ vi.mock('lucide-react', () => ({
 }));
 
 vi.mock('../../../../pages/Homepage/utils/dateFormatUtils', () => ({
-    formatTime12h: vi.fn(t => t ? '9:00 am' : ''),
+    formatTime12h: vi.fn((t) => (t ? '9:00 am' : '')),
     fmtDurationShort: vi.fn(() => '1h'),
 }));
 
@@ -29,6 +29,7 @@ vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
 }));
 
 import { PlanEventRow } from '../../../../pages/Homepage/components/MiniTimeline/PlanEventRow';
+import * as useSleepWarning from '../../../../components/Settings/hooks/useSleepWarning';
 
 const mockStyles = {
     planTimelineRow: 'row',
@@ -210,6 +211,14 @@ describe('PlanEventRow', () => {
         expect(onCardClick).toHaveBeenCalled();
     });
 
+    it('responds to keyboard Space', () => {
+        const onCardClick = vi.fn();
+        renderRow({ onCardClick });
+        const card = document.querySelector('[role="button"]');
+        fireEvent.keyDown(card, { key: ' ' });
+        expect(onCardClick).toHaveBeenCalled();
+    });
+
     it('renders module code pill when moduleCode provided', () => {
         renderRow({ row: { ...baseRow, moduleCode: 'CS101' } });
         expect(screen.getByText('CS101')).toBeTruthy();
@@ -218,5 +227,130 @@ describe('PlanEventRow', () => {
     it('renders duration pill when durationMins > 0', () => {
         renderRow();
         expect(screen.getByText('1h')).toBeTruthy();
+    });
+
+    it('does not render duration pill when durationMins is 0', () => {
+        renderRow({ row: { ...baseRow, durationMins: 0 } });
+        expect(screen.queryByText('1h')).toBeNull();
+    });
+
+    it('shows sleep badge when isDuringSleepWindow returns true', () => {
+        vi.mocked(useSleepWarning.isDuringSleepWindow).mockReturnValueOnce(true);
+        renderRow();
+        expect(screen.getByLabelText('Scheduled during sleep hours')).toBeInTheDocument();
+    });
+
+    it('toggles conflict popover when Fix it button is clicked', () => {
+        const setConflictPopoverRowId = vi.fn();
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            setConflictPopoverRowId,
+        });
+        fireEvent.click(screen.getByText('Fix it'));
+        expect(setConflictPopoverRowId).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('renders lecture accent for lecture tag', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: 'lecture', title: 'CS Lecture' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#7B9BAD');
+    });
+
+    it('renders routine accent for lunch title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Lunch' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#B8956A');
+    });
+
+    it('renders wellness accent for gym title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Gym session' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#7BB38E');
+    });
+
+    it('renders society accent for KCLSU in title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'KCLSU event' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#C4906A');
+    });
+
+    it('renders social accent for coffee in title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Coffee with friends' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#C0714E');
+    });
+
+    it('renders study accent for library in title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Library study' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#9A8CB0');
+    });
+
+    it('renders meeting accent for seminar in title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Seminar' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#A08B72');
+    });
+
+    it('renders admin accent for laundry in title', () => {
+        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Laundry' } } });
+        const card = document.querySelector('[style*="--card-accent"]');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('#C4A46D');
+    });
+
+    it('renders task list link when matchTask has task_list and no moduleCode', () => {
+        renderRow({
+            row: { ...baseRow, moduleCode: null, matchTask: { task_list: 5 } },
+            taskLists: [{ id: 5, name: 'My List' }],
+        });
+        const link = screen.getByRole('link', { name: 'My List' });
+        expect(link).toHaveAttribute('href', '/tasks?list=5');
+    });
+
+    it('renders module link with matchTask when both moduleCode and matchTask present', () => {
+        renderRow({ row: { ...baseRow, moduleCode: 'CS101', matchTask: { task_list: 5 } } });
+        const link = screen.getByRole('link', { name: 'CS101' });
+        expect(link).toHaveAttribute('href', '/tasks?list=5&module=CS101');
+    });
+
+    it('does not call onPushTomorrow when disabled', () => {
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            rows: [baseRow],
+            conflictPopoverRowId: baseRow.id,
+            onPushTomorrow: undefined,
+        });
+        const btn = screen.getByRole('button', { name: /Move to tomorrow/ });
+        expect(btn).toBeDisabled();
+    });
+
+    it('Auto-move button disabled when no nextFreeRow', () => {
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            rows: [baseRow],
+            conflictPopoverRowId: baseRow.id,
+        });
+        const btn = screen.getByRole('button', { name: /No free window/ });
+        expect(btn).toBeDisabled();
+        fireEvent.click(btn);
+    });
+
+    it('toggles popover closed when clicking card again', () => {
+        const setConflictPopoverRowId = vi.fn();
+        renderRow({
+            row: { ...baseRow, isOverlap: true },
+            conflictPopoverRowId: baseRow.id,
+            setConflictPopoverRowId,
+        });
+        const card = document.querySelector('[role="button"]');
+        fireEvent.click(card);
+        expect(setConflictPopoverRowId).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('renders end time when different from start', async () => {
+        const { formatTime12h } = await import('../../../../pages/Homepage/utils/dateFormatUtils');
+        formatTime12h.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
+        renderRow();
+        expect(screen.getByText(/10:00 am/)).toBeTruthy();
     });
 });

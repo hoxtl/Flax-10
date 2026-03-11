@@ -5,14 +5,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { CheckSquare } from "lucide-react";
+import { CheckSquare, Clock3, Target, ArrowRight, ChevronDown } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 
-const VISIBLE_COUNT = 5;
+const VISIBLE_COUNT = 3;
 
 const CATEGORY_COLOURS = {
   UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
@@ -87,15 +87,19 @@ export function TaskWidgetSlot({
   onInlineTaskEdit,
 }) {
   const [ctxMenu, setCtxMenu] = useState(null);
+  const [showCompleted, setShowCompleted] = useState(false);
   const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
+  const completedTasks = taskWidgetList.filter((t) => t.completed);
   const visibleIncomplete = showAllTaskWidgetTasks
     ? incompleteTasks
     : incompleteTasks.slice(0, VISIBLE_COUNT);
+  const visibleCompleted = completedTasks.slice(0, 3);
   const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
 
   const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
   const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
   const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
+  const estimatedLeft = getEstTime(taskWidgetList);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -140,10 +144,32 @@ export function TaskWidgetSlot({
                     <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
                   </div>
                 </div>
+                {!hasTimerSession && incompleteCount > 0 && (
+                  <button
+                    type="button"
+                    className={styles.taskWidgetFocusBtn}
+                    onClick={onStartFocus}
+                  >
+                    Focus now
+                    <ArrowRight size={12} strokeWidth={1.8} aria-hidden />
+                  </button>
+                )}
               </div>
 
-              <div className={styles.taskWidgetDueTodayPill}>
-                {taskWidgetDueTodayCount} due today
+              <div className={styles.taskWidgetSummaryRow}>
+                <div className={styles.taskWidgetDueTodayPill}>
+                  {taskWidgetDueTodayCount} due today
+                </div>
+                <div className={styles.taskWidgetSummaryPill}>
+                  <Target size={11} strokeWidth={1.8} aria-hidden />
+                  {incompleteCount} in queue
+                </div>
+                {estimatedLeft && (
+                  <div className={styles.taskWidgetSummaryPill}>
+                    <Clock3 size={11} strokeWidth={1.8} aria-hidden />
+                    {estimatedLeft}
+                  </div>
+                )}
               </div>
 
               {/* Task list */}
@@ -157,8 +183,12 @@ export function TaskWidgetSlot({
                 {visibleIncomplete.map((t, idx) => {
                   const status      = t.taskWidgetStatus;
                   const isOverdue   = status === "overdue";
-                  const rowAccent = isOverdue ? "#C0714E" : "#8B7355";
+                  const rowAccent = isOverdue
+                    ? "var(--home-urgency-danger)"
+                    : "var(--home-urgency-neutral)";
                   const urgency = getUrgencyMeta(t);
+                  const categoryLabel = getTaskCategoryPill?.(t);
+                  const categoryStyle = getCategoryStyle(categoryLabel);
 
                   return (
                     <motion.li
@@ -190,6 +220,14 @@ export function TaskWidgetSlot({
 
                       <div className={styles.taskWidgetTaskBody}>
                         <div className={styles.taskWidgetTaskTopRow}>
+                          {categoryLabel && (
+                            <span
+                              className={styles.taskWidgetCategoryPill}
+                              style={{ background: categoryStyle.bg, color: categoryStyle.text }}
+                            >
+                              {categoryLabel}
+                            </span>
+                          )}
                           <span className={styles.taskWidgetTaskTitle} title={t.title}>
                             {t.title}
                           </span>
@@ -225,6 +263,58 @@ export function TaskWidgetSlot({
                 )}
               </motion.ul>
 
+              {visibleCompleted.length > 0 && (
+                <div className={styles.taskWidgetCompletedSection}>
+                  <button
+                    type="button"
+                    className={styles.taskWidgetCompletedToggle}
+                    onClick={() => setShowCompleted((value) => !value)}
+                    aria-expanded={showCompleted}
+                  >
+                    <span className={styles.taskWidgetCompletedLabel}>Completed</span>
+                    <span className={styles.taskWidgetCompletedStats}>
+                      <span className={styles.taskWidgetCompletedCount}>
+                        {completedTasks.length} done
+                      </span>
+                      <span className={styles.taskWidgetCompletedChevronWrap} aria-hidden>
+                        <motion.span
+                          className={styles.taskWidgetCompletedChevron}
+                          animate={{ rotate: showCompleted ? 0 : -90 }}
+                          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                          <ChevronDown size={14} />
+                        </motion.span>
+                      </span>
+                    </span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {showCompleted && (
+                      <motion.ul
+                        className={styles.taskWidgetCompletedList}
+                        initial={{ height: 0, opacity: 0, y: -4 }}
+                        animate={{ height: "auto", opacity: 1, y: 0 }}
+                        exit={{ height: 0, opacity: 0, y: -4 }}
+                        transition={{
+                          height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+                          opacity: { duration: 0.18, ease: "easeOut" },
+                          y: { duration: 0.18, ease: "easeOut" },
+                        }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        {visibleCompleted.map((task) => (
+                          <li key={`completed-${task.id}`} className={styles.taskWidgetCompletedRow}>
+                            <span className={styles.taskWidgetCompletedCheck} aria-hidden>✓</span>
+                            <span className={styles.taskWidgetCompletedTitle} title={task.title}>
+                              {task.title}
+                            </span>
+                          </li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
               {ctxMenu && (
                 <TaskContextMenu
                   task={ctxMenu.task}
@@ -248,7 +338,7 @@ export function TaskWidgetSlot({
           ) : (
             <EmptyStateCard
               sub={null}
-              message="All caught up for today."
+              message="No tasks need attention."
               action={
                 <Link to="/tasks" className={styles.taskWidgetLink}>
                   Add a task →

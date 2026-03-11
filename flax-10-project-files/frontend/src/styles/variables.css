@@ -1,13 +1,7 @@
 :root {
-  /* Global Design Language: 24px card radius, no black/grey borders */
-  --radius: 12px;
-  --radius-pill: 9999px;
-  --card-radius: 24px;
-  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-
-  /* Typography: Inter for all text; JetBrains Mono for numbers/timestamps */
+  /* Typography families */
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-heading: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Lexend", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
 
   /* Weight rules: titles 700, task names/pills 500, subtext/captions 400 */
@@ -15,17 +9,17 @@
   --font-weight-task: 500;
   --font-weight-caption: 400;
 
-  /* Semantic text colors for typography — Warm-Classy: Flax Brown for primary headers */
-  --text-charcoal: #7B6751;
+  /* Semantic text colors for typography */
+  --text-charcoal: var(--primary);
   --text-muted-sage: #5a635a;
 
-  /* Flax-inspired palette: Flax Brown primary + soft yellows/golds */
-  --flax-brown: #7B6751;
-  --flax-brown-strong: #5c4d3e;
+  /* Flax-inspired palette: gold/yellows are unique; browns alias --primary */
+  --flax-brown: var(--primary);
+  --flax-brown-strong: var(--primary-strong);
   --flax-gold: #c4a35a;
   --flax-gold-soft: #e8dcc8;
   --color-flax-light: #f5f0e8;
-  --flax-charcoal: #7B6751;
+  --flax-charcoal: var(--primary);
   --flax-navy: #0f172a;
 
   --c-white: #ffffff;
@@ -53,7 +47,7 @@
 
   /* Semantic text & surfaces (light) */
   --text: #1A1A1A;
-  --text-primary: #7B6751;
+  --text-primary: var(--primary);
   --text-secondary: #64748b;
   --text-dark: #1e1b2e;
   --muted: #9CA3AF;
@@ -61,7 +55,7 @@
   --primary: #7B6751;
   --primary-strong: #5c4d3e;
   --sage: #8C9A86;
-  --accent: #7B6751;
+  --accent: var(--primary);
   --danger: #C05A3E;
   --danger-bg: rgba(192, 90, 62, 0.12);
   --danger-border: rgba(192, 90, 62, 0.4);
@@ -87,7 +81,6 @@
   --card-bg: #FFFCFA;
   --bento-card-bg: #FFFCFA;
   --surface: #F8F5F2;
-  /* Warm-Classy: Soft Paper for every widget/card */
   --soft-paper: #FFFCFA;
   /* Day-strip / date navigator dots (semantic) */
   --dot-lecture: var(--study);
@@ -96,9 +89,9 @@
   --dot-deadline: var(--urgent);
   --dot-personal: var(--personal);
 
-  /* Status: Sage Green success, Muted Terracotta warnings/conflicts */
-  --status-sage: #8C9A86;
-  --status-terracotta: #C05A3E;
+  /* Status: aliases to canonical semantic vars */
+  --status-sage: var(--sage);
+  --status-terracotta: var(--danger);
   --success-bg: rgba(140, 154, 134, 0.18);
   --success-text: #8C9A86;
   --error-bg: rgba(192, 90, 62, 0.12);
@@ -112,14 +105,14 @@
   --deadline-urgent-bg: rgba(192, 90, 62, 0.1);
   --deadline-urgent-border: #C05A3E;
 
-  /* Daily Progress widget */
-  --color-terracotta: #C05A3E;
-  --color-brown-light: #c4a35a;
+  /* Widget colour tokens */
+  --color-terracotta: var(--danger);
+  --color-brown-light: var(--flax-gold);
   --color-error-light: rgba(192, 90, 62, 0.15);
   --color-sage-dark: #3d5a52;
   --color-orange-400: #fb923c;
   --color-slate-400: #94a3b8;
-  --color-sage-primary: #8C9A86;
+  --color-sage-primary: var(--sage);
   --color-sage-glow: rgba(140, 154, 134, 0.5);
   --color-border-light: rgba(0, 0, 0, 0.08);
 
@@ -152,26 +145,68 @@
   --bg-home: var(--bg);
   --bg-home-night: var(--bg);
 
-  /* Master Restoration: Warm-Classy stationary theme — warm Almond */
-  --restoration-bg: #F8F5F2;
-  --restoration-sage: #8C9A86;
+  /* Restoration aliases — all point to canonical vars */
+  --restoration-bg: var(--bg);
+  --restoration-sage: var(--sage);
   --restoration-flax: #EEDC82;
   --restoration-earth: #6B5344;
-  --restoration-terracotta: #C05A3E;
-  --restoration-widget-radius: 24px;
+  --restoration-terracotta: var(--danger);
+  --restoration-widget-radius: var(--card-radius);
   --restoration-widget-blur: 12px;
-  /* No black/grey borders — use none or very subtle tint only */
   --restoration-widget-border: none;
   --restoration-gold-soft: rgba(238, 220, 130, 0.35);
   --restoration-coral-border: 1px solid rgba(192, 90, 62, 0.5);
   --restoration-coral-glow: 0 0 12px rgba(192, 90, 62, 0.2);
-  /* Body text: Warm-Classy — Flax Brown for primary headers & key accents */
-  --restoration-charcoal: #7B6751;
+  --restoration-charcoal: var(--primary);
 
   --divider: #ddd;
   --text-muted: #888;
   --scroll-btn-bg: #9E7E5D;
   --scroll-btn-hover: #8a6d4f;
+  --ai-panel-radius: 28px;
+  --ai-panel-radius-mobile: 24px;
+  --ai-panel-border: var(--border);
+  --ai-panel-shadow: 0 30px 80px rgba(49, 32, 16, 0.12), 0 8px 24px rgba(49, 32, 16, 0.06);
+  --ai-card-title: #2e261d;
+  --ai-card-subtitle: #8a7a68;
+  --ai-header-border: rgba(141, 117, 89, 0.12);
+  --ai-header-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+  --ai-icon-bg: rgba(159, 133, 100, 0.14);
+  --ai-icon-fg: #7f694e;
+  --ai-empty-icon-fg: #8b7356;
+  --ai-empty-text: #8a7a68;
+  --ai-button-fg: #ffffff;
+  --ai-button-spinner-track: rgba(255, 255, 255, 0.35);
+  --ai-button-spinner-head: #ffffff;
+  --ai-item-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --ai-item-active-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --ai-chat-clear-fg: #7b6a58;
+  --ai-chat-close-border: rgba(141, 117, 89, 0.16);
+  --ai-chat-suggestion-bg: rgba(255, 255, 255, 0.72);
+  --ai-chat-suggestion-border: rgba(141, 117, 89, 0.14);
+  --ai-chat-suggestion-hover-bg: #ffffff;
+  --ai-chat-suggestion-hover-border: rgba(141, 117, 89, 0.28);
+  --ai-chat-suggestion-fg: #2f271f;
+  --ai-chat-user-bubble-bg: linear-gradient(145deg, #3f1d0f, #261108);
+  --ai-chat-user-bubble-fg: #fff8f1;
+  --ai-chat-user-bubble-shadow: 0 12px 24px rgba(63, 29, 15, 0.18);
+  --ai-chat-ai-bubble-bg: rgba(255, 255, 255, 0.82);
+  --ai-chat-ai-bubble-border: rgba(141, 117, 89, 0.12);
+  --ai-chat-ai-bubble-fg: #302820;
+  --ai-chat-ai-bubble-shadow: none;
+  --ai-chat-dot: #8a7a68;
+  --ai-chat-input-border: rgba(141, 117, 89, 0.16);
+  --ai-chat-input-focus-border: rgba(141, 117, 89, 0.32);
+  --ai-chat-input-row-bg: rgba(255, 255, 255, 0.36);
+  --ai-chat-input-bg: rgba(255, 255, 255, 0.78);
+  --ai-chat-input-fg: #302820;
+  --ai-chat-placeholder: #9c8c7b;
+  --ai-chat-send-bg: linear-gradient(145deg, #9f8f83, #b5a79d);
+  --ai-chat-send-fg: #fff8f1;
+  --ai-chat-send-border: rgba(141, 117, 89, 0.12);
+  --ai-chat-send-shadow: 0 10px 20px rgba(80, 58, 35, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  --ai-chat-send-hover-shadow: 0 14px 24px rgba(80, 58, 35, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --ai-markdown-fg: #302820;
 
   --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
 }
@@ -193,7 +228,6 @@
   /* Global Design Language (dark): glass + inner glow */
   --glass-bg: rgba(26, 19, 16, 0.65);
   --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-  --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
   --c-white: #f1f5f9;
   --c-greige: #8d7d6e;
@@ -281,14 +315,56 @@
   --text-muted: rgba(200, 184, 164, 0.65);
   --scroll-btn-bg: #818cf8;
   --scroll-btn-hover: #6366f1;
+  --ai-panel-radius: 28px;
+  --ai-panel-radius-mobile: 24px;
+  --ai-panel-border: var(--border);
+  --ai-panel-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
+  --ai-card-title: var(--text);
+  --ai-card-subtitle: var(--text-secondary);
+  --ai-header-border: var(--border);
+  --ai-header-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+  --ai-icon-bg: rgba(184, 155, 126, 0.16);
+  --ai-icon-fg: var(--primary);
+  --ai-empty-icon-fg: var(--primary);
+  --ai-empty-text: var(--text-secondary);
+  --ai-button-fg: #1a1310;
+  --ai-button-spinner-track: rgba(26, 19, 16, 0.24);
+  --ai-button-spinner-head: #1a1310;
+  --ai-item-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --ai-item-active-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --ai-chat-clear-fg: var(--text-secondary);
+  --ai-chat-close-border: var(--border);
+  --ai-chat-suggestion-bg: rgba(255, 255, 255, 0.04);
+  --ai-chat-suggestion-border: rgba(255, 255, 255, 0.08);
+  --ai-chat-suggestion-hover-bg: rgba(255, 255, 255, 0.08);
+  --ai-chat-suggestion-hover-border: rgba(184, 155, 126, 0.24);
+  --ai-chat-suggestion-fg: var(--text);
+  --ai-chat-user-bubble-bg: linear-gradient(145deg, rgba(184, 155, 126, 0.28), rgba(92, 77, 62, 0.9));
+  --ai-chat-user-bubble-fg: var(--text);
+  --ai-chat-user-bubble-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+  --ai-chat-ai-bubble-bg: rgba(255, 255, 255, 0.06);
+  --ai-chat-ai-bubble-border: rgba(255, 255, 255, 0.08);
+  --ai-chat-ai-bubble-fg: var(--text);
+  --ai-chat-ai-bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --ai-chat-dot: var(--text-secondary);
+  --ai-chat-input-border: rgba(255, 255, 255, 0.1);
+  --ai-chat-input-focus-border: rgba(184, 155, 126, 0.4);
+  --ai-chat-input-row-bg: rgba(255, 255, 255, 0.02);
+  --ai-chat-input-bg: rgba(255, 255, 255, 0.06);
+  --ai-chat-input-fg: var(--text);
+  --ai-chat-placeholder: var(--text-secondary);
+  --ai-chat-send-bg: linear-gradient(145deg, var(--primary), var(--primary-strong));
+  --ai-chat-send-fg: #1a1310;
+  --ai-chat-send-border: rgba(255, 255, 255, 0.08);
+  --ai-chat-send-shadow: 0 10px 20px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --ai-chat-send-hover-shadow: 0 14px 24px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --ai-markdown-fg: var(--text);
 
-  /* Daily Progress widget (dark) */
-  --color-terracotta: #d97a65;
+  /* Widget colour tokens (dark overrides only for values that actually change) */
   --color-error-light: rgba(192, 90, 62, 0.25);
   --color-sage-dark: #5a7a6a;
   --color-orange-400: #fdba74;
   --color-slate-400: #94a3b8;
-  --color-sage-primary: #8C9A86;
   --color-sage-glow: rgba(140, 154, 134, 0.5);
   --color-border-light: rgba(255, 255, 255, 0.12);
   --glass-bg: rgba(26, 19, 16, 0.6);
