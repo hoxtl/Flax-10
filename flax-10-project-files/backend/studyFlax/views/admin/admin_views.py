@@ -8,6 +8,8 @@ from studyFlax.models.society.societyReportModel import SocietyReport
 
 User = get_user_model()
 
+# Users
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def user_list(request):
@@ -44,3 +46,38 @@ def ban_user(request, user_id):
         return Response({'message': f'{user.username} has been unbanned.', 'is_active': True})
     else:
         return Response({'error': 'Invalid action. Use "ban" or "unban".'}, status=status.HTTP_400_BAD_REQUEST)
+
+# Teacher Role requests
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def teacher_requests(request):
+    """List all users who have requested the teacher role."""
+    users = User.objects.filter(role='pending_teacher').order_by('date_joined')
+    data = [_serialize_user(u) for u in users]
+    return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def resolve_teacher_request(request, user_id):
+    """Approve or reject a pending teacher role request."""
+    try:
+        user = User.objects.get(id=user_id, role='pending_teacher')
+    except User.DoesNotExist:
+        return Response(
+            {'error': 'No pending teacher request found for this user'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    decision = request.data.get('decision')
+    if decision == 'approve':
+        user.role = 'teacher'
+        user.save()
+        return Response({'message': f'Teacher role granted to {user.username}.'})
+    elif decision == 'reject':
+        user.role = 'student'
+        user.save()
+        return Response({'message': f'Teacher request rejected for {user.username}.'})
+    else:
+        return Response({'error': 'Invalid decision. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
