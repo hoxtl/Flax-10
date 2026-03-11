@@ -38,41 +38,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.tabBar {
-  display: flex;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 2rem;
-}
-
-.tab {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: none;
-  border: none;
-  padding: 0.625rem 1.1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  border-radius: 8px 8px 0 0;
-  transition: color 0.18s ease;
-}
-
-.tab:hover { color: var(--text); }
-.tabActive { color: var(--primary) !important; }
-
-.tabIndicator {
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--primary);
-  border-radius: 2px 2px 0 0;
-}
 
 .card {
   background: var(--surface-card);

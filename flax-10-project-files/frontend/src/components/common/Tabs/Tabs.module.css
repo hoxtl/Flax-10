@@ -5,60 +5,46 @@
 
 .tabBar {
     display: flex;
-    flex-wrap: wrap;
-    border-bottom: 2px solid var(--border);
-    margin-bottom: 24px;
-    gap: 8px;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
 }
 
 .tab {
-    padding: 12px 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.625rem 1.1rem;
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--muted);
-    position: relative;
-    transition: color 0.2s, background 0.2s;
     border-radius: 8px 8px 0 0;
+    transition: color 0.18s ease;
 }
 
 .tab:hover {
     color: var(--text);
-    background: var(--hover, rgba(0, 0, 0, 0.05));
 }
 
 .tab.active {
     color: var(--primary);
 }
 
-.tab.active::after {
-    content: '';
+.tabIndicator {
     position: absolute;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: var(--primary);
-    border-radius: 3px;
+    border-radius: 2px 2px 0 0;
 }
 
-.content {
-    animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+.content {}
 
 @media (max-width: 640px) {
     .tabBar {
@@ -78,9 +64,5 @@
         background: var(--primary);
         color: white;
         border-color: var(--primary);
-    }
-
-    .tab.active::after {
-        display: none;
     }
 }

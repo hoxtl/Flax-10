@@ -203,9 +203,9 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("floating-chat")).toBeTruthy();
   });
 
-  it("renders BackToTop for home page", () => {
+  it("does not render BackToTop for home page", () => {
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    expect(screen.getByTestId("back-to-top")).toBeTruthy();
+    expect(screen.queryByTestId("back-to-top")).toBeNull();
   });
 
   it("does not render BackToTop on map page", () => {

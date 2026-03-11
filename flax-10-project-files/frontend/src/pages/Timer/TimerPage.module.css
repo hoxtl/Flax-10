@@ -24,25 +24,16 @@
     justify-content: center;
     background: var(--bg);
     z-index: 10;
-    animation: focusOverlayZoomInHoldZoomOut 6s ease-in-out forwards;
+    animation: focusOverlayZoomInHoldZoomOut 10s ease-in-out forwards;
 }
 
 .focusModeTransitionText {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--color-sage-primary, #52796f);
-    letter-spacing: 0.04em;
-    animation: focusTransitionTextFade 0.4s ease-out;
-}
-
-@keyframes focusTransitionTextFade {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    position: relative;
 }
 
 @keyframes focusOverlayZoomInHoldZoomOut {
@@ -56,7 +47,8 @@
     }
 
     6.01%,
-    90% {
+    72% {
+        opacity: 1;
         transform: scale(1);
     }
 
@@ -68,7 +60,7 @@
 }
 
 .containerFocusEntering .focusModeContent {
-    animation: focusContentZoomIn 0.9s 5.1s ease-out forwards;
+    animation: focusContentZoomIn 0.9s 9.1s ease-out forwards;
     opacity: 0;
     transform: scale(0.94);
 }

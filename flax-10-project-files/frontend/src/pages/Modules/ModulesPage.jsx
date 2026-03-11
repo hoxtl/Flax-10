@@ -179,7 +179,7 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
 function Toolbar({ search, sorting, departments }) {
     const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
     const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
-    const sortOptions = [{ value: 'name', label: 'Alphabetically' }, { value: 'deadlines', label: 'Deadlines' }];
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
     return (
         <PageToolbar
             searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}

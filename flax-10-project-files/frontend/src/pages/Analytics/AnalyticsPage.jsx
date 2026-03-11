@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import SummaryCards from '../../components/Analytics/SummaryCards';
@@ -12,6 +12,7 @@ import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
 import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
+import Tabs from '../../components/common/Tabs/Tabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import styles from './AnalyticsPage.module.css';
 
@@ -22,8 +23,8 @@ const PERIODS = [
 ];
 
 const TABS = [
-  { id: 'Overview', icon: '📊' },
-  { id: 'AI Insights', icon: '✨' },
+  { id: 'Overview', icon: '📊', label: 'Overview' },
+  { id: 'AI Insights', icon: '✨', label: 'AI Insights' },
 ];
 
 const fadeUp = {
@@ -76,6 +77,60 @@ export default function AnalyticsPage() {
     updateSearchState(period, nextTab);
   };
 
+  const overviewContent = !loading && data ? (
+    <div className={styles.overviewWrap}>
+      <motion.section custom={0} variants={fadeUp} initial="hidden" animate="visible">
+        <SummaryCards data={data} />
+      </motion.section>
+
+      <motion.div className={styles.twoCol} custom={1} variants={fadeUp} initial="hidden" animate="visible">
+        <div className={styles.card}>
+          <p className={styles.cardLabel}>Productivity</p>
+          <ProductivityCards data={data} progressData={progressData} />
+        </div>
+        <div className={styles.card}>
+          <p className={styles.cardLabel}>Insights</p>
+          <div className={styles.insightRow}>
+            <ConsistencyScore data={data} />
+            <PeakHoursCard data={data} />
+          </div>
+        </div>
+      </motion.div>
+
+      <div className={styles.chartsGrid}>
+        {[
+          { title: 'Study Hours', el: <StudyHoursChart data={data.daily_breakdown} />, i: 2 },
+          { title: 'Daily Breakdown', el: <DailyBreakdownChart data={data.daily_breakdown} />, i: 3 },
+          progressData && {
+            title: 'Planned vs Actual',
+            el: <div className={styles.chartContainerMin}><PlannedVsActualChart data={progressData.daily_progress} /></div>,
+            i: 4,
+            wide: true,
+          },
+          { title: 'Focus Heatmap', el: <StudyHeatmap heatmapData={data.heatmap} />, i: 5, wide: true },
+          themeStats && { title: 'Theme Usage', el: <ThemeUsageChart themeStats={themeStats} />, i: 6 },
+        ].filter(Boolean).map(({ title, el, i, wide }) => (
+          <motion.div
+            key={title}
+            className={`${styles.card} ${wide ? styles.wide : ''}`}
+            custom={i}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+          >
+            <p className={styles.cardLabel}>{title}</p>
+            {el}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  ) : null;
+
+  const tabs = [
+    { ...TABS[0], content: overviewContent },
+    { ...TABS[1], content: !loading ? <AIInsightsTab period={period} /> : null },
+  ];
+
   return (
     <div className={styles.page}>
       <PageHeader
@@ -96,121 +151,10 @@ export default function AnalyticsPage() {
         }
       />
 
-      <motion.div
-        className={styles.tabBar}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.35 }}
-      >
-        {TABS.map(({ id, icon }) => (
-          <button
-            key={id}
-            className={`${styles.tab} ${activeTab === id ? styles.tabActive : ''}`}
-            onClick={() => handleTabChange(id)}
-          >
-            <span>{icon}</span>
-            <span>{id}</span>
-            {activeTab === id && (
-              <motion.div className={styles.tabIndicator} layoutId="tabIndicator" />
-            )}
-          </button>
-        ))}
-      </motion.div>
-
       {error && <div className={styles.errorBanner}>{error}</div>}
-
       {loading && <PageSkeleton label="Loading analytics" cardCount={6} cardHeight="100px" columns={3} />}
 
-      <AnimatePresence mode="wait">
-        {!loading && data && activeTab === 'Overview' && (
-          <motion.div
-            key="overview"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className={styles.overviewWrap}
-          >
-            <motion.section custom={0} variants={fadeUp} initial="hidden" animate="visible">
-              <SummaryCards data={data} />
-            </motion.section>
-
-            <motion.div className={styles.twoCol} custom={1} variants={fadeUp} initial="hidden" animate="visible">
-              <div className={styles.card}>
-                <p className={styles.cardLabel}>Productivity</p>
-                <ProductivityCards data={data} progressData={progressData} />
-              </div>
-              <div className={styles.card}>
-                <p className={styles.cardLabel}>Insights</p>
-                <div className={styles.insightRow}>
-                  <ConsistencyScore data={data} />
-                  <PeakHoursCard data={data} />
-                </div>
-              </div>
-            </motion.div>
-
-            <div className={styles.chartsGrid}>
-              {[
-                {
-                  title: 'Study Hours',
-                  el: <StudyHoursChart data={data.daily_breakdown} />,
-                  i: 2,
-                },
-                {
-                  title: 'Daily Breakdown',
-                  el: <DailyBreakdownChart data={data.daily_breakdown} />,
-                  i: 3,
-                },
-                progressData && {
-                  title: 'Planned vs Actual',
-                  el: (
-                    <div className={styles.chartContainerMin}>
-                      <PlannedVsActualChart data={progressData.daily_progress} />
-                    </div>
-                  ),
-                  i: 4,
-                  wide: true,
-                },
-                {
-                  title: 'Focus Heatmap',
-                  el: <StudyHeatmap heatmapData={data.heatmap} />,
-                  i: 5,
-                  wide: true,
-                },
-                themeStats && {
-                  title: 'Theme Usage',
-                  el: <ThemeUsageChart themeStats={themeStats} />,
-                  i: 6,
-                },
-              ].filter(Boolean).map(({ title, el, i, wide }) => (
-                <motion.div
-                  key={title}
-                  className={`${styles.card} ${wide ? styles.wide : ''}`}
-                  custom={i}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <p className={styles.cardLabel}>{title}</p>
-                  {el}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {!loading && activeTab === 'AI Insights' && (
-          <motion.div
-            key="ai"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <AIInsightsTab period={period} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" />
     </div>
   );
 }
