@@ -841,6 +841,18 @@ export default function CampusMap() {
                 );
               })}
             </div>
+
+            {calendarEvents.length > 3 && (
+              <button
+                className={styles.showMoreBtn}
+                onClick={() => setShowAllEvents(!showAllEvents)}>
+                  {showAllEvents ? (
+                    <>
+                      Show Less <span>▲</span>
+                    </>
+                  )}
+                </button>
+            )}
           )
         </section>
 
