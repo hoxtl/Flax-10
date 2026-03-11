@@ -987,3 +987,10 @@
   flex-direction: column;
   gap: 4px;
 }
+
+.eventCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
