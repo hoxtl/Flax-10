@@ -39,6 +39,18 @@ const TABS = [
   { id: "reports", label: "🚩 Reported Societies" },
 ];
 
+function SectionCard({ children }) {
+  return <div className={styles.card}>{children}</div>;
+}
+
+function EmptyState({ message }) {
+  return (
+    <motion.p className={styles.empty} {...fadeUp}>
+      {message}
+    </motion.p>
+  );
+}
+
 export default function AdminPage() {
   return (
     <div className={styles.container}>
