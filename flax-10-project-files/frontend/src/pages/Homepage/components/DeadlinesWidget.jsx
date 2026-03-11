@@ -39,6 +39,14 @@ const TIER_TEXT = {
   distant:  "#A89279",
 };
 
+const TIER_ACCENT = {
+  overdue: "#C0714E",
+  critical: "#C0714E",
+  urgent: "#B08C4B",
+  upcoming: "#8B7355",
+  distant: "#CFC4B6",
+};
+
 const listVariants = {
   visible: { transition: { staggerChildren: 0.05, delayChildren: 0.04 } },
 };
@@ -70,9 +78,11 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.headerIconWrap}>
-            <AlertCircle className={styles.headerIcon} size={18} strokeWidth={1.85} aria-hidden />
+            <AlertCircle className={styles.headerIcon} size={17} strokeWidth={1.85} aria-hidden />
           </div>
-          <span className={styles.headerTitle}>Deadlines</span>
+          <div className={styles.headerTitleBlock}>
+            <span className={styles.headerTitle}>Deadlines</span>
+          </div>
         </div>
       </div>
 
@@ -120,12 +130,14 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
   const moduleCode = deadline.module_code || "";
   const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
   const textColor = TIER_TEXT[tier] || "#A89279";
+  const rowAccent = TIER_ACCENT[tier] || "#CFC4B6";
 
   return (
     <motion.div
       role="button"
       tabIndex={0}
       className={`${styles.row} ${isLast ? styles.rowLast : ""}`}
+      style={{ "--deadline-row-accent": rowAccent }}
       variants={rowVariants}
       onClick={onSelect}
       onKeyDown={(e) => {
