@@ -28,7 +28,7 @@ import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
 import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
-import BannedPage from "./pages/BannedPage";
+import BannedPage from "./pages/Banned/BannedPage";
 
 import "./App.css";
 
