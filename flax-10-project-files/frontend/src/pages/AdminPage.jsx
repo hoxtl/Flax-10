@@ -139,6 +139,91 @@ function BanModal({ user, onConfirm, onCancel }) {
   );
 }
 
+function ReportedSocietiesTab() {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setReports(await fetchReportedSocieties());
+    } catch (e) {
+      setError(e.message || "Failed to load reports.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const dismiss = async (reportId) => {
+    setBusy(reportId);
+    try {
+      await dismissReport(reportId);
+      setReports((prev) => prev.filter((r) => r.id !== reportId));
+    } catch (e) {
+      setError(e.message || "Failed to dismiss report.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <SectionCard>
+      <div className={styles.cardHeader}>
+        <h2 className={styles.cardTitle}>
+          Reported Societies{" "}
+          <span className={styles.count}>({reports.length})</span>
+        </h2>
+      </div>
+      {error && <p className={styles.errorMsg}>{error}</p>}
+      {loading ? (
+        <LoadingSpinner />
+      ) : reports.length === 0 ? (
+        <EmptyState message="No reported societies — all clear! 🎉" />
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={stagger}
+          initial="initial"
+          animate="animate"
+        >
+          {reports.map((r) => (
+            <motion.div
+              key={r.id}
+              className={styles.listRow}
+              variants={rowAnim}
+              layout
+            >
+              <div className={styles.listInfo}>
+                <span className={styles.listName}>{r.society_name}</span>
+                <span className={styles.listMeta}>
+                  Reported by <strong>@{r.reporter_username}</strong>
+                  {r.reason ? ` · "${r.reason}"` : ""}
+                </span>
+              </div>
+              <div className={styles.listActions}>
+                <button
+                  className={styles.dismissBtn}
+                  disabled={busy === r.id}
+                  onClick={() => dismiss(r.id)}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </SectionCard>
+  );
+}
+
 function AdminPage({ onNavChange }) {
   const [activeTab, setActiveTab] = useState("users");
 
