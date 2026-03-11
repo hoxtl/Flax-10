@@ -55,6 +55,30 @@ describe('Pagination', () => {
         const ellipses = screen.getAllByText('...');
         expect(ellipses.length).toBeGreaterThan(0);
     });
+
+    it('getPageNumbers returns start ellipsis when currentPage <= 3', () => {
+        render(<Pagination currentPage={2} totalPages={10} onPageChange={vi.fn()} />);
+        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByText('4')).toBeInTheDocument();
+        expect(screen.getAllByText('...').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('getPageNumbers returns end ellipsis when currentPage >= total - 2', () => {
+        render(<Pagination currentPage={9} totalPages={10} onPageChange={vi.fn()} />);
+        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByText('10')).toBeInTheDocument();
+        expect(screen.getByText('7')).toBeInTheDocument();
+    });
+
+    it('getPageNumbers returns both ellipses for middle page', () => {
+        render(<Pagination currentPage={5} totalPages={10} onPageChange={vi.fn()} />);
+        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByText('10')).toBeInTheDocument();
+        expect(screen.getByText('5')).toBeInTheDocument();
+        expect(screen.getByText('4')).toBeInTheDocument();
+        expect(screen.getByText('6')).toBeInTheDocument();
+        expect(screen.getAllByText('...').length).toBe(2);
+    });
 });
 
 describe('BackToTop', () => {
@@ -66,5 +90,19 @@ describe('BackToTop', () => {
     it('is hidden by default (not alwaysVisible)', () => {
         const { container } = render(<BackToTop alwaysVisible={false} />);
         expect(container.firstChild).toBeNull();
+    });
+
+    it('calls scrollTo on container when button clicked', () => {
+        const scrollToMock = vi.fn();
+        const container = document.createElement('div');
+        container.className = 'content';
+        container.scrollTo = scrollToMock;
+        document.body.appendChild(container);
+        vi.spyOn(document, 'querySelector').mockReturnValue(container);
+        render(<BackToTop alwaysVisible={true} containerSelector=".content" />);
+        fireEvent.click(screen.getByTestId('arrow-up').closest('button'));
+        expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+        document.body.removeChild(container);
+        vi.restoreAllMocks();
     });
 });

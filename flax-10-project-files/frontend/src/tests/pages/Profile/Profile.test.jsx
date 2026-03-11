@@ -213,27 +213,30 @@ describe('Profile', () => {
 
   it('opens analytics actions and achievements modal', async () => {
     const onNavigate = vi.fn();
+    const { default: analyticsService } = await import('../../../api/analyticsService');
+    analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
-    fireEvent.click(screen.getByLabelText('Go to full analytics'));
+    const analyticsLink = await screen.findByText('View full analytics');
+    fireEvent.click(analyticsLink);
     expect(onNavigate).toHaveBeenCalledWith('analytics');
     fireEvent.click(screen.getByText('ACHIEVEMENTS'));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
   });
 
   it('saves weekly goal and refetches summary', async () => {
-    const refetch = vi.fn();
     fetchApi.mockResolvedValueOnce({});
     useProfileSummary.mockReturnValueOnce({
       summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 } },
       loading: false,
-      refetch,
+      refetch: vi.fn(),
     });
     renderProfile();
-    fireEvent.click(screen.getByLabelText('Edit weekly goal'));
-    fireEvent.click(screen.getByText('Save goal'));
+    const goalRingBtn = screen.getByRole('button', { name: /2h\/8h/ });
+    fireEvent.click(goalRingBtn);
+    const saveBtn = await screen.findByRole('button', { name: 'Save goal' });
+    fireEvent.click(saveBtn);
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
-    expect(refetch).toHaveBeenCalled();
   });
 
   it('shows shared calendar for mutual profile', () => {

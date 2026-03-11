@@ -22,4 +22,11 @@ const testBreakMode = () => {
 describe('OvertimePopup', () => {
     it('renders correctly for work mode', testWorkMode);
     it('renders correctly for break mode', testBreakMode);
+    it('shows Finish Goal when work mode and isLastSession', () => {
+        const onAction = vi.fn();
+        render(<OvertimePopup mode="work" time={65} onAction={onAction} isLastSession={true} />);
+        expect(screen.getByText("Finish Goal")).toBeInTheDocument();
+        fireEvent.click(screen.getByText("Finish Goal"));
+        expect(onAction).toHaveBeenCalled();
+    });
 });

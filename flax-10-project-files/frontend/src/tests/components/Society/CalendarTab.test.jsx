@@ -28,6 +28,7 @@ vi.mock('../../../components/Calendar/header/DatePickerButton', () => ({
 vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     addMonths: vi.fn(d => d),
     formatMonthYear: vi.fn(() => 'March 2024'),
+    isSameMonth: vi.fn(() => false),
 }));
 
 vi.mock('../../../components/Calendar/utils/recurrenceUtils', () => ({

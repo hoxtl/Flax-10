@@ -127,4 +127,15 @@ describe('SocialDiscoverWidget', () => {
         render(<SocialDiscoverWidget />);
         expect(screen.getByText('Z')).toBeTruthy();
     });
+
+    it('shows society with cover_image', () => {
+        useSocieties.mockReturnValue({
+            societies: [{ id: 1, name: 'Photo Club', is_member: true, cover_image: 'https://example.com/cover.jpg' }],
+            loading: false,
+        });
+        const { container } = render(<SocialDiscoverWidget />);
+        const img = container.querySelector('img');
+        expect(img).toBeTruthy();
+        expect(img?.getAttribute('src')).toBe('https://example.com/cover.jpg');
+    });
 });

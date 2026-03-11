@@ -5,8 +5,9 @@ import SocietyDetailPage from '../../pages/Societies/SocietyDetailPage';
 
 vi.mock('react-router-dom', async (importOriginal) => {
     const actual = await importOriginal();
-    return { ...actual, useLocation: () => ({ state: null }) };
+    return { ...actual, useLocation: () => locationState };
 });
+let locationState = { state: null };
 
 const mockHookData = {
     society: {
@@ -58,20 +59,45 @@ vi.mock('../../components/Society/hooks/useChangeTracker', () => ({
     })),
 }));
 
+const mockConfirm = vi.fn();
+vi.mock('../../context/ConfirmContext', () => ({
+    useConfirm: () => mockConfirm,
+}));
+
+const unreportSocietyApiMock = vi.fn();
+vi.mock('../../api/societyApi', () => ({
+    unreportSociety: (...args) => unreportSocietyApiMock(...args),
+}));
+
+vi.mock('../../components/Society/hooks/useSocietySubscription', () => ({
+    useSocietySubscription: () => ({ isSubscribed: false, toggleSubscription: vi.fn() }),
+}));
+
 vi.mock('../../components/Society/SocietyDetail/SocietyHero', () => ({
-    default: ({ society }) => <div data-testid="society-hero">{society.name}</div>,
+    default: ({ society, onImageClick, onEditImages }) => (
+        <div data-testid="society-hero">
+            {society.name}
+            {onImageClick && <button onClick={onImageClick}>Open Gallery</button>}
+            {onEditImages && <button onClick={onEditImages}>Edit Cover</button>}
+        </div>
+    ),
 }));
 
 vi.mock('../../components/Society/SocietyDetail/SocietyInfo', () => ({
-    default: ({ society, onToggleEditMode }) => (
+    default: ({ society, onToggleEditMode, onViewMembers }) => (
         <div data-testid="society-info">
             <button onClick={onToggleEditMode}>Toggle Edit</button>
+            {onViewMembers && <button onClick={onViewMembers}>View Members</button>}
         </div>
     ),
 }));
 
 vi.mock('../../components/Society/SocietyDetail/tabs/SocietyTabs', () => ({
-    default: () => <div data-testid="society-tabs" />,
+    default: ({ onEditAnnouncement }) => (
+        <div data-testid="society-tabs">
+            {onEditAnnouncement && <button onClick={() => onEditAnnouncement({ id: 1, title: 'Edit Me' })}>Edit Announcement</button>}
+        </div>
+    ),
 }));
 
 vi.mock('../../components/Society/SocietyDetail/SocietySidebar', () => ({
@@ -79,7 +105,12 @@ vi.mock('../../components/Society/SocietyDetail/SocietySidebar', () => ({
 }));
 
 vi.mock('../../components/Society/SocietyDetail/imageHandlers/CoverImageModal', () => ({
-    default: ({ onClose }) => <div data-testid="cover-modal"><button onClick={onClose}>Close Cover</button></div>,
+    default: ({ onClose, onUpdate }) => (
+        <div data-testid="cover-modal">
+            <button onClick={onClose}>Close Cover</button>
+            <button onClick={() => onUpdate([{ url: 'https://example.com/1.jpg' }])}>Save Cover</button>
+        </div>
+    ),
 }));
 
 vi.mock('../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal', () => ({
@@ -96,7 +127,26 @@ vi.mock('../../components/Society/SocietyDetail/SettingsModal', () => ({
 }));
 
 vi.mock('../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal', () => ({
-    default: ({ onClose }) => <div data-testid="announcement-modal"><button onClick={onClose}>Close Announcement</button></div>,
+    default: ({ onClose, onSubmit }) => (
+        <div data-testid="announcement-modal">
+            <button onClick={onClose}>Close Announcement</button>
+            <button onClick={() => onSubmit({ id: 1, title: 'A' }, null)}>Submit Update</button>
+            <button onClick={() => onSubmit({ title: 'New Announcement' }, null)}>Submit New</button>
+            <button onClick={() => onSubmit({ id: 2, title: 'B' }, { id: 99, pinned: true })}>Submit With Conflict</button>
+        </div>
+    ),
+}));
+
+vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
+    default: ({ onClose }) => <div data-testid="report-modal"><button onClick={onClose}>Close Report</button></div>,
+}));
+
+vi.mock('../../components/Society/SocietyDetail/MemberDirectoryModal', () => ({
+    default: ({ onClose }) => (
+        <div data-testid="members-modal">
+            <button onClick={onClose}>Close Members</button>
+        </div>
+    ),
 }));
 
 import { useSocietyDetail } from '../../components/Society/hooks/useSocietyDetail';
@@ -112,7 +162,9 @@ function renderPage(props = {}) {
 describe('SocietyDetailPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        locationState = { state: null };
         useSocietyDetail.mockReturnValue(mockHookData);
+        mockConfirm.mockResolvedValue(false);
     });
 
     it('renders loading state', () => {
@@ -228,5 +280,119 @@ describe('SocietyDetailPage', () => {
     it('renders sidebar', () => {
         renderPage();
         expect(screen.getByTestId('society-sidebar')).toBeTruthy();
+    });
+
+    it('opens report modal when report button is clicked', () => {
+        renderPage();
+        fireEvent.click(screen.getByTitle('Report Society'));
+        expect(screen.getByTestId('report-modal')).toBeTruthy();
+    });
+
+    it('shows unreport title when society has been reported', () => {
+        useSocietyDetail.mockReturnValue({
+            ...mockHookData,
+            society: { ...mockHookData.society, has_reported: true },
+        });
+        renderPage();
+        expect(screen.getByTitle('You have reported this society. Click to unreport.')).toBeTruthy();
+    });
+
+    it('calls unreport and updateLocalSociety when unreport is clicked and user confirms', async () => {
+        const updateLocalSociety = vi.fn();
+        useSocietyDetail.mockReturnValue({
+            ...mockHookData,
+            society: { ...mockHookData.society, has_reported: true },
+            updateLocalSociety,
+        });
+        mockConfirm.mockResolvedValue(true);
+        unreportSocietyApiMock.mockResolvedValue(undefined);
+        renderPage();
+        fireEvent.click(screen.getByTitle('You have reported this society. Click to unreport.'));
+        await waitFor(() => {
+            expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({ title: 'Unreport Society' }));
+        });
+        await waitFor(() => {
+            expect(unreportSocietyApiMock).toHaveBeenCalledWith(1);
+            expect(updateLocalSociety).toHaveBeenCalledWith({ has_reported: false });
+        });
+    });
+
+    it('opens gallery modal when hero image is clicked', () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Open Gallery'));
+        expect(screen.getByTestId('gallery-modal')).toBeTruthy();
+    });
+
+    it('closes gallery modal', () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Open Gallery'));
+        fireEvent.click(screen.getByText('Close Gallery'));
+        expect(screen.queryByTestId('gallery-modal')).toBeNull();
+    });
+
+    it('opens cover modal when edit images is clicked', () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Edit Cover'));
+        expect(screen.getByTestId('cover-modal')).toBeTruthy();
+    });
+
+    it('opens members modal when view members is clicked', () => {
+        renderPage();
+        fireEvent.click(screen.getByText('View Members'));
+        expect(screen.getByTestId('members-modal')).toBeTruthy();
+    });
+
+    it('uses initialTab and location state for activeTab when provided', () => {
+        locationState = { state: { activeTab: 'about', announcementId: 'a1' } };
+        renderPage({ initialTab: 'announcements' });
+        expect(screen.getByTestId('society-tabs')).toBeTruthy();
+    });
+
+    it('announcement submit with conflict calls updateAnnouncement for conflict and data', async () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Edit Announcement'));
+        expect(screen.getByTestId('announcement-modal')).toBeTruthy();
+        fireEvent.click(screen.getByText('Submit With Conflict'));
+        await waitFor(() => {
+            expect(mockHookData.updateAnnouncement).toHaveBeenCalledWith(99, expect.objectContaining({ pinned: false }), false);
+            expect(mockHookData.updateAnnouncement).toHaveBeenCalledWith(2, expect.objectContaining({ title: 'B' }), false);
+        });
+        expect(screen.queryByTestId('announcement-modal')).toBeNull();
+    });
+
+    it('announcement submit without conflict calls addAnnouncement for new data', async () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Edit Announcement'));
+        fireEvent.click(screen.getByText('Submit New'));
+        await waitFor(() => {
+            expect(mockHookData.addAnnouncement).toHaveBeenCalledWith(expect.objectContaining({ title: 'New Announcement' }), false);
+        });
+        expect(screen.queryByTestId('announcement-modal')).toBeNull();
+    });
+
+    it('cover modal onUpdate calls updateSociety with images', async () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Edit Cover'));
+        fireEvent.click(screen.getByText('Save Cover'));
+        expect(mockHookData.updateSociety).toHaveBeenCalledWith({
+            images: [{ url: 'https://example.com/1.jpg' }],
+            image: { url: 'https://example.com/1.jpg' },
+        });
+    });
+
+    it('unreport error path does not call updateLocalSociety when API fails', async () => {
+        const updateLocalSociety = vi.fn();
+        useSocietyDetail.mockReturnValue({
+            ...mockHookData,
+            society: { ...mockHookData.society, has_reported: true },
+            updateLocalSociety,
+        });
+        mockConfirm.mockResolvedValue(true);
+        unreportSocietyApiMock.mockRejectedValue(new Error('Network error'));
+        renderPage();
+        fireEvent.click(screen.getByTitle('You have reported this society. Click to unreport.'));
+        await waitFor(() => expect(mockConfirm).toHaveBeenCalled());
+        await waitFor(() => expect(unreportSocietyApiMock).toHaveBeenCalledWith(1));
+        expect(updateLocalSociety).not.toHaveBeenCalled();
     });
 });

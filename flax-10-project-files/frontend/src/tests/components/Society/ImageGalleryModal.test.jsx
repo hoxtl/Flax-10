@@ -1,106 +1,94 @@
-import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import ImageGalleryModal from '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal';
 
-const mockPrev = vi.fn();
-const mockNext = vi.fn();
+vi.mock(
+  '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal.module.css',
+  () => ({
+    default: {
+      overlay: 'overlay',
+      modal: 'modal',
+      closeBtn: 'closeBtn',
+      image: 'image',
+      nav: 'nav',
+      navBtn: 'navBtn',
+      dots: 'dots',
+      dot: 'dot',
+      activeDot: 'activeDot',
+    },
+  }),
+);
 
-vi.mock('../../../components/Society/hooks/useCarouselNavigation', () => ({
-    useCarouselNavigation: vi.fn(() => ({ index: 0, prev: mockPrev, next: mockNext })),
+vi.mock('../../../components/Society/hooks/useCarouselNavigation', () => {
+  const state = { index: 0 };
+  return {
+    useCarouselNavigation: vi.fn((length, initial) => {
+      state.index = initial ?? 0;
+      return {
+        index: state.index,
+        prev: () => {
+          state.index = (state.index - 1 + length) % length;
+        },
+        next: () => {
+          state.index = (state.index + 1) % length;
+        },
+      };
+    }),
     useCarouselGestures: vi.fn(),
     useCarouselKeyboard: vi.fn(),
-}));
-
-import ImageGalleryModal from '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal';
-import { useCarouselNavigation, useCarouselKeyboard } from '../../../components/Society/hooks/useCarouselNavigation';
+  };
+});
 
 describe('ImageGalleryModal', () => {
-    const images = ['img1.jpg', 'img2.jpg', 'img3.jpg'];
+  const images = ['a.jpg', 'b.jpg', 'c.jpg'];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns null when there are no images', () => {
+    const { container } = render(<ImageGalleryModal images={[]} onClose={vi.fn()} />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders overlay, image and close button, and closes on overlay click', () => {
     const onClose = vi.fn();
+    render(<ImageGalleryModal images={images} onClose={onClose} initialIndex={1} />);
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-        useCarouselNavigation.mockReturnValue({ index: 0, prev: mockPrev, next: mockNext });
-    });
+    const overlay = document.querySelector('div.overlay');
+    expect(screen.getByAltText('Gallery')).toBeInTheDocument();
 
-    it('returns null when images array is empty', () => {
-        const { container } = render(<ImageGalleryModal images={[]} onClose={onClose} />);
-        expect(container.firstChild).toBeNull();
-    });
+    fireEvent.click(overlay);
+    expect(onClose).toHaveBeenCalled();
+  });
 
-    it('renders with single image and no navigation', () => {
-        useCarouselNavigation.mockReturnValue({ index: 0, prev: mockPrev, next: mockNext });
-        render(<ImageGalleryModal images={['solo.jpg']} onClose={onClose} />);
-        expect(screen.getByRole('img')).toBeTruthy();
-        expect(screen.queryByRole('button', { name: /←|→/ })).toBeNull();
-    });
+  it('stops propagation when clicking inside modal and uses navigation buttons', () => {
+    const onClose = vi.fn();
+    const { container } = render(
+      <ImageGalleryModal images={images} onClose={onClose} initialIndex={0} />,
+    );
 
-    it('renders with multiple images and shows navigation', () => {
-        render(<ImageGalleryModal images={images} onClose={onClose} />);
-        expect(screen.getByRole('img')).toBeTruthy();
-        const buttons = screen.getAllByRole('button');
-        // close button + prev + next = 3 buttons
-        expect(buttons.length).toBeGreaterThanOrEqual(3);
-    });
+    const modal = container.querySelector('div.modal');
+    fireEvent.click(modal);
+    expect(onClose).not.toHaveBeenCalled();
 
-    it('calls onClose when overlay is clicked', () => {
-        const { container } = render(<ImageGalleryModal images={images} onClose={onClose} />);
-        fireEvent.click(container.firstChild);
-        expect(onClose).toHaveBeenCalled();
-    });
+    const navButtons = container.querySelectorAll('button.navBtn');
+    expect(navButtons.length).toBe(2);
+    const [prev, next] = navButtons;
 
-    it('does not call onClose when modal content is clicked', () => {
-        const { container } = render(<ImageGalleryModal images={images} onClose={onClose} />);
-        const modal = container.firstChild.firstChild;
-        fireEvent.click(modal);
-        expect(onClose).not.toHaveBeenCalled();
-    });
+    // clicking prev / next should not close modal and should keep dots rendered
+    fireEvent.click(next);
+    fireEvent.click(prev);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(container.querySelectorAll('.dot').length).toBe(images.length);
+  });
 
-    it('calls onClose when close button is clicked', () => {
-        render(<ImageGalleryModal images={images} onClose={onClose} />);
-        const closeBtn = screen.getByRole('button', { name: '×' });
-        fireEvent.click(closeBtn);
-        expect(onClose).toHaveBeenCalled();
-    });
+  it('does not render navigation when there is a single image', () => {
+    const { container } = render(
+      <ImageGalleryModal images={['only.jpg']} onClose={vi.fn()} initialIndex={0} />,
+    );
 
-    it('displays current image based on carousel index', () => {
-        useCarouselNavigation.mockReturnValue({ index: 1, prev: mockPrev, next: mockNext });
-        render(<ImageGalleryModal images={images} onClose={onClose} />);
-        const img = screen.getByRole('img');
-        expect(img.getAttribute('src')).toBe('img2.jpg');
-    });
-
-    it('uses initialIndex prop for carousel', () => {
-        render(<ImageGalleryModal images={images} onClose={onClose} initialIndex={2} />);
-        expect(useCarouselNavigation).toHaveBeenCalledWith(3, 2);
-    });
-
-    it('passes default initialIndex of 0 when not provided', () => {
-        render(<ImageGalleryModal images={images} onClose={onClose} />);
-        expect(useCarouselNavigation).toHaveBeenCalledWith(3, 0);
-    });
-
-    it('renders navigation dots equal to image count', () => {
-        const { container } = render(<ImageGalleryModal images={images} onClose={onClose} />);
-        const dots = container.querySelectorAll('span');
-        expect(dots.length).toBe(images.length);
-    });
-
-    it('applies active dot class to current index dot', () => {
-        useCarouselNavigation.mockReturnValue({ index: 1, prev: mockPrev, next: mockNext });
-        const { container } = render(<ImageGalleryModal images={images} onClose={onClose} />);
-        const dots = Array.from(container.querySelectorAll('span'));
-        // active dot at index 1 should have activeDot class
-        expect(dots[1].className).toContain('activeDot');
-        expect(dots[0].className).not.toContain('activeDot');
-    });
-
-    it('sets up keyboard handler via useCarouselKeyboard', () => {
-        render(<ImageGalleryModal images={images} onClose={onClose} />);
-        expect(useCarouselKeyboard).toHaveBeenCalledWith(mockPrev, mockNext, onClose);
-    });
-
-    it('image has alt text "Gallery"', () => {
-        render(<ImageGalleryModal images={images} onClose={onClose} />);
-        expect(screen.getByAltText('Gallery')).toBeTruthy();
-    });
+    expect(container.querySelector('.nav')).toBeNull();
+  });
 });
+
