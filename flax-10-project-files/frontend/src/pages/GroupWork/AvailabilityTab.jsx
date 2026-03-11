@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAuthHeaders } from "./groupWorkHooks";
+import { useConfirm } from "../../context/ConfirmContext";
 import { Check, X, Star, Trash2 } from "lucide-react";
 import styles from "./AvailabilityTab.module.css";
 
@@ -16,6 +17,7 @@ export default function AvailabilityTab({ projectId }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [suggestingSlot, setSuggestingSlot] = useState(null);
+    const confirm = useConfirm();
 
     const fetchAvailability = async () => {
         try {
@@ -61,7 +63,14 @@ export default function AvailabilityTab({ projectId }) {
     };
 
     const handleDeleteSuggestion = async (suggestionId) => {
-        if (!window.confirm("Are you sure you want to delete this suggestion?")) return;
+        const isConfirmed = await confirm({
+            title: "Delete Suggestion",
+            message: "Are you sure you want to delete this meeting suggestion? This cannot be undone.",
+            confirmText: "Delete",
+            isDanger: true,
+        });
+        if (!isConfirmed) return;
+
         try {
             const res = await fetch(`/api/group-work/suggestions/${suggestionId}/`, {
                 method: "DELETE",
