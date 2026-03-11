@@ -994,3 +994,9 @@
   align-items: center;
   margin-bottom: 2px;
 }
+
+.eventTime {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+}
