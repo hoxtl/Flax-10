@@ -1,7 +1,7 @@
 .container {
     border-radius: 12px;
-    border: 1px solid #f0dfd1;
-    background: #fffaf4;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
     padding: 20px 24px;
     margin-top: 15px;
 }
@@ -23,8 +23,8 @@
 /* View Toggle Styling */
 .viewToggleGroup {
     display: flex;
-    background: #f7efe7;
-    border: 1px solid #e3d4c6;
+    background: var(--hover-light);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 4px;
     gap: 4px;
@@ -36,7 +36,7 @@
     border-radius: 9px;
     border: none;
     background: transparent;
-    color: #8a7355;
+    color: var(--text-secondary);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -48,12 +48,12 @@
 }
 
 .viewToggleBtn:hover {
-    color: #5c4436;
+    color: var(--text);
 }
 
 .viewToggleBtnActive {
-    background: #3c2a20;
-    color: #fff;
+    background: var(--primary);
+    color: white;
 }
 
 .viewToggleBtnActive:hover {
@@ -66,8 +66,9 @@
     height: 42px;
     padding: 0 16px;
     border-radius: 10px;
-    border: 1px solid #e3d4c6;
-    background: #fff;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -76,8 +77,8 @@
 }
 
 .taskInput:focus {
-    border-color: #8d7355;
-    box-shadow: 0 0 0 3px rgba(141, 115, 85, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--active);
 }
 
 /* Filter Dropdown Styling */
@@ -102,9 +103,9 @@
     height: 42px;
     padding: 0 16px;
     border-radius: 10px;
-    border: 1px solid #e3d4c6;
-    background: #f7efe7;
-    color: #3c2a20;
+    border: 1px solid var(--border);
+    background: var(--hover-light);
+    color: var(--text);
     font-size: 13px;
     font-weight: 600;
     display: flex;
@@ -117,8 +118,8 @@
 }
 
 .filterCustomTrigger:hover {
-    background: #f1e6db;
-    border-color: #dccdbd;
+    background: var(--hover);
+    border-color: var(--border);
 }
 
 .filterCustomArrow {
@@ -140,7 +141,7 @@
     border-radius: 10px;
     border: 1px solid transparent;
     /* matches the 1px border of input/dropdown */
-    background: #8d7355;
+    background: var(--primary);
     color: #fff;
     font-weight: 600;
     cursor: pointer;
@@ -153,7 +154,7 @@
 }
 
 .addBtn:hover {
-    background: #7a6449;
+    background: var(--primary-strong);
 }
 
 .addBtn:active {
@@ -165,7 +166,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) 100px 90px 160px 48px;
     align-items: center;
-    border-bottom: 1px solid #f0dfd1;
+    border-bottom: 1px solid var(--border);
     padding: 16px 0;
     gap: 16px;
     transition: background 0.2s;
@@ -227,7 +228,7 @@
 
 .titleDone {
     text-decoration: line-through;
-    color: #a89b91;
+    color: var(--muted);
 }
 
 .titleEditArea {
@@ -244,7 +245,7 @@
     font-family: inherit;
     resize: none;
     display: block;
-    color: #3c2a20;
+    color: var(--text);
     overflow: hidden;
 }
 
@@ -282,10 +283,10 @@
 .dateLabel {
     font-size: 13px;
     font-weight: 500;
-    color: #8f7969;
+    color: var(--text-secondary);
     text-align: center;
     padding: 6px 10px;
-    background: rgba(143, 121, 105, 0.05);
+    background: var(--hover-light);
     border-radius: 8px;
     width: 100%;
     border: none;
@@ -318,7 +319,7 @@
 }
 
 .assignClickTargetActive {
-    background: #eee3d8;
+    background: var(--hover);
 }
 
 .unassigned {
@@ -344,9 +345,9 @@
     font-size: 9px;
     font-weight: 800;
     flex-shrink: 0;
-    border: 2px solid #fffaf4;
+    border: 2px solid var(--card-bg);
     color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .avatarMore {
@@ -363,10 +364,10 @@
     left: 50%;
     transform: translateX(-50%);
     margin-top: 10px;
-    background: #fff;
-    border: 1px solid #e2d1c3;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(60, 42, 32, 0.15);
+    box-shadow: var(--shadow-lg);
     z-index: 100;
     min-width: 180px;
     padding: 10px 0;
@@ -390,7 +391,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 14px 8px;
-    border-bottom: 1px solid #f9f5f1;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 4px;
 }
 
@@ -427,7 +428,7 @@
 }
 
 .assignItem:hover {
-    background: #fdfaf7;
+    background: var(--hover-light);
 }
 
 .assignItemSelected {
