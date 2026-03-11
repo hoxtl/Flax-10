@@ -835,8 +835,10 @@ export default function CampusMap() {
                           </span>
                       </div>
                       <div className={styles.eventTitle}>{event.title}</div>
+                      <div className={styles.eventLocation}>📍 {event.location} </div>
                     </div>
-                )
+                  </div>
+                );
               })}
             </div>
           )
