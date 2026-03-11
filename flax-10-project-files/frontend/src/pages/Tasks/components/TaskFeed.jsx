@@ -16,6 +16,8 @@ import toolbarStyles from "./TaskFeedToolbar.module.css";
 import sectionStyles from "./TaskFeedSections.module.css";
 
 import useTaskFeedData from "../hooks/useTaskFeedData";
+import { isReadingList } from "../hooks/useCreateTaskBar";
+import SuggestedReadingsSection from "./SuggestedReadingsSection";
 
 const styles = { ...layoutStyles, ...toolbarStyles, ...sectionStyles };
 const SECTION_SHOW_LIMIT = 8;
@@ -100,7 +102,7 @@ function CompletedBlock({ data, lists, onToggleComplete, onDeleteTask, onEditTas
   return <CompletedTasksSection tasks={data.filteredCompleted} sortBy={data.sortBy} listMap={data.listMap} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />;
 }
 
-function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, activeListId, lists, onToggleComplete, onDeleteTask, onEditTask }) {
+function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, activeListId, lists, onToggleComplete, onDeleteTask, onEditTask, readingList, onTaskAdded, taskCount }) {
   return (
     <div className={styles.sectionsWrap}>
       <div className={styles.sections} key={`sections-${activeListId ?? "all"}`}>
@@ -113,6 +115,9 @@ function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, active
         <AllTasksSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
         <CompletedBlock data={data} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
       </div>
+      {readingList && (
+        <SuggestedReadingsSection key={activeListId} onTaskAdded={onTaskAdded} taskCount={taskCount} />
+      )}
     </div>
   );
 }
@@ -123,11 +128,15 @@ function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, active
 export default function TaskFeed(props) {
   const data = useTaskFeedData(props);
   const sectionPropsWithHandlers = { ...data.sectionProps, onToggleComplete: props.onToggleComplete, onDeleteTask: props.onDeleteTask, onEditTask: props.onEditTask };
+  const activeList = (props.lists || []).find(l => String(l.id) === String(props.activeListId));
+  const readingList = isReadingList(activeList);
   return (
     <div className={styles.feed}>
       <TaskFeedHeader title={data.headerTitle} />
       <TaskFeedSubHeader data={data} lists={props.lists} activeListId={props.activeListId} defaultDueDateForNewTask={props.defaultDueDateForNewTask} onAddTask={props.onAddTask} onCreateTask={props.onCreateTask} />
-      <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} />
+      <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} 
+      isReadingList={readingList} onTaskAdded={props.onReloadTasks} taskCount={props.tasks?.length}
+      />
     </div>
   );
 }
