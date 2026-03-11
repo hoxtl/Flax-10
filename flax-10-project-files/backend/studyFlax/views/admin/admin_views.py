@@ -81,3 +81,36 @@ def resolve_teacher_request(request, user_id):
         return Response({'message': f'Teacher request rejected for {user.username}.'})
     else:
         return Response({'error': 'Invalid decision. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
+
+# Reported Societies
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def reported_societies(request):
+    """List all reported societies with report details."""
+    reports = SocietyReport.objects.select_related('society', 'reporter').order_by('-created_at')
+    data = [
+        {
+            'id': r.id,
+            'society_id': r.society.id,
+            'society_name': r.society.name,
+            'reporter_id': r.reporter.id,
+            'reporter_username': r.reporter.username,
+            'reason': r.reason,
+            'created_at': r.created_at,
+        }
+        for r in reports
+    ]
+    return Response(data)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def dismiss_report(request, report_id):
+    """Dismiss (delete) a specific society report."""
+    try:
+        report = SocietyReport.objects.get(id=report_id)
+    except SocietyReport.DoesNotExist:
+        return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+    report.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
