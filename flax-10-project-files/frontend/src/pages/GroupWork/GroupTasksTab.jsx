@@ -3,6 +3,7 @@ import { Check, Hourglass, Circle, Trash2, X, Pencil, ChevronDown } from "lucide
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
 import DateTimePicker from "../../components/common/inputs/DateTimePicker";
+import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
 import styles from "./GroupTasksTab.module.css";
 
 const USER_COLORS = [
@@ -105,7 +106,7 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
         const p = (priority || "").toLowerCase();
         if (p === "urgent") return { background: "#ffaebe", color: "#9e1f3d" };
         if (p === "high") return { background: "#fed7aa", color: "#c2410c" };
-        if (p === "medium") return { background: "#ffe0b2", color: "#bf7b24" };
+        if (p === "medium") return { background: "#fef08a", color: "#854d0e" };
         return { background: "#f1ede9", color: "#8f7969" };
     };
 
@@ -383,21 +384,15 @@ export default function GroupTasksTab({ projectId, members }) {
                 />
 
                 <div className={styles.filterWrapper}>
-                    <select
+                    <AnimatedDropdown
                         value={filterUser}
-                        onChange={(e) => setFilterUser(e.target.value)}
-                        className={styles.filterSelect}
-                    >
-                        <option value="">All Members</option>
-                        {members.map(m => (
-                            <option key={m.id} value={m.user}>
-                                {m.user_name}
-                            </option>
-                        ))}
-                    </select>
-                    <div className={styles.filterArrow}>
-                        <ChevronDown size={14} />
-                    </div>
+                        onChange={(val) => setFilterUser(val)}
+                        placeholder="All Members"
+                        options={[
+                            { value: "", label: "All Members" },
+                            ...members.map(m => ({ value: String(m.user), label: m.user_name }))
+                        ]}
+                    />
                 </div>
 
                 <button type="submit" className={styles.addBtn}>

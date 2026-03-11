@@ -37,40 +37,8 @@
     position: relative;
     display: flex;
     align-items: center;
-}
-
-.filterSelect {
-    padding: 11px 38px 11px 16px;
-    border-radius: 10px;
-    border: 1px solid #e3d4c6;
-    background: #f7efe7;
-    color: #3c2a20;
-    font-size: 13px;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    /* Hide default arrow */
     min-width: 160px;
-    font-family: inherit;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.filterSelect:hover {
-    background: #f1e6db;
-    border-color: #dccdbd;
-}
-
-.filterArrow {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #8a7355;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 50;
 }
 
 .addBtn {
@@ -196,6 +164,7 @@
     width: 100%;
     letter-spacing: 0.05em;
     transition: transform 0.15s;
+    margin-right: 12px;
 }
 
 .prioritySelect:hover {
@@ -208,6 +177,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 12px;
 }
 
 .dateLabel {
