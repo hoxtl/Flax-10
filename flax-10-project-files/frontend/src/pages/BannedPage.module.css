@@ -35,3 +35,14 @@
 .reasonEmphasis {
   color: var(--text, #111);
 }
+
+.support {
+  font-size: 0.85rem;
+  color: var(--muted, #9ca3af);
+  margin: 0;
+}
+
+.supportLink {
+  color: var(--accent, #6c47ff);
+  text-decoration: underline;
+}
