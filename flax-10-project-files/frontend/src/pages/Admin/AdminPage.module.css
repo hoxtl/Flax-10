@@ -438,3 +438,17 @@ button:disabled {
   border-color: var(--accent, #6c47ff);
   box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
 }
+
+/* ── spinner ─────────────────────────────────────────────────────────────── */
+.spinnerWrap {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+.spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--border, #e5e7eb);
+  border-top-color: var(--accent, #6c47ff);
+  border-radius: 50%;
+}
