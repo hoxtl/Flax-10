@@ -34,8 +34,8 @@ function AddTaskForm({ newTaskTitle, setNewTaskTitle, filterUser, setFilterUser,
     return (
         <form onSubmit={onAdd} className={styles.addTaskForm}>
             <input value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Add a new task..." className={styles.taskInput} />
-            <TaskFilter filterUser={filterUser} setFilterUser={setFilterUser} members={members} />
             <button type="submit" className={styles.addBtn}>Add</button>
+            <TaskFilter filterUser={filterUser} setFilterUser={setFilterUser} members={members} />
         </form>
     );
 }
