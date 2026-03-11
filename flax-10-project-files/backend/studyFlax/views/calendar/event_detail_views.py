@@ -31,23 +31,6 @@ def update_event(event, data):
     serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    location = data.get('location')
-    if location and location.strip():
-        geocode_result = GeocodingService.geocode_location(location)
-        if geocode_result['success']:
-            event.location = geocode_result['formatted_address']
-            event.location_latitude = geocode_result['latitude']
-            event.location_longitude = geocode_result['longitude']
-            event.location_validated = True
-        else:
-            event.location = location
-            event.location_validated = False
-    else:
-        event.location = None
-        event.location_latitude = None
-        event.location_longitude = None
-        event.location_validated = False
 
     serialiser.save()
     event.save()
