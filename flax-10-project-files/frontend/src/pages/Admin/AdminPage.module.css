@@ -196,3 +196,50 @@
   gap: 0.4rem;
   align-items: center;
 }
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 0.6rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  gap: 1rem;
+  transition: background 0.14s;
+}
+.listRow:last-child {
+  border-bottom: none;
+}
+.listRow:hover {
+  background: var(--bg, #f9fafb);
+  border-radius: 10px;
+}
+
+.listInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.listName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text, #111);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.listMeta {
+  font-size: 0.81rem;
+  color: var(--muted, #6b7280);
+}
+
+.listActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
