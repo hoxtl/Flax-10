@@ -1,19 +1,38 @@
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Tabs.module.css";
 
-export default function Tabs({ tabs, activeTab, onTabChange, rightAction }) {
+export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator" }) {
     if (!tabs?.length) return null;
     return (
         <div className={styles.container}>
-            <div className={styles.tabBar}>
-                <div className={styles.tabList}>
-                    {tabs.map(tab => <TabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onClick={() => onTabChange(tab.id)} />)}
-                </div>
-                {rightAction && <div className={styles.rightAction}>{rightAction}</div>}
-            </div>
-            <div className={styles.content}>
-                {tabs.find(t => t.id === activeTab)?.content}
-            </div>
+            <motion.div
+                className={styles.tabBar}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.35 }}
+            >
+                {tabs.map(tab => (
+                    <TabButton
+                        key={tab.id}
+                        tab={tab}
+                        isActive={activeTab === tab.id}
+                        onClick={() => onTabChange(tab.id)}
+                        layoutId={layoutId}
+                    />
+                ))}
+            </motion.div>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    className={styles.content}
+                >
+                    {tabs.find(t => t.id === activeTab)?.content}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 }
