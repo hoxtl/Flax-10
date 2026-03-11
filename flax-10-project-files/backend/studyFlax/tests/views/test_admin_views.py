@@ -168,3 +168,34 @@ class AdminTeacherRequestsTest(TestCase):
         regular = make_user('norole')
         response = authed_client(regular).get(self.list_url)
         self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
+
+class RequestTeacherRoleTest(TestCase):
+    def setUp(self):
+        self.url = '/api/request-teacher-role/'
+
+    def test_student_can_request_teacher_role(self):
+        user = make_user('requester')
+        user.role = 'student'
+        user.save()
+        response = authed_client(user).post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user.refresh_from_db()
+        self.assertEqual(user.role, 'pending_teacher')
+
+    def test_teacher_cannot_request_again(self):
+        user = make_user('teacher_user')
+        user.role = 'teacher'
+        user.save()
+        response = authed_client(user).post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_pending_teacher_cannot_request_again(self):
+        user = make_user('pending_user')
+        user.role = 'pending_teacher'
+        user.save()
+        response = authed_client(user).post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unauthenticated_request_returns_401(self):
+        response = APIClient().post(self.url)
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
