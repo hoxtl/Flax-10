@@ -86,6 +86,7 @@ vi.mock('../../pages/Homepage/hooks/useHomeData', () => ({
     allTasks: mockAllTasks,
     removePendingTask: vi.fn(),
     refetchTasks: mockRefetchTasks,
+    loading: false,
   }),
 }));
 

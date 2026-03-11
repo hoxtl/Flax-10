@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { AlertCircle, ArrowRight } from "lucide-react";
 import styles from "./DeadlinesWidget.module.css";
+import EmptyStateCard from "./EmptyStateCard";
 
 const MAX_SHOWN = 3;
 
@@ -32,19 +33,19 @@ function getDaysLabel(dueDate) {
 }
 
 const TIER_TEXT = {
-  overdue:  "#B83232",
-  critical: "#B86050",
-  urgent:   "#A06030",
-  upcoming: "#8C6D3F",
-  distant:  "#A89279",
+  overdue: "var(--home-urgency-danger)",
+  critical: "var(--home-urgency-danger)",
+  urgent: "var(--home-urgency-warning)",
+  upcoming: "var(--home-urgency-neutral)",
+  distant: "var(--home-urgency-muted)",
 };
 
 const TIER_ACCENT = {
-  overdue: "#C0714E",
-  critical: "#C0714E",
-  urgent: "#B08C4B",
-  upcoming: "#8B7355",
-  distant: "#CFC4B6",
+  overdue: "var(--home-urgency-danger)",
+  critical: "var(--home-urgency-danger)",
+  urgent: "var(--home-urgency-warning)",
+  upcoming: "var(--home-urgency-neutral)",
+  distant: "var(--home-urgency-neutral-border)",
 };
 
 const listVariants = {
@@ -87,11 +88,10 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       </div>
 
       {sorted.length === 0 ? (
-        <div className={styles.emptyState}>
-          <CheckCircle2 size={26} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
-          <p className={styles.emptyTitle}>All caught up</p>
-          <p className={styles.emptySubtitle}>No upcoming deadlines</p>
-        </div>
+        <EmptyStateCard
+          message="All caught up for now."
+          sub="No upcoming deadlines to plan around."
+        />
       ) : (
         <motion.div
           className={styles.list}
@@ -129,8 +129,8 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
   const title      = deadline.assessment_title || deadline.title || "Assignment";
   const moduleCode = deadline.module_code || "";
   const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
-  const textColor = TIER_TEXT[tier] || "#A89279";
-  const rowAccent = TIER_ACCENT[tier] || "#CFC4B6";
+  const textColor = TIER_TEXT[tier] || "var(--home-urgency-muted)";
+  const rowAccent = TIER_ACCENT[tier] || "var(--home-urgency-neutral-border)";
 
   return (
     <motion.div

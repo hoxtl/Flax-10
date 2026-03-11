@@ -99,7 +99,7 @@ describe('TaskWidgetSlot', () => {
 
   it('renders empty state when no tasks', () => {
     renderTaskWidgetSlot();
-    expect(screen.getByText('All caught up for today.')).toBeTruthy();
+    expect(screen.getByText('All caught up for now.')).toBeTruthy();
     expect(screen.getByText('Add a task →')).toBeTruthy();
   });
 

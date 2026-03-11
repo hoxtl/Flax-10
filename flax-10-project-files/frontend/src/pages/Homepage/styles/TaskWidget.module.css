@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .taskWidgetSlotHeaderLeft {
@@ -70,44 +70,44 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(91, 134, 99, 0.18);
-  background: linear-gradient(135deg, #edf7ef 0%, #f5faf6 100%);
-  color: #54775a;
+  border: 1px solid rgba(44, 24, 16, 0.16);
+  background: linear-gradient(135deg, #3a2619 0%, #2c1810 100%);
+  color: #fffcf8;
   border-radius: 999px;
   padding: 8px 11px;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .taskWidgetFocusBtn:hover {
-  background: linear-gradient(135deg, #e4f1e7 0%, #f1f7f2 100%);
+  background: linear-gradient(135deg, #4a2e1d 0%, #362114 100%);
 }
 
 .taskWidgetSummaryRow {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 7px;
-  margin: 0 0 8px;
+  gap: 8px;
+  margin: 0 0 10px;
 }
 
 .taskWidgetDueTodayPill {
   padding: 4px 10px;
   border-radius: 9999px;
-  border: 1px solid rgba(196, 164, 109, 0.5);
-  background: #fbf7ea;
-  color: #b08c4b;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(243, 239, 234, 0.72);
+  color: #736048;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
 }
 
 .taskWidgetSummaryPill {
@@ -119,11 +119,11 @@
   border: 1px solid rgba(139, 115, 85, 0.12);
   background: rgba(243, 239, 234, 0.72);
   color: #736048;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -133,7 +133,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
 .taskWidgetTaskRow {
@@ -144,13 +144,13 @@
   padding: 9px 11px;
   border-radius: 14px;
   border: 1px solid rgba(139, 115, 85, 0.11);
-  border-left: 5px solid color-mix(in srgb, var(--task-row-accent, #8B7355) 55%, #f5ede3);
+  border-left: 5px solid color-mix(in srgb, var(--task-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
   background: linear-gradient(180deg, #fffdfa 0%, #fffaf5 100%);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
 }
 
 .taskWidgetTaskRowOverdue {
-  border-left-color: #c0714e;
+  border-left-color: var(--home-urgency-danger);
 }
 
 .taskWidgetTaskRowNext {
@@ -200,11 +200,11 @@
   align-items: center;
   padding: 5px 10px;
   border-radius: 10px;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 8px;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0.82;
@@ -218,12 +218,12 @@
   border: 1px solid #d8d4cf;
   background: #f0f0f0;
   color: #7f7b76;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 8px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .taskWidgetTaskTitle {
@@ -244,32 +244,32 @@
   align-items: center;
   padding: 3px 8px;
   border-radius: 999px;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 8px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
   margin-left: auto;
 }
 
 .taskWidgetUrgencyPillUrgent {
-  border: 1px solid #f1c4b8;
-  background: #fff3ef;
-  color: #b4583e;
+  border: 1px solid var(--home-urgency-danger-border);
+  background: var(--home-urgency-danger-soft);
+  color: var(--home-urgency-danger);
 }
 
 .taskWidgetUrgencyPillHigh {
-  border: 1px solid #eadfcb;
-  background: #fbf6ec;
-  color: #9a7a47;
+  border: 1px solid var(--home-urgency-warning-border);
+  background: var(--home-urgency-warning-soft);
+  color: var(--home-urgency-warning);
 }
 
 .taskWidgetUrgencyPillNow {
-  border: 1px solid #d4e2d6;
-  background: #f1f8f2;
-  color: #5b8663;
+  border: 1px solid var(--home-urgency-success-border);
+  background: var(--home-urgency-success-soft);
+  color: var(--home-urgency-success);
 }
 
 .taskWidgetMoreText {

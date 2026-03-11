@@ -17,11 +17,14 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
 };
 
-export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDuration }) {
+export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDuration, recommendation }) {
   const navigate = useNavigate();
   const hasFocusNow = !!onStartFocus;
 
-  const handleFocus = () => (onStartFocus ? onStartFocus() : navigate("/timer", { state: { fromTaskPlay: true } }));
+  const handleFocus = () => {
+    if (recommendation?.onAction) return recommendation.onAction();
+    return onStartFocus ? onStartFocus() : navigate("/timer", { state: { fromTaskPlay: true } });
+  };
   const handleAddEvent = () => (onAddEvent ? onAddEvent() : navigate("/calendar"));
   const handleOpenMap = () => navigate("/map");
   const handleRePlan = () => {
@@ -37,6 +40,11 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
       navigate("/calendar");
     }
   };
+
+  const primaryLabel = recommendation?.quickActionLabel || "Start Focus Session";
+  const primarySub = recommendation?.quickActionSub || (hasFocusNow
+    ? (focusWindowDuration ? `${focusWindowDuration} window available` : "Focus window available now")
+    : null);
 
   return (
     <div className={styles.root}>
@@ -69,12 +77,8 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
             )}
             <Sparkles size={20} strokeWidth={1.75} className={styles.primaryIcon} aria-hidden />
             <div className={styles.primaryTextBlock}>
-              <span className={styles.primaryLabel}>Start Focus Session</span>
-              {hasFocusNow && (
-                <span className={styles.primarySub}>
-                  {focusWindowDuration ? `${focusWindowDuration} window available` : "Focus window available now"}
-                </span>
-              )}
+              <span className={styles.primaryLabel}>{primaryLabel}</span>
+              {primarySub && <span className={styles.primarySub}>{primarySub}</span>}
             </div>
           </div>
           <motion.span

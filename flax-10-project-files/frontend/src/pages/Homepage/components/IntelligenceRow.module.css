@@ -20,8 +20,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-bottom: 1rem;
+  gap: 16px;
+  margin-bottom: 18px;
   padding: 26px 28px;
   border: 1px solid rgba(123, 103, 81, 0.14);
   border-radius: 28px;
@@ -53,17 +53,17 @@
 .headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1 1 auto;
   min-width: 0;
   justify-content: center;
 }
 
 .headerLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.875rem; /* text-sm */
-  font-weight: 500;
-  letter-spacing: 0.1em; /* tracking-widest */
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #a8a29e; /* text-stone-400 */
 }
@@ -71,7 +71,7 @@
 .headerDateRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .headerDateIcon {
@@ -142,27 +142,27 @@
 }
 
 .headerDayProgressCount {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: #7B6751;
 }
 
 .headerDayProgressOverdue {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
   font-weight: 700;
   color: #C0714E;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .headerDayProgressStreak {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #9a8778;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 /* Pills row at the top of the Right Now bento card */
@@ -255,10 +255,10 @@
 }
 
 .statusStripText {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   color: #5c4d3e;
 }
 
@@ -327,17 +327,17 @@
 }
 
 .tflCardLine {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.67rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: #5c3a1e;
 }
 
 .tflCardStatus {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #8a7060;
 }
 
@@ -368,10 +368,10 @@
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   color: rgba(155, 58, 42, 0.65);
   padding: 2px 0 2px 4px;
 }
@@ -432,7 +432,7 @@
 
 .headerPlannerPanel {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   padding: 12px;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.46);
@@ -443,16 +443,16 @@
 .metricRail {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 
 .metricChip {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 11px 12px;
+  gap: 4px;
+  padding: 12px;
   min-width: 98px;
-  border-radius: 16px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.76);
   border: 1px solid rgba(123, 103, 81, 0.06);
 }
@@ -465,10 +465,10 @@
 
 .metricLabel {
   color: #8f7b68;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -491,10 +491,10 @@
 }
 
 .nextStepLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: #8f7b68;
 }
@@ -510,11 +510,11 @@
 }
 
 .nextStepMeta {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.67rem;
-  font-weight: 600;
+  font-weight: 700;
   color: rgba(74, 52, 33, 0.56);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .nextStepFooter {
@@ -523,6 +523,35 @@
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.nextStepActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nextStepCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(44, 24, 16, 0.16);
+  background: linear-gradient(135deg, #3a2619 0%, #2c1810 100%);
+  color: #fffcf8;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.nextStepCta:hover {
+  background: linear-gradient(135deg, #4a2e1d 0%, #362114 100%);
 }
 
 .analyticsInline {
@@ -537,20 +566,21 @@
   min-height: 24px;
   padding: 0 9px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(123, 103, 81, 0.08);
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  background: rgba(243, 239, 234, 0.72);
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: rgba(74, 52, 33, 0.74);
+  text-transform: uppercase;
+  color: #736048;
 }
 
 .analyticsLink {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.67rem;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #7b6751;
   text-decoration: none;
@@ -565,15 +595,17 @@
   align-items: flex-start;
   gap: 12px;
   width: fit-content;
-  max-width: 100%;
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  max-width: min(100%, 34rem);
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(123, 103, 81, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 8px 18px rgba(74, 52, 33, 0.025);
+  backdrop-filter: blur(6px);
 }
 
 .liveContextCardWarning {
-  background: rgba(255, 248, 244, 0.88);
+  background: rgba(255, 248, 244, 0.78);
   border-color: rgba(192, 113, 78, 0.14);
 }
 
@@ -590,10 +622,10 @@
 }
 
 .liveContextLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #8f7b68;
 }
@@ -632,10 +664,10 @@
 }
 
 .liveContextMeta {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.66rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: rgba(132, 87, 72, 0.72);
 }
 
@@ -676,7 +708,7 @@
 
 @media (min-width: 1024px) {
   .primaryGrid {
-    grid-template-columns: minmax(240px, 0.38fr) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(270px, 0.43fr) minmax(0, 1fr) !important;
     grid-auto-rows: minmax(0, auto);
     gap: 12px;
     align-items: stretch;

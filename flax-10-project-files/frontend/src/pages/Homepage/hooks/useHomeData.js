@@ -12,15 +12,20 @@ export function useHomeData(selectedDate) {
   const { events, allEvents } = useCalendar();
   const [allTasks, setAllTasks] = useState([]);
   const [fallbackDayEvents, setFallbackDayEvents] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [eventsLoading, setEventsLoading] = useState(true);
 
   useEffect(() => {
+    setTasksLoading(true);
     fetchTasks()
       .then((data) => setAllTasks(data || []))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setTasksLoading(false));
   }, []);
 
   useEffect(() => {
     let cancelled = false;
+    setEventsLoading(true);
     const dayStart = new Date(selectedDate);
     dayStart.setHours(0, 0, 0, 0);
     const dayEnd = new Date(selectedDate);
@@ -32,6 +37,9 @@ export function useHomeData(selectedDate) {
       })
       .catch(() => {
         if (!cancelled) setFallbackDayEvents([]);
+      })
+      .finally(() => {
+        if (!cancelled) setEventsLoading(false);
       });
 
     return () => {
@@ -65,5 +73,12 @@ export function useHomeData(selectedDate) {
     fetchTasks().then((data) => setAllTasks(data || [])).catch(() => {});
   }, []);
 
-  return { dayEvents, dayTasks, allTasks, removePendingTask, refetchTasks };
+  return {
+    dayEvents,
+    dayTasks,
+    allTasks,
+    removePendingTask,
+    refetchTasks,
+    loading: tasksLoading || eventsLoading,
+  };
 }

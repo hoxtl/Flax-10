@@ -41,19 +41,6 @@ function getNextWindowMeta(windows = [], now = new Date()) {
   };
 }
 
-function getPlanningSubtitle({ eventsCount, tasksCount, windowsCount, nextWindowMeta }) {
-  if (tasksCount > 0 && nextWindowMeta?.duration) {
-    return `${tasksCount} task${tasksCount === 1 ? "" : "s"} to move forward, ${eventsCount} event${eventsCount === 1 ? "" : "s"} on the day, and a ${nextWindowMeta.duration} focus window to work with.`;
-  }
-  if (tasksCount > 0) {
-    return `${tasksCount} task${tasksCount === 1 ? "" : "s"} still need attention across ${eventsCount} event${eventsCount === 1 ? "" : "s"} today.`;
-  }
-  if (windowsCount > 0 && nextWindowMeta?.duration) {
-    return `Your schedule is under control. The next open block gives you ${nextWindowMeta.duration} of usable focus time.`;
-  }
-  return "Use the timeline below as the source of truth, and the cards here as your planning controls.";
-}
-
 function getNextStep({ tasksCount, nextWindowMeta }) {
   if (tasksCount > 0 && nextWindowMeta?.duration) {
     return `Use the ${nextWindowMeta.duration} window to move one priority task forward.`;
@@ -156,6 +143,8 @@ export default function IntelligenceRow({
   studyPulseOnStartFocus,
   studyPulseDeadlines,
   slot5Data,
+  recommendation,
+  onRecommendationAction,
 }) {
   const tflDelays = useTflDelays();
   const { summary, loading: profileLoading } = useProfileSummary();
@@ -174,15 +163,9 @@ export default function IntelligenceRow({
   });
   const LiveContextIcon = liveContext.Icon;
   const tasksCount = pendingTasks.length;
-  const windowsCount = Array.isArray(studyPulseWindows) ? studyPulseWindows.length : 0;
   const nextWindowMeta = getNextWindowMeta(studyPulseWindows, studyPulseNow ?? new Date());
-  const planningSubtitle = getPlanningSubtitle({
-    eventsCount,
-    tasksCount,
-    windowsCount,
-    nextWindowMeta,
-  });
-  const nextStep = getNextStep({ tasksCount, nextWindowMeta });
+  const nextStep = recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
+  const nextStepMeta = recommendation?.meta || null;
   const weekly = !profileLoading ? summary?.weekly : null;
   const streaks = !profileLoading ? summary?.streaks : null;
   const weeklyProgress = Number.isFinite(weekly?.percentage) ? `${Math.round(weekly.percentage)}% weekly goal` : null;
@@ -236,23 +219,24 @@ export default function IntelligenceRow({
           <div className={styles.headerPlannerPanel}>
             <div className={styles.metricRail}>
               <div className={styles.metricChip}>
-                <span className={styles.metricLabel}>Events</span>
+                <span className={styles.metricLabel}>On today</span>
                 <span className={styles.metricValue}>{eventsCount}</span>
               </div>
               <div className={styles.metricChip}>
-                <span className={styles.metricLabel}>Tasks in focus</span>
+                <span className={styles.metricLabel}>To do today</span>
                 <span className={styles.metricValue}>{tasksCount}</span>
               </div>
               <div className={styles.metricChip}>
-                <span className={styles.metricLabel}>Next open block</span>
+                <span className={styles.metricLabel}>Free to study</span>
                 <span className={styles.metricValue}>
-                  {nextWindowMeta?.duration || `${windowsCount} window${windowsCount === 1 ? "" : "s"}`}
+                  {nextWindowMeta?.duration || "No gap yet"}
                 </span>
               </div>
             </div>
             <div className={styles.nextStepCard}>
               <span className={styles.nextStepLabel}>Best next move</span>
               <p className={styles.nextStepText}>{nextStep}</p>
+              {nextStepMeta && <span className={styles.nextStepMeta}>{nextStepMeta}</span>}
               <div className={styles.nextStepFooter}>
                 <div className={styles.analyticsInline}>
                   {weeklyProgress && <span className={styles.analyticsPill}>{weeklyProgress}</span>}
@@ -261,9 +245,16 @@ export default function IntelligenceRow({
                     <span className={styles.analyticsPill}>{nextWindowMeta.label}</span>
                   )}
                 </div>
-                <Link to="/analytics?period=7&tab=Overview&from=homepage-banner" className={styles.analyticsLink}>
-                  Review my analytics
-                </Link>
+                <div className={styles.nextStepActions}>
+                  {onRecommendationAction && (
+                    <button type="button" className={styles.nextStepCta} onClick={onRecommendationAction}>
+                      {recommendation?.ctaLabel || "Start focus"}
+                    </button>
+                  )}
+                  <Link to="/analytics?period=7&tab=Overview&from=homepage-banner" className={styles.analyticsLink}>
+                    Review my analytics
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

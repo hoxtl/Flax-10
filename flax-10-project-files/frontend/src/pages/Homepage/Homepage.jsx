@@ -50,6 +50,7 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 
 
 /* HOME PAGE */
@@ -78,7 +79,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     }
   }, []);
 
-  const { dayEvents, dayTasks, allTasks, refetchTasks } = useHomeData(selectedDate);
+  const { dayEvents, dayTasks, allTasks, refetchTasks, loading: homeDataLoading } = useHomeData(selectedDate);
   const [toast, setToast] = useState(null);
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
@@ -655,6 +656,63 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     [taskWidgetItemsOnly]
   );
 
+  const homepageRecommendation = useMemo(() => {
+    const pendingTasks = (taskWidgetItemsOnly || []).filter((task) => !task.completed);
+    const sortedDeadlineList = [...(upcomingDeadlines || [])]
+      .filter((deadline) => deadline?.start_due_date)
+      .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
+
+    const getRelativeDueLabel = (dateLike) => {
+      if (!dateLike) return null;
+      const diffDays = Math.floor((new Date(dateLike).getTime() - Date.now()) / 86400000);
+      if (diffDays <= 0) return "due today";
+      if (diffDays === 1) return "due tomorrow";
+      return `due in ${diffDays}d`;
+    };
+
+    const getModuleKey = (item) =>
+      String(item?.module_id ?? item?.module ?? item?.moduleId ?? item?.module_code ?? "").trim().toUpperCase();
+
+    for (const deadline of sortedDeadlineList) {
+      const deadlineKey = getModuleKey(deadline);
+      if (!deadlineKey) continue;
+      const linkedTask = pendingTasks.find((task) => getModuleKey(task) === deadlineKey);
+      if (!linkedTask) continue;
+      const deadlineTitle = deadline.assessment_title || deadline.title || deadline.module_code || "upcoming deadline";
+      const dueLabel = getRelativeDueLabel(deadline.start_due_date);
+      return {
+        text: `Focus on ${linkedTask.title} for ${deadlineTitle}.`,
+        meta: `${deadline.module_code || "Module"}${dueLabel ? ` · ${dueLabel}` : ""}`,
+        ctaLabel: "Start focus",
+        quickActionLabel: `Focus on ${linkedTask.title}`,
+        quickActionSub: `${deadlineTitle}${dueLabel ? ` · ${dueLabel}` : ""}`,
+        taskTitle: linkedTask.title,
+      };
+    }
+
+    if (pendingTasks[0] && freeWindowLabel) {
+      return {
+        text: `Use the ${freeWindowLabel} window to move ${pendingTasks[0].title} forward.`,
+        meta: "Best task to move next",
+        ctaLabel: "Start focus",
+        quickActionLabel: `Focus on ${pendingTasks[0].title}`,
+        quickActionSub: `${freeWindowLabel} available now`,
+        taskTitle: pendingTasks[0].title,
+      };
+    }
+
+    return null;
+  }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
+
+  const handleHomepageRecommendation = useCallback(() => {
+    navigate("/timer", {
+      state: {
+        fromTaskPlay: true,
+        suggestedTaskTitle: homepageRecommendation?.taskTitle || null,
+      },
+    });
+  }, [navigate, homepageRecommendation]);
+
 
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
@@ -779,6 +837,10 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         </div>
       )}
 
+      {homeDataLoading ? (
+        <PageSkeleton label="Loading homepage" cardCount={5} cardHeight="180px" columns={2} />
+      ) : (
+      <>
       <div>
         {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
         {hasTimerSession && (
@@ -807,6 +869,8 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         <div className={styles.intelligenceRowWrap}>
           <IntelligenceRow
             displayName={displayName}
+            recommendation={homepageRecommendation}
+            onRecommendationAction={homepageRecommendation ? handleHomepageRecommendation : undefined}
 
             slot1TodayTasks={
               // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
@@ -946,14 +1010,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                     />
                   )}
                 </div>
-                <button
-                  type="button"
-                  className={styles.deadlineDetailClose}
-                  onClick={() => setSelectedDeadline(null)}
-                  aria-label="Close"
-                >
-                  <X size={18} strokeWidth={2} aria-hidden />
-                </button>
               </div>
               <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
                 {selectedDeadline.assessment_title || selectedDeadline.title || "Assignment"}
@@ -989,7 +1045,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           </div>
         )}
       </div>
-
+      
       <motion.div
         className={styles.bentoSpine}
         id="timeline-section"
@@ -1077,9 +1133,12 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             onStartFocus={() => navigate("/timer")}
             onAddEvent={() => navigate("/calendar")}
             focusWindowDuration={isToday(selectedDate) ? freeWindowLabel : null}
+            recommendation={homepageRecommendation ? { ...homepageRecommendation, onAction: handleHomepageRecommendation } : null}
           />
         </div>
       </section>
+      </>
+      )}
 
       {showCreateTaskModal && (
         <CreateTaskModal

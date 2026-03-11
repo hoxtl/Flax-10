@@ -180,7 +180,9 @@ export function TaskWidgetSlot({
                 {visibleIncomplete.map((t, idx) => {
                   const status      = t.taskWidgetStatus;
                   const isOverdue   = status === "overdue";
-                  const rowAccent = isOverdue ? "#C0714E" : "#8B7355";
+                  const rowAccent = isOverdue
+                    ? "var(--home-urgency-danger)"
+                    : "var(--home-urgency-neutral)";
                   const urgency = getUrgencyMeta(t);
                   const categoryLabel = getTaskCategoryPill?.(t);
                   const categoryStyle = getCategoryStyle(categoryLabel);
@@ -281,7 +283,7 @@ export function TaskWidgetSlot({
           ) : (
             <EmptyStateCard
               sub={null}
-              message="All caught up for today."
+              message="All caught up for now."
               action={
                 <Link to="/tasks" className={styles.taskWidgetLink}>
                   Add a task →

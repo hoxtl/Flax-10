@@ -4,14 +4,14 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 2px;
+  gap: 0;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .headerLeft {
@@ -40,7 +40,8 @@
 .headerTitleBlock {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: center;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -55,17 +56,8 @@
   color: #2f261f;
 }
 
-.headerSubtitle {
-  margin: 0;
-  color: #8a7868;
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 11px;
-  line-height: 1.35;
-  max-width: 22ch;
-}
-
 .headerStatus {
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -76,7 +68,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
   flex: 1;
 }
 
@@ -88,7 +80,7 @@
   min-height: 58px;
   border-radius: 14px;
   border: 1px solid rgba(139, 115, 85, 0.11);
-  border-left: 5px solid color-mix(in srgb, var(--deadline-row-accent, #8B7355) 55%, #f5ede3);
+  border-left: 5px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
   background: linear-gradient(180deg, #fffdfa 0%, #fffaf5 100%);
   padding: 9px 11px;
   cursor: pointer;
@@ -124,12 +116,12 @@
   color: #736048;
   border-radius: 999px;
   padding: 4px 10px;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   cursor: pointer;
 }
 
@@ -140,17 +132,17 @@
 .deadlineTypePill {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #d6e5d8;
-  background: #eef6ef;
-  color: #5f8d67;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(243, 239, 234, 0.72);
+  color: #736048;
   border-radius: 999px;
   padding: 4px 10px;
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
 }
 
 .rowTitle {
@@ -173,41 +165,12 @@
 }
 
 .daysLabel {
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
   line-height: 1;
-}
-
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 20px 8px;
-  gap: 5px;
-  flex: 1;
-}
-
-.emptyIcon {
-  color: #d4c4a8;
-  flex-shrink: 0;
-}
-
-.emptyTitle {
-  font-size: 14px;
-  font-weight: 500;
-  color: #8b7355;
-  margin: 4px 0 0;
-}
-
-.emptySubtitle {
-  font-size: 12px;
-  color: #b8a890;
-  margin: 2px 0 0;
 }
 
 .footer {

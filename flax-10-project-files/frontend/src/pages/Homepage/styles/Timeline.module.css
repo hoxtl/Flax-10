@@ -1439,7 +1439,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 6px 14px;
+    padding: 10px 6px 16px;
     border-bottom: none;
     gap: var(--home-space-md);
     flex-wrap: wrap;
@@ -1457,8 +1457,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 12px;
     background: #f3efea;
     color: #8a7868;
@@ -1497,7 +1497,7 @@
   .timelineTitle {
     margin: 0;
     font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-    font-size: 0.98rem;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -1523,8 +1523,10 @@
 
   .timelineHeaderSub {
     display: block;
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     color: #A89279;
     text-decoration: none;
     margin-top: 2px;
