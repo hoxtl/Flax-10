@@ -13,18 +13,19 @@ import { unreportSociety } from "../../api/societyApi";
 import Tabs from "../../components/common/Tabs/Tabs";
 import { usePagination } from "../../hooks/usePagination";
 import { BackToTop } from "../../components/Pagination/Pagination";
+import SearchBar from "../../components/common/SearchBar/SearchBar";
 
 function SocietiesSkeleton() {
-  return (
-    <div className={styles.container}>
-      <div className={`${styles.skel} ${styles.skelPageTitle}`} />
-      <div className={styles.skelGrid}>
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSocCard}`} style={{ animationDelay: `${i * 0.07}s` }} />
-        ))}
-      </div>
-    </div>
-  );
+    return (
+        <div className={styles.container}>
+            <div className={`${styles.skel} ${styles.skelPageTitle}`} />
+            <div className={styles.skelGrid}>
+                {[...Array(8)].map((_, i) => (
+                    <div key={i} className={`${styles.skel} ${styles.skelSocCard}`} style={{ animationDelay: `${i * 0.07}s` }} />
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default function SocietiesPage() {
@@ -102,12 +103,17 @@ const PAGE_SIZE = 12;
 
 function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport, onUnreport }) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [searchQuery, setSearchQuery] = useState("");
     const activeTab = searchParams.get('subTab') || "member";
 
     const setActiveTab = (t) => setSearchParams(prev => { prev.set('subTab', t); return prev; }, { replace: true });
 
-    const adminOf = societies.filter(s => s.is_admin);
-    const memberOf = societies.filter(s => s.is_member && !s.is_admin);
+    const filtered = societies.filter(s =>
+        s.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const adminOf = filtered.filter(s => s.is_admin);
+    const memberOf = filtered.filter(s => s.is_member && !s.is_admin);
 
     const adminPage = usePagination(adminOf, PAGE_SIZE);
     const memberPage = usePagination(memberOf, PAGE_SIZE);
@@ -118,10 +124,24 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
         { id: "admin", label: "Managed By Me", content: <SocietySection {...common} title="Managed Societies" items={adminPage.currentItems} type="admin" onAction={onCreateClick} pagination={{ currentPage: adminPage.currentPage, totalPages: adminPage.totalPages, onPageChange: adminPage.setPage }} /> }
     ];
 
+    const searchBar = (
+        <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search my societies..."
+            className={styles.smallSearch}
+        />
+    );
+
     return (
         <div className={styles.container}>
             <PageHeader title="Societies" subtitle="Your communities at King's College London" />
-            <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+            <Tabs
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                rightAction={searchBar}
+            />
             <BackToTop />
         </div>
     );

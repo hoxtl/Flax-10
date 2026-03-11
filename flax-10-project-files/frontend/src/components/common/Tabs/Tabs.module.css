@@ -5,10 +5,22 @@
 
 .tabBar {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 2px solid var(--border);
     margin-bottom: 24px;
+    gap: 16px;
+}
+
+.tabList {
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
+}
+
+.rightAction {
+    margin-bottom: 8px;
+    /* Lift slightly to align with tab text visually */
 }
 
 .tab {
