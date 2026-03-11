@@ -1,6 +1,175 @@
-import React, { useMemo } from "react";
-import { Check, Trash2 } from "lucide-react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
+import { Check, Trash2, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import styles from "./TaskBoardView.module.css";
+
+const USER_COLORS = [
+    "#7B6751", "#C0714E", "#7BB38E", "#9A8CB0",
+    "#7B9BAD", "#C4A46D", "#8A7060", "#b08c4b"
+];
+
+const getUserColor = (userId) => {
+    if (!userId) return USER_COLORS[0];
+    const idStr = String(userId);
+    let hash = 0;
+    for (let i = 0; i < idStr.length; i++) {
+        hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return USER_COLORS[Math.abs(hash) % USER_COLORS.length];
+};
+
+function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragStart }) {
+    const [showAssignPopup, setShowAssignPopup] = useState(false);
+    const popupRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setShowAssignPopup(false);
+            }
+        }
+        if (showAssignPopup) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showAssignPopup]);
+
+    const toggleAssignee = (userId) => {
+        const assignees = t.assignees_info || [];
+        let currentIds = assignees.map(a => a.id);
+        if (currentIds.includes(userId)) {
+            currentIds = currentIds.filter(id => id !== userId);
+        } else {
+            currentIds.push(userId);
+        }
+        onUpdate(t.id, { assigned_to: currentIds });
+    };
+
+    const handleContextMenu = (e) => {
+        e.preventDefault(); // Prevent standard browser right-click menu
+        setShowAssignPopup(true);
+    };
+
+    let fullDateStr = "";
+    if (t.due_date) {
+        const d = new Date(t.due_date);
+        fullDateStr = d.toISOString().slice(0, 10);
+    }
+
+    const assignees = t.assignees_info || [];
+
+    return (
+        <div
+            className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""}`}
+            draggable
+            onDragStart={(e) => handleDragStart(e, t.id)}
+            onContextMenu={handleContextMenu}
+        >
+            <div className={styles.cardHeader}>
+                <select
+                    value={(t.priority || "medium").toLowerCase()}
+                    onChange={(e) => onUpdate(t.id, { priority: e.target.value })}
+                    className={styles.prioritySelect}
+                    style={{ background: pColor.bg, color: pColor.text }}
+                    title="Change priority"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <option value="urgent">URGENT</option>
+                    <option value="high">HIGH</option>
+                    <option value="medium">MEDIUM</option>
+                    <option value="low">LOW</option>
+                </select>
+                <div className={styles.cardActions}>
+                    <button
+                        onClick={() => onDelete(t.id)}
+                        className={styles.iconBtnDelete}
+                        title="Delete task"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                </div>
+            </div>
+
+            <div className={styles.cardTitle}>{t.title}</div>
+
+            <div className={styles.cardFooter} style={{ position: 'relative' }}>
+                <div className={styles.cardDate}>
+                    <DateTimePicker
+                        value={fullDateStr}
+                        onChange={(val) => onUpdate(t.id, { due_date: val ? new Date(val).toISOString() : null })}
+                        placeholder="No due date"
+                        dateOnly={true}
+                        triggerClassName={styles.dateLabelInteractive}
+                        hideIcon={true}
+                    />
+                </div>
+                <div
+                    className={styles.avatarStack}
+                    onClick={(e) => { e.stopPropagation(); setShowAssignPopup(v => !v); }}
+                    style={{ cursor: "pointer" }}
+                >
+                    {assignees.slice(0, 3).map((a, i) => (
+                        <div
+                            key={a.id}
+                            className={styles.avatarMini}
+                            style={{
+                                marginLeft: i > 0 ? -6 : 0,
+                                background: getUserColor(a.id)
+                            }}
+                            title={a.name}
+                        >
+                            {(a.name || "?").slice(0, 2).toUpperCase()}
+                        </div>
+                    ))}
+                    {assignees.length > 3 && (
+                        <div className={styles.avatarMini} style={{ marginLeft: -6, fontSize: 8 }}>
+                            +{(assignees.length - 3)}
+                        </div>
+                    )}
+                </div>
+
+                <AnimatePresence>
+                    {showAssignPopup && (
+                        <motion.div
+                            ref={popupRef}
+                            className={styles.assignPopupBoard}
+                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                            style={{ originY: 1 }}
+                        >
+                            <div className={styles.assignPopupHeader}>
+                                <span className={styles.assignPopupTitle}>Assign Members</span>
+                                <span className={styles.closePopupBtn} onClick={() => setShowAssignPopup(false)}>
+                                    <X size={12} />
+                                </span>
+                            </div>
+                            {members.map(m => {
+                                const isSelected = assignees.some(a => String(a.id) === String(m.user));
+                                const userCol = getUserColor(m.user);
+                                return (
+                                    <div
+                                        key={m.id}
+                                        onClick={() => toggleAssignee(m.user)}
+                                        className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}
+                                    >
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <div style={{ width: 8, height: 8, borderRadius: "50%", background: userCol }} />
+                                            <span>{m.user_name}</span>
+                                        </div>
+                                        {isSelected && <Check size={14} color={userCol} strokeWidth={3} />}
+                                    </div>
+                                );
+                            })}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+    );
+}
 
 export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDelete, onAdd }) {
     const [addingToCol, setAddingToCol] = React.useState(null);
@@ -99,64 +268,17 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
                         {col.tasks.map(t => {
                             const pColor = priorityColors[(t.priority || "medium").toLowerCase()] || priorityColors.medium;
                             const isDone = (t.status === "done" || t.completed);
-                            const dateStr = formatDate(t.due_date);
-
                             return (
-                                <div
+                                <BoardCard
                                     key={t.id}
-                                    className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""}`}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, t.id)}
-                                >
-                                    <div className={styles.cardHeader}>
-                                        <select
-                                            value={(t.priority || "medium").toLowerCase()}
-                                            onChange={(e) => onUpdate(t.id, { priority: e.target.value })}
-                                            className={styles.prioritySelect}
-                                            style={{ background: pColor.bg, color: pColor.text }}
-                                            title="Change priority"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <option value="urgent">URGENT</option>
-                                            <option value="high">HIGH</option>
-                                            <option value="medium">MEDIUM</option>
-                                            <option value="low">LOW</option>
-                                        </select>
-                                        <div className={styles.cardActions}>
-                                            <button
-                                                onClick={() => onDelete(t.id)}
-                                                className={styles.iconBtnDelete}
-                                                title="Delete task"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className={styles.cardTitle}>{t.title}</div>
-
-                                    <div className={styles.cardFooter}>
-                                        <div className={styles.cardDate}>
-                                            {dateStr ? dateStr : "No due date"}
-                                        </div>
-                                        <div className={styles.avatarStack}>
-                                            {(t.assignees_info || []).slice(0, 3).map((a, i) => (
-                                                <div
-                                                    key={a.id}
-                                                    className={styles.avatarMini}
-                                                    style={{ marginLeft: i > 0 ? -6 : 0 }}
-                                                    title={a.name}
-                                                >
-                                                    {(a.name || "?").slice(0, 2).toUpperCase()}
-                                                </div>
-                                            ))}
-                                            {(t.assignees_info || []).length > 3 && (
-                                                <div className={styles.avatarMini} style={{ marginLeft: -6, fontSize: 8 }}>
-                                                    +{(t.assignees_info.length - 3)}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                                    t={t}
+                                    isDone={isDone}
+                                    pColor={pColor}
+                                    onUpdate={onUpdate}
+                                    onDelete={onDelete}
+                                    members={members}
+                                    handleDragStart={handleDragStart}
+                                />
                             );
                         })}
                         {col.tasks.length === 0 && (
