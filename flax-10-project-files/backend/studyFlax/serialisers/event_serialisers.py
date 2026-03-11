@@ -30,6 +30,7 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     tag = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     location_latitude = serializers.FloatField(required=False, allow_null=True)
     location_longitude = serializers.FloatField(required=False, allow_null=True)
+    location_validated = serializers.BooleanField(required=False, default=False)
 
     class Meta:
         model = CalendarEvent
