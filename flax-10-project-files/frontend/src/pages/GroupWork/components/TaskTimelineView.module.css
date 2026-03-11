@@ -24,3 +24,186 @@
     border: 1px solid #fff;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
+
+.viewContainer {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    height: calc(100vh - 220px);
+}
+
+.unscheduledWidget {
+    flex: 0 0 260px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    border: 1px solid #e8e0d4;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.widgetHeader {
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: #faf7f2;
+}
+
+.widgetTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #3b322a;
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.widgetCount {
+    background: rgba(0, 0, 0, 0.08);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #5b4b3b;
+    margin-left: 8px;
+}
+
+.widgetList {
+    padding: 12px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.unscheduledCard {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid #efeae4;
+    cursor: grab;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.unscheduledCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.unscheduledCard:active {
+    cursor: grabbing;
+}
+
+.timelineArea {
+    flex: 1;
+    height: 100%;
+    background: #faf7f2;
+    border-radius: 16px;
+    border: 1px solid #e8e0d4;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.timelineHeaderRow {
+    display: grid;
+    grid-template-columns: 120px repeat(6, 1fr);
+    border-bottom: 1.5px solid #e0d8cc;
+    background: #f2ede5;
+}
+
+.timelineHeaderCell {
+    padding: 14px 0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: #6b5e50;
+    letter-spacing: 0.06em;
+    font-family: 'DM Sans', sans-serif;
+    border-left: 1px solid #e8e0d4;
+}
+
+.timelineScrollable {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.timelineRow {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 120px repeat(6, 1fr);
+    min-height: 100px;
+    border-bottom: 1px solid #ede6dc;
+}
+
+.timelineWeekLabel {
+    padding: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9b8a78;
+    background: #f7f3ed;
+    border-right: 1px solid #ede6dc;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.timelineCell {
+    border-right: 1px solid #ede6dc;
+    padding: 8px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #faf7f2;
+    transition: background 0.2s;
+}
+
+.timelineCell:last-child {
+    border-right: none;
+}
+
+.timelineCellDropTarget {
+    background: #f0ebd6;
+}
+
+.widgetListDropTarget {
+    background: rgba(240, 235, 214, 0.5);
+    border-radius: 8px;
+}
+
+.paginationArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    border-top: 1px solid #e0d8cc;
+    background: #f2ede5;
+}
+
+.pageDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d4c8b8;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.pageDot:hover {
+    background: #b5a48e;
+}
+
+.pageDotActive {
+    background: #5b4b3b;
+    width: 28px;
+    border-radius: 5px;
+}
