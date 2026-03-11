@@ -16,20 +16,18 @@ vi.mock('../../../api/tflService', () => ({
     tflService: { getTfLDelays: vi.fn().mockResolvedValue([]) },
 }));
 
-vi.mock('../../../pages/Homepage/components/RightNowWidget', () => ({
-    RightNowWidget: () => <div data-testid="right-now-widget" />,
-}));
-
-vi.mock('../../../pages/Homepage/components/QuickActionsWidget', () => ({
-    QuickActionsWidget: () => <div data-testid="quick-actions-widget" />,
+vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
+    useProfileSummary: vi.fn(() => ({
+        summary: {
+            weekly: { percentage: 72 },
+            streaks: { current: 3 },
+        },
+        loading: false,
+    })),
 }));
 
 vi.mock('../../../pages/Homepage/components/SocialDiscoverWidget', () => ({
     SocialDiscoverWidget: () => <div data-testid="social-discover-widget" />,
-}));
-
-vi.mock('../../../pages/Homepage/components/StudyPulseWidget', () => ({
-    StudyPulseWidget: () => <div data-testid="study-pulse-widget" />,
 }));
 
 vi.mock('../../../components/ui/bento-grid', () => ({
@@ -57,19 +55,15 @@ describe('IntelligenceRow', () => {
         expect(screen.getByTestId('bento-grid')).toBeTruthy();
     });
 
-    it('renders RightNowWidget', () => {
+    it('renders live context summary in the banner', () => {
         renderRow();
-        expect(screen.getByTestId('right-now-widget')).toBeTruthy();
+        expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy();
     });
 
-    it('renders QuickActionsWidget', () => {
+    it('renders analytics summary in the banner', () => {
         renderRow();
-        expect(screen.getByTestId('quick-actions-widget')).toBeTruthy();
-    });
-
-    it('renders StudyPulseWidget', () => {
-        renderRow();
-        expect(screen.getByTestId('study-pulse-widget')).toBeTruthy();
+        expect(screen.getByText(/weekly goal/i)).toBeTruthy();
+        expect(screen.getByText(/streak/i)).toBeTruthy();
     });
 
     it('renders slot1TodayTasks content', () => {
@@ -98,13 +92,13 @@ describe('IntelligenceRow', () => {
         const { tflService } = await import('../../../api/tflService');
         tflService.getTfLDelays.mockRejectedValueOnce(new Error('Network error'));
         renderRow();
-        await waitFor(() => expect(screen.getByTestId('right-now-widget')).toBeTruthy());
+        await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
     });
 
     it('handles TfL getTfLDelays returning non-array', async () => {
         const { tflService } = await import('../../../api/tflService');
         tflService.getTfLDelays.mockResolvedValueOnce({ data: [] });
         renderRow();
-        await waitFor(() => expect(screen.getByTestId('right-now-widget')).toBeTruthy());
+        await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
     });
 });

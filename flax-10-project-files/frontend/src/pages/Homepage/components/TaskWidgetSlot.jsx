@@ -5,14 +5,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { CheckSquare } from "lucide-react";
+import { CheckSquare, Clock3, Target, ArrowRight } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 
-const VISIBLE_COUNT = 5;
+const VISIBLE_COUNT = 3;
 
 const CATEGORY_COLOURS = {
   UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
@@ -96,6 +96,7 @@ export function TaskWidgetSlot({
   const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
   const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
   const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
+  const estimatedLeft = getEstTime(taskWidgetList);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -138,12 +139,37 @@ export function TaskWidgetSlot({
                   </div>
                   <div className={styles.taskWidgetSlotTitleBlock}>
                     <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
+                    <p className={styles.taskWidgetSlotSubtitle}>
+                      Keep the queue clear and push the next meaningful task into focus.
+                    </p>
                   </div>
                 </div>
+                {!hasTimerSession && incompleteCount > 0 && (
+                  <button
+                    type="button"
+                    className={styles.taskWidgetFocusBtn}
+                    onClick={onStartFocus}
+                  >
+                    Focus now
+                    <ArrowRight size={12} strokeWidth={1.8} aria-hidden />
+                  </button>
+                )}
               </div>
 
-              <div className={styles.taskWidgetDueTodayPill}>
-                {taskWidgetDueTodayCount} due today
+              <div className={styles.taskWidgetSummaryRow}>
+                <div className={styles.taskWidgetDueTodayPill}>
+                  {taskWidgetDueTodayCount} due today
+                </div>
+                <div className={styles.taskWidgetSummaryPill}>
+                  <Target size={11} strokeWidth={1.8} aria-hidden />
+                  {incompleteCount} in queue
+                </div>
+                {estimatedLeft && (
+                  <div className={styles.taskWidgetSummaryPill}>
+                    <Clock3 size={11} strokeWidth={1.8} aria-hidden />
+                    {estimatedLeft}
+                  </div>
+                )}
               </div>
 
               {/* Task list */}

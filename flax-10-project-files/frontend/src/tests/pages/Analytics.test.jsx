@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
@@ -76,12 +77,12 @@ describe('AnalyticsPage', () => {
     });
 
     it('renders page title', async () => {
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByText('Analytics')).toBeTruthy());
     });
 
     it('renders period toggle buttons', async () => {
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => screen.getByText('Analytics'));
         expect(screen.getByText('7d')).toBeTruthy();
         expect(screen.getByText('30d')).toBeTruthy();
@@ -89,14 +90,14 @@ describe('AnalyticsPage', () => {
     });
 
     it('renders tab buttons', async () => {
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => screen.getByText('Analytics'));
         expect(screen.getByText(/Overview/)).toBeTruthy();
         expect(screen.getByText(/AI Insights/)).toBeTruthy();
     });
 
     it('shows loading state then renders summary cards', async () => {
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByTestId('summary-cards')).toBeTruthy());
     });
 
@@ -104,19 +105,19 @@ describe('AnalyticsPage', () => {
         analyticsService.getSummary.mockRejectedValueOnce(new Error('Network error'));
         analyticsService.getProgress.mockRejectedValueOnce(new Error('fail'));
         analyticsService.getThemeStats.mockRejectedValueOnce(new Error('fail'));
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByText(/Network error/)).toBeTruthy());
     });
 
     it('switches to AI Insights tab', async () => {
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => screen.getByText(/AI Insights/));
         fireEvent.click(screen.getByText(/AI Insights/));
         await waitFor(() => expect(screen.getByTestId('ai-insights-tab')).toBeTruthy());
     });
 
     it('refetches when period changes', async () => {
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => screen.getByText('7d'));
         fireEvent.click(screen.getByText('7d'));
         expect(analyticsService.getSummary).toHaveBeenCalledWith(7);

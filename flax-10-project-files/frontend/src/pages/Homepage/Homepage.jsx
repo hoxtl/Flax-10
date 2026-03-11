@@ -43,6 +43,7 @@ import {
 import { useHomeData } from "./hooks/useHomeData";
 import { MiniTimeline } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
+import { QuickActionsWidget } from "./components/QuickActionsWidget";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 import { DeadlinesWidget } from "./components/DeadlinesWidget";
@@ -634,6 +635,15 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       .sort((a, b) => a.start - b.start);
   }, [selectedDate, sortedEvents]);
 
+  const freeWindowLabel = useMemo(() => {
+    const nextWindow = todayFreeWindows[0];
+    if (!nextWindow?.minutes) return null;
+    if (nextWindow.minutes < 60) return `${nextWindow.minutes}m`;
+    const hours = Math.floor(nextWindow.minutes / 60);
+    const minutes = nextWindow.minutes % 60;
+    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+  }, [todayFreeWindows]);
+
 
 
 
@@ -1056,6 +1066,20 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           </div>
         </div>
       </motion.div>
+
+      <section className={styles.focusToolsSection} aria-labelledby="homepage-focus-tools">
+        <div className={styles.focusToolsInner}>
+          <div className={styles.focusToolsHeader}>
+            <span className={styles.focusToolsEyebrow}>Focus tools</span>
+            <h3 id="homepage-focus-tools" className={styles.focusToolsTitle}>Keep the rest of the day moving.</h3>
+          </div>
+          <QuickActionsWidget
+            onStartFocus={() => navigate("/timer")}
+            onAddEvent={() => navigate("/calendar")}
+            focusWindowDuration={isToday(selectedDate) ? freeWindowLabel : null}
+          />
+        </div>
+      </section>
 
       {showCreateTaskModal && (
         <CreateTaskModal

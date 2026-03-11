@@ -38,8 +38,12 @@ const mockStyles = {
   taskWidgetSlotIcon: 'icon',
   taskWidgetSlotTitleBlock: 'titleBlock',
   taskWidgetSlotTitle: 'title',
+  taskWidgetSlotSubtitle: 'subtitle',
   taskWidgetSlotHeaderLeft: 'left',
+  taskWidgetFocusBtn: 'focusBtn',
+  taskWidgetSummaryRow: 'summaryRow',
   taskWidgetDueTodayPill: 'pill',
+  taskWidgetSummaryPill: 'summaryPill',
   taskWidgetTaskList: 'list',
   taskWidgetTaskRow: 'row',
   taskWidgetTaskRowOverdue: 'overdue',
@@ -121,8 +125,11 @@ describe('TaskWidgetSlot', () => {
       ],
     });
     expect(screen.getByText("Today's Tasks")).toBeTruthy();
+    expect(screen.getByText(/Keep the queue clear/i)).toBeTruthy();
     expect(screen.getByText('Study math')).toBeTruthy();
     expect(screen.getByText('2 due today')).toBeTruthy();
+    expect(screen.getByText(/1 in queue/i)).toBeTruthy();
+    expect(screen.getByText('Focus now')).toBeTruthy();
   });
 
   it('calls handleTaskWidgetComplete when checkbox clicked', () => {

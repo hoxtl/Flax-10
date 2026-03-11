@@ -108,7 +108,7 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
           </motion.span>
         </motion.button>
 
-        {/* Tertiary: Re-plan My Day */}
+        {/* Tertiary: Review day plan */}
         <motion.button
           type="button"
           className={styles.secondaryCard}
@@ -126,7 +126,7 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
             <RefreshCw size={18} strokeWidth={1.75} className={styles.secondaryIconRefresh} />
           </motion.span>
           <span className={styles.secondaryLabel}>
-            Re-plan My Day
+            Review Day Plan
             <span className={styles.aiPill}>AI</span>
           </span>
           <motion.span

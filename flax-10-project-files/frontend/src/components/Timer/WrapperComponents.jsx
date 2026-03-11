@@ -4,6 +4,7 @@ import TreeAnimation from './TreeAnimation';
 import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
 import { OvertimePopup, GoalModal, BreakModal, EndEarlyModal } from './TimerPopups';
 import HistoryModal from './HistoryModal';
+import { splitEstimatedBlocks } from '../../lib/focusPlanner';
 
 /** Header with title and history button (original layout) */
 const TimerHeader = ({ onOpenHistory, isMobile }) => (
@@ -18,18 +19,6 @@ const TimerHeader = ({ onOpenHistory, isMobile }) => (
 );
 
 const TimerTopSection = ({ t, onOpenHistory, isMobile }) => {
-    const splitEstimatedBlocks = useCallback((blocks) => {
-        const total = Math.max(1, Number(blocks) || 1);
-        for (const perSession of [1, 2, 3, 4]) {
-            if (total % perSession !== 0) continue;
-            const sessions = total / perSession;
-            if (sessions >= 1 && sessions <= 12) {
-                return { sessionCount: sessions, workMinutes: perSession * 25 };
-            }
-        }
-        return { sessionCount: 1, workMinutes: total * 25 };
-    }, []);
-
     const handleTaskSelect = useCallback((task) => {
         t.setTask(task.title);
         const split = splitEstimatedBlocks(task.estimated_blocks || 1);
@@ -47,7 +36,7 @@ const TimerTopSection = ({ t, onOpenHistory, isMobile }) => {
             });
         }
         try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
-    }, [t, splitEstimatedBlocks]);
+    }, [t]);
 
     useEffect(() => {
         try {

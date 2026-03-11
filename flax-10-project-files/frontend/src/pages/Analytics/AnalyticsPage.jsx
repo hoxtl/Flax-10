@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import analyticsService from '../../api/analyticsService';
+import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import SummaryCards from '../../components/Analytics/SummaryCards';
 import ProductivityCards from '../../components/Analytics/ProductivityCards';
@@ -12,6 +12,7 @@ import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
 import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
+import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import styles from './AnalyticsPage.module.css';
 
 const PERIODS = [
@@ -35,36 +36,45 @@ const fadeUp = {
 };
 
 export default function AnalyticsPage() {
-  const [period, setPeriod] = useState(30);
-  const [activeTab, setActiveTab] = useState('Overview');
-  const [data, setData] = useState(null);
-  const [progressData, setProgressData] = useState(null);
-  const [themeStats, setThemeStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedPeriod = Number(searchParams.get('period'));
+  const requestedTab = searchParams.get('tab');
+  const resolvedPeriod = useMemo(
+    () => (PERIODS.some((item) => item.value === requestedPeriod) ? requestedPeriod : 30),
+    [requestedPeriod],
+  );
+  const resolvedTab = useMemo(
+    () => (TABS.some((item) => item.id === requestedTab) ? requestedTab : 'Overview'),
+    [requestedTab],
+  );
+  const [period, setPeriod] = useState(resolvedPeriod);
+  const [activeTab, setActiveTab] = useState(resolvedTab);
+  const { data, progressData, themeStats, loading, error } = useAnalyticsOverview(period);
 
   useEffect(() => {
-    const fetchAll = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [summary, progress, theme] = await Promise.all([
-          analyticsService.getSummary(period),
-          analyticsService.getProgress(period),
-          analyticsService.getThemeStats(period),
-        ]);
-        setData(summary);
-        setProgressData(progress);
-        setThemeStats(theme);
-      } catch (err) {
-        const message = err?.message || 'Failed to load analytics data.';
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, [period]);
+    setPeriod(resolvedPeriod);
+  }, [resolvedPeriod]);
+
+  useEffect(() => {
+    setActiveTab(resolvedTab);
+  }, [resolvedTab]);
+
+  const updateSearchState = (nextPeriod, nextTab) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('period', String(nextPeriod));
+    next.set('tab', nextTab);
+    setSearchParams(next, { replace: true });
+  };
+
+  const handlePeriodChange = (nextPeriod) => {
+    setPeriod(nextPeriod);
+    updateSearchState(nextPeriod, activeTab);
+  };
+
+  const handleTabChange = (nextTab) => {
+    setActiveTab(nextTab);
+    updateSearchState(period, nextTab);
+  };
 
   return (
     <div className={styles.page}>
@@ -77,7 +87,7 @@ export default function AnalyticsPage() {
               <button
                 key={p.value}
                 className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
-                onClick={() => setPeriod(p.value)}
+                onClick={() => handlePeriodChange(p.value)}
               >
                 {p.label}
               </button>
@@ -96,7 +106,7 @@ export default function AnalyticsPage() {
           <button
             key={id}
             className={`${styles.tab} ${activeTab === id ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab(id)}
+            onClick={() => handleTabChange(id)}
           >
             <span>{icon}</span>
             <span>{id}</span>

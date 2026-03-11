@@ -160,6 +160,6 @@ describe('StudyPulseWidget', () => {
 
     it('View detailed analysis button is present', () => {
         renderWidget();
-        expect(screen.getByText('View detailed analysis →')).toBeTruthy();
+        expect(screen.getByText('Open 7-day analytics →')).toBeTruthy();
     });
 });
