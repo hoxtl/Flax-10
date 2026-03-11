@@ -82,3 +82,65 @@ export default function SuggestedReadingCard({ reading, onAdded, avgMinPerPage }
     </div>
   );
 }
+
+function EmptyState() {
+  return (
+    <div className={styles.emptyInner}>
+      <span className={styles.emptyEmoji}>🎉</span>
+      <p className={styles.emptyMessage}>All caught up on readings!</p>
+      <p className={styles.emptySub}>No suggested readings left — check back when your teacher adds more.</p>
+    </div>
+  );
+}
+
+function SuggestedReadingsHeader({ readings, speedData }) {
+  return (
+    <>
+      <div className={styles.cardHeader}>
+        <div className={styles.cardHeaderLeft}>
+          <span className={styles.sectionIcon}>📚</span>
+          <span className={styles.sectionTitle}>Suggested Readings</span>
+          {readings.length > 0 && <span className={styles.sectionPill}>{readings.length}</span>}
+        </div>
+        {speedData && (
+          <span className={styles.speedTag}>
+            {speedData.is_personalised ? `⚡ ${speedData.avg_min_per_page.toFixed(1)} min/page` : "Estimates based on average speed"}
+          </span>
+        )}
+      </div>
+      <div className={styles.cardDivider} />
+    </>
+  );
+}
+
+function SuggestedReadingsList({ readings, onAdded, avgMinPerPage }) {
+  return (
+    <div className={styles.rows}>
+      {readings.map((r) => (
+        <SuggestedReadingCard key={r.id} reading={r} onAdded={onAdded} avgMinPerPage={avgMinPerPage} />
+      ))}
+    </div>
+  );
+}
+
+export default function SuggestedReadingsSection({ onTaskAdded, taskCount }) {
+  const { readings, setReadings, allAdded, setAllAdded, speedData } = useSuggestedReadings(taskCount);
+  const handleAdded = (readingId) => {
+    setReadings((prev) => {
+      const next = prev.filter((r) => r.id !== readingId);
+      if (next.length === 0) setAllAdded(true);
+      return next;
+    });
+    onTaskAdded?.();
+  };
+  return (
+    <div className={styles.section}>
+      <div className={styles.card}>
+        <SuggestedReadingsHeader readings={readings} speedData={speedData} />
+        {allAdded || readings.length === 0 ? <EmptyState />
+          : <SuggestedReadingsList readings={readings} onAdded={handleAdded} avgMinPerPage={speedData?.avg_min_per_page} />
+        }
+      </div>
+    </div>
+  );
+}
