@@ -1,3 +1,16 @@
+import React, { useState, useMemo, useRef } from "react";
+import styles from "./TaskTimelineView.module.css";
+import { getPriorityStyle, getUserColor } from "../utils/priorityUtils";
+import { handleDragStartTask, buildToggleAssignee } from "../utils/taskUtils";
+import { 
+    getTimelineAnchor, 
+    buildWeeks, 
+    placeTasksIntoWeeks, 
+    DAY_MS 
+} from "../utils/taskTimelineUtils";
+import TaskAvatarStack from "./TaskAvatarStack";
+import TaskAssigneePopup from "./TaskAssigneePopup";
+
 // --- Logic helpers for TaskTimelineView ---
 
 function useDragHandlers(onUpdate, setPage) {
@@ -128,7 +141,7 @@ function TimelineCard({ task, members, assignees, onUpdate }) {
 
     return (
         <div className={styles.timelineCard} style={cardStyle} draggable onDragStart={(e) => { e.stopPropagation(); handleDragStartTask(e, task.id); }} onContextMenu={(e) => { e.preventDefault(); setShowPopup(true); }}>
-            <div className={styles.cardTitle}>{task.title}</div>
+            <div className={styles.cardTitle} style={{ color: c.text }}>{task.title}</div>
             <div className={styles.cardFooter}>
                 <span className={styles.cardPriorityBadge} style={{ color: c.color, backgroundColor: c.backgroundColor }}>{task.priority || "MEDIUM"}</span>
                 <div ref={triggerRef} className={styles.avatarTrigger} onClick={(e) => { e.stopPropagation(); setShowPopup(v => !v); }}><TaskAvatarStack assignees={assignees} size={16} max={2} /></div>
