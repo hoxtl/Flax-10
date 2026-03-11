@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../api/userService";
+import { requestTeacherRole } from "../../api/adminApi";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import {
   FormInput,
@@ -33,43 +34,25 @@ function getCourseOptions() {
   }));
 }
 
-const lockedStyle = {
-  padding: "0.6rem 0.8rem",
-  borderRadius: "8px",
-  border: "1px solid var(--border)",
-  background: "var(--search-bg)",
-  color: "var(--muted)",
-  fontSize: "0.95rem",
-};
-const wrapStyle = { display: "flex", flexDirection: "column", flex: 1 };
-const labelStyle = {
-  fontSize: "0.85rem",
-  fontWeight: 600,
-  marginBottom: "6px",
-};
-const hintStyle = {
-  fontSize: "0.75rem",
-  color: "var(--muted)",
-  marginTop: "4px",
-};
-
-function CourseLabel({ children }) {
-  return <label style={labelStyle}>Course</label>;
+function CourseLabel() {
+  return <label className={styles.courseLabel}>Course</label>;
 }
 
 function LockedCourseField({ major }) {
   return (
-    <div style={wrapStyle}>
+    <div className={styles.courseWrap}>
       <CourseLabel />
-      <div style={lockedStyle}>{major}</div>
-      <p style={hintStyle}>🔒 Course cannot be changed after initial setup.</p>
+      <div className={styles.lockedCourse}>{major}</div>
+      <p className={styles.courseHint}>
+        🔒 Course cannot be changed after initial setup.
+      </p>
     </div>
   );
 }
 
 function EditableCourseField({ value, onChange }) {
   return (
-    <div style={wrapStyle}>
+    <div className={styles.courseWrap}>
       <CourseLabel />
       <FormSelect
         id="major"
@@ -80,7 +63,7 @@ function EditableCourseField({ value, onChange }) {
         options={getCourseOptions()}
         grouped={true}
       />
-      <p style={hintStyle}>
+      <p className={styles.courseHint}>
         ⚠️ Choose carefully — this cannot be changed later.
       </p>
     </div>
