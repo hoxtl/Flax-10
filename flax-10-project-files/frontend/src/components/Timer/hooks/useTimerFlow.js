@@ -1,10 +1,12 @@
 import { useState, useRef, useCallback } from 'react';
 import { useCompletionCheck } from '../utils/timerUtils';
 import { saveSession } from '../utils/historyUtils';
+import { logTaskTime } from '../../../api/taskService';
 
 export function useTimerFlow(t, notify) {
     const [modal, setModal] = useState(null);
     const studyBlockId = useRef(Date.now());
+    const {activeTaskId} = t;
 
     const save = useCallback((st = 'Completed') => {
         const c = st === 'Completed' ? t.completedSessions + 1 : t.completedSessions;
@@ -13,6 +15,7 @@ export function useTimerFlow(t, notify) {
 
     const startNext = useCallback(() => {
         save('Completed');
+        if (activeTaskId) logTaskTime(activeTaskId, Math.round(t.totalWork/60));
         const next = t.completedSessions + 1;
         t.setCompletedSessions(next);
         t.updateSettings({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
@@ -21,14 +24,17 @@ export function useTimerFlow(t, notify) {
             return setModal('goal');
         }
         t.setMode('work'); t.setTimeLeft(t.workTime * 60); t.setIsActive(modal !== 'break');
-    }, [save, t.completedSessions, t.targetSessions, modal, t.setCompletedSessions, t.updateSettings, t.setMode, t.setTimeLeft, t.setIsActive]);
+    }, [save, activeTaskId, t.totalWork, t.completedSessions, t.targetSessions, modal, t.setCompletedSessions, t.updateSettings, t.setMode, t.setTimeLeft, t.setIsActive]);
 
     const endEarly = useCallback(() => {
-        if (t.totalWork > 0) save('Incomplete');
+        if (t.totalWork > 0) {
+            save('Incomplete');
+            if (activeTaskId) logTaskTime(activeTaskId, Math.round(t.totalWork / 60));
+        }
         t.resetTimer();
         setModal(null);
         studyBlockId.current = Date.now();
-    }, [save, t.resetTimer, setModal]);
+    }, [save, activeTaskId, t.totalWork, t.resetTimer, setModal]);
 
     useCompletionCheck(t, startNext, notify);
     return { modal, setModal, startNext, endEarly, resetBlockId: useCallback(() => studyBlockId.current = Date.now(), []) };
