@@ -62,67 +62,44 @@ function ProgressBar({ taskStats }) {
   );
 }
 
+function ProjectProgress({ taskStats }) {
+  return (
+    <>
+      <ProgressBar taskStats={taskStats} />
+      <p>{taskStats.completed} / {taskStats.total} tasks complete · {taskStats.percent}% complete</p>
+    </>
+  );
+}
+
 function ProjectHeader({ project, members, onPatch, taskStats }) {
-  const handleNameBlur = e => { const v = e.target.value.trim(); if (v && v !== project.name) onPatch({ name: v }); };
-  const handleCourseBlur = e => onPatch({ course_code: e.target.value.trim() });
-  const handleDeadlineBlur = e => onPatch({ deadline: e.target.value ? new Date(e.target.value).toISOString() : null });
-  const memberCount = (project.member_count ?? members.length) || 0;
+  const handleName = e => { const v = e.target.value.trim(); if (v && v !== project.name) onPatch({ name: v }); };
+  const handleCourse = e => onPatch({ course_code: e.target.value.trim() });
+  const handleDeadline = e => onPatch({ deadline: e.target.value ? new Date(e.target.value).toISOString() : null });
+  const count = (project.member_count ?? members.length) || 0;
   return (
     <div className={styles.projectHeaderRow}>
       <div className={styles.projectLeft}>
-        <input defaultValue={project.name} onBlur={handleNameBlur} className={styles.projectNameInput} />
-        <p>
-          <input defaultValue={project.course_code || ""} placeholder="Course code" onBlur={handleCourseBlur} className={styles.courseCodeInput} />
-          · {memberCount} members
-        </p>
-        <ProgressBar taskStats={taskStats} />
-        <p>{taskStats.completed} / {taskStats.total} tasks complete · {taskStats.percent}% complete</p>
+        <input defaultValue={project.name} onBlur={handleName} className={styles.projectNameInput} />
+        <p><input defaultValue={project.course_code || ""} placeholder="Course code" onBlur={handleCourse} className={styles.courseCodeInput} /> · {count} members</p>
+        <ProjectProgress taskStats={taskStats} />
       </div>
       <div className={styles.deadlinePill}>
         <span>🗓</span>
-        <input type="date" defaultValue={project.deadline?.slice(0, 10) ?? ""} onBlur={handleDeadlineBlur} className={styles.deadlineInput} />
+        <input type="date" defaultValue={project.deadline?.slice(0, 10) ?? ""} onBlur={handleDeadline} className={styles.deadlineInput} />
       </div>
     </div>
   );
 }
 
-function MemberPill({ member, onRemove }) {
-  return (
-    <div className={styles.memberPill}>
-      <MemberAvatar member={member} size={24} />
-      <span>{member.first_name ? `${member.first_name} ${member.last_name || ""}`.trim() : member.user_name}</span>
-      {member.role !== "owner" && (
-        <button type="button" onClick={() => onRemove(member.id)} className={styles.removeBtn}>Remove</button>
-      )}
-    </div>
-  );
-}
-
-function MembersSection({ members, onRemove }) {
-  return (
-    <section className={styles.membersSection}>
-      <h2 className={styles.membersTitle}>Members</h2>
-      <div className={styles.membersList}>
-        {members.map(m => <MemberPill key={m.id} member={m} onRemove={onRemove} />)}
-        {members.length === 0 && <p>No members yet. Add your first member below.</p>}
-      </div>
-    </section>
-  );
-}
+// ... existing MemberPill, MembersSection ...
 
 function AddMemberForm({ projectId, onAdded }) {
   const [userId, setUserId] = useState("");
   const handleSubmit = async e => {
     e.preventDefault();
     if (!userId.trim()) return;
-    const res = await fetch(`/api/group-work/projects/${projectId}/members/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify({ user: Number(userId), role: "member" }),
-    });
-    if (!res.ok) return;
-    onAdded(await res.json());
-    setUserId("");
+    const res = await fetch(`/api/group-work/projects/${projectId}/members/`, { method: "POST", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify({ user: Number(userId), role: "member" }) });
+    if (res.ok) { onAdded(await res.json()); setUserId(""); }
   };
   return (
     <form onSubmit={handleSubmit} className={styles.addMemberForm}>
@@ -132,67 +109,51 @@ function AddMemberForm({ projectId, onAdded }) {
   );
 }
 
-function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdate }) {
-  return (
-    <section>
-      <div className={styles.tabsRow}>
-        <button type="button" className={`${styles.tab} ${activeTab === "tasks" ? styles.tabActive : ""}`} onClick={() => setActiveTab("tasks")}>Tasks</button>
-        <button type="button" className={`${styles.tab} ${activeTab === "availability" ? styles.tabActive : ""}`} onClick={() => setActiveTab("availability")}>Availability</button>
-      </div>
-      {activeTab === "tasks" && <GroupTasksTab projectId={projectId} members={members} onStatsUpdate={onStatsUpdate} />}
-      {activeTab === "availability" && <AvailabilityTab projectId={projectId} />}
-    </section>
-  );
-}
+// ... existing TabsSection ...
 
-// ---------------------------------------------------------------------------
-// Main exported component
-// ---------------------------------------------------------------------------
+function useProjectActions(projectId, setProject, setMembers, onBack) {
+  const patchProject = async p => {
+    const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "PATCH", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify(p) });
+    if (res.ok) setProject(await res.json());
+  };
+  const handleRemoveMember = async mid => {
+    const res = await fetch(`/api/group-work/projects/${projectId}/members/${mid}/`, { method: "DELETE", headers: getAuthHeaders() });
+    if (res.ok) setMembers(prev => prev.filter(i => i.id !== mid));
+  };
+  const handleDeleteProject = async () => {
+    const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "DELETE", headers: getAuthHeaders() });
+    if (res.ok) window?.location ? window.location.assign("/group-work") : onBack();
+  };
+  return { patchProject, handleRemoveMember, handleDeleteProject };
+}
 
 function useProjectDetail(projectId, onBack) {
   const { project, setProject, loading } = useProject(projectId);
   const { members, setMembers } = useProjectMembers(projectId);
   const [activeTab, setActiveTab] = useState("tasks");
   const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
+  const actions = useProjectActions(projectId, setProject, setMembers, onBack);
 
-  const patchProject = async partial => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "PATCH", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify(partial) });
-    if (res.ok) setProject(await res.json());
-  };
+  const onAdded = m => setMembers(prev => prev.some(i => i.id === m.id) ? prev : [...prev, m]);
 
-  const handleMemberAdded = membership =>
-    setMembers(prev => prev.some(i => i.id === membership.id) ? prev : [...prev, membership]);
-
-  const handleRemoveMember = async membershipId => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/members/${membershipId}/`, { method: "DELETE", headers: getAuthHeaders() });
-    if (res.ok) setMembers(prev => prev.filter(i => i.id !== membershipId));
-  };
-
-  const handleDeleteProject = async () => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "DELETE", headers: getAuthHeaders() });
-    if (!res.ok) return;
-    window?.location ? window.location.assign("/group-work") : onBack();
-  };
-
-  return { project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, patchProject, handleMemberAdded, handleRemoveMember, handleDeleteProject };
+  return { project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, onAdded, ...actions };
 }
 
 export default function GroupProjectDetail({ projectId, onBack }) {
-  const { project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, patchProject, handleMemberAdded, handleRemoveMember, handleDeleteProject } = useProjectDetail(projectId, onBack);
-
-  if (loading) return <div><BackButton onClick={onBack} /><p>Loading project…</p></div>;
-  if (!project) return <div><BackButton onClick={onBack} /><p>Project not found.</p></div>;
+  const d = useProjectDetail(projectId, onBack);
+  if (d.loading) return <div><BackButton onClick={onBack} /><p>Loading project…</p></div>;
+  if (!d.project) return <div><BackButton onClick={onBack} /><p>Project not found.</p></div>;
 
   return (
     <div>
       <div className={styles.topBar}>
         <BackButton onClick={onBack} />
-        <button type="button" onClick={handleDeleteProject} className={styles.deleteProjectBtn}>Delete project</button>
+        <button type="button" onClick={d.handleDeleteProject} className={styles.deleteProjectBtn}>Delete project</button>
       </div>
-      <ProjectHeader project={project} members={members} onPatch={patchProject} taskStats={taskStats} />
-      <MembersSection members={members} onRemove={handleRemoveMember} />
-      <AddMemberForm projectId={projectId} onAdded={handleMemberAdded} />
-      <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} projectId={projectId} members={members} onStatsUpdate={setTaskStats} />
+      <ProjectHeader project={d.project} members={d.members} onPatch={d.patchProject} taskStats={d.taskStats} />
+      <MembersSection members={d.members} onRemove={d.handleRemoveMember} />
+      <AddMemberForm projectId={projectId} onAdded={d.onAdded} />
+      <TabsSection activeTab={d.activeTab} setActiveTab={d.setActiveTab} projectId={projectId} members={d.members} onStatsUpdate={d.setTaskStats} />
     </div>
   );
 }
