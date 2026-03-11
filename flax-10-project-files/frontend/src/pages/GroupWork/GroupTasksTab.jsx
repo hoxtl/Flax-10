@@ -85,6 +85,14 @@ export default function GroupTasksTab({ projectId, members }) {
             prev.map((t) => {
                 if (t.id !== taskId) return t;
                 const next = { ...t, ...patchData };
+
+                // Keep completed boolean synced with status if one changes explicitly
+                if (patchData.status !== undefined) {
+                    next.completed = patchData.status === "done";
+                } else if (patchData.completed !== undefined) {
+                    next.status = patchData.completed ? "done" : "todo";
+                }
+
                 if (patchData.assigned_to) {
                     next.assignees_info = patchData.assigned_to.map(uid => {
                         const m = members.find(mem => mem.user === uid);
