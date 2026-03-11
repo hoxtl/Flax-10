@@ -139,16 +139,50 @@ function BanModal({ user, onConfirm, onCancel }) {
   );
 }
 
-export default function AdminPage() {
+function AdminPage({ onNavChange }) {
+  const [activeTab, setActiveTab] = useState("users");
+
   return (
-    <div className={styles.container}>
-      <PageHeader
-        title="Admin"
-        subtitle="Superuser controls — only visible to admin accounts"
-      />
-      <div className={styles.placeholder}>
-        <p>Admin tools coming soon.</p>
-      </div>
+    <div className={styles.page}>
+      <motion.div className={styles.header} {...fadeUp}>
+        <h1 className={styles.title}>Admin Dashboard</h1>
+        <p className={styles.subtitle}>
+          Manage users, societies and platform requests
+        </p>
+      </motion.div>
+
+      <motion.div
+        className={styles.tabBar}
+        {...fadeUp}
+        transition={{ delay: 0.08, duration: 0.28 }}
+      >
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab(t.id)}
+          >
+            {t.label}
+            {activeTab === t.id && (
+              <motion.div
+                className={styles.tabUnderline}
+                layoutId="admin-tab-underline"
+              />
+            )}
+          </button>
+        ))}
+      </motion.div>
+
+      <AnimatePresence mode="wait">
+        <motion.div key={activeTab} {...fadeUp} className={styles.tabContent}>
+          {activeTab === "users" && <UsersTab onNavigate={onNavChange} />}
+          {activeTab === "ratifications" && <RatificationsTab />}
+          {activeTab === "teachers" && <TeacherRequestsTab />}
+          {activeTab === "reports" && <ReportedSocietiesTab />}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
+
+export default AdminPage;
