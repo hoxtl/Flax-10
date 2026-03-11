@@ -17,7 +17,8 @@
 .taskInput {
     flex: 1;
     min-width: 120px;
-    padding: 11px 16px;
+    height: 42px;
+    padding: 0 16px;
     border-radius: 10px;
     border: 1px solid #e3d4c6;
     background: #fff;
@@ -25,6 +26,7 @@
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 .taskInput:focus {
@@ -45,9 +47,14 @@
     width: 100%;
 }
 
+.filterWrapper>div>div {
+    width: 100%;
+}
+
 .filterCustomTrigger {
     width: 100%;
-    padding: 11px 16px;
+    height: 42px;
+    padding: 0 16px;
     border-radius: 10px;
     border: 1px solid #e3d4c6;
     background: #f7efe7;
@@ -60,6 +67,7 @@
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
     user-select: none;
+    box-sizing: border-box;
 }
 
 .filterCustomTrigger:hover {
@@ -81,15 +89,21 @@
 }
 
 .addBtn {
-    padding: 11px 24px;
+    height: 42px;
+    padding: 0 24px;
     border-radius: 10px;
-    border: none;
+    border: 1px solid transparent;
+    /* matches the 1px border of input/dropdown */
     background: #8d7355;
     color: #fff;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
     font-family: inherit;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .addBtn:hover {
