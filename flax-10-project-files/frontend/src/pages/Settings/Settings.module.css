@@ -419,3 +419,22 @@
   border-radius: 12px;
   font-size: 0.9rem;
 }
+
+.teacherBadge {
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  color: #4c1d95;
+}
+
+.teacherPending {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #78350f;
+}
+
+.teacherRequest {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
