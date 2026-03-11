@@ -850,6 +850,10 @@ export default function CampusMap() {
                     <>
                       Show Less <span>▲</span>
                     </>
+                  ) : (
+                    <>
+                      Show {calendarEvents.length - 3} More <span>▼</span>
+                    </>
                   )}
                 </button>
             )}
