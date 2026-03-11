@@ -944,3 +944,9 @@
   font-size: 2rem;
   opacity: 0.5;
 }
+
+.noEvents p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
