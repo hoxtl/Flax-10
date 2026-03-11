@@ -40,9 +40,9 @@ describe('QuickActionsWidget', () => {
         expect(screen.getByText('Add Event')).toBeTruthy();
     });
 
-    it('renders Re-plan My Day button', () => {
+    it('renders Review Day Plan button', () => {
         render(<MemoryRouter><QuickActionsWidget /></MemoryRouter>);
-        expect(screen.getByText(/Re-plan My Day/)).toBeTruthy();
+        expect(screen.getByText(/Review Day Plan/)).toBeTruthy();
     });
 
     it('renders Plan my journey button', () => {
@@ -82,18 +82,18 @@ describe('QuickActionsWidget', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/map');
     });
 
-    it('dispatches flax-open-chat event when Re-plan My Day is clicked', () => {
+    it('dispatches flax-open-chat event when Review Day Plan is clicked', () => {
         const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
         render(<MemoryRouter><QuickActionsWidget /></MemoryRouter>);
-        fireEvent.click(screen.getByText(/Re-plan My Day/));
+        fireEvent.click(screen.getByText(/Review Day Plan/));
         expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'flax-open-chat' }));
         dispatchSpy.mockRestore();
     });
 
-    it('navigates to /calendar when Re-plan dispatch fails', () => {
+    it('navigates to /calendar when Review Day Plan dispatch fails', () => {
         vi.spyOn(window, 'dispatchEvent').mockImplementation(() => { throw new Error('fail'); });
         render(<MemoryRouter><QuickActionsWidget /></MemoryRouter>);
-        fireEvent.click(screen.getByText(/Re-plan My Day/));
+        fireEvent.click(screen.getByText(/Review Day Plan/));
         expect(mockNavigate).toHaveBeenCalledWith('/calendar');
         vi.restoreAllMocks();
     });

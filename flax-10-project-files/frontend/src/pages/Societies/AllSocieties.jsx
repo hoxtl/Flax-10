@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
+import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
 import BasePill from "../../components/Tags/BasePill";
 import SearchBar from "../../components/common/SearchBar";
 import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
@@ -22,6 +23,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [], onRepor
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={resetAndSet(setSearch)} sortBy={sortBy} setSortBy={resetAndSet(setSortBy)} />
             <FilterPills filters={filters} toggleFilter={(...a) => { toggleFilter(...a); setPage(1); }} clearFilters={() => { clearFilters(); setPage(1); }} societies={societies} />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <SocietyGrid items={currentItems} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <BackToTop />
@@ -47,11 +49,19 @@ function toggleFilterValue(prev, type, value) {
 
 function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
     return (
-        <header className={styles.header}>
-            <button onClick={onBack} className={styles.backBtn}>← Back</button>
-            <SearchBar value={search} onChange={setSearch} placeholder="Search societies..." />
-            <SortDropdown value={sortBy} onChange={setSortBy} />
-        </header>
+        <>
+            <header className={styles.header}>
+                <button onClick={onBack} className={styles.backBtn}>← Back</button>
+            </header>
+            <div className={styles.browseToolbar}>
+                <div className={styles.browseSearch}>
+                    <SearchBar value={search} onChange={setSearch} placeholder="Search societies..." />
+                </div>
+                <ToolbarSortControl className={styles.browseSortControl}>
+                    <SortDropdown value={sortBy} onChange={setSortBy} />
+                </ToolbarSortControl>
+            </div>
+        </>
     );
 }
 
@@ -64,9 +74,7 @@ const SORT_OPTIONS = [
 
 function SortDropdown({ value, onChange }) {
     return (
-        <div className={styles.sortWrapper}>
-            <AnimatedDropdown value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />
-        </div>
+        <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />
     );
 }
 

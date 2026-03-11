@@ -1,6 +1,6 @@
 .card {
     height: 220px;
-    border-radius: var(--radius-xl);
+    border-radius: var(--card-radius-token);
     background-size: cover;
     background-position: center;
     background-color: var(--primary);
@@ -10,13 +10,13 @@
     align-items: flex-end;
     padding: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--card-shadow-rest);
     position: relative;
 }
 
 .card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
+    transform: var(--card-hover-transform-strong);
+    box-shadow: var(--card-shadow-strong);
 }
 
 .name {

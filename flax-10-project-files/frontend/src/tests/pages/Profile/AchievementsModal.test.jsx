@@ -73,8 +73,8 @@ describe('AchievementsModal', () => {
 
     it('calls onClose when clicking overlay background', () => {
         render(<AchievementsModal badges={[]} onClose={onClose} />);
-        const overlay = document.querySelector('[class*="overlay"]');
-        fireEvent.click(overlay);
+        const overlay = document.querySelector('[class*="backdrop"]');
+        fireEvent.mouseDown(overlay);
         expect(onClose).toHaveBeenCalledOnce();
     });
 

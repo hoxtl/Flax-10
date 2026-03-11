@@ -39,8 +39,12 @@ const mockStyles = {
   taskWidgetSlotIcon: 'icon',
   taskWidgetSlotTitleBlock: 'titleBlock',
   taskWidgetSlotTitle: 'title',
+  taskWidgetSlotSubtitle: 'subtitle',
   taskWidgetSlotHeaderLeft: 'left',
+  taskWidgetFocusBtn: 'focusBtn',
+  taskWidgetSummaryRow: 'summaryRow',
   taskWidgetDueTodayPill: 'pill',
+  taskWidgetSummaryPill: 'summaryPill',
   taskWidgetTaskList: 'list',
   taskWidgetTaskRow: 'row',
   taskWidgetTaskRowOverdue: 'overdue',
@@ -96,7 +100,7 @@ describe('TaskWidgetSlot', () => {
 
   it('renders empty state when no tasks', () => {
     renderTaskWidgetSlot();
-    expect(screen.getByText('All caught up for today.')).toBeTruthy();
+    expect(screen.getByText('No tasks need attention.')).toBeTruthy();
     expect(screen.getByText('Add a task →')).toBeTruthy();
   });
 
@@ -124,6 +128,8 @@ describe('TaskWidgetSlot', () => {
     expect(screen.getByText("Today's Tasks")).toBeTruthy();
     expect(screen.getByText('Study math')).toBeTruthy();
     expect(screen.getByText('2 due today')).toBeTruthy();
+    expect(screen.getByText(/1 in queue/i)).toBeTruthy();
+    expect(screen.getByText('Focus now')).toBeTruthy();
   });
 
   it('calls handleTaskWidgetComplete when checkbox clicked', () => {
@@ -141,7 +147,7 @@ describe('TaskWidgetSlot', () => {
     expect(handleTaskWidgetComplete).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 
-  it('shows Show more when more than 5 incomplete tasks', () => {
+  it('shows Show more when more than 3 incomplete tasks', () => {
     const tasks = Array.from({ length: 7 }, (_, i) => ({
       id: i + 1,
       title: `Task ${i + 1}`,
@@ -151,7 +157,7 @@ describe('TaskWidgetSlot', () => {
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-    expect(screen.getByText('+ 2 more')).toBeTruthy();
+    expect(screen.getByText('+ 4 more')).toBeTruthy();
   });
 
   it('toggles showAll when Show more clicked', () => {
@@ -166,7 +172,7 @@ describe('TaskWidgetSlot', () => {
       taskWidgetList: tasks,
       setShowAllTaskWidgetTasks,
     });
-    fireEvent.click(screen.getByText('+ 2 more'));
+    fireEvent.click(screen.getByText('+ 4 more'));
     expect(setShowAllTaskWidgetTasks).toHaveBeenCalled();
   });
 
@@ -216,6 +222,24 @@ describe('TaskWidgetSlot', () => {
       taskWidgetList: [{ id: 1, title: 'High task', completed: false, priority: 'high' }],
     });
     expect(screen.getByText('High')).toBeTruthy();
+  });
+
+  it('renders a compact completed section below active tasks', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [
+        { id: 1, title: 'Active task', completed: false },
+        { id: 2, title: 'Completed task', completed: true },
+      ],
+      taskWidgetList: [
+        { id: 1, title: 'Active task', completed: false },
+        { id: 2, title: 'Completed task', completed: true },
+      ],
+    });
+    expect(screen.getByText('Completed')).toBeTruthy();
+    expect(screen.getByText('1 done')).toBeTruthy();
+    expect(screen.queryByText('Completed task')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /completed/i }));
+    expect(screen.getByText('Completed task')).toBeTruthy();
   });
 
   it('shows Now urgency pill for taskWidgetStatus now', () => {

@@ -91,7 +91,7 @@ describe('AllSocieties', () => {
     it('shows empty state when no societies match', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
         fireEvent.change(screen.getByPlaceholderText('Search societies...'), { target: { value: 'zzz' } });
-        expect(screen.getByText('No societies found.')).toBeTruthy();
+        expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
     it('calls onSelect when a society card is clicked', () => {
@@ -137,12 +137,12 @@ describe('AllSocieties', () => {
 
     it('renders with empty societies list', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={[]} />);
-        expect(screen.getByText('No societies found.')).toBeTruthy();
+        expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
     it('renders pagination', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
-        expect(screen.getByTestId('pagination')).toBeTruthy();
+        expect(screen.getAllByTestId('pagination')).toHaveLength(2);
     });
 
     it('sorts societies by name A-Z by default', () => {

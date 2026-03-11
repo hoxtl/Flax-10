@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader/PageHeader";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
@@ -15,16 +16,7 @@ import { usePagination } from "../../hooks/usePagination";
 import { BackToTop } from "../../components/Pagination/Pagination";
 
 function SocietiesSkeleton() {
-  return (
-    <div className={styles.container}>
-      <div className={`${styles.skel} ${styles.skelPageTitle}`} />
-      <div className={styles.skelGrid}>
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSocCard}`} style={{ animationDelay: `${i * 0.07}s` }} />
-        ))}
-      </div>
-    </div>
-  );
+  return <PageSkeleton label="Loading societies" cardCount={8} cardHeight="200px" columns={4} />;
 }
 
 export default function SocietiesPage() {

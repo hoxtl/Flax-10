@@ -77,8 +77,24 @@
 .header {
   display: flex;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   align-items: center;
+}
+
+.browseToolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.browseSearch {
+    min-width: 0;
+}
+
+.browseSortControl {
+    flex-shrink: 0;
 }
 
 .grid {
@@ -150,28 +166,9 @@
 }
 
 .sortDropdown {
-    padding: 8px 32px 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: var(--card-bg);
-    color: var(--text);
-    cursor: pointer;
-    min-width: 100px;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239E7E5D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-}
-
-.sortDropdown:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.sortWrapper {
-    min-width: 140px;
-    flex-shrink: 0;
+    width: 170px;
+    min-width: 170px;
+    flex: 0 0 170px;
 }
 
 .loadingIndicator {
@@ -187,6 +184,25 @@
 @media (max-width: 768px) {
   .container {
     padding: 16px;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .browseToolbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .browseSortControl {
+    width: 100%;
+  }
+
+  .sortDropdown {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .grid {
@@ -226,31 +242,3 @@
     border: 1px solid var(--border);
   }
 }
-
-/* ── Skeleton ── */
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-.skel {
-  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 10px;
-}
-.skelPageTitle {
-  height: 34px;
-  width: 220px;
-  margin: 16px 0 24px;
-}
-.skelGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-.skelSocCard {
-  height: 200px;
-}
-@media (max-width: 1200px) { .skelGrid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 900px) { .skelGrid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .skelGrid { grid-template-columns: 1fr; } }

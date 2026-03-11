@@ -7,6 +7,7 @@ import socialStyles from './Social.module.css';
 import searchStyles from './UserSearch.module.css';
 import SearchBar from '../common/SearchBar/SearchBar';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
+import EmptyState from '../common/EmptyState/EmptyState';
 const styles = { ...socialStyles, ...searchStyles };
 const YEAR_OPTIONS = ["Foundation", "Year 1", "Year 2", "Year 3", "Year 4"];
 
@@ -103,7 +104,20 @@ export function SocietyResultItem({ society, isChecked, onToggle }) {
 
 const getSocietyCategories = (societies) => Array.from(new Set(societies.map(s => s.categories?.[0]?.toLowerCase() || 'other'))).sort();
 
-const EmptySearchText = ({ text }) => <p className={styles.emptyText}>{text}</p>;
+const SEARCH_EMPTY_CONFIG = {
+    loading: { icon: '⏳', title: 'Searching users', description: 'Matching profiles will appear here.' },
+    users: { icon: '🔎', title: 'No users found', description: 'Try a different name or filter.' },
+    start: { icon: '👋', title: 'Start typing', description: 'Search by name, username, course, or society.' },
+    courses: { icon: '📚', title: 'No courses found', description: 'Try a different course search.' },
+    years: { icon: '🗓️', title: 'No years found', description: 'Try a different year search.' },
+    societies: { icon: '🎭', title: 'No societies found', description: 'Try a different society search.' },
+};
+
+const EmptySearchText = ({ icon, title, description }) => (
+    <div className={styles.emptyStateWrap}>
+        <EmptyState icon={icon} title={title} description={description} />
+    </div>
+);
 
 const SearchResultsList = ({ results, onSelect }) => (
     <div className={styles.userList}>
@@ -115,9 +129,9 @@ function SearchDropdown({ pos, loading, query, userResults, onUserSelect }) {
     const showEmpty = !loading && userResults.length === 0;
     return (
         <div className={styles.searchDropdownContainer} style={{ width: pos.width }}>
-            {loading && <EmptySearchText text="Searching..." />}
-            {showEmpty && query && <EmptySearchText text="No users found." />}
-            {showEmpty && !query && <EmptySearchText text="Start typing..." />}
+            {loading && <EmptySearchText {...SEARCH_EMPTY_CONFIG.loading} />}
+            {showEmpty && query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.users} />}
+            {showEmpty && !query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.start} />}
             {!loading && userResults.length > 0 && <SearchResultsList results={userResults} onSelect={onUserSelect} />}
         </div>
     );
@@ -170,7 +184,7 @@ const GroupedSection = ({ title, items, expanded, renderItem, toggle, sectionKey
 };
 
 const CourseList = ({ courseGroups, filteredCourses, filterQuery, querySelected, onToggle, expanded, toggleSection }) => {
-    if (filteredCourses.length === 0) return <EmptySearchText text="No courses found." />;
+    if (filteredCourses.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.courses} />;
     const renderItem = (course) => <CourseResultItem key={course} course={course} isChecked={querySelected(course)} onToggle={onToggle} />;
     if (filterQuery) return <div className={`${styles.userList} ${styles.userListNoGap}`}>{filteredCourses.map(renderItem)}</div>;
     return (
@@ -200,7 +214,7 @@ const YearResultItem = ({ year, isChecked, onToggle }) => (
 );
 
 const YearList = ({ years, querySelected, onToggle }) => {
-    if (years.length === 0) return <EmptySearchText text="No years found." />;
+    if (years.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.years} />;
     return (
         <div className={`${styles.userList} ${styles.userListNoGap}`}>
             {years.map((year) => (
@@ -212,7 +226,7 @@ const YearList = ({ years, querySelected, onToggle }) => {
 
 const matchCat = (s, cat) => cat === 'other' ? (!s.categories || !s.categories.length) : (s.categories?.[0]?.toLowerCase() === cat);
 const SocietyList = ({ societies, filterQuery, querySelected, onToggle, cats, expanded, toggleSection }) => {
-    if (societies.length === 0) return <EmptySearchText text="No societies found." />;
+    if (societies.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.societies} />;
     const rItem = s => <SocietyResultItem key={s.id} society={s} isChecked={querySelected(s.id)} onToggle={onToggle} />;
     if (filterQuery) return <div className={`${styles.userList} ${styles.userListNoGap}`}>{societies.map(rItem)}</div>;
     return (

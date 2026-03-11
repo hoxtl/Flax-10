@@ -37,6 +37,13 @@ describe('TopBar', () => {
     expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
+  it('renders the updated KCL-focused nav groups', () => {
+    render(<TopBar />);
+    expect(screen.getByText('Plan')).toBeTruthy();
+    expect(screen.getByText('Study')).toBeTruthy();
+    expect(screen.getByText('My KCL')).toBeTruthy();
+  });
+
   it('renders without user', () => {
     render(<TopBar />);
     expect(screen.getByText('StudyFlax')).toBeTruthy();

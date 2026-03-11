@@ -86,6 +86,7 @@ vi.mock('../../pages/Homepage/hooks/useHomeData', () => ({
     allTasks: mockAllTasks,
     removePendingTask: vi.fn(),
     refetchTasks: mockRefetchTasks,
+    loading: false,
   }),
 }));
 
@@ -178,6 +179,10 @@ vi.mock('../../pages/Homepage/components/SleepBanner', () => ({
 
 vi.mock('../../components/Calendar/EventPopups', () => ({
   EventPopups: () => <div data-testid="event-popups" />,
+}));
+
+vi.mock('../../components/Pagination/Pagination', () => ({
+  BackToTop: () => <div data-testid="back-to-top" />,
 }));
 
 vi.mock('../../components/Tags/PillFilters', () => ({
@@ -343,6 +348,15 @@ describe('Homepage', () => {
     expect(screen.getByTestId('display-name').textContent).toContain('Alice');
   });
 
+  it('renders the shared BackToTop control', () => {
+    render(
+      <MemoryRouter>
+        <Homepage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('back-to-top')).toBeTruthy();
+  });
+
   it('falls back when localStorage user JSON is invalid', () => {
     window.localStorage.setItem('user', '{nope');
     render(
@@ -455,8 +469,9 @@ describe('Homepage', () => {
     );
     fireEvent.click(screen.getByText('select-deadline'));
     await waitFor(() => expect(screen.getByText('Essay')).toBeInTheDocument());
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    fireEvent.click(screen.getByLabelText('Close'));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    fireEvent.click(dialog);
     await waitFor(() => expect(screen.queryByText('Essay')).not.toBeInTheDocument());
   });
 

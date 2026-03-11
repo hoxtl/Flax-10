@@ -16,7 +16,7 @@ describe('HomeAddressForm', () => {
     it('shows loading initially', () => {
         getHomeAddress.mockReturnValueOnce(new Promise(() => {}));
         render(<HomeAddressForm onSave={vi.fn()} isSaving={false} />);
-        expect(screen.getByText('Loading...')).toBeTruthy();
+        expect(screen.getByLabelText('Loading home address')).toBeTruthy();
     });
 
     it('renders address form after loading', async () => {

@@ -18,7 +18,6 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('lucide-react', () => ({
     AlertCircle: () => <svg />,
-    CheckCircle2: () => <svg />,
     ArrowRight: () => <svg />,
 }));
 
@@ -44,8 +43,8 @@ describe('DeadlinesWidget', () => {
 
     it('renders empty state when no deadlines', () => {
         render(<DeadlinesWidget deadlines={[]} />);
-        expect(screen.getByText('All caught up')).toBeTruthy();
-        expect(screen.getByText('No upcoming deadlines')).toBeTruthy();
+        expect(screen.getByText('No deadlines need attention.')).toBeTruthy();
+        expect(screen.getByText('Upcoming coursework and exams will show up here.')).toBeTruthy();
     });
 
     it('renders deadline titles', () => {

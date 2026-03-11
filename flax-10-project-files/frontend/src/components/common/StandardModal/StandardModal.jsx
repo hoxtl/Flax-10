@@ -12,12 +12,27 @@ export function ModalHeader({ title, subtitle, onClose }) {
     );
 }
 
-export default function StandardModal({ title, subtitle, onClose, children }) {
+export default function StandardModal({
+    title,
+    subtitle,
+    onClose,
+    children,
+    size = "md",
+    backdropClassName = "",
+    modalClassName = "",
+    contentClassName = "",
+    hideHeader = false,
+}) {
+    const backdropClasses = backdropClassName ? `${styles.backdrop} ${backdropClassName}` : styles.backdrop;
+    const sizeClass = styles[`size${size.charAt(0).toUpperCase()}${size.slice(1)}`] || "";
+    const modalClasses = [styles.modal, sizeClass, modalClassName].filter(Boolean).join(" ");
+    const contentClasses = contentClassName ? `${styles.content} ${contentClassName}` : styles.content;
+
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                {title && <ModalHeader title={title} subtitle={subtitle} onClose={onClose} />}
-                {children}
+        <div className={backdropClasses} onMouseDown={onClose}>
+            <div className={modalClasses} onMouseDown={e => e.stopPropagation()}>
+                {!hideHeader && title && <ModalHeader title={title} subtitle={subtitle} onClose={onClose} />}
+                <div className={contentClasses}>{children}</div>
             </div>
         </div>
     );

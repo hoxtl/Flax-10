@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
@@ -26,6 +27,16 @@ vi.mock('../../../pages/Homepage/utils/eventUtils', () => ({
     isNow: vi.fn(() => false),
 }));
 
+vi.mock('../../../api/tflService', () => ({
+    tflService: {
+        journeyPlanner: vi.fn().mockResolvedValue(null),
+    },
+}));
+
+vi.mock('../../../api/userService', () => ({
+    getHomeAddress: vi.fn().mockResolvedValue(null),
+}));
+
 import { RightNowWidget } from '../../../pages/Homepage/components/RightNowWidget';
 import * as eventUtils from '../../../pages/Homepage/utils/eventUtils';
 import * as kclTflMapping from '../../../pages/Homepage/utils/kclTflMapping';
@@ -34,13 +45,15 @@ const baseNow = new Date('2024-03-08T14:00:00Z');
 
 function renderWidget(props = {}) {
     return render(
-        <RightNowWidget
-            now={baseNow}
-            isToday={true}
-            sortedEvents={[]}
-            tflDelays={[]}
-            {...props}
-        />
+        <MemoryRouter>
+            <RightNowWidget
+                now={baseNow}
+                isToday={true}
+                sortedEvents={[]}
+                tflDelays={[]}
+                {...props}
+            />
+        </MemoryRouter>
     );
 }
 
@@ -238,8 +251,8 @@ describe('RightNowWidget', () => {
     });
 
     it('shows TFL delay card and dismisses it', () => {
-        vi.mocked(kclTflMapping.getRelevantDelays).mockReturnValueOnce([{ lineName: 'Northern', severityDescription: 'Minor delays' }]);
-        vi.mocked(kclTflMapping.getTflLinesForLocation).mockReturnValueOnce(['Northern']);
+        vi.mocked(kclTflMapping.getRelevantDelays).mockReturnValue([{ lineName: 'Northern', severityDescription: 'Minor delays' }]);
+        vi.mocked(kclTflMapping.getTflLinesForLocation).mockReturnValue(['Northern']);
         const futureTime = new Date(baseNow.getTime() + 60 * 60000).toISOString();
         renderWidget({
             isToday: true,

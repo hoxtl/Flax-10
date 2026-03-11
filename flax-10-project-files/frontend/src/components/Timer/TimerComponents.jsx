@@ -5,6 +5,12 @@ import styles from "../../pages/Timer/TimerPage.module.css";
 import { noiseGenerator } from './utils/noiseUtils';
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
 import AnimatedDropdown from '../ui/AnimatedDropdown';
+import {
+    compareTaskPriority,
+    compareTaskDue,
+    compareTaskEstimatedTime,
+    getTaskDurationMinutes,
+} from '../../lib/focusPlanner';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {
@@ -165,7 +171,6 @@ const handleTaskKey = (e) => {
 };
 
 /** Task input with optional pick-from-tasks list (sort by urgency/due/time, filter by list/module) */
-const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 const SORT_URGENCY = 'urgency';
 const SORT_TIME = 'time';
 const SORT_DUE = 'due';
@@ -212,20 +217,15 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                     return { ...t, list_name: listInfo.name, list_color: listInfo.color };
                 });
                 if (sort === SORT_TIME) {
-                    list.sort((a, b) => ((a.estimated_blocks || 1) - (b.estimated_blocks || 1)) || ((PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)));
+                    list.sort(compareTaskEstimatedTime);
                 } else if (sort === SORT_DUE) {
-                    list.sort((a, b) => {
-                        if (!a.due_date && !b.due_date) return 0;
-                        if (!a.due_date) return 1;
-                        if (!b.due_date) return -1;
-                        return new Date(a.due_date) - new Date(b.due_date);
-                    });
+                    list.sort(compareTaskDue);
                 } else if (sort === SORT_ALPHA) {
                     list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
                 } else if (sort === SORT_DATE_ADDED) {
                     list.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
                 } else {
-                    list.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4));
+                    list.sort(compareTaskPriority);
                 }
                 setTasks(list.slice(0, 100));
             })
@@ -385,7 +385,7 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                             ) : (
                                 <div className={styles.taskPickList}>
                                     {filteredTasks.map((task) => {
-                                        const duration = task.estimated_blocks ? `${task.estimated_blocks * 25}m` : '25m';
+                                        const duration = `${getTaskDurationMinutes(task)}m`;
                                         const listName = task.list_name || 'Other';
                                         const listColor = task.list_color || '#94a3b8';
                                         const isSelected = value === task.title;

@@ -151,4 +151,3 @@ describe('CoverImageModal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
-

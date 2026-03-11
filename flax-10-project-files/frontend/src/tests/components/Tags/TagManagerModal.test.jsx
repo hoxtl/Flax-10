@@ -63,8 +63,9 @@ describe('TagManagerModal', () => {
 
     it('calls onClose when overlay is clicked', () => {
         const onClose = vi.fn();
-        const { container } = render(<TagManagerModal onClose={onClose} />);
-        fireEvent.click(container.firstChild); // overlay
+        render(<TagManagerModal onClose={onClose} />);
+        const overlay = document.querySelector('[class*="backdrop"]');
+        fireEvent.mouseDown(overlay);
         expect(onClose).toHaveBeenCalled();
     });
 
