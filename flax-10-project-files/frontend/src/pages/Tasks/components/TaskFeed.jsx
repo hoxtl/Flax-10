@@ -135,7 +135,7 @@ export default function TaskFeed(props) {
       <TaskFeedHeader title={data.headerTitle} />
       <TaskFeedSubHeader data={data} lists={props.lists} activeListId={props.activeListId} defaultDueDateForNewTask={props.defaultDueDateForNewTask} onAddTask={props.onAddTask} onCreateTask={props.onCreateTask} />
       <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} 
-      isReadingList={readingList} onTaskAdded={props.onReloadTasks} taskCount={props.tasks?.length}
+      readingList={readingList} onTaskAdded={props.onReloadTasks} taskCount={props.tasks?.length}
       />
     </div>
   );
