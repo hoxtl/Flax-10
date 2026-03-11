@@ -123,9 +123,7 @@ function PaginatedGrid({ items, onSelect, onReport, onUnreport }) {
     }
     return (
         <>
-            <div className={styles.topPagination}>
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-            </div>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
             <div className={styles.grid}>
                 {currentItems.map(s => (
                     <SocietyCard key={s.id} society={s} onClick={onSelect}

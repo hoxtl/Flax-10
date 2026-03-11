@@ -13,6 +13,7 @@ export default function SocietySection({ title, items, type, onAction, allSociet
     return (
         <section className={styles.section}>
             {!hideTitle && <SectionHeader title={title} type={type} onAction={onAction} />}
+            {pagination && <Pagination {...pagination} />}
             <SectionGrid items={items} type={type} onAction={onAction}
                 allSocieties={allSocieties} onSelect={onSelect}
                 onReport={onReport} onUnreport={onUnreport} />

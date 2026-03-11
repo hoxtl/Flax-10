@@ -86,10 +86,6 @@
   min-width: 0;
 }
 
-.topPagination {
-  margin-bottom: 5px;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -129,7 +125,7 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
   width: 100%;
 }
 
