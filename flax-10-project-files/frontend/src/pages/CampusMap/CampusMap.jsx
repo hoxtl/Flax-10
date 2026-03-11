@@ -813,6 +813,17 @@ export default function CampusMap() {
               {( showAllEvents ? calendarEvents : calendarEvents.slice(0, 3)).map((event) => {
                 const startTime = new Date(event.start_time);
                 const color = priorityColors[event.priority] || '#4488FF';
+
+                return (
+                  <div key={event.id} className={styles.eventCard}>
+                    <div 
+                      className={styles.eventPriorityBar}
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className={styles.eventCardContent}>
+                      <div className={styles.eventCardHeader}></div>
+                    </div>
+                )
               })}
             </div>
           )
