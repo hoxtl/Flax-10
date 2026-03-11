@@ -821,7 +821,14 @@ export default function CampusMap() {
                       style={{ backgroundColor: color }}
                     />
                     <div className={styles.eventCardContent}>
-                      <div className={styles.eventCardHeader}></div>
+                      <div className={styles.eventCardHeader}>
+                        <span className={styles.eventTime}>
+                          {startTime.toLocaleDateString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
                     </div>
                 )
               })}
