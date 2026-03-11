@@ -63,6 +63,14 @@ function LoadingSpinner() {
   );
 }
 
+function StatusBadge({ active }) {
+  return (
+    <span className={active ? styles.badgeActive : styles.badgeBanned}>
+      {active ? "Active" : "Banned"}
+    </span>
+  );
+}
+
 export default function AdminPage() {
   return (
     <div className={styles.container}>
