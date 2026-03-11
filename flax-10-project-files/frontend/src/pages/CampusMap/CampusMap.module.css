@@ -957,3 +957,14 @@
   gap: 8px;
   margin-bottom: 8px;
 }
+
+.eventCard {
+  display: flex;
+  gap: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
