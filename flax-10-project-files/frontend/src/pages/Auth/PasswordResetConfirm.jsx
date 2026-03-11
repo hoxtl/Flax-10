@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
-import AuthHeroGeometric from '../components/Authentication/AuthHeroGeometric';
-import { AuthBrand, AuthFooter } from '../components/Authentication/AuthBranding';
+import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
+import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const bgStyle = { position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" };
