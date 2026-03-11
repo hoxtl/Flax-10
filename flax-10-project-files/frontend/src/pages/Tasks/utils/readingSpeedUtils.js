@@ -24,7 +24,7 @@ export function recalculatePendingBlocks(tasks) {
     return tasks.map((task) => {
         if (task.completed) return task;
         const pages = task.reading_page_count ?? task.page_count ?? null;
-        if (!pages) return t;
+        if (!pages) return task;
         return {...task, estimated_blocks: Math.max(1, Math.ceil((pages*avg)/25))};
     });
 }
