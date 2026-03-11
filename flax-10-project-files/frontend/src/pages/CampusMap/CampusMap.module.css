@@ -1037,3 +1037,12 @@
   gap: 6px;
   transition: all 0.2s ease;
 }
+
+.showMoreBtn:hover {
+  background: var(--hover-light);
+  border-color: var(--primary);
+}
+
+.showMoreBtn span {
+  font-size: 0.7rem;
+}
