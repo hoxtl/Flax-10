@@ -109,9 +109,19 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
                                     onDragStart={(e) => handleDragStart(e, t.id)}
                                 >
                                     <div className={styles.cardHeader}>
-                                        <span className={styles.cardPriority} style={{ background: pColor.bg, color: pColor.text }}>
-                                            {t.priority || "Medium"}
-                                        </span>
+                                        <select
+                                            value={(t.priority || "medium").toLowerCase()}
+                                            onChange={(e) => onUpdate(t.id, { priority: e.target.value })}
+                                            className={styles.prioritySelect}
+                                            style={{ background: pColor.bg, color: pColor.text }}
+                                            title="Change priority"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <option value="urgent">URGENT</option>
+                                            <option value="high">HIGH</option>
+                                            <option value="medium">MEDIUM</option>
+                                            <option value="low">LOW</option>
+                                        </select>
                                         <div className={styles.cardActions}>
                                             <select
                                                 value={t.status || (t.completed ? "done" : "todo")}
