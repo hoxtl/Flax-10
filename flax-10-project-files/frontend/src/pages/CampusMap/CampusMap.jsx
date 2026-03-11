@@ -808,6 +808,12 @@ export default function CampusMap() {
               <span className={styles.noEventsIcon}>✨</span>
               <p>No events to show on UniMap...</p>
             </div>
+          ) : (
+            <div className={styles.eventsList}>
+              {( showAllEvents ? calendarEvents : calendarEvents.slice(0, 3)).map((event) => {
+                const startTime = new Date(event.start_time);
+              })}
+            </div>
           )
         </section>
 
