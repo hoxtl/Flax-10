@@ -120,14 +120,17 @@ function useTasks(projectId, members, onStatsUpdate, confirm) {
 
 // --- Main Component ---
 
+function useTaskTabState(tasks, filterUser) {
+    const filtered = tasks.filter(t => filterUser ? (t.assignees_info || []).some(a => String(a.id) === String(filterUser)) : true);
+    return sortTasks(filtered);
+}
+
 export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
     const confirm = useConfirm();
     const { tasks, loading, newTaskTitle, setNewTaskTitle, addTask, updateTask, deleteTask } = useTasks(projectId, members, onStatsUpdate, confirm);
     const [filterUser, setFilterUser] = useState("");
     const [taskView, setTaskView] = useState("list");
-
-    const filtered = tasks.filter(t => filterUser ? (t.assignees_info || []).some(a => String(a.id) === String(filterUser)) : true);
-    const sortedTasks = sortTasks(filtered);
+    const sortedTasks = useTaskTabState(tasks, filterUser);
 
     return (
         <div style={{ marginTop: 24 }}>
