@@ -16,8 +16,7 @@ DEBUG = False
 ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS")]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    os.environ.get("ALLOWED_HOSTS")
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -107,8 +106,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'studyFlax' / 'fixtures',
+    BASE_DIR / 'studyFlax' / 'static',
 ]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
@@ -122,5 +122,4 @@ EMAIL_HOST_USER = 'StudyFlax@gmail.com'
 EMAIL_HOST_PASSWORD = 'xmgwyxrbevcqlevu'
 DEFAULT_FROM_EMAIL = 'StudyFlax <StudyFlax@gmail.com>'
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
