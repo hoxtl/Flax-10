@@ -16,12 +16,15 @@ vi.mock('../../../api/userService', () => ({
     searchUsers: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../api/moduleApi', () => ({
-    getModules: vi.fn(() => Promise.resolve([])),
-}));
-
 vi.mock('../../../api/societyApi', () => ({
     fetchSocieties: vi.fn(() => Promise.resolve([])),
+}));
+
+vi.mock('../../../lib/kclCourses', () => ({
+    KCL_DEPARTMENTS: {
+        'Natural, Mathematical & Engineering Sciences': ['Computer Science', 'Artificial Intelligence'],
+        'Arts & Humanities': ['History'],
+    },
 }));
 
 vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
@@ -38,7 +41,7 @@ vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
 
 import UserSearch, {
     UserResultItem,
-    ModuleResultItem,
+    CourseResultItem,
     SocietyResultItem,
     useClickOutside,
     useSearchInit,
@@ -46,7 +49,6 @@ import UserSearch, {
 } from '../../../components/Social/UserSearch';
 
 import { searchUsers } from '../../../api/userService';
-import { getModules } from '../../../api/moduleApi';
 import { fetchSocieties } from '../../../api/societyApi';
 
 describe('UserResultItem', () => {
@@ -79,27 +81,23 @@ describe('UserResultItem', () => {
     });
 });
 
-describe('ModuleResultItem', () => {
-    it('renders module code and name', () => {
-        const mod = { id: 1, module_code: 'CS3001', module_name: 'Algorithms' };
-        render(<ModuleResultItem module={mod} isChecked={false} onToggle={vi.fn()} />);
-        expect(screen.getByText('CS3001')).toBeTruthy();
-        expect(screen.getByText('Algorithms')).toBeTruthy();
+describe('CourseResultItem', () => {
+    it('renders course name', () => {
+        render(<CourseResultItem course="Computer Science" isChecked={false} onToggle={vi.fn()} />);
+        expect(screen.getByText('Computer Science')).toBeTruthy();
     });
 
     it('shows checked checkbox when isChecked is true', () => {
-        const mod = { id: 1, module_code: 'CS3001', module_name: 'Algorithms' };
-        render(<ModuleResultItem module={mod} isChecked={true} onToggle={vi.fn()} />);
+        render(<CourseResultItem course="Computer Science" isChecked={true} onToggle={vi.fn()} />);
         const checkbox = screen.getByRole('checkbox');
         expect(checkbox.checked).toBe(true);
     });
 
     it('calls onToggle when clicked', () => {
         const onToggle = vi.fn();
-        const mod = { id: 1, module_code: 'CS3001', module_name: 'Algorithms' };
-        render(<ModuleResultItem module={mod} isChecked={false} onToggle={onToggle} />);
-        fireEvent.click(screen.getByText('CS3001'));
-        expect(onToggle).toHaveBeenCalled();
+        render(<CourseResultItem course="Computer Science" isChecked={false} onToggle={onToggle} />);
+        fireEvent.click(screen.getByText('Computer Science'));
+        expect(onToggle).toHaveBeenCalledWith('Computer Science');
     });
 
     it('calls onToggle once when clicking checkbox (stopPropagation)', () => {
@@ -182,16 +180,16 @@ describe('UserSearch', () => {
     it('opens filter dropdown when Filter clicked', () => {
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        // Filter dropdown shows the module/societies tabs
-        expect(screen.getByText('modules')).toBeTruthy();
-        expect(screen.getByText('societies')).toBeTruthy();
+        expect(screen.getByText('Courses')).toBeTruthy();
+        expect(screen.getByText('Year')).toBeTruthy();
+        expect(screen.getByText('Societies')).toBeTruthy();
     });
 
     it('closes filter when Filter clicked again', () => {
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
         fireEvent.click(screen.getByText('Filter'));
-        expect(screen.queryByText('modules')).toBeNull();
+        expect(screen.queryByText('Courses')).toBeNull();
     });
 
     it('shows "Start typing..." when focused with empty query', async () => {
@@ -216,7 +214,7 @@ describe('UserSearch', () => {
         fireEvent.change(input, { target: { value: 'ali' } });
 
         await waitFor(() => {
-            expect(searchUsers).toHaveBeenCalledWith('ali', '', '');
+            expect(searchUsers).toHaveBeenCalledWith('ali', '', '', 0, 20, '');
         });
         await screen.findByText('@asmith');
 
@@ -225,25 +223,33 @@ describe('UserSearch', () => {
         expect(screen.getByTestId('search-bar').value).toBe('');
     });
 
-    it('can search with module filter (no query) once focused', async () => {
-        getModules.mockResolvedValueOnce([
-            { id: 1, module_code: 'CS3001', module_name: 'Algorithms' },
-            { id: 2, module_code: 'MA102', module_name: 'Math' },
-        ]);
+    it('can search with course filter (no query) once focused', async () => {
         fetchSocieties.mockResolvedValueOnce([]);
         searchUsers.mockResolvedValueOnce([]);
         render(<UserSearch onUserSelect={vi.fn()} />);
 
-        // open filter and toggle a module
         fireEvent.click(screen.getByText('Filter'));
-        await waitFor(() => expect(screen.getByText('CS3001')).toBeTruthy());
-        fireEvent.click(screen.getByText('CS3001'));
+        await waitFor(() => expect(screen.getByText('Computer Science')).toBeTruthy());
+        fireEvent.click(screen.getByText('Computer Science'));
 
-        // focusing search activates dropdown + search effect even with empty query
         const userSearchInput = screen.getAllByTestId('search-bar').find((el) => el.getAttribute('placeholder') === 'Search users...');
         fireEvent.focus(userSearchInput);
         await new Promise((r) => setTimeout(r, 350));
-        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', 'CS3001', ''));
+        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', 'Computer Science', '', 0, 20, ''));
+    });
+
+    it('can search with year filter', async () => {
+        searchUsers.mockResolvedValueOnce([]);
+        render(<UserSearch onUserSelect={vi.fn()} />);
+
+        fireEvent.click(screen.getByText('Filter'));
+        fireEvent.click(screen.getByText('Year'));
+        fireEvent.click(screen.getByText('Year 2'));
+
+        const userSearchInput = screen.getAllByTestId('search-bar').find((el) => el.getAttribute('placeholder') === 'Search users...');
+        fireEvent.focus(userSearchInput);
+        await new Promise((r) => setTimeout(r, 350));
+        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', '', '', 0, 20, 'Year 2'));
     });
 
     it('toggles module and society filters on and off', async () => {
@@ -265,11 +271,9 @@ describe('UserSearch', () => {
 
     it('handles module/society init errors without crashing', async () => {
         const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        getModules.mockRejectedValueOnce(new Error('modules down'));
         fetchSocieties.mockRejectedValueOnce(new Error('societies down'));
         render(<UserSearch onUserSelect={vi.fn()} />);
 
-        // Flush the init promises
         await act(async () => {});
         expect(screen.getByTestId('search-bar')).toBeTruthy();
         expect(errSpy).toHaveBeenCalled();

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import analyticsService from '../../api/analyticsService';
+import PageHeader from '../../components/common/PageHeader/PageHeader';
 import SummaryCards from '../../components/Analytics/SummaryCards';
 import ProductivityCards from '../../components/Analytics/ProductivityCards';
 import StudyHoursChart from '../../components/Analytics/StudyHoursChart';
@@ -66,28 +67,23 @@ export default function AnalyticsPage() {
 
   return (
     <div className={styles.page}>
-      <motion.div
-        className={styles.header}
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div>
-          <h1 className={styles.title}>Analytics</h1>
-          <p className={styles.subtitle}>Your study patterns & performance</p>
-        </div>
-        <div className={styles.periodToggle}>
-          {PERIODS.map(p => (
-            <button
-              key={p.value}
-              className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
-              onClick={() => setPeriod(p.value)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </motion.div>
+      <PageHeader
+        title="Analytics"
+        subtitle="Your study patterns & performance"
+        action={
+          <div className={styles.periodToggle}>
+            {PERIODS.map(p => (
+              <button
+                key={p.value}
+                className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
+                onClick={() => setPeriod(p.value)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
       <motion.div
         className={styles.tabBar}

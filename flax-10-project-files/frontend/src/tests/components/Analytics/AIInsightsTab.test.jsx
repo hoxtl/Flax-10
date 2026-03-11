@@ -120,7 +120,7 @@ describe('ChatPanel', () => {
         render(<ChatPanel period={30} />);
         const box = screen.getByPlaceholderText('Ask about your study patterns…');
         fireEvent.change(box, { target: { value: 'Hi' } });
-        fireEvent.click(screen.getByText('↑'));
+        fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
         await waitFor(() => expect(screen.getByText(/Could not get a response/)).toBeTruthy());
     });
 
@@ -128,7 +128,7 @@ describe('ChatPanel', () => {
         render(<ChatPanel period={30} />);
         const box = screen.getByPlaceholderText('Ask about your study patterns…');
         fireEvent.change(box, { target: { value: 'Hi' } });
-        fireEvent.click(screen.getByText('↑'));
+        fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
         await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalled());
         expect(screen.getByText('Clear')).toBeTruthy();
         fireEvent.click(screen.getByText('Clear'));

@@ -3,28 +3,6 @@
     max-width: 1400px;
     margin: 0 auto;
 }
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    margin-top: 1.5rem;
-    gap: 2rem;
-}
-.pageTitle {
-    margin: 0 0 0.5rem 0;
-    font-weight: 800;
-    font-size: 32px;
-    color: var(--text);
-    white-space: nowrap;
-    letter-spacing: -0.02em;
-}
-.subtitle {
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--muted);
-    font-weight: 400;
-}
 .createButton {
     padding: 0.75rem 1.5rem;
     background: var(--primary);
@@ -56,54 +34,31 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    align-items: center;
 }
 .toolbarDropdown {
     flex: 1;
     min-width: 150px;
 }
-.loading {
+.sortControl {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    gap: 1rem;
+    gap: 6px;
+    flex-shrink: 0;
 }
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(158, 126, 93, 0.2);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-.loading p {
+.sortLabel {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--muted);
-    font-size: 0.95rem;
-    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
 }
-.emptyState {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    background: var(--panel);
-    border-radius: 12px;
-    border: 1px dashed var(--border);
-}
-.emptyIcon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-.emptyState p {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin: 0;
+.sortDropdown {
+    width: 170px;
+    min-width: 170px;
+    flex: 0 0 170px;
 }
 @media (max-width: 768px) {
     .container {
@@ -116,7 +71,55 @@
     .toolbar {
         flex-direction: column;
     }
+    .sortControl {
+        width: 100%;
+    }
+    .sortDropdown {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+    }
     .createButton {
         width: 100%;
     }
+}
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+}
+.skelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+.skelTitle {
+  height: 36px;
+  width: 240px;
+}
+.skelBtn {
+  height: 36px;
+  width: 110px;
+}
+.skelSearch {
+  height: 40px;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+.skelGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+.skelCard {
+  height: 180px;
 }
