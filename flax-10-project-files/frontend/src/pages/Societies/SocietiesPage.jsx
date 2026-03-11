@@ -101,7 +101,7 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
         s.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const tabs = buildTabs(filtered, { onSelect, onReport, onUnreport, setView, onCreateClick });
+    const tabs = buildTabs(filtered, societies, { onSelect, onReport, onUnreport, setView, onCreateClick });
 
     return (
         <div className={styles.container}>
@@ -114,16 +114,16 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
 }
 
 /** Build the tab configuration for memberships and management. */
-function buildTabs(societies, { onSelect, onReport, onUnreport, setView, onCreateClick }) {
+function buildTabs(filtered, all, { onSelect, onReport, onUnreport, setView, onCreateClick }) {
     const common = { onSelect, onReport, onUnreport, hideTitle: true };
-    const adminOf = societies.filter(s => s.is_admin);
-    const memberOf = societies.filter(s => s.is_member && !s.is_admin);
+    const adminOf = filtered.filter(s => s.is_admin);
+    const memberOf = filtered.filter(s => s.is_member && !s.is_admin);
 
     return [
         {
             id: "member", label: "My Memberships",
             content: <PaginatedSection {...common} items={memberOf} type="member"
-                onAction={() => setView("all")} allSocieties={societies} />
+                onAction={() => setView("all")} allSocieties={all} />
         },
         {
             id: "admin", label: "Managed By Me",
