@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Check, Hourglass, Circle, Trash2, X, Pencil, ChevronDown } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
+import { useConfirm } from "../../context/ConfirmContext";
 import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 import styles from "./GroupTasksTab.module.css";
 
@@ -177,6 +178,8 @@ function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                     onChange={(val) => onUpdate(task.id, { due_date: val ? new Date(val).toISOString() : null })}
                     placeholder="Set Date"
                     dateOnly={true}
+                    triggerClassName={styles.dateLabel}
+                    hideIcon={true}
                 />
             </div>
 
@@ -258,6 +261,7 @@ export default function GroupTasksTab({ projectId, members }) {
     const [loading, setLoading] = useState(true);
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [filterUser, setFilterUser] = useState("");
+    const confirm = useConfirm();
 
     const fetchTasks = async () => {
         setLoading(true);
@@ -339,7 +343,14 @@ export default function GroupTasksTab({ projectId, members }) {
     };
 
     const deleteTask = async (taskId) => {
-        if (!window.confirm("Are you sure you want to delete this task?")) return;
+        const isConfirmed = await confirm({
+            title: "Delete Task",
+            message: "Are you sure you want to delete this task? This action cannot be undone.",
+            confirmText: "Delete",
+            isDanger: true,
+        });
+        if (!isConfirmed) return;
+
         setTasks((prev) => prev.filter((t) => t.id !== taskId));
         await fetch(`/api/tasks/${taskId}/`, {
             method: "DELETE",
