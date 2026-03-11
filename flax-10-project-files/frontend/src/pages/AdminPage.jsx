@@ -215,7 +215,7 @@ function UsersTab({ onNavigate }) {
           <SearchBar
             value={search}
             onChange={setSearch}
-            placeholder="Search by name, username or email…"
+            placeholder="Search by name"
           />
         </div>
 
