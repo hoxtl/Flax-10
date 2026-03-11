@@ -1,17 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
-vi.mock('../../components/Calendar/utils/dragUtils', () => ({
+const mockDragUtils = vi.hoisted(() => ({
     parseDropPayload: vi.fn(() => ({ type: 'event', data: { id: 1 } })),
     setupDragStart: vi.fn(),
     handleDragOverEffect: vi.fn(),
 }));
+
+vi.mock('../../components/Calendar/utils/dragUtils', () => mockDragUtils);
 
 import { useDrag, useDrop } from '../../components/Calendar/hooks/useDragDrop';
 
 describe('useDrag', () => {
     beforeEach(() => {
         vi.stubGlobal('requestAnimationFrame', (cb) => { cb(); return 1; });
+        mockDragUtils.setupDragStart.mockClear();
     });
 
     it('returns dragProps with draggable true', () => {
@@ -38,6 +41,16 @@ describe('useDrag', () => {
         });
         expect(result.current.isDragging).toBe(false);
     });
+
+    it('calls setupDragStart and sets isDragging true after onDragStart', () => {
+        const { result } = renderHook(() => useDrag({ type: 'event', data: { id: 1 } }));
+        const mockEl = { style: {} };
+        act(() => {
+            result.current.dragProps.onDragStart({ currentTarget: mockEl });
+        });
+        expect(mockDragUtils.setupDragStart).toHaveBeenCalled();
+        expect(result.current.isDragging).toBe(true);
+    });
 });
 
 describe('useDrop', () => {
@@ -61,5 +74,38 @@ describe('useDrop', () => {
             result.current.dropProps.onDragEnter({ preventDefault: vi.fn() });
         });
         expect(result.current.isOver).toBe(true);
+    });
+
+    it('sets isOver to false after dragLeave when counter reaches 0', () => {
+        const { result } = renderHook(() => useDrop({ accept: 'event', onDrop: vi.fn() }));
+        act(() => {
+            result.current.dropProps.onDragEnter({ preventDefault: vi.fn() });
+        });
+        expect(result.current.isOver).toBe(true);
+        act(() => {
+            result.current.dropProps.onDragLeave();
+        });
+        expect(result.current.isOver).toBe(false);
+    });
+
+    it('calls onDrop with payload when drop occurs and payload is valid', () => {
+        const onDrop = vi.fn();
+        const { result } = renderHook(() => useDrop({ accept: 'event', onDrop }));
+        const mockEvent = { preventDefault: vi.fn(), dataTransfer: {} };
+        act(() => {
+            result.current.dropProps.onDrop(mockEvent);
+        });
+        expect(onDrop).toHaveBeenCalledWith({ type: 'event', data: { id: 1 } }, mockEvent);
+        expect(result.current.isOver).toBe(false);
+    });
+
+    it('does not call onDrop when parseDropPayload returns null', () => {
+        mockDragUtils.parseDropPayload.mockReturnValueOnce(null);
+        const onDrop = vi.fn();
+        const { result } = renderHook(() => useDrop({ accept: 'event', onDrop }));
+        act(() => {
+            result.current.dropProps.onDrop({ preventDefault: vi.fn(), dataTransfer: {} });
+        });
+        expect(onDrop).not.toHaveBeenCalled();
     });
 });

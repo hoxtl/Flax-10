@@ -132,4 +132,29 @@ describe('PlanReadDetailModal', () => {
         fireEvent.click(container.querySelector('.overlay'));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
+
+    it('does not call onClose when Delete throws', async () => {
+        const onDeleteTask = vi.fn().mockRejectedValue(new Error('API error'));
+        const onClose = vi.fn();
+        render(
+            <PlanReadDetailModal
+                item={{ task: { title: 'T' } }}
+                styles={mockStyles}
+                onClose={onClose}
+                onDeleteTask={onDeleteTask}
+            />
+        );
+        fireEvent.click(screen.getByText('Delete'));
+        await vi.waitFor(() => expect(onDeleteTask).toHaveBeenCalled());
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('renders task with due_date and estimated_blocks', () => {
+        const item = {
+            task: { title: 'Report', due_date: '2024-03-08T14:00:00Z', estimated_blocks: 2 },
+        };
+        render(<PlanReadDetailModal item={item} styles={mockStyles} onClose={vi.fn()} />);
+        expect(screen.getByText('Report')).toBeTruthy();
+        expect(document.body.textContent).toMatch(/50m/);
+    });
 });

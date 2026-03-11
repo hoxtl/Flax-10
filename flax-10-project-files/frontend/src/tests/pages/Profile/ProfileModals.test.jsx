@@ -49,14 +49,23 @@ const defaultUser = { id: 1, username: 'alice' };
 const defaultModules = ['CS101', 'MA202'];
 const defaultEvents = [{ title: 'Meeting', start_time: '2024-03-08T10:00:00Z', location: 'Room A' }];
 
-function renderModals({ state: stateOverrides = {}, modules, filteredEvents, isMutualOrSelf = true, onNavChange } = {}) {
+const defaultVisibility = {
+    canEditProfile: true,
+    canViewModules: true,
+    canViewTasks: true,
+    canViewSharedWith: true,
+    canViewEvents: true,
+};
+
+function renderModals({ state: stateOverrides = {}, modules, filteredEvents, visibility: visibilityOverrides, onNavChange } = {}) {
+    const visibility = { ...defaultVisibility, ...visibilityOverrides };
     return render(
         <ProfileModals
             user={defaultUser}
             state={makeState(stateOverrides)}
             modules={modules ?? defaultModules}
             filteredEvents={filteredEvents ?? defaultEvents}
-            isMutualOrSelf={isMutualOrSelf}
+            visibility={visibility}
             onNavChange={onNavChange ?? vi.fn()}
         />
     );
@@ -116,8 +125,8 @@ describe('ProfileModals', () => {
         expect(setEventRange).toHaveBeenCalledWith('today');
     });
 
-    it('does not render events modal when isMutualOrSelf is false', () => {
-        renderModals({ state: { showEvents: true }, isMutualOrSelf: false });
+    it('does not render events modal when canViewEvents is false', () => {
+        renderModals({ state: { showEvents: true }, visibility: { canViewEvents: false } });
         expect(screen.queryByText('Meeting')).toBeNull();
     });
 
@@ -129,10 +138,11 @@ describe('ProfileModals', () => {
         expect(screen.getByText('Sharing With')).toBeTruthy();
     });
 
-    it('closes events modal when ✕ button is clicked', () => {
+    it('closes events modal when close button is clicked', () => {
         const setShowEvents = vi.fn();
         renderModals({ state: { showEvents: true, setShowEvents } });
-        fireEvent.click(screen.getByText('✕'));
+        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        fireEvent.click(closeBtn);
         expect(setShowEvents).toHaveBeenCalledWith(false);
     });
 });

@@ -1,10 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import {
+    formatTime,
     formatTimeHHMM,
     fmtDurationShort,
     formatTime12h,
     formatHour12h,
 } from '../../pages/Homepage/utils/dateFormatUtils';
+
+describe('formatTime', () => {
+    it('returns empty string for null or empty', () => {
+        expect(formatTime(null)).toBe('');
+        expect(formatTime('')).toBe('');
+    });
+    it('formats date string as en-GB time', () => {
+        expect(formatTime('2026-01-01T14:30:00')).toMatch(/\d{1,2}:\d{2}/);
+    });
+});
 
 describe('formatTimeHHMM', () => {
     it('formats a Date object to HH:MM', () => {

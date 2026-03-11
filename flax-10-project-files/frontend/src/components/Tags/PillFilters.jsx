@@ -63,12 +63,3 @@ function checkActive(active, key) {
 function ManagerButton({ onClick }) {
   return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage Tags">✎</button>;
 }
-
-function PillRow({ pills, active, counts, onChange, onManage }) {
-  return (
-    <div className={styles.row}>
-      {pills.map((p) => <PillItem key={p.id} pill={p} active={active} counts={counts} onChange={onChange} />)}
-      <ManagerButton onClick={onManage} />
-    </div>
-  );
-}

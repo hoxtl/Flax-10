@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
@@ -92,5 +92,19 @@ describe('IntelligenceRow', () => {
         // greeting should contain "Good" but no name
         const text = screen.getByText(/^Good (Morning|Afternoon|Evening)\.$/);
         expect(text).toBeTruthy();
+    });
+
+    it('handles TfL getTfLDelays rejection', async () => {
+        const { tflService } = await import('../../../api/tflService');
+        tflService.getTfLDelays.mockRejectedValueOnce(new Error('Network error'));
+        renderRow();
+        await waitFor(() => expect(screen.getByTestId('right-now-widget')).toBeTruthy());
+    });
+
+    it('handles TfL getTfLDelays returning non-array', async () => {
+        const { tflService } = await import('../../../api/tflService');
+        tflService.getTfLDelays.mockResolvedValueOnce({ data: [] });
+        renderRow();
+        await waitFor(() => expect(screen.getByTestId('right-now-widget')).toBeTruthy());
     });
 });

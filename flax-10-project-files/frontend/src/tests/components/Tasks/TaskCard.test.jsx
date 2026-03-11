@@ -45,7 +45,7 @@ vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => sleepWarningState),
 }));
 
-vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
+vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input data-testid="date-picker" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),

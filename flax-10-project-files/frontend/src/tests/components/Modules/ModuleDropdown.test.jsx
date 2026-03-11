@@ -34,4 +34,9 @@ describe('ModuleDropdown', () => {
       expect(screen.queryByText('Beta')).not.toBeInTheDocument();
     });
   });
+
+  it('handles value not in options', () => {
+    render(<ModuleDropdown value="z" onChange={vi.fn()} options={options} />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
 });

@@ -54,7 +54,11 @@ const testEmptyState = async () => {
 
 const testCancelClear = async () => {
     historyUtils.getHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
-    renderModal();
+    render(
+        <ConfirmProvider>
+            <HistoryModal onClose={onClose} />
+        </ConfirmProvider>
+    );
     fireEvent.click(await screen.findByText('Clear History'));
     await screen.findByText('Cancel');
     fireEvent.click(screen.getByText('Cancel'));
@@ -67,7 +71,11 @@ const testSingularSession = async () => {
         id: 99, startTime: new Date().toISOString(), endTime: new Date().toISOString(),
         duration: 25, breakDuration: 0, studyBlockId: 'block_singular', status: 'Completed'
     }]);
-    render(<HistoryModal onClose={onClose} />);
+    render(
+        <ConfirmProvider>
+            <HistoryModal onClose={onClose} />
+        </ConfirmProvider>
+    );
     await screen.findByText(/✅ 1 Session$/);
 };
 
@@ -77,13 +85,21 @@ const testBlockWithTask = async () => {
         duration: 25, breakDuration: 0, studyBlockId: 'block_task', status: 'Completed',
         task: 'Write unit tests'
     }]);
-    render(<HistoryModal onClose={onClose} />);
+    render(
+        <ConfirmProvider>
+            <HistoryModal onClose={onClose} />
+        </ConfirmProvider>
+    );
     await screen.findByText(/Write unit tests/);
 };
 
 const testCancelClearViaOverlay = async () => {
     historyUtils.getHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
-    renderModal();
+    render(
+        <ConfirmProvider>
+            <HistoryModal onClose={onClose} />
+        </ConfirmProvider>
+    );
     fireEvent.click(await screen.findByText('Clear History'));
     await screen.findByText('Confirm');
     const overlays = document.querySelectorAll('[class*="confirmOverlay"]');

@@ -52,7 +52,7 @@ import { EventPopups } from "../../components/Calendar/EventPopups";
 
 
 /* HOME PAGE */
-export default function Homepage() {
+export default function Homepage({ defaultShowCreateTaskModal = false, defaultPlanTimelineReadItem = null }) {
   const navigate = useNavigate();
   const { selectedDate, events: allCalEvents } = useCalendar();
   const dispatch = useCalendarDispatch();
@@ -82,11 +82,11 @@ export default function Homepage() {
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
-  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(defaultShowCreateTaskModal);
   const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
   const [lastCreatedListId, setLastCreatedListId] = useState(null);
   const [rescheduleTask, setRescheduleTask] = useState(null);
-  const [planTimelineReadItem, setPlanTimelineReadItem] = useState(null);
+  const [planTimelineReadItem, setPlanTimelineReadItem] = useState(defaultPlanTimelineReadItem);
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
