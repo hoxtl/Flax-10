@@ -431,7 +431,9 @@ button:disabled {
   font-family: inherit;
   line-height: 1.5;
   margin-top: 0.5rem;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
 }
 .reasonInput:focus {
   outline: none;
@@ -439,7 +441,6 @@ button:disabled {
   box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
 }
 
-/* ── spinner ─────────────────────────────────────────────────────────────── */
 .spinnerWrap {
   display: flex;
   justify-content: center;
@@ -451,4 +452,20 @@ button:disabled {
   border: 3px solid var(--border, #e5e7eb);
   border-top-color: var(--accent, #6c47ff);
   border-radius: 50%;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted, #9ca3af);
+  padding: 3rem 0;
+  font-size: 0.95rem;
+}
+
+.errorMsg {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
 }
