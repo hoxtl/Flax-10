@@ -12,6 +12,7 @@ import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js
 import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
+import ReadingModal from '../../components/Modules/ReadingModal.jsx';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +25,7 @@ function useModulesPage(initialSearch = '', initialCreate = false) {
     const [editing_module, setEditingModule] = useState(null);
     const [viewing_module, setViewingModule] = useState(null);
     const [deadline_module, setDeadlineModule] = useState(null);
+    const [reading_module, setReadingModule] = useState(null);
     const hook = useModules();
 
     const codeFromUrl = searchParams.get('code');
@@ -64,7 +66,7 @@ function useModulesPage(initialSearch = '', initialCreate = false) {
         }
     }, [codeFromUrl, moduleIdFromUrl, hook.loading, hook.modules, searchParams, setSearchParams]);
 
-    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook };
+    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook, reading_module, setReadingModule };
 }
 
 function useMainView(state) {
@@ -82,7 +84,7 @@ function useMainView(state) {
 
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
     const state = useModulesPage(initialSearch, initialCreate);
-    const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
+    const { hook, show_form, viewing_module, deadline_module, setDeadlineModule, reading_module, setReadingModule } = state;
     if (hook.loading) return <LoadingView />;
     if (show_form) return <FormView state={state} />;
     if (viewing_module) return <DetailsView state={state} />;
@@ -90,6 +92,7 @@ export default function ModulesPage({ initialSearch = '', initialCreate = false 
         <>
             <MainView state={state} />
             {deadline_module && <DeadlineModal module={deadline_module} onClose={() => setDeadlineModule(null)} />}
+            {reading_module && <ReadingModal module={reading_module} onClose={() => setReadingModule(null)} />}
         </>
     );
 }
@@ -127,19 +130,21 @@ function DetailsView({ state }) {
 }
 
 function MainView({ state }) {
-    const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule } = state;
+    const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule } = state;
     const { sorting, search, departments } = useMainView(state);
     return (
         <div className={styles.container}>
             <PageHeader is_teacher={is_teacher} onCreateModule={() => { setEditingModule(null); setShowForm(true); }} />
             <Toolbar search={search} sorting={sorting} departments={departments} />
-            <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
-                setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
+            <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher}
+                setViewingModule={setViewingModule} setEditingModule={setEditingModule}
+                setShowForm={setShowForm} setDeadlineModule={setDeadlineModule}
+                setReadingModule={setReadingModule} />
         </div>
     );
 }
 
-function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule }) {
+function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule }) {
     if (sorting.results.length === 0) return <EmptyState />;
     return (
         <div>
@@ -150,6 +155,7 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
                 onEdit={(m) => { setEditingModule(m); setShowForm(true); }}
                 onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
                 onManageDeadlines={setDeadlineModule}
+                onManageReadings={setReadingModule}
             />
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
             <BackToTop />
@@ -197,7 +203,7 @@ function Toolbar({ search, sorting, departments }) {
     );
 }
 
-function EmptyState({ }) {
+function EmptyState() {
     return (
         <div className={styles.emptyState}>
             <span className={styles.emptyIcon}>📚</span>
