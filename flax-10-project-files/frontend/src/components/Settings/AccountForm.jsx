@@ -84,6 +84,94 @@ function CourseRow({ formData, onChange }) {
   );
 }
 
+function TeacherRoleSection({ role }) {
+  const [status, setStatus] = useState(null);
+  const [message, setMessage] = useState("");
+
+  if (role === "teacher") {
+    return (
+      <div className={styles.teacherSection}>
+        <SectionHeader title="Role" />
+        <div className={styles.teacherBadge}>
+          <span className={styles.teacherBadgeIcon}>🎓</span>
+          <div>
+            <strong>You are a Teacher</strong>
+            <p className={styles.teacherBadgeSub}>
+              You have access to module creation and teacher features.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === "pending_teacher") {
+    return (
+      <div className={styles.teacherSection}>
+        <SectionHeader title="Role" />
+        <div className={styles.teacherPending}>
+          <span>⏳</span>
+          <div>
+            <strong>Teacher Request Pending</strong>
+            <p className={styles.teacherBadgeSub}>
+              An admin will review your request shortly.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleRequest = async () => {
+    setStatus("loading");
+    try {
+      const res = await requestTeacherRole();
+      setMessage(res?.message || "Request submitted!");
+      setStatus("done");
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        try {
+          const u = JSON.parse(stored);
+          u.role = "pending_teacher";
+          localStorage.setItem("user", JSON.stringify(u));
+          window.dispatchEvent(new Event("auth-changed"));
+        } catch (_) {}
+      }
+    } catch (e) {
+      setMessage(e.message || "Request failed.");
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className={styles.teacherSection}>
+      <SectionHeader title="Role" />
+      <div className={styles.teacherRequest}>
+        <div>
+          <strong>Become a Teacher</strong>
+          <p className={styles.teacherBadgeSub}>
+            Teachers can create and manage modules. Submit a request for admin
+            approval.
+          </p>
+        </div>
+        {status === "done" ? (
+          <span className={styles.teacherSuccess}>{message}</span>
+        ) : (
+          <button
+            type="button"
+            className={styles.teacherBtn}
+            onClick={handleRequest}
+            disabled={status === "loading"}
+          >
+            {status === "loading" ? "Requesting…" : "🎓 Request Teacher Role"}
+          </button>
+        )}
+        {status === "error" && <p className={styles.teacherError}>{message}</p>}
+      </div>
+    </div>
+  );
+}
+
 export default function AccountForm({ user, onSave, isSaving }) {
   const { formData, handleChange } = useAccountForm(user);
   const role = user?.role || "student";
