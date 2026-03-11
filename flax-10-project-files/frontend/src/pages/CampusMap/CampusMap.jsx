@@ -797,7 +797,11 @@ export default function CampusMap() {
         </section>
 
         {/* Calendar Events */}
-        <section className={styles.section}></section>
+        <section className={styles.section}>
+          <div className={styles.sectionLabel}>
+            <span className={styles.calendarIcon}>📅</span>
+          </div>
+        </section>
 
         <section className={styles.section}>
           <div className={styles.sectionLabel}>
