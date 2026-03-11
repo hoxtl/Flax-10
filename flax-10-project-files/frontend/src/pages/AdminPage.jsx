@@ -139,6 +139,99 @@ function BanModal({ user, onConfirm, onCancel }) {
   );
 }
 
+function TeacherRequestsTab() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setItems(await fetchTeacherRequests());
+    } catch (e) {
+      setError(e.message || "Failed to load teacher requests.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const decide = async (userId, decision) => {
+    setBusy(userId);
+    try {
+      await resolveTeacherRequest(userId, decision);
+      setItems((prev) => prev.filter((u) => u.id !== userId));
+    } catch (e) {
+      setError(e.message || "Action failed.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <SectionCard>
+      <div className={styles.cardHeader}>
+        <h2 className={styles.cardTitle}>
+          Teacher Role Requests{" "}
+          <span className={styles.count}>({items.length})</span>
+        </h2>
+      </div>
+      {error && <p className={styles.errorMsg}>{error}</p>}
+      {loading ? (
+        <LoadingSpinner />
+      ) : items.length === 0 ? (
+        <EmptyState message="No pending teacher role requests." />
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={stagger}
+          initial="initial"
+          animate="animate"
+        >
+          {items.map((u) => (
+            <motion.div
+              key={u.id}
+              className={styles.listRow}
+              variants={rowAnim}
+              layout
+            >
+              <div className={styles.listInfo}>
+                <span className={styles.listName}>
+                  {u.first_name} {u.last_name}
+                </span>
+                <span className={styles.listMeta}>
+                  @{u.username} · {u.email}
+                </span>
+              </div>
+              <div className={styles.listActions}>
+                <button
+                  className={styles.approveBtn}
+                  disabled={busy === u.id}
+                  onClick={() => decide(u.id, "approve")}
+                >
+                  ✓ Approve
+                </button>
+                <button
+                  className={styles.rejectBtn}
+                  disabled={busy === u.id}
+                  onClick={() => decide(u.id, "reject")}
+                >
+                  ✗ Reject
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </SectionCard>
+  );
+}
+
 function ReportedSocietiesTab() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
