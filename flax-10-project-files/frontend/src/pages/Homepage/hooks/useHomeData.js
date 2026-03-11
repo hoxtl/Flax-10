@@ -70,7 +70,15 @@ export function useHomeData(selectedDate) {
   }, []);
 
   const refetchTasks = useCallback(() => {
-    fetchTasks().then((data) => setAllTasks(data || [])).catch(() => {});
+    return fetchTasks()
+      .then((data) => {
+        const nextTasks = data || [];
+        setAllTasks(nextTasks);
+        return nextTasks;
+      })
+      .catch(() => {
+        return [];
+      });
   }, []);
 
   return {

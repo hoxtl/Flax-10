@@ -6,6 +6,7 @@ import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
+import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
 
 function getGreeting(name) {
   const h = new Date().getHours();
@@ -76,7 +77,34 @@ function formatEventTime(dateLike) {
   return new Date(dateLike).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
-function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays }) {
+function getTravelContext({ upcomingEvent, tflDelays, now = new Date() }) {
+  if (!upcomingEvent?.start_time || !Array.isArray(tflDelays) || tflDelays.length === 0) return null;
+
+  const startMs = new Date(upcomingEvent.start_time).getTime();
+  const minsUntilStart = Math.round((startMs - now.getTime()) / 60000);
+  if (minsUntilStart <= 0 || minsUntilStart > 120) return null;
+
+  const relevantDelays = getRelevantDelays(upcomingEvent, tflDelays);
+  if (!relevantDelays.length) return null;
+
+  const primaryDelay = relevantDelays[0];
+  const lineName = primaryDelay?.lineName || "TfL";
+  const severity = primaryDelay?.severityDescription || "Delays";
+  const severe = relevantDelays.some((delay) => isSevereDisruption(delay?.severityDescription));
+  const eventTime = formatEventTime(upcomingEvent.start_time);
+  const eventTitle = upcomingEvent.title || "your next class";
+  const locationMeta = upcomingEvent.location ? ` · ${upcomingEvent.location}` : "";
+
+  return {
+    label: "Travel",
+    text: `${lineName} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${eventTitle}.`,
+    meta: `${severity}${locationMeta}`,
+    tone: "warning",
+    Icon: Train,
+  };
+}
+
+function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now }) {
   if (currentEvent) {
     return {
       label: "On now",
@@ -96,15 +124,9 @@ function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays }) {
       Icon: AlertTriangle,
     };
   }
-  if ((tflDelays || []).length > 0) {
-    const firstDelay = tflDelays[0];
-    return {
-      label: "Travel",
-      text: `${firstDelay.lineName || "TfL"} delays may affect your next journey.`,
-      meta: firstDelay.severityDescription || "Check route before you leave",
-      tone: "warning",
-      Icon: Train,
-    };
+  const travelContext = getTravelContext({ upcomingEvent, tflDelays, now });
+  if (travelContext) {
+    return travelContext;
   }
   if (upcomingEvent) {
     return {
@@ -144,7 +166,6 @@ export default function IntelligenceRow({
   studyPulseDeadlines,
   slot5Data,
   recommendation,
-  onRecommendationAction,
 }) {
   const tflDelays = useTflDelays();
   const { summary, loading: profileLoading } = useProfileSummary();
@@ -153,13 +174,15 @@ export default function IntelligenceRow({
     ? slot5Data.taskWidgetItemsOnly.filter((task) => !task.completed)
     : [];
   const sortedEvents = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents : [];
-  const currentEvent = getCurrentEvent(sortedEvents, slot5Data?.now ?? new Date());
-  const upcomingEvent = getUpcomingEvent(sortedEvents, slot5Data?.now ?? new Date());
+  const bannerNow = slot5Data?.now ?? new Date();
+  const currentEvent = getCurrentEvent(sortedEvents, bannerNow);
+  const upcomingEvent = getUpcomingEvent(sortedEvents, bannerNow);
   const liveContext = getLiveContext({
     currentEvent,
     upcomingEvent,
     overlaps: slot5Data?.navigatorContext?.overlaps,
     tflDelays,
+    now: bannerNow,
   });
   const LiveContextIcon = liveContext.Icon;
   const tasksCount = pendingTasks.length;
@@ -245,16 +268,9 @@ export default function IntelligenceRow({
                     <span className={styles.analyticsPill}>{nextWindowMeta.label}</span>
                   )}
                 </div>
-                <div className={styles.nextStepActions}>
-                  {onRecommendationAction && (
-                    <button type="button" className={styles.nextStepCta} onClick={onRecommendationAction}>
-                      {recommendation?.ctaLabel || "Start focus"}
-                    </button>
-                  )}
-                  <Link to="/analytics?period=7&tab=Overview&from=homepage-banner" className={styles.analyticsLink}>
-                    Review my analytics
-                  </Link>
-                </div>
+                <Link to="/analytics?period=7&tab=Overview&from=homepage-banner" className={styles.analyticsLink}>
+                  Review my analytics
+                </Link>
               </div>
             </div>
           </div>

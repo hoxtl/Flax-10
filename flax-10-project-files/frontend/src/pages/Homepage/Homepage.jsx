@@ -43,7 +43,6 @@ import {
 import { useHomeData } from "./hooks/useHomeData";
 import { MiniTimeline } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
-import { QuickActionsWidget } from "./components/QuickActionsWidget";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 import { DeadlinesWidget } from "./components/DeadlinesWidget";
@@ -51,6 +50,7 @@ import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePi
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
+import { BackToTop } from "../../components/Pagination/Pagination";
 
 
 /* HOME PAGE */
@@ -79,7 +79,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     }
   }, []);
 
-  const { dayEvents, dayTasks, allTasks, refetchTasks, loading: homeDataLoading } = useHomeData(selectedDate);
+  const { dayEvents, dayTasks, allTasks, removePendingTask, refetchTasks, loading: homeDataLoading } = useHomeData(selectedDate);
   const [toast, setToast] = useState(null);
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
@@ -203,38 +203,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   }, [getTag]);
 
 
-  const handleTaskWidgetComplete = useCallback(async (t) => {
-    const newCompleted = !t.completed;
-    const numericId = typeof t.id === "string" && t.id.startsWith("task-") ? Number(t.id.replace("task-", "")) : t.id;
-    try {
-      await updateTask(numericId, { completed: newCompleted });
-      refetchTasks();
-      if (newCompleted) {
-        const isRoutine = isRoutineTask(t);
-        showCompletionToast(getCompletionMessage(t), { isRoutine });
-        if (!isRoutine) {
-          try {
-            const w = /** @type {any} */ (window);
-            const AudioCtx = w.AudioContext || w.webkitAudioContext;
-            const ctx = new AudioCtx();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.setValueAtTime(520, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(680, ctx.currentTime + 0.06);
-            gain.gain.setValueAtTime(0.08, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.15);
-          } catch (_) { }
-        }
-      }
-    } catch {
-      setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
-    }
-  }, [showCompletionToast, refetchTasks]);
-
   const closeToast = useCallback(() => {
     if (toastTimeoutRef.current) {
       clearTimeout(toastTimeoutRef.current);
@@ -257,6 +225,58 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       toastTimeoutRef.current = null;
     }, duration);
   }, []);
+
+  const handleTaskWidgetComplete = useCallback(async (t) => {
+    const newCompleted = !t.completed;
+    const numericId = typeof t.id === "string" && t.id.startsWith("task-") ? Number(t.id.replace("task-", "")) : t.id;
+    const isRoutine = isRoutineTask(t);
+    const completionMessage = getCompletionMessage(t);
+
+    if (newCompleted) {
+      try {
+        showCompletionToast(completionMessage, { isRoutine });
+      } catch (_) { }
+    }
+
+    if (newCompleted) {
+      removePendingTask(numericId);
+    }
+
+    try {
+      await updateTask(numericId, { completed: newCompleted });
+    } catch {
+      const refreshedTasks = await refetchTasks();
+      const taskStillIncomplete = (refreshedTasks || []).some((task) =>
+        String(task?.id) === String(numericId) && !task.completed
+      );
+      if (taskStillIncomplete) {
+        setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
+      }
+      return;
+    }
+
+    refetchTasks();
+
+    if (newCompleted) {
+      if (!isRoutine) {
+        try {
+          const w = /** @type {any} */ (window);
+          const AudioCtx = w.AudioContext || w.webkitAudioContext;
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.setValueAtTime(520, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(680, ctx.currentTime + 0.06);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.15);
+        } catch (_) { }
+      }
+    }
+  }, [showCompletionToast, removePendingTask, refetchTasks]);
 
 
 
@@ -683,9 +703,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       return {
         text: `Focus on ${linkedTask.title} for ${deadlineTitle}.`,
         meta: `${deadline.module_code || "Module"}${dueLabel ? ` · ${dueLabel}` : ""}`,
-        ctaLabel: "Start focus",
-        quickActionLabel: `Focus on ${linkedTask.title}`,
-        quickActionSub: `${deadlineTitle}${dueLabel ? ` · ${dueLabel}` : ""}`,
         taskTitle: linkedTask.title,
       };
     }
@@ -694,26 +711,12 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       return {
         text: `Use the ${freeWindowLabel} window to move ${pendingTasks[0].title} forward.`,
         meta: "Best task to move next",
-        ctaLabel: "Start focus",
-        quickActionLabel: `Focus on ${pendingTasks[0].title}`,
-        quickActionSub: `${freeWindowLabel} available now`,
         taskTitle: pendingTasks[0].title,
       };
     }
 
     return null;
   }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
-
-  const handleHomepageRecommendation = useCallback(() => {
-    navigate("/timer", {
-      state: {
-        fromTaskPlay: true,
-        suggestedTaskTitle: homepageRecommendation?.taskTitle || null,
-      },
-    });
-  }, [navigate, homepageRecommendation]);
-
-
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
   const [replanLoading, setReplanLoading] = useState(false);
@@ -870,7 +873,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           <IntelligenceRow
             displayName={displayName}
             recommendation={homepageRecommendation}
-            onRecommendationAction={homepageRecommendation ? handleHomepageRecommendation : undefined}
 
             slot1TodayTasks={
               // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
@@ -1122,21 +1124,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           </div>
         </div>
       </motion.div>
-
-      <section className={styles.focusToolsSection} aria-labelledby="homepage-focus-tools">
-        <div className={styles.focusToolsInner}>
-          <div className={styles.focusToolsHeader}>
-            <span className={styles.focusToolsEyebrow}>Focus tools</span>
-            <h3 id="homepage-focus-tools" className={styles.focusToolsTitle}>Keep the rest of the day moving.</h3>
-          </div>
-          <QuickActionsWidget
-            onStartFocus={() => navigate("/timer")}
-            onAddEvent={() => navigate("/calendar")}
-            focusWindowDuration={isToday(selectedDate) ? freeWindowLabel : null}
-            recommendation={homepageRecommendation ? { ...homepageRecommendation, onAction: handleHomepageRecommendation } : null}
-          />
-        </div>
-      </section>
+      <BackToTop containerSelector="[data-dashboard-main]" />
       </>
       )}
 

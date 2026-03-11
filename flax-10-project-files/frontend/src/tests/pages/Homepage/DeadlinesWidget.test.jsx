@@ -43,8 +43,8 @@ describe('DeadlinesWidget', () => {
 
     it('renders empty state when no deadlines', () => {
         render(<DeadlinesWidget deadlines={[]} />);
-        expect(screen.getByText('All caught up for now.')).toBeTruthy();
-        expect(screen.getByText('No upcoming deadlines to plan around.')).toBeTruthy();
+        expect(screen.getByText('No deadlines need attention.')).toBeTruthy();
+        expect(screen.getByText('Upcoming coursework and exams will show up here.')).toBeTruthy();
     });
 
     it('renders deadline titles', () => {

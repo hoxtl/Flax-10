@@ -92,6 +92,17 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
+.rowOverdue {
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.82) 0%, rgba(255, 250, 245, 0.96) 100%);
+  border-color: rgba(220, 38, 38, 0.14);
+  border-left-color: var(--home-urgency-danger);
+}
+
+.rowCritical {
+  background: linear-gradient(180deg, rgba(251, 245, 231, 0.94) 0%, rgba(255, 250, 245, 0.98) 100%);
+  border-left-color: var(--home-urgency-warning);
+}
+
 .rowLeft {
   display: flex;
   flex-direction: column;

@@ -34,7 +34,7 @@ function getDaysLabel(dueDate) {
 
 const TIER_TEXT = {
   overdue: "var(--home-urgency-danger)",
-  critical: "var(--home-urgency-danger)",
+  critical: "var(--home-urgency-warning)",
   urgent: "var(--home-urgency-warning)",
   upcoming: "var(--home-urgency-neutral)",
   distant: "var(--home-urgency-muted)",
@@ -42,7 +42,7 @@ const TIER_TEXT = {
 
 const TIER_ACCENT = {
   overdue: "var(--home-urgency-danger)",
-  critical: "var(--home-urgency-danger)",
+  critical: "var(--home-urgency-warning)",
   urgent: "var(--home-urgency-warning)",
   upcoming: "var(--home-urgency-neutral)",
   distant: "var(--home-urgency-neutral-border)",
@@ -89,8 +89,8 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
 
       {sorted.length === 0 ? (
         <EmptyStateCard
-          message="All caught up for now."
-          sub="No upcoming deadlines to plan around."
+          message="No deadlines need attention."
+          sub="Upcoming coursework and exams will show up here."
         />
       ) : (
         <motion.div
@@ -136,7 +136,7 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
     <motion.div
       role="button"
       tabIndex={0}
-      className={`${styles.row} ${isLast ? styles.rowLast : ""}`}
+      className={`${styles.row} ${tier === "overdue" ? styles.rowOverdue : ""} ${tier === "critical" ? styles.rowCritical : ""} ${isLast ? styles.rowLast : ""}`}
       style={{ "--deadline-row-accent": rowAccent }}
       variants={rowVariants}
       onClick={onSelect}

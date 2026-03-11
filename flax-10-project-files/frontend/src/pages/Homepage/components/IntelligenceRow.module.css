@@ -525,35 +525,6 @@
   flex-wrap: wrap;
 }
 
-.nextStepActions {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.nextStepCta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(44, 24, 16, 0.16);
-  background: linear-gradient(135deg, #3a2619 0%, #2c1810 100%);
-  color: #fffcf8;
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.nextStepCta:hover {
-  background: linear-gradient(135deg, #4a2e1d 0%, #362114 100%);
-}
-
 .analyticsInline {
   display: flex;
   flex-wrap: wrap;
@@ -591,12 +562,11 @@
 }
 
 .liveContextCard {
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 12px;
+  display: grid;
+  gap: 8px;
   width: fit-content;
   max-width: min(100%, 34rem);
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: rgba(255, 255, 255, 0.52);
   border: 1px solid rgba(123, 103, 81, 0.1);
   border-radius: 18px;
@@ -617,7 +587,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   min-width: 18px;
 }
 
@@ -638,7 +608,6 @@
 .liveContextDot {
   width: 10px;
   height: 10px;
-  margin-top: 5px;
   border-radius: 999px;
   background: radial-gradient(circle at 35% 35%, #f0b29d 0%, #c0714e 55%, #b83232 100%);
   box-shadow:
@@ -650,7 +619,7 @@
 
 .liveContextBody {
   display: grid;
-  gap: 4px;
+  gap: 5px;
 }
 
 .liveContextText {
@@ -669,6 +638,10 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   color: rgba(132, 87, 72, 0.72);
+}
+
+.liveContextInlineAlert .liveContextTop {
+  justify-content: flex-start;
 }
 
 @keyframes liveAlertDotPulse {
@@ -708,7 +681,7 @@
 
 @media (min-width: 1024px) {
   .primaryGrid {
-    grid-template-columns: minmax(270px, 0.43fr) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(300px, 0.48fr) minmax(0, 1fr) !important;
     grid-auto-rows: minmax(0, auto);
     gap: 12px;
     align-items: stretch;

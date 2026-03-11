@@ -99,7 +99,7 @@ describe('TaskWidgetSlot', () => {
 
   it('renders empty state when no tasks', () => {
     renderTaskWidgetSlot();
-    expect(screen.getByText('All caught up for now.')).toBeTruthy();
+    expect(screen.getByText('No tasks need attention.')).toBeTruthy();
     expect(screen.getByText('Add a task →')).toBeTruthy();
   });
 
@@ -221,6 +221,24 @@ describe('TaskWidgetSlot', () => {
       taskWidgetList: [{ id: 1, title: 'High task', completed: false, priority: 'high' }],
     });
     expect(screen.getByText('High')).toBeTruthy();
+  });
+
+  it('renders a compact completed section below active tasks', () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [
+        { id: 1, title: 'Active task', completed: false },
+        { id: 2, title: 'Completed task', completed: true },
+      ],
+      taskWidgetList: [
+        { id: 1, title: 'Active task', completed: false },
+        { id: 2, title: 'Completed task', completed: true },
+      ],
+    });
+    expect(screen.getByText('Completed')).toBeTruthy();
+    expect(screen.getByText('1 done')).toBeTruthy();
+    expect(screen.queryByText('Completed task')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /completed/i }));
+    expect(screen.getByText('Completed task')).toBeTruthy();
   });
 
   it('shows Now urgency pill for taskWidgetStatus now', () => {
