@@ -23,3 +23,15 @@
   color: var(--text, #111);
   letter-spacing: -0.3px;
 }
+
+.reason {
+  color: var(--muted, #6b7280);
+  max-width: 460px;
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.reasonEmphasis {
+  color: var(--text, #111);
+}
