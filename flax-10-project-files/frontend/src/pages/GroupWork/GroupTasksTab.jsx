@@ -66,17 +66,25 @@ export default function GroupTasksTab({ projectId, members, onStatsUpdate }) {
             } else {
                 assignees.forEach(a => {
                     if (!userCounts[a.id]) {
-                        userCounts[a.id] = { count: 0, name: a.name, id: a.id };
+                        // Find member name from official members list
+                        const memberInfo = members.find(m => String(m.user) === String(a.id));
+                        userCounts[a.id] = {
+                            totalShare: 0,
+                            tasksDone: 0,
+                            name: memberInfo ? memberInfo.user_name : (a.name || "Unknown Member"),
+                            id: a.id
+                        };
                     }
-                    userCounts[a.id].count += (1 / assignees.length);
+                    userCounts[a.id].totalShare += (1 / assignees.length);
+                    userCounts[a.id].tasksDone += 1;
                 });
             }
         });
 
         const segments = Object.values(userCounts).map(u => ({
             ...u,
-            percentage: (u.count / total) * 100,
-            tooltip: `${u.name} (${Math.round(u.count)} tasks)`
+            percentage: (u.totalShare / total) * 100,
+            tooltip: `${u.name} (${u.tasksDone} task${u.tasksDone !== 1 ? 's' : ''})`
         }));
 
         if (unassignedCount > 0) {
