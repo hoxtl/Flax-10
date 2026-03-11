@@ -8,11 +8,12 @@ from django.utils import timezone
 @permission_classes([IsAuthenticated])
 def calendar_events_map_view(request):
     """
-    Retrieve calendar events with a valid location to display on the map
+    Retrieve calendar events with a valid location to display on the map for that day.
     """
     user = request.user
-    today = datetime.now()
-    future_date = today + timedelta(days=30)
+    now = timezone.now()
+    start_time = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_time = now.replace(hour=23, minute=59, second=59, microsecond=999999)
     events = CalendarEvent.objects.filter(
         user=user,
         location_validated=True,
