@@ -7,7 +7,6 @@ import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
-import { PiSquare } from "lucide-react";
 
 const DURATION_OPTIONS = [
   { value: 1, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
@@ -40,7 +39,7 @@ function PageCountField({ styles: s, pageCount, setPageCount }) {
   return (
     <>
       <span className={s.optionsRowDivider} aria-hidden />
-      <span className={s.optionRowLabel}>Pages</span>
+      <span className={s.optionsRowLabel}>Pages</span>
       <input
         type="number" min="1" placeholder="e.g. 48" value={pageCount ?? ""} 
         onChange={(e) => setPageCount(e.target.value ? Number(e.target.value) : null)}
@@ -50,22 +49,35 @@ function PageCountField({ styles: s, pageCount, setPageCount }) {
   )
 }
 
-function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions }) {
+function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>List</span>
+      <div className={`${s.dropdownWrap} ${s.listDropdownWrap}`}>
+          <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+      </div>
+    </>
+  )
+}
+function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
   return (
     <div className={s.optionsRowWrapper}>
       <div className={`${s.optionsRow} ${showOptions ? s.optionsRowOpen : ""}`}>
-        <DurationGroup styles={s} estimatedBlocks={estimatedBlocks} setEstimatedBlocks={setEstimatedBlocks} />
+        {!isReadingList && (
+          <DurationGroup styles={s} estimatedBlocks={estimatedBlocks} setEstimatedBlocks={setEstimatedBlocks} />
+        )}
+        {isReadingList && (
+          <PageCountField styles={s} pageCount={pageCount} setPageCount={setPageCount} />
+        )}
         <span className={s.optionsRowDivider} aria-hidden />
         <span className={s.optionsRowLabel}>Module</span>
         <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
           <AnimatedDropdown value={moduleId ?? ""} onChange={(v) => setModuleId(v === "" ? null : v)} placeholder="Module" options={moduleOptions} className={s.moduleListDropdown} />
         </div>
-        <span className={s.optionsRowDivider} aria-hidden />
-        <span className={s.optionsRowLabel}>List</span>
-        <div className={`${s.dropdownWrap} ${s.listDropdownWrap}`}>
-          <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+        <span className={s.optionsRowDivider} aria-hidden /> <span className={s.optionsRowLabel}>List</span>
+        <ListDropdown s={s} taskListId={taskListId} setTaskListId={setTaskListId} sortedLists={sortedLists} listOptions={listOptions}/>
         </div>
-      </div>
     </div>
   );
 }
@@ -76,7 +88,10 @@ export default function CreateTaskBar(props) {
     <>
       <form className={styles.card} onSubmit={bar.handleSubmit} ref={bar.cardRef} data-create-task-bar-card>
         <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={bar.inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={bar.handleInputBlur} onKeyDown={bar.handleInputKeyDown} />
-        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions} />
+        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
+         sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
+         isReadingList={bar.isReadingList} pageCount={bar.pageCount} setPageCount={bar.setPageCount}
+        />
       </form>
       {bar.sleepWarning && <SleepWarningModal {...bar.sleepWarningProps} />}
     </>
