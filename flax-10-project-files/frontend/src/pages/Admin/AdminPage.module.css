@@ -366,3 +366,75 @@ button:disabled {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  background: var(--surface, #fff);
+  border-radius: 20px;
+  padding: 2rem 2.25rem;
+  width: 400px;
+  max-width: 92vw;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.modalIcon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text, #111);
+  text-align: center;
+}
+
+.modalSub {
+  color: var(--muted, #6b7280);
+  font-size: 0.88rem;
+  margin: 0.25rem 0 0.75rem;
+  text-align: center;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.reasonInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  resize: vertical;
+  background: var(--bg, #f9fafb);
+  color: var(--text, #111);
+  font-family: inherit;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.reasonInput:focus {
+  outline: none;
+  border-color: var(--accent, #6c47ff);
+  box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
+}
