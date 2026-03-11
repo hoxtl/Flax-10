@@ -4,7 +4,6 @@ import { useCalendarEvents } from "./hooks/useCalendarEvents";
 import { DayView } from "./DayView/DayView";
 import { WeekView } from "./WeekView/WeekView";
 import { SwipeMonthView } from "./MonthView/SwipeMonthView";
-import { TermView } from "./TermView/TermView";
 import { ListView } from "./ListView/ListView";
 import { TableView } from "./TableView/TableView";
 import "./Calendar.css";
@@ -31,8 +30,7 @@ function CalendarContent() {
 }
 
 function CalendarView({ viewMode, displayMode }) {
-  const gridViews = { day: DayView, week: WeekView, month: SwipeMonthView, term: TermView };
-  if (viewMode === 'term') return <TermView />;
+  const gridViews = { day: DayView, week: WeekView, month: SwipeMonthView };
 
   const displayViews = { grid: gridViews[viewMode], list: ListView, table: TableView };
   const View = displayViews[displayMode] || gridViews[viewMode];
