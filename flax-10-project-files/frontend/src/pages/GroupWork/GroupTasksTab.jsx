@@ -6,6 +6,7 @@ import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
 import TaskListView from "./components/TaskListView";
 import TaskTimelineView from "./components/TaskTimelineView";
+import TaskBoardView from "./components/TaskBoardView";
 import styles from "./GroupTasksTab.module.css";
 
 
@@ -204,7 +205,13 @@ export default function GroupTasksTab({ projectId, members }) {
                         />
                     )}
                     {taskView === "board" && (
-                        <div className={styles.emptyState}>Board view coming soon...</div>
+                        <TaskBoardView
+                            tasks={sortedTasks}
+                            members={members}
+                            onToggle={toggleTask}
+                            onUpdate={updateTask}
+                            onDelete={deleteTask}
+                        />
                     )}
                 </>
             )}
