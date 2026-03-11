@@ -139,6 +139,174 @@ function BanModal({ user, onConfirm, onCancel }) {
   );
 }
 
+function UsersTab({ onNavigate }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [banTarget, setBanTarget] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setUsers(await fetchAdminUsers());
+    } catch (e) {
+      setError(e.message || "Failed to load users.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const filtered = users.filter((u) =>
+    `${u.username} ${u.email} ${u.first_name} ${u.last_name}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
+  const handleBanConfirm = async (reason) => {
+    if (!banTarget) return;
+    setBusy(true);
+    try {
+      await banUser(banTarget.id, reason);
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === banTarget.id
+            ? { ...u, is_active: false, ban_reason: reason }
+            : u,
+        ),
+      );
+    } catch (e) {
+      setError(e.message || "Failed to ban user.");
+    } finally {
+      setBusy(false);
+      setBanTarget(null);
+    }
+  };
+
+  const handleUnban = async (user) => {
+    setBusy(true);
+    try {
+      await unbanUser(user.id);
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === user.id ? { ...u, is_active: true, ban_reason: "" } : u,
+        ),
+      );
+    } catch (e) {
+      setError(e.message || "Failed to unban user.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <SectionCard>
+        <div className={styles.cardHeader}>
+          <h2 className={styles.cardTitle}>
+            All Users <span className={styles.count}>({filtered.length})</span>
+          </h2>
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by name, username or email…"
+          />
+        </div>
+
+        {error && <p className={styles.errorMsg}>{error}</p>}
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : filtered.length === 0 ? (
+          <EmptyState message="No users found." />
+        ) : (
+          <motion.div
+            className={styles.table}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            <div className={`${styles.tableRow} ${styles.tableHead}`}>
+              <span>User</span>
+              <span>Email</span>
+              <span>Role</span>
+              <span>Status</span>
+              <span>Actions</span>
+            </div>
+            <AnimatePresence>
+              {filtered.map((u) => (
+                <motion.div
+                  key={u.id}
+                  className={styles.tableRow}
+                  variants={rowAnim}
+                  layout
+                >
+                  <span className={styles.nameCell}>
+                    <button
+                      className={styles.nameBtn}
+                      onClick={() => onNavigate?.(`profile_${u.id}`)}
+                    >
+                      {u.first_name} {u.last_name}
+                      <span className={styles.username}>@{u.username}</span>
+                    </button>
+                  </span>
+                  <span className={styles.emailCell}>{u.email}</span>
+                  <span>
+                    <RoleBadge role={u.role} />
+                  </span>
+                  <span>
+                    <StatusBadge active={u.is_active} />
+                  </span>
+                  <span className={styles.actionsCell}>
+                    {!u.is_staff &&
+                      !u.is_superuser &&
+                      (u.is_active ? (
+                        <button
+                          className={styles.banBtn}
+                          disabled={busy}
+                          onClick={() => setBanTarget(u)}
+                        >
+                          Ban
+                        </button>
+                      ) : (
+                        <button
+                          className={styles.unbanBtn}
+                          disabled={busy}
+                          onClick={() => handleUnban(u)}
+                        >
+                          Unban
+                        </button>
+                      ))}
+                    {(u.is_staff || u.is_superuser) && (
+                      <span className={styles.staffBadge}>Staff</span>
+                    )}
+                  </span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </SectionCard>
+
+      <AnimatePresence>
+        {banTarget && (
+          <BanModal
+            user={banTarget}
+            onConfirm={handleBanConfirm}
+            onCancel={() => setBanTarget(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 function RatificationsTab() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
