@@ -139,6 +139,99 @@ function BanModal({ user, onConfirm, onCancel }) {
   );
 }
 
+function RatificationsTab() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setItems(await fetchPendingRatifications());
+    } catch (e) {
+      setError(e.message || "Failed to load ratifications.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const decide = async (societyId, action) => {
+    setBusy(societyId);
+    try {
+      if (action === "approve") await approveRatification(societyId);
+      else await rejectRatification(societyId);
+      setItems((prev) => prev.filter((s) => s.id !== societyId));
+    } catch (e) {
+      setError(e.message || "Action failed.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <SectionCard>
+      <div className={styles.cardHeader}>
+        <h2 className={styles.cardTitle}>
+          Pending Ratifications{" "}
+          <span className={styles.count}>({items.length})</span>
+        </h2>
+      </div>
+      {error && <p className={styles.errorMsg}>{error}</p>}
+      {loading ? (
+        <LoadingSpinner />
+      ) : items.length === 0 ? (
+        <EmptyState message="No societies are awaiting ratification." />
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={stagger}
+          initial="initial"
+          animate="animate"
+        >
+          {items.map((s) => (
+            <motion.div
+              key={s.id}
+              className={styles.listRow}
+              variants={rowAnim}
+              layout
+            >
+              <div className={styles.listInfo}>
+                <span className={styles.listName}>{s.name}</span>
+                <span className={styles.listMeta}>
+                  {s.member_count ?? 0} members
+                  {s.description ? ` · ${s.description.slice(0, 80)}…` : ""}
+                </span>
+              </div>
+              <div className={styles.listActions}>
+                <button
+                  className={styles.approveBtn}
+                  disabled={busy === s.id}
+                  onClick={() => decide(s.id, "approve")}
+                >
+                  ✓ Approve
+                </button>
+                <button
+                  className={styles.rejectBtn}
+                  disabled={busy === s.id}
+                  onClick={() => decide(s.id, "reject")}
+                >
+                  ✗ Reject
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </SectionCard>
+  );
+}
+
 function TeacherRequestsTab() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
