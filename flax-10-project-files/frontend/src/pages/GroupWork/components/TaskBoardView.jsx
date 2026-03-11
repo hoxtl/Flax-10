@@ -63,7 +63,7 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
 
     const handleDrop = (e, colId) => {
         e.preventDefault();
-        const taskId = e.dataTransfer.getData("taskId");
+        const taskId = e.dataTransfer.getData("text/plain");
         if (taskId) {
             onUpdate(Number(taskId), { status: colId });
         }
@@ -74,7 +74,7 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
     };
 
     const handleDragStart = (e, taskId) => {
-        e.dataTransfer.setData("taskId", taskId);
+        e.dataTransfer.setData("text/plain", String(taskId));
     };
 
     return (
@@ -123,16 +123,6 @@ export default function TaskBoardView({ tasks, members, onToggle, onUpdate, onDe
                                             <option value="low">LOW</option>
                                         </select>
                                         <div className={styles.cardActions}>
-                                            <select
-                                                value={t.status || (t.completed ? "done" : "todo")}
-                                                onChange={(e) => onUpdate(t.id, { status: e.target.value })}
-                                                className={styles.statusSelect}
-                                                title="Change status"
-                                            >
-                                                <option value="todo">To Do</option>
-                                                <option value="in_progress">In Progress</option>
-                                                <option value="done">Done</option>
-                                            </select>
                                             <button
                                                 onClick={() => onDelete(t.id)}
                                                 className={styles.iconBtnDelete}
