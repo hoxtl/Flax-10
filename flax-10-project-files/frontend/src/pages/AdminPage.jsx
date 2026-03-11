@@ -51,6 +51,18 @@ function EmptyState({ message }) {
   );
 }
 
+function LoadingSpinner() {
+  return (
+    <div className={styles.spinnerWrap}>
+      <motion.div
+        className={styles.spinner}
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+      />
+    </div>
+  );
+}
+
 export default function AdminPage() {
   return (
     <div className={styles.container}>
