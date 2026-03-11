@@ -199,3 +199,38 @@ class RequestTeacherRoleTest(TestCase):
     def test_unauthenticated_request_returns_401(self):
         response = APIClient().post(self.url)
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+class AdminReportedSocietiesTest(TestCase):
+    def setUp(self):
+        self.admin = make_admin()
+        self.list_url = '/api/admin/reported-societies/'
+        self.reporter = make_user('reporter')
+        self.society = Society.objects.create(name='Test Society', ratification_status='none')
+
+    def test_admin_can_list_reports(self):
+        SocietyReport.objects.create(society=self.society, reporter=self.reporter, reason='Spam')
+        response = authed_client(self.admin).get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_report_data_includes_expected_fields(self):
+        SocietyReport.objects.create(society=self.society, reporter=self.reporter, reason='Spam')
+        data = authed_client(self.admin).get(self.list_url).data[0]
+        for field in ('id', 'society_id', 'society_name', 'reporter_id', 'reporter_username', 'reason'):
+            self.assertIn(field, data)
+
+    def test_non_admin_cannot_list_reports(self):
+        response = authed_client(self.reporter).get(self.list_url)
+        self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
+
+    def test_dismiss_report_deletes_it(self):
+        report = SocietyReport.objects.create(society=self.society, reporter=self.reporter, reason='Spam')
+        url = f'/api/admin/reports/{report.id}/dismiss/'
+        response = authed_client(self.admin).delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(SocietyReport.objects.filter(id=report.id).exists())
+
+    def test_dismiss_nonexistent_report_returns_404(self):
+        url = '/api/admin/reports/999999/dismiss/'
+        response = authed_client(self.admin).delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
