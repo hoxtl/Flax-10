@@ -15,7 +15,6 @@ from .event_helpers import (
 )
 from .timetable_service import sync_timetable_if_needed
 from .society_sync_service import get_synced_society_events
-from studyFlax.utils.geocoding_utils import GeocodingService
 
 
 @api_view(['GET', 'POST'])
