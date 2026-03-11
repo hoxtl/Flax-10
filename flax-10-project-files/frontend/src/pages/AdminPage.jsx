@@ -84,6 +84,17 @@ function RoleBadge({ role }) {
   );
 }
 
+function SearchBar({ value, onChange, placeholder }) {
+  return (
+    <input
+      className={styles.search}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+    />
+  );
+}
+
 export default function AdminPage() {
   return (
     <div className={styles.container}>
