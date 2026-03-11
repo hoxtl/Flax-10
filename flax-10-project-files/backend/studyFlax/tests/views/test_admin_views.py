@@ -234,3 +234,23 @@ class AdminReportedSocietiesTest(TestCase):
         url = '/api/admin/reports/999999/dismiss/'
         response = authed_client(self.admin).delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class LoginBannedUserTest(TestCase):
+    def setUp(self):
+        self.url = '/api/auth/login/'
+        self.user = make_user('banneduser', password='pass', is_active=False)
+        self.user.set_password('pass')
+        self.user.ban_reason = 'Violated community guidelines'
+        self.user.save()
+
+    def test_banned_user_gets_403(self):
+        response = APIClient().post(self.url, {'username': 'banneduser', 'password': 'pass'})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_banned_response_contains_is_banned_true(self):
+        response = APIClient().post(self.url, {'username': 'banneduser', 'password': 'pass'})
+        self.assertTrue(response.data.get('is_banned'))
+
+    def test_banned_response_contains_correct_ban_reason(self):
+        response = APIClient().post(self.url, {'username': 'banneduser', 'password': 'pass'})
+        self.assertEqual(response.data.get('ban_reason'), 'Violated community guidelines')
