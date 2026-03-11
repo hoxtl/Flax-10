@@ -71,6 +71,19 @@ function StatusBadge({ active }) {
   );
 }
 
+function RoleBadge({ role }) {
+  const map = {
+    teacher: styles.badgeTeacher,
+    student: styles.badgeStudent,
+    pending_teacher: styles.badgePending,
+  };
+  return (
+    <span className={`${styles.badge} ${map[role] || styles.badgeStudent}`}>
+      {role.replace("_", " ")}
+    </span>
+  );
+}
+
 export default function AdminPage() {
   return (
     <div className={styles.container}>
