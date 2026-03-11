@@ -1007,3 +1007,10 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+.eventTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
