@@ -803,61 +803,63 @@ export default function CampusMap() {
             Events Today
           </div>
 
-          {calendarEvents.length === 0} ? (
+          {calendarEvents.length === 0 ? (
             <div className={styles.noEvents}>
               <span className={styles.noEventsIcon}>✨</span>
               <p>No events to show on UniMap...</p>
             </div>
           ) : (
-            <div className={styles.eventsList}>
-              {( showAllEvents ? calendarEvents : calendarEvents.slice(0, 3)).map((event) => {
-                const startTime = new Date(event.start_time);
-                const color = priorityColors[event.priority] || '#4488FF';
+            <div>
+              <div className={styles.eventsList}>
+                {(showAllEvents ? calendarEvents : calendarEvents.slice(0, 3)).map((event) => {
+                  const startTime = new Date(event.start_time);
+                  const color = priorityColors[event.priority] || '#4488FF';
 
-                return (
-                  <div key={event.id} className={styles.eventCard}>
-                    <div 
-                      className={styles.eventPriorityBar}
-                      style={{ backgroundColor: color }}
-                    />
-                    <div className={styles.eventCardContent}>
-                      <div className={styles.eventCardHeader}>
-                        <span className={styles.eventTime}>
-                          {startTime.toLocaleDateString('en-GB', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                        <span
-                          className={styles.eventPriority}
-                          style={{ color: color }}>
-                            {event.priority}
+                  return (
+                    <div key={event.id} className={styles.eventCard}>
+                      <div 
+                        className={styles.eventPriorityBar}
+                        style={{ backgroundColor: color }}
+                      />
+                      <div className={styles.eventCardContent}>
+                        <div className={styles.eventCardHeader}>
+                          <span className={styles.eventTime}>
+                            {startTime.toLocaleTimeString('en-GB', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
                           </span>
+                          <span
+                            className={styles.eventPriority}
+                            style={{ color: color }}>
+                              {event.priority}
+                            </span>
+                        </div>
+                        <div className={styles.eventTitle}>{event.title}</div>
+                        <div className={styles.eventLocation}>📍 {event.location}</div>
                       </div>
-                      <div className={styles.eventTitle}>{event.title}</div>
-                      <div className={styles.eventLocation}>📍 {event.location} </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            {calendarEvents.length > 3 && (
-              <button
-                className={styles.showMoreBtn}
-                onClick={() => setShowAllEvents(!showAllEvents)}>
-                  {showAllEvents ? (
-                    <>
-                      Show Less <span>▲</span>
-                    </>
-                  ) : (
-                    <>
-                      Show {calendarEvents.length - 3} More <span>▼</span>
-                    </>
-                  )}
-                </button>
-            )}
-          )
+              {calendarEvents.length > 3 && (
+                <button
+                  className={styles.showMoreBtn}
+                  onClick={() => setShowAllEvents(!showAllEvents)}>
+                    {showAllEvents ? (
+                      <>
+                        Show Less <span>▲</span>
+                      </>
+                    ) : (
+                      <>
+                        Show {calendarEvents.length - 3} More <span>▼</span>
+                      </>
+                    )}
+                  </button>
+              )}
+            </div>
+          )}
         </section>
 
         <section className={styles.section}>
