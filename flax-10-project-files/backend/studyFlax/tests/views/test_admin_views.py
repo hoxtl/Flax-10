@@ -60,3 +60,61 @@ class AdminUserListTest(TestCase):
         bob = next(u for u in data if u['username'] == 'bob')
         self.assertIn('is_active', bob)
         self.assertIn('ban_reason', bob)
+
+class AdminBanUserTest(TestCase):
+    def setUp(self):
+        self.admin = make_admin()
+        self.target = make_user('target')
+        self.url = f'/api/admin/users/{self.target.id}/ban/'
+
+    def test_ban_sets_user_inactive(self):
+        authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': 'Spam'}, format='json')
+        self.target.refresh_from_db()
+        self.assertFalse(self.target.is_active)
+
+    def test_ban_stores_reason(self):
+        authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': 'Spam'}, format='json')
+        self.target.refresh_from_db()
+        self.assertEqual(self.target.ban_reason, 'Spam')
+
+    def test_ban_returns_200(self):
+        response = authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': ''}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_unban_restores_active(self):
+        self.target.is_active = False
+        self.target.ban_reason = 'Old reason'
+        self.target.save()
+        authed_client(self.admin).post(self.url, {'action': 'unban'}, format='json')
+        self.target.refresh_from_db()
+        self.assertTrue(self.target.is_active)
+
+    def test_unban_clears_reason(self):
+        self.target.is_active = False
+        self.target.ban_reason = 'Old reason'
+        self.target.save()
+        authed_client(self.admin).post(self.url, {'action': 'unban'}, format='json')
+        self.target.refresh_from_db()
+        self.assertEqual(self.target.ban_reason, '')
+
+    def test_cannot_ban_staff_user(self):
+        staff = User.objects.create_user(
+            username='staff2', email='staff2@example.com', password='pass', is_staff=True,
+        )
+        url = f'/api/admin/users/{staff.id}/ban/'
+        response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': ''}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_ban_nonexistent_user_returns_404(self):
+        url = '/api/admin/users/999999/ban/'
+        response = authed_client(self.admin).post(url, {'action': 'ban'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_invalid_action_returns_400(self):
+        response = authed_client(self.admin).post(self.url, {'action': 'delete'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_non_admin_cannot_ban(self):
+        regular = make_user('reg2')
+        response = authed_client(regular).post(self.url, {'action': 'ban', 'reason': ''}, format='json')
+        self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
