@@ -1,4 +1,4 @@
-import Home from "../pages/Home/Home";
+import Homepage from "../pages/Homepage/Homepage";
 import CalendarPage from "../pages/Calendar/CalendarPage";
 import SocietiesPage from "../pages/Societies/SocietiesPage";
 import ModulesPage from "../pages/Modules/ModulesPage";
@@ -10,7 +10,7 @@ import Discover from "../pages/Discover/Discover";
 import SchedulesPage from "../pages/Schedules/SchedulesPage";
 
 export const APP_ROUTES = [
-    { id: "home", label: "Home", icon: "🏠", path: "/", element: <Home /> },
+    { id: "home", label: "Home", icon: "🏠", path: "/", element: <Homepage /> },
     { id: "calendar", label: "Calendar", icon: "🗓️", path: "/calendar", element: <CalendarPage /> },
     { id: "timer", label: "Timer", icon: "⏲️", path: "/timer", element: <TimerPage /> },
     { id: "users", label: "Users", icon: "🔍", path: "/users", element: <Discover /> },
