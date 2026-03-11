@@ -11,6 +11,15 @@ vi.mock('../../api/notificationApi', () => ({
     clearAllNotifications: vi.fn(),
 }));
 
+vi.mock('../../components/Notifications/utils/browserNotification', () => ({
+    requestPermission: vi.fn(),
+    sendBrowserNotification: vi.fn(),
+}));
+
+vi.mock('../../components/Notifications/utils/notificationSound', () => ({
+    playNotificationSound: vi.fn(),
+}));
+
 const TestComponent = () => {
     const {
         notifications,
@@ -177,5 +186,67 @@ describe('NotificationContext', () => {
         expect(() => renderHook(() => useNotifications())).toThrow('useNotifications must be used within NotificationProvider');
 
         consoleSpy.mockRestore();
+    });
+
+    it('should handle poll fetch error', async () => {
+        vi.useFakeTimers();
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        api.fetchNotifications.mockResolvedValue([]);
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await act(async () => { vi.advanceTimersByTime(0); });
+        expect(screen.getByTestId('count')).toHaveTextContent('0');
+        api.fetchNotifications.mockRejectedValueOnce(new Error('poll failed'));
+        act(() => { vi.advanceTimersByTime(30000); });
+        await act(async () => { await Promise.resolve(); });
+        expect(errSpy).toHaveBeenCalledWith('Failed to poll notifications:', expect.any(Error));
+        vi.useRealTimers();
+        errSpy.mockRestore();
+    });
+
+    it('should process new notifications from poll and notify user', async () => {
+        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        vi.useFakeTimers();
+        api.fetchNotifications.mockResolvedValueOnce([]);
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await act(async () => { vi.advanceTimersByTime(0); });
+        expect(screen.getByTestId('count')).toHaveTextContent('0');
+        api.fetchNotifications.mockResolvedValueOnce([
+            { id: 99, title: 'Polled', message: 'New from poll', notification_type: 'info' },
+        ]);
+        act(() => { vi.advanceTimersByTime(30000); });
+        await act(async () => { await Promise.resolve(); });
+        expect(screen.getByTestId('count')).toHaveTextContent('1');
+        expect(sendBrowserNotification).toHaveBeenCalledWith('Polled', 'New from poll', 'notification-99', null);
+        vi.useRealTimers();
+    });
+
+    it('should not send browser notification for reminder type from poll', async () => {
+        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        sendBrowserNotification.mockClear();
+        vi.useFakeTimers();
+        api.fetchNotifications.mockResolvedValueOnce([]);
+        render(
+            <NotificationProvider>
+                <TestComponent />
+            </NotificationProvider>
+        );
+        await act(async () => { vi.advanceTimersByTime(0); });
+        expect(screen.getByTestId('count')).toHaveTextContent('0');
+        api.fetchNotifications.mockResolvedValueOnce([
+            { id: 88, title: 'Reminder', message: 'Task due', notification_type: 'reminder' },
+        ]);
+        act(() => { vi.advanceTimersByTime(30000); });
+        await act(async () => { await Promise.resolve(); });
+        expect(screen.getByTestId('count')).toHaveTextContent('1');
+        expect(sendBrowserNotification).not.toHaveBeenCalled();
+        vi.useRealTimers();
     });
 });

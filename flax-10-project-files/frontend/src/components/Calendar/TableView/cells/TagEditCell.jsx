@@ -1,5 +1,5 @@
 import { Pencil } from 'lucide-react';
-import AnimatedDropdown from '../../../ui/AnimatedDropdown';
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import styles from '../TableView.module.css';
 
 function TagBadge({ name, color }) {

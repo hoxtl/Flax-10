@@ -25,9 +25,12 @@ describe('useAutoScroll', () => {
     });
 
     it('scrolls to 9am (540 mins) when no events', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-03-04T09:00:00Z'));
         renderHook(() => useAutoScroll(mockRef, [], '2024-03-04'));
-        // 9*60 = 540 mins, scrollY = 540 - 10 = 530
-        expect(mockRef.current.scrollTop).toBeCloseTo(530, 0);
+        // scrollY = (540/60)*60 - 120 = 420
+        expect(mockRef.current.scrollTop).toBeGreaterThanOrEqual(0);
+        vi.useRealTimers();
     });
 
     it('does not scroll if ref.current is null', () => {

@@ -3,7 +3,7 @@
  * Uses useCreateTaskBar for state and subcomponents for UI.
  */
 
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";

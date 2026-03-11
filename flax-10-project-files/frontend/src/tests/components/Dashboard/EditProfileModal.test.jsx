@@ -102,4 +102,58 @@ describe('EditProfileModal', () => {
 
     expect(await screen.findByText('Server exploded')).toBeTruthy();
   });
+
+  it('calls onClose when overlay is clicked', () => {
+    const onClose = vi.fn();
+    const { container } = render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
+    const overlay = container.querySelector('[class*="overlay"]');
+    fireEvent.click(overlay);
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('calls onClose when Cancel is clicked', () => {
+    const onClose = vi.fn();
+    render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('skips username availability check when username unchanged', async () => {
+    render(<EditProfileModal user={user} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText('Add a personal reminder note...'), { target: { value: 'updated bio' } });
+    fireEvent.click(screen.getByText('Save Changes'));
+    await waitFor(() => expect(updateUserProfileMock).toHaveBeenCalled());
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('shows generic error when update fails without response data', async () => {
+    updateUserProfileMock.mockRejectedValueOnce(new Error('network'));
+    render(<EditProfileModal user={user} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+    fireEvent.click(screen.getByText('Save Changes'));
+    expect(await screen.findByText('Failed to update profile')).toBeTruthy();
+  });
+
+  it('uses username initials when user has no name', () => {
+    const userNoName = { username: 'bob', bio: '', profile_photo_url: null };
+    render(<EditProfileModal user={userNoName} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+    expect(document.querySelector('[class*="photoPlaceholder"]')?.textContent).toBe('BO');
+  });
+
+  it('does not show Remove Photo when user has no photo and no preview', () => {
+    const userNoPhoto = { username: 'x', name: 'X', bio: '', profile_photo_url: null };
+    render(<EditProfileModal user={userNoPhoto} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+    expect(screen.queryByText('Remove Photo')).toBeNull();
+  });
+
+  it('submits with new photo file when photo added without removing', async () => {
+    const file = new File(['x'], 'p.png', { type: 'image/png' });
+    render(<EditProfileModal user={user} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+    fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [file] } });
+    fireEvent.change(screen.getByPlaceholderText('Choose a username'), { target: { value: 'alice' } });
+    fireEvent.click(screen.getByText('Save Changes'));
+    await waitFor(() => expect(updateUserProfileMock).toHaveBeenCalled());
+    const formData = updateUserProfileMock.mock.calls[0][0];
+    expect(formData.get('profile_photo')).toEqual(file);
+    expect(formData.get('remove_photo')).toBeNull();
+  });
 });

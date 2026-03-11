@@ -2,20 +2,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-bottom: 2rem;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-bottom: var(--space-8);
 }
 
 .pageButton {
-  padding: 0.5rem 1.2rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  min-height: var(--btn-height);
+  padding: var(--btn-padding);
+  border: var(--stroke-soft);
+  border-radius: var(--btn-radius);
+  background: var(--surface-page);
   color: var(--text);
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: var(--text-base);
+  font-weight: 600;
   transition: all 0.2s;
 }
 .pageButton:hover:not(:disabled) {
@@ -30,18 +31,18 @@
 .pageNumbers {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .pageNum {
-  min-width: 36px;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  min-width: var(--control-height);
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: var(--stroke-soft);
+  border-radius: var(--btn-radius);
+  background: var(--surface-page);
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: var(--text-base);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -58,7 +59,7 @@
 }
 
 .ellipsis {
-  padding: 0 6px;
+  padding: 0 var(--space-2);
   color: var(--muted);
 }
 
@@ -77,7 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   transition:
     transform 0.2s,
     background 0.2s;

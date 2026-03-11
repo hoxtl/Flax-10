@@ -17,7 +17,7 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
         <article className={getCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
-            <CardBody module={module} enrolled={enrolled} isTeacher={isTeacher}
+            <CardBody module={module} enrolled={enrolled} isCore={isCore} isTeacher={isTeacher}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
@@ -26,14 +26,14 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     );
 }
 
-function CardBody({ module, enrolled, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardBody({ module, enrolled, isCore, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.content}>
-            {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} />}
+            {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
             <h3 className={styles.moduleTitle}>{module.module_name}</h3>
             {module.description && <Description text={module.description} />}
             <ScheduleMeta module={module} />
-            <CardActions isTeacher={isTeacher} enrolled={enrolled}
+            <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
                 onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
         </div>
     );
@@ -91,12 +91,12 @@ function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
 
-function CardActions({ isTeacher, enrolled, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardActions({ isTeacher, enrolled, isCore, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.actions}>
             {isTeacher
                 ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
-                : <StudentAction enrolled={enrolled} onToggle={onToggle} />}
+                : <StudentAction enrolled={enrolled} isCore={isCore} onToggle={onToggle} />}
         </div>
     );
 }

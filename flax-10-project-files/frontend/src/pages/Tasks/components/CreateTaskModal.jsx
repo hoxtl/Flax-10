@@ -5,9 +5,10 @@
 import { createPortal } from "react-dom";
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
 
@@ -174,13 +175,20 @@ function CreateTaskModalBody({ state, addToScheduleLabel }) {
 function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
   const { handleKey, onClose, isEditMode, handleSave, handleDelete, saveError, saving, form } = state;
   return (
-    <div className={styles.overlay} onMouseDown={onClose} onKeyDown={handleKey}>
-      <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
+    <StandardModal
+      onClose={onClose}
+      hideHeader
+      size="xl"
+      backdropClassName={styles.modalBackdrop}
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
+    >
+      <div onKeyDown={handleKey}>
         <CreateTaskModalHeader isEditMode={isEditMode} onClose={onClose} />
         <CreateTaskModalBody state={state} addToScheduleLabel={addToScheduleLabel} />
         <CreateTaskModalFooter saveError={saveError} isEditMode={isEditMode} onDeleteTask={onDeleteTask} saving={saving} onClose={onClose} handleSave={handleSave} form={form} handleDelete={handleDelete} />
       </div>
-    </div>
+    </StandardModal>
   );
 }
 

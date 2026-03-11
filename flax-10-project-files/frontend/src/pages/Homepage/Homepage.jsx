@@ -49,10 +49,12 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
+import { BackToTop } from "../../components/Pagination/Pagination";
 
 
 /* HOME PAGE */
-export default function Homepage() {
+export default function Homepage({ defaultShowCreateTaskModal = false, defaultPlanTimelineReadItem = null }) {
   const navigate = useNavigate();
   const { selectedDate, events: allCalEvents } = useCalendar();
   const dispatch = useCalendarDispatch();
@@ -77,16 +79,16 @@ export default function Homepage() {
     }
   }, []);
 
-  const { dayEvents, dayTasks, allTasks, refetchTasks } = useHomeData(selectedDate);
+  const { dayEvents, dayTasks, allTasks, removePendingTask, refetchTasks, loading: homeDataLoading } = useHomeData(selectedDate);
   const [toast, setToast] = useState(null);
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
-  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(defaultShowCreateTaskModal);
   const [showCreateListFromTask, setShowCreateListFromTask] = useState(false);
   const [lastCreatedListId, setLastCreatedListId] = useState(null);
   const [rescheduleTask, setRescheduleTask] = useState(null);
-  const [planTimelineReadItem, setPlanTimelineReadItem] = useState(null);
+  const [planTimelineReadItem, setPlanTimelineReadItem] = useState(defaultPlanTimelineReadItem);
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
@@ -201,38 +203,6 @@ export default function Homepage() {
   }, [getTag]);
 
 
-  const handleTaskWidgetComplete = useCallback(async (t) => {
-    const newCompleted = !t.completed;
-    const numericId = typeof t.id === "string" && t.id.startsWith("task-") ? Number(t.id.replace("task-", "")) : t.id;
-    try {
-      await updateTask(numericId, { completed: newCompleted });
-      refetchTasks();
-      if (newCompleted) {
-        const isRoutine = isRoutineTask(t);
-        showCompletionToast(getCompletionMessage(t), { isRoutine });
-        if (!isRoutine) {
-          try {
-            const w = /** @type {any} */ (window);
-            const AudioCtx = w.AudioContext || w.webkitAudioContext;
-            const ctx = new AudioCtx();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.setValueAtTime(520, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(680, ctx.currentTime + 0.06);
-            gain.gain.setValueAtTime(0.08, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.15);
-          } catch (_) { }
-        }
-      }
-    } catch {
-      setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
-    }
-  }, [showCompletionToast, refetchTasks]);
-
   const closeToast = useCallback(() => {
     if (toastTimeoutRef.current) {
       clearTimeout(toastTimeoutRef.current);
@@ -255,6 +225,58 @@ export default function Homepage() {
       toastTimeoutRef.current = null;
     }, duration);
   }, []);
+
+  const handleTaskWidgetComplete = useCallback(async (t) => {
+    const newCompleted = !t.completed;
+    const numericId = typeof t.id === "string" && t.id.startsWith("task-") ? Number(t.id.replace("task-", "")) : t.id;
+    const isRoutine = isRoutineTask(t);
+    const completionMessage = getCompletionMessage(t);
+
+    if (newCompleted) {
+      try {
+        showCompletionToast(completionMessage, { isRoutine });
+      } catch (_) { }
+    }
+
+    if (newCompleted) {
+      removePendingTask(numericId);
+    }
+
+    try {
+      await updateTask(numericId, { completed: newCompleted });
+    } catch {
+      const refreshedTasks = await refetchTasks();
+      const taskStillIncomplete = (refreshedTasks || []).some((task) =>
+        String(task?.id) === String(numericId) && !task.completed
+      );
+      if (taskStillIncomplete) {
+        setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
+      }
+      return;
+    }
+
+    refetchTasks();
+
+    if (newCompleted) {
+      if (!isRoutine) {
+        try {
+          const w = /** @type {any} */ (window);
+          const AudioCtx = w.AudioContext || w.webkitAudioContext;
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.setValueAtTime(520, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(680, ctx.currentTime + 0.06);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.15);
+        } catch (_) { }
+      }
+    }
+  }, [showCompletionToast, removePendingTask, refetchTasks]);
 
 
 
@@ -634,6 +656,15 @@ export default function Homepage() {
       .sort((a, b) => a.start - b.start);
   }, [selectedDate, sortedEvents]);
 
+  const freeWindowLabel = useMemo(() => {
+    const nextWindow = todayFreeWindows[0];
+    if (!nextWindow?.minutes) return null;
+    if (nextWindow.minutes < 60) return `${nextWindow.minutes}m`;
+    const hours = Math.floor(nextWindow.minutes / 60);
+    const minutes = nextWindow.minutes % 60;
+    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+  }, [todayFreeWindows]);
+
 
 
 
@@ -645,7 +676,47 @@ export default function Homepage() {
     [taskWidgetItemsOnly]
   );
 
+  const homepageRecommendation = useMemo(() => {
+    const pendingTasks = (taskWidgetItemsOnly || []).filter((task) => !task.completed);
+    const sortedDeadlineList = [...(upcomingDeadlines || [])]
+      .filter((deadline) => deadline?.start_due_date)
+      .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
 
+    const getRelativeDueLabel = (dateLike) => {
+      if (!dateLike) return null;
+      const diffDays = Math.floor((new Date(dateLike).getTime() - Date.now()) / 86400000);
+      if (diffDays <= 0) return "due today";
+      if (diffDays === 1) return "due tomorrow";
+      return `due in ${diffDays}d`;
+    };
+
+    const getModuleKey = (item) =>
+      String(item?.module_id ?? item?.module ?? item?.moduleId ?? item?.module_code ?? "").trim().toUpperCase();
+
+    for (const deadline of sortedDeadlineList) {
+      const deadlineKey = getModuleKey(deadline);
+      if (!deadlineKey) continue;
+      const linkedTask = pendingTasks.find((task) => getModuleKey(task) === deadlineKey);
+      if (!linkedTask) continue;
+      const deadlineTitle = deadline.assessment_title || deadline.title || deadline.module_code || "upcoming deadline";
+      const dueLabel = getRelativeDueLabel(deadline.start_due_date);
+      return {
+        text: `Focus on ${linkedTask.title} for ${deadlineTitle}.`,
+        meta: `${deadline.module_code || "Module"}${dueLabel ? ` · ${dueLabel}` : ""}`,
+        taskTitle: linkedTask.title,
+      };
+    }
+
+    if (pendingTasks[0] && freeWindowLabel) {
+      return {
+        text: `Use the ${freeWindowLabel} window to move ${pendingTasks[0].title} forward.`,
+        meta: "Best task to move next",
+        taskTitle: pendingTasks[0].title,
+      };
+    }
+
+    return null;
+  }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
 
   /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
   const [replanLoading, setReplanLoading] = useState(false);
@@ -769,6 +840,10 @@ export default function Homepage() {
         </div>
       )}
 
+      {homeDataLoading ? (
+        <PageSkeleton label="Loading homepage" cardCount={5} cardHeight="180px" columns={2} />
+      ) : (
+      <>
       <div>
         {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
         {hasTimerSession && (
@@ -797,6 +872,7 @@ export default function Homepage() {
         <div className={styles.intelligenceRowWrap}>
           <IntelligenceRow
             displayName={displayName}
+            recommendation={homepageRecommendation}
 
             slot1TodayTasks={
               // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
@@ -936,14 +1012,6 @@ export default function Homepage() {
                     />
                   )}
                 </div>
-                <button
-                  type="button"
-                  className={styles.deadlineDetailClose}
-                  onClick={() => setSelectedDeadline(null)}
-                  aria-label="Close"
-                >
-                  <X size={18} strokeWidth={2} aria-hidden />
-                </button>
               </div>
               <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
                 {selectedDeadline.assessment_title || selectedDeadline.title || "Assignment"}
@@ -979,7 +1047,7 @@ export default function Homepage() {
           </div>
         )}
       </div>
-
+      
       <motion.div
         className={styles.bentoSpine}
         id="timeline-section"
@@ -1056,6 +1124,9 @@ export default function Homepage() {
           </div>
         </div>
       </motion.div>
+      <BackToTop containerSelector="[data-dashboard-main]" />
+      </>
+      )}
 
       {showCreateTaskModal && (
         <CreateTaskModal

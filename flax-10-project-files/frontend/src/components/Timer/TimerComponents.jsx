@@ -4,7 +4,13 @@ import { Search, X, Check } from 'lucide-react';
 import styles from "../../pages/Timer/TimerPage.module.css";
 import { noiseGenerator } from './utils/noiseUtils';
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
-import AnimatedDropdown from '../ui/AnimatedDropdown';
+import AnimatedDropdown from '../common/AnimatedDropdown';
+import {
+    compareTaskPriority,
+    compareTaskDue,
+    compareTaskEstimatedTime,
+    getTaskDurationMinutes,
+} from '../../lib/focusPlanner';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {
@@ -165,7 +171,6 @@ const handleTaskKey = (e) => {
 };
 
 /** Task input with optional pick-from-tasks list (sort by urgency/due/time, filter by list/module) */
-const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 const SORT_URGENCY = 'urgency';
 const SORT_TIME = 'time';
 const SORT_DUE = 'due';
@@ -212,20 +217,15 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                     return { ...t, list_name: listInfo.name, list_color: listInfo.color };
                 });
                 if (sort === SORT_TIME) {
-                    list.sort((a, b) => ((a.estimated_blocks || 1) - (b.estimated_blocks || 1)) || ((PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)));
+                    list.sort(compareTaskEstimatedTime);
                 } else if (sort === SORT_DUE) {
-                    list.sort((a, b) => {
-                        if (!a.due_date && !b.due_date) return 0;
-                        if (!a.due_date) return 1;
-                        if (!b.due_date) return -1;
-                        return new Date(a.due_date) - new Date(b.due_date);
-                    });
+                    list.sort(compareTaskDue);
                 } else if (sort === SORT_ALPHA) {
                     list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
                 } else if (sort === SORT_DATE_ADDED) {
                     list.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
                 } else {
-                    list.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4));
+                    list.sort(compareTaskPriority);
                 }
                 setTasks(list.slice(0, 100));
             })
@@ -297,131 +297,131 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                     </button>
                 </div>
                 <AnimatePresence>
-                {open && (
-                    <>
-                        <motion.div
-                            className={styles.taskPickBackdrop}
-                            onClick={() => setOpen(false)}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.18 }}
-                        />
-                        <motion.div
-                            className={styles.taskPickDropdown}
-                            role="dialog"
-                            aria-label="Select task"
-                            initial={{ opacity: 0, scale: 0.96 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.96 }}
-                            transition={{ duration: 0.18 }}
-                            transformTemplate={({ scale }) => `translate(-50%, -50%) scale(${scale})`}
-                        >
-                            <div className={styles.taskPickHeader}>
-                                <div className={styles.taskPickHeaderCopy}>
-                                    <span className={styles.taskPickHeaderTitle}>Select a Task</span>
-                                    <span className={styles.taskPickHeaderSubtitle}>Pick something concrete and jump straight into focus mode.</span>
-                                </div>
-                                <button type="button" className={styles.taskPickCloseBtn} onClick={() => setOpen(false)} aria-label="Close">
-                                    <X size={16} />
-                                </button>
-                            </div>
-                            <div className={styles.taskPickSearchRow}>
-                                <div className={styles.taskPickSearchInputWrap}>
-                                    <Search size={15} className={styles.taskPickSearchIcon} />
-                                    <input
-                                        type="text"
-                                        className={styles.taskPickSearchInput}
-                                        placeholder="Search tasks…"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        autoFocus
-                                    />
-                                </div>
-                            </div>
-                            <div className={styles.taskPickFiltersBar}>
-                                <div className={styles.taskPickFilterGrid}>
-                                    <div className={`${styles.taskPickField} ${styles.taskPickFilterRow}`}>
-                                        <span className={styles.taskPickSortLabel}>Sort</span>
-                                        <AnimatedDropdown
-                                            value={sortBy}
-                                            onChange={(v) => { setSortBy(v); loadTasks(v); }}
-                                            options={SORT_OPTIONS}
-                                            className={styles.taskPickSortDropdown}
-                                        />
+                    {open && (
+                        <>
+                            <motion.div
+                                className={styles.taskPickBackdrop}
+                                onClick={() => setOpen(false)}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.18 }}
+                            />
+                            <motion.div
+                                className={styles.taskPickDropdown}
+                                role="dialog"
+                                aria-label="Select task"
+                                initial={{ opacity: 0, scale: 0.96 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.96 }}
+                                transition={{ duration: 0.18 }}
+                                transformTemplate={({ scale }) => `translate(-50%, -50%) scale(${scale})`}
+                            >
+                                <div className={styles.taskPickHeader}>
+                                    <div className={styles.taskPickHeaderCopy}>
+                                        <span className={styles.taskPickHeaderTitle}>Select a Task</span>
+                                        <span className={styles.taskPickHeaderSubtitle}>Pick something concrete and jump straight into focus mode.</span>
                                     </div>
-                                    <div className={styles.taskPickField}>
-                                        <span className={styles.taskPickSortLabel}>List</span>
-                                        <AnimatedDropdown
-                                            value={filterListId}
-                                            onChange={setFilterListId}
-                                            options={listOptions}
-                                            placeholder="All lists"
-                                            className={styles.taskPickFilterHalf}
-                                        />
-                                    </div>
-                                    <div className={`${styles.taskPickField} ${styles.taskPickFieldCompact}`}>
-                                        <span className={styles.taskPickSortLabel}>Module</span>
-                                        <AnimatedDropdown
-                                            value={filterModuleCode}
-                                            onChange={setFilterModuleCode}
-                                            options={moduleOptions}
-                                            placeholder="All"
-                                            className={`${styles.taskPickFilterHalf} ${styles.taskPickModuleFilter}`}
+                                    <button type="button" className={styles.taskPickCloseBtn} onClick={() => setOpen(false)} aria-label="Close">
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                                <div className={styles.taskPickSearchRow}>
+                                    <div className={styles.taskPickSearchInputWrap}>
+                                        <Search size={15} className={styles.taskPickSearchIcon} />
+                                        <input
+                                            type="text"
+                                            className={styles.taskPickSearchInput}
+                                            placeholder="Search tasks…"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            autoFocus
                                         />
                                     </div>
                                 </div>
-                            </div>
-                            {loading ? (
-                                <div className={styles.taskPickEmpty}>
-                                    <span className={styles.taskPickEmptyIcon}>⏳</span>
-                                    <span>Loading your tasks…</span>
+                                <div className={styles.taskPickFiltersBar}>
+                                    <div className={styles.taskPickFilterGrid}>
+                                        <div className={`${styles.taskPickField} ${styles.taskPickFilterRow}`}>
+                                            <span className={styles.taskPickSortLabel}>Sort</span>
+                                            <AnimatedDropdown
+                                                value={sortBy}
+                                                onChange={(v) => { setSortBy(v); loadTasks(v); }}
+                                                options={SORT_OPTIONS}
+                                                className={styles.taskPickSortDropdown}
+                                            />
+                                        </div>
+                                        <div className={styles.taskPickField}>
+                                            <span className={styles.taskPickSortLabel}>List</span>
+                                            <AnimatedDropdown
+                                                value={filterListId}
+                                                onChange={setFilterListId}
+                                                options={listOptions}
+                                                placeholder="All lists"
+                                                className={styles.taskPickFilterHalf}
+                                            />
+                                        </div>
+                                        <div className={`${styles.taskPickField} ${styles.taskPickFieldCompact}`}>
+                                            <span className={styles.taskPickSortLabel}>Module</span>
+                                            <AnimatedDropdown
+                                                value={filterModuleCode}
+                                                onChange={setFilterModuleCode}
+                                                options={moduleOptions}
+                                                placeholder="All"
+                                                className={`${styles.taskPickFilterHalf} ${styles.taskPickModuleFilter}`}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            ) : filteredTasks.length === 0 ? (
-                                <div className={styles.taskPickEmpty}>
-                                    <span className={styles.taskPickEmptyIcon}>{searchLower ? '🔍' : '📋'}</span>
-                                    <span>{searchLower ? 'No tasks match your search.' : 'No tasks yet. Add some on the Tasks page.'}</span>
-                                </div>
-                            ) : (
-                                <div className={styles.taskPickList}>
-                                    {filteredTasks.map((task) => {
-                                        const duration = task.estimated_blocks ? `${task.estimated_blocks * 25}m` : '25m';
-                                        const listName = task.list_name || 'Other';
-                                        const listColor = task.list_color || '#94a3b8';
-                                        const isSelected = value === task.title;
-                                        return (
-                                            <button
-                                                key={task.id}
-                                                type="button"
-                                                className={`${styles.taskPickItem} ${isSelected ? styles.taskPickItemSelected : ''}`}
-                                                onClick={() => selectTask(task)}
-                                                title={task.title}
-                                                style={{ borderLeft: `3px solid ${listColor}` }}
-                                            >
-                                                <div className={styles.taskPickItemContent}>
-                                                    <span className={styles.taskPickTitle}>{task.title}</span>
-                                                    <span className={styles.taskPickMetaRow}>
-                                                        <span
-                                                            className={styles.taskPickListPill}
-                                                            style={{ background: `${listColor}22`, color: listColor }}
-                                                        >
-                                                            {listName}
+                                {loading ? (
+                                    <div className={styles.taskPickEmpty}>
+                                        <span className={styles.taskPickEmptyIcon}>⏳</span>
+                                        <span>Loading your tasks…</span>
+                                    </div>
+                                ) : filteredTasks.length === 0 ? (
+                                    <div className={styles.taskPickEmpty}>
+                                        <span className={styles.taskPickEmptyIcon}>{searchLower ? '🔍' : '📋'}</span>
+                                        <span>{searchLower ? 'No tasks match your search.' : 'No tasks yet. Add some on the Tasks page.'}</span>
+                                    </div>
+                                ) : (
+                                    <div className={styles.taskPickList}>
+                                        {filteredTasks.map((task) => {
+                                            const duration = `${getTaskDurationMinutes(task)}m`;
+                                            const listName = task.list_name || 'Other';
+                                            const listColor = task.list_color || '#94a3b8';
+                                            const isSelected = value === task.title;
+                                            return (
+                                                <button
+                                                    key={task.id}
+                                                    type="button"
+                                                    className={`${styles.taskPickItem} ${isSelected ? styles.taskPickItemSelected : ''}`}
+                                                    onClick={() => selectTask(task)}
+                                                    title={task.title}
+                                                    style={{ borderLeft: `3px solid ${listColor}` }}
+                                                >
+                                                    <div className={styles.taskPickItemContent}>
+                                                        <span className={styles.taskPickTitle}>{task.title}</span>
+                                                        <span className={styles.taskPickMetaRow}>
+                                                            <span
+                                                                className={styles.taskPickListPill}
+                                                                style={{ background: `${listColor}22`, color: listColor }}
+                                                            >
+                                                                {listName}
+                                                            </span>
+                                                            {task.module_code && (
+                                                                <span className={styles.taskPickModulePill}>{task.module_code}</span>
+                                                            )}
+                                                            <span className={styles.taskPickDuration}>{duration}</span>
                                                         </span>
-                                                        {task.module_code && (
-                                                            <span className={styles.taskPickModulePill}>{task.module_code}</span>
-                                                        )}
-                                                        <span className={styles.taskPickDuration}>{duration}</span>
-                                                    </span>
-                                                </div>
-                                                {isSelected && <Check size={14} className={styles.taskPickCheckmark} />}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </motion.div>
-                    </>
-                )}
+                                                    </div>
+                                                    {isSelected && <Check size={14} className={styles.taskPickCheckmark} />}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </motion.div>
+                        </>
+                    )}
                 </AnimatePresence>
             </div>
         </div>

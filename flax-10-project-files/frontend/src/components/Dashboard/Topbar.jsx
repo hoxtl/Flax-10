@@ -7,7 +7,7 @@ import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus, ChevronDown, Calendar, Clock } from "lucide-react";
 import { SegmentedControl } from "../ui/SegmentedControl";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
@@ -56,9 +56,10 @@ function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChan
 }
 
 const NAV_SECTIONS = [
-  { title: "Planning", ids: ["calendar", "timer", "analytics", "tasks", "group-work"] },
-  { title: "Academic", ids: ["modules"] }, { title: "Campus", ids: ["map"] },
-  { title: "Social", ids: ["users", "societies"] }, { title: "Admin", ids: ["admin"] }
+  { title: "Plan", ids: ["calendar", "tasks", "timer", "analytics"] },
+  { title: "Study", ids: ["modules", "group-work"] },
+  { title: "My KCL", ids: ["map", "societies", "users"] },
+  { title: "Admin", ids: ["admin"] }
 ];
 
 function useTopBarHover() {
@@ -71,7 +72,9 @@ function useTopBarHover() {
 }
 
 function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu, onEnter, onOpenChange }) {
-  const sub = routes.filter(r => ids.includes(r.id));
+  const sub = ids
+    .map((id) => routes.find((route) => route.id === id))
+    .filter(Boolean);
   if (sub.length === 0) return null;
   const change = (v) => onOpenChange(title, v);
   return (

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import TaskFeedToolbar from "../../../../pages/Tasks/components/TaskFeedToolbar";
 
-vi.mock("../../../../components/ui/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   default: ({ onChange, value }) => (
     <button data-testid="sort" onClick={() => onChange(value === "priority" ? "due" : "priority")}>sort</button>
   ),

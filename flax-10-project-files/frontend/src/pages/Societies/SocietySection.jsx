@@ -46,4 +46,3 @@ function SectionGrid({ items, type, onAction, allSocieties, onSelect, onReport, 
         </div>
     );
 }
-

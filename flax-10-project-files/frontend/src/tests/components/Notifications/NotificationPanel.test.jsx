@@ -85,6 +85,19 @@ describe('NotificationPanel', () => {
     expect(context.closePanel).toHaveBeenCalledTimes(1);
   });
 
+  it('closes header dropdown when clicking outside the action menu', () => {
+    useNotificationsMock.mockReturnValue(getDefaultContext());
+
+    render(<NotificationPanel />);
+    const menuTrigger = document.querySelector('.action-menu-btn');
+    fireEvent.click(menuTrigger);
+    expect(screen.getByText('Mark all read')).toBeInTheDocument();
+
+    fireEvent.mouseDown(screen.getByRole('heading', { name: 'Notifications' }));
+
+    expect(screen.queryByText('Mark all read')).not.toBeInTheDocument();
+  });
+
   it('does not close panel on inside click', () => {
     const context = getDefaultContext();
     useNotificationsMock.mockReturnValue(context);

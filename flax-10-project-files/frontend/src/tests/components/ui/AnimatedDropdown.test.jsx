@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import AnimatedDropdown from '../../../components/ui/AnimatedDropdown';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import AnimatedDropdown from '../../../components/common/AnimatedDropdown';
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy(
@@ -186,5 +186,219 @@ describe('AnimatedDropdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Search...'), { target: { value: 'xyz' } });
     expect(screen.getByText('Nothing found')).toBeInTheDocument();
     expect(screen.getByText('Try a different search term')).toBeInTheDocument();
+  });
+
+  it('does not show "Try a different search term" when query is empty in empty state', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Search..."
+        options={[]}
+        searchable
+        emptyMessage="No options"
+      />
+    );
+    fireEvent.click(screen.getByText('Search...'));
+    expect(screen.getByText('No options')).toBeInTheDocument();
+    expect(screen.queryByText('Try a different search term')).not.toBeInTheDocument();
+  });
+
+  it('filters grouped options by search', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Search..."
+        options={GROUPED_OPTIONS}
+        grouped
+        searchable
+        emptyMessage="Nothing found"
+      />
+    );
+    fireEvent.click(screen.getByText('Search...'));
+    fireEvent.change(screen.getByPlaceholderText('Search...'), { target: { value: 'a1' } });
+    expect(screen.getByText('A1')).toBeInTheDocument();
+    expect(screen.queryByText('A2')).not.toBeInTheDocument();
+    expect(screen.queryByText('B1')).not.toBeInTheDocument();
+  });
+
+  it('filters flat object options by label', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Search..."
+        options={[{ value: 'x', label: 'Extra' }]}
+        searchable
+        emptyMessage="Nothing"
+      />
+    );
+    fireEvent.click(screen.getByText('Search...'));
+    fireEvent.change(screen.getByPlaceholderText('Search...'), { target: { value: 'ext' } });
+    expect(screen.getByText('Extra')).toBeInTheDocument();
+  });
+
+  it('supports hideCheckmark', () => {
+    const onChange = vi.fn();
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={onChange}
+        placeholder="Select"
+        options={OPTIONS}
+        hideCheckmark
+      />
+    );
+    fireEvent.click(screen.getByText('Select'));
+    fireEvent.click(screen.getAllByText('Option A2')[0]);
+    expect(onChange).toHaveBeenCalledWith('a2');
+  });
+
+  it('supports customTrigger', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        customTrigger={<span data-testid="custom-trigger">Custom</span>}
+      />
+    );
+    expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('custom-trigger'));
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+  });
+
+  it('supports controlled open state with isOpen and onOpenChange', () => {
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        isOpen={false}
+        onOpenChange={onOpenChange}
+      />
+    );
+    expect(screen.queryByText('Option A1')).not.toBeInTheDocument();
+    rerender(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        isOpen={true}
+        onOpenChange={onOpenChange}
+      />
+    );
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Option A1'));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('opens on hover when openOnHover', () => {
+    const { container } = render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        openOnHover
+      />
+    );
+    fireEvent.mouseEnter(container.firstChild);
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+  });
+
+  it('does not open on click when openOnHover', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        openOnHover
+      />
+    );
+    fireEvent.click(screen.getByText('Select'));
+    expect(screen.queryByText('Option A1')).toBeNull();
+  });
+
+  it('closes menu when clicking outside', () => {
+    const { container } = render(
+      <div>
+        <AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select" options={OPTIONS} />
+        <div data-testid="outside">Outside</div>
+      </div>
+    );
+    fireEvent.click(screen.getByText('Select'));
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByTestId('outside'));
+    expect(screen.queryByText('Option A1')).not.toBeInTheDocument();
+  });
+
+  it('supports menuMaxHeight', () => {
+    const { container } = render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        menuMaxHeight={200}
+      />
+    );
+    fireEvent.click(screen.getByText('Select'));
+    const menu = container.querySelector('[class*="dropdownMenu"]') || container.querySelector('[style*="maxHeight"]');
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+  });
+
+  it('applies className', () => {
+    const { container } = render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        className="my-dropdown"
+      />
+    );
+    expect(container.firstChild.className).toContain('my-dropdown');
+  });
+
+  it('search input stopPropagation does not close menu on click', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Search"
+        options={OPTIONS}
+        searchable
+      />
+    );
+    fireEvent.click(screen.getByText('Search'));
+    const input = screen.getByPlaceholderText('Search...');
+    fireEvent.click(input);
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+  });
+
+  it('closes on mouse leave when openOnHover', () => {
+    vi.useFakeTimers();
+    const { container } = render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+        openOnHover
+      />
+    );
+    fireEvent.mouseEnter(container.firstChild);
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+    fireEvent.mouseLeave(container.firstChild);
+    act(() => vi.advanceTimersByTime(200));
+    expect(screen.queryByText('Option A1')).not.toBeInTheDocument();
+    vi.useRealTimers();
   });
 });

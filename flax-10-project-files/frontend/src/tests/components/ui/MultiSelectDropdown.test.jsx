@@ -171,4 +171,99 @@ describe('MultiSelectDropdown', () => {
     fireEvent.click(screen.getAllByText('List A')[1]);
     expect(onChange).toHaveBeenCalledWith([]);
   });
+
+  it('handles non-array value by treating as empty', () => {
+    render(
+      <MultiSelectDropdown
+        value="a1"
+        onChange={vi.fn()}
+        placeholder="All"
+        options={OPTIONS}
+      />
+    );
+    expect(screen.getByText('All')).toBeInTheDocument();
+  });
+
+  it('shows placeholder in displayAsPills when nothing selected', () => {
+    render(
+      <MultiSelectDropdown
+        value={[]}
+        onChange={vi.fn()}
+        placeholder="Pick items"
+        options={OPTIONS}
+        displayAsPills
+      />
+    );
+    expect(screen.getByText('Pick items')).toBeInTheDocument();
+  });
+
+  it('opens pills trigger on Enter key', () => {
+    render(
+      <MultiSelectDropdown
+        value={[]}
+        onChange={vi.fn()}
+        placeholder="All"
+        options={OPTIONS}
+        displayAsPills
+      />
+    );
+    const pillsTrigger = document.querySelector('[aria-haspopup="listbox"]');
+    fireEvent.keyDown(pillsTrigger, { key: 'Enter', preventDefault: vi.fn() });
+    expect(screen.getByText('List A')).toBeInTheDocument();
+  });
+
+  it('opens pills trigger on Space key', () => {
+    render(
+      <MultiSelectDropdown
+        value={[]}
+        onChange={vi.fn()}
+        placeholder="All"
+        options={OPTIONS}
+        displayAsPills
+      />
+    );
+    const pillsTrigger = document.querySelector('[aria-haspopup="listbox"]');
+    fireEvent.keyDown(pillsTrigger, { key: ' ', preventDefault: vi.fn() });
+    expect(screen.getByText('List A')).toBeInTheDocument();
+  });
+
+  it('shows placeholder when selected value not in options', () => {
+    render(
+      <MultiSelectDropdown
+        value={['unknown']}
+        onChange={vi.fn()}
+        placeholder="All"
+        options={OPTIONS}
+      />
+    );
+    expect(screen.getByText('All')).toBeInTheDocument();
+  });
+
+  it('pill remove does not trigger parent onClick', () => {
+    const onChange = vi.fn();
+    render(
+      <MultiSelectDropdown
+        value={['a1']}
+        onChange={onChange}
+        placeholder="All"
+        options={OPTIONS}
+        displayAsPills
+      />
+    );
+    const pill = screen.getByText('List A').closest('[class*="pill"]');
+    if (pill) fireEvent.click(pill);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('adds open state class to root when menu is open', () => {
+    const { container } = render(
+      <MultiSelectDropdown value={[]} onChange={vi.fn()} placeholder="All" options={OPTIONS} />
+    );
+    const root = container.firstChild;
+    const classesBefore = root?.className ?? '';
+    fireEvent.click(screen.getByText('All'));
+    const classesAfter = root?.className ?? '';
+    expect(classesAfter.length).toBeGreaterThanOrEqual(classesBefore.length);
+    expect(screen.getByText('List A')).toBeInTheDocument();
+  });
 });

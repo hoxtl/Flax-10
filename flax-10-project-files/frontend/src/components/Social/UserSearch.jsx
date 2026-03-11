@@ -7,6 +7,7 @@ import socialStyles from './Social.module.css';
 import searchStyles from './UserSearch.module.css';
 import SearchBar from '../common/SearchBar/SearchBar';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
+import EmptyState from '../common/EmptyState/EmptyState';
 const styles = { ...socialStyles, ...searchStyles };
 const YEAR_OPTIONS = ["Foundation", "Year 1", "Year 2", "Year 3", "Year 4"];
 
@@ -32,40 +33,31 @@ export function useClickOutside(ref, onOutside) {
     }, [ref, onOutside]);
 }
 
-export const useSearchInit = () => {
+export const useSearchInit = (skip) => {
     const [allSocieties, setAllSocieties] = useState([]);
     useEffect(() => {
-        fetchSocieties().then(res => setAllSocieties(res.results || res)).catch(e => handleErr("Societies error", e, setAllSocieties));
-    }, []);
+        if (!skip) fetchSocieties().then(res => setAllSocieties(res.results || res)).catch(e => handleErr("Societies error", e, setAllSocieties));
+    }, [skip]);
     return { allCourses: KCL_DEPARTMENTS, allSocieties };
 };
 
-function useSearchState() {
+function useSearchState(skip) {
     const [query, setQuery] = useState('');
     const [userResults, setUserResults] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [dropdownPos, setDropdownPos] = useState(null);
     const containerRef = useRef(null);
-    const { allCourses, allSocieties } = useSearchInit();
-    return { query, setQuery, userResults, setUserResults, allCourses, allSocieties, loading, setLoading, dropdownPos, setDropdownPos, containerRef };
-}
-
-function useDropdownPosition(containerRef, userResults, setDropdownPos, showDropdown) {
-    useEffect(() => {
-        if (!showDropdown || !containerRef.current) return setDropdownPos(null);
-        const rect = containerRef.current.getBoundingClientRect();
-        setDropdownPos({ top: rect.bottom + 8, left: rect.left, width: Math.max(rect.width, 350) });
-    }, [showDropdown, userResults]);
+    const { allCourses, allSocieties } = useSearchInit(skip);
+    return { query, setQuery, userResults, setUserResults, allCourses, allSocieties, loading, setLoading, containerRef };
 }
 
 
-export function UserResultItem({ user, onSelect }) {
+export function UserResultItem({ user, onSelect, compact }) {
     return (
-        <div className={`${styles.userItem} ${styles.userResultItem}`} onClick={onSelect}>
+        <div className={`${styles.userItem} ${styles.userResultItem} ${compact ? styles.compactUserItem : ''}`} onClick={onSelect}>
             <UserAvatar user={user} avatarOnly />
             <div className={styles.userNameDetails}>
-                <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>
-                <span className={styles.userHandle}>@{user.username}</span>
+                {!compact && <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>}
+                <span className={styles.userHandle}>{compact ? user.username : `@${user.username}`}</span>
             </div>
         </div>
     );
@@ -103,22 +95,36 @@ export function SocietyResultItem({ society, isChecked, onToggle }) {
 
 const getSocietyCategories = (societies) => Array.from(new Set(societies.map(s => s.categories?.[0]?.toLowerCase() || 'other'))).sort();
 
-const EmptySearchText = ({ text }) => <p className={styles.emptyText}>{text}</p>;
+const SEARCH_EMPTY_CONFIG = {
+    loading: { icon: '⏳', title: 'Searching users', description: 'Matching profiles will appear here.' },
+    users: { icon: '🔎', title: 'No users found', description: 'Try a different name or filter.' },
+    start: { icon: '👋', title: 'Start typing', description: 'Search by name, username, course, or society.' },
+    courses: { icon: '📚', title: 'No courses found', description: 'Try a different course search.' },
+    years: { icon: '🗓️', title: 'No years found', description: 'Try a different year search.' },
+    societies: { icon: '🎭', title: 'No societies found', description: 'Try a different society search.' },
+};
 
-const SearchResultsList = ({ results, onSelect }) => (
-    <div className={styles.userList}>
-        {results.map((u, i) => <UserResultItem key={u.id || i} user={u} onSelect={() => onSelect(u)} />)}
+const EmptySearchText = ({ icon, title, description }) => (
+    <div className={styles.emptyStateWrap}>
+        <EmptyState icon={icon} title={title} description={description} />
     </div>
 );
 
-function SearchDropdown({ pos, loading, query, userResults, onUserSelect }) {
+const SearchResultsList = ({ results, onSelect, compact }) => (
+    <div className={styles.userList}>
+        {results.map((u, i) => <UserResultItem key={u.id || i} user={u} onSelect={() => onSelect(u)} compact={compact} />)}
+    </div>
+);
+
+function SearchDropdown({ loading, query, userResults, onUserSelect, compact }) {
     const showEmpty = !loading && userResults.length === 0;
+    if (compact && showEmpty && !query) return null;
     return (
-        <div className={styles.searchDropdownContainer} style={{ width: pos.width }}>
-            {loading && <EmptySearchText text="Searching..." />}
-            {showEmpty && query && <EmptySearchText text="No users found." />}
-            {showEmpty && !query && <EmptySearchText text="Start typing..." />}
-            {!loading && userResults.length > 0 && <SearchResultsList results={userResults} onSelect={onUserSelect} />}
+        <div className={`${styles.searchDropdownContainer} ${compact ? styles.compactDropdown : ''}`}>
+            {loading && <EmptySearchText {...SEARCH_EMPTY_CONFIG.loading} />}
+            {showEmpty && query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.users} />}
+            {showEmpty && !query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.start} />}
+            {!loading && userResults.length > 0 && <SearchResultsList results={userResults} onSelect={onUserSelect} compact={compact} />}
         </div>
     );
 }
@@ -170,7 +176,7 @@ const GroupedSection = ({ title, items, expanded, renderItem, toggle, sectionKey
 };
 
 const CourseList = ({ courseGroups, filteredCourses, filterQuery, querySelected, onToggle, expanded, toggleSection }) => {
-    if (filteredCourses.length === 0) return <EmptySearchText text="No courses found." />;
+    if (filteredCourses.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.courses} />;
     const renderItem = (course) => <CourseResultItem key={course} course={course} isChecked={querySelected(course)} onToggle={onToggle} />;
     if (filterQuery) return <div className={`${styles.userList} ${styles.userListNoGap}`}>{filteredCourses.map(renderItem)}</div>;
     return (
@@ -200,7 +206,7 @@ const YearResultItem = ({ year, isChecked, onToggle }) => (
 );
 
 const YearList = ({ years, querySelected, onToggle }) => {
-    if (years.length === 0) return <EmptySearchText text="No years found." />;
+    if (years.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.years} />;
     return (
         <div className={`${styles.userList} ${styles.userListNoGap}`}>
             {years.map((year) => (
@@ -212,7 +218,7 @@ const YearList = ({ years, querySelected, onToggle }) => {
 
 const matchCat = (s, cat) => cat === 'other' ? (!s.categories || !s.categories.length) : (s.categories?.[0]?.toLowerCase() === cat);
 const SocietyList = ({ societies, filterQuery, querySelected, onToggle, cats, expanded, toggleSection }) => {
-    if (societies.length === 0) return <EmptySearchText text="No societies found." />;
+    if (societies.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.societies} />;
     const rItem = s => <SocietyResultItem key={s.id} society={s} isChecked={querySelected(s.id)} onToggle={onToggle} />;
     if (filterQuery) return <div className={`${styles.userList} ${styles.userListNoGap}`}>{societies.map(rItem)}</div>;
     return (
@@ -271,12 +277,12 @@ const filterCourses = (courseGroups, q) => {
 };
 const toggleArr = (arr, val) => arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val];
 
-function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDpdwn, dpdwnPos, loading, userResults, handleSel }) {
+function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDpdwn, loading, userResults, handleSel, fullWidth, compact }) {
     const onFocus = () => setFocus();
     return (
-        <div className={`${styles.searchContainer} ${styles.relativeContainer}`} ref={containerRef}>
-            <SearchBar value={query} onChange={setQuery} onFocus={onFocus} placeholder="Search users..." className={styles.searchBarContainer} />
-            {showDpdwn && dpdwnPos && <SearchDropdown pos={dpdwnPos} loading={loading} query={query} userResults={userResults} onUserSelect={handleSel} />}
+        <div className={`${styles.searchContainer} ${styles.relativeContainer} ${fullWidth ? styles.fullWidthSearch : ''}`} ref={containerRef}>
+            <SearchBar value={query} onChange={setQuery} onFocus={onFocus} placeholder="Search users..." className={fullWidth ? styles.searchBarFull : styles.searchBarContainer} />
+            {showDpdwn && <SearchDropdown loading={loading} query={query} userResults={userResults} onUserSelect={handleSel} compact={compact} />}
         </div>
     );
 }
@@ -307,7 +313,7 @@ export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
     </div>
 );
 
-export const useFilterState = (allCourses, allSocieties, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading) => {
+export const useFilterState = (allCourses, allSocieties, query, isSearchFocused, userResults, setUserResults, setLoading) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activeFilterTab, setActiveFilterTab] = useState('courses');
     const [selectedCourses, setSelectedCourses] = useState([]);
@@ -319,7 +325,6 @@ export const useFilterState = (allCourses, allSocieties, query, isSearchFocused,
     const togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
     useUserSearchEffects(query, selectedCourses, selectedSocieties, selectedYears, setUserResults, setLoading);
     const active = isSearchFocused;
-    useDropdownPosition(containerRef, userResults, setDropdownPos, active);
     const filteredCourseGroups = filterCourses(allCourses, filterQuery);
     const props = {
         activeFilterTab,
@@ -340,20 +345,23 @@ export const useFilterState = (allCourses, allSocieties, query, isSearchFocused,
     return { isFilterOpen, setIsFilterOpen, active, props };
 };
 
-export default function UserSearch({ onUserSelect }) {
-    const { query, setQuery, userResults, setUserResults, allCourses: aC, allSocieties: aS, loading, setLoading, dropdownPos, setDropdownPos, containerRef } = useSearchState();
+export default function UserSearch({ onUserSelect, filterUsers, fullWidth, hideFilter, compact }) {
+    const { query, setQuery, userResults, setUserResults, allCourses: aC, allSocieties: aS, loading, setLoading, containerRef } = useSearchState(hideFilter);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const filterRef = useRef(null);
-    const { isFilterOpen, setIsFilterOpen, active, props } = useFilterState(aC, aS, query, isSearchFocused, containerRef, userResults, setDropdownPos, setUserResults, setLoading);
+    const { isFilterOpen, setIsFilterOpen, active, props } = useFilterState(aC, aS, query, isSearchFocused, userResults, setUserResults, setLoading);
     useClickOutside(containerRef, () => setIsSearchFocused(false));
     useClickOutside(filterRef, () => setIsFilterOpen(false));
     const handleS = (u) => { onUserSelect?.(u); setIsSearchFocused(false); setQuery(''); };
     const onSetFocus = () => { setIsSearchFocused(true); setIsFilterOpen(false); };
     const onToggleFilter = () => { setIsFilterOpen(!isFilterOpen); setIsSearchFocused(false); };
+
+    const displayResults = filterUsers ? filterUsers(userResults) : userResults;
+
     return (
-        <div className={styles.userSearchWrapper}>
-            <GlobalSearchBar query={query} setQuery={setQuery} setFocus={onSetFocus} containerRef={containerRef} showDpdwn={active} dpdwnPos={dropdownPos} loading={loading} userResults={userResults} handleSel={handleS} />
-            <FilterSection fRef={filterRef} isOpen={isFilterOpen} setOpen={onToggleFilter} props={props} />
+        <div className={`${styles.userSearchWrapper} ${fullWidth ? styles.fullWidthWrapper : ''}`}>
+            <GlobalSearchBar query={query} setQuery={setQuery} setFocus={onSetFocus} containerRef={containerRef} showDpdwn={active} loading={loading} userResults={displayResults} handleSel={handleS} fullWidth={fullWidth} compact={compact} />
+            {!hideFilter && <FilterSection fRef={filterRef} isOpen={isFilterOpen} setOpen={onToggleFilter} props={props} />}
         </div>
     );
 }

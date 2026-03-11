@@ -143,7 +143,7 @@ describe('TimerContext (node)', () => {
     tree.props.value.setActiveTaskId(42, { title: 'Essay', categoryColor: '#112233' });
     tree.props.value.setActiveTaskId(11, 'not-object');
     tree.props.value.setActiveTaskId(null);
-    expect(stateStore[0]).toBe(11);
+    expect(stateStore[0]).toBeNull();
     expect(stateStore[1]).toBeNull();
     expect(globalThis.sessionStorage.setItem).toHaveBeenCalledWith('timerTaskId', '42');
     expect(globalThis.sessionStorage.setItem).toHaveBeenCalledWith('timerTaskTitle', 'Essay');

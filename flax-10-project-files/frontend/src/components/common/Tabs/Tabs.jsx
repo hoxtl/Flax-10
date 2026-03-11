@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Tabs.module.css";
 
 export default function Tabs({ tabs, activeTab, onTabChange, rightAction }) {
@@ -17,7 +18,15 @@ export default function Tabs({ tabs, activeTab, onTabChange, rightAction }) {
     );
 }
 
-function TabButton({ tab, isActive, onClick }) {
+function TabButton({ tab, isActive, onClick, layoutId }) {
     const cls = isActive ? `${styles.tab} ${styles.active}` : styles.tab;
-    return <button className={cls} onClick={onClick}>{tab.label}</button>;
+    return (
+        <button className={cls} onClick={onClick}>
+            {tab.icon && <span>{tab.icon}</span>}
+            <span>{tab.label}</span>
+            {isActive && (
+                <motion.div className={styles.tabIndicator} layoutId={layoutId} />
+            )}
+        </button>
+    );
 }

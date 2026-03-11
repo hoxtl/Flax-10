@@ -24,36 +24,9 @@
 .createButton:active {
     transform: translateY(0);
 }
-.toolbar {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-.filters {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-}
 .toolbarDropdown {
     flex: 1;
     min-width: 150px;
-}
-.sortControl {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-.sortLabel {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
 }
 .sortDropdown {
     width: 170px;
@@ -68,12 +41,6 @@
         flex-direction: column;
         align-items: stretch;
     }
-    .toolbar {
-        flex-direction: column;
-    }
-    .sortControl {
-        width: 100%;
-    }
     .sortDropdown {
         flex: 1;
         width: auto;
@@ -82,44 +49,4 @@
     .createButton {
         width: 100%;
     }
-}
-
-/* ── Skeleton ── */
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-.skel {
-  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 10px;
-}
-.skelHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
-}
-.skelTitle {
-  height: 36px;
-  width: 240px;
-}
-.skelBtn {
-  height: 36px;
-  width: 110px;
-}
-.skelSearch {
-  height: 40px;
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
-.skelGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-}
-.skelCard {
-  height: 180px;
 }

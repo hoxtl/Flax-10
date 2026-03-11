@@ -1,4 +1,4 @@
-import AnimatedDropdown from '../../ui/AnimatedDropdown';
+import AnimatedDropdown from '../../common/AnimatedDropdown';
 
 const VIEW_MODE_OPTIONS = [
   { value: 'day', label: 'Day' },

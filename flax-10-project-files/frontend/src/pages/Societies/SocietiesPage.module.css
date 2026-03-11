@@ -60,8 +60,24 @@
 .header {
   display: flex;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   align-items: center;
+}
+
+.browseToolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.browseSearch {
+  min-width: 0;
+}
+
+.browseSortControl {
+  flex-shrink: 0;
 }
 
 .grid {
@@ -149,6 +165,25 @@
 @media (max-width: 768px) {
   .container {
     padding: 16px;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .browseToolbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .browseSortControl {
+    width: 100%;
+  }
+
+  .sortDropdown {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .grid {

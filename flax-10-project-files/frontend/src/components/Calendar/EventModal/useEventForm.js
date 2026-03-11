@@ -24,6 +24,7 @@ export function useEventForm(event, onClose, options = {}) {
     const [sleepWarning, setSleepWarning] = useState(false);
     const [pendingSubmit, setPendingSubmit] = useState(null);
     const [sleepSettings, setSleepSettings] = useState(null);
+    const [overlapWarning, setOverlapWarning] = useState(null);
 
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
     useEffect(() => { fetchSleepSettings().then(setSleepSettings); }, []);
@@ -46,7 +47,18 @@ export function useEventForm(event, onClose, options = {}) {
             doSubmit(e, false);
         };
 
-    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], true);
+    const handleConfirmSave = () =>
+        validateAndSubmit(
+            null,
+            form,
+            event,
+            actions,
+            onClose,
+            setError,
+            setOverlapWarning,
+            calendarContext?.events || [],
+            true
+        );
     const handleCancelSave = () => setOverlapWarning(null);
 
     const handleConfirmSleep = () => {
@@ -60,9 +72,19 @@ export function useEventForm(event, onClose, options = {}) {
     };
 
     return {
-        form, setForm, error, sleepWarning,
-        sleepSettings, isEditing: !!event?.id,
-        handleSubmit, handleConfirmSleep, handleCancelSleep, event
+        form,
+        setForm,
+        error,
+        sleepWarning,
+        sleepSettings,
+        overlapWarning,
+        isEditing: !!event?.id,
+        handleSubmit,
+        handleConfirmSleep,
+        handleCancelSleep,
+        handleConfirmSave,
+        handleCancelSave,
+        event
     };
 }
 

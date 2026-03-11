@@ -12,6 +12,18 @@ import {
     ThemeSelector,
 } from '../../../components/Settings/SettingsUI';
 
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder, grouped }) => {
+        const opts = grouped ? (options || []).flatMap(g => g.options || []) : (options || []);
+        return (
+            <select aria-label={placeholder} value={value} onChange={e => onChange(e.target.value)}>
+                <option value="">Select your course</option>
+                {opts.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
+        );
+    },
+}));
+
 describe('TabButton', () => {
     it('renders label', () => {
         render(<TabButton id="account" label="Account" isActive={false} onClick={vi.fn()} />);
@@ -136,7 +148,8 @@ describe('FormSelect', () => {
 
     it('renders label and select', () => {
         render(<FormSelect id="select" label="Choose" value="opt1" onChange={vi.fn()} options={options} />);
-        expect(screen.getByLabelText('Choose')).toBeTruthy();
+        expect(screen.getByText('Choose')).toBeTruthy();
+        expect(screen.getByRole('combobox')).toBeTruthy();
     });
 
     it('renders flat options', () => {

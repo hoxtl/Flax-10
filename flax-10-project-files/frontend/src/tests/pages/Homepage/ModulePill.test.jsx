@@ -28,6 +28,16 @@ describe('getModulePillColors', () => {
         const colors = getModulePillColors('');
         expect(colors).toBeTruthy();
     });
+
+    it('handles null', () => {
+        const colors = getModulePillColors(null);
+        expect(colors).toBeTruthy();
+    });
+
+    it('handles non-string via toString', () => {
+        const colors = getModulePillColors(12345);
+        expect(colors).toBeTruthy();
+    });
 });
 
 describe('ModulePill', () => {
@@ -59,6 +69,21 @@ describe('ModulePill', () => {
         const { container } = render(<ModulePill moduleCode="CS3001" className="custom-pill" />);
         expect(container.querySelector('.custom-pill')).toBeTruthy();
     });
+
+    it('returns null when moduleCode is null', () => {
+        const { container } = render(<ModulePill moduleCode={null} />);
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('returns null when moduleCode is empty string', () => {
+        const { container } = render(<ModulePill moduleCode="" />);
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('returns null when moduleCode is whitespace only', () => {
+        const { container } = render(<ModulePill moduleCode="   " />);
+        expect(container.firstChild).toBeNull();
+    });
 });
 
 describe('TypePill', () => {
@@ -80,5 +105,10 @@ describe('TypePill', () => {
     it('uses default colors for unknown type', () => {
         const { container } = render(<TypePill typeLabel="OTHER" />);
         expect(container.firstChild).toBeTruthy();
+    });
+
+    it('returns null when typeLabel is empty string', () => {
+        const { container } = render(<TypePill typeLabel="" />);
+        expect(container.firstChild).toBeNull();
     });
 });

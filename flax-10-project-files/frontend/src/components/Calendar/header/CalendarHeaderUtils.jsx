@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
-import AnimatedDropdown from '../../ui/AnimatedDropdown';
+import AnimatedDropdown from '../../common/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
 

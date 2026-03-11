@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { getCompletionMessage, isRoutineTask } from '../../lib/completionMessages';
 
 describe('isRoutineTask', () => {
@@ -60,5 +60,16 @@ describe('getCompletionMessage', () => {
         const msg = getCompletionMessage({ title: 'Study algebra' }, {});
         expect(typeof msg).toBe('string');
         expect(msg.length).toBeGreaterThan(0);
+    });
+
+    it('can return Lenny message when pickCalmCleverMessage gets r >= 0.9', () => {
+        const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.95);
+        const msg = getCompletionMessage(null);
+        const lennyMessages = [
+            'Lenny the campus cat sends a slow blink of approval.',
+            'Even Lenny approves of that one.',
+        ];
+        expect(lennyMessages).toContain(msg);
+        randomSpy.mockRestore();
     });
 });

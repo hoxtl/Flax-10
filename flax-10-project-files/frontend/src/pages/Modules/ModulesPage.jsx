@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
+import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
+import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
 
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
@@ -11,7 +13,7 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
-import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
+import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
 
@@ -83,20 +85,7 @@ function useMainView(state) {
 }
 
 function ModulesSkeleton() {
-  return (
-    <div className={styles.container}>
-      <div className={styles.skelHeader}>
-        <div className={`${styles.skel} ${styles.skelTitle}`} />
-        <div className={`${styles.skel} ${styles.skelBtn}`} />
-      </div>
-      <div className={`${styles.skel} ${styles.skelSearch}`} />
-      <div className={styles.skelGrid}>
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelCard}`} style={{ animationDelay: `${i * 0.08}s` }} />
-        ))}
-      </div>
-    </div>
-  );
+    return <PageSkeleton label="Loading modules" showAction showSearch cardCount={6} cardHeight="180px" columns={3} />;
 }
 
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
@@ -190,19 +179,19 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
 function Toolbar({ search, sorting, departments }) {
     const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
     const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
-    const sortOptions = [{ value: 'name', label: 'Alphabetically' }, { value: 'deadlines', label: 'Deadlines' }];
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
     return (
-        <div className={styles.toolbar}>
-            <SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />
-            <div className={styles.filters}>
-                <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-                <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-                <div className={styles.sortControl}>
-                    <label className={styles.sortLabel}>SORT</label>
-                    <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
-                </div>
-            </div>
-        </div>
+        <PageToolbar
+            searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
+            controlsSlot={
+                <>
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+                    <ToolbarSortControl>
+                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+                    </ToolbarSortControl>
+                </>
+            }
+        />
     );
 }
-

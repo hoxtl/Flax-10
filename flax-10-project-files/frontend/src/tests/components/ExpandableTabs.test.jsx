@@ -90,4 +90,13 @@ describe('ExpandableTabs', () => {
     const { container } = render(<ExpandableTabs tabs={tabsWithZeroBadge} />);
     expect(container.querySelector('[class*="badge"]')).toBeNull();
   });
+
+  it('does not show badge when count is null or negative', () => {
+    const tabsNullBadge = [{ title: 'N', icon: IconA, badge: null }];
+    const { container: c1 } = render(<ExpandableTabs tabs={tabsNullBadge} />);
+    expect(c1.querySelector('[class*="badge"]')).toBeNull();
+    const tabsNegBadge = [{ title: 'N', icon: IconA, badge: -1 }];
+    const { container: c2 } = render(<ExpandableTabs tabs={tabsNegBadge} />);
+    expect(c2.querySelector('[class*="badge"]')).toBeNull();
+  });
 });

@@ -19,7 +19,7 @@
 import { useState, useRef, useEffect, useMemo, forwardRef } from "react";
 import { createPortal } from "react-dom";
 import { Clock } from "lucide-react";
-import AnimatedDropdown from "../../ui/AnimatedDropdown";
+import AnimatedDropdown from "../AnimatedDropdown";
 import styles from "./DateTimePicker.module.css";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June",

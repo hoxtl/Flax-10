@@ -13,13 +13,13 @@ import Discover from "../pages/Discover/Discover";
 export const APP_ROUTES = [
     { id: "home",      label: "Home",      icon: "🏠", path: "/",          element: <Homepage /> },
     { id: "calendar",  label: "Calendar",  icon: "🗓️", path: "/calendar",  element: <CalendarPage /> },
-    { id: "timer",     label: "Timer",     icon: "⏲️", path: "/timer",     element: <TimerPage /> },
+    { id: "timer",     label: "Focus",     icon: "⏲️", path: "/timer",     element: <TimerPage /> },
     { id: "tasks",     label: "Tasks",     icon: "✅", path: "/tasks",     element: <TasksPage /> },
     { id: "group-work",label: "Group Work",icon: "🤝", path: "/group-work",element: <GroupWorkIndexPage /> },
-    { id: "users",     label: "Users",     icon: "🔍", path: "/users",     element: <Discover /> },
+    { id: "users",     label: "Students",  icon: "🔍", path: "/users",     element: <Discover /> },
     { id: "societies", label: "Societies", icon: "👥", path: "/societies", element: <SocietiesPage /> },
     { id: "modules",   label: "Modules",   icon: "📚", path: "/modules",   element: <ModulesPage /> },
-    { id: "map",       label: "UniMap",    icon: "🗺️", path: "/map",       element: <CampusMap /> },
+    { id: "map",       label: "KCL Map",   icon: "🗺️", path: "/map",       element: <CampusMap /> },
     { id: "analytics", label: "Analytics", icon: "📊", path: "/analytics", element: <AnalyticsPage /> },
     { id: "admin",     label: "Admin",     icon: "🛡️", path: "/admin",     element: <AdminPage />, isAdminOnly: true },
 ];

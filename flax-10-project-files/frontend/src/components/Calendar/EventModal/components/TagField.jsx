@@ -1,5 +1,5 @@
 import { useTags } from '../../../../context/TagContext';
-import AnimatedDropdown from '../../../ui/AnimatedDropdown';
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
 
 export function TagField({ value, onChange, customTags }) {
     const globalTags = useTags();

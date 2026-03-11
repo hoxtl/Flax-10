@@ -181,4 +181,41 @@ describe('AnnouncementModal', () => {
     await waitFor(() => expect(errorSpy).toHaveBeenCalled());
     errorSpy.mockRestore();
   });
+
+  it('delete without linked event shows simple message and calls onDelete and onClose', () => {
+    const onDelete = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <AnnouncementModal
+        onClose={onClose}
+        onSubmit={vi.fn()}
+        onDelete={onDelete}
+        announcement={{ id: 5, title: 'No Event', content: 'Body', pinned: false }}
+        societyId={1}
+        announcements={[]}
+      />,
+    );
+    fireEvent.click(screen.getByText('Delete'));
+    expect(screen.getByText('Delete Announcement')).toBeTruthy();
+    expect(screen.getByText(/Are you sure you want to delete this announcement/)).toBeTruthy();
+    expect(screen.queryByText(/linked event/)).toBeFalsy();
+    fireEvent.click(screen.getByText('confirm-delete'));
+    expect(onDelete).toHaveBeenCalledWith(5);
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('submit with no pinned conflict calls onSubmit with form only', () => {
+    const onSubmit = vi.fn();
+    render(
+      <AnnouncementModal
+        onClose={vi.fn()}
+        onSubmit={onSubmit}
+        announcement={{ id: 3, title: 'New Pin', content: '', pinned: true }}
+        announcements={[]}
+      />,
+    );
+    fireEvent.click(screen.getByText('Save Changes'));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ id: 3, pinned: true }));
+  });
 });

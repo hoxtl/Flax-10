@@ -42,7 +42,7 @@ vi.mock('../../../pages/Tasks/components/CreateTaskBar', () => ({
     default: () => <div data-testid="create-task-bar" />,
 }));
 
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={e => onChange(e.target.value)} data-testid="sort-dropdown">
             {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}

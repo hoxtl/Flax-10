@@ -5,6 +5,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader/PageHeader";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";

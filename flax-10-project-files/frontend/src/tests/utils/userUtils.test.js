@@ -11,11 +11,11 @@ describe('getInitials', () => {
   });
 
   it('returns single initial for single word', () => {
-    expect(getInitials('Jane')).toBe('K');
+    expect(getInitials('Jane')).toBe('J');
   });
 
   it('returns two initials for two words', () => {
-    expect(getInitials('Jane Doe')).toBe('KK');
+    expect(getInitials('Jane Doe')).toBe('JD');
   });
 
   it('returns only first two initials for more than two words', () => {
