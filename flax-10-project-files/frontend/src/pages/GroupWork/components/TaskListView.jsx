@@ -1,47 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Check, Trash2, X } from "lucide-react";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+import TaskAssigneePopup, { getUserColor } from "./TaskAssigneePopup";
+import TaskAvatarStack from "./TaskAvatarStack";
 import styles from "../GroupTasksTab.module.css";
 
-const USER_COLORS = [
-    "#7B6751", // Warm Brown
-    "#C0714E", // Terracotta
-    "#7BB38E", // Sage Green
-    "#9A8CB0", // Muted Lavender
-    "#7B9BAD", // Dusty Blue
-    "#C4A46D", // Warm Gold
-    "#8A7060", // Muted Bronze
-    "#b08c4b"  // Flax Gold
-];
 
-const getUserColor = (userId) => {
-    if (!userId) return USER_COLORS[0];
-    const idStr = String(userId);
-    let hash = 0;
-    for (let i = 0; i < idStr.length; i++) {
-        hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return USER_COLORS[Math.abs(hash) % USER_COLORS.length];
-};
 
 export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(task.title);
-    const popupRef = useRef(null);
+    const triggerRef = useRef(null);
     const isDone = task.completed;
 
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                setShowAssignPopup(false);
-            }
-        }
-        if (showAssignPopup) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [showAssignPopup]);
+    // Unified TaskAssigneePopup handles click outside and positioning logic
 
     const assignees = task.assignees_info || [];
     const taskColor = assignees.length > 0 ? getUserColor(assignees[0].id) : "#8d7355";
@@ -92,10 +65,10 @@ export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
 
     const getPriorityStyle = (priority) => {
         const p = (priority || "").toLowerCase();
-        if (p === "urgent") return { background: "#ffaebe", color: "#9e1f3d" };
-        if (p === "high") return { background: "#fed7aa", color: "#c2410c" };
-        if (p === "medium") return { background: "#fef08a", color: "#854d0e" };
-        return { background: "#f1ede9", color: "#8f7969" };
+        if (p === "urgent") return { background: "#f9a8c9", color: "#9b2257" };
+        if (p === "high") return { background: "#fcd5a8", color: "#9b5a22" };
+        if (p === "medium") return { background: "#f5e6a3", color: "#7a6a1a" };
+        return { background: "#b8e8c8", color: "#1a6a3a" };
     };
 
     const pStyle = getPriorityStyle(task.priority);
@@ -108,7 +81,7 @@ export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
                     className={`${styles.checkbox} ${isDone ? styles.checkboxDone : ""}`}
                     style={{
                         "--cb-bg": taskColor,
-                        "--cb-border": isDone ? taskColor : taskColorLight
+                        "--cb-border": isDone ? taskColor : "var(--border)"
                     }}
                 >
                     {isDone && <Check size={14} strokeWidth={3} />}
@@ -174,74 +147,38 @@ export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
 
             <div className={styles.assignCell}>
                 <div
+                    ref={triggerRef}
                     onClick={() => setShowAssignPopup(!showAssignPopup)}
                     className={`${styles.assignClickTarget} ${showAssignPopup ? styles.assignClickTargetActive : ""}`}
                 >
                     {assignees.length > 0 ? (
-                        <div className={styles.avatarStack}>
-                            {assignees.slice(0, 3).map((a, i) => (
-                                <div
-                                    key={a.id}
-                                    title={a.name}
-                                    className={styles.avatar}
-                                    style={{
-                                        background: getUserColor(a.id),
-                                        marginLeft: i > 0 ? -8 : 0,
-                                    }}
-                                >
-                                    {(a.name || "?").slice(0, 2).toUpperCase()}
-                                </div>
-                            ))}
-                            {assignees.length > 3 && (
-                                <span className={styles.avatarMore}>
-                                    +{assignees.length - 3}
-                                </span>
-                            )}
-                        </div>
+                        <TaskAvatarStack assignees={assignees} size={24} />
                     ) : (
                         <span className={styles.unassigned}>Unassigned</span>
                     )}
                 </div>
 
-                {showAssignPopup && (
-                    <div ref={popupRef} className={styles.assignPopup}>
-                        <div className={styles.assignPopupHeader}>
-                            <span className={styles.assignPopupTitle}>Assign Members</span>
-                            <span className={styles.closePopupBtn} onClick={() => setShowAssignPopup(false)}>
-                                <X size={12} />
-                            </span>
-                        </div>
-                        {members.map(m => {
-                            const isSelected = assignees.some(a => String(a.id) === String(m.user));
-                            const userCol = getUserColor(m.user);
-                            return (
-                                <div
-                                    key={m.id}
-                                    onClick={() => toggleAssignee(m.user)}
-                                    className={`${styles.assignItem} ${isSelected ? styles.assignItemSelected : ""}`}
-                                >
-                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: userCol }} />
-                                        <span>{m.user_name}</span>
-                                    </div>
-                                    {isSelected && <Check size={14} color={userCol} strokeWidth={3} />}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
+                <TaskAssigneePopup
+                    isOpen={showAssignPopup}
+                    onClose={() => setShowAssignPopup(false)}
+                    members={members}
+                    assignees={assignees}
+                    onToggleAssignee={toggleAssignee}
+                    triggerRef={triggerRef}
+                />
             </div>
 
             <div className={styles.actionCell}>
                 <button
                     onClick={() => onDelete(task.id)}
                     className={styles.deleteBtn}
+                    style={{ color: "var(--text-secondary)" }}
                     title="Delete task"
                 >
                     <Trash2 size={16} />
                 </button>
             </div>
-        </div>
+        </div >
     );
 }
 
