@@ -127,18 +127,24 @@ vi.mock('../../components/Society/SocietyDetail/SettingsModal', () => ({
 }));
 
 vi.mock('../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal', () => ({
-    default: ({ onClose, onSubmit }) => (
+    default: ({ onClose, onSubmit, onDelete }) => (
         <div data-testid="announcement-modal">
             <button onClick={onClose}>Close Announcement</button>
             <button onClick={() => onSubmit({ id: 1, title: 'A' }, null)}>Submit Update</button>
             <button onClick={() => onSubmit({ title: 'New Announcement' }, null)}>Submit New</button>
             <button onClick={() => onSubmit({ id: 2, title: 'B' }, { id: 99, pinned: true })}>Submit With Conflict</button>
+            {onDelete && <button onClick={() => onDelete(1, 'Edit Me')}>Delete Announcement</button>}
         </div>
     ),
 }));
 
 vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
-    default: ({ onClose }) => <div data-testid="report-modal"><button onClick={onClose}>Close Report</button></div>,
+    default: ({ onClose, onReportSuccess }) => (
+        <div data-testid="report-modal">
+            <button onClick={onClose}>Close Report</button>
+            <button onClick={onReportSuccess}>Report Success</button>
+        </div>
+    ),
 }));
 
 vi.mock('../../components/Society/SocietyDetail/MemberDirectoryModal', () => ({
@@ -389,10 +395,71 @@ describe('SocietyDetailPage', () => {
         });
         mockConfirm.mockResolvedValue(true);
         unreportSocietyApiMock.mockRejectedValue(new Error('Network error'));
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        renderPage();
+        fireEvent.click(screen.getByTitle('You have reported this society. Click to unreport.'));
+        await waitFor(() => expect(unreportSocietyApiMock).toHaveBeenCalledWith(1));
+        expect(updateLocalSociety).not.toHaveBeenCalled();
+        errSpy.mockRestore();
+    });
+
+    it('does not call unreport when user cancels confirm', async () => {
+        const updateLocalSociety = vi.fn();
+        useSocietyDetail.mockReturnValue({
+            ...mockHookData,
+            society: { ...mockHookData.society, has_reported: true },
+            updateLocalSociety,
+        });
+        mockConfirm.mockResolvedValue(false);
         renderPage();
         fireEvent.click(screen.getByTitle('You have reported this society. Click to unreport.'));
         await waitFor(() => expect(mockConfirm).toHaveBeenCalled());
-        await waitFor(() => expect(unreportSocietyApiMock).toHaveBeenCalledWith(1));
-        expect(updateLocalSociety).not.toHaveBeenCalled();
+        expect(unreportSocietyApiMock).not.toHaveBeenCalled();
+    });
+
+    it('report modal onReportSuccess updates local society', () => {
+        const updateLocalSociety = vi.fn();
+        useSocietyDetail.mockReturnValue({
+            ...mockHookData,
+            updateLocalSociety,
+        });
+        renderPage();
+        fireEvent.click(screen.getByTitle('Report Society'));
+        fireEvent.click(screen.getByText('Report Success'));
+        expect(updateLocalSociety).toHaveBeenCalledWith({ has_reported: true });
+    });
+
+    it('announcement modal onDelete closes and calls deleteAnnouncement', async () => {
+        renderPage();
+        fireEvent.click(screen.getByText('Edit Announcement'));
+        fireEvent.click(screen.getByText('Delete Announcement'));
+        await waitFor(() => expect(mockHookData.deleteAnnouncement).toHaveBeenCalledWith(1, false));
+        expect(screen.queryByTestId('announcement-modal')).toBeNull();
+    });
+
+    it('reads activeTab from search params', () => {
+        render(
+            <MemoryRouter initialEntries={['/society/1?tab=about']}>
+                <SocietyDetailPage societyId={1} onBack={vi.fn()} />
+            </MemoryRouter>
+        );
+        expect(screen.getByTestId('society-tabs')).toBeTruthy();
+    });
+
+    it('closes members modal', () => {
+        renderPage();
+        fireEvent.click(screen.getByText('View Members'));
+        fireEvent.click(screen.getByText('Close Members'));
+        expect(screen.queryByTestId('members-modal')).toBeNull();
+    });
+
+    it('members modal shows for editor role', () => {
+        useSocietyDetail.mockReturnValue({
+            ...mockHookData,
+            society: { ...mockHookData.society, role: 'editor' },
+        });
+        renderPage();
+        fireEvent.click(screen.getByText('View Members'));
+        expect(screen.getByTestId('members-modal')).toBeTruthy();
     });
 });

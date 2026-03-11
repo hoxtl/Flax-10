@@ -74,6 +74,16 @@ describe('TimetableImportModal', () => {
         await waitFor(() => expect(screen.getByText('Bad URL')).toBeTruthy());
     });
 
+    it('shows Import failed when onImport throws without message', async () => {
+        defaultProps.onImport.mockRejectedValue({});
+        render(<TimetableImportModal {...defaultProps} />);
+        fireEvent.change(screen.getByPlaceholderText(/timetable.ics/i), {
+            target: { value: 'https://example.com/file.ics' },
+        });
+        fireEvent.submit(document.querySelector('form'));
+        await waitFor(() => expect(screen.getByText('Import failed')).toBeTruthy());
+    });
+
     it('closes when cancel button clicked', () => {
         render(<TimetableImportModal {...defaultProps} />);
         fireEvent.click(screen.getByText('Cancel'));

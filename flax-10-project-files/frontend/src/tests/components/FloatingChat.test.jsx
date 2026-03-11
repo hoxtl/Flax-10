@@ -145,4 +145,64 @@ describe('FloatingChat', () => {
         fireEvent.click(screen.getByText('Clear'));
         expect(screen.queryByText('When should I study this week?')).toBeTruthy(); // suggestions back
     });
+
+    it('sends on Enter without Shift (handleKey path)', async () => {
+        analyticsService.aiChat.mockResolvedValue({ reply: 'Got it' });
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(textarea, { target: { value: 'My question' } });
+        await waitFor(() => expect(screen.getByDisplayValue('My question')).toBeTruthy());
+        fireEvent.keyDown(screen.getByPlaceholderText('Ask about your study patterns…'), { key: 'Enter', shiftKey: false });
+        await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalled());
+    });
+
+    it('does not send on Shift+Enter (allows newline)', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        fireEvent.change(textarea, { target: { value: 'Line 1' } });
+        fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true });
+        expect(analyticsService.aiChat).not.toHaveBeenCalled();
+    });
+
+    it('closes chat when FAB clicked while open', async () => {
+        render(<FloatingChat />);
+        const buttons = screen.getAllByRole('button');
+        fireEvent.click(buttons[0]);
+        expect(screen.getByText('Study Coach')).toBeTruthy();
+        const allBtns = screen.getAllByRole('button');
+        fireEvent.click(allBtns[allBtns.length - 1]);
+        await waitFor(() => expect(screen.queryByText('Study Coach')).toBeNull());
+    });
+
+    it('uses empty string when flax-open-chat has non-string initialMessage', () => {
+        render(<FloatingChat />);
+        act(() => {
+            window.dispatchEvent(new CustomEvent('flax-open-chat', { detail: { initialMessage: 123 } }));
+        });
+        expect(screen.getByText('Study Coach')).toBeTruthy();
+        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        expect(textarea.value).toBe('');
+    });
+
+    it('auto-sends initialMessage when opened via flax-open-chat', async () => {
+        analyticsService.aiChat.mockResolvedValue({ reply: 'Auto reply' });
+        render(<FloatingChat />);
+        act(() => {
+            window.dispatchEvent(new CustomEvent('flax-open-chat', { detail: { initialMessage: 'help me' } }));
+        });
+        await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalledWith(
+            [{ role: 'user', content: 'help me' }],
+            30
+        ), { timeout: 1000 });
+    });
+
+    it('does not send when input is empty and send button clicked', () => {
+        render(<FloatingChat />);
+        fireEvent.click(screen.getByRole('button'));
+        const sendBtn = screen.getByText('↑');
+        fireEvent.click(sendBtn);
+        expect(analyticsService.aiChat).not.toHaveBeenCalled();
+    });
 });

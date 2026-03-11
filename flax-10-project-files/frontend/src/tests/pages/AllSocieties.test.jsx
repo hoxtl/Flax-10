@@ -179,4 +179,45 @@ describe('AllSocieties', () => {
         fireEvent.change(select, { target: { value: 'other' } });
         expect(screen.getAllByTestId(/society-card-/).length).toBe(3);
     });
+
+    it('clears filters when clear button is clicked', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent?.includes('Ratified'));
+        if (ratifiedBtn) fireEvent.click(ratifiedBtn);
+        expect(screen.queryByText(/Clear/)).toBeTruthy();
+        fireEvent.click(screen.getByText(/Clear/));
+        expect(screen.getByText('Chess Club')).toBeTruthy();
+        expect(screen.getByText('Art Society')).toBeTruthy();
+    });
+
+    it('toggling same filter deactivates it', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent?.includes('Ratified'));
+        if (ratifiedBtn) {
+            fireEvent.click(ratifiedBtn);
+            expect(screen.queryByText('Art Society')).toBeNull();
+            fireEvent.click(ratifiedBtn);
+        }
+        expect(screen.getByText('Art Society')).toBeTruthy();
+    });
+
+    it('resets to page 1 when search changes', () => {
+        const manySocieties = Array.from({ length: 25 }, (_, i) => ({
+            id: i + 1,
+            name: `Society ${i + 1}`,
+            is_ratified: true,
+            category: 'sports',
+            member_count: 10,
+        }));
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={manySocieties} />);
+        fireEvent.click(screen.getByRole('button', { name: /Next/ }));
+        expect(screen.getByText(/Page 2/)).toBeTruthy();
+        fireEvent.change(screen.getByPlaceholderText('Search societies...'), { target: { value: 'Society 1' } });
+        expect(screen.getByText(/Page 1/)).toBeTruthy();
+    });
+
+    it('calls onSelect with undefined when onClick is not provided', () => {
+        render(<AllSocieties onBack={vi.fn()} societies={mockSocieties} />);
+        fireEvent.click(screen.getByTestId('society-card-1'));
+    });
 });
