@@ -150,4 +150,10 @@ describe('EventModal', () => {
         renderModal({ customTags });
         expect(screen.getByText('New Event')).toBeInTheDocument();
     });
+
+    it('hides reminder field when showReminder is false', () => {
+        renderModal({ showReminder: false });
+        expect(screen.getByText('New Event')).toBeInTheDocument();
+        expect(screen.queryByText('Reminders')).not.toBeInTheDocument();
+    });
 });

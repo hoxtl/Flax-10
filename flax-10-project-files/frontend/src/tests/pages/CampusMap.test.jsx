@@ -146,6 +146,15 @@ describe('CampusMap', () => {
         });
     });
 
+    it('handles getHomeAddress error without crashing', async () => {
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        getHomeAddress.mockRejectedValueOnce(new Error('network error'));
+        render(<CampusMap />);
+        await waitFor(() => expect(getHomeAddress).toHaveBeenCalled());
+        expect(errSpy).toHaveBeenCalledWith('User home could not be loaded: ', expect.any(Error));
+        errSpy.mockRestore();
+    });
+
     it('calculates walking route when start location and campus selected', async () => {
         render(<CampusMap />);
 

@@ -37,4 +37,21 @@ describe('ModuleDropdown', () => {
     render(<ModuleDropdown value="z" onChange={vi.fn()} options={options} />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
+
+  it('applies custom className to wrapper', () => {
+    const { container } = render(
+      <ModuleDropdown value="a" onChange={vi.fn()} options={options} className="custom-class" />
+    );
+    const wrapper = container.querySelector('[class*="wrapper"]');
+    expect(wrapper).toHaveClass('custom-class');
+  });
+
+  it('closes menu when clicking trigger again', () => {
+    render(<ModuleDropdown value="a" onChange={vi.fn()} options={options} />);
+    const trigger = screen.getAllByRole('button', { name: 'Alpha' })[0];
+    fireEvent.click(trigger);
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+    fireEvent.click(trigger);
+    expect(screen.queryByText('Beta')).not.toBeInTheDocument();
+  });
 });

@@ -668,7 +668,7 @@ export default function CampusMap() {
                 <div key={i} className={styles.disruptionCard}>
                   <div
                     className={styles.disruptionBadge}
-                    style={{ backgroundColor: disruptions.color }}
+                    style={{ backgroundColor: disruption.color }}
                   >
                     - {disruption.lineName}
                   </div>
