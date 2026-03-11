@@ -1,5 +1,6 @@
 import { formatTime, formatDuration } from './utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
+import { formatDate } from '../Calendar/utils/dateUtils.js';
 import styles from './ModuleDetails.module.css';
 
 // Detail view for a module - includes schedule, description and enrol button
@@ -14,10 +15,9 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                 <hr className={styles.divider} />
                 <ScheduleSection module={module} />
                 <hr className={styles.divider} />
-                <div className={styles.descriptionSection}>
-                    <h1 className={styles.sectionTitle}>Assignments</h1>
-                    <DeadlinesSection deadlines={module.deadlines} />
-                </div>
+                <AssignmentsSection deadlines={module.deadlines} />
+                <hr className={styles.divider} />
+                <ReadingsSectionWrapper readings={module.readings} />
                 <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
             </div>
         </div>
@@ -41,6 +41,24 @@ function DetailsHeader({ module, is_enrolled }) {
                     </a>
                 )}
             </div>
+        </div>
+    );
+}
+
+function AssignmentsSection({ deadlines }) {
+    return (
+        <div className={styles.descriptionSection}>
+            <h1 className={styles.sectionTitle}>Assignments</h1>
+            <DeadlinesSection deadlines={deadlines} />
+        </div>
+    );
+}
+
+function ReadingsSectionWrapper({ readings }) {
+    return (
+        <div className={styles.descriptionSection}>
+            <h1 className={styles.sectionTitle}>Readings</h1>
+            <ReadingsSection readings={readings} />
         </div>
     );
 }
@@ -107,6 +125,34 @@ function DeadlinesSection({ deadlines }) {
                     </div>
                 </div>
             ))}
+        </div>
+    );
+}
+
+function ReadingsSection({ readings }) {
+    if (!readings?.length) return <p className={styles.descriptionText}>No readings assigned yet.</p>;
+    const sorted = [...readings].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    return (
+        <div className={styles.deadlinesList}>
+            {sorted.map((r, i) => 
+                <ReadingRow key={r.id} reading={r} index={i} />)}
+        </div>
+    );
+}
+
+function ReadingRow({ reading, index }) {
+     return (
+        <div className={styles.deadlineItem}>
+            <span className={styles.deadlineIndex}>{index + 1}</span>
+            <div className={styles.deadlineBody}>
+                <div className={styles.deadlineTitleRow}>
+                    <span className={styles.deadlinesType}>📖 Reading</span>
+                    <span className={styles.deadlineTitle}>{reading.title}</span>
+                </div>
+                <span className={styles.deadlineDate}> 
+                    pages : {reading.start_page}-{reading.end_page} · Due {formatDate(new Date(reading.deadline))}
+                </span>
+            </div>
         </div>
     );
 }
