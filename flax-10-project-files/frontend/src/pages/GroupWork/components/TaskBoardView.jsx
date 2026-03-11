@@ -21,7 +21,9 @@ const getUserColor = (userId) => {
 
 function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragStart }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
+    const [popupPos, setPopupPos] = useState("bottom");
     const popupRef = useRef(null);
+    const triggerRef = useRef(null);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -34,6 +36,24 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [showAssignPopup]);
+
+    const handleTogglePopup = (e) => {
+        e.stopPropagation();
+        if (!showAssignPopup) {
+            // Measure before opening
+            if (triggerRef.current) {
+                const rect = triggerRef.current.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const estimatedPopupHeight = 250;
+                if (spaceBelow < estimatedPopupHeight && rect.top > estimatedPopupHeight) {
+                    setPopupPos("top");
+                } else {
+                    setPopupPos("bottom");
+                }
+            }
+        }
+        setShowAssignPopup(v => !v);
+    };
 
     const toggleAssignee = (userId) => {
         const assignees = t.assignees_info || [];
@@ -48,6 +68,14 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
 
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevent standard browser right-click menu
+        if (!showAssignPopup) {
+            if (triggerRef.current) {
+                const rect = triggerRef.current.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                if (spaceBelow < 250 && rect.top > 250) setPopupPos("top");
+                else setPopupPos("bottom");
+            }
+        }
         setShowAssignPopup(true);
     };
 
@@ -61,7 +89,7 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
 
     return (
         <div
-            className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""}`}
+            className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""} ${showAssignPopup ? styles.boardCardActive : ""}`}
             draggable
             onDragStart={(e) => handleDragStart(e, t.id)}
             onContextMenu={handleContextMenu}
@@ -105,8 +133,9 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
                     />
                 </div>
                 <div
+                    ref={triggerRef}
                     className={styles.avatarStack}
-                    onClick={(e) => { e.stopPropagation(); setShowAssignPopup(v => !v); }}
+                    onClick={handleTogglePopup}
                     style={{ cursor: "pointer" }}
                 >
                     {assignees.slice(0, 3).map((a, i) => (
@@ -134,11 +163,14 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
                         <motion.div
                             ref={popupRef}
                             className={styles.assignPopupBoard}
-                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            initial={{ opacity: 0, scale: 0.95, y: popupPos === "top" ? 10 : -10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            exit={{ opacity: 0, scale: 0.95, y: popupPos === "top" ? 10 : -10 }}
                             transition={{ duration: 0.15, ease: "easeOut" }}
-                            style={{ originY: 1 }}
+                            style={{
+                                originY: popupPos === "top" ? 1 : 0,
+                                ...(popupPos === "top" ? { top: "auto", bottom: "100%", marginBottom: "8px", marginTop: 0 } : {})
+                            }}
                         >
                             <div className={styles.assignPopupHeader}>
                                 <span className={styles.assignPopupTitle}>Assign Members</span>
