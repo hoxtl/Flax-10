@@ -1,0 +1,223 @@
+.section {
+  margin: 2rem 0 1rem;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.cardHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sectionIcon {
+  font-size: 0.9rem;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+}
+
+.sectionPill {
+  font-size: 0.7rem;
+  background: var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-family: var(--font-body);
+}
+
+.speedTag {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.cardDivider {
+  height: 1px;
+  background: var(--border);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s ease, opacity 0.2s;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: rgba(123, 103, 81, 0.03);
+}
+
+.row:active {
+  background: rgba(123, 103, 81, 0.06);
+}
+
+.rowAdded {
+  opacity: 0.35;
+}
+
+.rowLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-body);
+}
+
+.rowInfos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 2px 0;
+}
+
+.rowInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.rowHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-style: italic;
+  margin: 1px 0 0;
+  opacity: 0.7;
+}
+
+.addBtn {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  box-shadow: 0 2px 8px rgba(74, 52, 33, 0.10), inset 0 1px 0 rgba(255,255,255,0.25);
+  font-family: var(--font-body);
+}
+
+.addBtn:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 6px 16px rgba(74, 52, 33, 0.16), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+.addBtn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.addBtnDone {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.addBtn:disabled {
+  cursor: default;
+}
+
+.emptyInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.emptyEmoji {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  animation: wiggle 2s ease-in-out infinite;
+  transform-origin: 70% 80%;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15%       { transform: rotate(14deg) scale(1.1); }
+  30%       { transform: rotate(-10deg) scale(1.08); }
+  45%       { transform: rotate(8deg) scale(1.05); }
+  60%       { transform: rotate(-4deg) scale(1.02); }
+  75%       { transform: rotate(0deg) scale(1); }
+}
+
+.emptyMessage {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.emptySub {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1.4;
+}
