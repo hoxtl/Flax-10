@@ -209,21 +209,21 @@ export default function IntelligenceRow({
           >
             {getGreeting(displayName)}
           </motion.h2>
-          <motion.p
-            className={styles.headerSubtitle}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.16, ease: [0.23, 1, 0.32, 1] }}
-          >
-            {planningSubtitle}
-          </motion.p>
-          <div className={`${styles.liveContextCard} ${liveContext.tone === "warning" ? styles.liveContextCardWarning : ""}`}>
+          <div className={`${styles.liveContextCard} ${liveContext.tone === "warning" ? styles.liveContextInlineAlert : ""}`}>
             <div className={styles.liveContextTop}>
-              <span className={styles.liveContextLabel}>{liveContext.label}</span>
-              <LiveContextIcon size={14} strokeWidth={1.9} className={styles.liveContextIcon} aria-hidden />
+              {liveContext.tone === "warning" ? (
+                <span className={styles.liveContextDot} aria-hidden />
+              ) : (
+                <>
+                  <span className={styles.liveContextLabel}>{liveContext.label}</span>
+                  <LiveContextIcon size={14} strokeWidth={1.9} className={styles.liveContextIcon} aria-hidden />
+                </>
+              )}
             </div>
-            <p className={styles.liveContextText}>{liveContext.text}</p>
-            {liveContext.meta && <span className={styles.liveContextMeta}>{liveContext.meta}</span>}
+            <div className={styles.liveContextBody}>
+              <p className={styles.liveContextText}>{liveContext.text}</p>
+              {liveContext.meta && <span className={styles.liveContextMeta}>{liveContext.meta}</span>}
+            </div>
           </div>
         </div>
 
@@ -262,7 +262,7 @@ export default function IntelligenceRow({
                   )}
                 </div>
                 <Link to="/analytics?period=7&tab=Overview&from=homepage-banner" className={styles.analyticsLink}>
-                  Review analytics
+                  Review my analytics
                 </Link>
               </div>
             </div>

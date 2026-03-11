@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .taskWidgetSlotHeaderLeft {
@@ -42,7 +42,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -63,7 +63,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   line-height: 1.35;
-  max-width: 34ch;
+  max-width: 28ch;
 }
 
 .taskWidgetFocusBtn {
@@ -93,7 +93,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 7px;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
 .taskWidgetDueTodayPill {
@@ -133,14 +133,14 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .taskWidgetTaskRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 61px;
+  min-height: 58px;
   padding: 9px 11px;
   border-radius: 14px;
   border: 1px solid rgba(139, 115, 85, 0.11);
@@ -201,12 +201,13 @@
   padding: 5px 10px;
   border-radius: 10px;
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
+  opacity: 0.82;
 }
 
 .taskWidgetNextPill {
@@ -247,7 +248,7 @@
   font-size: 8px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
   margin-left: auto;
@@ -359,7 +360,7 @@
   }
 
   .taskWidgetTaskTitle {
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .taskWidgetMoreText {

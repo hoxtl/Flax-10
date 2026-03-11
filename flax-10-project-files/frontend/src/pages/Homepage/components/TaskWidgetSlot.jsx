@@ -139,9 +139,6 @@ export function TaskWidgetSlot({
                   </div>
                   <div className={styles.taskWidgetSlotTitleBlock}>
                     <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
-                    <p className={styles.taskWidgetSlotSubtitle}>
-                      Keep the queue clear and push the next meaningful task into focus.
-                    </p>
                   </div>
                 </div>
                 {!hasTimerSession && incompleteCount > 0 && (
@@ -185,6 +182,8 @@ export function TaskWidgetSlot({
                   const isOverdue   = status === "overdue";
                   const rowAccent = isOverdue ? "#C0714E" : "#8B7355";
                   const urgency = getUrgencyMeta(t);
+                  const categoryLabel = getTaskCategoryPill?.(t);
+                  const categoryStyle = getCategoryStyle(categoryLabel);
 
                   return (
                     <motion.li
@@ -216,6 +215,14 @@ export function TaskWidgetSlot({
 
                       <div className={styles.taskWidgetTaskBody}>
                         <div className={styles.taskWidgetTaskTopRow}>
+                          {categoryLabel && (
+                            <span
+                              className={styles.taskWidgetCategoryPill}
+                              style={{ background: categoryStyle.bg, color: categoryStyle.text }}
+                            >
+                              {categoryLabel}
+                            </span>
+                          )}
                           <span className={styles.taskWidgetTaskTitle} title={t.title}>
                             {t.title}
                           </span>
