@@ -86,13 +86,22 @@ function CourseRow({ formData, onChange }) {
 
 export default function AccountForm({ user, onSave, isSaving }) {
   const { formData, handleChange } = useAccountForm(user);
-  const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
+  const role = user?.role || "student";
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <SectionHeader title="Personal Information" />
       <PersonalInfoFields formData={formData} onChange={handleChange} />
       <CourseRow formData={formData} onChange={handleChange} />
-      <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
+      <TeacherRoleSection role={role} />
+      <SubmitButton
+        isSaving={isSaving}
+        label="Save Changes"
+        savingLabel="Saving..."
+      />
     </form>
   );
 }
