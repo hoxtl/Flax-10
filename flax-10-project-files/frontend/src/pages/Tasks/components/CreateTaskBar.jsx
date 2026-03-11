@@ -7,6 +7,7 @@ import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
+import { PiSquare } from "lucide-react";
 
 const DURATION_OPTIONS = [
   { value: 1, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
@@ -33,6 +34,20 @@ function DurationGroup({ styles: s, estimatedBlocks, setEstimatedBlocks }) {
       </div>
     </>
   );
+}
+
+function PageCountField({ styles: s, pageCount, setPageCount }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionRowLabel}>Pages</span>
+      <input
+        type="number" min="1" placeholder="e.g. 48" value={pageCount ?? ""} 
+        onChange={(e) => setPageCount(e.target.value ? Number(e.target.value) : null)}
+        className={`${s.input} ${s.pageCountInput}`} aria-label="Page count"
+      />
+    </>
+  )
 }
 
 function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions }) {
