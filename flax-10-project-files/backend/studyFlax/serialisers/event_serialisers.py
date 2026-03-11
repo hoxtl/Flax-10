@@ -29,6 +29,7 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     recurrence_rule = serializers.JSONField(required=False, allow_null=True)
     tag = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     location_latitude = serializers.FloatField(required=False, allow_null=True)
+    location_longitude = serializers.FloatField(required=False, allow_null=True)
 
     class Meta:
         model = CalendarEvent
