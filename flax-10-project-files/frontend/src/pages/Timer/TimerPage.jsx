@@ -40,7 +40,7 @@ export default function TimerPage() {
 
   useEffect(() => {
     if (!showFocusTransition) return;
-    const id = setTimeout(() => setShowFocusTransition(false), 10000);
+    const id = setTimeout(() => setShowFocusTransition(false), 5000);
     return () => clearTimeout(id);
   }, [showFocusTransition]);
 

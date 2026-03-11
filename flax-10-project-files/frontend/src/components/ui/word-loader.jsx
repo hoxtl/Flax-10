@@ -27,7 +27,7 @@ export default function WordLoader({ words, className }) {
         }
         return i + 1;
       });
-    }, 1800);
+    }, 1000);
     return () => clearInterval(interval);
   }, [words.length]);
 
