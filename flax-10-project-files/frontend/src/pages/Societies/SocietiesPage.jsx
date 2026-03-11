@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader/PageHeader";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
@@ -13,10 +14,23 @@ import Tabs from "../../components/common/Tabs/Tabs";
 import { usePagination } from "../../hooks/usePagination";
 import { BackToTop } from "../../components/Pagination/Pagination";
 
+function SocietiesSkeleton() {
+  return (
+    <div className={styles.container}>
+      <div className={`${styles.skel} ${styles.skelPageTitle}`} />
+      <div className={styles.skelGrid}>
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className={`${styles.skel} ${styles.skelSocCard}`} style={{ animationDelay: `${i * 0.07}s` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function SocietiesPage() {
     const state = useSocietiesPage();
 
-    if (state.loading) return <div className={styles.container}>Loading...</div>;
+    if (state.loading) return <SocietiesSkeleton />;
     if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={state.clearSelection} />;
     if (state.view === "all") return (
         <>
@@ -106,6 +120,7 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
 
     return (
         <div className={styles.container}>
+            <PageHeader title="Societies" subtitle="Your communities at King's College London" />
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
             <BackToTop />
         </div>

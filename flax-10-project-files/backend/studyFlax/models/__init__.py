@@ -9,6 +9,7 @@ from .calendar.categoryModel import *
 from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
 from .calendar.timetableSourceModel import *
+from .calendar.eventAttendanceModel import EventAttendance
 
 # Module
 from .modules.moduleModel import *
@@ -30,3 +31,6 @@ from studyFlax.models.tasks.taskModel import Task, TaskList
 
 # Social
 from .social import *
+
+# Group work
+from .groupwork.groupwork_models import GroupProject, GroupMembership

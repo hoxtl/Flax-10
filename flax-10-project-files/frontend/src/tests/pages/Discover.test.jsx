@@ -8,11 +8,11 @@ vi.mock('../../api/userService', () => ({
 
 vi.mock('../../components/Social/UserSearch', () => ({
     FilterSection: () => <div data-testid="filter-section" />,
-    useSearchInit: vi.fn(() => ({ allModules: [], allSocieties: [] })),
+    useSearchInit: vi.fn(() => ({ allCourses: {}, allSocieties: [] })),
     useFilterState: vi.fn(() => ({
         isFilterOpen: false,
         setIsFilterOpen: vi.fn(),
-        props: { selectedModules: [], selectedSocieties: [] },
+        props: { selectedCourses: [], selectedYears: [], selectedSocieties: [] },
     })),
     useClickOutside: vi.fn(),
 }));
