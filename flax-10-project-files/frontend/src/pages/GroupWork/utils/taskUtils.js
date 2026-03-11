@@ -12,6 +12,10 @@ export function buildToggleAssignee(assignees, taskId, onUpdate) {
     };
 }
 
+export function handleDragStartTask(e, taskId) {
+    e.dataTransfer.setData("text/plain", String(taskId));
+}
+
 export function getDueDateStr(due_date) {
     if (!due_date) return "";
     return new Date(due_date).toISOString().slice(0, 10);
