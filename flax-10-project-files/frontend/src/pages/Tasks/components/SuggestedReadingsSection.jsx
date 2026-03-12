@@ -37,7 +37,8 @@ function ReadingCardInfo({ reading, avgMinPerPage }) {
   const deadline = formatDeadline(reading.deadline);
   const estimatedMinutes = estimateMinutes(reading.page_count, avgMinPerPage);
   return (
-    <div className={styles.rowInfo}>
+    <div className={styles.rowInfos}>
+      {reading.module_code && (<span className={styles.rowInfoPill}>{reading.module_code}</span> )}
       {reading.page_count && (<span className={styles.rowInfo}><FileText size={11} strokeWidth={2} /> {reading.page_count} pages</span>)}
       {deadline && (<span className={styles.rowInfo}><Calendar size={11} strokeWidth={2} /> Due {deadline}</span>)}
       {estimatedMinutes && (<span className={styles.rowInfo}><Clock size={11} strokeWidth={2} /> {estimatedMinutes} min to read</span>)}
