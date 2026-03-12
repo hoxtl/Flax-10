@@ -110,3 +110,31 @@ describe("adminApi – reported societies", () => {
     );
   });
 });
+
+describe("adminApi – ratifications", () => {
+  it("fetchPendingRatifications calls correct endpoint", () => {
+    fetchApi.mockResolvedValue([]);
+    fetchPendingRatifications();
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/admin/societies/pending-ratifications/",
+    );
+  });
+
+  it("approveRatification calls correct endpoint with POST", () => {
+    fetchApi.mockResolvedValue({});
+    approveRatification(5);
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/societies/5/ratification/approve/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("rejectRatification calls correct endpoint with POST", () => {
+    fetchApi.mockResolvedValue({});
+    rejectRatification(5);
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/societies/5/ratification/reject/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});
