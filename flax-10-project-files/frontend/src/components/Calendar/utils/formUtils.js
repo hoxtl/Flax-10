@@ -137,6 +137,7 @@ async function buildEventData(form) {
         if (coords) {
             data.location_latitude = coords.latitude;
             data.location_longitude = coords.longitude;
+            data.location_validated = true;
         }
     }
 
