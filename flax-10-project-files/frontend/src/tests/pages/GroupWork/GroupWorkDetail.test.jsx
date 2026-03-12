@@ -13,6 +13,7 @@ vi.mock('../../../pages/GroupWork/groupWorkHooks', () => ({
   getAuthHeaders: () => ({}),
   useProject: vi.fn(),
   useProjectMembers: vi.fn(),
+  useSelectedTab: vi.fn(),
 }));
 
 // Mock sub-components to avoid context issues
@@ -23,7 +24,7 @@ vi.mock('../../../pages/GroupWork/AvailabilityTab', () => ({
   default: () => <div data-testid="availability-tab" />,
 }));
 
-import { useProject, useProjectMembers } from '../../../pages/GroupWork/groupWorkHooks';
+import { useProject, useProjectMembers, useSelectedTab } from '../../../pages/GroupWork/groupWorkHooks';
 
 const mockProject = {
   id: 1,
@@ -50,6 +51,7 @@ describe('GroupWorkDetail', () => {
     vi.clearAllMocks();
     useProject.mockReturnValue({ project: mockProject, loading: false });
     useProjectMembers.mockReturnValue({ members: mockMembers, setMembers: vi.fn(), loading: false });
+    useSelectedTab.mockReturnValue("tasks");
   });
 
   it('renders project details', () => {
