@@ -214,3 +214,45 @@ describe("AccountForm – teacher role section (pending_teacher)", () => {
     );
   });
 });
+
+describe("AccountForm – role sync", () => {
+  it("updates localStorage when API role differs from stored role", async () => {
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ ...baseUser, role: "student" }),
+    );
+    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    await waitFor(() => {
+      const stored = JSON.parse(localStorage.getItem("user"));
+      expect(stored.role).toBe("teacher");
+    });
+  });
+
+  it("dispatches auth-changed when role is stale in localStorage", async () => {
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ ...baseUser, role: "pending_teacher" }),
+    );
+    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
+    const listener = vi.fn();
+    window.addEventListener("auth-changed", listener);
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    await waitFor(() => expect(listener).toHaveBeenCalled());
+    window.removeEventListener("auth-changed", listener);
+  });
+
+  it("does not dispatch auth-changed when role is already correct", async () => {
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ ...baseUser, role: "student" }),
+    );
+    getUserProfile.mockResolvedValue({ ...baseUser, role: "student" });
+    const listener = vi.fn();
+    window.addEventListener("auth-changed", listener);
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    await new Promise((r) => setTimeout(r, 60));
+    expect(listener).not.toHaveBeenCalled();
+    window.removeEventListener("auth-changed", listener);
+  });
+});
