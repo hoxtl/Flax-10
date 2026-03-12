@@ -33,8 +33,8 @@ export function TableRow({ event, events, rowIndex, editState, navState, onCellC
     const { editingCell, cellValue, updateValue } = editState;
     const { focusedCell, handleKeyDown, EDITABLE_COLUMNS } = navState;
     const quickAction = useQuickActions(event);
-    const { tags } = useTags();
-    const theme = getEventTheme(event, tags);
+    const tagContext = useTags();
+    const theme = getEventTheme(event, tagContext);
 
     const isEditing = (field) => editingCell?.eventId === event.id && editingCell?.field === field;
     const isEditingDesc = isEditing('description');
@@ -82,7 +82,7 @@ export function TableRow({ event, events, rowIndex, editState, navState, onCellC
                 </div>
             </td>
             <td className={styles.tagCell} onClick={stopPropIfEditable}>
-                <TagEditCell event={event} tags={tags} theme={theme} isReadOnly={isReadOnly}
+                <TagEditCell event={event} tags={tagContext.tags} theme={theme} isReadOnly={isReadOnly}
                     isEditing={isEditing('tag')} editValue={cellValue} onEdit={(e) => handleCellClick(e, 'tag', 1)}
                     onSave={editState.saveWithValue} onCancel={editState.cancelEdit} />
                 <SourceBadge badge={sourceBadge} />
