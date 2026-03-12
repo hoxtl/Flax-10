@@ -129,7 +129,7 @@ export function isRecurringEvent(event) {
     return hasRecurrence(event);
 }
 
-function buildEventData(form) {
+async function buildEventData(form) {
     const data = buildBaseEventData(form);
     const { frequency, interval, end_date } = form.recurrence || {};
     if (frequency && frequency !== 'none') {
