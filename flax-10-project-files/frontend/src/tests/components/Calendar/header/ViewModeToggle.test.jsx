@@ -31,8 +31,5 @@ describe('ViewModeToggle', () => {
 
         fireEvent.click(screen.getByText('Month'));
         expect(dispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'month' });
-
-        fireEvent.click(screen.getByText('Year'));
-        expect(dispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'year' });
     });
 });

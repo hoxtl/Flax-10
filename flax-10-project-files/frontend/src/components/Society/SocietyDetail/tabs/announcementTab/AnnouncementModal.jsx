@@ -33,7 +33,7 @@ export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = 
             <StandardModal title={announcement ? "Edit Announcement" : "Add Announcement"} onClose={onClose}>
                 <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
                     error={error} setError={setError} onClose={onClose}
-                    onSubmit={async (f, conflict) => await handleSubmit(f, setError, onSubmit, announcements, conflict, confirmFn)}
+                    onSubmit={async (f) => await handleSubmit(f, setError, onSubmit, announcements, confirmFn)}
                     isEdit={!!announcement} setForm={setForm}
                     onDeleteClick={() => setShowDeleteConfirm(true)} />
             </StandardModal>

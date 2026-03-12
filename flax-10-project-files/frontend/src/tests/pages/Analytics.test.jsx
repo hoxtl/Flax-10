@@ -118,23 +118,23 @@ describe('AnalyticsPage', () => {
 
     it('refetches when period changes', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('7d'));
+        await screen.findByTestId('summary-cards');
         fireEvent.click(screen.getByText('7d'));
-        expect(analyticsService.getSummary).toHaveBeenCalledWith(7);
+        await waitFor(() => expect(analyticsService.getSummary).toHaveBeenCalledWith(7));
     });
 
     it('refetches with 90d when 90d period clicked', async () => {
-        render(<AnalyticsPage />);
-        await waitFor(() => screen.getByText('90d'));
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
+        await screen.findByTestId('summary-cards');
         fireEvent.click(screen.getByText('90d'));
-        expect(analyticsService.getSummary).toHaveBeenCalledWith(90);
+        await waitFor(() => expect(analyticsService.getSummary).toHaveBeenCalledWith(90));
     });
 
     it('shows generic error when fetch fails without message', async () => {
         analyticsService.getSummary.mockRejectedValueOnce({});
         analyticsService.getProgress.mockRejectedValueOnce({});
         analyticsService.getThemeStats.mockRejectedValueOnce({});
-        render(<AnalyticsPage />);
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByText(/Failed to load analytics data/)).toBeTruthy());
     });
 });

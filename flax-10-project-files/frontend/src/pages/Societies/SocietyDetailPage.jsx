@@ -120,7 +120,7 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
 
     return (
         <div className={styles.page}>
-            <TopBar onBack={onBack} isAdmin={society.role === 'admin'} onSettings={() => modals.setShowSettings(true)} onReport={() => modals.setShowReportModal(true)} onUnreport={handleUnreport} hasReported={society.has_reported} />
+            <TopBar onBack={onBack} isAdmin={society.role === 'admin'} onSettings={() => modals.setShowSettings(true)} onReport={() => modals.setShowReportModal(true)} onUnreport={() => handleUnreport(society)} hasReported={society.has_reported} />
             <SocietyHero society={society} onImageClick={() => modals.setGalleryOpen(true)} editMode={modals.editMode} onUpdateName={(name) => updateSociety({ name })} onEditImages={() => modals.setShowCoverModal(true)} />
             <SocietyInfo society={society} editMode={modals.editMode} onUpdateSociety={updateSociety} onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety} canEdit={society.is_admin} onToggleEditMode={toggleEdit} onViewMembers={() => modals.setShowMembersModal(true)} isSubscribed={subscription.isSubscribed} onToggleSubscription={subscription.toggleSubscription} />
             <MainContent activeTab={page.activeTab} setActiveTab={page.handleTabChange} society={society} editMode={modals.editMode} handlers={handlers} focusAnnouncementId={page.focusAnnouncementId} onEditAnnouncement={modals.setEditingAnnouncement} />

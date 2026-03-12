@@ -125,7 +125,7 @@ function isTodayVisible(viewMode, date) {
     const today = new Date();
     if (viewMode === 'day') return isSameDay(date, today);
     if (viewMode === 'week') return getWeekDays(date).some(d => isSameDay(d, today));
-    return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+    return date.getMonth() === today.getMonth()
 }
 
 function getTodayDate() {

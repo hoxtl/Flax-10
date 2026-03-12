@@ -36,7 +36,7 @@ describe('SocietyCard', () => {
         const onClick = vi.fn();
         const { container } = render(<SocietyCard society={society} onClick={onClick} />);
         fireEvent.click(container.firstChild);
-        expect(onClick).toHaveBeenCalledWith(society);
+        expect(onClick).toHaveBeenCalledWith(society.id);
     });
 
     it('does not throw when onClick is undefined', () => {

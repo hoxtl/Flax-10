@@ -5,11 +5,11 @@ import AdminPage from '../../pages/AdminPage';
 describe('AdminPage', () => {
     it('renders admin dashboard heading', () => {
         render(<AdminPage />);
-        expect(screen.getByText('Admin Dashboard')).toBeTruthy();
+        expect(screen.getByText('Admin', { selector: 'h1' })).toBeTruthy();
     });
 
     it('shows superuser visibility note', () => {
         render(<AdminPage />);
-        expect(screen.getByText(/only visible to superusers/)).toBeTruthy();
+        expect(screen.getByText(/only visible to admin accounts/)).toBeTruthy();
     });
 });

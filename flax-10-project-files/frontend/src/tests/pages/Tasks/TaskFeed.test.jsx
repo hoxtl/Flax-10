@@ -114,7 +114,7 @@ function renderFeed(props = {}) {
 
 describe('TaskFeed', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     it('renders "All tasks" header by default', () => {
@@ -217,7 +217,7 @@ describe('TaskFeed', () => {
         renderFeed();
         fireEvent.click(screen.getByText('Filter'));
         fireEvent.click(screen.getByText('Modules'));
-        expect(screen.getByText('No modules found.')).toBeTruthy();
+        expect(screen.getByText('No modules found')).toBeTruthy();
     });
 
     it('renders completed task count', () => {
@@ -306,10 +306,10 @@ describe('TaskFeed', () => {
         expect(screen.getByText('CS')).toBeTruthy();
         expect(screen.getByText('MA')).toBeTruthy();
         fireEvent.change(screen.getByPlaceholderText('Search modules...'), { target: { value: 'zzz' } });
-        expect(screen.getByText('No modules found.')).toBeTruthy();
+        expect(screen.getByText('No modules found')).toBeTruthy();
         fireEvent.click(screen.getByText('Lists'));
         fireEvent.change(screen.getByPlaceholderText('Search lists...'), { target: { value: 'zzz' } });
-        expect(screen.getByText('No lists found.')).toBeTruthy();
+        expect(screen.getByText('No lists found')).toBeTruthy();
     });
 
     it('closes filter dialog on outside mousedown', () => {

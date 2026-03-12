@@ -44,6 +44,14 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
         </>
     ),
     ViewSettingsMenu: () => null,
+    ViewModeButton: ({ modes, activeMode, onChange }) => (
+        <select value={activeMode} onChange={e => onChange(e.target.value)}>
+            {modes.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+        </select>
+    ),
+    SearchButton: ({ value, onChange }) => (
+        <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
+    ),
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
@@ -161,9 +169,9 @@ describe('CalendarHeader', () => {
         setup();
         const importBtn = screen.getByText('Import timetable');
         fireEvent.click(importBtn);
-        const urlInput = await screen.findByDisplayValue('');
+        const urlInput = await screen.findByPlaceholderText(/timetable\.ics/i);
         fireEvent.change(urlInput, { target: { value: 'http://example.com/calendar.ics' } });
-        const submitBtn = document.querySelector('button[type="submit"]');
+        const submitBtn = screen.getByRole('button', { name: /^import$/i });
         fireEvent.click(submitBtn);
         await waitFor(() => expect(importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics'));
     });
@@ -190,7 +198,7 @@ describe('CalendarHeader', () => {
         setup();
         fireEvent.click(screen.getByText('Import timetable'));
         await screen.findByText('Import Timetable');
-        fireEvent.click(screen.getByText('✕'));
+        fireEvent.click(screen.getByText('×'));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 

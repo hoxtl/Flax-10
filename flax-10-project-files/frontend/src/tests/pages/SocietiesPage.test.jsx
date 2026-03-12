@@ -5,6 +5,18 @@ import { MemoryRouter } from 'react-router-dom';
 // Mock CSS modules
 vi.mock('../../pages/Societies/SocietiesPage.module.css', () => ({ default: {} }));
 
+// Mock framer-motion
+vi.mock('framer-motion', () => ({
+    motion: new Proxy({}, {
+        get: (_, tag) => ({ children, ...props }) => {
+            const Tag = typeof tag === 'string' ? tag : 'div';
+            const { initial, animate, exit, transition, variants, custom, whileHover, whileTap, layoutId, ...rest } = props;
+            return <Tag {...rest}>{children}</Tag>;
+        },
+    }),
+    AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
 // Mock Skeletons
 vi.mock('../../pages/Societies/SocietySkeletons', () => ({
     SocietiesSkeleton: () => <div>Loading...</div>
