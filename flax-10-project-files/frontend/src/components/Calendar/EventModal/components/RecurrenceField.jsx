@@ -1,4 +1,20 @@
+import DateTimePicker from '../../../common/inputs/DateTimePicker';
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import './RecurrenceField.css';
+
+const FREQUENCY_OPTIONS = [
+    { value: 'none', label: 'None' },
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'biweekly', label: 'Biweekly' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' },
+];
+
+const END_TYPE_OPTIONS = [
+    { value: 'never', label: 'Never' },
+    { value: 'on_date', label: 'On date' },
+];
 
 export function RecurrenceField({ value, onChange }) {
     const { frequency = 'none', interval = 1, end_date = null } = value || {};
@@ -18,22 +34,11 @@ export function RecurrenceField({ value, onChange }) {
 function RecurrenceOptions({ frequency, interval, onChange }) {
     return (
         <div className="recurrence-row">
-            <FrequencySelect frequency={frequency} onChange={(e) => onChange('frequency', e.target.value)} />
+            <div className="frequency-dropdown">
+                <AnimatedDropdown value={frequency} onChange={(val) => onChange('frequency', val)} options={FREQUENCY_OPTIONS} placeholder="Select" />
+            </div>
             {frequency !== 'none' && <IntervalInput interval={interval} onChange={onChange} />}
         </div>
-    );
-}
-
-function FrequencySelect({ frequency, onChange }) {
-    return (
-        <select value={frequency} onChange={onChange} className="frequency-select">
-            <option value="none">None</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Biweekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
     );
 }
 
@@ -48,39 +53,28 @@ function IntervalInput({ interval, onChange }) {
 
 function EndRepeatField({ endDate, onChange }) {
     const endType = endDate ? 'on_date' : 'never';
-
-    const handleTypeChange = (e) => {
-        const newType = e.target.value;
-        onChange('end_date', newType === 'never' ? null : getDefaultEndDate());
-    };
+    const handleTypeChange = (val) => onChange('end_date', val === 'never' ? null : getDefaultEndDate());
 
     return (
         <div className="end-repeat-section">
             <label>End repeat</label>
-            <EndRepeatOptions endType={endType} endDate={endDate} onTypeChange={handleTypeChange} onChange={onChange} />
-        </div>
-    );
-}
-
-function EndRepeatOptions({ endType, endDate, onTypeChange, onChange }) {
-    return (
-        <div className="end-repeat-row">
-            <select value={endType} onChange={onTypeChange} className="end-type-select">
-                <option value="never">Never</option>
-                <option value="on_date">On date</option>
-            </select>
-            {endType === 'on_date' && <DateInput endDate={endDate} onChange={onChange} />}
+            <div className="end-repeat-row">
+                <div className="end-type-dropdown">
+                    <AnimatedDropdown value={endType} onChange={handleTypeChange} options={END_TYPE_OPTIONS} placeholder="Select" />
+                </div>
+                {endType === 'on_date' && <DateInput endDate={endDate} onChange={onChange} />}
+            </div>
         </div>
     );
 }
 
 function DateInput({ endDate, onChange }) {
     return (
-        <input
-            type="date"
-            value={endDate}
-            onChange={(e) => onChange('end_date', e.target.value || null)}
-            className="end-date-input"
+        <DateTimePicker
+            value={endDate || ''}
+            onChange={(val) => onChange('end_date', val || null)}
+            dateOnly
+            placeholder="Select end date"
         />
     );
 }

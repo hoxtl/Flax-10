@@ -1,3 +1,7 @@
+/**
+ * AnnouncementModal provides a comprehensive form for creating and editing society announcements,
+ * with optional synchronization to the society's event calendar.
+ */
 import { useState, useRef, useEffect } from "react";
 import styles from "./AnnouncementModal.module.css";
 import { getInitialForm, validateForm, handleFileSelect, MAX_IMAGES } from "./AnnouncementModalHelpers";
@@ -29,7 +33,7 @@ export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = 
             <StandardModal title={announcement ? "Edit Announcement" : "Add Announcement"} onClose={onClose}>
                 <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
                     error={error} setError={setError} onClose={onClose}
-                    onSubmit={async (f, conflict) => await handleSubmit(f, setError, onSubmit, announcements, conflict, confirmFn)}
+                    onSubmit={async (f) => await handleSubmit(f, setError, onSubmit, announcements, confirmFn)}
                     isEdit={!!announcement} setForm={setForm}
                     onDeleteClick={() => setShowDeleteConfirm(true)} />
             </StandardModal>
@@ -61,25 +65,24 @@ function DeleteConfirmModal({ hasEvent, onConfirm, onCancel }) {
     return <ConfirmModal title="Delete Announcement" message={message} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
-function handleSubmit(form, setError, onSubmit, announcements, conflict, confirmFn) {
-    const error = validateForm(form);
-    if (error) return setError(error);
+/** Form submission handler with pinning conflict resolution. */
+async function handleSubmit(form, setError, onSubmit, announcements, confirmFn) {
+    const err = validateForm(form);
+    if (err) return setError(err);
     if (form.pinned) {
-        const currentPinned = announcements.find(a => a.pinned && a.id !== form.id);
-        if (currentPinned) {
-            confirmFn({
-                title: "Replace Pinned Announcement",
-                message: `"${currentPinned.title}" is currently pinned. Do you want to unpin it and pin this one instead?`,
-                confirmText: "Yes, Replace",
-                cancelText: "Cancel"
-            }).then(confirmReplace => {
-                if (!confirmReplace) return;
-                onSubmit(form, currentPinned);
-            });
-            return;
-        }
+        const other = announcements.find(a => a.pinned && a.id !== form.id);
+        if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
     }
     onSubmit(form);
+}
+
+async function handlePinConflict(form, other, confirmFn, onSubmit) {
+    const ok = await confirmFn({
+        title: "Replace Pinned",
+        message: `"${other.title}" is already pinned. Replace it?`,
+        confirmText: "Replace", cancelText: "Cancel"
+    });
+    if (ok) onSubmit(form, other);
 }
 
 function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, onSubmit, isEdit, onDeleteClick }) {

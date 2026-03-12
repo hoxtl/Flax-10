@@ -30,6 +30,11 @@ from studyFlax.views.calendar.event_detail_views import event_detail, add_except
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
 from studyFlax.views.calendar.timetable_views import timetable_import
 from studyFlax.views.calendar.event_map_view import calendar_events_map_view
+from studyFlax.views.calendar.attendance_views import (
+    record_attendance,
+    attendance_stats,
+    attendance_records,
+)
 
 # Modules
 from studyFlax.views.modules.module_views import module_list, module_detail
@@ -45,6 +50,14 @@ from studyFlax.views.settings.user_settings_view import user_settings_view
 from studyFlax.views.tasks.task_views import (
     task_list_list, task_list_detail, task_list, task_detail, log_task_time
 )
+from studyFlax.views.groupwork.groupwork_views import (
+    group_project_list,
+    group_project_members,
+    group_project_detail,
+    group_project_member_detail,
+)
+from studyFlax.views.groupwork.availability_views import group_availability
+from studyFlax.views.groupwork.suggestion_views import create_suggestion, respond_to_suggestion, delete_suggestion
 
 # Societies
 from studyFlax.views.society import (
@@ -53,7 +66,7 @@ from studyFlax.views.society import (
     event_list as society_event_list, event_detail as society_event_detail,
     sync_status, sync_calendar, unsync_calendar,
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
-    add_society_event_exception, publish_changes
+    add_society_event_exception, publish_changes, report_society, toggle_subscription
 )
 # Notifications
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
@@ -119,6 +132,41 @@ urlpatterns = [
     path("tasks/lists/", task_list_list, name="task-list-list"),
     path("tasks/lists/<int:list_id>/", task_list_detail, name="task-list-detail"),
 
+    # Group work
+    path("group-work/projects/", group_project_list, name="group-project-list"),
+    path("group-work/projects/<int:project_id>/members/", group_project_members, name="group-project-members"),
+    path("group-work/projects/<int:project_id>/", group_project_detail, name="group-project-detail"),
+    path(
+        "group-work/projects/<int:project_id>/members/<int:membership_id>/",
+        group_project_member_detail,
+        name="group-project-member-detail",
+    ),
+    path(
+        "group-work/projects/<int:project_id>/availability/",
+        group_availability,
+        name="group-availability",
+    ),
+    path(
+        "group-work/projects/<int:project_id>/suggestions/",
+        create_suggestion,
+        name="group-suggestion-create",
+    ),
+    path(
+        "group-work/suggestions/<int:suggestion_id>/respond/",
+        respond_to_suggestion,
+        name="group-suggestion-respond",
+    ),
+    path(
+        "group-work/suggestions/<int:suggestion_id>/",
+        delete_suggestion,
+        name="group-suggestion-delete",
+    ),
+
+    # Attendance
+    path("attendance/record/", record_attendance, name="attendance-record"),
+    path("attendance/stats/", attendance_stats, name="attendance-stats"),
+    path("attendance/records/", attendance_records, name="attendance-records"),
+
     # Notifications
     path("notifications/", notification_list, name="notification-list"),
     path("notifications/<int:pk>/", notification_detail, name="notification-detail"),
@@ -139,6 +187,8 @@ urlpatterns = [
     path("societies/<int:society_id>/events/", society_event_list, name="society-events"),
     path("societies/<int:society_id>/events/<int:event_id>/", society_event_detail, name="society-event-detail"),
     path("societies/<int:society_id>/events/<int:event_id>/exception/", add_society_event_exception, name="society-event-exception"),
+    path("societies/<int:society_id>/report/", report_society, name="society-report"),
+    path("societies/<int:society_id>/subscribe/", toggle_subscription, name="society-subscribe"),
     path("societies/<int:society_id>/calendar-sync/", sync_calendar, name="society-calendar-sync"),
     path("societies/<int:society_id>/calendar-unsync/", unsync_calendar, name="society-calendar-unsync"),
     path("societies/<int:society_id>/calendar-sync-status/", sync_status, name="society-calendar-sync-status"),

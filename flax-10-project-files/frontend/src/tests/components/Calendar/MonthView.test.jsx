@@ -104,6 +104,18 @@ describe('MonthView', () => {
         expect(screen.getByText('Event 3')).toBeInTheDocument();
     });
 
+    it('renders society event with society name in title', () => {
+        const stateWithSociety = {
+            ...defaultState,
+            events: [
+                { id: 4, title: 'Society Meet', source: 'society', society_name: 'Chess Club', start_time: new Date(2026, 1, 15, 14, 0), end_time: new Date(2026, 1, 15, 15, 0) },
+            ],
+        };
+        setup(stateWithSociety);
+        const dot = document.querySelector('[title="Society Meet (Chess Club)"]');
+        expect(dot).toBeTruthy();
+    });
+
     it('should open modal when clicking add button on a day', () => {
         setup();
         const addBtns = screen.getAllByText('+');
@@ -169,5 +181,51 @@ describe('MonthView', () => {
         expect(screen.getByText('Ev 3')).toBeInTheDocument();
         expect(screen.queryByText('Ev 4')).not.toBeInTheDocument();
         expect(screen.getByText('+1 more')).toBeInTheDocument();
+    });
+
+    it('dispatches date and view mode when +X more clicked (no onMoreClick prop)', () => {
+        const manyEvents = [1, 2, 3, 4].map(i => ({
+            id: i, title: `Ev ${i}`, start_time: new Date(2026, 1, 15, 10, i), end_time: new Date(2026, 1, 15, 11, i)
+        }));
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({ ...defaultState, events: manyEvents });
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue({ ...defaultState, events: manyEvents });
+        render(<MonthView />);
+        const moreBtn = screen.getByText('+1 more');
+        fireEvent.click(moreBtn);
+        expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_SELECTED_DATE', payload: expect.any(Date) });
+        expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+    });
+
+    it('calls onMoreClick prop when +X more clicked', () => {
+        const manyEvents = [1, 2, 3, 4].map(i => ({
+            id: i, title: `Ev ${i}`, start_time: new Date(2026, 1, 15, 10, i), end_time: new Date(2026, 1, 15, 11, i)
+        }));
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({ ...defaultState, events: manyEvents });
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue({ ...defaultState, events: manyEvents });
+        const onMoreClick = vi.fn();
+        render(<MonthView onMoreClick={onMoreClick} />);
+        fireEvent.click(screen.getByText('+1 more'));
+        expect(onMoreClick).toHaveBeenCalledWith(expect.any(Date));
+    });
+
+    it('renders readOnly day cells without add button and uses ReadOnlyDayCell', () => {
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue(defaultState);
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue(defaultState);
+        render(<MonthView readOnly={true} />);
+        expect(screen.queryByText('+')).not.toBeInTheDocument();
+        expect(screen.getByText('15')).toBeInTheDocument();
+    });
+
+    it('uses selectedDate and events props when provided (over context)', () => {
+        const propDate = new Date(2026, 3, 10);
+        const propEvents = [{ id: 99, title: 'Prop event', start_time: new Date(2026, 3, 10, 9, 0), end_time: new Date(2026, 3, 10, 10, 0) }];
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({ selectedDate: new Date(2020, 0, 1), events: [] });
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue({ selectedDate: new Date(2020, 0, 1), events: [] });
+        render(
+            <TagProvider>
+                <MonthView selectedDate={propDate} events={propEvents} />
+            </TagProvider>
+        );
+        expect(screen.getByText('Prop event')).toBeInTheDocument();
     });
 });

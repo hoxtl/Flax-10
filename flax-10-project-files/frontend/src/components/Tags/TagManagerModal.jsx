@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTags } from '../../context/TagContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import EmojiPicker from './EmojiPicker';
+import StandardModal from '../common/StandardModal/StandardModal';
 import styles from './TagManagerModal.module.css';
 
 const PROTECTED_TAGS = ['other', 'lecture', 'deadline', 'exam', 'societies'];
@@ -28,7 +29,13 @@ function useTagModal() {
     await checkDuplicate(data, tags, editingId, confirmFn, updateTag, resetState, () => commitSave(data, editingId, updateTag, addTag, resetState));
   };
 
-  return { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };
+  const confirmDelete = async (id) => {
+    const tag = tags.find(t => t.id === id);
+    const yes = await confirmFn({ title: "Delete Tag", message: `Are you sure you want to delete "${tag?.label}"?`, confirmText: "Delete", cancelText: "Cancel" });
+    if (yes) deleteTag(id);
+  };
+
+  return { tags, deleteTag: confirmDelete, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };
 }
 
 async function checkDuplicate(data, tags, editingId, confirmFn, updateTag, resetState, onSafe) {
@@ -53,15 +60,6 @@ function commitSave(data, editingId, updateTag, addTag, resetState) {
   if (editingId) updateTag(editingId, data);
   else addTag(data);
   resetState();
-}
-
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h3>Manage Tags</h3>
-      <button className={styles.close} onClick={onClose}>×</button>
-    </div>
-  );
 }
 
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
@@ -194,12 +192,16 @@ export default function TagManagerModal({ onClose }) {
   const { tags, deleteTag, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState } = logic;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader onClose={onClose} />
-        <ModalContent tags={tags} editingId={editingId} isAdding={isAdding} setEditingId={setEditingId}
-          setIsAdding={setIsAdding} onSave={handleSave} onDelete={deleteTag} onCancel={resetState} />
-      </div>
-    </div>
+    <StandardModal
+      title="Manage Tags"
+      onClose={onClose}
+      size="sm"
+      backdropClassName={styles.modalBackdrop}
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
+    >
+      <ModalContent tags={tags} editingId={editingId} isAdding={isAdding} setEditingId={setEditingId}
+        setIsAdding={setIsAdding} onSave={handleSave} onDelete={deleteTag} onCancel={resetState} />
+    </StandardModal>
   );
 }

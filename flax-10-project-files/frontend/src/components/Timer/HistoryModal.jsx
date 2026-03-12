@@ -1,14 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { AlertCircle } from 'lucide-react';
 import styles from './HistoryModal.module.css';
 import { getHistory, clearHistory } from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
-
-const HistoryHeader = ({ onClose }) => {
-    const title = <h2 className={styles.title}>History</h2>;
-    const btn = <button className={styles.closeButton} onClick={onClose}>×</button>;
-    return <div className={styles.header}>{title}{btn}</div>;
-};
+import { useConfirm } from '../../context/ConfirmContext';
+import StandardModal from '../common/StandardModal/StandardModal';
 
 const StatsRow = ({ block }) => {
     const completedCount = block.sessions.filter(s => s.status !== 'Incomplete').length;
@@ -39,39 +34,27 @@ const ClearButton = ({ onClear }) => {
     return <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>{btn}</div>;
 };
 
-const ClearConfirmModal = ({ onConfirm, onCancel }) => {
-    const icon = <div className={styles.confirmIcon}><AlertCircle size={20} /></div>;
-    const title = <h3 className={styles.confirmTitle}>Are you sure?</h3>;
-    const msg = <p className={styles.confirmMessage}>Are you sure you want to delete your history?<br />All your data will be removed.</p>;
-    const textCol = <div className={styles.confirmTextCol}>{title}{msg}</div>;
-    const topRow = <div className={styles.confirmTopRow}>{icon}{textCol}</div>;
-    const cancelBtn = <button className={styles.confirmCancelBtn} onClick={onCancel}>Cancel</button>;
-    const confirmBtn = <button className={styles.confirmSubmitBtn} onClick={(e) => onConfirm(e)}>Confirm</button>;
-    const btns = <div className={styles.confirmBtnsRow}>{cancelBtn}{confirmBtn}</div>;
-    const content = <div className={`${styles.modal} ${styles.confirmModal}`} onClick={e => e.stopPropagation()}>{topRow}{btns}</div>;
-    return <div className={`${styles.overlay} ${styles.confirmOverlay}`} onClick={onCancel}>{content}</div>;
-};
-
-const useClearAction = (setHistory) => {
-    const [showConfirm, setShowConfirm] = useState(false);
-    const triggerClear = () => setShowConfirm(true);
-    const cancelClear = () => setShowConfirm(false);
-    const confirmClear = async (e) => {
-        if (e) e.stopPropagation();
+const useClearAction = (setHistory, confirm) => {
+    const triggerClear = async () => {
+        const confirmed = await confirm({
+            title: "Clear History",
+            message: "Are you sure you want to delete your history? All your data will be removed.",
+            isDanger: true,
+        });
+        if (!confirmed) return;
         await clearHistory();
         setHistory([]);
-        setShowConfirm(false);
         window.dispatchEvent(new Event('historyCleared'));
     };
-    return { showConfirm, triggerClear, cancelClear, confirmClear };
+    return { triggerClear };
 };
 
-const useHistoryData = () => {
+const useHistoryData = (confirm) => {
     const [history, setHistory] = useState([]);
     useEffect(() => { getHistory().then(setHistory); }, []);
     const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
-    const clearProps = useClearAction(setHistory);
-    return { history, blocks, ...clearProps };
+    const { triggerClear } = useClearAction(setHistory, confirm);
+    return { history, blocks, triggerClear };
 };
 
 const ModalContent = ({ history, blocks }) => {
@@ -81,11 +64,20 @@ const ModalContent = ({ history, blocks }) => {
 };
 
 export default function HistoryModal({ onClose }) {
-    const { history, blocks, showConfirm, triggerClear, cancelClear, confirmClear } = useHistoryData();
-    const hdr = <HistoryHeader onClose={onClose} />;
+    const confirm = useConfirm();
+    const { history, blocks, triggerClear } = useHistoryData(confirm);
     const content = <ModalContent history={history} blocks={blocks} />;
     const cBtn = history.length > 0 ? <ClearButton onClear={triggerClear} /> : null;
-    const inner = <div className={styles.modal} onClick={e => e.stopPropagation()}>{hdr}{content}{cBtn}</div>;
-    const confirmPopup = showConfirm ? <ClearConfirmModal onConfirm={confirmClear} onCancel={cancelClear} /> : null;
-    return <><div className={styles.overlay} onClick={onClose}>{inner}</div>{confirmPopup}</>;
+    return (
+        <StandardModal
+            title="History"
+            onClose={onClose}
+            size="md"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
+            {content}
+            {cBtn}
+        </StandardModal>
+    );
 }

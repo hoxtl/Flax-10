@@ -2,11 +2,10 @@
  * Dropdown panel for filtering tasks by list and module code.
  */
 
-import { useMemo } from "react";
 import { Search } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 
-import styles from "./TaskFeed.module.css";
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import styles from "./TaskFeedToolbar.module.css";
 
 function FilterCheckboxItem({ label, checked, onChange }) {
   return (
@@ -18,7 +17,9 @@ function FilterCheckboxItem({ label, checked, onChange }) {
 }
 
 function ListsTab({ visibleListItems, filterListIds, onToggleList }) {
-  if (visibleListItems.length === 0) return <p className={styles.filterEmptyText}>No lists found.</p>;
+  if (visibleListItems.length === 0) {
+    return <EmptyState icon="🗂️" title="No lists found" description="Try a different filter search." />;
+  }
   return (
     <div className={styles.filterItems}>
       {visibleListItems.map((item) => (
@@ -33,81 +34,69 @@ function ListsTab({ visibleListItems, filterListIds, onToggleList }) {
   );
 }
 
+function ModuleGroupRow({ group, groupedModuleItems, filterModuleCodes, onToggleModule }) {
+  const items = groupedModuleItems[group] || [];
+  return (
+    <div key={group} className={styles.filterGroup}>
+      <h4 className={styles.filterGroupTitle}>{group}</h4>
+      <div className={styles.filterItems}>
+        {items.map((item) => (
+          <FilterCheckboxItem
+            key={item.value}
+            label={item.label}
+            checked={filterModuleCodes.includes(String(item.value))}
+            onChange={() => onToggleModule(item.value)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FilterTabs({ activeFilterTab, onTabChange }) {
+  return (
+    <div className={styles.filterTabs}>
+      <button type="button" className={`${styles.filterTab} ${activeFilterTab === "lists" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("lists")}>Lists</button>
+      <button type="button" className={`${styles.filterTab} ${activeFilterTab === "modules" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("modules")}>Modules</button>
+    </div>
+  );
+}
+
+function FilterSearch({ filterQuery, onQueryChange, activeFilterTab }) {
+  return (
+    <div className={styles.filterSearchWrap}>
+      <Search size={14} className={styles.filterSearchIcon} />
+      <input type="text" value={filterQuery} onChange={e => onQueryChange(e.target.value)} className={styles.filterSearchInput} placeholder={`Search ${activeFilterTab}...`} />
+    </div>
+  );
+}
+
 function ModulesTab({ moduleGroupKeys, groupedModuleItems, filterModuleCodes, onToggleModule }) {
-  if (moduleGroupKeys.length === 0) return <p className={styles.filterEmptyText}>No modules found.</p>;
+  if (moduleGroupKeys.length === 0) {
+    return <EmptyState icon="📚" title="No modules found" description="Try a different filter search." />;
+  }
   return (
     <div className={styles.filterGroups}>
       {moduleGroupKeys.map((group) => (
-        <div key={group} className={styles.filterGroup}>
-          <h4 className={styles.filterGroupTitle}>{group}</h4>
-          <div className={styles.filterItems}>
-            {(groupedModuleItems[group] || []).map((item) => (
-              <FilterCheckboxItem
-                key={item.value}
-                label={item.label}
-                checked={filterModuleCodes.includes(String(item.value))}
-                onChange={() => onToggleModule(item.value)}
-              />
-            ))}
-          </div>
-        </div>
+        <ModuleGroupRow key={group} group={group} groupedModuleItems={groupedModuleItems} filterModuleCodes={filterModuleCodes} onToggleModule={onToggleModule} />
       ))}
     </div>
   );
 }
 
-/**
- * Animated dropdown panel for filtering tasks by list or module.
- *
- * @param {object} props
- * @param {string} props.activeFilterTab
- * @param {Function} props.onTabChange
- * @param {string} props.filterQuery
- * @param {Function} props.onQueryChange
- * @param {object[]} props.visibleListItems
- * @param {string[]} props.filterListIds
- * @param {Function} props.onToggleList
- * @param {string[]} props.moduleGroupKeys
- * @param {object} props.groupedModuleItems
- * @param {string[]} props.filterModuleCodes
- * @param {Function} props.onToggleModule
- * @param {Function} props.onClearAll
- */
-export default function TaskFilterPanel({
-  activeFilterTab, onTabChange, filterQuery, onQueryChange,
-  visibleListItems, filterListIds, onToggleList,
-  moduleGroupKeys, groupedModuleItems, filterModuleCodes, onToggleModule,
-  onClearAll,
-}) {
+/** Dropdown panel for filtering tasks by list or module. */
+export default function TaskFilterPanel(props) {
   return (
-    <AnimatePresence>
-      <motion.div
-        className={styles.filterPanel}
-        role="dialog"
-        aria-label="Task filters"
-        onClick={e => e.stopPropagation()}
-        initial={{ opacity: 0, y: -8, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -8, scale: 0.98 }}
-        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        style={{ originY: 0, originX: 1 }}
-      >
-        <div className={styles.filterTabs}>
-          <button type="button" className={`${styles.filterTab} ${activeFilterTab === "lists" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("lists")}>Lists</button>
-          <button type="button" className={`${styles.filterTab} ${activeFilterTab === "modules" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("modules")}>Modules</button>
-        </div>
-        <div className={styles.filterSearchWrap}>
-          <Search size={14} className={styles.filterSearchIcon} />
-          <input type="text" value={filterQuery} onChange={e => onQueryChange(e.target.value)} className={styles.filterSearchInput} placeholder={`Search ${activeFilterTab}...`} />
-        </div>
-        <div className={styles.filterListContainer}>
-          {activeFilterTab === "lists"   && <ListsTab   visibleListItems={visibleListItems} filterListIds={filterListIds} onToggleList={onToggleList} />}
-          {activeFilterTab === "modules" && <ModulesTab moduleGroupKeys={moduleGroupKeys} groupedModuleItems={groupedModuleItems} filterModuleCodes={filterModuleCodes} onToggleModule={onToggleModule} />}
-        </div>
-        <div className={styles.filterActions}>
-          <button type="button" className={styles.filterClearBtn} onClick={onClearAll}>Clear all</button>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+    <>
+      <FilterTabs activeFilterTab={props.activeFilterTab} onTabChange={props.onTabChange} />
+      <FilterSearch filterQuery={props.filterQuery} onQueryChange={props.onQueryChange} activeFilterTab={props.activeFilterTab} />
+      <div className={styles.filterListContainer}>
+        {props.activeFilterTab === "lists"   && <ListsTab   visibleListItems={props.visibleListItems} filterListIds={props.filterListIds} onToggleList={props.onToggleList} />}
+        {props.activeFilterTab === "modules" && <ModulesTab moduleGroupKeys={props.moduleGroupKeys} groupedModuleItems={props.groupedModuleItems} filterModuleCodes={props.filterModuleCodes} onToggleModule={props.onToggleModule} />}
+      </div>
+      <div className={styles.filterActions}>
+        <button type="button" className={styles.filterClearBtn} onClick={props.onClearAll}>Clear all</button>
+      </div>
+    </>
   );
 }

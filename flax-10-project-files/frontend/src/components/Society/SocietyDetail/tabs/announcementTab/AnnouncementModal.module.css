@@ -1,3 +1,4 @@
+/* Styles for the AnnouncementModal form and its sub-sections. */
 .error {
     background: var(--danger-bg);
     color: var(--danger);

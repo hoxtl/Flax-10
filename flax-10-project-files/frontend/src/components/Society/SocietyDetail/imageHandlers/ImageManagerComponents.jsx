@@ -1,4 +1,9 @@
+/**
+ * ImageManagerComponents provides a suite of reusable UI elements for
+ * managing society cover photos and gallery images.
+ */
 import { useState, useRef } from "react";
+import StandardModal from "../../../common/StandardModal/StandardModal";
 import styles from "./ImageManagerComponents.module.css";
 
 export function ImageHeader({ title, onClose }) {
@@ -42,6 +47,7 @@ export function ImageCard({ src, index, onDelete, onPin }) {
     );
 }
 
+/** Modal view for uploading a new image or selecting from existing photos. */
 export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
     const [tab, setTab] = useState("upload");
     const [selected, setSelected] = useState(null);
@@ -49,23 +55,29 @@ export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
 
     const handleUpload = (e) => {
         const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => onAdd(ev.target.result);
-        reader.readAsDataURL(file);
+        if (file) performUpload(file, onAdd);
     };
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ImageHeader title="Add Image" onClose={onClose} />
-                <TabSelector active={tab} onSelect={setTab} hasPhotos={availablePhotos.length > 0} />
-                <ViewContent tab={tab} fileRef={fileRef} handleUpload={handleUpload}
-                    availablePhotos={availablePhotos} selected={selected} onSelect={setSelected} />
-                <FooterActions tab={tab} onClose={onClose} onAdd={() => onAdd(selected)} selected={selected} />
-            </div>
-        </div>
+        <StandardModal
+            title="Add Image"
+            onClose={onClose}
+            size="md"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
+            <TabSelector active={tab} onSelect={setTab} hasPhotos={availablePhotos.length > 0} />
+            <ViewContent tab={tab} fileRef={fileRef} handleUpload={handleUpload}
+                availablePhotos={availablePhotos} selected={selected} onSelect={setSelected} />
+            <FooterActions tab={tab} onClose={onClose} onAdd={() => onAdd(selected)} selected={selected} />
+        </StandardModal>
     );
+}
+
+function performUpload(file, onAdd) {
+    const reader = new FileReader();
+    reader.onload = (ev) => onAdd(ev.target.result);
+    reader.readAsDataURL(file);
 }
 
 function TabSelector({ active, onSelect, hasPhotos }) {

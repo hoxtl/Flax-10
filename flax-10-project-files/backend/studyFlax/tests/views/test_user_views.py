@@ -1,17 +1,26 @@
+"""
+Backend tests for user views.
+"""
+
 from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework import status
 from django.contrib.auth import get_user_model
-from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.society.societyModel import Society
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
 
 User = get_user_model()
 
 
 class ProfileViewTest(TestCase):
+    """Tests for profile view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass', first_name='Test', last_name='User')
@@ -53,6 +62,11 @@ class ProfileViewTest(TestCase):
         response = self.client.patch('/api/profile/', {'remove_photo': 'true'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_patch_profile_upload_photo(self):
+        photo = SimpleUploadedFile("photo.jpg", b"fake image content", content_type="image/jpeg")
+        response = self.client.patch('/api/profile/', {'profile_photo': photo}, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_another_user_profile(self):
         other = User.objects.create_user(username='other', email='other@example.com', password='pass')
         response = self.client.get(f'/api/users/{other.id}/profile/')
@@ -68,6 +82,7 @@ class ProfileViewTest(TestCase):
 
 
 class CheckUsernameViewTest(TestCase):
+    """Tests for check username view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -101,6 +116,7 @@ class CheckUsernameViewTest(TestCase):
 
 
 class UserSearchViewTest(TestCase):
+    """Tests for user search view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='searcher', email='searcher@example.com', password='pass')
@@ -138,8 +154,21 @@ class UserSearchViewTest(TestCase):
         response = self.client.get('/api/users/search/?module=CS101')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_search_by_course(self):
+        UserSettings.objects.create(user=self.other, theme='light', timezone='Europe/London', major='Computer Science')
+        response = self.client.get('/api/users/search/?course=Computer%20Science')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+
+    def test_search_by_year(self):
+        UserSettings.objects.create(user=self.other, theme='light', timezone='Europe/London', year='Year 2')
+        response = self.client.get('/api/users/search/?year=Year%202')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+
 
 class HomeAddressViewTest(TestCase):
+    """Tests for home address view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -163,6 +192,7 @@ class HomeAddressViewTest(TestCase):
 
 
 class UserSettingsViewTest(TestCase):
+    """Tests for user settings view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -180,8 +210,25 @@ class UserSettingsViewTest(TestCase):
         response = self.client.patch('/api/settings/', {'theme': 'light'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_put_settings_updates_names(self):
+        response = self.client.patch('/api/settings/', {'first_name': 'New', 'last_name': 'Name'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, 'New')
+        self.assertEqual(self.user.last_name, 'Name')
+
+    def test_put_settings_short_password(self):
+        response = self.client.patch('/api/settings/', {'password': 'abc'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_settings_rejects_locked_major_change(self):
+        UserSettings.objects.create(user=self.user, theme='light', timezone='Europe/London', major='Physics')
+        response = self.client.patch('/api/settings/', {'major': 'Math'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class OnboardingViewTest(TestCase):
+    """Tests for onboarding view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass')
@@ -200,3 +247,41 @@ class OnboardingViewTest(TestCase):
         response = self.client.post('/api/onboarding/', {'year': '1', 'major': 'Unknown Major XYZ'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrolled_modules'], 0)
+
+
+class ProfileViewCoverageTest(TestCase):
+    """Tests for profile_view update photo branch."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='pv_user', email='pv_user@test.com', password='pass',
+            first_name='PV', last_name='User'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_patch_remove_photo(self):
+        response = self.client.patch('/api/profile/', data={'remove_photo': 'true'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class UserSearchCoverageTest(TestCase):
+    """Tests for user_search_view society filter."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='us_user', email='us_user@test.com', password='pass'
+        )
+        self.other = User.objects.create_user(
+            username='us_other', email='us_other@test.com', password='pass'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_search_by_society(self):
+        society = Society.objects.create(name='SearchSoc', bio='bio', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.other, society=society, role='member')
+        response = self.client.get(f'/api/users/search/?society={society.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [u['id'] for u in response.data['results']]
+        self.assertIn(self.other.id, ids)

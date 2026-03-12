@@ -1,3 +1,7 @@
+"""
+Backend tests for system tags.
+"""
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from studyFlax.models import Tag, CalendarEvent
@@ -47,27 +51,22 @@ class GetSystemTagTest(TestCase):
 
     def test_get_system_tag_returns_existing(self):
         from studyFlax.views.calendar.system_tags import get_system_tag
-        # Create first time
         tag1 = get_system_tag('Lecture')
-        # Get again — should return same
         tag2 = get_system_tag('Lecture')
         self.assertEqual(tag1.id, tag2.id)
-        # Only one should exist
         self.assertEqual(Tag.objects.filter(name='Lecture', is_default=True).count(), 1)
 
     def test_get_system_tag_updates_stale_tag(self):
         from studyFlax.views.calendar.system_tags import get_system_tag
-        # Create a tag with wrong icon
         tag = Tag.objects.create(name='Lecture', is_default=True, user=None,
                                  color='#000000', default_duration=60, icon='🔧')
         result = get_system_tag('Lecture')
         result.refresh_from_db()
-        self.assertEqual(result.icon, '📚')  # corrected icon
+        self.assertEqual(result.icon, '📚')
 
     def test_get_system_tag_fixes_user_owned_tag(self):
         from studyFlax.views.calendar.system_tags import get_system_tag
         user = make_user()
-        # Create as user-owned (non-system)
         tag = Tag.objects.create(name='Lecture', is_default=False, user=user,
                                  color='#000', default_duration=60, icon='📚')
         result = get_system_tag('Lecture')
@@ -152,7 +151,7 @@ class UpdateTagFieldsTest(TestCase):
     def test_update_tag_fields_no_changes(self):
         from studyFlax.views.calendar.system_tags import update_tag_fields
         tag = Tag(name='X', is_default=True, user=None, icon='🏷️')
-        config = {}  # no icon in config → defaults to '🏷️'
+        config = {}
         changed = update_tag_fields(tag, config)
         self.assertFalse(changed)
 
@@ -208,7 +207,7 @@ class FixUntaggedEventsTest(TestCase):
         exam_event = self._create_event('Exam: Maths')
         fix_deadline_events(deadline_tag)
         exam_event.refresh_from_db()
-        self.assertIsNone(exam_event.tag)  # not tagged by deadline fixer
+        self.assertIsNone(exam_event.tag)
 
     def test_fix_exam_events(self):
         from studyFlax.views.calendar.system_tags import fix_exam_events, get_exam_tag
@@ -236,4 +235,4 @@ class FixUntaggedEventsTest(TestCase):
         event = self._create_event('Assignment 2', tag=other_tag)
         fix_deadline_events(deadline_tag)
         event.refresh_from_db()
-        self.assertEqual(event.tag, other_tag)  # not overwritten
+        self.assertEqual(event.tag, other_tag)

@@ -10,7 +10,7 @@ import TaskCard from "./TaskCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
 
-import styles from "./TaskFeed.module.css";
+import styles from "./TaskFeedSections.module.css";
 
 const BODY_ANIM = {
   initial: { height: 0, opacity: 0, y: -4 },
@@ -47,18 +47,7 @@ function CompletedTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask
   );
 }
 
-/**
- * Renders a collapsible list of completed tasks.
- *
- * @param {object} props
- * @param {object[]} props.tasks
- * @param {string} props.sortBy
- * @param {object} props.listMap
- * @param {object[]} props.lists
- * @param {Function} props.onToggleComplete
- * @param {Function} props.onDeleteTask
- * @param {Function} props.onEditTask
- */
+/** Renders a collapsible list of completed tasks. */
 export default function CompletedTasksSection({ tasks, sortBy, listMap, lists, onToggleComplete, onDeleteTask, onEditTask }) {
   const [showDone, setShowDone] = useState(true);
   if (tasks.length === 0) return null;

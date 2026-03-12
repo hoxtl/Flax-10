@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { validatePasswords, getErrorMessage, saveUserData, clearUserData } from '../../utils/authHelpers';
+import { validatePasswords, getErrorMessage, saveUserData, clearUserData } from '../../components/Authentication/utils/authHelpers';
 
 const WELCOME_KEY = 'flax_welcome_seen_v1';
 
@@ -43,7 +43,7 @@ describe('getErrorMessage', () => {
 
 describe('saveUserData', () => {
   it('saves token and user to localStorage and dispatches event', () => {
-    const user = { username: 'kausar' };
+    const user = { username: 'jane' };
     saveUserData('tok123', user);
     expect(localStorage.getItem('token')).toBe('tok123');
     expect(localStorage.getItem('user')).toBe(JSON.stringify(user));

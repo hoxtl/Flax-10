@@ -1,4 +1,5 @@
 import { PieChart } from '@mui/x-charts/PieChart';
+import EmptyState from '../common/EmptyState/EmptyState';
 
 const ThemeUsageChart = ({ themeStats }) => {
   const { summary } = themeStats;
@@ -29,9 +30,11 @@ const ThemeUsageChart = ({ themeStats }) => {
       </div>
 
       {summary.total_minutes === 0 ? (
-        <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>
-          No theme session data yet — keep using the app and it will appear here.
-        </p>
+        <EmptyState
+          icon="🌓"
+          title="No theme session data yet"
+          description="Keep using the app and your light/dark usage will appear here."
+        />
       ) : (
         <PieChart
           series={[{ data, innerRadius: 50, outerRadius: 100, paddingAngle: 3, cornerRadius: 4 }]}

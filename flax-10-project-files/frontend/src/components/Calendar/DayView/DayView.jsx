@@ -81,7 +81,7 @@ function CurrentTimeLine() {
         right: 0,
         height: "2px",
         background: "#ea4335",
-        zIndex: 50,
+        zIndex: 15,
         pointerEvents: "none",
       }}
     >

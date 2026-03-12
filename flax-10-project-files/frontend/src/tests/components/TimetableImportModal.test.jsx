@@ -1,12 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TimetableImportModal from '../../../components/TimetableImportModal';
-
-vi.mock('../../../components/TimetableImportModal.module.css', () => ({
-    default: { overlay: 'overlay', modal: 'modal', header: 'header', closeBtn: 'closeBtn',
-               form: 'form', instructions: 'instructions', input: 'input', error: 'error',
-               actions: 'actions', cancelBtn: 'cancelBtn', importBtn: 'importBtn' }
-}));
+import TimetableImportModal from '../../components/TimetableImportModal';
 
 const defaultProps = {
     isOpen: true,
@@ -29,25 +23,25 @@ describe('TimetableImportModal', () => {
 
     it('closes when close button clicked', () => {
         render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.click(screen.getByText('✕'));
+        fireEvent.click(screen.getByText('×'));
         expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
     it('closes when overlay background clicked', () => {
         const { container } = render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.click(container.querySelector('.overlay'));
+        fireEvent.mouseDown(container.firstChild);
         expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
     it('does not close when modal content clicked', () => {
         const { container } = render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.click(container.querySelector('.modal'));
+        fireEvent.mouseDown(container.firstChild.firstChild);
         expect(defaultProps.onClose).not.toHaveBeenCalled();
     });
 
     it('shows error when submitting empty URL', async () => {
         render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.submit(screen.getByRole('form') ?? document.querySelector('form'));
+        fireEvent.submit(document.querySelector('form'));
         await waitFor(() => {
             expect(screen.getByText('Please enter a URL')).toBeTruthy();
         });
@@ -72,6 +66,16 @@ describe('TimetableImportModal', () => {
         });
         fireEvent.submit(document.querySelector('form'));
         await waitFor(() => expect(screen.getByText('Bad URL')).toBeTruthy());
+    });
+
+    it('shows Import failed when onImport throws without message', async () => {
+        defaultProps.onImport.mockRejectedValue({});
+        render(<TimetableImportModal {...defaultProps} />);
+        fireEvent.change(screen.getByPlaceholderText(/timetable.ics/i), {
+            target: { value: 'https://example.com/file.ics' },
+        });
+        fireEvent.submit(document.querySelector('form'));
+        await waitFor(() => expect(screen.getByText('Import failed')).toBeTruthy());
     });
 
     it('closes when cancel button clicked', () => {

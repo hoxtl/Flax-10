@@ -1,48 +1,53 @@
+/**
+ * AllSocieties provides an exploration view for all available societies.
+ * Features comprehensive filtering by category, ratification status, and search.
+ */
 import { useState, useMemo } from "react";
 import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
+import EmptyState from "../../components/common/EmptyState/EmptyState";
+import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
 import BasePill from "../../components/Tags/BasePill";
 import SearchBar from "../../components/common/SearchBar";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
+import { usePagination } from "../../hooks/usePagination";
 
 const PAGE_SIZE = 20;
 
-export default function AllSocieties({ onBack, onSelect, societies = [] }) {
-    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy, page, setPage } = useFilters();
-    const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { items, totalPages } = usePagination(filtered, page, PAGE_SIZE);
+/** Exploratory view for the full directory of societies. */
+export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
+    const filterState = useFilters();
+    const { search, filters, sortBy, setSearch, setSortBy } = filterState;
+
+    const filtered = useMemo(() =>
+        filterAndSort(societies, search, filters, sortBy),
+        [societies, search, filters, sortBy]
+    );
 
     return (
         <div className={styles.container}>
-            <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
-            <FilterPills filters={filters} toggleFilter={toggleFilter} clearFilters={clearFilters} societies={societies} />
-            <SocietyGrid items={items} onSelect={onSelect} />
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            <Header onBack={onBack} search={search} setSearch={setSearch}
+                sortBy={sortBy} setSortBy={setSortBy} />
+            <FilterPills {...filterState} societies={societies} />
+            <PaginatedGrid items={filtered} onSelect={onSelect}
+                onReport={onReport} onUnreport={onUnreport} />
             <BackToTop />
         </div>
     );
 }
 
-function usePagination(items, page, pageSize) {
-    const totalPages = Math.ceil(items.length / pageSize);
-    const start = (page - 1) * pageSize;
-    const paginatedItems = items.slice(start, start + pageSize);
-    return { items: paginatedItems, totalPages };
-}
-
+/** State manager for all-societies filtering and sorting. */
 function useFilters() {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ ratified: "all", category: "all" });
     const [sortBy, setSortBy] = useState("name");
-    const [page, setPage] = useState(1);
 
-    const handleSearch = (value) => { setSearch(value); setPage(1); };
-    const handleSort = (value) => { setSortBy(value); setPage(1); };
-    const toggleFilter = (type, value) => { setFilters(prev => toggleFilterValue(prev, type, value)); setPage(1); };
-    const clearFilters = () => { setFilters({ ratified: "all", category: "all" }); setPage(1); };
+    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
+    const clearFilters = () => setFilters({ ratified: "all", category: "all" });
 
-    return { search, setSearch: handleSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy: handleSort, page, setPage };
+    return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
 }
 
 function toggleFilterValue(prev, type, value) {
@@ -50,27 +55,39 @@ function toggleFilterValue(prev, type, value) {
     return { ...prev, [type]: newValue };
 }
 
+/** Header section for the all-societies view. */
 function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
     return (
-        <header className={styles.header}>
-            <button onClick={onBack} className={styles.backBtn}>← Back</button>
-            <SearchBar value={search} onChange={setSearch} placeholder="Search societies..." />
-            <SortDropdown value={sortBy} onChange={setSortBy} />
-        </header>
+        <>
+            <header className={styles.header}>
+                <button onClick={onBack} className={styles.backBtn}>← Back</button>
+            </header>
+            <div className={styles.browseToolbar}>
+                <div className={styles.browseSearch}>
+                    <SearchBar value={search} onChange={setSearch} placeholder="Search societies..." />
+                </div>
+                <ToolbarSortControl className={styles.browseSortControl}>
+                    <SortDropdown value={sortBy} onChange={setSortBy} />
+                </ToolbarSortControl>
+            </div>
+        </>
     );
 }
+
+const SORT_OPTIONS = [
+    { value: "name", label: "A-Z" },
+    { value: "name-desc", label: "Z-A" },
+    { value: "newest", label: "Newest" },
+    { value: "members", label: "Most Members" },
+];
 
 function SortDropdown({ value, onChange }) {
     return (
-        <select className={styles.sortDropdown} value={value} onChange={e => onChange(e.target.value)}>
-            <option value="name">A-Z</option>
-            <option value="name-desc">Z-A</option>
-            <option value="newest">Newest</option>
-            <option value="members">Most Members</option>
-        </select>
+        <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />
     );
 }
 
+/** Collection of category and status filter pills. */
 function FilterPills({ filters, toggleFilter, clearFilters, societies }) {
     const hasActiveFilters = filters.ratified !== "all" || filters.category !== "all";
     return (
@@ -97,17 +114,25 @@ function CategoryPills({ current, onChange, societies }) {
     ));
 }
 
-function SocietyGrid({ items, onSelect }) {
-    if (items.length === 0) return <EmptyState />;
+/** Renders the results grid with integrated pagination. */
+function PaginatedGrid({ items, onSelect, onReport, onUnreport }) {
+    const { currentItems, totalPages, currentPage, setPage } = usePagination(items, PAGE_SIZE);
+    if (items.length === 0) {
+        return <EmptyState icon="🎭" title="No societies found"
+            description="Try adjusting your search or filters." />;
+    }
     return (
-        <div className={styles.grid}>
-            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
-        </div>
+        <>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+            <div className={styles.grid}>
+                {currentItems.map(s => (
+                    <SocietyCard key={s.id} society={s} onClick={onSelect}
+                        onReport={onReport} onUnreport={onUnreport} />
+                ))}
+            </div>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+        </>
     );
-}
-
-function EmptyState() {
-    return <div className={styles.emptyContainer}><p className={styles.emptyText}>No societies found.</p></div>;
 }
 
 function countForFilter(societies, filterId) {

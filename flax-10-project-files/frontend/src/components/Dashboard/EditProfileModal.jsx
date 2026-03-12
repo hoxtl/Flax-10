@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styles from './EditProfileModal.module.css';
 import { updateUserProfile } from '../../api/userService';
 import { getInitials } from '../Authentication/utils/userUtils';
+import StandardModal from '../common/StandardModal/StandardModal';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -143,15 +144,6 @@ function FormActions({ loading, onClose }) {
   );
 }
 
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h2>Edit Profile</h2>
-      <button className={styles.closeBtn} onClick={onClose}>✕</button>
-    </div>
-  );
-}
-
 function ModalForm({ form, user, onClose, onSubmit }) {
   const { username, setUsername, bio, setBio, previewUrl, setProfilePhoto, setPreviewUrl, setRemovePhoto, loading, error, success } = form;
   const initials = user?.name ? getInitials(user.name) : username.substring(0, 2).toUpperCase();
@@ -172,11 +164,14 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   if (!isOpen) return null;
   const handleSubmit = buildSubmitHandler(form, user, onSave, onClose);
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader onClose={onClose} />
-        <ModalForm form={form} user={user} onClose={onClose} onSubmit={handleSubmit} />
-      </div>
-    </div>
+    <StandardModal
+      title="Edit Profile"
+      onClose={onClose}
+      size="md"
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
+    >
+      <ModalForm form={form} user={user} onClose={onClose} onSubmit={handleSubmit} />
+    </StandardModal>
   );
 }

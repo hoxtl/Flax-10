@@ -1,6 +1,5 @@
 .container {
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  background: var(--bg);
   padding: 0.875rem 1.5rem;
   display: flex;
   align-items: center;

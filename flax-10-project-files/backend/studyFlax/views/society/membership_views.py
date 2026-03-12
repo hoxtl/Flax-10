@@ -19,15 +19,15 @@ def membership_list(request, society_id):
         return society_not_found_response()
 
     if request.method == 'GET':
-        return get_members(society)
+        return get_members(request, society)
     if 'username' in request.data or 'email' in request.data:
         return add_collaborator(request, society)
     return join_society(request.user, society)
 
 
-def get_members(society):
+def get_members(request, society):
     members = SocietyMembership.objects.filter(society=society)
-    return Response(SocietyMembershipSerialiser(members, many=True).data)
+    return Response(SocietyMembershipSerialiser(members, many=True, context={'request': request}).data)
 
 
 def join_society(user, society):
@@ -80,10 +80,14 @@ def leave_or_remove(request, society, user_id):
     membership = get_membership_by_user_id(society, user_id)
     if not membership:
         return Response({'error': 'Not a member'}, status=status.HTTP_404_NOT_FOUND)
-    
+
     # Auto-unsync when leaving
     SocietyCalendarSync.objects.filter(user_id=user_id, society=society).delete()
-    
+
+    # Skip notification for voluntary leave (user leaves themselves)
+    if is_self:
+        membership._skip_notification = True
+
     membership.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -106,3 +110,17 @@ def get_membership_by_user_id(society, user_id):
         return SocietyMembership.objects.get(society=society, user_id=user_id)
     except SocietyMembership.DoesNotExist:
         return None
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def toggle_subscription(request, society_id):
+    society = get_society_or_404(society_id)
+    if not society:
+        return society_not_found_response()
+    membership = get_membership(request.user, society)
+    if not membership:
+        return Response({'error': 'Not a member'}, status=status.HTTP_403_FORBIDDEN)
+    membership.is_subscribed = request.data.get('is_subscribed', not membership.is_subscribed)
+    membership.save(update_fields=['is_subscribed'])
+    return Response({'is_subscribed': membership.is_subscribed})

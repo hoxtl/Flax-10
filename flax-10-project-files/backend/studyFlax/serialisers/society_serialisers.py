@@ -25,25 +25,39 @@ class SocietyAnnouncementImageSerialiser(serializers.ModelSerializer):
 
 class SocietyMembershipSerialiser(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
+    profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = SocietyMembership
-        fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin']
+        fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin', 'is_subscribed', 'profile_photo_url']
+
+    def get_profile_photo_url(self, obj):
+        if not obj.user.profile_photo:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.user.profile_photo.url) if request else None
 
 
 class SocietyListSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
     cover_image = serializers.SerializerMethodField()
+    has_reported = serializers.SerializerMethodField()
 
     class Meta:
         model = Society
-        fields = ['id', 'name', 'bio', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails']
+        fields = ['id', 'name', 'bio', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails', 'has_reported']
 
     def get_cover_image(self, obj):
         if obj.image:
             return obj.image
         first_img = obj.images.first()
         return first_img.url if first_img else None
+
+    def get_has_reported(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.reports.filter(reporter=request.user).exists()
+        return False
 
 
 class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
@@ -141,10 +155,17 @@ class SocietyDetailSerialiser(serializers.ModelSerializer):
     images = SocietyImageSerialiser(many=True, read_only=True)
     announcements = SocietyAnnouncementSerialiser(many=True, read_only=True)
     events = SocietyEventSerialiser(many=True, read_only=True)
+    has_reported = serializers.SerializerMethodField()
 
     class Meta:
         model = Society
         fields = [
             'id', 'name', 'bio', 'about', 'image', 'categories', 'is_ratified', 'ratification_status',
-            'date_created', 'member_count', 'tags', 'images', 'announcements', 'events', 'admin_emails'
+            'date_created', 'member_count', 'tags', 'images', 'announcements', 'events', 'admin_emails', 'has_reported'
         ]
+
+    def get_has_reported(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.reports.filter(reporter=request.user).exists()
+        return False

@@ -103,6 +103,8 @@ def build_settings_for_new_users():
             major=random.choice(course_fixtures),
             sleep_time=time(23, 0),
             wake_time=time(7, 0),
+            mode=random.choice(['light', 'dark']),
+            homepage_widgets=[],
         )
         for u in new_users
     ]

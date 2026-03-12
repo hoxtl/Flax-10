@@ -1,6 +1,7 @@
 import { getEffectiveTagName } from "./eventUtils";
 
 export function getEventTheme(event, tags) {
+    if (event.tag_color) return { color: event.tag_color, icon: '🏷️' };
     const tagName = getEffectiveTagName(event);
     const tag = resolveTagByName(tagName, tags);
     if (tag) return { color: tag.color, icon: tag.icon };

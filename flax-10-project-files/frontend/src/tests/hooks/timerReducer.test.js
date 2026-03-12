@@ -1,12 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { timerReducer, initialState } from '../../hooks/timerReducer';
+import { timerReducer, initialState } from '../../components/Timer/utils/timerReducer';
 
 describe('timerReducer', () => {
     it('returns initial state correctly', () => {
         const state = initialState(25, 5, 4);
         expect(state).toEqual({
             workTime: 25, breakTime: 5, targetSessions: 4, completedSessions: 0,
-            timeLeft: 1500, totalWork: 0, totalBreak: 0, isActive: false, mode: 'work'
+            timeLeft: 1500, totalWork: 0, totalBreak: 0, totalPaused: 0,
+            blockTotalWork: 0, blockTotalBreak: 0,
+            isActive: false, isPaused: false, mode: 'work'
         });
     });
 
@@ -45,5 +47,20 @@ describe('timerReducer', () => {
     it('returns current state for unknown action', () => {
         const state = initialState(25, 5);
         expect(timerReducer(state, { type: 'UNKNOWN' })).toBe(state);
+    });
+
+    it('TICK action increments totalPaused when isPaused', () => {
+        const startState = { ...initialState(25, 5), isActive: true, isPaused: true };
+        const nextState = timerReducer(startState, { type: 'TICK' });
+        expect(nextState.totalPaused).toBe(1);
+        expect(nextState.timeLeft).toBe(1500); // unchanged when paused
+    });
+
+    it('TOGGLE_PAUSE action toggles isPaused', () => {
+        const state = initialState(25, 5);
+        const paused = timerReducer(state, { type: 'TOGGLE_PAUSE' });
+        expect(paused.isPaused).toBe(true);
+        const resumed = timerReducer(paused, { type: 'TOGGLE_PAUSE' });
+        expect(resumed.isPaused).toBe(false);
     });
 });

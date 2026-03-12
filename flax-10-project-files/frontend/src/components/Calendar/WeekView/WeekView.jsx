@@ -59,31 +59,10 @@ function CurrentTimeLine() {
     return () => clearInterval(t);
   }, []);
   const top = (now.getHours() * 60 + now.getMinutes()) * (SLOT_HEIGHT / 60);
+  const lineColor = "var(--time-indicator, #ea4335)";
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: `${top}px`,
-        left: "60px",
-        right: 0,
-        height: "2px",
-        background: "#ea4335",
-        zIndex: 50,
-        pointerEvents: "none",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          left: "-6px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "12px",
-          height: "12px",
-          background: "#ea4335",
-          borderRadius: "50%",
-        }}
-      />
+    <div style={{ position: "absolute", top: `${top}px`, left: "60px", right: 0, height: "2px", background: lineColor, zIndex: 15, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: "-6px", top: "50%", transform: "translateY(-50%)", width: "12px", height: "12px", background: lineColor, borderRadius: "50%" }} />
     </div>
   );
 }

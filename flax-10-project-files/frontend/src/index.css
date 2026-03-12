@@ -2,6 +2,7 @@ html,
 body,
 #root {
   height: 100%;
+  background: var(--surface-page);
 }
 
 :root {
@@ -38,8 +39,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Warm stationary theme: warm Almond (#F8F5F2) via var(--bg) */
-  background: var(--bg);
+  background: var(--surface-page);
   color: var(--text);
   display: block;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -52,21 +52,26 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: var(--btn-radius);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
+  padding: var(--btn-padding);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
   font-family: inherit;
   cursor: pointer;
   transition: all 0.25s;
 }
 
+input,
+select,
+textarea {
+  font: inherit;
+}
 
 button:focus,
 button:focus-visible {
-  outline: 2px solid var(--primary);
   outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* Dark theme transitions */
@@ -97,7 +102,7 @@ button:focus-visible {
 [data-theme="dark"] select:focus,
 [data-theme="dark"] textarea:focus {
   border-color: rgba(183, 146, 107, 0.55);
-  box-shadow: 0 0 0 3px rgba(183, 146, 107, 0.35);
+  box-shadow: var(--focus-ring);
 }
 
 /* Buttons in dark mode */

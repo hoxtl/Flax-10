@@ -1,10 +1,16 @@
-import React from "react";
+import PageHeader from "../components/common/PageHeader/PageHeader";
+import styles from "./AdminPage.module.css";
 
 export default function AdminPage() {
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Admin Dashboard</h1>
-      <p>This page is only visible to superusers.</p>
+    <div className={styles.container}>
+      <PageHeader
+        title="Admin"
+        subtitle="Superuser controls — only visible to admin accounts"
+      />
+      <div className={styles.placeholder}>
+        <p>Admin tools coming soon.</p>
+      </div>
     </div>
   );
 }
