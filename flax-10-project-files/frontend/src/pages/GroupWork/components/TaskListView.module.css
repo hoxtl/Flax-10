@@ -1,7 +1,7 @@
 /* Task Row grid */
 .taskRow {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 100px 90px 160px 48px;
+    grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
     align-items: center;
     border-bottom: 1px solid var(--border);
     padding: 16px 0;
@@ -121,7 +121,10 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 6px 10px;
     background: var(--hover-light);
     border-radius: 8px;
@@ -129,6 +132,7 @@
     border: none;
     cursor: pointer;
     transition: background 0.15s ease;
+    white-space: nowrap;
 }
 
 .dateLabel:hover {

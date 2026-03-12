@@ -140,7 +140,7 @@ function TimelineCard({ task, members, assignees, onUpdate }) {
     const cardStyle = { background: c.bg, border: `1.5px solid ${c.border}`, position: showPopup ? "relative" : "static", zIndex: showPopup ? 50 : "auto" };
 
     return (
-        <div className={styles.timelineCard} style={cardStyle} draggable onDragStart={(e) => { e.stopPropagation(); handleDragStartTask(e, task.id); }} onContextMenu={(e) => { e.preventDefault(); setShowPopup(true); }}>
+        <div className={styles.timelineCard} style={{ ...cardStyle, opacity: task.completed ? 0.6 : 1 }} draggable onDragStart={(e) => { e.stopPropagation(); handleDragStartTask(e, task.id); }} onContextMenu={(e) => { e.preventDefault(); setShowPopup(true); }}>
             <div className={styles.cardTitle} style={{ color: c.text }}>{task.title}</div>
             <div className={styles.cardFooter}>
                 <span className={styles.cardPriorityBadge} style={{ color: c.color, backgroundColor: c.backgroundColor }}>{task.priority || "MEDIUM"}</span>
