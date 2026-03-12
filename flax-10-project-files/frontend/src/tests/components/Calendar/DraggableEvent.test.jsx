@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DraggableEvent } from '../../../components/Calendar/DraggableEvent';
+import * as useDragDrop from '../../../components/Calendar/hooks/useDragDrop';
+import * as useEventResize from '../../../components/Calendar/hooks/useEventResize';
 
 vi.mock('../../../components/Calendar/hooks/useDragDrop', () => ({
     useDrag: vi.fn(() => ({ dragProps: {}, isDragging: false })),
@@ -12,9 +14,10 @@ vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
 
 vi.mock('../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(() => ({ openModal: vi.fn() })),
-    useEventPopup: vi.fn(() => ({ openPopup: vi.fn() })),
+    useEventPopup: vi.fn(() => ({ openPopup: mockOpenPopup, closePopup: vi.fn(), popupEvent: null, popupAnchorRect: null })),
 }));
 
+const { mockOpenPopup } = vi.hoisted(() => ({ mockOpenPopup: vi.fn() }));
 vi.mock('../../../components/Calendar/hooks/useEventResize', () => ({
     useEventResize: vi.fn(() => ({
         handleResizeStart: vi.fn(),
@@ -151,4 +154,25 @@ describe('DraggableEvent', () => {
         const { container } = render(<DraggableEvent event={{ ...timetableEvent, source: 'module' } } style={{ height: '60px', width: '100%' }} />);
         expect(container.querySelector('.timetable-event')).toBeTruthy();
     });
+
+    it('does not call openPopup when isDragging', () => {
+        vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });
+        render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
+        const eventEl = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.click(eventEl);
+        expect(mockOpenPopup).not.toHaveBeenCalled();
+    });
+
+    it('does not call openPopup when isResizing', () => {
+        vi.mocked(useEventResize.useEventResize).mockReturnValue({
+            handleResizeStart: vi.fn(),
+            isResizing: true,
+            resizePreview: null,
+        });
+        render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
+        const eventEl = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.click(eventEl);
+        expect(mockOpenPopup).not.toHaveBeenCalled();
+    });
+
 });

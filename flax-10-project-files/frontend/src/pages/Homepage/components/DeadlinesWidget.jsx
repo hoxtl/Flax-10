@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { AlertCircle, ArrowRight } from "lucide-react";
 import styles from "./DeadlinesWidget.module.css";
+import EmptyStateCard from "./EmptyStateCard";
 
 const MAX_SHOWN = 3;
 
@@ -39,11 +40,19 @@ function getDaysLabel(dueDate) {
 }
 
 const TIER_TEXT = {
-  overdue: "#B83232",
-  critical: "#B86050",
-  urgent: "#A06030",
-  upcoming: "#8C6D3F",
-  distant: "var(--color-primary)",
+  overdue: "var(--home-urgency-danger)",
+  critical: "var(--home-urgency-warning)",
+  urgent: "var(--home-urgency-warning)",
+  upcoming: "var(--home-urgency-neutral)",
+  distant: "var(--home-urgency-muted)",
+};
+
+const TIER_ACCENT = {
+  overdue: "var(--home-urgency-danger)",
+  critical: "var(--home-urgency-warning)",
+  urgent: "var(--home-urgency-warning)",
+  upcoming: "var(--home-urgency-neutral)",
+  distant: "var(--home-urgency-neutral-border)",
 };
 
 const listVariants = {
@@ -77,18 +86,19 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.headerIconWrap}>
-            <AlertCircle className={styles.headerIcon} size={18} strokeWidth={1.85} aria-hidden />
+            <AlertCircle className={styles.headerIcon} size={17} strokeWidth={1.85} aria-hidden />
           </div>
-          <span className={styles.headerTitle}>Deadlines</span>
+          <div className={styles.headerTitleBlock}>
+            <span className={styles.headerTitle}>Deadlines</span>
+          </div>
         </div>
       </div>
 
       {sorted.length === 0 ? (
-        <div className={styles.emptyState}>
-          <CheckCircle2 size={26} strokeWidth={1.25} className={styles.emptyIcon} aria-hidden />
-          <p className={styles.emptyTitle}>All caught up</p>
-          <p className={styles.emptySubtitle}>No upcoming deadlines</p>
-        </div>
+        <EmptyStateCard
+          message="No deadlines need attention."
+          sub="Upcoming coursework and exams will show up here."
+        />
       ) : (
         <motion.div
           className={styles.list}
@@ -126,17 +136,15 @@ function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
   const title = deadline.assessment_title || deadline.title || "Assignment";
   const moduleCode = deadline.module_code || "";
   const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
-  const textColor = TIER_TEXT[tier] || "var(--color-primary)";
-
-  const daysNum = getDayCount(due);
-  const borderColor = getUrgencyColor(daysNum);
+  const textColor = TIER_TEXT[tier] || "var(--home-urgency-muted)";
+  const rowAccent = TIER_ACCENT[tier] || "var(--home-urgency-neutral-border)";
 
   return (
     <motion.div
       role="button"
       tabIndex={0}
-      className={`${styles.row} ${isLast ? styles.rowLast : ""}`}
-      style={{ borderLeftColor: borderColor }}
+      className={`${styles.row} ${tier === "overdue" ? styles.rowOverdue : ""} ${tier === "critical" ? styles.rowCritical : ""} ${isLast ? styles.rowLast : ""}`}
+      style={{ "--deadline-row-accent": rowAccent }}
       variants={rowVariants}
       onClick={onSelect}
       onKeyDown={(e) => {

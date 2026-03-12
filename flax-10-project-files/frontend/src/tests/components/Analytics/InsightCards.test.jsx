@@ -79,7 +79,7 @@ describe('PeakHoursCard', () => {
 
     it('shows no data message when no heatmap data', () => {
         render(<PeakHoursCard data={{ heatmap: { data: [[0, 0]], hours: [9, 10] } }} />);
-        expect(screen.getByText('No data yet')).toBeTruthy();
+        expect(screen.getByText('No peak-hour data yet')).toBeTruthy();
     });
 
     it('renders rank badges for top hours', () => {

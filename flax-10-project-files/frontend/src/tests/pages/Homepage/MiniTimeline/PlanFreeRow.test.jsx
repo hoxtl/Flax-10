@@ -103,4 +103,63 @@ describe('PlanFreeRow', () => {
         renderRow({ row: { ...baseRow, minutes: 30, gapContext: { type: 'study' } } });
         expect(screen.getByText('30m free')).toBeTruthy();
     });
+
+    it('renders study gap with isBestGap styling', () => {
+        const { container } = renderRow({
+            row: { ...baseRow, gapContext: { type: 'study' } },
+            isBestGap: true,
+        });
+        expect(container.querySelector('.planTimelineGapShortWindowBest')).toBeTruthy();
+    });
+
+    it('renders duration 90 minutes as 1h 30m', () => {
+        renderRow({
+            row: { ...baseRow, minutes: 90, gapContext: { type: 'study' } },
+        });
+        expect(screen.getByText('1h 30m free')).toBeTruthy();
+    });
+
+    it('uses deadlineSuggestions when no assignedTask', () => {
+        renderRow({
+            deadlineSuggestions: [{ title: 'Essay', start_due_date: '2024-03-15', assessment_title: 'CW1' }],
+        });
+        expect(screen.getByText(/Revision: CW1/)).toBeTruthy();
+    });
+
+    it('shows urgency emoji for overdue task', () => {
+        const pastDue = new Date();
+        pastDue.setDate(pastDue.getDate() - 1);
+        renderRow({
+            row: { ...baseRow, gapContext: { type: 'study' } },
+            assignedTask: { title: 'Late task', due_date: pastDue.toISOString(), estimated_blocks: 1 },
+        });
+        expect(screen.getByText(/❗.*Late task/)).toBeTruthy();
+    });
+
+    it('shows urgency emoji for urgent priority task', () => {
+        renderRow({
+            row: { ...baseRow, gapContext: { type: 'study' } },
+            assignedTask: { title: 'Urgent task', priority: 'urgent', estimated_blocks: 1 },
+        });
+        expect(screen.getByText(/❗.*Urgent task/)).toBeTruthy();
+    });
+
+    it('Slot in button does not throw when onQuickStart is undefined', () => {
+        renderRow({
+            row: { ...baseRow, gapContext: { type: 'study' } },
+            assignedTask: { title: 'Task', estimated_blocks: 1 },
+            onQuickStart: undefined,
+        });
+        fireEvent.click(screen.getByLabelText('Start Task'));
+    });
+
+    it('uses default campus labels when prevCampus/nextCampus unknown', () => {
+        renderRow({
+            row: {
+                ...baseRow,
+                gapContext: { type: 'transit', prevCampus: 'unknown', nextCampus: 'other', transitMins: 10 },
+            },
+        });
+        expect(screen.getByText(/travel/)).toBeTruthy();
+    });
 });

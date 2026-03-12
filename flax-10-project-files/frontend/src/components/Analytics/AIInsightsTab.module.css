@@ -8,7 +8,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* On the Analytics PAGE these stay tall; on Home they're overridden via :global */
@@ -16,18 +16,23 @@
 .chatPanel {
   background: var(--panel);
   border: none;
-  border-radius: 16px;
+  border-radius: var(--ai-panel-radius);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 540px;
   max-height: 680px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  box-shadow: var(--ai-panel-shadow);
 }
 
+<<<<<<< HEAD
 [data-mode="dark"] .panel,
 [data-mode="dark"] .chatPanel {
   box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+=======
+.chatPanel {
+  height: 100%;
+>>>>>>> origin/main
 }
 
 .panelHeader {
@@ -35,9 +40,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.375rem 1.5rem 1.25rem;
-  border-bottom: 1px solid var(--border);
+  padding: 1.3rem 1.3rem 1rem;
+  border-bottom: 1px solid var(--ai-header-border);
   flex-shrink: 0;
+  background: var(--ai-header-bg);
 }
 
 .panelHeaderCompact {
@@ -48,16 +54,34 @@
 }
 
 .panelTitle {
-  font-size: 0.95rem;
-  font-weight: 650;
-  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ai-card-title);
   margin: 0 0 0.2rem;
 }
 
 .panelSub {
-  font-size: 0.75rem;
-  color: var(--muted);
+  font-size: 0.8rem;
+  color: var(--ai-card-subtitle);
   margin: 0;
+}
+
+.chatHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.chatHeaderIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ai-icon-fg);
+  background: var(--ai-icon-bg);
+  flex-shrink: 0;
 }
 
 .generateBtn {
@@ -65,7 +89,11 @@
   align-items: center;
   gap: 0.4rem;
   background: var(--primary);
+<<<<<<< HEAD
   color: var(--color-card);
+=======
+  color: var(--ai-button-fg);
+>>>>>>> origin/main
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1rem;
@@ -84,8 +112,13 @@
 .btnSpinner {
   width: 14px;
   height: 14px;
+<<<<<<< HEAD
   border: 2px solid rgba(255,255,255,0.35);
   border-top-color: var(--color-card);
+=======
+  border: 2px solid var(--ai-button-spinner-track);
+  border-top-color: var(--ai-button-spinner-head);
+>>>>>>> origin/main
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -129,24 +162,32 @@
 }
 
 .emptyIcon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  opacity: 0.8;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ai-icon-bg);
+  color: var(--ai-empty-icon-fg);
+  font-size: 1.35rem;
+  margin-bottom: 0.1rem;
 }
 
 .emptyTitle {
   font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 700;
+  color: var(--ai-card-title);
   margin: 0;
 }
 
 .emptyText {
-  font-size: 0.825rem;
-  color: var(--muted);
-  margin: 0;
-  max-width: 280px;
+  font-size: 0.82rem;
   line-height: 1.55;
+  color: var(--ai-empty-text);
+  font-weight: 500;
+  margin: 0;
+  max-width: 300px;
 }
 
 .insightsBody {
@@ -169,6 +210,7 @@
   border-left: 3px solid var(--primary);
 }
 
+<<<<<<< HEAD
 .chatMessages {
   flex: 1;
   overflow-y: auto;
@@ -352,6 +394,8 @@
 
 .clearBtn:hover { border-color: var(--error-text); color: var(--error-text); }
 
+=======
+>>>>>>> origin/main
 .errorBanner {
   background: var(--error-bg);
   border: 1px solid var(--error-border);
@@ -361,23 +405,16 @@
   font-size: 0.825rem;
 }
 
-.chatError {
-  font-size: 0.8rem;
-  color: var(--error-text);
-  text-align: center;
-  margin: 0;
-}
-
 @media (max-width: 900px) {
   .aiGrid { grid-template-columns: 1fr; }
-  .panel, .chatPanel { min-height: 420px; max-height: 520px; }
+  .panel, .chatPanel { min-height: 420px; max-height: 520px; border-radius: var(--ai-panel-radius-mobile); }
 }
 
 /* ── Panel body ── */
 .panelBody {
   flex: 1;
   overflow: hidden;
-  padding: 1rem 1.25rem;
+  padding: 0.8rem 1.25rem 0.85rem;
   display: flex;
   flex-direction: column;
 }
@@ -394,9 +431,9 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.625rem;
-  padding: 1.25rem 2rem;   /* was 2rem — a bit tighter */
-  color: var(--muted);
+  gap: 0.55rem;
+  padding: 1rem 0 0.25rem;
+  color: var(--ai-empty-text);
   font-size: 0.875rem;
   min-height: 0;           /* was 300px — removed so Home card stays compact */
 }
@@ -410,17 +447,20 @@
   border: none;
   border-radius: 10px;
   border-left: 3px solid var(--primary);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: var(--ai-item-shadow);
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
+<<<<<<< HEAD
 [data-mode="dark"] .insightItem {
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
+=======
+>>>>>>> origin/main
 .insightItem.insightSelected {
   background: var(--hover);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: var(--ai-item-active-shadow);
 }
 
 .insightNum {
@@ -439,8 +479,6 @@
   line-height: 1.65;
   margin: 0;
 }
-
-/* ── Markdown rendering ── */
 
 .markdownBody {
   display: flex;

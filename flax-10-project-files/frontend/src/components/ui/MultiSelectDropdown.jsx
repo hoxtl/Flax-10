@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, X } from "lucide-react";
-import styles from "./AnimatedDropdown.module.css";
+import styles from "../common/AnimatedDropdown/AnimatedDropdown.module.css";
 import pillStyles from "./MultiSelectDropdown.module.css";
 
 function normalise(opt) {
@@ -15,17 +15,30 @@ export default function MultiSelectDropdown({
   placeholder = "All",
   options = [],
   className = "",
-  countLabel = "selected", // e.g. "lists" or "modules" for "3 lists"
+  countLabel = "selected",
   displayAsPills = false,
+  optionsAsPills = false,
+  customTrigger,
+  isOpen: forceOpen,
+  onOpenChange,
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isCtrl = forceOpen !== undefined;
+  const isOpen = isCtrl ? forceOpen : internalOpen;
+
+  const updateOpen = (v) => {
+    const next = typeof v === "function" ? v(isOpen) : v;
+    if (!isCtrl) setInternalOpen(next);
+    if (onOpenChange) onOpenChange(next);
+  };
+
   const rootRef = useRef(null);
   const selected = Array.isArray(value) ? value : [];
 
   useEffect(() => {
     if (!isOpen) return;
     const handleMouseDown = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target)) setIsOpen(false);
+      if (rootRef.current && !rootRef.current.contains(e.target)) updateOpen(false);
     };
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
@@ -64,13 +77,13 @@ export default function MultiSelectDropdown({
       return (
         <div
           className={pillStyles.triggerWithPills}
-          onClick={() => setIsOpen((o) => !o)}
+          onClick={() => updateOpen((o) => !o)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              setIsOpen((o) => !o);
+              updateOpen((o) => !o);
             }
           }}
           aria-haspopup="listbox"
@@ -118,7 +131,7 @@ export default function MultiSelectDropdown({
       <motion.button
         type="button"
         whileTap={{ scale: 0.99 }}
-        onClick={() => setIsOpen((o) => !o)}
+        onClick={() => updateOpen((o) => !o)}
         className={styles.trigger}
       >
         <span style={{ color: selected.length ? "inherit" : "var(--muted)" }}>
@@ -136,8 +149,8 @@ export default function MultiSelectDropdown({
   };
 
   return (
-    <div ref={rootRef} className={`${styles.root} ${isOpen ? styles.rootOpen : ""} ${className}`}>
-      {renderTrigger()}
+    <div ref={rootRef} className={`${styles.root} ${isOpen ? styles.rootOpen : ""} ${className}`} style={{ position: 'relative' }}>
+      {customTrigger ? customTrigger : renderTrigger()}
 
       <AnimatePresence>
         {isOpen && (
@@ -147,7 +160,7 @@ export default function MultiSelectDropdown({
             exit={{ opacity: 0, y: -6, scaleY: 0.95 }}
             transition={{ duration: 0.16 }}
             style={{ originY: 0 }}
-            className={styles.menu}
+            className={`${styles.menu} ${optionsAsPills ? pillStyles.menuPillsGrid : ""}`}
           >
             {opts.map((opt) => {
               const isActive = opt.value === "" ? selected.length === 0 : selectedSet.has(opt.value);
@@ -159,7 +172,7 @@ export default function MultiSelectDropdown({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.14 }}
                   onClick={() => handleToggle(opt.value)}
-                  className={`${styles.item} ${isActive ? styles.itemActive : ""}`}
+                  className={`${styles.item} ${optionsAsPills ? pillStyles.itemPill : ""} ${isActive ? (optionsAsPills ? pillStyles.itemPillActive : styles.itemActive) : ""}`}
                 >
                   <span>{opt.label}</span>
                   {isActive && (

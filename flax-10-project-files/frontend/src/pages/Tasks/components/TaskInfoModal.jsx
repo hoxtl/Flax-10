@@ -5,6 +5,7 @@
 import { createPortal } from "react-dom";
 import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
 
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
 import styles from "./TaskInfoModal.module.css";
 
@@ -85,14 +86,12 @@ function InfoModalFooter({ onClose }) {
 /** Portal modal displaying read-only task details. */
 export function TaskInfoModal({ task, listName, onClose }) {
   const modal = (
-    <div className={styles.modalBackdrop} onMouseDown={onClose}>
-      <div className={styles.infoModal} onMouseDown={e => e.stopPropagation()}>
+      <StandardModal onClose={onClose} hideHeader size="md" backdropClassName={styles.modalBackdrop} modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
         <div className={styles.infoModalAccent} aria-hidden />
         <InfoModalHeader onClose={onClose} />
         <InfoModalBody task={task} listName={listName} />
         <InfoModalFooter onClose={onClose} />
-      </div>
-    </div>
+      </StandardModal>
   );
   return createPortal(modal, document.body);
 }

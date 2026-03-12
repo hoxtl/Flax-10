@@ -73,8 +73,8 @@ describe('AchievementsModal', () => {
 
     it('calls onClose when clicking overlay background', () => {
         render(<AchievementsModal badges={[]} onClose={onClose} />);
-        const overlay = document.querySelector('[class*="overlay"]');
-        fireEvent.click(overlay);
+        const overlay = document.querySelector('[class*="backdrop"]');
+        fireEvent.mouseDown(overlay);
         expect(onClose).toHaveBeenCalledOnce();
     });
 
@@ -100,5 +100,12 @@ describe('AchievementsModal', () => {
         render(<AchievementsModal badges={[]} onClose={onClose} />);
         const lockIcons = screen.getAllByText('🔒');
         expect(lockIcons.length).toBeGreaterThan(0);
+    });
+
+    it('removes keydown listener on unmount', () => {
+        const { unmount } = render(<AchievementsModal badges={[]} onClose={onClose} />);
+        unmount();
+        fireEvent.keyDown(window, { key: 'Escape' });
+        expect(onClose).toHaveBeenCalledTimes(0);
     });
 });

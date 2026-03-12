@@ -1,0 +1,77 @@
+.container {
+    width: 100%;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skel {
+    background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 10px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.title {
+    height: 36px;
+    width: min(240px, 55%);
+}
+
+.action {
+    height: 36px;
+    width: 110px;
+}
+
+.search {
+    height: 40px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(var(--page-skeleton-columns, 3), minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.card {
+    height: 180px;
+}
+
+@media (max-width: 1200px) {
+    .grid {
+        grid-template-columns: repeat(min(2, var(--page-skeleton-columns, 3)), minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .header {
+        margin-top: 1rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

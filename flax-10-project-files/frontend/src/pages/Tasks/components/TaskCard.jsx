@@ -24,43 +24,43 @@ import ctxMenuStyles from "./TaskCardContextMenu.module.css";
 const styles = { ...cardStyles, ...ctxMenuStyles };
 
 function useActiveTimerTaskId() {
-    const [id, setId] = useState(() => {
-        try { return typeof window !== "undefined" ? sessionStorage.getItem("timerTaskId") : null; } catch (_) { return null; }
-    });
-    useEffect(() => {
-        const onStorage = (e) => { if (e.key === "timerTaskId") setId(e.newValue); };
-        window.addEventListener("storage", onStorage);
-        return () => window.removeEventListener("storage", onStorage);
-    }, []);
-    return id;
+  const [id, setId] = useState(() => {
+    try { return typeof window !== "undefined" ? sessionStorage.getItem("timerTaskId") : null; } catch (_) { return null; }
+  });
+  useEffect(() => {
+    const onStorage = (e) => { if (e.key === "timerTaskId") setId(e.newValue); };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+  return id;
 }
 
 const IconPlay = () => (
-    <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+  <svg className={styles.actionIcon} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
 );
 
 function HighlightText({ text, query }) {
-    if (!query || !text) return <>{text}</>;
-    const idx = text.toLowerCase().indexOf(query.toLowerCase());
-    if (idx === -1) return <>{text}</>;
-    return (
-        <>
-            {text.slice(0, idx)}
-            <mark className={styles.searchHighlight}>{text.slice(idx, idx + query.length)}</mark>
-            {text.slice(idx + query.length)}
-        </>
-    );
+  if (!query || !text) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className={styles.searchHighlight}>{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
 }
 
 function ModulePillLink({ task }) {
-    const mc = getModuleColor(task.module_code);
-    const moduleId = task.module_id ?? task.module ?? task.moduleId;
-    const to = moduleId ? `/modules?moduleId=${moduleId}` : `/modules?code=${encodeURIComponent(task.module_code)}`;
-    return (
-        <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={{ color: mc.text, background: "transparent", borderColor: mc.border }} onClick={(e) => e.stopPropagation()} title={`Open ${task.module_code} module`}>
-            {task.module_code}
-        </Link>
-    );
+  const mc = getModuleColor(task.module_code);
+  const moduleId = task.module_id ?? task.module ?? task.moduleId;
+  const to = moduleId ? `/modules?moduleId=${moduleId}` : `/modules?code=${encodeURIComponent(task.module_code)}`;
+  return (
+    <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={{ color: mc.text, background: "transparent", borderColor: mc.border }} onClick={(e) => e.stopPropagation()} title={`Open ${task.module_code} module`}>
+      {task.module_code}
+    </Link>
+  );
 }
 
 function useTaskContextMenuState(task) {
@@ -149,32 +149,32 @@ export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos
 }
 
 function buildCheckClickHandler(opts) {
-    const { task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast } = opts;
-    return function handleCheckClick() {
-        const wasIncomplete = !task.completed;
-        const routine = isRoutineTask(task);
-        if (!wasIncomplete) { onToggle(); return; }
-        if (!routine) { setBurstPop(true); setCheckBounce(true); setTimeout(() => setCheckBounce(false), 400); }
-        const messageContext = { isOverdue, dueStatus: due?.status };
-        showCompletionToast(getCompletionMessage(task, messageContext), { isRoutine: routine });
-        if (!routine && burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current);
-        if (!routine) burstTimeoutRef.current = setTimeout(() => { setBurstPop(false); burstTimeoutRef.current = null; }, 500);
-        onToggle();
-    };
+  const { task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast } = opts;
+  return function handleCheckClick() {
+    const wasIncomplete = !task.completed;
+    const routine = isRoutineTask(task);
+    if (!wasIncomplete) { onToggle(); return; }
+    if (!routine) { setBurstPop(true); setCheckBounce(true); setTimeout(() => setCheckBounce(false), 400); }
+    const messageContext = { isOverdue, dueStatus: due?.status };
+    showCompletionToast(getCompletionMessage(task, messageContext), { isRoutine: routine });
+    if (!routine && burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current);
+    if (!routine) burstTimeoutRef.current = setTimeout(() => { setBurstPop(false); burstTimeoutRef.current = null; }, 500);
+    onToggle();
+  };
 }
 
 export function EditTaskModal({ task, onSave, onDelete, onClose, lists = [] }) {
-    return (
-        <CreateTaskModal
-            mode="edit"
-            initialTask={task}
-            defaultListId={task.task_list}
-            lists={lists}
-            onSave={onSave}
-            onDeleteTask={onDelete}
-            onClose={onClose}
-        />
-    );
+  return (
+    <CreateTaskModal
+      mode="edit"
+      initialTask={task}
+      defaultListId={task.task_list}
+      lists={lists}
+      onSave={onSave}
+      onDeleteTask={onDelete}
+      onClose={onClose}
+    />
+  );
 }
 
 function getTaskCardAccentClass(task) {
@@ -206,21 +206,21 @@ function useTaskCardHandlers(props) {
 }
 
 function useTaskCard(props) {
-    const { task, onToggle, onDelete, onEdit, listName, listColor, lists, hideDueBadge, hideListBadge, isOverdue, searchQuery, isCompletedSection } = props;
-    const [showInfo, setShowInfo] = useState(false);
-    const [showEdit, setShowEdit] = useState(false);
-    const [ctxMenu, setCtxMenu] = useState(null);
-    const [burstPop, setBurstPop] = useState(false);
-    const [checkBounce, setCheckBounce] = useState(false);
-    const burstTimeoutRef = useRef(null);
-    const nav = useNavigate();
-    const { setActiveTaskId } = useTimerContext();
-    const activeTimerTaskId = useActiveTimerTaskId();
-    const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
-    const { due, priorityKey, showPriorityText } = getTaskCardDerived(task);
-    const { handleCheckClick, handleContextMenu } = useTaskCardHandlers({ task, due, isOverdue, onToggle, setCtxMenu, burstTimeoutRef, setBurstPop, setCheckBounce });
-    const accentCls = getTaskCardAccentClass(task);
-    return { task, listName, listColor, lists, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, showInfo, setShowInfo, showEdit, setShowEdit, ctxMenu, setCtxMenu, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, isOverdue, nav, setActiveTaskId, onDelete, onEdit };
+  const { task, onToggle, onDelete, onEdit, listName, listColor, lists, hideDueBadge, hideListBadge, isOverdue, searchQuery, isCompletedSection } = props;
+  const [showInfo, setShowInfo] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [ctxMenu, setCtxMenu] = useState(null);
+  const [burstPop, setBurstPop] = useState(false);
+  const [checkBounce, setCheckBounce] = useState(false);
+  const burstTimeoutRef = useRef(null);
+  const nav = useNavigate();
+  const { setActiveTaskId } = useTimerContext();
+  const activeTimerTaskId = useActiveTimerTaskId();
+  const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
+  const { due, priorityKey, showPriorityText } = getTaskCardDerived(task);
+  const { handleCheckClick, handleContextMenu } = useTaskCardHandlers({ task, due, isOverdue, onToggle, setCtxMenu, burstTimeoutRef, setBurstPop, setCheckBounce });
+  const accentCls = getTaskCardAccentClass(task);
+  return { task, listName, listColor, lists, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, showInfo, setShowInfo, showEdit, setShowEdit, ctxMenu, setCtxMenu, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, isOverdue, nav, setActiveTaskId, onDelete, onEdit };
 }
 
 function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDueBadge, due, isCompletedSection }) {
@@ -239,10 +239,18 @@ function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDu
 
 function CardMetaRow({ task, listName, hideListBadge, listColor }) {
   const listStyle = { "--lc": listColor || "#a89890", background: `color-mix(in srgb, ${listColor || "#a89890"} 8%, transparent)`, borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 18%, transparent)` };
+  const projectStyle = { color: "var(--primary)", background: "var(--primary-light)", borderColor: "var(--primary-border)" };
+
   return (
     <div className={`${styles.meta} ${task.completed ? styles.metaDone : ""}`}>
       {listName && !hideListBadge && <span className={styles.listIndicator} style={listStyle}><span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />{listName}</span>}
       {task.module_code && <ModulePillLink task={task} />}
+      {task.group_project_name && (
+        <span className={styles.projectPill} style={projectStyle} title={`Project: ${task.group_project_name}`}>
+          <ClipboardList size={11} className={styles.projectPillIcon} />
+          {task.group_project_name}
+        </span>
+      )}
     </div>
   );
 }
@@ -269,29 +277,29 @@ function CardPlayButton({ task, listColor, setActiveTaskId, nav }) {
 }
 
 function TaskCardView(card) {
-    const { task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, setActiveTaskId, nav } = card;
-    const cardCls = `${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${card.isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`;
-    return (
-        <div className={cardCls} style={{ "--list-color": listColor || "#a89890" }} onContextMenu={handleContextMenu} title="Right-click for more options">
-            <CheckBurst active={burstPop}>
-                <button className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`} onClick={handleCheckClick} aria-label={task.completed ? "Mark incomplete" : "Mark complete"}>
-                    {task.completed && <span className={styles.checkMark}>✓</span>}
-                </button>
-            </CheckBurst>
-            <CardContentArea card={card} task={task} listName={listName} listColor={listColor} hideDueBadge={hideDueBadge} hideListBadge={hideListBadge} isCompletedSection={isCompletedSection} searchQuery={searchQuery} due={due} priorityKey={priorityKey} showPriorityText={showPriorityText} />
-            {!task.completed && <CardPlayButton task={task} listColor={listColor} setActiveTaskId={setActiveTaskId} nav={nav} />}
-        </div>
-    );
+  const { task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, setActiveTaskId, nav } = card;
+  const cardCls = `${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${card.isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`;
+  return (
+    <div className={cardCls} style={{ "--list-color": listColor || "#a89890" }} onContextMenu={handleContextMenu} title="Right-click for more options">
+      <CheckBurst active={burstPop}>
+        <button className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`} onClick={handleCheckClick} aria-label={task.completed ? "Mark incomplete" : "Mark complete"}>
+          {task.completed && <span className={styles.checkMark}>✓</span>}
+        </button>
+      </CheckBurst>
+      <CardContentArea card={card} task={task} listName={listName} listColor={listColor} hideDueBadge={hideDueBadge} hideListBadge={hideListBadge} isCompletedSection={isCompletedSection} searchQuery={searchQuery} due={due} priorityKey={priorityKey} showPriorityText={showPriorityText} />
+      {!task.completed && <CardPlayButton task={task} listColor={listColor} setActiveTaskId={setActiveTaskId} nav={nav} />}
+    </div>
+  );
 }
 
 export default function TaskCard(props) {
-    const card = useTaskCard(props);
-    return (
-        <>
-            <TaskCardView {...card} />
-            {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={() => card.setShowEdit(true)} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
-            {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
-            {card.showEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
-        </>
-    );
+  const card = useTaskCard(props);
+  return (
+    <>
+      <TaskCardView {...card} />
+      {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={() => card.setShowEdit(true)} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
+      {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
+      {card.showEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
+    </>
+  );
 }

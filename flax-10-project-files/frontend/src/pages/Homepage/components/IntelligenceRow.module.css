@@ -17,35 +17,53 @@
 }
 
 .header {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 1.5rem;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(123, 103, 81, 0.15);
+  margin-bottom: 18px;
+  padding: 26px 28px;
+  border: 1px solid rgba(123, 103, 81, 0.14);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(255, 252, 248, 0.99) 0%, rgba(247, 241, 234, 0.96) 56%, rgba(243, 235, 226, 0.93) 100%);
+  box-shadow: 0 18px 36px rgba(74, 52, 33, 0.045);
+  overflow: hidden;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top right, rgba(196, 164, 109, 0.12), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.18), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 52%);
 }
 
 @media (min-width: 768px) {
   .header {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(420px, 0.9fr);
+    align-items: stretch;
   }
 }
 
 .headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
 }
 
 .headerLabel {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.875rem;
-  /* text-sm */
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  /* tracking-widest */
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-primary);
   /* text-stone-400 */
@@ -54,7 +72,7 @@
 .headerDateRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .headerDateIcon {
@@ -65,29 +83,24 @@
 
 .headerTitle {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 2rem;
+  font-size: clamp(2.35rem, 3.9vw, 3.2rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  color: #4a433d;
   margin: 0;
-}
-
-@media (min-width: 768px) {
-  .headerTitle {
-    font-size: 2.5rem;
-  }
+  max-width: none;
 }
 
 .headerRight {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  display: grid;
+  align-content: start;
+  min-width: 280px;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .headerRight {
-    align-items: flex-end;
+    min-width: 0;
   }
 }
 
@@ -131,27 +144,27 @@
 }
 
 .headerDayProgressCount {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #7B6751;
 }
 
 .headerDayProgressOverdue {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
   font-weight: 700;
-  color: var(--error-text);
-  letter-spacing: 0.02em;
+  color: #C0714E;
+  letter-spacing: 0.04em;
 }
 
 .headerDayProgressStreak {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  color: #9a8778;
+  letter-spacing: 0.04em;
 }
 
 /* Pills row at the top of the Right Now bento card */
@@ -248,11 +261,11 @@
 }
 
 .statusStripText {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #5c4d3e;
 }
 
 /* Conflict variant — terracotta with glow pulse */
@@ -327,18 +340,18 @@
 }
 
 .tflCardLine {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.67rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--text);
+  letter-spacing: 0.06em;
+  color: #5c3a1e;
 }
 
 .tflCardStatus {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
-  font-weight: 500;
-  color: var(--color-primary);
+  font-weight: 600;
+  color: #8a7060;
 }
 
 .tflCardLeave {
@@ -371,10 +384,10 @@
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   color: rgba(155, 58, 42, 0.65);
   padding: 2px 0 2px 4px;
 }
@@ -454,11 +467,273 @@
 
 .headerSubtitle {
   font-family: "Lexend", system-ui, sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
-  color: var(--color-primary);
+  line-height: 1.55;
+  color: rgba(74, 52, 33, 0.76);
   margin: 0;
-  max-width: 320px;
+  max-width: 39ch;
+}
+
+.headerPlannerPanel {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(123, 103, 81, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.metricRail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metricChip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  min-width: 98px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(123, 103, 81, 0.06);
+}
+
+@media (max-width: 767px) {
+  .metricRail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metricLabel {
+  color: #8f7b68;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  color: #4a3a2d;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.nextStepCard {
+  display: grid;
+  gap: 8px;
+  padding: 16px 17px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(250, 246, 240, 0.96) 0%, rgba(255, 255, 255, 0.82) 100%);
+  border: 1px solid rgba(123, 103, 81, 0.08);
+}
+
+.nextStepLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #8f7b68;
+}
+
+.nextStepText {
+  margin: 0;
+  color: #3f3025;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.nextStepMeta {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: rgba(74, 52, 33, 0.56);
+  letter-spacing: 0.05em;
+}
+
+.nextStepFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.analyticsInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.analyticsPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(243, 239, 234, 0.72);
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #736048;
+}
+
+.analyticsLink {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7b6751;
+  text-decoration: none;
+}
+
+.analyticsLink:hover {
+  color: #4a3421;
+}
+
+.liveContextCard {
+  display: grid;
+  gap: 8px;
+  width: fit-content;
+  max-width: min(100%, 34rem);
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(123, 103, 81, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 8px 18px rgba(74, 52, 33, 0.025);
+  backdrop-filter: blur(6px);
+}
+
+.liveContextCardWarning {
+  background: rgba(255, 248, 244, 0.78);
+  border-color: rgba(192, 113, 78, 0.14);
+}
+
+.liveContextInlineAlert {
+  position: relative;
+}
+
+.liveContextTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 18px;
+}
+
+.liveContextLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8f7b68;
+}
+
+.liveContextIcon {
+  color: rgba(192, 113, 78, 0.78);
+  flex-shrink: 0;
+}
+
+.liveContextDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #f0b29d 0%, #c0714e 55%, #b83232 100%);
+  box-shadow:
+    0 0 0 4px rgba(192, 113, 78, 0.1),
+    0 0 14px rgba(192, 113, 78, 0.42);
+  animation: liveAlertDotPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.liveContextBody {
+  display: grid;
+  gap: 5px;
+}
+
+.liveContextText {
+  margin: 0;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #6f3f30;
+  max-width: 35ch;
+}
+
+.liveContextMeta {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(132, 87, 72, 0.72);
+}
+
+.liveContextInlineAlert .liveContextTop {
+  justify-content: flex-start;
+}
+
+@keyframes liveAlertDotPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 4px rgba(192, 113, 78, 0.1),
+      0 0 14px rgba(192, 113, 78, 0.42);
+  }
+
+  50% {
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 6px rgba(192, 113, 78, 0.08),
+      0 0 18px rgba(192, 113, 78, 0.5);
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .headerPlannerPanel {
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .headerTitle {
+    font-size: clamp(2rem, 10vw, 2.55rem);
+  }
+}
+
+.primaryGrid {
+  margin-bottom: 14px;
+}
+
+@media (min-width: 1024px) {
+  .primaryGrid {
+    grid-template-columns: minmax(300px, 0.48fr) minmax(0, 1fr) !important;
+    grid-auto-rows: minmax(0, auto);
+    gap: 12px;
+    align-items: stretch;
+  }
 }
 
 .grid {
@@ -878,71 +1153,22 @@
   color: var(--warning-text);
 }
 
-/* ── Bento grid spans (Flow layout rather than fixed pos) ─────────────────── */
+/* ── Bento grid positions (desktop 2-col layout) ─────────────────── */
 @media (min-width: 1024px) {
-
-  /* Default unchanged layout: perfect specific placements */
-  .defaultLayout .posRightNow {
+  .posDeadlines {
     grid-column: 1;
     grid-row: 1;
-    align-self: start;
   }
 
-  .defaultLayout .posTodaysTasks {
-    grid-column: 2 / 4;
+  .posTodaysTasks {
+    grid-column: 2;
     grid-row: 1;
+    align-self: stretch;
   }
+}
 
-  .defaultLayout .posQuickActions {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: start;
-    margin-top: 0;
-  }
-
-  .defaultLayout .posStudyPulse {
-    grid-column: 2 / 4;
-    grid-row: 2;
-  }
-
-  .defaultLayout .posDeadlines {
-    grid-column: 1;
-    grid-row: 3;
-    align-self: start;
-    margin-top: 0;
-  }
-
-  .defaultLayout .posSocialDiscover {
-    grid-column: 2 / 4;
-    grid-row: 3;
-  }
-
-  .defaultLayout .posImageWidget {
-    grid-column: span 1;
-    grid-row: auto;
-  }
-
-  /* Custom / Editing layout: use fluid grid allowing free placement */
-  .customLayout {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-flow: dense;
-    gap: 12px;
-  }
-
-  /* Base 1-column items */
-  .customLayout .posRightNow,
-  .customLayout .posQuickActions,
-  .customLayout .posDeadlines {
-    grid-column: span 1;
-  }
-
-  /* Base 2-column items */
-  .customLayout .posTodaysTasks,
-  .customLayout .posStudyPulse,
-  .customLayout .posSocialDiscover {
-    grid-column: span 2;
-  }
+.posTodaysTasks {
+  min-height: 100%;
 }
 
 @media (max-width: 1023px) and (min-width: 768px) {

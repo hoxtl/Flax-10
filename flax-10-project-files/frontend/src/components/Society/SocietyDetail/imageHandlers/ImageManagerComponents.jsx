@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import StandardModal from "../../../common/StandardModal/StandardModal";
 import styles from "./ImageManagerComponents.module.css";
 
 export function ImageHeader({ title, onClose }) {
@@ -56,15 +57,18 @@ export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
     };
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ImageHeader title="Add Image" onClose={onClose} />
-                <TabSelector active={tab} onSelect={setTab} hasPhotos={availablePhotos.length > 0} />
-                <ViewContent tab={tab} fileRef={fileRef} handleUpload={handleUpload}
-                    availablePhotos={availablePhotos} selected={selected} onSelect={setSelected} />
-                <FooterActions tab={tab} onClose={onClose} onAdd={() => onAdd(selected)} selected={selected} />
-            </div>
-        </div>
+        <StandardModal
+            title="Add Image"
+            onClose={onClose}
+            size="md"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
+            <TabSelector active={tab} onSelect={setTab} hasPhotos={availablePhotos.length > 0} />
+            <ViewContent tab={tab} fileRef={fileRef} handleUpload={handleUpload}
+                availablePhotos={availablePhotos} selected={selected} onSelect={setSelected} />
+            <FooterActions tab={tab} onClose={onClose} onAdd={() => onAdd(selected)} selected={selected} />
+        </StandardModal>
     );
 }
 

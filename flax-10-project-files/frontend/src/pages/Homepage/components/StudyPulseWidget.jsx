@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { TrendingUp, Flame, Clock, ArrowRight, CalendarClock, Zap, CheckCircle2 } from "lucide-react";
+import { TrendingUp, Flame, Clock, ArrowRight, CalendarClock, Zap, CheckCircle2, BarChart3 } from "lucide-react";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import analyticsService from "../../../api/analyticsService";
 import styles from "./StudyPulseWidget.module.css";
@@ -212,8 +212,9 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
     .sort((a, b) => a.start.getTime() - b.start.getTime());
 
   const nextWindow = futureWindows[0] ?? null;
+  const analyticsHref = "/analytics?period=7&tab=Overview&from=study-pulse";
 
-  const handleViewAnalytics = () => navigate("/analytics");
+  const handleViewAnalytics = () => navigate(analyticsHref);
 
   return (
     <div className={styles.root}>
@@ -223,9 +224,15 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
           <div className={styles.headerIconWrap}>
             <TrendingUp size={17} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
           </div>
-          <span className={styles.headerTitle}>Study Pulse</span>
+          <div className={styles.headerTitleGroup}>
+            <span className={styles.headerTitle}>Study Pulse</span>
+            <span className={styles.headerSource}>
+              <BarChart3 size={11} strokeWidth={1.8} aria-hidden />
+              7-day analytics snapshot
+            </span>
+          </div>
         </div>
-        <Link to="/analytics" className={styles.headerLink}>
+        <Link to={analyticsHref} className={styles.headerLink}>
           View analytics
           <ArrowRight size={11} strokeWidth={2} aria-hidden />
         </Link>
@@ -349,7 +356,7 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
 
           {/* CTA */}
           <button type="button" className={styles.startBtn} onClick={handleViewAnalytics}>
-            View detailed analysis →
+            Open 7-day analytics →
           </button>
         </div>
       </div>

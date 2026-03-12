@@ -3,12 +3,7 @@ import styles from './HistoryModal.module.css';
 import { getHistory, clearHistory } from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
 import { useConfirm } from '../../context/ConfirmContext';
-
-const HistoryHeader = ({ onClose }) => {
-    const title = <h2 className={styles.title}>History</h2>;
-    const btn = <button className={styles.closeButton} onClick={onClose}>×</button>;
-    return <div className={styles.header}>{title}{btn}</div>;
-};
+import StandardModal from '../common/StandardModal/StandardModal';
 
 const StatsRow = ({ block }) => {
     const completedCount = block.sessions.filter(s => s.status !== 'Incomplete').length;
@@ -71,9 +66,18 @@ const ModalContent = ({ history, blocks }) => {
 export default function HistoryModal({ onClose }) {
     const confirm = useConfirm();
     const { history, blocks, triggerClear } = useHistoryData(confirm);
-    const hdr = <HistoryHeader onClose={onClose} />;
     const content = <ModalContent history={history} blocks={blocks} />;
     const cBtn = history.length > 0 ? <ClearButton onClear={triggerClear} /> : null;
-    const inner = <div className={styles.modal} onClick={e => e.stopPropagation()}>{hdr}{content}{cBtn}</div>;
-    return <div className={styles.overlay} onClick={onClose}>{inner}</div>;
+    return (
+        <StandardModal
+            title="History"
+            onClose={onClose}
+            size="md"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
+            {content}
+            {cBtn}
+        </StandardModal>
+    );
 }

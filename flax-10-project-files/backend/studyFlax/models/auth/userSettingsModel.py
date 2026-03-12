@@ -15,3 +15,5 @@ class UserSettings(models.Model):
     homepage_widgets = models.JSONField(default=list, blank=True)
     sleep_time = models.TimeField(default=time(23, 0))
     wake_time = models.TimeField(default=time(7, 0))
+    mode = models.CharField(max_length=50, default='light')
+    homepage_widgets = models.JSONField(default=list, blank=True)

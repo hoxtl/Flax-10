@@ -11,10 +11,14 @@ import {
   getTflLinesForLocation,
   isSevereDisruption,
 } from "../utils/kclTflMapping";
-import { Sun, Clock, AlertTriangle, Train, Sparkles, X } from "lucide-react";
+import { Sun, Clock, AlertTriangle, Train, Sparkles, X, MapPinned, ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useCountdown } from "../hooks/useCountdown";
 import { isNow } from "../utils/eventUtils";
+import { tflService } from "../../../api/tflService";
+import { getHomeAddress } from "../../../api/userService";
+import { resolveCampusFromText } from "../../../lib/kclCampuses";
 import styles from "./RightNowWidget.module.css";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -53,6 +57,19 @@ function formatTimeLeft(endTime, nowMs) {
   const m = Math.floor(ms / 60000);
   const h = Math.floor(m / 60);
   return h > 0 ? `${h}h ${m % 60}m left` : `${m}m left`;
+}
+
+function getJourneySummary(journey) {
+  if (!journey) return null;
+  const lines = journey.legs
+    ?.flatMap((leg) => leg.routeOptions?.map((option) => option.name).filter(Boolean) || [])
+    ?.filter(Boolean);
+  const uniqueLines = [...new Set(lines)];
+  return {
+    duration: Number.isFinite(journey.duration) ? `${journey.duration} min` : null,
+    mode: journey.legs?.[0]?.mode ? journey.legs[0].mode.replace(/_/g, " ") : "journey",
+    lines: uniqueLines.slice(0, 3),
+  };
 }
 
 function useLiveClock() {
@@ -235,6 +252,45 @@ function ConflictSummary({ conflicts, onDismiss }) {
   );
 }
 
+function CommuteContextCard({ campus, journey, loading, leaveByInfo }) {
+  const summary = getJourneySummary(journey);
+  const lead = leaveByInfo?.leaveByStr
+    ? `Leave by ${leaveByInfo.leaveByStr}`
+    : summary?.duration
+      ? `${summary.duration} from home`
+      : "Check travel";
+
+  return (
+    <motion.div className={styles.contextCard} {...fadeIn(0.22)}>
+      <div className={styles.contextCardHeader}>
+        <div className={styles.contextCardTitleRow}>
+          <MapPinned size={14} strokeWidth={1.8} className={styles.contextCardIcon} aria-hidden />
+          <span className={styles.contextCardEyebrow}>Travel context</span>
+        </div>
+        <Link to="/map" className={styles.contextCardLink}>
+          Open map
+          <ArrowUpRight size={12} strokeWidth={1.8} aria-hidden />
+        </Link>
+      </div>
+      <p className={styles.contextCardTitle}>
+        {campus ? `${campus.shortName} commute` : "Campus commute"}
+      </p>
+      <p className={styles.contextCardText}>
+        {loading
+          ? "Checking route and TfL context for your next campus event…"
+          : `${lead}${campus ? ` for ${campus.name}` : ""}.`}
+      </p>
+      {!loading && summary?.lines?.length > 0 && (
+        <div className={styles.contextPills}>
+          {summary.lines.map((line) => (
+            <span key={line} className={styles.contextPill}>{line}</span>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 // ─── Shared header for early-return views ───────────────────────────────────
 
 function SimpleHeader() {
@@ -273,6 +329,8 @@ export function RightNowWidget({
   const liveClock = useLiveClock();
   const [showConflictAlert, setShowConflictAlert] = useState(true);
   const [showTflAlert, setShowTflAlert] = useState(true);
+  const [commuteInfo, setCommuteInfo] = useState(null);
+  const [loadingCommute, setLoadingCommute] = useState(false);
 
   const currentBlock = nav.currentBlock ?? nav.current ?? getCurrentBlock(sortedEvents || [], now);
   const nextEvent = nav.nextItem ?? nav.next ?? getNextEvent(sortedEvents || [], now);
@@ -284,6 +342,37 @@ export function RightNowWidget({
   const hasCampus = hasCampusCommute(nextEvent);
   const showTfl = relevantDelays.length > 0 && hasCampus && nextEvent;
   const leaveByInfo = showTfl ? getLeaveByInfo(nextEvent, relevantDelays, nowMs) : null;
+  const nextCampus = resolveCampusFromText(nextEvent?.location || nextEvent?.title || "");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadCommute() {
+      if (!isToday || !nextCampus || !nextEvent?.start_time) {
+        setCommuteInfo(null);
+        return;
+      }
+      setLoadingCommute(true);
+      try {
+        const home = await getHomeAddress();
+        const lat = Number(home?.home_latitude);
+        const lng = Number(home?.home_longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+          if (!cancelled) setCommuteInfo(null);
+          return;
+        }
+        const journey = await tflService.journeyPlanner(lat, lng, nextCampus.coords[1], nextCampus.coords[0]);
+        if (!cancelled) setCommuteInfo(journey || null);
+      } catch (_) {
+        if (!cancelled) setCommuteInfo(null);
+      } finally {
+        if (!cancelled) setLoadingCommute(false);
+      }
+    }
+    loadCommute();
+    return () => {
+      cancelled = true;
+    };
+  }, [isToday, nextCampus, nextEvent?.start_time]);
 
   const tasks = taskWidgetItemsOnly;
   const tasksPending = tasks.filter((t) => !t.completed).length;
@@ -437,10 +526,8 @@ export function RightNowWidget({
   // ── Main today view ────────────────────────────────────────────────────────
   return (
     <div className={styles.root}>
-      {/* Header */}
       <WidgetHeader eventCount={eventCount} taskCount={tasksPending} />
 
-      {/* Conflicts */}
       <AnimatePresence>
         {showConflictAlert && conflicts.length > 0 && (
           <ConflictSummary key="conflicts" conflicts={conflicts} onDismiss={() => setShowConflictAlert(false)} />
@@ -454,36 +541,48 @@ export function RightNowWidget({
         )}
       </AnimatePresence>
 
-      {/* NOW row */}
-      <motion.div className={styles.nowLine} {...fadeIn(0.16)}>
-        <span className={styles.nowPill}>Now</span>
-        <div className={styles.nowContent}>
+      {currentBlock ? (
+        <ActiveEventCard
+          currentBlock={currentBlock}
+          timeRangeStr={timeRangeStr}
+          timeLeftStr={timeLeftStr}
+          currentProgressPct={currentProgressPct}
+        />
+      ) : (
+        <motion.div className={styles.nowLine} {...fadeIn(0.16)}>
+          <span className={styles.nowPill}>Now</span>
           <span className={styles.nowText}>
-            {currentBlock?.title ? currentBlock.title : "Nothing on right now"}
+            Nothing on right now
           </span>
-          {!currentBlock && nav.gapMins > 0 && (
-            <span className={styles.gapCountdown}>
-              Free for <strong>{Math.floor(nav.gapMins / 60)}h {nav.gapMins % 60}m</strong>
-            </span>
-          )}
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
-      {/* NEXT row */}
-      <motion.div className={styles.nextLine} {...fadeIn(0.2)}>
-        <span className={styles.nextPill}>Next</span>
+      <motion.div className={styles.upNextRow} {...fadeIn(0.2)}>
+        <div className={styles.upNextLeft}>
+          <span className={styles.upNextLabel}>Up next</span>
+        </div>
         {nextEvent ? (
           <div className={styles.nextBlock}>
             <span className={styles.nextTitle}>{nextEvent.title}</span>
             <span className={styles.nextMeta}>
               at <strong>{formatTime(nextEvent.start_time)}</strong>
               {countdown.text ? ` · ${countdown.text}` : ""}
+              {nextEvent.location ? ` · ${nextEvent.location}` : ""}
             </span>
           </div>
         ) : (
           <span className={styles.nextTitle}>No more events today</span>
         )}
       </motion.div>
+
+      {(nextCampus || loadingCommute) && (
+        <CommuteContextCard
+          campus={nextCampus}
+          journey={commuteInfo}
+          loading={loadingCommute}
+          leaveByInfo={leaveByInfo}
+        />
+      )}
 
     </div>
   );

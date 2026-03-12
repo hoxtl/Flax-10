@@ -78,11 +78,6 @@ describe('societyApi', () => {
         });
     });
 
-    it('searchUsers', async () => {
-        await api.searchUsers('alice');
-        expect(fetchApi).toHaveBeenCalledWith('/users/search/?q=alice');
-    });
-
     it('fetchSocietyTags', async () => {
         await api.fetchSocietyTags(1);
         expect(fetchApi).toHaveBeenCalledWith('/societies/1/tags/');
@@ -161,11 +156,38 @@ describe('societyApi', () => {
         expect(fetchApi).toHaveBeenCalledWith('/societies/1/calendar-unsync/', { method: 'DELETE' });
     });
 
+    it('reportSociety sends POST with reason', async () => {
+        await api.reportSociety(1, 'spam');
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/report/', {
+            method: 'POST',
+            body: JSON.stringify({ reason: 'spam' }),
+        });
+    });
+
+    it('unreportSociety sends DELETE', async () => {
+        await api.unreportSociety(1);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/report/', { method: 'DELETE' });
+    });
+
     it('requestRatification sends POST', async () => {
         await api.requestRatification(1);
         expect(fetchApi).toHaveBeenCalledWith('/societies/1/ratification/request/', {
             method: 'POST',
             body: JSON.stringify({}),
+        });
+    });
+
+    it('toggleSubscription sends PATCH with is_subscribed', async () => {
+        await api.toggleSubscription(1, true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/subscribe/', {
+            method: 'PATCH',
+            body: JSON.stringify({ is_subscribed: true }),
+        });
+        fetchApi.mockClear();
+        await api.toggleSubscription(2, false);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/2/subscribe/', {
+            method: 'PATCH',
+            body: JSON.stringify({ is_subscribed: false }),
         });
     });
 
@@ -209,6 +231,14 @@ describe('societyApi', () => {
         expect(fetchApi).toHaveBeenCalledWith('/societies/1/publish/', {
             method: 'POST',
             body: JSON.stringify(changes),
+        });
+    });
+
+    it('publishChanges with no second argument uses default empty object', async () => {
+        await api.publishChanges(1);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/publish/', {
+            method: 'POST',
+            body: JSON.stringify({}),
         });
     });
 });

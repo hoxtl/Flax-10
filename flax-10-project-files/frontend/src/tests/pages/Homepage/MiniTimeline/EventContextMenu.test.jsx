@@ -71,4 +71,20 @@ describe('EventContextMenu', () => {
         expect(menu.style.top).toBe('75px');
         expect(menu.style.left).toBe('50px');
     });
+
+    it('does not throw when onEdit is undefined', () => {
+        renderMenu({ onEdit: undefined });
+        expect(screen.getByText('Edit')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Edit'));
+    });
+
+    it('does not throw when onClose is undefined', () => {
+        renderMenu({ onClose: undefined });
+        fireEvent.mouseDown(document.body);
+    });
+
+    it('does not throw when onDelete is undefined', () => {
+        renderMenu({ onDelete: undefined });
+        fireEvent.click(screen.getByText('Delete'));
+    });
 });

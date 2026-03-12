@@ -17,14 +17,54 @@ import {
   ThisWeek,
   BadgesSection,
   SocietiesSection,
-  ModulesSection
+  ModulesSection,
 } from "./components/ProfileWidgets";
 
+/** Shimmer block used by both skeleton components */
+function SkelBlock({ className }) {
+  return <div className={`${styles.skel} ${className || ''}`} />;
+}
+
+/** Inner skeleton — shown while profile summary data loads (after header is visible) */
 function Skeleton() {
   return (
     <div className={styles.skeletonWrap}>
-      {['Persona', 'Week', 'Dna', 'Heatmap'].map(ty => <div key={ty} className={`${styles.skel} ${styles[`skel${ty}`]}`} />)}
-      <div className={styles.skelBadgeRow}>{[...Array(5)].map((_, i) => <div key={i} className={`${styles.skel} ${styles.skelBadge}`} />)}</div>
+      {['Persona', 'Week', 'Dna', 'Heatmap'].map(ty => (
+        <SkelBlock key={ty} className={styles[`skel${ty}`]} />
+      ))}
+      <div className={styles.skelBadgeRow}>
+        {[...Array(5)].map((_, i) => <SkelBlock key={i} className={styles.skelBadge} />)}
+      </div>
+    </div>
+  );
+}
+
+/** Full-page skeleton — shown immediately when the profile route loads */
+function ProfileSkeleton() {
+  return (
+    <div className={`${styles.container} ${styles.fullSkelContainer}`}>
+      {/* Header */}
+      <div className={styles.skelHeader}>
+        <SkelBlock className={styles.skelAvatar} />
+        <div className={styles.skelHeaderInfo}>
+          <SkelBlock className={styles.skelName} />
+          <SkelBlock className={styles.skelBio} />
+          <div className={styles.skelStatsRow}>
+            {[...Array(3)].map((_, i) => <SkelBlock key={i} className={styles.skelStat} />)}
+          </div>
+        </div>
+      </div>
+      {/* Two-column body */}
+      <div className={styles.skelBody}>
+        <div className={styles.skelLeftCol}>
+          {['Persona', 'Week', 'Dna', 'Heatmap'].map(ty => (
+            <SkelBlock key={ty} className={styles[`skel${ty}`]} />
+          ))}
+        </div>
+        <div className={styles.skelRightCol}>
+          {[...Array(3)].map((_, i) => <SkelBlock key={i} className={styles.skelWidget} />)}
+        </div>
+      </div>
     </div>
   );
 }
@@ -121,7 +161,7 @@ export default function Profile({ user, viewedUserId, onNavigate, onNavChange })
   const visibility = useProfileVisibility(state.profileData, user);
   const { filteredEvents, modules } = useProfileBodyData(state);
 
-  if (state.loading) return <div className={styles.container}>Loading...</div>;
+  if (state.loading) return <ProfileSkeleton />;
   if (!state.profileData) return <div className={styles.container}>User not found.</div>;
 
   return (

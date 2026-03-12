@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .backdrop {
     position: fixed;
     inset: 0;
@@ -11,44 +12,22 @@
 .modal {
     background: var(--panel, var(--color-card));
     border-radius: 12px;
+=======
+.modalShell {
+>>>>>>> origin/main
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border, #e5e7eb);
-}
-
-.title {
-    margin: 0;
-    font-size: 1.25rem;
-    color: var(--text, #1f2937);
-}
-
-.closeBtn {
-    background: none;
-    border: none;
-    color: var(--muted, #6b7280);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0.25rem;
-    line-height: 1;
-}
-
-.closeBtn:hover {
-    color: var(--text, #1f2937);
+.modalContent {
+    padding-top: 0;
 }
 
 .section {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border, #e5e7eb);
+    border-bottom: var(--stroke-soft);
 }
 
 .sectionTitle {
@@ -60,13 +39,18 @@
 }
 
 .addBtn {
-    padding: 0.5rem 1rem;
+    padding: var(--btn-padding-sm);
     background: var(--primary-color, #9E7E5D);
     border: none;
+<<<<<<< HEAD
     color: var(--color-card);
     border-radius: 4px;
+=======
+    color: #fff;
+    border-radius: var(--btn-radius);
+>>>>>>> origin/main
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
 }
 
 .addBtn:hover {
@@ -85,13 +69,13 @@
 
 .deleteBtn {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: var(--btn-padding);
     background: transparent;
     border: 1px solid #ff6b6b;
     color: #ff6b6b;
-    border-radius: 6px;
+    border-radius: var(--btn-radius);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--text-base);
     transition: all 0.2s;
 }
 

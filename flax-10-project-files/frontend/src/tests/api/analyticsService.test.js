@@ -39,9 +39,26 @@ describe('analyticsService', () => {
         });
     });
 
+    it('getAiInsights uses default days=30 when called with no argument', async () => {
+        await analyticsService.getAiInsights();
+        expect(fetchApi).toHaveBeenCalledWith('/analytics/ai-insights/', {
+            method: 'POST',
+            body: JSON.stringify({ days: 30 }),
+        });
+    });
+
     it('aiChat sends POST with messages and days', async () => {
         const messages = [{ role: 'user', content: 'Hello' }];
         await analyticsService.aiChat(messages, 30);
+        expect(fetchApi).toHaveBeenCalledWith('/analytics/ai-chat/', {
+            method: 'POST',
+            body: JSON.stringify({ messages, days: 30 }),
+        });
+    });
+
+    it('aiChat uses default days=30 when called with only messages', async () => {
+        const messages = [{ role: 'user', content: 'Hi' }];
+        await analyticsService.aiChat(messages);
         expect(fetchApi).toHaveBeenCalledWith('/analytics/ai-chat/', {
             method: 'POST',
             body: JSON.stringify({ messages, days: 30 }),
