@@ -59,7 +59,7 @@ export async function validateAndSubmit(e, form, event, actions, onClose, setErr
     const error = validateForm(form);
     if (error) return setError(error);
 
-    const data = buildEventData(form);
+    const data = await buildEventData(form);
     const others = allEvents.filter(ev => ev.id !== (event?.id));
     if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return;
 
@@ -138,6 +138,8 @@ async function buildEventData(form) {
             data.location_latitude = coords.latitude;
             data.location_longitude = coords.longitude;
             data.location_validated = true;
+        } else {
+            data.location_validated = false;
         }
     }
 
