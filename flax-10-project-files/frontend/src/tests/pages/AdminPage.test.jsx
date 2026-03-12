@@ -350,3 +350,60 @@ describe("AdminPage – Teacher Requests tab", () => {
     );
   });
 });
+
+describe("AdminPage – Reported Societies tab", () => {
+  it("shows empty state when no reports", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() =>
+      expect(screen.getByText(/No reported societies/i)).toBeTruthy(),
+    );
+  });
+
+  it("renders report with society name and dismiss button", async () => {
+    api.fetchReportedSocieties.mockResolvedValue([
+      {
+        id: 20,
+        society_name: "Bad Club",
+        reporter_username: "alice",
+        reason: "Inappropriate",
+      },
+    ]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() => expect(screen.getByText("Bad Club")).toBeTruthy());
+    expect(screen.getByText("Dismiss")).toBeTruthy();
+  });
+
+  it("shows reporter username in report row", async () => {
+    api.fetchReportedSocieties.mockResolvedValue([
+      {
+        id: 21,
+        society_name: "Test Club",
+        reporter_username: "reporter1",
+        reason: "Spam",
+      },
+    ]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() => expect(screen.getByText(/reporter1/)).toBeTruthy());
+  });
+
+  it("calls dismissReport and removes row", async () => {
+    api.fetchReportedSocieties.mockResolvedValue([
+      {
+        id: 20,
+        society_name: "Bad Club",
+        reporter_username: "alice",
+        reason: "Spam",
+      },
+    ]);
+    api.dismissReport.mockResolvedValue(undefined);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() => screen.getByText("Bad Club"));
+    fireEvent.click(screen.getByText("Dismiss"));
+    await waitFor(() => expect(api.dismissReport).toHaveBeenCalledWith(20));
+    await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
+  });
+});
