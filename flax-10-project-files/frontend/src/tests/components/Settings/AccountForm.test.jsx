@@ -168,3 +168,35 @@ describe("AccountForm – teacher role section (student)", () => {
     );
   });
 });
+
+// ── Teacher role – teacher ─────────────────────────────────────────────────
+
+describe("AccountForm – teacher role section (teacher)", () => {
+  it("shows teacher badge when API returns teacher role", async () => {
+    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
+    render(
+      <AccountForm
+        user={{ ...baseUser, role: "teacher" }}
+        onSave={vi.fn()}
+        isSaving={false}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByText(/You are a Teacher/i)).toBeTruthy(),
+    );
+  });
+
+  it("does not show request button for teachers", async () => {
+    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
+    render(
+      <AccountForm
+        user={{ ...baseUser, role: "teacher" }}
+        onSave={vi.fn()}
+        isSaving={false}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.queryByText(/Request Teacher Role/i)).toBeNull(),
+    );
+  });
+});
