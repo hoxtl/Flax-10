@@ -708,6 +708,7 @@ export default function CampusMap() {
               </div>
             </div>
           ) : (
+          <>
             <div className={styles.disruptionsList}>
               {(showAllDisruptions ? disruptions : disruptions.slice(0, 2)).map((disruption, i) => (
                 <div key={i} className={styles.disruptionCard}>
@@ -728,20 +729,25 @@ export default function CampusMap() {
                 </div>
               ))}
             </div>
-          )}
 
-          {disruptions.length > 2 && (
-            <button
-              className={styles.showMoreBtn}
-              onClick={() => setShowAllDisruptions(!showAllDisruptions)}
-            >
-              {showAllDisruptions > (
-                <>
-                  Show Less <span>▲</span>
-                </>
-              )}
-            </button>
-          )}
+            {disruptions.length > 2 && (
+              <button
+                className={styles.showMoreBtn}
+                onClick={() => setShowAllDisruptions(!showAllDisruptions)}
+              >
+                {showAllDisruptions ? (
+                  <>
+                    Show Less <span>▲</span>
+                  </>
+                ) : (
+                  <>
+                    Show {disruptions.length - 2} More <span>▼</span>
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        )}
 
           <div className={styles.lastUpdated}>
             Last Updated:{" "}
