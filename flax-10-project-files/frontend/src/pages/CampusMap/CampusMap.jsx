@@ -592,10 +592,6 @@ export default function CampusMap() {
   };
 
   useEffect(() => {
-    console.log('Route useEffect triggered');
-    console.log('startLocation:', startLocation);
-    console.log('selectedCampus:', selectedCampus);
-    console.log('customDestination:', customDestination);
     if (startLocation && (selectedCampus || customDestination)) {
       calculateRoute();
       calculateTflRoute();
