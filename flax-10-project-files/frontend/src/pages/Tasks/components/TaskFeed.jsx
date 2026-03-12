@@ -113,11 +113,12 @@ function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, active
         <ThisWeekSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
         <LaterSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
         <AllTasksSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        <CompletedBlock data={data} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
-      </div>
-      {readingList && (
+        {readingList && (
         <SuggestedReadingsSection key={activeListId} onTaskAdded={onTaskAdded} taskCount={taskCount} />
       )}
+        <CompletedBlock data={data} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
+      </div>
+      
     </div>
   );
 }
