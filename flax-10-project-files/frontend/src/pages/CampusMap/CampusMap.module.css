@@ -888,13 +888,6 @@
   transform: scale(1.2);
 }
 
-:global(.eventPopupTitle) {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-
 :global(.eventPopupLocation) {
   font-size: 0.75rem;
   color: var(--muted);
