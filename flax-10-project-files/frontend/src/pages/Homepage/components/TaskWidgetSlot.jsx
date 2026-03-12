@@ -89,7 +89,7 @@ export function TaskWidgetSlot({
   const [ctxMenu, setCtxMenu] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
+  const [editTitle, _setEditTitle] = useState("");
   const [optimisticTitles, setOptimisticTitles] = useState({});
   const inputRef = useRef(null);
 
@@ -110,7 +110,7 @@ export function TaskWidgetSlot({
     if (editingTaskId && inputRef.current) inputRef.current.focus();
   }, [editingTaskId]);
 
-  const commitEdit = async (t) => {
+  const _commitEdit = async (t) => {
     const newTitle = editTitle.trim();
     if (newTitle && newTitle !== (optimisticTitles[t.id] || t.title)) {
       setOptimisticTitles(prev => ({ ...prev, [t.id]: newTitle }));
