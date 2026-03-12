@@ -4,7 +4,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState } from "react";
 import { CheckSquare, Clock3, Target, ArrowRight, ChevronDown } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
@@ -15,13 +15,13 @@ import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 const VISIBLE_COUNT = 3;
 
 const CATEGORY_COLOURS = {
-  UNIVERSITY: { bg: "color-mix(in srgb, var(--color-primary) 8%, var(--color-sidebar))", text: "var(--color-primary)" },
-  HEALTH: { bg: "color-mix(in srgb, var(--status-sage) 8%, var(--color-sidebar))", text: "var(--status-sage)" },
-  PERSONAL: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)" },
-  WORK: { bg: "color-mix(in srgb, var(--warning) 8%, var(--color-sidebar))", text: "var(--warning)" },
-  FINANCE: { bg: "color-mix(in srgb, var(--color-primary-strong) 8%, var(--color-sidebar))", text: "var(--color-primary-strong)" },
-  STUDY: { bg: "color-mix(in srgb, var(--color-highlight) 12%, var(--color-sidebar))", text: "var(--color-primary-strong)" },
-  default: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)" },
+  UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
+  HEALTH:     { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
+  PERSONAL:   { bg: "#F5F0E8",                   text: "#736048" },
+  WORK:       { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
+  FINANCE:    { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
+  STUDY:      { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
+  default:    { bg: "#F5F0E8",                   text: "#736048" },
 };
 
 const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
@@ -88,12 +88,7 @@ export function TaskWidgetSlot({
 }) {
   const [ctxMenu, setCtxMenu] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
-  const [editingTaskId, setEditingTaskId] = useState(null);
-  const [editTitle, _setEditTitle] = useState("");
-  const [optimisticTitles, setOptimisticTitles] = useState({});
-  const inputRef = useRef(null);
-
-  const incompleteTasks = taskWidgetList.filter((t) => !t.completed);
+  const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
   const completedTasks = taskWidgetList.filter((t) => t.completed);
   const visibleIncomplete = showAllTaskWidgetTasks
     ? incompleteTasks
@@ -101,23 +96,10 @@ export function TaskWidgetSlot({
   const visibleCompleted = completedTasks.slice(0, 3);
   const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
 
-  const allTasksDone = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
-  const clearMessage = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
+  const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
+  const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
   const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
   const estimatedLeft = getEstTime(taskWidgetList);
-
-  useEffect(() => {
-    if (editingTaskId && inputRef.current) inputRef.current.focus();
-  }, [editingTaskId]);
-
-  const _commitEdit = async (t) => {
-    const newTitle = editTitle.trim();
-    if (newTitle && newTitle !== (optimisticTitles[t.id] || t.title)) {
-      setOptimisticTitles(prev => ({ ...prev, [t.id]: newTitle }));
-      await onInlineTaskEdit?.(t, { title: newTitle });
-    }
-    setEditingTaskId(null);
-  };
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -199,8 +181,8 @@ export function TaskWidgetSlot({
                 layout
               >
                 {visibleIncomplete.map((t, idx) => {
-                  const status = t.taskWidgetStatus;
-                  const isOverdue = status === "overdue";
+                  const status      = t.taskWidgetStatus;
+                  const isOverdue   = status === "overdue";
                   const rowAccent = isOverdue
                     ? "var(--home-urgency-danger)"
                     : "var(--home-urgency-neutral)";
@@ -251,12 +233,13 @@ export function TaskWidgetSlot({
                           </span>
                           {urgency && (
                             <span
-                              className={`${styles.taskWidgetUrgencyPill} ${urgency.tone === "urgent"
-                                ? styles.taskWidgetUrgencyPillUrgent
-                                : urgency.tone === "high"
-                                  ? styles.taskWidgetUrgencyPillHigh
-                                  : styles.taskWidgetUrgencyPillNow
-                                }`}
+                              className={`${styles.taskWidgetUrgencyPill} ${
+                                urgency.tone === "urgent"
+                                  ? styles.taskWidgetUrgencyPillUrgent
+                                  : urgency.tone === "high"
+                                    ? styles.taskWidgetUrgencyPillHigh
+                                    : styles.taskWidgetUrgencyPillNow
+                              }`}
                             >
                               {urgency.label}
                             </span>

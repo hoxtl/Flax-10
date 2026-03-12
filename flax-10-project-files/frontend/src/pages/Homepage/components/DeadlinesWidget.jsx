@@ -12,18 +12,11 @@ function getDayCount(dueDate) {
   return Math.floor(ms / 86400000);
 }
 
-function getUrgencyColor(days) {
-  if (days <= 2) return "#ef4444"; // Red (Urgent)
-  if (days <= 5) return "#f97316"; // Orange (Approaching)
-  if (days <= 10) return "#eab308"; // Yellow (Approaching)
-  return "#22c55e"; // Green (Plenty of time)
-}
-
 function getUrgencyTier(dueDate) {
   const days = getDayCount(dueDate);
-  if (days < 0) return "overdue";
-  if (days <= 2) return "critical";
-  if (days <= 5) return "urgent";
+  if (days < 0)   return "overdue";
+  if (days <= 2)  return "critical";
+  if (days <= 5)  return "urgent";
   if (days <= 14) return "upcoming";
   return "distant";
 }
@@ -60,7 +53,7 @@ const listVariants = {
 };
 
 const rowVariants = {
-  hidden: { opacity: 0, y: 6 },
+  hidden:  { opacity: 0, y: 6 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
 };
 
@@ -130,10 +123,10 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
 }
 
 function DeadlineRow({ deadline, isLast, onSelect, onSelectModule }) {
-  const due = deadline.start_due_date;
+  const due  = deadline.start_due_date;
   const tier = getUrgencyTier(due);
-  const daysLabel = getDaysLabel(due);
-  const title = deadline.assessment_title || deadline.title || "Assignment";
+  const daysLabel  = getDaysLabel(due);
+  const title      = deadline.assessment_title || deadline.title || "Assignment";
   const moduleCode = deadline.module_code || "";
   const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
   const textColor = TIER_TEXT[tier] || "var(--home-urgency-muted)";

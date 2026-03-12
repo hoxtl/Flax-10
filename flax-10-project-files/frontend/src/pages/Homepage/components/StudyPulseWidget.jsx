@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { TrendingUp, Flame, Clock, ArrowRight, CalendarClock, Zap, CheckCircle2, BarChart3 } from "lucide-react";
@@ -18,16 +17,16 @@ const DAY_SHORT = ["M", "T", "W", "T", "F", "S", "S"];
 
 function getRingColor(pct) {
   if (pct <= 25) return "#B87A6D";
-  if (pct <= 50) return "var(--color-highlight)";
-  if (pct <= 75) return "var(--color-highlight)";
-  return "var(--status-sage)";
+  if (pct <= 50) return "#C4946D";
+  if (pct <= 75) return "#C4A46D";
+  return "#7BB38E";
 }
 
 function getDailyBarColor(pct, isToday) {
-  if (isToday) return "var(--text)";
-  if (pct >= 1)   return "var(--status-sage)";
-  if (pct >= 0.5) return "var(--color-highlight)";
-  if (pct > 0)    return "var(--color-highlight)";
+  if (isToday) return "#2c1810";
+  if (pct >= 1)   return "#7BB38E";
+  if (pct >= 0.5) return "#C4A46D";
+  if (pct > 0)    return "#C4946D";
   return null;
 }
 
@@ -138,15 +137,15 @@ function buildInsights({ streak, todayStudied, weeklyRemaining, daysLeft, peakHo
 }
 
 const INSIGHT_STYLES = {
-  warning: { color: "var(--color-highlight)", bg: "rgba(196, 148, 109, 0.06)" },
-  alert:   { color: "var(--error-text)", bg: "rgba(168, 96, 96, 0.06)" },
-  info:    { color: "var(--color-primary)", bg: "rgba(139, 115, 85, 0.05)" },
-  success: { color: "var(--status-sage)", bg: "rgba(90, 140, 106, 0.06)" },
-  accent:  { color: "var(--color-highlight)", bg: "rgba(196, 164, 109, 0.08)" },
-  neutral: { color: "var(--color-primary)", bg: "transparent" },
+  warning: { color: "#C4946D", bg: "rgba(196, 148, 109, 0.06)" },
+  alert:   { color: "#A86060", bg: "rgba(168, 96, 96, 0.06)" },
+  info:    { color: "#8B7355", bg: "rgba(139, 115, 85, 0.05)" },
+  success: { color: "#5A8C6A", bg: "rgba(90, 140, 106, 0.06)" },
+  accent:  { color: "#C4A46D", bg: "rgba(196, 164, 109, 0.08)" },
+  neutral: { color: "#A89279", bg: "transparent" },
 };
 
-export function StudyPulseWidget({ windows = [], now = new Date(), _onStartFocus, deadlines = [] }) {
+export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus, deadlines = [] }) {
   const navigate  = useNavigate();
   const { summary, loading: profileLoading } = useProfileSummary();
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -298,7 +297,7 @@ export function StudyPulseWidget({ windows = [], now = new Date(), _onStartFocus
                       />
                     )}
                     {!d.isFuture && !barColor && d.isToday && (
-                      <div className={styles.dailyFill} style={{ width: "3px", background: "var(--text)", borderRadius: "2px" }} />
+                      <div className={styles.dailyFill} style={{ width: "3px", background: "#2c1810", borderRadius: "2px" }} />
                     )}
                   </div>
                   <span className={`${styles.dailyHours} ${d.isToday ? styles.dailyHoursToday : ""}`}>

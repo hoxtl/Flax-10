@@ -25,8 +25,8 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--color-sidebar);
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: #f3efea;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +34,7 @@
 }
 
 .headerIcon {
-  color: var(--color-primary-strong);
+  color: #8a7868;
 }
 
 .headerTitleBlock {
@@ -53,7 +53,7 @@
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--text);
+  color: #2f261f;
 }
 
 .headerStatus {
@@ -62,7 +62,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--color-primary);
+  color: #94867a;
 }
 
 .list {
@@ -79,28 +79,27 @@
   gap: 10px;
   min-height: 58px;
   border-radius: 14px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(139, 115, 85, 0.11);
   border-left: 5px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
-  background: var(--color-card);
+  background: linear-gradient(180deg, #fffdfa 0%, #fffaf5 100%);
   padding: 9px 11px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .row:hover {
-  border-color: var(--color-primary);
+  border-color: #ddd6cf;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .rowOverdue {
-  background: var(--danger-bg);
-  border-color: var(--danger-border);
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.82) 0%, rgba(255, 250, 245, 0.96) 100%);
+  border-color: rgba(220, 38, 38, 0.14);
   border-left-color: var(--home-urgency-danger);
 }
 
 .rowCritical {
-  background: var(--warning-bg);
-  border-color: var(--warning-border);
+  background: linear-gradient(180deg, rgba(251, 245, 231, 0.94) 0%, rgba(255, 250, 245, 0.98) 100%);
   border-left-color: var(--home-urgency-warning);
 }
 
@@ -123,9 +122,9 @@
 .moduleCodePill {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border);
-  background: var(--color-sidebar);
-  color: var(--color-primary-strong);
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(243, 239, 234, 0.72);
+  color: #736048;
   border-radius: 999px;
   padding: 4px 10px;
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
@@ -144,9 +143,9 @@
 .deadlineTypePill {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border);
-  background: var(--color-sidebar);
-  color: var(--color-primary-strong);
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(243, 239, 234, 0.72);
+  color: #736048;
   border-radius: 999px;
   padding: 4px 10px;
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
@@ -162,7 +161,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text);
+  color: #2f261f;
   line-height: 1.1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -196,7 +195,7 @@
   align-items: center;
   gap: 5px;
   text-decoration: none;
-  color: var(--color-primary);
+  color: #6d6157;
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -204,7 +203,7 @@
 
 .footerLink:hover,
 .footerLinkMuted:hover {
-  color: var(--text);
+  color: #3b3129;
 }
 
 @media (max-width: 900px) {

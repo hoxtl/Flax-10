@@ -104,25 +104,12 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
     hour: "2-digit",
     minute: "2-digit",
   });
-
-  const eventTitle = nextEvent.title || "your next event";
-  const eventTime = new Date(nextEvent.start_time).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  const displayLine = lineName.toLowerCase().includes("line") || lineName.toLowerCase().includes("overground") || lineName.toLowerCase().includes("dlr")
-    ? lineName
-    : `${lineName} line`;
-
   if (nowMs >= leaveByMs) {
     return {
       urgency: "critical",
-      message: (
-        <>
-          <strong>{displayLine}</strong> delays mean you’ll be <strong>late</strong> for your <strong>{eventTime}</strong>. Leave <strong>now</strong>!
-        </>
-      ),
+      lineName,
+      severity,
+      message: `${lineName} Line: ${severity} — leave now for ${nextEvent.title}`,
       leaveByStr,
       hasSevere,
     };
@@ -130,22 +117,18 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
   if (minsUntilLeave <= 15) {
     return {
       urgency: "urgent",
-      message: (
-        <>
-          <strong>{displayLine}</strong> {severity.toLowerCase()} — leave in <strong>{minsUntilLeave}m</strong> to make it for <strong>{eventTime}</strong>.
-        </>
-      ),
+      lineName,
+      severity,
+      message: `${lineName} Line: ${severity} — leave in ${minsUntilLeave}m for ${nextEvent.title}`,
       leaveByStr,
       hasSevere,
     };
   }
   return {
     urgency: "info",
-    message: (
-      <>
-        <strong>{displayLine}</strong> {severity.toLowerCase()}. Recommended leave by <strong>{leaveByStr}</strong> for your <strong>{eventTime}</strong>.
-      </>
-    ),
+    lineName,
+    severity,
+    message: `${lineName} Line: ${severity} — leave by ${leaveByStr} for ${nextEvent.title}`,
     leaveByStr,
     hasSevere,
   };
@@ -321,8 +304,6 @@ export function RightNowWidget({
   onOpenTimer,
   tomorrowFirstEvent,
   taskWidgetItemsOnly = [],
-  upcomingDeadlines = [],
-  todayFreeWindows = [],
 }) {
   const nav = navigatorContext || {};
   const nowMs = now.getTime();
@@ -382,9 +363,9 @@ export function RightNowWidget({
   const currentProgressPct =
     currentBlock?.start_time && currentBlock?.end_time
       ? Math.min(100, Math.max(0,
-        ((nowMs - new Date(currentBlock.start_time).getTime()) /
-          (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
-      ))
+          ((nowMs - new Date(currentBlock.start_time).getTime()) /
+            (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
+        ))
       : null;
   const timeRangeStr =
     currentBlock?.start_time && currentBlock?.end_time
@@ -449,16 +430,16 @@ export function RightNowWidget({
         <motion.div className={styles.endOfDayWrap} {...fadeIn(0.07)}>
           <div className={styles.endOfDayTopRow}>
             <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
+              animate={{ rotate: [0, 8, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Sparkles size={26} strokeWidth={1.25} color="var(--color-highlight)" aria-hidden />
+              <Sparkles size={26} strokeWidth={1.25} color="#C4A46D" aria-hidden />
             </motion.div>
             <div>
               <p className={styles.endOfDayTitle}>Day complete — nice work!</p>
               {(completedCount > 0 || eventsToday > 0) && (
                 <p className={styles.endOfDaySub}>
-                  {completedCount > 0 && `${completedCount}${tasks.length > 0 ? `/${tasks.length}` : ""} tasks done`}
+                  {completedCount > 0 && `${completedCount}${tasks.length > 0 ? `/${tasks.length}` : ""} tasks`}
                   {completedCount > 0 && eventsToday > 0 && " · "}
                   {eventsToday > 0 && `${eventsToday} event${eventsToday !== 1 ? "s" : ""} attended`}
                 </p>
@@ -471,7 +452,7 @@ export function RightNowWidget({
               <div className={styles.tomorrowSection}>
                 <p className={styles.tomorrowLabel}>TOMORROW</p>
                 <p className={styles.tomorrowFirstTitle}>{tomorrowFirstEvent.title}</p>
-                {tomorrowTime && <p className={styles.tomorrowFirstTime}>starts at <strong>{tomorrowTime}</strong></p>}
+                {tomorrowTime && <p className={styles.tomorrowFirstTime}>at {tomorrowTime}</p>}
               </div>
             </>
           )}
@@ -480,39 +461,17 @@ export function RightNowWidget({
     );
   }
 
-  // ── Empty day / Idle Purposeful State ──────────────────────────────────────
+  // ── Empty day ──────────────────────────────────────────────────────────────
   if (isToday && !currentBlock && !nextEvent && eventCount === 0) {
-    const nextDeadline = (upcomingDeadlines || [])
-      .filter(d => d.due_date ? new Date(d.due_date) > now : true)
-      .sort((a, b) => new Date(a.due_date || a.start_due_date) - new Date(b.due_date || b.start_due_date))[0];
-
-    const totalFreeMins = (todayFreeWindows || []).reduce((acc, w) => acc + w.minutes, 0);
-    const freeHours = Math.floor(totalFreeMins / 60);
-
     return (
       <div className={styles.root}>
         <SimpleHeader liveClock={liveClock} />
         <motion.div className={styles.emptyDay} {...fadeIn(0.07)}>
           <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-            <Sun size={30} strokeWidth={1.25} color="var(--color-highlight)" aria-hidden />
+            <Sun size={30} strokeWidth={1.25} color="#C4A46D" aria-hidden />
           </motion.div>
           <p className={styles.emptyDayTitle}>Nothing planned today</p>
-
-          {nextDeadline ? (
-            <div className={styles.suggestionBlock}>
-              <p className={styles.suggestionText}>
-                Next deadline: <strong>{nextDeadline.assessment_title || nextDeadline.title}</strong>
-              </p>
-              <p className={styles.suggestionSub}>
-                Why not use your <strong>{freeHours}h free</strong> to get ahead?
-              </p>
-            </div>
-          ) : (
-            <p className={styles.emptyDaySubtitle}>
-              You have <strong>{freeHours}h free</strong> today — enjoy it or plan a session!
-            </p>
-          )}
-
+          <p className={styles.emptyDaySubtitle}>Enjoy your day</p>
           {tomorrowFirstEvent && tomorrowTime && (
             <p className={styles.emptyDayTomorrow}>
               Tomorrow: {tomorrowFirstEvent.title} at {tomorrowTime}
@@ -565,7 +524,7 @@ export function RightNowWidget({
           <div className={styles.nextBlock}>
             <span className={styles.nextTitle}>{nextEvent.title}</span>
             <span className={styles.nextMeta}>
-              at <strong>{formatTime(nextEvent.start_time)}</strong>
+              at {formatTime(nextEvent.start_time)}
               {countdown.text ? ` · ${countdown.text}` : ""}
               {nextEvent.location ? ` · ${nextEvent.location}` : ""}
             </span>

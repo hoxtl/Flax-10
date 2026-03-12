@@ -1,6 +1,6 @@
   /* Active timer card: shown when a timer is running (replaces progress ring + task widget) */
   .activeTimerCard {
-    background: var(--color-card);
+    background: #FFFFFF;
     border: 1px solid var(--home-border-card);
     border-radius: var(--home-card-radius);
     box-shadow: var(--home-card-shadow);
@@ -96,7 +96,7 @@
   .activeTimerCardResume:hover { filter: brightness(1.08); }
   
   .taskWidget {
-    background: var(--color-card);
+    background: #FFFFFF;
     border: 1px solid var(--home-border-card);
     border-radius: var(--home-card-radius);
     box-shadow: var(--home-card-shadow);
