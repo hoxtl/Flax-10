@@ -4,6 +4,8 @@ import styles from "./BannedPage.module.css";
 function handleBackToAuth() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("banned");
+  localStorage.removeItem("ban_reason");
   window.dispatchEvent(new Event("auth-changed"));
 }
 

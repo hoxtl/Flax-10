@@ -58,11 +58,9 @@ export async function submitSignIn(signInData, setError, setLoading) {
     return;
   }
   if (result.response.status === 403 && result.data?.is_banned) {
-    window.dispatchEvent(
-      new CustomEvent("user-banned", {
-        detail: { reason: result.data.ban_reason || "" },
-      }),
-    );
+    localStorage.setItem("banned", "1");
+    localStorage.setItem("ban_reason", result.data.ban_reason || "");
+    window.dispatchEvent(new Event("auth-changed"));
     setLoading(false);
     return;
   }

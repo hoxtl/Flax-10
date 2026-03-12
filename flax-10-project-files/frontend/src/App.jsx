@@ -85,6 +85,10 @@ function isAuthenticated() {
   return !!localStorage.getItem("token");
 }
 
+function isBannedFromStorage() {
+  return localStorage.getItem("banned") === "1";
+}
+
 function resolveScreen(authed, user, showWelcome) {
   if (!authed || !user) return "auth";
   if (showWelcome) return "welcome";
@@ -148,16 +152,17 @@ function checkOnboarding(setShowOnboarding) {
 }
 
 // Custom hooks
-function useSyncAuth(setAuthed, setUser, setShowWelcome) {
+function useSyncAuth(setAuthed, setUser, setBanned, setShowWelcome) {
   useEffect(() => {
     const sync = () => {
       setAuthed(isAuthenticated());
       setUser(readUser());
+      setBanned(isBannedFromStorage());
       setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
     };
     window.addEventListener("auth-changed", sync);
     return () => window.removeEventListener("auth-changed", sync);
-  }, [setAuthed, setUser, setShowWelcome]);
+  }, [setAuthed, setUser, setBanned, setShowWelcome]);
 }
 
 function useThemeState(authed) {
@@ -180,21 +185,10 @@ function useAppState() {
   const [showWelcome, setShowWelcome] = useState(
     () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
   );
-  const [isBanned, setIsBanned] = useState(false);
-  const [banReason, setBanReason] = useState("");
+  const [isBanned, setIsBanned] = useState(() => isBannedFromStorage());
 
-  useSyncAuth(setAuthed, setUser, setShowWelcome);
+  useSyncAuth(setAuthed, setUser, setIsBanned, setShowWelcome);
   const { initialTheme, isLoadingTheme } = useThemeState(authed);
-
-  // Listen for banned-user events dispatched by the login handler
-  useEffect(() => {
-    const handler = (e) => {
-      setIsBanned(true);
-      setBanReason(e.detail?.reason || "");
-    };
-    window.addEventListener("user-banned", handler);
-    return () => window.removeEventListener("user-banned", handler);
-  }, []);
 
   const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
@@ -215,7 +209,6 @@ function useAppState() {
     showWelcome,
     setShowWelcome,
     isBanned,
-    banReason,
   };
 }
 
@@ -449,9 +442,14 @@ function renderScreen(screen, state) {
     activeNav,
     setActiveNav,
     isBanned,
-    banReason,
   } = state;
-  if (isBanned) return <BannedPage key="banned" reason={banReason} />;
+  if (isBanned)
+    return (
+      <BannedPage
+        key="banned"
+        reason={localStorage.getItem("ban_reason") || ""}
+      />
+    );
   if (screen === "auth") return <AuthScreen key="auth" />;
   if (screen === "welcome")
     return (
