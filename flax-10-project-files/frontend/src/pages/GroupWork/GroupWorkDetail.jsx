@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getAuthHeaders, useProject, useProjectMembers, useSelectedTab } from "./groupWorkHooks";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { getUserColor } from "./utils/priorityUtils";
 import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
@@ -143,7 +144,7 @@ function useProjectDetail(projectId, onBack) {
 
 export default function GroupProjectDetail({ projectId, onBack }) {
   const d = useProjectDetail(projectId, onBack);
-  if (d.loading) return <div className={styles.container}><BackButton onClick={onBack} /><p className={styles.loading}>Loading project…</p></div>;
+  if (d.loading) return <div className={styles.container}><BackButton onClick={onBack} /><PageSkeleton label="Loading project" showAction cardCount={6} cardHeight="170px" columns={2} testId="groupwork-skeleton" /></div>;
   if (!d.project) return <div className={styles.container}><BackButton onClick={onBack} /><p className={styles.empty}>Project not found.</p></div>;
 
   return (
@@ -159,4 +160,3 @@ export default function GroupProjectDetail({ projectId, onBack }) {
     </div>
   );
 }
-

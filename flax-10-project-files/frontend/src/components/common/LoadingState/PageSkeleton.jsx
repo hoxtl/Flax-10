@@ -12,9 +12,10 @@ export default function PageSkeleton({
     cardCount = 6,
     cardHeight = "180px",
     columns = 3,
+    testId,
 }) {
     return (
-        <div className={styles.container} aria-busy="true">
+        <div className={styles.container} aria-busy="true" data-testid={testId}>
             <span className={styles.srOnly}>{label}</span>
             <div className={styles.header}>
                 <ShimmerBlock className={styles.title} />

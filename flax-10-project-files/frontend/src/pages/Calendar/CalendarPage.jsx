@@ -6,6 +6,7 @@ import {
   useCalendarDispatch,
 } from "../../context/CalendarContext";
 import { getVisibleEventsInView } from "../../components/Calendar/utils/eventUtils";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
@@ -22,7 +23,7 @@ function useIsMobile(breakpoint = 900) {
 }
 
 export default function CalendarPage() {
-  const { filter, allEvents, selectedDate, viewMode } = useCalendar();
+  const { filter, allEvents, selectedDate, viewMode, isLoading } = useCalendar();
   const dispatch = useCalendarDispatch();
   const isMobile = useIsMobile();
   useEventPopupListener();
@@ -46,6 +47,19 @@ export default function CalendarPage() {
   const { displayMode } = useCalendar();
   const isListOrTable = displayMode === "list" || displayMode === "table";
   const showFilters = true;
+
+  if (isLoading && allEvents.length === 0) {
+    return (
+      <PageSkeleton
+        label="Loading calendar"
+        showSearch={!isListOrTable}
+        cardCount={6}
+        cardHeight="140px"
+        columns={2}
+        testId="calendar-skeleton"
+      />
+    );
+  }
 
   return (
     <div className={styles.page}>

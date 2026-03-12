@@ -6,6 +6,7 @@ import { tflService } from "../../api/tflService";
 import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -77,7 +78,7 @@ export default function CampusMap() {
   const homePopup = useRef(null);
 
   useEffect(() => {
-    if (map.current) return;
+    if (map.current || !mapContainer.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -569,8 +570,20 @@ export default function CampusMap() {
 
   return (
     <div className={styles.page}>
+      {!mapLoaded && (
+        <PageSkeleton
+          label="Loading campus map"
+          showSearch
+          cardCount={5}
+          cardHeight="160px"
+          columns={2}
+          testId="campus-map-skeleton"
+        />
+      )}
+
       <motion.aside
         className={styles.sidebar}
+        style={!mapLoaded ? { visibility: "hidden" } : undefined}
         initial={isMobile ? "closed" : false}
         animate={isMobile ? undefined : { y: 0 }}
         drag={isMobile ? "y" : false}
@@ -930,7 +943,7 @@ export default function CampusMap() {
         </div>
       </motion.aside>
 
-      <div className={styles.mapWrapper}>
+      <div className={styles.mapWrapper} style={!mapLoaded ? { visibility: "hidden" } : undefined}>
         <div ref={mapContainer} className={styles.mapContainer} />
 
         {/* Floating campus quick-fly buttons */}

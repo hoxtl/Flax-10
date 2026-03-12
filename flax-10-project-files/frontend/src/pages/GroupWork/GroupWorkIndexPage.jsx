@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GroupProjectDetail from "./GroupWorkDetail";
+import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import { getDeadlineLabel } from "./utils/taskUtils";
 import styles from "./GroupWorkIndexPage.module.css";
@@ -47,8 +48,7 @@ function ProjectRow({ project, onClick }) {
   );
 }
 
-function GroupWorkContent({ projects, loading, projectListProps }) {
-  if (loading) return <p className={styles.loading}>Loading your group projects…</p>;
+function GroupWorkContent({ projects, projectListProps }) {
   if (projects.length === 0) return <p className={styles.emptyMessage}>You do not have any group projects yet. Use the form above to create one.</p>;
   return (
     <div className={styles.projectList}>
@@ -71,12 +71,13 @@ export default function GroupWorkIndexPage() {
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
   if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} />;
+  if (loading) return <PageSkeleton label="Loading your group projects" showAction cardCount={6} cardHeight="170px" columns={2} testId="groupwork-skeleton" />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
     <div className={styles.container}>
       <GroupWorkHeader />
       <CreateProjectForm onCreated={onCreated} />
-      <GroupWorkContent projects={projects} loading={loading} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
+      <GroupWorkContent projects={projects} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
     </div>
   );
 }
