@@ -1,17 +1,55 @@
-.modalShell {
+/* Styles for the society settings administrative modal. */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: var(--panel, #fff);
+    border-radius: 12px;
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
-.modalContent {
-    padding-top: 0;
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text, #1f2937);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--muted, #6b7280);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: var(--text, #1f2937);
 }
 
 .section {
     padding: 1rem 1.5rem;
-    border-bottom: var(--stroke-soft);
+    border-bottom: 1px solid var(--border, #e5e7eb);
 }
 
 .sectionTitle {
@@ -23,13 +61,13 @@
 }
 
 .addBtn {
-    padding: var(--btn-padding-sm);
+    padding: 0.5rem 1rem;
     background: var(--primary-color, #9E7E5D);
     border: none;
     color: #fff;
-    border-radius: var(--btn-radius);
+    border-radius: 4px;
     cursor: pointer;
-    font-size: var(--text-sm);
+    font-size: 0.85rem;
 }
 
 .addBtn:hover {
@@ -48,13 +86,13 @@
 
 .deleteBtn {
     width: 100%;
-    padding: var(--btn-padding);
+    padding: 0.75rem 1rem;
     background: transparent;
     border: 1px solid #ff6b6b;
     color: #ff6b6b;
-    border-radius: var(--btn-radius);
+    border-radius: 6px;
     cursor: pointer;
-    font-size: var(--text-base);
+    font-size: 0.9rem;
     transition: all 0.2s;
 }
 

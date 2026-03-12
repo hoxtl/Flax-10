@@ -59,6 +59,10 @@ vi.mock('../../components/Society/hooks/useChangeTracker', () => ({
     })),
 }));
 
+vi.mock('../../pages/Societies/SocietySkeletons', () => ({
+    SocietyDetailSkeleton: () => <div>Loading...</div>
+}));
+
 const mockConfirm = vi.fn();
 vi.mock('../../context/ConfirmContext', () => ({
     useConfirm: () => mockConfirm,
@@ -395,7 +399,7 @@ describe('SocietyDetailPage', () => {
         });
         mockConfirm.mockResolvedValue(true);
         unreportSocietyApiMock.mockRejectedValue(new Error('Network error'));
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
         renderPage();
         fireEvent.click(screen.getByTitle('You have reported this society. Click to unreport.'));
         await waitFor(() => expect(unreportSocietyApiMock).toHaveBeenCalledWith(1));

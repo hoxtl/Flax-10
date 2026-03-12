@@ -54,7 +54,19 @@ export function getEffectiveTagName(event) {
  */
 export function getVisibleEventsInView(events, selectedDate, viewMode) {
     if (!events?.length) return [];
-    if (viewMode === 'month' || viewMode === 'year') return events;
+
+    if (viewMode === 'month') {
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth();
+        const start = new Date(year, month, 1);
+        const end = new Date(year, month + 1, 1);
+
+        return events.filter(e => {
+            const eStart = new Date(e.start_time);
+            const eEnd = new Date(e.end_time);
+            return eStart < end && eEnd >= start;
+        });
+    }
 
     if (viewMode === 'day') {
         return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate));

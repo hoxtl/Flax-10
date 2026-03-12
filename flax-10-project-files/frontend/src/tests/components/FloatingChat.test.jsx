@@ -199,7 +199,7 @@ describe('FloatingChat', () => {
     it('does not send when input is empty and send button clicked', () => {
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button'));
-        const sendBtn = screen.getByText('↑');
+        const sendBtn = screen.getByRole('button', { name: 'Send message' });
         fireEvent.click(sendBtn);
         expect(analyticsService.aiChat).not.toHaveBeenCalled();
     });

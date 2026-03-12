@@ -1,32 +1,15 @@
-import { useRef } from 'react';
-import { parseDateInput } from '../utils/dateUtils';
+import DateTimePicker from '../../common/inputs/DateTimePicker';
 import styles from './DatePickerButton.module.css';
 
 export function DatePickerButton({ selectedDate, onDatePick }) {
-    const ref = useRef(null);
-    const dateObj = selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
-    const value = !isNaN(dateObj) ? dateObj.toISOString().slice(0, 10) : '';
-    const handleChange = (e) => {
-        if (e.target.value) {
-            onDatePick(parseDateInput(e.target.value));
-        }
-    };
+    const value = selectedDate instanceof Date ? selectedDate.toISOString().slice(0, 10) : selectedDate || '';
+
     return (
-        <>
-            <button
-                className={styles.btnCalendar}
-                onClick={() => ref.current?.showPicker?.()}
-                title="Choose date"
-            >
-                🗓️
-            </button>
-            <input
-                ref={ref}
-                type="date"
-                className={styles.hiddenDateInput}
-                value={value}
-                onChange={handleChange}
-            />
-        </>
+        <DateTimePicker
+            value={value}
+            dateOnly={true}
+            onChange={(val) => val && onDatePick(new Date(val))}
+            customTrigger={<button className={styles.btnCalendar} title="Choose date">🗓️</button>}
+        />
     );
 }

@@ -1,6 +1,10 @@
+/**
+ * CategorySelector provides single or multi-select dropdowns/pills
+ * for classifying societies into predefined categories.
+ */
 import styles from "./CategorySelector.module.css";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 
 const CATEGORY_DROPDOWN_OPTIONS = [
     { value: '', label: 'Select a category' },
@@ -21,21 +25,18 @@ function SingleCategorySelector({ value, onChange, label }) {
     );
 }
 
+/** Renders a grid of category pills for multi-selection. */
 function MultiCategorySelector({ value = [], onChange, label }) {
     const selected = Array.isArray(value) ? value : [];
-    const toggle = (catId) => {
-        const newValue = selected.includes(catId)
-            ? selected.filter(id => id !== catId)
-            : [...selected, catId];
-        onChange(newValue);
-    };
+    const handleToggle = (id) => onChange(selected.includes(id) ? selected.filter(i => i !== id) : [...selected, id]);
 
     return (
         <div className={styles.field}>
             {label && <label className={styles.label}>{label}</label>}
             <div className={styles.pillGrid}>
                 {SOCIETY_CATEGORY_OPTIONS.map(cat => (
-                    <CategoryPill key={cat.id} label={cat.label} selected={selected.includes(cat.id)} onClick={() => toggle(cat.id)} />
+                    <CategoryPill key={cat.id} label={cat.label}
+                        selected={selected.includes(cat.id)} onClick={() => handleToggle(cat.id)} />
                 ))}
             </div>
         </div>

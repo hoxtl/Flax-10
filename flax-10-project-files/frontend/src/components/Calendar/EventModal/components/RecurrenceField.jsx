@@ -1,5 +1,5 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
-import AnimatedDropdown from '../../../ui/AnimatedDropdown';
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import './RecurrenceField.css';
 
 const FREQUENCY_OPTIONS = [

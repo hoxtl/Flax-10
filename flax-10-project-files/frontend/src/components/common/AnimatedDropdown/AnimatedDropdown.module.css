@@ -29,8 +29,7 @@
 .dropdownMenu {
   position: absolute;
   top: calc(100% + 4px);
-  left: auto;
-  right: 0;
+  min-width: 100%;
   width: max-content;
   max-width: 90vw;
   background: var(--dropdown-bg);
@@ -41,6 +40,16 @@
   max-height: 260px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.alignLeft {
+  left: 0;
+  right: auto;
+}
+
+.alignRight {
+  right: 0;
+  left: auto;
 }
 
 .dropdownGroup {

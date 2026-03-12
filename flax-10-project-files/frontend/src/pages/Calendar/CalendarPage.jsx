@@ -43,16 +43,23 @@ export default function CalendarPage() {
     dispatch({ type: "SET_FILTER", payload: key });
   };
 
+  const { displayMode } = useCalendar();
+  const isListOrTable = displayMode === "list" || displayMode === "table";
+  const showFilters = true;
+
   return (
     <div className={styles.page}>
-      <CalendarHeader />
-
-      <div className={styles.filters}>
-        <PillFilters
-          active={filter}
-          onChange={handleFilterChange}
-          items={visibleItems}
-        />
+      <div className={styles.stickyHeader}>
+        <CalendarHeader />
+        {showFilters && (
+          <div className={styles.filters}>
+            <PillFilters
+              active={filter}
+              onChange={handleFilterChange}
+              items={visibleItems}
+            />
+          </div>
+        )}
       </div>
 
       <main className={styles.mainContent}>

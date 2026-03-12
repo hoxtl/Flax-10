@@ -1,3 +1,7 @@
+/**
+ * MemberDirectoryModal displays a searchable list of all society members.
+ * Admins can remove members from the directory.
+ */
 import { useState, useEffect, useMemo } from "react";
 import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
 import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";

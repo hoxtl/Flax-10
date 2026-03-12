@@ -1,3 +1,7 @@
+/**
+ * CreateSocietyModal provides the interface for users to establish new societies.
+ * Collects basic info, categories, admins, and initial collaborators.
+ */
 import { useState } from "react";
 import styles from "./CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
@@ -14,22 +18,23 @@ const isValidEmail = (email) => {
 
 export default function CreateSocietyModal({ onClose, onCreate }) {
     const logic = useCreateSocietyForm(onCreate, onClose);
+    const { collab, photo } = logic.modals;
     return (
         <>
-            <StandardModal title="Create Society" subtitle="Start your own society or club" onClose={onClose}>
-                <FormFields {...logic} />
+            <StandardModal title="Create Society" subtitle="Start your own society" onClose={onClose}>
+                <FormFields form={logic.form} update={logic.update} setModals={logic.setModals} />
                 <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
             </StandardModal>
-            {logic.showCollabModal && <AddCollaboratorModal {...logic.collabModalProps} />}
-            {logic.showPhotoModal && <CoverImageModal {...logic.photoModalProps} />}
+            {collab && <AddCollaboratorModal {...logic.collabModalProps} />}
+            {photo && <CoverImageModal {...logic.photoModalProps} />}
         </>
     );
 }
 
+/** Custom hook to manage the creation form state and modal logic. */
 function useCreateSocietyForm(onCreate, onClose) {
-    const [form, setForm] = useState({ name: "", bio: "", categories: [], adminEmails: "", requestRatification: false, collaborators: [], images: [] });
-    const [showCollabModal, setShowCollabModal] = useState(false);
-    const [showPhotoModal, setShowPhotoModal] = useState(false);
+    const [form, setForm] = useState(initialForm());
+    const [modals, setModals] = useState({ collab: false, photo: false });
     const update = (field, value) => setForm(p => ({ ...p, [field]: value }));
 
     const handleAddCollabs = (users) => {
@@ -37,48 +42,55 @@ function useCreateSocietyForm(onCreate, onClose) {
         update("collaborators", [...form.collaborators, ...newCollabs]);
     };
 
-    const emailList = form.adminEmails.split(",").filter(e => e.trim());
-    const emailsInvalid = emailList.length > 0 && !emailList.every(isValidEmail);
+    const isInvalid = !form.name.trim() || !allEmailsValid(form.adminEmails);
 
     return {
-        form, update, showCollabModal, setShowCollabModal, showPhotoModal, setShowPhotoModal,
-        collabModalProps: getCollabModalProps(form, setShowCollabModal, handleAddCollabs),
-        photoModalProps: getPhotoModalProps(form, setShowPhotoModal, update),
-        isCreateDisabled: !form.name.trim() || emailsInvalid,
-        emailsInvalid,
+        form, update, modals, setModals, isCreateDisabled: isInvalid,
+        collabModalProps: getCollabModalProps(form, setModals, handleAddCollabs),
+        photoModalProps: getPhotoModalProps(form, setModals, update),
         handleSubmit: () => onCreate(form)
     };
 }
 
-function getCollabModalProps(form, setShowCollabModal, onAdd) {
+function initialForm() {
+    return { name: "", bio: "", categories: [], adminEmails: "", requestRatification: false, collaborators: [], images: [] };
+}
+
+function allEmailsValid(emails) {
+    const list = emails.split(",").filter(e => e.trim());
+    return list.every(isValidEmail);
+}
+
+function getCollabModalProps(form, setModals, onAdd) {
     return {
-        onClose: () => setShowCollabModal(false),
+        onClose: () => setModals(m => ({ ...m, collab: false })),
         onAdd,
         existingUsernames: form.collaborators.map(c => c.username)
     };
 }
 
-function getPhotoModalProps(form, setShowPhotoModal, update) {
+function getPhotoModalProps(form, setModals, update) {
     return {
         images: form.images, availablePhotos: [],
-        onClose: () => setShowPhotoModal(false),
+        onClose: () => setModals(m => ({ ...m, photo: false })),
         onUpdate: (imgs) => update("images", imgs)
     };
 }
 
 
-function FormFields({ form, update, setShowCollabModal, setShowPhotoModal, emailsInvalid }) {
-    const handlers = getFieldHandlers(form, update);
+function FormFields({ form, update, setModals }) {
+    const hs = getFieldHandlers(form, update);
+    const inval = form.adminEmails.trim() && !allEmailsValid(form.adminEmails);
     return (
         <div className={styles.form}>
-            <NameField value={form.name} onChange={handlers.name} />
-            <BioField value={form.bio} onChange={handlers.bio} />
-            <CategorySelector value={form.categories} onChange={handlers.categories} label="Categories" multiple />
-            <AdminEmailsField value={form.adminEmails} onChange={handlers.adminEmails} invalid={emailsInvalid} />
-            <PhotosField images={form.images} onOpen={() => setShowPhotoModal(true)} />
-            <CollaboratorsField collaborators={form.collaborators} onOpen={() => setShowCollabModal(true)}
-                onRoleChange={handlers.role} onRemove={handlers.remove} />
-            <RatificationToggle requested={form.requestRatification} onToggle={handlers.ratification} />
+            <NameField value={form.name} onChange={hs.name} />
+            <BioField value={form.bio} onChange={hs.bio} />
+            <CategorySelector value={form.categories} onChange={hs.categories} label="Categories" multiple />
+            <AdminEmailsField value={form.adminEmails} onChange={hs.adminEmails} invalid={inval} />
+            <PhotosField images={form.images} onOpen={() => setModals(m => ({ ...m, photo: true }))} />
+            <CollaboratorsField collaborators={form.collaborators} onOpen={() => setModals(m => ({ ...m, collab: true }))}
+                onRoleChange={hs.role} onRemove={hs.remove} />
+            <RatificationToggle requested={form.requestRatification} onToggle={hs.ratification} />
         </div>
     );
 }

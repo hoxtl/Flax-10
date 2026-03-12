@@ -7,7 +7,7 @@ import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import { Bell, Plus, ChevronDown, Calendar, Clock } from "lucide-react";
 import { SegmentedControl } from "../ui/SegmentedControl";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";

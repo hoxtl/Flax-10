@@ -30,9 +30,12 @@ export default function PillFilters({ active, onChange, items }) {
  * Combines the static 'All' option with dynamic tags from context.
  */
 function getAllPills(tags) {
+  const uniqueTags = Array.from(
+    new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
+  );
   return [
     { id: "all", key: "all", label: "All" },
-    ...tags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label, color: t.color })),
+    ...uniqueTags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label, color: t.color })),
   ];
 }
 

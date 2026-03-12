@@ -1,5 +1,5 @@
 import styles from "../../pages/Settings/Settings.module.css";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 
 export function TabButton({ id, label, isActive, onClick }) {
   return (
@@ -14,7 +14,7 @@ export function SettingsTabs({ activeTab, onChange }) {
     { id: "account", label: "Account" },
     { id: "security", label: "Security" },
     { id: "preferences", label: "Preferences" },
-    { id: "home", label: "Home Address"},
+    { id: "home", label: "Home Address" },
     { id: "sleep", label: "Sleep" },
   ];
   return (
