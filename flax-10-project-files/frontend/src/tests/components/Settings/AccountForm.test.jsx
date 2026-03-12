@@ -152,3 +152,19 @@ describe("AccountForm – submission", () => {
     );
   });
 });
+
+describe("AccountForm – teacher role section (student)", () => {
+  it('shows "Become a Teacher" for students', async () => {
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    await waitFor(() =>
+      expect(screen.getByText(/Become a Teacher/i)).toBeTruthy(),
+    );
+  });
+
+  it("shows the request button for students", async () => {
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    await waitFor(() =>
+      expect(screen.getByText(/Request Teacher Role/i)).toBeTruthy(),
+    );
+  });
+});
