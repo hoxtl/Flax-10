@@ -413,9 +413,9 @@ describe('Homepage', () => {
       </MemoryRouter>
     );
     fireEvent.click(screen.getByText('complete-task'));
-    await waitFor(() => expect(screen.getByText("Couldn't update task.")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Couldn't update task.")).toBeInTheDocument());
     fireEvent.click(screen.getByText('✕'));
-    expect(screen.queryByText("Couldn't update task.")).toBeNull();
+    await waitFor(() => expect(screen.queryByText("Couldn't update task.")).not.toBeInTheDocument());
   });
 
   it('dedupes meal events (e.g., lunch) by day', () => {
