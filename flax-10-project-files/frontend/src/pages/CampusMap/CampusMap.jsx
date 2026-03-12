@@ -761,6 +761,13 @@ export default function CampusMap() {
                             pitch: 55,
                             duration: 1200
                           });
+                        } else {
+                          setCustomDestination({
+                            lng: event.longitude,
+                            lat: event.latitude,
+                            name: event.title,
+                            address: event.location
+                          });
                         }
                     
                         }}
