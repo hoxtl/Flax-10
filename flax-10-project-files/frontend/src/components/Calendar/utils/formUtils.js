@@ -134,6 +134,10 @@ async function buildEventData(form) {
 
     if (form.location && form.location.trim()) {
         const coords = await geocodeAddress(form.location);
+        if (coords) {
+            data.location_latitude = coords.latitude;
+            
+        }
     }
 
     const { frequency, interval, end_date } = form.recurrence || {};
