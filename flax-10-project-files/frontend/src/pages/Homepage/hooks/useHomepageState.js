@@ -17,7 +17,7 @@ export function useHomepageState() {
     try {
       const cached = localStorage.getItem("homepageLayout");
       if (cached) return JSON.parse(cached);
-    } catch (_) {}
+    } catch { /* ignore */ }
     return [
       { id: "rightNow", type: "system" },
       { id: "tasks", type: "system" },
@@ -58,7 +58,7 @@ export function useHomepageState() {
         setHomepageWidgets(settings.homepage_widgets);
         localStorage.setItem("homepageLayout", JSON.stringify(settings.homepage_widgets));
       }
-    }).catch(() => {});
+    }).catch(() => { /* ignore */ });
   }, []);
 
   const saveWidgetLayout = async (newLayout) => {
