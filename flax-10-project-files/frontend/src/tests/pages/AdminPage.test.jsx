@@ -279,3 +279,74 @@ describe("AdminPage – Ratifications tab", () => {
     await waitFor(() => expect(screen.queryByText("Drama Club")).toBeNull());
   });
 });
+
+describe("AdminPage – Teacher Requests tab", () => {
+  it("shows empty state when no requests", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() =>
+      expect(screen.getByText(/No pending teacher/i)).toBeTruthy(),
+    );
+  });
+
+  it("renders pending teacher with approve and reject buttons", async () => {
+    api.fetchTeacherRequests.mockResolvedValue([
+      {
+        id: 5,
+        username: "jane",
+        first_name: "Jane",
+        last_name: "Doe",
+        email: "j@d.com",
+        role: "pending_teacher",
+      },
+    ]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeTruthy());
+    expect(screen.getByText("✓ Approve")).toBeTruthy();
+    expect(screen.getByText("✗ Reject")).toBeTruthy();
+  });
+
+  it("calls resolveTeacherRequest approve and removes row", async () => {
+    api.fetchTeacherRequests.mockResolvedValue([
+      {
+        id: 5,
+        username: "jane",
+        first_name: "Jane",
+        last_name: "Doe",
+        email: "j@d.com",
+        role: "pending_teacher",
+      },
+    ]);
+    api.resolveTeacherRequest.mockResolvedValue({});
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() => screen.getByText("Jane Doe"));
+    fireEvent.click(screen.getByText("✓ Approve"));
+    await waitFor(() =>
+      expect(api.resolveTeacherRequest).toHaveBeenCalledWith(5, "approve"),
+    );
+    await waitFor(() => expect(screen.queryByText("Jane Doe")).toBeNull());
+  });
+
+  it("calls resolveTeacherRequest reject and removes row", async () => {
+    api.fetchTeacherRequests.mockResolvedValue([
+      {
+        id: 6,
+        username: "tom",
+        first_name: "Tom",
+        last_name: "X",
+        email: "t@x.com",
+        role: "pending_teacher",
+      },
+    ]);
+    api.resolveTeacherRequest.mockResolvedValue({});
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() => screen.getByText("Tom X"));
+    fireEvent.click(screen.getByText("✗ Reject"));
+    await waitFor(() =>
+      expect(api.resolveTeacherRequest).toHaveBeenCalledWith(6, "reject"),
+    );
+  });
+});
