@@ -14,6 +14,7 @@ const COLUMNS = [
     { key: 'date', label: 'Date' },
     { key: 'location', label: 'Location' },
     { key: 'description', label: 'Description' },
+    { key: 'actions', label: '' },
 ];
 
 const PAGE_SIZE = 10;
@@ -37,6 +38,25 @@ function EmptyState() {
     );
 }
 
+function TableBody({ currentItems, editState, navState, viewMode }) {
+    if (!currentItems.length) return <tbody><EmptyState /></tbody>;
+    return (
+        <tbody>
+            {currentItems.map((event, index) => (
+                <TableRow
+                    key={event.id}
+                    event={event}
+                    rowIndex={index}
+                    editState={editState}
+                    navState={navState}
+                    onCellClick={(eventId, field, value) => editState.startEdit(eventId, field, value)}
+                    viewMode={viewMode}
+                />
+            ))}
+        </tbody>
+    );
+}
+
 function sortByStartTime(events) {
     return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
@@ -52,42 +72,28 @@ function useClickOutside(ref, callback, isActive) {
     }, [ref, callback, isActive]);
 }
 
-export function TableView({ selectedDate: propDate, events: propEvents }) {
-    const tableRef = useRef(null);
+function useTableViewData(propDate, propEvents) {
     const data = useCalendarData({ selectedDate: propDate, events: propEvents });
     const { tags } = useTags();
     const sortedEvents = sortByStartTime(data.events || []);
+    const pagination = usePagination(sortedEvents, PAGE_SIZE);
+    const editState = useTableEdit(pagination.currentItems, tags);
+    const navState = useKeyboardNav(pagination.currentItems.length, editState.startEdit, editState.saveEdit, editState.cancelEdit);
+    return { data, pagination, editState, navState };
+}
 
-    const { currentItems, totalPages, currentPage, setPage } = usePagination(sortedEvents, PAGE_SIZE);
-
-    const editState = useTableEdit(currentItems, tags);
-    const navState = useKeyboardNav(currentItems.length, editState.startEdit, editState.saveEdit, editState.cancelEdit);
-
+export function TableView({ selectedDate, events }) {
+    const tableRef = useRef(null);
+    const { data, pagination, editState, navState } = useTableViewData(selectedDate, events);
     useClickOutside(tableRef, editState.saveEdit, !!editState.editingCell);
-
-    const onCellClick = (eventId, field, value) => editState.startEdit(eventId, field, value);
 
     return (
         <div data-table-view className={styles.container}>
             <table ref={tableRef} className={styles.table}>
                 <TableHeader />
-                <tbody>
-                    {!currentItems.length && <EmptyState />}
-                    {currentItems.map((event, index) => (
-                        <TableRow
-                            key={event.id}
-                            event={event}
-                            events={currentItems}
-                            rowIndex={index}
-                            editState={editState}
-                            navState={navState}
-                            onCellClick={onCellClick}
-                            viewMode={data.viewMode}
-                        />
-                    ))}
-                </tbody>
+                <TableBody currentItems={pagination.currentItems} editState={editState} navState={navState} viewMode={data.viewMode} />
             </table>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+            <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={pagination.setPage} />
             <BackToTop containerSelector={SCROLL_SELECTOR} />
         </div>
     );
