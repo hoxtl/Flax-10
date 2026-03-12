@@ -10,6 +10,7 @@ from .calendar.recurrenceRuleModel import *
 from .calendar.tagModel import *
 from .calendar.timetableSourceModel import *
 from .calendar.scheduleModel import *
+from .calendar.eventAttendanceModel import *
 
 # Module
 from .modules.moduleModel import *
