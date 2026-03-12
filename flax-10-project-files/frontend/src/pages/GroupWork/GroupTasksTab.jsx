@@ -19,6 +19,7 @@ function TaskFilter({ filterUser, setFilterUser, members }) {
     return (
         <div className={styles.filterWrapper}>
             <AnimatedDropdown value={filterUser} onChange={setFilterUser} placeholder="All Members" options={options}
+                usePortal={true}
                 customTrigger={
                     <div className={styles.filterCustomTrigger}>
                         <span>{selectedName}</span>

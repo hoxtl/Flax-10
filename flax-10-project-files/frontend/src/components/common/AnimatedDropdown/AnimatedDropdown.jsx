@@ -388,7 +388,7 @@ export default function AnimatedDropdown({
   grouped = false, searchable = false, searchPlaceholder = "Search...",
   emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false,
-  isOpen: forceOpen, onOpenChange, usePortal = true
+  isOpen: forceOpen, onOpenChange, usePortal = false
 }) {
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
     options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange
@@ -413,7 +413,12 @@ export default function AnimatedDropdown({
   useEffect(() => {
     if (!openOnHover) {
       const listener = (event) => {
-        if (containerRef.current && !containerRef.current.contains(event.target)) {
+        const isInside = containerRef.current?.contains(event.target);
+        // If portaled, we also check if the click was inside the menu in the body
+        const dropdownMenu = document.querySelector(`.${styles.dropdownMenu}`);
+        const isInsideMenu = dropdownMenu?.contains(event.target);
+
+        if (!isInside && !isInsideMenu) {
           setIsOpen(false);
         }
       };
