@@ -422,27 +422,6 @@ export default function CampusMap() {
       const color = priorityColors[event.priority] || '#4488FF';
       el.style.color = color;
 
-      const popup = new mapboxgl.Popup({
-        offset: 25,
-        closeButton: false,
-        closeOnClick: false,
-      }).setHTML(`
-        <div class="eventPopupContent">
-          <div class="eventPopupTitle">${event.title}</div>
-          <div class="eventPopupLocation">${event.location}</div>
-          <div class="eventPopupTime">${new Date(event.start_time).toLocaleString('en-GB', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}</div>
-          <button id="setEventAsStart-${event.id}" class="eventPopupButton">
-            Set as Start
-          </button>
-        </div>
-      `);
-
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'bottom',
@@ -450,24 +429,7 @@ export default function CampusMap() {
         .setLngLat([event.longitude, event.latitude])
         .setPopup(popup)
         .addTo(map.current);
-      
-      popup.on('open', () => {
-        setTimeout(() => {
-          const startBtn = document.getElementById(`setEventAsStart-${event.id}`);
-          if (startBtn) {
-            startBtn.addEventListener('click', () => {
-              setStartLocation({ lng: event.longitude, lat: event.latitude});
-              marker.togglePopup();
-              map.current?.flyTo({
-                center: [event.longitude, event.latitude],
-                zoom: 15,
-                pitch: 55,
-                duration: 1200
-              });
-            });
-          }
-        }, 100);
-      });
+        
       eventMarkers.current.push(marker);
     });
     return () => {
@@ -813,6 +775,12 @@ export default function CampusMap() {
               <div className={styles.eventsList}>
                 {(showAllEvents ? calendarEvents : calendarEvents.slice(0, 3)).map((event) => {
                   const startTime = new Date(event.start_time);
+                  const priorityColors = {
+                    'urgent': '#FF4444',
+                    'high': '#FF8800',
+                    'medium': '#4488FF',
+                    'low': '#888888',
+                  };
                   const color = priorityColors[event.priority] || '#4488FF';
 
                   return (
