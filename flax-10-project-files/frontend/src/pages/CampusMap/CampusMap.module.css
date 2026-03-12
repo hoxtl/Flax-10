@@ -976,6 +976,10 @@
   border-color: var(--primary);
 }
 
+.eventCard:active {
+  transform: translateY(0);
+}
+
 .eventPriorityBar {
   width: 4px;
   flex-shrink: 0;
