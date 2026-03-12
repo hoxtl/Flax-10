@@ -91,13 +91,13 @@ export function useHomepageDerivations({
     const sT = sortedEvents.map(e => (e.title || "").toLowerCase());
     return (upcomingDeadlines || []).filter(d => {
       if (!d.start_due_date) return false;
-      const ms = new Date(d.start_due_date).getTime() - Date.now();
+      const ms = new Date(d.start_due_date).getTime() - now.getTime();
       if (ms <= 0 || ms > fDays) return false;
       const dt = (d.assessment_title || d.title || "").toLowerCase();
       const dc = (d.module_code || "").toLowerCase();
       return !sT.some(t => (dt && t.includes(dt.slice(0,8))) || (dc && t.includes(dc)));
     }).sort((a,b) => new Date(a.start_due_date) - new Date(b.start_due_date));
-  }, [selectedDate, upcomingDeadlines, sortedEvents]);
+  }, [selectedDate, upcomingDeadlines, sortedEvents, now]);
 
   const overdueTasksForNow = useMemo(() => tasksDueToday.filter(t => !isRoutineOrEventTask(t, getTag) && !t.completed && t.due_date && new Date(t.due_date) < now).sort((a,b)=>new Date(a.due_date)-new Date(b.due_date)), [tasksDueToday, getTag, now]);
 
@@ -141,13 +141,13 @@ export function useHomepageDerivations({
       if (!k(d)) continue;
       const t = pend.find(task => k(task) === k(d));
       if (!t) continue;
-      const diff = Math.floor((new Date(d.start_due_date).getTime() - Date.now())/86400000);
+      const diff = Math.floor((new Date(d.start_due_date).getTime() - now.getTime())/86400000);
       const dl = diff <= 0 ? "due today" : diff === 1 ? "due tomorrow" : `due in ${diff}d`;
       return { text: `Focus on ${t.title} for ${d.assessment_title || d.title || d.module_code || "upcoming deadline"}.`, meta: `${d.module_code || "Module"}${dl ? ` · ${dl}` : ""}` };
     }
     if (pend[0] && freeWindowLabel) return { text: `Use the ${freeWindowLabel} window to move ${pend[0].title} forward.`, meta: "Best task to move next" };
     return null;
-  }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
+  }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel, now]);
 
   return { enrolledModules, tomorrowFirstEvent, getTaskCategoryPill, getTaskCategoryColor, sortedEvents, missedItems, suggestableTasks, tasksDueToday, navigatorContext, deadlineSuggestions, overdueTasksForNow, taskWidgetList, taskWidgetItemsOnly, taskWidgetDueTodayCount, taskWidgetSpineCompletedPct, taskWidgetOverdueCount, todayFreeWindows, homepageRecommendation };
 }
