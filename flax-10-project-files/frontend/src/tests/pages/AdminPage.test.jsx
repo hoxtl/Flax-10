@@ -92,3 +92,47 @@ beforeEach(() => {
   vi.clearAllMocks();
   setupDefaultMocks();
 });
+
+describe("AdminPage – shell", () => {
+  it("renders the admin dashboard heading", () => {
+    render(<AdminPage />);
+    expect(screen.getByText("Admin Dashboard")).toBeTruthy();
+  });
+
+  it("renders all four tab buttons", () => {
+    render(<AdminPage />);
+    expect(screen.getByText(/Users/)).toBeTruthy();
+    expect(screen.getByText(/Ratifications/)).toBeTruthy();
+    expect(screen.getByText(/Teacher Requests/)).toBeTruthy();
+    expect(screen.getByText(/Reported Societies/)).toBeTruthy();
+  });
+
+  it("shows users tab content by default", async () => {
+    render(<AdminPage />);
+    await waitFor(() => expect(screen.getByText("Alice Smith")).toBeTruthy());
+  });
+
+  it("switches to ratifications tab", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Ratifications/));
+    await waitFor(() =>
+      expect(screen.getByText(/No societies are awaiting/i)).toBeTruthy(),
+    );
+  });
+
+  it("switches to teacher requests tab", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() =>
+      expect(screen.getByText(/No pending teacher/i)).toBeTruthy(),
+    );
+  });
+
+  it("switches to reported societies tab", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() =>
+      expect(screen.getByText(/No reported societies/i)).toBeTruthy(),
+    );
+  });
+});
