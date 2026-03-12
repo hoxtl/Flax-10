@@ -1,4 +1,4 @@
-import { Calendar, Settings2, ArrowUp, ArrowDown } from "lucide-react";
+import { Calendar, Settings2, ArrowUp, ArrowDown, Plus, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -62,6 +62,21 @@ export default function IntelligenceRow({
     newLayout[target] = temp;
     saveWidgetLayout(newLayout);
   };
+
+  const removeWidget = (index) => {
+    const newLayout = [...homepageWidgets];
+    newLayout.splice(index, 1);
+    saveWidgetLayout(newLayout);
+  };
+
+  const addWidget = (id) => {
+    const newLayout = [...homepageWidgets, { id, type: "system" }];
+    saveWidgetLayout(newLayout);
+  };
+
+  const availableWidgets = Object.keys(widgetElements).filter(
+    (id) => !homepageWidgets.find((w) => w.id === id)
+  );
 
   return (
     <section className={styles.section}>
@@ -134,17 +149,50 @@ export default function IntelligenceRow({
         {homepageWidgets.map((widget, i) => {
           const el = widgetElements[widget.id];
           if (!el) return null;
+          
+          let posClass = "";
+          if (widget.id === "deadlines") posClass = styles.posDeadlines || "";
+          if (widget.id === "tasks") posClass = styles.posTodaysTasks || "";
+          if (widget.id === "rightNow") posClass = styles.posRightNow || "";
+          if (widget.id === "studyPulse") posClass = styles.posStudyPulse || "";
+          if (widget.id === "quickActions") posClass = styles.posQuickActions || "";
+          if (widget.id === "socialDiscover") posClass = styles.posSocialDiscover || "";
+
           return (
-            <BentoCard key={widget.id} className={`${styles.bentoSlot} ${styles[`bentoSlotVariant${widget.id}`] || ""}`}>
+            <BentoCard key={widget.id} className={`${styles.bentoSlot} ${styles[`bentoSlotVariant${widget.id}`] || ""} ${posClass}`}>
               {el}
               {isEditingDashboard && (
                 <div className={styles.widgetEditOverlay}>
                   <div className={styles.widgetEditActions}>
                     <button type="button" onClick={() => moveWidget(i, -1)} disabled={i === 0}><ArrowUp size={16}/></button>
+                    <button type="button" onClick={() => removeWidget(i)}><Minus size={16}/></button>
                     <button type="button" onClick={() => moveWidget(i, 1)} disabled={i === homepageWidgets.length - 1}><ArrowDown size={16}/></button>
                   </div>
                 </div>
               )}
+            </BentoCard>
+          );
+        })}
+        {isEditingDashboard && availableWidgets.map(id => {
+          const el = widgetElements[id];
+          if (!el) return null;
+          
+          let posClass = "";
+          if (id === "deadlines") posClass = styles.posDeadlines || "";
+          if (id === "tasks") posClass = styles.posTodaysTasks || "";
+          if (id === "rightNow") posClass = styles.posRightNow || "";
+          if (id === "studyPulse") posClass = styles.posStudyPulse || "";
+          if (id === "quickActions") posClass = styles.posQuickActions || "";
+          if (id === "socialDiscover") posClass = styles.posSocialDiscover || "";
+
+          return (
+            <BentoCard key={`available-${id}`} className={`${styles.bentoSlot} ${styles[`bentoSlotVariant${id}`] || ""} ${posClass}`} style={{ opacity: 0.6, order: 999 }}>
+              <div style={{ pointerEvents: "none" }}>{el}</div>
+              <div className={styles.widgetEditOverlay}>
+                <div className={styles.widgetEditActions}>
+                  <button type="button" onClick={() => addWidget(id)} title="Add widget"><Plus size={16}/></button>
+                </div>
+              </div>
             </BentoCard>
           );
         })}
