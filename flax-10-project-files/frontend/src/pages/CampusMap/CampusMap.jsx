@@ -485,7 +485,8 @@ export default function CampusMap() {
     setRouteInfo(null);
 
     const { lng, lat } = startLocation;
-    const [dstLng, dstLat] = selectedCampus.coords;
+    const dstLng = destination.lng;
+    const dstLat = destination.lat;
 
     try {
       const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${lng},${lat};${dstLng},${dstLat}?steps=true&geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
@@ -539,7 +540,7 @@ export default function CampusMap() {
     } finally {
       setLoadingRoute(false);
     }
-  }, [startLocation, selectedCampus]);
+  }, [startLocation, selectedCampus, customDestination]);
 
   const calculateTflRoute = useCallback(async () => {
     const destination = customDestination || (selectedCampus ? {
@@ -589,7 +590,11 @@ export default function CampusMap() {
   };
 
   useEffect(() => {
-    if (startLocation && selectedCampus) {
+    console.log('Route useEffect triggered');
+    console.log('startLocation:', startLocation);
+    console.log('selectedCampus:', selectedCampus);
+    console.log('customDestination:', customDestination);
+    if (startLocation && (selectedCampus || customDestination)) {
       calculateRoute();
       calculateTflRoute();
     } else if (routeLayerAdded.current) {
@@ -597,7 +602,7 @@ export default function CampusMap() {
       setRouteInfo(null);
       setTflRouteInfo(null);
     }
-  }, [startLocation, selectedCampus, calculateRoute, calculateTflRoute]);
+  }, [startLocation, selectedCampus, customDestination, calculateRoute, calculateTflRoute]);
 
   // Use GPS of user's device
   const handleGeolocate = () => {
