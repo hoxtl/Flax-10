@@ -118,24 +118,6 @@ export function useHomepageReschedule({
     } catch { showToast("Couldn't delete item."); }
   }, [deleteTask, loadEvents, refetchTasks, removeEvent, showToast]);
 
-  const processReplanItems = async (items, windowCopies, isTask, assignedCountRef) => {
-    for (const item of items) {
-      const end = Number.isFinite(item.end_time) ? new Date(item.end_time) : new Date(new Date(item.start_time || new Date()).getTime() + 25 * 60000);
-      const durationMins = isTask ? (item.estimated_blocks || 1) * 25 : getDuration(new Date(item.start_time), end);
-      const win = windowCopies.find((w) => w.minutes >= durationMins);
-      if (!win) continue;
-      const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-      if (isTask) {
-        await addEvent({ title: item.title, description: item.description || "", start_time: win.start.toISOString(), end_time: slotEnd.toISOString() });
-      } else {
-        await editEvent(extractBaseEventId(item.id), { start_time: win.start.toISOString(), end_time: slotEnd.toISOString() });
-      }
-      win.start = slotEnd;
-      win.minutes -= durationMins;
-      assignedCountRef.current += 1;
-    }
-  };
-
   const handleReplanDay = useCallback(async () => {
     const missed = (missedItems || []).filter((item) => !isRoutineEvent(item));
     const overdue = overdueTasksForNow || [];
@@ -145,6 +127,24 @@ export function useHomepageReschedule({
     
     setReplanLoading(true);
     try {
+      const processReplanItems = async (items, windowCopies, isTask, assignedCountRef) => {
+        for (const item of items) {
+          const end = Number.isFinite(item.end_time) ? new Date(item.end_time) : new Date(new Date(item.start_time || new Date()).getTime() + 25 * 60000);
+          const durationMins = isTask ? (item.estimated_blocks || 1) * 25 : getDuration(new Date(item.start_time), end);
+          const win = windowCopies.find((w) => w.minutes >= durationMins);
+          if (!win) continue;
+          const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
+          if (isTask) {
+            await addEvent({ title: item.title, description: item.description || "", start_time: win.start.toISOString(), end_time: slotEnd.toISOString() });
+          } else {
+            await editEvent(extractBaseEventId(item.id), { start_time: win.start.toISOString(), end_time: slotEnd.toISOString() });
+          }
+          win.start = slotEnd;
+          win.minutes -= durationMins;
+          assignedCountRef.current += 1;
+        }
+      };
+
       const winCopies = windows.map((w) => ({ start: new Date(w.start), end: new Date(w.end), minutes: w.minutes }));
       const assigned = { current: 0 };
       await processReplanItems([...missed].sort((a,b)=>new Date(a.start_time)-new Date(b.start_time)), winCopies, false, assigned);
