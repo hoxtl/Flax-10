@@ -6,24 +6,23 @@ export function getAuthHeaders() {
   return token ? { Authorization: `Token ${token}` } : {};
 }
 
+async function fetchJSON(url) {
+  const h = { "Content-Type": "application/json", ...getAuthHeaders() };
+  const res = await fetch(url, { headers: h });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data || null);
+}
+
 export function useGroupProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/group-work/projects/", {
-          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-        });
-        if (!res.ok) return setProjects([]);
-        const data = await res.json();
-        setProjects(Array.isArray(data) ? data : []);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    fetchJSON("/api/group-work/projects/").then(data => {
+      setProjects(data || []);
+      setLoading(false);
+    });
   }, []);
 
   return { projects, setProjects, loading };
@@ -35,26 +34,22 @@ export function useSelectedProjectId() {
   return params.get("project");
 }
 
+export function useSelectedTab() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search || "");
+  return params.get("tab") || "tasks";
+}
+
 export function useProject(projectId) {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/group-work/projects/", {
-          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : [];
-        const found = list.find((item) => String(item.id) === String(projectId));
-        setProject(found || null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    fetchJSON("/api/group-work/projects/").then(data => {
+      const found = (data || []).find(i => String(i.id) === String(projectId));
+      setProject(found || null);
+      setLoading(false);
+    });
   }, [projectId]);
 
   return { project, setProject, loading };
@@ -64,17 +59,10 @@ export function useProjectMembers(projectId) {
   const [members, setMembers] = useState([]);
 
   useEffect(() => {
-    async function load() {
-      const res = await fetch(`/api/group-work/projects/${projectId}/members/`, {
-        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      });
-      if (!res.ok) return setMembers([]);
-      const data = await res.json();
-      setMembers(Array.isArray(data) ? data : []);
-    }
-    load();
+    fetchJSON(`/api/group-work/projects/${projectId}/members/`).then(data => {
+      setMembers(data || []);
+    });
   }, [projectId]);
 
   return { members, setMembers };
 }
-
