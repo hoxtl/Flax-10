@@ -53,6 +53,14 @@
     cursor: default;
 }
 
+.todayRow {
+    background: linear-gradient(
+        to right,
+        rgba(184, 155, 126, 0.14),
+        rgba(184, 155, 126, 0.04)
+    );
+}
+
 /* Cells */
 .nameCell,
 .tagCell,

@@ -74,8 +74,16 @@ export function TableView({ selectedDate: propDate, events: propEvents }) {
                 <tbody>
                     {!currentItems.length && <EmptyState />}
                     {currentItems.map((event, index) => (
-                        <TableRow key={event.id} event={event} events={currentItems} rowIndex={index}
-                            editState={editState} navState={navState} onCellClick={onCellClick} />
+                        <TableRow
+                            key={event.id}
+                            event={event}
+                            events={currentItems}
+                            rowIndex={index}
+                            editState={editState}
+                            navState={navState}
+                            onCellClick={onCellClick}
+                            viewMode={data.viewMode}
+                        />
                     ))}
                 </tbody>
             </table>

@@ -7,6 +7,7 @@ import { DateTimeCell } from './cells/DateTimeCell';
 import { useQuickActions } from '../hooks/useQuickActions';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
+import { isSameDay } from '../utils/dateUtils';
 import styles from './TableView.module.css';
 
 function getSourceBadge(event) {
@@ -27,7 +28,7 @@ function EditIcon({ show }) {
     return <Pencil size={14} className={styles.editIcon} />;
 }
 
-export function TableRow({ event, events, rowIndex, editState, navState, onCellClick }) {
+export function TableRow({ event, events, rowIndex, editState, navState, onCellClick, viewMode }) {
     const isReadOnly = isReadOnlyEvent(event);
     const [isExpanded, setIsExpanded] = useState(false);
     const { editingCell, cellValue, updateValue } = editState;
@@ -66,7 +67,9 @@ export function TableRow({ event, events, rowIndex, editState, navState, onCellC
     }, [focusedCell, rowIndex, isReadOnly, EDITABLE_COLUMNS, event, onCellClick]);
 
     const sourceBadge = getSourceBadge(event);
-    const rowClass = `${styles.row} ${isReadOnly ? styles.readOnly : ''} ${isExpanded ? styles.expanded : ''}`;
+    const isTodayRow = viewMode !== 'day' && isSameDay(new Date(event.start_time), new Date());
+    const todayClass = isTodayRow ? styles.todayRow : '';
+    const rowClass = `${styles.row} ${isReadOnly ? styles.readOnly : ''} ${isExpanded ? styles.expanded : ''} ${todayClass}`;
     const descClass = `${styles.descCell} ${isEditingDesc || isExpanded ? styles.descExpanded : ''}`;
 
     return (
