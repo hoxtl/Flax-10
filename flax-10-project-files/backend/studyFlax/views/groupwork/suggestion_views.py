@@ -43,7 +43,7 @@ def create_suggestion(request, project_id):
             title=f"New meeting suggestion for {project.name}",
             message=f"{request.user.username} suggested a meeting on {suggestion.start_time.strftime('%a %d %b at %I:%M %p')}.",
             notification_type="meeting_suggestion",
-            action_url=f"/group-work/{project.id}?tab=availability"
+            action_url=f"group-work_{project.id}_availability"
         )
     
     return Response({

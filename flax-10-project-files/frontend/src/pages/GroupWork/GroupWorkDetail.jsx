@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getAuthHeaders, useProject, useProjectMembers } from "./groupWorkHooks";
+import { getAuthHeaders, useProject, useProjectMembers, useSelectedTab } from "./groupWorkHooks";
 import { getUserColor } from "./utils/priorityUtils";
 import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
@@ -133,7 +133,8 @@ function useProjectActions(projectId, setProject, setMembers, onBack) {
 function useProjectDetail(projectId, onBack) {
   const { project, setProject, loading } = useProject(projectId);
   const { members, setMembers } = useProjectMembers(projectId);
-  const [activeTab, setActiveTab] = useState("tasks");
+  const initialTab = useSelectedTab();
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
   const { patchProject, handleRemoveMember, handleDeleteProject } = useProjectActions(projectId, setProject, setMembers, onBack);
   const onAdded = m => setMembers(p => p.some(i => i.id === m.id) ? p : [...p, m]);

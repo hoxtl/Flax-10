@@ -349,6 +349,15 @@ function AppScreen({ activeNav, setActiveNav, user }) {
       return;
     }
 
+    if (id.startsWith("group-work_")) {
+      const parts = id.split("_");
+      const projectId = parts[1];
+      const tab = parts[2];
+      const url = tab ? `/group-work?project=${projectId}&tab=${tab}` : `/group-work?project=${projectId}`;
+      handleNavChange(url);
+      return;
+    }
+
     if (id.startsWith('/')) {
       navigate(id);
       return;

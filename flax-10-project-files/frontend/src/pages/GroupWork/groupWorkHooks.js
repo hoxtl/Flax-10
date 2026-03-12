@@ -34,6 +34,12 @@ export function useSelectedProjectId() {
   return params.get("project");
 }
 
+export function useSelectedTab() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search || "");
+  return params.get("tab") || "tasks";
+}
+
 export function useProject(projectId) {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
