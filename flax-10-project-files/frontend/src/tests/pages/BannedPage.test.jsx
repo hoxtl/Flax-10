@@ -67,9 +67,18 @@ describe("BannedPage", () => {
     ).toBeTruthy();
   });
 
-  it("does not render support email link", () => {
+  it("clicking back button removes banned flag from localStorage", () => {
+    localStorage.setItem("banned", "1");
     render(<BannedPage />);
-    expect(screen.queryByText(/support@studyflax/i)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /back to sign in/i }));
+    expect(localStorage.getItem("banned")).toBeNull();
+  });
+
+  it("clicking back button removes ban_reason from localStorage", () => {
+    localStorage.setItem("ban_reason", "Spam");
+    render(<BannedPage />);
+    fireEvent.click(screen.getByRole("button", { name: /back to sign in/i }));
+    expect(localStorage.getItem("ban_reason")).toBeNull();
   });
 
   it("clicking back button removes token from localStorage", () => {
