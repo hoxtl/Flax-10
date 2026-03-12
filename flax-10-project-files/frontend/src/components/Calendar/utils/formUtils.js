@@ -136,7 +136,7 @@ async function buildEventData(form) {
         const coords = await geocodeAddress(form.location);
         if (coords) {
             data.location_latitude = coords.latitude;
-            
+            data.location_longitude = coords.longitude;
         }
     }
 
