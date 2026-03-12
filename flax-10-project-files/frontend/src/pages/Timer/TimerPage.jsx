@@ -7,6 +7,7 @@ import {
   MainSection,
   PopupSection,
 } from "../../components/Timer/WrapperComponents";
+import WordLoader from "../../components/ui/word-loader";
 
 function NotificationPrompt({ permission, request }) {
   if (permission !== "default") return null;
@@ -27,48 +28,29 @@ const useIsMobile = () => {
   return isMobile;
 };
 
-const FOCUS_TRANSITION_MESSAGES = [
-  "Entering focus mode...",
-  "Getting ready to be productive...",
-  "You've got this...",
-  "Almost there...",
-  "Let's focus...",
-];
+const FOCUS_WORDS = ["focus", "deep work", "lock in", "you've got this"];
 
 export default function TimerPage() {
   const t = useTimerContext();
   const location = useLocation();
   const [showHistory, setShowHistory] = useState(false);
   const [showFocusTransition, setShowFocusTransition] = useState(() => Boolean(location.state?.fromTaskPlay));
-  const [focusMessageIndex, setFocusMessageIndex] = useState(0);
   const { permission, request } = useNotificationPermission();
   const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!showFocusTransition) return;
-    const id = setTimeout(() => setShowFocusTransition(false), 6000);
+    const id = setTimeout(() => setShowFocusTransition(false), 5000);
     return () => clearTimeout(id);
   }, [showFocusTransition]);
 
-  useEffect(() => {
-    if (!showFocusTransition) return;
-    setFocusMessageIndex(0);
-    const interval = setInterval(() => {
-      setFocusMessageIndex((i) => (i + 1) % FOCUS_TRANSITION_MESSAGES.length);
-    }, 1200);
-    return () => clearInterval(interval);
-  }, [showFocusTransition]);
-
   const fromTaskPlay = Boolean(location.state?.fromTaskPlay);
-  const focusMessage = FOCUS_TRANSITION_MESSAGES[focusMessageIndex];
 
   return (
     <div className={`${styles.container} ${fromTaskPlay && showFocusTransition ? styles.containerFocusEntering : ""}`}>
       {showFocusTransition && (
         <div className={styles.focusModeTransition} aria-live="polite">
-          <p className={styles.focusModeTransitionText} key={focusMessageIndex}>
-            {focusMessage}
-          </p>
+          <WordLoader words={FOCUS_WORDS} className={styles.focusModeTransitionText} />
         </div>
       )}
       <div className={fromTaskPlay ? styles.focusModeContent : undefined}>

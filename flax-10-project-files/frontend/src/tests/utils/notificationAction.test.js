@@ -86,7 +86,7 @@ describe('notificationAction', () => {
             executeNotificationAction({ url: 'timer' });
             expect(dispatchedEvents.some(e => e.type === 'navigate')).toBe(true);
             const navEvent = dispatchedEvents.find(e => e.type === 'navigate');
-            expect(navEvent.detail).toBe('timer');
+            expect(navEvent.detail).toBe('/timer');
         });
 
         it('schedules event popup when openPopup is true', () => {

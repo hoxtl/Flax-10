@@ -3,17 +3,9 @@
  */
 
 import { useState } from "react";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
-
-function CreateListModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h2 className={styles.title}>New list</h2>
-      <button className={styles.closeBtn} onClick={onClose}>✕</button>
-    </div>
-  );
-}
 
 function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
   return (
@@ -55,12 +47,10 @@ export default function CreateListModal({ onSave, onClose }) {
     await onSave({ name: name.trim(), color });
     setSaving(false); onClose();
   };
-  return (<div className={styles.overlay} onMouseDown={onClose}>
-      <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-        <CreateListModalHeader onClose={onClose} />
+  return (
+      <StandardModal title="New list" onClose={onClose} size="sm" modalClassName={styles.modalShell} contentClassName={styles.modalContent}>
         <CreateListModalBody name={name} setName={setName} color={color} setColor={setColor} onEnter={handleSave} />
         <CreateListModalFooter onClose={onClose} onSave={handleSave} saving={saving} canSave={!!name.trim()} />
-      </div>
-    </div>
+      </StandardModal>
   );
 }

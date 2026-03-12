@@ -40,20 +40,23 @@ describe('EventsSummaryModal', () => {
 
     it('renders close button', () => {
         renderModal();
-        expect(screen.getByText('✕')).toBeTruthy();
+        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        expect(closeBtn).toBeTruthy();
     });
 
     it('calls onClose when close button is clicked', () => {
         const onClose = vi.fn();
         renderModal({ onClose });
-        fireEvent.click(screen.getByText('✕'));
+        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        fireEvent.click(closeBtn);
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('calls onClose when overlay is clicked', () => {
         const onClose = vi.fn();
-        const { container } = renderModal({ onClose });
-        fireEvent.click(container.firstChild);
+        renderModal({ onClose });
+        const backdrop = document.querySelector('[class*="backdrop"]');
+        if (backdrop) fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 

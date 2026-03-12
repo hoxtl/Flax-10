@@ -54,4 +54,41 @@ describe('ShareButton', () => {
         rerender(<ShareButton userId={1} initialIsSharing={true} />);
         expect(screen.getByText('Shared')).toBeTruthy();
     });
+
+    it('shows "..." and is disabled when loading', async () => {
+        shareCalendar.mockImplementation(() => new Promise(() => {}));
+        render(<ShareButton userId={1} initialIsSharing={false} />);
+        fireEvent.click(screen.getByRole('button'));
+        expect(screen.getByText('...')).toBeTruthy();
+        expect(screen.getByRole('button')).toBeDisabled();
+    });
+
+    it('stops propagation on click', () => {
+        const onParentClick = vi.fn();
+        render(
+            <div onClick={onParentClick}>
+                <ShareButton userId={1} initialIsSharing={false} />
+            </div>
+        );
+        fireEvent.click(screen.getByRole('button'));
+        expect(onParentClick).not.toHaveBeenCalled();
+    });
+
+    it('handles API error without throwing', async () => {
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        shareCalendar.mockRejectedValueOnce(new Error('network error'));
+        render(<ShareButton userId={1} initialIsSharing={false} />);
+        fireEvent.click(screen.getByRole('button'));
+        await waitFor(() => expect(errSpy).toHaveBeenCalledWith('Error toggling share status', expect.any(Error)));
+        errSpy.mockRestore();
+    });
+
+    it('does not call toggleShare when already loading', async () => {
+        shareCalendar.mockImplementation(() => new Promise(() => {}));
+        render(<ShareButton userId={1} initialIsSharing={false} />);
+        fireEvent.click(screen.getByRole('button'));
+        await waitFor(() => expect(screen.getByText('...')).toBeTruthy());
+        fireEvent.click(screen.getByRole('button'));
+        expect(shareCalendar).toHaveBeenCalledTimes(1);
+    });
 });

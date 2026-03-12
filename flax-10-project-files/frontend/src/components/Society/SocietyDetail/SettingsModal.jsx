@@ -4,6 +4,7 @@ import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
 import { RatificationSection } from "./RatificationSection";
 import { useConfirm } from "../../../context/ConfirmContext";
+import StandardModal from "../../common/StandardModal/StandardModal";
 
 async function addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator) {
   const existingMember = (members || []).find(m => m.username === user.username);
@@ -22,15 +23,6 @@ function useSettingsModal(props) {
   const collaborators = (members || []).filter(m => m.role !== 'member');
   const collaboratorUsernames = collaborators.map(c => c.username);
   return { showAddModal, setShowAddModal, handleAddCollaborators, collaborators, collaboratorUsernames };
-}
-
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h3 className={styles.title}>Society Settings</h3>
-      <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-    </div>
-  );
 }
 
 function AddCollaboratorSection({ onOpenModal }) {
@@ -77,28 +69,23 @@ function DangerSection({ onDelete, onClose }) {
   );
 }
 
-function ModalBackdrop({ onClose, children }) {
-  return (
-    <div className={styles.backdrop} onMouseDown={onClose}>
-      <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 export default function SettingsModal(props) {
   const { onClose, onDelete, onUpdateRole, onRemoveMember, ratificationStatus, isRatified, onRequestRatification } = props;
   const { showAddModal, setShowAddModal, handleAddCollaborators, collaborators, collaboratorUsernames } = useSettingsModal(props);
   return (
     <>
-      <ModalBackdrop onClose={onClose}>
-        <ModalHeader onClose={onClose} />
+      <StandardModal
+        title="Society Settings"
+        onClose={onClose}
+        size="md"
+        modalClassName={styles.modalShell}
+        contentClassName={styles.modalContent}
+      >
         <RatificationSection status={ratificationStatus} isRatified={isRatified} onRequest={onRequestRatification} />
         <AddCollaboratorSection onOpenModal={() => setShowAddModal(true)} />
         <CollaboratorsSection collaborators={collaborators} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
         <DangerSection onDelete={onDelete} onClose={onClose} />
-      </ModalBackdrop>
+      </StandardModal>
       {showAddModal && <AddCollaboratorModal onClose={() => setShowAddModal(false)} onAdd={handleAddCollaborators} existingUsernames={collaboratorUsernames} />}
     </>);
 }

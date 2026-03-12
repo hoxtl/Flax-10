@@ -1,0 +1,98 @@
+.container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 40px;
+    color: var(--text);
+}
+
+.title {
+    font-size: 24px;
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.createProjectForm {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.input {
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--hover);
+    font-size: 13px;
+    color: var(--text);
+}
+
+.inputName {
+    flex: 2;
+}
+
+.inputField {
+    flex: 1;
+}
+
+.submitBtn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.loading {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.emptyMessage {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.projectList {
+    margin-top: 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+.projectRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.projectRow:last-child {
+    border-bottom: none;
+}
+
+.projectRow:hover {
+    background: var(--hover);
+}
+
+.projectName {
+    font-weight: 500;
+    color: var(--text);
+}
+
+.projectDeadline {
+    font-size: 12px;
+    color: var(--text-secondary);
+}

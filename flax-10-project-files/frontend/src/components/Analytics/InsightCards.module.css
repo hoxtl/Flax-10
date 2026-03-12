@@ -11,6 +11,10 @@
   color: var(--muted);
   margin: 0;
 }
+
+.noDataWrap {
+  width: 100%;
+}
 .scoreCard {
   display: flex;
   flex-direction: column;

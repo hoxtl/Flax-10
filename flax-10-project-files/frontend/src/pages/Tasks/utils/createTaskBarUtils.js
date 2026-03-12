@@ -22,13 +22,13 @@ export function buildQuickAddPayload(state, taskTitle) {
 
 export async function runQuickAdd(state, onAddTask, taskTitle) {
   if (state.saving || !onAddTask) return;
-  state.setSaving(true);
+  if (typeof state.setSaving === 'function') state.setSaving(true);
   try {
     await onAddTask(buildQuickAddPayload(state, taskTitle));
     state.setTitle("");
     state.setModuleId(null);
     state.setPageCount(null);
   } finally {
-    state.setSaving(false);
+    if (typeof state.setSaving === 'function') state.setSaving(false);
   }
 }

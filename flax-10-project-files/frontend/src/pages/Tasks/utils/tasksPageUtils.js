@@ -33,7 +33,12 @@ export function filterTasksByListAndFilter(tasks, activeListId, activeFilter, fi
     filtered = tasks.filter((t) => set.has(String(t.task_list)));
   } else if (activeListId) {
     filtered = tasks.filter((t) => String(t.task_list) === String(activeListId));
+  } else if (activeFilter !== "all" && activeFilter !== "today" && activeFilter !== "this_week" && activeFilter !== "later" && activeFilter !== "overdue") {
+    // If we're on a specific list or filter that implies a task_list, we might keep filtering.
+    // But for "All tasks", "Today", "This Week", etc., we should show ALL relevant tasks (including group ones).
+    // The current logic already handles this because 'filtered' starts as 'tasks'.
   }
+
   if (activeFilter === "overdue") return filtered.filter((t) => !t.completed && t.due_date && new Date(t.due_date) < new Date());
   if (activeFilter === "today") return filtered.filter((t) => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
   if (activeFilter === "this_week") return filtered.filter((t) => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= weekEnd);

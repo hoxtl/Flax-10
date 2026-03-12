@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import StandardModal from './common/StandardModal/StandardModal';
 import styles from './TimetableImportModal.module.css';
 
 async function tryImport(url, onImport) {
@@ -21,15 +22,6 @@ function useImportForm(onImport, onClose) {
     setLoading(false);};
   return { url, setUrl, loading, error, handleSubmit };}
 
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h2>Import Timetable</h2>
-      <button className={styles.closeBtn} onClick={onClose}>✕</button>
-    </div>
-  );
-}
-
 function ModalForm({ url, setUrl, loading, error, onClose, handleSubmit }) {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -49,11 +41,15 @@ export default function TimetableImportModal({ isOpen, onClose, onImport }) {
   const form = useImportForm(onImport, onClose);
   if (!isOpen) return null;
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader onClose={onClose} />
+      <StandardModal
+        title="Import Timetable"
+        subtitle="Paste your timetable URL (.ics file or timetable page link)"
+        onClose={onClose}
+        size="sm"
+        modalClassName={styles.modalShell}
+        contentClassName={styles.modalContent}
+      >
         <ModalForm {...form} onClose={onClose} />
-      </div>
-    </div>
+      </StandardModal>
   );
 }
