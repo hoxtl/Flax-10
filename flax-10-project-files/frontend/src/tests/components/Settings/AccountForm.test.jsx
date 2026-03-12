@@ -62,3 +62,20 @@ vi.mock("../../../pages/Settings/Settings.module.css", () => ({ default: {} }));
 import { getUserProfile } from "../../../api/userService";
 import { requestTeacherRole } from "../../../api/adminApi";
 import AccountForm from "../../../components/Settings/AccountForm";
+
+// ── Fixtures ───────────────────────────────────────────────────────────────
+
+const baseUser = {
+  first_name: "Alice",
+  last_name: "Smith",
+  email: "alice@example.com",
+  year: "Year 2",
+  major: "",
+  role: "student",
+};
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  localStorage.clear();
+  getUserProfile.mockResolvedValue({ ...baseUser });
+});
