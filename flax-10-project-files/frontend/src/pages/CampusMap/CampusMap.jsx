@@ -788,8 +788,26 @@ export default function CampusMap() {
                       key={event.id} 
                       className={styles.eventCard}
                       onClick={() => {
-                        if (!startLocation) {
+                        if (!startLocation && !selectedCampus) {
                           setStartLocation({ lng: event.longitude, lat: event.latitude });
+                          map.current?.flyTo({
+                            center: [event.longitude, event.latitude],
+                            zoom: 15,
+                            pitch: 55,
+                            duration: 1200
+                          });
+                        } else if (selectedCampus && !startLocation) {
+                          setStartLocation({
+                            lng: selectedCampus.coords[0],
+                            lat: selectedCampus.coords[1]
+                          });
+                          setCustomDestination({
+                            lng: event.longitude,
+                            lat: event.latitude,
+                            name: event.title,
+                            address: event.location
+                          });
+                          setSelectedCampus(null);
                           map.current?.flyTo({
                             center: [event.longitude, event.latitude],
                             zoom: 15,
