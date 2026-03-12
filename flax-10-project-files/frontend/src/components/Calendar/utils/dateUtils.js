@@ -141,6 +141,31 @@ export function parseDateInput(v) {
     return x;
 }
 
+export function getMonthWeeks(date) {
+    const weeks = [];
+    const current = getMonthGridStartDate(date);
+    const last = getEndOfMonth(date);
+    while (current <= last || current.getDay() !== 0) {
+        weeks.push(generateMonthWeek(current));
+    }
+    return weeks;
+}
+
+function getMonthGridStartDate(date) {
+    const d = getStartOfMonth(date);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+}
+
+function generateMonthWeek(current) {
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+        week.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+    }
+    return week;
+}
+
 export function formatDayLabel(date, today = new Date()) {
     if (isSameDay(date, today)) return "Today";
     return date.toLocaleDateString(undefined, {
