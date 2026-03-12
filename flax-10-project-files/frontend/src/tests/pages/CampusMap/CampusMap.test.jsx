@@ -84,6 +84,14 @@ describe("CampusMap", () => {
     });
   });
 
+  it("shows the shared skeleton before the map finishes loading", () => {
+    mockMapInstance.on.mockImplementation(function () {
+      return mockMapInstance;
+    });
+    render(<CampusMap />);
+    expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument();
+  });
+
   it("renders StudyFlax Map title and subtitle", async () => {
     render(<CampusMap />);
     expect(screen.getByText("StudyFlax Map")).toBeInTheDocument();
