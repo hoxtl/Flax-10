@@ -1,6 +1,7 @@
 import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
+import { geocodeAddress } from '../../../api/userService';
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event, options);
