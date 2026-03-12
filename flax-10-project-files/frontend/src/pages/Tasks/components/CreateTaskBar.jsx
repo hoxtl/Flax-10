@@ -60,6 +60,7 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }
     </>
   )
 }
+
 function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
   return (
     <div className={s.optionsRowWrapper}>
@@ -75,7 +76,6 @@ function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEsti
         <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
           <AnimatedDropdown value={moduleId ?? ""} onChange={(v) => setModuleId(v === "" ? null : v)} placeholder="Module" options={moduleOptions} className={s.moduleListDropdown} />
         </div>
-        <span className={s.optionsRowDivider} aria-hidden /> <span className={s.optionsRowLabel}>List</span>
         <ListDropdown s={s} taskListId={taskListId} setTaskListId={setTaskListId} sortedLists={sortedLists} listOptions={listOptions}/>
         </div>
     </div>
