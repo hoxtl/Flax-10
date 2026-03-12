@@ -169,8 +169,6 @@ describe("AccountForm – teacher role section (student)", () => {
   });
 });
 
-// ── Teacher role – teacher ─────────────────────────────────────────────────
-
 describe("AccountForm – teacher role section (teacher)", () => {
   it("shows teacher badge when API returns teacher role", async () => {
     getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
@@ -197,6 +195,22 @@ describe("AccountForm – teacher role section (teacher)", () => {
     );
     await waitFor(() =>
       expect(screen.queryByText(/Request Teacher Role/i)).toBeNull(),
+    );
+  });
+});
+
+describe("AccountForm – teacher role section (pending_teacher)", () => {
+  it("shows pending message when API returns pending_teacher", async () => {
+    getUserProfile.mockResolvedValue({ ...baseUser, role: "pending_teacher" });
+    render(
+      <AccountForm
+        user={{ ...baseUser, role: "pending_teacher" }}
+        onSave={vi.fn()}
+        isSaving={false}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByText(/Teacher Request Pending/i)).toBeTruthy(),
     );
   });
 });
