@@ -134,3 +134,21 @@ describe("AccountForm – basic rendering", () => {
     await waitFor(() => expect(screen.getByDisplayValue("Alice")).toBeTruthy());
   });
 });
+
+describe("AccountForm – submission", () => {
+  it("calls onSave with correct form data", async () => {
+    const onSave = vi.fn();
+    const { container } = render(
+      <AccountForm user={baseUser} onSave={onSave} isSaving={false} />,
+    );
+    await waitFor(() => screen.getByDisplayValue("Alice"));
+    fireEvent.submit(container.querySelector("form"));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstName: "Alice",
+        lastName: "Smith",
+        email: "alice@example.com",
+      }),
+    );
+  });
+});
