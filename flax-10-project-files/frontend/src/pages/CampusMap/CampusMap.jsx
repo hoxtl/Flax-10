@@ -107,6 +107,7 @@ export default function CampusMap() {
   const [calendarEvents, setCalendarEvents] = useState([]);
   const eventMarkers = useRef([]);
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const [customDestination, setCustomDestination] = useState(null);
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
@@ -401,42 +402,6 @@ export default function CampusMap() {
       window.removeEventListener('calendar-event-updated', handleRefresh);
     };
   }, []);
-
-  // Display calendar event markers on the map
-  useEffect(() => {
-    if (!mapLoaded || calendarEvents.length === 0) return;
-    eventMarkers.current.forEach(marker => marker.remove());
-    eventMarkers.current = [];
-
-    calendarEvents.forEach((event) => {
-      const el = document.createElement('div');
-      el.className = 'eventMarker';
-      el.innerHTML = '📍';
-      el.title = event.title;
-      const priorityColors = {
-        'urgent': '#FF4444',
-        'high': '#FF8800',
-        'medium': '#4488FF',
-        'low': '#888888',
-      };
-      const color = priorityColors[event.priority] || '#4488FF';
-      el.style.color = color;
-
-      const marker = new mapboxgl.Marker({
-        element: el,
-        anchor: 'bottom',
-      })
-        .setLngLat([event.longitude, event.latitude])
-        .setPopup(popup)
-        .addTo(map.current);
-        
-      eventMarkers.current.push(marker);
-    });
-    return () => {
-      eventMarkers.current.forEach(marker => marker.remove());
-      eventMarkers.current = []
-    };
-  }, [calendarEvents, mapLoaded]);
 
   // Update the marker on the map when user's start location changes
   useEffect(() => {
@@ -784,16 +749,19 @@ export default function CampusMap() {
                   const color = priorityColors[event.priority] || '#4488FF';
 
                   return (
-                    <div key={event.id} className={styles.eventCard}>
-                         onClick={() => {
-                          setStartLocation({ lng: event.longitude, lat: event.latitude });
-                          map.current?.flyTo({
-                            center: [event.longitude, event.latitude],
-                            zoom: 15,
-                            pitch: 55,
-                            duration: 1200
-                          });
-                         }}
+                    <div 
+                      key={event.id} 
+                      className={styles.eventCard}
+                      onClick={() => {
+                        setStartLocation({ lng: event.longitude, lat: event.latitude });
+                        map.current?.flyTo({
+                          center: [event.longitude, event.latitude],
+                          zoom: 15,
+                          pitch: 55,
+                          duration: 1200
+                        });
+                        }}
+                    >
                       <div 
                         className={styles.eventPriorityBar}
                         style={{ backgroundColor: color }}
