@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { EventModal } from './EventModal/EventModal';
 import { EventPopover } from './EventPopover/EventPopover';

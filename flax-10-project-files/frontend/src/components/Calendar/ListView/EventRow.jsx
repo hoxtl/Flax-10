@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { useEventModal } from '../../../context/CalendarContext';
 import { useQuickActions } from '../hooks/useQuickActions';
@@ -20,8 +19,11 @@ function isAllDay(event) {
 function formatEventTime(event) {
     if (isAllDay(event)) return 'All day';
     const start = new Date(event.start_time);
-    const opts = { hour: 'numeric', minute: '2-digit', hour12: true };
-    return start.toLocaleTimeString('en-US', opts);
+    return start.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
 }
 
 function formatTimeRange(event) {
@@ -29,23 +31,32 @@ function formatTimeRange(event) {
     const start = new Date(event.start_time);
     const end = new Date(event.end_time);
     const opts = { hour: 'numeric', minute: '2-digit', hour12: true };
-    const startTime = start.toLocaleTimeString('en-US', opts);
-    const endTime = end.toLocaleTimeString('en-US', opts);
-    return `${startTime} - ${endTime}`;
+    const from = start.toLocaleTimeString('en-US', opts);
+    const to = end.toLocaleTimeString('en-US', opts);
+    return `${from} - ${to}`;
 }
 
-function getTagBadges(event, tags) {
-    const badges = [];
-    const tagName = event.tag_name || event.tag?.name;
-    const theme = getEventTheme(event, tags);
-    if (tagName) badges.push({ label: tagName, type: 'tag', color: theme.color });
+function getDurationLabel(event) {
+    if (isAllDay(event)) return 'All day';
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    const minutes = Math.max(0, Math.round((end - start) / 60000));
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+    if (!remainder) return `${hours}h`;
+    return `${hours}h ${remainder}m`;
+}
 
+function getTagBadges(event, accentColor) {
+    const tagName = event.tag_name || event.tag?.name;
+    const badges = tagName ? [{ label: tagName, type: 'tag', color: accentColor }] : [];
     const eventType = getEventType(event);
     if (eventType === 'module' && event.module?.name) {
         badges.push({ label: event.module.name, type: 'source', color: null });
     }
     if (eventType === 'society' && event.society_name) {
-        const societyColor = event.society_color || theme.color;
+        const societyColor = event.society_color || accentColor;
         badges.push({ label: event.society_name, type: 'source', color: societyColor });
     }
     return badges;
@@ -57,46 +68,117 @@ function TagBadge({ badge }) {
     return <span className={baseClass} style={style}>{badge.label}</span>;
 }
 
-function EditButton({ onClick }) {
+function DetailRow({ label, value, muted, full }) {
+    const valueClass = muted ? styles.detailValueMuted : styles.detailValue;
+    const rowClass = full ? `${styles.detailItem} ${styles.detailFullRow}` : styles.detailItem;
     return (
-        <button className={styles.editBtn} onClick={onClick} aria-label="Edit event">
-            <Pencil size={14} />
+        <div className={rowClass}>
+            <div className={styles.detailLabel}>{label}</div>
+            <div className={valueClass}>{value}</div>
+        </div>
+    );
+}
+
+function DetailButton({ variant = 'secondary', onClick, children }) {
+    const className = variant === 'primary'
+        ? `${styles.detailButton} ${styles.detailButtonPrimary}`
+        : styles.detailButton;
+    return (
+        <button type="button" className={className} onClick={onClick}>
+            {children}
         </button>
     );
 }
 
+/**
+ * Renders a single row in the calendar list view with expandable details.
+ */
 export function EventRow({ event }) {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(false);
     const { openModal } = useEventModal();
-    const { tags } = useTags();
-    const isReadOnly = isReadOnlyEvent(event);
+    const tagContext = useTags();
     const quickAction = useQuickActions(event);
-    const badges = getTagBadges(event, tags);
-
-    const handleEdit = (e) => { e.stopPropagation(); openModal(event); };
-
+    const accentColor = getEventTheme(event, tagContext).color;
+    const badges = getTagBadges(event, accentColor);
+    const readOnly = isReadOnlyEvent(event);
+    const onToggle = () => setExpanded(prev => !prev);
+    const onEdit = (e) => { e.stopPropagation(); openModal(event); };
+    const onUnimap = (e) => {
+        e.stopPropagation();
+        window.open('/map', '_blank', 'noopener,noreferrer');
+    };
+    const onQuick = (e) => {
+        e.stopPropagation();
+        quickAction?.onClick();
+    };
     return (
-        <div className={`${styles.eventRow} ${isReadOnly ? styles.readOnly : ''}`} onClick={() => setIsExpanded(e => !e)}>
-            <div className={styles.rowMain}>
-                <span className={styles.eventTime}>{formatEventTime(event)}</span>
-                <span className={styles.eventTitle}>{event.title}</span>
-                <div className={styles.rowActions}>
-                    {!isReadOnly && <EditButton onClick={handleEdit} />}
-                    {isReadOnly && quickAction && (
-                        <button className={styles.quickActionBtn} onClick={quickAction.onClick}>{quickAction.label}</button>
-                    )}
-                </div>
-                <div className={styles.badgesContainer}>
-                    {badges.map((b, i) => <TagBadge key={i} badge={b} />)}
-                </div>
-            </div>
-            {isExpanded && (
-                <div className={styles.expandedContent}>
-                    <div>🕐 {formatTimeRange(event)}</div>
-                    {event.location && <div>📍 {event.location}</div>}
-                    {event.description && <div style={{ whiteSpace: 'pre-wrap' }}>📝 {event.description}</div>}
-                </div>
+        <div
+            className={`${styles.eventRow} ${expanded ? styles.expanded : ''} ${readOnly ? styles.readOnly : ''}`}
+            onClick={onToggle}
+        >
+            <EventRowMain
+                event={event}
+                themeColor={accentColor}
+                badges={badges}
+                expanded={expanded}
+            />
+            {expanded && (
+                <EventRowDetail
+                    event={event}
+                    readOnly={readOnly}
+                    hasQuick={!!quickAction}
+                    onEdit={onEdit}
+                    onUnimap={onUnimap}
+                    onQuick={onQuick}
+                    quickLabel={quickAction?.label}
+                />
             )}
+        </div>
+    );
+}
+
+function EventRowMain({ event, themeColor, badges, expanded }) {
+    return (
+        <div className={styles.eventMain}>
+            <div className={styles.eventStrip} style={{ backgroundColor: themeColor }} />
+            <div className={styles.eventTime}>{formatEventTime(event)}</div>
+            <div className={styles.eventName}>{event.title}</div>
+            <div className={styles.badgesContainer}>
+                {badges.map((badge, index) => <TagBadge key={index} badge={badge} />)}
+            </div>
+            <div className={styles.eventChevron}>{expanded ? '▲' : '▼'}</div>
+        </div>
+    );
+}
+
+function EventRowDetail({
+    event,
+    readOnly,
+    hasQuick,
+    onEdit,
+    onUnimap,
+    onQuick,
+    quickLabel
+}) {
+    const typeLabel = event.tag_name || event.tag?.name || getEventType(event);
+    const timeLabel = `${formatTimeRange(event)} · ${getDurationLabel(event)}`;
+    const location = event.location || '-';
+    const description = event.description || '-';
+    return (
+        <div className={styles.eventDetail}>
+            <div className={styles.detailGrid}>
+                <DetailRow label="Time" value={timeLabel} />
+                <DetailRow label="Type" value={typeLabel} />
+                <DetailRow label="Location" value={location} muted={!event.location} full />
+                <DetailRow label="Description" value={description} muted={!event.description} full />
+            </div>
+            <div className={styles.detailActions}>
+                {!readOnly && <DetailButton variant="primary" onClick={onEdit}>Edit</DetailButton>}
+                <DetailButton onClick={onUnimap}>Get directions</DetailButton>
+                {readOnly && hasQuick && (
+                    <DetailButton onClick={onQuick}>{quickLabel}</DetailButton>
+                )}
+            </div>
         </div>
     );
 }

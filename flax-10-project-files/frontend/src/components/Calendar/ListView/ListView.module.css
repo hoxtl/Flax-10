@@ -1,36 +1,112 @@
-/* ListView Container */
+/* List view root */
 .container {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 280px);
     overflow-y: auto;
-    background: var(--bg);
-    padding: 0 16px;
+    background: var(--calendar-bg);
+    padding: 0 12px;
 }
 
-/* Date Group */
-.dateGroup {
-    margin-bottom: 8px;
+/* Card shell */
+.listCard {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow-y: auto;
 }
 
-/* Sticky Date Header */
-.dateHeader {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--panel);
-    padding: 12px 0;
+/* Day group */
+.dayGroup {
     border-bottom: 1px solid var(--border);
 }
 
-.dateText {
-    font-size: 0.875rem;
-    padding-left: 16px;
+.dayGroup:last-of-type {
+    border-bottom: none;
+}
+
+/* Sticky day header */
+.dayHeader {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+}
+
+.dayHeaderToday {
+    background: var(--panel);
+}
+
+.dayNumber {
+    font-size: 1.3rem;
+    font-weight: var(--font-weight-title);
+    color: var(--text);
+    line-height: 1;
+    min-width: 28px;
+    text-align: center;
+}
+
+.dayHeaderToday .dayNumber {
+    background: var(--accent);
+    color: var(--card-bg);
+    border-radius: 999px;
+    padding: 4px 8px;
+}
+
+.dayMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dayName {
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--text);
 }
 
-/* Events List */
+.dayHeaderToday .dayName {
+    color: var(--accent);
+}
+
+.daySubRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.dayBadges {
+    display: flex;
+    gap: 6px;
+}
+
+.dayBadge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.todayBadge {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.deadlineBadge {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+/* Events list */
 .eventsList {
     display: flex;
     flex-direction: column;
@@ -39,151 +115,179 @@
 .flatList {
     display: flex;
     flex-direction: column;
-    padding-top: 8px;
 }
 
-/* Event Row */
+/* Event row */
 .eventRow {
-    display: flex;
-    flex-direction: column;
-    padding: 12px 16px;
-    background: var(--bg);
     border-bottom: 1px solid var(--border);
     cursor: pointer;
-    transition: background 0.15s;
+    background: var(--bg);
+    transition: background 0.15s ease;
 }
 
-.eventRow:hover {
-    background: var(--hover);
+.eventRow:last-of-type {
+    border-bottom: none;
 }
 
-.rowMain {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 12px;
+.eventRow:hover,
+.eventRow.expanded {
+    background: var(--hover-light);
 }
 
 .eventRow.readOnly {
-    opacity: 0.85;
+    opacity: 0.9;
 }
 
-/* Event Time */
-.eventTime {
+.eventMain {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    gap: 0;
+}
+
+.eventStrip {
+    width: 3px;
+    border-radius: 2px;
+    align-self: stretch;
+    min-height: 28px;
+    margin-right: 14px;
     flex-shrink: 0;
-    width: 80px;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--muted);
 }
 
-/* Event Title */
-.eventTitle {
+.eventTime {
+    font-size: 0.7rem;
+    color: var(--muted);
+    width: 72px;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+}
+
+.eventName {
     flex: 1;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: var(--font-weight-task);
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* Row Actions (edit/quick action buttons) */
-.rowActions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-    width: 0;
-    overflow: hidden;
-    transition: width 0.15s ease;
-}
-
-.eventRow:hover .rowActions {
-    width: auto;
-    margin-right: 8px;
-}
-
-/* Badges Container */
 .badgesContainer {
     display: flex;
     gap: 6px;
     flex-shrink: 0;
-    transition: transform 0.15s ease;
+    margin-left: 12px;
 }
 
-/* Tag Badge */
-.tagBadge {
-    padding: 2px 8px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 12px;
-    background: var(--pill-bg);
-    color: #fff;
-    white-space: nowrap;
-}
-
-/* Source Badge (module/society name) */
+.tagBadge,
 .sourceBadge {
-    padding: 2px 8px;
+    padding: 3px 10px;
+    border-radius: 999px;
     font-size: 0.7rem;
     font-weight: 500;
-    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.tagBadge {
+    background: var(--pill-bg);
+    color: var(--text);
+}
+
+.sourceBadge {
     background: var(--primary);
-    color: #fff;
-    white-space: nowrap;
+    color: var(--c-white);
 }
 
-/* Edit Button */
-.editBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
+.eventChevron {
+    margin-left: 10px;
+    font-size: 0.7rem;
     color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
+    transform-origin: center;
+    transition: transform 0.18s ease;
 }
 
-.editBtn:hover {
-    background: var(--hover);
-    color: var(--primary);
+.eventRow.expanded .eventChevron {
+    transform: rotate(180deg);
 }
 
-.quickActionBtn {
-    background: var(--danger-light, #fee2e2);
-    color: var(--danger, #dc2626);
-    border: none;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.15s;
+/* Expanded detail panel */
+.eventDetail {
+    padding: 0 20px 16px 20px;
+    margin-left: 89px;
 }
 
-.quickActionBtn:hover {
-    background: var(--danger, #dc2626);
-    color: white;
+.detailGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 24px;
+    padding: 14px 16px;
+    background: var(--panel);
+    border-radius: 10px;
+    border: 1px solid var(--border);
 }
 
-.expandedContent {
-    margin-top: 12px;
-    padding-left: 92px;
-    /* 80px time + 12px gap */
-    font-size: 0.85rem;
-    color: var(--muted);
+.detailItem {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 2px;
 }
 
-/* Empty State */
+.detailLabel {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.detailValue {
+    font-size: 0.8rem;
+    color: var(--text);
+}
+
+.detailValueMuted {
+    color: var(--muted);
+    font-style: italic;
+}
+
+.detailFullRow {
+    grid-column: 1 / -1;
+}
+
+.detailActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.detailButton {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.detailButtonPrimary {
+    background: var(--btn-black);
+    color: var(--c-white);
+    border-color: var(--btn-black);
+}
+
+.detailButton:hover {
+    background: var(--hover-light);
+}
+
+.detailButtonPrimary:hover {
+    background: var(--btn-black-hover);
+    border-color: var(--btn-black-hover);
+}
+
+/* Empty state */
 .emptyState {
     display: flex;
     align-items: center;
@@ -192,20 +296,17 @@
     color: var(--muted);
 }
 
-/* Mobile Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .container {
-        padding: 0 12px;
+        padding: 0 8px;
     }
 
-    .eventRow {
-        padding: 10px 12px;
-        gap: 8px;
+    .eventMain {
+        padding-inline: 14px;
     }
 
-    .eventTime {
-        width: 60px;
-        font-size: 0.75rem;
+    .eventDetail {
+        margin-left: 83px;
     }
 
     .badgesContainer {
