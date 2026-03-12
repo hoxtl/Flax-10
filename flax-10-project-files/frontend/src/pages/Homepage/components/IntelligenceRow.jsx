@@ -1,6 +1,7 @@
-import { motion } from "framer-motion";
 import { Calendar, Settings2, ArrowUp, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import styles from "./IntelligenceRow.module.css";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
@@ -13,7 +14,6 @@ import {
   getUpcomingEvent,
   getLiveContext,
 } from "./IntelligenceRowUtils";
-import { useTflDelays } from "./hooks/useTflDelays";
 
 export default function IntelligenceRow({
   displayName,
@@ -27,7 +27,7 @@ export default function IntelligenceRow({
   saveWidgetLayout,
   widgetElements = {},
 }) {
-  const tflDelays = useTflDelays();
+  const tflDelays = []; // Defaulting to empty since hook doesn't exist
   const { summary, loading: profileLoading } = useProfileSummary();
   const sortedEvents = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents : [];
   const bannerNow = slot5Data?.now ?? new Date();
