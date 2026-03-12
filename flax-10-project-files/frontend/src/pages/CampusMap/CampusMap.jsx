@@ -768,9 +768,15 @@ export default function CampusMap() {
                             name: event.title,
                             address: event.location
                           });
+                          setSelectedCampus(null);
+                          map.current?.flyTo({
+                            center: [event.longitude, event.latitude],
+                            zoom: 15,
+                            pitch: 55,
+                            duration: 1200
+                          });
                         }
-                    
-                        }}
+                      }}
                     >
                       <div 
                         className={styles.eventPriorityBar}
