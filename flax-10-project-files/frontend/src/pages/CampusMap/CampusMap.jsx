@@ -785,6 +785,15 @@ export default function CampusMap() {
 
                   return (
                     <div key={event.id} className={styles.eventCard}>
+                         onClick={() => {
+                          setStartLocation({ lng: event.longitude, lat: event.latitude });
+                          map.current?.flyTo({
+                            center: [event.longitude, event.latitude],
+                            zoom: 15,
+                            pitch: 55,
+                            duration: 1200
+                          });
+                         }}
                       <div 
                         className={styles.eventPriorityBar}
                         style={{ backgroundColor: color }}
