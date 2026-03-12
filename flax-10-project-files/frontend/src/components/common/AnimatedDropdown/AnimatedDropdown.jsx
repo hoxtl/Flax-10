@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Search } from "lucide-react";
 import styles from "./AnimatedDropdown.module.css";
@@ -228,10 +229,27 @@ function DropdownContent({
  */
 function DropdownPanel({
   grouped, filteredOptions, value, onSelect,
-  searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark
+  searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark,
+  usePortal, coords
 }) {
   const yOffset = openUpward ? 8 : -8;
   const menuStyle = openUpward ? { bottom: '100%', top: 'auto', marginBottom: 4 } : {};
+  
+  if (usePortal && coords) {
+    const portalTop = openUpward ? 'auto' : coords.top + 4;
+    const portalBottom = openUpward ? window.innerHeight - coords.top + 4 : 'auto';
+    Object.assign(menuStyle, {
+        position: 'fixed',
+        top: portalTop,
+        bottom: portalBottom,
+        left: coords.left,
+        width: 'max-content',
+        minWidth: coords.width,
+        zIndex: 9999,
+        margin: 0
+    });
+  }
+
   if (menuMaxHeight) menuStyle.maxHeight = menuMaxHeight;
   return (
     <motion.div initial={{ opacity: 0, y: yOffset }} animate={{ opacity: 1, y: 0 }}
@@ -258,15 +276,25 @@ function DropdownPanel({
  * @param {boolean} props.openUpward - Whether to open the menu upward.
  * @param {number} props.menuMaxHeight - Max height for the menu.
  */
-function DropdownMenu({ isOpen, grouped, options, value, onSelect, searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark }) {
+function DropdownMenu({ 
+  isOpen, grouped, options, value, onSelect, searchable, query, setQuery, 
+  searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark,
+  usePortal, coords
+}) {
   const filteredOptions = searchable ? (grouped ? filterGrouped(options, query) : filterFlat(options, query)) : options;
-  return (
+  const menu = (
     <AnimatePresence>
       {isOpen && <DropdownPanel grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
-        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} />}
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} 
+        usePortal={usePortal} coords={coords} />}
     </AnimatePresence>
   );
+
+  if (usePortal && isOpen) {
+    return createPortal(menu, document.body);
+  }
+  return menu;
 }
 
 /**
@@ -311,15 +339,33 @@ function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpen
  */
 function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
   const [openUpward, setOpenUpward] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+
   useEffect(() => {
     if (!isOpen || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
-    const shouldOpenUpward = spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
-    setOpenUpward(shouldOpenUpward);
+    
+    const update = () => {
+        const rect = containerRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        const shouldOpenUpward = spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
+        setOpenUpward(shouldOpenUpward);
+        setCoords({
+            top: shouldOpenUpward ? rect.top : rect.bottom,
+            left: rect.left,
+            width: rect.width
+        });
+    }
+
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+        window.removeEventListener('scroll', update, true);
+        window.removeEventListener('resize', update);
+    }
   }, [isOpen, menuMaxHeight, containerRef]);
-  return openUpward;
+  return { openUpward, coords };
 }
 
 /**
@@ -335,20 +381,21 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
  * @param {string} [props.emptyMessage="Nothing found"] - Shown when the search has no results.
  * @param {number} [props.menuMaxHeight] - Optional max height for the dropdown menu.
  * @param {boolean} [props.openOnHover] - Whether the dropdown should open on hover.
+ * @param {boolean} [props.usePortal=true] - Whether to render the menu in a portal.
  */
 export default function AnimatedDropdown({
   value, onChange, placeholder, options,
   grouped = false, searchable = false, searchPlaceholder = "Search...",
   emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false,
-  isOpen: forceOpen, onOpenChange
+  isOpen: forceOpen, onOpenChange, usePortal = true
 }) {
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
     options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange
   );
   const containerRef = useRef(null);
   const timeoutRef = useRef(null);
-  const openUpward = useOpenDirection(containerRef, isOpen, menuMaxHeight);
+  const { openUpward, coords } = useOpenDirection(containerRef, isOpen, menuMaxHeight);
 
   const handleMouseEnter = () => {
     if (openOnHover) {
@@ -392,7 +439,8 @@ export default function AnimatedDropdown({
       )}
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
-        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} />
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark}
+        usePortal={usePortal} coords={coords} />
     </div>
   );
 }

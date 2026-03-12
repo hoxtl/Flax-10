@@ -30,13 +30,12 @@ export default function MemberAvatar({ member, size = 24 }) {
     const name = getDisplayName(member);
 
     if (photoUrl) {
-        return <img src={photoUrl} alt={name} className={styles.avatar} style={sizeStyle} title={name} />;
+        return <img src={photoUrl} alt={name} className={styles.avatar} style={sizeStyle} />;
     }
     return (
         <div
             className={styles.avatar}
             style={{ ...sizeStyle, background: getUserColor(member.user ?? member.id) }}
-            title={name}
         >
             {getInitials(member)}
         </div>
