@@ -888,13 +888,6 @@
   transform: scale(1.2);
 }
 
-:global(.eventPopupLocation) {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-bottom: 4px;
-  line-height: 1.3;
-}
-
 :global(.eventPopupButton:hover) {
   opacity: 0.85;
 }
