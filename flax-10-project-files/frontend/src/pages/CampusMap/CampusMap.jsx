@@ -554,7 +554,8 @@ export default function CampusMap() {
     setTflRouteInfo(null);
 
     const { lng, lat } = startLocation;
-    const [dstLng, dstLat] = selectedCampus.coords;
+    const dstLng = destination.lng;
+    const dstLat = destination.lat;
 
     try {
       const tflJourney = await tflService.journeyPlanner(
@@ -576,7 +577,7 @@ export default function CampusMap() {
     } finally {
       setLoadingTflRoute(false);
     }
-  }, [startLocation, selectedCampus]);
+  }, [startLocation, selectedCampus, customDestination]);
 
   const resetRoute = (routeID) => {
     const source = map.current?.getSource(routeID);
