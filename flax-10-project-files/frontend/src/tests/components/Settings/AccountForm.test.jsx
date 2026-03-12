@@ -256,3 +256,46 @@ describe("AccountForm – role sync", () => {
     window.removeEventListener("auth-changed", listener);
   });
 });
+
+describe("AccountForm – request teacher role flow", () => {
+  it("calls requestTeacherRole API on button click", async () => {
+    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    const btn = await screen.findByText(/Request Teacher Role/i);
+    await userEvent.click(btn);
+    expect(requestTeacherRole).toHaveBeenCalled();
+  });
+
+  it("shows success message after submission", async () => {
+    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    const btn = await screen.findByText(/Request Teacher Role/i);
+    await userEvent.click(btn);
+    await waitFor(() =>
+      expect(screen.getByText("Request submitted!")).toBeTruthy(),
+    );
+  });
+
+  it("sets localStorage role to pending_teacher after request", async () => {
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ ...baseUser, role: "student" }),
+    );
+    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    const btn = await screen.findByText(/Request Teacher Role/i);
+    await userEvent.click(btn);
+    await waitFor(() => {
+      const stored = JSON.parse(localStorage.getItem("user"));
+      expect(stored.role).toBe("pending_teacher");
+    });
+  });
+
+  it("shows error message when request fails", async () => {
+    requestTeacherRole.mockRejectedValue(new Error("Server error"));
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+    const btn = await screen.findByText(/Request Teacher Role/i);
+    await userEvent.click(btn);
+    await waitFor(() => expect(screen.getByText("Server error")).toBeTruthy());
+  });
+});
