@@ -909,7 +909,7 @@ export default function CampusMap() {
               </div>
               <button
                 className={styles.clearBtn}
-                onClick={setCustomDestination(null)}
+                onClick={() => setCustomDestination(null)}
                 title="Clear"
               >
                 ✕
@@ -970,7 +970,7 @@ export default function CampusMap() {
             Transport Modes
           </div>
 
-          {!startLocation || !selectedCampus ? (
+          {!startLocation || (!selectedCampus && !customDestination) ? (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>🚶</span>
               <p>
