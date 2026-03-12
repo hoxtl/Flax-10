@@ -474,6 +474,10 @@ export default function CampusMap() {
 
   // Calculate walking time/distance from start location to selected campus
   const calculateRoute = useCallback(async () => {
+    const destination = customDestination || (selectedCampus ? {
+      lng: selectedCampus.coords[0],
+      lat: selectedCampus.coords[1]
+    } : null);
     if (!startLocation || !selectedCampus || !routeLayerAdded.current) return;
 
     setLoadingRoute(true);
