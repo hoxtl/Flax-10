@@ -228,3 +228,54 @@ describe("AdminPage – Users tab", () => {
     );
   });
 });
+
+describe("AdminPage – Ratifications tab", () => {
+  it("shows empty state when no ratifications", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Ratifications/));
+    await waitFor(() =>
+      expect(screen.getByText(/No societies are awaiting/i)).toBeTruthy(),
+    );
+  });
+
+  it("renders society name with approve and reject buttons", async () => {
+    api.fetchPendingRatifications.mockResolvedValue([
+      { id: 10, name: "Chess Club", member_count: 5 },
+    ]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Ratifications/));
+    await waitFor(() => expect(screen.getByText("Chess Club")).toBeTruthy());
+    expect(screen.getByText("✓ Approve")).toBeTruthy();
+    expect(screen.getByText("✗ Reject")).toBeTruthy();
+  });
+
+  it("calls approveRatification and removes row", async () => {
+    api.fetchPendingRatifications.mockResolvedValue([
+      { id: 10, name: "Chess Club", member_count: 5 },
+    ]);
+    api.approveRatification.mockResolvedValue({});
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Ratifications/));
+    await waitFor(() => screen.getByText("Chess Club"));
+    fireEvent.click(screen.getByText("✓ Approve"));
+    await waitFor(() =>
+      expect(api.approveRatification).toHaveBeenCalledWith(10),
+    );
+    await waitFor(() => expect(screen.queryByText("Chess Club")).toBeNull());
+  });
+
+  it("calls rejectRatification and removes row", async () => {
+    api.fetchPendingRatifications.mockResolvedValue([
+      { id: 11, name: "Drama Club", member_count: 3 },
+    ]);
+    api.rejectRatification.mockResolvedValue({});
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Ratifications/));
+    await waitFor(() => screen.getByText("Drama Club"));
+    fireEvent.click(screen.getByText("✗ Reject"));
+    await waitFor(() =>
+      expect(api.rejectRatification).toHaveBeenCalledWith(11),
+    );
+    await waitFor(() => expect(screen.queryByText("Drama Club")).toBeNull());
+  });
+});
