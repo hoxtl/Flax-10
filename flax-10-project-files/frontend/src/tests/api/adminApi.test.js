@@ -93,3 +93,20 @@ describe("adminApi – teacher requests", () => {
     );
   });
 });
+
+describe("adminApi – reported societies", () => {
+  it("fetchReportedSocieties calls /admin/reported-societies/", () => {
+    fetchApi.mockResolvedValue([]);
+    fetchReportedSocieties();
+    expect(fetchApi).toHaveBeenCalledWith("/admin/reported-societies/");
+  });
+
+  it("dismissReport calls correct endpoint with DELETE", () => {
+    fetchApi.mockResolvedValue(undefined);
+    dismissReport(7);
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/admin/reports/7/dismiss/",
+      expect.objectContaining({ method: "DELETE" }),
+    );
+  });
+});
