@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { TrendingUp, Flame, Clock, ArrowRight, CalendarClock, Zap, CheckCircle2, BarChart3 } from "lucide-react";
@@ -145,7 +146,7 @@ const INSIGHT_STYLES = {
   neutral: { color: "var(--color-primary)", bg: "transparent" },
 };
 
-export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus, deadlines = [] }) {
+export function StudyPulseWidget({ windows = [], now = new Date(), _onStartFocus, deadlines = [] }) {
   const navigate  = useNavigate();
   const { summary, loading: profileLoading } = useProfileSummary();
   const [analyticsData, setAnalyticsData] = useState(null);
