@@ -1175,4 +1175,57 @@
   .customLayout>* {
     width: 100% !important;
   }
+
+.editDashboardBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary-strong);
+  color: var(--color-card);
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
+.editDashboardBtn:hover {
+  opacity: 0.9;
+}
+.widgetEditOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+}
+.widgetEditActions {
+  display: flex;
+  gap: 12px;
+}
+.widgetEditActions button {
+  background: var(--color-card);
+  color: var(--text);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+.widgetEditActions button:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+.widgetEditActions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}}
