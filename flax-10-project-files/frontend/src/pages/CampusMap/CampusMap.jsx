@@ -104,6 +104,7 @@ export default function CampusMap() {
   const [tflRouteError, setTflRouteError] = useState("");
   const [disruptions, setDisruptions] = useState([]);
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
+  const [showAllDisruptions, setShowAllDisruptions] = useState(false);
   const [calendarEvents, setCalendarEvents] = useState([]);
   const eventMarkers = useRef([]);
   const [showAllEvents, setShowAllEvents] = useState(false);
