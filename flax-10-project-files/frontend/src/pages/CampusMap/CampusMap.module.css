@@ -888,10 +888,6 @@
   transform: scale(1.2);
 }
 
-:global(.eventPopupButton:hover) {
-  opacity: 0.85;
-}
-
 .calendarIcon {
   font-size: 1rem;
 }
