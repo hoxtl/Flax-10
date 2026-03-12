@@ -880,18 +880,39 @@ export default function CampusMap() {
           </button>
         </section>
 
-        {/* Step 2 — Campus Selection */}
         <section className={styles.section}>
           <div className={styles.sectionLabel}>
             <span className={styles.stepBadge}>2</span>
-            King's College London CAMPUSES
+            Destination
           </div>
 
-          {selectedCampus ? (
+          {customDestination ? (
             <div className={styles.locationChip}>
               <div
                 className={styles.locationChipDot}
-                style={{ background: selectedCampus.color }}
+                style={{ background: "#FF6B6B" }}
+              />
+              <div className={styles.locationChipText}>
+                <span className={styles.locationCoords}>
+                  {customDestination.name}
+                </span>
+                <span className={styles.locationHint}>
+                  {customDestination.address}
+                </span>
+              </div>
+              <button
+                className={styles.clearBtn}
+                onClick={setCustomDestination(null)}
+                title="Clear"
+              >
+                ✕
+              </button>
+            </div>
+          ) : selectedCampus ? (
+            <div className={styles.locationChip}>
+              <div
+                className={styles.locationChipDot}
+                style={{background: selectedCampus.color}}
               />
               <div className={styles.locationChipText}>
                 <span className={styles.locationCoords}>
@@ -911,7 +932,7 @@ export default function CampusMap() {
             </div>
           ) : (
             <p className={styles.hintText}>
-              Select a campus from the map or from the options
+              Select a campus or event as destination
             </p>
           )}
 
