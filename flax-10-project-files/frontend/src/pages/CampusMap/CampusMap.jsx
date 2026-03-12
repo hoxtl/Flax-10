@@ -478,7 +478,7 @@ export default function CampusMap() {
       lng: selectedCampus.coords[0],
       lat: selectedCampus.coords[1]
     } : null);
-    if (!startLocation || !selectedCampus || !routeLayerAdded.current) return;
+    if (!startLocation || !destination || !routeLayerAdded.current) return;
 
     setLoadingRoute(true);
     setRouteError("");
@@ -542,7 +542,11 @@ export default function CampusMap() {
   }, [startLocation, selectedCampus]);
 
   const calculateTflRoute = useCallback(async () => {
-    if (!startLocation || !selectedCampus) return;
+    const destination = customDestination || (selectedCampus ? {
+      lng: selectedCampus.coords[0],
+      lat: selectedCampus.coords[1]
+    } : null);
+    if (!startLocation || !destination) return;
 
     setLoadingTflRoute(true);
     setTflRouteError("");
