@@ -35,6 +35,8 @@ TABLES = [
     'studyFlax_notification',
     'studyFlax_timetablesource',
     'studyFlax_user',
+    'studyFlax_groupproject', 'studyFlax_groupmembership',
+    'studyFlax_meetingsuggestion', 'studyFlax_meetingresponse',
     'studyFlax_studysession',
     'studyFlax_themesession',
 ]

@@ -1,0 +1,74 @@
+.assignPopupBoard {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollArea {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.assignPopupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.assignPopupTitle {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.closePopupBtn {
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.closePopupBtn:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.assignItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    color: var(--text);
+}
+
+.assignItem:hover {
+    background: var(--hover-light);
+}
+
+.assignItemSelected {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.assignItemLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

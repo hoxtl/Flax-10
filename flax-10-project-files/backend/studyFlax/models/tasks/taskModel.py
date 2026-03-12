@@ -1,6 +1,7 @@
 from django.db import models
 from studyFlax.models.auth.userModel import User
 from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.groupwork.groupwork_models import GroupProject
 
 
 class TaskList(models.Model):
@@ -27,11 +28,18 @@ class Task(models.Model):
         ('urgent', 'Urgent'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
+    assigned_to = models.ManyToManyField(User, related_name='assigned_tasks', blank=True)
+    group_project = models.ForeignKey(GroupProject, on_delete=models.CASCADE, null=True, blank=True, related_name='tasks')
     task_list = models.ForeignKey(TaskList, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     module = models.ForeignKey(Module, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    status = models.CharField(
+        max_length=20, 
+        choices=[('todo', 'To Do'), ('in_progress', 'In Progress'), ('done', 'Done')], 
+        default='todo'
+    )
     energy_level = models.CharField(
         max_length=10,
         choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],

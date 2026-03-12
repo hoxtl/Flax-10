@@ -44,3 +44,52 @@ class GroupMembership(models.Model):
     class Meta:
         unique_together = ("project", "user")
 
+
+class MeetingSuggestion(models.Model):
+    project = models.ForeignKey(
+        GroupProject,
+        on_delete=models.CASCADE,
+        related_name="suggestions",
+    )
+    suggested_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="made_suggestions",
+    )
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Suggestion for {self.project.name} at {self.start_time}"
+
+
+class MeetingResponse(models.Model):
+    STATUS_CHOICES = [
+        ("accepted", "Accepted"),
+        ("rejected", "Rejected"),
+        ("pending", "Pending"),
+    ]
+
+    suggestion = models.ForeignKey(
+        MeetingSuggestion,
+        on_delete=models.CASCADE,
+        related_name="responses",
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="meeting_responses",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("suggestion", "user")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.status} for {self.suggestion}"
