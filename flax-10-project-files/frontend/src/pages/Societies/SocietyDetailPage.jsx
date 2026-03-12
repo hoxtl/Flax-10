@@ -24,6 +24,12 @@ import { useSocietySubscription } from "../../components/Society/hooks/useSociet
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
 
+import { 
+    getImageUrls, getAvailablePhotos, scrollContentToTop,
+    wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
+    wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement
+} from "./SocietyDetailPageUtils";
+
 /** Manages the active tab and scroll orientation for the detail page. */
 function usePageState(initialTab, location) {
     const [params, setParams] = useSearchParams();
@@ -93,13 +99,14 @@ function usePageStateHandlers(data, onBack) {
 }
 
 const ModalsContainer = ({ state, data, handlers, societyId }) => {
-    const isAdmin = ['admin', 'editor'].includes(data.society.role);
+    const isAdmin = data.society && ['admin', 'editor'].includes(data.society.role);
+    const urls = getImageUrls(data.society?.images);
     return (
         <>
             {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} onRequestRatification={data.requestRatification} />}
             {state.showReportModal && <ReportSocietyModal society={data.society} onClose={() => handlers.setR(false)} onReportSuccess={() => handlers.updateLS({ has_reported: true })} />}
-            {state.galleryOpen && <ImageGalleryModal images={getImageUrls(data.society.images)} initialIndex={state.activeGallery?.index} onClose={() => handlers.setG(null)} />}
-            {state.showCoverModal && <CoverImageModal images={getImageUrls(data.society.images)} availablePhotos={getAvailablePhotos(data.society)} onClose={() => handlers.setCE(false)} onUpdate={(imgs) => handlers.updateS({ images: imgs, image: imgs[0] || null })} />}
+            {state.galleryOpen && <ImageGalleryModal images={urls} initialIndex={state.activeGallery?.index} onClose={() => handlers.setG(null)} />}
+            {state.showCoverModal && <CoverImageModal images={urls} availablePhotos={getAvailablePhotos(data.society)} onClose={() => handlers.setCE(false)} onUpdate={(imgs) => handlers.updateS({ images: imgs, image: imgs[0] || null })} />}
             {state.showMembersModal && <MemberDirectoryModal societyName={data.society.name} members={data.members} onFetchMembers={handlers.fetchM} onRemoveMember={handlers.removeM} isAdmin={isAdmin} onClose={() => handlers.setM(false)} />}
             {state.editingAnnouncement && <AnnouncementModal announcements={data.society.announcements} announcement={state.editingAnnouncement} societyId={societyId} onClose={() => handlers.setEA(null)} onSubmit={(d, conflict) => handlers.onAnnounceSubmit(d, conflict)} onDelete={(id) => handlers.onAnnounceDelete(id)} tags={data.society.tags} />}
         </>
@@ -118,29 +125,37 @@ const TabSection = ({ data }) => (
     </div>
 );
 
+const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
+    <div className={styles.page}>
+        <TopBar onBack={onBack} onSettings={() => handlers.setS(true)} isAdmin={isAdmin}
+            onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)} />
+        <SocietyHero society={data.society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })}
+            onImageClick={(index) => handlers.setG({ index })} onEditImages={() => handlers.setCE(true)} />
+        <SocietyInfo society={data.society} editMode={data.modals.editMode} onUpdateSociety={data.updateSociety}
+            isSubscribed={data.subscription.isSubscribed} onJoin={data.joinSociety} onLeave={data.leaveSociety}
+            canEdit={data.society.is_admin} onViewMembers={() => handlers.setM(true)} onToggleSubscription={data.subscription.toggleSubscription}
+            onToggleEditMode={() => handleToggleEditMode(data.modals, data.tracker, data.publishChanges)} />
+        <div className={styles.mainContent}>
+            <TabSection data={data} />
+            <SocietySidebar society={data.society} editMode={data.modals.editMode} onAddAnnouncement={data.addAnnouncement}
+                onUpdateAnnouncement={data.updateAnnouncement} onAddEvent={data.addEvent} tags={data.society.tags} />
+        </div>
+    </div>
+);
+
 export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
     const data = useSocietyPageData(societyId, initialTab);
     const handlers = usePageStateHandlers(data, onBack);
+    useSocietyInit(useLocation());
     if (data.loading) return <SocietyDetailSkeleton />;
     if (!data.society) return <NotFound onBack={onBack} />;
     const isAdmin = ['admin', 'editor'].includes(data.society.role);
 
     return (
-        <div className={styles.page}>
-            <TopBar onBack={onBack} onSettings={() => handlers.setS(true)} isAdmin={isAdmin}
-                onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)} />
-            <SocietyHero society={data.society} onImageClick={(index) => handlers.setG({ index })} onEditImages={() => handlers.setCE(true)} />
-            <SocietyInfo society={data.society} editMode={data.modals.editMode} onUpdateSociety={data.updateSociety}
-                isSubscribed={data.subscription.isSubscribed} onJoin={data.joinSociety} onLeave={data.leaveSociety}
-                canEdit={data.society.is_admin} onViewMembers={() => handlers.setM(true)} onToggleSubscription={data.subscription.toggleSubscription}
-                onToggleEditMode={() => handleToggleEditMode(data.modals, data.tracker, data.publishChanges)} />
-            <div className={styles.mainContent}>
-                <TabSection data={data} />
-                <SocietySidebar society={data.society} editMode={data.modals.editMode} onAddAnnouncement={data.addAnnouncement}
-                    onUpdateAnnouncement={data.updateAnnouncement} onAddEvent={data.addEvent} tags={data.society.tags} />
-            </div>
+        <>
+            <DetailLayout data={data} handlers={handlers} onBack={onBack} isAdmin={isAdmin} />
             <ModalsContainer state={handlers.state} data={data} handlers={handlers} societyId={societyId} />
-        </div>
+        </>
     );
 }
 
@@ -195,62 +210,6 @@ function buildHandlers(hookData, editMode, changeTracker) {
     };
 }
 
-function wrapAddEvent(addEvent, silent, track) {
-    return async (data) => {
-        const result = await addEvent(data, silent);
-        if (silent) track('Added', data.title);
-        return result;
-    };
-}
-
-function wrapUpdateEvent(updateEvent, silent, track) {
-    return async (eventId, data) => {
-        const result = await updateEvent(eventId, data, silent);
-        if (silent) track('Updated', data.title);
-        return result;
-    };
-}
-
-function wrapDeleteEvent(deleteEvent, silent, track) {
-    return async (eventId, title = 'Event') => {
-        await deleteEvent(eventId, silent);
-        if (silent) track('Deleted', title);
-    };
-}
-
-function wrapAddAnnouncement(addAnnouncement, silent, track) {
-    return async (data) => {
-        const result = await addAnnouncement(data, silent);
-        if (silent) track('Added', data.title);
-        return result;
-    };
-}
-
-function wrapUpdateAnnouncement(updateAnnouncement, silent, track) {
-    return async (announcementId, data) => {
-        const result = await updateAnnouncement(announcementId, data, silent);
-        if (silent) track('Updated', data.title);
-        return result;
-    };
-}
-
-function wrapDeleteAnnouncement(deleteAnnouncement, silent, track) {
-    return async (announcementId, title = 'Announcement') => {
-        await deleteAnnouncement(announcementId, silent);
-        if (silent) track('Deleted', title);
-    };
-}
-
-function getImageUrls(images) {
-    return (images || []).map(i => i.url || i);
-}
-
-function getAvailablePhotos(society) {
-    const announcementImages = (society.announcements || []).flatMap(a => a.images?.map(i => i.url) || []);
-    const currentCovers = new Set(getImageUrls(society.images));
-    return announcementImages.filter(img => !currentCovers.has(img));
-}
-
 /** Toggles the reporting status of the society. */
 function ReportButton({ hasReported, onReport, onUnreport }) {
     const style = { color: hasReported ? 'var(--primary)' : 'var(--text-secondary)', padding: '0.4rem', cursor: 'pointer', opacity: hasReported ? 1 : 0.7 };
@@ -283,21 +242,4 @@ function NotFound({ onBack }) {
             <button onClick={onBack}>Back to Societies</button>
         </div>
     );
-}
-
-/** Scrolls the viewport to the very top. */
-function scrollContentToTop() {
-    const scrollable = findScrollableParent(document.body);
-    if (scrollable) scrollable.scrollTop = 0;
-    window.scrollTo(0, 0);
-}
-
-function findScrollableParent(element) {
-    const containers = document.querySelectorAll('*');
-    for (const el of containers) {
-        const style = window.getComputedStyle(el);
-        const isScrollable = style.overflow === 'auto' || style.overflowY === 'auto';
-        if (isScrollable && el.scrollHeight > el.clientHeight) return el;
-    }
-    return null;
 }

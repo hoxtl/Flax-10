@@ -1,8 +1,4 @@
-/**
- * CalendarTab integrates the society's specific events into a MonthView,
- * allowing members to view and admins to manage scheduled social activities.
- */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";
 import { CalendarNav } from "../../../../Calendar/header/CalendarHeaderUtils";
@@ -18,6 +14,75 @@ import SyncButton from "./SyncButton";
 import { EventsSummaryModal } from "../../../../Calendar/EventsSummaryModal/EventsSummaryModal";
 import { useConfirm } from "../../../../../context/ConfirmContext";
 
+const useFocusScroll = (isFocused, ref) => {
+    useEffect(() => {
+        if (isFocused && ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            ref.current.classList.add(styles.highlight);
+            setTimeout(() => ref.current?.classList.remove(styles.highlight), 2000);
+        }
+    }, [isFocused, ref]);
+};
+
+function handleEventDeletion(handlers, close, confirmFn) {
+    return async (event) => {
+        try {
+            const choice = await confirmDeletion(event, confirmFn);
+            if (choice === null) return;
+            const baseId = extractBaseEventId(event.id, event);
+            if (choice === true) handlers?.onDelete?.(baseId, event.title);
+            else if (choice === 'ALTERNATE') {
+                handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
+            }
+        } catch (err) { console.error('Deletion failed:', err); }
+        close();
+    };
+}
+
+async function confirmDeletion(event, confirmFn) {
+    const isRecurring = hasRecurrence(event);
+    if (!isRecurring) return await confirmFn({
+        title: "Delete Event", message: `Delete "${event.title}"?`,
+        confirmText: "Delete", cancelText: "Cancel", isDanger: true
+    });
+    return await confirmFn({
+        title: "Delete Recurring Event",
+        message: "Delete this occurrence or all?",
+        confirmText: "All", alternateText: "Just this one",
+        cancelText: "Cancel", isDanger: true
+    });
+}
+
+function handleModalSubmit(data, modalEvent, eventHandlers, closeModal) {
+    const eventId = modalEvent?._baseId || modalEvent?.id;
+    if (eventId) eventHandlers?.onUpdate?.(eventId, data);
+    else eventHandlers?.onAdd?.(data);
+    closeModal();
+}
+
+function convertEvents(events, tags) {
+    return events.map(e => ({ ...e, tag_color: tags?.find(t => t.id === e.tag)?.color }));
+}
+
+function filterEvents(events, tagFilters) {
+    if (!tagFilters || tagFilters.length === 0) return events;
+    return events.filter(e => tagFilters.includes(e.tag));
+}
+
+function getPopupActions(event, onViewAnnouncement, editMode, handlers) {
+    const actions = [];
+    if (editMode) {
+        actions.push({ label: 'Edit', onClick: handlers.onEdit });
+        actions.push({ label: 'Delete', variant: 'danger', onClick: () => handlers.onDelete(event) });
+    }
+    if (event?.announcement && onViewAnnouncement) {
+        actions.push({ label: 'View Announcement', onClick: () => onViewAnnouncement(event.announcement) });
+    } else if (event?.announcementId && onViewAnnouncement) {
+        actions.push({ label: 'View Announcement', onClick: onViewAnnouncement });
+    }
+    return actions.length > 0 ? actions : null;
+}
+
 export default function CalendarTab(props) {
     return (
         <CalendarProvider>
@@ -26,7 +91,6 @@ export default function CalendarTab(props) {
     );
 }
 
-/** Inner content that utilizes the CalendarProvider context. */
 function CalendarTabContent(props) {
     const { events: raw, editMode, tags, societyId, isMember, societyName } = props;
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -76,21 +140,6 @@ function CalendarView({ props, events, selectedDate, setSelectedDate, setPopup, 
         readOnly={!editMode} onEventClick={handleEvent} onMoreClick={setSummaryDate} customTags={props.tags} />;
 }
 
-function handleEventDeletion(handlers, close, confirmFn) {
-    return async (event) => {
-        try {
-            const choice = await confirmDeletion(event, confirmFn);
-            if (choice === null) return;
-            const baseId = extractBaseEventId(event.id, event);
-            if (choice === true) handlers?.onDelete?.(baseId, event.title);
-            else if (choice === 'ALTERNATE') {
-                handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
-            }
-        } catch (err) { console.error('Deletion failed:', err); }
-        close();
-    };
-}
-
 function CalendarPopovers({ popup, setPopup, props, events, summaryDate, setSummaryDate }) {
     const { tags, onViewAnnouncement, editMode, eventHandlers } = props;
     const { openModal } = useEventModal();
@@ -107,20 +156,6 @@ function CalendarPopovers({ popup, setPopup, props, events, summaryDate, setSumm
                 allEvents={events} baseDate={summaryDate} isMutualOrSelf={true} />
         </>
     );
-}
-
-async function confirmDeletion(event, confirmFn) {
-    const isRecurring = hasRecurrence(event);
-    if (!isRecurring) return await confirmFn({
-        title: "Delete Event", message: `Delete "${event.title}"?`,
-        confirmText: "Delete", cancelText: "Cancel", isDanger: true
-    });
-    return await confirmFn({
-        title: "Delete Recurring Event",
-        message: "Delete this occurrence or all?",
-        confirmText: "All", alternateText: "Just this one",
-        cancelText: "Cancel", isDanger: true
-    });
 }
 
 function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
@@ -146,35 +181,5 @@ function SocietyEventModal({ eventHandlers, tags, editMode }) {
             showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)}
             onDelete={modalEvent?.id ? () => onDelete(modalEvent) : null} />
     );
-}
-
-function handleModalSubmit(data, modalEvent, eventHandlers, closeModal) {
-    const eventId = modalEvent?._baseId || modalEvent?.id;
-    if (eventId) eventHandlers?.onUpdate?.(eventId, data);
-    else eventHandlers?.onAdd?.(data);
-    closeModal();
-}
-
-function convertEvents(events, tags) {
-    return events.map(e => ({ ...e, tag_color: tags?.find(t => t.id === e.tag)?.color }));
-}
-
-function filterEvents(events, tagFilters) {
-    if (!tagFilters || tagFilters.length === 0) return events;
-    return events.filter(e => tagFilters.includes(e.tag));
-}
-
-function getPopupActions(event, onViewAnnouncement, editMode, handlers) {
-    const actions = [];
-    if (editMode) {
-        actions.push({ label: 'Edit', onClick: handlers.onEdit });
-        actions.push({ label: 'Delete', variant: 'danger', onClick: () => handlers.onDelete(event) });
-    }
-    if (event?.announcement && onViewAnnouncement) {
-        actions.push({ label: 'View Announcement', onClick: () => onViewAnnouncement(event.announcement) });
-    } else if (event?.announcementId && onViewAnnouncement) {
-        actions.push({ label: 'View Announcement', onClick: onViewAnnouncement });
-    }
-    return actions.length > 0 ? actions : null;
 }
 

@@ -76,16 +76,6 @@ function DeleteConfirmModal({ hasEvent, onConfirm, onCancel }) {
     return <ConfirmModal title="Delete Announcement" message={message} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
-/** Form submission handler with pinning conflict resolution. */
-async function handleSubmit(form, setError, onSubmit, announcements, confirmFn) {
-    const err = validateForm(form);
-    if (err) return setError(err);
-    if (form.pinned) {
-        const other = announcements.find(a => a.pinned && a.id !== form.id);
-        if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
-    }
-    onSubmit(form);
-}
 
 async function handlePinConflict(form, other, confirmFn, onSubmit) {
     const ok = await confirmFn({

@@ -39,7 +39,7 @@ function AddButton({ onClick, disabled }) {
 
 export function ImageCard({ src, index, onDelete, onPin }) {
     return (
-        <div className={`${styles.imageCard} ${index === 0 ? styles.pinned : ""}`} style={{ backgroundImage: `url(${src})` }}>
+        <div className={`${styles.imageCard} ${index === 0 ? styles.pinned : ""}`} style={{ backgroundImage: `url("${src}")` }}>
             {index === 0 && <span className={styles.pinnedBadge}>★ Main</span>}
             {index !== 0 && <button className={styles.pinBtn} onClick={onPin} title="Set as main" type="button">★</button>}
             <button className={styles.deleteBtn} onClick={onDelete} type="button">&times;</button>
@@ -52,7 +52,7 @@ const PhotoSelect = ({ photos, selected, onSelect }) => (
     <div className={styles.photoSelectGrid}>
         {photos.map((img, i) => (
             <div key={i} className={`${styles.photoSelectCard} ${selected === img ? styles.selected : ""}`}
-                style={{ backgroundImage: `url(${img})` }} onClick={() => onSelect(img)} />
+                style={{ backgroundImage: `url("${img}")` }} onClick={() => onSelect(img)} />
         ))}
     </div>
 );
@@ -63,6 +63,23 @@ const UploadZone = ({ fileRef, onUpload }) => (
         <span>Click to upload image</span>
     </div>
 );
+
+function TabSelector({ active, onSelect, hasPhotos }) {
+    if (!hasPhotos) return null;
+    return (
+        <div className={styles.tabSelector}>
+            <button className={active === 'upload' ? styles.activeTab : ''} onClick={() => onSelect('upload')}>Upload</button>
+            <button className={active === 'select' ? styles.activeTab : ''} onClick={() => onSelect('select')}>From Photos</button>
+        </div>
+    );
+}
+
+function performUpload(file, onAdd) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => onAdd(e.target.result);
+    reader.readAsDataURL(file);
+}
 
 export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
     const [tab, setTab] = useState("upload");

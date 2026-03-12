@@ -8,6 +8,11 @@ vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => confirmMock,
 }));
 
+vi.mock('../../../components/Society/SocietyDetail/SettingsModal.module.css', () => ({
+    default: { backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title' }
+}));
+import styles from '../../../components/Society/SocietyDetail/SettingsModal.module.css';
+
 vi.mock('../../../components/Society/AddCollaboratorModal', () => ({
   default: ({ onClose, onAdd, existingUsernames }) => (
     <div>
@@ -149,5 +154,15 @@ describe('SocietyDetail/SettingsModal', () => {
       expect(props.onAddCollaborator).toHaveBeenCalledWith('existingUser', 'editor');
       expect(props.onAddCollaborator).toHaveBeenCalledWith('newUser', 'editor');
     });
+  });
+
+  it('stops propagation when modal content is clicked', () => {
+    const props = baseProps();
+    render(<SettingsModal {...props} />);
+    const modalContent = screen.getByText('Society Settings').closest('.' + styles.modal);
+    const e = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    const spy = vi.spyOn(e, 'stopPropagation');
+    fireEvent(modalContent, e);
+    expect(spy).toHaveBeenCalled();
   });
 });

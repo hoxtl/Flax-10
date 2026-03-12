@@ -1,95 +1,99 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import CalendarTab from '../../../components/Society/SocietyDetail/tabs/calendarTab/CalendarTab';
+import { useEventModal } from '../../../context/CalendarContext';
+import { useConfirm } from '../../../context/ConfirmContext';
+import * as Mocks from './societyTestMocks';
 
-vi.mock('../../../components/Society/SocietyDetail/tabs/calendarTab/SyncButton', () => ({
-    default: () => <div data-testid="sync-button" />,
-}));
-
+// Mock BEFORE importing component
 vi.mock('../../../context/CalendarContext', () => ({
     CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
-    useEventModal: vi.fn(() => ({ openModal: vi.fn() })),
-    useEventPopup: vi.fn(() => ({ openPopup: vi.fn() })),
-    useCalendar: vi.fn(() => ({ selectedDate: new Date('2024-03-04') })),
-    useCalendarDispatch: vi.fn(() => vi.fn()),
+    useEventModal: vi.fn(),
 }));
 
 vi.mock('../../../context/ConfirmContext', () => ({
-    useConfirm: vi.fn(() => vi.fn()),
+    useConfirm: vi.fn(),
+}));
+
+vi.mock('../../../components/Society/SocietyDetail/tabs/calendarTab/SyncButton', () => ({
+    default: Mocks.MockSyncButton,
 }));
 
 vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
-    MonthView: () => <div data-testid="month-view" />,
+    MonthView: Mocks.MockMonthView,
 }));
 
-vi.mock('../../../components/Calendar/header/DatePickerButton', () => ({
-    DatePickerButton: () => <div data-testid="date-picker" />,
-}));
-
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
-    addMonths: vi.fn(d => d),
-    formatMonthYear: vi.fn(() => 'March 2024'),
-    isSameMonth: vi.fn(() => false),
-}));
-
-vi.mock('../../../components/Calendar/utils/recurrenceUtils', () => ({
-    expandRecurringEvents: vi.fn(events => events),
-}));
-
-vi.mock('../../../components/Calendar/utils/eventUtils', () => ({
-    hasRecurrence: vi.fn(() => false),
-    extractBaseEventId: vi.fn(id => id),
-}));
-
-vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
-    EventModal: () => <div data-testid="event-modal" />,
-}));
-
-vi.mock('../../../components/Calendar/EventDetailPopup', () => ({
-    EventDetailPopup: () => <div data-testid="event-detail-popup" />,
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+    EventPopover: Mocks.MockEventPopover,
 }));
 
 vi.mock('../../../components/Calendar/EventsSummaryModal/EventsSummaryModal', () => ({
-    EventsSummaryModal: () => <div data-testid="events-summary-modal" />,
+    EventsSummaryModal: Mocks.MockSummaryModal,
 }));
 
 vi.mock('../../../components/Society/SocietyDetail/tags/TagFilterBar', () => ({
-    default: () => <div data-testid="tag-filter-bar" />,
+    default: Mocks.MockTagFilterBar,
 }));
 
 vi.mock('../../../components/Society/SocietyDetail/tags/TagManager', () => ({
-    default: () => <div data-testid="tag-manager" />,
+    default: Mocks.MockTagManager,
 }));
 
-import CalendarTab from '../../../components/Society/SocietyDetail/tabs/calendarTab/CalendarTab';
+vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
+    EventModal: Mocks.MockEventModal,
+}));
 
 describe('CalendarTab', () => {
-    it('renders within CalendarProvider', () => {
-        render(<CalendarTab events={[]} editMode={false} societyId={1} isMember={true} societyName="Chess" />);
-        expect(screen.getByTestId('calendar-provider')).toBeTruthy();
+    let mockModal;
+    let mockConfirm;
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockModal = { ...Mocks.mockEventModal };
+        mockConfirm = vi.fn().mockResolvedValue(true);
+        vi.mocked(useEventModal).mockReturnValue(mockModal);
+        vi.mocked(useConfirm).mockReturnValue(mockConfirm);
     });
 
-    it('renders MonthView', () => {
-        render(<CalendarTab events={[]} editMode={false} societyId={1} isMember={true} societyName="Chess" />);
+    it('renders basic structure', () => {
+        render(<CalendarTab events={[]} societyId={1} isMember={true} />);
+        expect(screen.getByTestId('calendar-provider')).toBeTruthy();
         expect(screen.getByTestId('month-view')).toBeTruthy();
     });
 
-    it('renders TagFilterBar', () => {
-        render(<CalendarTab events={[]} editMode={false} societyId={1} isMember={true} societyName="Chess" />);
-        expect(screen.getByTestId('tag-filter-bar')).toBeTruthy();
+    it('handles event interactions', async () => {
+        const onEditAnn = vi.fn();
+        const events = [{ id: 1, title: 'E1', announcement: 10 }];
+        const anns = [{ id: 10, title: 'A1' }];
+        
+        const { rerender } = render(
+            <CalendarTab events={events} editMode={false} onEditAnnouncement={onEditAnn} announcements={anns} />
+        );
+
+        fireEvent.click(screen.getByText('E1-click'));
+        expect(screen.getByTestId('event-popover')).toBeTruthy();
+
+        rerender(<CalendarTab events={events} editMode={true} onEditAnnouncement={onEditAnn} announcements={anns} />);
+        fireEvent.click(screen.getByText('E1-click'));
+        expect(onEditAnn).toHaveBeenCalledWith(anns[0]);
     });
 
-    it('renders TagManager in editMode', () => {
-        render(<CalendarTab events={[]} editMode={true} tags={[{ id: 1, label: 'Sports' }]} societyId={1} isMember={true} societyName="Chess" />);
-        expect(screen.getByTestId('tag-manager')).toBeTruthy();
-    });
-
-    it('does not render TagManager when not in editMode', () => {
-        render(<CalendarTab events={[]} editMode={false} societyId={1} isMember={true} societyName="Chess" />);
-        expect(screen.queryByTestId('tag-manager')).toBeNull();
-    });
-
-    it('renders SyncButton for members', () => {
-        render(<CalendarTab events={[]} editMode={false} societyId={1} isMember={true} societyName="Chess" />);
+    it('handles deletion and modal submission', async () => {
+        const onDelete = vi.fn();
+        const onAdd = vi.fn();
+        const eventHandlers = { onDelete, onAdd };
+        mockModal.isModalOpen = true;
+        mockModal.modalEvent = { id: 1, title: 'E' };
+        
+        render(<CalendarTab events={[]} editMode={true} eventHandlers={eventHandlers} isMember={true} />);
+        
         expect(screen.getByTestId('sync-button')).toBeTruthy();
+        expect(screen.getByTestId('event-modal')).toBeTruthy();
+        
+        fireEvent.click(screen.getByText('delete'));
+        await waitFor(() => expect(onDelete).toHaveBeenCalled());
+        
+        fireEvent.click(screen.getByText('submit'));
+        expect(onAdd).toHaveBeenCalled();
     });
 });

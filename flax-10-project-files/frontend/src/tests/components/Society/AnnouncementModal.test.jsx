@@ -4,6 +4,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AnnouncementModal from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal';
+import styles from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal.module.css';
 
 const fetchSocietyEventMock = vi.fn();
 const confirmMock = vi.fn();
@@ -75,7 +76,7 @@ vi.mock('../../../components/common/ConfirmModal', () => ({
       <h3>{title}</h3>
       <p>{message}</p>
       <button onClick={onConfirm}>confirm-delete</button>
-      <button onClick={onCancel}>cancel-delete</button>
+      <button onClick={() => onCancel?.()}>cancel-delete</button>
     </div>
   ),
 }));
@@ -113,6 +114,15 @@ describe('AnnouncementModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Announcement' }));
     expect(screen.getByText('Title required')).toBeTruthy();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('triggers file input when clicking add image button div', () => {
+    const { container } = render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()} announcements={[]} />);
+    const addBtn = container.querySelector(`.${styles.addImageBtn}`);
+    const input = container.querySelector('input[type="file"]');
+    const clickSpy = vi.spyOn(input, 'click').mockImplementation(() => {});
+    fireEvent.click(addBtn);
+    expect(clickSpy).toHaveBeenCalled();
   });
 
   it('loads linked event on edit and handles delete flow with linked-event message', async () => {
@@ -217,5 +227,36 @@ describe('AnnouncementModal', () => {
     fireEvent.click(screen.getByText('Save Changes'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ id: 3, pinned: true }));
+  });
+
+  it('handles all form field changes and toggles', async () => {
+    const onSubmit = vi.fn();
+    render(<AnnouncementModal onClose={vi.fn()} onSubmit={onSubmit} tags={[{ label: 'A', id: 1 }]} announcements={[]} />);
+    
+    fireEvent.change(screen.getByLabelText('Title *'), { target: { value: 'New Title' } });
+    fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'New Desc' } });
+    fireEvent.change(screen.getByLabelText('Tag'), { target: { value: 'New Tag' } });
+    
+    const pinToggle = screen.getByLabelText('Pin this announcement');
+    fireEvent.click(pinToggle);
+    expect(pinToggle.checked).toBe(true);
+
+    const eventToggle = screen.getByLabelText('Also add as event');
+    fireEvent.click(eventToggle);
+    expect(screen.getByText('time-row')).toBeTruthy();
+    
+    // Test recurrence change through mock child
+    fireEvent.click(screen.getByText('set-weekly'));
+    
+    fireEvent.click(screen.getByRole('button', { name: 'Add Announcement' }));
+    
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'New Title',
+      content: 'New Desc',
+      tag: 'New Tag',
+      pinned: true,
+      addAsEvent: true,
+      recurrence: 'weekly'
+    }));
   });
 });

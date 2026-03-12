@@ -20,5 +20,5 @@ function ImageGrid({ images }) {
 }
 
 function GridImage({ src }) {
-    return <div className={styles.gridItem} style={{ backgroundImage: `url(${src})` }} />;
+    return <div className={styles.gridItem} style={{ backgroundImage: `url("${src}")` }} />;
 }

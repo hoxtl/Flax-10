@@ -1,0 +1,23 @@
+import { vi } from 'vitest';
+
+export const fetchSociety = vi.fn();
+export const updateSociety = vi.fn();
+export const deleteSociety = vi.fn();
+export const createSocietyTag = vi.fn();
+export const updateSocietyTag = vi.fn();
+export const deleteSocietyTag = vi.fn();
+export const createSocietyEvent = vi.fn();
+export const updateSocietyEvent = vi.fn();
+export const deleteSocietyEvent = vi.fn();
+export const addExceptionDate = vi.fn();
+export const createAnnouncement = vi.fn();
+export const updateAnnouncement = vi.fn();
+export const deleteAnnouncement = vi.fn();
+export const fetchMembers = vi.fn();
+export const updateMemberRole = vi.fn();
+export const addCollaborator = vi.fn();
+export const joinSociety = vi.fn();
+export const leaveSociety = vi.fn();
+export const requestRatification = vi.fn();
+export const publishChanges = vi.fn();
+export const toggleSubscription = vi.fn();
