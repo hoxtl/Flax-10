@@ -11,6 +11,7 @@ import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ConfirmProvider } from "./context/ConfirmContext";
 import { TaskCompletionProvider } from "./context/TaskCompletionContext";
+import { ToastProvider } from "./context/ToastContext";
 import { NotificationToast } from "./components/Notifications";
 import AttendancePrompt from "./components/Attendance/AttendancePrompt";
 
@@ -227,17 +228,19 @@ function AppProviders({ children }) {
   return (
     <NotificationProvider>
       <ConfirmProvider>
-        <CalendarProvider>
-          <TagProvider>
-            <TimerProvider>
-              <TaskCompletionProvider>
-                {children}
-                <NotificationToast />
-                <AttendancePrompt />
-              </TaskCompletionProvider>
-            </TimerProvider>
-          </TagProvider>
-        </CalendarProvider>
+        <ToastProvider>
+          <CalendarProvider>
+            <TagProvider>
+              <TimerProvider>
+                <TaskCompletionProvider>
+                  {children}
+                  <NotificationToast />
+                  <AttendancePrompt />
+                </TaskCompletionProvider>
+              </TimerProvider>
+            </TagProvider>
+          </CalendarProvider>
+        </ToastProvider>
       </ConfirmProvider>
     </NotificationProvider>
   );
