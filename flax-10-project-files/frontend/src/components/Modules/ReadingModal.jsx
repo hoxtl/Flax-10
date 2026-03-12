@@ -2,27 +2,22 @@ import { useReadingModal } from "./hooks/useReadingModal";
 import ReadingForm from "./ReadingForm";
 import ReadingCard from "./ReadingCard";
 import styles from './DeadlineModal.module.css';
+import StandardModal from "../common/StandardModal/StandardModal";
 
 export default function ReadingModal({ module, onClose}) {
     const modal = useReadingModal(module.id);
     return (
-        <div className={styles.overlay} onClick={onClose}>
-            <div className={styles.content} onClick={e => e.stopPropagation()}>
-                <ModalHeader module={module} onClose={onClose} />
+        <StandardModal
+            title={`${module.module_code} - Readings`}
+            onClose={onClose}
+            size="md"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
                 {modal.showForm
                     ? <ReadingForm initial={modal.editing} onSubmit={modal.handleSubmit} onCancel={modal.close} />
                     : <ModalBody modal={modal} />}
-            </div>
-        </div>
-    );
-}
-
-function ModalHeader({ module, onClose }) {
-    return (
-        <div className={styles.header}>
-            <h3 className={styles.title}> {module.module_code} — Readings</h3>
-            <button className={styles.closeBtn} onClick={onClose}>×</button>
-        </div>
+        </StandardModal>
     );
 }
 
