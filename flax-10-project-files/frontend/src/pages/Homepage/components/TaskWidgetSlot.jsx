@@ -4,7 +4,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { CheckSquare, Clock3, Target, ArrowRight, ChevronDown } from "lucide-react";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
@@ -88,6 +88,11 @@ export function TaskWidgetSlot({
 }) {
   const [ctxMenu, setCtxMenu] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [optimisticTitles, setOptimisticTitles] = useState({});
+  const inputRef = useRef(null);
+
   const incompleteTasks = taskWidgetList.filter((t) => !t.completed);
   const completedTasks = taskWidgetList.filter((t) => t.completed);
   const visibleIncomplete = showAllTaskWidgetTasks
@@ -107,7 +112,7 @@ export function TaskWidgetSlot({
 
   const commitEdit = async (t) => {
     const newTitle = editTitle.trim();
-    if (newTitle && newTitle !== t.title) {
+    if (newTitle && newTitle !== (optimisticTitles[t.id] || t.title)) {
       setOptimisticTitles(prev => ({ ...prev, [t.id]: newTitle }));
       await onInlineTaskEdit?.(t, { title: newTitle });
     }

@@ -1,219 +1,213 @@
-.modalBackdrop {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-}
+    .modalBackdrop {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+    }
 
-.modalShell {
-    width: 90%;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    max-height: 80vh;
-    overflow: visible;
-    padding: 0;
-}
+    .modalShell {
+        width: 90%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        max-height: 80vh;
+        overflow: visible;
+        padding: 0;
+    }
 
-.modalContent {
-    padding: 0;
-}
+    .modalContent {
+        padding: 0;
+    }
 
-.content {
-    padding: 20px;
-    overflow: visible;
-}
+    .content {
+        padding: 20px;
+        overflow: visible;
+    }
 
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
+    .list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 
-.item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
+    .item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
 
-.preview {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 500;
-    color: #333;
-}
+    .preview {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        color: #333;
+    }
 
-.preview span:first-child {
-    font-size: 1.2rem;
-}
+    .preview span:first-child {
+        font-size: 1.2rem;
+    }
 
-.preview span:last-child {
-    color: var(--color);
-}
+    .preview span:last-child {
+        color: var(--color);
+    }
 
-.actions {
-    display: flex;
-    gap: 8px;
-}
+    .actions {
+        display: flex;
+        gap: 8px;
+    }
 
-.actions button {
-    background: var(--surface-card);
-    border: var(--stroke-soft);
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-}
+    .actions button {
+        background: var(--surface-card);
+        border: var(--stroke-soft);
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
 
-.actions button:hover {
-    background: #f1f5f9;
-}
+    .actions button:hover {
+        background: #f1f5f9;
+    }
 
-.actions .delete:hover {
-    background: #fee2e2;
-    color: #dc2626;
-    border-color: #fca5a5;
-}
+    .actions .delete:hover {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fca5a5;
+    }
 
-.addBtn {
-    width: 100%;
-    margin-top: 16px;
-    padding: 12px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
-}
+    .addBtn {
+        width: 100%;
+        margin-top: 16px;
+        padding: 12px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, opacity 0.2s;
+    }
 
-.addBtn:hover {
-    opacity: 0.9;
-}
+    .addBtn:hover {
+        opacity: 0.9;
+    }
 
-/* Form Styles */
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+    /* Form Styles */
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
 
-.form label {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #475569;
-}
+    .form label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #475569;
+    }
 
-.form input[type="text"] {
-    padding: var(--input-padding);
-    border: var(--input-border);
-    border-radius: var(--input-radius);
-    font-size: 1rem;
-    box-sizing: border-box;
-}
+    .form input[type="text"] {
+        padding: var(--input-padding);
+        border: var(--input-border);
+        border-radius: var(--input-radius);
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
 
-.colorRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+    .colorRow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-.colorRow input[type="color"] {
-    width: 50px;
-    height: 40px;
-    border: none;
-    background: none;
-    cursor: pointer;
-}
+    .colorRow input[type="color"] {
+        width: 50px;
+        height: 40px;
+        border: none;
+        background: none;
+        cursor: pointer;
+    }
 
 
 
-.error {
-    color: #dc2626;
-    font-size: 0.9rem;
-    padding: 8px;
-    background: #fee2e2;
-    border-radius: var(--radius-md);
-    margin-top: 8px;
-    text-align: center;
-}
+    .error {
+        color: #dc2626;
+        font-size: 0.9rem;
+        padding: 8px;
+        background: #fee2e2;
+        border-radius: var(--radius-md);
+        margin-top: 8px;
+        text-align: center;
+    }
 
-.formActions {
-    display: flex;
-    gap: 12px;
-    margin-top: 8px;
-}
+    .formActions {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+    }
 
-.formActions button {
-    flex: 1;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-}
+    .formActions button {
+        flex: 1;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
 
-.cancelBtn {
-    background: #e2e8f0;
-    color: #475569;
-}
+    .cancelBtn {
+        background: #e2e8f0;
+        color: #475569;
+    }
 
-.saveBtn {
-    background: var(--primary);
-    color: white;
-}
+    .saveBtn {
+        background: var(--primary);
+        color: white;
+    }
 
-.saveBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+    .saveBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-/* Emoji Input */
-.emojiInputWrapper {
-    position: relative;
-}
+    /* Emoji Input */
+    .emojiInputWrapper {
+        position: relative;
+    }
 
-.emojiInputRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+    .emojiInputRow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-.emojiPreviewBtn {
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-<<<<<<< HEAD
-    border: 1px solid var(--border, #cbd5e1);
-    border-radius: 8px;
-    background: var(--bg, var(--color-card));
-=======
-    border: var(--input-border);
-    border-radius: var(--input-radius);
-    background: var(--surface-card);
->>>>>>> origin/main
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .emojiPreviewBtn {
+        width: 50px;
+        height: 50px;
+        font-size: 28px;
+        border: var(--input-border);
+        border-radius: var(--input-radius);
+        background: var(--surface-card);
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.emojiPreviewBtn:hover {
-    border-color: var(--primary);
-    background: var(--hover);
-}
+    .emojiPreviewBtn:hover {
+        border-color: var(--primary);
+        background: var(--hover);
+    }
 
-.emojiHint {
-    font-size: 0.85rem;
-    color: var(--muted, #64748b);
-    font-weight: 400;
-}
+    .emojiHint {
+        font-size: 0.85rem;
+        color: var(--muted, #64748b);
+        font-weight: 400;
+    }

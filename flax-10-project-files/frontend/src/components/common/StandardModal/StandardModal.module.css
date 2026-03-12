@@ -11,13 +11,6 @@
 .modal {
     width: min(520px, 92vw);
     max-height: 90vh;
-<<<<<<< HEAD
-    overflow-y: auto;
-    background: var(--panel, var(--color-card));
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-    padding: 24px;
-=======
     overflow: hidden;
     background: var(--surface-panel);
     border-radius: var(--modal-radius);
@@ -25,13 +18,23 @@
     padding: var(--modal-padding);
     display: flex;
     flex-direction: column;
->>>>>>> origin/main
 }
 
-.sizeSm { width: min(420px, 92vw); }
-.sizeMd { width: min(520px, 92vw); }
-.sizeLg { width: min(720px, 94vw); }
-.sizeXl { width: min(920px, 96vw); }
+.sizeSm {
+    width: min(420px, 92vw);
+}
+
+.sizeMd {
+    width: min(520px, 92vw);
+}
+
+.sizeLg {
+    width: min(720px, 94vw);
+}
+
+.sizeXl {
+    width: min(920px, 96vw);
+}
 
 .header {
     display: flex;

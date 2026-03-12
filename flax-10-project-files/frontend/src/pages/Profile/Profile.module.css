@@ -880,18 +880,21 @@
 }
 
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skel {
   border-radius: 16px;
-  background: linear-gradient(
-    90deg,
-    var(--panel) 0%,
-    var(--hover) 50%,
-    var(--panel) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--panel) 0%,
+      var(--hover) 50%,
+      var(--panel) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.6s ease infinite;
   border: 1px solid var(--border);
@@ -902,32 +905,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-<<<<<<< HEAD
-.skel {
-  background: rgba(246, 244, 241, 0.55);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 16px;
-  animation: skelPulse 1.4s ease infinite;
-}
-
-[data-mode="dark"] .skel {
-  background: rgba(26, 19, 16, 0.55);
-  border-color: rgba(180, 164, 144, 0.15);
-}
-
-@keyframes skelPulse {
-
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-
-  50% {
-    opacity: 0.3;
-  }
 }
 
 .skelPersona {
@@ -945,12 +922,6 @@
 .skelHeatmap {
   height: 90px;
 }
-=======
-.skelPersona  { height: 72px; }
-.skelWeek     { height: 120px; }
-.skelDna      { height: 64px; }
-.skelHeatmap  { height: 90px; }
->>>>>>> origin/main
 
 .skelBadgeRow {
   display: flex;

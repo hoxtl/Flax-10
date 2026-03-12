@@ -1,20 +1,4 @@
-<<<<<<< HEAD
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal {
-    background: var(--panel, var(--color-card));
-    border-radius: 12px;
-=======
 .modalShell {
->>>>>>> origin/main
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
@@ -42,13 +26,8 @@
     padding: var(--btn-padding-sm);
     background: var(--primary-color, #9E7E5D);
     border: none;
-<<<<<<< HEAD
-    color: var(--color-card);
-    border-radius: 4px;
-=======
     color: #fff;
     border-radius: var(--btn-radius);
->>>>>>> origin/main
     cursor: pointer;
     font-size: var(--text-sm);
 }
