@@ -11,19 +11,27 @@ const MAX_TAGS = 7;
 export default function TagManager({ tags = [], onAddTag, onDeleteTag }) {
     const nextColor = getNextColor(tags);
     const [newTag, setNewTag] = useState({ label: "", color: nextColor });
+    const [error, setError] = useState(null);
     const canAdd = tags.length < MAX_TAGS;
 
     const handleAdd = async () => {
-        if (!newTag.label.trim() || !canAdd) return;
-        const data = { label: newTag.label.trim(), color: newTag.color };
-        if (await onAddTag?.(data)) setNewTag({ label: "", color: getNextColor([...tags, data]) });
+        const label = newTag.label.trim();
+        if (!label || !canAdd) return;
+        if (tags.some(t => t.label.toLowerCase() === label.toLowerCase())) {
+            return setError("A tag with this name already exists.");
+        }
+        const data = { label, color: newTag.color };
+        if (await onAddTag?.(data)) {
+            setNewTag({ label: "", color: getNextColor([...tags, data]) });
+            setError(null);
+        }
     };
 
     return (
         <div className={styles.manager}>
             <ManagerHeader count={tags.length} max={MAX_TAGS} />
             <TagList tags={tags} onRemove={onDeleteTag} />
-            {canAdd && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} />}
+            {canAdd && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} error={error} setError={setError} />}
         </div>
     );
 }
@@ -56,14 +64,19 @@ function TagItem({ tag, onRemove }) {
     );
 }
 
-function AddTagForm({ newTag, setNewTag, onAdd }) {
+function AddTagForm({ newTag, setNewTag, onAdd, error, setError }) {
+    const handleChange = (e) => {
+        setNewTag(prev => ({ ...prev, label: e.target.value }));
+        setError(null);
+    };
     return (
         <div className={styles.addForm}>
             <input className={styles.input} placeholder="Tag name" value={newTag.label}
-                onChange={(e) => setNewTag(prev => ({ ...prev, label: e.target.value }))}
+                onChange={handleChange}
                 onKeyDown={(e) => e.key === "Enter" && onAdd()} />
             <ColorPicker color={newTag.color} onChange={(c) => setNewTag(prev => ({ ...prev, color: c }))} />
             <button className={styles.addBtn} onClick={onAdd} disabled={!newTag.label.trim()}>Add</button>
+            {error && <p className={styles.error}>{error}</p>}
         </div>
     );
 }

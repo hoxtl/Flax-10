@@ -59,18 +59,23 @@ function EmptyAnnouncements({ editMode }) {
 
 import { useEffect, useRef } from "react";
 
+const useFocusScroll = (isFocused, ref) => {
+    useEffect(() => {
+        if (isFocused && ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            ref.current.classList.add(styles.highlight);
+            setTimeout(() => ref.current?.classList.remove(styles.highlight), 2000);
+        }
+    }, [isFocused, ref]);
+};
+
 function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused, onImageClick }) {
     const cardRef = useRef(null);
-    useEffect(() => {
-        if (isFocused && cardRef.current) {
-            cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            cardRef.current.classList.add(styles.highlight);
-            setTimeout(() => cardRef.current?.classList.remove(styles.highlight), 2000);
-        }
-    }, [isFocused]);
+    useFocusScroll(isFocused, cardRef);
 
     return (
-        <div ref={cardRef} id={`announcement-${announcement.id}`} className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
+        <div ref={cardRef} id={`announcement-${announcement.id}`}
+            className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
             {editMode && <EditButton onClick={onEdit} />}
             <CardHeader announcement={announcement} tag={tag} />
             <p className={styles.announcementContent}>{announcement.content}</p>

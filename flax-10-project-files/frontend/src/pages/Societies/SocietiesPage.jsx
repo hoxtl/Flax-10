@@ -28,7 +28,7 @@ export default function SocietiesPage() {
     const state = useSocietiesPage();
 
     if (state.loading) return <SocietiesSkeleton />;
-    if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={state.clearSelection} />;
+    if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={() => { state.setView('all'); state.clearSelection(); }} />;
     if (state.view === "all") return (
         <>
             <AllSocieties onBack={() => state.setView("my")} onSelect={state.selectSociety} societies={state.societies} onReport={state.setReportingSociety} onUnreport={state.handleUnreport} />
@@ -58,6 +58,7 @@ function useSocietiesPage() {
         selectSociety: select, clearSelection: () => select(null),
         showCreateModal, setShowCreateModal, reportingSociety, setReportingSociety,
         ...societiesData, handleUnreport,
+        onReportSuccess: (id) => societiesData.updateSocietyLocally(id, { has_reported: true }),
         onCreate: async (form) => {
             const res = await societiesData.handleCreate(form);
             setShowCreateModal(false);

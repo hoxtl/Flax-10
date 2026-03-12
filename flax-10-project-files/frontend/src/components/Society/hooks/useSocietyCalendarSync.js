@@ -8,13 +8,13 @@ export function useSocietyCalendarSync(societyId, societyName) {
     const [loading, setLoading] = useState(true);
     const notify = useNotify();
     const { refreshTags } = useTags();
+
     useEffect(() => {
-        if (!societyId) return;
-        loadSyncStatus(societyId, setIsSynced, setLoading);
+        if (societyId) loadSyncStatus(societyId, setIsSynced, setLoading);
     }, [societyId]);
-    const toggleSync = useCallback(() => {
-        return handleToggle(societyId, isSynced, setIsSynced, setLoading, notify, societyName, refreshTags);
-    }, [societyId, isSynced, notify, societyName, refreshTags]);
+
+    const toggleSync = () => handleToggle(societyId, isSynced, setIsSynced, setLoading, notify, societyName, refreshTags);
+
     return { isSynced, loading, toggleSync };
 }
 

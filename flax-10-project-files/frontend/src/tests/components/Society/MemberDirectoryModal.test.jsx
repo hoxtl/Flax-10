@@ -3,15 +3,18 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import MemberDirectoryModal from '../../../components/Society/SocietyDetail/MemberDirectoryModal';
 
 vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal', () => ({
-    default: ({ title, subtitle, emptyMessage, topContent, items, renderItem }) => (
-        <div data-testid="generic-modal">
-            <h2>{title}</h2>
-            <p>{subtitle}</p>
-            <span>{emptyMessage}</span>
-            {topContent}
-            {items && items.length > 0 ? items.map(renderItem) : null}
-        </div>
-    ),
+    default: ({ title, subtitle, emptyMessage, topContent, items, renderItem, children }) => {
+        const hasItems = items && items.length > 0;
+        const listContent = children || (renderItem && items?.map(renderItem));
+        return (
+            <div data-testid="generic-modal">
+                <h2>{title}</h2>
+                <p>{subtitle}</p>
+                {topContent}
+                {!hasItems ? <span>{emptyMessage}</span> : listContent}
+            </div>
+        );
+    },
 }));
 vi.mock('../../../components/common/GenericSummaryModal/SummaryItem', () => ({
     default: ({ title, rightAction, onClick }) => (

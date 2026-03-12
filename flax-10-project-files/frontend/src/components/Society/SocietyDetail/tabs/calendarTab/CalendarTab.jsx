@@ -76,15 +76,28 @@ function CalendarView({ props, events, selectedDate, setSelectedDate, setPopup, 
         readOnly={!editMode} onEventClick={handleEvent} onMoreClick={setSummaryDate} customTags={props.tags} />;
 }
 
+function handleEventDeletion(handlers, close, confirmFn) {
+    return async (event) => {
+        try {
+            const choice = await confirmDeletion(event, confirmFn);
+            if (choice === null) return;
+            const baseId = extractBaseEventId(event.id, event);
+            if (choice === true) handlers?.onDelete?.(baseId, event.title);
+            else if (choice === 'ALTERNATE') {
+                handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
+            }
+        } catch (err) { console.error('Deletion failed:', err); }
+        close();
+    };
+}
+
 function CalendarPopovers({ popup, setPopup, props, events, summaryDate, setSummaryDate }) {
     const { tags, onViewAnnouncement, editMode, eventHandlers } = props;
     const { openModal } = useEventModal();
-    const confirmFn = useConfirm();
     const close = () => setPopup({ event: null, rect: null });
-    const acts = popup.event ? getPopupActions(popup.event, onViewAnnouncement, editMode, {
-        onEdit: () => openModal(popup.event, 'society', popup.event.start_time),
-        onDelete: (e) => handlePopupDelete(e, eventHandlers, close, confirmFn)
-    }) : null;
+    const onDelete = handleEventDeletion(eventHandlers, close, useConfirm());
+    const onEdit = () => openModal(popup.event, 'society', popup.event.start_time);
+    const acts = popup.event ? getPopupActions(popup.event, onViewAnnouncement, editMode, { onEdit, onDelete }) : null;
 
     return (
         <>
@@ -94,20 +107,6 @@ function CalendarPopovers({ popup, setPopup, props, events, summaryDate, setSumm
                 allEvents={events} baseDate={summaryDate} isMutualOrSelf={true} />
         </>
     );
-}
-
-/** Deletion handler with recurrence awareness and confirmation. */
-async function handlePopupDelete(event, handlers, closePopup, confirmFn) {
-    try {
-        const choice = await confirmDeletion(event, confirmFn);
-        if (choice === null) return;
-        const baseId = extractBaseEventId(event.id, event);
-        if (choice === true) handlers?.onDelete?.(baseId, event.title);
-        else if (choice === 'ALTERNATE') {
-            handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
-        }
-    } catch (err) { console.error('Deletion failed:', err); }
-    closePopup();
 }
 
 async function confirmDeletion(event, confirmFn) {
@@ -141,11 +140,11 @@ function SocietyEventModal({ eventHandlers, tags, editMode }) {
     const { isModalOpen, closeModal, modalEvent, modalInitialDate } = useEventModal();
     const confirmFn = useConfirm();
     if (!isModalOpen || !editMode) return null;
-    const handleDelete = async () => await handlePopupDelete(modalEvent, eventHandlers, closeModal, confirmFn);
+    const onDelete = handleEventDeletion(eventHandlers, closeModal, confirmFn);
     return (
         <EventModal event={modalEvent} initialDate={modalInitialDate} onClose={closeModal}
             showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)}
-            onDelete={modalEvent?.id ? handleDelete : null} />
+            onDelete={modalEvent?.id ? () => onDelete(modalEvent) : null} />
     );
 }
 

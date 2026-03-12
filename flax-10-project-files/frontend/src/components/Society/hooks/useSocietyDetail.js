@@ -35,7 +35,8 @@ function transformLegacyEventData(data) {
     return {
         title: data.title, description: data.description || "", location: data.location || "",
         start_time: `${data.date}T${time}:00`, end_time: `${data.date}T${endTime}:00`,
-        all_day: data.allDay || false, tag: parseTagId(data.tag), recurrence: data.recurrence || "none"
+        all_day: data.allDay || false, tag: parseTagId(data.tag), recurrence: data.recurrence || "none",
+        announcement: data.announcement || null
     };
 }
 
@@ -57,14 +58,15 @@ function getRecurrenceEndDate(data) {
 
 function useSocietyCore(societyId) {
     const [society, setSociety] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [state, setState] = useState({ loading: true, error: null });
 
     const loadSociety = useCallback(async () => {
         if (!societyId) return;
-        try { setLoading(true); setSociety(await api.fetchSociety(societyId)); }
-        catch (err) { setError(err.message); }
-        finally { setLoading(false); }
+        try {
+            setState({ loading: true, error: null });
+            setSociety(await api.fetchSociety(societyId));
+        } catch (err) { setState({ loading: false, error: err.message }); }
+        finally { setState(s => ({ ...s, loading: false })); }
     }, [societyId]);
 
     useEffect(() => { loadSociety(); }, [loadSociety]);
@@ -73,155 +75,160 @@ function useSocietyCore(societyId) {
         await api.updateSociety(societyId, updates);
         await loadSociety();
     };
-    const updateLocalSociety = (updates) => setSociety(prev => ({ ...prev, ...updates }));
-    return { society, setSociety, loading, error, loadSociety, updateSociety, updateLocalSociety };
+    const updateLocal = (u) => setSociety(p => ({ ...p, ...u }));
+    return { society, setSociety, ...state, loadSociety, updateSociety, updateLocalSociety: updateLocal };
 }
 
 function useSocietyTags(societyId, setSociety) {
+    const updateLocal = (fn) => setSociety(p => ({ ...p, tags: fn(p.tags || []) }));
     const addTag = async (tagData) => {
         const newTag = await api.createSocietyTag(societyId, tagData);
-        setSociety(prev => ({ ...prev, tags: [...(prev.tags || []), newTag] }));
+        updateLocal(tags => [...tags, newTag]);
     };
-    const updateTag = async (tagId, data) => {
-        const updated = await api.updateSocietyTag(societyId, tagId, data);
-        setSociety(prev => ({ ...prev, tags: prev.tags.map(t => t.id === tagId ? updated : t) }));
+    const updateTag = async (id, data) => {
+        const updated = await api.updateSocietyTag(societyId, id, data);
+        updateLocal(tags => tags.map(t => t.id === id ? updated : t));
     };
-    const deleteTag = async (tagId) => {
-        await api.deleteSocietyTag(societyId, tagId);
-        setSociety(prev => ({ ...prev, tags: prev.tags.filter(t => t.id !== tagId) }));
+    const deleteTag = async (id) => {
+        await api.deleteSocietyTag(societyId, id);
+        updateLocal(tags => tags.filter(t => t.id !== id));
     };
     return { addTag, updateTag, deleteTag };
 }
 
 function useSocietyEvents(societyId, setSociety, loadSociety) {
+    const updateLocal = (fn) => setSociety(prev => ({ ...prev, events: fn(prev.events || []) }));
+    
     const addEvent = async (data, silent = false) => {
         const event = await api.createSocietyEvent(societyId, transformEventData(data), silent);
-        setSociety(prev => ({ ...prev, events: [...(prev.events || []), event] }));
+        updateLocal(events => [...events, event]);
         return event;
     };
     const updateEvent = async (eventId, data, silent = false) => {
         const event = await api.updateSocietyEvent(societyId, eventId, transformEventData(data), silent);
-        setSociety(prev => ({ ...prev, events: prev.events.map(e => e.id === eventId ? event : e) }));
+        updateLocal(events => events.map(e => e.id === eventId ? event : e));
         return event;
     };
-    const deleteEvent = async (eventId, silent = false) => {
-        await api.deleteSocietyEvent(societyId, eventId, silent);
-        setSociety(prev => ({ ...prev, events: prev.events.filter(e => e.id !== eventId) }));
+    const deleteEvent = async (id, s = false) => {
+        await api.deleteSocietyEvent(societyId, id, s);
+        updateLocal(events => events.filter(e => e.id !== id));
     };
-    const addException = async (eventId, date, silent = false) => {
-        await api.addExceptionDate(societyId, eventId, date, silent);
+    const addException = async (id, date, s = false) => {
+        await api.addExceptionDate(societyId, id, date, s);
         await loadSociety();
     };
     return { addEvent, updateEvent, deleteEvent, addException };
 }
 
-function useSocietyAnnouncements(societyId, society, setSociety, eventOps) {
-    const setAnnouncementEventId = (announcementId, eventId) => {
-        setSociety(prev => ({ ...prev, announcements: prev.announcements.map(a => a.id === announcementId ? { ...a, event_id: eventId } : a) }));
+function useAnnounceHandlers(societyId, setSociety, eventOps) {
+    const setEventId = (annId, evId) => {
+        setSociety(p => ({ ...p, announcements: p.announcements.map(a => a.id === annId ? { ...a, event_id: evId } : a) }));
     };
-    const buildEventData = (data, announcement) => ({ ...data, description: data.content, tag: data.tag || null, announcement: announcement.id });
-
-    const addAnnouncement = async (data, silent = false) => {
-        const apiData = transformAnnouncementData(data);
-        const announcement = await api.createAnnouncement(societyId, apiData, silent);
-        setSociety(prev => ({ ...prev, announcements: [...(prev.announcements || []), announcement] }));
-        if (data.addAsEvent) await createLinkedEvent(buildEventData(data, announcement), announcement.id, silent);
-        return announcement;
+    const handleSync = async (data, ann, s) => {
+        if (!data.addAsEvent) return ann.event_id && deleteLinked(ann.event_id, ann.id, s);
+        const evData = { ...data, description: data.content, tag: data.tag || null, announcement: ann.id };
+        try {
+            if (ann.event_id) return await eventOps.updateEvent(ann.event_id, evData, s);
+            const ev = await eventOps.addEvent(evData, s);
+            setEventId(ann.id, ev.id);
+        } catch (e) { console.error('Failed to sync event:', e); }
     };
-
-    const createLinkedEvent = async (eventData, announcementId, silent) => {
-        try { const event = await eventOps.addEvent(eventData, silent); setAnnouncementEventId(announcementId, event.id); }
-        catch (e) { console.error('Failed to add event for announcement:', e); }
-    };
-
-    const updateAnnouncement = async (announcementId, data, silent = false) => {
-        const updated = await api.updateAnnouncement(societyId, announcementId, transformAnnouncementData(data), silent);
-        setSociety(prev => ({ ...prev, announcements: prev.announcements.map(a => a.id === announcementId ? updated : a) }));
-        await syncEvent(data, updated, silent);
-        return updated;
-    };
-
-    const syncEvent = async (data, announcement, silent) => {
-        const eventId = announcement.event_id || data.event_id;
-        if (!data.addAsEvent && eventId) return deleteLinkedEvent(eventId, announcement.id, silent);
-        if (data.addAsEvent) return upsertLinkedEvent(data, announcement, eventId, silent);
-    };
-
-    const deleteLinkedEvent = async (eventId, announcementId, silent) => {
-        try { await eventOps.deleteEvent(eventId, silent); setAnnouncementEventId(announcementId, null); }
+    const deleteLinked = async (evId, annId, s) => {
+        try { await eventOps.deleteEvent(evId, s); setEventId(annId, null); }
         catch (e) { console.error('Failed to delete linked event:', e); }
     };
+    return { handleSync, deleteLinked };
+}
 
-    const upsertLinkedEvent = async (data, announcement, eventId, silent) => {
-        const eventData = buildEventData(data, announcement);
-        try { if (eventId) await eventOps.updateEvent(eventId, eventData, silent); else await createLinkedEvent(eventData, announcement.id, silent); }
-        catch (e) { console.error('Failed to sync event for announcement:', e); }
+function useAnnounceActions(societyId, setSociety, handleSync) {
+    const updateLocal = (fn) => setSociety(p => ({ ...p, announcements: fn(p.announcements || []) }));
+    
+    const add = async (data, silent = false) => {
+        const ann = await api.createAnnouncement(societyId, transformAnnouncementData(data), silent);
+        updateLocal(anns => [...anns, ann]);
+        if (data.addAsEvent) await handleSync(data, ann, silent);
+        return ann;
     };
+    const update = async (id, data, silent = false) => {
+        const updated = await api.updateAnnouncement(societyId, id, transformAnnouncementData(data), silent);
+        updateLocal(anns => anns.map(a => a.id === id ? updated : a));
+        await handleSync(data, updated, silent);
+        return updated;
+    };
+    return { add, update };
+}
 
-    const deleteAnnouncement = async (announcementId, silent = false) => {
-        const announcement = society?.announcements?.find(a => a.id === announcementId);
-        const linkedEventId = announcement?.event_id;
-        await api.deleteAnnouncement(societyId, announcementId, silent);
-        setSociety(prev => ({
-            ...prev, announcements: prev.announcements.filter(a => a.id !== announcementId),
-            events: linkedEventId ? prev.events.filter(e => e.id !== linkedEventId) : prev.events
+function useSocietyAnnouncements(societyId, society, setSociety, eventOps) {
+    const { handleSync } = useAnnounceHandlers(societyId, setSociety, eventOps);
+    const { add, update } = useAnnounceActions(societyId, setSociety, handleSync);
+
+    const deleteAnnouncement = async (id, silent = false) => {
+        const ann = society?.announcements?.find(a => a.id === id);
+        await api.deleteAnnouncement(societyId, id, silent);
+        setSociety(p => ({
+            ...p, announcements: p.announcements.filter(a => a.id !== id),
+            events: ann?.event_id ? p.events.filter(e => e.id !== ann.event_id) : p.events
         }));
     };
-
-    return { addAnnouncement, updateAnnouncement, deleteAnnouncement };
+    return { addAnnouncement: add, updateAnnouncement: update, deleteAnnouncement };
 }
 
 function useSocietyMembers(societyId, setSociety) {
     const [members, setMembers] = useState([]);
     const fetchMembers = useCallback(async () => setMembers(await api.fetchMembers(societyId)), [societyId]);
-    const updateMemberRole = async (userId, role) => {
+    const updateRole = async (userId, role) => {
         await api.updateMemberRole(societyId, userId, role);
         setMembers(prev => prev.map(m => m.user === userId ? { ...m, role } : m));
     };
-    const removeMember = async (userId) => {
+    const remove = async (userId) => {
         await api.leaveSociety(societyId, userId);
         setMembers(prev => prev.filter(m => m.user !== userId));
         setSociety(prev => ({ ...prev, member_count: Math.max(0, prev.member_count - 1) }));
     };
-    const addCollaborator = async (identifier, role) => {
-        const member = await api.addCollaborator(societyId, identifier, role);
-        setMembers(prev => [...prev, member]);
+    const addCollab = async (id, role) => {
+        const m = await api.addCollaborator(societyId, id, role);
+        setMembers(prev => [...prev, m]);
         setSociety(prev => ({ ...prev, member_count: prev.member_count + 1 }));
-        return member;
+        return m;
     };
-    return { members, fetchMembers, updateMemberRole, removeMember, addCollaborator };
+    return { members, fetchMembers, updateMemberRole: updateRole, removeMember: remove, addCollaborator: addCollab };
 }
 
 function useSocietyMembership(societyId, setSociety) {
     const { refreshTags } = useTags();
     const confirm = useConfirm();
-    const joinSociety = async () => {
-        await api.joinSociety(societyId);
-        setSociety(prev => ({ ...prev, is_member: true, member_count: prev.member_count + 1 }));
-        await promptNotificationSubscription(societyId, setSociety, confirm);
+    const join = async () => {
+        try {
+            await api.joinSociety(societyId);
+            setSociety(p => ({ ...p, is_member: true, member_count: p.member_count + 1 }));
+            if (confirm) await promptNotificationSubscription(societyId, setSociety, confirm);
+        } catch (err) { console.error('Join failed:', err); }
     };
-    const leaveSociety = async () => {
-        await api.leaveSociety(societyId, 'me');
-        setSociety(prev => ({ ...prev, is_member: false, is_subscribed: false, member_count: Math.max(0, prev.member_count - 1) }));
-        await refreshTags();
+    const leave = async () => {
+        try {
+            await api.leaveSociety(societyId, 'me');
+            setSociety(p => ({ ...p, is_member: false, is_subscribed: false, member_count: Math.max(0, p.member_count - 1) }));
+            await refreshTags();
+        } catch (err) { console.error('Leave failed:', err); }
     };
-    const deleteSociety = async () => await api.deleteSociety(societyId);
-    const requestRatification = async () => {
+    const request = async () => {
         await api.requestRatification(societyId);
-        setSociety(prev => ({ ...prev, ratification_status: 'pending' }));
+        setSociety(p => ({ ...p, ratification_status: 'pending' }));
     };
-    const publishChanges = async (changes = {}) => await api.publishChanges(societyId, changes);
-    return { joinSociety, leaveSociety, deleteSociety, requestRatification, publishChanges };
+    return { joinSociety: join, leaveSociety: leave, requestRatification: request, 
+             deleteSociety: id => api.deleteSociety(id), publishChanges: c => api.publishChanges(societyId, c) };
 }
 
 async function promptNotificationSubscription(societyId, setSociety, confirm) {
-    const yes = await confirm({
-        title: "Enable notifications?",
-        message: "Would you like to turn on notifications for this society?",
-    });
-    if (!yes) return;
-    await api.toggleSubscription(societyId, true);
-    setSociety(prev => ({ ...prev, is_subscribed: true }));
+    try {
+        const yes = await confirm({
+            title: "Enable notifications?",
+            message: "Would you like to turn on notifications for this society?",
+        });
+        if (!yes) return;
+        await api.toggleSubscription(societyId, true);
+        setSociety(prev => ({ ...prev, is_subscribed: true }));
+    } catch (err) { console.error('Failed to prompt subscription:', err); }
 }
 
 export function useSocietyDetail(societyId) {
@@ -233,8 +240,43 @@ export function useSocietyDetail(societyId) {
     const membership = useSocietyMembership(societyId, core.setSociety);
 
     return {
-        society: core.society, loading: core.loading, error: core.error,
+        society: core.society, ...core, 
         refresh: core.loadSociety, updateSociety: core.updateSociety, updateLocalSociety: core.updateLocalSociety,
         ...tags, ...events, ...announcements, ...members, ...membership
+    };
+}
+
+export function buildHandlers(data, editMode, tracker) {
+    const isSilent = editMode;
+    return {
+        addAnnouncement: (d) => {
+            data.addAnnouncement(d, isSilent);
+            if (isSilent) tracker.trackAnnouncement("Added", d.title);
+        },
+        updateAnnouncement: (id, d) => {
+            data.updateAnnouncement(id, d, isSilent);
+            if (isSilent) tracker.trackAnnouncement("Updated", d.title);
+        },
+        deleteAnnouncement: (id) => {
+            const title = data.society?.announcements?.find(a => a.id === id)?.title;
+            data.deleteAnnouncement(id, isSilent);
+            if (isSilent && title) tracker.trackAnnouncement("Deleted", title);
+        },
+        addEvent: (d) => {
+            data.addEvent(d, isSilent);
+            if (isSilent) tracker.trackEvent("Added", d.title);
+        },
+        updateEvent: (id, d) => {
+            data.updateEvent(id, d, isSilent);
+            if (isSilent) tracker.trackEvent("Updated", d.title);
+        },
+        deleteEvent: (id, title) => {
+            data.deleteEvent(id, isSilent);
+            if (isSilent && title) tracker.trackEvent("Deleted", title);
+        },
+        addException: (id, date) => data.addException(id, date, isSilent),
+        onAddTag: data.addTag, onDeleteTag: data.deleteTag, onUpdateTag: data.updateTag,
+        society: data.society, updateSociety: data.updateSociety,
+        updateLocalSociety: data.updateLocalSociety, publishChanges: data.publishChanges
     };
 }

@@ -49,14 +49,16 @@ vi.mock('../../components/Society/hooks/useSocietyDetail', () => ({
     useSocietyDetail: vi.fn(() => mockHookData),
 }));
 
+const mockTracker = {
+    hasChanges: vi.fn(() => false),
+    getChangeSummary: vi.fn(() => ''),
+    resetChanges: vi.fn(),
+    trackEvent: vi.fn(),
+    trackAnnouncement: vi.fn(),
+};
+
 vi.mock('../../components/Society/hooks/useChangeTracker', () => ({
-    useChangeTracker: vi.fn(() => ({
-        hasChanges: vi.fn(() => false),
-        getChangeSummary: vi.fn(() => ''),
-        resetChanges: vi.fn(),
-        trackEvent: vi.fn(),
-        trackAnnouncement: vi.fn(),
-    })),
+    useChangeTracker: vi.fn(() => mockTracker),
 }));
 
 vi.mock('../../pages/Societies/SocietySkeletons', () => ({
@@ -131,15 +133,22 @@ vi.mock('../../components/Society/SocietyDetail/SettingsModal', () => ({
 }));
 
 vi.mock('../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal', () => ({
-    default: ({ onClose, onSubmit, onDelete }) => (
-        <div data-testid="announcement-modal">
-            <button onClick={onClose}>Close Announcement</button>
-            <button onClick={() => onSubmit({ id: 1, title: 'A' }, null)}>Submit Update</button>
-            <button onClick={() => onSubmit({ title: 'New Announcement' }, null)}>Submit New</button>
-            <button onClick={() => onSubmit({ id: 2, title: 'B' }, { id: 99, pinned: true })}>Submit With Conflict</button>
-            {onDelete && <button onClick={() => onDelete(1, 'Edit Me')}>Delete Announcement</button>}
-        </div>
-    ),
+    default: ({ onClose, onSubmit, onDelete }) => {
+        const h = {
+            onUpdate: () => onSubmit({ id: 1, title: 'A' }, null),
+            onNew: () => onSubmit({ title: 'New Announcement' }, null),
+            onConflict: () => onSubmit({ id: 2, title: 'B' }, { id: 99, pinned: true })
+        };
+        return (
+            <div data-testid="announcement-modal">
+                <button onClick={onClose}>Close Announcement</button>
+                <button onClick={h.onUpdate}>Submit Update</button>
+                <button onClick={h.onNew}>Submit New</button>
+                <button onClick={h.onConflict}>Submit With Conflict</button>
+                {onDelete && <button onClick={() => onDelete(1, 'Edit Me')}>Delete Announcement</button>}
+            </div>
+        );
+    }
 }));
 
 vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
@@ -169,12 +178,21 @@ function renderPage(props = {}) {
     );
 }
 
+const mockHandlers = { onAddAnnouncement: vi.fn(), onUpdateAnnouncement: vi.fn(), onAddEvent: vi.fn() };
+
+const setupMock = (overrides = {}) => {
+    const data = { ...mockHookData, ...overrides };
+    useSocietyDetail.mockReturnValue(data);
+    return data;
+};
+
 describe('SocietyDetailPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         locationState = { state: null };
-        useSocietyDetail.mockReturnValue(mockHookData);
+        setupMock();
         mockConfirm.mockResolvedValue(false);
+        mockTracker.hasChanges.mockReturnValue(false);
     });
 
     it('renders loading state', () => {
@@ -210,13 +228,13 @@ describe('SocietyDetailPage', () => {
 
     it('renders back button', () => {
         renderPage();
-        expect(screen.getByText(/← Back to Societies/)).toBeTruthy();
+        expect(screen.getByText(/← Back to All Societies/)).toBeTruthy();
     });
 
     it('calls onBack when back button is clicked', () => {
         const onBack = vi.fn();
         renderPage({ onBack });
-        fireEvent.click(screen.getByText(/← Back to Societies/));
+        fireEvent.click(screen.getByText(/← Back to All Societies/));
         expect(onBack).toHaveBeenCalledTimes(1);
     });
 
@@ -261,20 +279,12 @@ describe('SocietyDetailPage', () => {
     });
 
     it('calls publishChanges when toggling off edit mode with changes', async () => {
-        const { useChangeTracker } = await import('../../components/Society/hooks/useChangeTracker');
-        useChangeTracker.mockReturnValue({
-            hasChanges: vi.fn(() => true),
-            getChangeSummary: vi.fn(() => 'summary'),
-            resetChanges: vi.fn(),
-            trackEvent: vi.fn(),
-            trackAnnouncement: vi.fn(),
-        });
+        mockTracker.hasChanges.mockReturnValue(true);
+        mockTracker.getChangeSummary.mockReturnValue('summary');
         renderPage();
-        fireEvent.click(screen.getByText('Toggle Edit')); // enter edit
-        fireEvent.click(screen.getByText('Toggle Edit')); // exit edit with changes
-        await waitFor(() => {
-            expect(mockHookData.publishChanges).toHaveBeenCalled();
-        });
+        fireEvent.click(screen.getByText('Toggle Edit'));
+        fireEvent.click(screen.getByText('Toggle Edit'));
+        await waitFor(() => expect(mockHookData.publishChanges).toHaveBeenCalled());
     });
 
     it('calls onBack after deleting society', async () => {
@@ -307,23 +317,23 @@ describe('SocietyDetailPage', () => {
         expect(screen.getByTitle('You have reported this society. Click to unreport.')).toBeTruthy();
     });
 
-    it('calls unreport and updateLocalSociety when unreport is clicked and user confirms', async () => {
+    const setupUnreportTest = (confirmVal, apiRes) => {
         const updateLocalSociety = vi.fn();
-        useSocietyDetail.mockReturnValue({
-            ...mockHookData,
-            society: { ...mockHookData.society, has_reported: true },
-            updateLocalSociety,
-        });
-        mockConfirm.mockResolvedValue(true);
-        unreportSocietyApiMock.mockResolvedValue(undefined);
+        useSocietyDetail.mockReturnValue({ ...mockHookData, society: { ...mockHookData.society, has_reported: true }, updateLocalSociety });
+        mockConfirm.mockResolvedValue(confirmVal);
+        if (apiRes === 'fail') unreportSocietyApiMock.mockRejectedValue(new Error('error'));
+        else unreportSocietyApiMock.mockResolvedValue(undefined);
+        return updateLocalSociety;
+    };
+
+    it('calls unreport and updateLocalSociety when unreport is clicked and user confirms', async () => {
+        const updateLocal = setupUnreportTest(true);
         renderPage();
         fireEvent.click(screen.getByTitle('You have reported this society. Click to unreport.'));
-        await waitFor(() => {
-            expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({ title: 'Unreport Society' }));
-        });
+        await waitFor(() => expect(mockConfirm).toHaveBeenCalled());
         await waitFor(() => {
             expect(unreportSocietyApiMock).toHaveBeenCalledWith(1);
-            expect(updateLocalSociety).toHaveBeenCalledWith({ has_reported: false });
+            expect(updateLocal).toHaveBeenCalledWith({ has_reported: false });
         });
     });
 

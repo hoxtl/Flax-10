@@ -79,4 +79,14 @@ describe('GenericSummaryModal', () => {
         );
         expect(screen.getByText('No items found.')).toBeInTheDocument();
     });
+
+    it('renders children when provided', () => {
+        render(
+            <GenericSummaryModal isOpen={true} onClose={vi.fn()} title="Title" items={[{ id: 1 }]}>
+                <div data-testid="children">Child Content</div>
+            </GenericSummaryModal>
+        );
+        expect(screen.getByTestId('children')).toBeInTheDocument();
+        expect(screen.getByText('Child Content')).toBeInTheDocument();
+    });
 });

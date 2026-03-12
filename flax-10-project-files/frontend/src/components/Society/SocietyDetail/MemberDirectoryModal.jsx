@@ -49,6 +49,14 @@ function sortByRole(members) {
     return [...admins, ...regular];
 }
 
+const ListItems = ({ members, isAdmin, onRemove }) => (
+    members.map(m => (
+        <SummaryItem key={m.user} avatar={<UserAvatar user={m} avatarOnly />} title={<MemberTitle member={m} />}
+            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: `profile_${m.user}` }))}
+            rightAction={isAdmin ? <RemoveButton member={m} onRemove={onRemove} /> : null} />
+    ))
+);
+
 export default function MemberDirectoryModal({ societyName, members, onFetchMembers, onRemoveMember, isAdmin, onClose }) {
     const [searchQuery, setSearchQuery] = useState("");
     const confirm = useConfirm();
@@ -60,16 +68,12 @@ export default function MemberDirectoryModal({ societyName, members, onFetchMemb
         if (conf) onRemoveMember?.(member.user);
     };
 
-    const renderItem = (m) => (
-        <SummaryItem key={m.user} avatar={<UserAvatar user={m} avatarOnly />} title={<MemberTitle member={m} />}
-            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: `profile_${m.user}` }))}
-            rightAction={isAdmin ? <RemoveButton member={m} onRemove={handleRemove} /> : null} />
-    );
-
     return (
         <GenericSummaryModal isOpen={true} onClose={onClose} title={`Members of ${societyName}`} subtitle="View everyone in this society"
             emptyMessage={loading ? "Loading members..." : "No members found."}
             topContent={<SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search members..." />}
-            items={displayMembers} renderItem={renderItem} />
+            items={displayMembers}>
+            <ListItems members={displayMembers} isAdmin={isAdmin} onRemove={handleRemove} />
+        </GenericSummaryModal>
     );
 }

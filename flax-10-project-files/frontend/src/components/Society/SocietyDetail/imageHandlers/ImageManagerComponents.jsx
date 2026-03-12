@@ -48,65 +48,35 @@ export function ImageCard({ src, index, onDelete, onPin }) {
 }
 
 /** Modal view for uploading a new image or selecting from existing photos. */
+const PhotoSelect = ({ photos, selected, onSelect }) => (
+    <div className={styles.photoSelectGrid}>
+        {photos.map((img, i) => (
+            <div key={i} className={`${styles.photoSelectCard} ${selected === img ? styles.selected : ""}`}
+                style={{ backgroundImage: `url(${img})` }} onClick={() => onSelect(img)} />
+        ))}
+    </div>
+);
+
+const UploadZone = ({ fileRef, onUpload }) => (
+    <div className={styles.dropZone} onClick={() => fileRef.current?.click()}>
+        <input ref={fileRef} type="file" onChange={onUpload} hidden />
+        <span>Click to upload image</span>
+    </div>
+);
+
 export function AddImageView({ onClose, onAdd, availablePhotos = [] }) {
     const [tab, setTab] = useState("upload");
     const [selected, setSelected] = useState(null);
     const fileRef = useRef(null);
 
-    const handleUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) performUpload(file, onAdd);
-    };
-
     return (
-        <StandardModal
-            title="Add Image"
-            onClose={onClose}
-            size="md"
-            modalClassName={styles.modalShell}
-            contentClassName={styles.modalContent}
-        >
+        <StandardModal title="Add Image" onClose={onClose} size="md" modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}>
             <TabSelector active={tab} onSelect={setTab} hasPhotos={availablePhotos.length > 0} />
-            <ViewContent tab={tab} fileRef={fileRef} handleUpload={handleUpload}
-                availablePhotos={availablePhotos} selected={selected} onSelect={setSelected} />
+            {tab === "upload" ? <UploadZone fileRef={fileRef} onUpload={(e) => performUpload(e.target.files[0], onAdd)} /> :
+                <PhotoSelect photos={availablePhotos} selected={selected} onSelect={setSelected} />}
             <FooterActions tab={tab} onClose={onClose} onAdd={() => onAdd(selected)} selected={selected} />
         </StandardModal>
-    );
-}
-
-function performUpload(file, onAdd) {
-    const reader = new FileReader();
-    reader.onload = (ev) => onAdd(ev.target.result);
-    reader.readAsDataURL(file);
-}
-
-function TabSelector({ active, onSelect, hasPhotos }) {
-    return (
-        <div className={styles.tabs}>
-            <button className={`${styles.tab} ${active === "upload" ? styles.activeTab : ""}`}
-                onClick={() => onSelect("upload")} type="button">Upload</button>
-            {hasPhotos && <button className={`${styles.tab} ${active === "select" ? styles.activeTab : ""}`}
-                onClick={() => onSelect("select")} type="button">From Photos</button>}
-        </div>
-    );
-}
-
-function ViewContent({ tab, fileRef, handleUpload, availablePhotos, selected, onSelect }) {
-    if (tab === "upload") {
-        return (
-            <div className={styles.dropZone} onClick={() => fileRef.current?.click()}>
-                <input ref={fileRef} type="file" onChange={handleUpload} hidden />
-                <span>Click to upload image</span>
-            </div>
-        );
-    }
-    return (
-        <div className={styles.photoSelectGrid}>
-            {availablePhotos.map((img, i) => (
-                <div key={i} className={`${styles.photoSelectCard} ${selected === img ? styles.selected : ""}`}
-                    style={{ backgroundImage: `url(${img})` }} onClick={() => onSelect(img)} />
-            ))}
-        </div>
     );
 }
 

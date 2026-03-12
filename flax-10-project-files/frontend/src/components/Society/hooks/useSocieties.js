@@ -17,36 +17,27 @@ async function addCollaboratorsToSociety(societyId, collaborators) {
 
 export function useSocieties() {
     const [societies, setSocieties] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [state, setState] = useState({ loading: true, error: null });
 
-    const loadSocieties = useCallback(async () => {
+    const load = useCallback(async () => {
         try {
-            setLoading(true);
-            const data = await fetchSocieties();
-            setSocieties(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+            setState({ loading: true, error: null });
+            setSocieties(await fetchSocieties());
+        } catch (err) { setState({ loading: false, error: err.message }); }
+        finally { setState(s => ({ ...s, loading: false })); }
     }, []);
 
-    useEffect(() => { loadSocieties(); }, [loadSocieties]);
+    useEffect(() => { load(); }, [load]);
 
     const handleCreate = async (formData) => {
         const { collaborators, requestRatification: shouldRequest, ...rest } = formData;
-        const apiData = toSnakeCase(rest);
-        const newSociety = await createSociety(apiData);
+        const newSociety = await createSociety(toSnakeCase(rest));
         await addCollaboratorsToSociety(newSociety.id, collaborators);
         if (shouldRequest) await requestRatification(newSociety.id);
         setSocieties(prev => [...prev, newSociety]);
         return newSociety;
     };
 
-    const updateSocietyLocally = (id, updates) => {
-        setSocieties(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
-    };
-
-    return { societies, loading, error, refresh: loadSocieties, handleCreate, updateSocietyLocally };
+    return { societies, ...state, refresh: load, handleCreate, 
+             updateSocietyLocally: (id, u) => setSocieties(p => p.map(s => s.id === id ? { ...s, ...u } : s)) };
 }
