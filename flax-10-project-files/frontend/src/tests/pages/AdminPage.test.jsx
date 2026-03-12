@@ -136,3 +136,95 @@ describe("AdminPage – shell", () => {
     );
   });
 });
+
+describe("AdminPage – Users tab", () => {
+  it("renders all user names", async () => {
+    render(<AdminPage />);
+    await waitFor(() => expect(screen.getByText("Alice Smith")).toBeTruthy());
+    expect(screen.getByText("Bob Jones")).toBeTruthy();
+  });
+
+  it("shows Ban button for active non-staff user", async () => {
+    render(<AdminPage />);
+    await waitFor(() => expect(screen.getByText("Ban")).toBeTruthy());
+  });
+
+  it("shows Unban button for inactive user", async () => {
+    render(<AdminPage />);
+    await waitFor(() => expect(screen.getByText("Unban")).toBeTruthy());
+  });
+
+  it("shows Staff badge instead of ban button for staff user", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Staff User"));
+    expect(screen.queryAllByText("Ban").length).toBe(1);
+    expect(screen.getByText("Staff")).toBeTruthy();
+  });
+
+  it("filters users by search query", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Alice Smith"));
+    fireEvent.change(screen.getByPlaceholderText(/search/i), {
+      target: { value: "bob" },
+    });
+    expect(screen.queryByText("Alice Smith")).toBeNull();
+    expect(screen.getByText("Bob Jones")).toBeTruthy();
+  });
+
+  it("shows empty state when search has no matches", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Alice Smith"));
+    fireEvent.change(screen.getByPlaceholderText(/search/i), {
+      target: { value: "zzznomatch" },
+    });
+    expect(screen.getByText(/No users found/i)).toBeTruthy();
+  });
+
+  it("opens ban modal when Ban clicked", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Ban"));
+    fireEvent.click(screen.getByText("Ban"));
+    expect(screen.getByText(/Ban alice\?/i)).toBeTruthy();
+  });
+
+  it("closes ban modal when Cancel clicked", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Ban"));
+    fireEvent.click(screen.getByText("Ban"));
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(screen.queryByText(/Ban alice\?/i)).toBeNull();
+  });
+
+  it("calls banUser with userId and reason on confirm", async () => {
+    api.banUser.mockResolvedValue({});
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Ban"));
+    fireEvent.click(screen.getByText("Ban"));
+    fireEvent.click(screen.getByText("Ban User"));
+    await waitFor(() => expect(api.banUser).toHaveBeenCalledWith(1, ""));
+  });
+
+  it("calls unbanUser with correct userId", async () => {
+    api.unbanUser.mockResolvedValue({});
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Unban"));
+    fireEvent.click(screen.getByText("Unban"));
+    await waitFor(() => expect(api.unbanUser).toHaveBeenCalledWith(2));
+  });
+
+  it("calls onNavChange with profile id when name clicked", async () => {
+    const onNavChange = vi.fn();
+    render(<AdminPage onNavChange={onNavChange} />);
+    await waitFor(() => screen.getByText("Alice Smith"));
+    fireEvent.click(screen.getByText("Alice Smith"));
+    expect(onNavChange).toHaveBeenCalledWith("profile_1");
+  });
+
+  it("shows error when fetch fails", async () => {
+    api.fetchAdminUsers.mockRejectedValue(new Error("Network error"));
+    render(<AdminPage />);
+    await waitFor(() =>
+      expect(screen.getByText(/Failed to load users/i)).toBeTruthy(),
+    );
+  });
+});
