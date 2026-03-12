@@ -131,6 +131,11 @@ export function isRecurringEvent(event) {
 
 async function buildEventData(form) {
     const data = buildBaseEventData(form);
+
+    if (form.location && form.location.trim()) {
+        const coords = await geocodeAddress(form.location);
+    }
+
     const { frequency, interval, end_date } = form.recurrence || {};
     if (frequency && frequency !== 'none') {
         data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
