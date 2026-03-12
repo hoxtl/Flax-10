@@ -43,14 +43,14 @@ function parseRouteOption(r) {
   return { value: r.id, label };
 }
 
-function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange }) {
+function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange, usePortal }) {
   const hasActive = routes.some(r => r.id === activeNav);
   const trigger = <NavDropdownTrigger title={title} hasActive={hasActive} />;
   return (
     <div className={styles.navGroup}>
       <AnimatedDropdown customTrigger={trigger} options={routes.map(parseRouteOption)}
         value={activeNav} onChange={onNavChange} hideCheckmark={true}
-        isOpen={isOpen} onOpenChange={onOpenChange} />
+        isOpen={isOpen} onOpenChange={onOpenChange} usePortal={usePortal} />
     </div>
   );
 }
@@ -80,7 +80,7 @@ function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu
   return (
     <div onMouseEnter={() => onEnter(title)}>
       <NavDropdown title={title} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
-        isOpen={activeMenu === title} onOpenChange={change} />
+        isOpen={activeMenu === title} onOpenChange={change} usePortal={true} />
     </div>
   );
 }

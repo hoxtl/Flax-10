@@ -23,11 +23,10 @@
   gap: 16px;
   margin-bottom: 18px;
   padding: 26px 28px;
-  border: 1px solid rgba(123, 103, 81, 0.14);
+  border: 1px solid var(--border);
   border-radius: 28px;
-  background:
-    linear-gradient(135deg, rgba(255, 252, 248, 0.99) 0%, rgba(247, 241, 234, 0.96) 56%, rgba(243, 235, 226, 0.93) 100%);
-  box-shadow: 0 18px 36px rgba(74, 52, 33, 0.045);
+  background: var(--color-card);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.045);
   overflow: hidden;
 }
 
@@ -37,9 +36,9 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at top right, rgba(196, 164, 109, 0.12), transparent 24%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.18), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 52%);
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-strong) 12%, transparent), transparent 24%),
+    radial-gradient(circle at bottom left, color-mix(in srgb, var(--color-bg) 18%, transparent), transparent 22%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 22%, transparent), transparent 52%);
 }
 
 @media (min-width: 768px) {
@@ -66,7 +65,6 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-primary);
-  /* text-stone-400 */
 }
 
 .headerDateRow {
@@ -77,7 +75,6 @@
 
 .headerDateIcon {
   color: var(--color-primary);
-  /* match stone-400 */
   flex-shrink: 0;
 }
 
@@ -87,7 +84,7 @@
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 0.98;
-  color: #4a433d;
+  color: var(--text);
   margin: 0;
   max-width: none;
 }
@@ -104,7 +101,6 @@
   }
 }
 
-/* Row that holds statusStrip pill + TFL pill side by side */
 .statusRow {
   display: flex;
   flex-wrap: wrap;
@@ -112,7 +108,6 @@
   gap: 8px;
 }
 
-/* Compact Day Progress in greeting header */
 .headerDayProgress {
   display: flex;
   flex-direction: column;
@@ -122,7 +117,7 @@
 
 .headerDayProgressTrack {
   height: 4px;
-  background: rgba(123, 103, 81, 0.12);
+  background: var(--border);
   border-radius: 2px;
   overflow: hidden;
   width: 200px;
@@ -148,14 +143,14 @@
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #7B6751;
+  color: var(--text-secondary);
 }
 
 .headerDayProgressOverdue {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
   font-weight: 700;
-  color: #C0714E;
+  color: var(--danger);
   letter-spacing: 0.04em;
 }
 
@@ -163,11 +158,10 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
   font-weight: 700;
-  color: #9a8778;
+  color: var(--text-secondary);
   letter-spacing: 0.04em;
 }
 
-/* Pills row at the top of the Right Now bento card */
 .rightNowPillsRow {
   display: flex;
   flex-direction: column;
@@ -175,7 +169,6 @@
   margin-bottom: 10px;
 }
 
-/* ── Combined amber alerts container (status strip + TFL) ── */
 .intRowAlertsContainer {
   display: flex;
   flex-direction: column;
@@ -184,12 +177,11 @@
 }
 
 .intRowAlertsContainer:has(> *) {
-  background: rgba(196, 154, 75, 0.08);
+  background: color-mix(in srgb, var(--warning-text) 8%, transparent);
   border-left: 3px solid var(--warning-text);
   border-radius: 8px;
   padding: 8px 12px;
 }
-
 
 .intRowAlertRow {
   display: flex;
@@ -240,15 +232,14 @@
   padding-left: 12px;
 }
 
-/* Status strip — dynamic schedule state below greeting */
 .statusStrip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 5px 12px 5px 8px;
   border-radius: 20px;
-  border: 1px solid rgba(123, 103, 81, 0.15);
-  background: rgba(123, 103, 81, 0.06);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--color-primary-strong) 6%, transparent);
   max-width: fit-content;
 }
 
@@ -265,13 +256,12 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #5c4d3e;
+  color: var(--text-secondary);
 }
 
-/* Conflict variant — terracotta with glow pulse */
 .statusStripConflict {
-  border-color: rgba(220, 38, 38, 0.25);
-  background: rgba(254, 226, 226, 0.6);
+  border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+  background: color-mix(in srgb, var(--danger) 10%, var(--color-card));
 }
 
 .statusStripConflict .statusStripDot {
@@ -284,20 +274,16 @@
 }
 
 @keyframes stripConflictGlow {
-
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 40%, transparent);
   }
-
   50% {
     opacity: 0.9;
-    box-shadow: 0 0 0 5px rgba(220, 38, 38, 0);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--danger) 0%, transparent);
   }
 }
-
-/* ── TFL card (replaces old pill) ─────────────────────────────────────────── */
 
 .tflCard {
   display: flex;
@@ -305,18 +291,16 @@
   gap: 10px;
   padding: 8px 10px 8px 0;
   border-radius: 10px;
-  /* Neutral warm background — works with any TFL line colour */
-  background: rgba(123, 103, 81, 0.06);
-  border: 1px solid rgba(123, 103, 81, 0.15);
+  background: color-mix(in srgb, var(--color-primary-strong) 6%, transparent);
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 
 .tflCardSevere {
-  background: rgba(123, 103, 81, 0.09);
-  border-color: rgba(123, 103, 81, 0.22);
+  background: color-mix(in srgb, var(--color-primary-strong) 9%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary-strong) 22%, transparent);
 }
 
-/* Left colour accent strip — colour set via inline style */
 .tflCardAccent {
   width: 4px;
   flex-shrink: 0;
@@ -344,21 +328,21 @@
   font-size: 0.67rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #5c3a1e;
+  color: var(--text);
 }
 
 .tflCardStatus {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
   font-weight: 600;
-  color: #8a7060;
+  color: var(--text-secondary);
 }
 
 .tflCardLeave {
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 0.7rem;
   font-weight: 400;
-  color: rgba(74, 52, 33, 0.7);
+  color: var(--text-secondary);
 }
 
 .tflCardDismiss {
@@ -373,7 +357,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: rgba(122, 85, 32, 0.4);
+  color: var(--muted);
   transition: color 0.15s;
   margin-top: 1px;
 }
@@ -382,17 +366,15 @@
   color: var(--warning-text);
 }
 
-/* "+N more lines affected" overflow label */
 .tflOverflow {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: rgba(155, 58, 42, 0.65);
+  color: color-mix(in srgb, var(--danger) 65%, transparent);
   padding: 2px 0 2px 4px;
 }
 
-/* Dismiss button inside a pill */
 .statusStripPillDismiss {
   display: flex;
   align-items: center;
@@ -401,7 +383,7 @@
   padding: 0;
   margin-left: 2px;
   cursor: pointer;
-  color: rgba(122, 85, 32, 0.4);
+  color: var(--muted);
   transition: color 0.15s;
   line-height: 1;
 }
@@ -410,10 +392,9 @@
   color: var(--warning-text);
 }
 
-/* Gap variant — sage green */
 .statusStripGap {
-  border-color: rgba(22, 163, 74, 0.25);
-  background: rgba(220, 252, 231, 0.6);
+  border-color: color-mix(in srgb, var(--status-sage) 25%, transparent);
+  background: color-mix(in srgb, var(--status-sage) 10%, var(--color-card));
 }
 
 .statusStripGap .statusStripDot {
@@ -424,10 +405,9 @@
   color: var(--status-sage);
 }
 
-/* Active task variant — warm brown */
 .statusStripTask {
-  border-color: rgba(120, 113, 108, 0.2);
-  background: rgba(250, 250, 249, 0.8);
+  border-color: var(--border);
+  background: var(--color-card);
 }
 
 .statusStripTask .statusStripDot {
@@ -440,25 +420,21 @@
 }
 
 @keyframes stripPulse {
-
   0%,
   100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.5;
   }
 }
 
 @keyframes intRowPulseTerracotta {
-
   0%,
   100% {
     opacity: 0.9;
     transform: scale(1);
   }
-
   50% {
     opacity: 1;
     transform: scale(1.08);
@@ -470,7 +446,7 @@
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.55;
-  color: rgba(74, 52, 33, 0.76);
+  color: var(--text-secondary);
   margin: 0;
   max-width: 39ch;
 }
@@ -480,9 +456,8 @@
   gap: 12px;
   padding: 12px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.46);
-  border: 1px solid rgba(123, 103, 81, 0.08);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  border: none;
 }
 
 .metricRail {
@@ -498,8 +473,8 @@
   padding: 12px;
   min-width: 98px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(123, 103, 81, 0.06);
+  background: var(--color-card);
+  border: 1px solid var(--border);
 }
 
 @media (max-width: 767px) {
@@ -509,7 +484,7 @@
 }
 
 .metricLabel {
-  color: #8f7b68;
+  color: var(--text-secondary);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
@@ -518,7 +493,7 @@
 }
 
 .metricValue {
-  color: #4a3a2d;
+  color: var(--text);
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 1.02rem;
   font-weight: 700;
@@ -531,8 +506,8 @@
   gap: 8px;
   padding: 16px 17px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(250, 246, 240, 0.96) 0%, rgba(255, 255, 255, 0.82) 100%);
-  border: 1px solid rgba(123, 103, 81, 0.08);
+  background: var(--color-card);
+  border: 1px solid var(--border);
 }
 
 .nextStepLabel {
@@ -541,12 +516,12 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #8f7b68;
+  color: var(--text-secondary);
 }
 
 .nextStepText {
   margin: 0;
-  color: #3f3025;
+  color: var(--text);
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 1.08rem;
   font-weight: 700;
@@ -558,7 +533,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.67rem;
   font-weight: 700;
-  color: rgba(74, 52, 33, 0.56);
+  color: var(--text-secondary);
   letter-spacing: 0.05em;
 }
 
@@ -582,14 +557,14 @@
   min-height: 24px;
   padding: 0 9px;
   border-radius: 999px;
-  background: rgba(243, 239, 234, 0.72);
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: var(--color-sidebar);
+  border: 1px solid var(--border);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #736048;
+  color: var(--color-primary-strong);
 }
 
 .analyticsLink {
@@ -598,12 +573,12 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #7b6751;
+  color: var(--text-secondary);
   text-decoration: none;
 }
 
 .analyticsLink:hover {
-  color: #4a3421;
+  color: var(--text);
 }
 
 .liveContextCard {
@@ -612,16 +587,16 @@
   width: fit-content;
   max-width: min(100%, 34rem);
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.52);
-  border: 1px solid rgba(123, 103, 81, 0.1);
+  background: var(--color-card);
+  border: 1px solid var(--border);
   border-radius: 18px;
-  box-shadow: 0 8px 18px rgba(74, 52, 33, 0.025);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.025);
   backdrop-filter: blur(6px);
 }
 
 .liveContextCardWarning {
-  background: rgba(255, 248, 244, 0.78);
-  border-color: rgba(192, 113, 78, 0.14);
+  background: color-mix(in srgb, var(--danger) 10%, var(--color-card));
+  border-color: color-mix(in srgb, var(--danger) 25%, transparent);
 }
 
 .liveContextInlineAlert {
@@ -642,11 +617,11 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8f7b68;
+  color: var(--text-secondary);
 }
 
 .liveContextIcon {
-  color: rgba(192, 113, 78, 0.78);
+  color: var(--danger);
   flex-shrink: 0;
 }
 
@@ -654,10 +629,10 @@
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #f0b29d 0%, #c0714e 55%, #b83232 100%);
+  background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--danger) 80%, white) 0%, var(--danger) 55%, color-mix(in srgb, var(--danger) 80%, black) 100%);
   box-shadow:
-    0 0 0 4px rgba(192, 113, 78, 0.1),
-    0 0 14px rgba(192, 113, 78, 0.42);
+    0 0 0 4px color-mix(in srgb, var(--danger) 10%, transparent),
+    0 0 14px color-mix(in srgb, var(--danger) 42%, transparent);
   animation: liveAlertDotPulse 2s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -673,7 +648,7 @@
   font-size: 0.88rem;
   font-weight: 700;
   line-height: 1.35;
-  color: #6f3f30;
+  color: var(--text);
   max-width: 35ch;
 }
 
@@ -682,7 +657,7 @@
   font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(132, 87, 72, 0.72);
+  color: var(--text-secondary);
 }
 
 .liveContextInlineAlert .liveContextTop {
@@ -690,20 +665,18 @@
 }
 
 @keyframes liveAlertDotPulse {
-
   0%,
   100% {
     transform: scale(1);
     box-shadow:
-      0 0 0 4px rgba(192, 113, 78, 0.1),
-      0 0 14px rgba(192, 113, 78, 0.42);
+      0 0 0 4px color-mix(in srgb, var(--danger) 10%, transparent),
+      0 0 14px color-mix(in srgb, var(--danger) 42%, transparent);
   }
-
   50% {
     transform: scale(1.08);
     box-shadow:
-      0 0 0 6px rgba(192, 113, 78, 0.08),
-      0 0 18px rgba(192, 113, 78, 0.5);
+      0 0 0 6px color-mix(in srgb, var(--danger) 8%, transparent),
+      0 0 18px color-mix(in srgb, var(--danger) 50%, transparent);
   }
 }
 

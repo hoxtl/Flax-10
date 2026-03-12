@@ -7,36 +7,36 @@ import { motion } from "framer-motion";
 import styles from "./ModulePill.module.css";
 
 export const MODULE_COLOURS = {
-  PS4202: { bg: "#F3F0FF", text: "#5B4A8A", accent: "#8B7BB8" },
-  PS4101: { bg: "#EDF4FC", text: "#4A6D8C", accent: "#7BA3C4" },
-  IR4101: { bg: "#FFF6E9", text: "#8C6D3F", accent: "var(--color-highlight)" },
-  EE4303: { bg: "#EFF7F0", text: "#4A7C5A", accent: "var(--status-sage)" },
-  EE4202: { bg: "#FFF0F0", text: "#8C5A5A", accent: "#C48B8B" },
-  FR4101: { bg: "#FFF4EE", text: "#8C5D3F", accent: "#C49070" },
-  LS4101: { bg: "#F0F7F2", text: "#4A7360", accent: "#7BB396" },
-  CS3001: { bg: "#F5F0F0", text: "#7A5A5A", accent: "#B38B8B" },
-  EN4101: { bg: "#FFF6E9", text: "#8C6D3F", accent: "var(--color-highlight)" },
-  default: { bg: "#F5F0E8", text: "#736048", accent: "var(--color-primary)" },
+  PS4202: { bg: "color-mix(in srgb, #8B7BB8 12%, var(--color-sidebar))", text: "var(--text-secondary)", accent: "#8B7BB8" },
+  PS4101: { bg: "color-mix(in srgb, #7BA3C4 12%, var(--color-sidebar))", text: "var(--text-secondary)", accent: "#7BA3C4" },
+  IR4101: { bg: "color-mix(in srgb, var(--color-highlight) 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "var(--color-highlight)" },
+  EE4303: { bg: "color-mix(in srgb, var(--status-sage) 12%, var(--color-sidebar))", text: "var(--status-sage)", accent: "var(--status-sage)" },
+  EE4202: { bg: "color-mix(in srgb, var(--danger) 12%, var(--color-sidebar))", text: "var(--danger)", accent: "var(--danger)" },
+  FR4101: { bg: "color-mix(in srgb, #C49070 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "#C49070" },
+  LS4101: { bg: "color-mix(in srgb, #7BB396 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "#7BB396" },
+  CS3001: { bg: "color-mix(in srgb, #B38B8B 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "#B38B8B" },
+  EN4101: { bg: "color-mix(in srgb, var(--color-highlight) 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "var(--color-highlight)" },
+  default: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)", accent: "var(--color-primary)" },
 };
 
 const HASH_PALETTE = [
-  { bg: "#F3F0FF", text: "#5B4A8A", accent: "#8B7BB8" },
-  { bg: "#EDF4FC", text: "#4A6D8C", accent: "#7BA3C4" },
-  { bg: "#FFF6E9", text: "#8C6D3F", accent: "var(--color-highlight)" },
-  { bg: "#EFF7F0", text: "#4A7C5A", accent: "var(--status-sage)" },
-  { bg: "#FFF0F0", text: "#8C5A5A", accent: "#C48B8B" },
-  { bg: "#FFF4EE", text: "#8C5D3F", accent: "#C49070" },
-  { bg: "#F5F0F0", text: "#7A5A5A", accent: "#B38B8B" },
+  { bg: "color-mix(in srgb, #8B7BB8 12%, var(--color-sidebar))", text: "var(--text-secondary)", accent: "#8B7BB8" },
+  { bg: "color-mix(in srgb, #7BA3C4 12%, var(--color-sidebar))", text: "var(--text-secondary)", accent: "#7BA3C4" },
+  { bg: "color-mix(in srgb, var(--color-highlight) 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "var(--color-highlight)" },
+  { bg: "color-mix(in srgb, var(--status-sage) 12%, var(--color-sidebar))", text: "var(--status-sage)", accent: "var(--status-sage)" },
+  { bg: "color-mix(in srgb, var(--danger) 12%, var(--color-sidebar))", text: "var(--danger)", accent: "var(--danger)" },
+  { bg: "color-mix(in srgb, #C49070 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "#C49070" },
+  { bg: "color-mix(in srgb, #B38B8B 12%, var(--color-sidebar))", text: "var(--color-primary-strong)", accent: "#B38B8B" },
 ];
 
 const TYPE_COLOURS = {
-  COURSEWORK: { bg: "#EBF3EE", text: "#4A7C59", border: "rgba(74, 124, 89, 0.15)" },
-  EXAM: { bg: "#EBF3EE", text: "#4A7C59", border: "rgba(74, 124, 89, 0.15)" },
-  PRESENTATION: { bg: "#F0EDE8", text: "#6B6048", border: "rgba(107, 96, 72, 0.15)" },
-  LAB: { bg: "#EDF0E8", text: "#5A6B48", border: "rgba(90, 107, 72, 0.15)" },
-  REPORT: { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
-  QUIZ: { bg: "#EBF3EE", text: "#4A7C59", border: "rgba(74, 124, 89, 0.15)" },
-  default: { bg: "#F5F0E8", text: "#736048", border: "rgba(115, 96, 72, 0.15)" },
+  COURSEWORK: { bg: "color-mix(in srgb, var(--warning) 8%, var(--color-sidebar))", text: "var(--warning)", border: "var(--warning-border)" },
+  EXAM: { bg: "color-mix(in srgb, var(--danger) 8%, var(--color-sidebar))", text: "var(--danger)", border: "var(--danger-border)" },
+  PRESENTATION: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)", border: "var(--border)" },
+  LAB: { bg: "color-mix(in srgb, var(--status-sage) 8%, var(--color-sidebar))", text: "var(--status-sage)", border: "color-mix(in srgb, var(--status-sage) 20%, transparent)" },
+  REPORT: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)", border: "var(--border)" },
+  QUIZ: { bg: "color-mix(in srgb, var(--color-highlight) 8%, var(--color-sidebar))", text: "var(--color-highlight)", border: "color-mix(in srgb, var(--color-highlight) 20%, transparent)" },
+  default: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)", border: "var(--border)" },
 };
 
 function hashCode(str) {

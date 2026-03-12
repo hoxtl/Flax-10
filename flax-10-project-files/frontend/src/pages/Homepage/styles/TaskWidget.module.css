@@ -59,7 +59,7 @@
 
 .taskWidgetSlotSubtitle {
   margin: 0;
-  color: #8a7868;
+  color: var(--color-primary-strong);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   line-height: 1.35;
@@ -70,9 +70,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(44, 24, 16, 0.16);
-  background: linear-gradient(135deg, #3a2619 0%, #2c1810 100%);
-  color: #fffcf8;
+  border: 1px solid var(--border);
+  background: var(--btn-black);
+  color: var(--color-bg);
   border-radius: 999px;
   padding: 8px 11px;
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
@@ -85,7 +85,7 @@
 }
 
 .taskWidgetFocusBtn:hover {
-  background: linear-gradient(135deg, #4a2e1d 0%, #362114 100%);
+  background: var(--btn-black-hover);
 }
 
 .taskWidgetSummaryRow {
@@ -99,9 +99,9 @@
 .taskWidgetDueTodayPill {
   padding: 4px 10px;
   border-radius: 9999px;
-  border: 1px solid rgba(139, 115, 85, 0.12);
-  background: rgba(243, 239, 234, 0.72);
-  color: #736048;
+  border: 1px solid var(--border);
+  background: var(--color-sidebar);
+  color: var(--color-primary-strong);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
@@ -116,9 +116,9 @@
   gap: 5px;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(139, 115, 85, 0.12);
-  background: rgba(243, 239, 234, 0.72);
-  color: #736048;
+  border: 1px solid var(--border);
+  background: var(--color-sidebar);
+  color: var(--color-primary-strong);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
@@ -143,9 +143,9 @@
   min-height: 58px;
   padding: 9px 11px;
   border-radius: 14px;
-  border: 1px solid rgba(139, 115, 85, 0.11);
+  border: 1px solid var(--border);
   border-left: 5px solid color-mix(in srgb, var(--task-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
-  background: linear-gradient(180deg, #fffdfa 0%, #fffaf5 100%);
+  background: var(--color-card);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
 }
 
@@ -215,9 +215,9 @@
   align-items: center;
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid #d8d4cf;
-  background: #f0f0f0;
-  color: #7f7b76;
+  border: 1px solid var(--border);
+  background: var(--color-sidebar);
+  color: var(--color-primary-strong);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 8px;
   font-weight: 700;
@@ -314,7 +314,7 @@
 .taskWidgetCompletedSection {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(139, 115, 85, 0.1);
+  border-top: 1px solid var(--border);
   display: grid;
   gap: 8px;
 }
@@ -350,11 +350,11 @@
 }
 
 .taskWidgetCompletedLabel {
-  color: #736048;
+  color: var(--color-primary-strong);
 }
 
 .taskWidgetCompletedCount {
-  color: #9b8b7e;
+  color: var(--color-primary);
 }
 
 .taskWidgetCompletedStats {
@@ -370,8 +370,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid rgba(139, 115, 85, 0.12);
-  background: rgba(243, 239, 234, 0.72);
+  border: 1px solid var(--border);
+  background: var(--color-sidebar);
 }
 
 .taskWidgetCompletedChevron {

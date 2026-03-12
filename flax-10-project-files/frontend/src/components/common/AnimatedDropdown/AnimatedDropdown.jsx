@@ -245,8 +245,8 @@ function DropdownPanel({
         left: coords.left,
         width: 'max-content',
         minWidth: coords.width,
-        zIndex: 9999,
-        margin: 0
+        zIndex: 1000,
+        margin: openUpward ? '0 0 4px 0' : '4px 0 0 0'
     });
   }
 

@@ -15,13 +15,13 @@ import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 const VISIBLE_COUNT = 3;
 
 const CATEGORY_COLOURS = {
-  UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
-  HEALTH: { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
-  PERSONAL: { bg: "#F5F0E8", text: "#736048" },
-  WORK: { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
-  FINANCE: { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
-  STUDY: { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
-  default: { bg: "#F5F0E8", text: "#736048" },
+  UNIVERSITY: { bg: "color-mix(in srgb, var(--color-primary) 8%, var(--color-sidebar))", text: "var(--color-primary)" },
+  HEALTH: { bg: "color-mix(in srgb, var(--status-sage) 8%, var(--color-sidebar))", text: "var(--status-sage)" },
+  PERSONAL: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)" },
+  WORK: { bg: "color-mix(in srgb, var(--warning) 8%, var(--color-sidebar))", text: "var(--warning)" },
+  FINANCE: { bg: "color-mix(in srgb, var(--color-primary-strong) 8%, var(--color-sidebar))", text: "var(--color-primary-strong)" },
+  STUDY: { bg: "color-mix(in srgb, var(--color-highlight) 12%, var(--color-sidebar))", text: "var(--color-primary-strong)" },
+  default: { bg: "var(--color-sidebar)", text: "var(--color-primary-strong)" },
 };
 
 const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;

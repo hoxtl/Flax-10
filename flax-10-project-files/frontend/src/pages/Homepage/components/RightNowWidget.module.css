@@ -23,7 +23,7 @@
   height: 52px;
   border-radius: 14px;
   background: var(--color-sidebar);
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +81,7 @@
   align-items: center;
   gap: 8px;
   border-radius: 18px;
-  border: 1px solid #e5cdc6;
+  border: 1px solid var(--error-border);
   background: var(--error-bg);
   padding: 10px 12px;
 }
@@ -139,7 +139,7 @@
   border-radius: 999px;
   border: 1px solid var(--color-sidebar);
   background: var(--color-sidebar);
-  color: #857668;
+  color: var(--color-primary-strong);
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 12px;
   font-weight: 800;
@@ -151,7 +151,7 @@
 .nowPill {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-card);
+  color: var(--color-bg);
 }
 
 .nowText strong,
@@ -258,11 +258,11 @@
 /* ─── Current event card ──────────────────────────────────────── */
 
 .currentEventCard {
-  background: linear-gradient(135deg, #f8fbf6 0%, #f4f4ef 100%);
+  background: color-mix(in srgb, var(--status-sage) 4%, var(--color-card));
   border-radius: 16px;
   padding: 12px 14px;
-  border: 1px solid rgba(123, 179, 142, 0.18);
-  border-left: 4px solid #7BB38E;
+  border: 1px solid color-mix(in srgb, var(--status-sage) 18%, transparent);
+  border-left: 4px solid var(--status-sage);
 }
 
 .currentEventRow1 {
@@ -335,8 +335,8 @@
   gap: 6px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(248, 243, 236, 0.72);
-  border: 1px solid rgba(139, 115, 85, 0.08);
+  background: var(--color-sidebar);
+  border: 1px solid var(--border);
 }
 
 .upNextLeft {
@@ -361,8 +361,8 @@
   gap: 8px;
   padding: 11px 12px;
   border-radius: 14px;
-  background: rgba(250, 247, 242, 0.86);
-  border: 1px solid rgba(139, 115, 85, 0.09);
+  background: color-mix(in srgb, var(--color-sidebar) 50%, var(--color-card));
+  border: 1px solid var(--border);
 }
 
 .contextCardHeader {
@@ -379,12 +379,12 @@
 }
 
 .contextCardIcon {
-  color: #8b7355;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
 .contextCardEyebrow {
-  color: #a89279;
+  color: var(--color-primary-strong);
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 9px;
   font-weight: 700;
@@ -396,7 +396,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #8b7355;
+  color: var(--color-primary);
   text-decoration: none;
   font-size: 10px;
   font-weight: 600;
@@ -404,14 +404,14 @@
 
 .contextCardTitle {
   margin: 0;
-  color: #2c1810;
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
 
 .contextCardText {
   margin: 0;
-  color: #7f6a57;
+  color: var(--color-primary-strong);
   font-size: 11px;
   line-height: 1.45;
 }
@@ -427,8 +427,8 @@
   align-items: center;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(139, 115, 85, 0.08);
-  color: #6d5847;
+  background: var(--border);
+  color: var(--color-primary-strong);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -524,20 +524,20 @@
 }
 
 .tflCardInfo {
-  background: rgba(168, 146, 121, 0.05);
+  background: color-mix(in srgb, var(--color-card) 95%, var(--color-primary));
   border-left: 3px solid var(--color-primary);
   border-radius: 0 10px 10px 0;
 }
 
 .tflCardUrgent {
-  background: rgba(217, 119, 6, 0.05);
-  border-left: 3px solid #d97706;
+  background: var(--warning-bg);
+  border-left: 3px solid var(--warning);
   border-radius: 0 10px 10px 0;
 }
 
 .tflCardCritical {
-  background: rgba(220, 53, 69, 0.05);
-  border-left: 3px solid #dc3545;
+  background: var(--danger-bg);
+  border-left: 3px solid var(--danger);
   border-radius: 0 10px 10px 0;
 }
 
@@ -571,13 +571,13 @@
 }
 
 .tflBadgeUrgent {
-  background: rgba(217, 119, 6, 0.12);
-  color: #b45309;
+  background: var(--warning-bg);
+  color: var(--warning-text);
 }
 
 .tflBadgeCritical {
-  background: rgba(220, 53, 69, 0.12);
-  color: #dc3545;
+  background: var(--danger-bg);
+  color: var(--danger-text);
 }
 
 .tflCardSub {
@@ -615,34 +615,34 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: rgba(196, 164, 109, 0.06);
-  border: 1px solid rgba(196, 164, 109, 0.12);
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
   border-radius: 8px;
   width: 100%;
   text-align: left;
   cursor: default;
-  transition: background 0.15s ease;
+  transition: filter 0.15s ease;
 }
 
 .conflictPill:hover {
-  background: rgba(196, 164, 109, 0.1);
+  filter: brightness(0.95);
 }
 
 .conflictIcon {
   flex-shrink: 0;
-  color: var(--color-highlight);
+  color: var(--warning-text);
 }
 
 .conflictText {
   font-size: 11px;
   font-weight: 500;
-  color: var(--color-highlight);
+  color: var(--warning-text);
   flex: 1;
 }
 
 .conflictChevron {
   font-size: 9px;
-  color: var(--color-primary);
+  color: var(--warning-text);
   flex-shrink: 0;
 }
 
