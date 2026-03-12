@@ -11,8 +11,8 @@
 .card {
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 1rem;
   overflow: hidden;
+  border-radius: 1rem;
 }
 
 .cardHeader {
@@ -20,6 +20,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
+  gap: 4px;
+  flex-wrap:wrap;
+}
+
+.cardHeader:hover {
+  background: var(--hover-light);
+  transform: translateY(-0.5px);
+  box-shadow: var(--shadow-sm);
 }
 
 .cardHeaderLeft {
@@ -33,7 +41,7 @@
 }
 
 .sectionTitle {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text);
   text-transform: uppercase;
@@ -42,7 +50,7 @@
 }
 
 .sectionPill {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   background: var(--border);
   color: var(--muted);
   border-radius: 999px;
@@ -51,7 +59,7 @@
 }
 
 .speedTag {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--muted);
   font-family: var(--font-body);
   font-weight: 500;
@@ -72,7 +80,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 8px 14px;
+  padding: 12px 14px 14px;
   background: transparent;
   border-bottom: 1px solid var(--border);
   transition: background 0.1s ease, opacity 0.2s;
@@ -83,15 +91,29 @@
 }
 
 .row:hover {
-  background: rgba(123, 103, 81, 0.03);
+  background: var(--hover-light);
+  transform: translateY(-0.5px);
+  box-shadow: var(--shadow-sm);
 }
 
 .row:active {
   background: rgba(123, 103, 81, 0.06);
+  transform: translateY(0);
 }
 
 .rowAdded {
   opacity: 0.35;
+}
+
+.rowTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-body);
 }
 
 .rowLeft {
@@ -102,52 +124,42 @@
   min-width: 0;
 }
 
-.rowTitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: var(--font-body);
-}
 
 .rowInfos {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 2px 0;
+  gap: 8px 16px;
+  margin: 4px 0;
 }
 
 .rowInfo {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.78rem;
-  color: var(--text);
+  font-size: 0.82rem;
+  color: var(--flax-brown-strong);
   font-family: var(--font-body);
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .rowHint {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.72rem;
-  color: var(--text-secondary);
+  font-size: 0.76rem;
+  color: var(--flax-brown-strong);
   font-family: var(--font-body);
   font-weight: 400;
   font-style: italic;
-  margin: 1px 0 0;
+  margin: 4px 0 0;
   opacity: 0.7;
 }
 
 .addBtn {
   flex-shrink: 0;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 650;
-  padding: 5px 14px;
+  padding: 6px 16px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
@@ -220,4 +232,14 @@
   font-weight: 500;
   color: var(--muted);
   line-height: 1.4;
+}
+
+.rowInfoPill {
+  font-size: 0.72rem;
+  font-weight: 650;
+  font-family: var(--font-body);
+  color: var(--flax-brown-strong);
+  background: var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
 }
