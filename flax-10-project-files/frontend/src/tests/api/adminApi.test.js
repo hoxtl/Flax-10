@@ -60,3 +60,36 @@ describe("adminApi – users", () => {
     expect(body.action).toBe("unban");
   });
 });
+
+describe("adminApi – teacher requests", () => {
+  it("fetchTeacherRequests calls /admin/teacher-requests/", () => {
+    fetchApi.mockResolvedValue([]);
+    fetchTeacherRequests();
+    expect(fetchApi).toHaveBeenCalledWith("/admin/teacher-requests/");
+  });
+
+  it("resolveTeacherRequest calls correct endpoint with POST", () => {
+    fetchApi.mockResolvedValue({});
+    resolveTeacherRequest(3, "approve");
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/admin/teacher-requests/3/resolve/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("resolveTeacherRequest sends decision in body", () => {
+    fetchApi.mockResolvedValue({});
+    resolveTeacherRequest(3, "reject");
+    const body = JSON.parse(fetchApi.mock.calls[0][1].body);
+    expect(body).toEqual({ decision: "reject" });
+  });
+
+  it("requestTeacherRole calls /request-teacher-role/ with POST", () => {
+    fetchApi.mockResolvedValue({});
+    requestTeacherRole();
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/request-teacher-role/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});
