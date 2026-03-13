@@ -37,6 +37,8 @@ vi.mock("../../api/adminApi", () => ({
   fetchPendingRatifications: vi.fn(),
   approveRatification: vi.fn(),
   rejectRatification: vi.fn(),
+  fetchCourseChangeRequests: vi.fn(),
+  resolveCourseChangeRequest: vi.fn(),
 }));
 
 vi.mock("../../pages/Admin/AdminPage.module.css", () => ({ default: {} }));
@@ -86,6 +88,7 @@ function setupDefaultMocks() {
   api.fetchTeacherRequests.mockResolvedValue([]);
   api.fetchReportedSocieties.mockResolvedValue([]);
   api.fetchPendingRatifications.mockResolvedValue([]);
+  api.fetchCourseChangeRequests.mockResolvedValue([]);
 }
 
 beforeEach(() => {
@@ -99,12 +102,13 @@ describe("AdminPage – shell", () => {
     expect(screen.getByText("Admin Dashboard")).toBeTruthy();
   });
 
-  it("renders all four tab buttons", () => {
+  it("renders all five tab buttons", () => {
     render(<AdminPage />);
     expect(screen.getByText(/Users/)).toBeTruthy();
     expect(screen.getByText(/Ratifications/)).toBeTruthy();
     expect(screen.getByText(/Teacher Requests/)).toBeTruthy();
     expect(screen.getByText(/Reported Societies/)).toBeTruthy();
+    expect(screen.getByText(/Course Change Requests/)).toBeTruthy();
   });
 
   it("shows users tab content by default", async () => {
@@ -133,6 +137,16 @@ describe("AdminPage – shell", () => {
     fireEvent.click(screen.getByText(/Reported Societies/));
     await waitFor(() =>
       expect(screen.getByText(/No reported societies/i)).toBeTruthy(),
+    );
+  });
+
+  it("switches to course change requests tab", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/No pending course change requests/i),
+      ).toBeTruthy(),
     );
   });
 });
@@ -405,5 +419,65 @@ describe("AdminPage – Reported Societies tab", () => {
     fireEvent.click(screen.getByText("Dismiss"));
     await waitFor(() => expect(api.dismissReport).toHaveBeenCalledWith(20));
     await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
+  });
+});
+
+describe("AdminPage – Course Change Requests tab", () => {
+  it("shows empty state when no requests", async () => {
+    api.fetchCourseChangeRequests.mockResolvedValue([]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/No pending course change requests/i),
+      ).toBeTruthy(),
+    );
+  });
+
+  it("renders pending requests", async () => {
+    api.fetchCourseChangeRequests.mockResolvedValue([
+      {
+        id: 1,
+        first_name: "Jane",
+        last_name: "Doe",
+        username: "janedoe",
+        email: "jane@example.com",
+        current_course: "Physics",
+        requested_course: "Chemistry",
+        status: "pending",
+        created_at: "2024-01-01T00:00:00Z",
+        resolved_at: null,
+      },
+    ]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeTruthy());
+    expect(screen.getByText(/Physics.*Chemistry/)).toBeTruthy();
+  });
+
+  it("calls resolveCourseChangeRequest with approve and removes row", async () => {
+    api.fetchCourseChangeRequests.mockResolvedValue([
+      {
+        id: 5,
+        first_name: "Bob",
+        last_name: "Smith",
+        username: "bob",
+        email: "bob@example.com",
+        current_course: "History",
+        requested_course: "Law",
+        status: "pending",
+        created_at: "2024-01-01T00:00:00Z",
+        resolved_at: null,
+      },
+    ]);
+    api.resolveCourseChangeRequest.mockResolvedValue({ status: "approved" });
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+    await waitFor(() => screen.getByText("Bob Smith"));
+    fireEvent.click(screen.getByText("✓ Approve"));
+    await waitFor(() =>
+      expect(api.resolveCourseChangeRequest).toHaveBeenCalledWith(5, "approve"),
+    );
+    await waitFor(() => expect(screen.queryByText("Bob Smith")).toBeNull());
   });
 });
