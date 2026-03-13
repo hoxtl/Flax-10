@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
@@ -10,7 +11,7 @@ export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, 
     return (
         <div className={styles.nav}>
             <NavArrow direction="left" onClick={onPrev} />
-            {showToday && <button className={styles.todayBtn} onClick={onToday}>Today</button>}
+            {showToday && <PrimaryButton className={styles.todayBtn} variant="ghost" onClick={onToday} pill>Today</PrimaryButton>}
             <NavArrow direction="right" onClick={onNext} />
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
             {title && <h2 className={styles.title}>{title}</h2>}

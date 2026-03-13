@@ -3,6 +3,7 @@
  * including its biography and administrator contact emails.
  */
 import { useState } from "react";
+import PrimaryButton from "../../../common/PrimaryButton/PrimaryButton";
 import styles from "./tabs.module.css";
 
 const isValidEmail = (email) => {
@@ -98,8 +99,8 @@ function EmailInput({ emails, onChange }) {
 function EditorActions({ onCancel, onSave, disabled }) {
     return (
         <div className={styles.editorActions}>
-            <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-            <button className={styles.saveBtn} onClick={onSave} disabled={disabled}>Save Changes</button>
+            <PrimaryButton className={styles.cancelBtn} variant="ghost" pill onClick={onCancel}>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.saveBtn} pill onClick={onSave} disabled={disabled}>Save Changes</PrimaryButton>
         </div>
     );
 }

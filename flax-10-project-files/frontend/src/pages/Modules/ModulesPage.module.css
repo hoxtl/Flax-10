@@ -1,7 +1,5 @@
 .container {
-    padding: 1.5rem 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    min-height: 100%;
 }
 
 .skeletonHeader {
@@ -38,26 +36,9 @@
 }
 
 .skeletonCard { height: 180px; }
+/* Layout-only — button appearance comes from PrimaryButton */
 .createButton {
-    padding: 0.75rem 1.5rem;
-    background: var(--primary);
-    color: var(--c-white);
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.15);
-}
-.createButton:hover {
-    background: var(--c-olive);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(158, 126, 93, 0.2);
-}
-.createButton:active {
-    transform: translateY(0);
 }
 .toolbarDropdown {
     flex: 1;
