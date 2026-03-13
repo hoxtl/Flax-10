@@ -44,7 +44,7 @@
   height: auto;
   overflow-y: visible;
   overflow-x: hidden;
-  padding: 0px 24px 24px;
+  padding: 0 var(--space-6) var(--space-6);
   width: 100%;
   box-sizing: border-box;
   background: var(--bg);
@@ -53,7 +53,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--surface-overlay);
   backdrop-filter: blur(4px);
   z-index: 50;
 }
@@ -70,16 +70,16 @@
 
 .scrollToTop {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
+  bottom: var(--space-7, 28px);
+  right: var(--space-7, 28px);
   z-index: 9999;
   width: 56px;
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: #7f6a53;
-  color: #f7f6f3;
-  box-shadow: 0 6px 18px rgba(44, 36, 32, 0.24);
+  background: var(--primary);
+  color: var(--surface-paper);
+  box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,8 +91,8 @@
 }
 
 .scrollToTop:hover {
-  background: #6f5d4b;
-  box-shadow: 0 8px 22px rgba(44, 36, 32, 0.28);
+  background: var(--primary-strong);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 

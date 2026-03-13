@@ -137,7 +137,7 @@ function ProfileContent({ user, state, visibility, onNavigate }) {
   const { modules, upcomingEventCount, filteredEvents } = useProfileBodyData(state);
   return (
     <div className={styles.content}>
-      <ProfileHeader user={profileData || user} profileData={profileData} upcomingEventCount={upcomingEventCount} handlers={handlers} visibility={visibility} />
+      <ProfileHeader user={profileData || user} profileData={profileData} taskCount={state.taskCount} upcomingEventCount={upcomingEventCount} handlers={handlers} visibility={visibility} />
       <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={modules} />
       {visibility.canViewCalendar && <SharedCalendarSection events={filteredEvents} />}
     </div>

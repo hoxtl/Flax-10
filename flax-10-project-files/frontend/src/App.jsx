@@ -334,7 +334,7 @@ function OnboardingWrapper({ onComplete }) {
   );
 }
 
-import ScrollToTop from "./components/common/ScrollToTop";
+import ScrollToTop from "./components/common/ScrollToTop/ScrollToTop";
 
 function AppScreen({ activeNav, setActiveNav, user }) {
   const location = useLocation();
@@ -358,6 +358,25 @@ function AppScreen({ activeNav, setActiveNav, user }) {
       const tab = parts[2];
       const url = tab ? `/group-work?project=${projectId}&tab=${tab}` : `/group-work?project=${projectId}`;
       handleNavChange(url);
+      return;
+    }
+
+    if (id === "profile") {
+      setActiveNav("profile");
+      navigate("/profile");
+      return;
+    }
+
+    if (id.startsWith("profile_")) {
+      const viewedUserId = id.split("_")[1];
+      setActiveNav(id);
+      navigate(`/profile/${viewedUserId}`);
+      return;
+    }
+
+    if (id === "settings") {
+      setActiveNav("settings");
+      navigate("/settings");
       return;
     }
 
@@ -400,6 +419,19 @@ function AppScreen({ activeNav, setActiveNav, user }) {
 function useSyncNavFromUrl(pathname, setActiveNav) {
   useEffect(() => {
     const path = pathname || "/";
+    if (path === "/profile") {
+      setActiveNav("profile");
+      return;
+    }
+    if (path.startsWith("/profile/")) {
+      const viewedUserId = path.split("/")[2];
+      if (viewedUserId) setActiveNav(`profile_${viewedUserId}`);
+      return;
+    }
+    if (path === "/settings") {
+      setActiveNav("settings");
+      return;
+    }
     const route = APP_ROUTES.find((r) => r.path === path);
     if (route) setActiveNav(route.id);
   }, [pathname, setActiveNav]);

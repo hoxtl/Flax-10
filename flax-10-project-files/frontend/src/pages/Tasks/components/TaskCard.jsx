@@ -11,7 +11,7 @@ import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import { getUserSettings } from "../../../api/userService";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal/SleepWarningModal";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";

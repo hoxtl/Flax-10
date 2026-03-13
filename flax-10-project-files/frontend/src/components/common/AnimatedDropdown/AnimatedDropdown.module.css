@@ -32,7 +32,7 @@
   min-width: 100%;
   width: max-content;
   max-width: 90vw;
-  background: var(--dropdown-bg);
+  background: var(--surface-raised);
   border: var(--dropdown-border);
   border-radius: var(--dropdown-radius);
   box-shadow: var(--dropdown-shadow);
@@ -94,7 +94,7 @@
   align-items: center;
   gap: 0.45rem;
   padding: var(--space-2) var(--space-3);
-  background: var(--surface-panel);
+  background: var(--surface-raised);
   border-bottom: var(--stroke-soft);
   z-index: 1;
 }

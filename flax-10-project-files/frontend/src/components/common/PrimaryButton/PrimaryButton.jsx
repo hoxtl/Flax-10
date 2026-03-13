@@ -1,8 +1,7 @@
 import styles from "./PrimaryButton.module.css";
 
 /**
- * Primary action button with consistent padding and rounded corners (6–8px).
- * Use for main CTAs (Save, Submit, Add task, etc.).
+ * Shared action button for consistent CTA styling across the app.
  */
 export default function PrimaryButton({
   children,
@@ -10,13 +9,15 @@ export default function PrimaryButton({
   disabled = false,
   type = "button",
   size = "medium",
+  variant = "primary",
+  pill = false,
   ...props
 }) {
   return (
     <button
       type={type}
       disabled={disabled}
-      className={`${styles.btn} ${styles[size]} ${className}`.trim()}
+      className={`${styles.btn} ${styles[size]} ${styles[variant]} ${pill ? styles.pill : ""} ${className}`.trim()}
       {...props}
     >
       {children}

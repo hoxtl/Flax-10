@@ -24,6 +24,8 @@
     color: white;
     margin: 0;
     font-size: 1.4rem;
+    display: flex;
+    align-items: center;
 }
 
 .count {
@@ -32,9 +34,12 @@
     font-size: 0.9rem;
 }
 
-.badge {
-    margin-left: 8px;
-    font-size: 1rem;
+.verifiedIcon {
+    margin-left: 6px;
+    color: #22c55e;
+    flex-shrink: 0;
+    vertical-align: middle;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .overlay {
@@ -44,7 +49,7 @@
     align-items: flex-end;
     justify-content: flex-start;
     padding: 20px;
-    background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+    background: var(--surface-overlay-strong);
 }
 
 .reportBtn {
@@ -57,12 +62,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--surface-report-icon);
     cursor: pointer;
     opacity: 0;
     transition: all 0.2s ease;
     z-index: 2;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    filter: var(--shadow-report-icon);
 }
 
 .card:hover .reportBtn,

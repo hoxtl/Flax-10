@@ -3,38 +3,8 @@
     flex: 1;
 }
 
-.icon {
-    position: absolute;
-    left: var(--space-3);
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: var(--text-base);
-    color: var(--muted);
-    pointer-events: none;
-}
-
 .input {
-    width: 100%;
-    min-height: var(--input-height);
-    padding: var(--input-padding);
-    padding-left: 38px;
-    border: var(--input-border);
-    border-radius: var(--dropdown-radius);
     font-size: var(--text-md);
-    background: var(--surface-search);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    box-sizing: border-box;
-}
-
-.input:focus {
-    border-color: var(--primary);
-    box-shadow: var(--input-focus-ring);
-}
-
-.input::placeholder {
-    color: var(--text-secondary);
 }
 
 /* Compact variant for topbar */
@@ -44,16 +14,7 @@
 
 .compact .input {
     width: 200px;
-    min-height: var(--control-height);
     padding: var(--space-2) var(--space-3) var(--space-2) 32px;
     font-size: var(--text-sm);
     border-radius: var(--radius-md);
-}
-
-:root[data-theme="dark"] .input {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-:root[data-theme="dark"] .input:focus {
-    background: rgba(255, 255, 255, 0.08);
 }
