@@ -41,7 +41,10 @@ def patch_settings(settings, data, user):
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
-    settings, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings, _ = UserSettings.objects.get_or_create(
+        user=request.user,
+        defaults={'theme': 'light', 'timezone': 'Europe/London'},
+    )
     if request.method == 'GET':
         return Response(UserSettingsSerialiser(settings).data)
     error = apply_user_updates(request.user, request.data)

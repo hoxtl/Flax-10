@@ -51,6 +51,8 @@ class UserSerialiser(serializers.ModelSerializer):
             'shared_by_count', 'shared_with_count', 'is_shared_with_me', 'is_sharing',
             'modules', 'study_hours_this_week', 'study_streak',
             'role',
+            'is_active',
+            'ban_reason',
             'is_superuser',
         ]
         read_only_fields = ['id']
