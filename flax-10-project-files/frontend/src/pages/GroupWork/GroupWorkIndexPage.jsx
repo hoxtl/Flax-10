@@ -1,10 +1,38 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GroupProjectDetail from "./GroupWorkDetail";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import { getDeadlineLabel } from "./utils/taskUtils";
 import styles from "./GroupWorkIndexPage.module.css";
+
+function SkeletonBlock({ className = "" }) {
+  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
+}
+
+function GroupWorkIndexSkeleton() {
+  return (
+    <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
+      <div className={styles.skeletonHeader}>
+        <SkeletonBlock className={styles.skeletonTitle} />
+        <SkeletonBlock className={styles.skeletonSubtitle} />
+      </div>
+      <div className={styles.skeletonForm}>
+        <SkeletonBlock className={`${styles.skeletonInput} ${styles.skeletonInputName}`} />
+        <SkeletonBlock className={styles.skeletonInput} />
+        <SkeletonBlock className={styles.skeletonInput} />
+        <SkeletonBlock className={styles.skeletonButton} />
+      </div>
+      <div className={styles.skeletonList}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className={styles.skeletonRow}>
+            <SkeletonBlock className={styles.skeletonRowName} />
+            <SkeletonBlock className={styles.skeletonRowMeta} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function CreateProjectInputs({ data, onChange }) {
   return (
@@ -71,7 +99,7 @@ export default function GroupWorkIndexPage() {
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
   if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} />;
-  if (loading) return <PageSkeleton label="Loading your group projects" showAction cardCount={6} cardHeight="170px" columns={2} testId="groupwork-skeleton" />;
+  if (loading) return <GroupWorkIndexSkeleton />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
     <div className={styles.container}>

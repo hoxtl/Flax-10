@@ -5,6 +5,90 @@
     color: var(--text);
 }
 
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeletonBlock {
+    background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 999px;
+}
+
+.skeletonHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeletonTitle {
+    width: min(220px, 55%);
+    height: 30px;
+    border-radius: 12px;
+}
+
+.skeletonSubtitle {
+    width: min(420px, 80%);
+    height: 14px;
+    border-radius: 10px;
+}
+
+.skeletonForm {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.skeletonInput {
+    height: 40px;
+    flex: 1;
+}
+
+.skeletonInputName {
+    flex: 2;
+}
+
+.skeletonButton {
+    width: 88px;
+    height: 40px;
+}
+
+.skeletonList {
+    margin-top: 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    overflow: hidden;
+}
+
+.skeletonRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.skeletonRow:last-child {
+    border-bottom: none;
+}
+
+.skeletonRowName {
+    width: min(260px, 55%);
+    height: 16px;
+    border-radius: 8px;
+}
+
+.skeletonRowMeta {
+    width: 110px;
+    height: 14px;
+    border-radius: 8px;
+}
+
 .title {
     font-size: 24px;
     margin: 0;
@@ -95,4 +179,26 @@
 .projectDeadline {
     font-size: 12px;
     color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+    .skeletonForm {
+        flex-wrap: wrap;
+    }
+
+    .skeletonInputName,
+    .skeletonInput,
+    .skeletonButton {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .skeletonRow {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .skeletonRowName {
+        width: 72%;
+    }
 }

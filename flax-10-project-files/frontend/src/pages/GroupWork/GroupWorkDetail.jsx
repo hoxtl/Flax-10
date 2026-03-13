@@ -1,11 +1,60 @@
 import { useState } from "react";
 import { getAuthHeaders, useProject, useProjectMembers, useSelectedTab } from "./groupWorkHooks";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { getUserColor } from "./utils/priorityUtils";
 import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
 import MemberAvatar from "./components/MemberAvatar";
 import styles from "./GroupWorkDetail.module.css";
+
+function SkeletonBlock({ className = "" }) {
+  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
+}
+
+function GroupWorkDetailSkeleton({ onBack }) {
+  return (
+    <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
+      <div className={styles.topBar}>
+        <BackButton onClick={onBack} />
+        <SkeletonBlock className={styles.skeletonDeleteBtn} />
+      </div>
+      <section className={styles.headerSection}>
+        <div className={styles.headerInfo}>
+          <SkeletonBlock className={styles.skeletonProjectTitle} />
+          <SkeletonBlock className={styles.skeletonProjectMeta} />
+          <SkeletonBlock className={styles.skeletonProgressBar} />
+          <SkeletonBlock className={styles.skeletonStats} />
+        </div>
+        <SkeletonBlock className={styles.skeletonDeadlinePill} />
+      </section>
+      <section className={styles.membersSection}>
+        <SkeletonBlock className={styles.skeletonMembersTitle} />
+        <div className={styles.membersList}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className={styles.skeletonMemberPill}>
+              <SkeletonBlock className={styles.skeletonAvatar} />
+              <SkeletonBlock className={styles.skeletonMemberName} />
+            </div>
+          ))}
+        </div>
+      </section>
+      <div className={styles.skeletonAddMemberForm}>
+        <SkeletonBlock className={styles.skeletonAddMemberInput} />
+        <SkeletonBlock className={styles.skeletonAddMemberBtn} />
+      </div>
+      <section className={styles.tabsSection}>
+        <div className={styles.tabsRow}>
+          <SkeletonBlock className={styles.skeletonTab} />
+          <SkeletonBlock className={styles.skeletonTab} />
+        </div>
+        <div className={styles.skeletonTaskPanel}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <SkeletonBlock key={index} className={styles.skeletonTaskRow} />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
 
 function BackButton({ onClick }) {
   return (
@@ -144,7 +193,7 @@ function useProjectDetail(projectId, onBack) {
 
 export default function GroupProjectDetail({ projectId, onBack }) {
   const d = useProjectDetail(projectId, onBack);
-  if (d.loading) return <div className={styles.container}><BackButton onClick={onBack} /><PageSkeleton label="Loading project" showAction cardCount={6} cardHeight="170px" columns={2} testId="groupwork-skeleton" /></div>;
+  if (d.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;
   if (!d.project) return <div className={styles.container}><BackButton onClick={onBack} /><p className={styles.empty}>Project not found.</p></div>;
 
   return (
