@@ -99,8 +99,10 @@ function CardHeader({ announcement, tag }) {
     );
 }
 
+import { getImageList } from "./AnnouncementModalHelpers";
+
 function AnnouncementImages({ announcement, onImageClick }) {
-    const images = (announcement.images || []).map(i => i.url || i);
+    const images = getImageList(announcement);
     if (images.length === 0) return null;
 
     if (images.length === 1) {
