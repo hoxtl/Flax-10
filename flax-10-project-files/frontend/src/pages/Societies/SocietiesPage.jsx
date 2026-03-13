@@ -2,10 +2,9 @@
  * SocietiesPage handles the main view for exploring and managing societies.
  * It supports tabbed views for joined vs all societies and deep navigation to details.
  */
-import { useState, useCallback, useMemo } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader/PageHeader";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
@@ -13,8 +12,6 @@ import SocietySection from "./SocietySection";
 import SocietyDetailPage from "./SocietyDetailPage";
 import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
 import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSocietyModal";
-import { useConfirm } from "../../context/ConfirmContext";
-import { unreportSociety } from "../../api/societyApi";
 import Tabs from "../../components/common/Tabs/Tabs";
 import { usePagination } from "../../hooks/usePagination";
 import { BackToTop } from "../../components/Pagination/Pagination";

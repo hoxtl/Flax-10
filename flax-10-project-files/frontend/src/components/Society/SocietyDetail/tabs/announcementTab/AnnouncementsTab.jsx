@@ -10,7 +10,6 @@ import ImageGalleryModal from "../../imageHandlers/ImageGalleryModal";
 export default function AnnouncementsTab({ announcements = [], editMode, tags, focusAnnouncementId, onEdit }) {
     const [gallery, setGallery] = useState(null); // { images, index }
     const openGallery = (imgs, idx) => setGallery({ images: imgs, index: idx });
-
     return (
         <>
             <AnnouncementsList
@@ -34,7 +33,6 @@ export default function AnnouncementsTab({ announcements = [], editMode, tags, f
 
 function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId, onImageClick }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
-
     return (
         <div className={styles.announcementList}>
             {announcements.map(a => (

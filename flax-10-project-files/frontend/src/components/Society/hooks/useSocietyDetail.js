@@ -5,32 +5,46 @@ import { useSocietyAnnouncements } from './useSocietyAnnouncements';
 import { useSocietyMembers } from './useSocietyMembers';
 import { useSocietyMembership } from './useSocietyMembership';
 
-export const buildHandlers = (data, editMode, tracker) => {
-    const { addAnnouncement, updateAnnouncement, deleteAnnouncement, addEvent, updateEvent, deleteEvent, addException } = data;
-    const isSilent = editMode;
-    const wrapAn = (action, fn, titleFn) => (id, d) => {
-        const title = titleFn ? titleFn(id) : d.title;
-        tracker?.trackAnnouncement(action, title);
+const getAnnouncementTitle = (data, id) =>
+    data.society?.announcements?.find(a => a.id === id)?.title;
+
+const wrapAnnouncement = (action, fn, tracker, isSilent, titleFn) =>
+    (id, d) => {
+        tracker?.trackAnnouncement(action, titleFn ? titleFn(id) : d.title);
         return fn(id, d, isSilent);
     };
-    const wrapEv = (action, fn, titleFn) => (id, d) => {
-        const title = titleFn ? titleFn(id, d) : d.title;
-        tracker?.trackEvent(action, title);
+
+const wrapEvent = (action, fn, tracker, isSilent, titleFn) =>
+    (id, d) => {
+        tracker?.trackEvent(action, titleFn ? titleFn(id, d) : d.title);
         return fn(id, d, isSilent);
     };
-    
-    return {
-        ...data,
-        addAnnouncement: (d) => { tracker?.trackAnnouncement('Added', d.title); return addAnnouncement(d, isSilent); },
-        updateAnnouncement: wrapAn('Updated', updateAnnouncement),
-        deleteAnnouncement: (id) => wrapAn('Deleted', deleteAnnouncement, (i) => data.society?.announcements?.find(a => a.id === i)?.title)(id),
-        addEvent: (d) => { tracker?.trackEvent('Added', d.title); return addEvent(d, isSilent); },
-        updateEvent: wrapEv('Updated', updateEvent),
-        deleteEvent: (id, title) => wrapEv('Deleted', deleteEvent, () => title)(id),
-        addException: (id, d) => addException(id, d, isSilent),
-        onAddTag: data.addTag, onDeleteTag: data.deleteTag, onUpdateTag: data.updateTag
-    };
-};
+
+const buildAnnouncementHandlers = (data, tracker, isSilent) => ({
+    addAnnouncement: (d) => { tracker?.trackAnnouncement('Added', d.title); return data.addAnnouncement(d, isSilent); },
+    updateAnnouncement: wrapAnnouncement('Updated', data.updateAnnouncement, tracker, isSilent),
+    deleteAnnouncement: wrapAnnouncement('Deleted', data.deleteAnnouncement, tracker, isSilent, (id) => getAnnouncementTitle(data, id)),
+});
+
+const buildEventHandlers = (data, tracker, isSilent) => ({
+    addEvent: (d) => { tracker?.trackEvent('Added', d.title); return data.addEvent(d, isSilent); },
+    updateEvent: wrapEvent('Updated', data.updateEvent, tracker, isSilent),
+    deleteEvent: (id, title) => wrapEvent('Deleted', data.deleteEvent, tracker, isSilent, () => title)(id),
+    addException: (id, d) => data.addException(id, d, isSilent),
+});
+
+const buildTagHandlers = (data) => ({
+    onAddTag: data.addTag,
+    onDeleteTag: data.deleteTag,
+    onUpdateTag: data.updateTag,
+});
+
+export const buildHandlers = (data, editMode, tracker) => ({
+    ...data,
+    ...buildAnnouncementHandlers(data, tracker, editMode),
+    ...buildEventHandlers(data, tracker, editMode),
+    ...buildTagHandlers(data),
+});
 
 export const useSocietyDetail = (id) => {
     const core = useSocietyCore(id);
@@ -40,8 +54,8 @@ export const useSocietyDetail = (id) => {
     const members = useSocietyMembers(id, core.setSociety);
     const membership = useSocietyMembership(id, core.setSociety);
 
-    return { 
-        ...core, ...tags, ...events, ...announcements, 
-        ...members, ...membership 
+    return {
+        ...core, ...tags, ...events, ...announcements,
+        ...members, ...membership
     };
 };

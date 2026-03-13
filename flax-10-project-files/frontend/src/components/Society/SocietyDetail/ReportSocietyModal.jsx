@@ -16,26 +16,28 @@ const FormContent = ({ reason, onTextChange, error, submitting }) => (
     </div>
 );
 
-export default function ReportSocietyModal({ society, onClose, onReportSuccess }) {
-    const [reason, setReason] = useState("");
-    const [state, setState] = useState({ submitting: false, error: "" });
-
-    const onSubmit = async () => {
+const makeOnSubmit = (reason, setState, societyId, onReportSuccess, onClose) =>
+    async () => {
         if (!reason.trim()) return setState(s => ({ ...s, error: "Please provide a reason." }));
         setState({ submitting: true, error: "" });
         try {
-            await reportSociety(society.id, reason.trim());
-        } catch (err) { 
-            return setState({ submitting: false, error: "Failed to submit report." }); 
+            await reportSociety(societyId, reason.trim());
+        } catch {
+            return setState({ submitting: false, error: "Failed to submit report." });
         }
         onReportSuccess?.();
         onClose();
     };
 
+export default function ReportSocietyModal({ society, onClose, onReportSuccess }) {
+    const [reason, setReason] = useState("");
+    const [state, setState] = useState({ submitting: false, error: "" });
+    const onSubmit = makeOnSubmit(reason, setState, society.id, onReportSuccess, onClose);
+
     return (
         <StandardModal title={`Report "${society.name}"`} onClose={onClose}
             subtitle="Please let us know why you are reporting this society.">
-            <FormContent reason={reason} onTextChange={(e) => setReason(e.target.value)} 
+            <FormContent reason={reason} onTextChange={e => setReason(e.target.value)}
                 error={state.error} submitting={state.submitting} />
             <ReportActions onClose={onClose} onSubmit={onSubmit}
                 submitting={state.submitting} disabled={!reason.trim()} />

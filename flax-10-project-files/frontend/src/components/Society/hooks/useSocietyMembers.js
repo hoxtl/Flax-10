@@ -1,31 +1,46 @@
 import { useState } from 'react';
 import * as api from '../../../api/societyApi';
 
-export const useSocietyMembers = (id, setSociety) => {
-    const [members, setMembers] = useState([]);
+const adjustMemberCount = (setSociety, delta) =>
+    setSociety(prev => ({
+        ...prev,
+        member_count: Math.max(0, (prev.member_count || 0) + delta)
+    }));
 
-    const fetchMembers = async () => {
+const makeFetchMembers = (id, setMembers) =>
+    async () => {
         const data = await api.fetchMembers(id);
         setMembers(data);
     };
 
-    const updateMemberRole = async (userId, role) => {
+const makeUpdateMemberRole = (id, setMembers) =>
+    async (userId, role) => {
         await api.updateMemberRole(id, userId, role);
         setMembers(prev => prev.map(m => m.user === userId ? { ...m, role } : m));
     };
 
-    const addCollaborator = async (userId, role) => {
+const makeAddCollaborator = (id, setSociety, setMembers) =>
+    async (userId, role) => {
         const member = await api.addCollaborator(id, userId, role);
-        setSociety(prev => ({ ...prev, member_count: (prev.member_count || 0) + 1 }));
+        adjustMemberCount(setSociety, 1);
         setMembers(prev => [...prev, member]);
         return member;
     };
 
-    const removeMember = async (userId) => {
+const makeRemoveMember = (id, setSociety, setMembers) =>
+    async (userId) => {
         await api.leaveSociety(id, userId);
-        setSociety(prev => ({ ...prev, member_count: Math.max(0, (prev.member_count || 0) - 1) }));
+        adjustMemberCount(setSociety, -1);
         setMembers(prev => prev.filter(m => m.user !== userId));
     };
 
-    return { members, fetchMembers, updateMemberRole, addCollaborator, removeMember };
+export const useSocietyMembers = (id, setSociety) => {
+    const [members, setMembers] = useState([]);
+    return {
+        members,
+        fetchMembers: makeFetchMembers(id, setMembers),
+        updateMemberRole: makeUpdateMemberRole(id, setMembers),
+        addCollaborator: makeAddCollaborator(id, setSociety, setMembers),
+        removeMember: makeRemoveMember(id, setSociety, setMembers),
+    };
 };

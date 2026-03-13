@@ -1,28 +1,42 @@
 import * as api from '../../../api/societyApi';
 
-export const useSocietyTags = (id, society, setSociety) => {
-    const addTag = async (data) => {
+const appendTag = (setSociety, tag) =>
+    setSociety(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+
+const replaceTag = (setSociety, tagId, updated) =>
+    setSociety(prev => ({
+        ...prev,
+        tags: prev.tags.map(t => t.id === tagId ? updated : t)
+    }));
+
+const removeTag = (setSociety, tagId) =>
+    setSociety(prev => ({
+        ...prev,
+        tags: prev.tags.filter(t => t.id !== tagId)
+    }));
+
+const makeAddTag = (id, setSociety) =>
+    async (data) => {
         const tag = await api.createSocietyTag(id, data);
-        setSociety(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+        appendTag(setSociety, tag);
         return tag;
     };
 
-    const updateTag = async (tagId, data) => {
+const makeUpdateTag = (id, setSociety) =>
+    async (tagId, data) => {
         const updated = await api.updateSocietyTag(id, tagId, data);
-        setSociety(prev => ({
-            ...prev,
-            tags: prev.tags.map(t => t.id === tagId ? updated : t)
-        }));
+        replaceTag(setSociety, tagId, updated);
         return updated;
     };
 
-    const deleteTag = async (tagId) => {
+const makeDeleteTag = (id, setSociety) =>
+    async (tagId) => {
         await api.deleteSocietyTag(id, tagId);
-        setSociety(prev => ({
-            ...prev,
-            tags: prev.tags.filter(t => t.id !== tagId)
-        }));
+        removeTag(setSociety, tagId);
     };
 
-    return { addTag, updateTag, deleteTag };
-};
+export const useSocietyTags = (id, society, setSociety) => ({
+    addTag: makeAddTag(id, setSociety),
+    updateTag: makeUpdateTag(id, setSociety),
+    deleteTag: makeDeleteTag(id, setSociety),
+});

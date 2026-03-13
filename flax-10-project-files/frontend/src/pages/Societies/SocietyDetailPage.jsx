@@ -18,13 +18,11 @@ import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/annou
 import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSocietyModal";
 import MemberDirectoryModal from "../../components/Society/SocietyDetail/MemberDirectoryModal";
 import { Flag } from "lucide-react";
-import { useConfirm } from "../../context/ConfirmContext";
-import { unreportSociety } from "../../api/societyApi";
 import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
 
-import { 
+import {
     getImageUrls, getAvailablePhotos, scrollContentToTop,
     wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
     wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement

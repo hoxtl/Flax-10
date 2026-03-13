@@ -8,18 +8,14 @@ import styles from "./TagManager.module.css";
 const DEFAULT_COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"];
 const MAX_TAGS = 7;
 
-export default function TagManager({ tags = [], onAddTag, onDeleteTag }) {
-    const nextColor = getNextColor(tags);
-    const [newTag, setNewTag] = useState({ label: "", color: nextColor });
-    const [error, setError] = useState(null);
-    const canAdd = tags.length < MAX_TAGS;
+const isDuplicateTag = (tags, label) =>
+    tags.some(t => t.label.toLowerCase() === label.toLowerCase());
 
-    const handleAdd = async () => {
+const makeHandleAdd = (tags, newTag, setNewTag, setError, onAddTag) =>
+    async () => {
         const label = newTag.label.trim();
-        if (!label || !canAdd) return;
-        if (tags.some(t => t.label.toLowerCase() === label.toLowerCase())) {
-            return setError("A tag with this name already exists.");
-        }
+        if (!label || tags.length >= MAX_TAGS) return;
+        if (isDuplicateTag(tags, label)) return setError("A tag with this name already exists.");
         const data = { label, color: newTag.color };
         if (await onAddTag?.(data)) {
             setNewTag({ label: "", color: getNextColor([...tags, data]) });
@@ -27,11 +23,16 @@ export default function TagManager({ tags = [], onAddTag, onDeleteTag }) {
         }
     };
 
+export default function TagManager({ tags = [], onAddTag, onDeleteTag }) {
+    const [newTag, setNewTag] = useState({ label: "", color: getNextColor(tags) });
+    const [error, setError] = useState(null);
+    const handleAdd = makeHandleAdd(tags, newTag, setNewTag, setError, onAddTag);
+
     return (
         <div className={styles.manager}>
             <ManagerHeader count={tags.length} max={MAX_TAGS} />
             <TagList tags={tags} onRemove={onDeleteTag} />
-            {canAdd && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} error={error} setError={setError} />}
+            {tags.length < MAX_TAGS && <AddTagForm newTag={newTag} setNewTag={setNewTag} onAdd={handleAdd} error={error} setError={setError} />}
         </div>
     );
 }
