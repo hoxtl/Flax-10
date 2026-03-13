@@ -1,7 +1,4 @@
-/**
- * Plan timeline read modal — task or event detail overlay.
- */
-
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { formatTime } from "../utils/dateFormatUtils";
 
@@ -43,18 +40,13 @@ export function PlanReadDetailModal({
       (data.start_time && data.end_time ? ` · ${Math.round((new Date(data.end_time) - new Date(data.start_time)) / 60000)}m` : "");
 
   return (
-    <div
-      className={styles.actionHubReadOverlay}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="plan-read-title"
-      onClick={onClose}
+    <StandardModal
+      title={title}
+      subtitle={timeStr}
+      onClose={onClose}
+      size="sm"
     >
-      <div className={styles.actionHubReadModal} onClick={(e) => e.stopPropagation()}>
-        <h2 id="plan-read-title" className={styles.actionHubReadTitle}>
-          {title}
-        </h2>
-        <p className={styles.actionHubReadTime}>{timeStr}</p>
+      <div className={styles.actionHubReadContent}>
         {data?.description && (
           <p className={styles.actionHubReadDescription}>{data.description}</p>
         )}
@@ -62,8 +54,7 @@ export function PlanReadDetailModal({
           <PrimaryButton type="button" className={styles.actionHubReadBtn} variant="ghost" pill onClick={handleEdit}>Edit</PrimaryButton>
           <PrimaryButton type="button" className={styles.actionHubReadBtnDanger} variant="danger" pill onClick={handleDelete}>Delete</PrimaryButton>
         </div>
-        <PrimaryButton type="button" className={styles.actionHubReadClose} variant="ghost" size="small" pill onClick={onClose} aria-label="Close">×</PrimaryButton>
       </div>
-    </div>
+    </StandardModal>
   );
 }
