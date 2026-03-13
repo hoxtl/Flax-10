@@ -1,3 +1,4 @@
+/* Styles for the AnnouncementModal form and its sub-sections. */
 .error {
     background: var(--danger-bg);
     color: var(--danger);
@@ -139,46 +140,6 @@
     gap: 12px;
 }
 
-.deleteBtn {
-    padding: 10px 20px;
-    background: transparent;
-    color: #ef4444;
-    border: 1px solid #ef4444;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.deleteBtn:hover {
-    background: #ef4444;
-    color: white;
-}
-
-.cancelBtn {
-    padding: 10px 20px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--muted);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.submitBtn {
-    padding: 10px 20px;
-    background: var(--primary);
-    color: var(--c-white);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.submitBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 
 /* Mapping old styles to new for ImageField until fully refactored or if reusing wrapper */
 .field {

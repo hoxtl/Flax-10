@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
+const MIN_SKELETON_MS = 450;
+
 export function getAuthHeaders() {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Token ${token}` } : {};
@@ -19,9 +21,11 @@ export function useGroupProjects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const startedAt = Date.now();
     fetchJSON("/api/group-work/projects/").then(data => {
       setProjects(data || []);
-      setLoading(false);
+      const remaining = Math.max(0, MIN_SKELETON_MS - (Date.now() - startedAt));
+      setTimeout(() => setLoading(false), remaining);
     });
   }, []);
 
@@ -45,10 +49,12 @@ export function useProject(projectId) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const startedAt = Date.now();
     fetchJSON("/api/group-work/projects/").then(data => {
       const found = (data || []).find(i => String(i.id) === String(projectId));
       setProject(found || null);
-      setLoading(false);
+      const remaining = Math.max(0, MIN_SKELETON_MS - (Date.now() - startedAt));
+      setTimeout(() => setLoading(false), remaining);
     });
   }, [projectId]);
 

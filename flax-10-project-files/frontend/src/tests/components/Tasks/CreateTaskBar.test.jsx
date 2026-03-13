@@ -27,7 +27,7 @@ vi.mock('../../../components/common/SleepWarningModal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder, className }) => (
         <select
             aria-label={placeholder}

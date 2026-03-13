@@ -9,6 +9,7 @@ import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
+import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
 import { isDuringSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 
 const EVENT_ACCENTS = {
@@ -56,14 +57,15 @@ export function ConflictPairRow({
     row.startMins % 60
   );
 
-  // Prefer an event that can be auto-moved today; fallback to first overlap event for tomorrow moves.
+  // Prefer an event that can be auto-moved today; fallback to first movable (non-read-only) event.
   const movableWithGap = items.find((r) => {
+    if (isReadOnlyEvent(r.item)) return false;
     const freeRow = rows.find(
       (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= r.durationMins,
     );
     return !!freeRow;
   });
-  const movable = movableWithGap || items[0] || null;
+  const movable = movableWithGap || items.find((r) => !isReadOnlyEvent(r.item)) || null;
   const freeRow = movableWithGap
     ? rows.find(
         (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= movableWithGap.durationMins,
@@ -147,7 +149,7 @@ export function ConflictPairRow({
                     </span>
                   )}
                 </div>
-                {!freeRow && onPushTomorrow && (
+                {!freeRow && onPushTomorrow && !isReadOnlyEvent(r.item) && (
                   <button
                     type="button"
                     className={styles.planTimelineConflictCardMoveBtn}
@@ -185,7 +187,7 @@ export function ConflictPairRow({
               <RotateCw size={12} strokeWidth={2.1} aria-hidden />
               {freeRow ? "Auto-arrange" : "No free window"}
             </button>
-            {items.map((r) => (
+            {items.filter((r) => !isReadOnlyEvent(r.item)).map((r) => (
               <button
                 key={`edit-${r.id}`}
                 type="button"

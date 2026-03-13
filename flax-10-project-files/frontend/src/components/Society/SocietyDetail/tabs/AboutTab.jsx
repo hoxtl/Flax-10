@@ -1,4 +1,9 @@
+/**
+ * AboutTab displays and edits the general information about a society,
+ * including its biography and administrator contact emails.
+ */
 import { useState } from "react";
+import PrimaryButton from "../../../common/PrimaryButton/PrimaryButton";
 import styles from "./tabs.module.css";
 
 const isValidEmail = (email) => {
@@ -37,24 +42,47 @@ function AdminEmails({ emails }) {
     );
 }
 
+/** Editor interface for updating society bio and admin emails. */
 function AboutEditor({ about, emails, onUpdate }) {
-    const [vals, setVals] = useState({ about: about || "", emails: emails || "" });
-    const emailList = vals.emails.split(",").filter(e => e.trim());
-    const allValid = emailList.length > 0 && emailList.every(isValidEmail);
-    const isDirty = vals.about !== (about || "") || vals.emails !== (emails || "");
+    const vals = useAboutForm(about, emails);
+    const handlers = getAboutHandlers(onUpdate, vals);
 
     return (
         <div className={styles.editorContainer}>
-            <textarea className={styles.aboutInput} value={vals.about} rows={5}
-                onChange={e => setVals(p => ({ ...p, about: e.target.value }))}
-                placeholder="Write about your society..." />
-            <EmailInput emails={vals.emails} onChange={e => setVals(p => ({ ...p, emails: e.target.value }))} />
-            {!allValid && vals.emails.trim() && <p className={styles.error}>Please enter at least one valid email</p>}
-            {!vals.emails.trim() && <p className={styles.error}>Admin email is compulsory</p>}
-            <EditorActions onCancel={() => onUpdate?.({})}
-                onSave={() => onUpdate?.({ about: vals.about, admin_emails: vals.emails })}
-                disabled={!isDirty || !allValid} />
+            <textarea className={styles.aboutInput} value={vals.state.about} rows={5}
+                onChange={handlers.about} placeholder="Write about your society..." />
+            <EmailInput emails={vals.state.emails} onChange={handlers.emails} />
+            <AboutValidation emails={vals.state.emails} onUpdate={onUpdate}
+                state={vals.state} orig={{ about, emails }} />
         </div>
+    );
+}
+
+function useAboutForm(about, emails) {
+    const [state, setState] = useState({ about: about || "", emails: emails || "" });
+    return { state, setState };
+}
+
+function getAboutHandlers(onUpdate, { setState }) {
+    return {
+        about: e => setState(p => ({ ...p, about: e.target.value })),
+        emails: e => setState(p => ({ ...p, emails: e.target.value }))
+    };
+}
+
+function AboutValidation({ emails, onUpdate, state, orig }) {
+    const list = emails.split(",").filter(e => e.trim());
+    const valid = list.length > 0 && list.every(isValidEmail);
+    const isDirty = state.about !== (orig.about || "") || state.emails !== (orig.emails || "");
+
+    return (
+        <>
+            {!valid && emails.trim() && <p className={styles.error}>Invalid email(s)</p>}
+            {!emails.trim() && <p className={styles.error}>Email is compulsory</p>}
+            <EditorActions onCancel={() => onUpdate?.({})}
+                onSave={() => onUpdate?.({ about: state.about, admin_emails: state.emails })}
+                disabled={!isDirty || !valid} />
+        </>
     );
 }
 
@@ -71,8 +99,8 @@ function EmailInput({ emails, onChange }) {
 function EditorActions({ onCancel, onSave, disabled }) {
     return (
         <div className={styles.editorActions}>
-            <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-            <button className={styles.saveBtn} onClick={onSave} disabled={disabled}>Save Changes</button>
+            <PrimaryButton className={styles.cancelBtn} variant="ghost" pill onClick={onCancel}>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.saveBtn} pill onClick={onSave} disabled={disabled}>Save Changes</PrimaryButton>
         </div>
     );
 }

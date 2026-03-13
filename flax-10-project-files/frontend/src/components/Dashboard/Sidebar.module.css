@@ -1,7 +1,7 @@
 .sidebar {
   width: 260px;
   height: 100vh;
-  background: var(--bg);
+  background: var(--surface-paper);
   display: flex;
   flex-direction: column;
   overflow: visible !important;
@@ -15,7 +15,7 @@
 
 .header {
   padding: 1.25rem 1rem;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -34,10 +34,12 @@
 
 .brand {
   font-weight: 800;
-  font-size: 18px;
+  font-size: var(--type-card);
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .nav {
@@ -68,7 +70,7 @@
 }
 
 .navItem:hover {
-  background: var(--hover);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .navItemActive {
@@ -122,7 +124,7 @@
   display: flex;
   flex-direction: column;
   padding: 12px 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
   position: relative;
   gap: 0.25rem;
 }
@@ -192,12 +194,12 @@
   bottom: 100%;
   left: 8px;
   right: 8px;
-  background: var(--sidebar);
-  border: 1px solid var(--border);
+  background: var(--surface-card-glass);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 8px;
   margin-bottom: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-popover);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -220,7 +222,7 @@
 }
 
 .logoutBtn {
-  color: #ef4444 !important;
+  color: var(--danger) !important;
 }
 
 .menuDivider {
@@ -244,10 +246,10 @@
   display: flex;
   align-items: center;
   height: 64px;
-  background: rgba(250, 247, 244, 0.96);
+  background: var(--glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(180, 160, 140, 0.18);
+  border-top: 1px solid var(--glass-border);
   box-shadow: 0 -4px 24px rgba(74, 52, 33, 0.09);
   padding: 0 8px 0 4px;
   padding-bottom: env(safe-area-inset-bottom, 0px);

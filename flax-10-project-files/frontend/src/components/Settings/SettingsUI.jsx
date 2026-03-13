@@ -1,6 +1,8 @@
 import styles from "../../pages/Settings/Settings.module.css";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
-import { THEME_GROUPS } from "../../context/ThemeConstants";
+import AnimatedDropdown from "../common/AnimatedDropdown";
+import FormField from "../common/FormField/FormField";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import TextInput from "../common/TextInput/TextInput";
 
 export function TabButton({ id, label, isActive, onClick }) {
   return (
@@ -57,9 +59,9 @@ export function SectionHeader({ title, description }) {
 export function SubmitButton({ isSaving, label, savingLabel }) {
   return (
     <div className={styles.formActions}>
-      <button type="submit" className={styles.btnPrimary} disabled={isSaving}>
+      <PrimaryButton type="submit" className={styles.btnPrimary} disabled={isSaving} pill>
         {isSaving ? savingLabel : label}
-      </button>
+      </PrimaryButton>
     </div>
   );
 }
@@ -67,23 +69,27 @@ export function SubmitButton({ isSaving, label, savingLabel }) {
 export function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength }) {
   const remaining = maxLength ? maxLength - value.length : null;
   return (
-    <div className={styles.formGroup}>
-      <label htmlFor={id}>
-        {label}
-        {maxLength && <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>({remaining} characters remaining)</span>}
-      </label>
-      <input type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} />
-    </div>
+    <FormField
+      className={styles.formGroup}
+      htmlFor={id}
+      label={
+        <>
+          {label}
+          {maxLength && <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>({remaining} characters remaining)</span>}
+        </>
+      }
+    >
+      <TextInput type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} />
+    </FormField>
   );
 }
 
 export function FormSelect({ id, label, value, onChange, options, grouped }) {
   const handleChange = (val) => onChange({ target: { value: val } });
   return (
-    <div className={styles.formGroup}>
-      <label htmlFor={id}>{label}</label>
+    <FormField className={styles.formGroup} htmlFor={id} label={label}>
       <AnimatedDropdown value={value} onChange={handleChange} options={options} grouped={grouped} placeholder="Select" searchable={grouped} />
-    </div>
+    </FormField>
   );
 }
 

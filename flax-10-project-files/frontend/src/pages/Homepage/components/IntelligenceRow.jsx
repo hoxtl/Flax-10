@@ -3,7 +3,7 @@ import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
-import ConfirmModal from "../../../components/common/ConfirmModal";
+import { ConfirmModal } from "../../../components/common";
 import {
   getLiveContext,
   getNextWindowMeta,

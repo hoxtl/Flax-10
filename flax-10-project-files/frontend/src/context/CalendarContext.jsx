@@ -22,20 +22,41 @@ export function CalendarProvider({ children }) {
 export function useCalendar() {
     const context = useContext(CalendarContext);
     if (!context) {
-        throw new Error('useCalendar must be used within CalendarProvider');
+        return {
+            events: [],
+            allEvents: [],
+            selectedDate: new Date(),
+            viewMode: 'month',
+            displayMode: 'grid',
+            filter: 'all'
+        };
     }
     return getFilteredContext(context);
 }
 
 function getFilteredContext(context) {
     const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
-    const filteredEvents = filterEventsByTag(context.events, currentFilter);
-    return { ...context, events: filteredEvents, allEvents: context.events };
+    let filtered = filterEventsByTag(context.events, currentFilter);
+    filtered = filterEventsBySearch(filtered, context.searchQuery);
+    return { ...context, events: filtered, allEvents: context.events };
 }
 
 function filterEventsByTag(events, filter) {
     if (filter.includes('all')) return events;
     return events.filter(e => filter.includes(getEffectiveTagName(e)));
+}
+
+function filterEventsBySearch(events, query) {
+    if (!query || !query.trim()) return events;
+    const q = query.toLowerCase().trim();
+    return events.filter(e => matchesSearch(e, q));
+}
+
+function matchesSearch(event, query) {
+    const title = (event.title || '').toLowerCase();
+    const description = (event.description || '').toLowerCase();
+    const location = (event.location || '').toLowerCase();
+    return title.includes(query) || description.includes(query) || location.includes(query);
 }
 
 export function useCalendarData(props = {}) {
@@ -45,6 +66,7 @@ export function useCalendarData(props = {}) {
         selectedDate: props.selectedDate ?? filtered?.selectedDate ?? new Date(),
         events: props.events ?? filtered?.events ?? [],
         viewMode: props.viewMode ?? filtered?.viewMode ?? 'month',
+        displayMode: props.displayMode ?? filtered?.displayMode ?? 'grid',
     };
 }
 
@@ -76,8 +98,8 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect, readOnly } = context;
+    const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
     const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, readOnly, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
 }

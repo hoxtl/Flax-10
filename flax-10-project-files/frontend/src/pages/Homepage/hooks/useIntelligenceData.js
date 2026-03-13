@@ -4,7 +4,7 @@ import {
   getLiveContext,
   getCurrentEvent,
   getUpcomingEvent,
-} from "../components/IntelligenceRowUtils";
+} from "../components/IntelligenceUtils";
 
 export function useIntelligenceData(slot5Data, studyPulseWindows, studyPulseNow) {
   const { summary, loading: profileLoading } = useProfileSummary();

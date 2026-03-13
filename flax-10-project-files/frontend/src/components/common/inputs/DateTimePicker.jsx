@@ -19,7 +19,7 @@
 import { useState, useRef, useEffect, useMemo, forwardRef } from "react";
 import { createPortal } from "react-dom";
 import { Clock } from "lucide-react";
-import AnimatedDropdown from "../../ui/AnimatedDropdown";
+import AnimatedDropdown from "../AnimatedDropdown";
 import styles from "./DateTimePicker.module.css";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -72,7 +72,7 @@ function parseIncomingValue(value, timeOnly, dateOnly) {
   return new Date(value);
 }
 
-export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, triggerClassName, hideIcon }) {
+export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, hideIcon }) {
   const parsed = useMemo(() => parseIncomingValue(value, timeOnly, dateOnly), [value, timeOnly, dateOnly]);
 
   const [open, setOpen] = useState(false);
@@ -104,16 +104,26 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
 
   return (
     <div className={styles.wrap} ref={ref}>
-      <TriggerButton open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly}
-        placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} triggerClassName={triggerClassName} hideIcon={hideIcon} />
-      {open && createPortal(
-        <DropdownPanel ref={dropdownRef} pos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY}
-          prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel}
-          selectDay={selectDay} hour={hour} minute={minute} changeHour={changeHour}
-          changeMinute={changeMinute} setOpen={setOpen} />,
-        document.body
-      )}
-    </div>
+      {
+        customTrigger ? (
+          <div onClick={() => setOpen(p => !p)} style={{ cursor: "pointer" }}>
+            {customTrigger}
+          </div>
+        ) : (
+          <TriggerButton open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly}
+            placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} triggerClassName={triggerClassName} hideIcon={hideIcon} />
+        )
+      }
+      {
+        open && createPortal(
+          <DropdownPanel ref={dropdownRef} pos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY}
+            prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel}
+            selectDay={selectDay} hour={hour} minute={minute} changeHour={changeHour}
+            changeMinute={changeMinute} setOpen={setOpen} />,
+          document.body
+        )
+      }
+    </div >
   );
 }
 
@@ -123,6 +133,7 @@ function TriggerButton({ open, setOpen, selDate, timeOnly, dateOnly, placeholder
     : placeholder;
 
   const handleClear = (e) => { e.stopPropagation(); setSelDate(null); onChange?.(""); };
+  const handleKeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(p => !p); } };
 
   return (
     <button type="button" onClick={() => setOpen(p => !p)}

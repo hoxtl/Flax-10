@@ -29,11 +29,10 @@
 .dropdownMenu {
   position: absolute;
   top: calc(100% + 4px);
-  left: auto;
-  right: 0;
+  min-width: 100%;
   width: max-content;
   max-width: 90vw;
-  background: var(--dropdown-bg);
+  background: var(--surface-raised);
   border: var(--dropdown-border);
   border-radius: var(--dropdown-radius);
   box-shadow: var(--dropdown-shadow);
@@ -41,6 +40,16 @@
   max-height: 260px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.alignLeft {
+  left: 0;
+  right: auto;
+}
+
+.alignRight {
+  right: 0;
+  left: auto;
 }
 
 .dropdownGroup {
@@ -85,7 +94,7 @@
   align-items: center;
   gap: 0.45rem;
   padding: var(--space-2) var(--space-3);
-  background: var(--surface-panel);
+  background: var(--surface-raised);
   border-bottom: var(--stroke-soft);
   z-index: 1;
 }

@@ -3,15 +3,142 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    min-height: calc(100vh - 140px);
     width: 100%;
-    max-width: 100vw;
-    padding: 1rem;
     text-align: center;
     overflow-x: hidden;
     position: relative;
     box-sizing: border-box;
-    background: var(--bg);
+}
+
+.focusPageSkeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--surface-page);
+    border-radius: var(--radius-2xl);
+}
+
+.focusPageSkeletonHeader {
+    width: min(920px, 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.focusPageSkeletonTitle {
+    width: min(240px, 48%);
+    height: 38px;
+    border-radius: 14px;
+}
+
+.focusPageSkeletonAction {
+    width: 112px;
+    height: 36px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonTask {
+    width: min(540px, 100%);
+    height: 56px;
+    border-radius: 20px;
+}
+
+.focusPageSkeletonTree {
+    width: min(340px, 72vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.focusPageSkeletonBadge {
+    width: 148px;
+    height: 34px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonTime {
+    width: min(220px, 56vw);
+    height: 62px;
+    border-radius: 18px;
+}
+
+.focusPageSkeletonControls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.focusPageSkeletonBtnPrimary,
+.focusPageSkeletonBtnSecondary {
+    height: 44px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonBtnPrimary {
+    width: 140px;
+}
+
+.focusPageSkeletonBtnSecondary {
+    width: 118px;
+}
+
+.focusPageSkeletonSettings {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: min(640px, 100%);
+    padding-top: 1rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.focusPageSkeletonSetting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.focusPageSkeletonLabel,
+.focusPageSkeletonLabelWide {
+    height: 12px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonLabel {
+    width: 72px;
+}
+
+.focusPageSkeletonLabelWide {
+    width: 128px;
+}
+
+.focusPageSkeletonInput {
+    width: 60px;
+    height: 38px;
+    border-radius: 8px;
+}
+
+.focusPageSkeletonSound {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.focusPageSkeletonSoundInput {
+    width: 180px;
+    height: 40px;
+    border-radius: 999px;
 }
 
 /* Zoom-in transition when navigating from task Play */
@@ -507,19 +634,13 @@
 
 .notificationBtn {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
+    top: 0;
+    left: 0;
     z-index: 100;
 }
 
 .notificationBtn:hover {
-    background: #0056b3;
+    opacity: 0.92;
 }
 
 .soundSelectorContainer {
@@ -916,6 +1037,41 @@
     font-weight: 500;
     max-width: 220px;
     line-height: 1.5;
+}
+
+.taskPickLoadingState {
+    width: 100%;
+    display: grid;
+    gap: 10px;
+    padding: 1.25rem 0.75rem 0.75rem;
+}
+
+.taskPickLoadingHeader {
+    display: grid;
+    gap: 8px;
+}
+
+.taskPickLoadingTitle,
+.taskPickLoadingMeta,
+.taskPickLoadingRow {
+    border-radius: 12px;
+}
+
+.taskPickLoadingTitle {
+    height: 16px;
+    width: 140px;
+    border-radius: 8px;
+}
+
+.taskPickLoadingMeta {
+    height: 12px;
+    width: 220px;
+    border-radius: 8px;
+}
+
+.taskPickLoadingRow {
+    height: 56px;
+    border-radius: 14px;
 }
 
 .taskPickList {

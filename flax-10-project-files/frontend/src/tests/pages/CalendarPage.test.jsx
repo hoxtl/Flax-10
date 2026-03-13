@@ -8,6 +8,7 @@ const mockCalendarState = {
     allEvents: [],
     selectedDate: new Date('2025-01-15'),
     viewMode: 'month',
+    isLoading: false,
 };
 
 vi.mock('../../context/CalendarContext', () => ({
@@ -108,5 +109,11 @@ describe('CalendarPage', () => {
         unmount();
         expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function));
         removeSpy.mockRestore();
+    });
+
+    it('shows the shared skeleton while calendar data is initially loading', () => {
+        useCalendar.mockReturnValue({ ...mockCalendarState, isLoading: true, allEvents: [] });
+        render(<CalendarPage />);
+        expect(screen.getByTestId('calendar-skeleton')).toBeTruthy();
     });
 });

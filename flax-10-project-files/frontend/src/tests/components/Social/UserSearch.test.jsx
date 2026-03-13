@@ -102,16 +102,14 @@ describe('CourseResultItem', () => {
 
     it('calls onToggle once when clicking checkbox (stopPropagation)', () => {
         const onToggle = vi.fn();
-        const mod = { id: 1, module_code: 'CS3001', module_name: 'Algorithms' };
-        render(<ModuleResultItem module={mod} isChecked={false} onToggle={onToggle} />);
+        render(<CourseResultItem course="Algorithms" isChecked={false} onToggle={onToggle} />);
         fireEvent.click(screen.getByRole('checkbox'));
         expect(onToggle).toHaveBeenCalledTimes(1);
     });
 
-    it('renders module without id using index as key', () => {
-        const mod = { module_code: 'X101', module_name: 'Unknown' };
-        render(<ModuleResultItem module={mod} isChecked={false} onToggle={vi.fn()} />);
-        expect(screen.getByText('X101')).toBeTruthy();
+    it('renders course using index as key', () => {
+        render(<CourseResultItem course="Unknown" isChecked={false} onToggle={vi.fn()} />);
+        expect(screen.getByText('Unknown')).toBeTruthy();
     });
 });
 
@@ -251,57 +249,55 @@ describe('UserSearch', () => {
         await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', '', '', 0, 20, 'Year 2'));
     });
 
-    it('toggles module and society filters on and off', async () => {
-        getModules.mockResolvedValueOnce([{ id: 1, module_code: 'CS3001', module_name: 'Algorithms' }]);
+    it('toggles course and society filters on and off', async () => {
         fetchSocieties.mockResolvedValueOnce([{ id: 1, name: 'Chess', categories: ['sports'] }]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        await waitFor(() => expect(screen.getByText('CS3001')).toBeTruthy());
-        fireEvent.click(screen.getByText('CS3001'));
-        expect(screen.getByRole('checkbox')).toBeChecked();
-        fireEvent.click(screen.getByText('CS3001'));
-        expect(screen.getByRole('checkbox')).not.toBeChecked();
-        fireEvent.click(screen.getByText('societies'));
+        await waitFor(() => expect(screen.getByText('Computer Science')).toBeTruthy());
+        fireEvent.click(screen.getByText('Computer Science'));
+        expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
+        fireEvent.click(screen.getByText('Computer Science'));
+        expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
+        fireEvent.click(screen.getByText('Societies'));
         await waitFor(() => expect(screen.getByText('Chess')).toBeTruthy());
         fireEvent.click(screen.getByText('Chess'));
         const checkboxes = screen.getAllByRole('checkbox');
         expect(checkboxes[checkboxes.length - 1]).toBeChecked();
     });
 
-    it('handles module/society init errors without crashing', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    it('handles society init errors without crashing', async () => {
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
         fetchSocieties.mockRejectedValueOnce(new Error('societies down'));
         render(<UserSearch onUserSelect={vi.fn()} />);
 
-        await act(async () => {});
+        await act(async () => { });
         expect(screen.getByTestId('search-bar')).toBeTruthy();
         expect(errSpy).toHaveBeenCalled();
         errSpy.mockRestore();
     });
 
     it('shows societies tab and filters societies', async () => {
-        getModules.mockResolvedValueOnce([]);
         fetchSocieties.mockResolvedValueOnce([
             { id: 1, name: 'Chess Club', categories: ['sports'] },
             { id: 2, name: 'Drama Society', categories: ['arts'] },
         ]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        await waitFor(() => expect(screen.getByText('societies')).toBeTruthy());
-        fireEvent.click(screen.getByText('societies'));
+        await waitFor(() => expect(screen.getByText('Societies')).toBeTruthy());
+        fireEvent.click(screen.getByText('Societies'));
         await waitFor(() => {
             expect(screen.getByText('Chess Club')).toBeTruthy();
             expect(screen.getByText('Drama Society')).toBeTruthy();
         });
     });
 
-    it('shows "No users found." when search returns empty', async () => {
+    it('shows "No users found" when search returns empty', async () => {
         searchUsers.mockResolvedValueOnce([]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.focus(screen.getByTestId('search-bar'));
         fireEvent.change(screen.getByTestId('search-bar'), { target: { value: 'nonexistent' } });
         await waitFor(() => expect(searchUsers).toHaveBeenCalled());
-        await waitFor(() => expect(screen.getByText('No users found.')).toBeTruthy());
+        await waitFor(() => expect(screen.getByText('No users found')).toBeTruthy());
     });
 
     it('handles searchUsers rejection', async () => {
@@ -321,44 +317,27 @@ describe('UserSearch', () => {
         await waitFor(() => expect(screen.getByText('Ali B')).toBeTruthy());
     });
 
-    it('shows expand button when more than 5 modules', async () => {
-        const mods = Array.from({ length: 8 }, (_, i) => ({
-            id: i + 1,
-            module_code: `CS${1000 + i}`,
-            module_name: `Module ${i + 1}`,
-        }));
-        getModules.mockResolvedValueOnce(mods);
-        fetchSocieties.mockResolvedValueOnce([]);
-        render(<UserSearch onUserSelect={vi.fn()} />);
-        fireEvent.click(screen.getByText('Filter'));
-        await waitFor(() => expect(screen.getByText(/\+ 3 more/)).toBeTruthy());
-        fireEvent.click(screen.getByText(/\+ 3 more/));
-        await waitFor(() => expect(screen.getByText('Show less')).toBeTruthy());
-    });
-
     it('shows expand button when more than 5 societies', async () => {
         const socs = Array.from({ length: 7 }, (_, i) => ({
             id: i + 1,
             name: `Society ${i + 1}`,
             categories: ['sports'],
         }));
-        getModules.mockResolvedValueOnce([]);
         fetchSocieties.mockResolvedValueOnce(socs);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        fireEvent.click(screen.getByText('societies'));
+        fireEvent.click(screen.getByText('Societies'));
         await waitFor(() => expect(screen.getByText(/\+ 2 more/)).toBeTruthy());
     });
 
     it('groups societies with no categories under other', async () => {
-        getModules.mockResolvedValueOnce([]);
         fetchSocieties.mockResolvedValueOnce([
             { id: 1, name: 'No Cat Society' },
             { id: 2, name: 'Another No Cat', categories: [] },
         ]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        fireEvent.click(screen.getByText('societies'));
+        fireEvent.click(screen.getByText('Societies'));
         await waitFor(() => {
             expect(screen.getByText('No Cat Society')).toBeTruthy();
             expect(screen.getByText('Another No Cat')).toBeTruthy();
@@ -376,37 +355,32 @@ describe('UserSearch', () => {
     it('closes filter dropdown when clicking outside', () => {
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        expect(screen.getByText('modules')).toBeTruthy();
+        expect(screen.getByText('Courses')).toBeTruthy();
         fireEvent.mouseDown(document.body);
-        expect(screen.queryByText('modules')).toBeNull();
+        expect(screen.queryByText('Courses')).toBeNull();
     });
 
-    it('filter search filters modules by query', async () => {
-        getModules.mockResolvedValueOnce([
-            { id: 1, module_code: 'CS3001', module_name: 'Algorithms' },
-            { id: 2, module_code: 'MA102', module_name: 'Math' },
-        ]);
+    it('filter search filters courses by query', async () => {
         fetchSocieties.mockResolvedValueOnce([]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        await waitFor(() => expect(screen.getByText('CS3001')).toBeTruthy());
-        const filterInput = screen.getByPlaceholderText('Search modules...');
-        fireEvent.change(filterInput, { target: { value: 'math' } });
+        await waitFor(() => expect(screen.getByText('Computer Science')).toBeTruthy());
+        const filterInput = screen.getByPlaceholderText('Search courses or departments...');
+        fireEvent.change(filterInput, { target: { value: 'art' } });
         await waitFor(() => {
-            expect(screen.getByText('MA102')).toBeTruthy();
-            expect(screen.queryByText('CS3001')).toBeNull();
+            expect(screen.getByText('Artificial Intelligence')).toBeTruthy();
+            expect(screen.queryByText('Computer Science')).toBeNull();
         });
     });
 
     it('filter search filters societies by query', async () => {
-        getModules.mockResolvedValueOnce([]);
         fetchSocieties.mockResolvedValueOnce([
             { id: 1, name: 'Chess Club', categories: ['sports'] },
             { id: 2, name: 'Drama Society', categories: ['arts'] },
         ]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        fireEvent.click(screen.getByText('societies'));
+        fireEvent.click(screen.getByText('Societies'));
         await waitFor(() => expect(screen.getByText('Chess Club')).toBeTruthy());
         const filterInput = screen.getByPlaceholderText('Search societies...');
         fireEvent.change(filterInput, { target: { value: 'drama' } });
@@ -416,34 +390,24 @@ describe('UserSearch', () => {
         });
     });
 
-    it('shows No modules found when modules empty', async () => {
-        getModules.mockResolvedValueOnce([]);
-        fetchSocieties.mockResolvedValueOnce([]);
-        render(<UserSearch onUserSelect={vi.fn()} />);
-        fireEvent.click(screen.getByText('Filter'));
-        await waitFor(() => expect(screen.getByText('No modules found.')).toBeTruthy());
-    });
-
     it('shows No societies found when societies empty', async () => {
-        getModules.mockResolvedValueOnce([]);
         fetchSocieties.mockResolvedValueOnce([]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.click(screen.getByText('Filter'));
-        fireEvent.click(screen.getByText('societies'));
-        await waitFor(() => expect(screen.getByText('No societies found.')).toBeTruthy());
+        fireEvent.click(screen.getByText('Societies'));
+        await waitFor(() => expect(screen.getByText('No societies found')).toBeTruthy());
     });
 
-    it('shows Searching... while loading', async () => {
-        searchUsers.mockImplementation(() => new Promise(() => {}));
+    it('shows Searching users while loading', async () => {
+        searchUsers.mockImplementation(() => new Promise(() => { }));
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.focus(screen.getByTestId('search-bar'));
         fireEvent.change(screen.getByTestId('search-bar'), { target: { value: 'test' } });
-        await waitFor(() => expect(screen.getByText('Searching...')).toBeTruthy());
+        await waitFor(() => expect(screen.getByText('Searching users')).toBeTruthy());
     });
 
     it('does not call searchUsers when query and filters are all empty', async () => {
         vi.useFakeTimers();
-        getModules.mockResolvedValueOnce([]);
         fetchSocieties.mockResolvedValueOnce([]);
         render(<UserSearch onUserSelect={vi.fn()} />);
         fireEvent.focus(screen.getByTestId('search-bar'));

@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { RecurrenceField } from '../../../../../components/Calendar/EventModal/components/RecurrenceField';
 
-vi.mock('../../../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={(e) => onChange(e.target.value)}>
             {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
