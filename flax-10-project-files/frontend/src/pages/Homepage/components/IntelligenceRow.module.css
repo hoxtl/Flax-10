@@ -16,6 +16,34 @@
   background: transparent;
 }
 
+.editBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.editBtn {
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border-base);
+  color: var(--text-charcoal);
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn:hover {
+  background: var(--color-sidebar);
+}
+
+.editBtnActive {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
 .header {
   position: relative;
   display: flex;
