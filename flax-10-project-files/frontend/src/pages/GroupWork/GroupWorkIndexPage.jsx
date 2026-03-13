@@ -3,7 +3,33 @@ import { useNavigate } from "react-router-dom";
 import GroupProjectDetail from "./GroupWorkDetail";
 import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import { getDeadlineLabel } from "./utils/taskUtils";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import styles from "./GroupWorkIndexPage.module.css";
+
+function GroupWorkIndexSkeleton() {
+  return (
+    <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
+      <div className={styles.skeletonHeader}>
+        <SkeletonBlock className={styles.skeletonTitle} />
+        <SkeletonBlock className={styles.skeletonSubtitle} />
+      </div>
+      <div className={styles.skeletonForm}>
+        <SkeletonBlock className={`${styles.skeletonInput} ${styles.skeletonInputName}`} />
+        <SkeletonBlock className={styles.skeletonInput} />
+        <SkeletonBlock className={styles.skeletonInput} />
+        <SkeletonBlock className={styles.skeletonButton} />
+      </div>
+      <div className={styles.skeletonList}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className={styles.skeletonRow}>
+            <SkeletonBlock className={styles.skeletonRowName} />
+            <SkeletonBlock className={styles.skeletonRowMeta} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function CreateProjectInputs({ data, onChange }) {
   return (
@@ -47,8 +73,7 @@ function ProjectRow({ project, onClick }) {
   );
 }
 
-function GroupWorkContent({ projects, loading, projectListProps }) {
-  if (loading) return <p className={styles.loading}>Loading your group projects…</p>;
+function GroupWorkContent({ projects, projectListProps }) {
   if (projects.length === 0) return <p className={styles.emptyMessage}>You do not have any group projects yet. Use the form above to create one.</p>;
   return (
     <div className={styles.projectList}>
@@ -71,12 +96,13 @@ export default function GroupWorkIndexPage() {
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
   if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} />;
+  if (loading) return <GroupWorkIndexSkeleton />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
     <div className={styles.container}>
       <GroupWorkHeader />
       <CreateProjectForm onCreated={onCreated} />
-      <GroupWorkContent projects={projects} loading={loading} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
+      <GroupWorkContent projects={projects} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
     </div>
   );
 }

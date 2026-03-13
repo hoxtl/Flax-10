@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Check } from 'lucide-react';
 import styles from "../../pages/Timer/TimerPage.module.css";
+import SkeletonBlock from "../common/LoadingState/SkeletonBlock";
 import { noiseGenerator } from './utils/noiseUtils';
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
 import AnimatedDropdown from '../common/AnimatedDropdown';
@@ -373,9 +374,14 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                                     </div>
                                 </div>
                                 {loading ? (
-                                    <div className={styles.taskPickEmpty}>
-                                        <span className={styles.taskPickEmptyIcon}>⏳</span>
-                                        <span>Loading your tasks…</span>
+                                    <div className={styles.taskPickLoadingState}>
+                                        <div className={styles.taskPickLoadingHeader}>
+                                            <SkeletonBlock className={styles.taskPickLoadingTitle} />
+                                            <SkeletonBlock className={styles.taskPickLoadingMeta} />
+                                        </div>
+                                        {Array.from({ length: 4 }).map((_, index) => (
+                                            <SkeletonBlock key={index} className={styles.taskPickLoadingRow} />
+                                        ))}
                                     </div>
                                 ) : filteredTasks.length === 0 ? (
                                     <div className={styles.taskPickEmpty}>
