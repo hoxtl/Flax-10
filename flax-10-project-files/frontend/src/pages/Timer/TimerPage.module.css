@@ -918,6 +918,48 @@
     line-height: 1.5;
 }
 
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.taskPickLoadingState {
+    width: 100%;
+    display: grid;
+    gap: 10px;
+    padding: 1.25rem 0.75rem 0.75rem;
+}
+
+.taskPickLoadingHeader {
+    display: grid;
+    gap: 8px;
+}
+
+.taskPickLoadingTitle,
+.taskPickLoadingMeta,
+.taskPickLoadingRow {
+    background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+.taskPickLoadingTitle {
+    height: 16px;
+    width: 140px;
+    border-radius: 8px;
+}
+
+.taskPickLoadingMeta {
+    height: 12px;
+    width: 220px;
+    border-radius: 8px;
+}
+
+.taskPickLoadingRow {
+    height: 56px;
+    border-radius: 14px;
+}
+
 .taskPickList {
     display: flex;
     flex-direction: column;

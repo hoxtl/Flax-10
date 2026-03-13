@@ -373,9 +373,14 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                                     </div>
                                 </div>
                                 {loading ? (
-                                    <div className={styles.taskPickEmpty}>
-                                        <span className={styles.taskPickEmptyIcon}>⏳</span>
-                                        <span>Loading your tasks…</span>
+                                    <div className={styles.taskPickLoadingState}>
+                                        <div className={styles.taskPickLoadingHeader}>
+                                            <div className={styles.taskPickLoadingTitle} />
+                                            <div className={styles.taskPickLoadingMeta} />
+                                        </div>
+                                        {Array.from({ length: 4 }).map((_, index) => (
+                                            <div key={index} className={styles.taskPickLoadingRow} />
+                                        ))}
                                     </div>
                                 ) : filteredTasks.length === 0 ? (
                                     <div className={styles.taskPickEmpty}>
