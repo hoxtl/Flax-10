@@ -1,0 +1,110 @@
+/* StudyStreakWidget */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 2px 0 4px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.iconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(228, 148, 94, 0.1);
+  border: 1px solid rgba(228, 148, 94, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #e4945e;
+}
+
+.label {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #2c1810;
+}
+
+/* ── Streak number ───────────────────────────────────────────── */
+
+.streakRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.streakNum {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 44px;
+  font-weight: 800;
+  color: #2c1810;
+  line-height: 1;
+}
+
+.streakUnit {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #a89279;
+}
+
+.hint {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  color: #b8a890;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Day bars ─────────────────────────────────────────────────── */
+
+.bars {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(139, 115, 85, 0.1);
+  border: 1px solid rgba(139, 115, 85, 0.07);
+  transition: background 0.2s;
+}
+
+.barActive {
+  background: #e8a87c;
+  border-color: #e8a87c;
+}
+
+.barLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: #a89279;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
