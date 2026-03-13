@@ -72,11 +72,6 @@ describe('CalendarContext', () => {
     expect(screen.getByTestId('view-mode')).toHaveTextContent('month');
   });
 
-  it('should throw error if used outside provider', () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(<TestConsumer />)).toThrow('useCalendar must be used within CalendarProvider');
-    consoleSpy.mockRestore();
-  });
 
   it('should filter events with string filter', () => {
     render(

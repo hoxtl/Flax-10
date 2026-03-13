@@ -1,11 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   isNightSlot,
   getNextFreeSlotToday,
   getAllFreeWindowsToday,
 } from '../../pages/Homepage/utils/slotUtils';
 
-// ─── isNightSlot ──────────────────────────────────────────────────────────
+const mockIsToday = vi.fn();
+const mockOverlapsDay = vi.fn();
+
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+  isToday: (d) => mockIsToday(d),
+  overlapsDay: (start, end, day) => mockOverlapsDay(start, end, day),
+}));
+
+// Tests for slotUtils — covers isNightSlot, getNextFreeSlotToday, and getAllFreeWindowsToday including edge cases for time boundaries, blocking events, and null inputs
 
 describe('isNightSlot', () => {
   it('returns false for null/undefined', () => {
@@ -56,10 +64,20 @@ describe('isNightSlot', () => {
   });
 });
 
-// ─── getNextFreeSlotToday ─────────────────────────────────────────────────
-
 describe('getNextFreeSlotToday', () => {
+  beforeEach(() => {
+    mockIsToday.mockReturnValue(true);
+    mockOverlapsDay.mockImplementation((start, end, day) => {
+      const d = new Date(day);
+      d.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(d);
+      dayEnd.setHours(23, 59, 59, 999);
+      return start < dayEnd && end > d;
+    });
+  });
+
   it('returns null when selectedDate is not today', () => {
+    mockIsToday.mockReturnValueOnce(false);
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const result = getNextFreeSlotToday([], yesterday, 30);
@@ -72,12 +90,49 @@ describe('getNextFreeSlotToday', () => {
     expect(getNextFreeSlotToday([], today, -5)).toBeNull();
   });
 
-  it('returns null when there is no room left in the day', () => {
-    // End of day has passed — fake a date far in the future
-    const longAgo = new Date(2000, 0, 1);
-    // isToday will be false, so returns null anyway
-    const result = getNextFreeSlotToday([], longAgo, 30);
+  it('returns null when now >= dayEnd', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10, 23, 50, 0));
+    mockIsToday.mockReturnValue(true);
+    const today = new Date(2026, 2, 10);
+    const result = getNextFreeSlotToday([], today, 30);
     expect(result).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('finds gap between now and first event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10, 9, 0, 0));
+    mockIsToday.mockReturnValue(true);
+    mockOverlapsDay.mockReturnValue(true);
+    const today = new Date(2026, 2, 10);
+    const evStart = new Date(2026, 2, 10, 11, 0, 0);
+    const evEnd = new Date(2026, 2, 10, 12, 0, 0);
+    const events = [{ start_time: evStart.toISOString(), end_time: evEnd.toISOString() }];
+    const result = getNextFreeSlotToday(events, today, 60);
+    expect(result).not.toBeNull();
+    expect(result.end.getTime() - result.start.getTime()).toBe(60 * 60000);
+    vi.useRealTimers();
+  });
+
+  it('advances cursor when gap before event is too small', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10, 8, 30, 0));
+    mockIsToday.mockReturnValue(true);
+    mockOverlapsDay.mockReturnValue(true);
+    const today = new Date(2026, 2, 10);
+    const ev1Start = new Date(2026, 2, 10, 9, 0, 0);
+    const ev1End = new Date(2026, 2, 10, 10, 0, 0);
+    const ev2Start = new Date(2026, 2, 10, 12, 0, 0);
+    const ev2End = new Date(2026, 2, 10, 13, 0, 0);
+    const events = [
+      { start_time: ev1Start.toISOString(), end_time: ev1End.toISOString() },
+      { start_time: ev2Start.toISOString(), end_time: ev2End.toISOString() },
+    ];
+    const result = getNextFreeSlotToday(events, today, 60);
+    expect(result).not.toBeNull();
+    expect(result.start.getTime()).toBeGreaterThanOrEqual(ev1End.getTime());
+    vi.useRealTimers();
   });
 
   it('returns a slot when today has free time and no events', () => {
@@ -131,10 +186,14 @@ describe('getNextFreeSlotToday', () => {
   });
 });
 
-// ─── getAllFreeWindowsToday ───────────────────────────────────────────────
-
 describe('getAllFreeWindowsToday', () => {
+  beforeEach(() => {
+    mockIsToday.mockReturnValue(true);
+    mockOverlapsDay.mockReturnValue(true);
+  });
+
   it('returns empty array when selectedDate is not today', () => {
+    mockIsToday.mockReturnValueOnce(false);
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     expect(getAllFreeWindowsToday([], yesterday)).toEqual([]);
@@ -195,6 +254,37 @@ describe('getAllFreeWindowsToday', () => {
     expect(() => getAllFreeWindowsToday(null, today)).not.toThrow();
     expect(() => getAllFreeWindowsToday(undefined, today)).not.toThrow();
     expect(Array.isArray(getAllFreeWindowsToday(null, today))).toBe(true);
+  });
+
+  it('returns empty when now >= dayEnd', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10, 23, 59, 0));
+    mockIsToday.mockReturnValue(true);
+    const today = new Date(2026, 2, 10);
+    expect(getAllFreeWindowsToday([], today)).toEqual([]);
+    vi.useRealTimers();
+  });
+
+  it('finds windows between events', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10, 8, 0, 0));
+    mockIsToday.mockReturnValue(true);
+    mockOverlapsDay.mockReturnValue(true);
+    const today = new Date(2026, 2, 10);
+    const ev1Start = new Date(2026, 2, 10, 10, 0, 0);
+    const ev1End = new Date(2026, 2, 10, 11, 0, 0);
+    const ev2Start = new Date(2026, 2, 10, 13, 0, 0);
+    const ev2End = new Date(2026, 2, 10, 14, 0, 0);
+    const events = [
+      { start_time: ev1Start.toISOString(), end_time: ev1End.toISOString() },
+      { start_time: ev2Start.toISOString(), end_time: ev2End.toISOString() },
+    ];
+    const result = getAllFreeWindowsToday(events, today);
+    expect(Array.isArray(result)).toBe(true);
+    result.forEach((w) => {
+      expect(w.minutes).toBeGreaterThanOrEqual(15);
+    });
+    vi.useRealTimers();
   });
 
   it('window.end - window.start equals window.minutes in ms (approximately)', () => {

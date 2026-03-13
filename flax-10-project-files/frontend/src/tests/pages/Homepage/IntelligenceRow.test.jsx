@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
@@ -16,20 +16,18 @@ vi.mock('../../../api/tflService', () => ({
     tflService: { getTfLDelays: vi.fn().mockResolvedValue([]) },
 }));
 
-vi.mock('../../../pages/Homepage/components/RightNowWidget', () => ({
-    RightNowWidget: () => <div data-testid="right-now-widget" />,
-}));
-
-vi.mock('../../../pages/Homepage/components/QuickActionsWidget', () => ({
-    QuickActionsWidget: () => <div data-testid="quick-actions-widget" />,
+vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
+    useProfileSummary: vi.fn(() => ({
+        summary: {
+            weekly: { percentage: 72 },
+            streaks: { current: 3 },
+        },
+        loading: false,
+    })),
 }));
 
 vi.mock('../../../pages/Homepage/components/SocialDiscoverWidget', () => ({
     SocialDiscoverWidget: () => <div data-testid="social-discover-widget" />,
-}));
-
-vi.mock('../../../pages/Homepage/components/StudyPulseWidget', () => ({
-    StudyPulseWidget: () => <div data-testid="study-pulse-widget" />,
 }));
 
 vi.mock('../../../components/ui/bento-grid', () => ({
@@ -57,19 +55,15 @@ describe('IntelligenceRow', () => {
         expect(screen.getByTestId('bento-grid')).toBeTruthy();
     });
 
-    it('renders RightNowWidget', () => {
+    it('renders live context summary in the banner', () => {
         renderRow();
-        expect(screen.getByTestId('right-now-widget')).toBeTruthy();
+        expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy();
     });
 
-    it('renders QuickActionsWidget', () => {
+    it('renders analytics summary in the banner', () => {
         renderRow();
-        expect(screen.getByTestId('quick-actions-widget')).toBeTruthy();
-    });
-
-    it('renders StudyPulseWidget', () => {
-        renderRow();
-        expect(screen.getByTestId('study-pulse-widget')).toBeTruthy();
+        expect(screen.getByText(/weekly goal/i)).toBeTruthy();
+        expect(screen.getByText(/streak/i)).toBeTruthy();
     });
 
     it('renders slot1TodayTasks content', () => {
@@ -92,5 +86,49 @@ describe('IntelligenceRow', () => {
         // greeting should contain "Good" but no name
         const text = screen.getByText(/^Good (Morning|Afternoon|Evening)\.$/);
         expect(text).toBeTruthy();
+    });
+
+    it('handles TfL getTfLDelays rejection', async () => {
+        const { tflService } = await import('../../../api/tflService');
+        tflService.getTfLDelays.mockRejectedValueOnce(new Error('Network error'));
+        renderRow();
+        await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
+    });
+
+    it('handles TfL getTfLDelays returning non-array', async () => {
+        const { tflService } = await import('../../../api/tflService');
+        tflService.getTfLDelays.mockResolvedValueOnce({ data: [] });
+        renderRow();
+        await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
+    });
+
+    it('shows event-specific TfL warning for the next KCL event', async () => {
+        const { tflService } = await import('../../../api/tflService');
+        tflService.getTfLDelays.mockResolvedValueOnce([
+            { lineName: 'Northern', severityDescription: 'Minor delays' },
+        ]);
+
+        const start = new Date(Date.now() + 60 * 60 * 1000);
+        const end = new Date(Date.now() + 2 * 60 * 60 * 1000);
+
+        renderRow({
+            slot5Data: {
+                now: new Date(),
+                sortedEvents: [
+                    {
+                        id: 1,
+                        title: 'Algorithms Lecture',
+                        location: 'Strand Campus',
+                        start_time: start.toISOString(),
+                        end_time: end.toISOString(),
+                    },
+                ],
+            },
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText(/you may be late for your/i)).toBeTruthy();
+            expect(screen.getByText(/Algorithms Lecture/)).toBeTruthy();
+        });
     });
 });

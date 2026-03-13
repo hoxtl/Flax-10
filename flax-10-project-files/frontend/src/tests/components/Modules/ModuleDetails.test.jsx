@@ -64,4 +64,34 @@ describe('ModuleDetails', () => {
         expect(onUnenroll).toHaveBeenCalled();
     });
 
+    it('shows No description provided when description is null', () => {
+        render(<ModuleDetails module={{ ...module, description: null }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('No description provided.')).toBeInTheDocument();
+    });
+
+    it('shows Unknown when created_by_name is missing', () => {
+        render(<ModuleDetails module={{ ...module, created_by_name: null }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Unknown')).toBeInTheDocument();
+    });
+
+    it('shows No deadlines assigned yet when deadlines empty', () => {
+        render(<ModuleDetails module={{ ...module, deadlines: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('No deadlines assigned yet.')).toBeInTheDocument();
+    });
+
+    it('renders deadlines list when deadlines exist', () => {
+        const modWithDeadlines = { ...module, deadlines: [{ id: 1, title: 'CW1', deadline_type: 'coursework', start_due_date: '2026-04-01' }] };
+        render(<ModuleDetails module={modWithDeadlines} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('CW1')).toBeInTheDocument();
+    });
+
+    it('shows created_by_email link when present', () => {
+        render(<ModuleDetails module={{ ...module, created_by_email: 'j@kcl.ac.uk' }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByRole('link', { name: 'j@kcl.ac.uk' })).toHaveAttribute('href', 'mailto:j@kcl.ac.uk');
+    });
+
+    it('shows recurring badge when recurrence_rule is set', () => {
+        render(<ModuleDetails module={{ ...module, recurrence_rule: 'FREQ=WEEKLY' }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText(/repeats weekly/)).toBeInTheDocument();
+    });
 });

@@ -2,6 +2,10 @@ import { useState } from 'react';
 import styles from './EditProfileModal.module.css';
 import { updateUserProfile } from '../../api/userService';
 import { getInitials } from '../Authentication/utils/userUtils';
+import FormField from '../common/FormField/FormField';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import StandardModal from '../common/StandardModal/StandardModal';
+import TextInput from '../common/TextInput/TextInput';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -99,7 +103,7 @@ function PhotoActions({ previewUrl, profilePhotoUrl, onChange, onRemove }) {
         Change Photo
       </label>
       {(previewUrl || profilePhotoUrl) && (
-        <button type="button" className={styles.photoRemove} onClick={onRemove}>Remove Photo</button>
+        <PrimaryButton type="button" className={styles.photoRemove} variant="danger" pill onClick={onRemove}>Remove Photo</PrimaryButton>
       )}
     </div>
   );
@@ -118,36 +122,25 @@ function PhotoSection({ previewUrl, initials, user, onPhotoChange, onRemovePhoto
 
 function UsernameField({ username, setUsername }) {
   return (
-    <div className={styles.field}>
-      <label>Username</label>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} placeholder="Choose a username" />
-    </div>
+    <FormField label="Username" htmlFor="edit-profile-username" className={styles.field}>
+      <TextInput id="edit-profile-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} placeholder="Choose a username" />
+    </FormField>
   );
 }
 
 function BioField({ bio, setBio }) {
   return (
-    <div className={styles.field}>
-      <label>Reminder Note</label>
-      <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Add a personal reminder note..." />
-    </div>
+    <FormField label="Reminder Note" htmlFor="edit-profile-bio" className={styles.field}>
+      <TextInput multiline id="edit-profile-bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Add a personal reminder note..." />
+    </FormField>
   );
 }
 
 function FormActions({ loading, onClose }) {
   return (
     <div className={styles.actions}>
-      <button type="button" onClick={onClose} className={styles.cancelBtn}>Cancel</button>
-      <button type="submit" disabled={loading} className={styles.saveBtn}>{loading ? 'Saving...' : 'Save Changes'}</button>
-    </div>
-  );
-}
-
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h2>Edit Profile</h2>
-      <button className={styles.closeBtn} onClick={onClose}>✕</button>
+      <PrimaryButton type="button" onClick={onClose} className={styles.cancelBtn} variant="ghost" pill>Cancel</PrimaryButton>
+      <PrimaryButton type="submit" disabled={loading} className={styles.saveBtn} pill>{loading ? 'Saving...' : 'Save Changes'}</PrimaryButton>
     </div>
   );
 }
@@ -172,11 +165,14 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   if (!isOpen) return null;
   const handleSubmit = buildSubmitHandler(form, user, onSave, onClose);
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader onClose={onClose} />
-        <ModalForm form={form} user={user} onClose={onClose} onSubmit={handleSubmit} />
-      </div>
-    </div>
+    <StandardModal
+      title="Edit Profile"
+      onClose={onClose}
+      size="md"
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
+    >
+      <ModalForm form={form} user={user} onClose={onClose} onSubmit={handleSubmit} />
+    </StandardModal>
   );
 }

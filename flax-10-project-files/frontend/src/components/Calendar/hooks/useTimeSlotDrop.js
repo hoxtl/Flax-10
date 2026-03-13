@@ -5,7 +5,7 @@ import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
-import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
+import { extractBaseEventId, hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
 
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
@@ -96,6 +96,7 @@ async function createEventFromTag(tag, date, startMinutes, addEvent, allEvents, 
 }
 
 async function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addException, allEvents, confirmFn) {
+    if (isReadOnlyEvent(event)) return;
     if (hasRecurrence(event)) {
         await handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents, confirmFn);
     } else {

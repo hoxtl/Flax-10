@@ -1,29 +1,37 @@
+/**
+ * SocietyHero renders the visual header of the society detail page,
+ * featuring an image carousel and an editable society name.
+ */
 import { useState, useRef, useMemo } from "react";
 import styles from "./SocietyHero.module.css";
 import { useCarouselNavigation, useCarouselGestures } from "../hooks/useCarouselNavigation";
 
+/** Visual header carousel for the society detail page. */
 export default function SocietyHero({ society, onImageClick, editMode, onEditImages, onUpdateName }) {
-    const [hovered, setHovered] = useState(false);
     const heroRef = useRef(null);
-    const images = useMemo(() => getImages(society), [society.images, society.image]);
+    const images = useMemo(() => getImages(society), [society]);
     const { index, prev, next } = useCarouselNavigation(images.length);
+    const [hovered, setHovered] = useState(false);
+
     useCarouselGestures(heroRef, { prev, next });
 
-    const currentImage = images[index] || images[0];
-    const handleClick = !editMode ? onImageClick : undefined;
-
     return (
-        <div className={styles.hero} style={{ backgroundImage: `url("${currentImage}")` }}
-            ref={heroRef}
-            onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-            onClick={handleClick}>
+        <div className={styles.hero} style={{ backgroundImage: `url("${images[index] || images[0]}")` }}
+            ref={heroRef} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+            onClick={!editMode ? onImageClick : undefined}>
             <div className={styles.overlay}>
-                {!editMode && hovered && <HeroArrows index={index} total={images.length} prev={prev} next={next} />}
-                {editMode && hovered && <EditLayer onClick={onEditImages} />}
+                {hovered && <HeroControls editMode={editMode} images={images} index={index}
+                    prev={prev} next={next} onEditImages={onEditImages} />}
                 <HeroContent society={society} imageCount={images.length} editMode={editMode} onUpdateName={onUpdateName} />
             </div>
         </div>
     );
+}
+
+/** Handles rendering of contextual controls (arrows or edit layer). */
+function HeroControls({ editMode, images, index, prev, next, onEditImages }) {
+    if (editMode) return <EditLayer onClick={onEditImages} />;
+    return <HeroArrows index={index} total={images.length} prev={prev} next={next} />;
 }
 
 function getImages(society) {
@@ -78,16 +86,13 @@ function HeroContent({ society, imageCount, editMode, onUpdateName }) {
     );
 }
 
-function EditableName({ name, editMode, onUpdate }) {
+/** Renders a name that becomes an input field in edit mode. */
+export function EditableName({ name, editMode, onUpdate }) {
     const [isEditing, setIsEditing] = useState(false);
     const [val, setVal] = useState(name);
 
-    if (isEditing) {
-        return <input className={styles.nameInput} value={val} autoFocus
-            onChange={e => setVal(e.target.value)}
-            onBlur={() => { setIsEditing(false); onUpdate?.(val); }}
-            onKeyDown={e => e.key === 'Enter' && e.target.blur()} />;
-    }
+    if (isEditing) return <NameInput val={val} setVal={setVal} onUpdate={onUpdate} setEditing={setIsEditing} />;
+
     return (
         <div className={styles.nameWrapper}
             onClick={(e) => { if (editMode) { e.stopPropagation(); setIsEditing(true); } }}>
@@ -95,6 +100,15 @@ function EditableName({ name, editMode, onUpdate }) {
             {editMode && <span className={styles.editIcon}>✎</span>}
         </div>
     );
+}
+
+/** Inline text input for editing society names. */
+function NameInput({ val, setVal, onUpdate, setEditing }) {
+    const handleClose = () => { setEditing(false); onUpdate?.(val); };
+    return <input className={styles.nameInput} value={val} autoFocus
+        onChange={e => setVal(e.target.value)}
+        onBlur={handleClose}
+        onKeyDown={e => e.key === 'Enter' && handleClose()} />;
 }
 
 function ImageCounter({ count }) {

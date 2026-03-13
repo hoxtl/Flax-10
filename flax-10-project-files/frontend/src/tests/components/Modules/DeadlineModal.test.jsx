@@ -18,8 +18,13 @@ vi.mock('../../../components/Modules/hooks/useDeadlineModal', () => ({
     useDeadlineModal: () => mockModal,
 }));
 
-vi.mock('../DeadlineForm', () => ({
-    default: ({ onCancel }) => <div><button onClick={onCancel}>Cancel</button></div>,
+vi.mock('../../../components/Modules/DeadlineForm', () => ({
+    default: ({ onCancel, onSubmit }) => (
+        <div>
+            <button onClick={onCancel}>Cancel</button>
+            <button onClick={() => onSubmit({})}>Submit</button>
+        </div>
+    ),
 }));
 
 vi.mock('../DeadlineCard', () => ({
@@ -83,5 +88,35 @@ describe('DeadlineModal', () => {
         render(<DeadlineModal module={module} onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('Cancel'));
         expect(mockModal.close).toHaveBeenCalled();
+    });
+
+    it('calls onClose when backdrop is clicked', () => {
+        const onClose = vi.fn();
+        const { container } = render(<DeadlineModal module={module} onClose={onClose} />);
+        const backdrop = container.querySelector('[class*="backdrop"]');
+        fireEvent.mouseDown(backdrop);
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    it('calls onClose when startCreating and cancel from form', () => {
+        mockModal.showForm = true;
+        mockModal.editing = null;
+        const onClose = vi.fn();
+        render(<DeadlineModal module={module} onClose={onClose} startCreating={true} />);
+        fireEvent.click(screen.getByText('Cancel'));
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    it('calls onClose after submit when startCreating is true', async () => {
+        mockModal.showForm = true;
+        mockModal.editing = null;
+        mockModal.handleSubmit = vi.fn().mockResolvedValue(undefined);
+        const onClose = vi.fn();
+        render(<DeadlineModal module={module} onClose={onClose} startCreating={true} />);
+        fireEvent.click(screen.getByText('Submit'));
+        await vi.waitFor(() => {
+            expect(mockModal.handleSubmit).toHaveBeenCalled();
+            expect(onClose).toHaveBeenCalled();
+        });
     });
 });

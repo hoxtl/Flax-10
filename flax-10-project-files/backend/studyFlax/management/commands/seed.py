@@ -22,6 +22,7 @@ from studyFlax.models import (
     Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.groupwork.groupwork_models import GroupProject, GroupMembership
 
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures, module_fixtures,
@@ -29,6 +30,7 @@ from studyFlax.fixtures.data_fixtures import (
     MODULE_PILL_COLORS, location_fixtures,
 )
 from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
+from studyFlax.fixtures.groupwork_fixtures import GROUP_PROJECT_FIXTURES, GROUP_TASK_TEMPLATES
 from .seed_helpers import (
     build_users_list, build_settings_for_new_users, build_events_for_user,
     build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
@@ -51,7 +53,7 @@ class Command(BaseCommand):
 
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
-    USER_COUNT       = 25
+    USER_COUNT       = 58
     DEFAULT_PASSWORD = '1234'
 
     FIXTURE_USERS = [
@@ -103,6 +105,9 @@ class Command(BaseCommand):
         self.create_society_memberships()
         self.create_society_events()
         self.create_society_images()
+        self.create_group_projects()
+        self.create_group_memberships()
+        self.create_group_tasks()
         self.create_study_sessions()
         self.print_stats()  
         
@@ -463,21 +468,39 @@ class Command(BaseCommand):
 
     def create_society_memberships(self):
         self.stdout.write("Seeding society memberships...")
+        admin_counts = {u.id: 0 for u in self.users}
+        member_counts = {u.id: 0 for u in self.users}
         for society in Society.objects.all():
-            self._seed_society_members(society)
+            self._seed_society_members(society, admin_counts, member_counts)
 
-    def _seed_society_members(self, society):
-        admin = random.choice(self.users)
+    def _seed_society_members(self, society, admin_counts, member_counts):
+        admin = self._pick_admin(admin_counts)
+        if not admin:
+            return
+        self._add_admin_membership(society, admin, admin_counts)
+        self._seed_regular_members(society, admin, member_counts)
+
+    def _pick_admin(self, admin_counts):
+        eligible = [u for u in self.users if admin_counts[u.id] < 3]
+        return random.choice(eligible) if eligible else None
+
+    def _add_admin_membership(self, society, admin, admin_counts):
         SocietyMembership.objects.get_or_create(
             user=admin, society=society, defaults={'role': 'admin'}
         )
         society.admin_emails = admin.email
         society.save()
-        members = random.sample(self.users, random.randint(5, 15))
+        admin_counts[admin.id] += 1
+
+    def _seed_regular_members(self, society, admin, member_counts):
+        eligible = [u for u in self.users if u.id != admin.id and member_counts[u.id] < 5]
+        count = min(random.randint(5, 15), len(eligible))
+        members = random.sample(eligible, count)
         for member in members:
             SocietyMembership.objects.get_or_create(
                 user=member, society=society, defaults={'role': 'member'}
             )
+            member_counts[member.id] += 1
 
     def create_society_events(self):
         self.stdout.write("Seeding society events...")
@@ -488,6 +511,73 @@ class Command(BaseCommand):
         self.stdout.write("Seeding society images...")
         for society in Society.objects.all():
             self._seed_images_for_society(society)
+
+    def create_group_projects(self):
+        self.stdout.write("Seeding group projects...")
+        now = timezone.now()
+        fixture_user_objs = {u.username: u for u in User.objects.filter(username__in=['johndoe', 'janedoe', 'charlie'])}
+        
+        for name, code_prefix, desc in GROUP_PROJECT_FIXTURES:
+            owner_username = random.choice(['johndoe', 'janedoe', 'charlie'])
+            owner = fixture_user_objs.get(owner_username)
+            if not owner: continue
+            
+            due = (now + timedelta(days=random.randint(20, 45))).replace(hour=23, minute=59)
+            project, created = GroupProject.objects.get_or_create(
+                name=name,
+                defaults={
+                    'owner': owner,
+                    'course_code': f"{code_prefix}{random.randint(4000, 6000)}",
+                    'deadline': due
+                }
+            )
+            if created:
+                # Add owner to membership too
+                GroupMembership.objects.get_or_create(project=project, user=owner, defaults={'role': 'owner'})
+
+    def create_group_memberships(self):
+        self.stdout.write("Seeding group memberships...")
+        projects = list(GroupProject.objects.all())
+        students = list(User.objects.filter(username__in=['johndoe', 'janedoe', 'charlie']))
+        
+        for project in projects:
+            # Add 1-2 more fixture users as members
+            potential = [s for s in students if s != project.owner]
+            members = random.sample(potential, random.randint(1, min(2, len(potential))))
+            for m in members:
+                GroupMembership.objects.get_or_create(project=project, user=m, defaults={'role': 'member'})
+
+    def create_group_tasks(self):
+        self.stdout.write("Seeding group tasks with assignments and statuses...")
+        projects = GroupProject.objects.all()
+        statuses = ['todo', 'in_progress', 'done']
+        
+        for project in projects:
+            members = [m.user for m in project.memberships.all()]
+            due = project.deadline or (timezone.now() + timedelta(days=30))
+            
+            for t_title, t_desc, t_priority, t_blocks in GROUP_TASK_TEMPLATES:
+                # Randomly pick status
+                status = random.choice(statuses)
+                is_completed = (status == 'done')
+                completed_at = timezone.now() - timedelta(days=random.randint(0, 5)) if is_completed else None
+                
+                task = Task.objects.create(
+                    user=project.owner,
+                    group_project=project,
+                    title=t_title,
+                    description=t_desc,
+                    priority=t_priority,
+                    estimated_blocks=t_blocks,
+                    status=status,
+                    completed=is_completed,
+                    completed_at=completed_at,
+                    due_date=due - timedelta(days=random.randint(1, 15))
+                )
+                
+                # Assign to 1-2 random members
+                assignees = random.sample(members, random.randint(1, min(2, len(members))))
+                task.assigned_to.set(assignees)
 
     def print_stats(self):
         """Print a summary of all fixture users and database record counts."""
@@ -505,6 +595,7 @@ class Command(BaseCommand):
             ("Enrollments", Enrollment.objects.count()),
             ("Deadlines",   Deadline.objects.count()),
             ("Tasks",       Task.objects.count()),
+            ("Group Projects", GroupProject.objects.count()),
             ("Categories",  Category.objects.count()),
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),

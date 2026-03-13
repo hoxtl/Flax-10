@@ -16,6 +16,7 @@
     white-space: pre-wrap;
 }
 
+/* Base layouts for the different society detail tabs. */
 .aboutContainer {
     display: flex;
     flex-direction: column;

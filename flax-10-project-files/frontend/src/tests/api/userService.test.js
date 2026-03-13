@@ -100,12 +100,13 @@ describe('userService', () => {
         );
     });
 
-    it('searchUsers with moduleFilter and societyFilter', async () => {
+    it('searchUsers with course, society, and year filters', async () => {
         mockFetch({ results: [] });
-        await api.searchUsers('alice', 'CS101', 'Chess');
+        await api.searchUsers('alice', 'Computer Science', 'Chess', 0, 20, 'Year 2');
         const url = global.fetch.mock.calls[0][0];
-        expect(url).toContain('module=CS101');
+        expect(url).toContain('course=Computer%20Science');
         expect(url).toContain('society=Chess');
+        expect(url).toContain('year=Year%202');
     });
 
     describe('geocodeAddress', () => {

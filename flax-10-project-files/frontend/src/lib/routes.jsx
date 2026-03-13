@@ -7,6 +7,7 @@ import TimerPage from "../pages/Timer/TimerPage";
 import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
 import AdminPage from "../pages/Admin/AdminPage";
 import TasksPage from "../pages/Tasks/TasksPage";
+import GroupWorkIndexPage from "../pages/GroupWork/GroupWorkIndexPage";
 import Discover from "../pages/Discover/Discover";
 
 export const APP_ROUTES = [
@@ -31,6 +32,13 @@ export const APP_ROUTES = [
     icon: "✅",
     path: "/tasks",
     element: <TasksPage />,
+  },
+  {
+    id: "group-work",
+    label: "Group Work",
+    icon: "🤝",
+    path: "/group-work",
+    element: <GroupWorkIndexPage />,
   },
   {
     id: "users",

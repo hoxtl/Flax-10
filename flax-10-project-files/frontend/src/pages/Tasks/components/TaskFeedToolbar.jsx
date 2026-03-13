@@ -2,9 +2,10 @@
  * Toolbar for TaskFeed: search, sort, and filter. Composed from small components.
  */
 
-import { Search, X, Filter } from "lucide-react";
+import { X, Filter } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import SearchBar from "../../../components/common/SearchBar";
 import TaskFilterPanel from "./TaskFilterPanel";
 import styles from "./TaskFeedToolbar.module.css";
 
@@ -19,13 +20,14 @@ const SORT_OPTIONS = [
 function ToolbarSearch({ search, onSearchChange, searchInputRef }) {
   return (
     <div className={styles.searchWrap}>
-      <Search size={13} className={styles.searchIcon} aria-hidden />
-      <input
+      <SearchBar
         ref={searchInputRef}
-        className={styles.searchInput}
+        className={styles.searchField}
+        inputClassName={styles.searchInput}
         placeholder="Search… ( / )"
         value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
+        onChange={onSearchChange}
+        aria-label="Search tasks"
         onKeyDown={(e) => { if (e.key === "Escape") { onSearchChange(""); e.target.blur(); } }}
       />
       {search && <button type="button" className={styles.searchClear} onClick={() => onSearchChange("")} aria-label="Clear search"><X size={12} /></button>}

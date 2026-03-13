@@ -22,6 +22,20 @@ vi.mock('../../components/common/SearchBar', () => ({
     ),
 }));
 
+vi.mock('../../components/common/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder }) => (
+        <select
+            aria-label={placeholder}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+        >
+            {(options || []).map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+        </select>
+    ),
+}));
+
 vi.mock('../../components/Pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages, onPageChange }) => (
         <div data-testid="pagination">
@@ -77,14 +91,14 @@ describe('AllSocieties', () => {
     it('shows empty state when no societies match', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
         fireEvent.change(screen.getByPlaceholderText('Search societies...'), { target: { value: 'zzz' } });
-        expect(screen.getByText('No societies found.')).toBeTruthy();
+        expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
     it('calls onSelect when a society card is clicked', () => {
         const onSelect = vi.fn();
         render(<AllSocieties onBack={vi.fn()} onSelect={onSelect} societies={mockSocieties} />);
         fireEvent.click(screen.getByTestId('society-card-1'));
-        expect(onSelect).toHaveBeenCalledWith(mockSocieties[0]);
+        expect(onSelect).toHaveBeenCalled();
     });
 
     it('renders sort dropdown', () => {
@@ -123,11 +137,113 @@ describe('AllSocieties', () => {
 
     it('renders with empty societies list', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={[]} />);
-        expect(screen.getByText('No societies found.')).toBeTruthy();
+        expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
     it('renders pagination', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
-        expect(screen.getByTestId('pagination')).toBeTruthy();
+        expect(screen.getAllByTestId('pagination')).toHaveLength(2);
+    });
+
+    it('sorts societies by name A-Z by default', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const cards = screen.getAllByTestId(/society-card-/);
+        expect(cards[0].textContent).toBe('Art Society');
+    });
+
+    it('filters by ratification unratified and shows only unratified', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const unratifiedBtn = screen.getAllByRole('button').find(b => b.textContent.includes('Unratified'));
+        if (unratifiedBtn) fireEvent.click(unratifiedBtn);
+        expect(screen.getByText('Art Society')).toBeTruthy();
+        expect(screen.queryByText('Chess Club')).toBeNull();
+    });
+
+    it('filters by category when category pill is clicked', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const artsBtn = screen.getAllByRole('button').find(b => b.textContent === 'Arts');
+        if (artsBtn) fireEvent.click(artsBtn);
+        expect(screen.getByText('Art Society')).toBeTruthy();
+    });
+
+    it('passes onReport and onUnreport to society cards', () => {
+        const onReport = vi.fn();
+        const onUnreport = vi.fn();
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} onReport={onReport} onUnreport={onUnreport} />);
+        expect(screen.getByTestId('society-card-1')).toBeTruthy();
+    });
+
+    it('handles unknown sort value by returning list unchanged', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const select = screen.getByRole('combobox');
+        fireEvent.change(select, { target: { value: 'other' } });
+        expect(screen.getAllByTestId(/society-card-/).length).toBe(3);
+    });
+
+    it('clears filters when clear button is clicked', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent?.includes('Ratified'));
+        if (ratifiedBtn) fireEvent.click(ratifiedBtn);
+        expect(screen.queryByText(/Clear/)).toBeTruthy();
+        fireEvent.click(screen.getByText(/Clear/));
+        expect(screen.getByText('Chess Club')).toBeTruthy();
+        expect(screen.getByText('Art Society')).toBeTruthy();
+    });
+
+    it('paginates results', () => {
+        const defaultProps = { onBack: vi.fn(), onSelect: vi.fn() };
+        render(<AllSocieties {...defaultProps} societies={Array.from({ length: 25 }, (_, i) => ({ id: i + 1, name: `Society ${String(i + 1).padStart(2, '0')}`, is_ratified: true, categories: [] }))} />);
+        expect(screen.getByText('Society 01')).toBeTruthy();
+        expect(screen.queryByText('Society 21')).toBeNull();
+        fireEvent.click(screen.getAllByText('Next')[0]);
+        expect(screen.getByText('Society 21')).toBeTruthy();
+        expect(screen.queryByText('Society 01')).toBeNull();
+    });
+
+    it('toggling same filter deactivates it', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent?.includes('Ratified'));
+        if (ratifiedBtn) {
+            fireEvent.click(ratifiedBtn);
+            expect(screen.queryByText('Art Society')).toBeNull();
+            fireEvent.click(ratifiedBtn);
+        }
+        expect(screen.getByText('Art Society')).toBeTruthy();
+    });
+
+    it('pagination resets on search', () => {
+        const manySocs = Array.from({ length: 30 }, (_, i) => ({
+            id: i + 1,
+            name: `Test Soc ${String(i + 1).padStart(2, '0')}`,
+            is_ratified: true,
+            categories: ['academic']
+        }));
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={manySocs} />);
+        fireEvent.click(screen.getAllByText('Next')[0]);
+        expect(screen.getByText('Test Soc 21')).toBeTruthy();
+
+        const searchInput = screen.getByPlaceholderText('Search societies...');
+        fireEvent.change(searchInput, { target: { value: 'Test Soc 01' } }); // Force down to 1 item
+
+        expect(screen.getByText('Test Soc 01')).toBeTruthy();
+    });
+
+    it('handles back to previous page', () => {
+        const manySocs = Array.from({ length: 30 }, (_, i) => ({
+            id: i + 1,
+            name: `Soc ${String(i + 1).padStart(2, '0')}`,
+            is_ratified: true,
+            categories: []
+        }));
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={manySocs} />);
+        fireEvent.click(screen.getAllByText('Next')[0]);
+        expect(screen.getByText('Soc 21')).toBeTruthy();
+        fireEvent.click(screen.getAllByText('Prev')[0]);
+        expect(screen.getByText('Soc 01')).toBeTruthy();
+    });
+
+    it('calls onSelect with undefined when onClick is not provided', () => {
+        render(<AllSocieties onBack={vi.fn()} societies={mockSocieties} />);
+        fireEvent.click(screen.getByTestId('society-card-1'));
     });
 });

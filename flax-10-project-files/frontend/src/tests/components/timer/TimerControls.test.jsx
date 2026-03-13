@@ -27,7 +27,23 @@ const testPause = () => {
     expect(screen.getByText('Pause')).toBeInTheDocument();
 };
 
+const testResume = () => {
+    const onPause = vi.fn();
+    render(<TimerControls isActive={true} isPaused={true} onToggle={() => { }} onPause={onPause} onReset={() => { }} onEndEarly={() => { }} />);
+    expect(screen.getByText('Resume')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Resume'));
+    expect(onPause).toHaveBeenCalled();
+};
+
+const testPauseIndicator = () => {
+    render(<TimerControls isActive={true} isPaused={true} totalPaused={90} onToggle={() => { }} onPause={() => { }} onReset={() => { }} onEndEarly={() => { }} />);
+    expect(screen.getByText(/Paused:/)).toBeInTheDocument();
+    expect(screen.getByText(/01:30/)).toBeInTheDocument();
+};
+
 describe('TimerControls', () => {
     it('renders correct buttons', testButtons);
     it('shows Pause when active', testPause);
+    it('shows Resume when active and paused', testResume);
+    it('shows PauseIndicator when paused with totalPaused > 0', testPauseIndicator);
 });

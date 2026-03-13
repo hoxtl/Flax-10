@@ -1,0 +1,38 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--chip-padding);
+  font-size: var(--chip-font-size);
+  font-weight: var(--chip-font-weight);
+  border: 1px solid transparent;
+  line-height: 1;
+}
+
+.pill {
+  border-radius: var(--radius-pill);
+}
+
+.default {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.success {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: color-mix(in srgb, var(--success-text) 24%, transparent);
+}
+
+.danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+
+.muted {
+  background: color-mix(in srgb, var(--muted) 14%, transparent);
+  color: var(--text-secondary);
+  border-color: color-mix(in srgb, var(--muted) 16%, transparent);
+}

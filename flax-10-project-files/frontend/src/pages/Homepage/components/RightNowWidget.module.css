@@ -5,6 +5,7 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
+  height: 100%;
 }
 
 /* ─── Header ──────────────────────────────────────────────────── */
@@ -14,6 +15,7 @@
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  margin-bottom: 2px;
 }
 
 .headerIconWrap {
@@ -200,10 +202,11 @@
 /* ─── Current event card ──────────────────────────────────────── */
 
 .currentEventCard {
-  background: #FAFAF6;
-  border-radius: 0 9px 9px 0;
-  padding: 10px 14px;
-  border-left: 3px solid #7BB38E;
+  background: linear-gradient(135deg, #f8fbf6 0%, #f4f4ef 100%);
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(123, 179, 142, 0.18);
+  border-left: 4px solid #7BB38E;
 }
 
 .currentEventRow1 {
@@ -271,10 +274,13 @@
 
 .upNextRow {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 4px 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(248, 243, 236, 0.72);
+  border: 1px solid rgba(139, 115, 85, 0.08);
 }
 
 .upNextLeft {
@@ -285,12 +291,92 @@
 }
 
 .upNextLabel {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #a89279;
   flex-shrink: 0;
+}
+
+.contextCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: rgba(250, 247, 242, 0.86);
+  border: 1px solid rgba(139, 115, 85, 0.09);
+}
+
+.contextCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.contextCardTitleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contextCardIcon {
+  color: #8b7355;
+  flex-shrink: 0;
+}
+
+.contextCardEyebrow {
+  color: #a89279;
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contextCardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #8b7355;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.contextCardTitle {
+  margin: 0;
+  color: #2c1810;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.contextCardText {
+  margin: 0;
+  color: #7f6a57;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.contextPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.contextPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(139, 115, 85, 0.08);
+  color: #6d5847;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .upNextTitle {

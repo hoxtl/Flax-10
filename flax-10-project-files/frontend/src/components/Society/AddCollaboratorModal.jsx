@@ -1,76 +1,30 @@
-import { useState, useEffect } from "react";
-import { searchUsers } from "../../api/userService";
+import { useState } from "react";
+import Badge from "../common/Badge/Badge";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import StandardModal from "../common/StandardModal/StandardModal";
+import UserSearch from "../Social/UserSearch";
 import styles from "./AddCollaboratorModal.module.css";
 
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
     const [selected, setSelected] = useState([]);
-
-    useEffect(() => { fetchResults(query, setResults); }, [query]);
-
     const handleSelect = (user) => {
         if (!selected.find(u => u.id === user.id)) setSelected([...selected, user]);
-        setQuery("");
-        setResults([]);
     };
-
-    const handleRemove = (userId) => setSelected(selected.filter(u => u.id !== userId));
+    const handleRemove = (uid) => setSelected(selected.filter(u => u.id !== uid));
     const handleAdd = () => { onAdd(selected); onClose(); };
-    const filteredResults = filterResults(results, selected, existingUsernames);
-
+    const filterUsers = (res) => {
+        if (!Array.isArray(res)) return [];
+        const selIds = new Set(selected.map(u => u.id));
+        return res.filter(u => !existingUsernames.includes(u.username) && !selIds.has(u.id));
+    };
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ModalHeader onClose={onClose} />
-                <SearchInput query={query} setQuery={setQuery} />
-                {filteredResults.length > 0 && <SearchResults results={filteredResults} onSelect={handleSelect} />}
+        <StandardModal title="Add Collaborators" onClose={onClose} size="sm" modalClassName={styles.modalShell} contentClassName={styles.modalContent}>
+            <div className={styles.searchContainer}>
+                <UserSearch onUserSelect={handleSelect} filterUsers={filterUsers} fullWidth hideFilter compact />
                 <SelectedUsers users={selected} onRemove={handleRemove} />
-                <ModalFooter onClose={onClose} onAdd={handleAdd} disabled={selected.length === 0} />
             </div>
-        </div>
-    );
-}
-
-function filterResults(results, selected, existingUsernames) {
-    if (!Array.isArray(results)) return [];
-    const selectedIds = new Set(selected.map(u => u.id));
-    return results.filter(u => !existingUsernames.includes(u.username) && !selectedIds.has(u.id));
-}
-
-async function fetchResults(query, setResults) {
-    if (query.length < 2) return setResults([]);
-    try {
-        const data = await searchUsers(query);
-        setResults(data?.results || data || []);
-    } catch { setResults([]); }
-}
-
-function ModalHeader({ onClose }) {
-    return (
-        <div className={styles.header}>
-            <h3 className={styles.title}>Add Collaborators</h3>
-            <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-        </div>
-    );
-}
-
-function SearchInput({ query, setQuery }) {
-    return (
-        <input className={styles.input} value={query} onChange={e => setQuery(e.target.value)}
-            placeholder="Search by username..." autoFocus />
-    );
-}
-
-function SearchResults({ results, onSelect }) {
-    return (
-        <div className={styles.results}>
-            {results.map(user => (
-                <button key={user.id} className={styles.resultItem} onClick={() => onSelect(user)}>
-                    {user.username}
-                </button>
-            ))}
-        </div>
+            <ModalFooter onC={onClose} onA={handleAdd} dis={selected.length === 0} />
+        </StandardModal>
     );
 }
 
@@ -78,21 +32,25 @@ function SelectedUsers({ users, onRemove }) {
     if (users.length === 0) return null;
     return (
         <div className={styles.selected}>
-            {users.map(user => (
-                <span key={user.id} className={styles.chip}>
-                    {user.username}
-                    <button className={styles.chipRemove} onClick={() => onRemove(user.id)}>&times;</button>
-                </span>
-            ))}
+            {users.map(u => <UserChip key={u.id} user={u} onRemove={onRemove} />)}
         </div>
     );
 }
 
-function ModalFooter({ onClose, onAdd, disabled }) {
+function UserChip({ user, onRemove }) {
+    return (
+        <Badge className={styles.chip} tone="muted">
+            {user.username}
+            <PrimaryButton className={styles.chipRemove} variant="ghost" size="small" pill onClick={() => onRemove(user.id)} aria-label={`Remove ${user.username}`}>×</PrimaryButton>
+        </Badge>
+    );
+}
+
+function ModalFooter({ onC, onA, dis }) {
     return (
         <div className={styles.footer}>
-            <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-            <button className={styles.addBtn} onClick={onAdd} disabled={disabled}>Add</button>
+            <PrimaryButton className={styles.cancelBtn} variant="ghost" pill onClick={onC}>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.addBtn} pill onClick={onA} disabled={dis}>Add</PrimaryButton>
         </div>
     );
 }

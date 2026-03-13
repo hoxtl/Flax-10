@@ -12,7 +12,7 @@ describe('CreateListModal', () => {
     it('calls onClose when close button is clicked', () => {
         const onClose = vi.fn();
         render(<CreateListModal onSave={vi.fn()} onClose={onClose} />);
-        fireEvent.click(screen.getByText('✕'));
+        fireEvent.click(screen.getByText('×'));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 

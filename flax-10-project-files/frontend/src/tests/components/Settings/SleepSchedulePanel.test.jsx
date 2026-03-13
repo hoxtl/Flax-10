@@ -26,7 +26,7 @@ describe('SleepSchedulePanel', () => {
     it('shows loading initially', () => {
         getUserSettings.mockReturnValueOnce(new Promise(() => {}));
         render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
-        expect(screen.getByText('Loading…')).toBeTruthy();
+        expect(screen.getByLabelText('Loading sleep schedule')).toBeTruthy();
     });
 
     it('renders sleep schedule form after loading', async () => {

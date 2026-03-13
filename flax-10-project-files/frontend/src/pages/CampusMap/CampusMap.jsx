@@ -2,60 +2,43 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./CampusMap.module.css";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import { tflService } from "../../api/tflService";
 import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
+import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-const KCL_CAMPUSES = [
-  {
-    id: "strand",
-    name: "Strand Campus",
-    shortName: "Strand",
-    coords: [-0.116, 51.5114],
-    address: "Strand, London WC2R 2LS",
-    color: "#9E7E5D",
-    description:
-      "KCL Main Campus - Arts & Humanities, Law, Social Sciences and Business",
-  },
-  {
-    id: "guys",
-    name: "Guy's Campus",
-    shortName: "Guy's",
-    coords: [-0.0877, 51.5034],
-    address: "Great Maze Pond, London SE1 9RT",
-    color: "#7A6048",
-    description: "Riverside Campus - Life Sciences, Medicine and Dentistry",
-  },
-  {
-    id: "waterloo",
-    name: "Waterloo Campus",
-    shortName: "Waterloo",
-    coords: [-0.1155, 51.506],
-    address: "150 Stamford St, London SE1 9NH",
-    color: "#B8956A",
-    description: "Waterloo Campus - Nursing and Midwifery",
-  },
-  {
-    id: "st_thomas",
-    name: "St Thomas Campus",
-    shortName: "St Thomas",
-    coords: [-0.1176, 51.4986],
-    address: "Westminster Bridge Rd, London SE1 7EH",
-    color: "#6B7F6B",
-    description: "St Thomas Hospital Campus - Medical and Dental Training",
-  },
-  {
-    id: "denmark_hill",
-    name: "Denmark Hill Campus",
-    shortName: "Denmark Hill",
-    coords: [-0.0934, 51.4686],
-    address: "Denmark Hill, London SE5 9RS",
-    color: "#7B6E9E",
-    description: "South London Campus - Psychiatry, Psychology & Neuroscience",
-  },
-];
+const MIN_MAP_SKELETON_MS = 900;
+
+function CampusMapSkeleton() {
+  return (
+    <div className={styles.skeletonOverlay} data-testid="campus-map-skeleton" aria-busy="true">
+      <aside className={styles.sidebar}>
+        <section className={styles.sidebarHeader}>
+          <SkeletonBlock className={styles.skeletonSidebarTitle} />
+          <SkeletonBlock className={styles.skeletonSidebarSubtitle} />
+        </section>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <section key={index} className={styles.section}>
+            <SkeletonBlock className={styles.skeletonSectionLabel} />
+            <SkeletonBlock className={styles.skeletonPanelCard} />
+            <SkeletonBlock className={styles.skeletonPanelCardTall} />
+          </section>
+        ))}
+      </aside>
+      <div className={styles.mapWrapper}>
+        <SkeletonBlock className={styles.skeletonMapPane} />
+        <div className={styles.campusQuickNav}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <SkeletonBlock key={index} className={styles.skeletonQuickNavBtn} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function travelTime(seconds) {
   const mins = Math.round(seconds / 60);
@@ -103,6 +86,7 @@ export default function CampusMap() {
   const [tflRouteError, setTflRouteError] = useState("");
   const [disruptions, setDisruptions] = useState([]);
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
+  const [minSkeletonElapsed, setMinSkeletonElapsed] = useState(false);
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
@@ -111,6 +95,14 @@ export default function CampusMap() {
     const handleResize = () => setIsMobile(window.innerWidth < 900);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setMinSkeletonElapsed(true);
+    }, MIN_MAP_SKELETON_MS);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Variants for the bottom sheet states
@@ -125,7 +117,7 @@ export default function CampusMap() {
   const homePopup = useRef(null);
 
   useEffect(() => {
-    if (map.current) return;
+    if (map.current || !mapContainer.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -283,6 +275,16 @@ export default function CampusMap() {
       map.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!mapLoaded || !map.current) return;
+    const id = requestAnimationFrame(() => {
+      if (typeof map.current?.resize === "function") {
+        map.current.resize();
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [mapLoaded, isMobile]);
 
   // Load user's home address on the map
   useEffect(() => {
@@ -615,10 +617,17 @@ export default function CampusMap() {
     });
   };
 
+  const showInitialSkeleton = !mapLoaded || !minSkeletonElapsed;
+
   return (
     <div className={styles.page}>
+      {showInitialSkeleton && (
+        <CampusMapSkeleton />
+      )}
+
       <motion.aside
         className={styles.sidebar}
+        style={showInitialSkeleton ? { visibility: "hidden" } : undefined}
         initial={isMobile ? "closed" : false}
         animate={isMobile ? undefined : { y: 0 }}
         drag={isMobile ? "y" : false}
@@ -668,7 +677,7 @@ export default function CampusMap() {
                 <div key={i} className={styles.disruptionCard}>
                   <div
                     className={styles.disruptionBadge}
-                    style={{ backgroundColor: disruptions.color }}
+                    style={{ backgroundColor: disruption.color }}
                   >
                     - {disruption.lineName}
                   </div>
@@ -978,7 +987,7 @@ export default function CampusMap() {
         </div>
       </motion.aside>
 
-      <div className={styles.mapWrapper}>
+      <div className={styles.mapWrapper} style={showInitialSkeleton ? { visibility: "hidden" } : undefined}>
         <div ref={mapContainer} className={styles.mapContainer} />
 
         {/* Floating campus quick-fly buttons */}

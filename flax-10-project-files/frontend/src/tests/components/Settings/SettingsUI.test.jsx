@@ -12,6 +12,28 @@ import {
   ThemeSelector,
 } from "../../../components/Settings/SettingsUI";
 
+vi.mock("../../../components/common/AnimatedDropdown", () => ({
+  default: ({ value, onChange, options, placeholder, grouped }) => {
+    const opts = grouped
+      ? (options || []).flatMap((g) => g.options || [])
+      : options || [];
+    return (
+      <select
+        aria-label={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">Select your course</option>
+        {opts.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    );
+  },
+}));
+
 describe("TabButton", () => {
   it("renders label", () => {
     render(
@@ -198,6 +220,7 @@ describe("FormSelect", () => {
     const grouped = [
       { label: "Group A", options: [{ value: "a1", label: "A1" }] },
     ];
+
     render(
       <FormSelect
         id="select"

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({
@@ -98,6 +98,55 @@ describe('QuickAddModal', () => {
         renderModal({ isTeacher: true });
         fireEvent.click(screen.getByText('Module'));
         expect(screen.getByText('Module Options')).toBeTruthy();
+    });
+
+    it('navigates to module picker when Add Deadline is clicked', () => {
+        renderModal({ isTeacher: true });
+        fireEvent.click(screen.getByText('Module'));
+        fireEvent.click(screen.getByText('Add Deadline'));
+        expect(screen.getByText('Select Module')).toBeTruthy();
+    });
+
+    it('calls onSelectType with tag id when tag is selected in tag view', () => {
+        const onSelectType = vi.fn();
+        renderModal({ onSelectType });
+        fireEvent.click(screen.getByText('Event'));
+        fireEvent.click(screen.getByText('Lecture'));
+        expect(onSelectType).toHaveBeenCalledWith(1);
+    });
+
+    it('calls onSelectType with add_deadline and module when module selected in picker', async () => {
+        const onSelectType = vi.fn();
+        renderModal({ isTeacher: true, onSelectType });
+        fireEvent.click(screen.getByText('Module'));
+        fireEvent.click(screen.getByText('Add Deadline'));
+        await vi.waitFor(() => expect(screen.getByText('CS101')).toBeTruthy());
+        fireEvent.click(screen.getByText('CS101'));
+        expect(onSelectType).toHaveBeenCalledWith('add_deadline', { id: 1, module_code: 'CS101', module_name: 'Intro to CS' });
+    });
+
+    it('shows Create New Module and Add Deadline in module options', () => {
+        renderModal({ isTeacher: true });
+        fireEvent.click(screen.getByText('Module'));
+        expect(screen.getByText('Create New Module')).toBeTruthy();
+        expect(screen.getByText('Add Deadline')).toBeTruthy();
+    });
+
+    it('calls onSelectType with create_module when Create New Module is clicked', () => {
+        const onSelectType = vi.fn();
+        renderModal({ isTeacher: true, onSelectType });
+        fireEvent.click(screen.getByText('Module'));
+        fireEvent.click(screen.getByText('Create New Module'));
+        expect(onSelectType).toHaveBeenCalledWith('create_module');
+    });
+
+    it('shows loading or no modules when getModules returns empty', async () => {
+        const { getModules } = await import('../../../api/moduleApi');
+        getModules.mockResolvedValueOnce([]);
+        renderModal({ isTeacher: true });
+        fireEvent.click(screen.getByText('Module'));
+        fireEvent.click(screen.getByText('Add Deadline'));
+        await waitFor(() => expect(screen.getByText(/Loading or no modules/)).toBeTruthy());
     });
 
     it('calls onClose when Close button is clicked', () => {

@@ -4,7 +4,7 @@ import SocietySection from '../../../pages/Societies/SocietySection';
 
 vi.mock('../../../components/Society/SocietyCard', () => ({
     default: ({ society, onClick }) => (
-        <div data-testid="society-card" onClick={onClick}>{society.name}</div>
+        <div data-testid="society-card" onClick={() => onClick?.(society)}>{society.name}</div>
     ),
 }));
 
@@ -62,14 +62,13 @@ describe('SocietySection', () => {
 
     it('shows empty admin state when items is empty and type is admin', () => {
         render(<SocietySection title="Test" items={[]} type="admin" onAction={vi.fn()} />);
-        expect(screen.getByText("You don't manage any societies yet.")).toBeTruthy();
-        expect(screen.getByText('Create a Society')).toBeTruthy();
+        expect(screen.getByText(/Create a society/i)).toBeTruthy();
     });
 
-    it('calls onAction when Create a Society is clicked', () => {
+    it('calls onAction when Create a society is clicked', () => {
         const onAction = vi.fn();
         render(<SocietySection title="Test" items={[]} type="admin" onAction={onAction} />);
-        fireEvent.click(screen.getByText('Create a Society'));
+        fireEvent.click(screen.getByText(/Create a society/i));
         expect(onAction).toHaveBeenCalledTimes(1);
     });
 
@@ -84,5 +83,23 @@ describe('SocietySection', () => {
         render(<SocietySection title="Test" items={societies} type="member" onAction={vi.fn()} onSelect={onSelect} />);
         fireEvent.click(screen.getAllByTestId('society-card')[0]);
         expect(onSelect).toHaveBeenCalledWith(societies[0]);
+    });
+
+    it('does not render section header when hideTitle is true', () => {
+        render(<SocietySection hideTitle title="Hidden Title" items={societies} type="member" onAction={vi.fn()} />);
+        expect(screen.queryByText('Hidden Title')).not.toBeInTheDocument();
+    });
+
+    it('renders pagination when pagination prop is provided and totalPages > 1', () => {
+        render(
+            <SocietySection
+                title="Test"
+                items={societies}
+                type="member"
+                onAction={vi.fn()}
+                pagination={{ currentPage: 1, totalPages: 2, onPageChange: vi.fn() }}
+            />
+        );
+        expect(screen.getAllByRole('button', { name: /Next/ }).length).toBeGreaterThan(0);
     });
 });

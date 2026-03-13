@@ -1,59 +1,14 @@
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
+.modalShell {
   background: var(--bg);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.header {
+.modalContent {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.header h2 {
-  margin: 0;
-  font-size: 20px;
-  color: var(--text);
-}
-
-.closeBtn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-}
-
-.closeBtn:hover {
-  background: var(--hover);
+  flex-direction: column;
 }
 
 .form {
-  padding: 20px;
+  padding-top: 0;
 }
 
 .instructions {

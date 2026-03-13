@@ -1,6 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+
+const mockNavigate = vi.hoisted(() => vi.fn());
+
+vi.mock('react-router-dom', async (importOriginal) => {
+    const actual = await importOriginal();
+    return { ...actual, useNavigate: () => mockNavigate };
+});
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
@@ -56,7 +64,7 @@ vi.mock('../pages/Societies/SocietyDetailPage', () => ({
 }));
 
 vi.mock('../components/Onboarding/OnboardingModal', () => ({
-    default: ({ isOpen }) => isOpen ? <div data-testid="onboarding-modal">Onboarding</div> : null,
+    default: ({ isOpen, onComplete }) => isOpen ? <div data-testid="onboarding-modal"><button onClick={onComplete}>Complete onboarding</button></div> : null,
 }));
 
 vi.mock('../components/Notifications', () => ({
@@ -94,12 +102,26 @@ vi.mock('../context/TaskCompletionContext', () => ({
     TaskCompletionProvider: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../lib/routes', () => ({
-    APP_ROUTES: [
-        { id: 'home', path: '/', element: <div data-testid="home-route">Home</div> },
-        { id: 'settings', path: '/settings', element: null },
-    ],
-}));
+vi.mock('../lib/routes', () => {
+    const React = require('react');
+    const ModulesPlaceholder = (props) => (
+        <div
+            data-testid="modules-route"
+            data-initial-create={props.initialCreate}
+            data-initial-search={props.initialSearch}
+        >
+            Modules
+        </div>
+    );
+    return {
+        APP_ROUTES: [
+            { id: 'home', path: '/', element: <div data-testid="home-route">Home</div> },
+            { id: 'settings', path: '/settings', element: <div data-testid="settings-route">Settings Route</div> },
+            { id: 'profile', path: '/profile', element: <div data-testid="profile-route">Profile Route</div> },
+            { id: 'modules', path: '/modules', element: <ModulesPlaceholder /> },
+        ],
+    };
+});
 
 import App from '../App';
 
@@ -115,10 +137,12 @@ describe('App', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
+        mockNavigate.mockClear();
     });
 
     afterEach(() => {
         localStorage.clear();
+        cleanup();
     });
 
     it('renders auth screen when not authenticated', async () => {
@@ -163,7 +187,150 @@ describe('App', () => {
         localStorage.setItem('token', 'abc');
         localStorage.setItem('user', JSON.stringify({ id: 1, username: 'alice' }));
         localStorage.setItem('flax_welcome_seen_v1', '1');
-        window.dispatchEvent(new Event('auth-changed'));
+        act(() => {
+            window.dispatchEvent(new Event('auth-changed'));
+        });
         await waitFor(() => expect(screen.getByTestId('dashboard-layout')).toBeTruthy());
+    });
+
+    it('renders password reset request at /reset-password', async () => {
+        renderApp('/reset-password');
+        await waitFor(() => expect(screen.getByTestId('password-reset-request')).toBeTruthy());
+    });
+
+    it('renders password reset confirm at /reset-password/:token', async () => {
+        renderApp('/reset-password/abc-token-123');
+        await waitFor(() => expect(screen.getByTestId('password-reset-confirm')).toBeTruthy());
+    });
+
+    it('onBackToAuth clears storage and shows auth screen', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        renderApp('/');
+        await waitFor(() => screen.getByTestId('welcome-landing'));
+        fireEvent.click(screen.getByText('Back to Auth'));
+        await waitFor(() => expect(screen.getByTestId('auth-page')).toBeTruthy());
+        expect(localStorage.getItem('token')).toBeNull();
+        expect(localStorage.getItem('user')).toBeNull();
+    });
+
+    it('handles invalid user JSON in localStorage (readUser catch)', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', 'not-valid-json');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('auth-page')).toBeTruthy());
+    });
+
+    it('loadTheme uses light when getUserSettings rejects', async () => {
+        const { getUserSettings } = await import('../api/userService');
+        getUserSettings.mockRejectedValueOnce(new Error('network error'));
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('dashboard-layout')).toBeTruthy());
+    });
+
+    it('shows onboarding when profile has no major', async () => {
+        const { getUserProfile } = await import('../api/userService');
+        getUserProfile.mockResolvedValueOnce({});
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('onboarding-modal')).toBeTruthy());
+    });
+
+    it('onboarding complete dispatches navigate and closes modal', async () => {
+        const { getUserProfile } = await import('../api/userService');
+        getUserProfile.mockResolvedValueOnce({});
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/');
+        await waitFor(() => screen.getByTestId('onboarding-modal'));
+        fireEvent.click(screen.getByText('Complete onboarding'));
+        await waitFor(() => expect(screen.queryByTestId('onboarding-modal')).toBeNull());
+    });
+
+    it('syncs activeNav from URL and shows Settings at /settings', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/settings');
+        await waitFor(() => expect(screen.getByTestId('settings-page')).toBeTruthy());
+    });
+
+    it('navigate event to settings updates nav', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/');
+        await waitFor(() => screen.getByTestId('dashboard-layout'));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
+        });
+        await waitFor(() => expect(screen.getByTestId('settings-page')).toBeTruthy());
+    });
+
+    it('navigate event with societies_ id navigates to societies URL', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/');
+        await waitFor(() => screen.getByTestId('dashboard-layout'));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('navigate', { detail: 'societies_5_about' }));
+        });
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/societies?id=5&tab=about'));
+    });
+
+    it('navigate event with path starting with / navigates to path', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/');
+        await waitFor(() => screen.getByTestId('dashboard-layout'));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('navigate', { detail: '/map' }));
+        });
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/map'));
+    });
+
+    it('resolveRouteContent passes initialCreate for modules_create activeNav', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        localStorage.setItem('flax_active_nav', 'modules_create');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('modules-route')).toBeTruthy());
+        expect(screen.getByTestId('modules-route').getAttribute('data-initial-create')).toBe('true');
+    });
+
+    it('resolveRouteContent passes initialSearch for modules_param activeNav', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        localStorage.setItem('flax_active_nav', 'modules_5CCS2SEG');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('modules-route')).toBeTruthy());
+        expect(screen.getByTestId('modules-route').getAttribute('data-initial-search')).toBe('5CCS2SEG');
+    });
+
+    it('renders Profile view when activeNav is profile_userId', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        localStorage.setItem('flax_active_nav', 'profile_42');
+        renderApp('/');
+        await waitFor(() => expect(screen.getByTestId('profile-page')).toBeTruthy());
+    });
+
+    it('syncs activeNav from URL and shows Profile at /profile', async () => {
+        localStorage.setItem('token', 'abc');
+        localStorage.setItem('user', JSON.stringify({ id: 1 }));
+        localStorage.setItem('flax_welcome_seen_v1', '1');
+        renderApp('/profile');
+        await waitFor(() => expect(screen.getByTestId('profile-page')).toBeTruthy());
     });
 });

@@ -17,7 +17,9 @@ import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ConfirmProvider } from "./context/ConfirmContext";
 import { TaskCompletionProvider } from "./context/TaskCompletionContext";
+import { ToastProvider } from "./context/ToastContext";
 import { NotificationToast } from "./components/Notifications";
+import AttendancePrompt from "./components/Attendance/AttendancePrompt";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -241,16 +243,19 @@ function AppProviders({ children }) {
   return (
     <NotificationProvider>
       <ConfirmProvider>
-        <CalendarProvider>
-          <TagProvider>
-            <TimerProvider>
-              <TaskCompletionProvider>
-                {children}
-                <NotificationToast />
-              </TaskCompletionProvider>
-            </TimerProvider>
-          </TagProvider>
-        </CalendarProvider>
+        <ToastProvider>
+          <CalendarProvider>
+            <TagProvider>
+              <TimerProvider>
+                <TaskCompletionProvider>
+                  {children}
+                  <NotificationToast />
+                  <AttendancePrompt />
+                </TaskCompletionProvider>
+              </TimerProvider>
+            </TagProvider>
+          </CalendarProvider>
+        </ToastProvider>
       </ConfirmProvider>
     </NotificationProvider>
   );
@@ -357,7 +362,7 @@ function OnboardingWrapper({ onComplete }) {
   );
 }
 
-import ScrollToTop from "./components/common/ScrollToTop";
+import ScrollToTop from "./components/common/ScrollToTop/ScrollToTop";
 
 function AppScreen({ activeNav, setActiveNav, user }) {
   const location = useLocation();
@@ -375,6 +380,36 @@ function AppScreen({ activeNav, setActiveNav, user }) {
           ? `/societies?id=${socId}&tab=${tab}`
           : `/societies?id=${socId}`;
         navigate(url);
+        return;
+      }
+
+      if (id.startsWith("group-work_")) {
+        const parts = id.split("_");
+        const projectId = parts[1];
+        const tab = parts[2];
+        const url = tab
+          ? `/group-work?project=${projectId}&tab=${tab}`
+          : `/group-work?project=${projectId}`;
+        handleNavChange(url);
+        return;
+      }
+
+      if (id === "profile") {
+        setActiveNav("profile");
+        navigate("/profile");
+        return;
+      }
+
+      if (id.startsWith("profile_")) {
+        const viewedUserId = id.split("_")[1];
+        setActiveNav(id);
+        navigate(`/profile/${viewedUserId}`);
+        return;
+      }
+
+      if (id === "settings") {
+        setActiveNav("settings");
+        navigate("/settings");
         return;
       }
 
@@ -427,6 +462,19 @@ function AppScreen({ activeNav, setActiveNav, user }) {
 function useSyncNavFromUrl(pathname, setActiveNav) {
   useEffect(() => {
     const path = pathname || "/";
+    if (path === "/profile") {
+      setActiveNav("profile");
+      return;
+    }
+    if (path.startsWith("/profile/")) {
+      const viewedUserId = path.split("/")[2];
+      if (viewedUserId) setActiveNav(`profile_${viewedUserId}`);
+      return;
+    }
+    if (path === "/settings") {
+      setActiveNav("settings");
+      return;
+    }
     const route = APP_ROUTES.find((r) => r.path === path);
     if (route) setActiveNav(route.id);
   }, [pathname, setActiveNav]);

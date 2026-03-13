@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import AppPage from '../../components/common/AppPage/AppPage';
+import EmptyState from '../../components/common/EmptyState/EmptyState';
+import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
+import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
@@ -9,9 +13,10 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
-import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
+import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
+import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -80,10 +85,35 @@ function useMainView(state) {
     return { sorting, search, departments: getDepartments(hook.modules) };
 }
 
+function ModulesSkeleton() {
+    return (
+        <div className={styles.container} data-testid="modules-skeleton" aria-busy="true">
+            <div className={styles.skeletonHeader}>
+                <div className={styles.skeletonHeaderText}>
+                    <SkeletonBlock className={styles.skeletonTitle} />
+                    <SkeletonBlock className={styles.skeletonSubtitle} />
+                </div>
+                <SkeletonBlock className={styles.skeletonAction} />
+            </div>
+            <div className={styles.skeletonToolbar}>
+                <SkeletonBlock className={styles.skeletonSearch} />
+                <SkeletonBlock className={styles.skeletonSelect} />
+                <SkeletonBlock className={styles.skeletonSelect} />
+                <SkeletonBlock className={styles.skeletonSort} />
+            </div>
+            <div className={styles.skeletonGrid}>
+                {Array.from({ length: 6 }).map((_, index) => (
+                    <SkeletonBlock key={index} className={styles.skeletonCard} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
     const state = useModulesPage(initialSearch, initialCreate);
     const { hook, show_form, viewing_module, deadline_module, setDeadlineModule } = state;
-    if (hook.loading) return <LoadingView />;
+    if (hook.loading) return <ModulesSkeleton />;
     if (show_form) return <FormView state={state} />;
     if (viewing_module) return <DetailsView state={state} />;
     return (
@@ -129,18 +159,48 @@ function DetailsView({ state }) {
 function MainView({ state }) {
     const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule } = state;
     const { sorting, search, departments } = useMainView(state);
+    const subtitle = is_teacher ? 'Manage your course modules and lectures' : 'Browse and enroll into available modules';
     return (
-        <div className={styles.container}>
-            <PageHeader is_teacher={is_teacher} onCreateModule={() => { setEditingModule(null); setShowForm(true); }} />
-            <Toolbar search={search} sorting={sorting} departments={departments} />
+        <AppPage
+            width="xl"
+            className={styles.container}
+            title="Modules"
+            subtitle={subtitle}
+            action={is_teacher && (
+                <PrimaryButton className={styles.createButton} pill onClick={() => { setEditingModule(null); setShowForm(true); }}>
+                    + Create Module
+                </PrimaryButton>
+            )}
+        >
+            <ModuleToolbar search={search} sorting={sorting} departments={departments} />
             <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
                 setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
-        </div>
+        </AppPage>
+    );
+}
+
+function ModuleToolbar({ search, sorting, departments }) {
+    const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
+    const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
+    return (
+        <PageToolbar
+            searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
+            controlsSlot={
+                <>
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+                    <ToolbarSortControl>
+                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+                    </ToolbarSortControl>
+                </>
+            }
+        />
     );
 }
 
 function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule }) {
-    if (sorting.results.length === 0) return <EmptyState />;
+    if (sorting.results.length === 0) return <EmptyState icon="📚" title="No modules found" description="Try adjusting your search or filters." />;
     return (
         <div>
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
@@ -153,55 +213,6 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
             />
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
             <BackToTop />
-        </div>
-    );
-}
-
-function LoadingView() {
-    return (
-        <div className={styles.container}>
-            <div className={styles.loading}>
-                <div className={styles.spinner} />
-                <p>Loading modules...</p>
-            </div>
-        </div>
-    );
-}
-
-function PageHeader({ is_teacher, onCreateModule }) {
-    const subtitle = is_teacher ? 'Manage your course modules and lectures' : 'Browse and enroll into available modules...';
-    return (
-        <div className={styles.header}>
-            <div>
-                <h1 className={styles.pageTitle}>Modules</h1>
-                <p className={styles.subtitle}>{subtitle}</p>
-            </div>
-            {is_teacher && <button className={styles.createButton} onClick={onCreateModule}>+ Create Module</button>}
-        </div>
-    );
-}
-
-function Toolbar({ search, sorting, departments }) {
-    const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
-    const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
-    const sortOptions = [{ value: 'name', label: 'Sort by Name' }, { value: 'deadlines', label: 'Sort by Deadlines' }];
-    return (
-        <div className={styles.toolbar}>
-            <SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />
-            <div className={styles.filters}>
-                <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-                <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-                <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
-            </div>
-        </div>
-    );
-}
-
-function EmptyState({ }) {
-    return (
-        <div className={styles.emptyState}>
-            <span className={styles.emptyIcon}>📚</span>
-            <p>No modules found... </p>
         </div>
     );
 }

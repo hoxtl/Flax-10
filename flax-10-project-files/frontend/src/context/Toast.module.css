@@ -1,0 +1,79 @@
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 9999;
+  animation: slideUpFade 0.3s ease;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.icon {
+  color: #10b981;
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+.message {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.action {
+  border: 1px solid rgba(132, 169, 140, 0.45);
+  background: rgba(132, 169, 140, 0.12);
+  color: #4b7d5a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.action:hover {
+  background: rgba(132, 169, 140, 0.2);
+  border-color: rgba(132, 169, 140, 0.6);
+}
+
+.close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 4px;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

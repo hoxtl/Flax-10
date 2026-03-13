@@ -1,12 +1,13 @@
+import { memo } from 'react';
 import { useMonthDayDrop } from '../hooks/useMonthDayDrop';
 import { useEventModal } from '../../../context/CalendarContext';
 import { isSameDay } from '../utils/dateUtils';
 import { DayEvents } from './DayEvents';
 
-export function DayCell({ day, events, isCur, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
-    if (readOnly) return <ReadOnlyDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />;
-    return <EditableDayCell day={day} events={events} isCur={isCur} onDateSelect={onDateSelect} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />;
-}
+export const DayCell = memo(function DayCell(props) {
+    const Cell = props.readOnly ? ReadOnlyDayCell : EditableDayCell;
+    return <Cell {...props} />;
+});
 
 function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, onMoreClick, customTags }) {
     const isToday = isSameDay(day, new Date());
@@ -20,13 +21,12 @@ function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, onMor
 }
 
 function EditableDayCell({ day, events, isCur, onDateSelect, onEventClick, onMoreClick, customTags }) {
-    const isToday = isSameDay(day, new Date());
     const { dropProps, isOver } = useMonthDayDrop(day);
-    const cellProps = buildCellProps(dropProps, onDateSelect, day);
-    const className = buildCellClass(isCur, isToday, isOver);
+    const isToday = isSameDay(day, new Date());
+    const props = { ...dropProps, className: buildCellClass(isCur, isToday, isOver), onClick: () => onDateSelect?.(day) };
 
     return (
-        <div className={className} {...cellProps}>
+        <div {...props}>
             <span className="day-number">{day.getDate()}</span>
             <AddEventBtn day={day} />
             <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} />
@@ -49,10 +49,6 @@ function createDraftEvent(date) {
     const end = new Date(start);
     end.setHours(10, 0, 0, 0);
     return { start_time: start, end_time: end };
-}
-
-function buildCellProps(dropProps, onDateSelect, day) {
-    return { ...dropProps, onClick: () => onDateSelect?.(day) };
 }
 
 function buildCellClass(isCurrentMonth, isToday, isOver) {

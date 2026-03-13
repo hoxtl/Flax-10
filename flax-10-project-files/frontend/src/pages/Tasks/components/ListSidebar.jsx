@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { getListColor } from "../utils/listColorUtils";
 import { computeListSidebarCounts } from "../utils/listSidebarUtils";
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import styles from "./ListSidebar.module.css";
 
 function RenameInput({ value, onSave, onCancel }) {
@@ -72,7 +73,13 @@ function ListSidebarListItems({ lists, listCounts, activeListId, renamingId, set
       {lists.map((list, idx) => (
         <ListSidebarListItem key={list.id} list={list} idx={idx} color={getListColor(list, idx)} count={listCounts[list.id] || 0} active={activeListId === list.id} renamingId={renamingId} setRenamingId={setRenamingId} onSelectList={onSelectList} onSelectFilter={onSelectFilter} onRenameList={onRenameList} onCtxMenu={onCtxMenu} />
       ))}
-      {lists.length === 0 && <p className={styles.emptyLists}>No lists yet</p>}
+      {lists.length === 0 && (
+        <EmptyState
+          icon="🗂️"
+          title="No lists yet"
+          description="Create a list to organize your tasks."
+        />
+      )}
     </nav>
   );
 }
