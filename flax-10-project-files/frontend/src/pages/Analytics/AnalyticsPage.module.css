@@ -1,9 +1,52 @@
 .page {
-  padding: 2rem 2.5rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  min-height: 100vh;
+  min-height: 100%;
 }
+
+.skeletonHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.skeletonTitleGroup {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.skeletonTitle { width: min(220px, 42vw); height: 34px; }
+.skeletonSubtitle { width: min(320px, 60vw); height: 14px; }
+
+.skeletonPeriodToggle {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  border: var(--card-border);
+}
+
+.skeletonPeriodBtn { width: 48px; height: 32px; border-radius: 10px; }
+.skeletonTabs { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; }
+.skeletonTab { width: 136px; height: 40px; border-radius: 999px; }
+
+.skeletonSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.skeletonSummaryCard { height: 92px; }
+
+.skeletonAnalyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.skeletonAnalyticsCardTall { height: 240px; }
+.skeletonAnalyticsCardWide { grid-column: 1 / -1; height: 280px; }
 
 
 .periodToggle {
@@ -106,4 +149,8 @@
   .twoCol { grid-template-columns: 1fr; }
   .chartsGrid { grid-template-columns: 1fr; }
   .wide { grid-column: auto; }
+  .skeletonHeader { flex-direction: column; }
+  .skeletonSummaryGrid,
+  .skeletonAnalyticsGrid { grid-template-columns: 1fr; }
+  .skeletonAnalyticsCardWide { grid-column: auto; }
 }

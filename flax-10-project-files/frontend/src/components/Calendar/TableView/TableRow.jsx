@@ -9,7 +9,7 @@ import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
 import { isSameDay } from '../utils/dateUtils';
 import { useEventActions } from '../hooks/useCalendarEvents';
-import ConfirmModal from '../../common/ConfirmModal';
+import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
 import styles from './TableView.module.css';
 
 function getSourceBadge(event) {

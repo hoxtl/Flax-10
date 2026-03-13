@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "../Profile.module.css";
 import { getModules } from "../../../api/moduleApi";
+import Badge from "../../../components/common/Badge/Badge";
+import Card from "../../../components/common/Card/Card";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import SectionHeader from "../../../components/common/SectionHeader/SectionHeader";
 
 function ProfileWidget({ title, subtitle, action, onClick, children, className = "" }) {
     return (
-        <div className={`${styles.glassCard} ${styles.widgetBox} ${className}`} onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
-            <div className={styles.widgetHeader}>
-                <div className={styles.widgetTitleArea}>
-                    <div className={styles.cardLabel}>{title}</div>
-                    {subtitle && <div className={styles.widgetSubtitle}>{subtitle}</div>}
-                </div>
-                {action && <div className={styles.widgetAction}>{action}</div>}
-            </div>
+        <Card className={`${styles.glassCard} ${styles.widgetBox} ${className}`} variant="glass" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+            <SectionHeader title={title} subtitle={subtitle} action={action} className={styles.widgetHeader} />
             <div className={styles.widgetContent}>{children}</div>
-        </div>
+        </Card>
     );
 }
 
@@ -31,10 +29,10 @@ export function PersonaCard({ persona, peakHour }) {
     if (!persona) return null;
     const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? 'pm' : 'am'} peak` : null;
     return (
-        <div className={`${styles.glassCard} ${styles.personaCard}`}>
+        <Card className={`${styles.glassCard} ${styles.personaCard}`} variant="glass">
             <PersonaHeader label={persona.label} emoji={persona.emoji} peakLabel={peakLabel} />
             <p className={styles.personaDesc}>{persona.description}</p>
-        </div>
+        </Card>
     );
 }
 
@@ -68,7 +66,7 @@ export function StudyDNA({ heatmap }) {
     if (!heatmap?.data) return null;
     const segments = computeDnaSegments(heatmap);
     return (
-        <div className={`${styles.glassCard} ${styles.dnaCard}`}>
+        <Card className={`${styles.glassCard} ${styles.dnaCard}`} variant="glass">
             <div className={styles.cardLabel}>STUDY DNA</div>
             <div className={styles.dnaBar}>
                 {segments.map((s, i) => (
@@ -82,7 +80,7 @@ export function StudyDNA({ heatmap }) {
                     </div>
                 ))}
             </div>
-        </div>
+        </Card>
     );
 }
 
@@ -103,12 +101,12 @@ export function MiniHeatmap({ heatmap, onNavigate }) {
     heatmap.data.forEach((row, dayIndex) => { byDow[dayIndex % 7] += row.reduce((s, v) => s + v, 0); });
     const maxVal = Math.max(...byDow, 1);
     return (
-        <div className={`${styles.glassCard} ${styles.heatmapCard}`} onClick={() => onNavigate('analytics')} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onNavigate('analytics')}>
+        <Card className={`${styles.glassCard} ${styles.heatmapCard}`} variant="glass" onClick={() => onNavigate('analytics')} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onNavigate('analytics')}>
             <div className={styles.heatmapHeader}><div className={styles.cardLabel}>STUDY ACTIVITY</div><div className={styles.heatmapLinkBtn}>View full analytics</div></div>
             <div className={styles.miniHeatmap}>
                 {byDow.map((val, i) => <HeatmapCell key={i} val={val} maxVal={maxVal} label={DAY_LABELS[i]} />)}
             </div>
-        </div>
+        </Card>
     );
 }
 
@@ -131,7 +129,7 @@ function GoalEditor({ val, onSave, onCancel, onChange }) {
         <div className={styles.goalEditorPanel}>
             <div className={styles.goalEditorLabel}><span>Weekly target</span><span className={styles.goalEditorHrs}>{val}h / week</span></div>
             <input type="range" min="1" max="40" step="1" value={Math.min(val, 40)} onChange={e => onChange(parseInt(e.target.value))} className={styles.goalSlider} />
-            <div className={styles.goalEditorActions}><button className={styles.goalCancelBtn} onClick={onCancel}>Cancel</button><button className={styles.goalSaveBtn} onClick={() => onSave(val)}>Save goal</button></div>
+            <div className={styles.goalEditorActions}><PrimaryButton className={styles.goalCancelBtn} variant="ghost" pill onClick={onCancel}>Cancel</PrimaryButton><PrimaryButton className={styles.goalSaveBtn} pill onClick={() => onSave(val)}>Save goal</PrimaryButton></div>
         </div>
     );
 }
@@ -151,10 +149,10 @@ export function ThisWeek({ weekly, streaks, onGoalSave }) {
     if (!weekly) return null;
     const handleSave = (n) => { onGoalSave(n); setEditing(false); };
     return (
-        <div className={`${styles.glassCard} ${styles.weekCard}`}>
+        <Card className={`${styles.glassCard} ${styles.weekCard}`} variant="glass">
             <div className={styles.cardLabel}>THIS WEEK</div>
             <WeekContent weekly={weekly} streaks={streaks} editing={editing} setEditing={setEditing} tempGoal={tempGoal} setTempGoal={setTempGoal} onSave={handleSave} />
-        </div>
+        </Card>
     );
 }
 
@@ -174,7 +172,6 @@ function WeekContent({ weekly, streaks, editing, setEditing, tempGoal, setTempGo
 }
 
 export function BadgesSection({ badges, onOpen }) {
-    const meta = { gold: { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' }, silver: { bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' }, bronze: { bg: 'rgba(146,64,14,0.1)', border: 'rgba(146,64,14,0.25)' } };
     const viewAll = <span className={styles.badgesViewAll}>View all →</span>;
     return (
         <ProfileWidget title="ACHIEVEMENTS" action={viewAll} onClick={onOpen}>
@@ -184,8 +181,17 @@ export function BadgesSection({ badges, onOpen }) {
             </div>
             <div className={styles.badgesGrid}>
                 {badges?.slice(0, 6).map(b => (
-                    <div key={b.id} className={styles.badge} style={{ background: (meta[b.tier] || meta.bronze).bg, borderColor: (meta[b.tier] || meta.bronze).border }} title={b.description}><span className={styles.badgeEmoji}>{b.emoji}</span>{b.label}</div>
+                    <Badge
+                        key={b.id}
+                        className={`${styles.badge} ${styles[`badge${b.tier?.[0]?.toUpperCase()}${b.tier?.slice(1)}`] || ""}`}
+                        tone="muted"
+                        title={b.description}
+                    >
+                        <span className={styles.badgeEmoji}>{b.emoji}</span>
+                        {b.label}
+                    </Badge>
                 ))}
+                {(badges?.length || 0) > 6 && <Badge className={styles.badgesMore} tone="muted">+{badges.length - 6} more</Badge>}
             </div>
         </ProfileWidget>
     );

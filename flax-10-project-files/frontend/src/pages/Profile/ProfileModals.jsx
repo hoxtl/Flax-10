@@ -1,5 +1,6 @@
 import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
+import { fetchTasks } from "../../api/taskService";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
 import { useState, useEffect } from "react";
 import { getSharingWith, getSharedWithMe } from "../../api/socialService";
@@ -72,13 +73,72 @@ function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
   );
 }
 
+function formatTaskMeta(task) {
+  const dueDate = task?.due_date
+    ? new Date(task.due_date).toLocaleString("en-GB", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "No due date";
+  const listName = task?.task_list_name || task?.list_name || task?.module_code || "Task";
+  return `${dueDate} • ${listName}`;
+}
+
+function useTasksModalData(isOpen) {
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    fetchTasks()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.results || [];
+        const sorted = list
+          .filter((task) => !task.completed)
+          .sort((a, b) => {
+            if (!a.due_date) return 1;
+            if (!b.due_date) return -1;
+            return new Date(a.due_date) - new Date(b.due_date);
+          });
+        setTasks(sorted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch tasks for profile modal", err);
+        setTasks([]);
+      })
+      .finally(() => setLoading(false));
+  }, [isOpen]);
+
+  return { tasks, loading };
+}
+
 function TasksModal({ isOpen, onClose }) {
+  const { tasks, loading } = useTasksModalData(isOpen);
+
   return (
     <GenericSummaryModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Tasks"
-      emptyMessage="Tasks feature coming soon..."
+      title={`Tasks${tasks.length ? ` (${tasks.length})` : ""}`}
+      emptyMessage="No active tasks right now."
+      loading={loading}
+      items={tasks}
+      renderItem={(task, i) => (
+        <SummaryItem
+          key={task.id ?? i}
+          avatar="✓"
+          title={task.title}
+          subtitle={formatTaskMeta(task)}
+        />
+      )}
     />
   );
 }

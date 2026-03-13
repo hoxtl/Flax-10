@@ -1,54 +1,117 @@
 .container {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 32px 24px 40px;
+    min-height: 100%;
     color: var(--text);
 }
 
-.title {
-    font-size: 24px;
-    margin: 0;
-}
-
-.subtitle {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.createProjectForm {
+.skeletonHeader {
     display: flex;
-    gap: 8px;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeletonTitle {
+    width: min(220px, 55%);
+    height: 30px;
+    border-radius: 12px;
+}
+
+.skeletonSubtitle {
+    width: min(420px, 80%);
+    height: 14px;
+    border-radius: 10px;
+}
+
+.skeletonForm {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 120px;
+    gap: 12px;
     margin-top: 16px;
 }
 
-.input {
-    padding: 10px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--hover);
-    font-size: 13px;
-    color: var(--text);
-}
-
-.inputName {
-    flex: 2;
-}
-
-.inputField {
+.skeletonInput {
+    height: 40px;
     flex: 1;
 }
 
+.skeletonInputName {
+    flex: 2;
+}
+
+.skeletonButton {
+    width: 88px;
+    height: 40px;
+}
+
+.skeletonList {
+    margin-top: 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    overflow: hidden;
+}
+
+.skeletonRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.skeletonRow:last-child {
+    border-bottom: none;
+}
+
+.skeletonRowName {
+    width: min(260px, 55%);
+    height: 16px;
+    border-radius: 8px;
+}
+
+.skeletonRowMeta {
+    width: 110px;
+    height: 14px;
+    border-radius: 8px;
+}
+
+.createProjectForm {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-top: 4px;
+}
+
+.inputName {
+    min-width: 0;
+}
+
+.inputField {
+    min-width: 0;
+}
+
+.submitField {
+    display: grid;
+    gap: var(--space-2);
+    min-width: fit-content;
+}
+
+.submitLabel {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    visibility: hidden;
+}
+
 .submitBtn {
-    padding: 10px 18px;
-    border-radius: 999px;
-    border: none;
-    background: var(--primary);
-    color: white;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
     white-space: nowrap;
+    min-height: var(--input-height);
+}
+
+.submitWrap {
+    display: flex;
+    justify-content: flex-end;
+    align-self: end;
 }
 
 .loading {
@@ -64,19 +127,17 @@
 
 .projectList {
     margin-top: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
+    overflow: hidden;
 }
 
 .projectRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.18s ease;
 }
 
 .projectRow:last-child {
@@ -95,4 +156,38 @@
 .projectDeadline {
     font-size: 12px;
     color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+    .skeletonForm {
+        grid-template-columns: 1fr;
+    }
+
+    .skeletonInputName,
+    .skeletonInput,
+    .skeletonButton {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .skeletonRow {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .skeletonRowName {
+        width: 72%;
+    }
+
+    .createProjectForm {
+        grid-template-columns: 1fr;
+    }
+
+    .submitWrap {
+        justify-content: stretch;
+    }
+
+    .submitBtn {
+        width: 100%;
+    }
 }

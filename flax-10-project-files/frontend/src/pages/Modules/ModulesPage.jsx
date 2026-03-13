@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import PageHeader from '../../components/common/PageHeader/PageHeader';
+import AppPage from '../../components/common/AppPage/AppPage';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
 import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
-import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
+import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
@@ -16,6 +16,7 @@ import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js
 import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
+import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -85,7 +86,28 @@ function useMainView(state) {
 }
 
 function ModulesSkeleton() {
-    return <PageSkeleton label="Loading modules" showAction showSearch cardCount={6} cardHeight="180px" columns={3} />;
+    return (
+        <div className={styles.container} data-testid="modules-skeleton" aria-busy="true">
+            <div className={styles.skeletonHeader}>
+                <div className={styles.skeletonHeaderText}>
+                    <SkeletonBlock className={styles.skeletonTitle} />
+                    <SkeletonBlock className={styles.skeletonSubtitle} />
+                </div>
+                <SkeletonBlock className={styles.skeletonAction} />
+            </div>
+            <div className={styles.skeletonToolbar}>
+                <SkeletonBlock className={styles.skeletonSearch} />
+                <SkeletonBlock className={styles.skeletonSelect} />
+                <SkeletonBlock className={styles.skeletonSelect} />
+                <SkeletonBlock className={styles.skeletonSort} />
+            </div>
+            <div className={styles.skeletonGrid}>
+                {Array.from({ length: 6 }).map((_, index) => (
+                    <SkeletonBlock key={index} className={styles.skeletonCard} />
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
@@ -139,20 +161,41 @@ function MainView({ state }) {
     const { sorting, search, departments } = useMainView(state);
     const subtitle = is_teacher ? 'Manage your course modules and lectures' : 'Browse and enroll into available modules';
     return (
-        <div className={styles.container}>
-            <PageHeader
-                title="Modules"
-                subtitle={subtitle}
-                action={is_teacher && (
-                    <button className={styles.createButton} onClick={() => { setEditingModule(null); setShowForm(true); }}>
-                        + Create Module
-                    </button>
-                )}
-            />
-            <Toolbar search={search} sorting={sorting} departments={departments} />
+        <AppPage
+            width="xl"
+            className={styles.container}
+            title="Modules"
+            subtitle={subtitle}
+            action={is_teacher && (
+                <PrimaryButton className={styles.createButton} pill onClick={() => { setEditingModule(null); setShowForm(true); }}>
+                    + Create Module
+                </PrimaryButton>
+            )}
+        >
+            <ModuleToolbar search={search} sorting={sorting} departments={departments} />
             <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
                 setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
-        </div>
+        </AppPage>
+    );
+}
+
+function ModuleToolbar({ search, sorting, departments }) {
+    const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
+    const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
+    return (
+        <PageToolbar
+            searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
+            controlsSlot={
+                <>
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+                    <ToolbarSortControl>
+                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+                    </ToolbarSortControl>
+                </>
+            }
+        />
     );
 }
 
@@ -171,27 +214,5 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
             <BackToTop />
         </div>
-    );
-}
-
-
-
-function Toolbar({ search, sorting, departments }) {
-    const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
-    const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
-    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
-    return (
-        <PageToolbar
-            searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
-            controlsSlot={
-                <>
-                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-                    <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-                    <ToolbarSortControl>
-                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
-                    </ToolbarSortControl>
-                </>
-            }
-        />
     );
 }

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { getGreeting } from "../../components/Calendar/utils/dateUtils";
 import WelcomeBackgroundPaths from "../../components/Welcome/WelcomeBackgroundPaths";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 
 function pad2(n) { return String(n).padStart(2, "0"); }
 
@@ -91,9 +92,9 @@ function WelcomeActions({ onExplore, onBackToAuth }) {
   return (
     <motion.div className={styles.actions} initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, duration: 0.4 }}>
-      <button className={styles.primaryBtn} onClick={onExplore}>Explore StudyFlax</button>
-      <button className={styles.secondaryBtn} disabled title="Coming soon">Watch tutorial (coming soon)</button>
-      <button className={styles.tertiaryBtn} onClick={onBackToAuth}>Back to sign in</button>
+      <PrimaryButton className={styles.primaryBtn} size="large" pill onClick={onExplore}>Explore StudyFlax</PrimaryButton>
+      <PrimaryButton className={styles.secondaryBtn} variant="secondary" size="large" pill disabled title="Coming soon">Watch tutorial (coming soon)</PrimaryButton>
+      <PrimaryButton className={styles.tertiaryBtn} variant="ghost" size="large" pill onClick={onBackToAuth}>Back to sign in</PrimaryButton>
     </motion.div>
   );
 }

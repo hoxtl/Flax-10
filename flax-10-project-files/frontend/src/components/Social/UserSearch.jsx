@@ -18,11 +18,13 @@ function handleErr(label, error, setter) {
 }
 
 async function fetchUserResults(query, courses, socs, years, setRes, setL) {
-    if (!query.trim() && !courses.trim() && !socs.trim() && !years.trim()) return setRes([]);
-    setL(true);
+    const safeSetResults = typeof setRes === "function" ? setRes : () => { };
+    const safeSetLoading = typeof setL === "function" ? setL : () => { };
+    if (!query.trim() && !courses.trim() && !socs.trim() && !years.trim()) return safeSetResults([]);
+    safeSetLoading(true);
     const data = await searchUsers(query, courses, socs, 0, 20, years).catch(() => []);
-    setRes(data.results || data);
-    setL(false);
+    safeSetResults(data.results || data);
+    safeSetLoading(false);
 }
 
 export function useClickOutside(ref, onOutside) {

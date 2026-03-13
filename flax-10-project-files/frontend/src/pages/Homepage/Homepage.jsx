@@ -22,6 +22,7 @@ import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
+import { useToast } from "../../context/ToastContext";
 import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
 import { playCompletionChime } from "../../lib/sounds";
 
@@ -49,8 +50,35 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { BackToTop } from "../../components/Pagination/Pagination";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+
+function HomepageSkeleton() {
+  return (
+    <div className={styles.routeSkeleton} aria-busy="true">
+      <div className={styles.routeSkeletonTop}>
+        <SkeletonBlock className={styles.routeSkeletonBanner} />
+        <div className={styles.routeSkeletonGrid}>
+          <SkeletonBlock className={styles.routeSkeletonCardLarge} />
+          <SkeletonBlock className={styles.routeSkeletonCardLarge} />
+          <SkeletonBlock className={styles.routeSkeletonCardMedium} />
+        </div>
+      </div>
+      <div className={styles.routeSkeletonTimeline}>
+        <div className={styles.routeSkeletonTimelineHeader}>
+          <SkeletonBlock className={styles.routeSkeletonTimelineTitle} />
+          <SkeletonBlock className={styles.routeSkeletonTimelineAction} />
+        </div>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className={styles.routeSkeletonTimelineRow}>
+            <SkeletonBlock className={styles.routeSkeletonTime} />
+            <SkeletonBlock className={styles.routeSkeletonEvent} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 
 /* HOME PAGE */
@@ -79,8 +107,27 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     }
   }, []);
 
+  const toastApi = useToast();
+  const toastTimeoutRef = useRef(null);
+  const [fallbackToast, setFallbackToast] = useState(null);
+  const showToast = useMemo(() => {
+    if (typeof toastApi === "function") return toastApi;
+    if (typeof toastApi?.showToast === "function") return toastApi.showToast;
+    return (message, opts = {}) => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      setFallbackToast({
+        message,
+        actionLabel: opts.actionLabel || null,
+        onAction: typeof opts.onAction === "function" ? opts.onAction : null,
+      });
+      const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
+      toastTimeoutRef.current = setTimeout(() => {
+        setFallbackToast(null);
+        toastTimeoutRef.current = null;
+      }, duration);
+    };
+  }, [toastApi]);
   const { dayEvents, dayTasks, allTasks, removePendingTask, refetchTasks, loading: homeDataLoading } = useHomeData(selectedDate);
-  const [toast, setToast] = useState(null);
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
@@ -97,7 +144,13 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
-  const toastTimeoutRef = useRef(null);
+
+  useEffect(() => () => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+  }, []);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -151,9 +204,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
   }, []);
 
-  useEffect(() => () => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-  }, []);
 
 
   const enrolledModules = useMemo(
@@ -203,28 +253,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   }, [getTag]);
 
 
-  const closeToast = useCallback(() => {
-    if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current);
-      toastTimeoutRef.current = null;
-    }
-    setToast(null);
-  }, []);
-
-  // Show toast (supports optional action)
-  const showToast = useCallback((msg, opts = {}) => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    setToast({
-      message: msg,
-      actionLabel: opts.actionLabel || null,
-      onAction: typeof opts.onAction === "function" ? opts.onAction : null,
-    });
-    const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
-    toastTimeoutRef.current = setTimeout(() => {
-      setToast(null);
-      toastTimeoutRef.current = null;
-    }, duration);
-  }, []);
 
   const handleTaskWidgetComplete = useCallback(async (t) => {
     const newCompleted = !t.completed;
@@ -250,7 +278,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         String(task?.id) === String(numericId) && !task.completed
       );
       if (taskStillIncomplete) {
-        setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
+        showToast("Couldn't update task.");
       }
       return;
     }
@@ -400,7 +428,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   );
 
   const handleQuickStartGap = useCallback(
-    async (gapStartDate, _gapMins, task) => {
+    async (gapStartDate, _gapMins, task, nextTask) => {
       if (!task) return;
       try {
         const durationMins = (task.estimated_blocks || 1) * 25;
@@ -412,7 +440,27 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           description: task.description || "",
         });
         await loadEvents();
-        showToast(`"${task.title}" added to your schedule at ${formatTime(gapStartDate.toISOString())}`);
+        if (nextTask) {
+          showToast(`"${task.title}" added. Also slot in "${nextTask.title}"?`, {
+            actionLabel: "Slot in →",
+            durationMs: 6000,
+            onAction: async () => {
+              const nextDuration = (nextTask.estimated_blocks || 1) * 25;
+              const nextStart = endDate;
+              const nextEnd = new Date(nextStart.getTime() + nextDuration * 60000);
+              await addEvent({
+                title: nextTask.title,
+                start_time: nextStart.toISOString(),
+                end_time: nextEnd.toISOString(),
+                description: nextTask.description || "",
+              });
+              await loadEvents();
+              showToast(`"${nextTask.title}" added to your schedule.`);
+            },
+          });
+        } else {
+          showToast(`"${task.title}" added to your schedule at ${formatTime(gapStartDate.toISOString())}`);
+        }
       } catch {
         showToast("Couldn't add to schedule. Try again.");
       }
@@ -817,31 +865,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   return (
     <div className={`${styles.page} ${hasTimerSession ? styles.focusModeActive : ""}`}>
-      {toast && (
-        <div className={styles.alertToast}>
-          <div className={styles.alertContent}>
-            <span className={styles.alertIcon}>✓</span>
-            <span className={styles.alertMessage}>{toast.message}</span>
-          </div>
-          {toast.actionLabel && toast.onAction && (
-            <button
-              type="button"
-              className={styles.alertAction}
-              onClick={async () => {
-                const action = toast.onAction;
-                closeToast();
-                await action();
-              }}
-            >
-              {toast.actionLabel}
-            </button>
-          )}
-          <button className={styles.alertClose} onClick={closeToast}>✕</button>
-        </div>
-      )}
 
       {homeDataLoading ? (
-        <PageSkeleton label="Loading homepage" cardCount={5} cardHeight="180px" columns={2} />
+        <HomepageSkeleton />
       ) : (
       <>
       <div>
@@ -1223,6 +1249,28 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             await handleTimelineDelete(ev);
           }}
         />
+      )}
+
+      {!toastApi && fallbackToast && (
+        <div className={styles.toast} role="status" aria-live="polite">
+          <div>
+            <span className={styles.toastCheck}>✓</span>
+            <span>{fallbackToast.message}</span>
+          </div>
+          {fallbackToast.actionLabel && fallbackToast.onAction && (
+            <button
+              type="button"
+              onClick={async () => {
+                const action = fallbackToast.onAction;
+                setFallbackToast(null);
+                await action();
+              }}
+            >
+              {fallbackToast.actionLabel}
+            </button>
+          )}
+          <button type="button" onClick={() => setFallbackToast(null)}>✕</button>
+        </div>
       )}
     </div>
   );
