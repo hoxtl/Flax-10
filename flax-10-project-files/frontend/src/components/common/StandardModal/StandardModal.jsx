@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import styles from "./StandardModal.module.css";
 
 export function ModalHeader({ title, subtitle, onClose }) {
@@ -7,7 +8,9 @@ export function ModalHeader({ title, subtitle, onClose }) {
                 <h2 className={styles.title}>{title}</h2>
                 {subtitle && <p className={styles.sub}>{subtitle}</p>}
             </div>
-            <button className={styles.close} onClick={onClose} type="button">&times;</button>
+            <button className={styles.close} onClick={onClose} type="button" aria-label="Close">
+                <X size={16} strokeWidth={2.2} />
+            </button>
         </div>
     );
 }
