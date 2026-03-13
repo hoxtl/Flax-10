@@ -1,0 +1,171 @@
+/* WeeklyGoalWidget */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 2px 0 4px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.iconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(196, 164, 109, 0.1);
+  border: 1px solid rgba(196, 164, 109, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #c4a46d;
+}
+
+.label {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #2c1810;
+}
+
+/* ── Goal number / edit ──────────────────────────────────────── */
+
+.goalDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.goalNum {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  color: #2c1810;
+  line-height: 1;
+}
+
+.goalEdit {
+  font-size: 12px;
+  color: #b8a890;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.goalDisplay:hover .goalEdit {
+  opacity: 1;
+}
+
+/* ── Inline editor ───────────────────────────────────────────── */
+
+.editRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.goalInput {
+  width: 60px;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2c1810;
+  border: 1.5px solid rgba(196, 164, 109, 0.4);
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: #fdf8f2;
+  outline: none;
+}
+
+.goalInput:focus {
+  border-color: #c4a46d;
+}
+
+.goalInputLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  color: #a89279;
+}
+
+.saveBtn {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #c4a46d;
+  border: none;
+  border-radius: 7px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.saveBtn:hover {
+  background: #a88850;
+}
+
+/* ── Sub label ───────────────────────────────────────────────── */
+
+.sub {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #a89279;
+  margin: 0;
+}
+
+/* ── Progress bar ────────────────────────────────────────────── */
+
+.trackWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.track {
+  flex: 1;
+  height: 8px;
+  border-radius: 10px;
+  background: rgba(139, 115, 85, 0.1);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease, background 0.3s;
+}
+
+.pctLabel {
+  font-family: var(--font-mono, "JetBrains Mono"), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8b7355;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Caption ─────────────────────────────────────────────────── */
+
+.caption {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #b8a890;
+  margin: 0;
+}
