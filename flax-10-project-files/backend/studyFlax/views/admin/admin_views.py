@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 
 from studyFlax.models.society.societyReportModel import SocietyReport
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
+from studyFlax.models.notifications.notificationModel import Notification
 
 User = get_user_model()
 
@@ -114,6 +116,43 @@ def dismiss_report(request, report_id):
         return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
     report.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def ban_reported_society(request, report_id):
+    """Ban a reported society: notify creator and delete the society."""
+    reason = (request.data.get('reason') or '').strip()
+
+    try:
+        report = SocietyReport.objects.select_related('society').get(id=report_id)
+    except SocietyReport.DoesNotExist:
+        return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    society = report.society
+    creator_membership = (
+        SocietyMembership.objects
+        .filter(society=society, role='admin')
+        .select_related('user')
+        .order_by('joined_at', 'id')
+        .first()
+    )
+    creator = creator_membership.user if creator_membership else None
+
+    if creator:
+        message = f'Your society "{society.name}" has been banned by an administrator.'
+        if reason:
+            message += f' Reason: {reason}'
+        Notification.objects.create(
+            user=creator,
+            title=f'Society banned: {society.name}',
+            message=message,
+            notification_type='general',
+            action_url='societies',
+        )
+
+    society.delete()
+    return Response({'message': 'Society banned and deleted successfully.'}, status=status.HTTP_200_OK)
 
 # Allow students to request teacher role
 
