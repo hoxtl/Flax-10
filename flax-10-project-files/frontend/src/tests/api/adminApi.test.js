@@ -17,6 +17,10 @@ import {
   approveRatification,
   rejectRatification,
   requestTeacherRole,
+  fetchCourseChangeRequests,
+  resolveCourseChangeRequest,
+  requestCourseChange,
+  getMyCourseChangeRequest,
 } from "../../api/adminApi";
 
 beforeEach(() => vi.clearAllMocks());
@@ -136,5 +140,37 @@ describe("adminApi – ratifications", () => {
       "/societies/5/ratification/reject/",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+});
+
+describe("adminApi – course change", () => {
+  it("fetchCourseChangeRequests calls correct endpoint", () => {
+    fetchApi.mockResolvedValue([]);
+    fetchCourseChangeRequests();
+    expect(fetchApi).toHaveBeenCalledWith("/admin/course-change-requests/");
+  });
+
+  it("resolveCourseChangeRequest calls correct endpoint with POST", () => {
+    fetchApi.mockResolvedValue({});
+    resolveCourseChangeRequest(3, "approve");
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/admin/course-change-requests/3/resolve/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("requestCourseChange calls correct endpoint with POST", () => {
+    fetchApi.mockResolvedValue({});
+    requestCourseChange("Physics");
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/course-change/request/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("getMyCourseChangeRequest calls correct endpoint", () => {
+    fetchApi.mockResolvedValue(null);
+    getMyCourseChangeRequest();
+    expect(fetchApi).toHaveBeenCalledWith("/course-change/my-request/");
   });
 });
