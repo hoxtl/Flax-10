@@ -84,3 +84,144 @@ function CourseSelector({ value, onChange }) {
     </select>
   );
 }
+
+export default function CourseChangePanel({ user }) {
+  const [existingRequest, setExistingRequest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showApproved, setShowApproved] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    getMyCourseChangeRequest()
+      .then((data) => {
+        if (!cancelled) {
+          setExistingRequest(data || null);
+          setLoading(false);
+          if (data?.status === "approved") {
+            const key = `ccr_approved_seen_${data.id}`;
+            if (localStorage.getItem(key)) {
+              setShowApproved(false);
+            } else {
+              localStorage.setItem(key, "true");
+              setTimeout(() => setShowApproved(false), 5000);
+            }
+          }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const showForm =
+    !loading &&
+    (!existingRequest ||
+      existingRequest.status === "rejected" ||
+      existingRequest.status === "approved");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (!selectedCourse) {
+      setError("Please select a course.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await requestCourseChange(selectedCourse);
+      setExistingRequest(result);
+      setSelectedCourse("");
+      setSuccess("Your course change request has been submitted.");
+    } catch (err) {
+      setError(err.message || "Failed to submit request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.teacherPending}>
+        <p style={{ opacity: 0.6 }}>Loading…</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2 className={styles.sectionTitle}>Course Change Request</h2>
+      <p className={styles.formDescription}>
+        Submit a request to change your registered course. An admin will review
+        and approve or reject it.
+      </p>
+
+      {existingRequest && existingRequest.status === "pending" && (
+        <StatusBadge
+          status="pending"
+          requestedCourse={existingRequest.requested_course}
+          currentCourse={existingRequest.current_course}
+        />
+      )}
+
+      {existingRequest &&
+        existingRequest.status === "approved" &&
+        showApproved && (
+          <StatusBadge
+            status="approved"
+            requestedCourse={existingRequest.requested_course}
+            currentCourse={existingRequest.current_course}
+          />
+        )}
+
+      {existingRequest && existingRequest.status === "rejected" && (
+        <StatusBadge
+          status="rejected"
+          requestedCourse={existingRequest.requested_course}
+          currentCourse={existingRequest.current_course}
+        />
+      )}
+
+      {showForm && (
+        <form onSubmit={handleSubmit} style={{ marginTop: "1.2rem" }}>
+          <div className={styles.formGroup}>
+            <label htmlFor="course-select">Select new course</label>
+            <CourseSelector
+              value={selectedCourse}
+              onChange={setSelectedCourse}
+            />
+          </div>
+
+          {error && (
+            <div className={styles.teacherError} role="alert">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className={styles.teacherSuccess} role="status">
+              {success}
+            </div>
+          )}
+
+          <div className={styles.formActions}>
+            <button
+              type="submit"
+              className={styles.btnPrimary}
+              disabled={submitting}
+            >
+              {submitting ? "Submitting…" : "Submit Request"}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
