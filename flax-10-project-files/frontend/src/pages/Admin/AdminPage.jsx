@@ -8,6 +8,7 @@ import {
   resolveTeacherRequest,
   fetchReportedSocieties,
   dismissReport,
+  banReportedSociety,
   fetchPendingRatifications,
   approveRatification,
   rejectRatification,
@@ -502,6 +503,12 @@ function ReportedSocietiesTab() {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
 
+  const navigateToSociety = (societyId) => {
+    window.dispatchEvent(
+      new CustomEvent("navigate", { detail: `societies_${societyId}` }),
+    );
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -525,6 +532,28 @@ function ReportedSocietiesTab() {
       setReports((prev) => prev.filter((r) => r.id !== reportId));
     } catch (e) {
       setError(e.message || "Failed to dismiss report.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const ban = async (reportId) => {
+    const reason = window.prompt(
+      "Optional reason to send to the society creator:",
+      "",
+    );
+    if (reason === null) return;
+
+    setBusy(reportId);
+    try {
+      await banReportedSociety(reportId, reason);
+      setReports((prev) => {
+        const target = prev.find((r) => r.id === reportId);
+        if (!target) return prev.filter((r) => r.id !== reportId);
+        return prev.filter((r) => r.society_id !== target.society_id);
+      });
+    } catch (e) {
+      setError(e.message || "Failed to ban society.");
     } finally {
       setBusy(null);
     }
@@ -556,6 +585,8 @@ function ReportedSocietiesTab() {
               className={styles.listRow}
               variants={rowAnim}
               layout
+              onClick={() => navigateToSociety(r.society_id)}
+              style={{ cursor: "pointer" }}
             >
               <div className={styles.listInfo}>
                 <span className={styles.listName}>{r.society_name}</span>
@@ -566,9 +597,22 @@ function ReportedSocietiesTab() {
               </div>
               <div className={styles.listActions}>
                 <button
+                  className={styles.banBtn}
+                  disabled={busy === r.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    ban(r.id);
+                  }}
+                >
+                  Ban
+                </button>
+                <button
                   className={styles.dismissBtn}
                   disabled={busy === r.id}
-                  onClick={() => dismiss(r.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dismiss(r.id);
+                  }}
                 >
                   Dismiss
                 </button>
