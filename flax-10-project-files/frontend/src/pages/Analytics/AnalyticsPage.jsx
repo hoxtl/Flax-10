@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import PageHeader from '../../components/common/PageHeader/PageHeader';
+import AppPage from '../../components/common/AppPage/AppPage';
 import SummaryCards from '../../components/Analytics/SummaryCards';
 import ProductivityCards from '../../components/Analytics/ProductivityCards';
 import StudyHoursChart from '../../components/Analytics/StudyHoursChart';
@@ -165,29 +165,30 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className={styles.page}>
-      <PageHeader
-        title="Analytics"
-        subtitle="Your study patterns & performance"
-        action={
-          <div className={styles.periodToggle}>
-            {PERIODS.map(p => (
-              <button
-                key={p.value}
-                className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
-                onClick={() => handlePeriodChange(p.value)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        }
-      />
+    <AppPage
+      width="xl"
+      className={styles.page}
+      title="Analytics"
+      subtitle="Your study patterns & performance"
+      action={
+        <div className={styles.periodToggle}>
+          {PERIODS.map(p => (
+            <button
+              key={p.value}
+              className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
+              onClick={() => handlePeriodChange(p.value)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      }
+    >
 
       {error && <div className={styles.errorBanner}>{error}</div>}
       {loading && <AnalyticsSkeleton />}
 
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" />
-    </div>
+    </AppPage>
   );
 }
