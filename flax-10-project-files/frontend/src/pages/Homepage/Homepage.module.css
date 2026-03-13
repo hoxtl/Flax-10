@@ -9,23 +9,11 @@
 @import './styles/Timeline.module.css';
 @import './styles/Overlays.module.css';
 
-@keyframes routeShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
 .routeSkeleton {
   width: min(1200px, calc(100% - 32px));
   margin: 20px auto 0;
   display: grid;
   gap: 20px;
-}
-
-.routeSkeletonBlock {
-  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
-  background-size: 200% 100%;
-  animation: routeShimmer 1.4s infinite;
-  border-radius: 18px;
 }
 
 .routeSkeletonTop {

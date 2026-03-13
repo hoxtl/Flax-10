@@ -51,10 +51,7 @@ import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePi
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
-
-function SkeletonBlock({ className = "" }) {
-  return <div className={`${styles.routeSkeletonBlock} ${className}`.trim()} />;
-}
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 
 function HomepageSkeleton() {
   return (

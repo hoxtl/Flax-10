@@ -5,15 +5,12 @@ import {
   useCalendar,
   useCalendarDispatch,
 } from "../../context/CalendarContext";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import { getVisibleEventsInView } from "../../components/Calendar/utils/eventUtils";
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
-
-function SkeletonBlock({ className = "" }) {
-  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
-}
 
 function CalendarPageSkeleton({ showSearch = true }) {
   return (

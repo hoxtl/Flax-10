@@ -3,11 +3,8 @@ import { useNavigate } from "react-router-dom";
 import GroupProjectDetail from "./GroupWorkDetail";
 import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import { getDeadlineLabel } from "./utils/taskUtils";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import styles from "./GroupWorkIndexPage.module.css";
-
-function SkeletonBlock({ className = "" }) {
-  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
-}
 
 function GroupWorkIndexSkeleton() {
   return (

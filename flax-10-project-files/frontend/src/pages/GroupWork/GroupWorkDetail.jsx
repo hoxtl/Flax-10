@@ -4,11 +4,8 @@ import { getUserColor } from "./utils/priorityUtils";
 import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
 import MemberAvatar from "./components/MemberAvatar";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import styles from "./GroupWorkDetail.module.css";
-
-function SkeletonBlock({ className = "" }) {
-  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
-}
 
 function GroupWorkDetailSkeleton({ onBack }) {
   return (

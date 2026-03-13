@@ -19,26 +19,6 @@
   pointer-events: none;
 }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.skeletonBlock {
-  background: linear-gradient(
-    90deg,
-    var(--panel, #f8f7f4) 0%,
-    rgba(232, 236, 242, 0.92) 35%,
-    rgba(245, 248, 252, 0.98) 50%,
-    rgba(232, 236, 242, 0.92) 65%,
-    var(--panel, #f8f7f4) 100%
-  );
-  background-size: 240% 100%;
-  animation: shimmer 1.15s linear infinite;
-  border-radius: 12px;
-  box-shadow: inset 0 0 0 1px rgba(173, 181, 193, 0.14);
-}
-
 .skeletonSidebarTitle { width: 170px; height: 28px; }
 .skeletonSidebarSubtitle { width: 220px; height: 12px; margin-top: 8px; }
 .skeletonSectionLabel { width: 120px; height: 12px; border-radius: 999px; }
@@ -47,16 +27,7 @@
 .skeletonMapPane {
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    115deg,
-    rgba(236, 240, 245, 0.96) 0%,
-    rgba(248, 250, 253, 0.98) 28%,
-    rgba(223, 229, 237, 0.92) 50%,
-    rgba(248, 250, 253, 0.98) 72%,
-    rgba(236, 240, 245, 0.96) 100%
-  );
-  background-size: 240% 100%;
-  animation: shimmer 1.15s linear infinite;
+  background: rgba(236, 240, 245, 0.96);
   border-left: 1px solid rgba(173, 181, 193, 0.16);
 }
 .skeletonQuickNavBtn { width: 82px; height: 28px; border-radius: 999px; }

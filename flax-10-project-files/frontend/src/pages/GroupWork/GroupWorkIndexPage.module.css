@@ -5,18 +5,6 @@
     color: var(--text);
 }
 
-@keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-.skeletonBlock {
-    background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
-    border-radius: 999px;
-}
-
 .skeletonHeader {
     display: flex;
     flex-direction: column;

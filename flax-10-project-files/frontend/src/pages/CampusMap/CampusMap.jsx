@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./CampusMap.module.css";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import { tflService } from "../../api/tflService";
 import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
@@ -10,10 +11,6 @@ import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const MIN_MAP_SKELETON_MS = 900;
-
-function SkeletonBlock({ className = "" }) {
-  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
-}
 
 function CampusMapSkeleton() {
   return (
@@ -32,7 +29,7 @@ function CampusMapSkeleton() {
         ))}
       </aside>
       <div className={styles.mapWrapper}>
-        <div className={styles.skeletonMapPane} />
+        <SkeletonBlock className={styles.skeletonMapPane} />
         <div className={styles.campusQuickNav}>
           {Array.from({ length: 4 }).map((_, index) => (
             <SkeletonBlock key={index} className={styles.skeletonQuickNavBtn} />

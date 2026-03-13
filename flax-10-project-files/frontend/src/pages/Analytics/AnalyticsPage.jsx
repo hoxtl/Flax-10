@@ -12,6 +12,7 @@ import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
 import Tabs from '../../components/common/Tabs/Tabs';
+import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import styles from './AnalyticsPage.module.css';
 
@@ -34,10 +35,6 @@ const fadeUp = {
     transition: { delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
   }),
 };
-
-function SkeletonBlock({ className = "" }) {
-  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
-}
 
 function AnalyticsSkeleton() {
   return (

@@ -1,0 +1,12 @@
+.block {
+    background: linear-gradient(90deg, var(--panel, #f8f7f4) 0%, rgba(232, 236, 242, 0.92) 35%, rgba(245, 248, 252, 0.98) 50%, rgba(232, 236, 242, 0.92) 65%, var(--panel, #f8f7f4) 100%);
+    background-size: 240% 100%;
+    animation: shimmer 1.15s linear infinite;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(173, 181, 193, 0.14);
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

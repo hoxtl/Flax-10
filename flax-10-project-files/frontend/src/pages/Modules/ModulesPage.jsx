@@ -15,10 +15,7 @@ import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js
 import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
-
-function SkeletonBlock({ className = "" }) {
-    return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
-}
+import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
