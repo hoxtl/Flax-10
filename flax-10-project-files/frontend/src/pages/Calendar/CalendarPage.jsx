@@ -6,11 +6,45 @@ import {
   useCalendarDispatch,
 } from "../../context/CalendarContext";
 import { getVisibleEventsInView } from "../../components/Calendar/utils/eventUtils";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
+
+function SkeletonBlock({ className = "" }) {
+  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
+}
+
+function CalendarPageSkeleton({ showSearch = true }) {
+  return (
+    <div className={styles.page} data-testid="calendar-skeleton" aria-busy="true">
+      <div className={styles.skeletonStickyHeader}>
+        <div className={styles.skeletonCalendarHeader}>
+          <SkeletonBlock className={styles.skeletonNav} />
+          <SkeletonBlock className={styles.skeletonTitle} />
+          <SkeletonBlock className={styles.skeletonNav} />
+        </div>
+        {showSearch && (
+          <div className={styles.filters}>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <SkeletonBlock key={index} className={styles.skeletonFilterPill} />
+            ))}
+          </div>
+        )}
+      </div>
+      <main className={styles.mainContent}>
+        <div className={styles.skeletonCalendarGrid}>
+          {Array.from({ length: 5 }).map((_, row) => (
+            <div key={row} className={styles.skeletonCalendarRow}>
+              <SkeletonBlock className={styles.skeletonTimeCol} />
+              <SkeletonBlock className={styles.skeletonEventLane} />
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
 
 function useIsMobile(breakpoint = 900) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -50,14 +84,7 @@ export default function CalendarPage() {
 
   if (isLoading && allEvents.length === 0) {
     return (
-      <PageSkeleton
-        label="Loading calendar"
-        showSearch={!isListOrTable}
-        cardCount={6}
-        cardHeight="140px"
-        columns={2}
-        testId="calendar-skeleton"
-      />
+      <CalendarPageSkeleton showSearch={!isListOrTable} />
     );
   }
 

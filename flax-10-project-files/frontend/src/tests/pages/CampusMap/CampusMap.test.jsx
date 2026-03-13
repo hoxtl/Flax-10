@@ -123,6 +123,9 @@ describe("CampusMap", () => {
 
   it("selecting a campus shows campus name in chip", async () => {
     render(<CampusMap />);
+    await waitFor(() =>
+      expect(screen.queryByTestId("campus-map-skeleton")).not.toBeInTheDocument(),
+    );
     const strandButtons = await screen.findAllByRole("button", { name: /Strand/ });
     fireEvent.click(strandButtons[0]);
     await waitFor(() => expect(screen.getByText("Strand Campus")).toBeInTheDocument());
