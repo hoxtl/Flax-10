@@ -42,3 +42,16 @@ export const rejectRatification = (societyId) =>
 // ── Teacher role request (for regular users) ──────────────────────────────────
 export const requestTeacherRole = () =>
     postJson('/request-teacher-role/', {});
+
+// ── Course change requests ────────────────────────────────────────────────────
+export const fetchCourseChangeRequests = () =>
+    fetchApi('/admin/course-change-requests/');
+
+export const resolveCourseChangeRequest = (requestId, decision) =>
+    postJson(`/admin/course-change-requests/${requestId}/resolve/`, { decision });
+
+export const requestCourseChange = (requestedCourse) =>
+    postJson('/course-change/request/', { requested_course: requestedCourse });
+
+export const getMyCourseChangeRequest = () =>
+    fetchApi('/course-change/my-request/');
