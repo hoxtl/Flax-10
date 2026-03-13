@@ -5,6 +5,7 @@
 import { createPortal } from "react-dom";
 import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
 
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
 import styles from "./TaskInfoModal.module.css";
@@ -78,7 +79,7 @@ function InfoModalFooter({ onClose }) {
   return (
     <div className={styles.infoModalFooter}>
       <span className={styles.infoHint}><MousePointer2 size={12} strokeWidth={2} /> Right-click the task to edit or delete</span>
-      <button type="button" className={styles.infoCloseBtn} onClick={onClose}>Close</button>
+      <PrimaryButton variant="ghost" pill onClick={onClose}>Close</PrimaryButton>
     </div>
   );
 }
@@ -86,7 +87,7 @@ function InfoModalFooter({ onClose }) {
 /** Portal modal displaying read-only task details. */
 export function TaskInfoModal({ task, listName, onClose }) {
   const modal = (
-      <StandardModal onClose={onClose} hideHeader size="md" backdropClassName={styles.modalBackdrop} modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
+      <StandardModal onClose={onClose} hideHeader size="md" modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
         <div className={styles.infoModalAccent} aria-hidden />
         <InfoModalHeader onClose={onClose} />
         <InfoModalBody task={task} listName={listName} />

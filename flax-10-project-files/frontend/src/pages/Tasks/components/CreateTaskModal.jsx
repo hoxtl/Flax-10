@@ -11,6 +11,7 @@ import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButto
 import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import { X } from "lucide-react";
 import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
@@ -35,7 +36,9 @@ function CreateTaskModalHeader({ isEditMode, onClose }) {
   return (
     <div className={styles.header}>
       <h2 className={styles.title}>{isEditMode ? "Edit task" : "New task"}</h2>
-      <PrimaryButton type="button" variant="ghost" className={styles.closeBtn} onClick={onClose} aria-label="Close" pill>✕</PrimaryButton>
+      <PrimaryButton type="button" variant="ghost" className={styles.closeBtn} onClick={onClose} aria-label="Close" pill>
+        <X size={18} strokeWidth={2.5} />
+      </PrimaryButton>
     </div>
   );
 }
@@ -180,7 +183,6 @@ function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
       onClose={onClose}
       hideHeader
       size="xl"
-      backdropClassName={styles.modalBackdrop}
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
