@@ -231,12 +231,9 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.4;
   color: #2f261f;
   min-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   flex: 1 1 auto;
 }
 

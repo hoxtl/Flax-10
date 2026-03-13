@@ -51,40 +51,6 @@
     min-width: 0;
 }
 
-.titleSpan {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.5;
-    cursor: pointer;
-    transition: color 0.2s;
-    white-space: pre-wrap;
-    word-break: break-word;
-    display: block;
-    border-bottom: 2px solid transparent;
-}
-
-.titleDone {
-    text-decoration: line-through;
-    color: var(--muted);
-}
-
-.titleEditArea {
-    width: 100%;
-    border: none !important;
-    border-bottom: 2px solid var(--cb-bg, #8d7355) !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding: 2px 0 4px !important;
-    outline: none !important;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.5;
-    font-family: inherit;
-    resize: none;
-    display: block;
-    color: var(--text);
-    overflow: hidden;
-}
 
 /* Priority Select */
 .prioritySelect {

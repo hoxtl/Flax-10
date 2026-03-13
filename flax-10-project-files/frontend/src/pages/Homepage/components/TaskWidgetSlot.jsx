@@ -11,6 +11,7 @@ import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
+import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
 
 const VISIBLE_COUNT = 3;
 
@@ -56,74 +57,9 @@ function getUrgencyMeta(task) {
   return null;
 }
 
-/**
- * Inline title editor — mirrors the GroupWork TaskListView pattern.
- * Single-click activates; blur/Enter saves; Escape cancels.
- */
-function useInlineTitleEdit(task, onInlineTaskEdit) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft]   = useState("");
-  const start = useCallback(() => { setDraft(task.title); setEditing(true); }, [task.title]);
-  const save  = useCallback(() => {
-    const trimmed = draft.trim();
-    if (trimmed && trimmed !== task.title) onInlineTaskEdit?.(task, { title: trimmed });
-    setEditing(false);
-  }, [draft, task, onInlineTaskEdit]);
-  const cancel = useCallback(() => setEditing(false), []);
-  return { editing, draft, setDraft, start, save, cancel };
-}
-
-function InlineTitleField({ task, editing, draft, setDraft, start, save, cancel }) {
-  if (!editing) {
-    return (
-      <span
-        className={undefined}
-        title="Click to edit"
-        onClick={start}
-        style={{ cursor: "text", display: "block" }}
-      >
-        {task.title}
-      </span>
-    );
-  }
-  return (
-    <textarea
-      autoFocus
-      value={draft}
-      rows={1}
-      style={{
-        width: "100%",
-        fontFamily: "inherit",
-        fontSize: "inherit",
-        fontWeight: "inherit",
-        color: "inherit",
-        background: "rgba(139,115,85,0.05)",
-        border: "1.5px solid rgba(139,115,85,0.25)",
-        borderRadius: 6,
-        padding: "1px 5px",
-        resize: "none",
-        outline: "none",
-        lineHeight: "1.4",
-        overflow: "hidden",
-      }}
-      onChange={e => {
-        setDraft(e.target.value);
-        e.target.style.height = "auto";
-        e.target.style.height = e.target.scrollHeight + "px";
-      }}
-      ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
-      onBlur={save}
-      onKeyDown={e => {
-        if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); save(); }
-        if (e.key === "Escape") cancel();
-      }}
-    />
-  );
-}
-
 /** Individual task row with inline title editing */
 function TaskRow({ task, idx, styles, isOverdue, urgency, categoryLabel, categoryStyle, rowAccent, handleTaskWidgetComplete, onInlineTaskEdit, setCtxMenu }) {
-  const edit = useInlineTitleEdit(task, onInlineTaskEdit);
+  const edit = useInlineEdit(task.title, (newTitle) => onInlineTaskEdit?.(task, { title: newTitle }));
   return (
     <motion.li
       layout
@@ -161,9 +97,17 @@ function TaskRow({ task, idx, styles, isOverdue, urgency, categoryLabel, categor
             </span>
           )}
           <span className={styles.taskWidgetTaskTitle}>
-            <InlineTitleField task={task} {...edit} />
+            <InlineTitleField
+              value={task.title}
+              isEditing={edit.isEditing}
+              draft={edit.draft}
+              setDraft={edit.setDraft}
+              onStart={edit.start}
+              onSave={edit.save}
+              onCancel={edit.cancel}
+            />
           </span>
-          {urgency && !edit.editing && (
+          {urgency && !edit.isEditing && (
             <span
               className={`${styles.taskWidgetUrgencyPill} ${urgency.tone === "urgent"
                   ? styles.taskWidgetUrgencyPillUrgent
