@@ -50,8 +50,38 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { BackToTop } from "../../components/Pagination/Pagination";
+
+function SkeletonBlock({ className = "" }) {
+  return <div className={`${styles.routeSkeletonBlock} ${className}`.trim()} />;
+}
+
+function HomepageSkeleton() {
+  return (
+    <div className={styles.routeSkeleton} aria-busy="true">
+      <div className={styles.routeSkeletonTop}>
+        <SkeletonBlock className={styles.routeSkeletonBanner} />
+        <div className={styles.routeSkeletonGrid}>
+          <SkeletonBlock className={styles.routeSkeletonCardLarge} />
+          <SkeletonBlock className={styles.routeSkeletonCardLarge} />
+          <SkeletonBlock className={styles.routeSkeletonCardMedium} />
+        </div>
+      </div>
+      <div className={styles.routeSkeletonTimeline}>
+        <div className={styles.routeSkeletonTimelineHeader}>
+          <SkeletonBlock className={styles.routeSkeletonTimelineTitle} />
+          <SkeletonBlock className={styles.routeSkeletonTimelineAction} />
+        </div>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className={styles.routeSkeletonTimelineRow}>
+            <SkeletonBlock className={styles.routeSkeletonTime} />
+            <SkeletonBlock className={styles.routeSkeletonEvent} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 
 /* HOME PAGE */
@@ -840,7 +870,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     <div className={`${styles.page} ${hasTimerSession ? styles.focusModeActive : ""}`}>
 
       {homeDataLoading ? (
-        <PageSkeleton label="Loading homepage" cardCount={5} cardHeight="180px" columns={2} />
+        <HomepageSkeleton />
       ) : (
       <>
       <div>
