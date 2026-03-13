@@ -39,9 +39,13 @@ def create_announcement(request, society, silent=False):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     announcement = serialiser.save(society=society)
-    save_announcement_images(announcement, request.data.get('image_urls', []))
+    save_announcement_images(announcement, get_image_urls(request.data))
     announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data, status=status.HTTP_201_CREATED)
+
+
+def get_image_urls(data):
+    return data.get('images') or data.get('image_urls', [])
 
 
 def save_announcement_images(announcement, image_urls):
@@ -83,8 +87,9 @@ def update_announcement(announcement, data, silent=False):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
-    if 'image_urls' in data:
-        update_announcement_images(announcement, data['image_urls'])
+    image_urls = get_image_urls(data)
+    if 'images' in data or 'image_urls' in data:
+        update_announcement_images(announcement, image_urls)
     announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data)
 

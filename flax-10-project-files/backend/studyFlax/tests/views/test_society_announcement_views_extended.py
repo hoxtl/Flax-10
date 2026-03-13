@@ -59,6 +59,22 @@ class AnnouncementCreateExtendedTest(TestCase):
         ann = SocietyAnnouncement.objects.get(title='With Images')
         self.assertEqual(SocietyAnnouncementImage.objects.filter(announcement=ann).count(), 2)
 
+    def test_create_announcement_with_images_key(self):
+        """Verify that sending 'images' instead of 'image_urls' also works."""
+        response = self.client.post(
+            f'/api/societies/{self.society.id}/announcements/',
+            {
+                'title': 'With Images Key',
+                'content': 'Check these out',
+                'images': ['http://example.com/img3.jpg']
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        ann = SocietyAnnouncement.objects.get(title='With Images Key')
+        self.assertEqual(SocietyAnnouncementImage.objects.filter(announcement=ann).count(), 1)
+        self.assertEqual(ann.images.first().url, 'http://example.com/img3.jpg')
+
     def test_create_announcement_invalid(self):
         response = self.client.post(
             f'/api/societies/{self.society.id}/announcements/', {}
