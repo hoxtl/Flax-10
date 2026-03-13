@@ -78,6 +78,12 @@ from studyFlax.views.admin.admin_views import (
     reported_societies, dismiss_report,
     request_teacher_role,
 )
+from studyFlax.views.admin.course_change_views import (
+    request_course_change,
+    my_course_change_request,
+    list_course_change_requests,
+    resolve_course_change_request,
+)
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -185,4 +191,10 @@ urlpatterns = [
     path("admin/reported-societies/", reported_societies, name='admin-reported-societies'),
     path("admin/reports/<int:report_id>/dismiss/", dismiss_report, name='admin-dismiss-report'),
     path("request-teacher-role/", request_teacher_role, name='request-teacher-role'),
+
+    # Course change requests
+    path("course-change/request/", request_course_change, name='course-change-request'),
+    path("course-change/my-request/", my_course_change_request, name='course-change-my-request'),
+    path("admin/course-change-requests/", list_course_change_requests, name='admin-course-change-list'),
+    path("admin/course-change-requests/<int:request_id>/resolve/", resolve_course_change_request, name='admin-course-change-resolve'),
 ]
