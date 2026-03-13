@@ -51,4 +51,3 @@ def user_settings_view(request):
     if error:
         return error
     return patch_settings(settings, request.data, request.user)
-    return patch_settings(settings, request.data, request.user)
