@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .taskWidgetSlotHeaderLeft {
@@ -49,11 +49,11 @@
 .taskWidgetSlotTitle {
   margin: 0;
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
   color: #2f261f;
 }
 
@@ -133,15 +133,16 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .taskWidgetTaskRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 58px;
-  padding: 9px 11px;
+  min-height: 60px;
+  padding: 10px 14px;
   border-radius: 14px;
   border: 1px solid rgba(139, 115, 85, 0.11);
   border-left: 5px solid color-mix(in srgb, var(--task-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
