@@ -11,7 +11,6 @@ import PlannedVsActualChart from '../../components/Analytics/PlannedVsActualChar
 import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
-import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
 import Tabs from '../../components/common/Tabs/Tabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import styles from './AnalyticsPage.module.css';
@@ -35,6 +34,43 @@ const fadeUp = {
     transition: { delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
   }),
 };
+
+function SkeletonBlock({ className = "" }) {
+  return <div className={`${styles.skeletonBlock} ${className}`.trim()} />;
+}
+
+function AnalyticsSkeleton() {
+  return (
+    <div className={styles.page} aria-busy="true">
+      <div className={styles.skeletonHeader}>
+        <div className={styles.skeletonTitleGroup}>
+          <SkeletonBlock className={styles.skeletonTitle} />
+          <SkeletonBlock className={styles.skeletonSubtitle} />
+        </div>
+        <div className={styles.skeletonPeriodToggle}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <SkeletonBlock key={index} className={styles.skeletonPeriodBtn} />
+          ))}
+        </div>
+      </div>
+      <div className={styles.skeletonTabs}>
+        <SkeletonBlock className={styles.skeletonTab} />
+        <SkeletonBlock className={styles.skeletonTab} />
+      </div>
+      <div className={styles.skeletonSummaryGrid}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <SkeletonBlock key={index} className={styles.skeletonSummaryCard} />
+        ))}
+      </div>
+      <div className={styles.skeletonAnalyticsGrid}>
+        <SkeletonBlock className={styles.skeletonAnalyticsCardTall} />
+        <SkeletonBlock className={styles.skeletonAnalyticsCardTall} />
+        <SkeletonBlock className={styles.skeletonAnalyticsCardWide} />
+        <SkeletonBlock className={styles.skeletonAnalyticsCardWide} />
+      </div>
+    </div>
+  );
+}
 
 export default function AnalyticsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -152,7 +188,7 @@ export default function AnalyticsPage() {
       />
 
       {error && <div className={styles.errorBanner}>{error}</div>}
-      {loading && <PageSkeleton label="Loading analytics" cardCount={6} cardHeight="100px" columns={3} />}
+      {loading && <AnalyticsSkeleton />}
 
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" />
     </div>
