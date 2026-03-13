@@ -10,12 +10,8 @@ const updateAnnEventState = (setSociety, annId, eventId) => {
 
 /** Handles the removal of a linked event when an announcement is unsynced. */
 const handleRemoval = async (ann, eventOps, onIdUpdate) => {
-    try {
-        if (ann.event_id) await eventOps.deleteEvent(ann.event_id, true);
-        onIdUpdate(ann.id, null);
-    } catch (e) {
-        console.error('Failed to delete linked event:', e);
-    }
+    await deleteLinkedEvent(ann, eventOps);
+    onIdUpdate(ann.id, null);
 };
 
 /** Logic for creating or updating a linked event. */
@@ -58,11 +54,10 @@ const fetchAnnouncementById = async (societyId, annId) => {
 };
 
 const deleteLinkedEvent = async (ann, eventOps) => {
+    if (!ann?.event_id) return;
     try {
-        if (ann?.event_id) await eventOps.deleteEvent(ann.event_id, true);
-    } catch (e) {
-        console.error('Failed to delete linked event:', e);
-    }
+        await eventOps.deleteEvent(ann.event_id, true);
+    } catch (e) { console.error('Failed to delete linked event:', e); }
 };
 
 const makeAddAnnouncement = (id, setSociety, eventOps, onIdUpdate) =>

@@ -23,7 +23,6 @@ import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSo
 /** Main entry point for the Societies feature. */
 export default function SocietiesPage() {
     const state = useSocietiesPage();
-
     if (state.loading) return <SocietiesSkeleton />;
     if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={() => { state.setView('all'); state.clearSelection(); }} />;
     if (state.view === "all") return (
@@ -32,7 +31,6 @@ export default function SocietiesPage() {
             {state.reportingSociety && <ReportSocietyModal society={state.reportingSociety} onClose={() => state.setReportingSociety(null)} onReportSuccess={() => state.onReportSuccess(state.reportingSociety.id)} />}
         </>
     );
-
     return (
         <>
             <MySocietiesView setView={state.setView} onSelect={state.selectSociety}

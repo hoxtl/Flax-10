@@ -8,7 +8,7 @@ import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
 import ImageGalleryModal from "../../imageHandlers/ImageGalleryModal";
 
 export default function AnnouncementsTab({ announcements = [], editMode, tags, focusAnnouncementId, onEdit }) {
-    const [gallery, setGallery] = useState(null); // { images, index }
+    const [gallery, setGallery] = useState(null);
     const openGallery = (imgs, idx) => setGallery({ images: imgs, index: idx });
     return (
         <>

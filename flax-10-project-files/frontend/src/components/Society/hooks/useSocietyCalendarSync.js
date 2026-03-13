@@ -29,16 +29,16 @@ async function loadSyncStatus(societyId, setIsSynced, setLoading) {
     }
 }
 
+const syncOrUnsync = (isSynced, societyId, setIsSynced, notify, societyName, refreshTags) =>
+    isSynced
+        ? handleUnsync(societyId, setIsSynced, notify, societyName, refreshTags)
+        : handleSync(societyId, setIsSynced, notify, societyName, refreshTags);
+
 async function handleToggle(societyId, isSynced, setIsSynced, setLoading, notify, societyName, refreshTags) {
     setLoading(true);
-    try {
-        if (isSynced) await handleUnsync(societyId, setIsSynced, notify, societyName, refreshTags);
-        else await handleSync(societyId, setIsSynced, notify, societyName, refreshTags);
-    } catch (err) {
-        console.error('Failed to toggle sync:', err);
-    } finally {
-        setLoading(false);
-    }
+    try { await syncOrUnsync(isSynced, societyId, setIsSynced, notify, societyName, refreshTags); }
+    catch (err) { console.error('Failed to toggle sync:', err); }
+    finally { setLoading(false); }
 }
 
 async function handleUnsync(societyId, setIsSynced, notify, societyName, refreshTags) {

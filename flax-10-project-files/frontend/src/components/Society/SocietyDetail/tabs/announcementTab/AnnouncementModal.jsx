@@ -15,22 +15,29 @@ import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 import { useConfirm } from "../../../../../context/ConfirmContext";
 
+const findPinConflict = (announcements, formId) =>
+    announcements.find(a => a.pinned && a.id !== formId);
+
+const handlePinnedSubmit = async (form, announcements, confirmFn, onSubmit) => {
+    const other = findPinConflict(announcements, form.id);
+    if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
+    onSubmit(form);
+};
+
+const makeSubmit = (form, announcements, confirmFn, onSubmit, setError) =>
+    async () => {
+        const err = validateForm(form);
+        if (err) return setError(err);
+        if (form.pinned) return handlePinnedSubmit(form, announcements, confirmFn, onSubmit);
+        onSubmit(form);
+    };
+
 const useAnnounceForm = (announcement, societyId, onSubmit, announcements) => {
     const [form, setForm] = useState(getInitialForm(announcement));
     const [error, setError] = useState("");
     const confirmFn = useConfirm();
-
     useEffect(() => { loadLinkedEvent(announcement, societyId, setForm); }, [announcement, societyId]);
-
-    const submit = async () => {
-        const err = validateForm(form);
-        if (err) return setError(err);
-        if (form.pinned) {
-            const other = announcements.find(a => a.pinned && a.id !== form.id);
-            if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
-        }
-        onSubmit(form);
-    };
+    const submit = makeSubmit(form, announcements, confirmFn, onSubmit, setError);
     return { form, setForm, error, setError, submit };
 };
 
@@ -43,11 +50,11 @@ export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = 
     return (
         <>
             <StandardModal title={announcement ? "Edit Announcement" : "Add Announcement"} onClose={onClose}>
-                <ModalContent form={form} update={update} fileRef={fileRef} tags={tags} 
-                    error={error} onClose={onClose} onSubmit={submit} isEdit={!!announcement} 
+                <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
+                    error={error} onClose={onClose} onSubmit={submit} isEdit={!!announcement}
                     onDeleteClick={() => setShowDelete(true)} setForm={setForm} />
             </StandardModal>
-            {showDelete && <DeleteConfirmModal hasEvent={!!announcement?.event_id} 
+            {showDelete && <DeleteConfirmModal hasEvent={!!announcement?.event_id}
                 onConfirm={() => { onDelete?.(announcement.id); onClose(); }} onCancel={() => setShowDelete(false)} />}
         </>
     );
