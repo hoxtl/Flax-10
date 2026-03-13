@@ -56,6 +56,7 @@ vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
   addMonths: vi.fn((d, n) => d),
   formatMonthYear: () => 'March 2026',
   isSameMonth: vi.fn(() => false),
+  formatTimeRange: () => '10:00 - 11:00',
 }));
 
 vi.mock('../../../components/Calendar/utils/recurrenceUtils', () => ({
@@ -91,8 +92,8 @@ vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
   ),
 }));
 
-vi.mock('../../../components/Calendar/EventDetailPopup', () => ({
-  EventDetailPopup: ({ actions, onClose }) => (
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+  EventPopover: ({ actions, onClose }) => (
     <div data-testid="detail-popup">
       <button type="button" onClick={onClose}>close-popup</button>
       {actions?.map((a) => (
@@ -326,7 +327,7 @@ describe('Society detail CalendarTab', () => {
     mockIsModalOpen = true;
     mockModalEvent = { id: 1, title: 'E', start_time: '2026-03-09T10:00:00Z' };
     mockConfirm.mockRejectedValueOnce(new Error('cancel'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
     const handlers = { onDelete: vi.fn() };
     render(
       <CalendarTab

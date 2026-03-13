@@ -55,7 +55,7 @@ describe('CoverImageModal', () => {
     const onClose = vi.fn();
     const onUpdate = vi.fn();
 
-    render(
+    const { container } = render(
       <CoverImageModal
         images={baseImages}
         availablePhotos={[]}
@@ -74,7 +74,7 @@ describe('CoverImageModal', () => {
     expect(onClose).not.toHaveBeenCalled();
 
     // clicking backdrop should close
-    fireEvent.mouseDown(screen.getByText('Manage Cover Images').closest('div.backdrop'));
+    fireEvent.mouseDown(container.firstChild);
     expect(onClose).toHaveBeenCalled();
   });
 

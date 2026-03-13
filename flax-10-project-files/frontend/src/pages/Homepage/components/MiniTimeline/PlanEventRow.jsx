@@ -7,20 +7,21 @@ import { Link } from "react-router-dom";
 import { RotateCw, Pencil, AlertTriangle } from "lucide-react";
 import { formatTime12h, fmtDurationShort } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
+import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { isDuringSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 
 /* Event type → accent colour mapping */
 const EVENT_ACCENTS = {
-  lecture:  "#7B9BAD", // dusty blue      — lectures/seminars/tutorials
-  study:    "#9A8CB0", // muted lavender  — study sessions/library/revision
-  routine:  "#B8956A", // warm amber      — meals/sleep
+  lecture: "#7B9BAD", // dusty blue      — lectures/seminars/tutorials
+  study: "#9A8CB0", // muted lavender  — study sessions/library/revision
+  routine: "#B8956A", // warm amber      — meals/sleep
   wellness: "#7BB38E", // sage green      — gym/yoga/run/sport
-  social:   "#C0714E", // terracotta      — friends/coffee/pub/social
-  society:  "#C4906A", // warm dusty rose — KCLSU/society events
-  meeting:  "#A08B72", // warm brown      — meetings/office hours/tutor
-  admin:    "#C4A46D", // warm gold       — errands/laundry/medical/admin
-  default:  "#A08B72", // warm brown      — everything else
+  social: "#C0714E", // terracotta      — friends/coffee/pub/social
+  society: "#C4906A", // warm dusty rose — KCLSU/society events
+  meeting: "#A08B72", // warm brown      — meetings/office hours/tutor
+  admin: "#C4A46D", // warm gold       — errands/laundry/medical/admin
+  default: "#A08B72", // warm brown      — everything else
 };
 
 function getEventTypeKey(title, tagName) {
@@ -68,12 +69,11 @@ export function PlanEventRow({
   const endTimeStr =
     item.end_time && item.end_time !== item.start_time ? formatTime12h(item.end_time) : "";
   const titleClean = stripEmojiFromTitle(item.title);
-  const showConflictPopover = conflictPopoverRowId === row.id;
   const nextFreeRow =
     isOverlap && onConflictAutoMove
       ? rows.find(
-          (r) => r.type === "free" && r.gapStartMins >= row.endMins && r.minutes >= durationMins,
-        )
+        (r) => r.type === "free" && r.gapStartMins >= row.endMins && r.minutes >= durationMins,
+      )
       : null;
   const propMinHeight = durationMins > 0 ? Math.max(56, Math.min(durationMins * 1.2, 180)) : 56;
   const isSleepTime =
@@ -88,13 +88,16 @@ export function PlanEventRow({
   const tagName = getTag?.(item.tag)?.name ?? item.tag_name ?? "";
   const accentColor = isOverlap ? "#C0714E" : getEventAccentColor(item.title, tagName);
 
+  const isReadOnly = isReadOnlyEvent(item);
+  const showConflictPopover = conflictPopoverRowId === row.id && !isReadOnly;
+
   const handleConflictCardClick = () => {
-    if (isOverlap) {
+    if (isOverlap && !isReadOnly) {
       setConflictPopoverRowId((id) => (id === row.id ? null : row.id));
       return;
     }
     if (onCardClick) onCardClick(item, matchTask);
-    else onEdit?.(item, item.tag);
+    else if (!isReadOnly) onEdit?.(item, item.tag);
   };
 
   const handleAutoReschedule = () => {
@@ -134,7 +137,7 @@ export function PlanEventRow({
             onEventContextMenu?.(item, e.clientX, e.clientY);
           }}
           onClick={(e) => {
-            if (isOverlap) {
+            if (isOverlap && !isReadOnly) {
               handleConflictCardClick();
               return;
             }
@@ -142,7 +145,7 @@ export function PlanEventRow({
               onCardClick(item, matchTask, e.currentTarget.getBoundingClientRect());
               return;
             }
-            onEdit?.(item, item.tag);
+            if (!isReadOnly) onEdit?.(item, item.tag, e.currentTarget.getBoundingClientRect());
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -168,19 +171,21 @@ export function PlanEventRow({
                         <AlertTriangle size={11} strokeWidth={2.5} aria-hidden />
                         Conflict
                       </span>
-                      <button
-                        type="button"
-                        className={styles.planTimelineRescheduleBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setConflictPopoverRowId((id) => (id === row.id ? null : row.id));
-                        }}
-                        aria-label="Reschedule to next free window"
-                        title="Reschedule"
-                      >
-                        <RotateCw size={13} strokeWidth={2} aria-hidden />
-                        <span>Fix it</span>
-                      </button>
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          className={styles.planTimelineRescheduleBtn}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConflictPopoverRowId((id) => (id === row.id ? null : row.id));
+                          }}
+                          aria-label="Reschedule to next free window"
+                          title="Reschedule"
+                        >
+                          <RotateCw size={13} strokeWidth={2} aria-hidden />
+                          <span>Fix it</span>
+                        </button>
+                      )}
                     </>
                   )}
                   {moduleCode && (

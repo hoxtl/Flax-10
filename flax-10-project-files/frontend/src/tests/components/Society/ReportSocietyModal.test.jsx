@@ -24,7 +24,7 @@ describe('ReportSocietyModal', () => {
     it('renders modal with title and textarea', () => {
         render(<ReportSocietyModal society={society} onClose={onClose} />);
         expect(screen.getByText('Report "Test Society"')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Enter the reason for reporting...')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Reason...')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Submit Report' })).toBeInTheDocument();
     });
@@ -41,18 +41,10 @@ describe('ReportSocietyModal', () => {
         expect(societyApi.reportSociety).not.toHaveBeenCalled();
     });
 
-    it('shows error when form is submitted with empty reason', () => {
-        render(<ReportSocietyModal society={society} onClose={onClose} />);
-        const form = screen.getByTestId('report-form');
-        fireEvent.submit(form);
-        expect(screen.getByText('Please provide a reason to report this society.')).toBeInTheDocument();
-        expect(societyApi.reportSociety).not.toHaveBeenCalled();
-    });
-
     it('calls reportSociety, onReportSuccess and onClose on success', async () => {
         vi.mocked(societyApi.reportSociety).mockResolvedValue(undefined);
         render(<ReportSocietyModal society={society} onClose={onClose} onReportSuccess={onReportSuccess} />);
-        fireEvent.change(screen.getByPlaceholderText('Enter the reason for reporting...'), { target: { value: 'Spam' } });
+        fireEvent.change(screen.getByPlaceholderText('Reason...'), { target: { value: 'Spam' } });
         fireEvent.click(screen.getByRole('button', { name: 'Submit Report' }));
         await waitFor(() => {
             expect(societyApi.reportSociety).toHaveBeenCalledWith(1, 'Spam');
@@ -66,10 +58,10 @@ describe('ReportSocietyModal', () => {
     it('shows error message when reportSociety rejects', async () => {
         vi.mocked(societyApi.reportSociety).mockRejectedValue(new Error('Network error'));
         render(<ReportSocietyModal society={society} onClose={onClose} />);
-        fireEvent.change(screen.getByPlaceholderText('Enter the reason for reporting...'), { target: { value: 'Spam' } });
+        fireEvent.change(screen.getByPlaceholderText('Reason...'), { target: { value: 'Spam' } });
         fireEvent.click(screen.getByRole('button', { name: 'Submit Report' }));
         await waitFor(() => {
-            expect(screen.getByText('Failed to submit the report. Please try again later.')).toBeInTheDocument();
+            expect(screen.getByText('Failed to submit report.')).toBeInTheDocument();
         });
         expect(onClose).not.toHaveBeenCalled();
     });

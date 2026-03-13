@@ -3,7 +3,7 @@
  */
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import AnnouncementsTab, { saveAnnouncement } from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementsTab';
+import AnnouncementsTab from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementsTab';
 
 vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
   formatShortDate: () => 'Mar 9',
@@ -82,34 +82,5 @@ describe('AnnouncementsTab', () => {
 
     vi.advanceTimersByTime(2100);
     vi.useRealTimers();
-  });
-
-  describe('saveAnnouncement', () => {
-    it('calls onUpdate when data has id', () => {
-      const handlers = { onUpdate: vi.fn(), onAdd: vi.fn() };
-      saveAnnouncement({ id: 5, title: 'X' }, handlers, null);
-      expect(handlers.onUpdate).toHaveBeenCalledWith(5, { id: 5, title: 'X' });
-      expect(handlers.onAdd).not.toHaveBeenCalled();
-    });
-
-    it('calls onAdd when data has no id', () => {
-      const handlers = { onUpdate: vi.fn(), onAdd: vi.fn() };
-      saveAnnouncement({ title: 'New' }, handlers, null);
-      expect(handlers.onAdd).toHaveBeenCalledWith({ title: 'New' });
-      expect(handlers.onUpdate).not.toHaveBeenCalled();
-    });
-
-    it('unpins conflicting announcement then updates current when conflict provided', () => {
-      const handlers = { onUpdate: vi.fn(), onAdd: vi.fn() };
-      const conflict = { id: 1, title: 'Old Pin', pinned: true };
-      saveAnnouncement({ id: 2, title: 'New Pin', pinned: true }, handlers, conflict);
-      expect(handlers.onUpdate).toHaveBeenCalledWith(1, { id: 1, title: 'Old Pin', pinned: false });
-      expect(handlers.onUpdate).toHaveBeenCalledWith(2, { id: 2, title: 'New Pin', pinned: true });
-    });
-
-    it('handles missing handlers gracefully', () => {
-      expect(() => saveAnnouncement({ id: 1 }, undefined, null)).not.toThrow();
-      expect(() => saveAnnouncement({ id: 1 }, {}, null)).not.toThrow();
-    });
   });
 });

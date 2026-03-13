@@ -1,33 +1,39 @@
+/**
+ * SocietySidebar displays pinned announcements and the upcoming society event.
+ * In edit mode, it provides direct actions for creating new content.
+ */
 import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
 import AnnouncementModal from "./tabs/announcementTab/AnnouncementModal";
 import { EventModal } from "../../Calendar/EventModal/EventModal";
 import { formatDateTime } from "../../Calendar/utils/dateUtils";
 
+/** Secondary column for highlights and quick actions. */
 export default function SocietySidebar({ society, editMode, onAddAnnouncement, onUpdateAnnouncement, onAddEvent, tags }) {
-    const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
-    const [showEventModal, setShowEventModal] = useState(false);
-    const pinned = society.announcements?.find(a => a.pinned);
-    const nextEvent = society.events?.[0];
-
-    const handleAnnouncementSubmit = (data, conflictingAnnouncement) => {
-        if (conflictingAnnouncement) {
-            onUpdateAnnouncement?.(conflictingAnnouncement.id, { ...conflictingAnnouncement, pinned: false });
-        }
-        onAddAnnouncement?.(data);
-        setShowAnnouncementModal(false);
-    };
+    const [showAnnounce, setShowAnnounce] = useState(false);
+    const [showEvent, setShowEvent] = useState(false);
 
     return (
         <aside className={styles.sidebar}>
-            <SidebarContent pinned={pinned} next={nextEvent} editMode={editMode} />
-            {editMode && <AddButtons onAnnouncement={() => setShowAnnouncementModal(true)} onEvent={() => setShowEventModal(true)} />}
-            {showAnnouncementModal && <AnnouncementModal onClose={() => setShowAnnouncementModal(false)}
-                onSubmit={handleAnnouncementSubmit}
-                tags={tags} societyId={society.id} announcements={society.announcements} />}
-            {showEventModal && <EventModal onClose={() => setShowEventModal(false)} showReminder={false} customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEventModal(false); }} />}
+            <SidebarContent pinned={society.announcements?.find(a => a.pinned)} next={society.events?.[0]} editMode={editMode} />
+            {editMode && <AddButtons onAnnouncement={() => setShowAnnounce(true)} onEvent={() => setShowEvent(true)} />}
+            {showAnnounce && <SidebarAnnouncementModal society={society} tags={tags}
+                onAdd={onAddAnnouncement} onUpdate={onUpdateAnnouncement} onClose={() => setShowAnnounce(false)} />}
+            {showEvent && <EventModal onClose={() => setShowEvent(false)} showReminder={false}
+                customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEvent(false); }} />}
         </aside>
     );
+}
+
+/** Specific wrapper for sidebar announcement logic. */
+function SidebarAnnouncementModal({ society, tags, onAdd, onUpdate, onClose }) {
+    const handleSubmit = (data, conflicting) => {
+        if (conflicting) onUpdate?.(conflicting.id, { ...conflicting, pinned: false });
+        onAdd?.(data);
+        onClose();
+    };
+    return <AnnouncementModal onClose={onClose} onSubmit={handleSubmit}
+        tags={tags} societyId={society.id} announcements={society.announcements} />;
 }
 
 function SidebarContent({ pinned, next, editMode }) {

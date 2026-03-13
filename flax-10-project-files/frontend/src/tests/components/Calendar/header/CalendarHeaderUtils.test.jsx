@@ -26,7 +26,7 @@ vi.mock('../../../../components/ui/SegmentedControl', () => ({
     ),
 }));
 
-vi.mock('../../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/AnimatedDropdown', () => ({
     default: ({ customTrigger, options, onChange, value }) => (
         <div data-testid="animated-dropdown">
             {customTrigger}
@@ -135,20 +135,19 @@ describe('CalendarHeaderUtils', () => {
     });
 
     describe('ViewSettingsMenu', () => {
-        it('returns only settings button when not mobile', () => {
+        it('renders Display Mode button and AnimatedDropdown', () => {
             render(<ViewSettingsMenu isMobile={false} modes={[]} activeMode="month" onViewChange={vi.fn()} />);
-            expect(screen.getByTitle('View Settings')).toBeInTheDocument();
-            expect(screen.queryByTestId('animated-dropdown')).not.toBeInTheDocument();
+            expect(screen.getByTitle('Display Mode')).toBeInTheDocument();
+            expect(screen.getByTestId('animated-dropdown')).toBeInTheDocument();
         });
 
         it('returns AnimatedDropdown with modes when mobile', () => {
             const onViewChange = vi.fn();
-            const modes = [{ value: 'month', label: 'Month' }, { value: 'week', label: 'Week' }];
-            render(<ViewSettingsMenu isMobile={true} modes={modes} activeMode="month" onViewChange={onViewChange} />);
+            render(<ViewSettingsMenu isMobile={true} activeMode="grid" onViewChange={onViewChange} />);
             expect(screen.getByTestId('animated-dropdown')).toBeInTheDocument();
-            expect(screen.getByTitle('View Settings')).toBeInTheDocument();
-            fireEvent.click(screen.getByText('Week'));
-            expect(onViewChange).toHaveBeenCalledWith('week');
+            expect(screen.getByTitle('Display Mode')).toBeInTheDocument();
+            fireEvent.click(screen.getByText('List View'));
+            expect(onViewChange).toHaveBeenCalledWith('list');
         });
     });
 });

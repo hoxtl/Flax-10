@@ -320,10 +320,10 @@ beforeEach(() => {
   mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
   global.IntersectionObserver = class {
-    constructor() {}
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    constructor() { }
+    observe() { }
+    unobserve() { }
+    disconnect() { }
   };
 });
 
@@ -407,6 +407,7 @@ describe('Homepage', () => {
   it('shows an error toast when task update fails', async () => {
     const svc = await import('../../api/taskService');
     svc.updateTask.mockRejectedValueOnce(new Error('fail'));
+    mockRefetchTasks.mockResolvedValueOnce([{ id: 1, completed: false }]);
     render(
       <MemoryRouter>
         <Homepage />

@@ -5,7 +5,7 @@
 
 import { createPortal } from "react-dom";
 import { Clock } from "lucide-react";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import useDateTimePicker from "../hooks/useDateTimePicker";
 import { pad, formatDisplay } from "../utils/dateTimePickerUtils";
 import styles from "./DateTimePicker.module.css";

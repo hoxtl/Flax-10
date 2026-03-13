@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import AnimatedDropdown from '../../../components/ui/AnimatedDropdown';
+import AnimatedDropdown from '../../../components/common/AnimatedDropdown';
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy(

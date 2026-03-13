@@ -34,7 +34,7 @@ vi.mock(
   }),
 );
 
-vi.mock('../../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/AnimatedDropdown', () => ({
   default: function MockAnimatedDropdown({ value, onChange, options, placeholder, className }) {
     return (
       <select

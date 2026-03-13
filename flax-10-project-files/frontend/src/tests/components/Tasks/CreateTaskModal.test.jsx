@@ -13,7 +13,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
     ),
 }));
 
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}

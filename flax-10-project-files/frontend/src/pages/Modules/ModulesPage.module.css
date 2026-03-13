@@ -3,6 +3,41 @@
     max-width: 1400px;
     margin: 0 auto;
 }
+
+.skeletonHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.skeletonHeaderText {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.skeletonTitle { width: 170px; height: 34px; }
+.skeletonSubtitle { width: 280px; height: 14px; }
+.skeletonAction { width: 150px; height: 44px; border-radius: 10px; }
+
+.skeletonToolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.skeletonSearch,
+.skeletonSelect,
+.skeletonSort { height: 42px; }
+
+.skeletonGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.skeletonCard { height: 180px; }
 .createButton {
     padding: 0.75rem 1.5rem;
     background: var(--primary);
@@ -36,6 +71,13 @@
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
+    }
+    .skeletonHeader {
+        flex-direction: column;
+    }
+    .skeletonToolbar,
+    .skeletonGrid {
+        grid-template-columns: 1fr;
     }
     .header {
         flex-direction: column;

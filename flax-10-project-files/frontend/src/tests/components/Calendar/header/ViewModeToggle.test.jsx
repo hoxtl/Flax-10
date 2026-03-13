@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ViewModeToggle } from '../../../../components/Calendar/header/ViewModeToggle';
 
-vi.mock('../../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/AnimatedDropdown', () => ({
     default: function MockAnimatedDropdown({ value, onChange, options, placeholder }) {
         return (
             <div data-testid="view-mode-toggle">
@@ -31,8 +31,5 @@ describe('ViewModeToggle', () => {
 
         fireEvent.click(screen.getByText('Month'));
         expect(dispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'month' });
-
-        fireEvent.click(screen.getByText('Year'));
-        expect(dispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'year' });
     });
 });

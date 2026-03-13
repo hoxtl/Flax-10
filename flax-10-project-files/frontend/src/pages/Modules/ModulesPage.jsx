@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
 import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
-import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
 
 import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
@@ -13,10 +12,11 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
-import AnimatedDropdown from '../../components/ui/AnimatedDropdown.jsx';
+import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
 import ReadingModal from '../../components/Modules/ReadingModal.jsx';
+import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -87,7 +87,28 @@ function useMainView(state) {
 }
 
 function ModulesSkeleton() {
-  return <PageSkeleton label="Loading modules" showAction showSearch cardCount={6} cardHeight="180px" columns={3} />;
+    return (
+        <div className={styles.container} data-testid="modules-skeleton" aria-busy="true">
+            <div className={styles.skeletonHeader}>
+                <div className={styles.skeletonHeaderText}>
+                    <SkeletonBlock className={styles.skeletonTitle} />
+                    <SkeletonBlock className={styles.skeletonSubtitle} />
+                </div>
+                <SkeletonBlock className={styles.skeletonAction} />
+            </div>
+            <div className={styles.skeletonToolbar}>
+                <SkeletonBlock className={styles.skeletonSearch} />
+                <SkeletonBlock className={styles.skeletonSelect} />
+                <SkeletonBlock className={styles.skeletonSelect} />
+                <SkeletonBlock className={styles.skeletonSort} />
+            </div>
+            <div className={styles.skeletonGrid}>
+                {Array.from({ length: 6 }).map((_, index) => (
+                    <SkeletonBlock key={index} className={styles.skeletonCard} />
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
@@ -191,11 +212,11 @@ function Toolbar({ search, sorting, departments }) {
             searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
             controlsSlot={
                 <>
-                <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-                <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
-                <ToolbarSortControl>
-                    <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
-                </ToolbarSortControl>
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+                    <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+                    <ToolbarSortControl>
+                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+                    </ToolbarSortControl>
                 </>
             }
         />

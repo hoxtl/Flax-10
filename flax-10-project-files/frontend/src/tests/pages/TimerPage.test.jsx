@@ -144,20 +144,21 @@ describe('TimerPage Integration', () => {
     it('shows focus transition overlay when location.state.fromTaskPlay is true', () => {
         mockLocationState = { fromTaskPlay: true };
         helpers.renderTimerPage();
-        expect(screen.getByText(/Entering focus mode|Getting ready|You've got this|Almost there|Let's focus/)).toBeInTheDocument();
-        const container = document.querySelector('[class*="containerFocusEntering"]');
+        const container = document.querySelector('[class*="focusModeTransition"]');
         expect(container).toBeInTheDocument();
     });
 
-    it('cycles focus transition messages and hides after 6s', () => {
+    it('shows the focus page skeleton before the page settles', () => {
+        helpers.renderTimerPage({ settle: false });
+        expect(screen.getByTestId('focus-page-skeleton')).toBeInTheDocument();
+    });
+
+    it('cycles focus transition messages and hides after 10s', () => {
         mockLocationState = { fromTaskPlay: true };
         helpers.renderTimerPage();
-        const initialMessage = screen.getByText(/Entering focus mode|Getting ready|You've got this|Almost there|Let's focus/);
-        expect(initialMessage).toBeInTheDocument();
-        act(() => vi.advanceTimersByTime(1200));
-        act(() => vi.advanceTimersByTime(1200));
-        act(() => vi.advanceTimersByTime(4000));
-        expect(screen.queryByText(/Entering focus mode|Getting ready|You've got this|Almost there|Let's focus/)).not.toBeInTheDocument();
+        expect(document.querySelector('[class*="focusModeTransition"]')).toBeInTheDocument();
+        act(() => vi.advanceTimersByTime(11000));
+        expect(document.querySelector('[class*="focusModeTransition"]')).not.toBeInTheDocument();
     });
 
     it('useIsMobile true when window width < 900', () => {
