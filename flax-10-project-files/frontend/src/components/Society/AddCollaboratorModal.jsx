@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Badge from "../common/Badge/Badge";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import StandardModal from "../common/StandardModal/StandardModal";
 import UserSearch from "../Social/UserSearch";
 import styles from "./AddCollaboratorModal.module.css";
@@ -37,18 +39,18 @@ function SelectedUsers({ users, onRemove }) {
 
 function UserChip({ user, onRemove }) {
     return (
-        <span className={styles.chip}>
+        <Badge className={styles.chip} tone="muted">
             {user.username}
-            <button className={styles.chipRemove} onClick={() => onRemove(user.id)}>&times;</button>
-        </span>
+            <PrimaryButton className={styles.chipRemove} variant="ghost" size="small" pill onClick={() => onRemove(user.id)} aria-label={`Remove ${user.username}`}>×</PrimaryButton>
+        </Badge>
     );
 }
 
 function ModalFooter({ onC, onA, dis }) {
     return (
         <div className={styles.footer}>
-            <button className={styles.cancelBtn} onClick={onC}>Cancel</button>
-            <button className={styles.addBtn} onClick={onA} disabled={dis}>Add</button>
+            <PrimaryButton className={styles.cancelBtn} variant="ghost" pill onClick={onC}>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.addBtn} pill onClick={onA} disabled={dis}>Add</PrimaryButton>
         </div>
     );
 }

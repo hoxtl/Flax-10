@@ -9,7 +9,10 @@ import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
 import CategorySelector from "./CategorySelector";
+import FormField from "../common/FormField/FormField";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import StandardModal from "../common/StandardModal/StandardModal";
+import TextInput from "../common/TextInput/TextInput";
 
 const isValidEmail = (email) => {
     const trimmed = email.trim();
@@ -109,33 +112,28 @@ function getFieldHandlers(form, update) {
 
 function NameField({ value, onChange }) {
     return (
-        <div className={styles.field}>
-            <label className={styles.label}>Society Name *</label>
-            <input className={styles.input} value={value} onChange={e => onChange(e.target.value)}
+        <FormField label="Society Name *" className={styles.field}>
+            <TextInput className={styles.input} value={value} onChange={e => onChange(e.target.value)}
                 placeholder="e.g. Photography Club" />
-        </div>
+        </FormField>
     );
 }
 
 function BioField({ value, onChange }) {
     return (
-        <div className={styles.field}>
-            <label className={styles.label}>Bio / Description</label>
-            <textarea className={styles.textarea} value={value} onChange={e => onChange(e.target.value)}
+        <FormField label="Bio / Description" className={styles.field}>
+            <TextInput multiline className={styles.textarea} value={value} onChange={e => onChange(e.target.value)}
                 placeholder="What is your society about?" rows={3} />
-        </div>
+        </FormField>
     );
 }
 
 function AdminEmailsField({ value, onChange, invalid }) {
     return (
-        <div className={styles.field}>
-            <label className={styles.label}>Admin Emails (optional)</label>
-            <input className={styles.input} value={value} onChange={e => onChange(e.target.value)}
+        <FormField label="Admin Emails (optional)" error={invalid ? "Please check all emails are valid" : ""} hint="Comma separated. Defaults to your email if empty." className={styles.field}>
+            <TextInput className={styles.input} value={value} onChange={e => onChange(e.target.value)}
                 placeholder="e.g. contact@society.com, admin@society.com" />
-            {invalid && <p className={styles.error}>Please check all emails are valid</p>}
-            <p className={styles.hint}>Comma separated. Defaults to your email if empty.</p>
-        </div>
+        </FormField>
     );
 }
 
@@ -147,9 +145,9 @@ function PhotosField({ images, onOpen }) {
             {hasPhotos && <div className={styles.photoSummary}>
                 {images.map((img, i) => <div key={i} className={styles.summaryCard} style={{ backgroundImage: `url(${img})` }} />)}
             </div>}
-            <button type="button" className={styles.addCollabBtn} onClick={onOpen}>
+            <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={onOpen}>
                 {hasPhotos ? "Manage Photos" : "+ Add Photos"}
-            </button>
+            </PrimaryButton>
             <p className={styles.hint}>Recommended: Upload a cover photo and some gallery images</p>
         </div>
     );
@@ -161,7 +159,7 @@ function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
             <label className={styles.label}>Collaborators</label>
             <CollaboratorList collaborators={collaborators} onRoleChange={onRoleChange}
                 onRemove={onRemove} emptyMessage="No collaborators added yet." />
-            <button type="button" className={styles.addCollabBtn} onClick={onOpen}>+ Add Collaborators</button>
+            <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={onOpen}>+ Add Collaborators</PrimaryButton>
             <p className={styles.hint}>Collaborators can edit society details and manage events</p>
         </div>
     );
@@ -170,10 +168,10 @@ function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
 function ModalFooter({ onClose, onCreate, disabled }) {
     return (
         <div className={styles.footer}>
-            <button className={styles.cancelBtn} onClick={onClose} type="button">Cancel</button>
-            <button className={styles.createBtn} onClick={onCreate} type="button" disabled={disabled}>
+            <PrimaryButton className={styles.cancelBtn} onClick={onClose} type="button" variant="ghost" pill>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.createBtn} onClick={onCreate} type="button" disabled={disabled} pill>
                 Create Society
-            </button>
+            </PrimaryButton>
         </div>
     );
 }
