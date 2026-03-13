@@ -3,7 +3,7 @@ import { useCalendarData } from '../../../context/CalendarContext';
 import { usePagination } from '../../../hooks/usePagination';
 import { EventRow } from './EventRow';
 import { Pagination, BackToTop } from '../../Pagination/Pagination';
-import { getEffectiveTagName } from '../utils/eventUtils';
+import { getEffectiveTagName, sortByStartTime } from '../utils/eventUtils';
 import styles from './ListView.module.css';
 
 const PAGE_SIZE = 10;
@@ -11,10 +11,6 @@ const SCROLL_SELECTOR = '[data-list-view]';
 
 function getDateKey(event) {
     return new Date(event.start_time).toISOString().split('T')[0];
-}
-
-function sortByStartTime(events) {
-    return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
 
 function groupEventsByDate(events) {

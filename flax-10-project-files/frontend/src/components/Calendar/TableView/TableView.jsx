@@ -7,6 +7,7 @@ import { usePagination } from '../../../hooks/usePagination';
 import { TableRow } from './TableRow';
 import { Pagination, BackToTop } from '../../Pagination/Pagination';
 import styles from './TableView.module.css';
+import { sortByStartTime } from '../utils/eventUtils';
 
 const COLUMNS = [
     { key: 'title', label: 'Name' },
@@ -55,10 +56,6 @@ function TableBody({ currentItems, editState, navState, viewMode }) {
             ))}
         </tbody>
     );
-}
-
-function sortByStartTime(events) {
-    return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
 
 function useClickOutside(ref, callback, isActive) {
