@@ -59,3 +59,28 @@ function StatusBadge({ status, requestedCourse, currentCourse }) {
 
   return null;
 }
+
+function CourseSelector({ value, onChange }) {
+  const allCourses = Object.entries(KCL_DEPARTMENTS).flatMap(
+    ([dept, courses]) => courses.map((c) => ({ dept, course: c })),
+  );
+
+  return (
+    <select
+      className={styles.courseSelect}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    >
+      <option value="">— Select a course —</option>
+      {Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => (
+        <optgroup key={dept} label={dept}>
+          {courses.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  );
+}
