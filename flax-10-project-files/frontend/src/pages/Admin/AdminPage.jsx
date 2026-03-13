@@ -11,6 +11,8 @@ import {
   fetchPendingRatifications,
   approveRatification,
   rejectRatification,
+  fetchCourseChangeRequests,
+  resolveCourseChangeRequest,
 } from "../../api/adminApi";
 import styles from "./AdminPage.module.css";
 
@@ -37,6 +39,7 @@ const TABS = [
   { id: "ratifications", label: "🏛️ Ratifications" },
   { id: "teachers", label: "🎓 Teacher Requests" },
   { id: "reports", label: "🚩 Reported Societies" },
+  { id: "course-changes", label: "📚 Course Change Requests" },
 ];
 
 function SectionCard({ children }) {
@@ -578,6 +581,104 @@ function ReportedSocietiesTab() {
   );
 }
 
+function CourseChangeRequestsTab() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setItems(await fetchCourseChangeRequests());
+    } catch (e) {
+      setError(e.message || "Failed to load course change requests.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const decide = async (requestId, decision) => {
+    setBusy(requestId);
+    try {
+      await resolveCourseChangeRequest(requestId, decision);
+      setItems((prev) => prev.filter((r) => r.id !== requestId));
+    } catch (e) {
+      setError(e.message || "Action failed.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <SectionCard>
+      <div className={styles.cardHeader}>
+        <h2 className={styles.cardTitle}>
+          Course Change Requests{" "}
+          <span className={styles.count}>({items.length})</span>
+        </h2>
+      </div>
+      {error && <p className={styles.errorMsg}>{error}</p>}
+      {loading ? (
+        <LoadingSpinner />
+      ) : items.length === 0 ? (
+        <EmptyState message="No pending course change requests." />
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={stagger}
+          initial="initial"
+          animate="animate"
+        >
+          {items.map((r) => (
+            <motion.div
+              key={r.id}
+              className={styles.listRow}
+              variants={rowAnim}
+              layout
+            >
+              <div className={styles.listInfo}>
+                <span className={styles.listName}>
+                  {r.first_name} {r.last_name}
+                </span>
+                <span className={styles.listMeta}>
+                  @{r.username} · {r.email}
+                </span>
+                <span className={styles.listMeta}>
+                  {r.current_course
+                    ? `${r.current_course} → ${r.requested_course}`
+                    : `Requesting: ${r.requested_course}`}
+                </span>
+              </div>
+              <div className={styles.listActions}>
+                <button
+                  className={styles.approveBtn}
+                  disabled={busy === r.id}
+                  onClick={() => decide(r.id, "approve")}
+                >
+                  ✓ Approve
+                </button>
+                <button
+                  className={styles.rejectBtn}
+                  disabled={busy === r.id}
+                  onClick={() => decide(r.id, "reject")}
+                >
+                  ✗ Reject
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </SectionCard>
+  );
+}
+
 function AdminPage({ onNavChange }) {
   const [activeTab, setActiveTab] = useState("users");
 
@@ -618,6 +719,7 @@ function AdminPage({ onNavChange }) {
           {activeTab === "ratifications" && <RatificationsTab />}
           {activeTab === "teachers" && <TeacherRequestsTab />}
           {activeTab === "reports" && <ReportedSocietiesTab />}
+          {activeTab === "course-changes" && <CourseChangeRequestsTab />}
         </motion.div>
       </AnimatePresence>
     </div>
