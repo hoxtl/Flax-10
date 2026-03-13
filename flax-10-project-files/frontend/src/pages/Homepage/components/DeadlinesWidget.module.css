@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .headerLeft {
@@ -48,11 +48,11 @@
 .headerTitle {
   margin: 0;
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
   color: #2f261f;
 }
 
@@ -68,8 +68,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 10px;
 }
 
 .row {
@@ -77,12 +76,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  min-height: 58px;
+  min-height: 60px;
   border-radius: 14px;
   border: 1px solid rgba(139, 115, 85, 0.11);
   border-left: 5px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
   background: linear-gradient(180deg, #fffdfa 0%, #fffaf5 100%);
-  padding: 9px 11px;
+  padding: 10px 14px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
