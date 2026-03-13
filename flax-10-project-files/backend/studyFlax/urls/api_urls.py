@@ -75,7 +75,7 @@ from studyFlax.views.authentication.home_address_view import home_address_view
 from studyFlax.views.admin.admin_views import (
     user_list, ban_user,
     teacher_requests, resolve_teacher_request,
-    reported_societies, dismiss_report,
+    reported_societies, dismiss_report, ban_reported_society,
     request_teacher_role,
 )
 from studyFlax.views.admin.course_change_views import (
@@ -190,6 +190,7 @@ urlpatterns = [
     path("admin/teacher-requests/<int:user_id>/resolve/", resolve_teacher_request, name='admin-resolve-teacher'),
     path("admin/reported-societies/", reported_societies, name='admin-reported-societies'),
     path("admin/reports/<int:report_id>/dismiss/", dismiss_report, name='admin-dismiss-report'),
+    path("admin/reports/<int:report_id>/ban/", ban_reported_society, name='admin-ban-reported-society'),
     path("request-teacher-role/", request_teacher_role, name='request-teacher-role'),
 
     # Course change requests
