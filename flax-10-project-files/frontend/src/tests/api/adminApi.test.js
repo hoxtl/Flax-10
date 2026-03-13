@@ -13,6 +13,7 @@ import {
   resolveTeacherRequest,
   fetchReportedSocieties,
   dismissReport,
+  banReportedSociety,
   fetchPendingRatifications,
   approveRatification,
   rejectRatification,
@@ -112,6 +113,17 @@ describe("adminApi – reported societies", () => {
       "/admin/reports/7/dismiss/",
       expect.objectContaining({ method: "DELETE" }),
     );
+  });
+
+  it("banReportedSociety calls correct endpoint with POST and reason", () => {
+    fetchApi.mockResolvedValue({});
+    banReportedSociety(7, "Hate speech");
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/admin/reports/7/ban/",
+      expect.objectContaining({ method: "POST" }),
+    );
+    const body = JSON.parse(fetchApi.mock.calls[0][1].body);
+    expect(body).toEqual({ reason: "Hate speech" });
   });
 });
 

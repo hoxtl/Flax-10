@@ -34,6 +34,7 @@ vi.mock("../../api/adminApi", () => ({
   resolveTeacherRequest: vi.fn(),
   fetchReportedSocieties: vi.fn(),
   dismissReport: vi.fn(),
+  banReportedSociety: vi.fn(),
   fetchPendingRatifications: vi.fn(),
   approveRatification: vi.fn(),
   rejectRatification: vi.fn(),
@@ -378,6 +379,7 @@ describe("AdminPage – Reported Societies tab", () => {
     api.fetchReportedSocieties.mockResolvedValue([
       {
         id: 20,
+        society_id: 55,
         society_name: "Bad Club",
         reporter_username: "alice",
         reason: "Inappropriate",
@@ -386,6 +388,7 @@ describe("AdminPage – Reported Societies tab", () => {
     render(<AdminPage />);
     fireEvent.click(screen.getByText(/Reported Societies/));
     await waitFor(() => expect(screen.getByText("Bad Club")).toBeTruthy());
+    expect(screen.getByText("Ban")).toBeTruthy();
     expect(screen.getByText("Dismiss")).toBeTruthy();
   });
 
@@ -393,6 +396,7 @@ describe("AdminPage – Reported Societies tab", () => {
     api.fetchReportedSocieties.mockResolvedValue([
       {
         id: 21,
+        society_id: 56,
         society_name: "Test Club",
         reporter_username: "reporter1",
         reason: "Spam",
@@ -407,6 +411,7 @@ describe("AdminPage – Reported Societies tab", () => {
     api.fetchReportedSocieties.mockResolvedValue([
       {
         id: 20,
+        society_id: 55,
         society_name: "Bad Club",
         reporter_username: "alice",
         reason: "Spam",
@@ -419,6 +424,57 @@ describe("AdminPage – Reported Societies tab", () => {
     fireEvent.click(screen.getByText("Dismiss"));
     await waitFor(() => expect(api.dismissReport).toHaveBeenCalledWith(20));
     await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
+  });
+
+  it("calls banReportedSociety and removes society rows", async () => {
+    api.fetchReportedSocieties.mockResolvedValue([
+      {
+        id: 20,
+        society_id: 55,
+        society_name: "Bad Club",
+        reporter_username: "alice",
+        reason: "Spam",
+      },
+      {
+        id: 21,
+        society_id: 55,
+        society_name: "Bad Club",
+        reporter_username: "bob",
+        reason: "Abuse",
+      },
+    ]);
+    api.banReportedSociety.mockResolvedValue({});
+    vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() => screen.getAllByText("Bad Club"));
+    fireEvent.click(screen.getByText("Ban"));
+    await waitFor(() =>
+      expect(api.banReportedSociety).toHaveBeenCalledWith(20, "Policy breach"),
+    );
+    await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
+    window.prompt.mockRestore();
+  });
+
+  it("emits navigate event for specific society when report row is clicked", async () => {
+    api.fetchReportedSocieties.mockResolvedValue([
+      {
+        id: 30,
+        society_id: 77,
+        society_name: "Row Club",
+        reporter_username: "alice",
+        reason: "Spam",
+      },
+    ]);
+    const navListener = vi.fn();
+    window.addEventListener("navigate", navListener);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Reported Societies/));
+    await waitFor(() => screen.getByText("Row Club"));
+    fireEvent.click(screen.getByText("Row Club"));
+    await waitFor(() => expect(navListener).toHaveBeenCalled());
+    expect(navListener.mock.calls[0][0].detail).toBe("societies_77");
+    window.removeEventListener("navigate", navListener);
   });
 });
 
