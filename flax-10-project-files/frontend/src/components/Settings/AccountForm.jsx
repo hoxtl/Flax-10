@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../api/userService";
 import { requestTeacherRole } from "../../api/adminApi";
-import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import {
   FormInput,
   FormSelect,
@@ -16,7 +15,6 @@ function getInitialData(user) {
     lastName: user?.last_name || "",
     email: user?.email || "",
     year: user?.year || "",
-    major: user?.major || "",
   };
 }
 
@@ -25,49 +23,6 @@ function getYearOptions() {
     value: y,
     label: y,
   }));
-}
-
-function getCourseOptions() {
-  return Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
-    label: dept,
-    options: courses.map((c) => ({ value: c, label: c })),
-  }));
-}
-
-function CourseLabel() {
-  return <label className={styles.courseLabel}>Course</label>;
-}
-
-function LockedCourseField({ major }) {
-  return (
-    <div className={styles.courseWrap}>
-      <CourseLabel />
-      <div className={styles.lockedCourse}>{major}</div>
-      <p className={styles.courseHint}>
-        🔒 Course cannot be changed after initial setup.
-      </p>
-    </div>
-  );
-}
-
-function EditableCourseField({ value, onChange }) {
-  return (
-    <div className={styles.courseWrap}>
-      <CourseLabel />
-      <FormSelect
-        id="major"
-        name="major"
-        label=""
-        value={value}
-        onChange={onChange}
-        options={getCourseOptions()}
-        grouped={true}
-      />
-      <p className={styles.courseHint}>
-        ⚠️ Choose carefully — this cannot be changed later.
-      </p>
-    </div>
-  );
 }
 
 function syncRoleToStorage(role) {
@@ -86,6 +41,7 @@ function syncRoleToStorage(role) {
 function useAccountForm(user) {
   const [formData, setFormData] = useState(getInitialData(user));
   const [liveRole, setLiveRole] = useState(user?.role || "student");
+  const [currentCourse, setCurrentCourse] = useState(user?.major || "");
 
   useEffect(() => {
     getUserProfile()
@@ -93,11 +49,13 @@ function useAccountForm(user) {
         setFormData((prev) => ({
           ...prev,
           year: data?.year || prev.year,
-          major: data?.major || prev.major,
         }));
         if (data?.role) {
           setLiveRole(data.role);
           syncRoleToStorage(data.role);
+        }
+        if (data?.major !== undefined) {
+          setCurrentCourse(data.major || "");
         }
       })
       .catch(() => {});
@@ -108,7 +66,7 @@ function useAccountForm(user) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  return { formData, handleChange, liveRole };
+  return { formData, handleChange, liveRole, currentCourse };
 }
 
 function PersonalInfoFields({ formData, onChange }) {
@@ -142,6 +100,21 @@ function PersonalInfoFields({ formData, onChange }) {
   );
 }
 
+function CourseDisplay({ course }) {
+  return (
+    <div className={styles.formGroup}>
+      <label>Course</label>
+      <div className={styles.lockedCourse}>
+        {course ? course : <em>No course set</em>}
+      </div>
+      <p className={styles.courseHint}>
+        To change your course, go to the <strong>Course Change</strong> tab and
+        submit a request for admin approval.
+      </p>
+    </div>
+  );
+}
+
 function CourseRow({ formData, onChange }) {
   return (
     <div className={styles.formRow}>
@@ -149,14 +122,11 @@ function CourseRow({ formData, onChange }) {
         id="year"
         label="Year"
         value={formData.year}
-        onChange={onChange}
+        onChange={(e) =>
+          onChange({ target: { name: "year", value: e.target.value } })
+        }
         options={getYearOptions()}
       />
-      {formData.major ? (
-        <LockedCourseField major={formData.major} />
-      ) : (
-        <EditableCourseField value={formData.major} onChange={onChange} />
-      )}
     </div>
   );
 }
@@ -255,7 +225,8 @@ function TeacherRoleSection({ role }) {
 }
 
 export default function AccountForm({ user, onSave, isSaving }) {
-  const { formData, handleChange, liveRole } = useAccountForm(user);
+  const { formData, handleChange, liveRole, currentCourse } =
+    useAccountForm(user);
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
@@ -265,6 +236,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
       <SectionHeader title="Personal Information" />
       <PersonalInfoFields formData={formData} onChange={handleChange} />
       <CourseRow formData={formData} onChange={handleChange} />
+      <CourseDisplay course={currentCourse} />
       <TeacherRoleSection role={liveRole} />
       <SubmitButton
         isSaving={isSaving}
