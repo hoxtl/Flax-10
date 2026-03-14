@@ -46,6 +46,37 @@ const TABS = [
 ];
 
 
+const PAGE_SIZE = 20;
+
+const USER_FILTER_OPTIONS = [
+  { value: "all", label: "All users" },
+  { value: "student", label: "Students" },
+  { value: "teacher", label: "Teachers" },
+  { value: "staff", label: "Staff" },
+  { value: "active", label: "Active" },
+  { value: "banned", label: "Banned" },
+];
+
+function usePaginatedItems(items, pageSize = PAGE_SIZE) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil((items?.length || 0) / pageSize)),
+    [items, pageSize],
+  );
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [currentPage, totalPages]);
+
+  const pageItems = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return (items || []).slice(start, start + pageSize);
+  }, [items, currentPage, pageSize]);
+
+  return { currentPage, setCurrentPage, totalPages, pageItems };
+}
+
 function SectionCard({ children }) {
   return <div className={styles.card}>{children}</div>;
 }
