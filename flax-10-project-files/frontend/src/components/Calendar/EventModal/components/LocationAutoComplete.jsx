@@ -62,6 +62,7 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
     };
 
     const handleSuggestionClick = (suggestion) => {
+        justSelectedRef.current = true;
         onChange(suggestion.place_name);
         setSuggestions([]);
         setShowSuggestions(false);
