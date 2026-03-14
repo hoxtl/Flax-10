@@ -126,18 +126,18 @@
 }
 
 .globeInner {
-  transform: scale(0.75);
+  transform: scale(1);
 }
 
 @media (min-width: 640px) {
   .globeInner {
-    transform: scale(0.9);
+    transform: scale(1.12);
   }
 }
 
 @media (min-width: 1024px) {
   .globeInner {
-    transform: scale(1);
+    transform: scale(1.35);
   }
 }
 
@@ -278,10 +278,6 @@
 
 .actionButtonSecondary:hover {
   background: color-mix(in srgb, var(--bg-card, #fff) 95%, transparent);
-}
-
-.trailingSlot {
-  margin-top: 16px;
 }
 
 @keyframes ping {
