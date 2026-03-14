@@ -14,4 +14,8 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             return;
         }
     })
+
+    const timeoutId = setTimeout(async () => {
+        await fetchSuggestions(value);
+    }, 300)
 }
