@@ -38,6 +38,11 @@
   color: var(--muted);
 }
 
+.kclAccent {
+  font-style: italic;
+  color: var(--kcl-accent);
+}
+
 @media (max-width: 768px) {
   .authFormCard {
     width: 100%;
