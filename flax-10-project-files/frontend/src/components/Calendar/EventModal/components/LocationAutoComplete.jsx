@@ -10,8 +10,13 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
     const justSelectedRef = useRef(false);
 
     useEffect(() => {
+        if (justSelectedRef.current) {
+            return;
+        }
+
         if (!value || value.length < 3) {
             setSuggestions([]);
+            setShowSuggestions(false);
             return;
         }
 
