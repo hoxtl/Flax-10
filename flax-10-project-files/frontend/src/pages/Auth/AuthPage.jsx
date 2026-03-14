@@ -94,7 +94,6 @@ export default function AuthPage({ initialSignIn = true }) {
         align: "left",
         actions: [
           { label: "Begin Journey", variant: "primary", onClick: () => showAuthForm(true) },
-          { label: "Create Account", variant: "secondary", onClick: () => showAuthForm(false) },
         ],
       },
       {
@@ -121,8 +120,8 @@ export default function AuthPage({ initialSignIn = true }) {
           },
           {
             title: "Calendar",
-        description:
-          "Coordinate deadlines, lectures, and commitments from one timeline.",
+            description:
+              "Coordinate deadlines, lectures, and commitments from one timeline.",
           },
         ],
       },
@@ -162,7 +161,7 @@ export default function AuthPage({ initialSignIn = true }) {
         title: "Student-built routines",
         subtitle: "Students and teachers using Study Flax",
         description:
-          "A rotating selection of Study Flax workflows from students, lecturers, and societies balancing modules, deadlines, and life.",
+          "See what others are saying.",
         align: "left",
         content: <TestimonialsMarquee />,
       },
@@ -171,7 +170,7 @@ export default function AuthPage({ initialSignIn = true }) {
         badge: "Get Started",
         title: "Ready when you are",
         description:
-          "Sign in with your username and password, or create your free account to start planning tonight.",
+          "Start in under a minute with a free account, then begin planning your week.",
         align: "center",
         content: (
           <div id="auth-form-card" className={styles.authFormCard}>

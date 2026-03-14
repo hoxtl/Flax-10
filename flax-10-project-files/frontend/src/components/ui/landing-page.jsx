@@ -299,7 +299,6 @@ function ScrollGlobe({
               ) : null}
 
               {section.content ? <div className={styles.sectionContent}>{section.content}</div> : null}
-
               {section.actions?.length ? (
                 <div className={styles.actionRow}>
                   {section.actions.map((action) => (
