@@ -37,6 +37,26 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
         try {
             const mapboxToken = import.meta.event.VITE_MAPBOX_TOKEN;
             const encodedQuery = encodeURIComponent(query);
+
+            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedQuery}.json?` +
+                `access_token=${mapboxToken}&` +
+                `country=GB&` +
+                `proximity=-0.1276,51.5074&` +
+                `limit=5&` +
+                `types=address,poi,place`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.features) {
+                setSuggestions(data.features);
+                setShowSuggestions(true);
+            }
+        } catch (error) {
+            console.error('Error when geocoding: ', error);
+            setSuggestions([]);
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 }
