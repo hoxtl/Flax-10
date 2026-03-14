@@ -14,3 +14,8 @@
   color: var(--text);
   transition: border-color 0.2s ease;
 }
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
