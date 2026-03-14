@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown";
+import { Pagination } from "../../components/Pagination/Pagination";
 import {
   fetchAdminUsers,
   banUser,
@@ -42,6 +44,7 @@ const TABS = [
   { id: "reports", label: "🚩 Reported Societies" },
   { id: "course-changes", label: "📚 Course Change Requests" },
 ];
+
 
 function SectionCard({ children }) {
   return <div className={styles.card}>{children}</div>;
@@ -147,6 +150,7 @@ function UsersTab({ onNavigate }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [userFilter, setUserFilter] = useState("all");
   const [banTarget, setBanTarget] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -167,11 +171,23 @@ function UsersTab({ onNavigate }) {
     load();
   }, [load]);
 
-  const filtered = users.filter((u) =>
-    `${u.username} ${u.email} ${u.first_name} ${u.last_name}`
-      .toLowerCase()
-      .includes(search.toLowerCase()),
+  const filtered = useMemo(
+    () =>
+      users.filter((u) => {
+        const q = `${u.username} ${u.email} ${u.first_name} ${u.last_name}`
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        return q && matchesUserFilter(u, userFilter);
+      }),
+    [users, search, userFilter],
   );
+
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(filtered);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, userFilter, setCurrentPage]);
 
   const handleBanConfirm = async (reason) => {
     if (!banTarget) return;
@@ -216,11 +232,22 @@ function UsersTab({ onNavigate }) {
           <h2 className={styles.cardTitle}>
             All Users <span className={styles.count}>({filtered.length})</span>
           </h2>
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by name"
-          />
+          <div className={styles.headerControls}>
+            <div className={styles.filterControl}>
+              <AnimatedDropdown
+                value={userFilter}
+                onChange={setUserFilter}
+                options={USER_FILTER_OPTIONS}
+                placeholder="Filter users"
+                hideCheckmark
+              />
+            </div>
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+              placeholder="Search by name"
+            />
+          </div>
         </div>
 
         {error && <p className={styles.errorMsg}>{error}</p>}
@@ -230,71 +257,78 @@ function UsersTab({ onNavigate }) {
         ) : filtered.length === 0 ? (
           <EmptyState message="No users found." />
         ) : (
-          <motion.div
-            className={styles.table}
-            variants={stagger}
-            initial="initial"
-            animate="animate"
-          >
-            <div className={`${styles.tableRow} ${styles.tableHead}`}>
-              <span>User</span>
-              <span>Email</span>
-              <span>Role</span>
-              <span>Status</span>
-              <span>Actions</span>
-            </div>
-            <AnimatePresence>
-              {filtered.map((u) => (
-                <motion.div
-                  key={u.id}
-                  className={styles.tableRow}
-                  variants={rowAnim}
-                  layout
-                >
-                  <span className={styles.nameCell}>
-                    <button
-                      className={styles.nameBtn}
-                      onClick={() => onNavigate?.(`profile_${u.id}`)}
-                    >
-                      {u.first_name} {u.last_name}
-                      <span className={styles.username}>@{u.username}</span>
-                    </button>
-                  </span>
-                  <span className={styles.emailCell}>{u.email}</span>
-                  <span>
-                    <RoleBadge role={u.role} />
-                  </span>
-                  <span>
-                    <StatusBadge active={u.is_active} />
-                  </span>
-                  <span className={styles.actionsCell}>
-                    {!u.is_staff &&
-                      !u.is_superuser &&
-                      (u.is_active ? (
-                        <button
-                          className={styles.banBtn}
-                          disabled={busy}
-                          onClick={() => setBanTarget(u)}
-                        >
-                          Ban
-                        </button>
-                      ) : (
-                        <button
-                          className={styles.unbanBtn}
-                          disabled={busy}
-                          onClick={() => handleUnban(u)}
-                        >
-                          Unban
-                        </button>
-                      ))}
-                    {(u.is_staff || u.is_superuser) && (
-                      <span className={styles.staffBadge}>Staff</span>
-                    )}
-                  </span>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+            <motion.div
+              className={styles.table}
+              variants={stagger}
+              initial="initial"
+              animate="animate"
+            >
+              <div className={`${styles.tableRow} ${styles.tableHead}`}>
+                <span>User</span>
+                <span>Email</span>
+                <span>Role</span>
+                <span>Status</span>
+                <span>Actions</span>
+              </div>
+              <AnimatePresence>
+                {pageItems.map((u) => (
+                  <motion.div
+                    key={u.id}
+                    className={styles.tableRow}
+                    variants={rowAnim}
+                    layout
+                  >
+                    <span className={styles.nameCell}>
+                      <button
+                        className={styles.nameBtn}
+                        onClick={() => onNavigate?.(`profile_${u.id}`)}
+                      >
+                        {u.first_name} {u.last_name}
+                        <span className={styles.username}>@{u.username}</span>
+                      </button>
+                    </span>
+                    <span className={styles.emailCell}>{u.email}</span>
+                    <span>
+                      <RoleBadge role={u.role} />
+                    </span>
+                    <span>
+                      <StatusBadge active={u.is_active} />
+                    </span>
+                    <span className={styles.actionsCell}>
+                      {!u.is_staff &&
+                        !u.is_superuser &&
+                        (u.is_active ? (
+                          <button
+                            className={styles.banBtn}
+                            disabled={busy}
+                            onClick={() => setBanTarget(u)}
+                          >
+                            Ban
+                          </button>
+                        ) : (
+                          <button
+                            className={styles.unbanBtn}
+                            disabled={busy}
+                            onClick={() => handleUnban(u)}
+                          >
+                            Unban
+                          </button>
+                        ))}
+                      {(u.is_staff || u.is_superuser) && (
+                        <span className={styles.staffBadge}>Staff</span>
+                      )}
+                    </span>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          </>
         )}
       </SectionCard>
 
@@ -316,6 +350,8 @@ function RatificationsTab() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(items);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -360,45 +396,52 @@ function RatificationsTab() {
       ) : items.length === 0 ? (
         <EmptyState message="No societies are awaiting ratification." />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {items.map((s) => (
-            <motion.div
-              key={s.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>{s.name}</span>
-                <span className={styles.listMeta}>
-                  {s.member_count ?? 0} members
-                  {s.description ? ` · ${s.description.slice(0, 80)}…` : ""}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.approveBtn}
-                  disabled={busy === s.id}
-                  onClick={() => decide(s.id, "approve")}
-                >
-                  ✓ Approve
-                </button>
-                <button
-                  className={styles.rejectBtn}
-                  disabled={busy === s.id}
-                  onClick={() => decide(s.id, "reject")}
-                >
-                  ✗ Reject
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((s) => (
+              <motion.div
+                key={s.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>{s.name}</span>
+                  <span className={styles.listMeta}>
+                    {s.member_count ?? 0} members
+                    {s.description ? ` · ${s.description.slice(0, 80)}…` : ""}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.approveBtn}
+                    disabled={busy === s.id}
+                    onClick={() => decide(s.id, "approve")}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className={styles.rejectBtn}
+                    disabled={busy === s.id}
+                    onClick={() => decide(s.id, "reject")}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
@@ -409,6 +452,8 @@ function TeacherRequestsTab() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(items);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -452,46 +497,53 @@ function TeacherRequestsTab() {
       ) : items.length === 0 ? (
         <EmptyState message="No pending teacher role requests." />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {items.map((u) => (
-            <motion.div
-              key={u.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>
-                  {u.first_name} {u.last_name}
-                </span>
-                <span className={styles.listMeta}>
-                  @{u.username} · {u.email}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.approveBtn}
-                  disabled={busy === u.id}
-                  onClick={() => decide(u.id, "approve")}
-                >
-                  ✓ Approve
-                </button>
-                <button
-                  className={styles.rejectBtn}
-                  disabled={busy === u.id}
-                  onClick={() => decide(u.id, "reject")}
-                >
-                  ✗ Reject
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((u) => (
+              <motion.div
+                key={u.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>
+                    {u.first_name} {u.last_name}
+                  </span>
+                  <span className={styles.listMeta}>
+                    @{u.username} · {u.email}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.approveBtn}
+                    disabled={busy === u.id}
+                    onClick={() => decide(u.id, "approve")}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className={styles.rejectBtn}
+                    disabled={busy === u.id}
+                    onClick={() => decide(u.id, "reject")}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
@@ -502,6 +554,8 @@ function ReportedSocietiesTab() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(reports);
 
   const navigateToSociety = (societyId) => {
     window.dispatchEvent(
@@ -573,53 +627,60 @@ function ReportedSocietiesTab() {
       ) : reports.length === 0 ? (
         <EmptyState message="No reported societies — all clear! 🎉" />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {reports.map((r) => (
-            <motion.div
-              key={r.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-              onClick={() => navigateToSociety(r.society_id)}
-              style={{ cursor: "pointer" }}
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>{r.society_name}</span>
-                <span className={styles.listMeta}>
-                  Reported by <strong>@{r.reporter_username}</strong>
-                  {r.reason ? ` · "${r.reason}"` : ""}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.banBtn}
-                  disabled={busy === r.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    ban(r.id);
-                  }}
-                >
-                  Ban
-                </button>
-                <button
-                  className={styles.dismissBtn}
-                  disabled={busy === r.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dismiss(r.id);
-                  }}
-                >
-                  Dismiss
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((r) => (
+              <motion.div
+                key={r.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+                onClick={() => navigateToSociety(r.society_id)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>{r.society_name}</span>
+                  <span className={styles.listMeta}>
+                    Reported by <strong>@{r.reporter_username}</strong>
+                    {r.reason ? ` · "${r.reason}"` : ""}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.banBtn}
+                    disabled={busy === r.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      ban(r.id);
+                    }}
+                  >
+                    Ban
+                  </button>
+                  <button
+                    className={styles.dismissBtn}
+                    disabled={busy === r.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dismiss(r.id);
+                    }}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
@@ -630,6 +691,8 @@ function CourseChangeRequestsTab() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(items);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -673,51 +736,58 @@ function CourseChangeRequestsTab() {
       ) : items.length === 0 ? (
         <EmptyState message="No pending course change requests." />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {items.map((r) => (
-            <motion.div
-              key={r.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>
-                  {r.first_name} {r.last_name}
-                </span>
-                <span className={styles.listMeta}>
-                  @{r.username} · {r.email}
-                </span>
-                <span className={styles.listMeta}>
-                  {r.current_course
-                    ? `${r.current_course} → ${r.requested_course}`
-                    : `Requesting: ${r.requested_course}`}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.approveBtn}
-                  disabled={busy === r.id}
-                  onClick={() => decide(r.id, "approve")}
-                >
-                  ✓ Approve
-                </button>
-                <button
-                  className={styles.rejectBtn}
-                  disabled={busy === r.id}
-                  onClick={() => decide(r.id, "reject")}
-                >
-                  ✗ Reject
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((r) => (
+              <motion.div
+                key={r.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>
+                    {r.first_name} {r.last_name}
+                  </span>
+                  <span className={styles.listMeta}>
+                    @{r.username} · {r.email}
+                  </span>
+                  <span className={styles.listMeta}>
+                    {r.current_course
+                      ? `${r.current_course} → ${r.requested_course}`
+                      : `Requesting: ${r.requested_course}`}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.approveBtn}
+                    disabled={busy === r.id}
+                    onClick={() => decide(r.id, "approve")}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className={styles.rejectBtn}
+                    disabled={busy === r.id}
+                    onClick={() => decide(r.id, "reject")}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
