@@ -31,4 +31,12 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const fetchSuggestions = async (query) => {
+        setIsLoading(true);
+        try {
+            const mapboxToken = import.meta.event.VITE_MAPBOX_TOKEN;
+            const encodedQuery = encodeURIComponent(query);
+        }
+    }
 }
