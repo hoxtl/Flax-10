@@ -1,0 +1,47 @@
+.pageWrap {
+  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--surface-page);
+  position: relative;
+  overflow: visible;
+}
+
+.authFormCard {
+  width: min(900px, 100%);
+  margin: 0;
+  padding-bottom: 12px;
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  scroll-margin-top: 64px;
+}
+
+.authPanelCard {
+  width: 100%;
+  max-width: 860px;
+  margin: 0;
+  position: relative;
+}
+
+.formFooter {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  text-align: center;
+  pointer-events: none;
+  padding-bottom: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 768px) {
+  .authFormCard {
+    width: 100%;
+    margin: 0;
+    padding-bottom: 12px;
+  }
+}

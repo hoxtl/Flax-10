@@ -8,27 +8,6 @@
     background: transparent;
   }
   
-  .heading {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0 24px;
-  }
-  
-  .title {
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(43, 30, 20, 0.45);
-    margin: 0;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  
-  .subtitle {
-    display: none;
-  }
-  
   .marqueeWrapper {
     position: relative;
     width: 100%;
