@@ -65,4 +65,10 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
         setSuggestions([]);
         setShowSuggestions(false);
     };
+
+    const handleInputFocus = () => {
+        if (suggestions.length > 0) {
+            setShowSuggestions(true);
+        }
+    };
 }
