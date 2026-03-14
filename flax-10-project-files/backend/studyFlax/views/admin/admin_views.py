@@ -170,6 +170,18 @@ def request_teacher_role(request):
     user.save()
     return Response({'message': 'Teacher role request submitted successfully.'})
 
+@api_view(['POST'])
+def cancel_teacher_role_request(request):
+    """Allow a pending_teacher to cancel their request and revert to student."""
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    if user.role != 'pending_teacher':
+        return Response({'error': 'No pending teacher request to cancel'}, status=status.HTTP_400_BAD_REQUEST)
+    user.role = 'student'
+    user.save()
+    return Response({'message': 'Teacher role request cancelled.'})
+
 # Helper functions
 
 def _serialize_user(u):

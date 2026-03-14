@@ -63,7 +63,7 @@ def request_course_change(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def my_course_change_request(request):
     try:
@@ -73,6 +73,11 @@ def my_course_change_request(request):
             .order_by('-created_at')
             .first()
         )
+        if request.method == 'DELETE':
+            if not req or req.status != 'pending':
+                return Response({'error': 'No pending request to cancel'}, status=status.HTTP_404_NOT_FOUND)
+            req.delete()
+            return Response({'message': 'Course change request cancelled.'}, status=status.HTTP_200_OK)
         if not req:
             return Response(None)
         return Response(CourseChangeRequestSerialiser(req).data)

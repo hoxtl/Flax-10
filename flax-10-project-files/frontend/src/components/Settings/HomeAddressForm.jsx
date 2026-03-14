@@ -2,27 +2,18 @@ import { useState, useEffect } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
-import EmptyState from "../common/EmptyState/EmptyState";
-import FormField from "../common/FormField/FormField";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import TextInput from "../common/TextInput/TextInput";
+import { SectionHeader, SubmitButton } from "./SettingsUI";
 
 export default function HomeAddressForm({ onSave, isSaving, error }) {
     const [homeAddress, setHomeAddress] = useState("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadHomeAddress = async () => {
-            try {
-                const data = await getHomeAddress();
-                setHomeAddress(data.home_address || "");
-            } catch (err) {
-                console.error("Failure to load user's home address: ", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadHomeAddress();
+        getHomeAddress()
+            .then((data) => setHomeAddress(data.home_address || ""))
+            .catch(() => {})
+            .finally(() => setLoading(false));
     }, []);
 
     const handleSubmit = (e) => {
@@ -34,36 +25,44 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
 
     return (
         <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Home Address</h2>
-                <p className={styles.sectionDescription}>
-                    View your home address on UniMap to plan your journey in advance!
-                </p>
-            </div>
+            <SectionHeader
+                title="Home Address"
+                description="Used to calculate your commute time to KCL campuses 🏠"
+            />
 
-            <div className={styles.formGroup}>
-                <FormField label="Address" htmlFor="homeAddress">
-                  <TextInput
-                    id="homeAddress"
-                    type="text"
-                    className={styles.input}
-                    value={homeAddress}
-                    onChange={e => setHomeAddress(e.target.value)}
-                    placeholder="e.g., 123 Example Street, London E1 B23"
-                  />
-                </FormField>
-                  {error && (
-                    <EmptyState
-                      icon="⚠️"
-                      title="Could not save address"
-                      description={error}
+            <div className={styles.twoColLayout}>
+                <div className={styles.formGroup}>
+                    <label htmlFor="homeAddress">Address</label>
+                    <TextInput
+                        id="homeAddress"
+                        type="text"
+                        value={homeAddress}
+                        onChange={e => setHomeAddress(e.target.value)}
+                        placeholder="e.g., 123 Example Street, London E1 B23"
                     />
-                  )}
+                </div>
+                <div className={styles.contextCard}>
+                    <span className={styles.contextCardEmoji}>🗺️</span>
+                    <h3 className={styles.contextCardTitle}>Why we ask</h3>
+                    <p className={styles.contextCardBody}>
+                        Your address lets us calculate real commute times to KCL campuses — no more surprise 45-minute journeys to a 9am.
+                    </p>
+                    <ul className={styles.contextCardList}>
+                        <li>Commute time estimates</li>
+                        <li>Campus proximity info</li>
+                        <li>Smart travel alerts</li>
+                    </ul>
+                </div>
             </div>
 
-            <PrimaryButton type="submit" className={styles.submitButton} disabled={isSaving} pill>
-                {isSaving ? "Saving address...": "Save Home Address"}
-            </PrimaryButton>
+            {error && (
+                <div className={styles.errorMessage} role="alert">
+                    <span>⚠️</span>
+                    <span>{error}</span>
+                </div>
+            )}
+
+            <SubmitButton isSaving={isSaving} label="Save Home Address" savingLabel="Saving..." />
         </form>
     );
 }

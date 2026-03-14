@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Clock3, Train, AlertTriangle, BookOpen } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
+import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
@@ -156,6 +157,45 @@ function useTflDelays() {
   return delays;
 }
 
+function useCourseChangePending() {
+  const [request, setRequest] = useState(null);
+  useEffect(() => {
+    getMyCourseChangeRequest()
+      .then((data) => { if (data?.status === "pending") setRequest(data); })
+      .catch(() => {});
+  }, []);
+  return request;
+}
+
+function CourseChangeCard({ request, onDismiss }) {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className={styles.courseChangeCard}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
+    >
+      <BookOpen size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
+      <div className={styles.courseChangeBody}>
+        <span className={styles.courseChangeLabel}>Course change pending</span>
+        <span className={styles.courseChangeSub}>{request.requested_course}</span>
+      </div>
+      <button
+        type="button"
+        className={styles.courseChangeViewBtn}
+        onClick={() => navigate("/settings?tab=course")}
+      >
+        View
+      </button>
+      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
+        ×
+      </button>
+    </motion.div>
+  );
+}
+
 export default function IntelligenceRow({
   displayName,
   slot1TodayTasks,
@@ -168,6 +208,8 @@ export default function IntelligenceRow({
   recommendation,
 }) {
   const tflDelays = useTflDelays();
+  const courseChangeRequest = useCourseChangePending();
+  const [showCourseChange, setShowCourseChange] = useState(true);
   const { summary, loading: profileLoading } = useProfileSummary();
   const eventsCount = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents.length : 0;
   const pendingTasks = Array.isArray(slot5Data?.taskWidgetItemsOnly)
@@ -215,21 +257,32 @@ export default function IntelligenceRow({
           >
             {getGreeting(displayName)}
           </motion.h2>
-          <div className={`${styles.liveContextCard} ${liveContext.tone === "warning" ? styles.liveContextInlineAlert : ""}`}>
-            <div className={styles.liveContextTop}>
-              {liveContext.tone === "warning" ? (
-                <span className={styles.liveContextDot} aria-hidden />
-              ) : (
-                <>
-                  <span className={styles.liveContextLabel}>{liveContext.label}</span>
-                  <LiveContextIcon size={14} strokeWidth={1.9} className={styles.liveContextIcon} aria-hidden />
-                </>
+          <div className={styles.liveContextStack}>
+            <div className={`${styles.liveContextCard} ${liveContext.tone === "warning" ? styles.liveContextInlineAlert : ""}`}>
+              <div className={styles.liveContextTop}>
+                {liveContext.tone === "warning" ? (
+                  <span className={styles.liveContextDot} aria-hidden />
+                ) : (
+                  <>
+                    <span className={styles.liveContextLabel}>{liveContext.label}</span>
+                    <LiveContextIcon size={14} strokeWidth={1.9} className={styles.liveContextIcon} aria-hidden />
+                  </>
+                )}
+              </div>
+              <div className={styles.liveContextBody}>
+                <p className={styles.liveContextText}>{liveContext.text}</p>
+                {liveContext.meta && <span className={styles.liveContextMeta}>{liveContext.meta}</span>}
+              </div>
+            </div>
+            <AnimatePresence>
+              {courseChangeRequest && showCourseChange && (
+                <CourseChangeCard
+                  key="course-change"
+                  request={courseChangeRequest}
+                  onDismiss={() => setShowCourseChange(false)}
+                />
               )}
-            </div>
-            <div className={styles.liveContextBody}>
-              <p className={styles.liveContextText}>{liveContext.text}</p>
-              {liveContext.meta && <span className={styles.liveContextMeta}>{liveContext.meta}</span>}
-            </div>
+            </AnimatePresence>
           </div>
         </div>
 

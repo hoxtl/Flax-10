@@ -1,13 +1,21 @@
+/**
+ * Account settings form for personal information (name, email, year, course).
+ * Teacher role management has moved to the Academic tab.
+ */
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../api/userService";
-import { requestTeacherRole } from "../../api/adminApi";
-import {
-  FormInput,
-  FormSelect,
-  SectionHeader,
-  SubmitButton,
-} from "./SettingsUI";
+import { getMyCourseChangeRequest, requestCourseChange } from "../../api/adminApi";
+import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
+import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI";
+import StandardModal from "../common/StandardModal/StandardModal";
+import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import styles from "../../pages/Settings/Settings.module.css";
+
+const groupedCourses = Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
+  label: dept,
+  options: courses.map((c) => ({ value: c, label: c })),
+}));
 
 function getInitialData(user) {
   return {
@@ -25,39 +33,21 @@ function getYearOptions() {
   }));
 }
 
-function syncRoleToStorage(role) {
-  try {
-    const stored = localStorage.getItem("user");
-    if (!stored) return;
-    const u = JSON.parse(stored);
-    if (u.role !== role) {
-      u.role = role;
-      localStorage.setItem("user", JSON.stringify(u));
-      window.dispatchEvent(new Event("auth-changed"));
-    }
-  } catch (_) {}
-}
-
 function useAccountForm(user) {
   const [formData, setFormData] = useState(getInitialData(user));
-  const [liveRole, setLiveRole] = useState(user?.role || "student");
   const [currentCourse, setCurrentCourse] = useState(user?.major || "");
+  const [pendingRequest, setPendingRequest] = useState(null);
 
   useEffect(() => {
     getUserProfile()
       .then((data) => {
-        setFormData((prev) => ({
-          ...prev,
-          year: data?.year || prev.year,
-        }));
-        if (data?.role) {
-          setLiveRole(data.role);
-          syncRoleToStorage(data.role);
-        }
-        if (data?.major !== undefined) {
-          setCurrentCourse(data.major || "");
-        }
+        setFormData((prev) => ({ ...prev, year: data?.year || prev.year }));
+        if (data?.major !== undefined) setCurrentCourse(data.major || "");
       })
+      .catch(() => {});
+
+    getMyCourseChangeRequest()
+      .then((data) => { if (data?.status === "pending") setPendingRequest(data); })
       .catch(() => {});
   }, []);
 
@@ -66,183 +56,154 @@ function useAccountForm(user) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  return { formData, handleChange, liveRole, currentCourse };
+  return { formData, handleChange, currentCourse, pendingRequest, setPendingRequest };
 }
 
 function PersonalInfoFields({ formData, onChange }) {
   return (
     <>
-      <FormInput
-        id="firstName"
-        name="firstName"
-        label="First Name"
-        value={formData.firstName}
-        onChange={onChange}
-        required
-      />
-      <FormInput
-        id="lastName"
-        name="lastName"
-        label="Last Name"
-        value={formData.lastName}
-        onChange={onChange}
-        required
-      />
-      <FormInput
-        id="email"
-        label="Email Address"
-        type="email"
-        value={formData.email}
-        onChange={onChange}
-        required
-      />
+      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required />
+      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required />
+      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required />
     </>
   );
 }
 
-function CourseDisplay({ course }) {
+function CourseChangeModal({ onClose, onSuccess }) {
+  const [reason, setReason] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedCourse) { setError("Please select a course."); return; }
+    setSubmitting(true);
+    setError("");
+    try {
+      const result = await requestCourseChange(selectedCourse);
+      onSuccess(result);
+    } catch (err) {
+      setError(err.message || "Failed to submit. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <StandardModal
+      title="Request Course Change"
+      subtitle="Your request will be reviewed by an admin"
+      onClose={onClose}
+    >
+      <form onSubmit={handleSubmit}>
+        <div className={styles.formGroup}>
+          <label>Why do you want to change?</label>
+          <textarea
+            className={styles.modalTextarea}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Tell us a bit about why you'd like to switch..."
+            rows={3}
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label>Desired course</label>
+          <AnimatedDropdown
+            value={selectedCourse}
+            onChange={setSelectedCourse}
+            options={groupedCourses}
+            grouped
+            searchable
+            usePortal
+            placeholder="Search for a course..."
+            searchPlaceholder="Type to search courses"
+            emptyMessage="No courses found"
+            menuMaxHeight={220}
+          />
+        </div>
+        <div className={styles.modalWarning}>
+          <span className={styles.modalWarningIcon}>⚠️</span>
+          <span>Your request may be <strong>accepted or rejected</strong>. You'll be notified once a decision is made.</span>
+        </div>
+        {error && <div className={styles.teacherError} role="alert">{error}</div>}
+        <div className={styles.formActions}>
+          <PrimaryButton type="submit" disabled={submitting} pill>
+            {submitting ? "Submitting…" : "Submit Request"}
+          </PrimaryButton>
+        </div>
+      </form>
+    </StandardModal>
+  );
+}
+
+function CourseDisplay({ course, pendingRequest, onRequestClick }) {
   return (
     <div className={styles.formGroup}>
       <label>Course</label>
       <div className={styles.lockedCourse}>
         {course ? course : <em>No course set</em>}
       </div>
-      <p className={styles.courseHint}>
-        To change your course, go to the <strong>Course Change</strong> tab and
-        submit a request for admin approval.
-      </p>
-    </div>
-  );
-}
-
-function CourseRow({ formData, onChange }) {
-  return (
-    <div className={styles.formRow}>
-      <FormSelect
-        id="year"
-        label="Year"
-        value={formData.year}
-        onChange={(e) =>
-          onChange({ target: { name: "year", value: e.target.value } })
-        }
-        options={getYearOptions()}
-      />
-    </div>
-  );
-}
-
-function TeacherBadge() {
-  return (
-    <div className={styles.teacherBadge}>
-      <span className={styles.teacherBadgeIcon}>🎓</span>
-      <div>
-        <strong>You are a Teacher</strong>
-        <p className={styles.teacherBadgeSub}>
-          You have access to module creation and teacher features.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function TeacherPending() {
-  return (
-    <div className={styles.teacherPending}>
-      <span>⏳</span>
-      <div>
-        <strong>Teacher Request Pending</strong>
-        <p className={styles.teacherBadgeSub}>
-          An admin will review your request shortly.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function useTeacherRequest() {
-  const [status, setStatus] = useState(null);
-  const [message, setMessage] = useState("");
-
-  const handleRequest = async () => {
-    setStatus("loading");
-    try {
-      const res = await requestTeacherRole();
-      setMessage(res?.message || "Request submitted!");
-      setStatus("done");
-      syncRoleToStorage("pending_teacher");
-    } catch (e) {
-      setMessage(e.message || "Request failed.");
-      setStatus("error");
-    }
-  };
-
-  return { status, message, handleRequest };
-}
-
-function TeacherRequestButton({ onRequest, status, message }) {
-  return (
-    <div className={styles.teacherRequest}>
-      <div>
-        <strong>Become a Teacher</strong>
-        <p className={styles.teacherBadgeSub}>
-          Teachers can create and manage modules. Submit a request for admin
-          approval.
-        </p>
-      </div>
-      {status === "done" ? (
-        <span className={styles.teacherSuccess}>{message}</span>
+      {pendingRequest ? (
+        <div className={styles.courseChangePending}>
+          <span>⏳</span>
+          <span>Awaiting admin approval · <em>{pendingRequest.requested_course}</em></span>
+        </div>
       ) : (
-        <button
-          type="button"
-          className={styles.teacherBtn}
-          onClick={onRequest}
-          disabled={status === "loading"}
-        >
-          {status === "loading" ? "Requesting…" : "🎓 Request Teacher Role"}
+        <button type="button" className={styles.courseChangeLink} onClick={onRequestClick}>
+          Request a course change →
         </button>
       )}
-      {status === "error" && <p className={styles.teacherError}>{message}</p>}
     </div>
   );
 }
 
-function TeacherRoleSection({ role }) {
-  const { status, message, handleRequest } = useTeacherRequest();
-  return (
-    <div className={styles.teacherSection}>
-      <SectionHeader title="Role" />
-      {role === "teacher" && <TeacherBadge />}
-      {role === "pending_teacher" && <TeacherPending />}
-      {role === "student" && (
-        <TeacherRequestButton
-          onRequest={handleRequest}
-          status={status}
-          message={message}
-        />
-      )}
-    </div>
-  );
-}
-
+/**
+ * @param {object} props
+ * @param {object} props.user - Authenticated user object
+ * @param {Function} props.onSave
+ * @param {boolean} props.isSaving
+ */
 export default function AccountForm({ user, onSave, isSaving }) {
-  const { formData, handleChange, liveRole, currentCourse } =
-    useAccountForm(user);
+  const { formData, handleChange, currentCourse, pendingRequest, setPendingRequest } = useAccountForm(user);
+  const [showModal, setShowModal] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
   };
+
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <SectionHeader title="Personal Information" />
-      <PersonalInfoFields formData={formData} onChange={handleChange} />
-      <CourseRow formData={formData} onChange={handleChange} />
-      <CourseDisplay course={currentCourse} />
-      <TeacherRoleSection role={liveRole} />
-      <SubmitButton
-        isSaving={isSaving}
-        label="Save Changes"
-        savingLabel="Saving..."
-      />
-    </form>
+    <>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <SectionHeader
+          title="Personal Information"
+          description="Your name and contact details shown across the app 👋"
+        />
+        <PersonalInfoFields formData={formData} onChange={handleChange} />
+        <div className={styles.formRow}>
+          <FormSelect
+            id="year"
+            label="Year"
+            value={formData.year}
+            onChange={(e) => handleChange({ target: { name: "year", value: e.target.value } })}
+            options={getYearOptions()}
+          />
+        </div>
+        <CourseDisplay
+          course={currentCourse}
+          pendingRequest={pendingRequest}
+          onRequestClick={() => setShowModal(true)}
+        />
+        <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
+      </form>
+
+      {showModal && (
+        <CourseChangeModal
+          onClose={() => setShowModal(false)}
+          onSuccess={(result) => { setPendingRequest(result); setShowModal(false); }}
+        />
+      )}
+    </>
   );
 }
