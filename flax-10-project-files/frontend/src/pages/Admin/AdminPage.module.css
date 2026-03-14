@@ -103,6 +103,9 @@
 
 .filterControl {
   min-width: 180px;
+  --surface-panel: var(--bg, #f9fafb);
+  --surface-raised: var(--bg, #f9fafb);
+  --primary: var(--accent, #6c47ff);
 }
 
 .cardTitle {
