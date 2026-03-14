@@ -11,7 +11,7 @@ Requires explicit confirmation from the operator before proceeding.
 """
 
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import IntegrityError, connection
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -64,11 +64,29 @@ def truncate_tables(cursor, tables, stdout):
 
 
 def restore_superusers(superusers_data, stdout):
-    """Re-create each superuser from the serialised data saved before the wipe."""
+    """Re-create each superuser from the serialised data saved before the wipe.
+
+    If restoration fails due to schema drift (e.g. DB columns not represented in
+    the current User model), print a warning and continue so unseed can finish.
+    """
     if not superusers_data:
-        return
+        return []
+    failed = []
     for data in superusers_data:
-        User.objects.create_superuser(password='1234', **data)
+        payload = {
+            "username": data.get("username"),
+            "email": data.get("email"),
+            "first_name": data.get("first_name") or "",
+            "last_name": data.get("last_name") or "",
+            "is_superuser": True,
+            "is_staff": True,
+            "role": data.get("role") or "teacher",
+        }
+        try:
+            User.objects.create_superuser(password='1234', **payload)
+        except (IntegrityError, TypeError, ValueError) as exc:
+            failed.append((payload.get("username", "?"), str(exc)))
+    return failed
 
 
 def confirm_truncate(stdout):
@@ -113,9 +131,18 @@ class Command(BaseCommand):
 
         self.stdout.write("")
         self.stdout.write("  Restoring superusers...")
-        restore_superusers(superusers_data, self.stdout)
+        failed_restores = restore_superusers(superusers_data, self.stdout)
+        failed_names = {name for name, _ in failed_restores}
         for su in superusers_data:
-            self.stdout.write(f"  ✓  {su.get('username', '?')}")
+            username = su.get("username", "?")
+            prefix = "  ✓" if username not in failed_names else "  ✗"
+            self.stdout.write(f"{prefix}  {username}")
+        if failed_restores:
+            self.stdout.write("")
+            self.stdout.write(self.style.WARNING("  ⚠️  Some superusers could not be restored automatically."))
+            for username, reason in failed_restores:
+                self.stdout.write(self.style.WARNING(f"     - {username}: {reason}"))
+            self.stdout.write(self.style.WARNING("  Run `python manage.py createsuperuser` to recreate them manually."))
 
         div = "─" * 40
         self.stdout.write("")
