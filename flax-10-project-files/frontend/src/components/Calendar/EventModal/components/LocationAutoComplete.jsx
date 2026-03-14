@@ -80,7 +80,11 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
     };
 
     const handleInputFocus = () => {
-        if (suggestions.length > 0) {
+        if (justSelectedRef.current) {
+            return;
+        }
+
+        if (suggestions.length > 0 && value.length >= 3) {
             setShowSuggestions(true);
         }
     };
