@@ -18,8 +18,8 @@ function useAuthHandlers(signUpData, signInData, setError, setLoading, toggle) {
   return { handleSignUp, handleSignIn, handleToggle };
 }
 
-export function useAuthPage() {
-  const [signIn, toggle] = useState(true);
+export function useAuthPage(initialSignIn = true) {
+  const [signIn, toggle] = useState(initialSignIn);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUpData, updateSignUpField, signInData, updateSignInField } = useAuthFormData();

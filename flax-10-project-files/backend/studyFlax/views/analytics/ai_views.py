@@ -11,9 +11,11 @@ from studyFlax.models.timer.themeSessionModel import ThemeSession
 from collections import defaultdict
 
 try:
-    from openai import OpenAI
-    openai_available = True
-except ImportError:  # pragma: no cover
+    import openai  # pragma: no cover
+    OpenAI = getattr(openai, 'OpenAI', None)
+    openai_available = OpenAI is not None
+except Exception:  # pragma: no cover
+    OpenAI = None
     openai_available = False
 
 
