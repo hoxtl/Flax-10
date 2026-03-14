@@ -5,6 +5,7 @@ export { default as ConfirmModal } from "./ConfirmModal/ConfirmModal";
 export { default as EmptyState } from "./EmptyState/EmptyState";
 export { default as FormField } from "./FormField/FormField";
 export { default as PageHeader } from "./PageHeader/PageHeader";
+export { default as PageTransition } from "./PageTransition/PageTransition";
 export { default as PageToolbar } from "./PageToolbar/PageToolbar";
 export { default as PrimaryButton } from "./PrimaryButton/PrimaryButton";
 export { default as ScrollToTop } from "./ScrollToTop/ScrollToTop";

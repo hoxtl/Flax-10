@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
 import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
 import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
+import { PageTransition } from '../../components/common';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 const bgStyle = { position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" };
@@ -93,13 +94,15 @@ function ResetCard({ email, setEmail, loading, message, error, onSubmit }) {
 
 function ResetPageLayout({ children }) {
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
-      <AuthHeroGeometric />
-      <div aria-hidden="true" style={bgStyle} />
-      <AuthBrand />
-      <AuthFooter absolute />
-      <div style={centerStyle}>{children}</div>
-    </div>
+    <PageTransition>
+      <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
+        <AuthHeroGeometric />
+        <div aria-hidden="true" style={bgStyle} />
+        <AuthBrand />
+        <AuthFooter absolute />
+        <div style={centerStyle}>{children}</div>
+      </div>
+    </PageTransition>
   );
 }
 
