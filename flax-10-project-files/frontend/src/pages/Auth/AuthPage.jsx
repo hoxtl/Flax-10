@@ -88,7 +88,7 @@ export default function AuthPage({ initialSignIn = true }) {
             <span style={{ fontStyle: "italic", color: "#c40000" }}>
               King&apos;s College London
             </span>{" "}
-            students balancing study, societies, and life.
+            students balancing study, societies, and life, and helps you manage every hour with clarity.
           </>
         ),
         align: "left",
@@ -100,24 +100,29 @@ export default function AuthPage({ initialSignIn = true }) {
       {
         id: "features",
         badge: "Workflows",
-        title: "Tasks, modules, reminders—everything in one place",
+        title: "Command your study time",
         description:
-          "Study Flax brings your whole week into one clear workflow.",
+          "From deadlines and classes to deep-work blocks, Study Flax keeps your week visible, prioritised, and controllable.",
         features: [
           {
-            title: "Tasks",
+            title: "Tasks & Priorities",
             description:
-              "Turn long to-dos into clear priorities with due dates, importance levels, and progress at a glance.",
+              "Build a single to-do pipeline with priorities, due dates, and progress so important work never falls behind.",
           },
           {
             title: "Modules",
             description:
-              "Track course and module goals from one hub so everything stays visible instead of disappearing into another app.",
+              "Organise coursework around module goals, assessments, and lecture timelines in one place.",
           },
           {
             title: "Focus Timer",
             description:
-              "Use session-first study blocks to stay steady, reduce overwhelm, and build sustainable momentum.",
+              "Use guided focus sessions to block deep work time and protect attention when assignments spike.",
+          },
+          {
+            title: "Calendar",
+            description:
+              "View assignments, events, and study sessions together so planning is built on one timeline.",
           },
         ],
       },
@@ -132,7 +137,7 @@ export default function AuthPage({ initialSignIn = true }) {
           {
             title: "Society Hub",
             description:
-              "Keep society events and study groups organized alongside your academic schedule.",
+              "Keep society events and study groups organised alongside your academic schedule.",
           },
           {
             title: "Uni Map",
