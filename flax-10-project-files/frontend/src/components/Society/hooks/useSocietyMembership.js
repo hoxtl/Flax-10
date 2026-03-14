@@ -6,15 +6,18 @@ const updateMemberState = (setSociety, isMember, delta) =>
     setSociety(prev => ({
         ...prev,
         is_member: isMember,
+        is_subscribed: isMember ? prev.is_subscribed : false,
         member_count: Math.max(0, (prev.member_count || 0) + delta)
     }));
 
-const promptSubscription = async (confirm, id) => {
+const promptSubscription = async (confirm, id, setSociety) => {
     const result = await confirm({
         title: 'Turn on notifications?',
         message: 'Stay updated with announcements and events.'
     });
-    if (result) await api.toggleSubscription(id, true);
+    if (!result) return;
+    await api.toggleSubscription(id, true);
+    setSociety(prev => ({ ...prev, is_subscribed: true }));
 };
 
 const makeJoinSociety = (id, setSociety, confirm) =>
@@ -22,7 +25,7 @@ const makeJoinSociety = (id, setSociety, confirm) =>
         try {
             await api.joinSociety(id);
             updateMemberState(setSociety, true, 1);
-            await promptSubscription(confirm, id);
+            await promptSubscription(confirm, id, setSociety);
         } catch (e) { console.error('Join failed:', e); }
     };
 

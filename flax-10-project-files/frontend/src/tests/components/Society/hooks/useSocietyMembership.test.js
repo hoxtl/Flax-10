@@ -68,7 +68,7 @@ describe('useSocietyMembership', () => {
         confirm.mockResolvedValue(true);
         api.toggleSubscription.mockRejectedValue(new Error('sub fail'));
         await act(async () => { await result.current.joinSociety(); });
-        expect(spy).toHaveBeenCalledWith('Failed to prompt subscription:', expect.any(Error));
+        expect(spy).toHaveBeenCalledWith('Join failed:', expect.any(Error));
         
         spy.mockRestore();
     });
