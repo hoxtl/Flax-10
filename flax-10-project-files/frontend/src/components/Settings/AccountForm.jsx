@@ -174,36 +174,51 @@ export default function AccountForm({ user, onSave, isSaving }) {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <SectionHeader
-          title="Personal Information"
-          description="Your name and contact details shown across the app 👋"
-        />
-        <PersonalInfoFields formData={formData} onChange={handleChange} />
-        <div className={styles.formRow}>
-          <FormSelect
-            id="year"
-            label="Year"
-            value={formData.year}
-            onChange={(e) => handleChange({ target: { name: "year", value: e.target.value } })}
-            options={getYearOptions()}
-          />
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <SectionHeader
+        title="Personal Information"
+        description="Your profile details and current degree are shown everywhere across the app 👋"
+      />
+      <div className={styles.twoColLayout}>
+        <div>
+          <div className={styles.settingsTile}>
+            <PersonalInfoFields formData={formData} onChange={handleChange} />
+            <div className={styles.formRow}>
+              <FormSelect
+                id="year"
+                label="Year"
+                value={formData.year}
+                onChange={(e) => handleChange({ target: { name: "year", value: e.target.value } })}
+                options={getYearOptions()}
+              />
+            </div>
+            <CourseDisplay
+              course={currentCourse}
+              pendingRequest={pendingRequest}
+              onRequestClick={() => setShowModal(true)}
+            />
+            <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
+          </div>
         </div>
-        <CourseDisplay
-          course={currentCourse}
-          pendingRequest={pendingRequest}
-          onRequestClick={() => setShowModal(true)}
-        />
-        <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
-      </form>
-
+        <div className={styles.contextCard}>
+          <span className={styles.contextCardEmoji}>🧾</span>
+          <h3 className={styles.contextCardTitle}>Account setup</h3>
+          <p className={styles.contextCardBody}>
+            Keep your profile updated so StudyFlax can personalise your modules, reminders and timetable flow.
+          </p>
+          <ul className={styles.contextCardList}>
+            <li>Accurate first and last name for your timetable display</li>
+            <li>Correct year and course for relevant recommendations</li>
+            <li>Email helps with secure access and notifications</li>
+          </ul>
+        </div>
+      </div>
       {showModal && (
         <CourseChangeModal
           onClose={() => setShowModal(false)}
           onSuccess={(result) => { setPendingRequest(result); setShowModal(false); }}
         />
       )}
-    </>
+    </form>
   );
 }
