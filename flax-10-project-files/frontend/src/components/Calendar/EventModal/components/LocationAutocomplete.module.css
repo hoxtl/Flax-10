@@ -23,3 +23,11 @@
 .input::placeholder {
   color: var(--muted);
 }
+
+.loadingIndicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
