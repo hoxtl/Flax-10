@@ -4,6 +4,7 @@ import { RecurrenceField } from './RecurrenceField';
 import { TimeRow } from './TimeRow';
 import { ActionButtons } from './ActionButtons';
 import { ReminderField } from './ReminderField';
+import { LocationAutocomplete } from './LocationAutoComplete';
 
 function PrivacyToggle({ value, onChange }) {
     const isPrivate = value === true;
