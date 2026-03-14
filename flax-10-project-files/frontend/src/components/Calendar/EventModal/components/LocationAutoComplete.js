@@ -112,4 +112,14 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             ))}
             </div>
         )}
+
+        {showSuggestions && value.length >= 3 && suggestions.length === 0 && !isLoading && (
+            <div className={styles.suggestionsDropdown}>
+            <div className={styles.noResults}>
+                No locations found. You can still save this manually.
+            </div>
+            </div>
+        )}
+        </div>
+    );
 }
