@@ -83,12 +83,12 @@ export default function AuthPage({ initialSignIn = true }) {
         subtitle: "Built for calm study.",
         description: (
           <>
-            Study Flax blends scheduling, deadlines, and task planning into one simple workspace,
+            Study Flax turns your academic routine into one calm planning space,
             designed for{" "}
             <span style={{ fontStyle: "italic", color: "#c40000" }}>
               King&apos;s College London
             </span>{" "}
-            students balancing coursework, clubs, and life.
+            students balancing study, societies, and life.
           </>
         ),
         align: "left",
@@ -100,24 +100,54 @@ export default function AuthPage({ initialSignIn = true }) {
       {
         id: "features",
         badge: "Workflows",
-        title: "Courses, deadlines, reminders",
+        title: "Tasks, modules, reminders—everything in one place",
         description:
-          "See all your module work in one view and keep every module, task, and deadline connected so your study plan feels built for your life, not the other way around.",
+          "Study Flax brings your whole week into one clear workflow.",
         features: [
           {
-            title: "Focus on what matters",
+            title: "Tasks",
             description:
-              "Turn busy days into clear priorities with one view of tasks, calendar events, and study sessions.",
+              "Turn long to-dos into clear priorities with due dates, importance levels, and progress at a glance.",
           },
           {
-            title: "Fewer context switches",
+            title: "Modules",
             description:
-              "Move from plan to timer to tasks without hunting through separate tools.",
+              "Track course and module goals from one hub so everything stays visible instead of disappearing into another app.",
           },
           {
-            title: "Consistent progress",
+            title: "Focus Timer",
             description:
-              "Keep momentum with lightweight tracking and reminders that are designed to support you.",
+              "Use session-first study blocks to stay steady, reduce overwhelm, and build sustainable momentum.",
+          },
+        ],
+      },
+      {
+        id: "glimpse",
+        badge: "Product Glimpse",
+        title: "Built for how you work at KCL",
+        subtitle: "Students, teachers, and societies",
+        description:
+          "A practical stack for academic life: assignments, events, focus blocks, and campus context.",
+        features: [
+          {
+            title: "Society Hub",
+            description:
+              "Keep society events and study groups organized alongside your academic schedule.",
+          },
+          {
+            title: "Uni Map",
+            description:
+              "Jump between study spaces, lecture buildings, and event locations from one place.",
+          },
+          {
+            title: "Shared Planning",
+            description:
+              "Coordinate with peers and mentors through a calm, predictable planning workflow.",
+          },
+          {
+            title: "Session History",
+            description:
+              "Review what mattered most each week and keep your routine improving over time.",
           },
         ],
       },
