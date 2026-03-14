@@ -3,6 +3,7 @@ import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import EmptyState from "../common/EmptyState/EmptyState";
+import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 
 export default function HomeAddressForm({ onSave, isSaving, error }) {
     const [homeAddress, setHomeAddress] = useState("");
