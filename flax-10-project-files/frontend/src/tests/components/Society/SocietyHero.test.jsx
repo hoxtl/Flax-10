@@ -194,4 +194,10 @@ describe('SocietyHero', () => {
         render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
         expect(screen.getByText('Chess Society')).toBeTruthy();
     });
+
+    it('getImages handles images as plain strings without url property', () => {
+        const society = { ...baseSociety, images: ['plain-url.jpg', 'another.jpg'], image: null };
+        const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
+        expect(container.firstChild?.style?.backgroundImage).toContain('plain-url.jpg');
+    });
 });

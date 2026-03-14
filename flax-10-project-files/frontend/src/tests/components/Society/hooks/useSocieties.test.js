@@ -73,6 +73,18 @@ describe('useSocieties', () => {
         expect(result.current.societies[0].bio).toBe('NewBio');
     });
 
+    it('updateSocietyLocally leaves non-matching societies unchanged', async () => {
+        api.fetchSocieties.mockResolvedValue([
+            { id: 5, name: 'ToUpdate' },
+            { id: 6, name: 'NoChange' }
+        ]);
+        const { result } = renderHook(() => useSocieties());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        act(() => { result.current.updateSocietyLocally(5, { name: 'Updated' }); });
+        expect(result.current.societies[0].name).toBe('Updated');
+        expect(result.current.societies[1].name).toBe('NoChange');
+    });
+
     it('refresh reloads societies', async () => {
         api.fetchSocieties.mockResolvedValue([{ id: 1, name: 'First' }]);
         const { result } = renderHook(() => useSocieties());

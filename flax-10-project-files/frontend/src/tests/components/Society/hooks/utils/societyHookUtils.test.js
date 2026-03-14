@@ -39,8 +39,30 @@ describe('societyHookUtils', () => {
         const res = utils.transformEventData(data);
         expect(res.start_time).toBe('2025-01-01T10:00:00');
         expect(res.recurrence).toBe('daily');
-        
+
         const legacy = { title: 'T', date: '2025-01-01' };
         expect(utils.transformEventData(legacy).title).toBe('T');
+    });
+
+    it('transformAnnouncementData returns ann and evData', () => {
+        const data = { title: 'Ann', content: 'Body', tag: 5 };
+        const res = utils.transformAnnouncementData(data, {}, {});
+        expect(res.ann.title).toBe('Ann');
+        expect(res.ann.content).toBe('Body');
+        expect(res.evData.description).toBe('Body');
+    });
+
+    it('transformLegacyEventData with all fields', () => {
+        const data = { title: 'T', date: '2025-01-01', startTime: '09:00', endTime: '10:00',
+            description: 'Desc', location: 'Place', allDay: true, tag: '5', recurrence: 'weekly' };
+        const res = utils.transformLegacyEventData(data);
+        expect(res.end_time).toBe('2025-01-01T10:00:00');
+        expect(res.all_day).toBe(true);
+        expect(res.location).toBe('Place');
+        expect(res.recurrence).toBe('weekly');
+    });
+
+    it('parseTagId with valid number', () => {
+        expect(utils.parseTagId(5)).toBe(5);
     });
 });

@@ -30,7 +30,12 @@ vi.mock('../../components/Society/SocietyDetail/imageHandlers/CoverImageModal', 
     ),
 }));
 vi.mock('../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal', () => ({
-    default: () => <div data-testid="gallery">Gallery Modal Mock</div>,
+    default: ({ onClose }) => (
+        <div data-testid="gallery-modal">
+            Gallery Modal Mock
+            <button onClick={onClose}>Close</button>
+        </div>
+    ),
 }));
 vi.mock('../../components/Society/SocietyDetail/SettingsModal', () => ({
     default: ({ onClose, onDelete }) => (
@@ -100,13 +105,10 @@ describe('SocietyDetailPage Modals', () => {
         expect(screen.queryByTestId('gallery-modal')).toBeNull();
     });
 
-    it('EditableName: enter edit mode, change value, blur calls onUpdateName', async () => {
-        const onUpdateName = vi.fn();
-        const { container } = render(
-            <SocietyDetailPage societyId={1} />
-        );
+    it('EditableName: clicking update-name calls updateSociety', async () => {
+        render(<MemoryRouter><SocietyDetailPage societyId={1} /></MemoryRouter>);
         fireEvent.click(screen.getByText('update-name'));
-        expect(onUpdateName).toHaveBeenCalledWith('New Name');
+        expect(mockData.updateSociety).toHaveBeenCalledWith({ name: 'New Name' });
     });
 
     it('manages cover modal', () => {
