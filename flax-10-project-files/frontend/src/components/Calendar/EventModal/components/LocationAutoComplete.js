@@ -59,4 +59,10 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             setIsLoading(false);
         }
     };
+
+    const handleSuggestionClick = (suggestion) => {
+        onChange(suggestion.place_name);
+        setSuggestions([]);
+        setShowSuggestions(false);
+    };
 }
