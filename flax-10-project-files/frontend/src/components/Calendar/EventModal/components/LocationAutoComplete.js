@@ -71,4 +71,17 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             setShowSuggestions(true);
         }
     };
+
+    return (
+        <div className={styles.autocompleteWrapper} ref={wrapperRef}>
+        <input
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            placeholder={placeholder}
+            className={styles.input}
+            autoComplete="off"
+        />
 }
