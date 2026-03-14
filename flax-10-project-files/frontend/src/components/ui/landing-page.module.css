@@ -126,18 +126,18 @@
 }
 
 .globeInner {
-  transform: scale(1);
+  transform: scale(0.9);
 }
 
 @media (min-width: 640px) {
   .globeInner {
-    transform: scale(1.12);
+    transform: scale(1.05);
   }
 }
 
 @media (min-width: 1024px) {
   .globeInner {
-    transform: scale(1.35);
+    transform: scale(1.22);
   }
 }
 
@@ -167,6 +167,9 @@
 .sectionInner {
   width: min(980px, 100%);
   margin: 0 auto;
+  padding-right: clamp(16px, 30vw, 340px);
+  position: relative;
+  z-index: 2;
 }
 
 .title {
@@ -181,11 +184,12 @@
 
 .titleMain {
   display: inline-block;
-  color: var(--text-strong, var(--text));
+  color: color-mix(in srgb, var(--text) 84%, black 16%);
+  text-wrap: balance;
   font-size: clamp(2rem, 5vw, 3.9rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
-  text-wrap: balance;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
 }
 
 .titleSub {
@@ -245,11 +249,67 @@
   margin-top: 14px;
 }
 
+.heroTrustArea {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.trustChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trustChip {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  padding: 6px 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+  color: color-mix(in srgb, var(--text) 78%, black 22%);
+}
+
+.setupHint {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 82%, black 18%);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .actionRow {
   margin-top: 14px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.glimpseGrid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.glimpseCard {
+  border: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  border-radius: 12px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--bg-card, #fff) 84%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.glimpseTitle {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.glimpseText {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 76%, black 24%);
+  line-height: 1.45;
 }
 
 .actionButton {
@@ -307,5 +367,13 @@
   .actionButton {
     min-width: 0;
     width: 100%;
+  }
+
+  .sectionInner {
+    padding-right: 16px;
+  }
+
+  .glimpseGrid {
+    grid-template-columns: 1fr;
   }
 }
