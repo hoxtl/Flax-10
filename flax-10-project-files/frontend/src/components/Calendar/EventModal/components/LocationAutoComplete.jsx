@@ -7,6 +7,7 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
     const [isLoading, setIsLoading] = useState(false);
     const inputRef = useRef(null);
     const wrapperRef = useRef(null);
+    const justSelectedRef = useRef(false);
 
     useEffect(() => {
         if (!value || value.length < 3) {
