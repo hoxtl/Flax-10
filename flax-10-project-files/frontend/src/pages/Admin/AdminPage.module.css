@@ -94,6 +94,17 @@
   margin-bottom: 1.25rem;
 }
 
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.filterControl {
+  min-width: 180px;
+}
+
 .cardTitle {
   font-size: 1.1rem;
   font-weight: 650;
