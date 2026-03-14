@@ -43,14 +43,11 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
                 <label htmlFor="homeAddress" className={styles.label}>
                     Address
                 </label>
-                <input
-                  id="homeAddress"
-                  type="text"
-                  className={styles.input}
-                  value={homeAddress}
-                  onChange={e => setHomeAddress(e.target.value)}
-                  placeholder="e.g., 123 Example Street, London E1 B23"
-                  />
+                <LocationAutocomplete
+                    value={homeAddress}
+                    onChange={setHomeAddress}
+                    placeholder="e.g., 123 Example Street, London, E1 B23"
+                />
                   {error && (
                     <EmptyState
                       icon="⚠️"
