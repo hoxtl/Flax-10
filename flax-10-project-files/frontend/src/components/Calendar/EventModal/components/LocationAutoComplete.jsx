@@ -66,6 +66,13 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
         setShowSuggestions(false);
     };
 
+    const handleInputChange = (e) => {
+        onChange(e.target.value);
+        if (e.target.value.length >= 3) {
+            setShowSuggestions(true);
+        }
+    };
+
     const handleInputFocus = () => {
         if (suggestions.length > 0) {
             setShowSuggestions(true);
