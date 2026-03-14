@@ -90,4 +90,26 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             <span className={styles.spinner} />
             </div>
         )}
+
+        {showSuggestions && suggestions.length > 0 && (
+            <div className={styles.suggestionsDropdown}>
+            {suggestions.map((suggestion) => (
+                <div
+                key={suggestion.id}
+                className={styles.suggestionItem}
+                onClick={() => handleSuggestionClick(suggestion)}
+                >
+                <div className={styles.suggestionIcon}>📍</div>
+                <div className={styles.suggestionText}>
+                    <div className={styles.suggestionName}>
+                    {suggestion.text}
+                    </div>
+                    <div className={styles.suggestionAddress}>
+                    {suggestion.place_name}
+                    </div>
+                </div>
+                </div>
+            ))}
+            </div>
+        )}
 }
