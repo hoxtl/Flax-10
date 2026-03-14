@@ -2,6 +2,7 @@
 from .auth.userModel import *
 from .auth.userSettingsModel import *
 from .auth.resetPasswordTokenModel import ResetPasswordToken
+from .auth.courseChangeRequestModel import CourseChangeRequest
 
 # Calendar
 from .calendar.calendarEventModel import *
