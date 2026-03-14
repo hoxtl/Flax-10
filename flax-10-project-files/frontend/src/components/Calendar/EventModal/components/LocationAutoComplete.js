@@ -27,5 +27,8 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
                 setShowSuggestions(false);
             }
         }
-    })
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 }
