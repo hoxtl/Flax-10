@@ -68,3 +68,11 @@
   transition: background 0.2s ease;
   border-bottom: 1px solid var(--border);
 }
+
+.suggestionItem:last-child {
+  border-bottom: none;
+}
+
+.suggestionItem:hover {
+  background: var(--hover);
+}
