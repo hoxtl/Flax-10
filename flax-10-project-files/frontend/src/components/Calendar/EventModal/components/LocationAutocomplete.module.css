@@ -87,3 +87,10 @@
   flex: 1;
   min-width: 0;
 }
+
+.suggestionName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
