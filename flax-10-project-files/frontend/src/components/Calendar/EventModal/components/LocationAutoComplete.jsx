@@ -35,7 +35,7 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
     const fetchSuggestions = async (query) => {
         setIsLoading(true);
         try {
-            const mapboxToken = import.meta.event.VITE_MAPBOX_TOKEN;
+            const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
             const encodedQuery = encodeURIComponent(query);
 
             const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedQuery}.json?` +
