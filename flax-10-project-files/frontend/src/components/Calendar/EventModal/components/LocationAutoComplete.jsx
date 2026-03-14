@@ -104,7 +104,10 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
                 <div
                 key={suggestion.id}
                 className={styles.suggestionItem}
-                onClick={() => handleSuggestionClick(suggestion)}
+                onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleSuggestionClick(suggestion);
+                }}
                 >
                 <div className={styles.suggestionIcon}>📍</div>
                 <div className={styles.suggestionText}>
