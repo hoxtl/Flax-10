@@ -326,85 +326,11 @@
   margin-top: 14px;
 }
 
-.heroTrustArea {
-  margin-top: 14px;
-  display: grid;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.trustChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.trustChip {
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
-  padding: 7px 13px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--bg-card) 92%, transparent),
-    color-mix(in srgb, var(--surface-page) 85%, transparent)
-  );
-  color: color-mix(in srgb, var(--text) 80%, var(--primary) 20%);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2px 14px -10px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-}
-
-.trustChip:first-child {
-  border-color: color-mix(in srgb, var(--primary) 62%, transparent);
-  color: color-mix(in srgb, var(--primary) 70%, var(--text) 30%);
-}
-
-.setupHint {
-  margin: 0;
-  color: color-mix(in srgb, var(--text) 82%, black 18%);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
 .actionRow {
   margin-top: 14px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-.glimpseGrid {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.glimpseCard {
-  border: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
-  border-radius: 12px;
-  padding: 12px;
-  background: color-mix(in srgb, var(--bg-card, #fff) 84%, transparent);
-  backdrop-filter: blur(4px);
-}
-
-.glimpseTitle {
-  margin: 0 0 8px;
-  font-size: 0.98rem;
-  font-weight: 600;
-}
-
-.glimpseText {
-  margin: 0;
-  color: color-mix(in srgb, var(--text) 76%, black 24%);
-  line-height: 1.45;
 }
 
 .actionButton {
@@ -415,24 +341,6 @@
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.25s ease;
-}
-
-.actionButtonPrimary {
-  color: var(--primary-foreground, var(--text));
-  background: linear-gradient(180deg, var(--primary), color-mix(in srgb, var(--primary) 75%, black));
-}
-
-.actionButtonPrimary:hover {
-  transform: translateY(-1px);
-}
-
-.actionButtonSecondary {
-  background: color-mix(in srgb, var(--bg-card, #fff) 80%, transparent);
-  color: var(--text);
-}
-
-.actionButtonSecondary:hover {
-  background: color-mix(in srgb, var(--bg-card, #fff) 95%, transparent);
 }
 
 @keyframes ping {
@@ -479,9 +387,5 @@
 
   .sectionInner {
     padding-right: 16px;
-  }
-
-  .glimpseGrid {
-    grid-template-columns: 1fr;
   }
 }

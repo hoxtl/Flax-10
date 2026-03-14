@@ -50,8 +50,6 @@ function MarqueeTrack() {
 export function TestimonialsMarquee() {
   return (
     <section className={styles.section}>
-      <div className={styles.heading}>
-      </div>
       <div className={styles.marqueeWrapper}>
         <MarqueeTrack />
         <div className={styles.fadeLeft} />
