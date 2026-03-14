@@ -4,21 +4,23 @@
 
 export function getImageUrls(images) {
     const list = Array.isArray(images) ? images : [];
-    return list.map(i => {
-        const url = i?.url || i;
-        return typeof url === 'string' ? url.trim() : null;
-    }).filter(Boolean);
+    return list.map(extractUrl).filter(Boolean);
+}
+
+function extractUrl(item) {
+    const url = item?.url || item;
+    return typeof url === 'string' ? url.trim() : null;
 }
 
 export function getAvailablePhotos(society) {
     if (!society) return [];
-    const announcements = society.announcements || [];
-    const announcementImages = announcements.flatMap(a => {
-        const images = a?.images || [];
-        return images.map(i => i?.url || i);
-    }).map(u => typeof u === 'string' ? u.trim() : null).filter(Boolean);
+    const announcementImages = extractAnnouncementImages(society.announcements || []);
     const currentCovers = new Set(getImageUrls(society.images));
     return announcementImages.filter(img => !currentCovers.has(img));
+}
+
+function extractAnnouncementImages(announcements) {
+    return announcements.flatMap(a => (a?.images || []).map(extractUrl)).filter(Boolean);
 }
 
 export function scrollContentToTop() {
@@ -28,13 +30,14 @@ export function scrollContentToTop() {
 }
 
 function findScrollableParent() {
-    const containers = document.querySelectorAll('*');
-    for (const el of containers) {
-        const style = window.getComputedStyle(el);
-        const isScrollable = style.overflow === 'auto' || style.overflowY === 'auto';
-        if (isScrollable && el.scrollHeight > el.clientHeight) return el;
-    }
-    return null;
+    const containers = Array.from(document.querySelectorAll('*'));
+    return containers.find(isScrollableElement) || null;
+}
+
+function isScrollableElement(el) {
+    const style = window.getComputedStyle(el);
+    const isScrollable = style.overflow === 'auto' || style.overflowY === 'auto';
+    return isScrollable && el.scrollHeight > el.clientHeight;
 }
 
 export const wrapAddEvent = (addEvent, silent, track) => async (data) => {
