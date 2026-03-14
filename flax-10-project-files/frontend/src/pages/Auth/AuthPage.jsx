@@ -2,13 +2,13 @@ import { useAuthPage } from "./hooks/useAuthPage";
 import { useCallback, useMemo } from "react";
 import StudyFlaxLandingPage from "../../components/ui/landing-page";
 import styles from "./AuthPage.module.css";
-import StudentStoryCarousel from "../../components/ui/StudentStoryCarousel";
 import * as Components from "../../components/Authentication/AuthComponents";
 import { SignUpForm } from "../../components/Authentication/SignUpForm";
 import { SignInForm } from "../../components/Authentication/SignInForm";
 import { AuthOverlay } from "../../components/Authentication/Overlay";
 import { ErrorMessage } from "../../components/Authentication/ErrorMessage";
 import { AuthFooter } from "../../components/Authentication/AuthBranding";
+import { TestimonialsMarquee } from "../../components/Authentication/TestimonialsMarquee";
 
 function AuthForms({
   signIn,
@@ -81,8 +81,16 @@ export default function AuthPage({ initialSignIn = true }) {
         badge: "Study Flax",
         title: "StudyFlax",
         subtitle: "Built for calm study.",
-        description:
-          "Study Flax blends scheduling, deadlines, and task planning into one simple workspace. Move through your day with fewer jumps and more momentum.",
+        description: (
+          <>
+            Study Flax blends scheduling, deadlines, and task planning into one simple workspace,
+            designed for{" "}
+            <span style={{ fontStyle: "italic", color: "#c40000" }}>
+              King&apos;s College London
+            </span>{" "}
+            students balancing coursework, clubs, and life.
+          </>
+        ),
         align: "left",
         actions: [
           { label: "Begin Journey", variant: "primary", onClick: () => showAuthForm(true) },
@@ -117,38 +125,16 @@ export default function AuthPage({ initialSignIn = true }) {
         id: "discover",
         badge: "Discover",
         title: "Student-built routines",
-        subtitle: "What other KCL students are using",
+        subtitle: "What other students and teachers are using",
         description:
           "A rotating selection of Study Flax setups from students balancing classes, assignments, and social life.",
         align: "left",
-        content: (
-          <StudentStoryCarousel
-            items={[
-              {
-                title: "Module planner",
-                copy: "“I use two 50-minute blocks a day for modules and keep distractions to one place only.”",
-              },
-              {
-                title: "Revision sprint",
-                copy: "“Deadlines used to overwhelm me; now I can see every due date and push priorities in one glance.”",
-              },
-              {
-                title: "Group balance",
-                copy: "“It links my group work and my calendar so we stop double-booking meetings at 11pm.”",
-              },
-              {
-                title: "Calm workflow",
-                copy: "“The fewer jumps between apps, the more momentum I keep through the week.”",
-              },
-            ]}
-          />
-        ),
+        content: <TestimonialsMarquee />,
       },
       {
         id: "start",
         badge: "Get Started",
         title: "Ready when you are",
-        subtitle: "Sign in or join quickly",
         description:
           "Sign in with your username and password, or create your free account to start planning tonight.",
         align: "center",
