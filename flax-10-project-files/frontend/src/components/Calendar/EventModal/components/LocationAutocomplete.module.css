@@ -2,3 +2,15 @@
   position: relative;
   width: 100%;
 }
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  padding-right: 36px; /* Space for loading spinner */
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--input-bg);
+  color: var(--text);
+  transition: border-color 0.2s ease;
+}
