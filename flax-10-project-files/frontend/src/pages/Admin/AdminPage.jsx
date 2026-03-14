@@ -77,6 +77,17 @@ function usePaginatedItems(items, pageSize = PAGE_SIZE) {
   return { currentPage, setCurrentPage, totalPages, pageItems };
 }
 
+function matchesUserFilter(user, filterType) {
+  if (filterType === "student")
+    return user.role === "student" && !user.is_staff && !user.is_superuser;
+  if (filterType === "teacher")
+    return user.role === "teacher" || user.role === "pending_teacher";
+  if (filterType === "staff") return !!user.is_staff || !!user.is_superuser;
+  if (filterType === "active") return !!user.is_active;
+  if (filterType === "banned") return !user.is_active;
+  return true;
+}
+
 function SectionCard({ children }) {
   return <div className={styles.card}>{children}</div>;
 }
