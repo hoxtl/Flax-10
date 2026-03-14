@@ -13,9 +13,19 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             setSuggestions([]);
             return;
         }
-    })
 
-    const timeoutId = setTimeout(async () => {
-        await fetchSuggestions(value);
-    }, 300)
+        const timeoutId = setTimeout(async () => {
+            await fetchSuggestions(value);
+        }, 300)
+
+        return () => clearTimeout(timeoutId);
+    }, [value]);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        }
+    })
 }
