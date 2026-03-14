@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Globe from "./globe";
 import styles from "./landing-page.module.css";
+import { PrimaryButton } from "../common";
 
 const lerp = (start, end, factor) => start + (end - start) * factor;
 const defaultGlobeConfig = {
@@ -17,13 +18,11 @@ const parsePercent = (value) => Number.parseFloat(value);
 
 function ScrollGlobe({
   sections,
-  children,
   className = "",
   globeConfig = defaultGlobeConfig,
 }) {
   const [activeSection, setActiveSection] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [globeTransform, setGlobeTransform] = useState("");
   const [displayTransform, setDisplayTransform] = useState("");
 
   const sectionRefs = useRef([]);
@@ -118,9 +117,6 @@ function ScrollGlobe({
     };
 
     targetTransformRef.current = currentPos;
-    setGlobeTransform(
-      `translate3d(${currentPos.left}vw, ${currentPos.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${currentPos.scale}, ${currentPos.scale}, 1)`,
-    );
     setActiveSection(newActiveSection);
   }, [calculatedPositions, getScrollableParent]);
 
@@ -138,7 +134,7 @@ function ScrollGlobe({
       top: initial.top,
       scale: initial.scale,
     };
-    setGlobeTransform(
+    setDisplayTransform(
       `translate3d(${initial.left}vw, ${initial.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${initial.scale}, ${initial.scale}, 1)`,
     );
 
@@ -191,7 +187,6 @@ function ScrollGlobe({
       scale: initial.scale,
     };
     const initialTransform = `translate3d(${initial.left}vw, ${initial.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${initial.scale}, ${initial.scale}, 1)`;
-    setGlobeTransform(initialTransform);
     setDisplayTransform(initialTransform);
   }, [calculatedPositions]);
 
@@ -240,7 +235,7 @@ function ScrollGlobe({
       <div
         className={styles.globeWrap}
         style={{
-          transform: displayTransform || globeTransform,
+          transform: displayTransform,
           opacity: activeSection === sections.length - 1 ? 0.38 : 0.85,
         }}
       >
@@ -297,19 +292,16 @@ function ScrollGlobe({
               {section.actions?.length ? (
                 <div className={styles.actionRow}>
                   {section.actions.map((action) => (
-                    <button
+                    <PrimaryButton
                       key={action.label}
                       type="button"
+                      variant={action.variant === "secondary" ? "secondary" : "primary"}
+                      size="large"
+                      className={styles.actionButton}
                       onClick={action.onClick}
-                      className={cx(
-                        styles.actionButton,
-                        action.variant === "primary"
-                          ? styles.actionButtonPrimary
-                          : styles.actionButtonSecondary,
-                      )}
                     >
                       {action.label}
-                    </button>
+                    </PrimaryButton>
                   ))}
                 </div>
               ) : null}
@@ -317,8 +309,6 @@ function ScrollGlobe({
           </section>
         ))}
       </main>
-
-      {children ? <div className={styles.trailingSlot}>{children}</div> : null}
     </div>
   );
 }
