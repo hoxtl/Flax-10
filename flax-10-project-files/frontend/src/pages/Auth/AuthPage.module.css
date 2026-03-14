@@ -1,0 +1,26 @@
+.pageWrap {
+  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--surface-page);
+  position: relative;
+  overflow: hidden;
+}
+
+.authFormCard {
+  width: min(900px, 100%);
+  margin: 0 auto;
+  padding-bottom: 12px;
+}
+
+.formFooter {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  text-align: center;
+  pointer-events: none;
+  padding-bottom: 12px;
+  color: var(--muted);
+}
