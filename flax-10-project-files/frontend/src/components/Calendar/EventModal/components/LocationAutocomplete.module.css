@@ -94,3 +94,12 @@
   color: var(--text);
   margin-bottom: 2px;
 }
+
+.suggestionAddress {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
