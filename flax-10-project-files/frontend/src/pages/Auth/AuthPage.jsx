@@ -83,11 +83,12 @@ export default function AuthPage({ initialSignIn = true }) {
         subtitle: "Built for calm study.",
         description: (
           <>
-            Study Flax turns your academic routine into one calm planning space for{" "}
+            Study Flax helps{" "}
             <span style={{ fontStyle: "italic", color: "#c40000" }}>
               King&apos;s College London
             </span>{" "}
-            students, helping you manage your time, commitments, and momentum.
+            students and teachers manage their time with one calm workflow for deadlines, tasks,
+            modules, lectures, and focus sessions.
           </>
         ),
         align: "left",
@@ -136,12 +137,12 @@ export default function AuthPage({ initialSignIn = true }) {
           {
             title: "Society Hub",
             description:
-              "Keep society events and study groups organised alongside your academic schedule.",
+              "Keep KCLSU events and study groups organised alongside your academic schedule.",
           },
           {
             title: "Uni Map",
             description:
-              "Jump between study spaces, lecture buildings, and event locations from one place.",
+              "Jump between study spaces across Strand, Guy's, Waterloo, and other campuses in one place.",
           },
           {
             title: "Shared Planning",

@@ -7,6 +7,51 @@
   overflow: hidden;
 }
 
+.timeSnapshot {
+  margin-top: 16px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
+  padding: 14px;
+  background: color-mix(in srgb, var(--bg-card, #ffffff) 82%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.timeSnapshotHeading {
+  margin: 0 0 10px;
+  color: color-mix(in srgb, var(--text) 78%, black 22%);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.timeSnapshotRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.timeSnapshotRow:last-child {
+  border-bottom: 0;
+}
+
+.timeSnapshotBadge {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--primary) 50%, transparent);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 4px 9px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.timeSnapshotText {
+  font-size: 0.96rem;
+  color: color-mix(in srgb, var(--text) 84%, black 16%);
+}
+
 .authFormCard {
   width: min(900px, 100%);
   margin: 0 auto;

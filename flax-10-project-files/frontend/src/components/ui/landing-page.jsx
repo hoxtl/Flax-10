@@ -245,7 +245,10 @@ function ScrollGlobe({
       </div>
 
       <main>
-        {sections.map((section, index) => (
+        {sections.map((section, index) => {
+          const isAlternate = index % 2 === 1;
+          const isActiveSection = activeSection === index;
+          return (
           <section
             id={section.id}
             key={section.id}
@@ -257,7 +260,15 @@ function ScrollGlobe({
               index === 0 ? styles.sectionFirst : "",
               section.align === "center" ? styles.sectionCenter : "",
               section.align === "right" ? styles.sectionRight : "",
+              isAlternate ? styles.sectionAlternate : "",
+              isActiveSection ? styles.sectionActive : styles.sectionInactive,
             )}
+            style={
+              {
+                "--section-delay": `${index * 0.08}s`,
+                "--section-shift": isAlternate ? "10px" : "-10px",
+              }
+            }
           >
             <div className={styles.sectionInner}>
               <h1 className={styles.title}>
@@ -307,7 +318,7 @@ function ScrollGlobe({
               ) : null}
             </div>
           </section>
-        ))}
+        )})}
       </main>
     </div>
   );
