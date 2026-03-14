@@ -83,12 +83,11 @@ export default function AuthPage({ initialSignIn = true }) {
         subtitle: "Built for calm study.",
         description: (
           <>
-            Study Flax turns your academic routine into one calm planning space,
-            designed for{" "}
+            Study Flax turns your academic routine into one calm planning space for{" "}
             <span style={{ fontStyle: "italic", color: "#c40000" }}>
               King&apos;s College London
             </span>{" "}
-            students balancing study, societies, and life, and helps you manage every hour with clarity.
+            students, helping you manage your time, commitments, and momentum.
           </>
         ),
         align: "left",
@@ -100,29 +99,29 @@ export default function AuthPage({ initialSignIn = true }) {
       {
         id: "features",
         badge: "Workflows",
-        title: "Command your study time",
+        title: "Command your academic week",
         description:
-          "From deadlines and classes to deep-work blocks, Study Flax keeps your week visible, prioritised, and controllable.",
+          "Keep deadlines, lectures, and focus blocks in one calm, clear workflow.",
         features: [
           {
             title: "Tasks & Priorities",
             description:
-              "Build a single to-do pipeline with priorities, due dates, and progress so important work never falls behind.",
+              "Turn long to-dos into clear priorities with due dates, importance levels, and progress.",
           },
           {
             title: "Modules",
             description:
-              "Organise coursework around module goals, assessments, and lecture timelines in one place.",
+              "Keep each module's assessments and revision work visible in one place.",
           },
           {
             title: "Focus Timer",
             description:
-              "Use guided focus sessions to block deep work time and protect attention when assignments spike.",
+              "Use focused study sessions to protect momentum when assignments build up.",
           },
           {
             title: "Calendar",
-            description:
-              "View assignments, events, and study sessions together so planning is built on one timeline.",
+        description:
+          "Coordinate deadlines, lectures, and commitments from one timeline.",
           },
         ],
       },
@@ -132,7 +131,7 @@ export default function AuthPage({ initialSignIn = true }) {
         title: "Built for how you work at KCL",
         subtitle: "Students, teachers, and societies",
         description:
-          "A practical stack for academic life: assignments, events, focus blocks, and campus context.",
+          "A practical stack for academic life: assignments, events, focus blocks, and campus context in one place.",
         features: [
           {
             title: "Society Hub",
@@ -160,9 +159,9 @@ export default function AuthPage({ initialSignIn = true }) {
         id: "discover",
         badge: "Discover",
         title: "Student-built routines",
-        subtitle: "What other students and teachers are using",
+        subtitle: "Students and teachers using Study Flax",
         description:
-          "A rotating selection of Study Flax setups from students balancing classes, assignments, and social life.",
+          "A rotating selection of Study Flax workflows from students, lecturers, and societies balancing modules, deadlines, and life.",
         align: "left",
         content: <TestimonialsMarquee />,
       },
