@@ -9,7 +9,7 @@ import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal/SleepWarningModal";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import TextInput from "../../../components/common/TextInput/TextInput";
 

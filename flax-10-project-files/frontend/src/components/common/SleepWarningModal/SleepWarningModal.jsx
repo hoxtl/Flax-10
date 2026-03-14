@@ -11,7 +11,7 @@ export function SleepWarningModal({ sleepTime, wakeTime, onConfirm, onCancel }) 
   };
 
   return (
-    <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="sleep-warning-title">
+    <div data-testid="sleep-warning" className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="sleep-warning-title">
       <div className={styles.modal}>
         <h2 id="sleep-warning-title" className={styles.title}>
           You should be resting!
