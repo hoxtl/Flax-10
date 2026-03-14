@@ -1,10 +1,11 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useMemo } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
 import { useReminderNotifications } from "../components/Notifications/hooks/useReminderNotifications";
 import { getEffectiveTagName } from "../components/Calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
+const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all' };
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);
@@ -21,29 +22,30 @@ export function CalendarProvider({ children }) {
 
 export function useCalendar() {
     const context = useContext(CalendarContext);
-    if (!context) {
-        return {
-            events: [],
-            allEvents: [],
-            selectedDate: new Date(),
-            viewMode: 'month',
-            displayMode: 'grid',
-            filter: 'all'
-        };
-    }
-    return getFilteredContext(context);
+    const filter = context?.filter;
+    const searchQuery = context?.searchQuery;
+    const events = context?.events;
+
+    const filteredEvents = useMemo(() => {
+        if (!events) return [];
+        return applyFilters(events, filter, searchQuery);
+    }, [events, filter, searchQuery]);
+
+    return useMemo(() => {
+        if (!context) return DEFAULT_CONTEXT;
+        return { ...context, events: filteredEvents, allEvents: context.events };
+    }, [context, filteredEvents]);
 }
 
-function getFilteredContext(context) {
-    const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
-    let filtered = filterEventsByTag(context.events, currentFilter);
-    filtered = filterEventsBySearch(filtered, context.searchQuery);
-    return { ...context, events: filtered, allEvents: context.events };
+function applyFilters(events, filter, searchQuery) {
+    let result = filterEventsByTag(events, filter);
+    return filterEventsBySearch(result, searchQuery);
 }
 
 function filterEventsByTag(events, filter) {
-    if (filter.includes('all')) return events;
-    return events.filter(e => filter.includes(getEffectiveTagName(e)));
+    const currentFilter = Array.isArray(filter) ? filter : [filter];
+    if (currentFilter.includes('all')) return events;
+    return events.filter(e => currentFilter.includes(getEffectiveTagName(e)));
 }
 
 function filterEventsBySearch(events, query) {
@@ -60,14 +62,13 @@ function matchesSearch(event, query) {
 }
 
 export function useCalendarData(props = {}) {
-    const context = useContext(CalendarContext);
-    const filtered = context ? getFilteredContext(context) : null;
-    return {
-        selectedDate: props.selectedDate ?? filtered?.selectedDate ?? new Date(),
-        events: props.events ?? filtered?.events ?? [],
-        viewMode: props.viewMode ?? filtered?.viewMode ?? 'month',
-        displayMode: props.displayMode ?? filtered?.displayMode ?? 'grid',
-    };
+    const calendarState = useCalendar();
+    return useMemo(() => ({
+        selectedDate: props.selectedDate ?? calendarState.selectedDate ?? new Date(),
+        events: props.events ?? calendarState.events ?? [],
+        viewMode: props.viewMode ?? calendarState.viewMode ?? 'month',
+        displayMode: props.displayMode ?? calendarState.displayMode ?? 'grid',
+    }), [props.selectedDate, props.events, props.viewMode, props.displayMode, calendarState]);
 }
 
 export function useCalendarDispatch() {
