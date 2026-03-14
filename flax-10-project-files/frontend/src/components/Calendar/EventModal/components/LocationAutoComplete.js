@@ -84,4 +84,10 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
             className={styles.input}
             autoComplete="off"
         />
+
+        {isLoading && value.length >= 3 && (
+            <div className={styles.loadingIndicator}>
+            <span className={styles.spinner} />
+            </div>
+        )}
 }
