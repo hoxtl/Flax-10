@@ -9,6 +9,7 @@ import { AuthOverlay } from "../../components/Authentication/Overlay";
 import { ErrorMessage } from "../../components/Authentication/ErrorMessage";
 import { AuthFooter } from "../../components/Authentication/AuthBranding";
 import { TestimonialsMarquee } from "../../components/Authentication/TestimonialsMarquee";
+import { PageTransition } from "../../components/common";
 
 function AuthForms({
   signIn,
@@ -25,22 +26,24 @@ function AuthForms({
   const commonProps = { signIn, loading, onToggle: handleToggle };
 
   return (
-    <Components.Container>
-      <ErrorMessage error={error} />
-      <SignUpForm
-        {...commonProps}
-        formData={signUpData}
-        updateField={updateSignUpField}
-        onSubmit={handleSignUp}
-      />
-      <SignInForm
-        {...commonProps}
-        formData={signInData}
-        updateField={updateSignInField}
-        onSubmit={handleSignIn}
-      />
-      <AuthOverlay signIn={signIn} onToggle={handleToggle} />
-    </Components.Container>
+    <div className={styles.authPanelCard}>
+      <Components.Container>
+        <ErrorMessage error={error} />
+        <SignUpForm
+          {...commonProps}
+          formData={signUpData}
+          updateField={updateSignUpField}
+          onSubmit={handleSignUp}
+        />
+        <SignInForm
+          {...commonProps}
+          formData={signInData}
+          updateField={updateSignInField}
+          onSubmit={handleSignIn}
+        />
+        <AuthOverlay signIn={signIn} onToggle={handleToggle} />
+      </Components.Container>
+    </div>
   );
 }
 
@@ -186,7 +189,7 @@ export default function AuthPage({ initialSignIn = true }) {
         title: "Ready when you are",
         description:
           "Start in under a minute with a free account, then begin planning your week.",
-        align: "center",
+        align: "left",
         content: (
           <div id="auth-form-card" className={styles.authFormCard}>
             <AuthForms {...state} handleToggle={state.handleToggle} />
@@ -198,11 +201,13 @@ export default function AuthPage({ initialSignIn = true }) {
   );
 
   return (
-    <div className={styles.pageWrap}>
-      <StudyFlaxLandingPage sections={landingSections} />
-      <div className={styles.formFooter}>
-        <AuthFooter absolute />
+    <PageTransition>
+      <div className={styles.pageWrap}>
+        <StudyFlaxLandingPage sections={landingSections} />
+        <div className={styles.formFooter}>
+          <AuthFooter absolute />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

@@ -4,13 +4,26 @@
   width: 100%;
   background: var(--surface-page);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .authFormCard {
   width: min(900px, 100%);
-  margin: 0 auto;
+  margin: 0;
   padding-bottom: 12px;
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  scroll-margin-top: 64px;
+}
+
+.authPanelCard {
+  width: 100%;
+  max-width: 860px;
+  margin: 0;
+  position: relative;
 }
 
 .formFooter {
@@ -23,4 +36,12 @@
   pointer-events: none;
   padding-bottom: 12px;
   color: var(--muted);
+}
+
+@media (max-width: 768px) {
+  .authFormCard {
+    width: 100%;
+    margin: 0;
+    padding-bottom: 12px;
+  }
 }
