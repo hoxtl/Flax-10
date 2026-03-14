@@ -28,6 +28,37 @@
   transition: transform 0.15s ease-out;
 }
 
+.pageTopPills {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 65;
+  display: flex;
+  justify-content: center;
+  width: min(980px, calc(100% - 40px));
+  pointer-events: none;
+}
+
+.pageTopText {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 82%, transparent);
+  backdrop-filter: blur(5px);
+  color: color-mix(in srgb, var(--text) 74%, black 26%);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pageTopItem {
+  color: inherit;
+}
+
 .sectionNav {
   position: fixed;
   right: 24px;
@@ -299,22 +330,40 @@
   margin-top: 14px;
   display: grid;
   gap: 10px;
+  margin-bottom: 18px;
 }
 
 .trustChips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .trustChip {
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
-  padding: 6px 12px;
-  font-size: 0.84rem;
+  border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  padding: 7px 13px;
+  font-size: 0.82rem;
   font-weight: 600;
-  background: color-mix(in srgb, var(--bg-card) 85%, transparent);
-  color: color-mix(in srgb, var(--text) 78%, black 22%);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--bg-card) 92%, transparent),
+    color-mix(in srgb, var(--surface-page) 85%, transparent)
+  );
+  color: color-mix(in srgb, var(--text) 80%, var(--primary) 20%);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 14px -10px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.trustChip:first-child {
+  border-color: color-mix(in srgb, var(--primary) 62%, transparent);
+  color: color-mix(in srgb, var(--primary) 70%, var(--text) 30%);
 }
 
 .setupHint {
@@ -398,6 +447,19 @@
 }
 
 @media (max-width: 768px) {
+  .pageTopPills {
+    width: calc(100% - 24px);
+    top: 10px;
+  }
+
+  .pageTopText {
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: 0.68rem;
+    padding: 6px 10px;
+    letter-spacing: 0.03em;
+  }
+
   .sectionNav {
     display: none;
   }

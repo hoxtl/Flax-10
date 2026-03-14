@@ -81,6 +81,7 @@ export default function AuthPage({ initialSignIn = true }) {
         badge: "Study Flax",
         title: "StudyFlax",
         subtitle: "Built for calm study.",
+        pills: ["Calendar", "Tasks", "Deadlines", "Group Study", "Uni Map"],
         description: (
           <>
             Study Flax helps{" "}
@@ -135,13 +136,27 @@ export default function AuthPage({ initialSignIn = true }) {
         features: [
           {
             title: "Society Hub",
-            description:
-              "Keep KCLSU events and study groups organised alongside your academic schedule.",
+            description: (
+              <>
+                Keep{" "}
+                <span style={{ fontStyle: "italic", color: "#c40000" }}>
+                  KCLSU
+                </span>{" "}
+                events and study groups organised alongside your academic schedule.
+              </>
+            ),
           },
           {
             title: "Uni Map",
-            description:
-              "Jump between study spaces across Strand, Guy's, Waterloo, and other campuses in one place.",
+            description: (
+              <>
+                Jump between study spaces across{" "}
+                <span style={{ fontStyle: "italic", color: "#c40000" }}>
+                  Strand, Guy&apos;s, Waterloo, and other campuses
+                </span>{" "}
+                in one place.
+              </>
+            ),
           },
           {
             title: "Shared Planning",

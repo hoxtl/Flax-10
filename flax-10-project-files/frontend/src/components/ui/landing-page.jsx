@@ -40,6 +40,7 @@ function ScrollGlobe({
       scale: position.scale || 1,
     }));
   }, [globeConfig.positions]);
+  const topPills = sections?.[0]?.pills || [];
 
   const getScrollableParent = useCallback(() => containerRef.current || window, []);
 
@@ -198,6 +199,18 @@ function ScrollGlobe({
           style={{ transform: `scaleX(${scrollProgress})` }}
         />
       </div>
+      {topPills.length ? (
+        <div className={styles.pageTopPills} aria-label="Key features">
+          <p className={styles.pageTopText}>
+            {topPills.map((pill, index) => (
+              <span key={pill} className={styles.pageTopItem}>
+                {index > 0 ? " \u00b7 " : ""}
+                {pill}
+              </span>
+            ))}
+          </p>
+        </div>
+      ) : null}
 
       <nav className={styles.sectionNav} aria-label="Landing page sections">
         <div className={styles.navStack}>
