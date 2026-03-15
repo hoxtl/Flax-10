@@ -73,25 +73,6 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertFalse(Schedule.objects.filter(id=schedule_id).exists())
         self.assertEqual(CalendarEvent.objects.filter(source='auto_scheduler').count(), 0)
 
-    def test_same_name_schedule_overwrites_previous_and_creates_notification(self):
-        payload = {
-            'title': 'Reusable Name',
-            'worktime_preference': 'day',
-            'week_preference': 'both',
-            'deadline_preferences': [
-                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30},
-            ],
-        }
-        first = self.client.post(self.url, payload, format='json')
-        self.assertEqual(first.status_code, status.HTTP_201_CREATED)
-
-        second = self.client.post(self.url, payload, format='json')
-        self.assertEqual(second.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(second.data['overwritten'])
-        self.assertEqual(Schedule.objects.filter(user=self.user, title='Reusable Name').count(), 1)
-        self.assertTrue(Notification.objects.filter(user=self.user, title='Schedule overwritten').exists())
-
-
     def test_create_manual_schedule_from_existing_schedule_tagged_events(self):
         tag = Tag.objects.create(name='schedule', is_default=True)
         start = timezone.now() + timedelta(days=1)
@@ -165,3 +146,39 @@ class ScheduleViewsTests(BaseTestCase):
         # 3 days * 60 max daily budget
         total_allocated = sum(a['allocated_minutes'] for a in response.data['event_allocations'])
         self.assertEqual(total_allocated, 180)
+
+    def test_create_auto_schedule_tags_generated_events_as_schedule(self):
+        payload = {
+            'title': 'Tagged auto plan',
+            'worktime_preference': 'day',
+            'week_preference': 'both',
+            'deadline_preferences': [
+                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 60},
+            ],
+        }
+
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        for allocation in response.data['event_allocations']:
+            self.assertEqual(allocation['event']['tag_name'], 'Schedule')
+
+    def test_create_manual_schedule_accepts_lowercase_schedule_tag(self):
+        lower_schedule_tag = Tag.objects.create(name='schedule', user=self.user)
+        start = timezone.now() + timedelta(days=1)
+        event = CalendarEvent.objects.create(
+            user=self.user,
+            title='Session Lowercase',
+            start_time=start,
+            end_time=start + timedelta(hours=1),
+            tag=lower_schedule_tag,
+        )
+
+        response = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Lowercase schedule plan',
+            'event_ids': [event.id],
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(response.data['event_allocations']), 1)

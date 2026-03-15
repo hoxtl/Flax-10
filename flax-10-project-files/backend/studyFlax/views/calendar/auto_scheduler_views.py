@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from studyFlax.models import CalendarEvent, Deadline, Schedule, Notification, ScheduleEventAllocation
 from studyFlax.serialisers import AutoScheduleRequestSerialiser, ScheduleSerialiser
-
+from .system_tags import get_schedule_tag
 
 def _resolve_window(current_day, preferred_start, preferred_end, worktime_preference):
     if preferred_start and preferred_end:
@@ -92,6 +92,7 @@ def build_auto_schedule(request):
 
 
 def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, payload):
+    schedule_tag = get_schedule_tag()
     start_date = timezone.localtime(timezone.now()).date()
     end_date = max(timezone.localtime(deadline.start_due_date).date() for deadline in deadlines)
     current_day = start_date
@@ -137,6 +138,7 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, payload):
                     start_time=block_start,
                     end_time=block_end,
                     source='auto_scheduler',
+                    tag=schedule_tag,
                 )
                 ScheduleEventAllocation.objects.create(
                     schedule=schedule,
