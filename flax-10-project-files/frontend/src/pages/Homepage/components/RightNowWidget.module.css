@@ -27,8 +27,8 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #f2eee8;
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,14 +36,14 @@
 }
 
 .headerIcon {
-  color: #7b9970;
+  color: var(--widget-accent);
 }
 
 .headerLabel {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 800;
-  color: #2c1810;
+  color: #ffffff;
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
@@ -53,7 +53,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 10px;
   font-weight: 500;
-  color: #a39587;
+  color: var(--widget-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -67,15 +67,16 @@
   gap: 2px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #f8f4ef 0%, #f2ece4 100%);
-  border: 1px solid rgba(139, 115, 85, 0.1);
+  background: var(--surface-raised);
+  border: 1px solid var(--widget-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .clockTime {
   font-family: var(--font-mono, "JetBrains Mono"), ui-monospace, monospace;
   font-size: 28px;
   font-weight: 700;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   letter-spacing: 0.04em;
   line-height: 1;
 }
@@ -84,7 +85,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 10px;
   font-weight: 600;
-  color: #a89279;
+  color: var(--widget-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 2px;
@@ -92,11 +93,12 @@
 
 /* ── Active event card ──────────────────────────────────────── */
 .currentEventCard {
-  background: linear-gradient(135deg, #f7fbf5 0%, #f2f5ef 100%);
+  background: var(--surface-raised);
   border-radius: 14px;
   padding: 12px 14px;
-  border: 1px solid rgba(123, 179, 142, 0.22);
-  border-left: 3px solid #7BB38E;
+  border: 1px solid color-mix(in srgb, var(--widget-border) 70%, white 30%);
+  border-left: 4px solid var(--widget-accent);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 }
 
@@ -111,7 +113,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #1a1207;
+  color: var(--widget-text-primary);
   line-height: 1.3;
   min-width: 0;
   overflow: hidden;
@@ -127,7 +129,7 @@
   flex-shrink: 0;
   padding: 2px 7px;
   border-radius: 6px;
-  background: rgba(123, 179, 142, 0.12);
+  background: var(--widget-accent-soft);
 }
 
 .currentEventRow2 {
@@ -141,7 +143,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 10px;
   font-weight: 500;
-  color: #a89279;
+  color: var(--widget-text-secondary);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -151,7 +153,7 @@
   flex-grow: 1;
   height: 4px;
   border-radius: 2px;
-  background: rgba(139, 115, 85, 0.12);
+  background: var(--widget-border);
   overflow: hidden;
   position: relative;
   min-width: 40px;
@@ -163,7 +165,7 @@
   top: 0;
   height: 100%;
   border-radius: 2px;
-  background: linear-gradient(90deg, #7BB38E, #5a9870);
+  background: var(--widget-accent);
   transition: width 0.8s ease;
 }
 
@@ -174,8 +176,8 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(248, 243, 236, 0.6);
-  border: 1px solid rgba(139, 115, 85, 0.07);
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
 }
 
 .nowPill {
@@ -185,9 +187,8 @@
   min-width: 48px;
   height: 26px;
   border-radius: 999px;
-  background: #4a2f19;
-  border-color: #4a2f19;
-  color: #fff3e7;
+  background: var(--color-primary);
+  color: var(--color-card);
   font-family: var(--font-mono, "JetBrains Mono"), ui-monospace, monospace;
   font-size: 10px;
   font-weight: 800;
@@ -200,7 +201,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #7a6d62;
+  color: var(--widget-text-secondary);
   line-height: 1.3;
 }
 
@@ -211,9 +212,13 @@
   gap: 5px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(248, 243, 236, 0.72);
-  border: 1px solid rgba(139, 115, 85, 0.08);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
   flex-shrink: 0;
+}
+
+[data-mode="dark"] .upNextRow {
+  border-color: color-mix(in srgb, var(--widget-border) 65%, white 35%);
 }
 
 .upNextLeft {
@@ -228,7 +233,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #a89279;
+  color: var(--widget-text-tertiary);
 }
 
 .nextBlock {
@@ -241,7 +246,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #25211d;
+  color: var(--widget-text-primary);
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -252,7 +257,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 10px;
   font-weight: 400;
-  color: #9a8f84;
+  color: var(--widget-text-secondary);
   line-height: 1.3;
 }
 
@@ -262,20 +267,20 @@
   align-items: center;
   gap: 8px;
   border-radius: 12px;
-  border: 1px solid #f0cfc8;
-  background: #fff7f4;
+  border: 1px solid var(--danger-border);
+  background: var(--danger-bg);
   padding: 9px 11px;
   flex-shrink: 0;
 }
 
 .alertIcon {
   flex-shrink: 0;
-  color: #b56f5a;
+  color: var(--error-text);
 }
 
 .alertIconWarn {
   flex-shrink: 0;
-  color: #c4946d;
+  color: var(--widget-accent);
 }
 
 .alertText {
@@ -285,7 +290,7 @@
   font-size: 11px;
   font-weight: 600;
   line-height: 1.35;
-  color: #b16953;
+  color: var(--error-text);
 }
 
 .alertTextWarn {
@@ -295,16 +300,16 @@
   font-size: 11px;
   font-weight: 600;
   line-height: 1.35;
-  color: #8c6d3f;
+  color: var(--warning-text);
 }
 
 .alertDismiss {
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  border: 1px solid rgba(139, 115, 85, 0.12);
-  background: rgba(139, 115, 85, 0.05);
-  color: #8a7a6b;
+  border: 1px solid var(--widget-border);
+  background: var(--widget-surface-secondary);
+  color: var(--widget-text-secondary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -314,8 +319,8 @@
 }
 
 .alertDismiss:hover {
-  background: rgba(139, 115, 85, 0.12);
-  color: #604f42;
+  background: var(--hover);
+  color: var(--widget-text-secondary);
 }
 
 /* ── Commute context card ───────────────────────────────────── */
@@ -325,8 +330,8 @@
   gap: 7px;
   padding: 11px 12px;
   border-radius: 14px;
-  background: rgba(250, 247, 242, 0.86);
-  border: 1px solid rgba(139, 115, 85, 0.09);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
   flex-shrink: 0;
 }
 
@@ -344,7 +349,7 @@
 }
 
 .contextCardIcon {
-  color: #8b7355;
+  color: var(--widget-text-secondary);
   flex-shrink: 0;
 }
 
@@ -354,14 +359,14 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a89279;
+  color: var(--widget-text-secondary);
 }
 
 .contextCardLink {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  color: #8b7355;
+  color: var(--widget-accent);
   text-decoration: none;
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 10px;
@@ -370,7 +375,7 @@
 }
 
 .contextCardLink:hover {
-  color: #5a4a33;
+  color: var(--widget-accent);
 }
 
 .contextCardTitle {
@@ -378,7 +383,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 700;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   line-height: 1.3;
 }
 
@@ -387,7 +392,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 400;
-  color: #7f6a57;
+  color: var(--widget-text-secondary);
   line-height: 1.45;
 }
 
@@ -402,9 +407,9 @@
   align-items: center;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(139, 115, 85, 0.08);
-  border: 1px solid rgba(139, 115, 85, 0.1);
-  color: #6d5847;
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
+  color: var(--widget-text-secondary);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 9px;
   font-weight: 700;
@@ -419,8 +424,9 @@
   gap: 8px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #f7f4ee 0%, #f2ece2 100%);
-  border: 1px solid rgba(196, 164, 109, 0.2);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: var(--widget-glass-blur);
 }
 
 .timerBlock .progressTrack {
@@ -432,7 +438,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   margin: 0;
   line-height: 1.4;
 }
@@ -441,7 +447,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 600;
-  color: #8b6914;
+  color: var(--widget-accent);
   background: none;
   border: none;
   cursor: pointer;
@@ -452,14 +458,14 @@
 }
 
 .timerBtn:hover {
-  color: #5a4311;
+  color: var(--widget-accent);
   text-decoration: underline;
 }
 
 /* ── Section divider ────────────────────────────────────────── */
 .sectionDivider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(139, 115, 85, 0.1), transparent);
+  background: var(--widget-border);
   flex-shrink: 0;
 }
 
@@ -476,15 +482,16 @@
   gap: 12px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #fdf8f0 0%, #f9f3e7 100%);
-  border: 1px solid rgba(196, 164, 109, 0.2);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: var(--widget-glass-blur);
 }
 
 .endOfDayTitle {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   margin: 0;
 }
 
@@ -492,7 +499,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 400;
-  color: #a89279;
+  color: var(--widget-text-tertiary);
   margin: 4px 0 0;
   line-height: 1.4;
 }
@@ -503,8 +510,8 @@
   gap: 4px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: rgba(248, 243, 236, 0.6);
-  border: 1px solid rgba(139, 115, 85, 0.08);
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
 }
 
 .tomorrowLabel {
@@ -513,7 +520,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #c4b8a0;
+  color: var(--widget-text-secondary);
   margin: 0 0 3px;
 }
 
@@ -521,7 +528,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -532,7 +539,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 400;
-  color: #8b7355;
+  color: var(--widget-text-tertiary);
   margin: 2px 0 0;
 }
 
@@ -552,7 +559,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   margin: 8px 0 0;
 }
 
@@ -560,7 +567,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #b8a890;
+  color: var(--widget-text-secondary);
   margin: 2px 0 0;
 }
 
@@ -568,7 +575,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 500;
-  color: #8b7355;
+  color: var(--widget-text-tertiary);
   margin: 8px 0 0;
 }
 
@@ -577,7 +584,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #1a1207;
+  color: var(--widget-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -587,7 +594,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 400;
-  color: #8b7355;
+  color: var(--widget-text-tertiary);
   margin: 3px 0 0;
 }
 
@@ -595,7 +602,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #8b7355;
+  color: var(--widget-text-secondary);
   line-height: 1.4;
   margin: 0;
 }
