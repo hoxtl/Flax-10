@@ -16,13 +16,13 @@ import InlineTitleField, { useInlineEdit } from "../../../components/common/Inli
 const VISIBLE_COUNT = 3;
 
 const CATEGORY_COLOURS = {
-  UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
-  HEALTH: { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
-  PERSONAL: { bg: "#F5F0E8", text: "#736048" },
-  WORK: { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
-  FINANCE: { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
-  STUDY: { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
-  default: { bg: "#F5F0E8", text: "#736048" },
+  UNIVERSITY: { bg: "color-mix(in srgb, #4A6D8C 35%, transparent)", text: "#7FA7C2" },
+  HEALTH:     { bg: "color-mix(in srgb, #D97A65 35%, transparent)", text: "#E2907E" },
+  INTERNSHIPS: { bg: "color-mix(in srgb, var(--color-primary) 35%, transparent)", text: "var(--color-primary)" },
+  WORK:       { bg: "color-mix(in srgb, #4F6D8A 35%, transparent)", text: "#7FA7C2" },
+  PERSONAL:   { bg: "color-mix(in srgb, var(--color-primary) 35%, transparent)", text: "var(--color-primary)" },
+  FINANCE:    { bg: "color-mix(in srgb, #B57A42 35%, transparent)", text: "#E3B285" },
+  default:    { bg: "color-mix(in srgb, var(--color-primary) 30%, transparent)", text: "var(--color-primary)" },
 };
 
 const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
@@ -30,11 +30,24 @@ const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
 function getCategoryStyle(label) {
   if (!label) return CATEGORY_COLOURS.default;
   const key = label.toUpperCase().trim();
+  
+  const isDark = document.documentElement.getAttribute('data-mode') === 'dark';
+  let style = CATEGORY_COLOURS[key] || CATEGORY_COLOURS.default;
+  
+  if (isDark) {
+    // In dark mode, we force the text to be a very light tint of the color for maximum pop
+    // And increase background opacity to ground it better
+    return {
+      bg: style.bg.replace('35%', '42%').replace('30%', '42%'),
+      text: "#FFFFFF"
+    };
+  }
+  
   if (MODULE_CODE_RE.test(key)) {
     const c = getModulePillColors(key);
     return { bg: c.bg, text: c.text };
   }
-  return CATEGORY_COLOURS[key] || CATEGORY_COLOURS.default;
+  return style;
 }
 
 function getEstTime(items) {
