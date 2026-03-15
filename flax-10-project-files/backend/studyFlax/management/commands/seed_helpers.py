@@ -7,7 +7,7 @@ seeding flow. Orchestration lives in seed.Command.
 """
 
 import random
-from datetime import date, datetime, timedelta, timezone as dt_timezone
+from datetime import date, datetime, time, timedelta, timezone as dt_timezone
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from faker import Faker
@@ -101,6 +101,10 @@ def build_settings_for_new_users():
             timezone='Europe/London',
             year=random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
             major=random.choice(course_fixtures),
+            sleep_time=time(23, 0),
+            wake_time=time(7, 0),
+            mode=random.choice(['light', 'dark']),
+            homepage_widgets=[],
         )
         for u in new_users
     ]
@@ -132,11 +136,6 @@ def _fresh_week_titles():
 
 
 def build_events_for_user(user, tags, rules, count):
-    """
-    Seeds personal (non-meal) events for SEED_DAYS from SEED_START.
-    Titles reshuffle each week so no two weeks look alike, and the same
-    title never appears twice within the same week.
-    """
     non_lecture_hours = [8, 13, 17, 19, 20]
     events = []
     week_titles  = []
@@ -160,16 +159,44 @@ def build_events_for_user(user, tags, rules, count):
     return events
 
 
-def build_meal_events(user, tags):
-    """
-    Seeds Breakfast (08:00), Lunch (12:30) and Dinner (19:00) for every day
-    in the seeding range. Each fixture list rotates by day index so meals vary
-    daily without repeating the same combination two days running.
+def build_today_afternoon_events(user, tags):
+    """Five mock events for today between 14:30 and 20:00: Academic, Social, Admin + 2 more."""
+    now = timezone.now()
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    user_tags = [t for t in tags if t.user == user or t.user is None]
+    tag = random.choice(user_tags) if user_tags else None
 
-    Title is the meal label; description is the specific food item so the
-    timeline card shows a clear heading and a readable subtitle.
-    """
-    meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
+    slots = [
+        (14, 30, 60, "Review notes", "Academic"),
+        (15, 30, 30, "Coffee with flatmates", "Social"),
+        (16, 30, 45, "Reply to emails", "Admin"),
+        (17, 45, 60, "Study at library", "Academic"),
+        (19, 0, 30, "Plan tomorrow", "Admin"),
+    ]
+    events = []
+    for hour, minute, duration_min, title, _ in slots:
+        start = today.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if start.tzinfo is None:
+            start = timezone.make_aware(start)
+        end = start + timedelta(minutes=duration_min)
+        events.append(CalendarEvent(
+            user=user,
+            title=title,
+            description="",
+            start_time=start,
+            end_time=end,
+            tag=tag,
+            priority=random.choice(['low', 'medium', 'high']),
+            recurrence_rule=None,
+        ))
+    return events
+
+
+def build_meal_events(user, tags):
+    """Meals (Breakfast, Lunch, Dinner) use Routine or Wellness tag — NOT Academic/Work."""
+    routine_tag = next((t for t in tags if t.name == 'Routine'), None)
+    wellness_tag = next((t for t in tags if t.name == 'Wellness'), None)
+    meal_tag = routine_tag or wellness_tag or (tags[0] if tags else None)
     events   = []
 
     for day_offset in range(SEED_DAYS):
@@ -262,11 +289,6 @@ def create_lecture_event(user, module, start, end, lecture_tag):
 
 
 def build_lecture_events(user, module, lecture_tag):
-    """
-    Returns exactly 10 lecture instances spaced one week apart, skipping
-    reading week. Any slot that falls within reading week is deferred to the
-    following week so the module still delivers all 10 sessions.
-    """
     sessions  = []
     candidate = module.start_time
     while len(sessions) < 10:
@@ -293,12 +315,17 @@ def _get_random_offset(used_offsets):
 def build_deadlines_for_module(module):
     """Return a list of unsaved Deadline instances for *module*.
 
-    Templates are taken from module_deadline_fixtures using the two-letter
-    module code prefix; deadline_fixtures is used as a fallback. Each
-    deadline is given a unique due-date offset so no two share the same day.
+    Templates are taken from module_deadline_fixtures using the full module
+    code first, then the two-letter module code prefix; deadline_fixtures is
+    used as a fallback. Each deadline is given a unique due-date offset so
+    no two share the same day.
     """
-    prefix    = module.module_code[:2]
-    templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
+    prefix = module.module_code[:2]
+    default_list = list(deadline_fixtures[:3])
+    templates = module_deadline_fixtures.get(
+        module.module_code,
+        module_deadline_fixtures.get(prefix, default_list),
+    )
     used_offsets = set()
     deadlines    = []
     now = timezone.now()
@@ -324,15 +351,12 @@ def build_deadlines_for_module(module):
     return deadlines
 
 
-def get_tag_for_deadline_type(deadline_type):
-    from studyFlax.views.calendar.system_tags import get_deadline_tag, get_exam_tag
-    if deadline_type.lower() == 'exam':
-        return get_exam_tag()
-    return get_deadline_tag()
-
-
 def create_deadline_calendar_event(user, deadline):
-    """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""
+    """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar.
+
+    Uses get_or_create keyed on (user, title, start_time) so that
+    re-running the seed never duplicates deadline events.
+    """
     CalendarEvent.objects.get_or_create(
         user=user,
         title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
@@ -341,13 +365,13 @@ def create_deadline_calendar_event(user, deadline):
             'end_time': deadline.end_due_date or deadline.start_due_date,
             'location': deadline.location,
             'description': deadline.description,
-            'tag': get_tag_for_deadline_type(deadline.deadline_type),
             'priority': 'high',
             'module': deadline.module,
             'source': 'module_deadline',
             'external_id': str(deadline.id),
         },
     )
+
 
 # ---------------------------------------------------------------------------
 # Study session & theme session seeding

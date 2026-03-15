@@ -1,11 +1,31 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as helpers from '../utils/timerTestHelpers';
-import * as historyUtils from '../../utils/historyUtils';
-import { fireEvent, screen } from '@testing-library/react';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
+import { fireEvent, screen, act } from '@testing-library/react';
 
 vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
+
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
+    useNotify: () => vi.fn(),
+}));
+
+let mockLocationState = null;
+vi.mock('react-router-dom', () => ({
+    useLocation: () => ({ pathname: '/timer', state: mockLocationState }),
+    useNavigate: () => vi.fn(),
+}));
+
+let mockNotificationPermission = 'granted';
+const mockRequestPermission = vi.fn();
+vi.mock('../../components/Timer/utils/timerUtils', async () => {
+    const actual = await vi.importActual('../../components/Timer/utils/timerUtils');
+    return {
+        ...actual,
+        useNotificationPermission: () => ({ permission: mockNotificationPermission, request: mockRequestPermission }),
+    };
+});
 
 const setupTests = () => {
     vi.useFakeTimers();
@@ -17,6 +37,8 @@ const cleanupTests = () => {
     vi.useRealTimers();
     vi.clearAllMocks();
     vi.unstubAllGlobals();
+    mockLocationState = null;
+    mockNotificationPermission = 'granted';
 };
 
 const testInitialState = () => {
@@ -32,7 +54,7 @@ const testStartStop = () => {
     helpers.advanceTimer(1000);
     helpers.expectTimer('24:59');
     helpers.clickPause();
-    helpers.expectButton('Start');
+    helpers.expectButton('Resume');
 };
 
 const testReset = () => {
@@ -103,4 +125,54 @@ describe('TimerPage Integration', () => {
     it('enters break mode from modal', testBreakModalEnter);
     it('opens history modal when history button is clicked', testHistoryModal);
     it('closes history modal', testHistoryModalClose);
+
+    it('shows Enable Notifications when permission is default and click calls request', () => {
+        mockNotificationPermission = 'default';
+        helpers.renderTimerPage();
+        const btn = screen.getByText('Enable Notifications');
+        expect(btn).toBeInTheDocument();
+        fireEvent.click(btn);
+        expect(mockRequestPermission).toHaveBeenCalled();
+    });
+
+    it('hides notification prompt when permission is not default', () => {
+        mockNotificationPermission = 'denied';
+        helpers.renderTimerPage();
+        expect(screen.queryByText('Enable Notifications')).not.toBeInTheDocument();
+    });
+
+    it('shows focus transition overlay when location.state.fromTaskPlay is true', () => {
+        mockLocationState = { fromTaskPlay: true };
+        helpers.renderTimerPage();
+        expect(screen.getByText(/Entering focus mode|Getting ready|You've got this|Almost there|Let's focus/)).toBeInTheDocument();
+        const container = document.querySelector('[class*="containerFocusEntering"]');
+        expect(container).toBeInTheDocument();
+    });
+
+    it('cycles focus transition messages and hides after 6s', () => {
+        mockLocationState = { fromTaskPlay: true };
+        helpers.renderTimerPage();
+        const initialMessage = screen.getByText(/Entering focus mode|Getting ready|You've got this|Almost there|Let's focus/);
+        expect(initialMessage).toBeInTheDocument();
+        act(() => vi.advanceTimersByTime(1200));
+        act(() => vi.advanceTimersByTime(1200));
+        act(() => vi.advanceTimersByTime(4000));
+        expect(screen.queryByText(/Entering focus mode|Getting ready|You've got this|Almost there|Let's focus/)).not.toBeInTheDocument();
+    });
+
+    it('useIsMobile true when window width < 900', () => {
+        const origInnerWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { value: 800, writable: true, configurable: true });
+        helpers.renderTimerPage();
+        expect(screen.getByText('View History 📜')).toBeInTheDocument();
+        Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
+    });
+
+    it('useIsMobile false when window width >= 900', () => {
+        const origInnerWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { value: 1000, writable: true, configurable: true });
+        helpers.renderTimerPage();
+        expect(screen.getByLabelText('History')).toBeInTheDocument();
+        Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
+    });
 });

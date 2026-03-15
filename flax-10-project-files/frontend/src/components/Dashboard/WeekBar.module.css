@@ -1,13 +1,11 @@
 .container {
-  background: var(--weekbar-bg);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 32px;
+  background: var(--bg);
+  padding: 0.875rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 1.25rem;
 }
 
-/* ─── BADGE ───────────────────────── */
 .badgeWrap {
   display: flex;
   align-items: center;
@@ -16,11 +14,11 @@
 }
 
 .badge {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 6px 14px;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.875rem;
   border-radius: 999px;
 }
 
@@ -39,28 +37,26 @@
   color: var(--muted);
 }
 
-/* ─── TRACK ───────────────────────── */
 .track {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
   flex: 1;
   align-items: center;
 }
 
-/* ─── SEGMENTS ────────────────────── */
 .segment {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 0.35rem;
 }
 
 .segmentBar {
   width: 100%;
-  height: 5px;
+  height: 4px;
   border-radius: 999px;
-  background: #eee;
+  background: var(--border);
   transition: height 0.2s ease, background 0.2s ease;
 }
 

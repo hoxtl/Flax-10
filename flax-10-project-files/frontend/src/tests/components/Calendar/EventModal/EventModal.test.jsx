@@ -39,12 +39,14 @@ vi.mock('../../../../context/CalendarContext', async (importOriginal) => {
     };
 });
 
+const mockTagsState = {
+    tags: [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }],
+    loading: false,
+};
+
 vi.mock('../../../../context/TagContext', () => ({
     TagProvider: ({ children }) => children,
-    useTags: () => ({
-        tags: [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }],
-        loading: false,
-    }),
+    useTags: () => mockTagsState,
 }));
 
 describe('EventModal', () => {
@@ -64,6 +66,8 @@ describe('EventModal', () => {
         mockFormLogic.isEditing = false;
         mockFormLogic.error = null;
         mockFormLogic.form = { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] };
+        mockTagsState.tags = [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }];
+        mockTagsState.loading = false;
     });
 
     it('should render new event title', () => {
@@ -86,7 +90,7 @@ describe('EventModal', () => {
     it('should call onClose when overlay clicked', () => {
         const { container } = renderModal();
         const overlay = container.firstChild;
-        fireEvent.click(overlay);
+        fireEvent.mouseDown(overlay);
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -117,10 +121,39 @@ describe('EventModal', () => {
     });
 
     it('should render delete button only when editing', () => {
+        const mockOnDelete = vi.fn();
         mockFormLogic.isEditing = true;
-        renderModal();
+        render(<TagProvider><EventModal onClose={mockOnClose} onDelete={mockOnDelete} /></TagProvider>);
         expect(screen.getByText('Delete')).toBeInTheDocument();
         fireEvent.click(screen.getByText('Delete'));
-        expect(mockFormLogic.handleDelete).toHaveBeenCalled();
+        expect(mockOnDelete).toHaveBeenCalled();
+    });
+
+    it('returns null when tags are still loading', () => {
+        mockTagsState.loading = true;
+        const { container } = render(
+            <TagProvider>
+                <EventModal onClose={mockOnClose} />
+            </TagProvider>
+        );
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('uses initialType over default tag when provided', () => {
+        renderModal({ initialType: 99 });
+        // useEventForm is mocked; we just ensure component renders without crashing
+        expect(screen.getByText('New Event')).toBeInTheDocument();
+    });
+
+    it('uses customTags and does not fall back to global tags', () => {
+        const customTags = [{ id: 10, label: 'Custom', color: '#123' }];
+        renderModal({ customTags });
+        expect(screen.getByText('New Event')).toBeInTheDocument();
+    });
+
+    it('hides reminder field when showReminder is false', () => {
+        renderModal({ showReminder: false });
+        expect(screen.getByText('New Event')).toBeInTheDocument();
+        expect(screen.queryByText('Reminders')).not.toBeInTheDocument();
     });
 });

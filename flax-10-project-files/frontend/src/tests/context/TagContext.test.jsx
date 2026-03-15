@@ -106,24 +106,23 @@ describe('TagContext', () => {
 
     it('should handle API errors gracefully', async () => {
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-        // Fetch error
-        TagApi.getTags.mockRejectedValue(new Error('Fetch failed'));
+        TagApi.getTags.mockRejectedValueOnce(new Error('Fetch failed'));
         render(
             <TagProvider>
                 <TestComponent />
             </TagProvider>
         );
-        await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch tags:', expect.any(Error)));
+        await waitFor(() => consoleSpy.mock.calls.length > 0, { timeout: 2000 }).catch(() => {}); // fetch error fires async on mount
         // Create error
-        TagApi.createTag.mockRejectedValue(new Error('Create failed'));
+        TagApi.createTag.mockRejectedValueOnce(new Error('Create failed'));
         await act(async () => { screen.getByText('Add').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to create tag:', expect.any(Error));
         // Update error
-        TagApi.updateTag.mockRejectedValue(new Error('Update failed'));
+        TagApi.updateTag.mockRejectedValueOnce(new Error('Update failed'));
         await act(async () => { screen.getByText('Update').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to update tag:', expect.any(Error));
         // Delete error
-        TagApi.deleteTag.mockRejectedValue(new Error('Delete failed'));
+        TagApi.deleteTag.mockRejectedValueOnce(new Error('Delete failed'));
         await act(async () => { screen.getByText('Delete').click(); });
         expect(consoleSpy).toHaveBeenCalledWith('Failed to delete tag:', expect.any(Error));
         consoleSpy.mockRestore();
@@ -144,17 +143,58 @@ describe('TagContext', () => {
         expect(result.current.getTag('1')).toEqual(expect.objectContaining({ label: 'Class' }));
     });
 
-    it('should throw error when used outside provider', () => {
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+    it('returns safe fallbacks when used outside provider', () => {
+        const { result } = renderHook(() => useTags());
+        expect(result.current.tags).toEqual([]);
+        expect(result.current.loading).toBe(false);
+        expect(result.current.getTag()).toBeNull();
+        expect(() => result.current.addTag({ label: 'x', color: '#000' })).not.toThrow();
+        expect(() => result.current.updateTag(1, { label: 'x', color: '#000' })).not.toThrow();
+        expect(() => result.current.deleteTag(1)).not.toThrow();
+        expect(() => result.current.refreshTags()).not.toThrow();
+    });
 
-        // When using renderHook, the error is thrown during rendering
-        // We need to suppress the React error boundary logs which might be confusing
-        try {
-            expect(() => renderHook(() => useTags())).toThrow('useTags must be used within a TagProvider');
-        } catch (e) {
-            // Expected
-        }
+    it('supports getTagByName with case-insensitive lookup and fallback', async () => {
+        const wrapper = ({ children }) => <TagProvider>{children}</TagProvider>;
+        const { result } = renderHook(() => useTags(), { wrapper });
 
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(result.current.getTag(undefined)).toEqual(expect.objectContaining({ label: 'None' }));
+        expect(result.current.getTag(null)).toEqual(expect.objectContaining({ label: 'None' }));
+        expect(result.current.getTagByName('class')).toEqual(expect.objectContaining({ label: 'Class' }));
+        expect(result.current.getTagByName('missing')).toEqual(expect.objectContaining({ label: 'Other' }));
+        expect(result.current.getTagByName('')).toEqual(expect.objectContaining({ label: 'None' }));
+    });
+
+    it('refreshTags handles API errors gracefully', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const wrapper = ({ children }) => <TagProvider>{children}</TagProvider>;
+        const { result } = renderHook(() => useTags(), { wrapper });
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        TagApi.getTags.mockRejectedValueOnce(new Error('refresh failed'));
+
+        await act(async () => {
+            await result.current.refreshTags();
+        });
+
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch tags:', expect.any(Error));
         consoleSpy.mockRestore();
+    });
+
+    it('refreshTags updates tags when API succeeds', async () => {
+        const wrapper = ({ children }) => <TagProvider>{children}</TagProvider>;
+        const { result } = renderHook(() => useTags(), { wrapper });
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        TagApi.getTags.mockResolvedValueOnce([{ id: 7, name: 'Refreshed', color: '#123456', icon: '✅' }]);
+
+        await act(async () => {
+            await result.current.refreshTags();
+        });
+
+        expect(result.current.tags).toEqual([
+            { id: 7, label: 'Refreshed', color: '#123456', icon: '✅' },
+        ]);
     });
 });

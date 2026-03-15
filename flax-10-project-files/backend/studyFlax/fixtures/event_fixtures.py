@@ -27,7 +27,7 @@ event_title_fixtures = (
     "KEATS Coursework Submission", "Denmark Hill Placement", "St Thomas Hospital Visit",
     "KCL Research Seminar", "Strand Roof Terrace Break", "KCL Mental Health Workshop",
     "Rise and Shine", "Morning Stretch", "Take a Shower",
-    "Have a coffee", "Make Breakfast", "Bike to Campus",
+    "Have a coffee", "Bike to Campus",
     "Walk to the Strand", "Call Mum", "Call Dad",
     "Call Linda", "Call Jake", "Text the group chat",
     "Go to Dentist", "Pick up prescription", "Haircut at the barber",

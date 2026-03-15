@@ -1,60 +1,85 @@
-import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
+import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
+import { useState, useEffect } from "react";
 import { getSharingWith, getSharedWithMe } from "../../api/socialService";
 import UserListModal from "../../components/Social/UserListModal";
-import { EventsSummaryModal } from "../../components/Calendar/EventsSummaryModal/EventsSummaryModal";
+import GenericSummaryModal from "../../components/common/GenericSummaryModal/GenericSummaryModal";
+import SummaryItem from "../../components/common/GenericSummaryModal/SummaryItem";
 
-function Modal({ isOpen, onClose, title, children }) {
-  if (!isOpen) return null;
+function RangeButtons({ range, onRangeChange }) {
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>{title}</h2>
-          <button className={styles.modalClose} onClick={onClose}>✕</button>
-        </div>
-        <div className={styles.modalContent}>{children}</div>
-      </div>
+    <div style={{ display: 'flex', gap: '4px', padding: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '12px', justifyContent: 'space-between' }}>
+      {RANGE_OPTIONS.map(([key, label]) => (
+        <RangeButton key={key} isActive={range === key} label={label} onClick={() => onRangeChange(key)} />
+      ))}
     </div>
   );
 }
 
+function RangeButton({ isActive, label, onClick }) {
+  const style = {
+    flex: 1, padding: '8px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '0.9rem', transition: 'all 0.2s ease',
+    background: isActive ? '#8b6e4e' : 'transparent',
+    color: isActive ? '#fff' : 'var(--text, #1f2937)',
+    fontWeight: isActive ? '600' : '500',
+  };
+  return <button style={style} onClick={onClick}>{label}</button>;
+}
 
-function ModuleItem({ code, onNavigate, onClose }) {
+function formatEventMeta(event) {
+  const date = new Date(event.start_time);
+  const dateStr = date.toLocaleDateString('en-GB', DATE_FORMAT);
+  const timeStr = date.toLocaleTimeString('en-GB', TIME_FORMAT);
+  return `${dateStr} at ${timeStr}${event.location ? ` • ${event.location}` : ''}`;
+}
+
+function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
+  const title = `Events - ${getRangeLabel(range)} (${events.length})`;
   return (
-    <div
-      className={styles.listItem}
-      style={{ cursor: 'pointer' }}
-      role="button"
-      tabIndex={0}
-      onClick={() => { onClose?.(); onNavigate?.(`modules_${code}`); }}
-      onKeyDown={(e) => e.key === 'Enter' && (onClose?.(), onNavigate?.(`modules_${code}`))}
-    >
-      <div className={styles.listAvatar}>📚</div>
-      <div className={styles.listInfo}>
-        <div className={styles.listName}>{code}</div>
-        <div className={styles.listMeta}>Module</div>
-      </div>
-    </div>
+    <GenericSummaryModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      emptyMessage="No events found for this period"
+      topContent={<RangeButtons range={range} onRangeChange={onRangeChange} />}
+      items={events}
+      renderItem={(event, i) => (
+        <SummaryItem key={i} avatar="📅" title={event.title} subtitle={formatEventMeta(event)} />
+      )}
+    />
   );
 }
 
 function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Modules">
-      {modules.length > 0
-        ? modules.map((code, i) => <ModuleItem key={i} code={code} onNavigate={onNavigate} onClose={onClose} />)
-        : <p className={styles.emptyMessage}>No modules found</p>}
-    </Modal>
+    <GenericSummaryModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Modules"
+      emptyMessage="No modules found"
+      items={modules}
+      renderItem={(code, i) => (
+        <SummaryItem
+          key={i}
+          avatar="📚"
+          title={code}
+          subtitle="Module"
+          onClick={() => { onClose?.(); onNavigate?.(`modules_${code}`); }}
+        />
+      )}
+    />
   );
 }
 
 function TasksModal({ isOpen, onClose }) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Tasks">
-      <p className={styles.emptyMessage}>Tasks feature coming soon...</p>
-    </Modal>
+    <GenericSummaryModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Tasks"
+      emptyMessage="Tasks feature coming soon..."
+    />
   );
 }
 
@@ -99,55 +124,38 @@ function EditProfileSection({ state }) {
   );
 }
 
-function EditModals({ user, state, modules, isMutualOrSelf, onNavChange }) {
+function ProfileEditModals({ user, state, modules, visibility, onNavChange }) {
   const { showModules, setShowModules, showTasks, setShowTasks, profileData } = state;
   return (
     <>
-      {isMutualOrSelf && <EditProfileSection state={state} />}
-      <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} onNavigate={onNavChange} />
-      {isMutualOrSelf && <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />}
-
-      <SocialDataModal
-        isOpen={state.showSharedWith}
-        onClose={() => state.setShowSharedWith(false)}
-        title="Sharing With"
-        fetchFn={getSharingWith}
-        userId={(profileData || user)?.id}
-        onNavChange={onNavChange}
-        onUserUpdate={state.reload}
-      />
-      <SocialDataModal
-        isOpen={state.showSharedBy}
-        onClose={() => state.setShowSharedBy(false)}
-        title="Shared By"
-        fetchFn={getSharedWithMe}
-        userId={(profileData || user)?.id}
-        onNavChange={onNavChange}
-        onUserUpdate={state.reload}
-      />
+      {visibility.canEditProfile && <EditProfileSection state={state} />}
+      {visibility.canViewModules && <ModulesModal isOpen={showModules} onClose={() => setShowModules(false)} modules={modules} onNavigate={onNavChange} />}
+      {visibility.canViewTasks && <TasksModal isOpen={showTasks} onClose={() => setShowTasks(false)} />}
+      {visibility.canViewSharedWith && <SharingModals user={user} state={state} profileData={profileData} onNavChange={onNavChange} />}
     </>
   );
 }
 
-function EventsModalContainer({ state, allEvents, isMutualOrSelf }) {
-  const { showEvents, setShowEvents } = state;
-  if (!isMutualOrSelf) return null;
-
+function SharingModals({ user, state, profileData, onNavChange }) {
   return (
-    <EventsSummaryModal
-      isOpen={showEvents}
-      onClose={() => setShowEvents(false)}
-      allEvents={allEvents}
-      isMutualOrSelf={isMutualOrSelf}
-    />
+    <>
+      <SocialDataModal isOpen={state.showSharedWith} onClose={() => state.setShowSharedWith(false)} title="Sharing With" fetchFn={getSharingWith} userId={(profileData || user)?.id} onNavChange={onNavChange} onUserUpdate={state.reload} />
+      <SocialDataModal isOpen={state.showSharedBy} onClose={() => state.setShowSharedBy(false)} title="Shared By" fetchFn={getSharedWithMe} userId={(profileData || user)?.id} onNavChange={onNavChange} onUserUpdate={state.reload} />
+    </>
   );
 }
 
-export default function ProfileModals({ user, state, modules, allEvents, isMutualOrSelf, onNavChange }) {
+function EventsModalContainer({ state, filteredEvents, visibility }) {
+  const { showEvents, setShowEvents, eventRange, setEventRange } = state;
+  if (!visibility.canViewEvents) return null;
+  return <EventsModal isOpen={showEvents} onClose={() => setShowEvents(false)} events={filteredEvents} range={eventRange} onRangeChange={setEventRange} />;
+}
+
+export default function ProfileModals({ user, state, modules, filteredEvents, visibility, onNavChange }) {
   return (
     <>
-      <EditModals user={user} state={state} modules={modules} isMutualOrSelf={isMutualOrSelf} onNavChange={onNavChange} />
-      <EventsModalContainer state={state} allEvents={allEvents} isMutualOrSelf={isMutualOrSelf} />
+      <ProfileEditModals user={user} state={state} modules={modules} visibility={visibility} onNavChange={onNavChange} />
+      <EventsModalContainer state={state} filteredEvents={filteredEvents} visibility={visibility} />
     </>
   );
 }

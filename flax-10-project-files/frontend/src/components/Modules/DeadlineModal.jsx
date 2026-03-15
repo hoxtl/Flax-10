@@ -1,6 +1,7 @@
 import { useDeadlineModal } from './hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';
+import StandardModal from '../common/StandardModal/StandardModal';
 import styles from './DeadlineModal.module.css';
 
 export default function DeadlineModal({ module, onClose, startCreating }) {
@@ -8,23 +9,17 @@ export default function DeadlineModal({ module, onClose, startCreating }) {
     const handleCancel = () => { if (startCreating && !modal.editing) onClose(); else modal.close(); };
     const handleSubmitWrap = async (d) => { await modal.handleSubmit(d); if (startCreating && !modal.editing) onClose(); };
     return (
-        <div className={styles.overlay} onClick={onClose}>
-            <div className={styles.content} onClick={e => e.stopPropagation()}>
-                <ModalHeader module={module} onClose={onClose} />
+        <StandardModal
+            title={`${module.module_code} - Deadlines`}
+            onClose={onClose}
+            size="md"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
                 {modal.showForm
                     ? <DeadlineForm initial={modal.editing} onSubmit={handleSubmitWrap} onCancel={handleCancel} />
                     : <ModalBody modal={modal} />}
-            </div>
-        </div>
-    );
-}
-
-function ModalHeader({ module, onClose }) {
-    return (
-        <div className={styles.header}>
-            <h3 className={styles.title}> {module.module_code} — Deadlines</h3>
-            <button className={styles.closeBtn} onClick={onClose}>×</button>
-        </div>
+        </StandardModal>
     );
 }
 

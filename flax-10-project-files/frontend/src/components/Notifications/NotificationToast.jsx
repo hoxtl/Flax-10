@@ -26,11 +26,15 @@ function useToastRefs() {
 
 function useShowNext(queueRef, setCurrentToast) {
     return useCallback(() => {
-        if (queueRef.current.length === 0) return setCurrentToast(null);
-        setCurrentToast(queueRef.current.shift());
-        playNotificationSound();
-        setTimeout(() => setCurrentToast(prev => prev ? null : prev), 3000);
+        showNextToast(queueRef, setCurrentToast);
     }, [queueRef, setCurrentToast]);
+}
+
+export function showNextToast(queueRef, setCurrentToast) {
+    if (queueRef.current.length === 0) return setCurrentToast(null);
+    setCurrentToast(queueRef.current.shift());
+    playNotificationSound();
+    setTimeout(() => setCurrentToast(prev => prev ? null : prev), 3000);
 }
 
 function useToastEffect(notifications, loading, refs, currentToast, showNext) {

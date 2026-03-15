@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useDrop } from './useDragDrop';
 import { useCalendar, useEventModal } from "../../../context/CalendarContext";
+import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
@@ -9,17 +10,18 @@ import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
     const { openModal } = useEventModal();
+    const confirmFn = useConfirm();
     const actions = useEventActions();
     const [highlightQuarter, setHi] = useState(null);
-    const onDrop = useCallback((p, e) => onDropAction(p, e, hour, date, actions, events, setHi), [hour, date, actions, events]);
+    const onDrop = useCallback((p, e) => onDropAction(p, e, hour, date, actions, events, setHi, confirmFn), [hour, date, actions, events, confirmFn]);
     const onClick = useCallback((e) => onClickAction(e, hour, date, openModal), [hour, date, openModal]);
     const { dropProps, isOver } = useDrop({ accept: ['TAG', 'EVENT'], onDrop: onDrop });
     return { mergedProps: buildMergedProps(dropProps, isOver, setHi, onClick), isOver, highlightQuarter: highlightQuarter };
 }
 
-async function onDropAction(payload, e, hour, date, actions, events, setHighlight) {
+async function onDropAction(payload, e, hour, date, actions, events, setHighlight, confirmFn) {
     setHighlight(null);
-    await dispatchDrop(payload, date, getDropMinutes(hour, e), actions.addEvent, actions.editEvent, actions.addException, events);
+    await dispatchDrop(payload, date, getDropMinutes(hour, e), actions.addEvent, actions.editEvent, actions.addException, events, confirmFn);
 }
 
 function onClickAction(e, hour, date, openModal) {
@@ -32,11 +34,11 @@ function getDropMinutes(hour, e) {
     return hour * 60 + minuteOffset;
 }
 
-async function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, allEvents) {
+async function dispatchDrop(payload, date, minutes, addEvent, editEvent, addException, allEvents, confirmFn) {
     if (payload.type === 'TAG') {
-        await createEventFromTag(payload.data, date, minutes, addEvent, allEvents);
+        await createEventFromTag(payload.data, date, minutes, addEvent, allEvents, confirmFn);
     } else if (payload.type === 'EVENT') {
-        await moveEventToTime(payload.data, date, minutes, addEvent, editEvent, addException, allEvents);
+        await moveEventToTime(payload.data, date, minutes, addEvent, editEvent, addException, allEvents, confirmFn);
     }
 }
 
@@ -79,7 +81,7 @@ function openEventModalAtTime(date, startMinutes, openModal) {
     openModal({ start_time: start, end_time: end });
 }
 
-async function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) {
+async function createEventFromTag(tag, date, startMinutes, addEvent, allEvents, confirmFn) {
     const start = createDateAtMinutes(date, startMinutes);
     const end = new Date(start);
     end.setMinutes(end.getMinutes() + (tag.default_duration || 60));
@@ -89,30 +91,33 @@ async function createEventFromTag(tag, date, startMinutes, addEvent, allEvents) 
         start_time: start.toISOString(),
         end_time: end.toISOString(),
     };
-    if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
+    if (!(await checkOverlapWithConfirm(newEvent, allEvents, confirmFn))) return;
     await addEvent(newEvent);
 }
 
-async function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
+async function moveEventToTime(event, date, startMinutes, addEvent, editEvent, addException, allEvents, confirmFn) {
     if (hasRecurrence(event)) {
-        await handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents);
+        await handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents, confirmFn);
     } else {
-        await executeMove(event, date, startMinutes, editEvent, allEvents);
+        await executeMove(event, date, startMinutes, editEvent, allEvents, confirmFn);
     }
 }
 
-async function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Change time for ALL occurrences\nCancel = Move only this occurrence'
-    );
+async function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents, confirmFn) {
+    const choice = await confirmFn({
+        title: "Recurring Event",
+        message: "This is a recurring event. How would you like to move it?",
+        confirmText: "Move ALL",
+        cancelText: "Move ONLY this"
+    });
     if (choice) {
-        await updateAllOccurrences(event, startMinutes, editEvent, allEvents);
+        await updateAllOccurrences(event, startMinutes, editEvent, allEvents, confirmFn);
     } else {
-        await moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents);
+        await moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents, confirmFn);
     }
 }
 
-async function updateAllOccurrences(event, startMinutes, editEvent, allEvents) {
+async function updateAllOccurrences(event, startMinutes, editEvent, allEvents, confirmFn) {
     const originalStart = new Date(event.start_time);
     const newStart = new Date(originalStart);
     newStart.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
@@ -121,14 +126,14 @@ async function updateAllOccurrences(event, startMinutes, editEvent, allEvents) {
     const baseEventId = extractBaseEventId(event.id);
     const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
     const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
+    if (!(await checkOverlapWithConfirm({ ...event, ...updateData }, others, confirmFn))) return;
     await editEvent(baseEventId, updateData);
 }
 
-async function moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents) {
+async function moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents, confirmFn) {
     const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
     const newEvent = buildNewEvent(event, newStart, newEnd);
-    if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
+    if (!(await checkOverlapWithConfirm(newEvent, allEvents, confirmFn))) return;
 
     const baseEventId = extractBaseEventId(event.id);
     const originalDateStr = getDateString(event.start_time);
@@ -150,12 +155,12 @@ function getDateString(dateTime) {
     return new Date(dateTime).toISOString().slice(0, 10);
 }
 
-async function executeMove(event, date, startMinutes, editEvent, allEvents) {
+async function executeMove(event, date, startMinutes, editEvent, allEvents, confirmFn) {
     const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
     const baseEventId = extractBaseEventId(event.id);
     const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
     const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
+    if (!(await checkOverlapWithConfirm({ ...event, ...updateData }, others, confirmFn))) return;
     await editEvent(baseEventId, updateData);
 }
 

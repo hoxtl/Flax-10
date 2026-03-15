@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { searchUsers } from "../../api/societyApi";
+import { searchUsers } from "../../api/userService";
+import StandardModal from "../common/StandardModal/StandardModal";
 import styles from "./AddCollaboratorModal.module.css";
 
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
@@ -20,19 +21,23 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
     const filteredResults = filterResults(results, selected, existingUsernames);
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ModalHeader onClose={onClose} />
-                <SearchInput query={query} setQuery={setQuery} />
-                {filteredResults.length > 0 && <SearchResults results={filteredResults} onSelect={handleSelect} />}
-                <SelectedUsers users={selected} onRemove={handleRemove} />
-                <ModalFooter onClose={onClose} onAdd={handleAdd} disabled={selected.length === 0} />
-            </div>
-        </div>
+        <StandardModal
+            title="Add Collaborators"
+            onClose={onClose}
+            size="sm"
+            modalClassName={styles.modalShell}
+            contentClassName={styles.modalContent}
+        >
+            <SearchInput query={query} setQuery={setQuery} />
+            {filteredResults.length > 0 && <SearchResults results={filteredResults} onSelect={handleSelect} />}
+            <SelectedUsers users={selected} onRemove={handleRemove} />
+            <ModalFooter onClose={onClose} onAdd={handleAdd} disabled={selected.length === 0} />
+        </StandardModal>
     );
 }
 
 function filterResults(results, selected, existingUsernames) {
+    if (!Array.isArray(results)) return [];
     const selectedIds = new Set(selected.map(u => u.id));
     return results.filter(u => !existingUsernames.includes(u.username) && !selectedIds.has(u.id));
 }
@@ -41,17 +46,8 @@ async function fetchResults(query, setResults) {
     if (query.length < 2) return setResults([]);
     try {
         const data = await searchUsers(query);
-        setResults(data);
+        setResults(data?.results || data || []);
     } catch { setResults([]); }
-}
-
-function ModalHeader({ onClose }) {
-    return (
-        <div className={styles.header}>
-            <h3 className={styles.title}>Add Collaborators</h3>
-            <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-        </div>
-    );
 }
 
 function SearchInput({ query, setQuery }) {

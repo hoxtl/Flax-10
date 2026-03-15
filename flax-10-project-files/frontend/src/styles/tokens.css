@@ -1,0 +1,140 @@
+/**
+ * Flax Design Tokens
+ * Standardised scale for border-radius, font-size, spacing, and shadows.
+ * Import after variables.css — these tokens reference and alias the base vars.
+ *
+ * Usage: border-radius: var(--radius-md);  font-size: var(--text-sm);
+ */
+
+:root {
+  /* ── Border Radius ──────────────────────────────────────────────────────── */
+  --radius-xs:   4px;     /* tiny: toggle tracks, progress bars              */
+  --radius-sm:   6px;     /* small: inline badges, chips, status dots         */
+  --radius-md:   8px;     /* medium: buttons, input fields, small cards        */
+  --radius-lg:   12px;    /* large: dropdowns, panels, section cards (= --radius) */
+  --radius-xl:   16px;    /* xl: modals, large cards                           */
+  --radius-2xl:  24px;    /* 2xl: bento cards, hero widgets (= --card-radius)  */
+  --radius-pill: 9999px;  /* pill: full rounded (= existing --radius-pill)     */
+  --radius: var(--radius-lg);
+  --card-radius: var(--radius-2xl);
+  --radius-control: var(--radius-md);
+
+  /* ── Font Size Scale ────────────────────────────────────────────────────── */
+  /* All rem — base 16px browser default                                       */
+  --text-2xs:  0.6rem;    /* ~9.6px  — mono micro-labels, letter-spaced caps   */
+  --text-xs:   0.7rem;    /* ~11.2px — secondary meta, chip labels             */
+  --text-sm:   0.8rem;    /* ~12.8px — most UI text (options rows, task meta)  */
+  --text-base: 0.875rem;  /* ~14px   — primary body text, task titles          */
+  --text-md:   1rem;      /* 16px    — prominent labels, subheadings           */
+  --text-lg:   1.125rem;  /* ~18px   — card headings                           */
+  --text-xl:   1.25rem;   /* 20px    — widget titles                           */
+  --text-2xl:  1.5rem;    /* 24px    — section headings                        */
+  --text-3xl:  2rem;      /* 32px    — greeting / hero headings                */
+  --text-4xl:  2.5rem;    /* 40px    — display headings                        */
+
+  /* ── Spacing Scale (4px base) ───────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Shadow Levels ──────────────────────────────────────────────────────── */
+  --shadow-sm:  0 1px 3px rgba(74, 52, 33, 0.06);
+  --shadow-md:  0 4px 16px rgba(74, 52, 33, 0.08);
+  --shadow-lg:  0 8px 32px rgba(74, 52, 33, 0.12);
+  --shadow-xl:  0 20px 60px rgba(74, 52, 33, 0.14);
+  --shadow-card: 0 8px 30px rgba(44, 24, 16, 0.08);
+  --shadow-popover: 0 12px 30px rgba(44, 24, 16, 0.12);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.25);
+  --card-shadow: var(--shadow-card);
+
+  /* ── Shared Brand Surface Tokens ───────────────────────────────────────── */
+  --surface-page: var(--bg);
+  --surface-panel: var(--panel);
+  --surface-card: var(--card-bg);
+  --surface-card-muted: var(--surface);
+  --surface-overlay: rgba(20, 18, 30, 0.45);
+  --surface-search: var(--search-bg, var(--panel));
+
+  /* ── Shared Border / Focus Tokens ──────────────────────────────────────── */
+  --stroke-soft: 1px solid var(--border);
+  --stroke-strong: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  --focus-ring: 0 0 0 3px rgba(123, 103, 81, 0.15);
+  --focus-ring-strong: 0 0 0 3px rgba(123, 103, 81, 0.22);
+
+  /* ── Component Tokens ───────────────────────────────────────────────────── */
+  /* Inputs */
+  --control-height:    36px;
+  --control-height-sm: 30px;
+  --control-radius:    var(--radius-control);
+  --control-padding-y: var(--space-2);
+  --control-padding-x: var(--space-3);
+  --control-border:    1px solid var(--border);
+  --input-height:      var(--control-height);
+  --input-height-sm:   30px;
+  --input-padding:     var(--control-padding-y) var(--control-padding-x);
+  --input-radius:      var(--control-radius);
+  --input-border:      var(--control-border);
+  --input-focus-ring:  var(--focus-ring);
+
+  /* Buttons */
+  --btn-height:        var(--control-height);
+  --btn-height-sm:     var(--control-height-sm);
+  --btn-radius:        var(--control-radius);
+  --btn-padding:       var(--space-2) var(--space-4);
+  --btn-padding-sm:    var(--space-1) var(--space-3);
+  --btn-font-size:     var(--text-base);
+  --btn-font-weight:   600;
+
+  /* Dropdowns / Popovers */
+  --dropdown-radius:   var(--radius-lg);
+  --dropdown-shadow:   var(--shadow-popover);
+  --dropdown-border:   var(--stroke-soft);
+  --dropdown-padding:  var(--space-1);
+  --dropdown-bg:       var(--panel, #FFFCFA);
+  --dropdown-item-padding: var(--space-2) var(--space-3);
+  --dropdown-item-radius:  var(--radius-md);
+
+  /* Cards */
+  --card-padding:      var(--space-5);
+  --card-padding-lg:   var(--space-6);
+  --card-radius-token: var(--radius-2xl);
+  --card-border:       var(--stroke-soft);
+  --card-shadow-rest:  var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-shadow-strong: var(--shadow-lg);
+  --card-hover-transform: translateY(-2px);
+  --card-hover-transform-strong: translateY(-4px);
+  --card-icon-surface: var(--surface-card-muted);
+  --card-icon-radius:  var(--radius-md);
+
+  /* Modals */
+  --modal-radius:      var(--radius-xl);
+  --modal-padding:     var(--space-6);
+  --modal-shadow:      var(--shadow-modal);
+
+  /* Chips / Badges */
+  --chip-radius:       var(--radius-md);
+  --chip-padding:      var(--space-1) var(--space-2);
+  --chip-font-size:    var(--text-xs);
+  --chip-font-weight:  600;
+}
+
+:root[data-theme="dark"] {
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-popover: 0 14px 36px rgba(0, 0, 0, 0.32);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.36);
+  --card-shadow: var(--shadow-card);
+  --card-shadow-rest: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 24px rgba(0, 0, 0, 0.18);
+  --card-shadow-hover: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 36px rgba(0, 0, 0, 0.24);
+  --card-shadow-strong: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 48px rgba(0, 0, 0, 0.3);
+  --surface-overlay: rgba(10, 9, 12, 0.62);
+  --focus-ring: 0 0 0 3px rgba(184, 155, 126, 0.28);
+  --focus-ring-strong: 0 0 0 3px rgba(184, 155, 126, 0.38);
+}

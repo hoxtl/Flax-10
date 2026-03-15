@@ -26,15 +26,6 @@ class RegistrationUserSerialiser(serializers.Serializer):
             raise serializers.ValidationError("This email is already registered")
         return email_value
 
-    def validate_first_name(self, name_value):
-        if name_value == '' or not name_value:
-            raise serializers.ValidationError("First name cannot be empty")
-        return name_value
-
-    def validate_last_name(self, lastname_value):
-        if lastname_value == '' or not lastname_value:
-            raise serializers.ValidationError("Last name cannot be empty")
-        return lastname_value
 
 
 class UserSerialiser(serializers.ModelSerializer):

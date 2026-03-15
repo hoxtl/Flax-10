@@ -3,6 +3,8 @@ import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
 import { RatificationSection } from "./RatificationSection";
+import { useConfirm } from "../../../context/ConfirmContext";
+import StandardModal from "../../common/StandardModal/StandardModal";
 
 async function addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator) {
   const existingMember = (members || []).find(m => m.username === user.username);
@@ -21,15 +23,6 @@ function useSettingsModal(props) {
   const collaborators = (members || []).filter(m => m.role !== 'member');
   const collaboratorUsernames = collaborators.map(c => c.username);
   return { showAddModal, setShowAddModal, handleAddCollaborators, collaborators, collaboratorUsernames };
-}
-
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h3 className={styles.title}>Society Settings</h3>
-      <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-    </div>
-  );
 }
 
 function AddCollaboratorSection({ onOpenModal }) {
@@ -52,37 +45,26 @@ function CollaboratorsSection({ collaborators, onUpdateRole, onRemove }) {
   );
 }
 
-function DeleteConfirm({ onConfirm, onCancel, onClose }) {
-  const handleDelete = () => { onConfirm?.(); onClose?.(); };
-  return (
-    <div className={styles.dangerSection}>
-      <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <p className={styles.confirmText}>Are you sure? This cannot be undone.</p>
-      <div className={styles.confirmBtns}>
-        <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-        <button className={styles.confirmDeleteBtn} onClick={handleDelete}>Delete</button>
-      </div>
-    </div>
-  );
-}
-
 function DangerSection({ onDelete, onClose }) {
-  const [confirming, setConfirming] = useState(false);
-  if (confirming) return <DeleteConfirm onConfirm={onDelete} onCancel={() => setConfirming(false)} onClose={onClose} />;
+  const confirmFn = useConfirm();
+  const handleDeleteClick = async () => {
+    const choice = await confirmFn({
+      title: "Delete Society",
+      message: "Are you sure? This cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      isDanger: true
+    });
+    if (choice) {
+      onDelete?.();
+      onClose?.();
+    }
+  };
+
   return (
     <div className={styles.dangerSection}>
       <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete Society</button>
-    </div>
-  );
-}
-
-function ModalBackdrop({ onClose, children }) {
-  return (
-    <div className={styles.backdrop} onMouseDown={onClose}>
-      <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-        {children}
-      </div>
+      <button className={styles.deleteBtn} onClick={handleDeleteClick}>Delete Society</button>
     </div>
   );
 }
@@ -92,12 +74,18 @@ export default function SettingsModal(props) {
   const { showAddModal, setShowAddModal, handleAddCollaborators, collaborators, collaboratorUsernames } = useSettingsModal(props);
   return (
     <>
-      <ModalBackdrop onClose={onClose}>
-        <ModalHeader onClose={onClose} />
+      <StandardModal
+        title="Society Settings"
+        onClose={onClose}
+        size="md"
+        modalClassName={styles.modalShell}
+        contentClassName={styles.modalContent}
+      >
         <RatificationSection status={ratificationStatus} isRatified={isRatified} onRequest={onRequestRatification} />
         <AddCollaboratorSection onOpenModal={() => setShowAddModal(true)} />
         <CollaboratorsSection collaborators={collaborators} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
         <DangerSection onDelete={onDelete} onClose={onClose} />
-      </ModalBackdrop>
+      </StandardModal>
       {showAddModal && <AddCollaboratorModal onClose={() => setShowAddModal(false)} onAdd={handleAddCollaborators} existingUsernames={collaboratorUsernames} />}
-    </>);}
+    </>);
+}

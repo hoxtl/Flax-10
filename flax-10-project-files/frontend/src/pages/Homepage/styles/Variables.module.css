@@ -1,0 +1,68 @@
+/* Homepage layout: unified time management dashboard — Master Restoration */
+
+  .page {
+    /* Dashboard: warm notebook — one base, accents only for data */
+    --dash-base: #faf8f5;
+    --dash-green: #16a34a;
+    --dash-green-bg: #f0fdf4;
+    --dash-orange: #ea580c;
+    --dash-orange-bg: #fff7ed;
+    --dash-red: #dc2626;
+    --dash-red-bg: #fef2f2;
+    --dash-blue: #2563eb;
+    --dash-blue-bg: #eff6ff;
+    --dash-violet: #7c3aed;
+    --dash-violet-bg: #f5f3ff;
+    --home-font-sans: var(--font-body);
+    --home-bg: var(--restoration-bg, var(--dash-base));
+    --home-card-bg: rgba(255, 255, 255, 0.6);
+    --home-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --home-card-radius: 12px;
+    --home-now-bg: var(--restoration-earth, #6B5344);
+    /* Typography: Charcoal for titles, Muted Sage for captions */
+    --home-text-primary: var(--text-charcoal);
+    --home-text-meta: var(--text-muted-sage);
+    --home-font-header: 17px;
+    --home-font-task: 13px;
+    --home-font-meta: 10px;
+    --flax-sage: var(--restoration-sage, #87A96B);
+    --flax-sage-muted: #B2AC88;
+    --flax-gold: var(--restoration-flax, #EEDC82);
+    --flax-tan: #D2B48C;
+    --flax-charcoal: var(--restoration-charcoal, #2d352d);
+    --flax-charcoal-heading: #1e261e;
+    --home-text-label: var(--flax-sage-muted);
+    --home-card-padding: 12px 18px;
+    --home-border-soft: rgba(0, 0, 0, 0.06);
+    /* Glassmorphism: all widgets */
+    --home-border-card: 1px solid rgba(255, 255, 255, 0.2);
+    --home-glass-blur: 12px;
+    --home-urgency-danger: var(--dash-red);
+    --home-urgency-danger-soft: var(--dash-red-bg);
+    --home-urgency-danger-border: color-mix(in srgb, var(--home-urgency-danger) 24%, white);
+    --home-urgency-warning: #a7793f;
+    --home-urgency-warning-soft: #fbf5e7;
+    --home-urgency-warning-border: color-mix(in srgb, var(--home-urgency-warning) 22%, white);
+    --home-urgency-success: #5b8663;
+    --home-urgency-success-soft: #f1f8f2;
+    --home-urgency-success-border: color-mix(in srgb, var(--home-urgency-success) 20%, white);
+    --home-urgency-neutral: #8b7355;
+    --home-urgency-neutral-soft: #f5ede3;
+    --home-urgency-neutral-border: color-mix(in srgb, var(--home-urgency-neutral) 16%, white);
+    --home-urgency-muted: #a89279;
+    --home-space-xs: 0.25rem;
+    --home-space-sm: 0.5rem;
+    --home-space-md: 0.75rem;
+    --home-space-lg: 1rem;
+    --home-space-xl: 1.25rem;
+    --home-space-2xl: 1.5rem;
+    font-family: var(--home-font-sans, inherit);
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    overflow-y: visible;
+    overflow-x: hidden;
+    padding-bottom: 3rem;
+    background: var(--home-bg);
+  }

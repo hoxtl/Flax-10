@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../api/userService';
-import styles from './SleepSchedulePanel.module.css';
+import DateTimePicker from '../../pages/Tasks/components/DateTimePicker';
+import { SectionHeader, SubmitButton } from './SettingsUI';
+import SectionSkeleton from '../common/LoadingState/SectionSkeleton';
+import styles from '../../pages/Settings/Settings.module.css';
 
 export function SleepSchedulePanel({ onSave, isSaving }) {
   const [sleepTime, setSleepTime] = useState('23:00');
   const [wakeTime, setWakeTime] = useState('07:00');
-  const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,10 +19,9 @@ export function SleepSchedulePanel({ onSave, isSaving }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
     await onSave({ sleep_time: sleepTime, wake_time: wakeTime });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
   };
 
   const sleepDuration = () => {
@@ -33,55 +34,54 @@ export function SleepSchedulePanel({ onSave, isSaving }) {
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   };
 
-  if (loading) return <p style={{ color: 'var(--text-muted)' }}>Loading…</p>;
+  const sleepDurationMeta = () => {
+    const [sh, sm] = sleepTime.split(':').map(Number);
+    const [wh, wm] = wakeTime.split(':').map(Number);
+    let mins = (wh * 60 + wm) - (sh * 60 + sm);
+    if (mins <= 0) mins += 24 * 60;
+    return `${mins} minutes total`;
+  };
+
+  if (loading) return <SectionSkeleton label="Loading sleep schedule" rows={3} />;
 
   return (
-    <div className={styles.panel}>
-      <div className={styles.header}>
-        <div>
-          <h3 className={styles.title}>Sleep Schedule</h3>
-          <p className={styles.subtitle}>
-            We'll warn you if you try to add tasks during your sleep window.
-          </p>
+    <form className={styles.form} onSubmit={handleSave}>
+      <SectionHeader
+        title="Sleep Schedule"
+        description="We'll warn you if you try to add tasks during your sleep window."
+      />
+
+      <div className={styles.formRow}>
+        <div className={styles.formGroup}>
+          <label>Bedtime</label>
+          <DateTimePicker
+            value={sleepTime}
+            onChange={(v) => setSleepTime(v || "23:00")}
+            placeholder="Pick bedtime"
+            timeOnly
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>Wake up</label>
+          <DateTimePicker
+            value={wakeTime}
+            onChange={(v) => setWakeTime(v || "07:00")}
+            placeholder="Pick wake time"
+            timeOnly
+          />
         </div>
       </div>
 
-      <div className={styles.fields}>
-        <label className={styles.field}>
-          <span className={styles.label}>Bedtime</span>
-          <input
-            type="time"
-            value={sleepTime}
-            onChange={(e) => setSleepTime(e.target.value)}
-            className={styles.timeInput}
-          />
-        </label>
-
-        <div className={styles.divider} aria-hidden="true">→</div>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Wake up</span>
-          <input
-            type="time"
-            value={wakeTime}
-            onChange={(e) => setWakeTime(e.target.value)}
-            className={styles.timeInput}
-          />
-        </label>
+      <div className={styles.formGroup}>
+        <label>Sleep duration</label>
+        <div className={styles.sleepDurationCard} role="status" aria-live="polite">
+          <div className={styles.sleepDurationMain}>{sleepDuration()}</div>
+          <div className={styles.sleepDurationMeta}>{sleepDurationMeta()}</div>
+        </div>
       </div>
 
-      <div className={styles.footer}>
-        <span className={styles.duration}>
-          Sleep duration: <strong>{sleepDuration()}</strong>
-        </span>
-        <button
-          className={styles.saveBtn}
-          onClick={handleSave}
-          disabled={isSaving}
-        >
-          {saved ? '✓ Saved' : isSaving ? 'Saving…' : 'Save'}
-        </button>
-      </div>
-    </div>
+      <SubmitButton isSaving={isSaving} label="Save" savingLabel="Saving…" />
+    </form>
   );
 }

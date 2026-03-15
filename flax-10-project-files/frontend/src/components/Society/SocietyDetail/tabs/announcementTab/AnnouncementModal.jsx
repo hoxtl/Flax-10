@@ -9,12 +9,14 @@ import ConfirmModal from "../../../../common/ConfirmModal";
 import StandardModal from "../../../../common/StandardModal/StandardModal";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
+import { useConfirm } from "../../../../../context/ConfirmContext";
 
 export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = [], announcement = null, societyId, announcements = [] }) {
     const [form, setForm] = useState(getInitialForm(announcement));
     const [error, setError] = useState("");
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const fileRef = useRef(null);
+    const confirmFn = useConfirm();
     const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
 
     useEffect(() => { loadLinkedEvent(announcement, societyId, setForm); }, [announcement, societyId]);
@@ -27,7 +29,7 @@ export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = 
             <StandardModal title={announcement ? "Edit Announcement" : "Add Announcement"} onClose={onClose}>
                 <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
                     error={error} setError={setError} onClose={onClose}
-                    onSubmit={(f, conflict) => handleSubmit(f, setError, onSubmit, announcements, conflict)}
+                    onSubmit={async (f, conflict) => await handleSubmit(f, setError, onSubmit, announcements, conflict, confirmFn)}
                     isEdit={!!announcement} setForm={setForm}
                     onDeleteClick={() => setShowDeleteConfirm(true)} />
             </StandardModal>
@@ -59,17 +61,22 @@ function DeleteConfirmModal({ hasEvent, onConfirm, onCancel }) {
     return <ConfirmModal title="Delete Announcement" message={message} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
-function handleSubmit(form, setError, onSubmit, announcements, conflict) {
+function handleSubmit(form, setError, onSubmit, announcements, conflict, confirmFn) {
     const error = validateForm(form);
     if (error) return setError(error);
     if (form.pinned) {
         const currentPinned = announcements.find(a => a.pinned && a.id !== form.id);
         if (currentPinned) {
-            const confirmReplace = window.confirm(
-                `"${currentPinned.title}" is currently pinned. Do you want to unpin it and pin this one instead?`
-            );
-            if (!confirmReplace) return;
-            return onSubmit(form, currentPinned);
+            confirmFn({
+                title: "Replace Pinned Announcement",
+                message: `"${currentPinned.title}" is currently pinned. Do you want to unpin it and pin this one instead?`,
+                confirmText: "Yes, Replace",
+                cancelText: "Cancel"
+            }).then(confirmReplace => {
+                if (!confirmReplace) return;
+                onSubmit(form, currentPinned);
+            });
+            return;
         }
     }
     onSubmit(form);

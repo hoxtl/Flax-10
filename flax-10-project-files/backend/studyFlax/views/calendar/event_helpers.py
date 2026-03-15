@@ -14,9 +14,13 @@ def apply_filter(qs, start, end, rec_q):
     non_rec = Q(recurrence_rule__isnull=True)
     if start and end:
         in_range = Q(start_time__lte=end) & Q(end_time__gte=start)
-        return qs.filter((non_rec & in_range) | (rec_q & Q(start_time__lte=end)))
+        if rec_q is not None:
+            return qs.filter((non_rec & in_range) | (rec_q & Q(start_time__lte=end)))
+        return qs.filter(non_rec & in_range)
     if start:
-        return qs.filter(Q(end_time__gte=start) | rec_q)
+        if rec_q is not None:
+            return qs.filter(Q(end_time__gte=start) | rec_q)
+        return qs.filter(end_time__gte=start)
     return qs.filter(start_time__lte=end)
 
 def expand_recurring_events(events, start_date=None, end_date=None):
@@ -120,3 +124,21 @@ def check_event_overlap(user, data):
 
 def parse_date_param(ds):
     return datetime.fromisoformat(ds.replace('Z', '+00:00')) if ds else None
+def get_next_occurrence(start, frequency, interval, num):
+    class FakeRule:
+        pass
+    rule = FakeRule()
+    rule.frequency = frequency
+    rule.interval = interval
+    return calc_occurrence(start, rule, num)
+
+def is_exception_date(dt, rule):
+    return is_exception(dt, rule)
+
+def should_stop_generating(current, end_date, rule):
+    return stop_generation(current, end_date, rule)
+
+def get_base_instance(event, rule):
+    if is_exception(event.start_time, rule):
+        return []
+    return [event]

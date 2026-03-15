@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import styles from './InsightCards.module.css';
+import EmptyState from '../common/EmptyState/EmptyState';
 
 export function ConsistencyScore({ data }) {
   if (!data?.summary) return null;
@@ -91,7 +92,13 @@ export function PeakHoursCard({ data }) {
     <div className={styles.peakCard}>
       <p className={styles.cardLabel}>Peak Hours</p>
       {topHours.length === 0 ? (
-        <p className={styles.noData}>No data yet</p>
+        <div className={styles.noDataWrap}>
+          <EmptyState
+            icon="📈"
+            title="No peak-hour data yet"
+            description="Study sessions will appear here once you log more time."
+          />
+        </div>
       ) : (
         <>
           <div className={styles.peakList}>

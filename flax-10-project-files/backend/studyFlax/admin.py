@@ -1,7 +1,7 @@
 from django.contrib import admin
 from studyFlax.models.society import (
     Society, SocietyMembership, SocietyTag, SocietyImage,
-    SocietyAnnouncement, SocietyAnnouncementImage, SocietyEvent
+    SocietyAnnouncement, SocietyAnnouncementImage, SocietyEvent, SocietyReport
 )
 from django.contrib.auth import get_user_model
 
@@ -16,4 +16,28 @@ admin.site.register(SocietyAnnouncement)
 admin.site.register(SocietyAnnouncementImage)
 admin.site.register(SocietyEvent)
 
+class SocietyReportInline(admin.TabularInline):
+    model = SocietyReport
+    extra = 0
+    readonly_fields = ('reporter', 'reason', 'created_at')
+    can_delete = True
 
+class ReportedSociety(Society):
+    class Meta:
+        proxy = True
+        verbose_name = 'Society Report'
+        verbose_name_plural = 'Society Reports'
+
+class ReportedSocietyAdmin(admin.ModelAdmin):
+    inlines = [SocietyReportInline]
+    list_display = ('name', 'is_ratified', 'report_count')
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(reports__isnull=False).distinct()
+        
+    def report_count(self, obj):
+        return obj.reports.count()
+    report_count.short_description = 'Total Reports'
+
+admin.site.register(ReportedSociety, ReportedSocietyAdmin)

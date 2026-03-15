@@ -58,6 +58,10 @@
     padding: 20px;
 }
 
+.emptyStateWrap {
+    padding: var(--space-2) 0;
+}
+
 /* Filter Dropdown Styles */
 .filterDropdown {
     position: absolute;

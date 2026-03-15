@@ -1,7 +1,7 @@
 .day-view {
     display: flex;
     flex-direction: column;
-    background: var(--calendar-bg);
+    background: var(--panel);
     border-radius: 8px;
     overflow-y: auto;
     flex: 1;
@@ -12,7 +12,7 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--calendar-bg);
+    background: var(--panel);
 }
 
 .day-grid-container {
@@ -37,7 +37,8 @@
 
 .time-label-text {
     font-size: 0.75rem;
-    color: var(--muted);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-task);
     transform: translateY(-50%);
     line-height: 1;
 }
@@ -57,18 +58,24 @@
     border-bottom: 1px solid var(--border);
     box-sizing: border-box;
     position: relative;
+    background-image: none;
+}
+
+/* Show sub-grid lines only during drag/resize interactions */
+.day-view:has(.draggable-event.dragging) .time-slot,
+.day-view:has(.draggable-event.resizing) .time-slot {
     background-image: linear-gradient(to bottom,
             transparent 24%,
-            var(--hover) 25%,
-            var(--hover) 26%,
+            var(--divider) 25%,
+            var(--divider) 26%,
             transparent 27%,
             transparent 49%,
-            var(--active) 50%,
-            var(--active) 51%,
+            var(--divider) 50%,
+            var(--divider) 51%,
             transparent 52%,
             transparent 74%,
-            var(--hover) 75%,
-            var(--hover) 76%,
+            var(--divider) 75%,
+            var(--divider) 76%,
             transparent 77%);
 }
 

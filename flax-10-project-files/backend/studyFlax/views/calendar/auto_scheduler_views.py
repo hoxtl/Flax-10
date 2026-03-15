@@ -3,7 +3,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
-from studyFlax.models import CalendarEvent, Deadline, Schedule, ScheduleEventAllocation
+from studyFlax.models import CalendarEvent, Deadline, Schedule, Notification, ScheduleEventAllocation
 from studyFlax.serialisers import AutoScheduleRequestSerialiser, ScheduleSerialiser
 
 
@@ -73,6 +73,7 @@ def build_auto_schedule(request):
         if payload.get('clear_existing'):
             request.user.schedules.all().delete()
 
+        overwritten = _overwrite_same_name_schedules(request.user, payload['title'])
         schedule = Schedule.objects.create(
             title=payload['title'],
             user=request.user,
@@ -81,12 +82,14 @@ def build_auto_schedule(request):
             worktime_preference=payload['worktime_preference'],
             week_preference=payload['week_preference'],
         )
-        schedule.deadlines.set(deadlines)
+        schedule.deadline.set(deadlines)
 
         for deadline in deadlines:
             _allocate_deadline_blocks(schedule, request.user, deadline, deadline_map[deadline.id], payload)
 
-    return Response(ScheduleSerialiser(schedule).data, status=status.HTTP_201_CREATED)
+    response_payload = ScheduleSerialiser(schedule).data
+    response_payload['overwritten'] = overwritten
+    return Response(response_payload, status=status.HTTP_201_CREATED)
 
 
 def _allocate_deadline_blocks(schedule, user, deadline, minutes_per_day, payload):
@@ -125,7 +128,6 @@ def _allocate_deadline_blocks(schedule, user, deadline, minutes_per_day, payload
                 start_time=block_start,
                 end_time=block_end,
                 source='auto_scheduler',
-                module=deadline.module,
             )
             ScheduleEventAllocation.objects.create(
                 schedule=schedule,
@@ -135,3 +137,22 @@ def _allocate_deadline_blocks(schedule, user, deadline, minutes_per_day, payload
             )
 
         current_day += timedelta(days=1)
+
+def _notify_schedule_overwrite(user, title):
+    Notification.objects.create(
+        user=user,
+        title='Schedule overwritten',
+        message=f'Your previous schedule "{title}" has been overwritten by a newer one.',
+        notification_type='general',
+    )
+
+
+def _overwrite_same_name_schedules(user, title):
+    existing = list(Schedule.objects.filter(user=user, title=title))
+    if not existing:
+        return False
+
+    for schedule in existing:
+        schedule.delete()
+    _notify_schedule_overwrite(user, title)
+    return True

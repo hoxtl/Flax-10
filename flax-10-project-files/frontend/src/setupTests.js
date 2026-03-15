@@ -1,20 +1,12 @@
 import '@testing-library/jest-dom';
 
-const localStorageMock = (function () {
+const localStorageMock = (() => {
     let store = {};
     return {
-        getItem: function (key) {
-            return store[key] || null;
-        },
-        setItem: function (key, value) {
-            store[key] = value.toString();
-        },
-        removeItem: function (key) {
-            delete store[key];
-        },
-        clear: function () {
-            store = {};
-        }
+        getItem: (key) => store[key] || null,
+        setItem: (key, value) => { store[key] = value.toString(); },
+        removeItem: (key) => { delete store[key]; },
+        clear: () => { store = {}; },
     };
 })();
 

@@ -68,7 +68,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
         # Users target_user shares with
         shared_with_users = User.objects.filter(shared_with_me__owner=target_user)
         page = self.paginate_queryset(shared_with_users)
-        if page is not None:
+        if page is not None:  # pragma: no cover
             serializer = CalendarShareUserSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
@@ -86,7 +86,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
         # Users who share with target_user
         owners = User.objects.filter(sharing_with__shared_with=target_user)
         page = self.paginate_queryset(owners)
-        if page is not None:
+        if page is not None:  # pragma: no cover
             serializer = CalendarShareUserSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 

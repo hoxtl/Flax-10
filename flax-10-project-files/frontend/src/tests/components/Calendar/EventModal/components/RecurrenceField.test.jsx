@@ -2,6 +2,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { RecurrenceField } from '../../../../../components/Calendar/EventModal/components/RecurrenceField';
 
+vi.mock('../../../../../components/ui/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options }) => (
+        <select value={value} onChange={(e) => onChange(e.target.value)}>
+            {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+        </select>
+    )
+}));
+
+vi.mock('../../../../../components/common/inputs/DateTimePicker', () => ({
+    default: ({ value, onChange }) => (
+        <input
+            type="date"
+            className="end-date-input"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+        />
+    )
+}));
+
 describe('RecurrenceField', () => {
     const mockOnChange = vi.fn();
 
@@ -49,7 +68,7 @@ describe('RecurrenceField', () => {
 
     it('should call onChange when end date changes', () => {
         render(<RecurrenceField value={{ frequency: 'daily', end_date: '2025-01-01' }} onChange={mockOnChange} />);
-        const dateInput = document.querySelector('.end-date-input'); // class check or type check
+        const dateInput = document.querySelector('.end-date-input');
         expect(dateInput).toBeInTheDocument();
         fireEvent.change(dateInput, { target: { value: '2025-02-01' } });
         expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ end_date: '2025-02-01' }));

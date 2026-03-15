@@ -1,3 +1,7 @@
+"""
+Backend tests for sleep settings views.
+"""
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -5,9 +9,9 @@ from rest_framework import status
 
 User = get_user_model()
 
-
 class SleepSettingsViewTest(TestCase):
 
+    """Tests for sleep settings view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -15,6 +19,18 @@ class SleepSettingsViewTest(TestCase):
         )
         self.client.force_authenticate(user=self.user)
         self.url = '/api/settings/'
+
+    def get_sleep(self, response):
+        """Extract sleep_time from either flat or nested response."""
+        if 'settings' in response.data:
+            return response.data['settings']['sleep_time']
+        return response.data['sleep_time']
+
+    def get_wake(self, response):
+        """Return wake for tests."""
+        if 'settings' in response.data:
+            return response.data['settings']['wake_time']
+        return response.data['wake_time']
 
     def test_settings_include_sleep_fields(self):
         response = self.client.get(self.url)
@@ -30,8 +46,8 @@ class SleepSettingsViewTest(TestCase):
     def test_update_sleep_times(self):
         response = self.client.patch(self.url, {'sleep_time': '22:30', 'wake_time': '06:30'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data['sleep_time'].startswith('22:30'))
-        self.assertTrue(response.data['wake_time'].startswith('06:30'))
+        self.assertTrue(self.get_sleep(response).startswith('22:30'))
+        self.assertTrue(self.get_wake(response).startswith('06:30'))
 
     def test_sleep_time_persisted_after_update(self):
         self.client.patch(self.url, {'sleep_time': '00:00', 'wake_time': '08:00'}, format='json')

@@ -1,0 +1,38 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-8);
+  background: var(--surface-panel);
+  border-radius: var(--card-radius);
+  border: 1px dashed color-mix(in srgb, var(--primary) 22%, transparent);
+  gap: var(--space-2);
+}
+
+.icon {
+  font-size: var(--text-4xl);
+  opacity: 0.45;
+  margin-bottom: var(--space-2);
+  line-height: 1;
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.description {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+.action {
+  margin-top: var(--space-5);
+}

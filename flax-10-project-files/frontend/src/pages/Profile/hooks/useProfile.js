@@ -92,7 +92,7 @@ export function useProfileBodyData(state) {
   const modules = profileData?.modules || [];
   const filteredEvents = getFilteredEvents(allEvents, eventRange);
   const upcomingEventCount = getUpcomingCount(allEvents);
-  return { modules, filteredEvents, upcomingEventCount, allEvents };
+  return { modules, filteredEvents, upcomingEventCount };
 }
 
 export function useProfileContent(state) {

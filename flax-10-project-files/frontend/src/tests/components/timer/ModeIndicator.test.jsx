@@ -13,4 +13,9 @@ const testModes = () => {
 
 describe('ModeIndicator', () => {
     it('shows correct text for modes', testModes);
+
+    it('shows Overtime for work mode when isOvertime is true', () => {
+        render(<ModeIndicator mode="work" isOvertime={true} />);
+        expect(screen.getByText('🚀 Overtime')).toBeInTheDocument();
+    });
 });

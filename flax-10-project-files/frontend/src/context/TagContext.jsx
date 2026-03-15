@@ -42,6 +42,8 @@ async function loadInitialTags(setTags, setLoading) {
     try {
         const data = await getTags();
         setTags(data.map(mapBackendTag));
+    } catch (err) {
+        console.error('Failed to fetch tags:', err);
     } finally {
         setLoading(false);
     }

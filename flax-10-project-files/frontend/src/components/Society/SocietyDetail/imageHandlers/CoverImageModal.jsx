@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./ImageManagerComponents.module.css";
-import { ImageHeader, ImageGrid, AddImageView } from "./ImageManagerComponents";
+import { ImageGrid, AddImageView } from "./ImageManagerComponents";
+import StandardModal from "../../../common/StandardModal/StandardModal";
 
 export default function CoverImageModal({ images, availablePhotos, onClose, onUpdate }) {
     const [view, setView] = useState("list");
@@ -11,13 +12,16 @@ export default function CoverImageModal({ images, availablePhotos, onClose, onUp
     }
 
     return (
-        <div className={styles.backdrop} onMouseDown={onClose}>
-            <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-                <ImageHeader title="Manage Cover Images" onClose={onClose} />
-                <p className={styles.hint}>First image is shown on society card. Click ★ to pin.</p>
-                <ImageGrid images={images} onDelete={handlers.delete} onPin={handlers.pin} onAddClick={() => setView("add")} />
-            </div>
-        </div>
+        <StandardModal
+            title="Manage Cover Images"
+            onClose={onClose}
+            size="lg"
+            modalClassName={styles.modalShellWide}
+            contentClassName={styles.modalContent}
+        >
+            <p className={styles.hint}>First image is shown on society card. Click ★ to pin.</p>
+            <ImageGrid images={images} onDelete={handlers.delete} onPin={handlers.pin} onAddClick={() => setView("add")} />
+        </StandardModal>
     );
 }
 

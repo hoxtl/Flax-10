@@ -3,8 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="screen-orientation" content="portrait" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>StudyFlax</title>
+    <style>
+      @media screen and (orientation: landscape) and (max-width: 900px) {
+        html {
+          transform: rotate(-90deg);
+          transform-origin: left top;
+          width: 100vh;
+          height: 100vw;
+          overflow-x: hidden;
+          position: absolute;
+          top: 100%;
+          left: 0;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

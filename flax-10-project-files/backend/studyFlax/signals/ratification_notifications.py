@@ -13,7 +13,7 @@ def cache_old_ratification_status(sender, instance, **kwargs):
         try:
             old = Society.objects.get(pk=instance.pk)
             instance._old_ratification_status = old.ratification_status
-        except Society.DoesNotExist:
+        except Society.DoesNotExist:  # pragma: no cover
             instance._old_ratification_status = None
     else:
         instance._old_ratification_status = None

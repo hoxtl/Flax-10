@@ -1,5 +1,11 @@
 import styles from "./CategorySelector.module.css";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
+import AnimatedDropdown from "../ui/AnimatedDropdown";
+
+const CATEGORY_DROPDOWN_OPTIONS = [
+    { value: '', label: 'Select a category' },
+    ...SOCIETY_CATEGORY_OPTIONS.map(cat => ({ value: cat.id, label: cat.label }))
+];
 
 export default function CategorySelector({ value, onChange, label = "Category", multiple = false }) {
     if (multiple) return <MultiCategorySelector value={value} onChange={onChange} label={label} />;
@@ -10,10 +16,7 @@ function SingleCategorySelector({ value, onChange, label }) {
     return (
         <div className={styles.field}>
             {label && <label className={styles.label}>{label}</label>}
-            <select className={styles.select} value={value || ""} onChange={e => onChange(e.target.value)}>
-                <option value="">Select a category</option>
-                {SOCIETY_CATEGORY_OPTIONS.map(cat => <option key={cat.id} value={cat.id}>{cat.label}</option>)}
-            </select>
+            <AnimatedDropdown value={value || ""} onChange={onChange} options={CATEGORY_DROPDOWN_OPTIONS} placeholder="Select a category" />
         </div>
     );
 }

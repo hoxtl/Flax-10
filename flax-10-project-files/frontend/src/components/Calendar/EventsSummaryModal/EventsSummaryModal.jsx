@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import styles from "./EventsSummaryModal.module.css";
+import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
+import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/Profile/utils/profileHelpers";
 
 export function EventsSummaryModal({ isOpen, onClose, allEvents, baseDate, isMutualOrSelf }) {
@@ -14,70 +15,47 @@ export function EventsSummaryModal({ isOpen, onClose, allEvents, baseDate, isMut
     const filteredEvents = getFilteredEvents(allEvents, range, baseDate);
     const title = `Events - ${getRangeLabel(range)} (${filteredEvents.length})`;
 
-    return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                <Header title={title} onClose={onClose} />
-                <div className={styles.modalContent}>
-                    <RangeButtons range={range} onRangeChange={setRange} />
-                    <EventsList events={filteredEvents} />
-                </div>
-            </div>
-        </div>
-    );
-}
+    const formatMeta = (ev) => {
+        const date = new Date(ev.start_time);
+        return `${date.toLocaleDateString('en-GB', DATE_FORMAT)} at ${date.toLocaleTimeString('en-GB', TIME_FORMAT)} ${ev.location ? `• ${ev.location}` : ''}`;
+    };
 
-function Header({ title, onClose }) {
     return (
-        <div className={styles.modalHeader}>
-            <h2 className={styles.modalTitle}>{title}</h2>
-            <button className={styles.modalClose} onClick={onClose}>✕</button>
-        </div>
+        <GenericSummaryModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={title}
+            emptyMessage="No events found for this period"
+            topContent={<RangeButtons range={range} onRangeChange={setRange} />}
+            items={filteredEvents}
+            renderItem={(event, i) => (
+                <SummaryItem
+                    key={i}
+                    avatar="📅"
+                    title={event.title}
+                    subtitle={formatMeta(event)}
+                />
+            )}
+        />
     );
 }
 
 function RangeButtons({ range, onRangeChange }) {
     return (
-        <div className={styles.rangeSelector}>
+        <div style={{ display: 'flex', gap: '4px', padding: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '12px', justifyContent: 'space-between' }}>
             {RANGE_OPTIONS.map(([key, label]) => (
-                <button
-                    key={key}
-                    className={range === key ? styles.rangeActive : ''}
-                    onClick={() => onRangeChange(key)}
-                >
-                    {label}
-                </button>
+                <RangeButton key={key} isActive={range === key} label={label} onClick={() => onRangeChange(key)} />
             ))}
         </div>
     );
 }
 
-function EventsList({ events }) {
-    if (events.length === 0) {
-        return <p className={styles.emptyMessage}>No events found for this period</p>;
-    }
-    return events.map((event, i) => <EventItem key={i} event={event} />);
-}
-
-function EventItem({ event }) {
-    return (
-        <div className={styles.listItem}>
-            <div className={styles.listAvatar}>📅</div>
-            <div className={styles.listInfo}>
-                <div className={styles.listName}>{event.title}</div>
-                <EventMeta startTime={event.start_time} location={event.location} />
-            </div>
-        </div>
-    );
-}
-
-function EventMeta({ startTime, location }) {
-    const date = new Date(startTime);
-    const dateStr = date.toLocaleDateString('en-GB', DATE_FORMAT);
-    const timeStr = date.toLocaleTimeString('en-GB', TIME_FORMAT);
-    return (
-        <div className={styles.listMeta}>
-            {dateStr} at {timeStr} {location ? `• ${location}` : ''}
-        </div>
-    );
+function RangeButton({ isActive, label, onClick }) {
+    const style = {
+        flex: 1, padding: '8px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '0.9rem', transition: 'all 0.2s ease',
+        background: isActive ? '#8b6e4e' : 'transparent',
+        color: isActive ? '#fff' : 'var(--text, #1f2937)',
+        fontWeight: isActive ? '600' : '500',
+    };
+    return <button style={style} onClick={onClick}>{label}</button>;
 }

@@ -10,7 +10,7 @@ import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment'
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
-import ConfirmModal from '../common/ConfirmModal';
+import { useConfirm } from '../../context/ConfirmContext';
 
 export function EventPopups() {
     return (
@@ -27,19 +27,35 @@ function EventModalContainer() {
     return <EventModal event={modalEvent} onClose={closeModal} initialType={modalType} initialDate={modalInitialDate} />;
 }
 
-function useEventDeletion(closePopup) {
+function useEventDeletion() {
     const { removeEvent, addException } = useEventActions();
-    const [deleteEventState, setDeleteEvent] = useState(null);
-    const handleDeleteRequest = (event) => { closePopup(); setDeleteEvent(event); };
-    const onConfirm = async () => {
-        if (!deleteEventState) return;
-        const recurring = hasRecurrence(deleteEventState);
-        const choice = recurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
-        if (choice) await executeDelete(deleteEventState, { removeEvent });
-        else await deleteRecurrenceOccurrence(deleteEventState, { addException });
-        setDeleteEvent(null);
+    const confirmFn = useConfirm();
+
+    const handleDeleteRequest = async (event) => {
+        const recurring = hasRecurrence(event);
+        if (recurring) {
+            const choice = await confirmFn({
+                title: "Delete Recurring Event",
+                message: "This is a recurring event. How would you like to delete it?",
+                confirmText: "Delete ALL occurrences",
+                alternateText: "Delete ONLY this one",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice === true) await executeDelete(event, { removeEvent });
+            else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
+        } else {
+            const choice = await confirmFn({
+                title: "Delete Event",
+                message: `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice) await executeDelete(event, { removeEvent });
+        }
     };
-    return { deleteEventState, handleDeleteRequest, handleDeleteConfirm: onConfirm, handleDeleteCancel: () => setDeleteEvent(null) };
+    return { handleDeleteRequest };
 }
 
 function EventPopupContainer() {
@@ -50,19 +66,18 @@ function EventPopupContainer() {
     const { getTag, refreshTags } = useTags();
     const notify = useNotify();
     const navigate = useNavigate();
-    const { deleteEventState, handleDeleteRequest, handleDeleteConfirm, handleDeleteCancel } = useEventDeletion(closePopup);
+    const { handleDeleteRequest } = useEventDeletion();
 
-    if (deleteEventState) return <DeleteConfirmModal event={deleteEventState} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />;
     if (isModalOpen || !popupEvent) return null;
 
     const tag = getEventTag(popupEvent, getTag);
-    const handlers = { openModal, onDeleteRequest: handleDeleteRequest, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags, notify };
+    const onDeleteWrapped = async (ev) => {
+        closePopup();
+        await handleDeleteRequest(ev);
+    };
+    const handlers = { openModal, onDeleteRequest: onDeleteWrapped, closePopup, loadEvents, navigate, disenrollFromModule, refreshTags, notify };
     const actions = getCalendarPopupActions(popupEvent, handlers);
     return <EventDetailPopup event={popupEvent} tag={tag} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} />;
-}
-
-function DeleteConfirmModal({ event, onConfirm, onCancel }) {
-    return <ConfirmModal title="Delete Event" message={`Are you sure you want to delete "${event.title}"? This cannot be undone.`} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
 function getEventTag(event, getTag) {

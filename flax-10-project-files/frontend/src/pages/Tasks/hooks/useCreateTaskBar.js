@@ -1,0 +1,150 @@
+/**
+ * Hook for CreateTaskBar: state, effects, and submit handler.
+ */
+
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { getModules, getEnrollments } from "../../../api/moduleApi";
+import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+import { getUserSettings } from "../../../api/userService";
+import { runQuickAdd } from "../utils/createTaskBarUtils";
+
+function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
+  const sortedLists = useMemo(
+    () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
+    [lists]
+  );
+  const [title, setTitle] = useState("");
+  const [estimatedBlocks, setEstimatedBlocks] = useState(1);
+  const [taskListId, setTaskListId] = useState(() => (defaultListId || sortedLists[0]?.id) ?? "");
+  const [moduleId, setModuleId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [enrolledModules, setEnrolledModules] = useState([]);
+  const [sleepSettings, setSleepSettings] = useState(null);
+  const inputRef = useRef(null);
+  const cardRef = useRef(null);
+  const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
+  return { sortedLists, title, setTitle, estimatedBlocks, setEstimatedBlocks, taskListId, setTaskListId, moduleId, setModuleId, saving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate };
+}
+
+function useEnrolledModulesEffect(setEnrolledModules) {
+  useEffect(() => {
+    Promise.all([getModules(), getEnrollments()])
+      .then(([modulesList, enrollments]) => {
+        const enrolled = (modulesList || []).filter((m) => isEnrolledIn(m.id, enrollments || []));
+        setEnrolledModules(enrolled);
+      })
+      .catch(() => setEnrolledModules([]));
+  }, [setEnrolledModules]);
+}
+
+function useSleepSettingsEffect(setSleepSettings) {
+  useEffect(() => {
+    let cancelled = false;
+    getUserSettings()
+      .then((data) => {
+        if (cancelled) return;
+        setSleepSettings({
+          sleep_time: data?.sleep_time?.slice(0, 5) || "23:00",
+          wake_time: data?.wake_time?.slice(0, 5) || "07:00",
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" });
+      });
+    return () => { cancelled = true; };
+  }, [setSleepSettings]);
+}
+
+function useTaskListIdSync(defaultListId, sortedLists, setTaskListId) {
+  useEffect(() => {
+    const next = (defaultListId || sortedLists[0]?.id) ?? "";
+    if (!next) return;
+    setTaskListId((prev) => (prev === next ? prev : next));
+  }, [defaultListId, sortedLists, setTaskListId]);
+}
+
+function useClickOutsideEffect(inputFocused, cardRef, inputRef, externalInputRef, setInputFocused) {
+  useEffect(() => {
+    if (!inputFocused) return;
+    const handleDown = (e) => {
+      if (!cardRef.current?.contains(e.target)) {
+        setInputFocused(false);
+        (externalInputRef?.current || inputRef.current)?.blur?.();
+      }
+    };
+    document.addEventListener("mousedown", handleDown);
+    document.addEventListener("touchstart", handleDown);
+    return () => {
+      document.removeEventListener("mousedown", handleDown);
+      document.removeEventListener("touchstart", handleDown);
+    };
+  }, [inputFocused, cardRef, inputRef, externalInputRef, setInputFocused]);
+}
+
+function useCreateTaskBarHandlers(state, onAddTask) {
+  const doAdd = useCallback(
+    (taskTitle) => runQuickAdd(state, onAddTask, taskTitle),
+    [state.saving, state.setSaving, state.setTitle, state.setModuleId, onAddTask, state]
+  );
+  const handleSubmit = useCallback(
+    async (e) => {
+      e?.preventDefault();
+      const t = state.title.trim();
+      if (!t || state.saving || !onAddTask) return;
+      if (state.defaultDueDate) state.checkSleepAndRun(state.defaultDueDate, () => doAdd(t));
+      else await doAdd(t);
+    },
+    [state.title, state.saving, state.defaultDueDate, state.checkSleepAndRun, onAddTask, doAdd]
+  );
+  return { handleSubmit };
+}
+
+function useCreateTaskBarInputHandlers(state) {
+  const handleInputBlur = useCallback(() => {
+    setTimeout(() => {
+      const activeEl = document.activeElement;
+      if (!activeEl?.closest?.("[data-create-task-bar-card]")) state.setInputFocused(false);
+    }, 0);
+  }, [state.setInputFocused]);
+  const handleInputKeyDown = useCallback((e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      state.setInputFocused(false);
+      e.currentTarget.blur();
+    }
+  }, [state.setInputFocused]);
+  return { handleInputBlur, handleInputKeyDown };
+}
+
+function useCreateTaskBarOptions(state) {
+  const moduleOptions = useMemo(
+    () => [
+      { value: "", label: "None" },
+      ...state.enrolledModules.map((m) => ({
+        value: String(m.id),
+        label: (m.module_code || "") + (m.module_name ? ` — ${m.module_name}` : ""),
+      })),
+    ],
+    [state.enrolledModules]
+  );
+  const listOptions = useMemo(
+    () => state.sortedLists.map((l) => ({ value: String(l.id), label: l.name || "Unnamed list" })),
+    [state.sortedLists]
+  );
+  return { moduleOptions, listOptions };
+}
+
+export default function useCreateTaskBar(props) {
+  const { lists = [], defaultListId, defaultDueDate, onAddTask, inputRef: externalInputRef } = props;
+  const state = useCreateTaskBarFormState(lists, defaultListId, defaultDueDate);
+  useEnrolledModulesEffect(state.setEnrolledModules);
+  useSleepSettingsEffect(state.setSleepSettings);
+  useTaskListIdSync(state.defaultListId, state.sortedLists, state.setTaskListId);
+  useClickOutsideEffect(state.inputFocused, state.cardRef, state.inputRef, externalInputRef, state.setInputFocused);
+  const { handleSubmit } = useCreateTaskBarHandlers(state, onAddTask);
+  const { handleInputBlur, handleInputKeyDown } = useCreateTaskBarInputHandlers(state);
+  const { moduleOptions, listOptions } = useCreateTaskBarOptions(state);
+  return { ...state, handleSubmit, handleInputBlur, handleInputKeyDown, showOptions: state.inputFocused, moduleOptions, listOptions };
+}

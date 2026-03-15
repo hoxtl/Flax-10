@@ -1,5 +1,5 @@
-import { FormField } from './FormField';
-import { getType, handleDateChange, getDisplayValue, handleToggle } from './timeRowHelpers';
+import DateTimePicker from '../../../common/inputs/DateTimePicker';
+import { getDisplayValue, handleToggle, handleDatePickerChange, handleNativeDateChange } from './timeRowHelpers';
 import './TimeRow.css';
 
 export function TimeRow({ form, update, setForm }) {
@@ -16,11 +16,7 @@ function AllDayToggle({ form, setForm }) {
         <div className="all-day-toggle-row">
             <span className="toggle-label">All-day</span>
             <label className="switch">
-                <input
-                    type="checkbox"
-                    checked={form.all_day || false}
-                    onChange={handleToggle(setForm, form)}
-                />
+                <input type="checkbox" checked={form.all_day || false} onChange={handleToggle(setForm, form)} />
                 <span className="slider"></span>
             </label>
         </div>
@@ -29,28 +25,33 @@ function AllDayToggle({ form, setForm }) {
 
 function TimeFields({ form, update }) {
     const isAllDay = form.all_day || false;
-    const type = getType(isAllDay);
-    const fields = [
-        { label: 'Start', value: form.start_time, field: 'start_time' },
-        { label: 'End', value: form.end_time, field: 'end_time' }
-    ];
     return (
         <div className="form-row">
-            {fields.map(f => (
-                <TimeInput key={f.field} {...f} update={update} type={type} isAllDay={isAllDay} />
-            ))}
+            <TimeInput label="Start" value={form.start_time} field="start_time" update={update} isAllDay={isAllDay} />
+            <TimeInput label="End" value={form.end_time} field="end_time" update={update} isAllDay={isAllDay} />
         </div>
     );
 }
 
-function TimeInput({ label, value, field, update, type, isAllDay }) {
+function TimeInput({ label, value, field, update, isAllDay }) {
+    if (isAllDay) return <DateOnlyInput label={label} value={value} field={field} update={update} />;
+    return <DateTimeInput label={label} value={value} field={field} update={update} />;
+}
+
+function DateTimeInput({ label, value, field, update }) {
     return (
-        <FormField
-            label={label}
-            type={type}
-            value={getDisplayValue(value, isAllDay, field) || ''}
-            onChange={handleDateChange(field, isAllDay, update)}
-            required
-        />
+        <div className="form-field">
+            <label>{label}</label>
+            <DateTimePicker value={value || ''} onChange={handleDatePickerChange(field, update)} placeholder={`Select ${label.toLowerCase()}`} />
+        </div>
+    );
+}
+
+function DateOnlyInput({ label, value, field, update }) {
+    return (
+        <div className="form-field">
+            <label>{label}</label>
+            <input type="date" value={getDisplayValue(value, true, field) || ''} onChange={handleNativeDateChange(field, update)} required />
+        </div>
     );
 }

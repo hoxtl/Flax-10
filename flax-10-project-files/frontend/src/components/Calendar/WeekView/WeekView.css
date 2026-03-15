@@ -1,183 +1,191 @@
 .week-view {
-    background: var(--calendar-bg);
-    border-radius: 8px;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
+  background: var(--panel);
+  border-radius: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sticky-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: var(--calendar-bg);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--panel);
 }
 
 .week-header {
-    z-index: 10;
-    display: flex;
-    border-bottom: 2px solid var(--border);
-    background-color: var(--panel);
-    flex-shrink: 0;
+  z-index: 10;
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  background-color: var(--bg);
+  flex-shrink: 0;
 }
 
 .week-grid {
-    display: flex;
-    flex: 1;
-    color: var(--text);
+  display: flex;
+  flex: 1;
+  color: var(--text);
+  position: relative;
 }
 
 .time-gutter {
-    width: 60px;
-    flex-shrink: 0;
+  width: 60px;
+  flex-shrink: 0;
 }
 
 .day-header {
-    flex: 1;
-    text-align: center;
-    padding: 0.4rem;
-    background: transparent;
+  flex: 1;
+  text-align: center;
+  padding: 0.4rem;
+  background: transparent;
 }
 
 .day-header.is-today .day-number {
-    background-color: var(--primary);
-    color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .day-header.is-today .day-name {
-    color: var(--primary);
-    font-weight: bold;
+  color: var(--primary);
+  font-weight: bold;
 }
 
 .day-name {
-    display: block;
-    font-size: 0.65rem;
-    color: var(--muted);
+  display: block;
+  font-size: 0.65rem;
+  color: var(--muted);
 }
 
 .day-number {
-    display: block;
-    font-size: 1rem;
-    font-weight: bold;
-    color: var(--text);
-    cursor: pointer;
-    transition: color 0.2s ease;
+  display: block;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .day-number:hover {
-    color: var(--primary);
+  color: var(--primary);
 }
 
 .time-labels {
-    width: 60px;
-    flex-shrink: 0;
+  width: 60px;
+  flex-shrink: 0;
 }
 
 .time-label-cell {
-    padding: 0.25rem;
-    text-align: right;
-    font-size: 0.75rem;
-    color: var(--muted);
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    box-sizing: border-box;
+  padding: 0.25rem;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-task);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  box-sizing: border-box;
 }
 
 .day-column {
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid var(--border);
-    position: relative;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  position: relative;
+  flex: 1;
 }
 
 .hour-cell {
-    border-bottom: 1px solid var(--border) !important;
-    box-sizing: border-box;
-    position: relative;
-    background-image: linear-gradient(to bottom,
-            transparent 24%,
-            var(--hover) 25%,
-            var(--hover) 26%,
-            transparent 27%,
-            transparent 49%,
-            var(--active) 50%,
-            var(--active) 51%,
-            transparent 52%,
-            transparent 74%,
-            var(--hover) 75%,
-            var(--hover) 76%,
-            transparent 77%);
-    flex-shrink: 0;
+  border-bottom: 1px solid var(--border) !important;
+  box-sizing: border-box;
+  position: relative;
+  background-image: none;
+  flex-shrink: 0;
+}
+
+/* Show sub-grid lines only during drag/resize interactions */
+.week-view:has(.draggable-event.dragging) .hour-cell,
+.week-view:has(.draggable-event.resizing) .hour-cell {
+  background-image: linear-gradient(to bottom,
+      transparent 24%,
+      var(--divider) 25%,
+      var(--divider) 26%,
+      transparent 27%,
+      transparent 49%,
+      var(--divider) 50%,
+      var(--divider) 51%,
+      transparent 52%,
+      transparent 74%,
+      var(--divider) 75%,
+      var(--divider) 76%,
+      transparent 77%);
 }
 
 .hour-cell.drop-target {
-    background-color: var(--active);
-    background-image: none;
-    box-shadow: inset 0 0 0 2px var(--primary);
-    transition: all 0.15s ease;
+  background-color: var(--active);
+  background-image: none;
+  box-shadow: inset 0 0 0 2px var(--primary);
+  transition: all 0.15s ease;
 }
 
 .hour-cell:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .hour-cell:nth-last-child(1) {
-    border-bottom: 2px solid var(--border) !important;
+  border-bottom: 2px solid var(--border) !important;
 }
 
 .column-events {
-    position: absolute;
-    top: 0;
-    left: 2px;
-    right: 2px;
-    bottom: 0;
-    pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 2px;
+  right: 2px;
+  bottom: 0;
+  pointer-events: none;
 }
 
 .column-events>* {
-    pointer-events: auto;
+  pointer-events: auto;
 }
 
 .quarter-highlight {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 25%;
-    background-color: var(--active);
-    border: 2px solid var(--primary);
-    box-sizing: border-box;
-    pointer-events: none;
-    border-radius: 4px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background-color: var(--active);
+  border: 2px solid var(--primary);
+  box-sizing: border-box;
+  pointer-events: none;
+  border-radius: 4px;
 }
 
 .resize-line-highlight {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 0;
-    border-bottom: 3px solid var(--primary);
-    pointer-events: none;
-    z-index: 15;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-bottom: 3px solid var(--primary);
+  pointer-events: none;
+  z-index: 15;
 }
 
 .week-view:has(.draggable-event.dragging) .draggable-event:not(.dragging) {
-    opacity: 0.2;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
+  opacity: 0.2;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
 .week-view:has(.draggable-event.dragging) .draggable-event.dragging {
-    opacity: 0;
-    pointer-events: none;
+  opacity: 0;
+  pointer-events: none;
 }

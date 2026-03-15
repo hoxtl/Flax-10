@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.society import SocietyMembership
 
 
 # ---------------------------------------------------------------------------
@@ -82,9 +83,6 @@ def derive_persona(sessions):
     for s in sessions:
         hour_totals[s.end_time.hour] += s.duration
         durations.append(s.duration)
-
-    if not hour_totals:
-        return PERSONAS[0]
 
     peak_hour = max(hour_totals, key=hour_totals.get)
     avg_duration = sum(durations) / len(durations) if durations else 0
@@ -244,6 +242,14 @@ def get_weekly_study_hours(sessions_all):
     return round(sum(s.duration for s in week_sessions) / 60, 1)
 
 
+def get_society_image(society):
+    """Resolves primary image from Society or the first related SocietyImage."""
+    if society.image:
+        return society.image
+    first_img = society.images.first()
+    return first_img.url if first_img else None
+
+
 # ---------------------------------------------------------------------------
 # Main view
 # ---------------------------------------------------------------------------
@@ -279,6 +285,15 @@ def profile_summary_view(request):
     weekly_hours = get_weekly_study_hours(sessions_all)
     weekly_goal  = user.weekly_goal_hours or 20
 
+    memberships = SocietyMembership.objects.filter(user=user).select_related('society')
+    societies = [
+        {
+            'id': m.society.id,
+            'name': m.society.name,
+            'image': get_society_image(m.society),
+        } for m in memberships
+    ]
+
     return Response({
         'persona': persona,
         'streaks': {
@@ -291,4 +306,5 @@ def profile_summary_view(request):
             'goal_hours':    weekly_goal,
             'percentage':    min(round((weekly_hours / weekly_goal) * 100), 100) if weekly_goal else 0,
         },
+        'societies': societies,
     })

@@ -16,7 +16,7 @@ vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
   ExpandableTabs: ({ onChange }) => (
     <div>
       <button onClick={() => onChange(0)}>add-tab</button>
-      <button onClick={() => onChange(1)}>notif-tab</button>
+      <button onClick={() => onChange(2)}>notif-tab</button>
       <button onClick={() => onChange(null)}>deselect</button>
     </div>
   ),
@@ -25,38 +25,69 @@ vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
 vi.mock('../../components/Dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
 vi.mock('../../components/Timer/MiniTimer', () => ({ default: () => <div>timer</div> }));
 vi.mock('../../context/NotificationContext', () => ({
-  useNotifications: () => ({ togglePanel: vi.fn(), notifications: [] })
+  useNotifications: vi.fn(() => ({ togglePanel: vi.fn(), notifications: [] })),
 }));
 vi.mock('../../components/Notifications/NotificationPanel', () => ({
   NotificationPanel: () => <div>notifications</div>
 }));
 
 describe('TopBar', () => {
-  it('calls onAddClick when add tab selected', () => {
-    const onAdd = vi.fn();
-    render(<TopBar onAddClick={onAdd} />);
-    fireEvent.click(screen.getByText('add-tab'));
-    expect(onAdd).toHaveBeenCalled();
+  it('renders brand', () => {
+    render(<TopBar user={{ first_name: 'Jane', username: 'JD' }} />);
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
-  it('does not call onAddClick for non-0 tab index', () => {
-    const onAdd = vi.fn();
-    render(<TopBar onAddClick={onAdd} />);
-    fireEvent.click(screen.getByText('notif-tab'));
-    expect(onAdd).not.toHaveBeenCalled();
+  it('renders the updated KCL-focused nav groups', () => {
+    render(<TopBar />);
+    expect(screen.getByText('Plan')).toBeTruthy();
+    expect(screen.getByText('Study')).toBeTruthy();
+    expect(screen.getByText('My KCL')).toBeTruthy();
   });
 
-  it('handles null tab index without crash', () => {
-    expect(() => {
-      render(<TopBar onAddClick={vi.fn()} />);
-      fireEvent.click(screen.getByText('deselect'));
-    }).not.toThrow();
+  it('renders without user', () => {
+    render(<TopBar />);
+    expect(screen.getByText('StudyFlax')).toBeTruthy();
   });
 
   it('calls onSettingsClick', () => {
     const fn = vi.fn();
-    render(<TopBar onSettingsClick={fn} />);
+    render(<TopBar user={{}} onSettingsClick={fn} />);
     fireEvent.click(screen.getByText('settings'));
     expect(fn).toHaveBeenCalled();
+  });
+
+  it('renders theme toggle and timer', () => {
+    render(<TopBar />);
+    expect(screen.getByText('theme')).toBeTruthy();
+    expect(screen.getByText('timer')).toBeTruthy();
+  });
+
+  it('calls onNavChange with home when brand is clicked', () => {
+    const onNavChange = vi.fn();
+    render(<TopBar onNavChange={onNavChange} />);
+    fireEvent.click(screen.getByText('StudyFlax'));
+    expect(onNavChange).toHaveBeenCalledWith('home');
+  });
+
+  it('calls onAddClick when add tab is clicked', () => {
+    const onAddClick = vi.fn();
+    render(<TopBar onAddClick={onAddClick} />);
+    fireEvent.click(screen.getByText('add-tab'));
+    expect(onAddClick).toHaveBeenCalled();
+  });
+
+  it('calls togglePanel when notifications tab is clicked', async () => {
+    const togglePanel = vi.fn();
+    const { useNotifications } = await import('../../context/NotificationContext');
+    useNotifications.mockReturnValue({ togglePanel, notifications: [] });
+    render(<TopBar />);
+    fireEvent.click(screen.getByText('notif-tab'));
+    expect(togglePanel).toHaveBeenCalled();
+  });
+
+  it('renders tools and timer', () => {
+    const onNavChange = vi.fn();
+    render(<TopBar onNavChange={onNavChange} activeNav="home" />);
+    expect(screen.getByText('timer')).toBeTruthy();
   });
 });

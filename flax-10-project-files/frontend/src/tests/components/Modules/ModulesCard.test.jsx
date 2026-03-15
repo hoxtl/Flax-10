@@ -9,7 +9,7 @@ vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     getDepartment: vi.fn(() => "King's College London"),
 }));
 
-vi.mock('../ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+vi.mock('../../../components/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
 
 const module = {
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
@@ -75,5 +75,30 @@ describe('ModulesCard', () => {
         render(<ModulesCard {...mockParameters} isTeacher={true} onDelete={onDelete} />);
         fireEvent.click(screen.getByText('× Delete'));
         expect(onDelete).toHaveBeenCalled();
+    });
+
+    it('shows Core badge when enrolled in core module', async () => {
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
+        isEnrolledIn.mockReturnValueOnce(true);
+        render(<ModulesCard {...mockParameters} enrollments={[{ module: 1, is_core: true }]} />);
+        expect(screen.getByText('📌 Core')).toBeInTheDocument();
+    });
+
+    it('shows Core module tag in actions when enrolled in core', async () => {
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
+        isEnrolledIn.mockReturnValueOnce(true);
+        render(<ModulesCard {...mockParameters} enrollments={[{ module: 1, is_core: true }]} />);
+        expect(screen.getByText('📌 Core module')).toBeInTheDocument();
+    });
+
+    it('shows Read more for long description', () => {
+        render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
+        expect(screen.getByText('Read more')).toBeInTheDocument();
+    });
+
+    it('toggles Show less after Read more', () => {
+        render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
+        fireEvent.click(screen.getByText('Read more'));
+        expect(screen.getByText('Show less')).toBeInTheDocument();
     });
 });

@@ -1,19 +1,19 @@
 .card {
-    background: var(--bg);
-    border-radius: 12px;
+    background: var(--surface-card);
+    border-radius: var(--card-radius-token);
     width: 380px;
-    box-shadow: 0 4px 12px rgba(20, 20, 20, 0.06);
-    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow-rest);
+    border: var(--card-border);
     position: relative;
     overflow: hidden;
-    transition: transform 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 160ms ease;
+    transition: transform 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 200ms ease;
     display: flex;
 }
 
 .card:hover,
 .card:focus-within {
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
+    transform: var(--card-hover-transform) scale(1.01);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .card:active {
@@ -21,15 +21,15 @@
 }
 
 .card.enrolled {
-    background: linear-gradient(to bottom, var(--bg) 0%, var(--panel) 100%);
+    background: linear-gradient(to bottom, var(--surface-card) 0%, var(--surface-panel) 100%);
 }
 
 .content {
     flex: 1;
-    padding: 1rem 1.25rem;
+    padding: var(--card-padding);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .cardHeader {
@@ -41,10 +41,10 @@
 .iconWrap {
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: var(--card-icon-radius);
     display: grid;
     place-items: center;
-    background: var(--hover);
+    background: var(--card-icon-surface);
     flex: 0 0 auto;
     font-size: 16px;
 }
@@ -52,9 +52,9 @@
 .moduleCode {
     background: var(--pill-bg);
     color: var(--primary);
-    padding: 0.25rem 0.625rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    padding: var(--chip-padding);
+    border-radius: var(--chip-radius);
+    font-size: var(--chip-font-size);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -63,9 +63,9 @@
 .enrolledBadge {
     background: #e8f5e9;
     color: #2e7d32;
-    padding: 0.25rem 0.625rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    padding: var(--chip-padding);
+    border-radius: var(--chip-radius);
+    font-size: var(--chip-font-size);
     font-weight: 600;
     margin-left: auto;
 }
@@ -107,11 +107,11 @@
 
 .meta {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-3);
     flex-wrap: wrap;
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    padding: var(--space-3) 0;
+    border-top: var(--stroke-soft);
+    border-bottom: var(--stroke-soft);
 }
 
 .metaItem {
@@ -125,7 +125,7 @@
 
 .actions {
     display: flex;
-    gap: 0.625rem;
+    gap: var(--space-2);
     margin-top: 0.25rem;
 }
 
@@ -133,10 +133,10 @@
 .deleteButton,
 .enrollButton,
 .unenrollButton {
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    padding: var(--btn-padding-sm);
+    border-radius: var(--btn-radius);
+    font-size: var(--text-sm);
+    font-weight: var(--btn-font-weight);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(.2, .9, .2, 1);
     border: none;
@@ -166,13 +166,13 @@
     background: var(--primary);
     color: var(--c-white);
     width: 100%;
-    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.15);
+    box-shadow: var(--shadow-sm);
 }
 
 .enrollButton:hover {
     background: var(--c-olive);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(158, 126, 93, 0.2);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .enrollButton:active {
@@ -196,10 +196,10 @@
 }
 
 .deadlineButton {
-    font-size: 0.8rem;
-    padding: 4px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
+    font-size: var(--text-sm);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--chip-radius);
+    border: var(--stroke-soft);
     background: transparent;
     color: var(--text);
     cursor: pointer;

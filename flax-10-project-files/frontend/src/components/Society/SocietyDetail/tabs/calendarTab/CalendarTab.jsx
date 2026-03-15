@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";
-import { DatePickerButton } from "../../../../Calendar/header/DatePickerButton";
-import { addMonths, formatMonthYear } from "../../../../Calendar/utils/dateUtils";
+import { CalendarNav } from "../../../../Calendar/header/CalendarHeaderUtils";
+import { addMonths, formatMonthYear, isSameMonth } from "../../../../Calendar/utils/dateUtils";
 import { expandRecurringEvents } from "../../../../Calendar/utils/recurrenceUtils";
 import { hasRecurrence, extractBaseEventId } from "../../../../Calendar/utils/eventUtils";
 import { CalendarProvider, useEventModal } from "../../../../../context/CalendarContext";
@@ -12,6 +12,7 @@ import TagManager from "../../tags/TagManager";
 import { EventDetailPopup } from "../../../../Calendar/EventDetailPopup";
 import SyncButton from "./SyncButton";
 import { EventsSummaryModal } from "../../../../Calendar/EventsSummaryModal/EventsSummaryModal";
+import { useConfirm } from "../../../../../context/ConfirmContext";
 
 export default function CalendarTab(props) {
     return (
@@ -27,6 +28,7 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     const [popupState, setPopupState] = useState({ event: null, rect: null });
     const [summaryDate, setSummaryDate] = useState(null);
     const { openModal } = useEventModal();
+    const confirmFn = useConfirm();
     const expanded = expandRecurringEvents(rawEvents, selectedDate);
     const events = filterEvents(convertEvents(expanded, tags), tagFilters);
     const closePopup = () => setPopupState({ event: null, rect: null });
@@ -57,7 +59,7 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
                 tag={tags?.find(t => t.id === popupState.event.tag)} onClose={closePopup}
                 actions={getPopupActions(popupState.event, onViewAnnouncement, editMode, {
                     onEdit: () => openModal(popupState.event, 'society', popupState.event.start_time),
-                    onDelete: (e) => handlePopupDelete(e, eventHandlers, closePopup)
+                    onDelete: async (e) => await handlePopupDelete(e, eventHandlers, closePopup, confirmFn)
                 })} />}
             <EventsSummaryModal
                 isOpen={!!summaryDate}
@@ -70,17 +72,32 @@ function CalendarTabContent({ events: rawEvents = [], editMode, eventHandlers, t
     );
 }
 
-function handlePopupDelete(event, handlers, closePopup) {
+async function handlePopupDelete(event, handlers, closePopup, confirmFn) {
     try {
         const isRecurring = hasRecurrence(event);
-        const choice = isRecurring ? window.confirm('Delete recurring event?\n\nOK = ALL occurrences\nCancel = ONLY this one') : true;
-        const baseId = extractBaseEventId(event.id, event);
-
-        if (choice) handlers?.onDelete?.(baseId, event.title);
-        else {
-            const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
-            handlers?.onAddException?.(baseId, dateStr);
+        let choice = true;
+        if (isRecurring) {
+            choice = await confirmFn({
+                title: "Delete Recurring Society Event",
+                message: "This is a recurring event. How would you like to delete it?",
+                confirmText: "Delete ALL occurrences",
+                alternateText: "Delete ONLY this one",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+        } else {
+            choice = await confirmFn({
+                title: "Delete Society Event",
+                message: `Are you sure you want to delete "${event.title}"?`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                isDanger: true
+            });
         }
+
+        const baseId = extractBaseEventId(event.id, event);
+        if (choice === true) handlers?.onDelete?.(baseId, event.title);
+        else if (choice === 'ALTERNATE') handlers?.onAddException?.(baseId, new Date(event.start_time).toISOString().slice(0, 10));
     } catch (err) {
         console.error('Deletion failed:', err);
     }
@@ -88,31 +105,23 @@ function handlePopupDelete(event, handlers, closePopup) {
 }
 
 function CalendarHeader({ date, setDate, societyId, isMember, societyName }) {
+    const showToday = !isSameMonth(date, new Date());
     return (
         <div className={styles.calendarHeader}>
-            <NavButtons date={date} setDate={setDate} />
-            <span className={styles.calendarTitle}>{formatMonthYear(date)}</span>
+            <CalendarNav onPrev={() => setDate(addMonths(date, -1))} onNext={() => setDate(addMonths(date, 1))}
+                onToday={() => setDate(new Date())} showToday={showToday} selectedDate={date}
+                onDatePick={setDate} title={formatMonthYear(date)} />
+            <div style={{ flex: 1 }} />
             {isMember && <SyncButton societyId={societyId} societyName={societyName} />}
-        </div>
-    );
-}
-
-function NavButtons({ date, setDate }) {
-    const nav = (dir) => setDate(addMonths(date, dir));
-    return (
-        <div className={styles.navButtons}>
-            <button onClick={() => nav(-1)}>&larr;</button>
-            <button onClick={() => setDate(new Date())}>Today</button>
-            <button onClick={() => nav(1)}>&rarr;</button>
-            <DatePickerButton selectedDate={date} onDatePick={setDate} />
         </div>
     );
 }
 
 function SocietyEventModal({ eventHandlers, tags, editMode }) {
     const { isModalOpen, closeModal, modalEvent, modalInitialDate } = useEventModal();
+    const confirmFn = useConfirm();
     if (!isModalOpen || !editMode) return null;
-    const handleDelete = () => handlePopupDelete(modalEvent, eventHandlers, closeModal);
+    const handleDelete = async () => await handlePopupDelete(modalEvent, eventHandlers, closeModal, confirmFn);
     return (
         <EventModal event={modalEvent} initialDate={modalInitialDate} onClose={closeModal}
             showReminder={false} customTags={tags} onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)}

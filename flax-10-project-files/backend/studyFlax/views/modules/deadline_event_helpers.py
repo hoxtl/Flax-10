@@ -1,24 +1,16 @@
 from studyFlax.models import CalendarEvent, User
-from studyFlax.views.calendar.system_tags import get_deadline_tag, get_exam_tag
 
-
-def get_tag_for_deadline(deadline_type):
-    if deadline_type.lower() == 'exam':
-        return get_exam_tag()
-    return get_deadline_tag()
-
-
+#Data for deadline events created during enrollment and after
 def event_data(deadline, user):
     return dict(
         user=user,
         module=deadline.module,
-        tag=get_tag_for_deadline(deadline.deadline_type),
         title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
         start_time=deadline.start_due_date,
-        end_time=deadline.end_due_date or deadline.start_due_date,
+        end_time=deadline.end_due_date or deadline.start_due_date, 
         location=deadline.location,
         description=deadline.description,
-        external_id=str(deadline.id),
+        external_id = str(deadline.id),
         source='module_deadline',
         priority='high'
     )

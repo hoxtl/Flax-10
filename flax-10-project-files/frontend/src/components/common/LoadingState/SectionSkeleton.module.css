@@ -1,0 +1,50 @@
+.wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--surface-card) 0%, var(--hover) 50%, var(--surface-card) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: var(--radius-md);
+}
+
+.title {
+    height: 20px;
+    width: min(220px, 55%);
+}
+
+.subtitle {
+    height: 14px;
+    width: min(360px, 80%);
+}
+
+.row {
+    height: 44px;
+    width: 100%;
+}
+
+.button {
+    height: 40px;
+    width: 160px;
+    align-self: flex-end;
+}

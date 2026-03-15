@@ -19,6 +19,17 @@
   border-bottom: 1px solid var(--border);
 }
 
+.topBar::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: var(--bg);
+  z-index: -1;
+}
+
 .backBtn {
   background: var(--bg);
   border: 1px solid var(--border);
@@ -117,4 +128,61 @@
     padding: 10px 20px;
     font-size: 14px;
   }
+}
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+}
+.skelTopBar {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.skelBackBtn {
+  height: 34px;
+  width: 90px;
+}
+.skelHero {
+  height: 220px;
+  border-radius: 0;
+  width: 100%;
+}
+.skelTabRow {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.skelTab {
+  height: 32px;
+  width: 90px;
+  border-radius: 8px;
+}
+.skelBody {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.skelMain {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.skelBlock {
+  height: 120px;
+}
+.skelSidePanel {
+  height: 340px;
 }

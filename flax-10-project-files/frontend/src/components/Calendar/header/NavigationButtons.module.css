@@ -83,7 +83,7 @@
   padding: 6px 12px;
   border-radius: 8px;
   background: rgba(180, 140, 90, 0.15);
-  color: #6b4e2e;
+  color: var(--text-primary);
   border: none;
   font-size: 13px;
   font-weight: 600;
@@ -98,7 +98,7 @@
 /* Dark mode adjustments */
 [data-theme="dark"] .today {
   background: rgba(180, 140, 90, 0.2);
-  color: #d4a574;
+  color: var(--primary);
 }
 
 [data-theme="dark"] .today:hover {

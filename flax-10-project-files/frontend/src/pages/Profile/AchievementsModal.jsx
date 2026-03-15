@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
+import StandardModal from "../../components/common/StandardModal/StandardModal";
 
 // ---------------------------------------------------------------------------
 // Full badge catalogue — must match backend IDs exactly
@@ -82,7 +83,6 @@ function BadgeTile({ badge, earned }) {
 
 export default function AchievementsModal({ badges, onClose }) {
   const earnedIds = new Set((badges || []).map(b => b.id));
-  const overlayRef = useRef(null);
 
   // Close on Escape
   useEffect(() => {
@@ -95,12 +95,13 @@ export default function AchievementsModal({ badges, onClose }) {
   const totalBadges = ALL_BADGES.length;
 
   return (
-    <div
-      className={styles.overlay}
-      ref={overlayRef}
-      onClick={e => { if (e.target === overlayRef.current) onClose(); }}
+    <StandardModal
+      onClose={onClose}
+      hideHeader
+      size="lg"
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
     >
-      <div className={styles.modal}>
         {/* Header */}
         <div className={styles.header}>
           <div>
@@ -139,7 +140,6 @@ export default function AchievementsModal({ badges, onClose }) {
             );
           })}
         </div>
-      </div>
-    </div>
+    </StandardModal>
   );
 }

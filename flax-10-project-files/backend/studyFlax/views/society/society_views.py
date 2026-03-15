@@ -18,15 +18,15 @@ def society_list(request):
 
 def get_societies(request):
     societies = Society.objects.all()
-    data = build_society_list_data(societies, request.user)
+    data = build_society_list_data(societies, request)
     return Response(data)
 
 
-def build_society_list_data(societies, user):
+def build_society_list_data(societies, request):
     result = []
     for society in societies:
-        society_data = SocietyListSerialiser(society).data
-        membership = get_user_membership(user, society)
+        society_data = SocietyListSerialiser(society, context={'request': request}).data
+        membership = get_user_membership(request.user, society)
         society_data['is_member'] = membership is not None
         society_data['is_admin'] = membership.is_admin if membership else False
         result.append(society_data)
@@ -44,7 +44,7 @@ def create_society(request):
     data = request.data.copy()
     if not data.get('admin_emails'):
         data['admin_emails'] = request.user.email
-    serialiser = SocietyListSerialiser(data=data)
+    serialiser = SocietyListSerialiser(data=data, context={'request': request})
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     society = serialiser.save()
@@ -81,8 +81,8 @@ def build_update_notification(society, changes):
 
 def get_notification_action_url(society_id, changes):
     if is_only_announcement_changes(changes):
-        return f"societies_{society_id}_announcements"
-    return f"societies_{society_id}"
+        return f"/societies?id={society_id}&tab=announcements"
+    return f"/societies?id={society_id}"
 
 
 def is_only_announcement_changes(changes):

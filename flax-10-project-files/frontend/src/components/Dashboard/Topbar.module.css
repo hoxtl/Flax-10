@@ -11,6 +11,8 @@
   position: sticky;
   top: 0;
   z-index: 500;
+  flex-shrink: 0;
+  font-family: var(--font-body);
 }
 
 .leftSection {
@@ -53,6 +55,7 @@
 }
 
 .brandName {
+  font-family: var(--font-heading);
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
@@ -77,7 +80,8 @@
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: #111111;
+  color: var(--text);
+  font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -102,47 +106,6 @@
   transition: transform 0.2s ease;
 }
 
-.dropdownMenu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  background: var(--card-bg, #fff);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  padding: 6px;
-  z-index: 510;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.dropdownItem {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: #111111;
-  font-weight: 500;
-  font-size: 0.85rem;
-  cursor: pointer;
-  text-align: left;
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.dropdownItem:hover {
-  color: var(--text);
-  background-color: var(--hover);
-}
-
-.dropdownItemActive {
-  color: var(--primary);
-}
-
 .dropdownIcon {
   font-size: 1.1em;
   line-height: 1;
@@ -153,62 +116,6 @@
   z-index: 1;
 }
 
-.dropdownActivePill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--primary-light, rgba(158, 126, 93, 0.1));
-  border-radius: 8px;
-  z-index: 0;
-}
-
-.navItem {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: var(--muted);
-  font-weight: 500;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.navItem:hover {
-  color: var(--text);
-  background-color: var(--hover);
-}
-
-.navItemActive {
-  color: var(--primary);
-}
-
-.navIcon {
-  font-size: 1.1em;
-  line-height: 1;
-}
-
-.navLabel {
-  position: relative;
-  z-index: 1;
-}
-
-.activePill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--primary-light, rgba(158, 126, 93, 0.1));
-  border-radius: 8px;
-  z-index: 0;
-}
 
 
 .actions {
@@ -255,49 +162,6 @@
   flex-shrink: 0;
 }
 
-.addBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 2px 8px rgba(74, 52, 33, 0.2);
-}
-
-.addBtn:hover {
-  box-shadow: 0 4px 12px rgba(74, 52, 33, 0.3);
-  transform: translateY(-1px);
-}
-
-.addBtn:active {
-  transform: scale(0.92);
-  box-shadow: none;
-}
-
-.addIcon {
-  color: #fff;
-  font-size: 20px;
-  line-height: 1;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-}
 
 .actionPill {
   display: flex;
@@ -343,16 +207,6 @@
   color: var(--text);
 }
 
-:root[data-theme="dark"] .activePill {
-  background: rgba(158, 126, 93, 0.2);
-}
-
-:root[data-theme="dark"] .dropdownMenu {
-  background: rgba(30, 24, 20, 0.95);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-:root[data-theme="dark"] .dropdownActivePill,
 :root[data-theme="dark"] .navGroupTriggerActive {
   background: rgba(158, 126, 93, 0.2);
 }

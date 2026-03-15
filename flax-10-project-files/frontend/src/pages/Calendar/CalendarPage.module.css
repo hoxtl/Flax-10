@@ -1,9 +1,40 @@
 .page {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg);
 }
 
 .filters {
-    padding: 12px 32px 0;
-    flex-shrink: 0;
+  padding: 4px 16px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.mainContent {
+  flex: 1;
+  min-height: 0;
+  overflow-y: hidden;
+  background: var(--calendar-bg);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    padding: 8px 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+  }
 }

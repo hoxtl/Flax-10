@@ -1,21 +1,13 @@
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(20, 18, 30, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
+.modalShell {
+    width: min(520px, 92vw);
 }
 
-.modal {
-    width: min(520px, 92vw);
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--panel, #fff);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-    padding: 24px;
+.modalShellWide {
+    width: min(600px, 92vw);
+}
+
+.modalContent {
+    padding-top: 0;
 }
 
 .header {
@@ -156,7 +148,7 @@
     display: flex;
     gap: 8px;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--border, #e5e7eb);
+    border-bottom: var(--stroke-soft);
     padding-bottom: 8px;
 }
 
@@ -225,19 +217,19 @@
 }
 
 .cancelBtn {
-    padding: 8px 16px;
-    border: 1px solid var(--border, #e5e7eb);
-    background: white;
-    border-radius: 8px;
+    padding: var(--btn-padding-sm);
+    border: var(--stroke-soft);
+    background: var(--surface-card);
+    border-radius: var(--btn-radius);
     cursor: pointer;
 }
 
 .confirmBtn {
-    padding: 8px 20px;
+    padding: var(--btn-padding-sm);
     border: none;
     background: var(--primary-color, #9E7E5D);
     color: white;
-    border-radius: 8px;
+    border-radius: var(--btn-radius);
     cursor: pointer;
 }
 

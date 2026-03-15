@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
+import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from '../hooks/useCalendarEvents';
 import { getInitialForm, validateAndSubmit } from '../utils/formUtils';
 import { getUserSettings } from '../../../api/userService';
@@ -16,19 +17,20 @@ async function fetchSleepSettings() {
 
 export function useEventForm(event, onClose, options = {}) {
     const calendarContext = useCalendar();
+    const confirmFn = useConfirm();
     const actions = useEventActions();
     const [form, setForm] = useState(() => getInitialForm(event, options));
     const [error, setError] = useState('');
-    const [overlapWarning, setOverlapWarning] = useState(null);
     const [sleepWarning, setSleepWarning] = useState(false);
     const [pendingSubmit, setPendingSubmit] = useState(null);
     const [sleepSettings, setSleepSettings] = useState(null);
+    const [overlapWarning, setOverlapWarning] = useState(null);
 
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
     useEffect(() => { fetchSleepSettings().then(setSleepSettings); }, []);
 
-    const doSubmit = (e, skipOverlap = false) =>
-        validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], skipOverlap);
+    const doSubmit = async (e, skipOverlap = false) =>
+        await validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, calendarContext?.events || [], skipOverlap);
 
     const handleSubmit = options.customSubmit
         ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError)
@@ -45,7 +47,18 @@ export function useEventForm(event, onClose, options = {}) {
             doSubmit(e, false);
         };
 
-    const handleConfirmSave = () => validateAndSubmit(null, form, event, actions, onClose, setError, setOverlapWarning, calendarContext?.events || [], true);
+    const handleConfirmSave = () =>
+        validateAndSubmit(
+            null,
+            form,
+            event,
+            actions,
+            onClose,
+            setError,
+            setOverlapWarning,
+            calendarContext?.events || [],
+            true
+        );
     const handleCancelSave = () => setOverlapWarning(null);
 
     const handleConfirmSleep = () => {
@@ -59,10 +72,19 @@ export function useEventForm(event, onClose, options = {}) {
     };
 
     return {
-        form, setForm, error, overlapWarning, sleepWarning,
-        sleepSettings, isEditing: !!event?.id,
-        handleSubmit, handleConfirmSave, handleCancelSave,
-        handleConfirmSleep, handleCancelSleep, event
+        form,
+        setForm,
+        error,
+        sleepWarning,
+        sleepSettings,
+        overlapWarning,
+        isEditing: !!event?.id,
+        handleSubmit,
+        handleConfirmSleep,
+        handleCancelSleep,
+        handleConfirmSave,
+        handleCancelSave,
+        event
     };
 }
 

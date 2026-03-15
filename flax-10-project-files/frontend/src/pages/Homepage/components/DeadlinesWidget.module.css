@@ -1,0 +1,238 @@
+/* Deadlines widget — prototype style */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.headerIconWrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: #f3efea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  color: #8a7868;
+}
+
+.headerTitleBlock {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.headerTitle {
+  margin: 0;
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #2f261f;
+}
+
+.headerStatus {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #94867a;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 58px;
+  border-radius: 14px;
+  border: 1px solid rgba(139, 115, 85, 0.11);
+  border-left: 5px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft));
+  background: linear-gradient(180deg, #fffdfa 0%, #fffaf5 100%);
+  padding: 9px 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.row:hover {
+  border-color: #ddd6cf;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.rowOverdue {
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.82) 0%, rgba(255, 250, 245, 0.96) 100%);
+  border-color: rgba(220, 38, 38, 0.14);
+  border-left-color: var(--home-urgency-danger);
+}
+
+.rowCritical {
+  background: linear-gradient(180deg, rgba(251, 245, 231, 0.94) 0%, rgba(255, 250, 245, 0.98) 100%);
+  border-left-color: var(--home-urgency-warning);
+}
+
+.rowLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rowTopPills {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.moduleCodePill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(243, 239, 234, 0.72);
+  color: #736048;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.moduleCodePill:hover {
+  filter: brightness(0.97);
+}
+
+.deadlineTypePill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(243, 239, 234, 0.72);
+  color: #736048;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rowTitle {
+  margin: 0;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2f261f;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 36px;
+}
+
+.daysLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.footer {
+  margin-top: 6px;
+  padding-top: 2px;
+}
+
+.footerLink,
+.footerLinkMuted {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: #6d6157;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.footerLink:hover,
+.footerLinkMuted:hover {
+  color: #3b3129;
+}
+
+@media (max-width: 900px) {
+  .headerIconWrap {
+    width: 36px;
+    height: 36px;
+  }
+
+  .headerTitle {
+    font-size: 12px;
+  }
+
+  .headerStatus {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+
+  .row {
+    min-height: 64px;
+    padding: 8px 10px;
+  }
+
+  .moduleCodePill,
+  .deadlineTypePill {
+    font-size: 9px;
+    padding: 4px 8px;
+  }
+
+  .daysLabel {
+    font-size: 12px;
+  }
+}

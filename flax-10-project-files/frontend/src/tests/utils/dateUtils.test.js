@@ -1,9 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
     getWeekDays, getMonthDays, getStartOfWeek, getStartOfMonth, getEndOfMonth,
+    getStartOfYear, getEndOfYear,
     addDays, isSameDay, isSameMonth, addWeeks, addMonths, startOfDay, isToday,
     formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
-    parseDateInput
+    parseDateInput, formatDateTime, formatShortDate, formatDateWithYear,
+    formatDateRange, formatTimeRange, addHourToTime
 } from '../../components/Calendar/utils/dateUtils';
 
 describe('dateUtils', () => {
@@ -52,6 +54,18 @@ describe('dateUtils', () => {
         it('getEndOfMonth', () => {
             const d = getEndOfMonth(date);
             expect(d.getDate()).toBe(28);
+        });
+
+        it('getStartOfYear', () => {
+            const d = getStartOfYear(date);
+            expect(d.getMonth()).toBe(0);
+            expect(d.getDate()).toBe(1);
+        });
+
+        it('getEndOfYear', () => {
+            const d = getEndOfYear(date);
+            expect(d.getMonth()).toBe(11);
+            expect(d.getDate()).toBe(31);
         });
 
         it('addDays', () => {
@@ -114,6 +128,71 @@ describe('dateUtils', () => {
             expect(formatDayLabel(addDays(date, 1))).toMatch(/Mon, Feb 16|Mon, 16 Feb 2026/);
             vi.useRealTimers();
         });
+
+        it('formatDateTime', () => {
+            const d = new Date(2026, 1, 15, 10, 30);
+            const result = formatDateTime(d);
+            expect(result).toMatch(/Sun, Feb 15|Sun, 15 Feb/);
+            expect(result).toMatch(/10:30/);
+        });
+
+        it('formatShortDate', () => {
+            const d = new Date(2026, 1, 15);
+            const result = formatShortDate(d);
+            expect(result).toMatch(/15 Feb|Feb 15/);
+        });
+
+        it('formatDateWithYear', () => {
+            const d = new Date(2026, 1, 15);
+            const result = formatDateWithYear(d);
+            expect(result).toMatch(/2026/);
+            expect(result).toMatch(/Feb|15/);
+        });
+
+        it('formatDateRange: same day', () => {
+            const start = new Date(2026, 1, 15, 10, 0);
+            const end = new Date(2026, 1, 15, 11, 0);
+            const result = formatDateRange(start, end, false);
+            expect(result).toMatch(/2026/);
+        });
+
+        it('formatDateRange: different days', () => {
+            const start = new Date(2026, 1, 15, 10, 0);
+            const end = new Date(2026, 1, 20, 11, 0);
+            const result = formatDateRange(start, end, false);
+            expect(result).toContain('–');
+        });
+
+        it('formatDateRange: allDay', () => {
+            const start = new Date(2026, 1, 15, 0, 0);
+            const end = new Date(2026, 1, 16, 0, 0);
+            const result = formatDateRange(start, end, true);
+            expect(result).toMatch(/2026/);
+        });
+
+        it('formatTimeRange: normal', () => {
+            const start = new Date(2026, 1, 15, 10, 0);
+            const end = new Date(2026, 1, 15, 11, 0);
+            const result = formatTimeRange(start, end, false);
+            expect(result).toContain('to');
+        });
+
+        it('formatTimeRange: allDay', () => {
+            const start = new Date(2026, 1, 15, 0, 0);
+            const end = new Date(2026, 1, 16, 0, 0);
+            expect(formatTimeRange(start, end, true)).toBe('All day');
+        });
+
+        it('formatTimeRange: midnight to midnight returns All day', () => {
+            const start = new Date(2026, 1, 15, 0, 0);
+            const end = new Date(2026, 1, 16, 0, 0);
+            expect(formatTimeRange(start, end, false)).toBe('All day');
+        });
+
+        it('addHourToTime', () => {
+            expect(addHourToTime('10:30')).toBe('11:30');
+            expect(addHourToTime('23:00')).toBe('00:00');
+        });
     });
 
     describe('Greeting', () => {
@@ -159,10 +238,10 @@ describe('dateUtils', () => {
         });
 
         it('isAllDayEvent', async () => {
-            const { isAllDayEvent } = await import('../../components/Calendar/utils/dateUtils');
-            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(true);
+            const { isAllDayEvent } = await import('../../components/Calendar/utils/eventDisplayUtils');
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(false);
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 9) })).toBe(false);
-            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 17, 10) })).toBe(true);
+            expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 0), end_time: new Date(2026, 1, 16, 0) })).toBe(true);
         });
     });
 });

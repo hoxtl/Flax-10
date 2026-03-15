@@ -88,7 +88,8 @@ export const tflService = {
     },
 
     /**
-     * Getter method to return current TfL service disruptions/delays
+     * Getter method to return current TfL service disruptions/delays.
+     * Response feeds getRelevantDelays / getContextualTravelAlert for the Right Now widget and contextual travel alerts.
      */
     async getTfLDelays() {
         try {

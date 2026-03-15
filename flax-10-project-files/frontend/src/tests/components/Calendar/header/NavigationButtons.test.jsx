@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NavigationButtons } from '../../../../components/Calendar/header/NavigationButtons';
-import { isSameDay, parseDateInput } from '../../../../components/Calendar/utils/dateUtils';
+import * as dateUtils from '../../../../components/Calendar/utils/dateUtils';
 import { useCalendar } from '../../../../context/CalendarContext';
 
 vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
@@ -25,6 +25,14 @@ describe('NavigationButtons', () => {
         onNavigate: mockNavigate,
         onDatePick: mockDatePick
     };
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(useCalendar).mockReturnValue({ viewMode: 'week' });
+        vi.mocked(dateUtils.isSameDay).mockReturnValue(false);
+        vi.mocked(dateUtils.getWeekDays).mockReturnValue([]);
+        vi.mocked(dateUtils.isSameMonth).mockReturnValue(false);
+    });
 
     it('should render navigation buttons', () => {
         render(<NavigationButtons {...defaultProps} />);
@@ -53,25 +61,57 @@ describe('NavigationButtons', () => {
 
     it('should handle DatePicker input change', () => {
         const targetDate = new Date(2026, 0, 20);
-        parseDateInput.mockReturnValue(targetDate);
+        vi.mocked(dateUtils.parseDateInput).mockReturnValue(targetDate);
 
         render(<NavigationButtons {...defaultProps} />);
         const input = screen.getByDisplayValue('2026-01-15');
         fireEvent.change(input, { target: { value: '2026-01-20' } });
 
-        expect(parseDateInput).toHaveBeenCalledWith('2026-01-20');
+        expect(dateUtils.parseDateInput).toHaveBeenCalledWith('2026-01-20');
         expect(mockDatePick).toHaveBeenCalledWith(targetDate);
     });
 
     it('should hide Today button if today is visible', () => {
-        useCalendar.mockReturnValue({ viewMode: 'day' });
-        isSameDay.mockReturnValue(true);
+        vi.mocked(useCalendar).mockReturnValue({ viewMode: 'day' });
+        vi.mocked(dateUtils.isSameDay).mockReturnValue(true);
         render(<NavigationButtons {...defaultProps} />);
         expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    });
 
-        isSameDay.mockReturnValue(false);
-        isSameDay.mockReturnValue(false);
-        useCalendar.mockReturnValue({ viewMode: 'week' }); // Reset
+    it('should hide Today when viewMode is week and week contains today', () => {
+        vi.mocked(useCalendar).mockReturnValue({ viewMode: 'week' });
+        const weekDays = [new Date(2026, 0, 12), new Date(2026, 0, 13), new Date(2026, 0, 14), new Date(2026, 0, 15), new Date(2026, 0, 16), new Date(2026, 0, 17), new Date(2026, 0, 18)];
+        vi.mocked(dateUtils.getWeekDays).mockReturnValue(weekDays);
+        vi.mocked(dateUtils.isSameDay).mockImplementation((d) => d.getDate() === 15);
+        render(<NavigationButtons {...defaultProps} />);
+        expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    });
+
+    it('should hide Today when viewMode is month and same month', () => {
+        vi.mocked(useCalendar).mockReturnValue({ viewMode: 'month' });
+        vi.mocked(dateUtils.isSameMonth).mockReturnValue(true);
+        render(<NavigationButtons {...defaultProps} />);
+        expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    });
+
+    it('should show Today when viewMode is year', () => {
+        vi.mocked(useCalendar).mockReturnValue({ viewMode: 'year' });
+        render(<NavigationButtons {...defaultProps} />);
+        expect(screen.getByText('Today')).toBeInTheDocument();
+    });
+
+    it('Today click passes date at midnight', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(2026, 2, 10, 14, 30, 0));
+        render(<NavigationButtons {...defaultProps} />);
+        fireEvent.click(screen.getByText('Today'));
+        expect(mockDatePick).toHaveBeenCalledWith(expect.any(Date));
+        const arg = mockDatePick.mock.calls[0][0];
+        expect(arg.getHours()).toBe(0);
+        expect(arg.getMinutes()).toBe(0);
+        expect(arg.getDate()).toBe(10);
+        expect(arg.getMonth()).toBe(2);
+        vi.useRealTimers();
     });
 
     it('should open date picker on calendar click', async () => {

@@ -1,0 +1,15 @@
+.container {
+  padding: 1.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.placeholder {
+  padding: 4rem 2rem;
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}

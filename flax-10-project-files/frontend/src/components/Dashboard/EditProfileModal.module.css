@@ -1,62 +1,13 @@
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+.modalShell {
+  width: min(500px, 92vw);
 }
 
-.modal {
-  background: var(--bg);
-  border-radius: 16px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-}
-
-.header h2 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
-}
-
-.closeBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.closeBtn:hover {
-  background: var(--hover);
-  color: var(--text);
+.modalContent {
+  padding-top: 0;
 }
 
 .form {
-  padding: 24px;
+  padding: 0;
 }
 
 .photoSection {
@@ -103,12 +54,12 @@
 
 .photoUpload,
 .photoRemove {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  padding: var(--btn-padding-sm);
+  border-radius: var(--btn-radius);
+  border: var(--stroke-soft);
+  background: var(--surface-card);
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--text-base);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -143,20 +94,22 @@
 .field input,
 .field textarea {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
+  padding: var(--input-padding);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  background: var(--surface-card);
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--text-base);
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
 .field input:focus,
 .field textarea:focus {
   outline: none;
   border-color: var(--primary);
+  box-shadow: var(--input-focus-ring);
 }
 
 .field textarea {
@@ -173,17 +126,17 @@
 
 .cancelBtn,
 .saveBtn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: var(--btn-padding);
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
   border: none;
   transition: all 0.2s;
 }
 
 .cancelBtn {
-  background: var(--panel);
+  background: var(--surface-card-muted);
   color: var(--text);
 }
 
@@ -209,17 +162,17 @@
   background: #fee;
   border: 1px solid #fcc;
   color: #c33;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   margin-bottom: 16px;
 }
 
 .success {
   background: var(--success-bg);
   color: var(--success-text);
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   margin-bottom: 16px;
 }
