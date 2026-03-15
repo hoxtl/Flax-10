@@ -49,7 +49,7 @@ function resolveClassmatesCount(module) {
     );
 }
 
-export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, taskCountsByModule = {} }) {
+export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, onManageReadings, taskCountsByModule = {} }) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const enrollment = enrollments?.find(e => e.module === module.id);
     const isCore = enrollment?.is_core || false;
@@ -71,12 +71,13 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
-                onManageDeadlines={(e) => stop(e, onManageDeadlines)} />
+                onManageDeadlines={(e) => stop(e, onManageDeadlines)} 
+                onManageReadings={(e) => stop(e, onManageReadings)}/> 
         </GridCard>
     );
 }
 
-function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines, upcomingTasksCount, classmatesCount }) {
+function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings, upcomingTasksCount, classmatesCount }) {
     return (
         <div className={styles.content}>
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
@@ -85,7 +86,7 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
             <QuickMeta module={module} />
             <RelatedLinks module={module} upcomingTasksCount={upcomingTasksCount} classmatesCount={classmatesCount} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
-                onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
+                onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines}  onManageReadings={onManageReadings}/>
         </div>
     );
 }
@@ -177,20 +178,21 @@ function RelatedLinks({ module, upcomingTasksCount, classmatesCount }) {
     );
 }
 
-function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings }) {
     return (
         <div className={styles.actions}>
             {isTeacher
-                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
+                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} onManageReadings={onManageReadings}/>
                 : <StudentActions enrolled={enrolled} isCore={isCore} onToggle={onToggle} onView={onView} />}
         </div>
     );
 }
 
-function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
+function TeacherActions({ onEdit, onDelete, onManageDeadlines, onManageReadings }) {
     return (
         <>
             <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
+            <button className={styles.deadlineButton} onClick={onManageReadings}>Readings</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
         </>

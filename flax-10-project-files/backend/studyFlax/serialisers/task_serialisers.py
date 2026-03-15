@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils import timezone
 from studyFlax.models.tasks.taskModel import Task, TaskList
-
+from studyFlax.utils.reading_utils import update_reading_estimates
 
 class TaskListSerialiser(serializers.ModelSerializer):
     task_count = serializers.SerializerMethodField()
@@ -17,9 +17,9 @@ class TaskListSerialiser(serializers.ModelSerializer):
 class TaskSerialiser(serializers.ModelSerializer):
     module_code = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
+    reading_id = serializers.IntegerField(source='reading.id', read_only=True)
+    reading_page_count = serializers.SerializerMethodField()
     group_project_name = serializers.SerializerMethodField()
-
-
     assignees_info = serializers.SerializerMethodField()
 
     class Meta:
@@ -27,11 +27,10 @@ class TaskSerialiser(serializers.ModelSerializer):
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code',
             'group_project', 'group_project_name', 'assigned_to', 'assignees_info',
-
             'title', 'description', 'priority', 'status', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
-            'estimated_blocks', 'completed_blocks',
-            'created_at', 'updated_at'
+            'estimated_blocks', 'completed_blocks', 'page_count', 'reading_id',
+            'reading_page_count', 'created_at', 'updated_at'
         ]
 
     def get_module_code(self, obj):
@@ -40,9 +39,11 @@ class TaskSerialiser(serializers.ModelSerializer):
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
 
+    def get_reading_page_count(self, obj):
+        return obj.reading.page_count() if obj.reading_id else None
+
     def get_group_project_name(self, obj):
         return obj.group_project.name if obj.group_project else None
-
 
     def get_assignees_info(self, obj):
         return [
@@ -65,7 +66,6 @@ class TaskSerialiser(serializers.ModelSerializer):
         # Sync completed and status fields
         status = validated_data.get('status', instance.status)
         completed = validated_data.get('completed', instance.completed)
-        
         # If toggling 'completed' directly from older UI
         if 'completed' in validated_data and 'status' not in validated_data:
             validated_data['status'] = 'done' if completed else 'todo'
@@ -78,5 +78,8 @@ class TaskSerialiser(serializers.ModelSerializer):
             validated_data['completed_at'] = timezone.now()
         elif completed is False:
             validated_data['completed_at'] = None
-            
-        return super().update(instance, validated_data)
+        
+        updated = super().update(instance,validated_data)
+        if completed is True and (updated.reading_id or updated.page_count):
+            update_reading_estimates(updated.user)
+        return updated

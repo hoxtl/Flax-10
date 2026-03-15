@@ -1,5 +1,6 @@
 import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
+import { formatDate } from '../Calendar/utils/dateUtils.js';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
 import styles from './ModuleDetails.module.css';
@@ -148,6 +149,10 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                         <h2 className={styles.sectionTitle}>Assignments</h2>
                         <DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} />
                     </article>
+                    <article className={styles.sectionCard}>
+                        <h2 className={styles.sectionTitle}>Readings</h2>
+                        <ReadingsSection readings={module.readings} />
+                    </article>
                 </div>
 
                 <aside className={styles.sideColumn}>
@@ -234,6 +239,34 @@ function DeadlinesSection({ deadlines, moduleCode }) {
                     </div>
                 );
             })}
+        </div>
+    );
+}
+
+function ReadingsSection({ readings }) {
+    if (!readings?.length) return <p className={styles.descriptionText}>No readings assigned yet.</p>;
+    const sorted = [...readings].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    return (
+        <div className={styles.deadlinesList}>
+            {sorted.map((r, i) => 
+                <ReadingRow key={r.id} reading={r} index={i} />)}
+        </div>
+    );
+}
+
+function ReadingRow({ reading, index }) {
+     return (
+        <div className={styles.deadlineItem}>
+            <span className={styles.deadlineIndex}>{index + 1}</span>
+            <div className={styles.deadlineBody}>
+                <div className={styles.deadlineTitleRow}>
+                    <span className={styles.deadlinesType}>📖 Reading</span>
+                    <span className={styles.deadlineTitle}>{reading.title}</span>
+                </div>
+                <span className={styles.deadlineDate}> 
+                    pages : {reading.start_page}-{reading.end_page} · Due {formatDate(new Date(reading.deadline))}
+                </span>
+            </div>
         </div>
     );
 }

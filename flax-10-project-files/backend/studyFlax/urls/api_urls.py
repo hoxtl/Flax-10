@@ -38,12 +38,11 @@ from studyFlax.views.calendar.attendance_views import (
 # Modules
 from studyFlax.views.modules.module_views import module_list, module_detail
 from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
-
-from studyFlax.views.authentication.register_view import register_view
-from studyFlax.views.authentication.login_view import login_view
-from studyFlax.views.authentication.logout_view import logout_view
-from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
-from studyFlax.views.settings.user_settings_view import user_settings_view
+from studyFlax.views.modules.reading_views import (
+    reading_list, reading_detail, load_task, 
+    suggested_readings, reading_speed
+)
+from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 
 # Tasks
 from studyFlax.views.tasks.task_views import (
@@ -81,7 +80,6 @@ from studyFlax.views.user.profile_view import profile_view, another_user_profile
 from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 from studyFlax.views.user.settings_views import onboarding_view
-from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 from studyFlax.views.authentication.home_address_view import home_address_view
 
 # Admin
@@ -128,14 +126,18 @@ urlpatterns = [
     path("timetable/import/", timetable_import, name="timetable-import"),
 
     # Modules
-    path("modules/", module_list, name="module_list"),
-    path("modules/<int:module_id>/", module_detail, name="module_detail"),
-    path("enrollments/", enrollment_list, name="enrollment_list"),
-    path("enrollments/<int:enrollment_id>/", enrollment_detail, name="enrollment_detail"),
-    path("auth/register/", register_view, name='auth-register'),
-    path("auth/login/", login_view, name='auth-login'),
-    path("auth/logout/", logout_view, name='auth-logout'),
-    path("timetable/import/", timetable_import, name="timetable-import"),
+    path("modules/", module_list, name="module-list"),
+    path("modules/<int:module_id>/", module_detail, name="module-detail"),
+    path("enrollments/", enrollment_list, name="enrollment-list"),
+    path("enrollments/<int:enrollment_id>/", enrollment_detail, name="enrollment-detail"),
+    path("modules/<int:module_id>/readings/", reading_list, name="reading-list"),
+    path("modules/<int:module_id>/readings/<int:reading_id>/", reading_detail, name="reading-detail"),
+    path("readings/suggested/", suggested_readings, name="reading-suggested"),
+    path("readings/speed/", reading_speed, name="reading-speed"),
+    path("readings/<int:reading_id>/load-task/", load_task, name="reading-load-task"),
+    path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline-list"),
+    path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline-detail"),
+    path("deadlines/upcoming/", upcoming_deadlines, name="deadline-upcoming"),
 
     # Tasks
     path("tasks/", task_list, name="task-list"),
@@ -226,9 +228,6 @@ urlpatterns = [
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
     path('onboarding/', onboarding_view, name='onboarding'),
-    path("modules/<int:module_id>/deadlines/", deadline_list, name="deadline_list"),
-    path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
-    path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
     path("user/home-address/", home_address_view, name='home_address'),
 
     # Admin
