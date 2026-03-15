@@ -11,6 +11,11 @@
     gap: 2px;
     box-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
     height: 36px;
+    width: fit-content;
+}
+
+.fill {
+    width: 100%;
 }
 
 :root[data-mode="dark"] .container {
@@ -32,6 +37,11 @@
     color: var(--muted);
     transition: all 0.15s;
     white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.fillBtn {
+    flex: 1;
 }
 
 .button svg {

@@ -31,12 +31,17 @@
   position: relative;
   flex: 1;
   overflow: hidden;
-  border-radius: 11px;
-  background: #fffcf8;
-  border: 1px solid rgba(139, 115, 85, 0.06);
+  border-radius: 20px;
+  /* More modern, smoother radius */
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
   padding: 20px;
   box-sizing: border-box;
+  backdrop-filter: var(--widget-glass-blur);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
+
+/* [Highlight gradient removed for flatter look] */
 
 .glow {
   pointer-events: none;
@@ -49,6 +54,11 @@
       rgba(139, 115, 85, 0.09),
       transparent 70%);
   z-index: 0;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
 .card:hover .glow {
