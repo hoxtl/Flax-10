@@ -168,7 +168,7 @@ function StudyTimeSection({
                 type="number"
                 min={30}
                 max={600}
-                step={15}
+                step={30}
                 value={minutesPerDay}
                 onChange={(e) => onMinutesChange(e.target.value)}
               />
@@ -187,7 +187,7 @@ function StudyTimeSection({
         <span className={styles.contextCardEmoji}>📚</span>
         <h3 className={styles.contextCardTitle}>Auto-scheduler capacity</h3>
         <ul className={styles.contextCardList}>
-          <li>Customizable, desirable study length per day</li>
+          <li>Customizable, desirable study length per day(must be divisible by 30)</li>
         </ul>
       </div>
     </div>
