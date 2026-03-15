@@ -1,5 +1,6 @@
 import { formatDuration, formatTime, getDepartment } from './utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModuleDetails.module.css';
 
 function getSortedDeadlines(deadlines = []) {
@@ -93,7 +94,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
 
             <section className={styles.hero}>
                 <div className={styles.heroTop}>
-                    <span className={styles.moduleCode}>{module.module_code}</span>
+                    <EntityLinkChip to="/modules" className={styles.moduleCode}>{module.module_code}</EntityLinkChip>
                     <span className={styles.departmentChip}>{department}</span>
                     {is_enrolled && <span className={styles.enrolledBadge}>✓ Enrolled</span>}
                 </div>
@@ -117,7 +118,13 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                                 }}
                             />
                             <span className={styles.tutorAvatarFallback}>{getInitials(module.created_by_name || "Tutor")}</span>
-                            <span className={styles.heroMetaValue}>{module.created_by_name || "Unknown"}</span>
+                            {module.created_by
+                                ? (
+                                    <EntityLinkChip to={`/profile/${module.created_by}`} className={styles.heroMetaValue}>
+                                        {module.created_by_name || "Unknown"}
+                                    </EntityLinkChip>
+                                )
+                                : <span className={styles.heroMetaValue}>{module.created_by_name || "Unknown"}</span>}
                         </div>
                     </div>
                     <div className={styles.heroMetaItem}>
@@ -152,7 +159,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
 
                     <article className={styles.sectionCard}>
                         <h2 className={styles.sectionTitle}>Assignments</h2>
-                        <DeadlinesSection deadlines={sortedDeadlines} />
+                        <DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} />
                     </article>
                 </div>
 
@@ -211,7 +218,7 @@ function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
         : <button className={styles.enrollButton} onClick={onEnroll}>Enroll in module</button>;
 }
 
-function DeadlinesSection({ deadlines }) {
+function DeadlinesSection({ deadlines, moduleCode }) {
     if (!deadlines?.length) return <p className={styles.emptyText}>No assignments yet.</p>;
 
     return (
@@ -224,7 +231,13 @@ function DeadlinesSection({ deadlines }) {
                         <div className={styles.deadlineBody}>
                             <div className={styles.deadlineTitleRow}>
                                 <span className={styles.deadlinesType}>{DEADLINE_LABELS[d.deadline_type]}</span>
-                                <span className={styles.deadlineTitle}>{d.title}</span>
+                                <EntityLinkChip
+                                    to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`}
+                                    className={styles.deadlineTitle}
+                                    title="Open related tasks"
+                                >
+                                    {d.title}
+                                </EntityLinkChip>
                                 <span className={`${styles.urgencyTag} ${styles[urgency]}`}>
                                     {getUrgencyText(urgency)}
                                 </span>

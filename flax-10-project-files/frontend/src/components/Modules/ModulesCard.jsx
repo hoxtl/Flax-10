@@ -1,6 +1,7 @@
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatDuration, formatTime, getDepartment } from './utils/moduleUtils.js';
 import GridCard from '../common/Card/GridCard';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {
@@ -77,7 +78,13 @@ function CardHeader({ module, enrolled, isCore }) {
             <div className={styles.headerTopRow}>
                 <div className={styles.headerIdentity}>
                     <div className={styles.iconWrap}>📚</div>
-                    <span className={styles.moduleCode}>{module.module_code}</span>
+                    <EntityLinkChip
+                        to={`/modules?moduleId=${module.id}`}
+                        className={styles.moduleCode}
+                        title={`Open ${module.module_code}`}
+                    >
+                        {module.module_code}
+                    </EntityLinkChip>
                 </div>
                 {enrolled && (
                     <span className={styles.enrolledBadge}>

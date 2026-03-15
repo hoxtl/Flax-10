@@ -11,12 +11,15 @@ import { FilterSection, useSearchInit, useFilterState, useClickOutside } from ".
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
 import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
+import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
 
 function UserCardInfo({ user }) {
     return (
         <div className={styles.userInfo}>
             <div className={styles.name}>{user.first_name} {user.last_name}</div>
-            <div className={styles.username}>@{user.username}</div>
+            <EntityLinkChip to={`/profile/${user.id}`} className={styles.username} title={`Open @${user.username}`}>
+                @{user.username}
+            </EntityLinkChip>
             <div className={styles.courseInfo}>
                 {user.year && <span>{user.year}</span>}
                 {user.major && <span> • {user.major}</span>}

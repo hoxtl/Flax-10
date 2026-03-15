@@ -4,6 +4,7 @@
  */
 import styles from './SocietyCard.module.css';
 import GridCard from '../common/Card/GridCard';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip';
 import { Flag, BadgeCheck } from "lucide-react";
 
 /** Displays a verified icon for officially ratified societies. */
@@ -46,7 +47,12 @@ function ReportAction({ society, onReport, onUnreport }) {
 function CardContent({ society, hasImage }) {
     const info = (
         <div className={styles.info}>
-            <h3 className={styles.name}>{society.name}<RatifiedBadge isRatified={society.is_ratified} /></h3>
+            <h3 className={styles.name}>
+                <EntityLinkChip to={`/societies?id=${society.id}`} className={styles.nameChip}>
+                    {society.name}
+                </EntityLinkChip>
+                <RatifiedBadge isRatified={society.is_ratified} />
+            </h3>
             <p className={styles.count}>{society.member_count} members</p>
         </div>
     );

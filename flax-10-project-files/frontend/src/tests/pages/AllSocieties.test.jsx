@@ -91,7 +91,7 @@ describe('AllSocieties', () => {
     it('shows empty state when no societies match', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
         fireEvent.change(screen.getByPlaceholderText('Search societies...'), { target: { value: 'zzz' } });
-        expect(screen.getByText('No societies found')).toBeTruthy();
+        expect(screen.getByText(/No societies match/i)).toBeTruthy();
     });
 
     it('calls onSelect when a society card is clicked', () => {
