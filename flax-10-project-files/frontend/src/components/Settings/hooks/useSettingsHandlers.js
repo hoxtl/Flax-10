@@ -37,6 +37,7 @@ async function saveAccount(
   }).catch(() => ({ ok: false, data: {} }));
   if (ok && res.user) {
     saveUserToStorage(res.user);
+    window.dispatchEvent(new Event("auth-changed"));
     showTemporaryMessage(setSuccessMessage, "The account has been updated!");
     setIsSaving(false);
     return true;
