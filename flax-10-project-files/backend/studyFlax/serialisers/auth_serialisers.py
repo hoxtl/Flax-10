@@ -58,7 +58,10 @@ class UserSerialiser(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def get_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
+        name = f"{obj.first_name} {obj.last_name}".strip()
+        if getattr(obj, 'role', None) == 'teacher' and not name.startswith("Dr."):
+            return f"Dr. {name}"
+        return name
 
     def get_settings_field(self, obj, field):
         settings = getattr(obj, 'settings', None)

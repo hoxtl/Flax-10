@@ -22,6 +22,71 @@ from studyFlax.fixtures.data_fixtures import (
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
+STUDENT_INTRO_SNIPPETS = [
+    "I thrive on turning busy uni weeks into a game plan that is actually realistic.",
+    "I am most in my zone when my calendar is tidy, my goals are clear, and my notes are colour-coded.",
+    "I love practical learning and finding smart ways to make heavy weeks feel lighter.",
+    "I am a momentum person - small daily wins keep me consistent and confident.",
+    "I am curious, collaborative, and always up for a focused study sprint with friends.",
+]
+
+STUDENT_STUDY_SNIPPETS = [
+    "My weekly rhythm is active recall, short deep-work blocks, and a Sunday reset so deadlines never sneak up.",
+    "I split assignments into mini-milestones, track progress visually, and leave buffer time for edits.",
+    "I prefer focused sessions over marathon cramming, and I build in breaks so quality stays high.",
+    "I learn best by explaining concepts out loud, building summary sheets, and revisiting them through the week.",
+    "I keep a practical system: plan early, execute steadily, review often, and avoid panic mode.",
+]
+
+STUDENT_PERSONALITY_SNIPPETS = [
+    "Outside class, I recharge with long walks, good playlists, and trying new cafes around London.",
+    "When I am not studying, I am usually at a society event, working on side projects, or exploring new places in the city.",
+    "I enjoy meeting new people, sharing revision tricks, and making difficult topics feel approachable.",
+    "I care about great grades, but I care just as much about building healthy habits that last beyond uni.",
+    "I bring friendly energy to group work and I am usually the one turning chaos into a clear next step.",
+]
+
+TEACHING_SPECIALISMS = [
+    "applied machine learning and responsible AI systems",
+    "clinical decision-making in acute and community care",
+    "behavioural economics and policy evaluation",
+    "distributed systems, cloud platforms, and software architecture",
+    "public health strategy, prevention science, and epidemiology",
+    "digital media, cultural analysis, and communication theory",
+    "biostatistics, research design, and health data interpretation",
+    "financial strategy, risk analysis, and corporate governance",
+    "educational psychology, learning science, and assessment design",
+    "human-centred product design and service innovation",
+    "international business strategy and cross-cultural leadership",
+]
+
+PHD_UNIVERSITIES = [
+    "University of Cambridge",
+    "University of Oxford",
+    "Imperial College London",
+    "University College London",
+    "The London School of Economics and Political Science",
+    "ETH Zurich",
+    "Stanford University",
+    "Massachusetts Institute of Technology",
+    "University of Toronto",
+    "National University of Singapore",
+    "University of Melbourne",
+    "University of Edinburgh",
+]
+
+PRIOR_UNIVERSITIES = [
+    "University of Manchester",
+    "University of Bristol",
+    "University of Warwick",
+    "University of Leeds",
+    "University of Glasgow",
+    "Durham University",
+    "King's College London",
+    "University of Birmingham",
+    "University of Nottingham",
+    "University of Sheffield",
+]
 
 SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
 SEED_DAYS  = 365
@@ -69,45 +134,64 @@ def generate_unique_username(first, last, existing):
     return username
 
 
-def build_user(first, last, existing):
+def build_user(first, last, existing, role='student'):
     """Construct an unsaved User with a KCL email address and hashed password."""
     username = generate_unique_username(first, last, existing)
+    if role == 'teacher':
+        specialism = random.choice(TEACHING_SPECIALISMS)
+        phd_uni = random.choice(PHD_UNIVERSITIES)
+        prior_uni = random.choice([u for u in PRIOR_UNIVERSITIES if u != phd_uni] or PRIOR_UNIVERSITIES)
+        bio = (
+            f"Dr. {first} {last} specialises in {specialism}. "
+            f"They completed their PhD at {phd_uni} after earlier study at {prior_uni}. "
+            "Known for energetic, discussion-rich teaching, they combine academic rigour with practical, career-ready skills and clear feedback students can use immediately."
+        )
+    else:
+        bio = (
+            f"I am {first}, and {random.choice(STUDENT_INTRO_SNIPPETS)} "
+            f"{random.choice(STUDENT_STUDY_SNIPPETS)} "
+            f"{random.choice(STUDENT_PERSONALITY_SNIPPETS)}"
+        )
     user = User(
         username=username,
         email=f"{first.lower()}.{last.lower()}@kcl.ac.uk",
         first_name=first,
         last_name=last,
+        bio=bio,
+        role=role,
     )
     user.set_password(DEFAULT_PASSWORD)
     return user
 
 
-def build_users_list(needed):
+def build_users_list(needed, role='student'):
     """Return a list of *needed* unsaved User instances with unique names and usernames."""
     users_to_create = []
     for _ in range(needed):
         first, last = generate_unique_name(users_to_create)
-        users_to_create.append(build_user(first, last, users_to_create))
+        users_to_create.append(build_user(first, last, users_to_create, role=role))
     return users_to_create
 
 
 def build_settings_for_new_users():
     """Return a list of UserSettings instances for every user that has no settings row yet."""
     new_users = User.objects.filter(settings__isnull=True)
-    return [
-        UserSettings(
-            user=u,
-            theme=random.choice(['light', 'dark']),
-            timezone='Europe/London',
-            year=random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
-            major=random.choice(course_fixtures),
-            sleep_time=time(23, 0),
-            wake_time=time(7, 0),
-            mode=random.choice(['light', 'dark']),
-            homepage_widgets=[],
+    settings = []
+    for u in new_users:
+        settings.append(
+            UserSettings(
+                user=u,
+                theme=random.choice(['light', 'dark']),
+                timezone='Europe/London',
+                year='' if getattr(u, 'role', None) == 'teacher' else random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
+                major=random.choice(course_fixtures),
+                sleep_time=time(23, 0),
+                wake_time=time(7, 0),
+                mode=random.choice(['light', 'dark']),
+                homepage_widgets=[],
+            )
         )
-        for u in new_users
-    ]
+    return settings
 
 
 def build_event(user, title, tags, day_offset, hour):
