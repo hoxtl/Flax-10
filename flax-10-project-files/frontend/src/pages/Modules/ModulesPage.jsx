@@ -175,14 +175,14 @@ function MainView({ state }) {
                 </PrimaryButton>
             )}
         >
-            <ModuleToolbar search={search} sorting={sorting} departments={departments} />
+            <ModuleToolbar search={search} sorting={sorting} departments={departments} isTeacher={is_teacher} />
             <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
                 setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} setReadingModule={setReadingModule} />
         </AppPage>
     );
 }
 
-function ModuleToolbar({ search, sorting, departments }) {
+function ModuleToolbar({ search, sorting, departments, isTeacher }) {
     const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
     const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
     const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
@@ -191,7 +191,9 @@ function ModuleToolbar({ search, sorting, departments }) {
             searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
             controlsSlot={
                 <>
-                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+            {!isTeacher && (
+                <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+            )}
                     <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
                     <ToolbarSortControl>
                         <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
