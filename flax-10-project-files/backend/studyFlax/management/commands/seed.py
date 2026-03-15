@@ -468,21 +468,39 @@ class Command(BaseCommand):
 
     def create_society_memberships(self):
         self.stdout.write("Seeding society memberships...")
+        admin_counts = {u.id: 0 for u in self.users}
+        member_counts = {u.id: 0 for u in self.users}
         for society in Society.objects.all():
-            self._seed_society_members(society)
+            self._seed_society_members(society, admin_counts, member_counts)
 
-    def _seed_society_members(self, society):
-        admin = random.choice(self.users)
+    def _seed_society_members(self, society, admin_counts, member_counts):
+        admin = self._pick_admin(admin_counts)
+        if not admin:
+            return
+        self._add_admin_membership(society, admin, admin_counts)
+        self._seed_regular_members(society, admin, member_counts)
+
+    def _pick_admin(self, admin_counts):
+        eligible = [u for u in self.users if admin_counts[u.id] < 3]
+        return random.choice(eligible) if eligible else None
+
+    def _add_admin_membership(self, society, admin, admin_counts):
         SocietyMembership.objects.get_or_create(
             user=admin, society=society, defaults={'role': 'admin'}
         )
         society.admin_emails = admin.email
         society.save()
-        members = random.sample(self.users, random.randint(5, 15))
+        admin_counts[admin.id] += 1
+
+    def _seed_regular_members(self, society, admin, member_counts):
+        eligible = [u for u in self.users if u.id != admin.id and member_counts[u.id] < 5]
+        count = min(random.randint(5, 15), len(eligible))
+        members = random.sample(eligible, count)
         for member in members:
             SocietyMembership.objects.get_or_create(
                 user=member, society=society, defaults={'role': 'member'}
             )
+            member_counts[member.id] += 1
 
     def create_society_events(self):
         self.stdout.write("Seeding society events...")

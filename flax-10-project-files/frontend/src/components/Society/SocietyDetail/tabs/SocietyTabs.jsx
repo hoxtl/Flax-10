@@ -1,3 +1,7 @@
+/**
+ * SocietyTabs manages the navigation between different content areas of a society profile:
+ * Calendar, About information, and Announcements.
+ */
 import styles from "./SocietyTabs.module.css";
 import CalendarTab from "./calendarTab/CalendarTab";
 import AboutTab from "./AboutTab";

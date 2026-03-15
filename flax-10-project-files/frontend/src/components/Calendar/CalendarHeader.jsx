@@ -1,46 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear, isSameDay, getStartOfWeek } from "./utils/dateUtils";
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu } from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton } from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
+import useBreakpoint from "../../hooks/useBreakpoint";
 import "./CalendarHeader.css";
 
 const VIEW_MODES = [
     { value: 'day', label: 'Day' },
     { value: 'week', label: 'Week' },
     { value: 'month', label: 'Month' },
-    { value: 'year', label: 'Year' },
 ];
 
-function useIsMobile(breakpoint = 900) {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
-    useEffect(() => {
-        const onResize = () => setIsMobile(window.innerWidth < breakpoint);
-        window.addEventListener("resize", onResize);
-        return () => window.removeEventListener("resize", onResize);
-    }, [breakpoint]);
-    return isMobile;
-}
-
 function useCalendarHeader() {
-    const { selectedDate, viewMode } = useCalendar();
+    const { selectedDate, viewMode, displayMode, searchQuery } = useCalendar();
     const dispatch = useCalendarDispatch();
     const { openModal } = useEventModal();
     const [showImportModal, setShowImportModal] = useState(false);
-    return { selectedDate, viewMode, dispatch, openModal, showImportModal, setShowImportModal };
+    const setSearchQuery = (q) => dispatch({ type: 'SET_SEARCH_QUERY', payload: q });
+    return { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, dispatch, openModal, showImportModal, setShowImportModal };
 }
 
 export function CalendarHeader() {
-    const { selectedDate, viewMode, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
-    const isMobile = useIsMobile();
+    const { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
+    const isMobile = useBreakpoint();
     const modes = isMobile ? VIEW_MODES.filter(m => m.value !== 'week') : VIEW_MODES;
 
     const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
     const jumpToDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
     const setViewMode = (mode) => dispatch({ type: "SET_VIEW_MODE", payload: mode });
+    const setDisplayMode = (mode) => dispatch({ type: "SET_DISPLAY_MODE", payload: mode });
     const onImport = async (url) => { await importTimetable(url); await reloadEvents(dispatch, selectedDate, viewMode); };
     const showToday = !isTodayVisible(viewMode, selectedDate);
     const title = getTitle(selectedDate, viewMode);
@@ -64,8 +56,10 @@ export function CalendarHeader() {
                         </div>
                     )}
                     <div className="header-actions">
+                        <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
+                        {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
+                        <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
                         <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
-                        <ViewSettingsMenu isMobile={isMobile} modes={modes} activeMode={viewMode} onViewChange={setViewMode} />
                     </div>
                 </header>
                 {isMobile && (
@@ -103,19 +97,18 @@ function DateCard({ day, isActive, onClick }) {
 }
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
-    const delta = { day: 1, week: 7, month: 30, year: 365 }[viewMode] * dir;
-    if (viewMode === "year") {
-        const newDate = new Date(selectedDate);
-        newDate.setFullYear(newDate.getFullYear() + dir);
-        dispatch({ type: "SET_SELECTED_DATE", payload: newDate });
+    const newDate = new Date(selectedDate);
+    if (viewMode === "month") {
+        newDate.setMonth(newDate.getMonth() + dir);
     } else {
-        dispatch({ type: "SET_SELECTED_DATE", payload: addDays(selectedDate, delta) });
+        const delta = viewMode === "week" ? 7 : 1;
+        newDate.setDate(newDate.getDate() + delta * dir);
     }
+    dispatch({ type: "SET_SELECTED_DATE", payload: newDate });
 }
 
 function getTitle(selectedDate, viewMode) {
     if (viewMode === "day") return formatDate(selectedDate);
-    if (viewMode === "year") return selectedDate.getFullYear().toString();
     return formatMonthYear(selectedDate);
 }
 
@@ -123,7 +116,7 @@ function isTodayVisible(viewMode, date) {
     const today = new Date();
     if (viewMode === 'day') return isSameDay(date, today);
     if (viewMode === 'week') return getWeekDays(date).some(d => isSameDay(d, today));
-    return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+    return date.getMonth() === today.getMonth()
 }
 
 function getTodayDate() {

@@ -51,7 +51,7 @@ function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask,
 
 function TasksSkeleton() {
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-testid="tasks-skeleton">
       <div className={styles.skelSidebar}>
         <div className={`${styles.skel} ${styles.skelSidebarTitle}`} />
         {[...Array(3)].map((_, i) => (

@@ -103,11 +103,11 @@ describe('EditProfileModal', () => {
     expect(await screen.findByText('Server exploded')).toBeTruthy();
   });
 
-  it('calls onClose when overlay is clicked', () => {
+  it('calls onClose when backdrop is clicked', () => {
     const onClose = vi.fn();
     const { container } = render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
-    const overlay = container.querySelector('[class*="overlay"]');
-    fireEvent.click(overlay);
+    const backdrop = container.querySelector('[class*="backdrop"]');
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
 

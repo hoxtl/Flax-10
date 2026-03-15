@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockNavigate = vi.hoisted(() => vi.fn());
@@ -142,6 +142,7 @@ describe('App', () => {
 
     afterEach(() => {
         localStorage.clear();
+        cleanup();
     });
 
     it('renders auth screen when not authenticated', async () => {
@@ -186,7 +187,9 @@ describe('App', () => {
         localStorage.setItem('token', 'abc');
         localStorage.setItem('user', JSON.stringify({ id: 1, username: 'alice' }));
         localStorage.setItem('flax_welcome_seen_v1', '1');
-        window.dispatchEvent(new Event('auth-changed'));
+        act(() => {
+            window.dispatchEvent(new Event('auth-changed'));
+        });
         await waitFor(() => expect(screen.getByTestId('dashboard-layout')).toBeTruthy());
     });
 
@@ -264,7 +267,9 @@ describe('App', () => {
         localStorage.setItem('flax_welcome_seen_v1', '1');
         renderApp('/');
         await waitFor(() => screen.getByTestId('dashboard-layout'));
-        window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
+        });
         await waitFor(() => expect(screen.getByTestId('settings-page')).toBeTruthy());
     });
 
@@ -274,7 +279,9 @@ describe('App', () => {
         localStorage.setItem('flax_welcome_seen_v1', '1');
         renderApp('/');
         await waitFor(() => screen.getByTestId('dashboard-layout'));
-        window.dispatchEvent(new CustomEvent('navigate', { detail: 'societies_5_about' }));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('navigate', { detail: 'societies_5_about' }));
+        });
         await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/societies?id=5&tab=about'));
     });
 
@@ -284,7 +291,9 @@ describe('App', () => {
         localStorage.setItem('flax_welcome_seen_v1', '1');
         renderApp('/');
         await waitFor(() => screen.getByTestId('dashboard-layout'));
-        window.dispatchEvent(new CustomEvent('navigate', { detail: '/map' }));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('navigate', { detail: '/map' }));
+        });
         await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/map'));
     });
 

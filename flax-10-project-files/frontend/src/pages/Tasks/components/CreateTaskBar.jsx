@@ -3,8 +3,9 @@
  * Uses useCreateTaskBar for state and subcomponents for UI.
  */
 
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
 
@@ -17,7 +18,7 @@ function CreateTaskBarInput({ styles: s, title, setTitle, saving, inputRef, exte
   return (
     <div className={s.inputRow}>
       <input ref={externalInputRef ?? inputRef} type="text" className={s.input} placeholder="Quick add: what needs to be done?" value={title} onChange={(e) => setTitle(e.target.value)} onFocus={() => setInputFocused(true)} onBlur={onBlur} onKeyDown={onKeyDown} aria-label="Quick add task" />
-      {title.trim() && <button type="submit" className={s.addBtn} disabled={saving || !title.trim()} aria-label="Add task">{saving ? "…" : "Add"}</button>}
+      {title.trim() && <PrimaryButton type="submit" className={s.addBtn} disabled={saving || !title.trim()} aria-label="Add task">{saving ? "…" : "Add"}</PrimaryButton>}
     </div>
   );
 }

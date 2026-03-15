@@ -4,6 +4,7 @@ import { Calendar } from '../../../components/Calendar/Calendar';
 
 vi.mock('../../../context/CalendarContext', () => ({
     useCalendar: vi.fn(() => ({ viewMode: 'month' })),
+    useCalendarDispatch: vi.fn(() => vi.fn()),
     CalendarProvider: ({ children }) => <div>{children}</div>,
 }));
 
@@ -23,12 +24,8 @@ vi.mock('../../../components/Calendar/WeekView/WeekView', () => ({
     WeekView: () => <div data-testid="week-view">Week View</div>,
 }));
 
-vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
-    MonthView: () => <div data-testid="month-view">Month View</div>,
-}));
-
-vi.mock('../../../components/Calendar/YearView/YearView', () => ({
-    YearView: () => <div data-testid="year-view">Year View</div>,
+vi.mock('../../../components/Calendar/MonthView/SwipeMonthView', () => ({
+    SwipeMonthView: () => <div data-testid="month-view">Month View</div>,
 }));
 
 import { useCalendar } from '../../../context/CalendarContext';
@@ -57,11 +54,7 @@ describe('Calendar', () => {
         expect(screen.getByTestId('day-view')).toBeTruthy();
     });
 
-    it('renders YearView when viewMode is year', () => {
-        useCalendar.mockReturnValue({ viewMode: 'year' });
-        render(<Calendar />);
-        expect(screen.getByTestId('year-view')).toBeTruthy();
-    });
+
 
     it('renders nothing for unknown viewMode', () => {
         useCalendar.mockReturnValue({ viewMode: 'unknown' });

@@ -4,70 +4,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Profile from '../../../pages/Profile/Profile';
+
+// Mock hooks
 vi.mock('../../../pages/Profile/hooks/useProfile', () => ({
-  useProfileState: vi.fn(() => ({
-    loading: false,
-    profileData: { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' },
-    events: [],
-    viewedUserId: 1,
-    onNavChange: vi.fn(),
-    showEditProfile: false,
-    setShowEditProfile: vi.fn(),
-    showModules: false,
-    setShowModules: vi.fn(),
-    showTasks: false,
-    setShowTasks: vi.fn(),
-    showSharedWith: false,
-    setShowSharedWith: vi.fn(),
-    showSharedBy: false,
-    setShowSharedBy: vi.fn(),
-    showEvents: false,
-    setShowEvents: vi.fn(),
-    eventRange: 'week',
-    setEventRange: vi.fn(),
-    reload: vi.fn(),
-    handleSaveProfile: vi.fn(),
-  })),
-  useProfileBodyData: vi.fn(() => ({
-    modules: ['CS101'],
-    upcomingEventCount: 3,
-    filteredEvents: [],
-  })),
-  useProfileContent: vi.fn((state) => ({
-    profileData: state.profileData,
-    handlers: {
-      onEditProfile: vi.fn(),
-      onModulesClick: vi.fn(),
-      onTasksClick: vi.fn(),
-      onEventsClick: vi.fn(),
-      onSharedWithClick: vi.fn(),
-      onSharedByClick: vi.fn(),
-      reload: vi.fn(),
-      setOptimisticShare: vi.fn(),
-    },
-  })),
+  useProfileState: vi.fn(),
+  useProfileBodyData: vi.fn(),
+  useProfileContent: vi.fn(),
 }));
 
 vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
-  useProfileSummary: vi.fn(() => ({
-    summary: { persona: null, badges: [], weekly: null, streaks: null },
-    loading: false,
-    refetch: vi.fn(),
-  })),
+  useProfileSummary: vi.fn(),
 }));
 
+vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
+  useProfileVisibility: vi.fn(),
+}));
+
+// Mock services
 vi.mock('../../../api/analyticsService', () => ({
-  default: { getSummary: vi.fn().mockResolvedValue(null) },
+  default: {
+    getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })),
+  },
 }));
 
 vi.mock('../../../api/moduleApi', () => ({
-  getModules: vi.fn().mockResolvedValue([]),
+  getModules: vi.fn(() => Promise.resolve([])),
 }));
 
 vi.mock('../../../api/client', () => ({
-  fetchApi: vi.fn().mockResolvedValue({}),
+  fetchApi: vi.fn(() => Promise.resolve({})),
 }));
 
+// Mock components
 vi.mock('../../../pages/Profile/ProfileModals', () => ({
   default: () => <div data-testid="profile-modals" />,
 }));
@@ -84,13 +52,14 @@ vi.mock('../../../pages/Profile/AchievementsModal', () => ({
   default: ({ onClose }) => <div data-testid="achievements-modal"><button onClick={onClose}>Close</button></div>,
 }));
 
-import { useProfileState } from '../../../pages/Profile/hooks/useProfile';
+import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/Profile/hooks/useProfile';
 import { useProfileSummary } from '../../../pages/Profile/hooks/useProfileSummary';
+import { useProfileVisibility } from '../../../pages/Profile/hooks/useProfileVisibility';
 import analyticsService from '../../../api/analyticsService';
 import { fetchApi } from '../../../api/client';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
-const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
+const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', module_count: 3 };
 const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones' };
 
 const makeProfileState = (overrides = {}) => ({
@@ -118,6 +87,20 @@ const makeProfileState = (overrides = {}) => ({
   ...overrides,
 });
 
+const defaultVisibility = {
+  isSelf: true,
+  isShared: false,
+  canViewTasks: true,
+  canViewEvents: true,
+  canViewSharedWith: true,
+  canViewAnalytics: true,
+  canViewCalendar: false,
+  canViewModules: true,
+  canViewAchievements: true,
+  canViewSocieties: true,
+  canEditProfile: true,
+};
+
 const selfAnalyticsSummary = {
   persona: { emoji: '🦉', label: 'Night Owl', description: 'You work best late.' },
   badges: [{ id: 1, tier: 'gold', label: 'Focus Hero', emoji: '🏅', description: 'desc' }],
@@ -141,72 +124,96 @@ const makeHeatmap = () => ({
 
 describe('Profile', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+
+    // Set up default mock implementations
+    useProfileState.mockReturnValue(makeProfileState());
+    useProfileBodyData.mockReturnValue({
+      modules: ['CS101'],
+      upcomingEventCount: 3,
+      filteredEvents: [],
+    });
+    useProfileContent.mockImplementation((state) => ({
+      profileData: state.profileData,
+      handlers: {
+        onEditProfile: vi.fn(),
+        onModulesClick: vi.fn(),
+        onTasksClick: vi.fn(),
+        onEventsClick: vi.fn(),
+        onSharedWithClick: vi.fn(),
+        onSharedByClick: vi.fn(),
+        reload: vi.fn(),
+        setOptimisticShare: vi.fn(),
+      },
+    }));
+    useProfileSummary.mockReturnValue({
+      summary: { persona: null, badges: [], weekly: null, streaks: null },
+      loading: false,
+      refetch: vi.fn(),
+    });
+    useProfileVisibility.mockReturnValue(defaultVisibility);
+    analyticsService.getSummary.mockResolvedValue({ heatmap: { data: [] } });
+    fetchApi.mockResolvedValue({});
   });
 
   it('renders loading state', () => {
-    useProfileState.mockReturnValueOnce({ loading: true });
+    useProfileState.mockReturnValue(makeProfileState({ loading: true }));
     renderProfile();
-    expect(screen.getByText('Loading...')).toBeTruthy();
+    expect(document.querySelectorAll('[class*="skel"]').length).toBeGreaterThan(0);
   });
 
   it('renders not found when no profileData', () => {
-    useProfileState.mockReturnValueOnce({ loading: false, profileData: null });
+    useProfileState.mockReturnValue(makeProfileState({ loading: false, profileData: null }));
     renderProfile();
     expect(screen.getByText('User not found.')).toBeTruthy();
   });
 
   it('renders username', async () => {
     renderProfile();
-    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
-    const usernameEls = screen.getAllByText('alice');
-    expect(usernameEls.length).toBeGreaterThan(0);
+    await waitFor(() => expect(screen.getAllByText('alice').length).toBeGreaterThan(0));
   });
 
   it('renders profile modals', async () => {
     renderProfile();
-    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
-    expect(screen.getByTestId('profile-modals')).toBeTruthy();
+    await waitFor(() => expect(screen.getByTestId('profile-modals')).toBeTruthy());
   });
 
   it('shows edit profile button for self', async () => {
     renderProfile();
-    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
-    expect(screen.getByText('Edit profile')).toBeTruthy();
+    await waitFor(() => expect(screen.getAllByText(/edit profile/i).length).toBeGreaterThan(0));
   });
 
   it('renders module count', async () => {
     renderProfile();
-    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
-    expect(screen.getByText('modules')).toBeTruthy();
+    await waitFor(() => expect(screen.getAllByText(/modules/i).length).toBeGreaterThan(0));
   });
 
   it('renders achievements section', async () => {
-    useProfileSummary.mockReturnValueOnce({
+    useProfileSummary.mockReturnValue({
       summary: { persona: null, badges: [{ id: 1, name: 'Early Bird', tier: 'bronze', emoji: '🐦', label: 'Early Bird', description: '' }], weekly: null, streaks: null },
       loading: false,
       refetch: vi.fn(),
     });
     renderProfile();
-    await waitFor(() => expect(screen.getByText('modules')).toBeInTheDocument());
-    expect(screen.getByText('ACHIEVEMENTS')).toBeTruthy();
+    await waitFor(() => expect(screen.getByText('ACHIEVEMENTS')).toBeTruthy());
   });
 
   it('shows Share button when viewing another profile', async () => {
-    useProfileState.mockReturnValueOnce(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
+    useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
+    useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canEditProfile: false });
     renderProfile({ user: defaultUser, viewedUserId: 2 });
     await waitFor(() => expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0));
-    expect(screen.queryByText('Edit profile')).toBeNull();
+    expect(screen.queryByText(/edit profile/i)).toBeNull();
   });
 
   it('renders profile-home loading skeleton when summary is loading', () => {
-    useProfileSummary.mockReturnValueOnce({ summary: null, loading: true, refetch: vi.fn() });
+    useProfileSummary.mockReturnValue({ summary: null, loading: true, refetch: vi.fn() });
     renderProfile();
     expect(document.querySelectorAll('[class*="skel"]').length).toBeGreaterThan(0);
   });
 
   it('renders self analytics blocks', async () => {
-    analyticsService.getSummary.mockResolvedValueOnce({ heatmap: makeHeatmap() });
+    analyticsService.getSummary.mockResolvedValue({ heatmap: makeHeatmap() });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
     expect(await screen.findByText('Night Owl')).toBeTruthy();
@@ -217,7 +224,6 @@ describe('Profile', () => {
 
   it('opens analytics actions and achievements modal', async () => {
     const onNavigate = vi.fn();
-    const { default: analyticsService } = await import('../../../api/analyticsService');
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
@@ -230,7 +236,6 @@ describe('Profile', () => {
 
   it('closes achievements modal when Close clicked', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
-    const { default: analyticsService } = await import('../../../api/analyticsService');
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     renderProfile();
     await screen.findByText('Night Owl');
@@ -241,53 +246,53 @@ describe('Profile', () => {
   });
 
   it('saves weekly goal and refetches summary', async () => {
-    fetchApi.mockResolvedValueOnce({});
-    useProfileSummary.mockReturnValueOnce({
+    fetchApi.mockResolvedValue({});
+    useProfileSummary.mockReturnValue({
       summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 } },
       loading: false,
       refetch: vi.fn(),
     });
     renderProfile();
-    const goalRingBtn = screen.getByRole('button', { name: /2h\/8h/ });
-    fireEvent.click(goalRingBtn);
+    const goalRingBtns = screen.getAllByRole('button', { name: /2h\/8h/ });
+    fireEvent.click(goalRingBtns[0]);
     const saveBtn = await screen.findByRole('button', { name: 'Save goal' });
     fireEvent.click(saveBtn);
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
   });
 
   it('shows shared calendar for mutual profile', async () => {
-    useProfileState.mockReturnValueOnce(makeProfileState({
+    useProfileState.mockReturnValue(makeProfileState({
       profileData: { ...otherProfileData, is_shared_with_me: true },
       viewedUserId: 2,
     }));
+    useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewCalendar: true });
     renderProfile({ user: defaultUser, viewedUserId: 2 });
     await waitFor(() => expect(screen.getByText('SHARED CALENDAR')).toBeInTheDocument());
     expect(screen.getByTestId('profile-calendar')).toBeTruthy();
   });
 
   it('does not show shared calendar when viewing another profile without share', async () => {
-    useProfileState.mockReturnValueOnce(makeProfileState({
+    useProfileState.mockReturnValue(makeProfileState({
       profileData: { ...otherProfileData },
       viewedUserId: 2,
     }));
+    useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewCalendar: false, canEditProfile: false });
     renderProfile({ user: defaultUser, viewedUserId: 2 });
-    await waitFor(() => expect(screen.queryByText('Edit profile')).toBeNull());
-    expect(screen.queryByText('SHARED CALENDAR')).toBeNull();
-    expect(screen.queryByTestId('profile-calendar')).toBeNull();
+    await waitFor(() => expect(screen.queryByText(/edit profile/i)).toBeNull());
+    expect(screen.queryByText('SHARED CALENDAR')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('profile-calendar')).not.toBeInTheDocument();
   });
 
   it('useProfileAnalytics handles getSummary failure without crashing', async () => {
-    const { default: analytics } = await import('../../../api/analyticsService');
-    analytics.getSummary.mockRejectedValueOnce(new Error('network error'));
+    analyticsService.getSummary.mockRejectedValue(new Error('network error'));
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
-    await waitFor(() => expect(analytics.getSummary).toHaveBeenCalledWith(90));
+    await waitFor(() => expect(analyticsService.getSummary).toHaveBeenCalledWith(90));
     expect(screen.getByText('Night Owl')).toBeInTheDocument();
   });
 
   it('computePeakHour returns null when heatmap is all zeros', async () => {
-    const { default: analytics } = await import('../../../api/analyticsService');
-    analytics.getSummary.mockResolvedValueOnce({
+    analyticsService.getSummary.mockResolvedValue({
       heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) },
     });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });

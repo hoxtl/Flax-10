@@ -34,7 +34,7 @@ describe('Discover', () => {
 
     it('renders page title', () => {
         render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText('Users')).toBeTruthy();
+        expect(screen.getByText('Discover', { selector: 'h1' })).toBeTruthy();
     });
 
     it('renders subtitle', () => {
@@ -48,8 +48,8 @@ describe('Discover', () => {
     });
 
     it('shows loading state initially', () => {
-        render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText('Loading users...')).toBeTruthy();
+        const { container } = render(<Discover onNavChange={vi.fn()} />);
+        expect(container.querySelector('[class*="skelWrap"]')).toBeTruthy();
     });
 
     it('shows empty state when no users found', async () => {

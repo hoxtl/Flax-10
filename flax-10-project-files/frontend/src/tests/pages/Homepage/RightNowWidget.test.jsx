@@ -59,7 +59,7 @@ function renderWidget(props = {}) {
 
 describe('RightNowWidget', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     it('renders "Right Now" header', () => {
@@ -310,10 +310,10 @@ describe('RightNowWidget', () => {
     });
 
     it('shows leave-by info with urgent message when within 15 min', () => {
-        vi.mocked(kclTflMapping.getRelevantDelays).mockReturnValueOnce([
+        vi.mocked(kclTflMapping.getRelevantDelays).mockReturnValue([
             { lineName: 'Victoria', severityDescription: 'Minor delays' },
         ]);
-        vi.mocked(kclTflMapping.getTflLinesForLocation).mockReturnValueOnce(['Victoria']);
+        vi.mocked(kclTflMapping.getTflLinesForLocation).mockReturnValue(['Victoria']);
         const leaveInMins = 12;
         const startTime = new Date(baseNow.getTime() + (leaveInMins + 35) * 60000).toISOString();
         renderWidget({

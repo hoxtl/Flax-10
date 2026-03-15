@@ -28,8 +28,8 @@ vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/Calendar/EventDetailPopup', () => ({
-    EventDetailPopup: ({ event, onClose, actions }) => (
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+    EventPopover: ({ event, onClose, actions }) => (
         <div data-testid="event-popup">
             <span>{event?.title}</span>
             <button onClick={onClose}>Close Popup</button>

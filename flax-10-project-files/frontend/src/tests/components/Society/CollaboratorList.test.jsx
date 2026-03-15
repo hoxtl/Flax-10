@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CollaboratorList from '../../../components/Society/CollaboratorList';
 
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select aria-label={placeholder} value={value} onChange={e => onChange(e.target.value)}>
             {(options || []).map(opt => (

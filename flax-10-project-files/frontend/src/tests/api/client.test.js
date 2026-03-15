@@ -16,7 +16,7 @@ describe('fetchApi', () => {
         global.fetch.mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => mockData,
+            text: async () => JSON.stringify(mockData),
         });
         const data = await fetchApi('/test');
         expect(data).toEqual(mockData);
@@ -36,7 +36,7 @@ describe('fetchApi', () => {
         global.fetch.mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => ({}),
+            text: async () => JSON.stringify({}),
         });
         await fetchApi('/test', { method: 'POST' });
         expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
@@ -52,7 +52,7 @@ describe('fetchApi', () => {
         global.fetch.mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => ({}),
+            text: async () => JSON.stringify({}),
         });
         await fetchApi('/test');
         const callHeaders = global.fetch.mock.calls[0][1].headers;
@@ -110,7 +110,7 @@ describe('fetchApi', () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => ({ data: 'ok' }),
+            text: async () => JSON.stringify({ data: 'ok' }),
         });
         const result = await fetchApi('/test');
         const callHeaders = global.fetch.mock.calls[0][1].headers;

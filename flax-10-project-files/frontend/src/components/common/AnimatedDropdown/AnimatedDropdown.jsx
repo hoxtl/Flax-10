@@ -7,6 +7,12 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Search } from "lucide-react";
+import {
+  checkmarkMotion,
+  chevronRotateTransition,
+  getDropdownItemMotion,
+  getDropdownPanelMotion,
+} from "../motion/transitions";
 import styles from "./AnimatedDropdown.module.css";
 
 /**
@@ -94,7 +100,7 @@ function filterFlat(options, query) {
  */
 function CheckMark() {
   return (
-    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500 }}>
+    <motion.div {...checkmarkMotion}>
       <Check size={14} />
     </motion.div>
   );
@@ -111,8 +117,7 @@ function CheckMark() {
 function GroupedOptionItem({ opt, value, onSelect, index, hideCheckmark }) {
   return (
     <motion.button type="button"
-      initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.15, delay: index * 0.02 }}
+      {...getDropdownItemMotion(index)}
       onClick={() => onSelect(opt.value)}
       className={`${styles.dropdownItem} ${value === opt.value && !hideCheckmark ? styles.dropdownItemActive : ''}`}>
       <span>{opt.label}</span>
@@ -152,8 +157,7 @@ function FlatOptions({ options, value, onSelect, hideCheckmark }) {
     const optLabel = typeof opt === 'string' ? opt : opt.label;
     return (
       <motion.button type="button" key={optValue ?? i}
-        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.15, delay: i * 0.03 }}
+        {...getDropdownItemMotion(i)}
         onClick={() => onSelect(optValue)}
         className={`${styles.dropdownItem} ${value === optValue && !hideCheckmark ? styles.dropdownItemActive : ''}`}
       >
@@ -176,7 +180,7 @@ function DropdownButton({ selectedLabel, value, isOpen, onClick }) {
   return (
     <motion.button type="button" whileTap={{ scale: 0.99 }} onClick={onClick} className={styles.dropdownBtn}>
       <span style={{ color: value ? 'inherit' : 'var(--muted)' }}>{selectedLabel}</span>
-      <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.25 }}>
+      <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={chevronRotateTransition}>
         <ChevronDown size={16} />
       </motion.div>
     </motion.button>
@@ -230,30 +234,33 @@ function DropdownContent({
 function DropdownPanel({
   grouped, filteredOptions, value, onSelect,
   searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark,
-  usePortal, coords
+  align, usePortal, coords
 }) {
-  const yOffset = openUpward ? 8 : -8;
   const menuStyle = openUpward ? { bottom: '100%', top: 'auto', marginBottom: 4 } : {};
-  
+
   if (usePortal && coords) {
     const portalTop = openUpward ? 'auto' : coords.top + 4;
     const portalBottom = openUpward ? window.innerHeight - coords.top + 4 : 'auto';
     Object.assign(menuStyle, {
-        position: 'fixed',
-        top: portalTop,
-        bottom: portalBottom,
-        left: coords.left,
-        width: 'max-content',
-        minWidth: coords.width,
-        zIndex: 9999,
-        margin: 0
+      position: 'fixed',
+      top: portalTop,
+      bottom: portalBottom,
+      left: coords.left,
+      width: 'max-content',
+      minWidth: coords.width,
+      zIndex: 10001,
+      margin: 0
     });
   }
 
   if (menuMaxHeight) menuStyle.maxHeight = menuMaxHeight;
+
+  const alignCls = align === 'right' ? styles.alignRight : styles.alignLeft;
+
   return (
-    <motion.div initial={{ opacity: 0, y: yOffset }} animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: yOffset }} transition={{ duration: 0.18 }} className={styles.dropdownMenu} style={menuStyle}>
+    <motion.div
+      {...getDropdownPanelMotion(openUpward)}
+      className={`${styles.dropdownMenu} ${alignCls}`} style={menuStyle}>
       <DropdownContent grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} hideCheckmark={hideCheckmark} />
     </motion.div>
@@ -276,9 +283,9 @@ function DropdownPanel({
  * @param {boolean} props.openUpward - Whether to open the menu upward.
  * @param {number} props.menuMaxHeight - Max height for the menu.
  */
-function DropdownMenu({ 
-  isOpen, grouped, options, value, onSelect, searchable, query, setQuery, 
-  searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark,
+function DropdownMenu({
+  isOpen, grouped, options, value, onSelect, searchable, query, setQuery,
+  searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark, align,
   usePortal, coords
 }) {
   const filteredOptions = searchable ? (grouped ? filterGrouped(options, query) : filterFlat(options, query)) : options;
@@ -286,8 +293,8 @@ function DropdownMenu({
     <AnimatePresence>
       {isOpen && <DropdownPanel grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
-        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} 
-        usePortal={usePortal} coords={coords} />}
+        openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark}
+        usePortal={usePortal} coords={coords} align={align} />}
     </AnimatePresence>
   );
 
@@ -335,36 +342,38 @@ function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpen
  * @param {React.RefObject} containerRef - Ref to the dropdown container element.
  * @param {boolean} isOpen - Whether the dropdown is currently open.
  * @param {number} menuMaxHeight - Max height of the dropdown menu (default 260).
+ * @param {boolean} allowFlipUpward - Whether the menu is allowed to flip upward.
  * @returns {boolean} True if the dropdown should open upward.
  */
-function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
+function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260, allowFlipUpward = false) {
   const [openUpward, setOpenUpward] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
 
   useEffect(() => {
     if (!isOpen || !containerRef.current) return;
-    
+
     const update = () => {
-        const rect = containerRef.current.getBoundingClientRect();
-        const spaceBelow = window.innerHeight - rect.bottom;
-        const spaceAbove = rect.top;
-        const shouldOpenUpward = spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
-        setOpenUpward(shouldOpenUpward);
-        setCoords({
-            top: shouldOpenUpward ? rect.top : rect.bottom,
-            left: rect.left,
-            width: rect.width
-        });
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldOpenUpward =
+        allowFlipUpward && spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
+      setOpenUpward(shouldOpenUpward);
+      setCoords({
+        top: shouldOpenUpward ? rect.top : rect.bottom,
+        left: rect.left,
+        width: rect.width
+      });
     }
 
     update();
     window.addEventListener('scroll', update, true);
     window.addEventListener('resize', update);
     return () => {
-        window.removeEventListener('scroll', update, true);
-        window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
     }
-  }, [isOpen, menuMaxHeight, containerRef]);
+  }, [isOpen, menuMaxHeight, containerRef, allowFlipUpward]);
   return { openUpward, coords };
 }
 
@@ -382,20 +391,27 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
  * @param {number} [props.menuMaxHeight] - Optional max height for the dropdown menu.
  * @param {boolean} [props.openOnHover] - Whether the dropdown should open on hover.
  * @param {boolean} [props.usePortal=true] - Whether to render the menu in a portal.
+ * @param {boolean} [props.allowFlipUpward=false] - Whether the menu can flip upward.
  */
 export default function AnimatedDropdown({
   value, onChange, placeholder, options,
   grouped = false, searchable = false, searchPlaceholder = "Search...",
   emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false,
-  isOpen: forceOpen, onOpenChange, usePortal = false
+  isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false,
+  allowFlipUpward = false
 }) {
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
     options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange
   );
   const containerRef = useRef(null);
   const timeoutRef = useRef(null);
-  const { openUpward, coords } = useOpenDirection(containerRef, isOpen, menuMaxHeight);
+  const { openUpward, coords } = useOpenDirection(
+    containerRef,
+    isOpen,
+    menuMaxHeight,
+    allowFlipUpward
+  );
 
   const handleMouseEnter = () => {
     if (openOnHover) {
@@ -445,7 +461,7 @@ export default function AnimatedDropdown({
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
         openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark}
-        usePortal={usePortal} coords={coords} />
+        align={align} usePortal={usePortal} coords={coords} />
     </div>
   );
 }

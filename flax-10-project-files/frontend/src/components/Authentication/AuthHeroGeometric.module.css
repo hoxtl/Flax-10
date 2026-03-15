@@ -2,15 +2,15 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #f0ede8 0%, #eadfd2 100%);
+  background: var(--auth-geo-hero-bg);
 }
 
 .glow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 20%, rgba(158,126,93,0.18), transparent 55%),
-    radial-gradient(circle at 80% 70%, rgba(74,52,33,0.12), transparent 60%);
+    radial-gradient(circle at 20% 20%, var(--auth-geo-glow-a), transparent 55%),
+    radial-gradient(circle at 80% 70%, var(--auth-geo-glow-b), transparent 60%);
   filter: blur(32px);
   opacity: 0.9;
 }
@@ -33,8 +33,10 @@
   inset: 0;
   border-radius: 999px;
   border: 2px solid;
+  border-color: var(--auth-geo-shape-border);
+  background: linear-gradient(90deg, var(--auth-geo-shape-from), transparent);
   backdrop-filter: blur(2px);
-  box-shadow: 0 10px 36px rgba(74, 52, 33, 0.16);
+  box-shadow: var(--auth-geo-shape-shadow);
 }
 
 .shapeInner::after {
@@ -42,23 +44,47 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.20), transparent 70%);
+  background: radial-gradient(circle at 50% 50%, var(--auth-geo-shape-highlight), transparent 70%);
 }
 
-.leftTop { left: -12%; top: 16%; }
-.rightMid { right: -8%; top: 68%; }
-.leftBottom { left: 6%; bottom: 6%; }
-.rightTop { right: 16%; top: 10%; }
-.leftSmall { left: 20%; top: 6%; }
+.leftTop {
+  left: -12%;
+  top: 16%;
+  --auth-geo-shape-from: var(--auth-geo-shape-a);
+  --auth-geo-shape-border: var(--auth-geo-shape-border-a);
+}
+
+.rightMid {
+  right: -8%;
+  top: 68%;
+  --auth-geo-shape-from: var(--auth-geo-shape-b);
+  --auth-geo-shape-border: var(--auth-geo-shape-border-b);
+}
+
+.leftBottom {
+  left: 6%;
+  bottom: 6%;
+  --auth-geo-shape-from: var(--auth-geo-shape-c);
+  --auth-geo-shape-border: var(--auth-geo-shape-border-c);
+}
+
+.rightTop {
+  right: 16%;
+  top: 10%;
+  --auth-geo-shape-from: var(--auth-geo-shape-d);
+  --auth-geo-shape-border: var(--auth-geo-shape-border-d);
+}
+
+.leftSmall {
+  left: 20%;
+  top: 6%;
+  --auth-geo-shape-from: var(--auth-geo-shape-e);
+  --auth-geo-shape-border: var(--auth-geo-shape-border-e);
+}
 
 .fade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(240,237,232,0.90),
-    rgba(240,237,232,0.22),
-    rgba(240,237,232,0.80)
-  );
+  background: var(--auth-geo-fade-overlay);
   pointer-events: none;
 }

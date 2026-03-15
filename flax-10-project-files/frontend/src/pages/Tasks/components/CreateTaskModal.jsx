@@ -5,10 +5,12 @@
 import { createPortal } from "react-dom";
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
-import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import FormField from "../../../components/common/FormField/FormField";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
 
@@ -32,7 +34,7 @@ function CreateTaskModalHeader({ isEditMode, onClose }) {
   return (
     <div className={styles.header}>
       <h2 className={styles.title}>{isEditMode ? "Edit task" : "New task"}</h2>
-      <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+      <PrimaryButton type="button" variant="ghost" className={styles.closeBtn} onClick={onClose} aria-label="Close" pill>✕</PrimaryButton>
     </div>
   );
 }
@@ -42,12 +44,12 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
     <div className={styles.footer}>
       {saveError && <p className={styles.saveError} role="alert">{saveError}</p>}
       {isEditMode && onDeleteTask && (
-        <button type="button" className={styles.deleteBtn} onClick={handleDelete} disabled={saving}>Delete task</button>
+        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" onClick={handleDelete} disabled={saving} pill>Delete task</PrimaryButton>
       )}
-      <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-      <button type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date}>
+      <PrimaryButton type="button" className={styles.cancelBtn} variant="ghost" onClick={onClose} pill>Cancel</PrimaryButton>
+      <PrimaryButton type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date} pill>
         {saving ? "Saving…" : (isEditMode ? "Save" : "Add task")}
-      </button>
+      </PrimaryButton>
     </div>
   );
 }
@@ -55,14 +57,12 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
 function CreateTaskModalTitleDesc({ form, set }) {
   return (
     <div className={styles.canvas}>
-      <label htmlFor="create-task-title" className={styles.label}>Task name <span className={styles.labelRequired}>*</span></label>
-      <div className={styles.fieldGroup}>
-        <input id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
-      </div>
-      <label htmlFor="create-task-desc" className={styles.label}>Description</label>
-      <div className={styles.fieldGroup}>
-        <textarea id="create-task-desc" className={styles.desc} placeholder="Optional" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
-      </div>
+      <FormField htmlFor="create-task-title" label={<>Task name <span className={styles.labelRequired}>*</span></>} className={styles.fieldGroup}>
+        <TextInput id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
+      </FormField>
+      <FormField htmlFor="create-task-desc" label="Description" className={styles.fieldGroup}>
+        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Optional" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
+      </FormField>
     </div>
   );
 }
@@ -78,10 +78,9 @@ function CreateTaskModalDateTime({ form, set }) {
   );
 }
 
-function CreateTaskModalDuration({ form, setForm, askFlaxInitialMessage }) {
+function CreateTaskModalDuration({ form, setForm }) {
   return (
     <div className={styles.durationRow}>
-      <EstTimeHelpBanner message="Not sure what estimated time to put? Ask Flax for a suggestion." ctaLabel="Ask Flax" initialMessage={askFlaxInitialMessage} className={styles.estTimeBannerModal} />
       <span className={styles.focusBlocksLabel}>Est. time</span>
       <div className={styles.chipGroup}>
         {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
@@ -165,7 +164,7 @@ function CreateTaskModalBody({ state, addToScheduleLabel }) {
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
-      <CreateTaskModalDuration form={form} setForm={setForm} askFlaxInitialMessage={askFlaxInitialMessage} />
+      <CreateTaskModalDuration form={form} setForm={setForm} />
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>

@@ -183,7 +183,15 @@ export function MiniTimeline({
       map[row.id] = pick;
       used.add(pick.id);
     }
-    return map;
+
+    // Build a map of each row → the next free row's assigned task
+    const nextMap = {};
+    for (let i = 0; i < freeRows.length - 1; i++) {
+      const nextTask = map[freeRows[i + 1].id] || null;
+      if (nextTask) nextMap[freeRows[i].id] = nextTask;
+    }
+
+    return { map, nextMap };
   }, [rows, suggestableTasks, now]);
 
   const currentBlock = useMemo(
@@ -211,7 +219,8 @@ export function MiniTimeline({
             slotPopoverRowId={slotPopoverRowId}
             setSlotPopoverRowId={setSlotPopoverRowId}
             isBestGap={row.id === bestFreeRowId}
-            assignedTask={assignedGapTasks[row.id] || null}
+            assignedTask={assignedGapTasks.map[row.id] || null}
+            nextAssignedTask={assignedGapTasks.nextMap[row.id] || null}
           />
         );
       }

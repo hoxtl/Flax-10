@@ -7,6 +7,14 @@ vi.mock('lucide-react', () => ({
   Check: () => <span data-testid="check" />,
 }));
 
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    button: ({ children, ...props }) => <button {...props}>{children}</button>,
+  },
+  AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
 describe('ModuleDropdown', () => {
   const options = [
     { value: 'a', label: 'Alpha' },
@@ -44,13 +52,13 @@ describe('ModuleDropdown', () => {
     const { container } = render(
       <ModuleDropdown value="a" onChange={vi.fn()} options={options} className="custom-class" />
     );
-    const wrapper = container.querySelector('[class*="wrapper"]');
-    expect(wrapper).toHaveClass('custom-class');
+    expect(container.firstChild).toHaveClass('custom-class');
   });
 
   it('closes menu when clicking trigger again', () => {
     render(<ModuleDropdown value="a" onChange={vi.fn()} options={options} />);
-    const trigger = screen.getAllByRole('button', { name: 'Alpha' })[0];
+    const buttons = screen.getAllByRole('button', { name: 'Alpha' });
+    const trigger = buttons[0];
     fireEvent.click(trigger);
     expect(screen.getByText('Beta')).toBeInTheDocument();
     fireEvent.click(trigger);

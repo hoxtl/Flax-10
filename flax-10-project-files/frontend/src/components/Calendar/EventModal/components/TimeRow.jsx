@@ -1,5 +1,5 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
-import { getDisplayValue, handleToggle, handleDatePickerChange, handleNativeDateChange } from './timeRowHelpers';
+import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
 import './TimeRow.css';
 
 export function TimeRow({ form, update, setForm }) {
@@ -51,7 +51,12 @@ function DateOnlyInput({ label, value, field, update }) {
     return (
         <div className="form-field">
             <label>{label}</label>
-            <input type="date" value={getDisplayValue(value, true, field) || ''} onChange={handleNativeDateChange(field, update)} required />
+            <DateTimePicker
+                value={getDisplayValue(value, true, field) || ''}
+                onChange={handleDateOnlyPickerChange(field, update)}
+                dateOnly={true}
+                placeholder={`Select ${label.toLowerCase()}`}
+            />
         </div>
     );
 }

@@ -41,13 +41,13 @@ describe('FloatingChat', () => {
     it('opens chat window when FAB clicked', () => {
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button', { name: 'Open chat' }));
-        expect(screen.getByText('Study Coach')).toBeTruthy();
+        expect(screen.getByText('Flax Bot')).toBeTruthy();
     });
 
     it('shows subtitle in chat header', () => {
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button', { name: 'Open chat' }));
-        expect(screen.getByText('Ask about your study habits')).toBeTruthy();
+        expect(screen.getByText('Ask me anything')).toBeTruthy();
     });
 
     it('shows suggestions when no messages', () => {
@@ -62,7 +62,7 @@ describe('FloatingChat', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Open chat' }));
         fireEvent.click(screen.getAllByRole('button', { name: 'Close chat' })[0]);
         await waitFor(() => {
-            expect(screen.queryByText('Study Coach')).toBeNull();
+            expect(screen.queryByText('Flax Bot')).toBeNull();
         });
     });
 
@@ -90,7 +90,7 @@ describe('FloatingChat', () => {
         analyticsService.aiChat.mockRejectedValue(new Error('Network error'));
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button', { name: 'Open chat' }));
-        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        const textarea = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(textarea, { target: { value: 'Test question' } });
         fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
         await waitFor(() => {
@@ -103,7 +103,7 @@ describe('FloatingChat', () => {
         act(() => {
             window.dispatchEvent(new CustomEvent('flax-open-chat', { detail: { initialMessage: 'hello' } }));
         });
-        expect(screen.getByText('Study Coach')).toBeTruthy();
+        expect(screen.getByText('Flax Bot')).toBeTruthy();
     });
 
     it('disables send button when input is empty', () => {
@@ -116,7 +116,7 @@ describe('FloatingChat', () => {
     it('enables send button when input has text', () => {
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button', { name: 'Open chat' }));
-        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        const textarea = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(textarea, { target: { value: 'Hello' } });
         const sendBtn = screen.getByRole('button', { name: 'Send message' });
         expect(sendBtn.disabled).toBe(false);
@@ -126,7 +126,7 @@ describe('FloatingChat', () => {
         analyticsService.aiChat.mockResolvedValue({ reply: 'Done' });
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button', { name: 'Open chat' }));
-        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        const textarea = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(textarea, { target: { value: 'Hello' } });
         fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
         await waitFor(() => {
@@ -148,17 +148,17 @@ describe('FloatingChat', () => {
         analyticsService.aiChat.mockResolvedValue({ reply: 'Got it' });
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button'));
-        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        const textarea = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(textarea, { target: { value: 'My question' } });
         await waitFor(() => expect(screen.getByDisplayValue('My question')).toBeTruthy());
-        fireEvent.keyDown(screen.getByPlaceholderText('Ask about your study patterns…'), { key: 'Enter', shiftKey: false });
+        fireEvent.keyDown(screen.getByPlaceholderText('Ask me anything…'), { key: 'Enter', shiftKey: false });
         await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalled());
     });
 
     it('does not send on Shift+Enter (allows newline)', () => {
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button'));
-        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        const textarea = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(textarea, { target: { value: 'Line 1' } });
         fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true });
         expect(analyticsService.aiChat).not.toHaveBeenCalled();
@@ -168,10 +168,10 @@ describe('FloatingChat', () => {
         render(<FloatingChat />);
         const buttons = screen.getAllByRole('button');
         fireEvent.click(buttons[0]);
-        expect(screen.getByText('Study Coach')).toBeTruthy();
+        expect(screen.getByText('Flax Bot')).toBeTruthy();
         const allBtns = screen.getAllByRole('button');
         fireEvent.click(allBtns[allBtns.length - 1]);
-        await waitFor(() => expect(screen.queryByText('Study Coach')).toBeNull());
+        await waitFor(() => expect(screen.queryByText('Flax Bot')).toBeNull());
     });
 
     it('uses empty string when flax-open-chat has non-string initialMessage', () => {
@@ -179,8 +179,8 @@ describe('FloatingChat', () => {
         act(() => {
             window.dispatchEvent(new CustomEvent('flax-open-chat', { detail: { initialMessage: 123 } }));
         });
-        expect(screen.getByText('Study Coach')).toBeTruthy();
-        const textarea = screen.getByPlaceholderText('Ask about your study patterns…');
+        expect(screen.getByText('Flax Bot')).toBeTruthy();
+        const textarea = screen.getByPlaceholderText('Ask me anything…');
         expect(textarea.value).toBe('');
     });
 
@@ -199,7 +199,7 @@ describe('FloatingChat', () => {
     it('does not send when input is empty and send button clicked', () => {
         render(<FloatingChat />);
         fireEvent.click(screen.getByRole('button'));
-        const sendBtn = screen.getByText('↑');
+        const sendBtn = screen.getByRole('button', { name: 'Send message' });
         fireEvent.click(sendBtn);
         expect(analyticsService.aiChat).not.toHaveBeenCalled();
     });

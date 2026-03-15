@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
 import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
 import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
+import { PageTransition } from '../../components/common';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-const bgStyle = { position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" };
-const centerStyle = { position: "relative", zIndex: 1, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "2rem" };
 
 function useResetForm() {
   const [email, setEmail] = useState('');
@@ -47,7 +46,7 @@ function SuccessMessage({ message }) {
     <div className={styles.success}>
       <strong>✅ Email Sent!</strong>
       <p>{message}</p>
-      <p style={{ marginTop: '10px', fontSize: '0.9em' }}>Check your inbox for the reset link.</p>
+      <p className={styles.infoText}>Check your inbox for the reset link.</p>
     </div>
   );
 }
@@ -93,13 +92,15 @@ function ResetCard({ email, setEmail, loading, message, error, onSubmit }) {
 
 function ResetPageLayout({ children }) {
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
-      <AuthHeroGeometric />
-      <div aria-hidden="true" style={bgStyle} />
-      <AuthBrand />
-      <AuthFooter absolute />
-      <div style={centerStyle}>{children}</div>
-    </div>
+    <PageTransition>
+      <div className={styles.heroPage}>
+        <AuthHeroGeometric />
+        <div aria-hidden="true" className={styles.heroOverlay} />
+        <AuthBrand />
+        <AuthFooter absolute />
+        <div className={styles.centerContent}>{children}</div>
+      </div>
+    </PageTransition>
   );
 }
 

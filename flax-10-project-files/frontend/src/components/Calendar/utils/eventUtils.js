@@ -54,7 +54,19 @@ export function getEffectiveTagName(event) {
  */
 export function getVisibleEventsInView(events, selectedDate, viewMode) {
     if (!events?.length) return [];
-    if (viewMode === 'month' || viewMode === 'year') return events;
+
+    if (viewMode === 'month') {
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth();
+        const start = new Date(year, month, 1);
+        const end = new Date(year, month + 1, 1);
+
+        return events.filter(e => {
+            const eStart = new Date(e.start_time);
+            const eEnd = new Date(e.end_time);
+            return eStart < end && eEnd >= start;
+        });
+    }
 
     if (viewMode === 'day') {
         return events.filter(e => overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate));
@@ -74,4 +86,18 @@ export function getVisibleEventsInView(events, selectedDate, viewMode) {
     }
 
     return events;
+}
+
+export function sortByStartTime(events) {
+    return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+}
+
+export function isAllDay(event) {
+    if (event.all_day || event.is_all_day) return true;
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    const startMidnight = start.getHours() === 0 && start.getMinutes() === 0;
+    const endMidnight = end.getHours() === 0 && end.getMinutes() === 0;
+    const nextDay = end.getDate() !== start.getDate() || end.getMonth() !== start.getMonth();
+    return startMidnight && endMidnight && nextDay;
 }

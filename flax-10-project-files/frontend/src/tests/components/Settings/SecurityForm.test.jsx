@@ -5,7 +5,6 @@ import SecurityForm from '../../../components/Settings/SecurityForm';
 describe('SecurityForm', () => {
     it('renders password fields', () => {
         render(<SecurityForm onSave={vi.fn()} isSaving={false} />);
-        expect(screen.getByLabelText('Current Password')).toBeTruthy();
         expect(screen.getByLabelText('New Password')).toBeTruthy();
         expect(screen.getByLabelText('Confirm New Password')).toBeTruthy();
     });
@@ -28,12 +27,10 @@ describe('SecurityForm', () => {
     it('calls onSave with form data on submit', () => {
         const onSave = vi.fn();
         const { container } = render(<SecurityForm onSave={onSave} isSaving={false} />);
-        fireEvent.change(screen.getByLabelText('Current Password'), { target: { name: 'currentPassword', value: 'old123' } });
         fireEvent.change(screen.getByLabelText('New Password'), { target: { name: 'newPassword', value: 'new123' } });
         fireEvent.change(screen.getByLabelText('Confirm New Password'), { target: { name: 'confirmPassword', value: 'new123' } });
         fireEvent.submit(container.querySelector('form'));
         expect(onSave).toHaveBeenCalledWith({
-            currentPassword: 'old123',
             newPassword: 'new123',
             confirmPassword: 'new123',
         });

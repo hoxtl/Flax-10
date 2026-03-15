@@ -119,7 +119,7 @@ describe('formatTimeRange', () => {
     const start = new Date(2024, 0, 15, 9, 0).toISOString();
     const end = new Date(2024, 0, 15, 10, 0).toISOString();
     const result = formatTimeRange(start, end, false);
-    expect(result).toContain(' to ');
+    expect(result).toContain(' - ');
   });
 });
 

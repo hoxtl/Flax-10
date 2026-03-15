@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import styles from "./StandardModal.module.css";
 
 export function ModalHeader({ title, subtitle, onClose }) {
@@ -28,12 +29,13 @@ export default function StandardModal({
     const modalClasses = [styles.modal, sizeClass, modalClassName].filter(Boolean).join(" ");
     const contentClasses = contentClassName ? `${styles.content} ${contentClassName}` : styles.content;
 
-    return (
+    return createPortal(
         <div className={backdropClasses} onMouseDown={onClose}>
             <div className={modalClasses} onMouseDown={e => e.stopPropagation()}>
                 {!hideHeader && title && <ModalHeader title={title} subtitle={subtitle} onClose={onClose} />}
                 <div className={contentClasses}>{children}</div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

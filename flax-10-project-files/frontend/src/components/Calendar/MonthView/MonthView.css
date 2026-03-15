@@ -8,6 +8,9 @@
     grid-template-columns: repeat(7, 1fr);
     background: var(--calendar-bg);
     border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .weekday-label {

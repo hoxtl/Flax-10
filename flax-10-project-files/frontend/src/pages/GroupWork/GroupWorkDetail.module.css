@@ -5,6 +5,40 @@
     margin: 0 auto;
 }
 
+.skeletonDeleteBtn { width: 110px; height: 30px; border-radius: 999px; }
+.skeletonProjectTitle { width: min(280px, 60%); height: 32px; }
+.skeletonProjectMeta { width: min(220px, 50%); height: 14px; margin-top: 6px; }
+.skeletonProgressBar { width: 100%; height: 12px; margin-top: 14px; border-radius: 999px; }
+.skeletonStats { width: 160px; height: 12px; margin-top: 8px; }
+.skeletonDeadlinePill { width: 124px; height: 34px; border-radius: 999px; }
+.skeletonMembersTitle { width: 90px; height: 16px; margin-bottom: 12px; }
+.skeletonMemberPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+}
+.skeletonAvatar { width: 24px; height: 24px; border-radius: 50%; }
+.skeletonMemberName { width: 90px; height: 12px; border-radius: 8px; }
+.skeletonAddMemberForm {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+.skeletonAddMemberInput { flex: 1; height: 40px; }
+.skeletonAddMemberBtn { width: 80px; height: 40px; border-radius: 999px; }
+.skeletonTab { width: 110px; height: 36px; border-radius: 999px; }
+.skeletonTaskPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+}
+.skeletonTaskRow { width: 100%; height: 54px; }
+
 .metaText, .metaRow {
     font-size: 13px;
     color: var(--text-secondary);

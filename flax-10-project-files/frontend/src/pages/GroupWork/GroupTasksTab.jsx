@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { List, CalendarIcon, Square, ChevronDown } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
-import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown/AnimatedDropdown";
 import TaskListView from "./components/TaskListView";
 import TaskTimelineView from "./components/TaskTimelineView";
 import TaskBoardView from "./components/TaskBoardView";

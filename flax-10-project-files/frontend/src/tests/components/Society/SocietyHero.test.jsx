@@ -116,8 +116,7 @@ describe('SocietyHero', () => {
         );
         const nameWrapper = container.querySelector('[class*="nameWrapper"]');
         fireEvent.click(nameWrapper);
-        const input = container.querySelector('input');
-        expect(input).toBeTruthy();
+        const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'New Name' } });
         fireEvent.blur(input);
         expect(onUpdateName).toHaveBeenCalledWith('New Name');
@@ -130,7 +129,7 @@ describe('SocietyHero', () => {
         );
         const nameWrapper = container.querySelector('[class*="nameWrapper"]');
         fireEvent.click(nameWrapper);
-        const input = container.querySelector('input');
+        const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'Updated' } });
         fireEvent.keyDown(input, { key: 'Enter' });
         expect(onUpdateName).toHaveBeenCalledWith('Updated');
@@ -181,14 +180,34 @@ describe('SocietyHero', () => {
         expect(container.firstChild?.style?.backgroundImage).toContain('1.jpg');
     });
 
-    it('EditableName blur does not throw when onUpdate is undefined', () => {
+    it('EditableName: does not enter edit mode when editMode is false', () => {
         const { container } = render(
-            <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode onUpdateName={undefined} />
+            <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode={false} />
         );
         const nameWrapper = container.querySelector('[class*="nameWrapper"]');
         fireEvent.click(nameWrapper);
-        const input = container.querySelector('input');
-        fireEvent.change(input, { target: { value: 'X' } });
-        expect(() => fireEvent.blur(input)).not.toThrow();
+        expect(screen.queryByRole('textbox')).toBeNull();
+    });
+
+    it('getImages handles null society.images', () => {
+        const society = { ...baseSociety, images: null, image: 'x.jpg' };
+        render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.getByText('Chess Society')).toBeTruthy();
+    });
+
+    it('getImages handles images as plain strings without url property', () => {
+        const society = { ...baseSociety, images: ['plain-url.jpg', 'another.jpg'], image: null };
+        const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
+        expect(container.firstChild?.style?.backgroundImage).toContain('plain-url.jpg');
+    });
+
+    it('hides controls when mouse leaves hero', () => {
+        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
+        const society = { ...baseSociety, images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] };
+        const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
+        fireEvent.mouseEnter(container.firstChild);
+        expect(container.querySelector('[class*="arrowBtn"]')).toBeTruthy();
+        fireEvent.mouseLeave(container.firstChild);
+        expect(container.querySelector('[class*="arrowBtn"]')).toBeNull();
     });
 });

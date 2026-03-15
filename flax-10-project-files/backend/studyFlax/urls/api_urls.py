@@ -84,6 +84,20 @@ from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 from studyFlax.views.authentication.home_address_view import home_address_view
 
+# Admin
+from studyFlax.views.admin.admin_views import (
+    user_list, ban_user,
+    teacher_requests, resolve_teacher_request,
+    reported_societies, dismiss_report, ban_reported_society,
+    request_teacher_role, cancel_teacher_role_request,
+)
+from studyFlax.views.admin.course_change_views import (
+    request_course_change,
+    my_course_change_request,
+    list_course_change_requests,
+    resolve_course_change_request,
+)
+
 urlpatterns = [
     path("", include(router.urls)),
     #path("hello/", hello, name="hello"),
@@ -216,4 +230,21 @@ urlpatterns = [
     path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
     path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
     path("user/home-address/", home_address_view, name='home_address'),
+
+    # Admin
+    path("admin/users/", user_list, name='admin-user-list'),
+    path("admin/users/<int:user_id>/ban/", ban_user, name='admin-ban-user'),
+    path("admin/teacher-requests/", teacher_requests, name='admin-teacher-requests'),
+    path("admin/teacher-requests/<int:user_id>/resolve/", resolve_teacher_request, name='admin-resolve-teacher'),
+    path("admin/reported-societies/", reported_societies, name='admin-reported-societies'),
+    path("admin/reports/<int:report_id>/dismiss/", dismiss_report, name='admin-dismiss-report'),
+    path("admin/reports/<int:report_id>/ban/", ban_reported_society, name='admin-ban-reported-society'),
+    path("request-teacher-role/", request_teacher_role, name='request-teacher-role'),
+    path("cancel-teacher-role/", cancel_teacher_role_request, name='cancel-teacher-role'),
+
+    # Course change requests
+    path("course-change/request/", request_course_change, name='course-change-request'),
+    path("course-change/my-request/", my_course_change_request, name='course-change-my-request'),
+    path("admin/course-change-requests/", list_course_change_requests, name='admin-course-change-list'),
+    path("admin/course-change-requests/<int:request_id>/resolve/", resolve_course_change_request, name='admin-course-change-resolve'),
 ]

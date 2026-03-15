@@ -108,6 +108,11 @@ function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
   useEffect(() => { loadProfileData(setProfileData); }, []);
+  useEffect(() => {
+    const syncProfile = () => { loadProfileData(setProfileData); };
+    window.addEventListener("auth-changed", syncProfile);
+    return () => window.removeEventListener("auth-changed", syncProfile);
+  }, []);
   const handleSettingsClick = () => { setIsOpen(false); onSettingsClick?.(); };
   const handleLogoutClick = () => { setIsOpen(false); onLogoutClick?.(); };
   const handleProfileClick = () => { setIsOpen(false); onProfileClick?.(); };
@@ -115,7 +120,19 @@ function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
 }
 
 function buildDisplayUser(user, profileData) {
-  return { ...user, year: profileData?.year || user?.year, major: profileData?.major || user?.major };
+  const merged = { ...user, ...profileData };
+  return {
+    ...merged,
+    year: merged.year || "Year 2",
+    major: merged.major || "CS",
+  };
+}
+
+function resolveYearDisplay(year) {
+  if (!year) return "Year 2";
+  if (typeof year === "string" && /^year\s+/i.test(year)) return year;
+  if (!Number.isNaN(Number(year))) return `Year ${year}`;
+  return year;
 }
 
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
@@ -124,12 +141,20 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, 
   const initials = getInitials(user?.name) || "?";
   const profilePhotoUrl = profileData?.profile_photo_url;
   const displayUser = buildDisplayUser(user, profileData);
+  const displayYear = resolveYearDisplay(displayUser.year);
+  const displayMajor = displayUser.major || "CS";
   return (
     <div className={styles.container}>
       <AvatarButton initials={initials} profilePhotoUrl={profilePhotoUrl} onClick={() => setIsOpen(!isOpen)} />
-      <DropdownMenu isOpen={isOpen} onClose={() => setIsOpen(false)}
-        onSettingsClick={handleSettingsClick} onLogoutClick={handleLogoutClick}
-        onProfileClick={handleProfileClick} user={displayUser} profilePhotoUrl={profilePhotoUrl} />
+      <DropdownMenu
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onSettingsClick={handleSettingsClick}
+        onLogoutClick={handleLogoutClick}
+        onProfileClick={handleProfileClick}
+        user={{ ...displayUser, year: displayYear, major: displayMajor }}
+        profilePhotoUrl={profilePhotoUrl}
+      />
     </div>
   );
 }

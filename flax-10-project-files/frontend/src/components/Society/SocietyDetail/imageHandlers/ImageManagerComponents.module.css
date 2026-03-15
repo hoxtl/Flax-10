@@ -10,6 +10,7 @@
     padding-top: 0;
 }
 
+/* Common styles for image management sub-components and modals. */
 .header {
     display: flex;
     align-items: flex-start;

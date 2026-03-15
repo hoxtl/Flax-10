@@ -90,10 +90,11 @@ describe('DeadlineModal', () => {
         expect(mockModal.close).toHaveBeenCalled();
     });
 
-    it('calls onClose when overlay is clicked', () => {
+    it('calls onClose when backdrop is clicked', () => {
         const onClose = vi.fn();
         const { container } = render(<DeadlineModal module={module} onClose={onClose} />);
-        fireEvent.click(container.firstChild);
+        const backdrop = container.querySelector('[class*="backdrop"]');
+        fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalled();
     });
 

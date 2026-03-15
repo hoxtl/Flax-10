@@ -5,7 +5,32 @@
   overflow: hidden;
   background: var(--bg, #f0e9df);
   font-family: inherit;
+  position: relative;
 }
+
+.skeletonOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  background: var(--bg, #f0e9df);
+  pointer-events: none;
+}
+
+.skeletonSidebarTitle { width: 170px; height: 28px; }
+.skeletonSidebarSubtitle { width: 220px; height: 12px; margin-top: 8px; }
+.skeletonSectionLabel { width: 120px; height: 12px; border-radius: 999px; }
+.skeletonPanelCard { width: 100%; height: 44px; }
+.skeletonPanelCardTall { width: 100%; height: 110px; }
+.skeletonMapPane {
+  width: 100%;
+  height: 100%;
+  background: rgba(236, 240, 245, 0.96);
+  border-left: 1px solid rgba(173, 181, 193, 0.16);
+}
+.skeletonQuickNavBtn { width: 82px; height: 28px; border-radius: 999px; }
 
 .sidebar {
   width: 340px;

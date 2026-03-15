@@ -1,8 +1,12 @@
+import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+
 const MODULE_PREFIX_TO_DEPARTMENT = {
     CS: "Natural, Mathematical & Engineering Sciences",
     AI: "Natural, Mathematical & Engineering Sciences",
     MA: "Natural, Mathematical & Engineering Sciences",
     PH: "Natural, Mathematical & Engineering Sciences",
+    EE: "Natural, Mathematical & Engineering Sciences",
+    GN: "Natural, Mathematical & Engineering Sciences",
     LS: "Life Sciences & Medicine",
     LW: "Law",
     PS: "Psychiatry, Psychology & Neuroscience",
@@ -16,11 +20,29 @@ const MODULE_PREFIX_TO_DEPARTMENT = {
     IR: "Social Science & Public Policy",
     NU: "Nursing, Midwifery & Palliative Care",
     DE: "Dentistry, Oral & Craniofacial Sciences",
+    FR: "Arts & Humanities",
+    SP: "Arts & Humanities",
+    GL: "Arts & Humanities",
+    AR: "Arts & Humanities",
+    ZH: "Arts & Humanities",
+    IT: "Arts & Humanities",
+    PT: "Arts & Humanities",
+    FA: "Arts & Humanities",
+    TH: "Arts & Humanities",
+    MU: "Arts & Humanities",
+    CL: "Arts & Humanities",
+    CR: "Arts & Humanities",
 };
 
-export function getDepartment(module_code) {
+export function getDepartment(module_code, storedDepartment) {
     const prefix = module_code?.match(/^[A-Z]+/)?.[0];
-    return MODULE_PREFIX_TO_DEPARTMENT[prefix] || "King's College London";
+    const derivedDepartment = MODULE_PREFIX_TO_DEPARTMENT[prefix];
+
+    if (storedDepartment && storedDepartment !== "King's College London") {
+        return storedDepartment;
+    }
+
+    return derivedDepartment || storedDepartment || "King's College London";
 }
 
 export function isEnrolledIn(module_id, enrollments) {
@@ -37,6 +59,8 @@ export function serialiseModule(form_data) {
         module_code: form_data.module_code,
         module_name: form_data.module_name,
         description: form_data.description,
+        department: form_data.department,
+        course: form_data.course,
         start_time: form_data.start_time,
         end_time: form_data.end_time,
         location: form_data.location,
@@ -110,7 +134,7 @@ function checkFilter(module, enrollments, filter_mode) {
 }
 
 export function getDepartments(modules) {
-    const depts = modules.map(m => getDepartment(m.module_code));
+    const depts = modules.map(m => getDepartment(m.module_code, m.department));
     return Array.from(new Set(depts)).sort();
 }
 
@@ -122,8 +146,19 @@ export function sortModules(modules, sort_by) {
 
 }
 
-export function applyFiltersAndSort(modules, department, sort_by) {
-    const by_department = department === 'all' ? modules :
-    modules.filter(m=>getDepartment(m.module_code) === department);
-    return sortModules(by_department, sort_by);
+export function applyFiltersAndSort(modules, selectedCourses, sort_by) {
+    if (!selectedCourses || selectedCourses.length === 0) return sortModules(modules, sort_by);
+    const filtered = modules.filter(m => {
+        if (m.course && selectedCourses.includes(m.course)) return true;
+        const dept = getDepartment(m.module_code, m.department);
+        return selectedCourses.some(c => getDepartmentForCourse(c) === dept);
+    });
+    return sortModules(filtered, sort_by);
+}
+
+function getDepartmentForCourse(courseName) {
+    for (const [dept, courses] of Object.entries(KCL_DEPARTMENTS)) {
+        if (courses.includes(courseName)) return dept;
+    }
+    return null;
 }

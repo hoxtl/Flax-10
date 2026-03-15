@@ -49,7 +49,7 @@ vi.mock('../../components/Modules/DeadlineModal', () => ({
 }));
 vi.mock('../../pages/Modules/ModulesPage.module.css', () => ({ default: {} }));
 
-vi.mock('../../components/ui/AnimatedDropdown.jsx', () => ({
+vi.mock('../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, className }) => (
         <select
             data-testid={className || 'animated-dd'}

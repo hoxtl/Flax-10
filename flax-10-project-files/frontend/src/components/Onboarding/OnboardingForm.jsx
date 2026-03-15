@@ -1,4 +1,4 @@
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 import WarningBox from "./WarningBox";
 import styles from "./OnboardingModal.module.css";
 import { motion, AnimatePresence } from "framer-motion";

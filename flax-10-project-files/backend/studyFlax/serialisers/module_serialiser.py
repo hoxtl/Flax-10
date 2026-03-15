@@ -11,9 +11,9 @@ class ModuleSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'module_code', 'module_name', 'description', 'created_by', 
-                'created_by_name', 'start_time', 'end_time', 'location', 
-                'recurrence_rule','is_recurring', 'deadlines', 'created_by_email']
+        fields = ['id', 'module_code', 'module_name', 'description', 'department',
+                'course', 'created_by', 'created_by_name', 'start_time', 'end_time',
+                'location', 'recurrence_rule', 'is_recurring', 'deadlines', 'created_by_email']
         read_only_fields = ['created_by']
         
     def validate(self, validated_data):

@@ -114,13 +114,13 @@ describe('TasksPage', () => {
     it('shows loading when tasksInitialLoading is true', () => {
         useTasks.mockReturnValue({ ...mockTasksHook, initialLoading: true });
         renderTasksPage();
-        expect(screen.getByText('Loading tasks...')).toBeTruthy();
+        expect(screen.getByTestId('tasks-skeleton')).toBeTruthy();
     });
 
     it('shows loading when listsLoading is true', () => {
         useTaskLists.mockReturnValue({ ...mockListsHook, loading: true });
         renderTasksPage();
-        expect(screen.getByText('Loading tasks...')).toBeTruthy();
+        expect(screen.getByTestId('tasks-skeleton')).toBeTruthy();
     });
 
     it('opens CreateTaskModal when New Task is clicked', () => {

@@ -21,25 +21,23 @@ import { isEnrolledIn } from "../components/Modules/utils/moduleUtils";
 import CreateTaskModal from "../pages/Tasks/components/CreateTaskModal";
 import { useTimerContext } from "../context/TimerContext";
 import { LeaveTimerModal } from "../components/Timer/TimerPopups";
-
-function useIsMobile(breakpoint = 900) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < breakpoint);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [breakpoint]);
-  return isMobile;
-}
+import useBreakpoint from "../hooks/useBreakpoint";
 
 function parseStoredUser(user) {
+  const formatYear = (year) => {
+    if (!year) return "Year: ";
+    const trimmed = String(year).trim();
+    if (/^year\s+/i.test(trimmed)) return trimmed;
+    if (!Number.isNaN(Number(trimmed))) return `Year ${trimmed}`;
+    return trimmed;
+  };
   const name =
     user.first_name && user.last_name
       ? `${user.first_name} ${user.last_name}`
       : user.username;
   return {
     name,
-    year: user.year ? `Year ${user.year}` : "Year: ",
+    year: formatYear(user.year),
     major: user.major || "Major: ",
     email: user.email,
     username: user.username,
@@ -169,7 +167,7 @@ function useTimerNav(activeNav, onNavChange, t) {
 
 function useDashboardState(activeNav, onNavChange) {
   const location = useLocation();
-  const isMobile = useIsMobile(900);
+  const isMobile = useBreakpoint(900);
   const user = useUserSync();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const modals = useModalStates();

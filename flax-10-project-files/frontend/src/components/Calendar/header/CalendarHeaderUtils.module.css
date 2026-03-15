@@ -15,6 +15,8 @@
     justify-content: center;
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     padding: 0;
     border: 1px solid rgba(0, 0, 0, 0.15);
     background: transparent;
@@ -22,6 +24,7 @@
     cursor: pointer;
     color: var(--text);
     transition: all 0.15s;
+    flex-shrink: 0;
 }
 
 :root[data-theme="dark"] .arrowBtn,
@@ -77,4 +80,40 @@
 /* Action Menu */
 .actionMenu {
     position: relative;
+}
+
+/* Search */
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.searchBar {
+    flex: none;
+    min-width: 180px;
+}
+
+.searchBar input {
+    padding: 6px 12px 6px 32px;
+    font-size: 0.85rem;
+    height: 32px;
+}
+
+.searchClose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.searchClose:hover {
+    background: var(--hover);
+    color: var(--text);
 }

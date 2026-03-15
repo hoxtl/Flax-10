@@ -36,64 +36,9 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  background: var(--primary-color, #9E7E5D);
-  color: white;
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.formWrap {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.fieldLabel {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.input {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: var(--bg);
-  color: var(--text-primary);
-}
-
-.eventList {
-  max-height: 220px;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px;
-}
-
-.checkRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-}
-
-.primaryBtn {
-  margin-top: 4px;
-  border: 0;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-weight: 700;
-  background: var(--primary-color, #9E7E5D);
-  color: #fff;
-  cursor: pointer;
-}
-
-.muted {
-  color: #6b7280;
-  font-size: 13px;
 }

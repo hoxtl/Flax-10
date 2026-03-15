@@ -4,7 +4,7 @@
 
 import { X, Filter } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import SearchBar from "../../../components/common/SearchBar";
 import TaskFilterPanel from "./TaskFilterPanel";
 import styles from "./TaskFeedToolbar.module.css";
@@ -24,7 +24,7 @@ function ToolbarSearch({ search, onSearchChange, searchInputRef }) {
         ref={searchInputRef}
         className={styles.searchField}
         inputClassName={styles.searchInput}
-        placeholder="Search… ( / )"
+        placeholder="search by list or task..."
         value={search}
         onChange={onSearchChange}
         aria-label="Search tasks"

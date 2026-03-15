@@ -34,7 +34,7 @@ describe('DeadlinesWidget (Homepage)', () => {
 
   it('renders empty state when no deadlines', () => {
     renderWidget();
-    expect(screen.getByText(/All caught up/i)).toBeInTheDocument();
+    expect(screen.getByText(/No deadlines need attention/i)).toBeInTheDocument();
   });
 
   it('renders deadlines when provided', () => {

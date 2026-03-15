@@ -1,5 +1,5 @@
 import styles from "./CollaboratorList.module.css";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 
 const ROLES = [
     { value: "editor", label: "Editor" },

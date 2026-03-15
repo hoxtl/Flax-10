@@ -38,6 +38,7 @@ export function PlanFreeRow({
   setSlotPopoverRowId,
   isBestGap = false,
   assignedTask = null,
+  nextAssignedTask = null,
 }) {
   const gapContext = row.gapContext || { type: "study" };
   const gapStartDate = getGapStartDate(selectedDate, row.gapStartMins);
@@ -55,7 +56,7 @@ export function PlanFreeRow({
   );
 
   function startTask(task) {
-    if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task);
+    if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task, nextAssignedTask);
   }
 
   function isOverdue(task) {

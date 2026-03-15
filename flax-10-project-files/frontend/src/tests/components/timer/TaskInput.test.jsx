@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TaskInput } from '../../../components/Timer/TimerComponents';
 
 // Keep dropdowns testable (native controls)
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
   default: ({ value, onChange, options }) => (
     <select
-      aria-label="sort"
+      role="combobox"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     >
@@ -16,28 +16,6 @@ vi.mock('../../../components/ui/AnimatedDropdown', () => ({
         </option>
       ))}
     </select>
-  ),
-}));
-
-vi.mock('../../../components/ui/MultiSelectDropdown', () => ({
-  default: ({ value = [], onChange, options = [], placeholder }) => (
-    <div>
-      <div>{placeholder}</div>
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          onClick={() => {
-            // special "All" option clears
-            if (o.value === '') return onChange([]);
-            const next = value.includes(o.value) ? value.filter((v) => v !== o.value) : [...value, o.value];
-            onChange(next);
-          }}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
   ),
 }));
 
@@ -83,7 +61,6 @@ describe('TaskInput', () => {
     fireEvent.click(screen.getByText('Select Task'));
 
     await waitFor(() => {
-      // both tasks + lists are fetched via fetchApi
       expect(fetchApi).toHaveBeenCalled();
     });
 
@@ -107,8 +84,8 @@ describe('TaskInput', () => {
     fireEvent.click(screen.getByText('Select Task'));
     await waitFor(() => expect(fetchApi).toHaveBeenCalled());
 
-    fireEvent.change(screen.getByLabelText('sort'), { target: { value: 'due' } });
-    // loadTasks is re-run on sort change
+    const dropdowns = screen.getAllByRole('combobox');
+    fireEvent.change(dropdowns[0], { target: { value: 'due' } });
     await waitFor(() => expect(fetchApi).toHaveBeenCalledTimes(4));
     const dialog = screen.getByRole('dialog', { name: 'Select task' });
     const list = dialog.querySelector('[class*="taskPickList"]');
@@ -121,15 +98,16 @@ describe('TaskInput', () => {
     fireEvent.click(screen.getByText('Select Task'));
     await waitFor(() => expect(fetchApi).toHaveBeenCalled());
 
-    // Filter list: Work (id 1) → removes list 2 tasks
-    const workBtn = screen.getAllByText('Work').find((el) => el.tagName === 'BUTTON');
-    fireEvent.click(workBtn);
+    const dropdowns = screen.getAllByRole('combobox');
+    // Filter list: Work (id 1)
+    fireEvent.change(dropdowns[1], { target: { value: '1' } });
     expect(screen.queryByText('Low task')).toBeNull();
     expect(screen.getByText('Urgent task')).toBeTruthy();
 
-    // Filter module: CS101 → removes MA102
-    fireEvent.click(screen.getByText('CS101'));
+    // Filter module: CS101
+    fireEvent.change(dropdowns[2], { target: { value: 'CS101' } });
     expect(screen.queryByText('Low task')).toBeNull();
+    expect(screen.getByText('Urgent task')).toBeTruthy();
   });
 
   it('selecting a task updates value and calls onTaskSelect', async () => {
@@ -144,4 +122,3 @@ describe('TaskInput', () => {
     expect(onTaskSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 });
-

@@ -1,3 +1,7 @@
+/**
+ * TagFilterBar provides a horizontal list of toggleable pills for filtering
+ * society events by their assigned category/tags.
+ */
 import BasePill from "../../../Tags/BasePill";
 import styles from "./TagFilterBar.module.css";
 
