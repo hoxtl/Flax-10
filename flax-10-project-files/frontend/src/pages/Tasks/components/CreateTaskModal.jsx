@@ -199,12 +199,8 @@ function CreateTaskModalBody({ state, addToScheduleLabel }) {
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
-<<<<<<< HEAD
       <CreateTaskModalPageCount form={form} set={set} isReadingList={isReadingList} estimatedReadingMinutes={estimatedReadingMinutes} />
-      <CreateTaskModalDuration form={form} setForm={setForm} askFlaxInitialMessage={askFlaxInitialMessage} isReadingList={isReadingList}/>
-=======
-      <CreateTaskModalDuration form={form} setForm={setForm} />
->>>>>>> origin/main
+      <CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>
