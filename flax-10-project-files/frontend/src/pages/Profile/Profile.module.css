@@ -198,6 +198,20 @@
   color: var(--text);
 }
 
+.teacherEmail {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.teacherEmail a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.teacherEmail a:hover {
+  text-decoration: underline;
+}
+
 .reminder {
   margin-top: 8px;
   padding: 10px 14px;

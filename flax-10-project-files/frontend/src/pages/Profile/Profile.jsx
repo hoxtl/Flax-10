@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import AchievementsModal from "./AchievementsModal";
 import styles from "./Profile.module.css";
+import EmptyState from "../../components/common/EmptyState/EmptyState";
 import ProfileModals from "./ProfileModals";
 import { ProfileCalendar } from "./ProfileCalendar";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
@@ -163,7 +164,17 @@ export default function Profile({ user, viewedUserId, onNavigate, onNavChange })
   const { filteredEvents, modules } = useProfileBodyData(state);
 
   if (state.loading) return <ProfileSkeleton />;
-  if (!state.profileData) return <div className={styles.container}>User not found.</div>;
+  if (!state.profileData) {
+    return (
+      <div className={styles.container}>
+        <EmptyState
+          icon="👤"
+          title="Profile unavailable"
+          description="Could not load this profile. Try logging out and back in, or return to the home page."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>

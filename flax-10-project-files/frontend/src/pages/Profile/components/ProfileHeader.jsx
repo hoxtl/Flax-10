@@ -46,6 +46,11 @@ function ProfileHeaderInfo({ user, profileData, taskCount, upcoming, handlers, v
                     <span className={styles.rolePill}>{roleLabel}</span>
                 </div>
                 <div className={styles.description}>{description}</div>
+                {isTeacher && profileData?.email && (
+                    <div className={styles.teacherEmail}>
+                        <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
+                    </div>
+                )}
                 {profileData?.bio && <div className={styles.reminder}>{profileData.bio}</div>}
             </div>
         </div>
@@ -89,6 +94,11 @@ export default function ProfileHeader({ user, profileData, taskCount, upcomingEv
                     <div className={styles.mobileAvatar}>{resolvedPhoto ? <img src={resolvedPhoto} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
                     <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1><p className={styles.mobileBio}>{mobileDescription}</p>
                     <span className={styles.mobileRolePill}>{roleLabel}</span>
+                    {isTeacher && profileData?.email && (
+                        <div className={styles.teacherEmail}>
+                            <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
+                        </div>
+                    )}
                     <div className={styles.mobileActions}>{visibility.canEditProfile ? <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>Edit Profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}</div>
                 </div>
                 <MobileStats profileData={profileData} taskCount={taskCount} upcoming={upcoming} handlers={handlers} visibility={visibility} />

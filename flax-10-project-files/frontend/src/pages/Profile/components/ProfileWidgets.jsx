@@ -224,9 +224,7 @@ export function ModulesSection({ modules, onNavigate, role }) {
                         </button>
                     ))}
                 </div>
-            ) : (
-                <div className={styles.cardLabel}>No teaching modules assigned yet.</div>
-            )}
+            ) : null}
         </ProfileWidget>
     );
 }
