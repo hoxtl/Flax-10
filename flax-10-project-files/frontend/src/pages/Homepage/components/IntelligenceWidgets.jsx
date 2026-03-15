@@ -97,29 +97,3 @@ export function IntelligenceHero({
 }
 
 export default IntelligenceHero;
-
-export const GreetingWidget = ({ displayName, liveContext }) => (
-  <div className={styles.premiumCard}>
-    <div className={styles.headerLeft} style={{ padding: "26px 28px" }}>
-      <span className={styles.headerLabel}>{getTodayLabel()}</span>
-      <h2 className={styles.headerTitle} style={{ marginTop: 8 }}>{getGreeting(displayName)}</h2>
-    </div>
-  </div>
-);
-
-export const StatsWidget = ({ eventsCount, tasksCount }) => (
-  <div className={styles.premiumCard}>
-    <div className={styles.headerPlannerPanel} style={{ padding: 24, background: "transparent", border: "none" }}>
-      <div className={styles.metricRail}>
-        <div className={styles.metricChip}>
-          <span className={styles.metricLabel}>Events</span>
-          <span className={styles.metricValue}>{eventsCount}</span>
-        </div>
-        <div className={styles.metricChip}>
-          <span className={styles.metricLabel}>To do today</span>
-          <span className={styles.metricValue}>{tasksCount}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-);
