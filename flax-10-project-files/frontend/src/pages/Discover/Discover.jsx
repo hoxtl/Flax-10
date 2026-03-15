@@ -39,6 +39,7 @@ function UserCardInfo({ user }) {
         : (user?.major || "");
     const roleLabel = isTeacher ? "Professor" : getRoleLabel(user?.role);
     const roleClass = isTeacher ? styles.teacherPill : isStudent ? styles.studentPill : styles.userRolePill;
+    const modules = user?.modules || [];
     return (
         <div className={styles.userInfo}>
             <div className={styles.nameRow}>
@@ -53,6 +54,15 @@ function UserCardInfo({ user }) {
                 {yearText && majorText && <span> • </span>}
                 {majorText && <span>{majorText}</span>}
             </div>
+            {user?.bio && <p className={styles.bio}>{user.bio}</p>}
+            {modules.length > 0 && (
+                <div className={styles.modulePills}>
+                    {modules.slice(0, 3).map((code, i) => (
+                        <span key={i} className={styles.modulePill}>{code}</span>
+                    ))}
+                    {modules.length > 3 && <span className={styles.modulePillMore}>+{modules.length - 3}</span>}
+                </div>
+            )}
         </div>
     );
 }
@@ -66,11 +76,14 @@ function UserCard({ user, onNavChange }) {
         <GridCard className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
             <UserAvatar user={avatarUser} avatarOnly size={64} />
             <UserCardInfo user={user} />
+            <div className={styles.cardFooter}>
+                <button type="button" className={styles.viewProfileBtn}>View Profile</button>
+            </div>
         </GridCard>
     );
 }
 
-const USERS_PER_PAGE = 16;
+const USERS_PER_PAGE = 15;
 
 async function loadUsers(query, filters, page, setU, setTotalPages, setL) {
     setL(true);
