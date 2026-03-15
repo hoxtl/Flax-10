@@ -169,7 +169,11 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                     <div className={styles.sideCard}>
                         <p className={styles.sideLabel}>Progress</p>
                         <p className={styles.sideValue}>
-                            {timelineProgress !== null ? `${timelineProgress}% through assignment timeline` : "Progress will appear when more deadlines are set"}
+                            {timelineProgress !== null
+                                ? timelineProgress === 0
+                                    ? "Assignment timeline hasn't started yet"
+                                    : `${timelineProgress}% through assignment timeline`
+                                : "Progress will appear when more deadlines are set"}
                         </p>
                         {timelineProgress !== null && (
                             <div className={styles.progressTrack} aria-hidden="true">
@@ -263,8 +267,11 @@ function ReadingRow({ reading, index }) {
                     <span className={styles.deadlinesType}>📖 Reading</span>
                     <span className={styles.deadlineTitle}>{reading.title}</span>
                 </div>
-                <span className={styles.deadlineDate}> 
-                    pages : {reading.start_page}-{reading.end_page} · Due {formatDate(new Date(reading.deadline))}
+                <span className={styles.deadlineDate}>
+                    {reading.start_page != null && reading.end_page != null
+                        ? `pp. ${reading.start_page}–${reading.end_page}`
+                        : reading.page_count ? `${reading.page_count} pages` : ''}
+                    {' · '}Due {formatDate(new Date(reading.deadline))}
                 </span>
             </div>
         </div>

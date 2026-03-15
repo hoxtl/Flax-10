@@ -42,7 +42,7 @@ class ReadingSummarySerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = Reading
-        fields = ['id',  'title', 'chapter', 'page_count','deadline']
+        fields = ['id', 'title', 'chapter', 'start_page', 'end_page', 'page_count', 'deadline']
 
     def get_page_count(self, obj):
         return obj.page_count()
