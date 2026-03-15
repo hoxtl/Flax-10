@@ -30,7 +30,7 @@ const VALID_THEMES = ['flax', 'coral', 'rust', 'amber', 'ocean', 'indigo', 'teal
 
 export function ThemeProvider({ children, initialTheme, initialMode }) {
   const [mode, setModeState] = useState(() => initialMode || getStored('mode', VALID_MODES, 'light'));
-  const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_MODES, 'flax'));
+  const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_THEMES, 'flax'));
   const sessionStart = useRef(new Date().toISOString());
   const currentTheme = useRef(theme);
 
