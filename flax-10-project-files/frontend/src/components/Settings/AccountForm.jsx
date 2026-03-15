@@ -285,6 +285,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
   const [courseRequestNotice, setCourseRequestNotice] = useState(() =>
     getCachedPendingRequest() ? "Request sent." : "",
   );
+  const [courseRequestError, setCourseRequestError] = useState("");
   const [saveSignal, setSaveSignal] = useState(0);
 
   const hasUnsaved =
@@ -305,13 +306,29 @@ export default function AccountForm({ user, onSave, isSaving }) {
 
   const handleCancelCourseRequest = async () => {
     setCancellingRequest(true);
+    setCourseRequestNotice("");
+    setCourseRequestError("");
     try {
       await cancelCourseChangeRequest();
       clearCachedPendingRequest();
-      setPendingRequest(null);
-      setCourseRequestNotice("");
-    } catch {
-      // keep silent here to avoid noisy UX in account card; request remains visible if cancel fails
+      const req = await getMyCourseChangeRequest()
+        .then((data) => normaliseCourseRequest(data))
+        .catch(() => null);
+      if (req?.status === "pending") {
+        setPendingRequest(req);
+      } else {
+        setPendingRequest(null);
+        setCourseRequestNotice("Request cancelled.");
+      }
+    } catch (error) {
+      const msg = String(error?.message || "");
+      if (msg.toLowerCase().includes("no pending request to cancel")) {
+        clearCachedPendingRequest();
+        setPendingRequest(null);
+        setCourseRequestNotice("Request cancelled.");
+      } else {
+        setCourseRequestError(msg || "Failed to cancel request. Please try again.");
+      }
     } finally {
       setCancellingRequest(false);
     }
@@ -326,6 +343,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
     if (courseName) setCachedPendingRequest(courseName);
     setPendingRequest({ ...req, status: "pending", requested_course: courseName });
     setShowModal(false);
+    setCourseRequestError("");
     setCourseRequestNotice("Request sent.");
   };
 
@@ -356,6 +374,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
               cancellingRequest={cancellingRequest}
               successMessage={courseRequestNotice ? `✓ ${courseRequestNotice}` : null}
             />
+            <InlineAlert message={courseRequestError} variant="error" />
             <SubmitButton
               isSaving={isSaving}
               label="Save Changes"

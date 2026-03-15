@@ -18,6 +18,33 @@ function isPasswordTooShort(password) {
 function passwordsDoNotMatch(a, b) {
   return a !== b;
 }
+function getStoredUser() {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+function normaliseYearForStorage(year) {
+  if (!year) return year;
+  if (typeof year === "string" && /^year\s+/i.test(year)) return year;
+  if (typeof year === "string" && !Number.isNaN(Number(year))) return `Year ${year}`;
+  return year;
+}
+function mergeAccountSettingsToUser(storedUser, settingsPayload) {
+  if (!settingsPayload) return storedUser;
+  if (!storedUser) return settingsPayload;
+  const updates = {};
+  if (settingsPayload.first_name !== undefined) updates.first_name = settingsPayload.first_name;
+  if (settingsPayload.last_name !== undefined) updates.last_name = settingsPayload.last_name;
+  if (settingsPayload.email !== undefined) updates.email = settingsPayload.email;
+  if (settingsPayload.major !== undefined) updates.major = settingsPayload.major;
+  if (settingsPayload.year !== undefined) updates.year = normaliseYearForStorage(settingsPayload.year);
+
+  if (Object.keys(updates).length === 0) return storedUser;
+  return { ...(storedUser || {}), ...updates };
+}
 
 async function saveAccount(
   data,
@@ -27,6 +54,7 @@ async function saveAccount(
 ) {
   if (!hasToken()) {
     setPasswordError("You are not logged in, please try again...");
+    setIsSaving(false);
     return;
   }
   const { ok, data: res } = await patchSettings({
@@ -35,8 +63,10 @@ async function saveAccount(
     email: data.email,
     year: data.year,
   }).catch(() => ({ ok: false, data: {} }));
-  if (ok && res.user) {
-    saveUserToStorage(res.user);
+  if (ok) {
+    const incoming = res.user || res;
+    const nextUser = mergeAccountSettingsToUser(getStoredUser(), incoming);
+    if (nextUser) saveUserToStorage(nextUser);
     window.dispatchEvent(new Event("auth-changed"));
     showTemporaryMessage(setSuccessMessage, "The account has been updated!");
     setIsSaving(false);

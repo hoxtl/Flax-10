@@ -106,7 +106,12 @@ export default function ModuleCourseFilter({ selectedCourses, onToggleCourse, fi
                         </div>
                         {activeTab === 'courses' && (
                             <>
-                                <SearchBar value={filterQuery} onChange={setFilterQuery} placeholder="Search courses or departments..." />
+                                <SearchBar
+                                    value={filterQuery}
+                                    onChange={setFilterQuery}
+                                    placeholder="Search courses or departments..."
+                                    inputClassName={styles.searchInput}
+                                />
                                 <div className={styles.listContainer}>
                                     {flatFiltered.length === 0 && <p className={styles.empty}>No courses found</p>}
                                     {filterQuery ? (

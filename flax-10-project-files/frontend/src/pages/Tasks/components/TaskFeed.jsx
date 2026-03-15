@@ -115,6 +115,7 @@ export default function TaskFeed(props) {
       <PageHeader
         title={data.headerTitle}
         subtitle="Plan coursework, deadlines, and day-to-day admin in one place."
+        compact
       />
       <TaskFeedSubHeader data={data} lists={props.lists} activeListId={props.activeListId} defaultDueDateForNewTask={props.defaultDueDateForNewTask} onAddTask={props.onAddTask} onCreateTask={props.onCreateTask} />
       <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} />

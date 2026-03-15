@@ -39,7 +39,8 @@
     top: 100%;
     margin-top: 8px;
     right: 0;
-    width: 350px;
+    width: var(--filter-dropdown-width);
+    max-width: var(--filter-dropdown-max-width);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -56,6 +57,11 @@
 .listContainer {
     flex: 1;
     overflow-y: auto;
+}
+
+.searchInput {
+    font-size: var(--text-base);
+    line-height: 1.35;
 }
 
 .groups {
@@ -170,6 +176,6 @@
 
 @media (max-width: 768px) {
     .dropdown {
-        width: 300px;
+        width: var(--filter-dropdown-width-sm);
     }
 }

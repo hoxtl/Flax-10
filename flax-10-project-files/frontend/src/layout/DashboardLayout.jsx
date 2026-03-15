@@ -24,13 +24,20 @@ import { LeaveTimerModal } from "../components/Timer/TimerPopups";
 import useBreakpoint from "../hooks/useBreakpoint";
 
 function parseStoredUser(user) {
+  const formatYear = (year) => {
+    if (!year) return "Year: ";
+    const trimmed = String(year).trim();
+    if (/^year\s+/i.test(trimmed)) return trimmed;
+    if (!Number.isNaN(Number(trimmed))) return `Year ${trimmed}`;
+    return trimmed;
+  };
   const name =
     user.first_name && user.last_name
       ? `${user.first_name} ${user.last_name}`
       : user.username;
   return {
     name,
-    year: user.year ? `Year ${user.year}` : "Year: ",
+    year: formatYear(user.year),
     major: user.major || "Major: ",
     email: user.email,
     username: user.username,

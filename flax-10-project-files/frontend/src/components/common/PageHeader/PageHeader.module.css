@@ -14,6 +14,19 @@
   overflow: hidden;
 }
 
+.headerCompact {
+  padding: var(--space-3) var(--space-5);
+  margin-bottom: var(--space-3);
+}
+
+.headerCompact .title {
+  line-height: 1.1;
+}
+
+.headerCompact .subtitle {
+  line-height: 1.4;
+}
+
 .titleGroup {
   display: flex;
   flex-direction: column;
