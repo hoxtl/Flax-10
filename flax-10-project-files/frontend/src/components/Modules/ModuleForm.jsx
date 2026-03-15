@@ -3,6 +3,7 @@ import { createModule, updateModule } from '../../api/moduleApi';
 import { serialiseModule } from './utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from './utils/moduleHelpers';
 import styles from './ModuleForm.module.css'
+import DateTimePicker from '../common/inputs/DateTimePicker';
 
 
 async function saveModule(is_editing, module, form_data) {
@@ -78,10 +79,10 @@ function TimeFields({ form_data, errors, onChange }) {
     return (
         <>
             <FormGroup label="First Lecture Date & Time" error={errors.start_time} required>
-                <input type="datetime-local" className={getInput(errors.start_time, styles)} value={form_data.start_time} onChange={(e) => onChange('start_time', e.target.value)} />
+                <DateTimePicker value={form_data.start_time} onChange={val => onChange('start_time', val)} placeholder="Pick date & time" />
             </FormGroup>
             <FormGroup label="Lecture End Time" error={errors.end_time} required>
-                <input type="datetime-local" className={getInput(errors.end_time, styles)} value={form_data.end_time} onChange={(e) => onChange('end_time', e.target.value)} />
+                <DateTimePicker value={form_data.end_time} onChange={val => onChange('end_time', val)} placeholder="Pick date & time" />
             </FormGroup>
         </>
     );
