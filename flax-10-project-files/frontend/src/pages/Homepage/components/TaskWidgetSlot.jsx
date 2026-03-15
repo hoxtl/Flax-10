@@ -41,6 +41,12 @@ function getCategoryStyle(label) {
       bg: style.bg.replace('35%', '42%').replace('30%', '42%'),
       text: "#FFFFFF"
     };
+  } else {
+    // Light mode: use a darker version of the theme primary or the specific text color
+    return {
+      bg: style.bg,
+      text: "var(--color-primary-strong)"
+    };
   }
   
   if (MODULE_CODE_RE.test(key)) {
