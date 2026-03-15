@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 import styles from "./DashboardLayout.module.css";
 import TopBar from "../components/Dashboard/Topbar";
+import QuickCommandBar from "../components/common/QuickCommandBar/QuickCommandBar";
 import Sidebar from "../components/Dashboard/Sidebar";
 import WeekBar from "../components/Dashboard/WeekBar";
 import QuickAddModal from "../components/Dashboard/QuickAddModal";
@@ -316,6 +317,7 @@ function DashboardMain({ state, onNavChange, children }) {
     isMobile,
     t,
     setPendingNav,
+    setShowTaskModal,
   } = state;
   return (
     <>
@@ -340,6 +342,10 @@ function DashboardMain({ state, onNavChange, children }) {
         {children}
       </MainArea>
       <DashboardModals state={state} />
+      <QuickCommandBar
+        onNavChange={onNavChange}
+        onOpenTask={() => setShowTaskModal(true)}
+      />
     </>
   );
 }

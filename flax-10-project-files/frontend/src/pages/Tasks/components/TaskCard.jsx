@@ -241,10 +241,34 @@ function CardMetaRow({ task, listName, hideListBadge, listColor }) {
   const listStyle = { "--lc": listColor || "#a89890", background: `color-mix(in srgb, ${listColor || "#a89890"} 8%, transparent)`, borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 18%, transparent)` };
   const projectStyle = { color: "var(--primary)", background: "var(--primary-light)", borderColor: "var(--primary-border)" };
 
+  const societyName = task.society_name || task.society?.name || "";
+  const societyId = task.society_id || task.society?.id;
+  const peopleCount = task.assignees_count ?? task.people_count ?? task.group_member_count ?? (Array.isArray(task.assignees) ? task.assignees.length : null);
+
   return (
     <div className={`${styles.meta} ${task.completed ? styles.metaDone : ""}`}>
       {listName && !hideListBadge && <span className={styles.listIndicator} style={listStyle}><span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />{listName}</span>}
       {task.module_code && <ModulePillLink task={task} />}
+      {societyName && (
+        <Link
+          to={societyId ? `/societies?id=${societyId}` : `/societies?search=${encodeURIComponent(societyName)}`}
+          className={styles.societyPill}
+          onClick={(e) => e.stopPropagation()}
+          title={`Open ${societyName}`}
+        >
+          🏛️ {societyName}
+        </Link>
+      )}
+      {Number.isFinite(Number(peopleCount)) && Number(peopleCount) > 0 && (
+        <Link
+          to="/users"
+          className={styles.peoplePill}
+          onClick={(e) => e.stopPropagation()}
+          title="Open users"
+        >
+          👥 {peopleCount} people
+        </Link>
+      )}
       {task.group_project_name && (
         <span className={styles.projectPill} style={projectStyle} title={`Project: ${task.group_project_name}`}>
           <ClipboardList size={11} className={styles.projectPillIcon} />

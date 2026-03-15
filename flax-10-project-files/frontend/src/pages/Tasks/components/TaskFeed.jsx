@@ -11,6 +11,7 @@ import TaskFeedToolbar from "./TaskFeedToolbar";
 import CompletedTasksSection from "./CompletedTasksSection";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 
 import layoutStyles from "./TaskFeedLayout.module.css";
 import toolbarStyles from "./TaskFeedToolbar.module.css";
@@ -38,12 +39,11 @@ function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask
 function SearchEmptyBlock({ data }) {
   if (!data.showSearchEmptyState) return null;
   return (
-    <div className={styles.searchEmptyCard}>
-      <span className={styles.searchEmptyEmoji}>🔍</span>
-      <p className={styles.searchEmptyMessage}>No tasks match &ldquo;{data.search}&rdquo;</p>
-      <p className={styles.searchEmptyHint}>Try a different keyword or check your spelling</p>
-      <PrimaryButton type="button" className={styles.searchEmptyBtn} variant="secondary" size="small" pill onClick={() => data.setSearch("")}>Clear search</PrimaryButton>
-    </div>
+    <SearchEmptyState
+      query={data.search}
+      itemLabel="tasks"
+      onClear={() => data.setSearch("")}
+    />
   );
 }
 

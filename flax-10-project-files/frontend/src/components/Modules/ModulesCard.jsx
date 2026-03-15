@@ -1,6 +1,7 @@
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatDuration, formatTime, getDepartment } from './utils/moduleUtils.js';
 import GridCard from '../common/Card/GridCard';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {
@@ -34,12 +35,28 @@ function getCardClass(enrolled, is_teacher) {
     return cls;
 }
 
-export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines }) {
+function normalizeModuleCode(code) {
+    return String(code || "").toUpperCase().replace(/\s+/g, "");
+}
+
+function resolveClassmatesCount(module) {
+    return (
+        module?.classmates_count ??
+        module?.enrollment_count ??
+        module?.enrolled_count ??
+        module?.class_size ??
+        null
+    );
+}
+
+export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, taskCountsByModule = {} }) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const enrollment = enrollments?.find(e => e.module === module.id);
     const isCore = enrollment?.is_core || false;
     const department = getDepartment(module.module_code, module.department);
     const accent = DEPARTMENT_ACCENTS[department] || "var(--primary)";
+    const upcomingTasksCount = taskCountsByModule[normalizeModuleCode(module.module_code)] || 0;
+    const classmatesCount = resolveClassmatesCount(module);
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
         <GridCard
@@ -48,6 +65,8 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
             onClick={() => !isTeacher && onViewModule(module)}
         >
             <CardBody module={module} enrolled={enrolled} isCore={isCore} isTeacher={isTeacher}
+                upcomingTasksCount={upcomingTasksCount}
+                classmatesCount={classmatesCount}
                 onView={(e) => stop(e, onViewModule)}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
@@ -57,13 +76,14 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     );
 }
 
-function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines, upcomingTasksCount, classmatesCount }) {
     return (
         <div className={styles.content}>
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
             <h3 className={styles.moduleTitle}>{module.module_name}</h3>
             {module.description && <Description text={module.description} />}
             <QuickMeta module={module} />
+            <RelatedLinks module={module} upcomingTasksCount={upcomingTasksCount} classmatesCount={classmatesCount} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
                 onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
         </div>
@@ -77,7 +97,13 @@ function CardHeader({ module, enrolled, isCore }) {
             <div className={styles.headerTopRow}>
                 <div className={styles.headerIdentity}>
                     <div className={styles.iconWrap}>📚</div>
-                    <span className={styles.moduleCode}>{module.module_code}</span>
+                    <EntityLinkChip
+                        to={`/modules?moduleId=${module.id}`}
+                        className={styles.moduleCode}
+                        title={`Open ${module.module_code}`}
+                    >
+                        {module.module_code}
+                    </EntityLinkChip>
                 </div>
                 {enrolled && (
                     <span className={styles.enrolledBadge}>
@@ -117,6 +143,36 @@ function QuickMeta({ module }) {
 
 function MetaPill({ icon, text }) {
     return <span className={styles.metaPill}>{icon} {text}</span>;
+}
+
+function RelatedLinks({ module, upcomingTasksCount, classmatesCount }) {
+    const hasClassmates = Number.isFinite(Number(classmatesCount)) && Number(classmatesCount) > 0;
+    const hasTasks = Number.isFinite(Number(upcomingTasksCount)) && Number(upcomingTasksCount) > 0;
+
+    if (!hasTasks && !hasClassmates) return null;
+
+    return (
+        <div className={styles.relatedRow}>
+            {hasTasks && (
+                <EntityLinkChip
+                    to={`/tasks?module=${encodeURIComponent(module.module_code || "")}`}
+                    className={styles.relatedChip}
+                    title="Open tasks linked to this module"
+                >
+                    ✅ {upcomingTasksCount} upcoming task{upcomingTasksCount === 1 ? "" : "s"}
+                </EntityLinkChip>
+            )}
+            {hasClassmates && (
+                <EntityLinkChip
+                    to={`/users?module=${encodeURIComponent(module.module_code || "")}`}
+                    className={styles.relatedChip}
+                    title="Find classmates in this module"
+                >
+                    👥 {classmatesCount} classmate{classmatesCount === 1 ? "" : "s"}
+                </EntityLinkChip>
+            )}
+        </div>
+    );
 }
 
 function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {

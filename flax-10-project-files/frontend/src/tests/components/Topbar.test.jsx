@@ -13,10 +13,11 @@ vi.mock('../../components/Dashboard/ProfileDropdown', () => ({
 }));
 
 vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
-  ExpandableTabs: ({ onChange }) => (
+  ExpandableTabs: ({ tabs = [], onChange }) => (
     <div>
-      <button onClick={() => onChange(0)}>add-tab</button>
-      <button onClick={() => onChange(2)}>notif-tab</button>
+      <button data-testid={`tab-${tabs[0]?.title || 'unknown'}`} onClick={() => onChange(0)}>
+        {tabs[0]?.title || 'tab'}
+      </button>
       <button onClick={() => onChange(null)}>deselect</button>
     </div>
   ),
@@ -72,7 +73,7 @@ describe('TopBar', () => {
   it('calls onAddClick when add tab is clicked', () => {
     const onAddClick = vi.fn();
     render(<TopBar onAddClick={onAddClick} />);
-    fireEvent.click(screen.getByText('add-tab'));
+    fireEvent.click(screen.getByTestId('tab-Add'));
     expect(onAddClick).toHaveBeenCalled();
   });
 
@@ -81,7 +82,7 @@ describe('TopBar', () => {
     const { useNotifications } = await import('../../context/NotificationContext');
     useNotifications.mockReturnValue({ togglePanel, notifications: [] });
     render(<TopBar />);
-    fireEvent.click(screen.getByText('notif-tab'));
+    fireEvent.click(screen.getByTestId('tab-Notifications'));
     expect(togglePanel).toHaveBeenCalled();
   });
 
