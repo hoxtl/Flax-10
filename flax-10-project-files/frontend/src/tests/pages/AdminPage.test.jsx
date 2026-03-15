@@ -44,22 +44,6 @@ vi.mock("../../api/adminApi", () => ({
 
 vi.mock("../../pages/Admin/AdminPage.module.css", () => ({ default: {} }));
 
-vi.mock("../../components/common/AnimatedDropdown", () => ({
-  default: ({ value, onChange, options }) => (
-    <select
-      aria-label="User filter"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  ),
-}));
-
 vi.mock("../../components/Pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) =>
     totalPages > 1 ? (
@@ -223,12 +207,10 @@ describe("AdminPage – Users tab", () => {
     expect(screen.getByText("Bob Jones")).toBeTruthy();
   });
 
-  it("filters users by selected user filter", async () => {
+  it("filters users by selected status filter", async () => {
     render(<AdminPage />);
     await waitFor(() => screen.getByText("Alice Smith"));
-    fireEvent.change(screen.getByLabelText("User filter"), {
-      target: { value: "banned" },
-    });
+    fireEvent.click(screen.getByRole("button", { name: "Banned" }));
     await waitFor(() => expect(screen.getByText("Bob Jones")).toBeTruthy());
     expect(screen.queryByText("Alice Smith")).toBeNull();
     expect(screen.queryByText("Staff User")).toBeNull();
