@@ -1,21 +1,14 @@
 import { useState } from "react";
+import AppPage from "../../components/common/AppPage/AppPage";
+import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import styles from "./Settings.module.css";
-import { SettingsTabs, SuccessBanner } from "../../components/Settings/SettingsUI";
+import { SuccessBanner } from "../../components/Settings/SettingsUI";
 import AccountForm from "../../components/Settings/AccountForm";
 import SecurityForm from "../../components/Settings/SecurityForm";
 import PreferencesPanel from "../../components/Settings/PreferencesPanel";
 import HomeAddressForm from "../../components/Settings/HomeAddressForm";
 import { SleepSchedulePanel } from "../../components/Settings/SleepSchedulePanel";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
-
-function SettingsHeader({ onBack }) {
-  return (
-    <div className={styles.header}>
-      <button className={styles.backButton} onClick={onBack}>←</button>
-      <h1 className={styles.title}>Settings</h1>
-    </div>
-  );
-}
 
 function SettingsPanel({ activeTab, handlers, user }) {
   const { isSaving, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, homeAddressError, handleSleepSave } = handlers;
@@ -30,17 +23,36 @@ function SettingsPanel({ activeTab, handlers, user }) {
   );
 }
 
+const SETTINGS_TABS = [
+  { value: "account", label: "Account" },
+  { value: "security", label: "Security" },
+  { value: "preferences", label: "Preferences" },
+  { value: "home", label: "Home Address" },
+  { value: "sleep", label: "Sleep Schedule" },
+];
+
 export default function Settings({ user, onBack }) {
   const [activeTab, setActiveTab] = useState("account");
   const handlers = useSettingsHandlers(onBack);
   return (
-    <div className={styles.container}>
-      <SettingsHeader onBack={onBack} />
+    <AppPage
+      title="Settings"
+      subtitle="Manage your account preferences and security"
+      className={styles.container}
+      onBack={onBack}
+    >
       <SuccessBanner message={handlers.successMessage} />
       <div className={styles.content}>
-        <SettingsTabs activeTab={activeTab} onChange={setActiveTab} />
+        <div className={styles.tabsWrapper}>
+          <SegmentedControl
+            options={SETTINGS_TABS}
+            value={activeTab}
+            onChange={setActiveTab}
+            fill
+          />
+        </div>
         <SettingsPanel activeTab={activeTab} handlers={handlers} user={user} />
       </div>
-    </div>
+    </AppPage>
   );
 }

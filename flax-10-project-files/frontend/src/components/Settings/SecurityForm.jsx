@@ -9,9 +9,9 @@ function getInitialData() {
 function PasswordFields({ formData, onChange }) {
   return (
     <>
-      <FormInput id="currentPassword" label="Current Password" type="password" value={formData.currentPassword} onChange={onChange} required />
-      <FormInput id="newPassword" label="New Password" type="password" value={formData.newPassword} onChange={onChange} required />
-      <FormInput id="confirmPassword" label="Confirm New Password" type="password" value={formData.confirmPassword} onChange={onChange} required />
+      <FormInput id="currentPassword" label="Current Password" type="password" value={formData.currentPassword} onChange={onChange} required autoComplete="current-password" />
+      <FormInput id="newPassword" label="New Password" type="password" value={formData.newPassword} onChange={onChange} required autoComplete="new-password" />
+      <FormInput id="confirmPassword" label="Confirm New Password" type="password" value={formData.confirmPassword} onChange={onChange} required autoComplete="new-password" />
     </>
   );
 }

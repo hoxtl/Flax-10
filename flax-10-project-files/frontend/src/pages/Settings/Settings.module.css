@@ -31,7 +31,7 @@
 
 .title {
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 800;
   margin: 0;
   color: var(--text);
 }
@@ -60,17 +60,13 @@
   }
 }
 
-.content {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
+.tabsWrapper {
+  padding: 12px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--widget-border);
 }
 
-.tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  padding: 0 12px;
+.content {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -118,7 +114,7 @@
 
 .sectionTitle {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
   margin-bottom: 8px;
   color: var(--text);
 }
@@ -151,7 +147,7 @@
 .formGroup select {
   width: 100%;
   padding: 10px 6px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--widget-border);
   border-radius: 8px;
   font-size: 15px;
   background: var(--bg);
@@ -179,7 +175,7 @@
 
 .formActions {
   padding-top: 24px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--widget-border);
   display: flex;
   justify-content: flex-end;
 }
@@ -213,7 +209,7 @@
   background: var(--panel);
   padding: 4px;
   border-radius: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--widget-border);
   margin-top: 12px;
 }
 

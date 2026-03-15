@@ -50,6 +50,7 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
                     value={homeAddress}
                     onChange={e => setHomeAddress(e.target.value)}
                     placeholder="e.g., 123 Example Street, London E1 B23"
+                    autoComplete="street-address"
                   />
                 </FormField>
                   {error && (

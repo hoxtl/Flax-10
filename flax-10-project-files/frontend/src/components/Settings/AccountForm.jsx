@@ -65,9 +65,9 @@ function useAccountForm(user) {
 function PersonalInfoFields({ formData, onChange }) {
   return (
     <>
-      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required />
-      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required />
-      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required />
+      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required autoComplete="given-name" />
+      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required autoComplete="family-name" />
+      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required autoComplete="email" />
     </>
   );
 }

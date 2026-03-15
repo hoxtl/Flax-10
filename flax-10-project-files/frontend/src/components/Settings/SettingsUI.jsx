@@ -3,6 +3,7 @@ import AnimatedDropdown from "../common/AnimatedDropdown";
 import FormField from "../common/FormField/FormField";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import TextInput from "../common/TextInput/TextInput";
+import { THEME_GROUPS } from "../../context/ThemeConstants";
 
 export function TabButton({ id, label, isActive, onClick }) {
   return (
@@ -66,7 +67,7 @@ export function SubmitButton({ isSaving, label, savingLabel }) {
   );
 }
 
-export function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength }) {
+export function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength, autoComplete }) {
   const remaining = maxLength ? maxLength - value.length : null;
   return (
     <FormField
@@ -79,7 +80,7 @@ export function FormInput({ id, label, type = "text", value, onChange, required,
         </>
       }
     >
-      <TextInput type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} />
+      <TextInput type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} autoComplete={autoComplete} />
     </FormField>
   );
 }
