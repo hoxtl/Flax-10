@@ -18,4 +18,10 @@ export function ManualJourneySection({
         const coords = await geocodeAddress(address);
         setStartCoords(coords);
     };
+
+    const handleDestSelect = async (address) => {
+        setManualDestination(address);
+        const coords = await geocodeAddress(address);
+        setDestCoords(coords);
+    };
 }
