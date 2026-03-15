@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
 from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.notifications.notificationModel import Notification
 from studyFlax.serialisers.course_change_serialisers import CourseChangeRequestSerialiser
 
 
@@ -120,6 +121,21 @@ def resolve_course_change_request(request, request_id):
             settings_obj = _get_user_settings(req.user)
             settings_obj.major = req.requested_course
             settings_obj.save()
+            Notification.objects.create(
+                user=req.user,
+                title='Course change approved',
+                message=f'Your request to change to {req.requested_course} has been approved. Your course has been updated.',
+                notification_type='general',
+                action_url='/settings?tab=account',
+            )
+        else:
+            Notification.objects.create(
+                user=req.user,
+                title='Course change rejected',
+                message=f'Your request to change to {req.requested_course} was rejected. You can submit a new request from settings.',
+                notification_type='general',
+                action_url='/settings?tab=account',
+            )
 
         return Response(CourseChangeRequestSerialiser(req).data)
     except Exception as e:
