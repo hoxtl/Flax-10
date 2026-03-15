@@ -143,7 +143,7 @@ function PhotosField({ images, onOpen }) {
         <div className={styles.field}>
             <label className={styles.label}>Photos ({images.length}/5)</label>
             {hasPhotos && <div className={styles.photoSummary}>
-                {images.map((img, i) => <div key={i} className={styles.summaryCard} style={{ backgroundImage: `url(${img})` }} />)}
+                {images.map((img, i) => <div key={i} className={styles.summaryCard} style={{ backgroundImage: `url("${img}")` }} />)}
             </div>}
             <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={onOpen}>
                 {hasPhotos ? "Manage Photos" : "+ Add Photos"}
