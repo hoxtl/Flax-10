@@ -98,20 +98,26 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   );
 }
 
-function QuickTabs({ onAddClick }) {
+function AddTab({ onAddClick }) {
+  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }];
+  return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && onAddClick?.()} />;
+}
+
+function NotifTab() {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
-  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }, { type: "separator" }, { title: "Notifications", icon: Bell, badge: unreadCount }];
-  const change = (i) => i === 0 ? onAddClick?.() : i === 2 && togglePanel();
-  return <ExpandableTabs tabs={tabs} onChange={change} />;
+  const tabs = [{ title: "Notifications", icon: Bell, badge: unreadCount }];
+  return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && togglePanel()} />;
 }
 
 function ActionPill({ onAddClick, onNavChange }) {
   return (
     <div className={styles.actionPill}>
+      <AddTab onAddClick={onAddClick} />
+      <div className={styles.pillDivider} />
       <ThemeToggle />
       <div className={styles.pillDivider} />
-      <QuickTabs onAddClick={onAddClick} />
+      <NotifTab />
       <NotificationPanel onNavChange={onNavChange} />
     </div>
   );

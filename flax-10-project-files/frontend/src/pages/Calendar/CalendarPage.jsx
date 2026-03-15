@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Calendar } from "../../components/Calendar/Calendar";
 import PillFilters from "../../components/Tags/PillFilters";
 import {
@@ -11,6 +12,8 @@ import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
+import useBreakpoint from "../../hooks/useBreakpoint";
+import { viewSwapMotion } from "../../components/common";
 
 function CalendarPageSkeleton({ showSearch = true }) {
   return (
@@ -43,20 +46,10 @@ function CalendarPageSkeleton({ showSearch = true }) {
   );
 }
 
-function useIsMobile(breakpoint = 900) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < breakpoint);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [breakpoint]);
-  return isMobile;
-}
-
 export default function CalendarPage() {
   const { filter, allEvents, selectedDate, viewMode, isLoading } = useCalendar();
   const dispatch = useCalendarDispatch();
-  const isMobile = useIsMobile();
+  const isMobile = useBreakpoint();
   useEventPopupListener();
 
   // Redirect week view to day view on mobile
@@ -78,6 +71,7 @@ export default function CalendarPage() {
   const { displayMode } = useCalendar();
   const isListOrTable = displayMode === "list" || displayMode === "table";
   const showFilters = true;
+  const calendarViewKey = `${viewMode}-${displayMode}`;
 
   if (isLoading && allEvents.length === 0) {
     return (
@@ -101,7 +95,11 @@ export default function CalendarPage() {
       </div>
 
       <main className={styles.mainContent}>
-        <Calendar />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={calendarViewKey} {...viewSwapMotion}>
+            <Calendar />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <EventPopups />

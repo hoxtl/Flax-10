@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./QuickAddModal.module.css";
 import { useTags } from "../../context/TagContext";
+import Badge from "../common/Badge/Badge";
 import StandardModal from "../common/StandardModal/StandardModal";
 import { getModules } from "../../api/moduleApi";
 
@@ -25,7 +26,7 @@ function Tile({ item, onClick }) {
     <button className={styles.tile} onClick={onClick} type="button" style={tileStyle(item)} disabled={item.locked}>
       <span className={styles.icon}>{item.icon}</span>
       <span className={styles.label} style={{ color: item.locked ? '#94a3b8' : item.color }}>{item.label}</span>
-      {item.locked && <span className={styles.badge}>Coming Soon</span>}
+      {item.locked && <Badge className={styles.badge} tone="muted">Coming Soon</Badge>}
     </button>
   );
 }

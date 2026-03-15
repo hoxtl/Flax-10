@@ -181,8 +181,6 @@
 
 .tagBadge,
 .sourceBadge {
-    padding: 3px 10px;
-    border-radius: 999px;
     font-size: 0.7rem;
     font-weight: 500;
     white-space: nowrap;
@@ -194,7 +192,6 @@
 }
 
 .sourceBadge {
-    background: var(--primary);
     color: var(--c-white);
 }
 
@@ -261,30 +258,8 @@
 }
 
 .detailButton {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.detailButtonPrimary {
-    background: var(--btn-black);
-    color: var(--c-white);
-    border-color: var(--btn-black);
-}
-
-.detailButton:hover {
-    background: var(--hover-light);
-}
-
-.detailButtonPrimary:hover {
-    background: var(--btn-black-hover);
-    border-color: var(--btn-black-hover);
+    font-size: var(--text-sm);
+    min-height: var(--btn-height-sm);
 }
 
 /* Empty state */

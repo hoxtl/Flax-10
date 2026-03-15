@@ -1,211 +1,211 @@
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 24px;
-  }
-  
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  
-  .backButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    color: var(--muted);
-    font-size: 24px;
-    transition: background 0.2s;
-  }
-  
-  .backButton:hover {
-    background: var(--hover);
-  }
-  
-  .title {
-    font-size: 28px;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text);
-  }
-  
-  .successBanner {
-    background: #10b981;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    animation: slide-down 0.3s ease-out;
-  }
-  
-  @keyframes slide-down {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .content {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    padding: 0 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
 
-  .tabs::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .tab {
-    background: none;
-    border: none;
-    padding: 16px 20px;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    margin-bottom: -1px;
-    white-space: nowrap;
-  }
-  
-  .tab:hover {
-    color: var(--text);
-  }
-  
-  .tabActive {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
-  }
-  
-  .panel {
-    padding: 32px 24px;
-  }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .formSection {
-    margin-bottom: 32px;
-  }
-  
-  .sectionTitle {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--text);
-  }
-  
-  .formDescription {
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 24px;
-  }
-  
-  .formRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-  
-  .formGroup {
-    margin-bottom: 20px;
-  }
-  
-  .formGroup label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
-  
-  .formGroup input,
-  .formGroup select {
-    width: 100%;
-    padding: 10px 6px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 15px;
-    background: var(--bg);
-    color: var(--text);
-    transition: border-color 0.2s;
-  }
-  
-  .formGroup input:focus,
-  .formGroup select:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
-  
-  .errorMessage {
-    background: #fef2f2;
-    color: #dc2626;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .formActions {
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .btnPrimary {
-    background: var(--primary);
-    color: #ffffff;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    width: auto;
-  }
-  
-  .btnPrimary:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-  
-  .btnPrimary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
 
-  /* Theme Selector */
+.backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 24px;
+  transition: background 0.2s;
+}
+
+.backButton:hover {
+  background: var(--hover);
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.successBanner {
+  background: #10b981;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  animation: slide-down 0.3s ease-out;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.panel {
+  padding: 32px 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.formSection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.formDescription {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 10px 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.errorMessage {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formActions {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btnPrimary {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  width: auto;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Theme Selector */
 .themeSelector {
   display: flex;
   gap: 12px;
@@ -318,7 +318,11 @@
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(123, 103, 81, 0.06), rgba(123, 103, 81, 0.02));
+  background: linear-gradient(
+    180deg,
+    rgba(123, 103, 81, 0.06),
+    rgba(123, 103, 81, 0.02)
+  );
   padding: 14px 16px;
   box-sizing: border-box;
 }
@@ -365,4 +369,135 @@
   .themeIcon {
     font-size: 24px;
   }
+}
+
+.courseWrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.courseLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.lockedCourse {
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--search-bg);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.courseHint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.teacherSection {
+  margin-top: 0.5rem;
+}
+
+.teacherBadge,
+.teacherPending,
+.teacherRequest {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.teacherBadge {
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  color: #4c1d95;
+}
+
+.teacherPending {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #78350f;
+}
+
+.teacherRequest {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.teacherBadgeIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.teacherBadgeSub {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.8;
+}
+
+.teacherBtn {
+  background: #6c47ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.16s,
+    transform 0.1s;
+  font-family: inherit;
+  flex-shrink: 0;
+  align-self: center;
+}
+.teacherBtn:hover {
+  background: #5535d4;
+}
+.teacherBtn:active {
+  transform: scale(0.97);
+}
+.teacherBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.teacherSuccess {
+  font-size: 0.85rem;
+  color: #15803d;
+  font-weight: 600;
+  align-self: center;
+}
+
+.teacherError {
+  font-size: 0.82rem;
+  color: #b91c1c;
+  margin: 0.4rem 0 0;
+  width: 100%;
+}
+
+.courseSelect {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--search-bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.courseSelect:focus {
+  outline: none;
+  border-color: var(--accent, #6c47ff);
 }

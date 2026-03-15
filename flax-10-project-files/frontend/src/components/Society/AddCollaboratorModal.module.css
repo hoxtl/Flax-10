@@ -27,29 +27,14 @@
 }
 
 .chip {
-    display: inline-flex;
-    align-items: center;
     gap: 0.5rem;
-    padding: 0.25rem 0.6rem;
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
 }
 
 .chipRemove {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1rem;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 2px;
-}
-
-.chipRemove:hover {
-    color: var(--error);
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    padding: 0;
+    box-shadow: none;
 }
 
 .footer {
@@ -62,34 +47,9 @@
 }
 
 .cancelBtn {
-    padding: var(--btn-padding);
-    border: var(--stroke-soft);
-    border-radius: var(--btn-radius);
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 0.95rem;
-}
-
-.cancelBtn:hover {
-    background: var(--surface-card);
+    box-shadow: none;
 }
 
 .addBtn {
-    padding: var(--btn-padding);
-    border: none;
-    border-radius: var(--btn-radius);
-    background: var(--primary-color, #9E7E5D);
-    color: white;
-    cursor: pointer;
-    font-size: 0.95rem;
-}
-
-.addBtn:hover:not(:disabled) {
-    filter: brightness(1.1);
-}
-
-.addBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    min-width: 88px;
 }

@@ -4,7 +4,7 @@
  */
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import PageHeader from "../../components/common/PageHeader/PageHeader";
+import AppPage from "../../components/common/AppPage/AppPage";
 import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
@@ -105,12 +105,11 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
     const tabs = buildTabs(filtered, societies, { onSelect, onReport, onUnreport, setView, onCreateClick });
 
     return (
-        <div className={styles.container}>
-            <PageHeader title="Societies" subtitle="Your communities at King's College London" />
+        <AppPage className={styles.container} title="Societies" subtitle="Your communities at King's College London">
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setTab}
                 rightAction={<MySocietiesSearch value={search} onChange={setSearch} />} />
             <BackToTop />
-        </div>
+        </AppPage>
     );
 }
 

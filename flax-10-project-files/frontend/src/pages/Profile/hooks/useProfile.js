@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { fetchTasks } from "../../../api/taskService";
 import { getUserProfile, getAnotherUserProfile } from "../../../api/userService";
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
@@ -77,14 +78,38 @@ function useModalState() {
   };
 }
 
+function useTaskCountData(userId) {
+  const [taskCount, setTaskCount] = useState(0);
+
+  useEffect(() => {
+    if (userId) {
+      setTaskCount(0);
+      return;
+    }
+
+    fetchTasks()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.results || [];
+        setTaskCount(list.filter((task) => !task.completed).length);
+      })
+      .catch((e) => {
+        console.error("Failed to load task count:", e);
+        setTaskCount(0);
+      });
+  }, [userId]);
+
+  return { taskCount };
+}
+
 export function useProfileState(userId) {
   const { profileData, loading, reload, setOptimisticShare } = useProfileData(userId);
   const eventsState = useEventsData(userId);
   const modalState = useModalState();
+  const taskState = useTaskCountData(userId);
   const handleSaveProfile = async () => {
     await reload();
   };
-  return { viewedUserId: userId, profileData, loading, handleSaveProfile, reload, setOptimisticShare, ...eventsState, ...modalState };
+  return { viewedUserId: userId, profileData, loading, handleSaveProfile, reload, setOptimisticShare, ...eventsState, ...modalState, ...taskState };
 }
 
 export function useProfileBodyData(state) {

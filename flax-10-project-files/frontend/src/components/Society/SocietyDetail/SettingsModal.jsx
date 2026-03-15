@@ -6,6 +6,9 @@ import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
+import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import SectionHeader from "../../common/SectionHeader/SectionHeader";
+import StandardModal from "../../common/StandardModal/StandardModal";
 import { RatificationSection } from "./RatificationSection";
 import { useConfirm } from "../../../context/ConfirmContext";
 
@@ -33,10 +36,7 @@ function useSettings(props) {
 
 function ModalHeader({ onClose }) {
   return (
-    <div className={styles.header}>
-      <h3 className={styles.title}>Society Settings</h3>
-      <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-    </div>
+    <SectionHeader eyebrow="Society" title="Settings" action={<PrimaryButton className={styles.closeBtn} variant="ghost" onClick={onClose} pill>&times;</PrimaryButton>} />
   );
 }
 
@@ -44,7 +44,7 @@ function AddCollaboratorSection({ onOpen }) {
   return (
     <div className={styles.section}>
       <h4 className={styles.sectionTitle}>Add Collaborator</h4>
-      <button className={styles.addBtn} onClick={onOpen}>+ Add Collaborators</button>
+      <PrimaryButton className={styles.addBtn} variant="secondary" onClick={onOpen} pill>+ Add Collaborators</PrimaryButton>
     </div>
   );
 }
@@ -72,18 +72,16 @@ function DangerSection({ onDelete, onClose }) {
   return (
     <div className={styles.dangerSection}>
       <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <button className={styles.deleteBtn} onClick={handleDelete}>Delete Society</button>
+      <PrimaryButton className={styles.deleteBtn} variant="danger" onClick={handleDelete} pill>Delete Society</PrimaryButton>
     </div>
   );
 }
 
 function ModalLayout({ onClose, children }) {
   return (
-    <div className={styles.backdrop} onMouseDown={onClose}>
-      <div className={styles.modal} onMouseDown={e => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>
+    <StandardModal title={null} hideHeader onClose={onClose} modalClassName={styles.modal}>
+      {children}
+    </StandardModal>
   );
 }
 

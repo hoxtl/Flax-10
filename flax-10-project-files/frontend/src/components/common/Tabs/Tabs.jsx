@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { fadeInMotion, tabContentMotion } from "../motion/transitions";
 import styles from "./Tabs.module.css";
 
 export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator" }) {
@@ -7,9 +8,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndi
         <div className={styles.container}>
             <motion.div
                 className={styles.tabBar}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.35 }}
+                {...fadeInMotion}
             >
                 {tabs.map(tab => (
                     <TabButton
@@ -24,10 +23,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndi
             <AnimatePresence mode="wait">
                 <motion.div
                     key={activeTab}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    {...tabContentMotion}
                     className={styles.content}
                 >
                     {tabs.find(t => t.id === activeTab)?.content}

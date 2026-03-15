@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCalendar, useCalendarDispatch, useEventModal } from "../../context/CalendarContext";
 import { addDays, formatDate, getWeekDays, formatMonthYear, isSameDay, getStartOfWeek } from "./utils/dateUtils";
 import { importTimetable } from "../../api/timetableApi";
@@ -6,6 +6,7 @@ import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
 import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton } from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
+import useBreakpoint from "../../hooks/useBreakpoint";
 import "./CalendarHeader.css";
 
 const VIEW_MODES = [
@@ -13,16 +14,6 @@ const VIEW_MODES = [
     { value: 'week', label: 'Week' },
     { value: 'month', label: 'Month' },
 ];
-
-function useIsMobile(breakpoint = 900) {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
-    useEffect(() => {
-        const onResize = () => setIsMobile(window.innerWidth < breakpoint);
-        window.addEventListener("resize", onResize);
-        return () => window.removeEventListener("resize", onResize);
-    }, [breakpoint]);
-    return isMobile;
-}
 
 function useCalendarHeader() {
     const { selectedDate, viewMode, displayMode, searchQuery } = useCalendar();
@@ -35,7 +26,7 @@ function useCalendarHeader() {
 
 export function CalendarHeader() {
     const { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, dispatch, openModal, showImportModal, setShowImportModal } = useCalendarHeader();
-    const isMobile = useIsMobile();
+    const isMobile = useBreakpoint();
     const modes = isMobile ? VIEW_MODES.filter(m => m.value !== 'week') : VIEW_MODES;
 
     const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);

@@ -3,12 +3,17 @@ import { useNavigate } from "react-router-dom";
 import GroupProjectDetail from "./GroupWorkDetail";
 import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import { getDeadlineLabel } from "./utils/taskUtils";
+import AppPage from "../../components/common/AppPage/AppPage";
+import Card from "../../components/common/Card/Card";
+import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
+import TextInput from "../../components/common/TextInput/TextInput";
 import styles from "./GroupWorkIndexPage.module.css";
 
 function GroupWorkIndexSkeleton() {
   return (
-    <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
+    <AppPage className={styles.container} data-testid="groupwork-skeleton" aria-busy="true" title="Group work" subtitle="Create shared projects and link them to your modules.">
       <div className={styles.skeletonHeader}>
         <SkeletonBlock className={styles.skeletonTitle} />
         <SkeletonBlock className={styles.skeletonSubtitle} />
@@ -27,16 +32,22 @@ function GroupWorkIndexSkeleton() {
           </div>
         ))}
       </div>
-    </div>
+    </AppPage>
   );
 }
 
 function CreateProjectInputs({ data, onChange }) {
   return (
     <>
-      <input value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Group project name" className={`${styles.input} ${styles.inputName}`} required />
-      <input value={data.courseCode} onChange={(e) => onChange('courseCode', e.target.value)} placeholder="Course code (optional)" className={`${styles.input} ${styles.inputField}`} />
-      <input type="date" value={data.deadline} onChange={(e) => onChange('deadline', e.target.value)} className={`${styles.input} ${styles.inputField}`} />
+      <FormField label="Project name" className={styles.inputName}>
+        <TextInput value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Group project name" required />
+      </FormField>
+      <FormField label="Course code" hint="Optional" className={styles.inputField}>
+        <TextInput value={data.courseCode} onChange={(e) => onChange('courseCode', e.target.value)} placeholder="Course code" />
+      </FormField>
+      <FormField label="Deadline" className={styles.inputField}>
+        <TextInput type="date" value={data.deadline} onChange={(e) => onChange('deadline', e.target.value)} />
+      </FormField>
     </>
   );
 }
@@ -57,10 +68,15 @@ function useCreateProject(onCreated) {
 function CreateProjectForm({ onCreated }) {
   const { form, change, submit } = useCreateProject(onCreated);
   return (
-    <form onSubmit={submit} className={styles.createProjectForm}>
+    <Card as="form" onSubmit={submit} className={styles.createProjectForm} padding="lg">
       <CreateProjectInputs data={form} onChange={change} />
-      <button type="submit" className={styles.submitBtn}>Create</button>
-    </form>
+      <div className={styles.submitField}>
+        <span className={styles.submitLabel} aria-hidden>Create project</span>
+        <div className={styles.submitWrap}>
+          <PrimaryButton type="submit" className={styles.submitBtn} pill>Create</PrimaryButton>
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -76,18 +92,9 @@ function ProjectRow({ project, onClick }) {
 function GroupWorkContent({ projects, projectListProps }) {
   if (projects.length === 0) return <p className={styles.emptyMessage}>You do not have any group projects yet. Use the form above to create one.</p>;
   return (
-    <div className={styles.projectList}>
+    <Card className={styles.projectList} padding="sm">
       {projects.map((p) => <ProjectRow key={p.id} project={p} {...projectListProps(p)} />)}
-    </div>
-  );
-}
-
-function GroupWorkHeader() {
-  return (
-    <>
-      <h1 className={styles.title}>Group work</h1>
-      <p className={styles.subtitle}>Create shared projects and link them to your modules.</p>
-    </>
+    </Card>
   );
 }
 
@@ -99,10 +106,9 @@ export default function GroupWorkIndexPage() {
   if (loading) return <GroupWorkIndexSkeleton />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
-    <div className={styles.container}>
-      <GroupWorkHeader />
+    <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
       <CreateProjectForm onCreated={onCreated} />
       <GroupWorkContent projects={projects} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
-    </div>
+    </AppPage>
   );
 }

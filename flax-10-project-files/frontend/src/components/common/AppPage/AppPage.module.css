@@ -1,0 +1,38 @@
+.page {
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(var(--space-5), 2vw, var(--space-8)) clamp(var(--space-4), 2.5vw, var(--space-8)) var(--space-10);
+  position: relative;
+}
+
+.widthMd {
+  max-width: 960px;
+}
+
+.widthLg {
+  max-width: 1200px;
+}
+
+.widthXl {
+  max-width: 1400px;
+}
+
+.widthFull {
+  max-width: none;
+}
+
+.toolbar {
+  margin-bottom: var(--space-6);
+}
+
+.content {
+  min-width: 0;
+}
+
+
+@media (max-width: 768px) {
+  .page {
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-8);
+  }
+}

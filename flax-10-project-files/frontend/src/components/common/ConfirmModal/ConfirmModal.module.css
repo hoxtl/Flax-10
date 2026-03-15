@@ -1,0 +1,22 @@
+.modalBody {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.message {
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.cancelBtn,
+.alternateBtn,
+.confirmBtn {
+    min-width: 112px;
+}

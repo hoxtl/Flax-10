@@ -3,12 +3,12 @@
  * name, membership count, and a quick-report action.
  */
 import styles from './SocietyCard.module.css';
-import { Flag } from "lucide-react";
+import { Flag, BadgeCheck } from "lucide-react";
 
-/** Displays a badge for officially recognized societies. */
+/** Displays a verified icon for officially ratified societies. */
 function RatifiedBadge({ isRatified }) {
     if (!isRatified) return null;
-    return <span className={styles.badge} title="Official Society">✅</span>;
+    return <BadgeCheck className={styles.verifiedIcon} size={22} title="Ratified Society" aria-label="Ratified Society" />;
 }
 
 /** Interactive card component for society directory listings. */

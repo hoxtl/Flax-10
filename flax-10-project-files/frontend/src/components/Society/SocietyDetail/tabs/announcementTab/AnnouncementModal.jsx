@@ -9,8 +9,9 @@ import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
 import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
-import ConfirmModal from "../../../../common/ConfirmModal";
+import ConfirmModal from "../../../../common/ConfirmModal/ConfirmModal";
 import StandardModal from "../../../../common/StandardModal/StandardModal";
+import PrimaryButton from "../../../../common/PrimaryButton/PrimaryButton";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 import { useConfirm } from "../../../../../context/ConfirmContext";
@@ -182,12 +183,12 @@ function EventFields({ form, update, setForm }) {
 function ModalFooter({ onClose, onSubmit, isEdit, onDelete }) {
     return (
         <div className={styles.footer}>
-            {isEdit && <button className={styles.deleteBtn} onClick={onDelete}>Delete</button>}
+            {isEdit && <PrimaryButton variant="danger" pill onClick={onDelete}>Delete</PrimaryButton>}
             <div className={styles.footerRight}>
-                <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-                <button className={styles.submitBtn} onClick={onSubmit}>
+                <PrimaryButton variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
+                <PrimaryButton variant="primary" pill onClick={onSubmit}>
                     {isEdit ? "Save Changes" : "Add Announcement"}
-                </button>
+                </PrimaryButton>
             </div>
         </div>
     );

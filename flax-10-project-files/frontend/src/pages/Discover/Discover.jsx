@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
-import PageHeader from "../../components/common/PageHeader/PageHeader";
+import AppPage from "../../components/common/AppPage/AppPage";
+import Card from "../../components/common/Card/Card";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
+import SearchBar from "../../components/common/SearchBar/SearchBar";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
@@ -23,12 +25,12 @@ function UserCardInfo({ user }) {
 
 function UserCard({ user, onNavChange }) {
     return (
-        <div className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
+        <Card className={styles.userCard} interactive onClick={() => onNavChange?.("profile_" + user.id)}>
             <div style={{ marginBottom: 16 }}>
                 <UserAvatar user={user} avatarOnly size={80} />
             </div>
             <UserCardInfo user={user} />
-        </div>
+        </Card>
     );
 }
 
@@ -92,14 +94,12 @@ function useDiscoverSearch() {
     return { ...fetch, searchQuery, setSearchQuery, ...ui };
 }
 
-
-function SearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState }) {
+function DiscoverSearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState }) {
     const toggle = () => filterState.setIsFilterOpen(!filterState.isFilterOpen);
     return (
         <div className={styles.filterBar}>
             <div className={styles.searchWrap} ref={containerRef}>
-                <span className={styles.searchIcon}>🔍</span>
-                <input type="text" className={styles.searchInput} placeholder="Search by name or username..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                <SearchBar placeholder="Search by name or username..." value={searchQuery} onChange={setSearchQuery} />
             </div>
             <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={toggle} props={filterState.props} />
         </div>
@@ -144,14 +144,13 @@ export default function Discover({ onNavChange }) {
     const { loading, users, currentPage, setCurrentPage, totalPages, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
     const showLoader = loading && users.length === 0;
 
-    const srch = <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />;
+    const srch = <DiscoverSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />;
     const content = showLoader ? <DiscoverSkeleton /> : <UsersGrid users={users} onNavChange={onNavChange} loading={loading} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
 
     return (
-        <div className={styles.container}>
-            <PageHeader title="Discover" subtitle="Find course mates and study partners" />
+        <AppPage className={styles.container} title="Discover" subtitle="Find course mates and study partners">
             {srch}
             {content}
-        </div>
+        </AppPage>
     );
 }
