@@ -1,3 +1,9 @@
 .searchIcon {
   font-size: 1rem;
 }
+
+.manualJourneyInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
