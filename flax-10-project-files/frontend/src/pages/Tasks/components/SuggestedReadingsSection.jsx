@@ -2,6 +2,8 @@ import {useState, useEffect} from "react";
 import { getSuggestedReadings, getReadingSpeed } from "../../../api/readingApi";
 import { FileText, Calendar, Clock, Timer } from "lucide-react";
 import { convertReadingToTask } from "../../../api/readingApi";
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import styles from "./SuggestedReadingsSection.module.css";
 
 export function useSuggestedReadings(taskCount) {
@@ -56,9 +58,11 @@ function ReadingCardHint() {
 
 function ReadingCardButton({ added, loading, handleAdd }) {
   return (
-    <button className={`${styles.addBtn} ${added ? styles.addBtnDone : ""}`} onClick={handleAdd} disabled={added || loading}>
+    <PrimaryButton 
+      size="small" pill onClick={handleAdd} disabled={added || loading} variant={added ? "secondary" : "primary"}
+    >
       {added ? "✓ Added" : loading ? "Adding…" : "+ Add as task"}
-    </button>
+    </PrimaryButton>
   );
 }
 
@@ -84,14 +88,11 @@ export function SuggestedReadingCard({ reading, onAdded, avgMinPerPage }) {
   );
 }
 
-function EmptyState() {
-  return (
-    <div className={styles.emptyInner}>
-      <span className={styles.emptyEmoji}>🎉</span>
-      <p className={styles.emptyMessage}>All caught up on readings!</p>
-      <p className={styles.emptySub}>No suggested readings left — check back when your teacher adds more.</p>
-    </div>
-  );
+function EmptyReadings({allAdded, readings, onAdded, avgMinPerPage}) {
+  if (allAdded || readings.length === 0) {
+    return <EmptyState icon="🎉" title="All caught up on readings!" description="No suggested readings left - check back when your teacher adds more." />;
+  }
+    return <SuggestedReadingsList readings={readings} onAdded={onAdded} avgMinPerPage={avgMinPerPage} />;
 }
 
 function SuggestedReadingsHeader({ readings, speedData }) {
@@ -138,9 +139,7 @@ export default function SuggestedReadingsSection({ onTaskAdded, taskCount }) {
     <div className={styles.section}>
       <div className={styles.card}>
         <SuggestedReadingsHeader readings={readings} speedData={speedData} />
-        {allAdded || readings.length === 0 ? <EmptyState />
-          : <SuggestedReadingsList readings={readings} onAdded={handleAdded} avgMinPerPage={speedData?.avg_min_per_page} />
-        }
+        <EmptyReadings allAdded={allAdded} readings={readings} onAdded={handleAdded} avgMinPerPage={speedData?.avg_min_per_page} />
       </div>
     </div>
   );
