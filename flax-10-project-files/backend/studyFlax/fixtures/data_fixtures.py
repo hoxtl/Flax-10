@@ -242,6 +242,13 @@ personal_task_fixtures = (
     ("Read: Why Nations Fail",          "First 4 chapters. Consider how it connects to your IR module.",            "low",    3,  20, "Reading List"),
 )
 
+reading_fixtures = [ 
+    ("Module Handbook", "Ch.9", 1, 45),
+    ("Advanced Topics", "Ch.5", 41, 80),
+    ("Case Studies & Applications", "Ch.3", 35, 78),
+    ("Core Principles", "Ch.13", 121,155),
+]
+
 __all__ = [
     "category_fixtures",
     "tag_fixtures",
@@ -264,4 +271,5 @@ __all__ = [
     "MODULE_PILL_COLORS",
     "task_list_fixtures",
     "personal_task_fixtures",
+    "reading_fixtures",
 ]
