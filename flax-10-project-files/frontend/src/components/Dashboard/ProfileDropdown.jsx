@@ -25,11 +25,11 @@ function HeaderAvatar({ profilePhotoUrl, initials }) {
   );
 }
 
-function HeaderUserInfo({ displayName, year, major }) {
+function HeaderUserInfo({ displayName, major }) {
   return (
     <div className={styles.userInfo}>
       <div className={styles.userName}>{displayName}</div>
-      <div className={styles.userMeta}>{year} · {major}</div>
+      <div className={styles.userMeta}>{major}</div>
     </div>
   );
 }
@@ -41,12 +41,11 @@ function resolveDisplayName(user) {
 function DropdownHeader({ user, profilePhotoUrl }) {
   const initials = getInitials(user?.name) || "?";
   const displayName = resolveDisplayName(user);
-  const year = user?.year || "Year 2";
-  const major = user?.major || "CS";
+  const major = user?.major || "Computer Science";
   return (
     <div className={styles.dropdownHeader}>
       <HeaderAvatar profilePhotoUrl={profilePhotoUrl} initials={initials} />
-      <HeaderUserInfo displayName={displayName} year={year} major={major} />
+      <HeaderUserInfo displayName={displayName} major={major} />
     </div>
   );
 }
@@ -145,16 +144,8 @@ function buildDisplayUser(user, profileData) {
   const merged = { ...user, ...profileData };
   return {
     ...merged,
-    year: merged.year || "Year 2",
-    major: merged.major || "CS",
+    major: merged.major || "Computer Science",
   };
-}
-
-function resolveYearDisplay(year) {
-  if (!year) return "Year 2";
-  if (typeof year === "string" && /^year\s+/i.test(year)) return year;
-  if (!Number.isNaN(Number(year))) return `Year ${year}`;
-  return year;
 }
 
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
@@ -172,8 +163,7 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, 
   const initials = getInitials(user?.name) || "?";
   const profilePhotoUrl = profileData?.profile_photo_url;
   const displayUser = buildDisplayUser(user, profileData);
-  const displayYear = resolveYearDisplay(displayUser.year);
-  const displayMajor = displayUser.major || "CS";
+  const displayMajor = displayUser.major || "Computer Science";
   return (
     <div className={styles.container} onMouseEnter={onHoverEnter} onMouseLeave={onHoverLeave}>
       <AvatarButton initials={initials} profilePhotoUrl={profilePhotoUrl} onClick={() => setIsOpen(!isOpen)} />
@@ -183,7 +173,7 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, 
         onSettingsClick={handleSettingsClick}
         onLogoutClick={handleLogoutClick}
         onProfileClick={handleProfileClick}
-        user={{ ...displayUser, year: displayYear, major: displayMajor }}
+        user={{ ...displayUser, major: displayMajor }}
         profilePhotoUrl={profilePhotoUrl}
       />
     </div>
