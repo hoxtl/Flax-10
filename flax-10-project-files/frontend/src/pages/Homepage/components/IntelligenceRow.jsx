@@ -13,7 +13,7 @@ import {
 } from "./IntelligenceUtils";
 
 import IntelligenceGrid from "./IntelligenceGrid";
-import { IntelligenceHero, StatsWidget } from "./IntelligenceWidgets";
+import { IntelligenceHero } from "./IntelligenceWidgets";
 import { RightNowWidget } from "./RightNowWidget";
 import { StudyPulseWidget } from "./StudyPulseWidget";
 import { QuickActionsWidget } from "./QuickActionsWidget";
