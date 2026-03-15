@@ -211,7 +211,7 @@ function DetailsView({ state }) {
                 module={viewing_module}
                 is_enrolled={isEnrolledIn(viewing_module.id, hook.enrollments)}
                 is_teacher={is_teacher}
-                onBack={() => setViewingModule(null)}
+                onBack={() => { setViewingModule(null); state.setSearchQuery(''); }}
                 onEnroll={() => hook.handleEnrollment(viewing_module)}
                 onUnenroll={() => hook.handleDisenrol(viewing_module)}
             />
@@ -275,6 +275,9 @@ function ModuleResults({ sorting, search, hook, isTeacher, setViewingModule, set
                     onClear={() => search.onQueryChange("")}
                 />
             );
+        }
+        if (isTeacher) {
+            return <EmptyState icon="📚" title="No modules yet" description="Create your first module for students to browse and enrol in." />;
         }
         return <EmptyState icon="📚" title="No modules found" description="Try adjusting your search or filters." />;
     }
