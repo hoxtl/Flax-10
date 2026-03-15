@@ -1,9 +1,26 @@
 .card {
     background: var(--surface-card);
     flex-direction: column;
-    min-height: 192px;
+    min-height: 214px;
     position: relative;
     overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--module-accent, var(--border)) 14%, var(--border));
+    transition: transform 0.24s cubic-bezier(.2, .9, .2, 1), box-shadow 0.24s cubic-bezier(.2, .9, .2, 1), border-color 0.24s ease;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--module-accent, var(--primary)), color-mix(in srgb, var(--module-accent, var(--primary)) 48%, transparent));
+    pointer-events: none;
+}
+
+.card.clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: color-mix(in srgb, var(--module-accent, var(--primary)) 32%, var(--border));
 }
 
 .card.enrolled {
@@ -28,22 +45,37 @@
 
 .content {
     flex: 1;
-    padding: var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-3);
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
     overflow: hidden;
 }
 
 .cardHeader {
     display: flex;
+    flex-direction: column;
+    gap: 0.38rem;
+    min-width: 0;
+}
+
+.headerTopRow {
+    display: flex;
     align-items: center;
-    gap: 0.625rem;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.headerIdentity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
 }
 
 .iconWrap {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--card-icon-radius);
     display: grid;
     place-items: center;
@@ -55,7 +87,7 @@
 .moduleCode {
     background: var(--pill-bg);
     color: var(--primary);
-    padding: var(--chip-padding);
+    padding: 0.22rem 0.52rem;
     border-radius: var(--chip-radius);
     font-size: var(--chip-font-size);
     font-weight: 700;
@@ -64,18 +96,26 @@
 }
 
 .enrolledBadge {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: var(--success-bg);
+    color: var(--success-text);
     padding: var(--chip-padding);
     border-radius: var(--chip-radius);
     font-size: var(--chip-font-size);
+    font-weight: 700;
+}
+
+.departmentText {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
     font-weight: 600;
-    margin-left: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .moduleTitle {
     margin: 0;
-    font-size: 0.92rem;
+    font-size: 1.02rem;
     font-weight: 700;
     color: var(--text);
     line-height: 1.25;
@@ -85,40 +125,49 @@
 }
 
 .description {
-    font-size: 0.78rem;
-    color: color-mix(in srgb, var(--text) 62%, var(--muted) 38%);
+    font-size: 0.84rem;
+    color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
     line-height: 1.35;
     margin: 0;
-    white-space: normal;
-    overflow: visible;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.meta {
+.metaPills {
     display: flex;
-    gap: var(--space-2);
+    gap: var(--space-1);
     flex-wrap: nowrap;
-    padding: var(--space-1) 0;
+    padding-top: var(--space-1);
     border-top: var(--stroke-soft);
-    margin-top: auto;
+    overflow: hidden;
 }
 
-.metaItem {
+.metaPill {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.76rem;
-    color: color-mix(in srgb, var(--text) 60%, var(--muted) 40%);
+    gap: 0.32rem;
+    font-size: 0.7rem;
+    color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
     font-weight: 500;
-    min-width: 0;
+    padding: 0.18rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--panel) 88%, var(--surface-card) 12%);
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
     white-space: nowrap;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .actions {
     display: flex;
+    justify-content: space-between;
     gap: var(--space-2);
     align-items: center;
+    margin-top: var(--space-1);
+    padding-top: 0;
 }
 
 .editButton,
@@ -181,14 +230,6 @@
     background: rgba(225, 29, 72, 0.15);
 }
 
-.department {
-    font-size: 0.75rem;
-    color: color-mix(in srgb, var(--text) 52%, var(--muted) 48%);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .deadlineButton {
     font-size: var(--text-sm);
     padding: var(--space-1) var(--space-3);
@@ -205,17 +246,17 @@
 .viewDetailsBtn {
     border: none;
     background: transparent;
-    color: color-mix(in srgb, var(--text) 56%, var(--muted) 44%);
-    font-size: var(--text-sm);
+    color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
+    font-size: 0.86rem;
     font-weight: 600;
     padding: 0;
     cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    text-decoration-color: color-mix(in srgb, var(--muted) 55%, transparent);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, transparent);
+    line-height: 1.1;
 }
 
 .viewDetailsBtn:hover {
     color: var(--text);
-    text-decoration-color: color-mix(in srgb, var(--text) 65%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--text) 65%, transparent);
 }

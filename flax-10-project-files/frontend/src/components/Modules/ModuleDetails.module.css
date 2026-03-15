@@ -1,7 +1,9 @@
 .container {
-    max-width: 680px;
+    max-width: 1120px;
     margin: 0 auto;
+    padding-bottom: var(--space-8);
 }
+
 .backButton {
     background: none;
     border: none;
@@ -10,268 +12,447 @@
     font-weight: 600;
     cursor: pointer;
     padding: 0.5rem 0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     transition: opacity 0.2s;
 }
+
 .backButton:hover {
-    opacity: 0.7;
+    opacity: 0.8;
 }
-.content {
-    background: var(--bg);
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    padding: 2rem;
-    box-shadow: 0 2px 16px rgba(20, 20, 20, 0.07);
-}
-.headerSection {
-    margin-bottom: 1.5rem;
-}
-.titleRow {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+
+.hero {
+    background: var(--surface-card);
+    border: var(--stroke-soft);
+    border-radius: var(--radius-xl);
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow-sm);
     margin-bottom: 1rem;
 }
+
+.heroTop {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+}
+
 .moduleCode {
     background: var(--pill-bg);
     color: var(--primary);
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
+    padding: 0.28rem 0.62rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
     font-weight: 700;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+.departmentChip {
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    color: color-mix(in srgb, var(--primary) 82%, var(--text) 18%);
+    border: 1px solid color-mix(in srgb, var(--primary) 32%, transparent);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+
 .enrolledBadge {
+    margin-left: auto;
     background: var(--success-bg);
     color: var(--success-text);
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.22rem 0.62rem;
+    font-size: 0.74rem;
+    font-weight: 700;
 }
+
 .moduleTitle {
-    margin: 0 0 0.75rem 0;
-    font-size: 1.5rem;
-    font-weight: 700;
+    margin: 0;
+    font-size: clamp(1.35rem, 2.6vw, 1.9rem);
     color: var(--text);
-    line-height: 1.3;
-    letter-spacing: -0.02em;
+    line-height: 1.22;
 }
+
+.heroSubtext {
+    margin: 0.5rem 0 0;
+    color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
+    line-height: 1.45;
+}
+
+.heroMeta {
+    margin-top: 0.9rem;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.heroMetaItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+}
+
+.tutorInline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.tutorPhoto {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+    display: inline-block;
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.tutorAvatarFallback {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: var(--radius-pill);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, var(--primary) 86%, var(--text) 14%);
+    background: color-mix(in srgb, var(--primary) 16%, var(--surface-card));
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.heroMetaLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+}
+
+.heroMetaValue,
+.heroLink {
+    font-size: 0.92rem;
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.heroLink:hover {
+    text-decoration: underline;
+}
+
+.heroActions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.7rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.secondaryAction {
+    border: var(--stroke-soft);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 0.9rem;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    background: var(--panel);
+}
+
+.secondaryAction:hover {
+    background: var(--hover);
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.mainColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sectionCard {
+    background: var(--surface-card);
+    border: var(--stroke-soft);
+    border-radius: var(--radius-xl);
+    padding: 1rem 1.1rem;
+    box-shadow: var(--shadow-sm);
+}
+
 .sectionTitle {
-    margin: 0 0 1rem 0;
-    font-size: 1.25rem;
-    font-weight: 700;
+    margin: 0 0 0.8rem;
+    font-size: 1.24rem;
     color: var(--text);
 }
-.divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 1.5rem 0;
-}
-.scheduleSection {
-    margin-bottom: 1.5rem;
-}
+
 .scheduleGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
 }
+
 .infoCard {
     background: var(--panel);
-    border: none;
-    border-radius: 10px;
-    padding: 1rem;
+    border: var(--stroke-soft);
+    border-radius: var(--radius-md);
+    padding: 0.78rem;
     display: flex;
-    gap: 0.75rem;
+    gap: 0.55rem;
     align-items: flex-start;
 }
+
 .infoIcon {
-    font-size: 1.2rem;
-    flex-shrink: 0;
-    opacity: 0.7;
+    font-size: 1rem;
+    line-height: 1;
 }
+
 .infoLabel {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     color: var(--muted);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
 }
+
 .infoValue {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--text);
     font-weight: 600;
+    line-height: 1.4;
 }
+
 .recurringBadge {
+    margin-top: 0.75rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     background: var(--warning-bg);
     border: 1px solid var(--warning-border);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: var(--radius-md);
+    font-size: 0.86rem;
     color: var(--warning-text);
-    font-weight: 500;
-}
-.descriptionSection {
-    margin-bottom: 1.5rem;
-}
-.descriptionText {
-    font-size: 1rem;
-    color: var(--text);
-    line-height: 1.7;
-    margin: 0;
-    white-space: pre-wrap;
-}
-
-/* Module Leader */
-.moduleLeader {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 10px;
-    padding: 10px 14px;
-    background: transparent;
-    border-radius: 0;
-    border-left: 3px solid var(--primary);
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
-}
-.moduleLeaderLabel {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-}
-.moduleLeaderName {
-    font-size: 0.92rem;
     font-weight: 600;
-    color: var(--text);
-}
-.moduleLeaderEmail {
-    font-size: 0.78rem;
-    color: var(--primary);
-    text-decoration: none;
-}
-.moduleLeaderEmail:hover {
-    text-decoration: underline;
 }
 
-/* Deadlines — list style, no boxes */
 .deadlinesList {
     display: flex;
     flex-direction: column;
 }
+
 .deadlineItem {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 4px;
+    gap: 0.72rem;
+    padding: 0.66rem 0.1rem;
     border-bottom: 1px solid var(--border);
 }
+
 .deadlineItem:last-child {
     border-bottom: none;
 }
+
 .deadlineIndex {
     font-size: 0.72rem;
     font-weight: 700;
     color: var(--muted);
-    width: 18px;
-    flex-shrink: 0;
+    width: 1.1rem;
     text-align: center;
+    flex-shrink: 0;
 }
+
 .deadlineBody {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 0.55rem;
     min-width: 0;
 }
+
 .deadlineTitleRow {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.42rem;
     min-width: 0;
 }
+
 .deadlinesType {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     background: var(--pill-bg);
     color: var(--primary);
-    padding: 1px 7px;
-    border-radius: 20px;
+    padding: 0.12rem 0.48rem;
+    border-radius: var(--radius-pill);
     white-space: nowrap;
-    flex-shrink: 0;
 }
+
 .deadlineTitle {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--text);
 }
+
+.urgencyTag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.46rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.due-soon {
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+}
+
+.this-week {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--panel));
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.later {
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+    background: color-mix(in srgb, var(--panel) 88%, var(--surface-card) 12%);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+}
+
 .deadlineDate {
     font-size: 0.78rem;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-/* Enrollment buttons */
+.emptyText {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+}
+
+.sideColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: sticky;
+    top: 1rem;
+}
+
+.sideCard {
+    background: var(--surface-card);
+    border: var(--stroke-soft);
+    border-radius: var(--radius-lg);
+    padding: 0.8rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.sideLabel {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.sideValue {
+    margin: 0.38rem 0 0;
+    color: color-mix(in srgb, var(--text) 86%, var(--muted) 14%);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+.progressTrack {
+    margin-top: 0.5rem;
+    width: 100%;
+    height: 0.4rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--primary) 12%, var(--panel));
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--sage)));
+}
+
 .enrollButton,
 .unenrollButton {
-    width: auto;
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-md);
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
     border: none;
-    margin-top: 1rem;
-    display: block;
-    margin-left: auto;
+    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
+
 .enrollButton {
     background: var(--primary);
     color: var(--c-white);
-    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.15);
 }
+
 .enrollButton:hover {
-    background: var(--c-olive);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(158, 126, 93, 0.2);
+    background: var(--primary-strong);
 }
-.enrollButton:active {
-    transform: translateY(0);
-}
+
 .unenrollButton {
     background: var(--error-bg);
     color: var(--error-text);
     border: 1px solid var(--error-border);
 }
+
 .unenrollButton:hover {
-    background: var(--error-border);
+    background: color-mix(in srgb, var(--error-bg) 80%, var(--error-border));
+}
+
+@media (max-width: 980px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sideColumn {
+        position: static;
+    }
 }
 
 @media (max-width: 768px) {
-    .content {
-        padding: 1.5rem;
+    .hero,
+    .sectionCard {
+        padding: 0.9rem;
     }
-    .moduleTitle {
-        font-size: 1.2rem;
+
+    .heroMeta {
+        grid-template-columns: 1fr;
     }
+
     .scheduleGrid {
         grid-template-columns: 1fr;
     }
+
+    .heroActions {
+        justify-content: stretch;
+    }
+
+    .secondaryAction,
     .enrollButton,
     .unenrollButton {
         width: 100%;
-        margin-left: 0;
+        text-align: center;
     }
 }

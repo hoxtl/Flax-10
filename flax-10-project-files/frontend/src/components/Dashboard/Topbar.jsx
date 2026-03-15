@@ -46,10 +46,16 @@ function parseRouteOption(r) {
 function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange }) {
   const hasActive = routes.some(r => r.id === activeNav);
   const trigger = <NavDropdownTrigger title={title} hasActive={hasActive} />;
+  const handleSelect = (nextId) => {
+    if (nextId === "modules") {
+      window.dispatchEvent(new CustomEvent("modules:show-all"));
+    }
+    onNavChange?.(nextId);
+  };
   return (
     <div className={styles.navGroup}>
       <AnimatedDropdown customTrigger={trigger} options={routes.map(parseRouteOption)}
-        value={activeNav} onChange={onNavChange} hideCheckmark={true}
+        value={activeNav} onChange={handleSelect} hideCheckmark={true}
         isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
   );
