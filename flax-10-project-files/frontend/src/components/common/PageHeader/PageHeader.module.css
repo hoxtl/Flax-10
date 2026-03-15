@@ -9,7 +9,7 @@
   padding: var(--space-6);
   border-radius: var(--radius-2xl);
   background: var(--surface-hero);
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
+  border: 1px solid var(--widget-border);
   box-shadow: var(--frame-shadow);
   overflow: hidden;
 }
@@ -23,7 +23,7 @@
 .title {
   font-family: var(--font-heading);
   font-size: var(--type-page);
-  font-weight: var(--font-weight-title);
+  font-weight: 800;
   color: var(--text);
   letter-spacing: -0.03em;
   margin: 0;
