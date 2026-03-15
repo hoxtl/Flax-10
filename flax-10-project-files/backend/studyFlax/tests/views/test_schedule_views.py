@@ -9,6 +9,7 @@ from studyFlax.models import (
     Notification,
     Schedule,
     Tag,
+    UserSettings,
 )
 from ..base import BaseTestCase
 
@@ -127,8 +128,9 @@ class ScheduleViewsTests(BaseTestCase):
             start_due_date=timezone.now() + timedelta(days=2),
             end_due_date=timezone.now() + timedelta(days=2, hours=1),
         )
-        self.user.settings.preferred_study_minutes_per_day = 60
-        self.user.settings.save(update_fields=['preferred_study_minutes_per_day'])
+        settings, _ = UserSettings.objects.get_or_create(user=self.user)
+        settings.preferred_study_minutes_per_day = 60
+        settings.save(update_fields=['preferred_study_minutes_per_day'])
 
         payload = {
             'title': 'Budgeted plan',
