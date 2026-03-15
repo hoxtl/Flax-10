@@ -28,7 +28,7 @@ class ReadingSerialiser(serializers.ModelSerializer):
         return validated_data
 
     def validate_chapter(self, value):
-        if value and value().strip().startswith('-'):
+        if value and value.strip().startswith('-'):
             raise serializers.ValidationError("Chapter cannot be negative.")
         return value
     def get_page_count(self,obj):
