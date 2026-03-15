@@ -9,6 +9,8 @@ vi.mock('../../../context/ThemeContext', () => ({
 import { useTheme } from '../../../context/ThemeContext';
 
 describe('PreferencesPanel', () => {
+    const onStudyTimeSave = vi.fn().mockResolvedValue(true);
+
     it('renders Appearance section title', () => {
         render(<PreferencesPanel onSave={vi.fn()} isSaving={false} />);
         expect(screen.getByText('Appearance')).toBeTruthy();
@@ -49,5 +51,13 @@ describe('PreferencesPanel', () => {
         const { container } = render(<PreferencesPanel onSave={onSave} isSaving={false} />);
         fireEvent.submit(container.querySelector('form'));
         expect(onSave).toHaveBeenCalledWith({ theme: 'dark' });
+    });
+
+    it('submits study-time preference', async () => {
+        render(<PreferencesPanel onSave={vi.fn()} onSleepSave={onSleepSave} onStudyTimeSave={onStudyTimeSave} isSaving={false} />);
+        const input = await screen.findByLabelText('Preferred study time per day (minutes)');
+        fireEvent.change(input, { target: { value: '180' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Save Study Time' }));
+        expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 180 });
     });
 });
