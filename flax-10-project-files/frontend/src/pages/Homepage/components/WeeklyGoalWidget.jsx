@@ -69,8 +69,8 @@ export default function WeeklyGoalWidget() {
     setEditing(false);
   }, [draft]);
 
-  // Progress colour: green when done, amber mid, red early
-  const barColor = pct >= 100 ? "#7BB38E" : pct >= 50 ? "#c4a46d" : "#d8807a";
+  // Progress colour: theme-aware urgency
+  const barColor = pct >= 100 ? "var(--sage)" : pct >= 50 ? "var(--color-primary)" : "var(--home-urgency-warning)";
 
   return (
     <div className={styles.root}>
