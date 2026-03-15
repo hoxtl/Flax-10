@@ -611,6 +611,10 @@ export default function CampusMap() {
     });
   };
 
+  const handleUserJourneyCalculate = (startCoords, destCoords) => {
+    setStartLocation({lng: startCoords.longitude, lat: startCoords.latitude});
+  }
+
   return (
     <div className={styles.page}>
       <motion.aside
