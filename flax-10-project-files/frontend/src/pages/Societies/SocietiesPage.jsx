@@ -5,7 +5,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import AppPage from "../../components/common/AppPage/AppPage";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import styles from "./SocietiesPage.module.css";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";
 import AllSocieties from "./AllSocieties";
@@ -90,17 +89,13 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
     const [params, setParams] = useSearchParams();
     const [search, setSearch] = useState("");
     const activeTab = params.get('subTab') || "member";
-
     const setTab = (t) => setParams(prev => {
         prev.set('subTab', t); return prev;
     }, { replace: true });
-
     const filtered = societies.filter(s =>
         s.name.toLowerCase().includes(search.toLowerCase())
     );
-
     const tabs = buildTabs(filtered, societies, { onSelect, onReport, onUnreport, setView, onCreateClick });
-
     return (
         <AppPage className={styles.container} title="Societies" subtitle="Your communities at King's College London">
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setTab}
