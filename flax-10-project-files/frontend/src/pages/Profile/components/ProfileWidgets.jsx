@@ -208,20 +208,25 @@ function useModuleNameMap() {
     return nameMap;
 }
 
-export function ModulesSection({ modules, onNavigate }) {
+export function ModulesSection({ modules, onNavigate, role }) {
     const nameMap = useModuleNameMap();
-    if (!modules?.length) return null;
+    const isTeacher = role === "teacher";
+    if (!modules?.length && !isTeacher) return null;
     return (
-        <ProfileWidget title="MODULES" className={styles.modulesWidget}>
-            <div className={styles.modulesScroll}>
-                {modules.map((code, i) => (
-                    <button key={i} className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
-                        <div className={styles.moduleIcon}>📚</div>
-                        <div className={styles.moduleCode}>{code}</div>
-                        {nameMap[code] && <div className={styles.moduleName}>{nameMap[code]}</div>}
-                    </button>
-                ))}
-            </div>
+        <ProfileWidget title={isTeacher ? "MODULES I TEACH" : "MODULES"} className={styles.modulesWidget}>
+            {modules?.length ? (
+                <div className={styles.modulesScroll}>
+                    {modules.map((code, i) => (
+                        <button key={i} className={styles.moduleCard} onClick={() => onNavigate?.(`modules_${code}`)}>
+                            <div className={styles.moduleIcon}>📚</div>
+                            <div className={styles.moduleCode}>{code}</div>
+                            {nameMap[code] && <div className={styles.moduleName}>{nameMap[code]}</div>}
+                        </button>
+                    ))}
+                </div>
+            ) : (
+                <div className={styles.cardLabel}>No teaching modules assigned yet.</div>
+            )}
         </ProfileWidget>
     );
 }

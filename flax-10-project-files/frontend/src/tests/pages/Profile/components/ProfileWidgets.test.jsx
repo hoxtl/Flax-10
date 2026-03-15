@@ -268,6 +268,12 @@ describe('ModulesSection', () => {
     await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
+  it('shows empty teacher state when no taught modules yet', async () => {
+    render(<ModulesSection modules={[]} role="teacher" onNavigate={vi.fn()} />);
+    await screen.findByText('MODULES I TEACH');
+    expect(screen.getByText('No teaching modules assigned yet.')).toBeTruthy();
+  });
+
   it('renders module codes and names from API', async () => {
     const { getModules } = await import('../../../../api/moduleApi');
     getModules.mockResolvedValue([
@@ -285,6 +291,12 @@ describe('ModulesSection', () => {
     await screen.findByText('MODULES');
     fireEvent.click(screen.getByText('MA102'));
     expect(onNavigate).toHaveBeenCalledWith('modules_MA102');
+  });
+
+  it('uses teacher heading for professor profiles', async () => {
+    render(<ModulesSection modules={['EC4202']} role="teacher" onNavigate={vi.fn()} />);
+    await screen.findByText('MODULES I TEACH');
+    expect(screen.getByText('EC4202')).toBeTruthy();
   });
 
   it('handles getModules returning results array', async () => {

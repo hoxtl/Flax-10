@@ -167,10 +167,30 @@
   gap: 3px;
 }
 
+.fullNameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .fullName {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
+}
+
+.rolePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
+  background: color-mix(in oklab, var(--primary-soft, var(--panel)) 60%, var(--panel));
+  color: var(--primary-700, var(--primary));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .description {
@@ -1283,8 +1303,22 @@
 .mobileBio {
   font-size: 13px;
   opacity: 0.9;
-  margin: 0 0 16px;
+  margin: 0 0 8px;
   font-weight: 500;
+}
+
+.mobileRolePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  margin-bottom: 12px;
 }
 
 .mobileActions {
