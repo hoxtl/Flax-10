@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import { geocodeAddress } from '../../api/userService';
-import styles from './UserJourneySection.module.css'
+import styles from './UserJourneySection.module.css';
 
 export function UserJourneySection({
     manualStart,
@@ -9,7 +9,6 @@ export function UserJourneySection({
     manualDestination,
     setManualDestination,
     onCalculate,
-    styles
 }) {
     const [startCoords, setStartCoords] = useState(null);
     const [destCoords, setDestCoords] = useState(null);
