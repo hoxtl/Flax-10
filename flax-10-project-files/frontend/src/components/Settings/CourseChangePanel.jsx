@@ -15,6 +15,7 @@ import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import { SectionHeader } from "./SettingsUI";
 import StandardModal from "../common/StandardModal/StandardModal";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import RequestStatusCard from "../common/RequestStatusCard/RequestStatusCard";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 
@@ -22,6 +23,24 @@ const groupedCourses = Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => 
   label: dept,
   options: courses.map((c) => ({ value: c, label: c })),
 }));
+
+const TEACHER_REQUEST_CACHE_KEY = "teacher_request_pending";
+
+function getCachedTeacherRequest() {
+  try {
+    return localStorage.getItem(TEACHER_REQUEST_CACHE_KEY) === "true";
+  } catch (_) {
+    return false;
+  }
+}
+
+function setCachedTeacherRequest() {
+  try { localStorage.setItem(TEACHER_REQUEST_CACHE_KEY, "true"); } catch (_) {}
+}
+
+function clearCachedTeacherRequest() {
+  try { localStorage.removeItem(TEACHER_REQUEST_CACHE_KEY); } catch (_) {}
+}
 
 function syncRoleToStorage(role) {
   try {
@@ -214,6 +233,7 @@ function TeacherApplyModal({ onClose, onSuccess }) {
       title="Apply for Teacher Role"
       subtitle="Tell us why you'd like to teach"
       onClose={onClose}
+      backdropClassName={styles.modalBlurBackdrop}
     >
       <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
@@ -253,6 +273,9 @@ function TeacherRoleSection() {
   const [message, setMessage] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [teacherNotice, setTeacherNotice] = useState(() =>
+    getCachedTeacherRequest() ? "Request sent." : "",
+  );
 
   useEffect(() => {
     getUserProfile()
@@ -260,6 +283,10 @@ function TeacherRoleSection() {
         if (data?.role) {
           setLiveRole(data.role);
           syncRoleToStorage(data.role);
+          if (data.role === "pending_teacher") {
+            setCachedTeacherRequest();
+            setTeacherNotice("Request sent.");
+          }
         }
       })
       .catch(() => {})
@@ -271,6 +298,8 @@ function TeacherRoleSection() {
     setStatus("done");
     syncRoleToStorage("pending_teacher");
     setLiveRole("pending_teacher");
+    setCachedTeacherRequest();
+    setTeacherNotice("Request sent.");
     setShowModal(false);
   };
 
@@ -281,6 +310,8 @@ function TeacherRoleSection() {
       syncRoleToStorage("student");
       setLiveRole("student");
       setStatus(null);
+      clearCachedTeacherRequest();
+      setTeacherNotice("");
     } catch (e) {
       setMessage(e.message || "Failed to cancel.");
       setStatus("error");
@@ -308,25 +339,14 @@ function TeacherRoleSection() {
           )}
 
           {liveRole === "pending_teacher" && (
-            <div>
-              <div className={styles.teacherCard}>
-                <div className={styles.teacherCardIcon}>⏳</div>
-                <div className={styles.teacherCardBody}>
-                  <p className={styles.teacherCardTitle}>Teacher request pending</p>
-                  <p className={styles.teacherCardSub}>An admin will review your request shortly.</p>
-                </div>
-                <div className={styles.teacherCardAction}>
-                  <button type="button" className={styles.cancelRequestBtn} disabled={cancelling} onClick={handleCancelTeacher}>
-                    {cancelling ? "Cancelling…" : "Cancel request"}
-                  </button>
-                </div>
-              </div>
-              {status === "done" && (
-                <p className={styles.successText}>
-                  ✓ Request sent. The admin team is reviewing your teacher application.
-                </p>
-              )}
-            </div>
+            <RequestStatusCard
+              icon="⏳"
+              title="Teacher request pending"
+              subtitle="An admin will review your request shortly."
+              onCancel={handleCancelTeacher}
+              cancelling={cancelling}
+              successMessage={teacherNotice ? `✓ ${teacherNotice}` : null}
+            />
           )}
 
           {(liveRole === "student" || (!liveRole && !loading)) && (
