@@ -9,6 +9,7 @@ import AdminPage from "../pages/Admin/AdminPage";
 import TasksPage from "../pages/Tasks/TasksPage";
 import GroupWorkIndexPage from "../pages/GroupWork/GroupWorkIndexPage";
 import Discover from "../pages/Discover/Discover";
+import SchedulesPage from "../pages/Schedules/SchedulesPage";
 
 export const APP_ROUTES = [
   { id: "home", label: "Home", icon: "🏠", path: "/", element: <Homepage /> },
@@ -82,5 +83,11 @@ export const APP_ROUTES = [
     path: "/admin",
     element: <AdminPage />,
     isAdminOnly: true,
+  },
+  { id: "schedules",
+    label: "Schedules",
+    icon: "🗂️",
+    path: "/schedules",
+    element: <SchedulesPage />
   },
 ];

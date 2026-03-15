@@ -84,6 +84,9 @@ from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
 from studyFlax.views.authentication.home_address_view import home_address_view
 
+# Schedules
+from studyFlax.views.calendar.schedule_views import schedule_list, schedule_detail
+
 # Admin
 from studyFlax.views.admin.admin_views import (
     user_list, ban_user,
@@ -230,6 +233,10 @@ urlpatterns = [
     path("modules/<int:module_id>/deadlines/<int:deadline_id>/", deadline_detail, name="deadline_detail"),
     path("deadlines/upcoming/", upcoming_deadlines, name="deadline_upcoming"),
     path("user/home-address/", home_address_view, name='home_address'),
+
+    # Schedules
+    path("schedules/", schedule_list, name='schedules'),
+    path("schedules/<int:schedule_id>/", schedule_detail, name='schedule-detail'),
 
     # Admin
     path("admin/users/", user_list, name='admin-user-list'),

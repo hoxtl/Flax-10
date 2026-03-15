@@ -62,7 +62,7 @@ function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChan
 }
 
 const NAV_SECTIONS = [
-  { title: "Plan", ids: ["calendar", "tasks", "timer", "analytics"] },
+  { title: "Plan", ids: ["calendar", "tasks", "timer", "analytics", "schedules"] },
   { title: "Study", ids: ["modules", "group-work"] },
   { title: "My KCL", ids: ["map", "societies", "users"] },
   { title: "Admin", ids: ["admin"] }
