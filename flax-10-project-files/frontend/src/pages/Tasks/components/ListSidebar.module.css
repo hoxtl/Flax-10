@@ -3,7 +3,7 @@
     min-width: 220px;
     max-width: 220px;
     flex-shrink: 0;
-    border-right: 1px solid var(--frame-border);
+    border-right: 1px solid var(--widget-border);
     background: var(--sidebar);
     display: flex;
     flex-direction: column;
