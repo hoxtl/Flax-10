@@ -62,6 +62,8 @@ export default function CampusMap() {
   const eventMarkers = useRef([]);
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [customDestination, setCustomDestination] = useState(null);
+  const [manualStart, setManualStart] = useState("");
+  const [manualDestination, setManualDestination] = useState("");
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
