@@ -139,7 +139,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
-  const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
   const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
@@ -198,11 +197,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
     }
   }, [showCreateTaskModal]);
-
-  /* Fetch task lists on mount so Action Hub can show list names (e.g. University, SEG) and link to /tasks?list= */
-  useEffect(() => {
-    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
-  }, []);
 
 
 
@@ -884,14 +878,11 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
 
 
-        {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
         <div className={styles.intelligenceRowWrap}>
           <IntelligenceRow
             displayName={displayName}
             recommendation={homepageRecommendation}
-
             slot1TodayTasks={
-              // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
               <TaskWidgetSlot
                 styles={taskWidgetStyles}
                 displayName={displayName}
@@ -922,19 +913,14 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
               />
             }
             slot3Urgent={
-              // ─── SLOT 3: DEADLINES WIDGET ─── upcoming coursework/assessment deadlines
               <DeadlinesWidget
                 deadlines={upcomingDeadlines || []}
                 onSelectDeadline={setSelectedDeadline}
                 onSelectModule={(mod) => setSelectedModulePill(mod)}
               />
             }
-            // ─── SLOT 2: STUDY PULSE WIDGET ─── free windows + focus suggestions
             studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
             studyPulseNow={now}
-            studyPulseOnStartFocus={() => navigate("/timer")}
-            studyPulseDeadlines={upcomingDeadlines || []}
-            // ─── SLOT 5: RIGHT NOW WIDGET ─── live schedule compass + timer overlay
             slot5Data={{
               now,
               isToday: isToday(selectedDate),
@@ -1123,13 +1109,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                 onDelete={handleTimelineDelete}
                 onReschedule={handleReschedule}
                 getTag={getTag}
-                completedEventIds={completedEventIds}
-                onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
-                  const next = new Set(prev);
-                  if (next.has(eventId)) next.delete(eventId);
-                  else next.add(eventId);
-                  return next;
-                })}
                 hasTimerSession={hasTimerSession}
                 timerTask={timerTask}
                 timeLeft={timeLeft}
