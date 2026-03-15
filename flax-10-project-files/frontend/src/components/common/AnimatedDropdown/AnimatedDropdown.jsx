@@ -342,9 +342,10 @@ function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpen
  * @param {React.RefObject} containerRef - Ref to the dropdown container element.
  * @param {boolean} isOpen - Whether the dropdown is currently open.
  * @param {number} menuMaxHeight - Max height of the dropdown menu (default 260).
+ * @param {boolean} allowFlipUpward - Whether the menu is allowed to flip upward.
  * @returns {boolean} True if the dropdown should open upward.
  */
-function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
+function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260, allowFlipUpward = false) {
   const [openUpward, setOpenUpward] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
 
@@ -355,7 +356,8 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
       const rect = containerRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      const shouldOpenUpward = spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
+      const shouldOpenUpward =
+        allowFlipUpward && spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
       setOpenUpward(shouldOpenUpward);
       setCoords({
         top: shouldOpenUpward ? rect.top : rect.bottom,
@@ -371,7 +373,7 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     }
-  }, [isOpen, menuMaxHeight, containerRef]);
+  }, [isOpen, menuMaxHeight, containerRef, allowFlipUpward]);
   return { openUpward, coords };
 }
 
@@ -389,20 +391,27 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260) {
  * @param {number} [props.menuMaxHeight] - Optional max height for the dropdown menu.
  * @param {boolean} [props.openOnHover] - Whether the dropdown should open on hover.
  * @param {boolean} [props.usePortal=true] - Whether to render the menu in a portal.
+ * @param {boolean} [props.allowFlipUpward=false] - Whether the menu can flip upward.
  */
 export default function AnimatedDropdown({
   value, onChange, placeholder, options,
   grouped = false, searchable = false, searchPlaceholder = "Search...",
   emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false,
-  isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false
+  isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false,
+  allowFlipUpward = false
 }) {
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
     options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange
   );
   const containerRef = useRef(null);
   const timeoutRef = useRef(null);
-  const { openUpward, coords } = useOpenDirection(containerRef, isOpen, menuMaxHeight);
+  const { openUpward, coords } = useOpenDirection(
+    containerRef,
+    isOpen,
+    menuMaxHeight,
+    allowFlipUpward
+  );
 
   const handleMouseEnter = () => {
     if (openOnHover) {

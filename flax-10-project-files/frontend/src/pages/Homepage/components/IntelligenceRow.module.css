@@ -440,6 +440,61 @@
   backdrop-filter: blur(8px);
 }
 
+.semesterWidget {
+  display: grid;
+  gap: 6px;
+  padding: 11px 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  background: color-mix(in srgb, var(--panel) 82%, var(--surface-page));
+}
+
+.semesterWidgetHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.semesterWidgetLabel {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--primary) 72%, var(--muted));
+}
+
+.semesterWidgetValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.semesterWidgetTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.semesterWidgetFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 65%, var(--accent))
+  );
+  transition: width 0.3s ease;
+}
+
+.semesterWidgetMeta {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 66%, var(--muted));
+}
+
 .metricRail {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

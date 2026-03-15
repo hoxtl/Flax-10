@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { loadTermConfig } from "../../../lib/termConfig";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
@@ -161,10 +162,63 @@ function useCourseChangePending() {
   const [request, setRequest] = useState(null);
   useEffect(() => {
     getMyCourseChangeRequest()
-      .then((data) => { if (data?.status === "pending") setRequest(data); })
+      .then((data) => {
+        const status = String(data?.status || "").toLowerCase();
+        if (status === "pending" || (data?.requested_course && status !== "approved" && status !== "rejected")) {
+          setRequest(data);
+        }
+      })
       .catch(() => {});
   }, []);
   return request;
+}
+
+function getSemesterProgress(now = new Date()) {
+  const cfg = loadTermConfig();
+  const startDate = new Date(cfg?.startDate);
+  if (Number.isNaN(startDate.getTime())) return null;
+
+  startDate.setHours(0, 0, 0, 0);
+  const extraWeeks = cfg?.hasReadingWeek ? 1 : 0;
+  const totalWeeks = Math.max(1, Number(cfg?.totalWeeks || 0) + extraWeeks);
+  const totalDays = totalWeeks * 7;
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + totalDays - 1);
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+
+  const elapsedDays = Math.floor((today - startDate) / (24 * 60 * 60 * 1000));
+  const clampedElapsed = Math.min(Math.max(elapsedDays + 1, 0), totalDays);
+  const pct = Math.round((clampedElapsed / totalDays) * 100);
+
+  return {
+    pct,
+    hasStarted: today >= startDate,
+    isFinished: today > endDate,
+  };
+}
+
+function SemesterProgressWidget() {
+  const progress = getSemesterProgress();
+  if (!progress) return null;
+
+  let label = "Semester not started";
+  if (progress.isFinished) label = "Semester completed";
+  else if (progress.hasStarted) label = `${progress.pct}% through term`;
+
+  return (
+    <div className={styles.semesterWidget}>
+      <div className={styles.semesterWidgetHead}>
+        <span className={styles.semesterWidgetLabel}>Semester progress</span>
+        <span className={styles.semesterWidgetValue}>{progress.pct}%</span>
+      </div>
+      <div className={styles.semesterWidgetTrack} aria-hidden="true">
+        <div className={styles.semesterWidgetFill} style={{ width: `${progress.pct}%` }} />
+      </div>
+      <span className={styles.semesterWidgetMeta}>{label}</span>
+    </div>
+  );
 }
 
 function CourseChangeCard({ request, onDismiss }) {
@@ -179,8 +233,11 @@ function CourseChangeCard({ request, onDismiss }) {
     >
       <BookOpen size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
       <div className={styles.courseChangeBody}>
-        <span className={styles.courseChangeLabel}>Course change pending</span>
-        <span className={styles.courseChangeSub}>{request.requested_course}</span>
+        <span className={styles.courseChangeLabel}>Request sent to admin</span>
+        <span className={styles.courseChangeSub}>
+          Your course change application is being reviewed
+          {request.requested_course ? <> · <strong>{request.requested_course}</strong></> : null}.
+        </span>
       </div>
       <button
         type="button"
@@ -293,6 +350,7 @@ export default function IntelligenceRow({
           transition={{ duration: 0.45, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
           >
           <div className={styles.headerPlannerPanel}>
+            <SemesterProgressWidget />
             <div className={styles.metricRail}>
               <div className={styles.metricChip}>
                 <span className={styles.metricLabel}>On today</span>
