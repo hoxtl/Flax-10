@@ -147,20 +147,70 @@ function SleepSection({
   );
 }
 
+function StudyTimeSection({
+  minutesPerDay,
+  onMinutesChange,
+  onSubmit,
+  isSaving,
+  hasUnsaved,
+  saveSignal,
+}) {
+  return (
+    <div className={styles.twoColLayout}>
+      <div>
+        <div className={styles.settingsTile}>
+          <form onSubmit={onSubmit}>
+            <SectionHeader title="Study Time Budget" />
+            <div className={styles.formGroup}>
+              <label htmlFor="preferred-study-minutes">Preferred study time per day (minutes)</label>
+              <input
+                id="preferred-study-minutes"
+                type="number"
+                min={30}
+                max={600}
+                step={15}
+                value={minutesPerDay}
+                onChange={(e) => onMinutesChange(e.target.value)}
+              />
+            </div>
+            <SubmitButton
+              isSaving={isSaving}
+              label="Save Study Time"
+              savingLabel="Saving..."
+              hasUnsaved={hasUnsaved}
+              saveSignal={saveSignal}
+            />
+          </form>
+        </div>
+      </div>
+      <div className={styles.contextCard}>
+        <span className={styles.contextCardEmoji}>📚</span>
+        <h3 className={styles.contextCardTitle}>Auto-scheduler capacity</h3>
+        <ul className={styles.contextCardList}>
+          <li>Customizable, desirable study length per day</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 /**
  * @param {object} props
  * @param {Function} props.onSave - Saves theme preference
  * @param {Function} props.onSleepSave - Saves sleep schedule
  * @param {boolean} props.isSaving
  */
-export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
+export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStudyTimeSave }) {
   const { theme, setTheme } = useTheme();
   const [sleepTime, setSleepTime] = useState("23:00");
   const [wakeTime, setWakeTime] = useState("07:00");
   const [initialSleepTime, setInitialSleepTime] = useState("23:00");
   const [initialWakeTime, setInitialWakeTime] = useState("07:00");
-  const [loadingSleep, setLoadingSleep] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [sleepSaveSignal, setSleepSaveSignal] = useState(0);
+  const [minutesPerDay, setMinutesPerDay] = useState("120");
+  const [initialMinutesPerDay, setInitialMinutesPerDay] = useState("120");
+  const [studySaveSignal, setStudySaveSignal] = useState(0);
 
   useEffect(() => {
     getUserSettings()
@@ -175,8 +225,13 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
           setWakeTime(nextWakeTime);
           setInitialWakeTime(nextWakeTime);
         }
+        if (data?.preferred_study_minutes_per_day) {
+          const nextStudyTime = String(data.preferred_study_minutes_per_day);
+          setMinutesPerDay(nextStudyTime);
+          setInitialMinutesPerDay(nextStudyTime);
+        }
       })
-      .finally(() => setLoadingSleep(false));
+      .finally(() => setLoading(false));
   }, []);
 
   const handleThemeChange = (newTheme) => {
@@ -185,14 +240,30 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
   };
 
   const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;
+  const hasUnsavedStudyTime = minutesPerDay !== initialMinutesPerDay;
 
-  if (loadingSleep) return <SectionSkeleton label="Loading preferences" rows={4} />;
+  if (loading) return <SectionSkeleton label="Loading preferences" rows={4} />;
 
   return (
     <div className={styles.form}>
-      <AppearanceSection
-        theme={theme}
-        onChange={handleThemeChange}
+      <AppearanceSection theme={theme} onChange={handleThemeChange} />
+      <StudyTimeSection
+        minutesPerDay={minutesPerDay}
+        onMinutesChange={setMinutesPerDay}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const safeValue = Math.max(30, Math.min(600, Number(minutesPerDay) || 120));
+          const ok = await onStudyTimeSave({ preferred_study_minutes_per_day: safeValue });
+          if (ok) {
+            const persisted = String(safeValue);
+            setMinutesPerDay(persisted);
+            setInitialMinutesPerDay(persisted);
+            setStudySaveSignal((s) => s + 1);
+          }
+        }}
+        isSaving={isSaving}
+        hasUnsaved={hasUnsavedStudyTime}
+        saveSignal={studySaveSignal}
       />
       <SleepSection
         sleepTime={sleepTime}

@@ -220,6 +220,10 @@ export default function useSettingsHandlers() {
     return saveSleep(data, setSuccessMessage, setIsSaving);
   };
 
+  const handleStudyTimeSave = async (data) => {
+    return saveStudyTime(data, setSuccessMessage, setIsSaving);
+  };
+  
   return {
     isSaving,
     successMessage,
@@ -230,5 +234,18 @@ export default function useSettingsHandlers() {
     handlePreferencesSave,
     handleHomeAddressSave,
     handleSleepSave,
+    handleStudyTimeSave,
   };
+}
+
+async function saveStudyTime(data, setSuccessMessage, setIsSaving) {
+  if (!hasToken()) return false;
+  setIsSaving(true);
+  const { ok } = await patchSettings({
+    preferred_study_minutes_per_day: data.preferred_study_minutes_per_day,
+  }).catch(() => ({ ok: false }));
+  const msg = ok ? "Study time preference saved!" : "Failed to save study time preference";
+  showTemporaryMessage(setSuccessMessage, msg);
+  setIsSaving(false);
+  return ok;
 }

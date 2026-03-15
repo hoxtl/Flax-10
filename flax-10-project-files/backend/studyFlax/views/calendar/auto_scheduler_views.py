@@ -84,57 +84,67 @@ def build_auto_schedule(request):
         )
         schedule.deadline.set(deadlines)
 
-        for deadline in deadlines:
-            _allocate_deadline_blocks(schedule, request.user, deadline, deadline_map[deadline.id], payload)
+        _allocate_deadline_blocks(schedule, request.user, deadlines, deadline_map, payload)
 
     response_payload = ScheduleSerialiser(schedule).data
     response_payload['overwritten'] = overwritten
     return Response(response_payload, status=status.HTTP_201_CREATED)
 
 
-def _allocate_deadline_blocks(schedule, user, deadline, minutes_per_day, payload):
+def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, payload):
     start_date = timezone.localtime(timezone.now()).date()
-    end_date = timezone.localtime(deadline.start_due_date).date()
+    end_date = max(timezone.localtime(deadline.start_due_date).date() for deadline in deadlines)
     current_day = start_date
+    daily_budget = _daily_budget_minutes(user)
 
     while current_day <= end_date:
         if not _is_allowed_day(current_day, payload['week_preference']):
             current_day += timedelta(days=1)
             continue
 
-        window_start, window_end = _resolve_window(
-            current_day,
-            payload.get('preferred_start_time'),
-            payload.get('preferred_end_time'),
-            payload['worktime_preference'],
-        )
+        remaining_minutes = daily_budget
+        for deadline in deadlines:
+            deadline_due_date = timezone.localtime(deadline.start_due_date).date()
+            if current_day > deadline_due_date or remaining_minutes <= 0:
+                continue
 
-        if timezone.is_naive(window_start):
-            window_start = timezone.make_aware(window_start)
-        if timezone.is_naive(window_end):
-            window_end = timezone.make_aware(window_end)
+            requested_minutes = deadline_map[deadline.id]
+            allocation_minutes = min(requested_minutes, remaining_minutes)
 
-        if window_end <= window_start:
-            window_end = window_end + timedelta(days=1)
-
-        busy = _busy_slots_for_day(user, window_start, window_end)
-        block_start, block_end = _find_first_gap(busy, window_start, window_end, minutes_per_day)
-
-        if block_start and block_end:
-            event = CalendarEvent.objects.create(
-                user=user,
-                title=f"Study: {deadline.title}",
-                description=f"Auto-scheduled work block for {deadline.title}",
-                start_time=block_start,
-                end_time=block_end,
-                source='auto_scheduler',
+            window_start, window_end = _resolve_window(
+                current_day,
+                payload.get('preferred_start_time'),
+                payload.get('preferred_end_time'),
+                payload['worktime_preference'],
             )
-            ScheduleEventAllocation.objects.create(
-                schedule=schedule,
-                event=event,
-                deadline=deadline,
-                allocated_minutes=minutes_per_day,
-            )
+
+            if timezone.is_naive(window_start):
+                window_start = timezone.make_aware(window_start)
+            if timezone.is_naive(window_end):
+                window_end = timezone.make_aware(window_end)
+
+            if window_end <= window_start:
+                window_end = window_end + timedelta(days=1)
+
+            busy = _busy_slots_for_day(user, window_start, window_end)
+            block_start, block_end = _find_first_gap(busy, window_start, window_end, allocation_minutes)
+
+            if block_start and block_end:
+                event = CalendarEvent.objects.create(
+                    user=user,
+                    title=f"Study: {deadline.title}",
+                    description=f"Auto-scheduled work block for {deadline.title}",
+                    start_time=block_start,
+                    end_time=block_end,
+                    source='auto_scheduler',
+                )
+                ScheduleEventAllocation.objects.create(
+                    schedule=schedule,
+                    event=event,
+                    deadline=deadline,
+                    allocated_minutes=allocation_minutes,
+                )
+                remaining_minutes -= allocation_minutes
 
         current_day += timedelta(days=1)
 
@@ -156,3 +166,11 @@ def _overwrite_same_name_schedules(user, title):
         schedule.delete()
     _notify_schedule_overwrite(user, title)
     return True
+
+def _daily_budget_minutes(user):
+    default_budget = 120
+    settings = getattr(user, 'settings', None)
+    if settings is None:
+        return default_budget
+    budget = getattr(settings, 'preferred_study_minutes_per_day', default_budget)
+    return max(1, int(budget))

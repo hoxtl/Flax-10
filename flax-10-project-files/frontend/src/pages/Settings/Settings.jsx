@@ -66,6 +66,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
     handleHomeAddressSave,
     homeAddressError,
     handleSleepSave,
+    handleStudyTimeSave,
   } = handlers;
 
   return (
@@ -79,7 +80,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
           <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />
         )}
         {activeTab === "preferences" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} />
+          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} onStudyTimeSave={handleStudyTimeSave} isSaving={isSaving} />
         )}
         {activeTab === "home" && (
           <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />

@@ -15,3 +15,4 @@ class UserSettings(models.Model):
     wake_time = models.TimeField(default=time(7, 0))
     mode = models.CharField(max_length=50, default='light')
     homepage_widgets = models.JSONField(default=list, blank=True)
+    preferred_study_minutes_per_day = models.PositiveIntegerField(default=120)
