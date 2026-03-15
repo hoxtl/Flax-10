@@ -27,3 +27,16 @@
   gap: 8px;
   margin-top: 4px;
 }
+
+.goButton {
+  flex: 1;
+  padding: 12px;
+  background: var(--primary);
+  color: var(--c-white);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
