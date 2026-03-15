@@ -178,4 +178,12 @@ describe('SocietyInfo', () => {
         rerender(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />);
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
+
+    it('CategorySection useEffect covers true branch when categories changes to truthy', () => {
+        const { rerender } = render(
+            <SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />
+        );
+        rerender(<SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} />);
+        expect(screen.getByTestId('category-display')).toBeTruthy();
+    });
 });

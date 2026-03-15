@@ -200,4 +200,14 @@ describe('SocietyHero', () => {
         const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
         expect(container.firstChild?.style?.backgroundImage).toContain('plain-url.jpg');
     });
+
+    it('hides controls when mouse leaves hero', () => {
+        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
+        const society = { ...baseSociety, images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] };
+        const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
+        fireEvent.mouseEnter(container.firstChild);
+        expect(container.querySelector('[class*="arrowBtn"]')).toBeTruthy();
+        fireEvent.mouseLeave(container.firstChild);
+        expect(container.querySelector('[class*="arrowBtn"]')).toBeNull();
+    });
 });

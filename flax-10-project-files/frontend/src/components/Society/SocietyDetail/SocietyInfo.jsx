@@ -60,10 +60,12 @@ function BioEditor({ value, setValue, onSave }) {
     );
 }
 
+const ensureArray = (val) => val || [];
+
 function CategorySection({ categories, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
-    const [value, setValue] = useState(categories || []);
-    useEffect(() => setValue(categories || []), [categories]);
+    const [value, setValue] = useState(() => ensureArray(categories));
+    useEffect(() => setValue(ensureArray(categories)), [categories]);
 
     if (editing) return <CategoryEditor value={value} setValue={setValue} onSave={() => { onSave(value); setEditing(false); }} />;
     return <CategoryDisplay category={categories} editMode={editMode} onEdit={() => setEditing(true)} />;

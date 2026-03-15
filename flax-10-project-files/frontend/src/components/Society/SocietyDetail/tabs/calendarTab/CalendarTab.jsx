@@ -14,16 +14,6 @@ import SyncButton from "./SyncButton";
 import { EventsSummaryModal } from "../../../../Calendar/EventsSummaryModal/EventsSummaryModal";
 import { useConfirm } from "../../../../../context/ConfirmContext";
 
-const useFocusScroll = (isFocused, ref) => {
-    useEffect(() => {
-        if (isFocused && ref.current) {
-            ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            ref.current.classList.add(styles.highlight);
-            setTimeout(() => ref.current?.classList.remove(styles.highlight), 2000);
-        }
-    }, [isFocused, ref]);
-};
-
 const confirmNonRecurringDeletion = (event, confirmFn) =>
     confirmFn({
         title: "Delete Event", message: `Delete "${event.title}"?`,

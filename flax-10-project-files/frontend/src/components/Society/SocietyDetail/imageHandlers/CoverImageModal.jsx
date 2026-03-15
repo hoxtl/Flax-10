@@ -30,11 +30,7 @@ export default function CoverImageModal({ images, availablePhotos, onClose, onUp
 
 function getModalHandlers(images, onUpdate, setView) {
     return {
-        add: (img) => {
-            if (images.length >= 5) return alert("Maximum 5 images reach.");
-            onUpdate([...images, img]);
-            setView("list");
-        },
+        add: (img) => { onUpdate([...images, img]); setView("list"); },
         delete: (index) => onUpdate(images.filter((_, i) => i !== index)),
         pin: (index) => onUpdate([images[index], ...images.filter((_, i) => i !== index)])
     };

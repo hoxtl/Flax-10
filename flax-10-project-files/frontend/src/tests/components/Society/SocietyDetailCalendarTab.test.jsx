@@ -91,7 +91,7 @@ describe('Society detail CalendarTab', () => {
     expect(mockOpenModal).toHaveBeenCalledWith(expect.objectContaining({ id: 'e1' }), 'society', '2026-03-09T10:00:00Z');
   });
 
-  it('read-only: event opens popup with View Announcement action', async () => {
+  it('read-only: event with announcementId shows View Announcement action', async () => {
     monthViewClickEvent = { id: 'e1', announcementId: 9, start_time: '2026-03-09T10:00:00Z' };
     const onViewAnnouncement = vi.fn();
     renderTab({ events: [{ id: 'e1', title: 'Event', start_time: '2026-03-09T10:00:00Z' }], onViewAnnouncement });
@@ -99,6 +99,15 @@ describe('Society detail CalendarTab', () => {
     expect(screen.getByTestId('detail-popup')).toBeTruthy();
     fireEvent.click(screen.getByText('View Announcement'));
     expect(onViewAnnouncement).toHaveBeenCalled();
+  });
+
+  it('read-only: event with announcement ID shows View Announcement and calls with ID', async () => {
+    monthViewClickEvent = { id: 'e1', announcement: 5, start_time: '2026-03-09T10:00:00Z' };
+    const onViewAnnouncement = vi.fn();
+    renderTab({ onViewAnnouncement });
+    fireEvent.click(screen.getByText('click-event'));
+    fireEvent.click(screen.getByText('View Announcement'));
+    expect(onViewAnnouncement).toHaveBeenCalledWith(5);
   });
 
   it('recurring delete with ALTERNATE adds exception', async () => {
@@ -232,6 +241,25 @@ describe('Society detail CalendarTab', () => {
     expect(screen.getByTestId('detail-popup')).toBeInTheDocument();
     expect(screen.queryByText('Edit')).toBeNull();
     expect(screen.queryByText('View Announcement')).toBeNull();
+  });
+
+  it('delete cancelled by confirm returns null and skips delete', async () => {
+    mockIsModalOpen = true;
+    mockModalEvent = { id: 5, title: 'E', start_time: '2026-03-09T10:00:00Z' };
+    mockConfirm.mockResolvedValueOnce(null);
+    const handlers = { onDelete: vi.fn() };
+    renderTab({ editMode: true, eventHandlers: handlers, tags: [] });
+    fireEvent.click(screen.getByText('delete'));
+    await waitFor(() => expect(mockCloseModal).toHaveBeenCalled());
+    expect(handlers.onDelete).not.toHaveBeenCalled();
+  });
+
+  it('handleAnnouncementClick does nothing when announcement not found', () => {
+    monthViewClickEvent = { id: 'e1', announcement: 999, start_time: '2026-03-09T10:00:00Z' };
+    const onEditAnnouncement = vi.fn();
+    renderTab({ editMode: true, eventHandlers: {}, tags: [], announcements: [], onEditAnnouncement });
+    fireEvent.click(screen.getByText('click-event'));
+    expect(onEditAnnouncement).not.toHaveBeenCalled();
   });
 
   it('popup with editMode after rerender shows Edit/Delete handlers', async () => {

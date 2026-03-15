@@ -22,7 +22,7 @@ export function ImageGrid({ images, onDelete, onPin, onAddClick }) {
             {images.map((img, i) => (
                 <ImageCard key={i} src={img} index={i} onDelete={() => onDelete(i)} onPin={() => onPin(i)} />
             ))}
-            <AddButton onClick={isFull ? () => alert("Maximum 5 images reached") : onAddClick} disabled={isFull} />
+            <AddButton onClick={onAddClick} disabled={isFull} />
         </div>
     );
 }

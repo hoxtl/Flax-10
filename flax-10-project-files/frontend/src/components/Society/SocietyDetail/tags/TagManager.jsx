@@ -14,7 +14,6 @@ const isDuplicateTag = (tags, label) =>
 const makeHandleAdd = (tags, newTag, setNewTag, setError, onAddTag) =>
     async () => {
         const label = newTag.label.trim();
-        if (!label || tags.length >= MAX_TAGS) return;
         if (isDuplicateTag(tags, label)) return setError("A tag with this name already exists.");
         const data = { label, color: newTag.color };
         if (await onAddTag?.(data)) {

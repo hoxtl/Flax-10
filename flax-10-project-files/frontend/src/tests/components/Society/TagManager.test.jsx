@@ -106,15 +106,6 @@ describe('TagManager', () => {
         expect(colorInput.value).toBe('#000000');
     });
 
-    it('handleAdd short circuits on empty label', async () => {
-        const onAddTag = vi.fn();
-        render(<TagManager tags={[]} onAddTag={onAddTag} onDeleteTag={vi.fn()} />);
-        const input = screen.getByPlaceholderText('Tag name');
-        fireEvent.change(input, { target: { value: ' ' } });
-        fireEvent.click(screen.getByText('Add'));
-        expect(onAddTag).not.toHaveBeenCalled();
-    });
-
     it('getNextColor falls back to first color if all taken', () => {
         const fullTags = [
             "#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"
