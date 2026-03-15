@@ -64,6 +64,20 @@ function FormActions({ onCancel, isEditing }) {
     );
 }
 
+function useDeadlineFormValidation() {
+    const [error, setError] = useState('');
+    const validate = (form) => {
+        if (form.end_due_date && form.start_due_date && 
+            new Date(form.end_due_date) <= new Date(form.start_due_date)) {
+            setError("End time must be after start time."); 
+            return false
+        }
+        setError('');
+        return true;
+    };
+    return {error, validate};
+}
+
 const buildFormData = (form) => ({
     ...form,
     start_due_date: form.start_due_date ? new Date(form.start_due_date).toISOString() : '',
@@ -72,8 +86,9 @@ const buildFormData = (form) => ({
 
 export default function DeadlineForm({ initial, onSubmit, onCancel }) {
     const [form, setForm] = useState(initial || EMPTY_FORM);
+    const {error, validate} = useDeadlineFormValidation();
     const onChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
-    const handleSubmit = (e) => { e.preventDefault(); onSubmit(buildFormData(form)); };
+    const handleSubmit = (e) => { e.preventDefault(); if (validate(form)) onSubmit(buildFormData(form)); };
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
             <TitleField value={form.title} onChange={onChange} />
@@ -82,6 +97,7 @@ export default function DeadlineForm({ initial, onSubmit, onCancel }) {
             {TYPES_WITH_END_DATE.includes(form.deadline_type) && <EndDateField value={form.end_due_date} onChange={onChange} />}
             {TYPES_WITH_LOCATION.includes(form.deadline_type) && <LocationField value={form.location} onChange={onChange} />}
             <DescriptionField value={form.description} onChange={onChange} />
+            {error && <div className={styles.error}> {error}</div>}
             <FormActions onCancel={onCancel} isEditing={!!initial} />
         </form>
     );
