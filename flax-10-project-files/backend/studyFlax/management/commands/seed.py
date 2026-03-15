@@ -194,7 +194,10 @@ class Command(BaseCommand):
                     username,
                     "Lecturer at King's College London. Focused on practical teaching, clear feedback, and student success."
                 )
-            elif username != 'johndoe':
+            elif username == 'johndoe':
+                user.role = 'student'
+                user.bio = "Third-year medical student at King's with a focus on clinical anatomy and patient-centred care. I keep a tight weekly schedule with early morning revision blocks and evening review sessions. Outside lectures I volunteer at the campus health clinic and organise study groups for my cohort."
+            else:
                 user.role = 'student'
                 user.bio = self.STUDENT_BIOS.get(
                     username,
@@ -348,7 +351,7 @@ class Command(BaseCommand):
         if not teachers:
             teachers = [User.objects.filter(is_superuser=True).first()]
         weekly_rule = RecurrenceRule.objects.filter(frequency='weekly', interval=1).first()
-        all_module_entries = self._build_modules_with_target_per_prefix(module_fixtures, target_count=8)
+        all_module_entries = self._build_modules_with_target_per_prefix(module_fixtures, target_count=5)
         for i, (code, name, description) in enumerate(all_module_entries):
             teacher = teachers[i % len(teachers)]
             self._create_module(code, name, description, teacher, weekly_rule)
