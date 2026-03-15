@@ -2,7 +2,7 @@
  * SocietiesPage handles the main view for exploring and managing societies.
  * It supports tabbed views for joined vs all societies and deep navigation to details.
  */
-import { useState, useCallback, useMemo } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import AppPage from "../../components/common/AppPage/AppPage";
@@ -15,8 +15,6 @@ import SocietySection from "./SocietySection";
 import SocietyDetailPage from "./SocietyDetailPage";
 import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
 import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSocietyModal";
-import { useConfirm } from "../../context/ConfirmContext";
-import { unreportSociety } from "../../api/societyApi";
 import Tabs from "../../components/common/Tabs/Tabs";
 import { usePagination } from "../../hooks/usePagination";
 import { BackToTop } from "../../components/Pagination/Pagination";
@@ -28,10 +26,16 @@ import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSo
 /** Main entry point for the Societies feature. */
 export default function SocietiesPage() {
     const state = useSocietiesPage();
-
     if (state.loading) return <SocietiesSkeleton />;
     const activeView = state.selectedSocietyId ? "detail" : state.view;
 
+    if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={() => { state.setView('all'); state.clearSelection(); }} />;
+    if (state.view === "all") return (
+        <>
+            <AllSocieties onBack={() => state.setView("my")} onSelect={state.selectSociety} societies={state.societies} onReport={state.setReportingSociety} onUnreport={state.handleUnreport} />
+            {state.reportingSociety && <ReportSocietyModal society={state.reportingSociety} onClose={() => state.setReportingSociety(null)} onReportSuccess={() => state.onReportSuccess(state.reportingSociety.id)} />}
+        </>
+    );
     return (
         <>
             <AnimatePresence mode="wait" initial={false}>
@@ -68,6 +72,7 @@ function useSocietiesPage() {
         selectSociety: select, clearSelection: () => select(null),
         showCreateModal, setShowCreateModal, reportingSociety, setReportingSociety,
         ...societiesData, handleUnreport,
+        onReportSuccess: (id) => societiesData.updateSocietyLocally(id, { has_reported: true }),
         onCreate: async (form) => {
             const res = await societiesData.handleCreate(form);
             setShowCreateModal(false);
@@ -103,17 +108,13 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
     const [params, setParams] = useSearchParams();
     const [search, setSearch] = useState("");
     const activeTab = params.get('subTab') || "member";
-
     const setTab = (t) => setParams(prev => {
         prev.set('subTab', t); return prev;
     }, { replace: true });
-
     const filtered = societies.filter(s =>
         s.name.toLowerCase().includes(search.toLowerCase())
     );
-
     const tabs = buildTabs(filtered, societies, { onSelect, onReport, onUnreport, setView, onCreateClick });
-
     return (
         <AppPage className={styles.container} title="Societies" subtitle="Your communities at King's College London">
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setTab}

@@ -1,5 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useMemo, useEffect } from "react";
 import { Calendar } from "../../components/Calendar/Calendar";
 import PillFilters from "../../components/Tags/PillFilters";
 import {
@@ -13,7 +12,6 @@ import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import { viewSwapMotion } from "../../components/common";
 
 function CalendarPageSkeleton({ showSearch = true }) {
   return (
@@ -71,7 +69,6 @@ export default function CalendarPage() {
   const { displayMode } = useCalendar();
   const isListOrTable = displayMode === "list" || displayMode === "table";
   const showFilters = true;
-  const calendarViewKey = `${viewMode}-${displayMode}`;
 
   if (isLoading && allEvents.length === 0) {
     return (
@@ -95,11 +92,7 @@ export default function CalendarPage() {
       </div>
 
       <main className={styles.mainContent}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={calendarViewKey} {...viewSwapMotion}>
-            <Calendar />
-          </motion.div>
-        </AnimatePresence>
+        <Calendar />
       </main>
 
       <EventPopups />
