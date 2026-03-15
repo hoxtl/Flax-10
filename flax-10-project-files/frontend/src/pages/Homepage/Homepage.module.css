@@ -1,11 +1,6 @@
-/* Homepage module — composed from logical partials */
 @import './styles/Variables.module.css';
 @import './styles/Bento.module.css';
-@import './styles/Navigator.module.css';
 @import './styles/HomepageSlots.module.css';
-@import './styles/Analytics.module.css';
-@import './styles/DailyNarrative.module.css';
-@import './styles/Timer.module.css';
 @import './styles/Timeline.module.css';
 @import './styles/Overlays.module.css';
 
@@ -65,43 +60,6 @@
 .routeSkeletonTime { height: 14px; border-radius: 8px; }
 .routeSkeletonEvent { height: 72px; }
 
-.focusToolsSection {
-  width: min(1200px, calc(100% - 32px));
-  margin: 20px auto 0;
-}
-
-.focusToolsInner {
-  padding: 18px 20px;
-  border: 1px solid rgba(123, 103, 81, 0.1);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255, 252, 248, 0.92) 0%, rgba(255, 255, 255, 0.88) 100%);
-  box-shadow: 0 10px 24px rgba(74, 52, 33, 0.035);
-}
-
-.focusToolsHeader {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.focusToolsEyebrow {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.63rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--widget-text-secondary);
-}
-
-.focusToolsTitle {
-  margin: 0;
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--widget-text-primary);
-}
-
 @media (max-width: 767px) {
   .routeSkeleton {
     width: calc(100% - 24px);
@@ -110,14 +68,5 @@
   .routeSkeletonGrid,
   .routeSkeletonTimelineRow {
     grid-template-columns: 1fr;
-  }
-
-  .focusToolsSection {
-    width: calc(100% - 24px);
-  }
-
-  .focusToolsInner {
-    padding: 16px;
-    border-radius: 18px;
   }
 }
