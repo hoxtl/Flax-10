@@ -12,4 +12,10 @@ export function ManualJourneySection({
 }) {
     const [startCoords, setStartCoords] = useState(null);
     const [destCoords, setDestCoords] = useState(null);
+
+    const handleStartSelect = async (address) => {
+        setManualStart(address);
+        const coords = await geocodeAddress(address);
+        setStartCoords(coords);
+    };
 }
