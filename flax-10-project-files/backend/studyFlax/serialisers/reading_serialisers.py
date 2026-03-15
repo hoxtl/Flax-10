@@ -23,10 +23,14 @@ class ReadingSerialiser(serializers.ModelSerializer):
             raise serializers.ValidationError("Only teachers are allowed to manage readings.")
         start = validated_data.get('start_page')
         end = validated_data.get('end_page')
-        if end and end < start:
+        if start is not None and end is not None and end < start:
             raise serializers.ValidationError("End page must be after start page")
         return validated_data
 
+    def validate_chapter(self, value):
+        if value and value().strip().startswith('-'):
+            raise serializers.ValidationError("Chapter cannot be negative.")
+        return value
     def get_page_count(self,obj):
         return obj.page_count()
     
