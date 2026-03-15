@@ -24,4 +24,10 @@ export function ManualJourneySection({
         const coords = await geocodeAddress(address);
         setDestCoords(coords);
     };
+
+    const handleGo = () => {
+        if (startCoords && destCoords) {
+            onCalculate(startCoords, destCoords);
+        }
+    };
 }
