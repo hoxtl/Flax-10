@@ -12,26 +12,59 @@ import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
 import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
 import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
+import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
+
+function getDisplayName(user) {
+    const serverName = (user?.name || "").trim();
+    if (serverName) return serverName;
+    const baseName = `${user?.first_name || ""} ${user?.last_name || ""}`.trim();
+    if (!baseName) return "User";
+    return user?.role === "teacher" && !baseName.startsWith("Dr.") ? `Dr. ${baseName}` : baseName;
+}
+
+function getRoleLabel(role) {
+    if (role === "teacher") return "Teacher";
+    if (role === "student") return "Student";
+    if (role === "pending_teacher") return "Teacher applicant";
+    return "User";
+}
 
 function UserCardInfo({ user }) {
+    const displayName = getDisplayName(user);
+    const isTeacher = user?.role === "teacher" || displayName.startsWith("Dr.");
+    const isStudent = user?.role === "student";
+    const yearText = isTeacher ? "" : (isStudent ? (user?.year || "") : "");
+    const majorText = isTeacher
+        ? (user?.major ? `Department: ${user.major}` : "Department: Teaching staff")
+        : (user?.major || "");
+    const roleLabel = isTeacher ? "Professor" : getRoleLabel(user?.role);
+    const roleClass = isTeacher ? styles.teacherPill : isStudent ? styles.studentPill : styles.userRolePill;
     return (
         <div className={styles.userInfo}>
-            <div className={styles.name}>{user.first_name} {user.last_name}</div>
+            <div className={styles.nameRow}>
+                <div className={styles.name}>{displayName}</div>
+                <span className={`${styles.rolePill} ${roleClass}`}>{roleLabel}</span>
+            </div>
             <EntityLinkChip to={`/profile/${user.id}`} className={styles.username} title={`Open @${user.username}`}>
                 @{user.username}
             </EntityLinkChip>
             <div className={styles.courseInfo}>
-                {user.year && <span>{user.year}</span>}
-                {user.major && <span> • {user.major}</span>}
+                {yearText && <span>{yearText}</span>}
+                {yearText && majorText && <span> • </span>}
+                {majorText && <span>{majorText}</span>}
             </div>
         </div>
     );
 }
 
 function UserCard({ user, onNavChange }) {
+    const avatarUser = {
+        ...user,
+        profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }),
+    };
     return (
         <GridCard className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
-            <UserAvatar user={user} avatarOnly size={64} />
+            <UserAvatar user={avatarUser} avatarOnly size={64} />
             <UserCardInfo user={user} />
         </GridCard>
     );
@@ -42,15 +75,23 @@ const USERS_PER_PAGE = 16;
 async function loadUsers(query, filters, page, setU, setTotalPages, setL) {
     setL(true);
     const offset = (page - 1) * USERS_PER_PAGE;
-    const d = await searchUsers(query, filters.courses.join(','), filters.socs.join(','), offset, USERS_PER_PAGE, filters.years.join(',')).catch(() => ({ results: [], total_count: 0 }));
+    const d = await searchUsers(
+        query,
+        filters.courses.join(','),
+        filters.socs.join(','),
+        offset,
+        USERS_PER_PAGE,
+        filters.years.join(','),
+        filters.roles.join(',')
+    ).catch(() => ({ results: [], total_count: 0 }));
     setU(d.results || []);
     setTotalPages(Math.ceil((d.total_count || 0) / USERS_PER_PAGE));
     setL(false);
 }
 
-function usePaginationReset(query, filterCourses, filterSocs, filterYears) {
+function usePaginationReset(query, filterCourses, filterSocs, filterYears, filterRoles) {
     const [currentPage, setCurrentPage] = useState(1);
-    useEffect(() => { setCurrentPage(1); }, [query, filterCourses, filterSocs, filterYears]);
+    useEffect(() => { setCurrentPage(1); }, [query, filterCourses, filterSocs, filterYears, filterRoles]);
     return { currentPage, setCurrentPage };
 }
 
@@ -62,30 +103,29 @@ function useDiscoverFetch(query, filterState) {
     const filterCourses = filterState.props.selectedCourses.join(',');
     const filterSocs = filterState.props.selectedSocieties.join(',');
     const filterYears = filterState.props.selectedYears.join(',');
+    const filterRoles = (filterState.props.selectedRoles || []).join(',');
 
-    const { currentPage, setCurrentPage } = usePaginationReset(query, filterCourses, filterSocs, filterYears);
+    const { currentPage, setCurrentPage } = usePaginationReset(query, filterCourses, filterSocs, filterYears, filterRoles);
 
     useEffect(() => {
         const filters = {
             courses: filterState.props.selectedCourses,
             years: filterState.props.selectedYears,
             socs: filterState.props.selectedSocieties,
+            roles: filterState.props.selectedRoles || [],
         };
         const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading), 300);
         return () => clearTimeout(timer);
-    }, [query, filterCourses, filterSocs, filterYears, currentPage]);
+    }, [query, filterCourses, filterSocs, filterYears, filterRoles, currentPage]);
 
     return { loading, users, currentPage, setCurrentPage, totalPages };
 }
 
 function useDiscoverUIState(query) {
-    const [res, setRes] = useState([]);
-    const [sL, setSL] = useState(false);
-    const [pos, setPos] = useState(null);
     const cRef = useRef(null);
     const fRef = useRef(null);
     const { allCourses, allSocieties } = useSearchInit();
-    const fS = useFilterState(allCourses, allSocieties, query, true, cRef, res, setPos, setRes, setSL);
+    const fS = useFilterState(allCourses, allSocieties, query, true, [], () => { }, () => { });
     useClickOutside(fRef, () => fS.setIsFilterOpen(false));
     return { containerRef: cRef, filterRef: fRef, filterState: fS };
 }
