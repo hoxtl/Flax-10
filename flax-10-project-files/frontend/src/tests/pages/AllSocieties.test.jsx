@@ -246,4 +246,20 @@ describe('AllSocieties', () => {
         render(<AllSocieties onBack={vi.fn()} societies={mockSocieties} />);
         fireEvent.click(screen.getByTestId('society-card-1'));
     });
+
+    it('sorts by members with fallback for missing member_count', () => {
+        const societies = [
+            { id: 1, name: 'A', is_ratified: true },
+            { id: 2, name: 'B', is_ratified: true, member_count: 10 },
+        ];
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={societies} />);
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'members' } });
+        const cards = screen.getAllByTestId(/society-card-/);
+        expect(cards[0].textContent).toBe('B');
+    });
+
+    it('renders with default empty societies prop', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} />);
+        expect(screen.getByText('No societies found')).toBeTruthy();
+    });
 });

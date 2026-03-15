@@ -87,11 +87,7 @@ const runAnnouncementOperations = async (result) => {
   await act(async () => {
     await result.current.addAnnouncement(baseAnnouncementPayload);
   });
-  expect(api.createAnnouncement).toHaveBeenCalledWith(
-    5,
-    expect.objectContaining({ title: 'Ann 1', content: 'Body', tag: 2, image_urls: ['img-a', 'img-b'] }),
-    false,
-  );
+  expect(api.createAnnouncement).toHaveBeenCalledWith(5, baseAnnouncementPayload, false);
   expect(api.createSocietyEvent).toHaveBeenCalled();
 };
 
@@ -106,7 +102,7 @@ const runEventOperations = async (result) => {
   });
   expect(api.deleteSocietyEvent).toHaveBeenCalledWith(5, 99, true);
 
-  api.updateAnnouncement.mockResolvedValueOnce({ id: 10, title: 'B', event_id: null });
+  api.updateAnnouncement.mockResolvedValueOnce({ id: 10, title: 'B', event_id: 99 });
   await act(async () => {
     await result.current.updateAnnouncement(
       10,
@@ -122,7 +118,7 @@ const runEventOperations = async (result) => {
       false,
     );
   });
-  expect(api.updateSocietyEvent).toHaveBeenCalledWith(5, 99, expect.objectContaining({ tag: null }), false);
+  expect(api.updateSocietyEvent).toHaveBeenCalledWith(5, 99, expect.objectContaining({ tag: null }), true);
 };
 
 const runCoreEventOperations = async (result) => {

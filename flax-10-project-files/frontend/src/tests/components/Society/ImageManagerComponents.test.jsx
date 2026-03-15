@@ -90,4 +90,33 @@ describe('ImageManagerComponents', () => {
     fireEvent.click(screen.getByText('Cancel'));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('ImageCard index 0 shows Main badge and no pin button', () => {
+    render(<ImageCard src="/img.jpg" index={0} onDelete={vi.fn()} onPin={vi.fn()} />);
+    expect(screen.getByText('★ Main')).toBeTruthy();
+    expect(screen.queryByTitle('Set as main')).toBeNull();
+  });
+
+  it('AddImageView without photos does not show tab selector', () => {
+    render(<AddImageView onClose={vi.fn()} onAdd={vi.fn()} availablePhotos={[]} />);
+    expect(screen.queryByText('From Photos')).toBeNull();
+    expect(screen.queryByText('Upload')).toBeNull();
+  });
+
+  it('performUpload handles empty file gracefully', async () => {
+    const onAdd = vi.fn();
+    const { container } = render(<AddImageView onClose={vi.fn()} onAdd={onAdd} availablePhotos={[]} />);
+    const fileInput = container.querySelector('input[type="file"]');
+    fireEvent.change(fileInput, { target: { files: [] } });
+    expect(onAdd).not.toHaveBeenCalled();
+  });
+
+  it('TabSelector shows both tabs with correct active states', () => {
+    const { container } = render(<AddImageView onClose={vi.fn()} onAdd={vi.fn()} availablePhotos={['a.jpg']} />);
+    const uploadBtn = screen.getByText('Upload');
+    expect(uploadBtn).toBeTruthy();
+    fireEvent.click(screen.getByText('From Photos'));
+    fireEvent.click(screen.getByText('Upload'));
+    expect(screen.getByText('Click to upload image')).toBeTruthy();
+  });
 });

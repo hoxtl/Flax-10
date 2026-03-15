@@ -8,13 +8,13 @@ export function useSocietyCalendarSync(societyId, societyName) {
     const [loading, setLoading] = useState(true);
     const notify = useNotify();
     const { refreshTags } = useTags();
+
     useEffect(() => {
-        if (!societyId) return;
-        loadSyncStatus(societyId, setIsSynced, setLoading);
+        if (societyId) loadSyncStatus(societyId, setIsSynced, setLoading);
     }, [societyId]);
-    const toggleSync = useCallback(() => {
-        return handleToggle(societyId, isSynced, setIsSynced, setLoading, notify, societyName, refreshTags);
-    }, [societyId, isSynced, notify, societyName, refreshTags]);
+
+    const toggleSync = () => handleToggle(societyId, isSynced, setIsSynced, setLoading, notify, societyName, refreshTags);
+
     return { isSynced, loading, toggleSync };
 }
 
@@ -29,16 +29,16 @@ async function loadSyncStatus(societyId, setIsSynced, setLoading) {
     }
 }
 
+const syncOrUnsync = (isSynced, societyId, setIsSynced, notify, societyName, refreshTags) =>
+    isSynced
+        ? handleUnsync(societyId, setIsSynced, notify, societyName, refreshTags)
+        : handleSync(societyId, setIsSynced, notify, societyName, refreshTags);
+
 async function handleToggle(societyId, isSynced, setIsSynced, setLoading, notify, societyName, refreshTags) {
     setLoading(true);
-    try {
-        if (isSynced) await handleUnsync(societyId, setIsSynced, notify, societyName, refreshTags);
-        else await handleSync(societyId, setIsSynced, notify, societyName, refreshTags);
-    } catch (err) {
-        console.error('Failed to toggle sync:', err);
-    } finally {
-        setLoading(false);
-    }
+    try { await syncOrUnsync(isSynced, societyId, setIsSynced, notify, societyName, refreshTags); }
+    catch (err) { console.error('Failed to toggle sync:', err); }
+    finally { setLoading(false); }
 }
 
 async function handleUnsync(societyId, setIsSynced, notify, societyName, refreshTags) {

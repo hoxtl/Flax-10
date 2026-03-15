@@ -3,16 +3,7 @@ import { Pencil } from 'lucide-react';
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import { validateEventTimes } from '../../utils/dateValidation';
 import styles from '../TableView.module.css';
-
-function isAllDay(event) {
-    if (event.all_day || event.is_all_day) return true;
-    const start = new Date(event.start_time);
-    const end = new Date(event.end_time);
-    const startMidnight = start.getHours() === 0 && start.getMinutes() === 0;
-    const endMidnight = end.getHours() === 0 && end.getMinutes() === 0;
-    const nextDay = end.getDate() !== start.getDate() || end.getMonth() !== start.getMonth();
-    return startMidnight && endMidnight && nextDay;
-}
+import { isAllDay } from '../../utils/eventUtils';
 
 function formatTimeRange(event) {
     if (isAllDay(event)) return 'All day';
