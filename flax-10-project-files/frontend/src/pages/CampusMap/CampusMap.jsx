@@ -618,6 +618,11 @@ export default function CampusMap() {
     const bounds = new mapboxgl.LngLatBounds()
       .extend([startCoords.longitude, startCoords.latitude])
       .extend([destCoords.longitude, destCoords.latitude]);
+    
+    map.current?.fitBounds(bounds, {
+      padding: {top: 100, bottom: 100, left: 100, right: 100},
+      duration: 1500
+    });
   }
 
   return (
