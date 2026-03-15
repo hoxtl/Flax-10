@@ -9,7 +9,9 @@ from rest_framework.response import Response
 from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
 from studyFlax.models.auth.userSettingsModel import UserSettings
 from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models import Enrollment, CalendarEvent
 from studyFlax.serialisers.course_change_serialisers import CourseChangeRequestSerialiser
+from studyFlax.views.user.settings_views import get_modules_for_major, enroll_user_in_modules
 
 
 def _get_user_settings(user):
@@ -119,8 +121,27 @@ def resolve_course_change_request(request, request_id):
 
         if req.status == 'approved':
             settings_obj = _get_user_settings(req.user)
+            old_major = settings_obj.major
             settings_obj.major = req.requested_course
             settings_obj.save()
+
+            # Remove old course enrollments and their calendar events
+            old_modules = get_modules_for_major(old_major)
+            old_module_ids = [m.pk for m in old_modules]
+            CalendarEvent.objects.filter(
+                user=req.user,
+                module_id__in=old_module_ids,
+                source__in=['module_enrollment', 'module_deadline'],
+            ).delete()
+            Enrollment.objects.filter(
+                student=req.user,
+                module_id__in=old_module_ids,
+            ).delete()
+
+            # Enroll in new course modules
+            new_modules = get_modules_for_major(req.requested_course)
+            enroll_user_in_modules(req.user, new_modules)
+
             Notification.objects.create(
                 user=req.user,
                 title='Course change approved',
