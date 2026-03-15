@@ -3,6 +3,7 @@ import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import TextInput from "../common/TextInput/TextInput";
+import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 
 export default function HomeAddressForm({ onSave, isSaving, error }) {
@@ -63,12 +64,7 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
               saveSignal={saveSignal}
             />
           </div>
-          {error && (
-            <div className={styles.errorMessage} role="alert">
-              <span>⚠️</span>
-              <span>{error}</span>
-            </div>
-          )}
+          <InlineAlert message={error} variant="warning" />
         </div>
         <div className={styles.contextCard}>
           <span className={styles.contextCardEmoji}>🗺️</span>

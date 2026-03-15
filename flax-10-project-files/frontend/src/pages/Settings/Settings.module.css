@@ -223,28 +223,10 @@
   background: color-mix(in srgb, var(--primary) 13%, transparent);
   color: var(--primary);
   font-weight: 600;
-  /* 3px left accent bar via inset shadow — respects border-radius */
-  box-shadow: inset 3px 0 0 var(--primary);
   padding-left: 12px;
   box-shadow:
     inset 3px 0 0 var(--primary),
     0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
-  animation: navPulse 1.2s ease-in-out infinite;
-}
-
-@keyframes navPulse {
-  0%,
-  100% {
-    box-shadow:
-      inset 3px 0 0 var(--primary),
-      0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
-  }
-  50% {
-    box-shadow:
-      inset 3px 0 0 var(--primary),
-      0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent),
-      0 0 16px color-mix(in srgb, var(--primary) 18%, transparent);
-  }
 }
 
 .navItemActive:hover {

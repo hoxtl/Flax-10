@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
 import styles from "./Settings.module.css";
-import { SettingsSidebar, SuccessBanner } from "../../components/Settings/SettingsUI";
+import { SettingsSidebar } from "../../components/Settings/SettingsUI";
 import AccountForm from "../../components/Settings/AccountForm";
 import SecurityForm from "../../components/Settings/SecurityForm";
 import PreferencesPanel from "../../components/Settings/PreferencesPanel";
@@ -17,7 +17,7 @@ import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHand
 const PANEL_META = {
   account:     { icon: User,     title: "Account",     desc: "Manage your personal information and year of study." },
   home:        { icon: MapPin,   title: "Location",    desc: "Set your home address for journey planning on UniMap." },
-  security:    { icon: Lock,     title: "Security",    desc: "Keep your account safe with a strong password." },
+  security:    { icon: Lock,     title: "Security",    desc: "Update your password anytime." },
   preferences: { icon: Palette,  title: "Preferences", desc: "Customise your theme and daily sleep schedule." },
   course:      { icon: BookOpen, title: "Teacher Access", desc: "Manage your teacher request and course changes." },
 };
@@ -112,7 +112,6 @@ export default function Settings({ user, onBack }) {
   return (
     <div className={styles.container}>
       <SettingsHeader onBack={onBack} />
-      <SuccessBanner message={handlers.successMessage} />
       <div className={styles.content}>
         <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />
         <div className={styles.contentMain}>

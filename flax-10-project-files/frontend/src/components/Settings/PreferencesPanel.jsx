@@ -47,34 +47,22 @@ function SleepCard({ totalMins, duration }) {
   );
 }
 
-function AppearanceSection({ theme, onChange, onSubmit, isSaving, hasUnsaved, saveSignal }) {
+function AppearanceSection({ theme, onChange }) {
   return (
     <div className={styles.twoColLayout}>
       <div>
         <div className={styles.settingsTile}>
-          <form onSubmit={onSubmit}>
-            <SectionHeader
-              title="Appearance"
-            />
-            <div className={styles.formGroup}>
-              <ThemeSelector value={theme} onChange={onChange} />
-            </div>
-            <SubmitButton
-              isSaving={isSaving}
-              label="Save Appearance"
-              savingLabel="Saving..."
-              hasUnsaved={hasUnsaved}
-              saveSignal={saveSignal}
-            />
-          </form>
+          <SectionHeader
+            title="Appearance"
+          />
+          <div className={styles.formGroup}>
+            <ThemeSelector value={theme} onChange={onChange} />
+          </div>
         </div>
       </div>
       <div className={styles.contextCard}>
         <span className={styles.contextCardEmoji}>🎨</span>
         <h3 className={styles.contextCardTitle}>Theme preferences</h3>
-        <p className={styles.contextCardBody}>
-          Your theme choice is saved to your profile and used across the app.
-        </p>
         <ul className={styles.contextCardList}>
           <li>Consistent look across every page</li>
           <li>Lower eye strain during long sessions</li>
@@ -167,14 +155,11 @@ function SleepSection({
  */
 export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
   const { theme, setTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = useState(theme);
-  const [initialTheme, setInitialTheme] = useState(theme);
   const [sleepTime, setSleepTime] = useState("23:00");
   const [wakeTime, setWakeTime] = useState("07:00");
   const [initialSleepTime, setInitialSleepTime] = useState("23:00");
   const [initialWakeTime, setInitialWakeTime] = useState("07:00");
   const [loadingSleep, setLoadingSleep] = useState(true);
-  const [themeSaveSignal, setThemeSaveSignal] = useState(0);
   const [sleepSaveSignal, setSleepSaveSignal] = useState(0);
 
   useEffect(() => {
@@ -195,11 +180,10 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
   }, []);
 
   const handleThemeChange = (newTheme) => {
-    setCurrentTheme(newTheme);
     setTheme(newTheme);
+    onSave({ theme: newTheme });
   };
 
-  const hasUnsavedTheme = currentTheme !== initialTheme;
   const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;
 
   if (loadingSleep) return <SectionSkeleton label="Loading preferences" rows={4} />;
@@ -207,19 +191,8 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
   return (
     <div className={styles.form}>
       <AppearanceSection
-        theme={currentTheme}
+        theme={theme}
         onChange={handleThemeChange}
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const ok = await onSave({ theme: currentTheme });
-          if (ok) {
-            setInitialTheme(currentTheme);
-            setThemeSaveSignal((s) => s + 1);
-          }
-        }}
-        isSaving={isSaving}
-        hasUnsaved={hasUnsavedTheme}
-        saveSignal={themeSaveSignal}
       />
       <SleepSection
         sleepTime={sleepTime}

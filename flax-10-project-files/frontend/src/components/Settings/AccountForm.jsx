@@ -7,6 +7,7 @@ import { getUserProfile } from "../../api/userService";
 import { getMyCourseChangeRequest, requestCourseChange, cancelCourseChangeRequest } from "../../api/adminApi";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI";
+import InlineAlert from "../common/InlineAlert/InlineAlert";
 import StandardModal from "../common/StandardModal/StandardModal";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
@@ -220,7 +221,7 @@ function CourseChangeModal({ onClose, onSuccess }) {
           <span className={styles.modalWarningIcon}>⚠️</span>
           <span>Your request may be <strong>accepted or rejected</strong>. You'll be notified once a decision is made.</span>
         </div>
-        {error && <div className={styles.teacherError} role="alert">{error}</div>}
+        <InlineAlert message={error} variant="error" />
         <div className={styles.formActions}>
           <PrimaryButton type="submit" disabled={submitting} pill>
             {submitting ? "Submitting…" : "Submit Request"}
@@ -332,7 +333,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
     <form onSubmit={handleSubmit} className={styles.form}>
       <SectionHeader
         title="Personal Information"
-        description="Your profile details and current degree are shown everywhere across the app 👋"
+        description="Your profile details and current degree are shown everywhere across the app"
       />
       <div className={styles.twoColLayout}>
         <div>

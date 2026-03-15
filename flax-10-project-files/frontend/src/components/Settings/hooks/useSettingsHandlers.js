@@ -32,6 +32,7 @@ async function saveAccount(
   const { ok, data: res } = await patchSettings({
     first_name: data.firstName,
     last_name: data.lastName,
+    email: data.email,
     year: data.year,
   }).catch(() => ({ ok: false, data: {} }));
   if (ok && res.user) {

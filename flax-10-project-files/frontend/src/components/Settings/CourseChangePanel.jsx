@@ -12,6 +12,7 @@ import {
 } from "../../api/adminApi";
 import { getUserProfile } from "../../api/userService";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { SectionHeader } from "./SettingsUI";
 import StandardModal from "../common/StandardModal/StandardModal";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
@@ -157,13 +158,12 @@ function CourseChangeSection({ user }) {
             )}
           </div>
 
-          {isRejected && (
-            <div className={styles.statusAlert}>
-              ❌ Request to change to <em>{existingRequest.requested_course}</em> was rejected. Submit a new one below.
-            </div>
-          )}
+          <InlineAlert
+            message={isRejected ? `Request to change to ${existingRequest.requested_course} was rejected. Submit a new one below.` : null}
+            variant="error"
+          />
 
-          {error && <div className={styles.teacherError}>{error}</div>}
+          <InlineAlert message={error} variant="error" />
 
           {showForm && (
             <form onSubmit={handleSubmit}>
@@ -180,7 +180,7 @@ function CourseChangeSection({ user }) {
                   emptyMessage="No courses found"
                   menuMaxHeight={260}
                 />
-                {success && <div className={styles.successText}>✓ {success}</div>}
+                <InlineAlert message={success} variant="success" />
                 <div className={`${styles.formActions} ${styles.formActionsPadded}`}>
                   <PrimaryButton type="submit" disabled={submitting} pill>
                     {submitting ? "Submitting…" : "Submit Request"}
@@ -255,7 +255,7 @@ function TeacherApplyModal({ onClose, onSuccess }) {
           <span className={styles.modalWarningIcon}>⚠️</span>
           <span>Your request may be <strong>accepted or rejected</strong>. You'll be notified once a decision is made.</span>
         </div>
-        {error && <div className={styles.teacherError} role="alert">{error}</div>}
+        <InlineAlert message={error} variant="error" />
         <div className={styles.formActions}>
           <PrimaryButton type="submit" disabled={submitting} pill>
             {submitting ? "Submitting…" : "Submit Application"}
@@ -368,7 +368,7 @@ function TeacherRoleSection() {
             </div>
           )}
 
-          {status === "error" && <p className={styles.teacherError}>{message}</p>}
+          <InlineAlert message={status === "error" ? message : null} variant="error" />
         </div>
 
         <div className={styles.contextCard}>

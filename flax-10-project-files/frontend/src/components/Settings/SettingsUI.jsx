@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 import FormField from "../common/FormField/FormField";
+import InlineAlert from "../common/InlineAlert/InlineAlert";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import TextInput from "../common/TextInput/TextInput";
 
 const TAB_CONFIG = [
-  { id: "account",     label: "Account",     icon: User,     group: "Profile" },
-  { id: "home",        label: "Location",    icon: MapPin,   group: "Profile" },
-  { id: "security",    label: "Security",    icon: Lock,     group: "Profile" },
+  { id: "account",     label: "Account",     icon: User,     group: "My Details" },
+  { id: "home",        label: "Location",    icon: MapPin,   group: "My Details" },
+  { id: "security",    label: "Security",    icon: Lock,     group: "My Details" },
   { id: "preferences", label: "Preferences", icon: Palette,  group: "Preferences" },
   { id: "course",      label: "Teacher Access", icon: BookOpen, group: "Teacher" },
 ];
@@ -98,23 +99,11 @@ export function TabButton({ id, label, isActive, onClick }) {
 }
 
 export function SuccessBanner({ message }) {
-  if (!message) return null;
-  return (
-    <div className={styles.successBanner}>
-      <span>✅</span>
-      <span>{message}</span>
-    </div>
-  );
+  return <InlineAlert message={message} variant="success" />;
 }
 
 export function ErrorMessage({ message }) {
-  if (!message) return null;
-  return (
-    <div className={styles.errorMessage}>
-      <span>⚠️</span>
-      <span>{message}</span>
-    </div>
-  );
+  return <InlineAlert message={message} variant="error" />;
 }
 
 export function SectionHeader({ title, description }) {
