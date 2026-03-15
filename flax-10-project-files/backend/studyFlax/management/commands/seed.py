@@ -19,7 +19,7 @@ from django.contrib.auth import get_user_model
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent, 
     UserSettings, Module, Enrollment, Deadline,
-    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage
+    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage, Reading
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
 from studyFlax.models.groupwork.groupwork_models import GroupProject, GroupMembership
@@ -36,10 +36,12 @@ from .seed_helpers import (
     build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
     build_lecture_events, create_lecture_event, build_deadlines_for_module,
     create_deadline_calendar_event, build_study_sessions_for_user,
-    build_theme_sessions_for_user,
+    build_theme_sessions_for_user, build_readings_for_module, build_reading_user_history_,
 )
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.utils.reading_utils import update_reading_estimates
+
 
 User = get_user_model()
 
@@ -134,6 +136,7 @@ class Command(BaseCommand):
         self.create_group_memberships()
         self.create_group_tasks()
         self.create_study_sessions()
+        self.create_readings()
         self.print_stats()  
         
 
@@ -606,6 +609,46 @@ class Command(BaseCommand):
                 # Assign to 1-2 random members
                 assignees = random.sample(members, random.randint(1, min(2, len(members))))
                 task.assigned_to.set(assignees)
+    
+    def create_readings(self):
+        self.stdout.write("Seeding readings..")
+        self._seed_readings_for_modules()
+        self._seed_reading_history_janedoe()
+        self._seed_reading_history_random_students()
+        self.stdout.write( f" {Reading.objects.count()} total readings in database.")
+    
+    def _seed_readings_for_modules(self):
+        readings = []
+        for module in self.modules:
+            readings.extend(build_readings_for_module(module))
+        Reading.objects.bulk_create(readings, ignore_conflicts=True)
+        self.stdout.write(f" Created {len(readings)} readings across {len(self.modules)} modules.")
+    
+    def _seed_reading_history_user(self, user):
+        reading_list = TaskList.objects.filter(user=user, name="Reading List").first()
+        if not reading_list:
+            return 0
+        module_ids = Enrollment.objects.filter(student=user).values_list('module', flat=True)
+        modules = [m for m in self.modules if m.id in module_ids]
+        tasks = build_reading_user_history_(user, modules, reading_list)
+        Task.objects.bulk_create(tasks, ignore_conflicts=True)
+        if tasks:
+            update_reading_estimates(user)
+        return len(tasks)
+    
+    def _seed_reading_history_janedoe(self):
+        try: 
+            jane = User.objects.get(username='janedoe')
+        except User.DoesNotExist:
+            return
+        count = self._seed_reading_history_user(jane)
+        self.stdout.write(f" janedoe: {count} completed reading tasks and speed is personalised")
+
+    def _seed_reading_history_random_students(self):
+        students = list(User.objects.filter(role='student').exclude(username__in=['janedoe', 'charlie']))
+        sample = random.sample(students, min(3, len(students)))
+        count = sum(1 for s in sample if self._seed_reading_history_user(s) > 0)
+        self.stdout.write(f" {count} random students seeded with reading history.")
 
     def print_stats(self):
         """Print a summary of all fixture users and database record counts."""
@@ -628,6 +671,7 @@ class Command(BaseCommand):
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),
             ("Societies",   Society.objects.count()),
+            ("Readings",   Reading.objects.count()),
         ]
         for label, count in stats:
             self.stdout.write(f"  {label:<14}  {count}")
