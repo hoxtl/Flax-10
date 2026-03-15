@@ -31,6 +31,21 @@
     font-size: 0.9rem;
 }
 
+.relatedRow {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.relatedChip {
+    color: white;
+    background: rgba(0, 0, 0, 0.22);
+    border-color: rgba(255, 255, 255, 0.28);
+    font-size: 0.74rem;
+    padding: 2px 8px;
+}
+
 .verifiedIcon {
     margin-left: 6px;
     color: #22c55e;

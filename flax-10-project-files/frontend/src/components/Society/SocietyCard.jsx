@@ -10,7 +10,7 @@ import { Flag, BadgeCheck } from "lucide-react";
 /** Displays a verified icon for officially ratified societies. */
 function RatifiedBadge({ isRatified }) {
     if (!isRatified) return null;
-    return <BadgeCheck className={styles.verifiedIcon} size={22} title="Ratified Society" aria-label="Ratified Society" />;
+    return <BadgeCheck className={styles.verifiedIcon} size={22} title="Official Society" aria-label="Official Society" />;
 }
 
 /** Interactive card component for society directory listings. */
@@ -45,6 +45,10 @@ function ReportAction({ society, onReport, onUnreport }) {
 
 /** Renders the text info and overlays for the society card. */
 function CardContent({ society, hasImage }) {
+    const eventsCount = society.upcoming_events_count ?? society.events_count ?? (Array.isArray(society.events) ? society.events.length : null);
+    const tasksCount = society.related_tasks_count ?? society.tasks_count ?? null;
+    const showEvents = Number.isFinite(Number(eventsCount)) && Number(eventsCount) > 0;
+    const showTasks = Number.isFinite(Number(tasksCount)) && Number(tasksCount) > 0;
     const info = (
         <div className={styles.info}>
             <h3 className={styles.name}>
@@ -54,6 +58,20 @@ function CardContent({ society, hasImage }) {
                 <RatifiedBadge isRatified={society.is_ratified} />
             </h3>
             <p className={styles.count}>{society.member_count} members</p>
+            {(showEvents || showTasks) && (
+                <div className={styles.relatedRow}>
+                {showEvents && (
+                    <EntityLinkChip to={`/societies?id=${society.id}&tab=events`} className={styles.relatedChip}>
+                        📅 {eventsCount} event{eventsCount === 1 ? '' : 's'}
+                    </EntityLinkChip>
+                )}
+                {showTasks && (
+                    <EntityLinkChip to={`/tasks?society=${encodeURIComponent(society.name || '')}`} className={styles.relatedChip}>
+                        ✅ {tasksCount} task{tasksCount === 1 ? '' : 's'}
+                    </EntityLinkChip>
+                )}
+                </div>
+            )}
         </div>
     );
     return hasImage ? info : <div className={styles.overlay}>{info}</div>;

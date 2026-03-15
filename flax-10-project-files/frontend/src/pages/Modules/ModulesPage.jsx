@@ -279,6 +279,7 @@ function ModuleResults({ sorting, search, hook, isTeacher, setViewingModule, set
                 onEdit={(m) => { setEditingModule(m); setShowForm(true); }}
                 onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
                 onManageDeadlines={setDeadlineModule}
+                taskCountsByModule={hook.taskCountsByModule}
             />
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
             <BackToTop />
