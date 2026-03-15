@@ -46,6 +46,16 @@ export function ManualJourneySection({
                 <span className={styles.searchIcon}>🔍</span>
                 Plan Custom Journey
             </div>
+
+            <div className={styles.manualJourneyInputs}>
+                <div className={styles.manualInputGroup}>
+                <label className={styles.manualLabel}>From</label>
+                <LocationAutocomplete
+                    value={manualStart}
+                    onChange={handleStartSelect}
+                    placeholder="Enter starting location"
+                />
+                </div>
         </section>
     )
 }
