@@ -10,6 +10,7 @@ import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI
 import StandardModal from "../common/StandardModal/StandardModal";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import RequestStatusCard from "../common/RequestStatusCard/RequestStatusCard";
 import styles from "../../pages/Settings/Settings.module.css";
 
 const COURSE_REQUEST_CACHE_KEY = "course_change_pending_request";
@@ -180,6 +181,7 @@ function CourseChangeModal({ onClose, onSuccess }) {
       title="Request Course Change"
       subtitle="Your request will be reviewed by an admin"
       onClose={onClose}
+      backdropClassName={styles.modalBlurBackdrop}
     >
       <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
@@ -197,7 +199,10 @@ function CourseChangeModal({ onClose, onSuccess }) {
           />
         </div>
         <div className={styles.formGroup}>
-          <label>Desired course</label>
+          <label>
+            Desired course
+            <span className={styles.requiredAsterisk} aria-hidden="true"> *</span>
+          </label>
           <AnimatedDropdown
             value={selectedCourse}
             onChange={setSelectedCourse}
@@ -226,7 +231,7 @@ function CourseChangeModal({ onClose, onSuccess }) {
   );
 }
 
-function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest, cancellingRequest }) {
+function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest, cancellingRequest, successMessage }) {
   return (
     <div className={styles.formGroup}>
       <label>Course</label>
@@ -234,26 +239,22 @@ function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest
         {course ? course : <em>No course set</em>}
       </div>
       {pendingRequest ? (
-        <div className={styles.courseRequestCard}>
-          <div className={styles.courseRequestCardBody}>
-            <p className={styles.courseRequestCardTitle}>Course change request received</p>
-            <p className={styles.courseRequestCardSub}>
-              Thanks, your request is with the admin team and is now under review.
-              {pendingRequest.requested_course ? <> · <em>{pendingRequest.requested_course}</em></> : null}
-            </p>
-          </div>
-          <button
-            type="button"
-            className={styles.cancelRequestBtn}
-            disabled={cancellingRequest}
-            onClick={onCancelRequest}
-          >
-            {cancellingRequest ? "Cancelling…" : "Cancel request"}
-          </button>
-        </div>
+        <RequestStatusCard
+          icon="⏳"
+          title="Course change request pending"
+          subtitle={
+            <>
+              An admin will review your request shortly.
+              {pendingRequest.requested_course ? <> &middot; <em>{pendingRequest.requested_course}</em></> : null}
+            </>
+          }
+          onCancel={onCancelRequest}
+          cancelling={cancellingRequest}
+          successMessage={successMessage}
+        />
       ) : (
         <button type="button" className={styles.courseChangeLink} onClick={onRequestClick}>
-          Request a course change →
+          Request a course change &rarr;
         </button>
       )}
     </div>
@@ -278,7 +279,9 @@ export default function AccountForm({ user, onSave, isSaving }) {
   } = useAccountForm(user);
   const [showModal, setShowModal] = useState(false);
   const [cancellingRequest, setCancellingRequest] = useState(false);
-  const [courseRequestNotice, setCourseRequestNotice] = useState("");
+  const [courseRequestNotice, setCourseRequestNotice] = useState(() =>
+    getCachedPendingRequest() ? "Request sent." : "",
+  );
   const [saveSignal, setSaveSignal] = useState(0);
 
   const hasUnsaved =
@@ -302,6 +305,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
       await cancelCourseChangeRequest();
       clearCachedPendingRequest();
       setPendingRequest(null);
+      setCourseRequestNotice("");
     } catch {
       // keep silent here to avoid noisy UX in account card; request remains visible if cancel fails
     } finally {
@@ -314,13 +318,11 @@ export default function AccountForm({ user, onSave, isSaving }) {
       status: "pending",
       requested_course: selectedCourse || "",
     };
-    if (req.requested_course) setCachedPendingRequest(req.requested_course);
-    setPendingRequest(req);
+    const courseName = req.requested_course || selectedCourse || "";
+    if (courseName) setCachedPendingRequest(courseName);
+    setPendingRequest({ ...req, status: "pending", requested_course: courseName });
     setShowModal(false);
-    setCourseRequestNotice(
-      "Thanks for your request. The admin team is reviewing it now, and we will notify you once a decision is made.",
-    );
-    setTimeout(() => setCourseRequestNotice(""), 5000);
+    setCourseRequestNotice("Request sent.");
   };
 
   return (
@@ -348,12 +350,8 @@ export default function AccountForm({ user, onSave, isSaving }) {
               onRequestClick={() => setShowModal(true)}
               onCancelRequest={handleCancelCourseRequest}
               cancellingRequest={cancellingRequest}
+              successMessage={courseRequestNotice ? `✓ ${courseRequestNotice}` : null}
             />
-            {courseRequestNotice ? (
-              <p className={styles.statusNotice} role="status" aria-live="polite">
-                {courseRequestNotice}
-              </p>
-            ) : null}
             <SubmitButton
               isSaving={isSaving}
               label="Save Changes"
