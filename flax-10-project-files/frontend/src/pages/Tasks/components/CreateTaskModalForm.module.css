@@ -242,3 +242,14 @@
 .settingRow {
   width: 100%;
 }
+
+.pageCountModalInput {
+  width: 100px;
+  margin-top: 6px;
+}
+
+.pageCountHint {
+  margin: 6px 0 0;
+  font-size: 0.8em;
+  opacity: 0.6;
+}

@@ -16,7 +16,7 @@ from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
     location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
-    module_deadline_fixtures, deadline_fixtures,
+    module_deadline_fixtures, deadline_fixtures, reading_fixtures
 )
 
 User = get_user_model()
@@ -514,3 +514,53 @@ def build_theme_sessions_for_user(user, profile='balanced'):
             ))
 
     return sessions
+
+# Reading seeding helpers
+
+def _build_readings(module, title, chapter, start, end, now):
+    from studyFlax.models import Reading
+    deadline = now + timedelta(days=random.randint(7,28))
+    if Reading.objects.filter(module=module, title=title).exists():
+        return None
+    return Reading(
+        module=module, title=title, chapter=chapter, start_page=start, end_page=end, deadline=deadline,
+    )
+
+def build_readings_for_module(module):
+    from studyFlax.models import Reading
+    now = timezone.now()
+    reading_examples = random.sample(reading_fixtures, random.randint(1,2))
+    readings = []
+    for suffix, chapter, start, end in reading_examples:
+        read = _build_readings(module, f"{module.module_name}: {suffix}", chapter, start, end, now)
+        if read:
+            readings.append(read)
+    return readings
+
+def _build_reading_task(user, reading, reading_list):
+    from studyFlax.models import Task
+    pages = reading.page_count()
+    if pages <= 0:
+        return None
+    if Task.objects.filter(user=user, reading=reading).exists():
+        return None
+    speed = round(random.uniform(1.2, 2.5), 1)
+    return Task(
+        user=user, task_list=reading_list, module=reading.module,
+        reading=reading, title=f"Read: {reading.title}",
+        page_count=pages, time_spent_minutes=round(pages * speed),
+        completed=True, completed_at=timezone.now() - timedelta(days=random.randint(1, 14)),
+        priority='medium', energy_level='medium', due_date=reading.deadline,
+    )
+
+def build_reading_user_history_(user, modules, reading_list):
+    from studyFlax.models import Reading
+    tasks = []
+    for module in random.sample(modules, min(2, len(modules))):
+        readings = list(Reading.objects.filter(module=module))
+        if not readings:
+            continue
+        task = _build_reading_task(user, random.choice(readings), reading_list)
+        if task: 
+            tasks.append(task)
+    return tasks

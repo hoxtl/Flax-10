@@ -55,7 +55,8 @@ function TagGrid({ tags, onSelect }) {
 function ModuleOptsGrid({ onSelect }) {
   const opts = [
     { id: 'create_module', icon: '✨', label: 'Create New Module', color: '#10b981' },
-    { id: 'add_deadline', icon: '⏰', label: 'Add Deadline', color: '#ef4444' }
+    { id: 'add_deadline', icon: '⏰', label: 'Add Deadline', color: '#ef4444' },
+    { id: 'add_reading', icon: '📖', label: 'Add Reading', color: '#f59e0b'},
   ];
   return (
     <div className={styles.grid}>
@@ -89,15 +90,17 @@ function useQuickAddLogic(onSelectType) {
     if (id === 'event') setView('tag');
     else if (id === 'module') setView('module');
     else if (id === 'add_deadline') setView('module_picker');
+    else if (id === 'add_reading') setView('module_picker_reading');
     else onSelectType(id);
   };
   return { tags, view, handleType };
 }
 
 function getHeader(view) {
-  if (view === 'module') return { title: 'Module Options', sub: 'Create a module or add a deadline' };
+  if (view === 'module') return { title: 'Module Options', sub: 'Create a module, add a deadline or reading ' };
   if (view === 'tag') return { title: 'Choose Event Tag', sub: 'What kind of event is this?' };
   if (view === 'module_picker') return { title: 'Select Module', sub: 'Which module is this deadline for?' };
+  if (view === 'module_picker_reading') return { title: 'Select Module', sub: 'Which module is this reading for? '};
   return { title: 'Quick Add', sub: 'What would you like to add?' };
 }
 
@@ -105,13 +108,14 @@ export default function QuickAddModal({ onClose, onSelectType, isTeacher }) {
   const { tags, view, handleType } = useQuickAddLogic(onSelectType);
   const { title, sub } = getHeader(view);
   const handlePickerSelect = (m) => onSelectType('add_deadline', m);
-
+  const handleReadingPickerSelect = (m) => onSelectType('add_reading', m);
   return (
     <StandardModal title={title} subtitle={sub} onClose={onClose}>
       {view === 'type' && <TypeGrid onType={handleType} isTeacher={isTeacher} />}
       {view === 'tag' && <TagGrid tags={tags} onSelect={onSelectType} />}
       {view === 'module' && <ModuleOptsGrid onSelect={handleType} />}
       {view === 'module_picker' && <ModulePickerGrid onSelect={handlePickerSelect} />}
+      {view === 'module_picker_reading' && <ModulePickerGrid onSelect={handleReadingPickerSelect} />}
     </StandardModal>
   );
 }

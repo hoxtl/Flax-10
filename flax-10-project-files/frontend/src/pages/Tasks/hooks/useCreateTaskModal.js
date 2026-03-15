@@ -9,6 +9,7 @@ import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { runCreateTaskSave } from "../utils/createTaskModalUtils";
+import { isReadingList } from "./useCreateTaskBar";
 
 const ALLOWED_PRIORITIES = new Set(["medium", "high", "urgent"]);
 
@@ -24,6 +25,7 @@ function getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists)
     task_list: String(task.task_list ?? defaultListId ?? sortedLists[0]?.id ?? ""),
     estimated_blocks: task.estimated_blocks ?? 1,
     module: taskModuleId ? String(taskModuleId) : "",
+    page_count: task.page_count ?? null,
   };
 }
 
@@ -71,8 +73,14 @@ function useCreateTaskModalDerived(form, sortedLists, onOpenCreateList) {
   const categoryOptions = useMemo(() => [...sortedLists.map((l) => ({ value: String(l.id), label: l.name })), ...(onOpenCreateList ? [{ value: "__new_list__", label: "+ New List" }] : [])], [sortedLists, onOpenCreateList]);
   const selectedList = useMemo(() => sortedLists.find((l) => String(l.id) === String(form.task_list)), [sortedLists, form.task_list]);
   const selectedListColor = selectedList ? getListColor(selectedList, sortedLists.indexOf(selectedList)) : null;
+  const readingList = isReadingList(selectedList);
+
+  const estimatedReadingMinutes = useMemo( () => {
+    if (!readingList || !form.page_count) return null;
+    return Math.round(Number(form.page_count) * 2);
+  }, [readingList, form.page_count])
   const askFlaxInitialMessage = useMemo(() => ((form.title || "").trim() ? `Help me estimate how long "${(form.title || "").trim()}" might take and which focus block I should pick.` : "Help me estimate how long this task might take — what time block should I pick?"), [form.title]);
-  return { categoryOptions, selectedList, selectedListColor, askFlaxInitialMessage };
+  return { categoryOptions, selectedList, selectedListColor, isReadingList: readingList, estimatedReadingMinutes, askFlaxInitialMessage };
 }
 
 function useCreateTaskModalHandlers(props, formState, sleepState) {
