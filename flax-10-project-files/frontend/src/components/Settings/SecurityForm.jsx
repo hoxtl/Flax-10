@@ -52,7 +52,7 @@ export default function SecurityForm({ onSave, isSaving, error }) {
           <span className={styles.contextCardEmoji}>🔐</span>
           <h3 className={styles.contextCardTitle}>Password tips</h3>
           <p className={styles.contextCardBody}>
-            Strong passwords protect your modules, study plans, and personal data.
+            Keep your account safe with a strong password.
           </p>
           <ul className={styles.contextCardList}>
             <li>Use a unique passphrase with mixed characters</li>

@@ -294,6 +294,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!hasUnsaved) return;
     const ok = await onSave(formData);
     if (ok) {
       setInitialFormData(formData);
@@ -367,7 +368,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
           <span className={styles.contextCardEmoji}>🧾</span>
           <h3 className={styles.contextCardTitle}>Account setup</h3>
           <p className={styles.contextCardBody}>
-            Keep your profile updated so StudyFlax can personalise your modules, reminders and timetable flow.
+            Keep your profile updated for a personalised experience.
           </p>
           <ul className={styles.contextCardList}>
             <li>Accurate first and last name for your timetable display</li>

@@ -2,7 +2,8 @@
  * Settings page — two-column layout with a sticky sidebar nav and a content panel.
  * Each tab renders a header strip with icon + description, then the form body.
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
 import styles from "./Settings.module.css";
 import { SettingsSidebar, SuccessBanner } from "../../components/Settings/SettingsUI";
@@ -94,9 +95,19 @@ function SettingsPanel({ activeTab, handlers, user }) {
  * @param {object} props.user - Authenticated user object
  * @param {Function} props.onBack - Called when the back button is pressed
  */
+const VALID_TABS = new Set(Object.keys(PANEL_META));
+
 export default function Settings({ user, onBack }) {
-  const [activeTab, setActiveTab] = useState("account");
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(
+    VALID_TABS.has(tabFromUrl) ? tabFromUrl : "account",
+  );
   const handlers = useSettingsHandlers(onBack);
+
+  useEffect(() => {
+    if (tabFromUrl && VALID_TABS.has(tabFromUrl)) setActiveTab(tabFromUrl);
+  }, [tabFromUrl]);
 
   return (
     <div className={styles.container}>
