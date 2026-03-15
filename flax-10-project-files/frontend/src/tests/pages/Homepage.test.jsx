@@ -14,6 +14,7 @@ const {
   mockUseCalendarEvents,
   mockNavigate,
   mockGetTag,
+  mockGetUpcomingDeadlines,
 } = vi.hoisted(() => ({
   mockDispatch: vi.fn(),
   mockOpenModal: vi.fn(),
@@ -25,6 +26,7 @@ const {
   mockUseCalendarEvents: vi.fn(),
   mockNavigate: vi.fn(),
   mockGetTag: vi.fn(() => ({ label: 'Academic' })),
+  mockGetUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1, start_due_date: new Date(Date.now() + 2 * 86400000).toISOString() }]),
 }));
 
 const TODAY = new Date();
@@ -284,7 +286,11 @@ vi.mock('../../api/moduleApi', () => ({
 }));
 
 vi.mock('../../api/deadlineApi', () => ({
-  getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]),
+  getUpcomingDeadlines: mockGetUpcomingDeadlines,
+}));
+
+vi.mock('../../api/scheduleApi', () => ({
+  createSchedule: vi.fn().mockResolvedValue({ event_allocations: [{ id: 1 }] }),
 }));
 
 vi.mock('../../lib/completionMessages', () => ({
@@ -319,6 +325,7 @@ beforeEach(() => {
   mockRemoveEvent.mockResolvedValue(undefined);
   mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
+  mockGetUpcomingDeadlines.mockResolvedValue([{ id: 1, start_due_date: new Date(Date.now() + 2 * 86400000).toISOString() }]);
   global.IntersectionObserver = class {
     constructor() { }
     observe() { }
@@ -657,38 +664,36 @@ describe('Homepage', () => {
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText(/Re-planned|No items could fit|Nothing to re-plan|No free windows/)).toBeInTheDocument());
+    const replanButton = screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i });
+    await waitFor(() => expect(replanButton).not.toBeDisabled());
+    fireEvent.click(replanButton);
+    await waitFor(() => expect(screen.getByText(/Auto schedule created|No upcoming deadlines to auto-schedule/)).toBeInTheDocument());
   });
 
-  it('Re-plan button is disabled when no missed or overdue items', async () => {
+  it('Re-plan button is disabled when there are no upcoming deadline', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const { getUpcomingDeadlines } = await import('../../api/deadlineApi');
     isToday.mockReturnValue(true);
-    mockDayEvents = [];
-    mockAllTasks = [];
+    getUpcomingDeadlines.mockResolvedValue([]);
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    expect(screen.getByRole('button', { name: /Re-plan/ })).toBeDisabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i })).toBeDisabled());
   });
 
-  it('Re-plan shows "No free windows" when getAllFreeWindowsToday returns empty', async () => {
-    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
-    const { getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
+  it('Re-plan shows no-deadline toast when no upcoming deadlines are available', async () => {
+    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const { getUpcomingDeadlines } = await import('../../api/deadlineApi');
     isToday.mockReturnValue(true);
-    getAllFreeWindowsToday.mockReturnValue([]);
-    mockDayEvents = [{ id: 1, title: 'Missed', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
+    getUpcomingDeadlines.mockResolvedValue([]);
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText(/No free windows left today/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i })).toBeDisabled());
   });
 
   it('focus banner shows BREAK when timer mode is break', () => {
@@ -1108,42 +1113,39 @@ describe('Homepage', () => {
     await waitFor(() => expect(screen.getByText("Couldn't re-schedule. Try again.")).toBeInTheDocument());
   });
 
-  it('Re-plan shows "Nothing to re-plan" when missed items are all routine', async () => {
+  it('Re-plan surfaces auto-scheduler error toast when API call fails', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { isRoutineEvent, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
+    const { createSchedule } = await import('../../api/scheduleApi');
     isToday.mockReturnValue(true);
-    isRoutineEvent.mockReturnValue(true);
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    const past = new Date(Date.now() - 2 * 3600000);
-    mockDayEvents = [{ id: 1, title: 'Routine', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [];
+    createSchedule.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText('Nothing to re-plan.')).toBeInTheDocument());
+    const replanButton = screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i });
+    await waitFor(() => expect(replanButton).not.toBeDisabled());
+    fireEvent.click(replanButton);
+    await waitFor(() => expect(screen.getByText("Couldn't auto-schedule right now. Try again.")).toBeInTheDocument());
   });
 
-  it('Re-plan shows error toast when editEvent fails', async () => {
-    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
-    const { getAllFreeWindowsToday, isRoutineEvent } = await import('../../pages/Homepage/utils/index');
+  it('Re-plan calls createSchedule with generated deadline preferences', async () => {
+    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const { createSchedule } = await import('../../api/scheduleApi');
     isToday.mockReturnValue(true);
-    isRoutineEvent.mockReturnValue(false);
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    const past = new Date(Date.now() - 2 * 3600000);
-    mockDayEvents = [{ id: 1, title: 'Missed', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [];
-    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText("Couldn't re-plan. Try again.")).toBeInTheDocument());
+    const replanButton = screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i });
+    await waitFor(() => expect(replanButton).not.toBeDisabled());
+    fireEvent.click(replanButton);
+    await waitFor(() => expect(createSchedule).toHaveBeenCalledWith(expect.objectContaining({
+      deadline_preferences: expect.any(Array),
+      worktime_preference: 'both',
+      week_preference: 'both',
+    })));
   });
 
   it('deadline detail shows link to module by code when only module_code set', async () => {
