@@ -615,6 +615,9 @@ export default function CampusMap() {
     setStartLocation({lng: startCoords.longitude, lat: startCoords.latitude});
     setCustomDestination({lng: destCoords.longitude, lat: destCoords.latitude, name: manualDestination, address: manualDestination});
     setSelectedCampus(null);
+    const bounds = new mapboxgl.LngLatBounds()
+      .extend([startCoords.longitude, startCoords.latitude])
+      .extend([destCoords.longitude, destCoords.latitude]);
   }
 
   return (
