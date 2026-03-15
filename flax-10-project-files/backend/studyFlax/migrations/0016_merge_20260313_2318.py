@@ -6,8 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0006_coursechangerequest'),
-        ('studyFlax', '0015_usersettings_homepage_widgets_usersettings_mode'),
+        ('studyFlax', '0001_initial'),
     ]
 
     operations = [

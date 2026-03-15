@@ -6,7 +6,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0006_coursechangerequest'),
         ('studyFlax', '0016_merge_20260314_2133'),
     ]
 
