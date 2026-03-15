@@ -74,9 +74,17 @@ export function ManualJourneySection({
                     >
                         {canCalculate ? "Calculate Route 🚀": "Enter both locations"}
                     </button>
-                </div>
 
+                    {(manualStart || manualDestination) && (
+                        <button
+                            className={styles.clearManualButton}
+                            onClick={handleClear}
+                        >
+                            Clear
+                        </button>
+                    )}
+                </div>
             </div>
         </section>
-    )
+    );
 }
