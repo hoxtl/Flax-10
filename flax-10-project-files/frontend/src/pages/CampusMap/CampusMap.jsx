@@ -713,7 +713,7 @@ export default function CampusMap() {
             <div className={styles.locationChip}>
               <div
                 className={styles.locationChipDot}
-                style={{ background: "#4A3421" }}
+                style={{ background: "var(--primary)" }}
               />
               <div className={styles.locationChipText}>
                 <span className={styles.locationCoords}>
