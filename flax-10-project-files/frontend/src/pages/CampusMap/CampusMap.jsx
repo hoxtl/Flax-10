@@ -613,6 +613,8 @@ export default function CampusMap() {
 
   const handleUserJourneyCalculate = (startCoords, destCoords) => {
     setStartLocation({lng: startCoords.longitude, lat: startCoords.latitude});
+    setCustomDestination({lng: destCoords.longitude, lat: destCoords.latitude, name: manualDestination, address: manualDestination});
+    
   }
 
   return (
