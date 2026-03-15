@@ -101,7 +101,7 @@ function useSocietiesNavigation() {
 }
 
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 15;
 
 /** Displays the user's joined and managed societies with search. */
 function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport, onUnreport }) {
