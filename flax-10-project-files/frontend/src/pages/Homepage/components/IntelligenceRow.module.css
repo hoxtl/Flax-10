@@ -51,11 +51,10 @@
   gap: 16px;
   margin-bottom: 18px;
   padding: 26px 28px;
-  border: 1px solid rgba(123, 103, 81, 0.14);
+  border: 1px solid var(--widget-border);
   border-radius: 28px;
-  background:
-    linear-gradient(135deg, rgba(255, 252, 248, 0.99) 0%, rgba(247, 241, 234, 0.96) 56%, rgba(243, 235, 226, 0.93) 100%);
-  box-shadow: 0 18px 36px rgba(74, 52, 33, 0.045);
+  background: var(--widget-surface-secondary);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.045);
   overflow: hidden;
 }
 
@@ -65,9 +64,9 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at top right, rgba(196, 164, 109, 0.12), transparent 24%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.18), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 52%);
+    radial-gradient(circle at top right, var(--widget-accent-soft), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 52%);
 }
 
 @media (min-width: 768px) {
@@ -93,7 +92,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a8a29e; /* text-stone-400 */
+  color: var(--widget-text-tertiary);
 }
 
 .headerDateRow {
@@ -103,7 +102,7 @@
 }
 
 .headerDateIcon {
-  color: #a8a29e; /* match stone-400 */
+  color: var(--widget-text-tertiary);
   flex-shrink: 0;
 }
 
@@ -113,7 +112,7 @@
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 0.98;
-  color: #4a433d;
+  color: var(--widget-text-primary);
   margin: 0;
   max-width: none;
 }
@@ -148,7 +147,7 @@
 
 .headerDayProgressTrack {
   height: 4px;
-  background: rgba(123, 103, 81, 0.12);
+  background: var(--widget-border);
   border-radius: 2px;
   overflow: hidden;
   width: 200px;
@@ -174,7 +173,7 @@
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #7B6751;
+  color: var(--widget-text-secondary);
 }
 
 .headerDayProgressOverdue {
@@ -209,8 +208,8 @@
   margin-bottom: 10px;
 }
 .intRowAlertsContainer:has(> *) {
-  background: rgba(196, 154, 75, 0.08);
-  border-left: 3px solid #c49a4b;
+  background: var(--widget-accent-soft);
+  border-left: 3px solid var(--widget-accent);
   border-radius: 8px;
   padding: 8px 12px;
 }
@@ -233,7 +232,7 @@
 .intRowAlertText {
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
-  color: #8a6d30;
+  color: var(--widget-text-primary);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -269,8 +268,8 @@
   gap: 7px;
   padding: 5px 12px 5px 8px;
   border-radius: 20px;
-  border: 1px solid rgba(123, 103, 81, 0.15);
-  background: rgba(123, 103, 81, 0.06);
+  border: 1px solid var(--widget-border);
+  background: var(--widget-icon-bg);
   max-width: fit-content;
 }
 
@@ -287,7 +286,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #5c4d3e;
+  color: var(--widget-text-secondary);
 }
 
 /* Conflict variant — terracotta with glow pulse */
@@ -320,9 +319,8 @@
   gap: 10px;
   padding: 8px 10px 8px 0;
   border-radius: 10px;
-  /* Neutral warm background — works with any TFL line colour */
-  background: rgba(123, 103, 81, 0.06);
-  border: 1px solid rgba(123, 103, 81, 0.15);
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
   overflow: hidden;
 }
 
@@ -359,7 +357,7 @@
   font-size: 0.67rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #5c3a1e;
+  color: var(--widget-text-primary);
 }
 
 .tflCardStatus {
@@ -373,7 +371,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 0.7rem;
   font-weight: 400;
-  color: rgba(74, 52, 33, 0.7);
+  color: var(--widget-text-tertiary);
 }
 
 .tflCardDismiss {
@@ -392,7 +390,7 @@
   transition: color 0.15s;
   margin-top: 1px;
 }
-.tflCardDismiss:hover { color: #7A5520; }
+.tflCardDismiss:hover { color: var(--widget-accent); }
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
@@ -417,7 +415,7 @@
   transition: color 0.15s;
   line-height: 1;
 }
-.statusStripPillDismiss:hover { color: #7A5520; }
+.statusStripPillDismiss:hover { color: var(--widget-accent); }
 
 /* Gap variant — sage green */
 .statusStripGap {
@@ -463,8 +461,8 @@
   gap: 12px;
   padding: 12px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.46);
-  border: 1px solid rgba(123, 103, 81, 0.08);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
   backdrop-filter: blur(8px);
 }
 
@@ -481,8 +479,8 @@
   padding: 12px;
   min-width: 98px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(123, 103, 81, 0.06);
+  background: var(--widget-metric-bg);
+  border: 1px solid var(--widget-border);
 }
 
 @media (max-width: 767px) {
@@ -492,7 +490,7 @@
 }
 
 .metricLabel {
-  color: #8f7b68;
+  color: var(--widget-metric-label);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
@@ -501,7 +499,7 @@
 }
 
 .metricValue {
-  color: #4a3a2d;
+  color: var(--widget-metric-value);
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 1.02rem;
   font-weight: 700;
@@ -514,8 +512,8 @@
   gap: 8px;
   padding: 16px 17px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(250, 246, 240, 0.96) 0%, rgba(255, 255, 255, 0.82) 100%);
-  border: 1px solid rgba(123, 103, 81, 0.08);
+  background: var(--widget-card-bg-soft);
+  border: 1px solid var(--widget-border);
 }
 
 .nextStepLabel {
@@ -524,12 +522,12 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #8f7b68;
+  color: var(--widget-text-tertiary);
 }
 
 .nextStepText {
   margin: 0;
-  color: #3f3025;
+  color: var(--widget-text-primary);
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 1.08rem;
   font-weight: 700;
@@ -541,7 +539,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.67rem;
   font-weight: 700;
-  color: rgba(74, 52, 33, 0.56);
+  color: var(--widget-text-tertiary);
   letter-spacing: 0.05em;
 }
 
@@ -565,14 +563,14 @@
   min-height: 24px;
   padding: 0 9px;
   border-radius: 999px;
-  background: rgba(243, 239, 234, 0.72);
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #736048;
+  color: var(--widget-text-secondary);
 }
 
 .analyticsLink {
@@ -581,7 +579,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #7b6751;
+  color: var(--widget-accent);
   text-decoration: none;
 }
 
@@ -595,10 +593,10 @@
   width: fit-content;
   max-width: min(100%, 34rem);
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.52);
-  border: 1px solid rgba(123, 103, 81, 0.1);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
   border-radius: 18px;
-  box-shadow: 0 8px 18px rgba(74, 52, 33, 0.025);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.025);
   backdrop-filter: blur(6px);
 }
 
@@ -625,7 +623,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8f7b68;
+  color: var(--widget-text-tertiary);
 }
 
 .liveContextIcon {
@@ -656,7 +654,7 @@
   font-size: 0.88rem;
   font-weight: 700;
   line-height: 1.35;
-  color: #6f3f30;
+  color: var(--widget-text-primary);
   max-width: 35ch;
 }
 
@@ -751,44 +749,42 @@
   justify-content: space-between;
   overflow: hidden;
   border-radius: 1rem;
-  border: 1px solid rgba(120, 113, 108, 0.6);
-  background: #ffffff;
+  border: 1px solid var(--widget-border);
+  background: var(--widget-surface);
   padding: 1.08rem;
   min-height: 160px;
   opacity: 0;
 }
 
-.bentoSlot:hover {
-  /* No shadow — clean white cards only */
-}
+
 
 /* Widget cards: same base style for all — no colored tints */
 .bentoSlotVariantRightNow {
-  background: #ffffff;
+  background: var(--widget-surface);
 }
 .bentoSlotVariantRightNow .bentoIcon {
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .bentoSlotVariantTasks {
-  background: #ffffff;
+  background: var(--widget-surface);
 }
 .bentoSlotVariantTasks .bentoIcon {
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .bentoSlotVariantDeadlines {
-  background: #ffffff;
+  background: var(--widget-surface);
 }
 .bentoSlotVariantDeadlines .bentoIcon {
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .bentoSlotVariantFocus {
-  background: #ffffff;
+  background: var(--widget-surface);
 }
 .bentoSlotVariantFocus .bentoIcon {
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .bentoSlot.bentoVisible {
@@ -838,7 +834,7 @@
   position: absolute;
   inset: 0;
   border-radius: 1rem;
-  border: 1px solid rgba(123, 103, 81, 0.1);
+  border: 1px solid var(--widget-border);
 }
 
 .bentoContent {
@@ -872,7 +868,7 @@
 .bentoIcon {
   width: 16px;
   height: 16px;
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .bentoHeader {
@@ -890,7 +886,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #44403c;
+  color: var(--widget-text-primary);
   margin: 0;
 }
 
@@ -900,7 +896,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
   font-weight: 500;
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .bentoBody {
@@ -909,7 +905,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 0.8rem;
   line-height: 1.5;
-  color: rgba(45, 53, 45, 0.85);
+  color: var(--widget-text-secondary);
 }
 
 .bentoCenteredBody {
@@ -923,14 +919,14 @@
 .footer {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid rgba(123, 103, 81, 0.15);
+  border-top: 1px solid var(--widget-border);
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   text-align: center;
-  color: #7B6751;
+  color: var(--widget-text-tertiary);
   opacity: 0.85;
 }
 
@@ -955,8 +951,8 @@
   gap: 10px;
   padding: 11px 14px;
   border-radius: 16px;
-  background: #FFFCFA;
-  border: 1px solid rgba(123, 103, 81, 0.1);
+  background: var(--widget-surface-raised);
+  border: 1px solid var(--widget-border);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -969,12 +965,12 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(123, 103, 81, 0.07);
+  background: var(--widget-icon-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #7B6751;
+  color: var(--widget-accent);
   transition: background 0.2s;
 }
 
@@ -989,7 +985,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -1000,7 +996,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9a8778;
+  color: var(--widget-text-tertiary);
   white-space: nowrap;
 }
 
@@ -1014,8 +1010,8 @@
   padding: 9px 14px;
   margin-bottom: 14px;
   border-radius: 12px;
-  background: rgba(185, 130, 55, 0.07);
-  border: 1px solid rgba(185, 130, 55, 0.2);
+  background: var(--widget-accent-soft);
+  border: 1px solid var(--widget-accent);
 }
 
 .travelAlertLeft {
@@ -1034,8 +1030,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(185, 130, 55, 0.12);
-  color: #9A6E2A;
+  background: var(--widget-icon-bg);
+  color: var(--widget-accent);
 }
 
 .travelAlertBody {
@@ -1065,14 +1061,14 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.67rem;
   font-weight: 600;
-  color: #9A6E2A;
+  color: var(--widget-accent);
 }
 
 .travelAlertSuggestion {
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(74, 52, 33, 0.8);
+  color: var(--widget-text-secondary);
 }
 
 .travelAlertDismiss {
