@@ -37,4 +37,6 @@ export function ManualJourneySection({
         setStartCoords(null);
         setDestCoords(null);
     };
+
+    const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
 }
