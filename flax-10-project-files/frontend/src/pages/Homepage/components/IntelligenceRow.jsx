@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle, BookOpen } from "lucide-react";
+import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { getUserProfile } from "../../../api/userService";
 import { loadTermConfig } from "../../../lib/termConfig";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
@@ -173,6 +174,18 @@ function useCourseChangePending() {
   return request;
 }
 
+function useTeacherRequestPending() {
+  const [pending, setPending] = useState(false);
+  useEffect(() => {
+    getUserProfile()
+      .then((data) => {
+        if (data?.role === "pending_teacher") setPending(true);
+      })
+      .catch(() => {});
+  }, []);
+  return pending;
+}
+
 function getSemesterProgress(now = new Date()) {
   const cfg = loadTermConfig();
   const startDate = new Date(cfg?.startDate);
@@ -233,10 +246,42 @@ function CourseChangeCard({ request, onDismiss }) {
     >
       <BookOpen size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
       <div className={styles.courseChangeBody}>
-        <span className={styles.courseChangeLabel}>Request sent to admin</span>
+        <span className={styles.courseChangeLabel}>Course change status: pending</span>
         <span className={styles.courseChangeSub}>
-          Your course change application is being reviewed
-          {request.requested_course ? <> · <strong>{request.requested_course}</strong></> : null}.
+          Your request to switch
+          {request.requested_course ? <> to <strong>{request.requested_course}</strong></> : null}
+          {" "}is under admin review.
+        </span>
+      </div>
+      <button
+        type="button"
+        className={styles.courseChangeViewBtn}
+        onClick={() => navigate("/settings?tab=account")}
+      >
+        View
+      </button>
+      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
+        &times;
+      </button>
+    </motion.div>
+  );
+}
+
+function TeacherRequestCard({ onDismiss }) {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className={styles.courseChangeCard}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
+    >
+      <GraduationCap size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
+      <div className={styles.courseChangeBody}>
+        <span className={styles.courseChangeLabel}>Teacher access status: pending</span>
+        <span className={styles.courseChangeSub}>
+          Your teacher application is under admin review.
         </span>
       </div>
       <button
@@ -247,7 +292,7 @@ function CourseChangeCard({ request, onDismiss }) {
         View
       </button>
       <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
-        ×
+        &times;
       </button>
     </motion.div>
   );
@@ -266,7 +311,9 @@ export default function IntelligenceRow({
 }) {
   const tflDelays = useTflDelays();
   const courseChangeRequest = useCourseChangePending();
+  const teacherRequestPending = useTeacherRequestPending();
   const [showCourseChange, setShowCourseChange] = useState(true);
+  const [showTeacherRequest, setShowTeacherRequest] = useState(true);
   const { summary, loading: profileLoading } = useProfileSummary();
   const eventsCount = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents.length : 0;
   const pendingTasks = Array.isArray(slot5Data?.taskWidgetItemsOnly)
@@ -332,6 +379,12 @@ export default function IntelligenceRow({
               </div>
             </div>
             <AnimatePresence>
+              {teacherRequestPending && showTeacherRequest && (
+                <TeacherRequestCard
+                  key="teacher-request"
+                  onDismiss={() => setShowTeacherRequest(false)}
+                />
+              )}
               {courseChangeRequest && showCourseChange && (
                 <CourseChangeCard
                   key="course-change"

@@ -1215,3 +1215,39 @@
 .posTodaysTasks {
   min-height: 100%;
 }
+
+/* ── Dark-mode overrides for homepage greeting cards ─────────────────────── */
+:global([data-theme="dark"]) .courseChangeCard {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(200, 180, 150, 0.2);
+  border-left-color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeLabel {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeSub {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn {
+  color: #d4b896;
+  border-color: rgba(200, 180, 150, 0.35);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn:hover {
+  background: rgba(200, 180, 150, 0.12);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss {
+  color: rgba(200, 180, 150, 0.5);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss:hover {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeIcon {
+  color: #c4a46d;
+}
