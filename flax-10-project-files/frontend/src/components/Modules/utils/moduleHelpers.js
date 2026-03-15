@@ -1,7 +1,7 @@
 import { formatForInput } from './moduleUtils.js';
 
 export function getFormData() {
-    return { module_code: '', module_name: '', description: '', start_time: '', end_time: '', location: '', is_recurring: true };
+    return { module_code: '', module_name: '', description: '', department: '', course: '', start_time: '', end_time: '', location: '', is_recurring: true };
 }
 
 export function updateForm(module) {
@@ -9,6 +9,8 @@ export function updateForm(module) {
         module_code: module.module_code || '',
         module_name: module.module_name || '',
         description: module.description || '',
+        department: module.department || '',
+        course: module.course || '',
         start_time: formatForInput(module.start_time),
         end_time: formatForInput(module.end_time),
         location: module.location || '',
@@ -18,6 +20,8 @@ export function updateForm(module) {
 
 export function validateForm(form_data) {
     const errors = {};
+    if (!form_data.department) errors.department = 'Department is required';
+    if (!form_data.course) errors.course = 'Course is required';
     if (!form_data.module_code.trim()) errors.module_code = 'Module code is required';
     if (!form_data.module_name.trim()) errors.module_name = 'Module name is required';
     if (!form_data.start_time) errors.start_time = 'Start time is required';

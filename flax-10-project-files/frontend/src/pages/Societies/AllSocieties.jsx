@@ -5,6 +5,7 @@
 import { useState, useMemo } from "react";
 import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
+import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
 import BasePill from "../../components/Tags/BasePill";
@@ -124,7 +125,7 @@ function PaginatedGrid({ items, onSelect, onReport, onUnreport }) {
     return (
         <>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-            <div className={styles.grid}>
+            <div className={gridStyles.grid}>
                 {currentItems.map(s => (
                     <SocietyCard key={s.id} society={s} onClick={onSelect}
                         onReport={onReport} onUnreport={onUnreport} />

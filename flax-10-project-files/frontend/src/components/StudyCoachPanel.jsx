@@ -38,9 +38,9 @@ function TypingIndicator() {
 export default function StudyCoachPanel({
   period = 30,
   initialMessage = "",
-  title = "Study Coach",
-  subtitle = "Ask about your study habits",
-  placeholder = "Ask about your study patterns…",
+  title = "Flax Bot",
+  subtitle = "Ask me anything",
+  placeholder = "Ask me anything…",
   className = "",
   onClose,
 }) {
@@ -201,7 +201,7 @@ export default function StudyCoachPanel({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
           placeholder={placeholder}
-          rows={onClose ? 3 : 1}
+          rows={onClose ? 1 : 1}
           disabled={loading}
         />
         <button
@@ -210,7 +210,7 @@ export default function StudyCoachPanel({
           disabled={loading || !input.trim()}
           aria-label="Send message"
         >
-          <ArrowUp size={32} strokeWidth={3.1} />
+          <ArrowUp size={22} strokeWidth={2.5} />
         </button>
       </div>
     </div>

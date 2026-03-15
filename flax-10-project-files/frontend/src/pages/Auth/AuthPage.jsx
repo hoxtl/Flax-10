@@ -88,7 +88,7 @@ export default function AuthPage({ initialSignIn = true }) {
         description: (
           <>
             Study Flax helps{" "}
-            <span style={{ fontStyle: "italic", color: "#c40000" }}>
+            <span className={styles.kclAccent}>
               King&apos;s College London
             </span>{" "}
             students and teachers manage their time with one calm workflow for deadlines, tasks,
@@ -142,7 +142,7 @@ export default function AuthPage({ initialSignIn = true }) {
             description: (
               <>
                 Keep{" "}
-                <span style={{ fontStyle: "italic", color: "#c40000" }}>
+                <span className={styles.kclAccent}>
                   KCLSU
                 </span>{" "}
                 events and study groups organised alongside your academic schedule.
@@ -154,7 +154,7 @@ export default function AuthPage({ initialSignIn = true }) {
             description: (
               <>
                 Jump between study spaces across{" "}
-                <span style={{ fontStyle: "italic", color: "#c40000" }}>
+                <span className={styles.kclAccent}>
                   Strand, Guy&apos;s, Waterloo, and other campuses
                 </span>{" "}
                 in one place.

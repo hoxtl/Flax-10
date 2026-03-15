@@ -1,35 +1,38 @@
 .card {
     background: var(--surface-card);
-    border-radius: var(--card-radius-token);
-    width: 380px;
-    box-shadow: var(--card-shadow-rest);
-    border: var(--card-border);
+    flex-direction: column;
+    min-height: 192px;
     position: relative;
     overflow: hidden;
-    transition: transform 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 200ms ease;
-    display: flex;
-}
-
-.card:hover,
-.card:focus-within {
-    transform: var(--card-hover-transform) scale(1.01);
-    box-shadow: var(--card-shadow-hover);
-}
-
-.card:active {
-    transform: translateY(-1px) scale(1.005);
 }
 
 .card.enrolled {
     background: linear-gradient(to bottom, var(--surface-card) 0%, var(--surface-panel) 100%);
 }
 
+.card.enrolled::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--sage) 68%, var(--primary) 32%),
+        color-mix(in srgb, var(--sage) 44%, transparent)
+    );
+    box-shadow: 1px 0 0 color-mix(in srgb, var(--sage) 35%, transparent);
+    pointer-events: none;
+}
+
 .content {
     flex: 1;
-    padding: var(--card-padding);
+    padding: var(--space-3);
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-1);
+    overflow: hidden;
 }
 
 .cardHeader {
@@ -72,61 +75,50 @@
 
 .moduleTitle {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: var(--text);
-    line-height: 1.4;
+    line-height: 1.25;
     letter-spacing: -0.01em;
-}
-
-.descriptionSection {
-    margin: 0;
+    white-space: normal;
+    overflow: visible;
 }
 
 .description {
-    font-size: 0.875rem;
-    color: var(--muted);
-    line-height: 1.6;
-    margin: 0 0 0.5rem 0;
-}
-
-.expandButton {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0;
-    transition: opacity 0.2s;
-}
-
-.expandButton:hover {
-    opacity: 0.7;
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--text) 62%, var(--muted) 38%);
+    line-height: 1.35;
+    margin: 0;
+    white-space: normal;
+    overflow: visible;
 }
 
 .meta {
     display: flex;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-    padding: var(--space-3) 0;
+    gap: var(--space-2);
+    flex-wrap: nowrap;
+    padding: var(--space-1) 0;
     border-top: var(--stroke-soft);
-    border-bottom: var(--stroke-soft);
+    margin-top: auto;
 }
 
 .metaItem {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.8125rem;
-    color: var(--muted);
+    font-size: 0.76rem;
+    color: color-mix(in srgb, var(--text) 60%, var(--muted) 40%);
     font-weight: 500;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .actions {
     display: flex;
     gap: var(--space-2);
-    margin-top: 0.25rem;
+    align-items: center;
 }
 
 .editButton,
@@ -165,7 +157,7 @@
 .enrollButton {
     background: var(--primary);
     color: var(--c-white);
-    width: 100%;
+    flex: 1;
     box-shadow: var(--shadow-sm);
 }
 
@@ -182,7 +174,7 @@
 .unenrollButton {
     background: rgba(225, 29, 72, 0.1);
     color: var(--error-text);
-    width: 100%;
+    flex: 1;
 }
 
 .unenrollButton:hover {
@@ -190,9 +182,11 @@
 }
 
 .department {
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 2px;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--text) 52%, var(--muted) 48%);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .deadlineButton {
@@ -206,4 +200,22 @@
 }
 .deadlineButton:hover {
     background: var(--hover);
+}
+
+.viewDetailsBtn {
+    border: none;
+    background: transparent;
+    color: color-mix(in srgb, var(--text) 56%, var(--muted) 44%);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+.viewDetailsBtn:hover {
+    color: var(--text);
+    text-decoration-color: color-mix(in srgb, var(--text) 65%, transparent);
 }

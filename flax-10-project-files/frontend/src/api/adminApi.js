@@ -44,7 +44,8 @@ export const rejectRatification = (societyId) =>
   postJson(`/societies/${societyId}/ratification/reject/`, {});
 
 // ── Teacher role request (for regular users) ──────────────────────────────────
-export const requestTeacherRole = () => postJson("/request-teacher-role/", {});
+export const requestTeacherRole = (reason = "") =>
+  postJson("/request-teacher-role/", { reason });
 
 // ── Course change requests ────────────────────────────────────────────────────
 export const fetchCourseChangeRequests = () =>
@@ -58,3 +59,9 @@ export const requestCourseChange = (requestedCourse) =>
 
 export const getMyCourseChangeRequest = () =>
   fetchApi("/course-change/my-request/");
+
+export const cancelCourseChangeRequest = () =>
+  fetchApi("/course-change/my-request/", { method: "DELETE" });
+
+export const cancelTeacherRoleRequest = () =>
+  postJson("/cancel-teacher-role/", {});

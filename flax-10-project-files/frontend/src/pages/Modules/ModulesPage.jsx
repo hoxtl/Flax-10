@@ -5,7 +5,7 @@ import EmptyState from '../../components/common/EmptyState/EmptyState';
 import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 
-import { isEnrolledIn, filterModules, getDepartments } from '../../components/Modules/utils/moduleUtils.js';
+import { isEnrolledIn, filterModules } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleGrid from '../../components/Modules/ModuleGrid.jsx';
 import ModuleForm from '../../components/Modules/ModuleForm.jsx';
@@ -14,6 +14,7 @@ import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
 import AnimatedDropdown from '../../components/common/AnimatedDropdown';
+import ModuleCourseFilter from '../../components/Modules/ModuleCourseFilter';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
@@ -82,7 +83,7 @@ function useMainView(state) {
         onQueryChange: (q) => { setSearchQuery(q); sorting.setCurrentPage(1); },
         onFilterChange: (f) => { setFilterMode(f); sorting.setCurrentPage(1); },
     };
-    return { sorting, search, departments: getDepartments(hook.modules) };
+    return { sorting, search };
 }
 
 function ModulesSkeleton() {
@@ -158,7 +159,7 @@ function DetailsView({ state }) {
 
 function MainView({ state }) {
     const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule } = state;
-    const { sorting, search, departments } = useMainView(state);
+    const { sorting, search } = useMainView(state);
     const subtitle = is_teacher ? 'Manage your course modules and lectures' : 'Browse and enroll into available modules';
     return (
         <AppPage
@@ -172,24 +173,21 @@ function MainView({ state }) {
                 </PrimaryButton>
             )}
         >
-            <ModuleToolbar search={search} sorting={sorting} departments={departments} />
+            <ModuleToolbar search={search} sorting={sorting} />
             <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
                 setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
         </AppPage>
     );
 }
 
-function ModuleToolbar({ search, sorting, departments }) {
-    const filter_options = [{ value: 'all', label: 'All Modules' }, { value: 'enrolled', label: 'My Enrollments' }];
-    const dept_options = [{ value: 'all', label: 'All Departments' }, ...departments.map(d => ({ value: d, label: d }))];
+function ModuleToolbar({ search, sorting }) {
     const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
     return (
         <PageToolbar
             searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
             controlsSlot={
                 <>
-                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
-                    <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
+                    <ModuleCourseFilter selectedCourses={sorting.selectedCourses} onToggleCourse={sorting.toggleCourse} filterMode={search.filter} onFilterModeChange={search.onFilterChange} />
                     <ToolbarSortControl>
                         <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
                     </ToolbarSortControl>

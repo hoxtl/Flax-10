@@ -24,7 +24,7 @@ function ToolbarSearch({ search, onSearchChange, searchInputRef }) {
         ref={searchInputRef}
         className={styles.searchField}
         inputClassName={styles.searchInput}
-        placeholder="Search… ( / )"
+        placeholder="Search..."
         value={search}
         onChange={onSearchChange}
         aria-label="Search tasks"

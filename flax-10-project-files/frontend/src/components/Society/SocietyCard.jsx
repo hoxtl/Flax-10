@@ -3,6 +3,7 @@
  * name, membership count, and a quick-report action.
  */
 import styles from './SocietyCard.module.css';
+import GridCard from '../common/Card/GridCard';
 import { Flag, BadgeCheck } from "lucide-react";
 
 /** Displays a verified icon for officially ratified societies. */
@@ -17,10 +18,10 @@ export default function SocietyCard({ society, onClick, onReport, onUnreport }) 
     const bg = imageUrl ? { backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)), url(${imageUrl})` } : {};
 
     return (
-        <div className={styles.card} style={bg} onClick={() => onClick?.(society.id)}>
+        <GridCard className={styles.card} style={bg} onClick={() => onClick?.(society.id)}>
             <ReportAction society={society} onReport={onReport} onUnreport={onUnreport} />
             <CardContent society={society} hasImage={!!imageUrl} />
-        </div>
+        </GridCard>
     );
 }
 

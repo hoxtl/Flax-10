@@ -89,7 +89,7 @@ from studyFlax.views.admin.admin_views import (
     user_list, ban_user,
     teacher_requests, resolve_teacher_request,
     reported_societies, dismiss_report, ban_reported_society,
-    request_teacher_role,
+    request_teacher_role, cancel_teacher_role_request,
 )
 from studyFlax.views.admin.course_change_views import (
     request_course_change,
@@ -240,6 +240,7 @@ urlpatterns = [
     path("admin/reports/<int:report_id>/dismiss/", dismiss_report, name='admin-dismiss-report'),
     path("admin/reports/<int:report_id>/ban/", ban_reported_society, name='admin-ban-reported-society'),
     path("request-teacher-role/", request_teacher_role, name='request-teacher-role'),
+    path("cancel-teacher-role/", cancel_teacher_role_request, name='cancel-teacher-role'),
 
     # Course change requests
     path("course-change/request/", request_course_change, name='course-change-request'),

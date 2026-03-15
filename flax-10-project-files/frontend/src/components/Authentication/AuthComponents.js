@@ -2,16 +2,16 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 export const Container = styled.div`
-  background-color: #ffffff;
+  background-color: var(--auth-card-bg, var(--panel));
   border-radius: 16px;
   box-shadow:
-    0 20px 60px rgba(74, 52, 33, 0.18),
-    0 8px 24px rgba(74, 52, 33, 0.1);
+    0 20px 60px color-mix(in srgb, var(--primary) 18%, transparent),
+    0 8px 24px color-mix(in srgb, var(--primary) 10%, transparent);
   position: relative;
   overflow: hidden;
   width: 860px;
   max-width: 100%;
-  min-height: 480px;
+  min-height: 460px;
 
   @media (max-width: 768px) {
     /* Allow the card to grow with content on mobile for the long Sign Up form */
@@ -88,34 +88,34 @@ export const SignInContainer = styled.div`
 `;
 
 export const Form = styled.form`
-  background-color: #ffffff;
+  background-color: var(--auth-form-bg, var(--panel));
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 28px 52px;
+  padding: 20px 38px;
   height: 100%;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
   box-sizing: border-box;
 `;
 
 export const Title = styled.h1`
   font-weight: 700;
-  margin: 0 0 8px 0;
-  font-size: 28px;
+  margin: 0 0 4px 0;
+  font-size: 24px;
   text-align: center;
-  color: #2b1e14;
+  color: var(--auth-title-fg, var(--text));
   letter-spacing: -0.3px;
 `;
 
 export const Input = styled.input`
-  background-color: #f7f5f2;
-  border: 1.5px solid rgba(74, 52, 33, 0.12);
-  padding: 8px 18px;
+  background-color: var(--auth-input-bg, var(--panel));
+  border: 1.5px solid var(--auth-input-border, var(--border));
+  padding: 7px 14px;
   width: 100%;
   border-radius: 8px;
-  color: #2b1e14;
+  color: var(--auth-input-fg, var(--text));
   font-size: 14px;
   transition:
     border-color 0.15s ease,
@@ -124,13 +124,31 @@ export const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #9e7e5d;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.12);
+    border-color: var(--auth-input-focus-border, var(--primary));
+    background-color: var(--auth-input-focus-bg, var(--panel));
+    box-shadow: var(--auth-input-focus-ring, var(--focus-ring));
   }
 
   &::placeholder {
-    color: rgba(43, 30, 20, 0.42);
+    color: var(--auth-input-placeholder, var(--muted));
+  }
+
+  /* Keep browser autofill aligned with theme colours (esp. dark mode) */
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover {
+    -webkit-text-fill-color: var(--auth-input-fg, var(--text));
+    caret-color: var(--auth-input-fg, var(--text));
+    -webkit-box-shadow: 0 0 0 1000px var(--auth-input-bg, var(--panel)) inset;
+    box-shadow: 0 0 0 1000px var(--auth-input-bg, var(--panel)) inset;
+    border: 1.5px solid var(--auth-input-border, var(--border));
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  &:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--auth-input-fg, var(--text));
+    -webkit-box-shadow: 0 0 0 1000px var(--auth-input-focus-bg, var(--panel)) inset;
+    box-shadow: 0 0 0 1000px var(--auth-input-focus-bg, var(--panel)) inset;
+    border: 1.5px solid var(--auth-input-focus-border, var(--primary));
   }
 `;
 
@@ -142,7 +160,7 @@ export const Button = styled.button`
   color: rgba(255, 255, 255, 0.96);
   font-size: 11px;
   font-weight: 700;
-  padding: 13px 44px;
+  padding: 11px 34px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -204,6 +222,24 @@ export const Button = styled.button`
       animation: none !important;
     }
     transition: none !important;
+  }
+`;
+
+export const FieldStack = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const FieldRow = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
 `;
 

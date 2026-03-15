@@ -2,8 +2,8 @@ import React from "react";
 
 export default function Globe() {
   const globeStyle = {
-    width: "250px",
-    height: "250px",
+    width: "235px",
+    height: "235px",
     borderRadius: "9999px",
     overflow: "hidden",
     boxShadow:

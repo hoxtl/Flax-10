@@ -1,0 +1,16 @@
+.card {
+  min-height: 220px;
+  border-radius: var(--card-radius-token);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  position: relative;
+  box-shadow: var(--card-shadow-rest);
+  border: var(--card-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: var(--card-hover-transform-strong);
+  box-shadow: var(--card-shadow-strong);
+}
