@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AnimatedDropdown from "../../components/common/AnimatedDropdown";
 import { Pagination } from "../../components/Pagination/Pagination";
+import BasePill from "../../components/Tags/BasePill";
 import {
   fetchAdminUsers,
   banUser,
@@ -45,17 +45,19 @@ const TABS = [
   { id: "course-changes", label: "📚 Course Change Requests" },
 ];
 
-
 const PAGE_SIZE = 20;
 
-const USER_FILTER_OPTIONS = [
-  { value: "all", label: "All users" },
-  { value: "student", label: "Students" },
-  { value: "teacher", label: "Teachers" },
-  { value: "staff", label: "Staff" },
-  { value: "active", label: "Active" },
-  { value: "banned", label: "Banned" },
-];
+const USER_FILTER_GROUPS = {
+  roles: [
+    { value: "student", label: "Student" },
+    { value: "teacher", label: "Teacher" },
+  ],
+  staff: [{ value: "staff", label: "Staff" }],
+  status: [
+    { value: "active", label: "Active" },
+    { value: "banned", label: "Banned" },
+  ],
+};
 
 function usePaginatedItems(items, pageSize = PAGE_SIZE) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,14 +79,43 @@ function usePaginatedItems(items, pageSize = PAGE_SIZE) {
   return { currentPage, setCurrentPage, totalPages, pageItems };
 }
 
-function matchesUserFilter(user, filterType) {
-  if (filterType === "student")
-    return user.role === "student" && !user.is_staff && !user.is_superuser;
-  if (filterType === "teacher")
-    return user.role === "teacher" || user.role === "pending_teacher";
-  if (filterType === "staff") return !!user.is_staff || !!user.is_superuser;
-  if (filterType === "active") return !!user.is_active;
-  if (filterType === "banned") return !user.is_active;
+function toggleArrayValue(arr, value) {
+  return arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
+}
+
+function matchesRoleFilter(user, selectedRoles) {
+  if (!selectedRoles.length) return true;
+  return selectedRoles.some((role) => {
+    if (role === "teacher") {
+      return user.role === "teacher" || user.role === "pending_teacher";
+    }
+    if (role === "student") {
+      return user.role === "student";
+    }
+    return false;
+  });
+}
+
+function matchesStaffFilter(user, selectedStaff) {
+  if (!selectedStaff.length) return true;
+  return selectedStaff.some(
+    (option) => option === "staff" && (!!user.is_staff || !!user.is_superuser),
+  );
+}
+
+function matchesStatusFilter(user, selectedStatus) {
+  if (!selectedStatus.length) return true;
+  return selectedStatus.some((status) => {
+    if (status === "active") return !!user.is_active;
+    if (status === "banned") return !user.is_active;
+    return false;
+  });
+}
+
+function matchesAllUserFilters(user, filters) {
+  if (!matchesRoleFilter(user, filters.roles)) return false;
+  if (!matchesStaffFilter(user, filters.staff)) return false;
+  if (!matchesStatusFilter(user, filters.status)) return false;
   return true;
 }
 
@@ -133,14 +164,35 @@ function RoleBadge({ role }) {
   );
 }
 
-function SearchBar({ value, onChange, placeholder }) {
+function SearchBar({ value, onChange, placeholder, className = "" }) {
   return (
     <input
-      className={styles.search}
+      className={`${styles.search} ${className}`.trim()}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
     />
+  );
+}
+
+function FilterToggleGroup({ label, options, selected, onToggle }) {
+  return (
+    <div className={styles.filterGroup}>
+      <span className={styles.filterGroupLabel}>{label}</span>
+      <div className={styles.filterButtons}>
+        {options.map((opt) => {
+          const active = selected.includes(opt.value);
+          return (
+            <BasePill
+              key={opt.value}
+              label={opt.label}
+              isActive={active}
+              onClick={() => onToggle(opt.value)}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -192,7 +244,11 @@ function UsersTab({ onNavigate }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [userFilter, setUserFilter] = useState("all");
+  const [userFilters, setUserFilters] = useState({
+    roles: [],
+    staff: [],
+    status: [],
+  });
   const [banTarget, setBanTarget] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -219,9 +275,17 @@ function UsersTab({ onNavigate }) {
         const q = `${u.username} ${u.email} ${u.first_name} ${u.last_name}`
           .toLowerCase()
           .includes(search.toLowerCase());
-        return q && matchesUserFilter(u, userFilter);
+        return q && matchesAllUserFilters(u, userFilters);
       }),
-    [users, search, userFilter],
+    [users, search, userFilters],
+  );
+
+  const hasActiveUserFilters = useMemo(
+    () =>
+      userFilters.roles.length > 0 ||
+      userFilters.staff.length > 0 ||
+      userFilters.status.length > 0,
+    [userFilters],
   );
 
   const { currentPage, setCurrentPage, totalPages, pageItems } =
@@ -229,7 +293,18 @@ function UsersTab({ onNavigate }) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, userFilter, setCurrentPage]);
+  }, [search, userFilters, setCurrentPage]);
+
+  const toggleGroup = (group, value) => {
+    setUserFilters((prev) => ({
+      ...prev,
+      [group]: toggleArrayValue(prev[group], value),
+    }));
+  };
+
+  const clearUserFilters = () => {
+    setUserFilters({ roles: [], staff: [], status: [] });
+  };
 
   const handleBanConfirm = async (reason) => {
     if (!banTarget) return;
@@ -271,23 +346,41 @@ function UsersTab({ onNavigate }) {
     <>
       <SectionCard>
         <div className={styles.cardHeader}>
-          <h2 className={styles.cardTitle}>
-            All Users <span className={styles.count}>({filtered.length})</span>
-          </h2>
+          <h2 className={styles.cardTitle}>All Users</h2>
           <div className={styles.headerControls}>
-            <div className={styles.filterControl}>
-              <AnimatedDropdown
-                value={userFilter}
-                onChange={setUserFilter}
-                options={USER_FILTER_OPTIONS}
-                placeholder="Filter users"
-                hideCheckmark
+            <div className={styles.filterGroupsWrap}>
+              <FilterToggleGroup
+                options={USER_FILTER_GROUPS.roles}
+                selected={userFilters.roles}
+                onToggle={(value) => toggleGroup("roles", value)}
               />
+              <span className={styles.pillDivider} />
+              <FilterToggleGroup
+                options={USER_FILTER_GROUPS.staff}
+                selected={userFilters.staff}
+                onToggle={(value) => toggleGroup("staff", value)}
+              />
+              <span className={styles.pillDivider} />
+              <FilterToggleGroup
+                options={USER_FILTER_GROUPS.status}
+                selected={userFilters.status}
+                onToggle={(value) => toggleGroup("status", value)}
+              />
+              {hasActiveUserFilters && (
+                <button
+                  type="button"
+                  className={styles.clearFiltersBtn}
+                  onClick={clearUserFilters}
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
             <SearchBar
+              className={styles.searchCompact}
               value={search}
               onChange={setSearch}
-              placeholder="Search by name"
+              placeholder="Search"
             />
           </div>
         </div>
