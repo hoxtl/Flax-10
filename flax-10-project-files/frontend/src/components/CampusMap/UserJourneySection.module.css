@@ -21,3 +21,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+.manualButtonGroup {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
