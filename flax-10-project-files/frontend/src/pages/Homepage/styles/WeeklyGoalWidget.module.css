@@ -19,13 +19,13 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: rgba(196, 164, 109, 0.1);
-  border: 1px solid rgba(196, 164, 109, 0.16);
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #c4a46d;
+  color: var(--widget-accent);
 }
 
 .label {
@@ -34,7 +34,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #2c1810;
+  color: var(--widget-text-primary);
 }
 
 /* ── Goal number / edit ──────────────────────────────────────── */
@@ -54,13 +54,13 @@
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 34px;
   font-weight: 800;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   line-height: 1;
 }
 
 .goalEdit {
   font-size: 12px;
-  color: #b8a890;
+  color: var(--widget-text-tertiary);
   opacity: 0.6;
   transition: opacity 0.15s;
 }
@@ -83,11 +83,11 @@
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 22px;
   font-weight: 700;
-  color: #2c1810;
-  border: 1.5px solid rgba(196, 164, 109, 0.4);
+  color: var(--widget-text-primary);
+  border: 1.5px solid var(--widget-border);
   border-radius: 8px;
   padding: 4px 8px;
-  background: #fdf8f2;
+  background: var(--surface-inner);
   outline: none;
 }
 
@@ -98,15 +98,15 @@
 .goalInputLabel {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
-  color: #a89279;
+  color: var(--widget-text-secondary);
 }
 
 .saveBtn {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #fff;
-  background: #c4a46d;
+  color: var(--color-on-primary);
+  background: var(--color-primary-solid);
   border: none;
   border-radius: 7px;
   padding: 5px 12px;
@@ -115,7 +115,7 @@
 }
 
 .saveBtn:hover {
-  background: #a88850;
+  background: var(--color-primary-strong);
 }
 
 /* ── Sub label ───────────────────────────────────────────────── */
@@ -124,7 +124,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #a89279;
+  color: var(--widget-text-secondary);
   margin: 0;
 }
 
@@ -141,7 +141,7 @@
   flex: 1;
   height: 8px;
   border-radius: 10px;
-  background: rgba(139, 115, 85, 0.1);
+  background: var(--surface-inner);
   overflow: hidden;
 }
 
@@ -155,7 +155,7 @@
   font-family: var(--font-mono, "JetBrains Mono"), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
-  color: #8b7355;
+  color: var(--widget-text-secondary);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -166,6 +166,6 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 400;
-  color: #b8a890;
+  color: var(--widget-text-tertiary);
   margin: 0;
 }
