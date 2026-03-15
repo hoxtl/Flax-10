@@ -101,11 +101,55 @@
   flex-wrap: wrap;
 }
 
-.filterControl {
-  min-width: 180px;
-  --surface-panel: var(--bg, #f9fafb);
-  --surface-raised: var(--bg, #f9fafb);
-  --primary: var(--accent, #6c47ff);
+.filterGroupsWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-top: 9px;
+}
+
+.filterGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.filterGroupLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filterButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.clearFiltersBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--card-bg, var(--surface, #fff));
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+  margin-bottom: 9px;
+}
+
+.clearFiltersBtn:hover {
+  background-color: var(--danger-bg);
+  border-color: var(--danger);
 }
 
 .cardTitle {
@@ -138,6 +182,20 @@
 .search:focus {
   border-color: var(--accent, #6c47ff);
   box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
+}
+
+.searchCompact {
+  width: 130px;
+  min-width: 130px;
+  margin-left: auto;
+}
+
+.pillDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 8px 8px 8px;
+  flex-shrink: 0;
 }
 
 .table {
