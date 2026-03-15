@@ -40,3 +40,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
+.goButton:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
