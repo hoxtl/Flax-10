@@ -67,7 +67,7 @@ function buildNonHumanAvatar(seedKey = "") {
 const FIXED_PROFILE_PHOTOS = {
   // Core fixed accounts
   johndoe: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=96&h=96&q=80",
-  janedoe: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=96&h=96&q=80",
+  janedoe: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=96&h=96&q=80",
   charlie: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&h=96&q=80",
   riley: "https://robohash.org/riley.wood?set=set4&size=96x96",
   nina: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=96&h=96&q=80",

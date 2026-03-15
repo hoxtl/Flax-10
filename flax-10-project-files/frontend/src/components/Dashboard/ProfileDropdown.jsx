@@ -3,6 +3,7 @@ import { LogOut, Settings, UserRound } from "lucide-react";
 import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../Authentication/utils/userUtils";
 import { getUserProfile } from "../../api/userService";
+import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 
 function useClickOutside(ref, onClose, isActive) {
   useEffect(() => {
@@ -161,8 +162,8 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, 
   } =
     useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick);
   const initials = getInitials(user?.name) || "?";
-  const profilePhotoUrl = profileData?.profile_photo_url;
   const displayUser = buildDisplayUser(user, profileData);
+  const profilePhotoUrl = profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: true });
   const displayMajor = displayUser.major || "Computer Science";
   return (
     <div className={styles.container} onMouseEnter={onHoverEnter} onMouseLeave={onHoverLeave}>
