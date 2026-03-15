@@ -18,22 +18,23 @@ function getWeekNumber(d) {
     return Math.ceil((diff + start.getDay() + 1) / 7);
 }
 
+const fetchingRef = { current: false, key: null };
+
 export function useCalendarEvents() {
     const { events, selectedDate, viewMode } = useCalendar();
     const dispatch = useCalendarDispatch();
     const dateKey = useMemo(() => getDateKey(selectedDate, viewMode), [selectedDate, viewMode]);
-    const fetchedKeyRef = useRef(null);
-    const stateRef = useRef({ selectedDate, viewMode, dispatch });
-    stateRef.current = { selectedDate, viewMode, dispatch };
+    const stateRef = useRef({ selectedDate, viewMode });
+    stateRef.current = { selectedDate, viewMode };
 
     useEffect(() => {
-        if (fetchedKeyRef.current === dateKey) return;
-        fetchedKeyRef.current = dateKey;
+        if (fetchingRef.key === dateKey || fetchingRef.current) return;
+        fetchingRef.key = dateKey;
         fetchEvents(stateRef.current, dispatch);
     }, [dateKey, dispatch]);
 
     const loadEvents = useCallback(() => {
-        fetchedKeyRef.current = null;
+        fetchingRef.key = null;
         fetchEvents(stateRef.current, dispatch);
     }, [dispatch]);
 
@@ -41,9 +42,12 @@ export function useCalendarEvents() {
 }
 
 async function fetchEvents(state, dispatch) {
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
     const { start, end } = getDateRangeForView(state.selectedDate, state.viewMode);
     try { dispatch({ type: 'SET_EVENTS', payload: await getEvents({ start, end }) }); }
     catch (error) { dispatch({ type: 'SET_ERROR', payload: error.message }); }
+    finally { fetchingRef.current = false; }
 }
 
 export function useEventActions() {
