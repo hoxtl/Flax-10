@@ -170,6 +170,20 @@
     text-overflow: ellipsis;
 }
 
+.relatedRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+}
+
+.relatedChip {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+    background: color-mix(in srgb, var(--surface-card) 78%, var(--module-accent, var(--primary)) 8%);
+    border-color: color-mix(in srgb, var(--module-accent, var(--primary)) 22%, var(--border));
+}
+
 .actions {
     display: flex;
     justify-content: space-between;

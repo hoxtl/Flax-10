@@ -88,6 +88,21 @@ describe('ProfileHeader', () => {
     expect(imgs[0].src).toContain('example.com/photo.jpg');
   });
 
+  it('falls back to seeded tutor photo when profile photo is missing', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'srahwan', first_name: 'Sam', last_name: 'Rahwan' }}
+        profileData={{}}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    const imgs = document.querySelectorAll('img[alt="Profile"]');
+    expect(imgs.length).toBe(2);
+    expect(imgs[0].src).toContain('images.unsplash.com');
+  });
+
   it('renders Edit profile button when canEditProfile is true', () => {
     render(
       <ProfileHeader
