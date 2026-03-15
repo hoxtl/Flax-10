@@ -1,12 +1,4 @@
-/* Intelligence Row — Monochrome Bento adapted for Flax/Almond time management theme */
-
-/* ─── Dashboard color palette (muted/pastel — Notion/Linear premium planner) ───
-   Warm base: stone neutrals
-   Soft green: success / done / tasks
-   Soft red/orange: urgency / deadlines / overdue
-   Soft blue: academic
-   Soft purple: focus / analytics
-   All tints kept classy — no harsh colors. */
+/* Intelligence Row — Layout and Edit Bar styles only */
 
 .section {
   position: relative;
@@ -23,25 +15,40 @@
 }
 
 .editBtn {
-  background: var(--color-bg);
-  border: 1.5px solid var(--color-border-base);
-  color: var(--text-charcoal);
-  padding: 6px 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 18px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .editBtn:hover {
-  background: var(--color-sidebar);
+  background: var(--hover-light);
+  color: var(--text-primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .editBtnActive {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
+  background: var(--primary);
+  color: #fff !important;
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.editBtnActive:hover {
+  background: var(--primary-strong);
+  color: #fff !important;
+  transform: translateY(-1px);
 }
 
 .header {
