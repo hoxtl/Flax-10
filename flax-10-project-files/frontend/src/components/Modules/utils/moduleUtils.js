@@ -18,7 +18,8 @@ const MODULE_PREFIX_TO_DEPARTMENT = {
     DE: "Dentistry, Oral & Craniofacial Sciences",
 };
 
-export function getDepartment(module_code) {
+export function getDepartment(module_code, storedDepartment) {
+    if (storedDepartment) return storedDepartment;
     const prefix = module_code?.match(/^[A-Z]+/)?.[0];
     return MODULE_PREFIX_TO_DEPARTMENT[prefix] || "King's College London";
 }
@@ -37,6 +38,8 @@ export function serialiseModule(form_data) {
         module_code: form_data.module_code,
         module_name: form_data.module_name,
         description: form_data.description,
+        department: form_data.department,
+        course: form_data.course,
         start_time: form_data.start_time,
         end_time: form_data.end_time,
         location: form_data.location,
@@ -110,7 +113,7 @@ function checkFilter(module, enrollments, filter_mode) {
 }
 
 export function getDepartments(modules) {
-    const depts = modules.map(m => getDepartment(m.module_code));
+    const depts = modules.map(m => getDepartment(m.module_code, m.department));
     return Array.from(new Set(depts)).sort();
 }
 
@@ -124,6 +127,6 @@ export function sortModules(modules, sort_by) {
 
 export function applyFiltersAndSort(modules, department, sort_by) {
     const by_department = department === 'all' ? modules :
-    modules.filter(m=>getDepartment(m.module_code) === department);
+    modules.filter(m=>getDepartment(m.module_code, m.department) === department);
     return sortModules(by_department, sort_by);
 }

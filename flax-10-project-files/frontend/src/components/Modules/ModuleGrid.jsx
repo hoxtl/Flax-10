@@ -7,7 +7,7 @@ export default function ModuleGrid({
     return (
         <div className={styles.grid}>
             {modules.map(module => (
-                <ModulesCard 
+                <ModulesCard
                     key = {module.id} module={module} enrollments={enrollments} isTeacher={isTeacher}
                     onViewModule = {onViewModule} onEnrollmentToggle = {onEnrollmentToggle}
                     onEdit = {onEdit} onDelete = {onDelete}
@@ -15,5 +15,5 @@ export default function ModuleGrid({
                 />
             ))}
         </div>
-    );  
+    );
 }

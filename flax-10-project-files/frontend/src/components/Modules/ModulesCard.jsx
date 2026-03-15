@@ -45,7 +45,7 @@ function CardHeader({ module, enrolled, isCore }) {
             <div className={styles.iconWrap}>📚</div>
             <div>
                 <span className={styles.moduleCode}>{module.module_code}</span>
-                <div className={styles.department}>{getDepartment(module.module_code)}</div>
+                <div className={styles.department}>{getDepartment(module.module_code, module.department)}</div>
             </div>
             {enrolled && (
                 <span className={styles.enrolledBadge}>
