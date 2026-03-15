@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
+import GridCard from '../common/Card/GridCard';
 import styles from './ModulesCard.module.css';
 
 function getCardClass(enrolled, is_teacher) {
@@ -16,13 +17,13 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     const isCore = enrollment?.is_core || false;
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
-        <article className={getCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
+        <GridCard className={getCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
             <CardBody module={module} enrolled={enrolled} isCore={isCore} isTeacher={isTeacher}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
                 onManageDeadlines={(e) => stop(e, onManageDeadlines)} />
-        </article>
+        </GridCard>
     );
 }
 
@@ -43,10 +44,8 @@ function CardHeader({ module, enrolled, isCore }) {
     return (
         <div className={styles.cardHeader}>
             <div className={styles.iconWrap}>📚</div>
-            <div>
-                <span className={styles.moduleCode}>{module.module_code}</span>
-                <div className={styles.department}>{getDepartment(module.module_code, module.department)}</div>
-            </div>
+            <span className={styles.moduleCode}>{module.module_code}</span>
+            <span className={styles.department}>{getDepartment(module.module_code, module.department)}</span>
             {enrolled && (
                 <span className={styles.enrolledBadge}>
                     {isCore ? '📌 Core' : '✓ Enrolled'}

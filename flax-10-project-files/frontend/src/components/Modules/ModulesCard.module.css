@@ -1,23 +1,6 @@
 .card {
     background: var(--surface-card);
-    border-radius: var(--card-radius-token);
-    width: 380px;
-    box-shadow: var(--card-shadow-rest);
-    border: var(--card-border);
-    position: relative;
-    overflow: hidden;
-    transition: transform 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 200ms ease;
-    display: flex;
-}
-
-.card:hover,
-.card:focus-within {
-    transform: var(--card-hover-transform) scale(1.01);
-    box-shadow: var(--card-shadow-hover);
-}
-
-.card:active {
-    transform: translateY(-1px) scale(1.005);
+    flex-direction: column;
 }
 
 .card.enrolled {
@@ -26,10 +9,11 @@
 
 .content {
     flex: 1;
-    padding: var(--card-padding);
+    padding: var(--space-3) var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-2);
+    overflow: hidden;
 }
 
 .cardHeader {
@@ -72,11 +56,15 @@
 
 .moduleTitle {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text);
-    line-height: 1.4;
+    line-height: 1.3;
     letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .descriptionSection {
@@ -84,10 +72,14 @@
 }
 
 .description {
-    font-size: 0.875rem;
+    font-size: 0.82rem;
     color: var(--muted);
-    line-height: 1.6;
-    margin: 0 0 0.5rem 0;
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .expandButton {
@@ -107,11 +99,11 @@
 
 .meta {
     display: flex;
-    gap: var(--space-3);
+    gap: var(--space-2);
     flex-wrap: wrap;
-    padding: var(--space-3) 0;
+    padding: var(--space-2) 0;
     border-top: var(--stroke-soft);
-    border-bottom: var(--stroke-soft);
+    margin-top: auto;
 }
 
 .metaItem {
@@ -126,7 +118,6 @@
 .actions {
     display: flex;
     gap: var(--space-2);
-    margin-top: 0.25rem;
 }
 
 .editButton,
@@ -190,9 +181,11 @@
 }
 
 .department {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--muted);
-    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .deadlineButton {

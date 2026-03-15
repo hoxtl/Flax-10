@@ -1,11 +1,11 @@
 import ModulesCard from './ModulesCard.jsx';
-import styles from './ModuleGrid.module.css';
+import gridStyles from '../common/Card/CardGrid.module.css';
 
 export default function ModuleGrid({
     modules, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines
 }) {
     return (
-        <div className={styles.grid}>
+        <div className={gridStyles.grid}>
             {modules.map(module => (
                 <ModulesCard
                     key = {module.id} module={module} enrollments={enrollments} isTeacher={isTeacher}

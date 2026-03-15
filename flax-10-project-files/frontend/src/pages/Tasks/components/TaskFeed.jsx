@@ -10,7 +10,6 @@ import TaskSection from "./TaskSection";
 import TaskFeedToolbar from "./TaskFeedToolbar";
 import CompletedTasksSection from "./CompletedTasksSection";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
-import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 
 import layoutStyles from "./TaskFeedLayout.module.css";
@@ -26,12 +25,9 @@ function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask
   const toolbarProps = { search: data.search, onSearchChange: data.setSearch, searchInputRef: data.searchInputRef, sortBy: data.sortBy, onSortChange: data.setSortBy, filterRef: data.filterRef, isFilterOpen: data.isFilterOpen, onFilterOpenChange: data.setIsFilterOpen, activeFilterCount: data.activeFilterCount, activeFilterTab: data.activeFilterTab, onFilterTabChange: data.setActiveFilterTab, filterQuery: data.filterQuery, onFilterQueryChange: data.setFilterQuery, visibleListItems: data.visibleListItems, filterListIds: data.filterListIds, onToggleList: data.toggleListFilter, moduleGroupKeys: data.moduleGroupKeys, groupedVisibleModuleItems: data.groupedVisibleModuleItems, filterModuleCodes: data.filterModuleCodes, onToggleModule: data.toggleModuleFilter, onClearAllFilters: data.clearAllFilters };
   return (
     <div className={styles.subHeader}>
-      <div className={styles.bannerRow}>
-        <EstTimeHelpBanner message="Not sure how long it'll take? Ask Flax for a suggestion." ctaLabel="Ask Flax" initialMessage="Help me estimate how long this task might take — what time block should I pick?" />
-      </div>
       <div className={styles.createRow}>
         {onAddTask ? <div className={styles.createBarWrap}><CreateTaskBar lists={lists} defaultListId={activeListId} defaultDueDate={defaultDueDateForNewTask} onAddTask={onAddTask} /></div> : <div className={styles.subHeaderSpacer} aria-hidden />}
-        {onCreateTask && <PrimaryButton type="button" className={styles.addBtn} onClick={onCreateTask} pill><Plus size={13} /> Full Planning</PrimaryButton>}
+        {onCreateTask && <PrimaryButton type="button" className={styles.fullPlanBtn} onClick={onCreateTask} pill><Plus size={13} /> Full Planning</PrimaryButton>}
       </div>
       <div className={styles.quickAddDivider} aria-hidden />
       <TaskFeedToolbar {...toolbarProps} />

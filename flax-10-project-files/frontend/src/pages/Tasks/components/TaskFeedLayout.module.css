@@ -56,10 +56,9 @@
     margin-bottom: 18px;
 }
 
-.bannerRow {
-  width: 100%;
-  margin-bottom: 10px;
-  flex-shrink: 0;
+.inlineBanner {
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .createRow {
@@ -78,6 +77,11 @@
 }
 .subHeader .createBarWrap { width: 100%; }
 .subHeaderSpacer { flex: 1; min-width: 0; }
+
+.fullPlanBtn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 
 .createBarWrap {
     width: 100%;

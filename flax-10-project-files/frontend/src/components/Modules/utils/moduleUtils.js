@@ -1,3 +1,5 @@
+import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+
 const MODULE_PREFIX_TO_DEPARTMENT = {
     CS: "Natural, Mathematical & Engineering Sciences",
     AI: "Natural, Mathematical & Engineering Sciences",
@@ -125,8 +127,19 @@ export function sortModules(modules, sort_by) {
 
 }
 
-export function applyFiltersAndSort(modules, department, sort_by) {
-    const by_department = department === 'all' ? modules :
-    modules.filter(m=>getDepartment(m.module_code, m.department) === department);
-    return sortModules(by_department, sort_by);
+export function applyFiltersAndSort(modules, selectedCourses, sort_by) {
+    if (!selectedCourses || selectedCourses.length === 0) return sortModules(modules, sort_by);
+    const filtered = modules.filter(m => {
+        if (m.course && selectedCourses.includes(m.course)) return true;
+        const dept = getDepartment(m.module_code, m.department);
+        return selectedCourses.some(c => getDepartmentForCourse(c) === dept);
+    });
+    return sortModules(filtered, sort_by);
+}
+
+function getDepartmentForCourse(courseName) {
+    for (const [dept, courses] of Object.entries(KCL_DEPARTMENTS)) {
+        if (courses.includes(courseName)) return dept;
+    }
+    return null;
 }

@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
 import AppPage from "../../components/common/AppPage/AppPage";
-import Card from "../../components/common/Card/Card";
+import GridCard from "../../components/common/Card/GridCard";
+import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
@@ -25,12 +26,10 @@ function UserCardInfo({ user }) {
 
 function UserCard({ user, onNavChange }) {
     return (
-        <Card className={styles.userCard} interactive onClick={() => onNavChange?.("profile_" + user.id)}>
-            <div style={{ marginBottom: 16 }}>
-                <UserAvatar user={user} avatarOnly size={80} />
-            </div>
+        <GridCard className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
+            <UserAvatar user={user} avatarOnly size={64} />
             <UserCardInfo user={user} />
-        </Card>
+        </GridCard>
     );
 }
 
@@ -110,7 +109,7 @@ function PaginatedGrid({ filtered, onNavChange, currentPage, totalPages, setCurr
     return (
         <div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
-            <div className={styles.grid}>
+            <div className={gridStyles.grid}>
                 {filtered.map(u => <div key={u.id}><UserCard user={u} onNavChange={onNavChange} /></div>)}
             </div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}

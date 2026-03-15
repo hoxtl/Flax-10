@@ -1,23 +1,12 @@
 /* Styles for the individual SocietyCard component. */
 .card {
     height: 220px;
-    border-radius: var(--card-radius-token);
+    min-height: 220px;
     background-size: cover;
     background-position: center;
     background-color: var(--primary);
-    overflow: hidden;
-    cursor: pointer;
-    display: flex;
     align-items: flex-end;
     padding: 20px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: var(--card-shadow-rest);
-    position: relative;
-}
-
-.card:hover {
-    transform: var(--card-hover-transform-strong);
-    box-shadow: var(--card-shadow-strong);
 }
 
 .name {

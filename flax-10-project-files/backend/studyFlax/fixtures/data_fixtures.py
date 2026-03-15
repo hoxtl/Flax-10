@@ -177,14 +177,9 @@ task_list_fixtures = (
 personal_task_fixtures = (
     # ── Overdue ──
     ("Submit ethics form",              "Missed the window — chase the admin office and resubmit ASAP.",              "urgent", 1, -1, "University"),
-    ("Pay rent",                        "Bank transfer due — check landlord details before sending.",                  "urgent", 1, -2, "Finance"),
-    ("Return library books",            "Two books overdue — return before the fine increases further.",               "medium", 1, -3, "University"),
-    ("Reply to careers email",          "Careers service sent a follow-up — respond and confirm your slot.",          "high",   1, -4, "Internships"),
-    ("File lecture notes — week 5",     "Consolidate and file your notes before the backlog grows.",                  "medium", 2, -5, "University"),
-    ("Cancel free trial",               "Free period ended — cancel before the next billing cycle.",                  "low",    1, -6, "Finance"),
-    ("Log gym sessions for the month",  "Track all sessions in your fitness log before you forget the details.",      "low",    1, -7, "Health"),
+    ("Pay rent",                        "Bank transfer due — check landlord details before sending.",                  "high",   1, -2, "Finance"),
 
-    # ── Urgent / today ──
+    # ── Today ──
     ("Send supervisor check-in",        "Confirm this week's milestones and attach your latest draft snapshot.",       "urgent", 1,  0, "University"),
     ("Plan the week ahead",             "Look at the week's deadlines and block out study time in your calendar.",   "medium", 1,  0, "Personal"),
     ("Scan KEATS for surprises",        "Quick sweep of module pages for hidden updates, new files, and changes.",   "low",    1,  0, "University"),
@@ -199,13 +194,13 @@ personal_task_fixtures = (
     ("Track spending this week",        "Log all expenses and check you're on budget.",                              "low",    1,  2, "Finance"),
 
     # ── Day 3 ──
-    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "high",   1,  3, "Internships"),
+    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "urgent", 1,  3, "Internships"),
     ("Seminar talking points prep",     "Re-read the core text and draft two sharp questions for discussion.",       "medium", 2,  3, "University"),
     ("GP appointment",                  "Nothing urgent — just a general check-up.",                                 "low",    1,  3, "Health"),
 
     # ── Day 4 ──
     ("Book dentist appointment",        "Overdue — call and book for sometime next month.",                          "low",    1,  4, "Health"),
-    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "high",   4,  4, "University"),
+    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "urgent", 4,  4, "University"),
 
     # ── Day 5 ──
     ("Update CV",                       "Add the latest project or placement before applying to grad roles.",        "medium", 2,  5, "Internships"),

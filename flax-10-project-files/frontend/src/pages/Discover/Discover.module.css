@@ -19,17 +19,17 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
 }
 
 .userCard {
-    padding: 24px;
-    display: flex;
+    padding: 20px;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
-    cursor: pointer;
+    gap: 12px;
 }
 
 .avatar {
