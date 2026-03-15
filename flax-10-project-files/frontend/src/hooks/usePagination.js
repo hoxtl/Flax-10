@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 
 /**
  * Custom hook for pagination logic.
@@ -8,21 +8,22 @@ import { useState, useMemo } from 'react';
  * @returns {Object} { currentItems, totalPages, currentPage, setPage }
  */
 export function usePagination(items, pageSize, initialPage = 1) {
-    const [currentPage, setPage] = useState(initialPage);
-
-    const totalPages = Math.ceil(items.length / pageSize);
+    const [currentPage, setPageInternal] = useState(initialPage);
+    const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+    const safePage = Math.min(currentPage, totalPages);
 
     const currentItems = useMemo(() => {
-        const start = (currentPage - 1) * pageSize;
+        const start = (safePage - 1) * pageSize;
         return items.slice(start, start + pageSize);
-    }, [items, currentPage, pageSize]);
+    }, [items, safePage, pageSize]);
 
-    // Reset to page 1 if search/filters change and current page is out of bounds
-    useMemo(() => {
-        if (currentPage > 1 && currentPage > totalPages) {
-            setPage(1);
-        }
+    useEffect(() => {
+        if (currentPage > totalPages) setPageInternal(1);
     }, [totalPages, currentPage]);
 
-    return { currentItems, totalPages, currentPage, setPage };
+    const setPage = useCallback((page) => {
+        setPageInternal(Math.max(1, Math.min(page, totalPages)));
+    }, [totalPages]);
+
+    return { currentItems, totalPages, currentPage: safePage, setPage };
 }

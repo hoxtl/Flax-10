@@ -1,23 +1,12 @@
 /* Styles for the individual SocietyCard component. */
 .card {
     height: 220px;
-    border-radius: var(--card-radius-token);
+    min-height: 220px;
     background-size: cover;
     background-position: center;
     background-color: var(--primary);
-    overflow: hidden;
-    cursor: pointer;
-    display: flex;
     align-items: flex-end;
     padding: 20px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: var(--card-shadow-rest);
-    position: relative;
-}
-
-.card:hover {
-    transform: var(--card-hover-transform-strong);
-    box-shadow: var(--card-shadow-strong);
 }
 
 .name {
@@ -28,10 +17,33 @@
     align-items: center;
 }
 
+.nameChip {
+    color: white;
+    background: rgba(0, 0, 0, 0.16);
+    border-color: rgba(255, 255, 255, 0.28);
+    font-size: 1rem;
+    padding: 4px 10px;
+}
+
 .count {
     color: white;
     margin: 4px 0 0 0;
     font-size: 0.9rem;
+}
+
+.relatedRow {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.relatedChip {
+    color: white;
+    background: rgba(0, 0, 0, 0.22);
+    border-color: rgba(255, 255, 255, 0.28);
+    font-size: 0.74rem;
+    padding: 2px 8px;
 }
 
 .verifiedIcon {

@@ -1,6 +1,7 @@
 import styles from "../Profile.module.css";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
 import ShareButton from "../../../components/Social/ShareButton";
+import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 
 function ProfileAvatar({ user, profilePhotoUrl }) {
     return <div className={styles.avatar}>{profilePhotoUrl ? <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>;
@@ -50,15 +51,19 @@ function MobileStats({ profileData, taskCount, upcoming, handlers, visibility })
 export default function ProfileHeader({ user, profileData, taskCount, upcomingEventCount: upcoming, handlers, visibility }) {
     const year = profileData?.year || user?.year || "";
     const major = profileData?.major || user?.major || "";
+    const resolvedPhoto = getResolvedUserPhoto({
+        ...user,
+        ...profileData,
+    });
     return (
         <>
             <div className={`${styles.header} ${styles.desktopOnly}`}>
-                <ProfileAvatar user={user} profilePhotoUrl={profileData?.profile_photo_url} />
+                <ProfileAvatar user={user} profilePhotoUrl={resolvedPhoto} />
                 <ProfileHeaderInfo user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }} profileData={profileData} taskCount={taskCount} upcoming={upcoming} handlers={handlers} visibility={visibility} />
             </div>
             <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
                 <div className={styles.mobileHero}>
-                    <div className={styles.mobileAvatar}>{profileData?.profile_photo_url ? <img src={profileData.profile_photo_url} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
+                    <div className={styles.mobileAvatar}>{resolvedPhoto ? <img src={resolvedPhoto} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
                     <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1><p className={styles.mobileBio}>{year} {year && major ? '·' : ''} {major}</p>
                     <div className={styles.mobileActions}>{visibility.canEditProfile ? <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>Edit Profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}</div>
                 </div>

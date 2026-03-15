@@ -8,10 +8,10 @@ import styles from "./PageHeader.module.css";
  *   subtitle – optional string, shown below the title
  *   action   – optional ReactNode, floated to the right (e.g. a button or toggle)
  */
-export default function PageHeader({ title, subtitle, action }) {
+export default function PageHeader({ title, subtitle, action, compact = false }) {
   return (
     <motion.div
-      className={styles.header}
+      className={`${styles.header} ${compact ? styles.headerCompact : ""}`}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}

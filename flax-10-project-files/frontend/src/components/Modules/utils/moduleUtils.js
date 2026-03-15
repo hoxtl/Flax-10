@@ -1,12 +1,22 @@
+import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+
 const MODULE_PREFIX_TO_DEPARTMENT = {
     CS: "Natural, Mathematical & Engineering Sciences",
     AI: "Natural, Mathematical & Engineering Sciences",
     MA: "Natural, Mathematical & Engineering Sciences",
     PH: "Natural, Mathematical & Engineering Sciences",
+    EE: "Natural, Mathematical & Engineering Sciences",
+    GN: "Natural, Mathematical & Engineering Sciences",
+    CH: "Natural, Mathematical & Engineering Sciences",
+    CM: "Natural, Mathematical & Engineering Sciences",
     LS: "Life Sciences & Medicine",
+    MD: "Life Sciences & Medicine",
+    NS: "Life Sciences & Medicine",
     LW: "Law",
     PS: "Psychiatry, Psychology & Neuroscience",
     BM: "Business",
+    AF: "Business",
+    IM: "Business",
     EC: "Business",
     HI: "Arts & Humanities",
     EN: "Arts & Humanities",
@@ -15,12 +25,78 @@ const MODULE_PREFIX_TO_DEPARTMENT = {
     PO: "Social Science & Public Policy",
     IR: "Social Science & Public Policy",
     NU: "Nursing, Midwifery & Palliative Care",
+    MW: "Nursing, Midwifery & Palliative Care",
     DE: "Dentistry, Oral & Craniofacial Sciences",
+    FR: "Arts & Humanities",
+    SP: "Arts & Humanities",
+    GL: "Arts & Humanities",
+    AR: "Arts & Humanities",
+    ZH: "Arts & Humanities",
+    IT: "Arts & Humanities",
+    PT: "Arts & Humanities",
+    FA: "Arts & Humanities",
+    TH: "Arts & Humanities",
+    MU: "Arts & Humanities",
+    CL: "Arts & Humanities",
+    CR: "Arts & Humanities",
 };
 
-export function getDepartment(module_code) {
+const MODULE_PREFIX_TO_COURSE = {
+    CS: "Computer Science",
+    AI: "Artificial Intelligence",
+    MA: "Mathematics",
+    PH: "Physics",
+    EE: "Electronic Engineering",
+    GN: "General Engineering",
+    CH: "Chemistry",
+    CM: "Computer Science with Management",
+    LS: "Biomedical Science",
+    MD: "Medicine",
+    NS: "Neuroscience",
+    LW: "Law",
+    PS: "Psychology",
+    BM: "Business Management",
+    AF: "Accounting & Finance",
+    IM: "International Management",
+    EC: "Economics",
+    HI: "History",
+    EN: "English Literature",
+    PL: "Philosophy",
+    GE: "Geography",
+    PO: "Politics",
+    IR: "International Relations",
+    NU: "Nursing",
+    MW: "Midwifery",
+    DE: "Dentistry",
+    FR: "French",
+    SP: "Spanish",
+    GL: "German",
+    AR: "Arabic",
+    ZH: "Chinese",
+    IT: "Italian",
+    PT: "Portuguese",
+    FA: "Film Studies",
+    TH: "Theatre Studies",
+    MU: "Music",
+    CL: "Classics",
+    CR: "Creative Writing",
+};
+
+export function getCourse(module_code, storedCourse) {
+    if (storedCourse) return storedCourse;
     const prefix = module_code?.match(/^[A-Z]+/)?.[0];
-    return MODULE_PREFIX_TO_DEPARTMENT[prefix] || "King's College London";
+    return MODULE_PREFIX_TO_COURSE[prefix] || null;
+}
+
+export function getDepartment(module_code, storedDepartment) {
+    const prefix = module_code?.match(/^[A-Z]+/)?.[0];
+    const derivedDepartment = MODULE_PREFIX_TO_DEPARTMENT[prefix];
+
+    if (storedDepartment && storedDepartment !== "King's College London") {
+        return storedDepartment;
+    }
+
+    return derivedDepartment || storedDepartment || "King's College London";
 }
 
 export function isEnrolledIn(module_id, enrollments) {
@@ -37,6 +113,8 @@ export function serialiseModule(form_data) {
         module_code: form_data.module_code,
         module_name: form_data.module_name,
         description: form_data.description,
+        department: form_data.department,
+        course: form_data.course,
         start_time: form_data.start_time ? new Date(form_data.start_time).toISOString() : '',
         end_time: form_data.end_time ? new Date(form_data.end_time).toISOString() : '',
         location: form_data.location,
@@ -110,20 +188,30 @@ function checkFilter(module, enrollments, filter_mode) {
 }
 
 export function getDepartments(modules) {
-    const depts = modules.map(m => getDepartment(m.module_code));
+    const depts = modules.map(m => getDepartment(m.module_code, m.department));
     return Array.from(new Set(depts)).sort();
 }
 
 export function sortModules(modules, sort_by) {
     return [...modules].sort((a,b) => {
         if (sort_by === 'deadlines') return (b.deadlines?.length || 0) - (a.deadlines?.length || 0);
+        if (sort_by === 'name-desc') return b.module_name.localeCompare(a.module_name);
         return a.module_name.localeCompare(b.module_name);
     });
-
 }
 
-export function applyFiltersAndSort(modules, department, sort_by) {
-    const by_department = department === 'all' ? modules :
-    modules.filter(m=>getDepartment(m.module_code) === department);
-    return sortModules(by_department, sort_by);
+export function applyFiltersAndSort(modules, selectedCourses, sort_by) {
+    if (!selectedCourses || selectedCourses.length === 0) return sortModules(modules, sort_by);
+    const filtered = modules.filter(m => {
+        const course = getCourse(m.module_code, m.course);
+        return course && selectedCourses.includes(course);
+    });
+    return sortModules(filtered, sort_by);
+}
+
+function getDepartmentForCourse(courseName) {
+    for (const [dept, courses] of Object.entries(KCL_DEPARTMENTS)) {
+        if (courses.includes(courseName)) return dept;
+    }
+    return null;
 }

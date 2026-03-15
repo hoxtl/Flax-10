@@ -3,13 +3,14 @@ import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context
 import { EventModal } from './EventModal/EventModal';
 import { EventPopover } from './EventPopover/EventPopover';
 import { useTags } from '../../context/TagContext';
-import { useToast } from '../../context/ToastContext';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
 import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
 import { useConfirm } from '../../context/ConfirmContext';
+import { useNotify } from '../Notifications/hooks/useNotify';
+import { useToast } from '../../context/ToastContext';
 
 export function EventPopups() {
     return (
@@ -64,7 +65,18 @@ function EventPopupContainer() {
     const { loadEvents } = useCalendarEvents();
     const { disenrollFromModule } = useModuleDisenrollment();
     const { getTag, refreshTags } = useTags();
-    const showToast = useToast();
+    const toast = useToast();
+    const notify = useNotify();
+    const showToast = (title, message) => {
+        if (typeof notify === "function" && message !== undefined) {
+            notify(title, message);
+            return;
+        }
+        if (typeof toast === "function") {
+            toast(message === undefined ? title : `${title}: ${message}`);
+            return;
+        }
+    };
     const { handleDeleteRequest } = useEventDeletion();
 
     if (isModalOpen || !popupEvent) return null;
@@ -73,7 +85,7 @@ function EventPopupContainer() {
     const onDeleteWrapped = async (ev) => {
         closePopup();
         const deleted = await handleDeleteRequest(ev);
-        if (deleted) showToast(`"${ev.title}" deleted.`);
+        if (deleted) showToast("Event deleted", `"${ev.title}" deleted.`);
     };
     const handlers = { openModal, onDeleteRequest: onDeleteWrapped, closePopup, loadEvents, disenrollFromModule, refreshTags, showToast };
     const actions = getCalendarPopupActions(popupEvent, handlers);
@@ -114,7 +126,10 @@ function getSocietyActions(event, { closePopup, loadEvents, refreshTags, showToa
         await unsyncCalendar(event.society_id);
         await refreshTags();
         loadEvents();
-        showToast(`Calendar for ${event.society_name || 'this society'} is now unsynced.`);
+        showToast(
+          "Unsync Successful",
+          `Calendar for ${event.society_name || 'this society'} is now unsynced.`
+        );
     };
     return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }

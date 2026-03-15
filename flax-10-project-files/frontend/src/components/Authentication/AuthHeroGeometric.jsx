@@ -25,18 +25,11 @@ const FLOAT_TRANSITION = (floatDuration) => ({
   ease: "easeInOut",
 });
 
-const GRADIENT_BG = (from) => `linear-gradient(90deg, ${from}, rgba(255,255,255,0))`;
-
-function ShapeInner({ from, border }) {
-  return (
-    <div
-      className={styles.shapeInner}
-      style={{ background: GRADIENT_BG(from), borderColor: border }}
-    />
-  );
+function ShapeInner() {
+  return <div className={styles.shapeInner} />;
 }
 
-function FloatingShape({ width, height, driftX, driftY, floatDuration, from, border }) {
+function FloatingShape({ width, height, driftX, driftY, floatDuration }) {
   return (
     <motion.div
       className={styles.shape}
@@ -44,7 +37,7 @@ function FloatingShape({ width, height, driftX, driftY, floatDuration, from, bor
       transition={FLOAT_TRANSITION(floatDuration)}
       style={{ width, height }}
     >
-      <ShapeInner from={from} border={border} />
+      <ShapeInner />
     </motion.div>
   );
 }
@@ -54,8 +47,6 @@ const DEFAULT_ELEGANT = {
   width: 520,
   height: 120,
   rotate: 0,
-  from: "rgba(158,126,93,0.26)",
-  border: "rgba(74,52,33,0.26)",
   driftX: 10,
   driftY: 22,
   floatDuration: 9.5,
@@ -65,7 +56,7 @@ function ElegantShape(props) {
   const p = { ...DEFAULT_ELEGANT, ...props };
   return (
     <motion.div className={`${styles.shapeWrap} ${p.className || ""}`} initial={ENTER_INITIAL(p.rotate)} animate={ENTER_ANIMATE(p.rotate)} transition={ENTER_TRANSITION(p.delay)}>
-      <FloatingShape width={p.width} height={p.height} driftX={p.driftX} driftY={p.driftY} floatDuration={p.floatDuration} from={p.from} border={p.border} />
+      <FloatingShape width={p.width} height={p.height} driftX={p.driftX} driftY={p.driftY} floatDuration={p.floatDuration} />
     </motion.div>
   );
 }
@@ -76,7 +67,6 @@ const SHAPES = [
     width: 640,
     height: 160,
     rotate: 12,
-    from: "rgba(158,126,93,0.30)",
     driftX: 14,
     driftY: 26,
     floatDuration: 10,
@@ -87,7 +77,6 @@ const SHAPES = [
     width: 540,
     height: 140,
     rotate: -14,
-    from: "rgba(170,154,148,0.26)",
     driftX: 16,
     driftY: 24,
     floatDuration: 9.2,
@@ -98,7 +87,6 @@ const SHAPES = [
     width: 340,
     height: 96,
     rotate: -8,
-    from: "rgba(180,164,144,0.28)",
     driftX: 12,
     driftY: 22,
     floatDuration: 8.8,
@@ -109,7 +97,6 @@ const SHAPES = [
     width: 240,
     height: 70,
     rotate: 18,
-    from: "rgba(158,126,93,0.24)",
     driftX: 10,
     driftY: 18,
     floatDuration: 8.4,
@@ -120,7 +107,6 @@ const SHAPES = [
     width: 180,
     height: 52,
     rotate: -22,
-    from: "rgba(74,52,33,0.18)",
     driftX: 10,
     driftY: 16,
     floatDuration: 8.0,

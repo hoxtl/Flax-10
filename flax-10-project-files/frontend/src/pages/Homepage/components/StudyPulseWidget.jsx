@@ -71,7 +71,7 @@ function fmtPeakRange(hr) {
 }
 
 /** Build prioritised list of insight rows from available data */
-function buildInsights({ streak, todayStudied, weeklyRemaining, daysLeft, peakHour, deadlines, pct, currentHour }) {
+function buildInsights({ streak, todayStudied, todayGoal, weeklyRemaining, daysLeft, nowDate, peakHour, deadlines, pct, currentHour }) {
   const list = [];
 
   // 1. Streak at risk — highest urgency
@@ -84,11 +84,12 @@ function buildInsights({ streak, todayStudied, weeklyRemaining, daysLeft, peakHo
   }
 
   // 2. Urgent deadline (≤5 days) — flag if study goal is below 70%
+  const nowMs = nowDate?.getTime() || Date.now();
   const urgent = (deadlines || [])
     .filter((d) => d.start_due_date)
     .map((d) => ({
       ...d,
-      daysLeft: Math.floor((new Date(d.start_due_date) - Date.now()) / 86400000),
+      daysLeft: Math.floor((new Date(d.start_due_date) - nowMs) / 86400000),
     }))
     .filter((d) => d.daysLeft >= 0 && d.daysLeft <= 5)
     .sort((a, b) => a.daysLeft - b.daysLeft)[0];
@@ -107,17 +108,17 @@ function buildInsights({ streak, todayStudied, weeklyRemaining, daysLeft, peakHo
   // 3. Today's study budget
   const dailyBudget = daysLeft > 0 ? weeklyRemaining / daysLeft : 0;
   const budgetLeft  = Math.max(0, dailyBudget - todayStudied);
-  if (budgetLeft > 0.1) {
-    list.push({
-      type: "info",
-      Icon: Clock,
-      text: `${budgetLeft.toFixed(1)}h more today keeps you on track`,
-    });
-  } else if (dailyBudget > 0 && todayStudied >= dailyBudget) {
+  if (todayGoal > 0 && todayStudied >= todayGoal) {
     list.push({
       type: "success",
       Icon: CheckCircle2,
       text: "Today's target met — great work",
+    });
+  } else if (budgetLeft > 0.1) {
+    list.push({
+      type: "info",
+      Icon: Clock,
+      text: `${budgetLeft.toFixed(1)}h more today keeps you on track`,
     });
   }
 
@@ -189,6 +190,7 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
   /* ─── Insights ────────────────────────────────── */
   const peakHour       = getPeakHour(analyticsData?.heatmap);
   const todayBar       = dailyBars[todayIdx];
+  const todayGoal      = todayBar.planned || 0;
   const weeklyRemain   = Math.max(0, goal - studied);
   const today          = now.getDay();
   const daysLeft       = Math.max(1, 7 - (today === 0 ? 7 : today));
@@ -197,8 +199,10 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
   const insights = buildInsights({
     streak,
     todayStudied: todayBar.studied,
+    todayGoal,
     weeklyRemaining: weeklyRemain,
     daysLeft,
+    nowDate: now,
     peakHour,
     deadlines,
     pct,

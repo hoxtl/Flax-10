@@ -266,6 +266,7 @@ function AuthRoutes({ location }) {
   return (
     <Routes location={location}>
       <Route path="/login" element={<AuthPage />} />
+      <Route path="/signup" element={<AuthPage initialSignIn={false} />} />
       <Route path="/reset-password" element={<PasswordResetRequest />} />
       <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
       <Route path="*" element={<Navigate to="/login" replace />} />

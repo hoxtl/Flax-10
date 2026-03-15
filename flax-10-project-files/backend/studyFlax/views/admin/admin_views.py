@@ -76,10 +76,24 @@ def resolve_teacher_request(request, user_id):
     if decision == 'approve':
         user.role = 'teacher'
         user.save()
+        Notification.objects.create(
+            user=user,
+            title='Teacher role approved',
+            message='Your request for teacher access has been approved. You can now create and manage modules.',
+            notification_type='general',
+            action_url='/modules',
+        )
         return Response({'message': f'Teacher role granted to {user.username}.'})
     elif decision == 'reject':
         user.role = 'student'
         user.save()
+        Notification.objects.create(
+            user=user,
+            title='Teacher request rejected',
+            message='Your request for teacher access was rejected. You can submit a new request from settings.',
+            notification_type='general',
+            action_url='/settings?tab=course',
+        )
         return Response({'message': f'Teacher request rejected for {user.username}.'})
     else:
         return Response({'error': 'Invalid decision. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
@@ -169,6 +183,18 @@ def request_teacher_role(request):
     user.role = 'pending_teacher'
     user.save()
     return Response({'message': 'Teacher role request submitted successfully.'})
+
+@api_view(['POST'])
+def cancel_teacher_role_request(request):
+    """Allow a pending_teacher to cancel their request and revert to student."""
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    if user.role != 'pending_teacher':
+        return Response({'error': 'No pending teacher request to cancel'}, status=status.HTTP_400_BAD_REQUEST)
+    user.role = 'student'
+    user.save()
+    return Response({'message': 'Teacher role request cancelled.'})
 
 # Helper functions
 

@@ -4,7 +4,7 @@
  */
 
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal/SleepWarningModal";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";

@@ -440,6 +440,61 @@
   backdrop-filter: blur(8px);
 }
 
+.semesterWidget {
+  display: grid;
+  gap: 6px;
+  padding: 11px 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  background: color-mix(in srgb, var(--panel) 82%, var(--surface-page));
+}
+
+.semesterWidgetHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.semesterWidgetLabel {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--primary) 72%, var(--muted));
+}
+
+.semesterWidgetValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.semesterWidgetTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.semesterWidgetFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 65%, var(--accent))
+  );
+  transition: width 0.3s ease;
+}
+
+.semesterWidgetMeta {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 66%, var(--muted));
+}
+
 .metricRail {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -559,6 +614,89 @@
 
 .analyticsLink:hover {
   color: #4a3421;
+}
+
+.liveContextStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.courseChangeCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(123, 103, 81, 0.15);
+  border-left: 3px solid #7b6751;
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(74, 52, 33, 0.04);
+  width: fit-content;
+  max-width: min(100%, 34rem);
+}
+
+.courseChangeIcon {
+  color: #7b6751;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.courseChangeBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.courseChangeLabel {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7b6751;
+}
+
+.courseChangeSub {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4a3421;
+}
+
+.courseChangeViewBtn {
+  background: none;
+  border: 1px solid rgba(123, 103, 81, 0.3);
+  color: #7b6751;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: background 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.courseChangeViewBtn:hover {
+  background: rgba(123, 103, 81, 0.08);
+}
+
+.courseChangeDismiss {
+  background: none;
+  border: none;
+  color: rgba(123, 103, 81, 0.5);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 2px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.courseChangeDismiss:hover {
+  color: #7b6751;
 }
 
 .liveContextCard {
@@ -1076,4 +1214,40 @@
 
 .posTodaysTasks {
   min-height: 100%;
+}
+
+/* ── Dark-mode overrides for homepage greeting cards ─────────────────────── */
+:global([data-theme="dark"]) .courseChangeCard {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(200, 180, 150, 0.2);
+  border-left-color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeLabel {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeSub {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn {
+  color: #d4b896;
+  border-color: rgba(200, 180, 150, 0.35);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn:hover {
+  background: rgba(200, 180, 150, 0.12);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss {
+  color: rgba(200, 180, 150, 0.5);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss:hover {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeIcon {
+  color: #c4a46d;
 }

@@ -1,7 +1,7 @@
-.morning { --bg: #f3ede4; }
-.day     { --bg: #f0e9df; }
-.evening { --bg: #eee3d6; }
-.night   { --bg: #eadfd2; }
+.morning { --welcome-bg: color-mix(in srgb, var(--surface-page) 92%, var(--surface-warm) 8%); }
+.day     { --welcome-bg: color-mix(in srgb, var(--surface-page) 88%, var(--surface-warm) 12%); }
+.evening { --welcome-bg: color-mix(in srgb, var(--surface-page) 84%, var(--surface-warm) 16%); }
+.night   { --welcome-bg: color-mix(in srgb, var(--surface-page) 76%, var(--surface-card) 24%); }
 
 .page {
   height: 100vh;
@@ -12,8 +12,12 @@
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 50% 30%, rgba(74,52,33,0.04), transparent 60%),
-    var(--bg, #f0e9df);
+    radial-gradient(
+      circle at 50% 30%,
+      color-mix(in srgb, var(--primary) 12%, transparent),
+      transparent 60%
+    ),
+    var(--welcome-bg, var(--surface-page));
 }
 
 .center {
@@ -33,22 +37,22 @@
   font-weight: 650;
   line-height: 1;
   letter-spacing: -1px;
-  color: rgba(43, 30, 20, 0.92);
-  text-shadow: 0 10px 40px rgba(74, 52, 33, 0.16);
+  color: var(--text);
+  text-shadow: 0 10px 40px color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 .bigLine {
   font-size: clamp(30px, 4vw, 52px);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: rgba(43, 30, 20, 0.92);
+  color: var(--text);
 }
 
 .smallLine {
   font-size: clamp(18px, 2.3vw, 26px);
   font-weight: 650;
-  opacity: 0.75;
-  color: rgba(43, 30, 20, 0.85);
+  opacity: 0.95;
+  color: var(--text-secondary);
 }
 
 .actions {
@@ -75,7 +79,7 @@
   font-size: 12px;
   letter-spacing: 0.34em;
   font-weight: 800;
-  color: rgba(43, 30, 20, 0.62);
+  color: color-mix(in srgb, var(--text) 76%, transparent);
 }
 
 .brandName::after {
@@ -84,7 +88,7 @@
   width: 24px;
   height: 2px;
   margin-top: 6px;
-  background: rgba(43, 30, 20, 0.4);
+  background: color-mix(in srgb, var(--text) 45%, transparent);
   border-radius: 2px;
 }
 
@@ -92,7 +96,7 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(43, 30, 20, 0.42);
+  color: color-mix(in srgb, var(--text-secondary) 78%, transparent);
 }
 
 .footerNote {
@@ -103,5 +107,32 @@
   z-index: 3;
   text-align: center;
   font-size: 12px;
-  color: rgba(10, 7, 5, 0.45);
+  color: color-mix(in srgb, var(--text-secondary) 80%, transparent);
+}
+
+.primaryBtn {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 94%, var(--surface-card) 6%),
+    color-mix(in srgb, var(--primary-strong) 92%, var(--surface-card) 8%)
+  ) !important;
+  color: var(--c-white) !important;
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent) !important;
+}
+
+.secondaryBtn {
+  background: color-mix(in srgb, var(--surface-card) 88%, transparent) !important;
+  color: var(--text) !important;
+  border-color: color-mix(in srgb, var(--border) 85%, transparent) !important;
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.78 !important;
+  color: var(--text-secondary) !important;
+}
+
+.tertiaryBtn {
+  background: color-mix(in srgb, var(--surface-panel) 72%, transparent) !important;
+  color: var(--text) !important;
+  border-color: color-mix(in srgb, var(--border) 75%, transparent) !important;
 }

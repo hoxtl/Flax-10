@@ -8,8 +8,7 @@ import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal/SleepWarningModal";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import TextInput from "../../../components/common/TextInput/TextInput";
 
@@ -93,11 +92,10 @@ function StudyBlockOptions({ form, setForm }) {
   );
 }
 
-function CreateTaskModalDuration({ form, setForm, askFlaxInitialMessage, isReadingList }) {
+function CreateTaskModalDuration({ form, setForm, isReadingList }) {
   if (isReadingList) return null;
   return (
     <div className={styles.durationRow}>
-      <EstTimeHelpBanner message="Not sure what estimated time to put? Ask Flax for a suggestion." ctaLabel="Ask Flax" initialMessage={askFlaxInitialMessage} className={styles.estTimeBannerModal} />
       <span className={styles.focusBlocksLabel}>Est. time</span>
         <StudyBlockOptions form={form} setForm={setForm} />
     </div>
@@ -201,8 +199,12 @@ function CreateTaskModalBody({ state, addToScheduleLabel }) {
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
+<<<<<<< HEAD
       <CreateTaskModalPageCount form={form} set={set} isReadingList={isReadingList} estimatedReadingMinutes={estimatedReadingMinutes} />
       <CreateTaskModalDuration form={form} setForm={setForm} askFlaxInitialMessage={askFlaxInitialMessage} isReadingList={isReadingList}/>
+=======
+      <CreateTaskModalDuration form={form} setForm={setForm} />
+>>>>>>> origin/main
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>

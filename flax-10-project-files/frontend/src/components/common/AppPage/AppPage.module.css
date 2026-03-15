@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: clamp(var(--space-5), 2vw, var(--space-8)) clamp(var(--space-4), 2.5vw, var(--space-8)) var(--space-10);
   position: relative;
+  animation: pageFlowIn 0.26s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .widthMd {
@@ -27,6 +28,18 @@
 
 .content {
   min-width: 0;
+}
+
+@keyframes pageFlowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 

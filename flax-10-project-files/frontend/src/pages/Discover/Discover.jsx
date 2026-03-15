@@ -2,19 +2,24 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
 import AppPage from "../../components/common/AppPage/AppPage";
-import Card from "../../components/common/Card/Card";
+import GridCard from "../../components/common/Card/GridCard";
+import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
+import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 
 import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
+import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
 
 function UserCardInfo({ user }) {
     return (
         <div className={styles.userInfo}>
             <div className={styles.name}>{user.first_name} {user.last_name}</div>
-            <div className={styles.username}>@{user.username}</div>
+            <EntityLinkChip to={`/profile/${user.id}`} className={styles.username} title={`Open @${user.username}`}>
+                @{user.username}
+            </EntityLinkChip>
             <div className={styles.courseInfo}>
                 {user.year && <span>{user.year}</span>}
                 {user.major && <span> • {user.major}</span>}
@@ -25,12 +30,10 @@ function UserCardInfo({ user }) {
 
 function UserCard({ user, onNavChange }) {
     return (
-        <Card className={styles.userCard} interactive onClick={() => onNavChange?.("profile_" + user.id)}>
-            <div style={{ marginBottom: 16 }}>
-                <UserAvatar user={user} avatarOnly size={80} />
-            </div>
+        <GridCard className={styles.userCard} onClick={() => onNavChange?.("profile_" + user.id)}>
+            <UserAvatar user={user} avatarOnly size={64} />
             <UserCardInfo user={user} />
-        </Card>
+        </GridCard>
     );
 }
 
@@ -110,7 +113,7 @@ function PaginatedGrid({ filtered, onNavChange, currentPage, totalPages, setCurr
     return (
         <div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
-            <div className={styles.grid}>
+            <div className={gridStyles.grid}>
                 {filtered.map(u => <div key={u.id}><UserCard user={u} onNavChange={onNavChange} /></div>)}
             </div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
@@ -119,10 +122,21 @@ function PaginatedGrid({ filtered, onNavChange, currentPage, totalPages, setCurr
     );
 }
 
-function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCurrentPage }) {
+function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery }) {
     const self = JSON.parse(localStorage.getItem("user")) || {};
     const filtered = users.filter(u => u.id !== self.id && u.username !== self.username);
-    if (!loading && filtered.length === 0) return <EmptyState icon="👥" title="No users found" description="Try adjusting your search or filters." />;
+    if (!loading && filtered.length === 0) {
+        if (String(searchQuery || "").trim()) {
+            return (
+                <SearchEmptyState
+                    query={searchQuery}
+                    itemLabel="users"
+                    onClear={() => setSearchQuery("")}
+                />
+            );
+        }
+        return <EmptyState icon="👥" title="No users found" description="Try adjusting your search or filters." />;
+    }
     return <PaginatedGrid filtered={filtered} onNavChange={onNavChange} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
 }
 
@@ -145,7 +159,18 @@ export default function Discover({ onNavChange }) {
     const showLoader = loading && users.length === 0;
 
     const srch = <DiscoverSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />;
-    const content = showLoader ? <DiscoverSkeleton /> : <UsersGrid users={users} onNavChange={onNavChange} loading={loading} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
+    const content = showLoader
+        ? <DiscoverSkeleton />
+        : <UsersGrid
+            users={users}
+            onNavChange={onNavChange}
+            loading={loading}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+        />;
 
     return (
         <AppPage className={styles.container} title="Discover" subtitle="Find course mates and study partners">

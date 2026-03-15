@@ -10,8 +10,8 @@ import TaskSection from "./TaskSection";
 import TaskFeedToolbar from "./TaskFeedToolbar";
 import CompletedTasksSection from "./CompletedTasksSection";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
-import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 
 import layoutStyles from "./TaskFeedLayout.module.css";
 import toolbarStyles from "./TaskFeedToolbar.module.css";
@@ -28,12 +28,9 @@ function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask
   const toolbarProps = { search: data.search, onSearchChange: data.setSearch, searchInputRef: data.searchInputRef, sortBy: data.sortBy, onSortChange: data.setSortBy, filterRef: data.filterRef, isFilterOpen: data.isFilterOpen, onFilterOpenChange: data.setIsFilterOpen, activeFilterCount: data.activeFilterCount, activeFilterTab: data.activeFilterTab, onFilterTabChange: data.setActiveFilterTab, filterQuery: data.filterQuery, onFilterQueryChange: data.setFilterQuery, visibleListItems: data.visibleListItems, filterListIds: data.filterListIds, onToggleList: data.toggleListFilter, moduleGroupKeys: data.moduleGroupKeys, groupedVisibleModuleItems: data.groupedVisibleModuleItems, filterModuleCodes: data.filterModuleCodes, onToggleModule: data.toggleModuleFilter, onClearAllFilters: data.clearAllFilters };
   return (
     <div className={styles.subHeader}>
-      <div className={styles.bannerRow}>
-        <EstTimeHelpBanner message="Not sure how long it'll take? Ask Flax for a suggestion." ctaLabel="Ask Flax" initialMessage="Help me estimate how long this task might take — what time block should I pick?" />
-      </div>
       <div className={styles.createRow}>
         {onAddTask ? <div className={styles.createBarWrap}><CreateTaskBar lists={lists} defaultListId={activeListId} defaultDueDate={defaultDueDateForNewTask} onAddTask={onAddTask} /></div> : <div className={styles.subHeaderSpacer} aria-hidden />}
-        {onCreateTask && <PrimaryButton type="button" className={styles.addBtn} onClick={onCreateTask} pill><Plus size={13} /> Full Planning</PrimaryButton>}
+        {onCreateTask && <PrimaryButton type="button" className={styles.fullPlanBtn} onClick={onCreateTask} pill><Plus size={13} /> Full Planning</PrimaryButton>}
       </div>
       <div className={styles.quickAddDivider} aria-hidden />
       <TaskFeedToolbar {...toolbarProps} />
@@ -44,12 +41,11 @@ function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask
 function SearchEmptyBlock({ data }) {
   if (!data.showSearchEmptyState) return null;
   return (
-    <div className={styles.searchEmptyCard}>
-      <span className={styles.searchEmptyEmoji}>🔍</span>
-      <p className={styles.searchEmptyMessage}>No tasks match &ldquo;{data.search}&rdquo;</p>
-      <p className={styles.searchEmptyHint}>Try a different keyword or check your spelling</p>
-      <PrimaryButton type="button" className={styles.searchEmptyBtn} variant="secondary" size="small" pill onClick={() => data.setSearch("")}>Clear search</PrimaryButton>
-    </div>
+    <SearchEmptyState
+      query={data.search}
+      itemLabel="tasks"
+      onClear={() => data.setSearch("")}
+    />
   );
 }
 
@@ -127,6 +123,7 @@ export default function TaskFeed(props) {
       <PageHeader
         title={data.headerTitle}
         subtitle="Plan coursework, deadlines, and day-to-day admin in one place."
+        compact
       />
       <TaskFeedSubHeader data={data} lists={props.lists} activeListId={props.activeListId} defaultDueDateForNewTask={props.defaultDueDateForNewTask} onAddTask={props.onAddTask} onCreateTask={props.onCreateTask} />
       <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} 
