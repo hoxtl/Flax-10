@@ -98,9 +98,9 @@
   --dropdown-padding: var(--space-1);
   --dropdown-item-padding: var(--space-2) var(--space-3);
   --dropdown-item-radius: var(--radius-md);
-  --filter-dropdown-width: 300px;
-  --filter-dropdown-width-sm: 260px;
-  --filter-dropdown-max-width: min(92vw, var(--filter-dropdown-width));
+  --filter-dropdown-width: 280px;
+  --filter-dropdown-width-sm: 240px;
+  --filter-dropdown-max-width: min(90vw, var(--filter-dropdown-width));
 
   --modal-radius: var(--radius-xl);
   --modal-padding: var(--space-6);

@@ -5,6 +5,8 @@ const MODULE_PREFIX_TO_DEPARTMENT = {
     AI: "Natural, Mathematical & Engineering Sciences",
     MA: "Natural, Mathematical & Engineering Sciences",
     PH: "Natural, Mathematical & Engineering Sciences",
+    EE: "Natural, Mathematical & Engineering Sciences",
+    GN: "Natural, Mathematical & Engineering Sciences",
     LS: "Life Sciences & Medicine",
     LW: "Law",
     PS: "Psychiatry, Psychology & Neuroscience",
@@ -18,12 +20,29 @@ const MODULE_PREFIX_TO_DEPARTMENT = {
     IR: "Social Science & Public Policy",
     NU: "Nursing, Midwifery & Palliative Care",
     DE: "Dentistry, Oral & Craniofacial Sciences",
+    FR: "Arts & Humanities",
+    SP: "Arts & Humanities",
+    GL: "Arts & Humanities",
+    AR: "Arts & Humanities",
+    ZH: "Arts & Humanities",
+    IT: "Arts & Humanities",
+    PT: "Arts & Humanities",
+    FA: "Arts & Humanities",
+    TH: "Arts & Humanities",
+    MU: "Arts & Humanities",
+    CL: "Arts & Humanities",
+    CR: "Arts & Humanities",
 };
 
 export function getDepartment(module_code, storedDepartment) {
-    if (storedDepartment) return storedDepartment;
     const prefix = module_code?.match(/^[A-Z]+/)?.[0];
-    return MODULE_PREFIX_TO_DEPARTMENT[prefix] || "King's College London";
+    const derivedDepartment = MODULE_PREFIX_TO_DEPARTMENT[prefix];
+
+    if (storedDepartment && storedDepartment !== "King's College London") {
+        return storedDepartment;
+    }
+
+    return derivedDepartment || storedDepartment || "King's College London";
 }
 
 export function isEnrolledIn(module_id, enrollments) {

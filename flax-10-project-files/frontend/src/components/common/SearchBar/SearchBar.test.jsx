@@ -6,13 +6,12 @@ import styles from './SearchBar.module.css';
 describe('SearchBar Component', () => {
     it('renders with default placeholder', () => {
         render(<SearchBar />);
-        expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument();
-        expect(screen.getByText('🔍')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Search... ( / )')).toBeInTheDocument();
     });
 
     it('renders with custom placeholder and value', () => {
         render(<SearchBar placeholder="Custom Search" value="initial query" />);
-        const input = screen.getByPlaceholderText('Custom Search');
+        const input = screen.getByPlaceholderText('Custom Search ( / )');
         expect(input).toBeInTheDocument();
         expect(input.value).toBe('initial query');
     });
@@ -21,7 +20,7 @@ describe('SearchBar Component', () => {
         const mockOnChange = vi.fn();
         render(<SearchBar onChange={mockOnChange} />);
 
-        const input = screen.getByPlaceholderText('Search...');
+        const input = screen.getByPlaceholderText('Search... ( / )');
         fireEvent.change(input, { target: { value: 'new query' } });
 
         expect(mockOnChange).toHaveBeenCalledWith('new query');

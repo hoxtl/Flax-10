@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatWeekdayTime, formatDuration, getDepartment } from './utils/moduleUtils.js';
 import GridCard from '../common/Card/GridCard';
@@ -19,6 +18,7 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     return (
         <GridCard className={getCardClass(enrolled, isTeacher)} onClick={() => !isTeacher && onViewModule(module)}>
             <CardBody module={module} enrolled={enrolled} isCore={isCore} isTeacher={isTeacher}
+                onView={(e) => stop(e, onViewModule)}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
@@ -27,7 +27,7 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
     );
 }
 
-function CardBody({ module, enrolled, isCore, isTeacher, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.content}>
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
@@ -35,7 +35,7 @@ function CardBody({ module, enrolled, isCore, isTeacher, onEdit, onDelete, onTog
             {module.description && <Description text={module.description} />}
             <ScheduleMeta module={module} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
-                onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
+                onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
         </div>
     );
 }
@@ -56,22 +56,7 @@ function CardHeader({ module, enrolled, isCore }) {
 }
 
 function Description({ text }) {
-    const [is_expanded, setIsExpanded] = useState(false);
-    const is_long = text.length > 180;
-    const display = is_expanded || !is_long ? text : text.substring(0, 180) + '...';
-    return (
-        <div className={styles.descriptionSection}>
-            <p className={styles.description}>{display}</p>
-            {is_long && (
-                <button
-                    className={styles.expandButton}
-                    onClick={(e) => { e.stopPropagation(); setIsExpanded(!is_expanded); }}
-                >
-                    {is_expanded ? 'Show less' : 'Read more'}
-                </button>
-            )}
-        </div>
-    );
+    return <p className={styles.description}>{text}</p>;
 }
 
 function ScheduleMeta({ module }) {
@@ -81,7 +66,6 @@ function ScheduleMeta({ module }) {
             {module.start_time && module.end_time && (
                 <MetaItem icon="⏱️" text={formatDuration(module.start_time, module.end_time)} />
             )}
-            {module.location && <MetaItem icon="📍" text={module.location} />}
         </div>
     );
 }
@@ -90,12 +74,12 @@ function MetaItem({ icon, text }) {
     return <span className={styles.metaItem}>{icon} {text}</span>;
 }
 
-function CardActions({ isTeacher, enrolled, isCore, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {
     return (
         <div className={styles.actions}>
             {isTeacher
                 ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
-                : <StudentAction enrolled={enrolled} isCore={isCore} onToggle={onToggle} />}
+                : <StudentActions enrolled={enrolled} isCore={isCore} onToggle={onToggle} onView={onView} />}
         </div>
     );
 }
@@ -106,6 +90,15 @@ function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
             <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
+        </>
+    );
+}
+
+function StudentActions({ enrolled, isCore, onToggle, onView }) {
+    return (
+        <>
+            <button type="button" className={styles.viewDetailsBtn} onClick={onView}>View details</button>
+            <StudentAction enrolled={enrolled} isCore={isCore} onToggle={onToggle} />
         </>
     );
 }

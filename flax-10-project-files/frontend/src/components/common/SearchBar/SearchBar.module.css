@@ -5,6 +5,12 @@
 
 .input {
     font-size: var(--text-md);
+    background: var(--panel);
+    color: var(--text);
+}
+
+.input::placeholder {
+    color: var(--muted);
 }
 
 /* Compact variant for topbar */
