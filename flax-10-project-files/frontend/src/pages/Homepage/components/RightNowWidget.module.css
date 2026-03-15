@@ -462,12 +462,6 @@
   text-decoration: underline;
 }
 
-/* ── Section divider ────────────────────────────────────────── */
-.sectionDivider {
-  height: 1px;
-  background: var(--widget-border);
-  flex-shrink: 0;
-}
 
 /* ── End of day ─────────────────────────────────────────────── */
 .endOfDayWrap {
@@ -563,13 +557,6 @@
   margin: 8px 0 0;
 }
 
-.emptyDaySubtitle {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--widget-text-secondary);
-  margin: 2px 0 0;
-}
 
 .emptyDayTomorrow {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
