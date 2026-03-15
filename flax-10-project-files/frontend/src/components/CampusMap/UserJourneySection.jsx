@@ -39,4 +39,13 @@ export function ManualJourneySection({
     };
 
     const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
+
+    return (
+        <section className={styles.section}>
+            <div className={styles.sectionLabel}>
+                <span className={styles.searchIcon}>🔍</span>
+                Plan Custom Journey
+            </div>
+        </section>
+    )
 }
