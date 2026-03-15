@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
 import { getCalendarEvents } from "../../api/calendarService";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
+import { userJourneySection } from "../../components/CampusMap/UserJourneySection"
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
