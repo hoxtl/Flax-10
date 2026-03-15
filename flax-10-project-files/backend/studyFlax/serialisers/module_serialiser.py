@@ -34,7 +34,10 @@ class ModuleSerialiser(serializers.ModelSerializer):
     def get_created_by_name(self, obj):
         try:
             if obj.created_by:
-                return f"{obj.created_by.first_name} {obj.created_by.last_name}".strip()
+                name = f"{obj.created_by.first_name} {obj.created_by.last_name}".strip()
+                if getattr(obj.created_by, 'role', None) == 'teacher' and not name.startswith('Dr.'):
+                    return f"Dr. {name}"
+                return name
         except Exception:
             pass
         return 'Unknown'

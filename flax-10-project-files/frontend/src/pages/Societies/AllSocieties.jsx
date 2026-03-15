@@ -76,8 +76,8 @@ function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
 }
 
 const SORT_OPTIONS = [
-    { value: "name", label: "A-Z" },
-    { value: "name-desc", label: "Z-A" },
+    { value: "name", label: "A → Z" },
+    { value: "name-desc", label: "Z → A" },
     { value: "newest", label: "Newest" },
     { value: "members", label: "Most Members" },
 ];

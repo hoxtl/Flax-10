@@ -13,6 +13,7 @@ const SORT_OPTIONS = [
   { value: "priority", label: "Priority" },
   { value: "due", label: "Due date" },
   { value: "alpha", label: "A → Z" },
+  { value: "alpha-desc", label: "Z → A" },
   { value: "date_added", label: "Date added" },
   { value: "est_time", label: "Estimated time" },
 ];

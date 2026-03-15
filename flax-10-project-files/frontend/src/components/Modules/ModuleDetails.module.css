@@ -57,6 +57,16 @@
     font-weight: 600;
 }
 
+.courseChip {
+    background: color-mix(in srgb, var(--muted) 10%, var(--surface-card));
+    color: var(--muted);
+    border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 500;
+}
+
 .enrolledBadge {
     margin-left: auto;
     background: var(--success-bg);
@@ -194,41 +204,49 @@
     color: var(--text);
 }
 
-.scheduleGrid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
-}
-
-.infoCard {
-    background: var(--panel);
-    border: var(--stroke-soft);
-    border-radius: var(--radius-md);
-    padding: 0.78rem;
+.scheduleRow {
     display: flex;
-    gap: 0.55rem;
     align-items: flex-start;
+    gap: 1.2rem;
+    flex-wrap: wrap;
 }
 
-.infoIcon {
-    font-size: 1rem;
-    line-height: 1;
+.scheduleItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 140px;
 }
 
-.infoLabel {
-    font-size: 0.7rem;
+.scheduleIcon {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.scheduleDivider {
+    width: 1px;
+    align-self: stretch;
+    min-height: 2.4rem;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+.scheduleLabel {
+    font-size: 0.68rem;
     text-transform: uppercase;
     color: var(--muted);
     font-weight: 700;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.2rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.15rem;
 }
 
-.infoValue {
-    font-size: 0.9rem;
+.scheduleValue {
+    font-size: 0.88rem;
     color: var(--text);
     font-weight: 600;
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
 .recurringBadge {
@@ -441,8 +459,13 @@
         grid-template-columns: 1fr;
     }
 
-    .scheduleGrid {
-        grid-template-columns: 1fr;
+    .scheduleRow {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .scheduleDivider {
+        display: none;
     }
 
     .heroActions {

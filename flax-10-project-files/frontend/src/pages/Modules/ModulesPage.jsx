@@ -237,7 +237,7 @@ function MainView({ state }) {
 }
 
 function ModuleToolbar({ search, sorting }) {
-    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'name-desc', label: 'Z → A' }, { value: 'deadlines', label: 'Deadlines' }];
     const selectedCourses = sorting.selectedCourses || [];
     const onToggleCourse = sorting.toggleCourse || (() => {});
     return (

@@ -1,5 +1,5 @@
 import { isEnrolledIn } from './utils/moduleUtils.js';
-import { formatDuration, formatTime, getDepartment } from './utils/moduleUtils.js';
+import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
 import GridCard from '../common/Card/GridCard';
 import styles from './ModulesCard.module.css';
 
@@ -72,6 +72,7 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
 
 function CardHeader({ module, enrolled, isCore }) {
     const department = getDepartment(module.module_code, module.department);
+    const course = getCourse(module.module_code, module.course);
     return (
         <div className={styles.cardHeader}>
             <div className={styles.headerTopRow}>
@@ -86,6 +87,7 @@ function CardHeader({ module, enrolled, isCore }) {
                 )}
             </div>
             <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
+            {course && <span className={styles.courseText}>{course}</span>}
         </div>
     );
 }
