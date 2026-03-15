@@ -30,4 +30,11 @@ export function ManualJourneySection({
             onCalculate(startCoords, destCoords);
         }
     };
+
+    const handleClear = () => {
+        setManualStart("");
+        setManualDestination("");
+        setStartCoords(null);
+        setDestCoords(null);
+    };
 }
