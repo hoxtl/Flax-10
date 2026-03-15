@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.society import SocietyMembership
 
 
@@ -275,7 +276,10 @@ def profile_summary_view(request):
     current_streak, longest_streak = compute_streaks(sessions_all)
     persona = derive_persona(sessions_90)
 
-    module_count = Enrollment.objects.filter(student=user).count()
+    if getattr(user, 'role', None) == 'teacher':
+        module_count = Module.objects.filter(created_by=user).count()
+    else:
+        module_count = Enrollment.objects.filter(student=user).count()
     badges = compute_badges(
         sessions_all, sessions_90,
         current_streak, longest_streak,
@@ -286,6 +290,8 @@ def profile_summary_view(request):
     weekly_goal  = user.weekly_goal_hours or 20
 
     memberships = SocietyMembership.objects.filter(user=user).select_related('society')
+    if getattr(user, 'role', None) == 'teacher':
+        memberships = memberships.none()
     societies = [
         {
             'id': m.society.id,

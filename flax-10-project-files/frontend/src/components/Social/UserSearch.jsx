@@ -10,6 +10,10 @@ import UserAvatar from '../common/UserAvatar/UserAvatar';
 import EmptyState from '../common/EmptyState/EmptyState';
 const styles = { ...socialStyles, ...searchStyles };
 const YEAR_OPTIONS = ["Foundation", "Year 1", "Year 2", "Year 3", "Year 4"];
+const ROLE_OPTIONS = [
+    { value: "student", label: "Student" },
+    { value: "teacher", label: "Professor" },
+];
 
 function handleErr(label, error, setter) {
     // Keep the search UI resilient even if the filter sources fail.
@@ -17,12 +21,12 @@ function handleErr(label, error, setter) {
     setter([]);
 }
 
-async function fetchUserResults(query, courses, socs, years, setRes, setL) {
+async function fetchUserResults(query, courses, socs, years, roles, setRes, setL) {
     const safeSetResults = typeof setRes === "function" ? setRes : () => { };
     const safeSetLoading = typeof setL === "function" ? setL : () => { };
-    if (!query.trim() && !courses.trim() && !socs.trim() && !years.trim()) return safeSetResults([]);
+    if (!query.trim() && !courses.trim() && !socs.trim() && !years.trim() && !roles.trim()) return safeSetResults([]);
     safeSetLoading(true);
-    const data = await searchUsers(query, courses, socs, 0, 20, years).catch(() => []);
+    const data = await searchUsers(query, courses, socs, 0, 20, years, roles).catch(() => []);
     safeSetResults(data.results || data);
     safeSetLoading(false);
 }
@@ -54,11 +58,12 @@ function useSearchState(skip) {
 
 
 export function UserResultItem({ user, onSelect, compact }) {
+    const displayName = (user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || user?.username || 'User');
     return (
         <div className={`${styles.userItem} ${styles.userResultItem} ${compact ? styles.compactUserItem : ''}`} onClick={onSelect}>
             <UserAvatar user={user} avatarOnly />
             <div className={styles.userNameDetails}>
-                {!compact && <span className={styles.userFullName}>{user.first_name} {user.last_name}</span>}
+                {!compact && <span className={styles.userFullName}>{displayName}</span>}
                 <span className={styles.userHandle}>{compact ? user.username : `@${user.username}`}</span>
             </div>
         </div>
@@ -103,6 +108,7 @@ const SEARCH_EMPTY_CONFIG = {
     start: { icon: '👋', title: 'Start typing', description: 'Search by name, username, course, or society.' },
     courses: { icon: '📚', title: 'No courses found', description: 'Try a different course search.' },
     years: { icon: '🗓️', title: 'No years found', description: 'Try a different year search.' },
+    roles: { icon: '🧑‍🏫', title: 'No roles found', description: 'Try selecting a different role.' },
     societies: { icon: '🎭', title: 'No societies found', description: 'Try a different society search.' },
 };
 
@@ -132,6 +138,7 @@ function SearchDropdown({ loading, query, userResults, onUserSelect, compact }) 
 }
 
 const FILTER_TABS = [
+    { value: 'roles', label: 'Role' },
     { value: 'courses', label: 'Courses' },
     { value: 'years', label: 'Year' },
     { value: 'societies', label: 'Societies' },
@@ -149,7 +156,13 @@ const FilterSearchInput = ({ query, setQuery, tab }) => (
     <SearchBar
         value={query}
         onChange={setQuery}
-        placeholder={tab === 'courses' ? 'Search courses or departments...' : tab === 'years' ? 'Search years...' : 'Search societies...'}
+        placeholder={tab === 'courses'
+            ? 'Search courses or departments...'
+            : tab === 'years'
+                ? 'Search years...'
+                : tab === 'roles'
+                    ? 'Search roles...'
+                    : 'Search societies...'}
     />
 );
 
@@ -218,6 +231,26 @@ const YearList = ({ years, querySelected, onToggle }) => {
     );
 };
 
+const RoleResultItem = ({ role, isChecked, onToggle }) => (
+    <div className={`${styles.userItem} ${styles.filterItem}`} onClick={() => onToggle(role.value)}>
+        <FilterCheckbox isChecked={isChecked} onToggle={onToggle} id={role.value} />
+        <div className={styles.filterItemText}>
+            <span className={styles.filterItemTitle}>{role.label}</span>
+        </div>
+    </div>
+);
+
+const RoleList = ({ roles, querySelected, onToggle }) => {
+    if (roles.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.roles} />;
+    return (
+        <div className={`${styles.userList} ${styles.userListNoGap}`}>
+            {roles.map((role) => (
+                <RoleResultItem key={role.value} role={role} isChecked={querySelected(role.value)} onToggle={onToggle} />
+            ))}
+        </div>
+    );
+};
+
 const matchCat = (s, cat) => cat === 'other' ? (!s.categories || !s.categories.length) : (s.categories?.[0]?.toLowerCase() === cat);
 const SocietyList = ({ societies, filterQuery, querySelected, onToggle, cats, expanded, toggleSection }) => {
     if (societies.length === 0) return <EmptySearchText {...SEARCH_EMPTY_CONFIG.societies} />;
@@ -242,6 +275,9 @@ function FilterDropdown({
     yearResults: yR,
     selectedYears: sY,
     toggleYear: tY,
+    roleResults: rR,
+    selectedRoles: sRls,
+    toggleRole: tR,
     societyResults: sR,
     selectedSocieties: sS,
     toggleSociety: tS,
@@ -256,6 +292,7 @@ function FilterDropdown({
             <div className={styles.filterListContainer}>
                 {tab === 'courses' && <CourseList courseGroups={courseGroups} filteredCourses={courseResults} filterQuery={q} querySelected={course => sC.includes(course)} onToggle={tC} expanded={expanded} toggleSection={toggle} />}
                 {tab === 'years' && <YearList years={yR} querySelected={year => sY.includes(year)} onToggle={tY} />}
+                {tab === 'roles' && <RoleList roles={rR} querySelected={role => sRls.includes(role)} onToggle={tR} />}
                 {tab === 'societies' && <SocietyList societies={sR} filterQuery={q} querySelected={id => sS.includes(id)} onToggle={tS} cats={cats} expanded={expanded} toggleSection={toggle} />}
             </div>
         </div>
@@ -289,11 +326,19 @@ function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDpdwn, l
     );
 }
 
-const useUserSearchEffects = (query, selectedCourses, selectedSocieties, selectedYears, setUserResults, setLoading) => {
+const useUserSearchEffects = (query, selectedCourses, selectedSocieties, selectedYears, selectedRoles, setUserResults, setLoading) => {
     useEffect(() => {
-        const timer = setTimeout(() => fetchUserResults(query, selectedCourses.join(','), selectedSocieties.join(','), selectedYears.join(','), setUserResults, setLoading), 300);
+        const timer = setTimeout(() => fetchUserResults(
+            query,
+            selectedCourses.join(','),
+            selectedSocieties.join(','),
+            selectedYears.join(','),
+            selectedRoles.join(','),
+            setUserResults,
+            setLoading
+        ), 300);
         return () => clearTimeout(timer);
-    }, [query, selectedCourses, selectedSocieties, selectedYears]);
+    }, [query, selectedCourses, selectedSocieties, selectedYears, selectedRoles]);
 };
 
 export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
@@ -306,7 +351,7 @@ export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.98 }}
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ originY: 0, originX: 1 }}
+                    style={{ originY: 0, originX: 1, position: 'relative', zIndex: 10000 }}
                 >
                     <FilterDropdown {...props} />
                 </motion.div>
@@ -320,12 +365,14 @@ export const useFilterState = (allCourses, allSocieties, query, isSearchFocused,
     const [activeFilterTab, setActiveFilterTab] = useState('courses');
     const [selectedCourses, setSelectedCourses] = useState([]);
     const [selectedYears, setSelectedYears] = useState([]);
+    const [selectedRoles, setSelectedRoles] = useState([]);
     const [selectedSocieties, setSelectedSocieties] = useState([]);
     const [filterQuery, setFilterQuery] = useState('');
     const togCourse = (course) => setSelectedCourses(p => toggleArr(p, course));
     const togYear = (year) => setSelectedYears(p => toggleArr(p, year));
+    const togRole = (role) => setSelectedRoles(p => toggleArr(p, role));
     const togSoc = (id) => setSelectedSocieties(p => toggleArr(p, id));
-    useUserSearchEffects(query, selectedCourses, selectedSocieties, selectedYears, setUserResults, setLoading);
+    useUserSearchEffects(query, selectedCourses, selectedSocieties, selectedYears, selectedRoles, setUserResults, setLoading);
     const active = isSearchFocused;
     const filteredCourseGroups = filterCourses(allCourses, filterQuery);
     const props = {
@@ -337,9 +384,12 @@ export const useFilterState = (allCourses, allSocieties, query, isSearchFocused,
         courseResults: Object.values(filteredCourseGroups).flat(),
         selectedCourses,
         selectedYears,
+        selectedRoles,
         toggleCourse: togCourse,
         yearResults: YEAR_OPTIONS.filter((year) => !filterQuery || year.toLowerCase().includes(filterQuery.toLowerCase())),
         toggleYear: togYear,
+        roleResults: ROLE_OPTIONS.filter((role) => !filterQuery || role.label.toLowerCase().includes(filterQuery.toLowerCase())),
+        toggleRole: togRole,
         societyResults: filterObj(allSocieties, filterQuery, ['name']),
         selectedSocieties,
         toggleSociety: togSoc,

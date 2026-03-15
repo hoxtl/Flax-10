@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 import styles from "./DashboardLayout.module.css";
 import TopBar from "../components/Dashboard/Topbar";
+import QuickCommandBar from "../components/common/QuickCommandBar/QuickCommandBar";
 import Sidebar from "../components/Dashboard/Sidebar";
 import WeekBar from "../components/Dashboard/WeekBar";
 import QuickAddModal from "../components/Dashboard/QuickAddModal";
@@ -14,6 +15,7 @@ import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
 import CreateSocietyModal from "../components/Society/CreateSocietyModal";
 import DeadlineModal from "../components/Modules/DeadlineModal";
+import ReadingModal from "../components/Modules/ReadingModal";
 import { createSociety } from "../api/societyApi";
 import { createTask, fetchTaskLists } from "../api/taskService";
 import { getModules, getEnrollments } from "../api/moduleApi";
@@ -153,7 +155,8 @@ function useModalStates() {
   const [showSocietyModal, setShowSocietyModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [deadlineModule, setDeadlineModule] = useState(null);
-  return { showQuickAdd, setShowQuickAdd, showSocietyModal, setShowSocietyModal, showTaskModal, setShowTaskModal, deadlineModule, setDeadlineModule };
+  const [readingModule, setReadingModule] = useState(null);
+  return { showQuickAdd, setShowQuickAdd, showSocietyModal, setShowSocietyModal, showTaskModal, setShowTaskModal, deadlineModule, setDeadlineModule, readingModule, setReadingModule };
 }
 
 function useTimerNav(activeNav, onNavChange, t) {
@@ -186,6 +189,7 @@ function useDashboardState(activeNav, onNavChange) {
     else if (id === 'task') modals.setShowTaskModal(true);
     else if (id === 'create_module') onPickNav('modules_create');
     else if (id === 'add_deadline') modals.setDeadlineModule(extra);
+    else if (id === 'add_reading') modals.setReadingModule(extra);
     else modal.openModal(null, id, selectedDate);
   };
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav, onSelectType, handleNavChange, pendingNav, setPendingNav, t, ...modals };
@@ -299,6 +303,12 @@ function DashboardModals({ state }) {
           startCreating={true}
         />
       )}
+      {state.readingModule && (
+        <ReadingModal
+          module={state.readingModule}
+          onClose={() => state.setReadingModule(null)}
+        />
+      )}
     </>
   );
 }
@@ -316,6 +326,7 @@ function DashboardMain({ state, onNavChange, children }) {
     isMobile,
     t,
     setPendingNav,
+    setShowTaskModal,
   } = state;
   return (
     <>
@@ -340,6 +351,10 @@ function DashboardMain({ state, onNavChange, children }) {
         {children}
       </MainArea>
       <DashboardModals state={state} />
+      <QuickCommandBar
+        onNavChange={onNavChange}
+        onOpenTask={() => setShowTaskModal(true)}
+      />
     </>
   );
 }

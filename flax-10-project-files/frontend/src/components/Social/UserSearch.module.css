@@ -75,8 +75,8 @@
     top: 100%;
     margin-top: 8px;
     right: 0;
-    width: var(--filter-dropdown-width);
-    max-width: var(--filter-dropdown-max-width);
+    width: var(--user-filter-dropdown-width);
+    max-width: var(--user-filter-dropdown-max-width);
     z-index: 9999;
     display: flex;
     flex-direction: column;

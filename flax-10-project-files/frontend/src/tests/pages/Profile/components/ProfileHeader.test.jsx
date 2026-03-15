@@ -88,6 +88,21 @@ describe('ProfileHeader', () => {
     expect(imgs[0].src).toContain('example.com/photo.jpg');
   });
 
+  it('falls back to seeded tutor photo when profile photo is missing', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'srahwan', first_name: 'Sam', last_name: 'Rahwan' }}
+        profileData={{}}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    const imgs = document.querySelectorAll('img[alt="Profile"]');
+    expect(imgs.length).toBe(2);
+    expect(imgs[0].src).toContain('images.unsplash.com');
+  });
+
   it('renders Edit profile button when canEditProfile is true', () => {
     render(
       <ProfileHeader
@@ -185,6 +200,21 @@ describe('ProfileHeader', () => {
     expect(screen.getAllByText(/Year 2/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Computer Science/).length).toBeGreaterThan(0);
     expect(document.body.textContent).toMatch(/·/);
+  });
+
+  it('shows department and hides year for professors', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'echen', first_name: 'Eric', last_name: 'Chen', role: 'teacher' }}
+        profileData={{ year: 'Year 2', major: 'Spanish' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.getAllByText('Professor').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Department: Spanish').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Year 2/)).toBeNull();
   });
 
   it('hides stats when visibility flags are false', () => {
