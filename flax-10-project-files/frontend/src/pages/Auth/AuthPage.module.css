@@ -18,11 +18,11 @@
 }
 
 .authFormCard {
-  width: min(900px, 100%);
+  width: min(620px, 100%);
   margin: 0;
   padding-bottom: 12px;
-  padding-left: max(12px, env(safe-area-inset-left));
-  padding-right: max(12px, env(safe-area-inset-right));
+  padding-left: 0;
+  padding-right: 0;
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
@@ -31,7 +31,7 @@
 
 .authPanelCard {
   width: 100%;
-  max-width: 860px;
+  max-width: 600px;
   margin: 0;
   position: relative;
 }
@@ -58,5 +58,7 @@
     width: 100%;
     margin: 0;
     padding-bottom: 12px;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
