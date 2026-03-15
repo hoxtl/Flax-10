@@ -1,5 +1,6 @@
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
+import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
 import GridCard from '../common/Card/GridCard';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
@@ -91,6 +92,32 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
     );
 }
 
+function getTutorImage(moduleCode, tutorName) {
+    return getTutorPhotoFallback({ fullName: tutorName, seed: moduleCode, allowGeneric: true });
+}
+
+function TutorAvatar({ module }) {
+    const src = getTutorImage(module.module_code, module.created_by_name);
+    if (!src) return null;
+    const initials = (module.created_by_name || 'T')
+        .split(/\s+/).filter(Boolean)
+        .map(p => p[0]).join('').slice(0, 2).toUpperCase();
+    return (
+        <div className={styles.tutorAvatar} title={module.created_by_name || 'Tutor'}>
+            <img
+                src={src}
+                alt={module.created_by_name || 'Tutor'}
+                className={styles.tutorAvatarImg}
+                onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                }}
+            />
+            <span className={styles.tutorAvatarFallback} style={{ display: 'none' }}>{initials}</span>
+        </div>
+    );
+}
+
 function CardHeader({ module, enrolled, isCore }) {
     const department = getDepartment(module.module_code, module.department);
     const course = getCourse(module.module_code, module.course);
@@ -107,11 +134,14 @@ function CardHeader({ module, enrolled, isCore }) {
                         {module.module_code}
                     </EntityLinkChip>
                 </div>
-                {enrolled && (
-                    <span className={styles.enrolledBadge}>
-                        {isCore ? '📌 Core' : '✓ Enrolled'}
-                    </span>
-                )}
+                <div className={styles.headerRight}>
+                    {enrolled && (
+                        <span className={styles.enrolledBadge}>
+                            {isCore ? '📌 Core' : '✓ Enrolled'}
+                        </span>
+                    )}
+                    <TutorAvatar module={module} />
+                </div>
             </div>
             <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
             {course && <span className={styles.courseText}>{course}</span>}
