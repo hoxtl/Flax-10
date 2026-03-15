@@ -54,7 +54,7 @@
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #ffffff;
+  color: var(--widget-text-primary);
 }
 
 .taskWidgetSlotSubtitle {
