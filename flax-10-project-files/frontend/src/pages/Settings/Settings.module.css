@@ -322,24 +322,12 @@
   --panelAccent: var(--primary);
 }
 
-.panelAccount {
-  --panelAccent: color-mix(in srgb, var(--warning) 70%, var(--primary) 30%);
-}
-
-.panelHome {
-  --panelAccent: color-mix(in srgb, var(--success-text) 78%, var(--primary) 22%);
-}
-
-.panelSecurity {
-  --panelAccent: color-mix(in srgb, var(--danger) 48%, var(--primary) 52%);
-}
-
-.panelPreferences {
-  --panelAccent: color-mix(in srgb, var(--primary-strong) 75%, var(--warning) 25%);
-}
-
+.panelAccount,
+.panelHome,
+.panelSecurity,
+.panelPreferences,
 .panelCourse {
-  --panelAccent: color-mix(in srgb, var(--danger) 30%, var(--primary-strong) 70%);
+  --panelAccent: color-mix(in srgb, var(--primary) 75%, var(--warning) 25%);
 }
 
 /* Section header strip at top of panel */
@@ -464,46 +452,6 @@
   font-family: var(--font-heading);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.securityHealthy {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
-  margin: 0 0 8px;
-  border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--success-text) 36%, var(--border));
-  background: color-mix(in srgb, var(--success-bg) 78%, transparent);
-}
-
-.securityHealthyIcon {
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, var(--success-text) 24%, transparent);
-  color: color-mix(in srgb, var(--success-text) 92%, var(--text) 8%);
-  font-size: 12px;
-  font-weight: 800;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.securityHealthyTitle {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--success-text) 88%, var(--text) 12%);
-}
-
-.securityHealthySub {
-  margin: 2px 0 0;
-  font-size: 11px;
-  line-height: 1.4;
-  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
 }
 
 .formDescription {
@@ -1209,6 +1157,12 @@
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.modalBlurBackdrop {
+  background: rgba(74, 52, 33, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* Light-theme polish: increase contrast and warmth so it matches dark-mode quality */
