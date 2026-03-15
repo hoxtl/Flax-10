@@ -53,7 +53,7 @@
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #ffffff;
+  color: var(--widget-text-primary);
 }
 
 .headerStatus {
@@ -128,7 +128,7 @@
   align-items: center;
   border: 1px solid var(--focus-ring);
   background: var(--pill-bg);
-  color: #ffffff;
+  color: var(--color-primary-strong);
   border-radius: 10px;
   padding: 4px 10px;
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
@@ -139,6 +139,10 @@
   letter-spacing: 0.05em;
   opacity: 0.9;
   cursor: pointer;
+}
+
+[data-mode="dark"] .moduleCodePill {
+  color: #ffffff;
 }
 
 .moduleCodePill:hover {
