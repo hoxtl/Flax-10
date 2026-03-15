@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import styles from './DeadlineForm.module.css';
+import DateTimePicker from '../common/inputs/DateTimePicker';
 
 const EMPTY_FORM = { title: '', chapter: '', start_page: '', end_page:'', deadline: '', estimated_minutes: '',};
 
@@ -8,6 +9,7 @@ const buildFormData = (form) => ({
     start_page: Number(form.start_page),
     end_page: Number(form.end_page),
     estimated_minutes: form.estimated_minutes ? Number(form.estimated_minutes) : null,
+    deadline: form.deadline ? new Date(form.deadline).toISOString() : '',
 })
 
 function Field({label, children}) {
@@ -57,8 +59,8 @@ function PageFields({start, end, onChange}) {
 function DeadlineField({value, onChange}) {
     return (
         <Field label="Due Date">
-            <input className = {styles.input} type="datetime-local" value={value}
-                onChange={e => onChange('deadline', e.target.value)} required/>
+            <DateTimePicker
+                value={value} onChange={val => { console.log('DateTimePicker onChange:', val); onChange('deadline', val); }} placeholder='Pick due date & time'/>
         </Field>
     );
 }
