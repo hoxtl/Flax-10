@@ -54,10 +54,10 @@ function computeDnaSegments(heatmap) {
     const [m, a, e, n] = sumByPeriod(heatmap);
     const t = m + a + e + n || 1;
     const segments = [
-        { label: "Morning", pct: m / t, color: "#F59E0B" },
-        { label: "Afternoon", pct: a / t, color: "#D97706" },
-        { label: "Evening", pct: e / t, color: "#7C3AED" },
-        { label: "Night", pct: n / t, color: "#1E3A5F" },
+        { label: "Morning", pct: m / t, color: "var(--color-primary-strong)" },
+        { label: "Afternoon", pct: a / t, color: "var(--color-primary)" },
+        { label: "Evening", pct: e / t, color: "var(--color-highlight)" },
+        { label: "Night", pct: n / t, color: "color-mix(in srgb, var(--color-primary) 20%, black)" },
     ];
     return segments.filter(s => s.pct > 0.01);
 }
@@ -117,7 +117,7 @@ function GoalRing({ percentage, hoursStudied, goalHours, editing, onToggle }) {
         <button className={`${styles.goalRingBtn} ${editing ? styles.goalRingActive : ''}`} onClick={onToggle}>
             <svg width="84" height="84" viewBox="0 0 84 84" className={styles.goalRingSvg}>
                 <circle cx="42" cy="42" r={radius} fill="none" stroke="var(--border)" strokeWidth="7" />
-                <circle cx="42" cy="42" r={radius} fill="none" stroke={percentage >= 100 ? "#4CAF50" : "var(--primary)"} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={circ * 0.25} style={{ transition: 'stroke-dasharray 0.8s ease' }} />
+                <circle cx="42" cy="42" r={radius} fill="none" stroke={percentage >= 100 ? "var(--success-text)" : "var(--primary)"} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={circ * 0.25} style={{ transition: 'stroke-dasharray 0.8s ease' }} />
             </svg>
             <div className={styles.ringInner}><span className={styles.ringValue}>{hoursStudied}h</span><span className={styles.ringGoal}>/{goalHours}h</span></div>
         </button>
