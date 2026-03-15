@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('studyFlax', '0005_task_page_count_reading_task_reading'),
-        ('studyFlax', '0015_usersettings_homepage_widgets_usersettings_mode'),
+        ('studyFlax', '0019_module_course_module_department'),
     ]
 
     operations = [
