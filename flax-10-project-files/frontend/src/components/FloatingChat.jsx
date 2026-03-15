@@ -32,7 +32,7 @@ export default function FloatingChat() {
             <StudyCoachPanel
               period={30}
               initialMessage={initialMessage}
-              subtitle="Ask about your study habits"
+              subtitle="Ask me anything"
               className={styles.windowPanel}
               onClose={() => { setOpen(false); setInitialMessage(''); }}
             />

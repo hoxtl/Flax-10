@@ -36,9 +36,9 @@
 }
 
 .window {
-  width: min(360px, calc(100vw - 32px));
-  height: min(480px, calc(100vh - 140px));
-  min-height: 400px;
+  width: min(340px, calc(100vw - 32px));
+  height: min(540px, calc(100vh - 140px));
+  min-height: 440px;
   border-radius: var(--ai-panel-radius);
   display: flex;
   flex-direction: column;
