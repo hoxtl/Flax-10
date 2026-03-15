@@ -239,19 +239,21 @@ function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest
         {course ? course : <em>No course set</em>}
       </div>
       {pendingRequest ? (
-        <RequestStatusCard
-          icon="⏳"
-          title="Course change request pending"
-          subtitle={
-            <>
-              An admin will review your request shortly.
-              {pendingRequest.requested_course ? <> &middot; <em>{pendingRequest.requested_course}</em></> : null}
-            </>
-          }
-          onCancel={onCancelRequest}
-          cancelling={cancellingRequest}
-          successMessage={successMessage}
-        />
+        <div style={{ marginTop: 8 }}>
+          <RequestStatusCard
+            icon="⏳"
+            title="Course change request pending"
+            subtitle={
+              <>
+                An admin will review your request shortly.
+                {pendingRequest.requested_course ? <> &middot; <em>{pendingRequest.requested_course}</em></> : null}
+              </>
+            }
+            onCancel={onCancelRequest}
+            cancelling={cancellingRequest}
+            successMessage={successMessage}
+          />
+        </div>
       ) : (
         <button type="button" className={styles.courseChangeLink} onClick={onRequestClick}>
           Request a course change &rarr;

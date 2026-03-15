@@ -15,7 +15,6 @@ function isStrongPassword(password) {
 export default function SecurityForm({ onSave, isSaving, error }) {
   const [formData, setFormData] = useState({ newPassword: "", confirmPassword: "" });
   const [saveSignal, setSaveSignal] = useState(0);
-  const showHealthyState = !error && isStrongPassword(formData.newPassword);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,15 +31,6 @@ export default function SecurityForm({ onSave, isSaving, error }) {
   };
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      {showHealthyState ? (
-        <div className={styles.securityHealthy} role="status" aria-live="polite">
-          <span className={styles.securityHealthyIcon} aria-hidden="true">✓</span>
-          <div>
-            <p className={styles.securityHealthyTitle}>Your account is secure</p>
-            <p className={styles.securityHealthySub}>No recent security alerts. Your password policy checks are active.</p>
-          </div>
-        </div>
-      ) : null}
       <SectionHeader title="Change Password" />
       <ErrorMessage message={error} />
       <div className={styles.twoColLayout}>
