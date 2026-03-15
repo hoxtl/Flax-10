@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import styles from "../AttendancePage.module.css";
 
 function formatEventDate(startTime) {
@@ -26,7 +27,7 @@ export default function SegmentDetailPanel({ segmentLabel, events, onClose }) {
           onClick={onClose}
           aria-label="Close"
         >
-          ×
+          <X size={18} />
         </button>
       </div>
       <ul className={styles.detailList}>
