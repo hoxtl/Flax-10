@@ -7,7 +7,7 @@
  *
  * Each week column shows stacked density bars by type:
  *   🟢 Lectures   (timetable / lecture / seminar / tutorial / lab)
- *   🔴 Deadlines  (from upcomingDeadlines)
+ *   🟠 Deadlines  (from upcomingDeadlines)
  *   🟣 Exams      (events whose title contains "exam" / "assessment")
  */
 
