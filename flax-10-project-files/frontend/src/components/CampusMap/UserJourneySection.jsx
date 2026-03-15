@@ -49,13 +49,34 @@ export function ManualJourneySection({
 
             <div className={styles.manualJourneyInputs}>
                 <div className={styles.manualInputGroup}>
-                <label className={styles.manualLabel}>From</label>
-                <LocationAutocomplete
-                    value={manualStart}
-                    onChange={handleStartSelect}
-                    placeholder="Enter starting location"
-                />
+                    <label className={styles.manualLabel}>From</label>
+                    <LocationAutocomplete 
+                        value={manualStart}
+                        onChange={handleStartSelect}
+                        placeholder="Enter a starting location"
+                    />
                 </div>
+
+                <div className={styles.manualInputGroup}>
+                    <label className={styles.manualLabel}>To</label>
+                    <LocationAutocomplete 
+                        value={manualDestination}
+                        onChange={handleDestSelect}
+                        placeholder="Enter a destination"
+                    />
+                </div>
+
+                <div className={styles.manualButtonGroup}>
+                    <button
+                        className={styles.goButton}    
+                        onClick={handleGo}
+                        disabled={!canCalculate}
+                    >
+                        {canCalculate ? "Calculate Route 🚀": "Enter both locations"}
+                    </button>
+                </div>
+
+            </div>
         </section>
     )
 }
