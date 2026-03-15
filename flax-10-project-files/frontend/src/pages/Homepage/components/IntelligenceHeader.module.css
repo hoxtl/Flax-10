@@ -1,10 +1,9 @@
 .premiumCard {
   position: relative;
   border-radius: 28px;
-  background:
-    linear-gradient(135deg, rgba(255, 252, 248, 0.99) 0%, rgba(247, 241, 234, 0.96) 56%, rgba(243, 235, 226, 0.93) 100%);
-  border: 1px solid rgba(123, 103, 81, 0.14);
-  box-shadow: 0 18px 36px rgba(74, 52, 33, 0.045);
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.045);
   overflow: hidden;
   height: 100%;
 }
@@ -23,10 +22,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at top right, rgba(196, 164, 109, 0.12), transparent 24%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.18), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 52%);
+  background: var(--premium-glow);
 }
 
 @media (min-width: 768px) {
@@ -52,7 +48,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
 }
 
 .headerDateRow {
@@ -62,7 +58,7 @@
 }
 
 .headerDateIcon {
-  color: #a8a29e;
+  color: var(--widget-text-tertiary);
   flex-shrink: 0;
 }
 
@@ -72,7 +68,7 @@
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 0.98;
-  color: #4a433d;
+  color: var(--widget-text-primary);
   margin: 0;
   max-width: none;
 }
@@ -94,9 +90,9 @@
   gap: 12px;
   padding: 12px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(123, 103, 81, 0.08);
-  backdrop-filter: blur(8px);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: var(--widget-glass-blur);
 }
 
 .metricRail {
@@ -112,8 +108,9 @@
   padding: 12px;
   min-width: 98px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(123, 103, 81, 0.06);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 @media (max-width: 767px) {
@@ -123,7 +120,7 @@
 }
 
 .metricLabel {
-  color: #8f7b68;
+  color: var(--widget-metric-label);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
@@ -132,7 +129,7 @@
 }
 
 .metricValue {
-  color: #4a3a2d;
+  color: var(--widget-metric-value);
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 1.02rem;
   font-weight: 700;
@@ -145,8 +142,9 @@
   gap: 8px;
   padding: 16px 17px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(123, 103, 81, 0.08);
+  background: var(--surface-raised);
+  border: 1px solid var(--widget-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .nextStepLabel {
@@ -155,12 +153,12 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #8f7b68;
+  color: var(--widget-text-tertiary);
 }
 
 .nextStepText {
   margin: 0;
-  color: #3f3025;
+  color: var(--widget-text-primary);
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 1.08rem;
   font-weight: 700;
@@ -172,7 +170,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.67rem;
   font-weight: 700;
-  color: rgba(74, 52, 33, 0.56);
+  color: var(--widget-text-tertiary);
   letter-spacing: 0.05em;
 }
 
@@ -203,7 +201,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #736048;
+  color: var(--widget-text-secondary);
 }
 
 .analyticsLink {
@@ -212,7 +210,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #7b6751;
+  color: var(--widget-accent);
   text-decoration: none;
 }
 
@@ -227,11 +225,11 @@
   width: fit-content;
   max-width: min(100%, 34rem);
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.52);
-  border: 1px solid rgba(123, 103, 81, 0.1);
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
   border-radius: 18px;
-  box-shadow: 0 8px 18px rgba(74, 52, 33, 0.025);
-  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.025);
+  backdrop-filter: var(--widget-glass-blur);
 }
 
 .liveContextInlineAlert {
@@ -252,7 +250,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8f7b68;
+  color: var(--widget-text-tertiary);
 }
 
 .liveContextIcon {
@@ -283,7 +281,7 @@
   font-size: 0.88rem;
   font-weight: 700;
   line-height: 1.35;
-  color: #6f3f30;
+  color: var(--widget-text-primary);
   max-width: 35ch;
 }
 
@@ -292,7 +290,7 @@
   font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(132, 87, 72, 0.72);
+  color: var(--widget-text-tertiary);
 }
 
 .liveContextInlineAlert .liveContextTop {
