@@ -1,3 +1,4 @@
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
@@ -171,17 +172,11 @@ export default function AnalyticsPage() {
       title="Analytics"
       subtitle="Your study patterns & performance"
       action={
-        <div className={styles.periodToggle}>
-          {PERIODS.map(p => (
-            <button
-              key={p.value}
-              className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
-              onClick={() => handlePeriodChange(p.value)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={PERIODS}
+          value={period}
+          onChange={handlePeriodChange}
+        />
       }
     >
 

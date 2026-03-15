@@ -13,6 +13,7 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
@@ -188,10 +189,10 @@ function ModuleToolbar({ search, sorting, departments }) {
             searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
             controlsSlot={
                 <>
-                    <AnimatedDropdown className={styles.toolbarDropdown} value={search.filter} onChange={search.onFilterChange} options={filter_options} />
+                    <SegmentedControl value={search.filter} onChange={search.onFilterChange} options={filter_options} />
                     <AnimatedDropdown className={styles.toolbarDropdown} value={sorting.department} onChange={sorting.handleNewDepartment} options={dept_options} />
                     <ToolbarSortControl>
-                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+                        <SegmentedControl value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
                     </ToolbarSortControl>
                 </>
             }
