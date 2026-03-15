@@ -60,7 +60,7 @@ function DeadlineField({value, onChange}) {
     return (
         <Field label="Due Date">
             <DateTimePicker
-                value={value} onChange={val => { console.log('DateTimePicker onChange:', val); onChange('deadline', val); }} placeholder='Pick due date & time'/>
+                value={value} onChange={val => onChange('deadline', val)} placeholder='Pick due date & time'/>
         </Field>
     );
 }
