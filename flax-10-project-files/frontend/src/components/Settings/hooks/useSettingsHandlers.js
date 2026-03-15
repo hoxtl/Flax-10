@@ -37,10 +37,13 @@ async function saveAccount(
   if (ok && res.user) {
     saveUserToStorage(res.user);
     showTemporaryMessage(setSuccessMessage, "The account has been updated!");
+    setIsSaving(false);
+    return true;
   } else {
     setPasswordError(res.error || "The account update has failed...");
+    setIsSaving(false);
+    return false;
   }
-  setIsSaving(false);
 }
 
 async function savePassword(
@@ -51,15 +54,15 @@ async function savePassword(
 ) {
   if (isPasswordTooShort(data.newPassword)) {
     setPasswordError("Password must be at least 8 characters long");
-    return;
+    return false;
   }
   if (passwordsDoNotMatch(data.newPassword, data.confirmPassword)) {
     setPasswordError("New passwords do not match");
-    return;
+    return false;
   }
   if (!hasToken()) {
     setPasswordError("You are not logged in");
-    return;
+    return false;
   }
   setIsSaving(true);
   const { ok, data: res } = await patchSettings({
@@ -68,7 +71,7 @@ async function savePassword(
   if (!ok) {
     setPasswordError(res.error || "Failed to change password");
     setIsSaving(false);
-    return;
+    return false;
   }
   showTemporaryMessage(
     setSuccessMessage,
@@ -76,6 +79,7 @@ async function savePassword(
   );
   setTimeout(clearAuthAndRedirect, 2000);
   setIsSaving(false);
+  return true;
 }
 
 async function tryUpdateSettings(data) {
@@ -91,10 +95,11 @@ async function savePreferences(data, setSuccessMessage, setIsSaving) {
     : "Failed to save preferences";
   showTemporaryMessage(setSuccessMessage, msg);
   setIsSaving(false);
+  return Boolean(response);
 }
 
 async function saveSleep(data, setSuccessMessage, setIsSaving) {
-  if (!hasToken()) return;
+  if (!hasToken()) return false;
   setIsSaving(true);
   const { ok } = await patchSettings({
     sleep_time: data.sleep_time,
@@ -103,6 +108,7 @@ async function saveSleep(data, setSuccessMessage, setIsSaving) {
   const msg = ok ? "Sleep schedule saved!" : "Failed to save sleep schedule";
   showTemporaryMessage(setSuccessMessage, msg);
   setIsSaving(false);
+  return ok;
 }
 
 function useSettingsState() {
@@ -133,20 +139,20 @@ export default function useSettingsHandlers() {
   const handleAccountSave = async (data) => {
     setIsSaving(true);
     setPasswordError("");
-    await saveAccount(data, setPasswordError, setSuccessMessage, setIsSaving);
+    return saveAccount(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
   const handlePasswordSave = async (data) => {
     setPasswordError("");
-    await savePassword(data, setPasswordError, setSuccessMessage, setIsSaving);
+    return savePassword(data, setPasswordError, setSuccessMessage, setIsSaving);
   };
   const handlePreferencesSave = async (data) => {
     setIsSaving(true);
-    await savePreferences(data, setSuccessMessage, setIsSaving);
+    return savePreferences(data, setSuccessMessage, setIsSaving);
   };
   const handleHomeAddressSave = async (address) => {
     if (!address.trim()) {
       setHomeAddressError("Please enter a valid home address");
-      return;
+      return false;
     }
     setIsSaving(true);
     setHomeAddressError("");
@@ -158,7 +164,7 @@ export default function useSettingsHandlers() {
       if (!coords) {
         setHomeAddressError("Address not found, please try again...");
         setIsSaving(false);
-        return;
+        return false;
       }
 
       await saveHomeAddress(address, coords.latitude, coords.longitude);
@@ -167,17 +173,19 @@ export default function useSettingsHandlers() {
 
       setSuccessMessage("Home address has been saved!");
       setTimeout(() => setSuccessMessage(""), 3000);
+      return true;
     } catch (error) {
       setHomeAddressError(
         "Home address could not be saved, please try again...",
       );
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleSleepSave = async (data) => {
-    await saveSleep(data, setSuccessMessage, setIsSaving);
+    return saveSleep(data, setSuccessMessage, setIsSaving);
   };
 
   return {

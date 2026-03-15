@@ -18,7 +18,15 @@ const PANEL_META = {
   home:        { icon: MapPin,   title: "Location",    desc: "Set your home address for journey planning on UniMap." },
   security:    { icon: Lock,     title: "Security",    desc: "Keep your account safe with a strong password." },
   preferences: { icon: Palette,  title: "Preferences", desc: "Customise your theme and daily sleep schedule." },
-  course:      { icon: BookOpen, title: "Academic",    desc: "Manage your course and teacher role." },
+  course:      { icon: BookOpen, title: "Teacher Access", desc: "Manage your teacher request and course changes." },
+};
+
+const panelVariantClass = {
+  account: "panelAccount",
+  home: "panelHome",
+  security: "panelSecurity",
+  preferences: "panelPreferences",
+  course: "panelCourse",
 };
 
 function SettingsHeader({ onBack }) {
@@ -41,6 +49,7 @@ function PanelHeader({ tabId }) {
       </div>
       <div className={styles.panelHeaderText}>
         <h2 className={styles.panelHeaderTitle}>{meta.title}</h2>
+        <p className={styles.panelHeaderDesc}>{meta.desc}</p>
       </div>
     </div>
   );
@@ -59,7 +68,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
   } = handlers;
 
   return (
-    <div className={styles.panel}>
+    <div className={`${styles.panel} ${styles[panelVariantClass[activeTab] || "panelDefault"]}`}>
       <PanelHeader tabId={activeTab} />
       <div className={styles.panelBody}>
         {activeTab === "account" && (
@@ -95,7 +104,9 @@ export default function Settings({ user, onBack }) {
       <SuccessBanner message={handlers.successMessage} />
       <div className={styles.content}>
         <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />
-        <SettingsPanel activeTab={activeTab} handlers={handlers} user={user} />
+        <div className={styles.contentMain}>
+          <SettingsPanel activeTab={activeTab} handlers={handlers} user={user} />
+        </div>
       </div>
     </div>
   );

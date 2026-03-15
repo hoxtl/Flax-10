@@ -121,9 +121,9 @@ function CourseChangeSection({ user }) {
             </div>
 
             {isPending && (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "12px", color: "#b45309", background: "#fef3c7", border: "1px solid #fde68a", borderRadius: "99px", padding: "3px 10px", fontWeight: 600 }}>
-                  ⏳ Change pending · <em style={{ fontWeight: 400 }}>{existingRequest.requested_course}</em>
+              <div className={styles.statusTagActionRow}>
+                <span className={`${styles.statusTag} ${styles.statusTagPending}`}>
+                  ⏳ Change pending · <em className={styles.fieldMeta}>{existingRequest.requested_course}</em>
                 </span>
                 <button type="button" className={styles.cancelRequestBtn} disabled={cancelling} onClick={handleCancel}>
                   {cancelling ? "Cancelling…" : "Cancel"}
@@ -132,14 +132,14 @@ function CourseChangeSection({ user }) {
             )}
 
             {isApproved && (
-              <span style={{ fontSize: "12px", color: "#15803d", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "99px", padding: "3px 10px", fontWeight: 600 }}>
-                ✅ Approved · <em style={{ fontWeight: 400 }}>{existingRequest.requested_course}</em>
+              <span className={`${styles.statusTag} ${styles.statusTagSuccess}`}>
+                ✅ Approved · <em className={styles.fieldMeta}>{existingRequest.requested_course}</em>
               </span>
             )}
           </div>
 
           {isRejected && (
-            <div style={{ marginTop: "10px", fontSize: "12px", color: "#b91c1c", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", padding: "8px 12px" }}>
+            <div className={styles.statusAlert}>
               ❌ Request to change to <em>{existingRequest.requested_course}</em> was rejected. Submit a new one below.
             </div>
           )}
@@ -161,8 +161,8 @@ function CourseChangeSection({ user }) {
                   emptyMessage="No courses found"
                   menuMaxHeight={260}
                 />
-                {success && <div style={{ fontSize: "12.5px", color: "#15803d", fontWeight: 600, marginTop: "6px" }}>✓ {success}</div>}
-                <div className={styles.formActions} style={{ paddingTop: "10px" }}>
+                {success && <div className={styles.successText}>✓ {success}</div>}
+                <div className={`${styles.formActions} ${styles.formActionsPadded}`}>
                   <PrimaryButton type="submit" disabled={submitting} pill>
                     {submitting ? "Submitting…" : "Submit Request"}
                   </PrimaryButton>
@@ -217,13 +217,18 @@ function TeacherApplyModal({ onClose, onSuccess }) {
     >
       <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
-          <label>Why should you be a teacher?</label>
+          <label>
+            Why should you be a teacher?
+            <span aria-hidden="true"> *</span>
+          </label>
           <textarea
             className={styles.modalTextarea}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Tell us about your teaching experience, expertise, or why you'd like to create modules..."
             rows={4}
+            required
+            aria-required="true"
           />
         </div>
         <div className={styles.modalWarning}>
@@ -303,17 +308,24 @@ function TeacherRoleSection() {
           )}
 
           {liveRole === "pending_teacher" && (
-            <div className={styles.teacherCard}>
-              <div className={styles.teacherCardIcon}>⏳</div>
-              <div className={styles.teacherCardBody}>
-                <p className={styles.teacherCardTitle}>Teacher request pending</p>
-                <p className={styles.teacherCardSub}>An admin will review your request shortly.</p>
+            <div>
+              <div className={styles.teacherCard}>
+                <div className={styles.teacherCardIcon}>⏳</div>
+                <div className={styles.teacherCardBody}>
+                  <p className={styles.teacherCardTitle}>Teacher request pending</p>
+                  <p className={styles.teacherCardSub}>An admin will review your request shortly.</p>
+                </div>
+                <div className={styles.teacherCardAction}>
+                  <button type="button" className={styles.cancelRequestBtn} disabled={cancelling} onClick={handleCancelTeacher}>
+                    {cancelling ? "Cancelling…" : "Cancel request"}
+                  </button>
+                </div>
               </div>
-              <div className={styles.teacherCardAction}>
-                <button type="button" className={styles.cancelRequestBtn} disabled={cancelling} onClick={handleCancelTeacher}>
-                  {cancelling ? "Cancelling…" : "Cancel request"}
-                </button>
-              </div>
+              {status === "done" && (
+                <p className={styles.successText}>
+                  ✓ Request sent. The admin team is reviewing your teacher application.
+                </p>
+              )}
             </div>
           )}
 
@@ -326,7 +338,7 @@ function TeacherRoleSection() {
               </div>
               <div className={styles.teacherCardAction}>
                 {status === "done" ? (
-                  <span style={{ fontSize: "12px", color: "#15803d", fontWeight: 600 }}>✓ Requested</span>
+                  <span className={`${styles.statusTag} ${styles.statusTagSuccess}`}>✓ Requested</span>
                 ) : (
                   <PrimaryButton type="button" pill onClick={() => setShowModal(true)}>
                     Apply
@@ -336,7 +348,7 @@ function TeacherRoleSection() {
             </div>
           )}
 
-          {status === "error" && <p className={styles.teacherError} style={{ marginTop: "6px" }}>{message}</p>}
+          {status === "error" && <p className={styles.teacherError}>{message}</p>}
         </div>
 
         <div className={styles.contextCard}>

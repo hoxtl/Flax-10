@@ -4,13 +4,15 @@
  */
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../api/userService";
-import { getMyCourseChangeRequest, requestCourseChange } from "../../api/adminApi";
+import { getMyCourseChangeRequest, requestCourseChange, cancelCourseChangeRequest } from "../../api/adminApi";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI";
 import StandardModal from "../common/StandardModal/StandardModal";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import styles from "../../pages/Settings/Settings.module.css";
+
+const COURSE_REQUEST_CACHE_KEY = "course_change_pending_request";
 
 const groupedCourses = Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
   label: dept,
@@ -33,22 +35,91 @@ function getYearOptions() {
   }));
 }
 
+function normaliseCourseRequest(data) {
+  if (!data) return null;
+  const raw = Array.isArray(data)
+    ? data.find((item) => String(item?.status || item?.request_status || "").toLowerCase() === "pending") || data[0]
+    : data;
+  if (!raw || typeof raw !== "object") return null;
+  const status = String(raw.status || raw.request_status || "").toLowerCase();
+  const requested_course =
+    raw.requested_course ||
+    raw.requestedCourse ||
+    raw.new_course ||
+    raw.desired_course ||
+    "";
+  return {
+    ...raw,
+    status,
+    requested_course,
+  };
+}
+
+function getCachedPendingRequest() {
+  try {
+    const cached = localStorage.getItem(COURSE_REQUEST_CACHE_KEY);
+    if (!cached) return null;
+    const parsed = JSON.parse(cached);
+    if (!parsed?.requested_course) return null;
+    return {
+      status: "pending",
+      requested_course: parsed.requested_course,
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+function setCachedPendingRequest(requestedCourse) {
+  try {
+    localStorage.setItem(
+      COURSE_REQUEST_CACHE_KEY,
+      JSON.stringify({ requested_course: requestedCourse, created_at: Date.now() }),
+    );
+  } catch (_) {}
+}
+
+function clearCachedPendingRequest() {
+  try {
+    localStorage.removeItem(COURSE_REQUEST_CACHE_KEY);
+  } catch (_) {}
+}
+
 function useAccountForm(user) {
-  const [formData, setFormData] = useState(getInitialData(user));
+  const initialData = getInitialData(user);
+  const [formData, setFormData] = useState(initialData);
+  const [initialFormData, setInitialFormData] = useState(initialData);
   const [currentCourse, setCurrentCourse] = useState(user?.major || "");
   const [pendingRequest, setPendingRequest] = useState(null);
 
   useEffect(() => {
     getUserProfile()
       .then((data) => {
-        setFormData((prev) => ({ ...prev, year: data?.year || prev.year }));
+        const nextYear = data?.year || "";
+        setFormData((prev) => ({ ...prev, year: nextYear || prev.year }));
+        setInitialFormData((prev) => ({ ...prev, year: nextYear || prev.year }));
         if (data?.major !== undefined) setCurrentCourse(data.major || "");
       })
       .catch(() => {});
 
     getMyCourseChangeRequest()
-      .then((data) => { if (data?.status === "pending") setPendingRequest(data); })
-      .catch(() => {});
+      .then((data) => {
+        const req = normaliseCourseRequest(data);
+        if (!req) {
+          setPendingRequest(getCachedPendingRequest());
+          return;
+        }
+        if (req.status === "pending") {
+          setPendingRequest(req);
+          if (req.requested_course) setCachedPendingRequest(req.requested_course);
+          return;
+        }
+        clearCachedPendingRequest();
+        setPendingRequest(null);
+      })
+      .catch(() => {
+        setPendingRequest(getCachedPendingRequest());
+      });
   }, []);
 
   const handleChange = (e) => {
@@ -56,14 +127,24 @@ function useAccountForm(user) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  return { formData, handleChange, currentCourse, pendingRequest, setPendingRequest };
+  return {
+    formData,
+    initialFormData,
+    setInitialFormData,
+    handleChange,
+    currentCourse,
+    pendingRequest,
+    setPendingRequest,
+  };
 }
 
 function PersonalInfoFields({ formData, onChange }) {
   return (
     <>
-      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required />
-      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required />
+      <div className={styles.formRow}>
+        <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required />
+        <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required />
+      </div>
       <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required />
     </>
   );
@@ -77,12 +158,16 @@ function CourseChangeModal({ onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!reason.trim()) {
+      setError("Please tell us why you want to change course.");
+      return;
+    }
     if (!selectedCourse) { setError("Please select a course."); return; }
     setSubmitting(true);
     setError("");
     try {
       const result = await requestCourseChange(selectedCourse);
-      onSuccess(result);
+      onSuccess(result, selectedCourse);
     } catch (err) {
       setError(err.message || "Failed to submit. Please try again.");
     } finally {
@@ -98,13 +183,17 @@ function CourseChangeModal({ onClose, onSuccess }) {
     >
       <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
-          <label>Why do you want to change?</label>
+          <label>
+            Why do you want to change?
+            <span className={styles.requiredAsterisk} aria-hidden="true"> *</span>
+          </label>
           <textarea
             className={styles.modalTextarea}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Tell us a bit about why you'd like to switch..."
             rows={3}
+            required
           />
         </div>
         <div className={styles.formGroup}>
@@ -137,7 +226,7 @@ function CourseChangeModal({ onClose, onSuccess }) {
   );
 }
 
-function CourseDisplay({ course, pendingRequest, onRequestClick }) {
+function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest, cancellingRequest }) {
   return (
     <div className={styles.formGroup}>
       <label>Course</label>
@@ -145,9 +234,22 @@ function CourseDisplay({ course, pendingRequest, onRequestClick }) {
         {course ? course : <em>No course set</em>}
       </div>
       {pendingRequest ? (
-        <div className={styles.courseChangePending}>
-          <span>⏳</span>
-          <span>Awaiting admin approval · <em>{pendingRequest.requested_course}</em></span>
+        <div className={styles.courseRequestCard}>
+          <div className={styles.courseRequestCardBody}>
+            <p className={styles.courseRequestCardTitle}>Course change request received</p>
+            <p className={styles.courseRequestCardSub}>
+              Thanks, your request is with the admin team and is now under review.
+              {pendingRequest.requested_course ? <> · <em>{pendingRequest.requested_course}</em></> : null}
+            </p>
+          </div>
+          <button
+            type="button"
+            className={styles.cancelRequestBtn}
+            disabled={cancellingRequest}
+            onClick={onCancelRequest}
+          >
+            {cancellingRequest ? "Cancelling…" : "Cancel request"}
+          </button>
         </div>
       ) : (
         <button type="button" className={styles.courseChangeLink} onClick={onRequestClick}>
@@ -165,12 +267,60 @@ function CourseDisplay({ course, pendingRequest, onRequestClick }) {
  * @param {boolean} props.isSaving
  */
 export default function AccountForm({ user, onSave, isSaving }) {
-  const { formData, handleChange, currentCourse, pendingRequest, setPendingRequest } = useAccountForm(user);
+  const {
+    formData,
+    initialFormData,
+    setInitialFormData,
+    handleChange,
+    currentCourse,
+    pendingRequest,
+    setPendingRequest,
+  } = useAccountForm(user);
   const [showModal, setShowModal] = useState(false);
+  const [cancellingRequest, setCancellingRequest] = useState(false);
+  const [courseRequestNotice, setCourseRequestNotice] = useState("");
+  const [saveSignal, setSaveSignal] = useState(0);
 
-  const handleSubmit = (e) => {
+  const hasUnsaved =
+    formData.firstName !== initialFormData.firstName ||
+    formData.lastName !== initialFormData.lastName ||
+    formData.email !== initialFormData.email ||
+    formData.year !== initialFormData.year;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
+    const ok = await onSave(formData);
+    if (ok) {
+      setInitialFormData(formData);
+      setSaveSignal((s) => s + 1);
+    }
+  };
+
+  const handleCancelCourseRequest = async () => {
+    setCancellingRequest(true);
+    try {
+      await cancelCourseChangeRequest();
+      clearCachedPendingRequest();
+      setPendingRequest(null);
+    } catch {
+      // keep silent here to avoid noisy UX in account card; request remains visible if cancel fails
+    } finally {
+      setCancellingRequest(false);
+    }
+  };
+
+  const handleCourseRequestSuccess = (result, selectedCourse) => {
+    const req = normaliseCourseRequest(result) || {
+      status: "pending",
+      requested_course: selectedCourse || "",
+    };
+    if (req.requested_course) setCachedPendingRequest(req.requested_course);
+    setPendingRequest(req);
+    setShowModal(false);
+    setCourseRequestNotice(
+      "Thanks for your request. The admin team is reviewing it now, and we will notify you once a decision is made.",
+    );
+    setTimeout(() => setCourseRequestNotice(""), 5000);
   };
 
   return (
@@ -196,8 +346,21 @@ export default function AccountForm({ user, onSave, isSaving }) {
               course={currentCourse}
               pendingRequest={pendingRequest}
               onRequestClick={() => setShowModal(true)}
+              onCancelRequest={handleCancelCourseRequest}
+              cancellingRequest={cancellingRequest}
             />
-            <SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." />
+            {courseRequestNotice ? (
+              <p className={styles.statusNotice} role="status" aria-live="polite">
+                {courseRequestNotice}
+              </p>
+            ) : null}
+            <SubmitButton
+              isSaving={isSaving}
+              label="Save Changes"
+              savingLabel="Saving..."
+              hasUnsaved={hasUnsaved}
+              saveSignal={saveSignal}
+            />
           </div>
         </div>
         <div className={styles.contextCard}>
@@ -216,7 +379,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
       {showModal && (
         <CourseChangeModal
           onClose={() => setShowModal(false)}
-          onSuccess={(result) => { setPendingRequest(result); setShowModal(false); }}
+          onSuccess={handleCourseRequestSuccess}
         />
       )}
     </form>

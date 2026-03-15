@@ -7,62 +7,82 @@ import { SectionHeader, SubmitButton } from "./SettingsUI";
 
 export default function HomeAddressForm({ onSave, isSaving, error }) {
     const [homeAddress, setHomeAddress] = useState("");
+    const [initialHomeAddress, setInitialHomeAddress] = useState("");
     const [loading, setLoading] = useState(true);
+    const [saveSignal, setSaveSignal] = useState(0);
 
     useEffect(() => {
         getHomeAddress()
-            .then((data) => setHomeAddress(data.home_address || ""))
+            .then((data) => {
+                const address = data.home_address || "";
+                setHomeAddress(address);
+                setInitialHomeAddress(address);
+            })
             .catch(() => {})
             .finally(() => setLoading(false));
     }, []);
 
-    const handleSubmit = (e) => {
+    const hasUnsaved = homeAddress !== initialHomeAddress;
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(homeAddress);
+        const ok = await onSave(homeAddress);
+        if (ok) {
+            setInitialHomeAddress(homeAddress);
+            setSaveSignal((s) => s + 1);
+        }
     };
 
     if (loading) return <SectionSkeleton label="Loading home address" rows={1} />;
 
-    return (
-        <form onSubmit={handleSubmit} className={styles.form}>
-            <SectionHeader
-                title="Home Address"
-                description="Used to calculate your commute time to KCL campuses 🏠"
-            />
+  return (
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <SectionHeader
+        title="Home Address"
+        description="Used to calculate your commute time to KCL campuses 🏠"
+      />
 
-            <div className={styles.twoColLayout}>
-                <div className={styles.formGroup}>
-                    <label htmlFor="homeAddress">Address</label>
-                    <TextInput
-                        id="homeAddress"
-                        type="text"
-                        value={homeAddress}
-                        onChange={e => setHomeAddress(e.target.value)}
-                        placeholder="e.g., 123 Example Street, London E1 B23"
-                    />
-                </div>
-                <div className={styles.contextCard}>
-                    <span className={styles.contextCardEmoji}>🗺️</span>
-                    <h3 className={styles.contextCardTitle}>Why we ask</h3>
-                    <p className={styles.contextCardBody}>
-                        Your address lets us calculate real commute times to KCL campuses — no more surprise 45-minute journeys to a 9am.
-                    </p>
-                    <ul className={styles.contextCardList}>
-                        <li>Commute time estimates</li>
-                        <li>Campus proximity info</li>
-                        <li>Smart travel alerts</li>
-                    </ul>
-                </div>
+      <div className={styles.twoColLayout}>
+        <div>
+          <div className={styles.settingsTile}>
+            <div className={styles.formGroup}>
+              <label htmlFor="homeAddress">Address</label>
+              <TextInput
+                id="homeAddress"
+                type="text"
+                value={homeAddress}
+                onChange={e => setHomeAddress(e.target.value)}
+                placeholder="e.g., 123 Example Street, London E1 B23"
+              />
             </div>
-
-            {error && (
-                <div className={styles.errorMessage} role="alert">
-                    <span>⚠️</span>
-                    <span>{error}</span>
-                </div>
-            )}
-
-            <SubmitButton isSaving={isSaving} label="Save Home Address" savingLabel="Saving..." />
-        </form>
-    );
+            <SubmitButton
+              isSaving={isSaving}
+              label="Save Home Address"
+              savingLabel="Saving..."
+              hasUnsaved={hasUnsaved}
+              saveSignal={saveSignal}
+            />
+          </div>
+          {error && (
+            <div className={styles.errorMessage} role="alert">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
+        <div className={styles.contextCard}>
+          <span className={styles.contextCardEmoji}>🗺️</span>
+          <h3 className={styles.contextCardTitle}>Why we ask</h3>
+          <p className={styles.contextCardBody}>
+            Your address lets us calculate real commute times to KCL campuses — no more surprise 45-minute journeys to a 9am.
+          </p>
+          <ul className={styles.contextCardList}>
+            <li>Commute time estimates</li>
+            <li>Campus proximity info</li>
+            <li>Smart travel alerts</li>
+          </ul>
+        </div>
+      </div>
+    </form>
+  );
 }

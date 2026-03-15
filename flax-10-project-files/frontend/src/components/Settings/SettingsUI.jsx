@@ -2,6 +2,7 @@
  * Shared UI primitives and the sidebar navigation for the Settings page.
  */
 import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 import FormField from "../common/FormField/FormField";
@@ -13,23 +14,8 @@ const TAB_CONFIG = [
   { id: "home",        label: "Location",    icon: MapPin,   group: "Profile" },
   { id: "security",    label: "Security",    icon: Lock,     group: "Profile" },
   { id: "preferences", label: "Preferences", icon: Palette,  group: "Preferences" },
-  { id: "course",      label: "Academic",    icon: BookOpen, group: "Academic" },
+  { id: "course",      label: "Teacher Access", icon: BookOpen, group: "Teacher" },
 ];
-
-function getInitials(user) {
-  if (!user) return "?";
-  const first = user.first_name?.[0] || "";
-  const last  = user.last_name?.[0]  || "";
-  return (first + last).toUpperCase() || user.email?.[0]?.toUpperCase() || "?";
-}
-
-function getGreeting(user) {
-  const firstName = user?.first_name || user?.email?.split("@")[0] || "there";
-  const hour = new Date().getHours();
-  if (hour < 12) return { text: `Good morning, ${firstName}`, icon: "☀️" };
-  if (hour < 17) return { text: `Good afternoon, ${firstName}`, icon: "🌤️" };
-  return { text: `Good evening, ${firstName}`, icon: "🌙" };
-}
 
 function getProfileCompletion(user) {
   const checks = [
@@ -53,22 +39,9 @@ function getProfileCompletion(user) {
  */
 export function SettingsSidebar({ activeTab, onChange, user }) {
   const groups = [...new Set(TAB_CONFIG.map((t) => t.group))];
-  const greeting = getGreeting(user);
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.sidebarProfile}>
-        <div className={styles.avatar}>{getInitials(user)}</div>
-        <div className={styles.sidebarProfileInfo}>
-          <div className={styles.sidebarName}>
-            {greeting.icon} {greeting.text}
-          </div>
-          <div className={styles.sidebarRole}>
-            {user?.role === "teacher" ? "Teacher" : "Student"}
-          </div>
-        </div>
-      </div>
-
       {(() => {
         const pct = getProfileCompletion(user);
         return pct < 100 ? (
@@ -86,7 +59,7 @@ export function SettingsSidebar({ activeTab, onChange, user }) {
 
       <nav className={styles.sidebarNav}>
         {groups.map((group) => (
-          <div key={group} style={{ width: "100%" }}>
+          <div key={group} className={styles.sidebarGroup} style={{ width: "100%" }}>
             <div className={styles.sidebarSectionLabel}>{group}</div>
             {TAB_CONFIG.filter((t) => t.group === group).map((tab) => {
               const Icon = tab.icon;
@@ -95,6 +68,7 @@ export function SettingsSidebar({ activeTab, onChange, user }) {
                   key={tab.id}
                   className={`${styles.navItem} ${activeTab === tab.id ? styles.navItemActive : ""}`}
                   onClick={() => onChange(tab.id)}
+                  aria-current={activeTab === tab.id ? "page" : undefined}
                 >
                   <Icon className={styles.navIcon} size={15} strokeWidth={2} />
                   {tab.label}
@@ -152,16 +126,34 @@ export function SectionHeader({ title, description }) {
   );
 }
 
-export function SubmitButton({ isSaving, label, savingLabel }) {
+export function SubmitButton({
+  isSaving,
+  label,
+  savingLabel,
+  hasUnsaved = false,
+  saveSignal = 0,
+  savedLabel = "Saved!",
+}) {
+  const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    if (!saveSignal) return undefined;
+    setShowSaved(true);
+    const timer = setTimeout(() => setShowSaved(false), 2000);
+    return () => clearTimeout(timer);
+  }, [saveSignal]);
+
+  const buttonLabel = isSaving ? savingLabel : showSaved ? `✓ ${savedLabel}` : label;
+
   return (
     <div className={styles.formActions}>
       <PrimaryButton
         type="submit"
-        className={styles.btnPrimary}
+        className={`${styles.btnPrimary} ${hasUnsaved && !isSaving && !showSaved ? styles.btnPrimaryNeedsSave : ""} ${showSaved ? styles.btnPrimarySaved : ""}`}
         disabled={isSaving}
         pill
       >
-        {isSaving ? savingLabel : label}
+        {buttonLabel}
       </PrimaryButton>
     </div>
   );
@@ -185,11 +177,11 @@ export function FormInput({
       label={
         <>
           {label}
-          {maxLength && (
-            <span style={{ color: "var(--muted)", fontSize: "0.9em", marginLeft: "5px" }}>
-              ({remaining} characters remaining)
-            </span>
-          )}
+      {maxLength && (
+        <span className={styles.fieldMeta}>
+          ({remaining} characters remaining)
+        </span>
+      )}
         </>
       }
     >
