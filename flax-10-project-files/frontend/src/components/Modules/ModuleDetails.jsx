@@ -2,7 +2,7 @@ import { formatDuration, formatTime, getDepartment, getCourse } from './utils/mo
 import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
 import { formatDate } from '../Calendar/utils/dateUtils.js';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback.js';
 import styles from './ModuleDetails.module.css';
 
 function getSortedDeadlines(deadlines = []) {
@@ -57,12 +57,13 @@ function getInitials(name) {
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
-function getTutorImage(moduleCode, tutorName) {
-    return getTutorPhotoFallback({
-        fullName: tutorName,
-        seed: moduleCode,
-        allowGeneric: true,
-    });
+function getTutorImage(moduleData) {
+    return getResolvedUserPhoto({
+        id: moduleData?.created_by,
+        name: moduleData?.created_by_name,
+        role: 'teacher',
+        profile_photo_url: moduleData?.created_by_profile_photo_url,
+    }, { allowGeneric: true });
 }
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
@@ -95,7 +96,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                         <div className={styles.tutorInline}>
                             <img
                                 className={styles.tutorPhoto}
-                                src={getTutorImage(module.module_code, module.created_by_name)}
+                                src={getTutorImage(module)}
                                 alt={`${module.created_by_name || "Tutor"} profile`}
                                 onError={(e) => {
                                     e.currentTarget.style.display = "none";

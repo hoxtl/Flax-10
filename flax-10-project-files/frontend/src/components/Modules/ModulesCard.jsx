@@ -1,6 +1,6 @@
 import { isEnrolledIn } from './utils/moduleUtils.js';
 import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
-import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback.js';
 import GridCard from '../common/Card/GridCard';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
@@ -92,12 +92,17 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
     );
 }
 
-function getTutorImage(moduleCode, tutorName) {
-    return getTutorPhotoFallback({ fullName: tutorName, seed: moduleCode, allowGeneric: true });
+function getTutorImage(moduleData) {
+    return getResolvedUserPhoto({
+        id: moduleData?.created_by,
+        name: moduleData?.created_by_name,
+        role: 'teacher',
+        profile_photo_url: moduleData?.created_by_profile_photo_url,
+    }, { allowGeneric: true });
 }
 
 function TutorAvatar({ module }) {
-    const src = getTutorImage(module.module_code, module.created_by_name);
+    const src = getTutorImage(module);
     if (!src) return null;
     const initials = (module.created_by_name || 'T')
         .split(/\s+/).filter(Boolean)

@@ -120,18 +120,10 @@ export function getTutorPhotoFallback({ fullName = "", username = "", role = "",
   const byName = FIXED_NAME_PHOTOS[normalise(fullName)];
   if (byName) return byName;
 
+  // New/unknown users should render initials unless they upload a real photo.
+  // `allowGeneric` is kept for backwards compatibility but no longer generates random avatars.
   if (!allowGeneric) return null;
-
-  const roleKey = normalise(role);
-  const baseKey = `${normalise(fullName)}-${normalise(username)}-${seed || "profile"}`;
-  const hash = getHash(baseKey);
-  const gender = inferGender({ fullName, username });
-
-  // Mostly human for students, fully human for teachers.
-  if (roleKey === "teacher") return buildGenderAvatar(`teacher-${baseKey}`, gender);
-  if (roleKey === "student" && gender !== "unknown") return buildGenderAvatar(`student-${baseKey}`, gender);
-  if (roleKey === "student" && hash % 5 === 0) return buildNonHumanAvatar(`student-${baseKey}`);
-  return buildGenderAvatar(`student-${baseKey}`, gender);
+  return null;
 }
 
 export function getResolvedUserPhoto(user, options = {}) {

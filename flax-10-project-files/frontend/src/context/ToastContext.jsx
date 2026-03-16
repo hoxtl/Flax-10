@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef } from 'react';
-import styles from './Toast.module.css';
+import AppToast from '../components/common/AppToast/AppToast';
 
 const ToastContext = createContext(null);
 
@@ -21,6 +21,8 @@ export function ToastProvider({ children }) {
             message: msg,
             actionLabel: opts.actionLabel || null,
             onAction: typeof opts.onAction === 'function' ? opts.onAction : null,
+            variant: opts.variant || 'success',
+            icon: opts.icon || null,
         });
         const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
         timeoutRef.current = setTimeout(() => {
@@ -32,36 +34,20 @@ export function ToastProvider({ children }) {
     return (
         <ToastContext.Provider value={showToast}>
             {children}
-            {toast && <ToastUI toast={toast} onClose={closeToast} />}
+            {toast && (
+                <AppToast
+                    message={toast.message}
+                    actionLabel={toast.actionLabel}
+                    onAction={toast.onAction}
+                    variant={toast.variant}
+                    icon={toast.icon}
+                    onClose={closeToast}
+                />
+            )}
         </ToastContext.Provider>
     );
 }
 
 export function useToast() {
     return useContext(ToastContext);
-}
-
-function ToastUI({ toast, onClose }) {
-    return (
-        <div className={styles.toast}>
-            <div className={styles.content}>
-                <span className={styles.icon}>✓</span>
-                <span className={styles.message}>{toast.message}</span>
-            </div>
-            {toast.actionLabel && toast.onAction && (
-                <button
-                    type="button"
-                    className={styles.action}
-                    onClick={async () => {
-                        const action = toast.onAction;
-                        onClose();
-                        await action();
-                    }}
-                >
-                    {toast.actionLabel}
-                </button>
-            )}
-            <button type="button" className={styles.close} onClick={onClose}>✕</button>
-        </div>
-    );
 }
