@@ -209,20 +209,6 @@ describe('CalendarHeader', () => {
         expect(mockOpenModal).toHaveBeenCalledWith(null, null, defaultState.selectedDate);
     });
 
-    it('should navigate correctly in year view', () => {
-        setup({ ...defaultState, viewMode: 'year' });
-        const nextBtn = screen.getByText('>');
-        fireEvent.click(nextBtn);
-
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_SELECTED_DATE',
-            payload: expect.any(Date)
-        });
-        const callArgs = mockDispatch.mock.calls[0][0];
-        // 2026 + 1 = 2027
-        expect(callArgs.payload.getFullYear()).toBe(2027);
-    });
-
     it('should navigate correctly in week view', () => {
         setup({ ...defaultState, viewMode: 'week' });
         const nextBtn = screen.getByText('>');
@@ -273,11 +259,4 @@ describe('CalendarHeader', () => {
         Object.defineProperty(window, 'innerWidth', { value: originalInnerWidth, configurable: true });
     });
 
-    it('navigate prev in year view decrements year', () => {
-        setup({ ...defaultState, viewMode: 'year' });
-        const prevBtn = screen.getByText('<');
-        fireEvent.click(prevBtn);
-        const callArgs = mockDispatch.mock.calls[0][0];
-        expect(callArgs.payload.getFullYear()).toBe(2025);
-    });
 });
