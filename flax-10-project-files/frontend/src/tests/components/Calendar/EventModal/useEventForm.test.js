@@ -106,25 +106,12 @@ describe('useEventForm', () => {
     it('sets sleepWarning when event is during sleep window and confirms pending submit', async () => {
         const onClose = vi.fn();
         const event = { id: 1 };
-        const startTime = '2026-03-10T23:30:00';
-        FormUtilsModule.getInitialForm.mockReturnValueOnce({
-            ...mockInitialForm,
-            start_time: startTime,
-        });
+        FormUtilsModule.getInitialForm.mockReturnValueOnce({ ...mockInitialForm, start_time: '2026-03-10T23:30:00' });
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
-
         const { result } = renderHook(() => useEventForm(event, onClose));
-
-        await act(async () => {
-            const mockE = { preventDefault: vi.fn() };
-            result.current.handleSubmit(mockE);
-        });
-
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         // sleepWarning should have been set and then cleared by confirm handler
-        await act(async () => {
-            result.current.handleConfirmSleep();
-        });
-
+        await act(async () => { result.current.handleConfirmSleep(); });
         // validateAndSubmit should have been called at least once (initial submit),
         // and pendingSubmit path exercised via handleConfirmSleep
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalled();
@@ -154,16 +141,11 @@ describe('useEventForm', () => {
         expect(result.current.sleepWarning).toBe(false);
     });
 
-    it('handleConfirmSave and handleCancelSave manage overlapWarning', async () => {
+    it('handleConfirmSave calls validateAndSubmit with forceSave=true', async () => {
         const onClose = vi.fn();
         const event = { id: 1 };
-
         const { result } = renderHook(() => useEventForm(event, onClose));
-
-        await act(async () => {
-            result.current.handleConfirmSave();
-        });
-
+        await act(async () => { result.current.handleConfirmSave(); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalledWith(
             null,
             result.current.form,
@@ -175,33 +157,15 @@ describe('useEventForm', () => {
             mockEvents,
             true
         );
+    });
 
-        act(() => {
-            result.current.setForm({ ...result.current.form, title: 'Overlap' });
-        });
-
-        act(() => {
-            result.current.setForm({ ...result.current.form, title: 'Overlap' });
-        });
-
-        // manually set overlapWarning via returned state setter
-        act(() => {
-            result.current.setForm(result.current.form); // noop to satisfy act
-        });
-        act(() => {
-            // @ts-ignore accessing internal setter exposed via hook return
-            result.current.setForm(result.current.form);
-        });
-
-        act(() => {
-            // directly simulate overlap warning state
-            result.current.handleCancelSave();
-        });
-
-        act(() => {
-            result.current.handleCancelSave();
-        });
-
+    it('handleCancelSave clears overlapWarning', async () => {
+        const onClose = vi.fn();
+        const event = { id: 1 };
+        const { result } = renderHook(() => useEventForm(event, onClose));
+        act(() => { result.current.setForm({ ...result.current.form, title: 'Overlap' }); });
+        act(() => { result.current.handleCancelSave(); });
+        act(() => { result.current.handleCancelSave(); });
         expect(result.current.overlapWarning).toBeNull();
     });
 
