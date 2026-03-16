@@ -28,7 +28,7 @@ describe('useSocieties', () => {
         expect(result.current.error).toBe('Network error');
     });
 
-    it('handleCreate creates society and adds to list', async () => {
+    it('handleCreate creates society and adds to list with admin flags', async () => {
         api.fetchSocieties.mockResolvedValue([]);
         api.createSociety.mockResolvedValue({ id: 2, name: 'NewSoc' });
         const { result } = renderHook(() => useSocieties());
@@ -36,8 +36,9 @@ describe('useSocieties', () => {
         let newSoc;
         await act(async () => { newSoc = await result.current.handleCreate({ name: 'NewSoc' }); });
         expect(api.createSociety).toHaveBeenCalledWith({ name: 'NewSoc' });
-        expect(result.current.societies).toContainEqual({ id: 2, name: 'NewSoc' });
+        expect(result.current.societies).toContainEqual({ id: 2, name: 'NewSoc', is_admin: true, role: 'admin' });
         expect(newSoc.id).toBe(2);
+        expect(newSoc.is_admin).toBe(true);
     });
 
     it('handleCreate adds collaborators when provided', async () => {
@@ -92,5 +93,30 @@ describe('useSocieties', () => {
         api.fetchSocieties.mockResolvedValue([{ id: 1, name: 'First' }, { id: 2, name: 'Second' }]);
         await act(async () => { result.current.refresh(); });
         await waitFor(() => expect(result.current.societies).toHaveLength(2));
+    });
+
+    it('removeSociety removes a society from the list', async () => {
+        api.fetchSocieties.mockResolvedValue([
+            { id: 1, name: 'Keep' },
+            { id: 2, name: 'Remove' }
+        ]);
+        const { result } = renderHook(() => useSocieties());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        act(() => { result.current.removeSociety(2); });
+        expect(result.current.societies).toHaveLength(1);
+        expect(result.current.societies[0].id).toBe(1);
+    });
+
+    it('removeSociety leaves other societies unchanged', async () => {
+        api.fetchSocieties.mockResolvedValue([
+            { id: 1, name: 'First' },
+            { id: 2, name: 'Second' },
+            { id: 3, name: 'Third' }
+        ]);
+        const { result } = renderHook(() => useSocieties());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        act(() => { result.current.removeSociety(2); });
+        expect(result.current.societies).toHaveLength(2);
+        expect(result.current.societies.map(s => s.name)).toEqual(['First', 'Third']);
     });
 });

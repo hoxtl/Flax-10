@@ -21,7 +21,8 @@ function getWeekNumber(d) {
 const fetchingRef = { current: false, key: null };
 
 export function useCalendarEvents() {
-    const { events, selectedDate, viewMode } = useCalendar();
+    const calendarState = useCalendar();
+    const { events, selectedDate, viewMode, reloadKey } = calendarState;
     const dispatch = useCalendarDispatch();
     const dateKey = useMemo(() => getDateKey(selectedDate, viewMode), [selectedDate, viewMode]);
     const stateRef = useRef({ selectedDate, viewMode });
@@ -32,6 +33,12 @@ export function useCalendarEvents() {
         fetchingRef.key = dateKey;
         fetchEvents(stateRef.current, dispatch);
     }, [dateKey, dispatch]);
+
+    useEffect(() => {
+        if (!reloadKey) return;
+        fetchingRef.key = null;
+        fetchEvents(stateRef.current, dispatch);
+    }, [reloadKey, dispatch]);
 
     const loadEvents = useCallback(() => {
         fetchingRef.key = null;

@@ -156,6 +156,13 @@ describe('calendarReducer', () => {
         expect(state.readOnly).toBe(true);
     });
 
+    it('should handle TRIGGER_RELOAD', () => {
+        const state = calendarReducer(initialState, { type: 'TRIGGER_RELOAD' });
+        expect(state.reloadKey).toBe(1);
+        const state2 = calendarReducer(state, { type: 'TRIGGER_RELOAD' });
+        expect(state2.reloadKey).toBe(2);
+    });
+
     // Test openModalHandler edge cases
     it('should handle OPEN_MODAL with complex payload', () => {
         const event = { id: 1 };
