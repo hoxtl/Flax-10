@@ -58,6 +58,11 @@
   color: var(--text, #111);
   background: var(--bg, #f9fafb);
 }
+.tabBtn:focus,
+.tabBtn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
 .tabActive {
   color: var(--accent, #6c47ff) !important;
   font-weight: 600;
