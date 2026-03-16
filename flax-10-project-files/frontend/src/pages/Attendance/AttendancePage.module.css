@@ -338,11 +338,16 @@
   position: absolute;
   bottom: 125%;
   right: 0;
-  padding: 6px 12px;
-  background: #333;
+  padding: 8px 14px;
+  background: rgba(30, 41, 49, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #fff;
   font-size: 11px;
-  border-radius: 6px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
@@ -365,7 +370,7 @@
   bottom: 110%;
   right: 14px;
   border: 6px solid transparent;
-  border-top-color: #333;
+  border-top-color: rgba(30, 41, 49, 0.85);
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
