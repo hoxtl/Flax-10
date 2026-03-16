@@ -2,19 +2,19 @@
  * Tests for ListView - Calendar list view with grouped daily sections.
  */
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ListView } from '../../../../components/Calendar/ListView/ListView';
 import { createMockEvent } from '../mocks/calendarMocks';
 
-const mockPagination = { currentPage: 1, totalPages: 1, currentItems: [], setPage: vi.fn() };
-const mockCalendarData = { events: [], viewMode: 'month', selectedDate: new Date(2026, 2, 15) };
+let mockViewMode = 'month';
+let mockEvents = [];
 
 vi.mock('../../../../context/CalendarContext', () => ({
-    useCalendarData: () => mockCalendarData,
+    useCalendarData: ({ events }) => ({ events: events || mockEvents, viewMode: mockViewMode, selectedDate: new Date(2026, 2, 15) }),
 }));
 
 vi.mock('../../../../hooks/usePagination', () => ({
-    usePagination: (items) => ({ ...mockPagination, currentItems: items.slice(0, 10), totalPages: Math.ceil(items.length / 10) }),
+    usePagination: (items, size) => ({ currentPage: 1, totalPages: Math.ceil(items.length / size) || 1, currentItems: items.slice(0, size), setPage: vi.fn() }),
 }));
 
 vi.mock('../../../../components/Calendar/ListView/EventRow', () => ({
@@ -34,8 +34,13 @@ vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
 describe('ListView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockCalendarData.events = [];
-        mockCalendarData.viewMode = 'month';
+        mockEvents = [];
+        mockViewMode = 'month';
+        Element.prototype.scrollIntoView = vi.fn();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('renders empty state when no events', () => {
@@ -50,7 +55,7 @@ describe('ListView', () => {
     });
 
     it('renders flat list for day view', () => {
-        mockCalendarData.viewMode = 'day';
+        mockViewMode = 'day';
         const events = [createMockEvent({ id: 1, title: 'Day Event' })];
         render(<ListView events={events} />);
         expect(screen.getByText('Day Event')).toBeInTheDocument();
@@ -103,10 +108,9 @@ describe('ListView', () => {
     it('shows Today badge for current date events', () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date('2026-03-15T12:00:00Z'));
-        const events = [createMockEvent({ id: 1, title: 'Today', start_time: '2026-03-15T10:00:00Z' })];
+        const events = [createMockEvent({ id: 1, title: 'My Event', start_time: '2026-03-15T10:00:00Z' })];
         render(<ListView events={events} />);
         expect(screen.getByText('Today')).toBeInTheDocument();
-        vi.useRealTimers();
     });
 
     it('renders event count in header label', () => {
@@ -125,7 +129,7 @@ describe('ListView', () => {
     });
 
     it('uses props events over context events', () => {
-        mockCalendarData.events = [createMockEvent({ id: 99, title: 'Context Event' })];
+        mockEvents = [createMockEvent({ id: 99, title: 'Context Event' })];
         const propEvents = [createMockEvent({ id: 1, title: 'Prop Event' })];
         render(<ListView events={propEvents} />);
         expect(screen.getByText('Prop Event')).toBeInTheDocument();

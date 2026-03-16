@@ -87,7 +87,9 @@ describe('TableRow', () => {
 
     it('hides delete button for read-only events', () => {
         render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        expect(screen.queryByRole('button')).not.toBeInTheDocument();
+        // Delete button cell is empty for read-only - check for trash icon specifically
+        const trashButtons = screen.queryAllByRole('button').filter(btn => btn.querySelector('svg'));
+        expect(trashButtons.filter(btn => !btn.textContent.includes('Join'))).toHaveLength(0);
     });
 
     it('shows confirm modal when delete clicked', () => {
@@ -140,7 +142,9 @@ describe('TableRow', () => {
 
     it('toggles expansion on row click for read-only events', () => {
         const { container } = render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        fireEvent.click(container.querySelector('tr'));
-        expect(container.querySelector('tr')).toHaveClass('expanded');
+        const row = container.querySelector('tr');
+        fireEvent.click(row);
+        // CSS modules hash class names, so check class contains 'expanded' pattern
+        expect(row.className).toMatch(/expanded/i);
     });
 });

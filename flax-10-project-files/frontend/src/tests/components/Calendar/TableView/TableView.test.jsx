@@ -6,13 +6,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TableView } from '../../../../components/Calendar/TableView/TableView';
 import { createMockEvent } from '../mocks/calendarMocks';
 
-const mockPagination = { currentPage: 1, totalPages: 1, currentItems: [], setPage: vi.fn() };
+let mockEvents = [];
 const mockEditState = { editingCell: null, cellValue: '', startEdit: vi.fn(), updateValue: vi.fn(), saveEdit: vi.fn(), cancelEdit: vi.fn(), saveDateTimes: vi.fn(), saveWithValue: vi.fn() };
 const mockNavState = { focusedCell: null, handleKeyDown: vi.fn(), EDITABLE_COLUMNS: ['title', 'tag', 'date', 'location', 'description'] };
-const mockCalendarData = { events: [], viewMode: 'month', selectedDate: new Date(2026, 2, 15) };
 
 vi.mock('../../../../context/CalendarContext', () => ({
-    useCalendarData: () => mockCalendarData,
+    useCalendarData: ({ events }) => ({ events: events || mockEvents, viewMode: 'month', selectedDate: new Date(2026, 2, 15) }),
 }));
 
 vi.mock('../../../../context/TagContext', () => ({
@@ -20,7 +19,7 @@ vi.mock('../../../../context/TagContext', () => ({
 }));
 
 vi.mock('../../../../hooks/usePagination', () => ({
-    usePagination: (items) => ({ ...mockPagination, currentItems: items.slice(0, 10), totalPages: Math.ceil(items.length / 10) || 1 }),
+    usePagination: (items, size) => ({ currentPage: 1, totalPages: Math.ceil(items.length / size) || 1, currentItems: items.slice(0, size), setPage: vi.fn() }),
 }));
 
 vi.mock('../../../../components/Calendar/hooks/useTableEdit', () => ({
@@ -47,7 +46,7 @@ vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
 describe('TableView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockCalendarData.events = [];
+        mockEvents = [];
         mockEditState.editingCell = null;
     });
 
@@ -111,7 +110,7 @@ describe('TableView', () => {
     });
 
     it('uses props events over context events', () => {
-        mockCalendarData.events = [createMockEvent({ id: 99, title: 'Context Event' })];
+        mockEvents = [createMockEvent({ id: 99, title: 'Context Event' })];
         const propEvents = [createMockEvent({ id: 1, title: 'Prop Event' })];
         render(<TableView events={propEvents} />);
         expect(screen.getByText('Prop Event')).toBeInTheDocument();
