@@ -11,19 +11,7 @@ from collections import defaultdict
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-
-def _compute_streaks(sessions):
-    """Return (current_streak, longest_streak) from session dates."""
-    dates = sorted(set(s.end_time.date() for s in sessions))
-    if not dates:
-        return 0, 0
-    longest = temp = 1
-    for i in range(1, len(dates)):
-        temp = temp + 1 if (dates[i] - dates[i - 1]).days == 1 else 1
-        longest = max(longest, temp)
-    today = timezone.now().date()
-    current = temp if dates[-1] >= today - timedelta(days=1) else 0
-    return current, longest
+from .session_analytics_service import compute_active_days, compute_streaks
 
 def _get_sessions(user, start_date, end_date):
     """Fetch study sessions for the given user and date range."""
@@ -61,7 +49,7 @@ def _build_heatmap(sessions):
 def _build_analytics_response(sessions, days):
     """Assemble the full analytics response dict from a sessions queryset."""
     totals = _aggregate_totals(sessions)
-    current_streak, longest_streak = _compute_streaks(list(sessions))
+    current_streak, longest_streak = compute_streaks(list(sessions))
     return {
         'summary': _build_summary_dict(sessions, totals, current_streak, longest_streak),
         'daily_breakdown': _build_daily_breakdown(sessions),
@@ -95,7 +83,7 @@ def _build_summary_dict(sessions, totals, current_streak, longest_streak):
         'longest_streak_days': longest_streak,
         'overtime_sessions': sessions.filter(status='Overtime').count(),
         'work_break_ratio': _safe_ratio(totals['total_study'], totals['total_break']),
-        'active_days': len(set(s.end_time.date() for s in sessions)),
+        'active_days': compute_active_days(sessions),
     }
 
 def _safe_ratio(numerator, denominator):

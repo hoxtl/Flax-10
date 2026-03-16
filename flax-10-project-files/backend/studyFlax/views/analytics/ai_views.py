@@ -10,11 +10,11 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
-from itertools import takewhile
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.timer.themeSessionModel import ThemeSession
+from .session_analytics_service import compute_peak_hour, compute_streaks
 
 try:
     import openai
@@ -51,14 +51,6 @@ def _compute_session_stats(sessions):
     overtime = sessions.filter(status='Overtime').count()
     return total_study, total_break, total_pause, count, avg, overtime
 
-def _compute_peak_hours(sessions):
-    """Return formatted top-3 peak study hours."""
-    hour_totals = defaultdict(int)
-    for s in sessions:
-        hour_totals[s.end_time.hour] += s.duration
-    peak = sorted(hour_totals, key=hour_totals.get, reverse=True)[:3]
-    return ', '.join(_fmt_hour(h) for h in peak)
-
 def _fmt_hour(h):
     """Format an hour integer as '9am' / '3pm'."""
     suffix = 'am' if h < 12 else 'pm'
@@ -71,19 +63,6 @@ def _compute_theme_pct(themes):
     total = dark + sum(s.duration_minutes for s in themes if s.theme == 'light')
     return round(dark / total * 100) if total else 0
 
-def _count_trailing_streak(dates):
-    """Count consecutive days from the most recent date backwards."""
-    pairs = [(dates[i] - dates[i - 1]).days for i in range(len(dates) - 1, 0, -1)]
-    return 1 + sum(1 for _ in takewhile(lambda d: d == 1, pairs))
-
-def _compute_streak(sessions):
-    """Return the current consecutive-day streak."""
-    dates = sorted(set(s.end_time.date() for s in sessions))
-    if not dates:
-        return 0
-    streak = _count_trailing_streak(dates)
-    return streak if dates[-1] == timezone.now().date() else 0
-
 def _format_upcoming(user):
     """Return formatted string of upcoming calendar events."""
     upcoming = CalendarEvent.objects.filter(
@@ -94,21 +73,34 @@ def _format_upcoming(user):
         return '  None scheduled'
     return '\n'.join(f"  - {e.title} on {e.start_time.strftime('%A %d %b at %H:%M')}" for e in upcoming)
 
-def _build_stats_lines(sessions, themes):
-    """Return a formatted multi-line string of study statistics."""
+def _build_stats_summary(sessions, themes):
+    """Return a dict of core statistics for a user's study data."""
     total_study, total_break, total_pause, count, avg, overtime = _compute_session_stats(sessions)
     dark_pct = _compute_theme_pct(themes)
     owl_label = 'likely a night owl' if dark_pct > 60 else 'prefers daytime work'
+    current_streak, _ = compute_streaks(list(sessions))
+    peak_hour = compute_peak_hour(list(sessions))
+    return {
+        'total_study': total_study, 'total_break': total_break, 'total_pause': total_pause,
+        'count': count, 'avg': avg, 'overtime': overtime,
+        'dark_pct': dark_pct, 'owl_label': owl_label,
+        'current_streak': current_streak, 'peak_hour': peak_hour,
+    }
+
+
+def _build_stats_lines(sessions, themes):
+    """Return a formatted multi-line string of study statistics."""
+    stats = _build_stats_summary(sessions, themes)
     return (
-        f"- Total study sessions: {count}\n"
-        f"- Total study time: {round(total_study / 60, 1)} hours\n"
-        f"- Total break time: {round(total_break / 60, 1)} hours\n"
-        f"- Total pause duration: {round(total_pause / 60, 1)} minutes\n"
-        f"- Average session length: {avg} minutes\n"
-        f"- Overtime sessions: {overtime} (ran past planned time)\n"
-        f"- Current streak: {_compute_streak(sessions)} consecutive days\n"
-        f"- Peak study hours: {_compute_peak_hours(sessions)}\n"
-        f"- Dark mode usage: {dark_pct}% ({owl_label})"
+        f"- Total study sessions: {stats['count']}\n"
+        f"- Total study time: {round(stats['total_study'] / 60, 1)} hours\n"
+        f"- Total break time: {round(stats['total_break'] / 60, 1)} hours\n"
+        f"- Total pause duration: {round(stats['total_pause'] / 60, 1)} minutes\n"
+        f"- Average session length: {stats['avg']} minutes\n"
+        f"- Overtime sessions: {stats['overtime']} (ran past planned time)\n"
+        f"- Current streak: {stats['current_streak']} consecutive days\n"
+        f"- Peak study hour: {_fmt_hour(stats['peak_hour'])}\n"
+        f"- Dark mode usage: {stats['dark_pct']}% ({stats['owl_label']})"
     )
 
 def _build_user_context(user, days=30):

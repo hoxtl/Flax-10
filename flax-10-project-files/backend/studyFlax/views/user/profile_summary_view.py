@@ -15,29 +15,7 @@ from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
 from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.society import SocietyMembership
-
-def _sorted_unique_dates(sessions):
-    """Extract sorted unique dates from a list of study sessions."""
-    return sorted(set(s.end_time.date() for s in sessions))
-
-def _advance_streak(current, longest, diff):
-    """Update streak counters based on the gap in days between two dates."""
-    if diff == 1:
-        current += 1
-        return current, max(longest, current)
-    return 1, longest
-
-def compute_streaks(sessions):
-    """Return (active_streak, longest_streak) from session history."""
-    dates = _sorted_unique_dates(sessions)
-    if not dates:
-        return 0, 0
-    longest = current = 1
-    for i in range(1, len(dates)):
-        current, longest = _advance_streak(current, longest, (dates[i] - dates[i - 1]).days)
-    today = timezone.now().date()
-    active_streak = current if dates[-1] >= today - timedelta(days=1) else 0
-    return active_streak, longest
+from studyFlax.views.analytics.session_analytics_service import compute_peak_hour, compute_recent_active_days, compute_streaks
 
 PERSONAS = [
     {'id': 'night_owl', 'label': 'Night Owl', 'emoji': '🦉',
@@ -56,18 +34,9 @@ PERSONAS = [
 
 def _collect_session_stats(sessions):
     """Return (peak_hour, avg_duration, is_consistent) from sessions."""
-    hour_totals = defaultdict(int)
-    durations = []
-    for s in sessions:
-        hour_totals[s.end_time.hour] += s.duration
-        durations.append(s.duration)
-    peak_hour = max(hour_totals, key=hour_totals.get)
-    avg_duration = sum(durations) / len(durations) if durations else 0
-    recent_dates = set(
-        s.end_time.date() for s in sessions
-        if s.end_time >= timezone.now() - timedelta(days=7)
-    )
-    return peak_hour, avg_duration, len(recent_dates) >= 5
+    peak_hour = compute_peak_hour(sessions)
+    avg_duration = sum(s.duration for s in sessions) / len(sessions) if sessions else 0
+    return peak_hour, avg_duration, compute_recent_active_days(sessions, 7) >= 5
 
 def derive_persona(sessions):
     if not sessions:
