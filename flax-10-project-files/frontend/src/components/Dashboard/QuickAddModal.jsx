@@ -220,8 +220,6 @@ function ScheduleAutoForm({ onDone }) {
     if (!deadlines.length) return addNotification({ title: 'No deadlines', message: 'No upcoming deadlines to auto-schedule.', notification_type: 'general' });
     const payload = {
       title: title.trim() || 'Auto schedule',
-      worktime_preference: 'both',
-      week_preference: 'both',
       deadline_preferences: deadlines.map(d => ({ deadline_id: d.id, ideal_minutes_per_day: 60 })),
     };
     try {

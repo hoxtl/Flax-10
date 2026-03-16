@@ -36,8 +36,6 @@ export function buildScheduleAutoForm({ deadlines = [] } = {}) {
 
   return {
     title: `Homepage auto schedule ${new Date().toLocaleDateString('en-GB')}`,
-    worktime_preference: 'both',
-    week_preference: 'both',
     clear_existing: false,
     deadline_preferences: prefs,
   };

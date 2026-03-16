@@ -24,8 +24,8 @@ def _resolved_preferences(user, payload):
     return {
         'preferred_start_time': preferred_start,
         'preferred_end_time': preferred_end,
-        'worktime_preference': worktime_preference or 'both',
-        'week_preference': week_preference or 'both',
+        'worktime_preference': worktime_preference,
+        'week_preference': week_preference,
     }
 
 def _resolve_window(current_day, preferred_start, preferred_end, worktime_preference):
@@ -35,9 +35,9 @@ def _resolve_window(current_day, preferred_start, preferred_end, worktime_prefer
             datetime.combine(current_day, preferred_end),
         )
     if worktime_preference == 'day':
-        return datetime.combine(current_day, time(8, 0)), datetime.combine(current_day, time(20, 0))
+        return datetime.combine(current_day, time(8, 0)), datetime.combine(current_day, time(18, 0))
     if worktime_preference == 'night':
-        return datetime.combine(current_day, time(20, 0)), datetime.combine(current_day + timedelta(days=1), time(2, 0))
+        return datetime.combine(current_day, time(18, 0)), datetime.combine(current_day + timedelta(days=1), time(2, 0))
     return datetime.combine(current_day, time(8, 0)), datetime.combine(current_day, time(23, 0))
 
 

@@ -1143,8 +1143,6 @@ describe('Homepage', () => {
     fireEvent.click(replanButton);
     await waitFor(() => expect(createSchedule).toHaveBeenCalledWith(expect.objectContaining({
       deadline_preferences: expect.any(Array),
-      worktime_preference: 'both',
-      week_preference: 'both',
     })));
   });
 
