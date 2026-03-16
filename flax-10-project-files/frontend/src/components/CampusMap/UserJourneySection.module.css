@@ -49,14 +49,15 @@
   box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
+.goButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 .goButton:disabled {
   background: var(--muted);
   cursor: not-allowed;
   opacity: 0.6;
-}
-
-.goButton:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .clearManualButton {
