@@ -58,6 +58,25 @@
   justify-content: space-between;
   gap: var(--space-4);
   margin-bottom: var(--space-5);
+  position: relative;
+}
+
+.headerCentered {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-right: 0;
+}
+
+.headerCentered .title,
+.headerCentered .sub {
+  text-align: center;
+}
+
+.headerCentered .close {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .title {
@@ -103,4 +122,10 @@
 .content {
   overflow-y: auto;
   flex: 1;
+}
+.contentCentered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
