@@ -30,15 +30,17 @@
 
 .goButton {
   flex: 1;
-  padding: 12px;
   background: var(--primary);
-  color: var(--c-white);
+  color: #ffffff;
   border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.18s, transform 0.12s, box-shadow 0.18s;
+  font-family: var(--font-body);
+  letter-spacing: 0.01em;
 }
 
 .goButton:hover:not(:disabled) {
