@@ -1,5 +1,5 @@
 """
-Event, module, lecture and deadline building factories for the seed command.
+Factories for building calendar events, lectures, meals and deadlines.
 """
 
 import random

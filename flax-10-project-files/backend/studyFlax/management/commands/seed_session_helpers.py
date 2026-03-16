@@ -1,5 +1,5 @@
 """
-Study session and theme session building factories for the seed command.
+Factories for building study sessions and theme sessions.
 """
 
 import random

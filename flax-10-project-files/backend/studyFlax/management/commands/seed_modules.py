@@ -1,5 +1,5 @@
 """
-Module, enrollment and deadline creation helpers for the seed management command.
+Orchestrates creation of modules, enrolments and deadlines.
 """
 
 from collections import defaultdict

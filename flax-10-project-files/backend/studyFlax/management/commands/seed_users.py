@@ -1,5 +1,5 @@
 """
-User creation helpers for the seed management command.
+Orchestrates creation of admin, fixture and random users with settings.
 """
 
 import random

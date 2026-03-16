@@ -1,5 +1,5 @@
 """
-Study session and theme session creation helpers for the seed command.
+Orchestrates bulk creation of study sessions and theme sessions.
 """
 
 from django.contrib.auth import get_user_model

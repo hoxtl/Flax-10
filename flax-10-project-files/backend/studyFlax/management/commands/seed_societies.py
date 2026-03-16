@@ -1,5 +1,5 @@
 """
-Society, membership, event and image creation helpers for the seed management command.
+Orchestrates creation of societies, memberships, events and images.
 """
 
 import random

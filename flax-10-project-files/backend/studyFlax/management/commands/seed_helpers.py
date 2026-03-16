@@ -1,9 +1,5 @@
 """
-User building and reading factories for the seed management command.
-
-Each public function is a pure factory — it constructs model instances or
-performs targeted get_or_create calls without orchestrating the overall
-seeding flow. Orchestration lives in seed.Command.
+Factories for building User instances and Reading task history.
 """
 
 import random

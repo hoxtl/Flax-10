@@ -1,5 +1,5 @@
 """
-Task creation helpers for the seed management command.
+Orchestrates creation of task lists and tasks for seeded users.
 """
 
 from datetime import timedelta

@@ -1,5 +1,5 @@
 """
-Calendar event creation helpers for the seed command.
+Orchestrates bulk creation of calendar events for all users.
 """
 
 from studyFlax.models import CalendarEvent

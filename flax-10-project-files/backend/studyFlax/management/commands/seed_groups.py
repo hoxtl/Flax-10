@@ -1,5 +1,5 @@
 """
-Group project, membership and task creation helpers for the seed management command.
+Orchestrates creation of group projects, memberships and group tasks.
 """
 
 import random
