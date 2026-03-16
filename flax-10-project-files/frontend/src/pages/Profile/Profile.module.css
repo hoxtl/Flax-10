@@ -744,6 +744,22 @@
   padding-bottom: 4px;
 }
 
+.attendanceWarning {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+  color: white;
+  padding: 3px 12px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 12px rgba(239, 83, 80, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .goalSaveBtn {
   padding: 6px 14px;
   background: var(--primary);
